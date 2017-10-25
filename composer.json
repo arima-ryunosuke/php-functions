@@ -1,0 +1,57 @@
+{
+  "config": {
+    "platform": {
+      "php": "5.4.16"
+    }
+  },
+  "name": "ryunosuke/functions",
+  "description": "Utility functions for PHP",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "ryunosuke",
+      "email": "ryunosuke.arima@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ryunosuke\\Functions\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ryunosuke\\Test\\": "tests/Test/"
+    }
+  },
+  "require": {
+    "php": ">=5.4",
+    "psr/simple-cache": "^1.0",
+    "symfony/polyfill-php55": "*"
+  },
+  "require-dev": {
+    "apigen/apigen": "4.1.*",
+    "phpunit/phpunit": "4.*"
+  },
+  "scripts": {
+    "build": [
+      "@composer export",
+      "@composer test",
+      "@composer document"
+    ],
+    "export": [
+      "ryunosuke\\Functions\\Loader::export"
+    ],
+    "test": [
+      "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=global    vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=namespace vendor/bin/phpunit --configuration=tests/phpunit.xml"
+    ],
+    "test-coverage": [
+      "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
+    ],
+    "document": [
+      "rm -rf docs/html",
+      "vendor/bin/apigen generate -s src/package -d docs/html --template-config docs/theme/config.neon"
+    ]
+  }
+}

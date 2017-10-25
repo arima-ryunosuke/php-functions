@@ -1,0 +1,10 @@
+/composer.lock
+/vendor
+/tests/coverage
+/tests/namespace/*
+!/tests/namespace/.gitkeep
+/tests/example-code/*
+!/tests/example-code/.gitkeep
+/tests/temporary/*
+!/tests/temporary/.gitkeep
+/tests/phpunit.xml
