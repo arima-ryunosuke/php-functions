@@ -19,7 +19,7 @@ php-function
 
 ## Usage
 
-各リファレンスは docs/index.html を参照してください。
+各リファレンスは https://arima-ryunosuke.github.io/php-functions/ を参照してください。
 
 ### import
 
