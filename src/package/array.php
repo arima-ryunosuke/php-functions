@@ -292,20 +292,52 @@ function array_get($array, $key, $default = null)
 /**
  * 伏せると同時にその値を返す
  *
+ * $key に配列を与えると全て伏せて配列で返す。
+ * その場合、$default が活きるのは「全て無かった場合」となる。
+ *
+ * 配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
+ * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
+ *
  * Example:
  * ```php
  * $array = ['a' => 'A', 'b' => 'B'];
+ * // ない場合は $default を返す
+ * assert(array_unset($array, 'x', 'X') === 'X');
+ * // 指定したキーを返す。そのキーは伏せられている
  * assert(array_unset($array, 'a') === 'A');
  * assert($array === ['b' => 'B']);
+ *
+ * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 配列を与えるとそれらを返す。そのキーは全て伏せられている
+ * assert(array_unset($array, ['a', 'b', 'x']) === ['A', 'B']);
+ * assert($array === ['c' => 'C']);
+ *
+ * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 配列のキーは返されるキーを表す。順番も維持される
+ * assert(array_unset($array, ['x2' => 'b', 'x1' => 'a']) === ['x2' => 'B', 'x1' => 'A']);
  * ```
  *
  * @param array $array 配列
- * @param string|int $key 伏せたいキー
+ * @param string|int|array $key 伏せたいキー。配列を与えると全て伏せる
  * @param mixed $default 無かった場合のデフォルト値
  * @return mixed 指定したキーの値
  */
 function array_unset(&$array, $key, $default = null)
 {
+    if (is_array($key)) {
+        $result = [];
+        foreach ($key as $rk => $ak) {
+            if (array_key_exists($ak, $array)) {
+                $result[$rk] = $array[$ak];
+                unset($array[$ak]);
+            }
+        }
+        if (!$result) {
+            return $default;
+        }
+        return $result;
+    }
+
     if (array_key_exists($key, $array)) {
         $result = $array[$key];
         unset($array[$key]);

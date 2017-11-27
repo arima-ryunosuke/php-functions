@@ -78,11 +78,25 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_unset()
     {
+        // single
         $array = ['a' => 'A', 'b' => 'B'];
         $this->assertEquals('A', array_unset($array, 'a'));
         $this->assertEquals(['b' => 'B'], $array);
         $this->assertEquals('X', array_unset($array, 'x', 'X'));
         $this->assertEquals(['b' => 'B'], $array);
+
+        // array
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertEquals('X', array_unset($array, ['x'], 'X'));
+        $this->assertEquals(['X'], array_unset($array, ['x'], ['X']));
+        $this->assertEquals(['A', 'B'], array_unset($array, ['a', 'b', 'x']));
+        $this->assertEquals(['c' => 'C'], $array);
+
+        // array with key
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertSame(['B', 'A'], array_unset($array, ['b', 'a']));
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertSame([1 => 'A', 0 => 'B'], array_unset($array, [1 => 'a', 0 => 'b']));
     }
 
     function test_array_dive()
