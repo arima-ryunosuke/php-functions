@@ -44,6 +44,7 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
 
         class_replace('\\ryunosuke\\Test\\package\\Classobj\\B', function () {
             require_once __DIR__ . '/Classobj/B_.php';
+            /** @noinspection PhpUndefinedClassInspection */
             return new \B();
         });
 

@@ -59,7 +59,7 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
             foreach ($matches as $match) {
                 $exfile = __DIR__ . '/../example-code/' . $dir . '/' . $name . '.php';
                 @mkdir(dirname($exfile));
-                file_put_contents($exfile, '<?php ' . preg_replace('#^ \* #um', '', $match[1]));
+                file_put_contents($exfile, '<?php ' . preg_replace('#^ \* ?#um', '', $match[1]));
                 include $exfile;
             }
         }

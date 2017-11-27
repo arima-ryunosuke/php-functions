@@ -138,6 +138,7 @@ function class_replace($class, $register, $dirname = null)
     }
     // php7.0 から無名クラスが使えるのでそのクラス名でエイリアスする
     if (is_object($newclass)) {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $newclass = get_class($newclass);
     }
 
