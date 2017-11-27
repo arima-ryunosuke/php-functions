@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Function array_depth</title>
+	<title>Function array_order</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?4bb6454ea5dbd127d475d6edffaf8eda279d79a3">
@@ -89,7 +89,7 @@
 			<ul>
 				<li><a href="function-array_assort.html">array_assort<small class="summary">: 配列をコールバックに従って分類する</small></a></li>
 				<li><a href="function-array_columns.html">array_columns<small class="summary">: 全要素に対して array_column する</small></a></li>
-				<li class="active"><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
+				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
 				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
@@ -103,7 +103,7 @@
 				<li><a href="function-array_map_key.html">array_map_key<small class="summary">: キーをマップして変換する</small></a></li>
 				<li><a href="function-array_map_method.html">array_map_method<small class="summary">: メソッドを指定できるようにした array_map</small></a></li>
 				<li><a href="function-array_nmap.html">array_nmap<small class="summary">: 要素値を $callback の n 番目(0ベース)に適用して array_map する</small></a></li>
-				<li><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
+				<li class="active"><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
 				<li><a href="function-array_pos.html">array_pos<small class="summary">: 配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small></a></li>
 				<li><a href="function-array_rmap.html">array_rmap<small class="summary">: 要素値を $callback の最右に適用して array_map する</small></a></li>
 				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
@@ -127,20 +127,32 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="function">
-	<h1>Function array_depth</h1>
+	<h1>Function array_order</h1>
 
 
 	<div class="description">
-	<p>配列の次元数を返す</p>
+	<p>配列を $orders に従って並べ替える</p>
 
-<p>フラット配列は 1 と定義する。
-つまり、配列を与える限りは 0 以下を返すことはない。</p>
+<p>データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' => 'value'])にも対応している。
+その場合 $orders に配列ではなく直値を渡せば良い。</p>
+
+<p>$orders には下記のような配列を渡す。</p>
+
+<pre><span class="php-var">$orders</span> = [
+<span class="php-quote">'col1'</span> =&gt; <span class="php-keyword1">true</span>,                               <span class="php-comment">// true: 昇順, false: 降順。照合は型に依存</span>
+<span class="php-quote">'col2'</span> =&gt; SORT_NATURAL,                       <span class="php-comment">// SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順</span>
+<span class="php-quote">'col3'</span> =&gt; [<span class="php-quote">'sort'</span>, <span class="php-quote">'this'</span>, <span class="php-quote">'order'</span>],          <span class="php-comment">// 指定した配列順で昇順</span>
+<span class="php-quote">'col4'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) {<span class="php-keyword1">return</span> <span class="php-var">$v</span>;},          <span class="php-comment">// クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存</span>
+<span class="php-quote">'col5'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>) {<span class="php-keyword1">return</span> <span class="php-var">$a</span> - <span class="php-var">$b</span>;}, <span class="php-comment">// クロージャで比較して昇順（いわゆる比較関数を渡す）</span>
+];</pre>
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_depth([])                       === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(array_depth([<span class="php-quote">'hoge'</span>])                 === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(array_depth([[<span class="php-quote">'nest1'</span> =&gt; [<span class="php-quote">'nest2'</span>]]]) === <span class="php-num">3</span>);</pre>
+<pre><span class="php-var">$v1</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-quote">'1'</span>, <span class="php-quote">'no'</span> =&gt; <span class="php-quote">'a03'</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'yyy'</span>];
+<span class="php-var">$v2</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-quote">'2'</span>, <span class="php-quote">'no'</span> =&gt; <span class="php-quote">'a4'</span>,  <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'yyy'</span>];
+<span class="php-var">$v3</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-quote">'3'</span>, <span class="php-quote">'no'</span> =&gt; <span class="php-quote">'a12'</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'xxx'</span>];
+<span class="php-comment">// name 昇順, no 自然降順</span>
+<span class="php-keyword2">assert</span>(array_order([<span class="php-var">$v1</span>, <span class="php-var">$v2</span>, <span class="php-var">$v3</span>], [<span class="php-quote">'name'</span> =&gt; <span class="php-keyword1">true</span>, <span class="php-quote">'no'</span> =&gt; -SORT_NATURAL]) === [<span class="php-var">$v3</span>, <span class="php-var">$v2</span>, <span class="php-var">$v1</span>]);</pre>
 	</div>
 
 
@@ -150,7 +162,17 @@
 		<tr id="$array">
 			<td class="name"><code>array</code></td>
 			<td class="value"><code><var>$array</var></code></td>
-			<td>調べる配列</td>
+			<td>対象配列</td>
+		</tr>
+		<tr id="$orders">
+			<td class="name"><code>mixed</code></td>
+			<td class="value"><code><var>$orders</var></code></td>
+			<td>ソート順</td>
+		</tr>
+		<tr id="$preserve_keys">
+			<td class="name"><code>boolean</code></td>
+			<td class="value"><code><var>$preserve_keys</var> = <span class="php-keyword1">false</span></code></td>
+			<td>キーを保存するか。 false の場合数値キーは振り直される</td>
 		</tr>
 		</table>
 	</div>
@@ -160,10 +182,10 @@
 		<table class="summary table table-bordered" id="returns">
 		<tr>
 			<td class="name"><code>
-				integer
+				array
 			</code></td>
 			<td>
-				次元数。素のフラット配列は 1
+				並び替えられた配列
 			</td>
 		</tr>
 		</table>
@@ -174,7 +196,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_depth.html#712-740" title="Go to source code">
+		<a href="source-function-array_order.html#809-945" title="Go to source code">
 			array.php
 		</a><br>
 	</div>

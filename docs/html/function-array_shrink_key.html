@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Function array_depth</title>
+	<title>Function array_shrink_key</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?4bb6454ea5dbd127d475d6edffaf8eda279d79a3">
@@ -89,7 +89,7 @@
 			<ul>
 				<li><a href="function-array_assort.html">array_assort<small class="summary">: 配列をコールバックに従って分類する</small></a></li>
 				<li><a href="function-array_columns.html">array_columns<small class="summary">: 全要素に対して array_column する</small></a></li>
-				<li class="active"><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
+				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
 				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
@@ -106,7 +106,7 @@
 				<li><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
 				<li><a href="function-array_pos.html">array_pos<small class="summary">: 配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small></a></li>
 				<li><a href="function-array_rmap.html">array_rmap<small class="summary">: 要素値を $callback の最右に適用して array_map する</small></a></li>
-				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
+				<li class="active"><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
 				<li><a href="function-array_uncolumns.html">array_uncolumns<small class="summary">: array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する</small></a></li>
 				<li><a href="function-array_unset.html">array_unset<small class="summary">: 伏せると同時にその値を返す</small></a></li>
 				<li><a href="function-arrayize.html">arrayize<small class="summary">: 引数の配列を生成する。</small></a></li>
@@ -127,20 +127,22 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="function">
-	<h1>Function array_depth</h1>
+	<h1>Function array_shrink_key</h1>
 
 
 	<div class="description">
-	<p>配列の次元数を返す</p>
+	<p>値の優先順位を逆にした array_intersect_key</p>
 
-<p>フラット配列は 1 と定義する。
-つまり、配列を与える限りは 0 以下を返すことはない。</p>
+<p>array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。
+「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。</p>
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_depth([])                       === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(array_depth([<span class="php-quote">'hoge'</span>])                 === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(array_depth([[<span class="php-quote">'nest1'</span> =&gt; [<span class="php-quote">'nest2'</span>]]]) === <span class="php-num">3</span>);</pre>
+<pre><span class="php-var">$array1</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A1'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B1'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C1'</span>];
+<span class="php-var">$array2</span> = [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C2'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B2'</span>, <span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A2'</span>];
+<span class="php-var">$array3</span> = [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C3'</span>, <span class="php-quote">'dummy'</span> =&gt; <span class="php-quote">'DUMMY'</span>];
+<span class="php-comment">// 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる</span>
+<span class="php-keyword2">assert</span>(array_shrink_key(<span class="php-var">$array1</span>, <span class="php-var">$array2</span>, <span class="php-var">$array3</span>) === [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C3'</span>]);</pre>
 	</div>
 
 
@@ -150,7 +152,12 @@
 		<tr id="$array">
 			<td class="name"><code>array</code></td>
 			<td class="value"><code><var>$array</var></code></td>
-			<td>調べる配列</td>
+			<td>対象配列</td>
+		</tr>
+		<tr id="$arrays">
+			<td class="name"><code>array</code></td>
+			<td class="value"><code><var>$arrays</var>,…</code></td>
+			<td>比較する配列</td>
 		</tr>
 		</table>
 	</div>
@@ -160,10 +167,10 @@
 		<table class="summary table table-bordered" id="returns">
 		<tr>
 			<td class="name"><code>
-				integer
+				array
 			</code></td>
 			<td>
-				次元数。素のフラット配列は 1
+				新しい配列
 			</td>
 		</tr>
 		</table>
@@ -174,7 +181,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_depth.html#712-740" title="Go to source code">
+		<a href="source-function-array_shrink_key.html#948-972" title="Go to source code">
 			array.php
 		</a><br>
 	</div>

@@ -103,8 +103,10 @@
 				<li><a href="function-array_map_key.html">array_map_key<small class="summary">: キーをマップして変換する</small></a></li>
 				<li><a href="function-array_map_method.html">array_map_method<small class="summary">: メソッドを指定できるようにした array_map</small></a></li>
 				<li><a href="function-array_nmap.html">array_nmap<small class="summary">: 要素値を $callback の n 番目(0ベース)に適用して array_map する</small></a></li>
+				<li><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
 				<li><a href="function-array_pos.html">array_pos<small class="summary">: 配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small></a></li>
 				<li><a href="function-array_rmap.html">array_rmap<small class="summary">: 要素値を $callback の最右に適用して array_map する</small></a></li>
+				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
 				<li><a href="function-array_uncolumns.html">array_uncolumns<small class="summary">: array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する</small></a></li>
 				<li class="active"><a href="function-array_unset.html">array_unset<small class="summary">: 伏せると同時にその値を返す</small></a></li>
 				<li><a href="function-arrayize.html">arrayize<small class="summary">: 引数の配列を生成する。</small></a></li>
@@ -131,11 +133,29 @@
 	<div class="description">
 	<p>伏せると同時にその値を返す</p>
 
+<p>$key に配列を与えると全て伏せて配列で返す。
+その場合、$default が活きるのは「全て無かった場合」となる。</p>
+
+<p>配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
+これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。</p>
+
 <p>Example:</p>
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>];
+<span class="php-comment">// ない場合は $default を返す</span>
+<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>, <span class="php-quote">'X'</span>) === <span class="php-quote">'X'</span>);
+<span class="php-comment">// 指定したキーを返す。そのキーは伏せられている</span>
 <span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, <span class="php-quote">'a'</span>) === <span class="php-quote">'A'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$array</span> === [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>]);</pre>
+<span class="php-keyword2">assert</span>(<span class="php-var">$array</span> === [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>]);
+
+<span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>];
+<span class="php-comment">// 配列を与えるとそれらを返す。そのキーは全て伏せられている</span>
+<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'x'</span>]) === [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]);
+<span class="php-keyword2">assert</span>(<span class="php-var">$array</span> === [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]);
+
+<span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>];
+<span class="php-comment">// 配列のキーは返されるキーを表す。順番も維持される</span>
+<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, [<span class="php-quote">'x2'</span> =&gt; <span class="php-quote">'b'</span>, <span class="php-quote">'x1'</span> =&gt; <span class="php-quote">'a'</span>]) === [<span class="php-quote">'x2'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'x1'</span> =&gt; <span class="php-quote">'A'</span>]);</pre>
 	</div>
 
 
@@ -148,9 +168,9 @@
 			<td>配列</td>
 		</tr>
 		<tr id="$key">
-			<td class="name"><code>string|integer</code></td>
+			<td class="name"><code>string|integer|array</code></td>
 			<td class="value"><code><var>$key</var></code></td>
-			<td>伏せたいキー</td>
+			<td>伏せたいキー。配列を与えると全て伏せる</td>
 		</tr>
 		<tr id="$default">
 			<td class="name"><code>mixed</code></td>
@@ -179,7 +199,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_unset.html#292-315" title="Go to source code">
+		<a href="source-function-array_unset.html#283-338" title="Go to source code">
 			array.php
 		</a><br>
 	</div>
@@ -192,6 +212,6 @@
 	</div>
 </div>
 <script src="resources/combined.js?64829dd0598cd54a3fd46ce58f8efe7e2fac9ecc"></script>
-<script src="elementlist.js?cacfab17473a4300a259d03bf03c67230b8001b0"></script>
+<script src="elementlist.js?126bd6c95b8435693cf10370e961aa6442ab73c9"></script>
 </body>
 </html>

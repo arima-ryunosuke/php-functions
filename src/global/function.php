@@ -65,7 +65,7 @@ function is_hasharray(array $array)
 /**
  * 配列の最初のキーを返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -79,18 +79,18 @@ function is_hasharray(array $array)
  */
 function first_key($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = first_keyvalue($array);
-        return $k;
+    if (empty($array)) {
+        return $default;
     }
-    return first_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = first_keyvalue($array);
+    return $k;
 }
 
 /**
  * 配列の最初の値を返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -104,18 +104,18 @@ function first_key($array, $default = null)
  */
 function first_value($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = first_keyvalue($array);
-        return $v;
+    if (empty($array)) {
+        return $default;
     }
-    return first_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = first_keyvalue($array);
+    return $v;
 }
 
 /**
  * 配列の最初のキー/値ペアをタプルで返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -132,16 +132,13 @@ function first_keyvalue($array, $default = null)
     foreach ($array as $k => $v) {
         return [$k, $v];
     }
-    if (func_num_args() === 1) {
-        throw new \OutOfBoundsException("array is empty.");
-    }
     return $default;
 }
 
 /**
  * 配列の最後のキーを返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -155,18 +152,18 @@ function first_keyvalue($array, $default = null)
  */
 function last_key($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = last_keyvalue($array);
-        return $k;
+    if (empty($array)) {
+        return $default;
     }
-    return last_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = last_keyvalue($array);
+    return $k;
 }
 
 /**
  * 配列の最後の値を返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -180,18 +177,18 @@ function last_key($array, $default = null)
  */
 function last_value($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = last_keyvalue($array);
-        return $v;
+    if (empty($array)) {
+        return $default;
     }
-    return last_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = last_keyvalue($array);
+    return $v;
 }
 
 /**
  * 配列の最後のキー/値ペアをタプルで返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -213,9 +210,6 @@ function last_keyvalue($array, $default = null)
     if (isset($k)) {
         /** @noinspection PhpUndefinedVariableInspection */
         return [$k, $v];
-    }
-    if (func_num_args() === 1) {
-        throw new \OutOfBoundsException("array is empty.");
     }
     return $default;
 }
@@ -265,7 +259,7 @@ function array_pos($array, $position, $return_key = false)
 /**
  * デフォルト値付きの配列値取得
  *
- * 存在しない場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 存在しない場合は $default を返す。
  *
  * Example:
  * ```php
@@ -283,29 +277,58 @@ function array_get($array, $key, $default = null)
     if (array_key_exists($key, $array)) {
         return $array[$key];
     }
-    if (func_num_args() === 2) {
-        throw new \OutOfBoundsException("undefined '$key'.");
-    }
     return $default;
 }
 
 /**
  * 伏せると同時にその値を返す
  *
+ * $key に配列を与えると全て伏せて配列で返す。
+ * その場合、$default が活きるのは「全て無かった場合」となる。
+ *
+ * 配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
+ * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
+ *
  * Example:
  * ```php
  * $array = ['a' => 'A', 'b' => 'B'];
+ * // ない場合は $default を返す
+ * assert(array_unset($array, 'x', 'X') === 'X');
+ * // 指定したキーを返す。そのキーは伏せられている
  * assert(array_unset($array, 'a') === 'A');
  * assert($array === ['b' => 'B']);
+ *
+ * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 配列を与えるとそれらを返す。そのキーは全て伏せられている
+ * assert(array_unset($array, ['a', 'b', 'x']) === ['A', 'B']);
+ * assert($array === ['c' => 'C']);
+ *
+ * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 配列のキーは返されるキーを表す。順番も維持される
+ * assert(array_unset($array, ['x2' => 'b', 'x1' => 'a']) === ['x2' => 'B', 'x1' => 'A']);
  * ```
  *
  * @param array $array 配列
- * @param string|int $key 伏せたいキー
+ * @param string|int|array $key 伏せたいキー。配列を与えると全て伏せる
  * @param mixed $default 無かった場合のデフォルト値
  * @return mixed 指定したキーの値
  */
 function array_unset(&$array, $key, $default = null)
 {
+    if (is_array($key)) {
+        $result = [];
+        foreach ($key as $rk => $ak) {
+            if (array_key_exists($ak, $array)) {
+                $result[$rk] = $array[$ak];
+                unset($array[$ak]);
+            }
+        }
+        if (!$result) {
+            return $default;
+        }
+        return $result;
+    }
+
     if (array_key_exists($key, $array)) {
         $result = $array[$key];
         unset($array[$key]);
@@ -317,7 +340,7 @@ function array_unset(&$array, $key, $default = null)
 /**
  * パス形式で配列値を取得
  *
- * 存在しない場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 存在しない場合は $default を返す。
  *
  * Example:
  * ```php
@@ -342,9 +365,6 @@ function array_dive($array, $path, $default = null, $delimiter = '.')
 {
     foreach (explode($delimiter, $path) as $key) {
         if (!array_key_exists($key, $array)) {
-            if (func_num_args() === 2) {
-                throw new \OutOfBoundsException("undefined '$key'.");
-            }
             return $default;
         }
         $array = $array[$key];
@@ -787,6 +807,171 @@ function array_assort($array, $rules)
 }
 
 /**
+ * 配列を $orders に従って並べ替える
+ *
+ * データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' => 'value'])にも対応している。
+ * その場合 $orders に配列ではなく直値を渡せば良い。
+ *
+ * $orders には下記のような配列を渡す。
+ *
+ * ```php
+ * $orders = [
+ * 'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
+ * 'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+ * 'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
+ * 'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+ * 'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+ * ];
+ * ```
+ *
+ * Example:
+ * ```php
+ * $v1 = ['id' => '1', 'no' => 'a03', 'name' => 'yyy'];
+ * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
+ * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
+ * // name 昇順, no 自然降順
+ * assert(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]) === [$v3, $v2, $v1]);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param mixed $orders ソート順
+ * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
+ * @return array 並び替えられた配列
+ */
+function array_order(array $array, $orders, $preserve_keys = false)
+{
+    if (count($array) <= 1) {
+        return $array;
+    }
+
+    if (!is_array($orders) || !is_hasharray($orders)) {
+        $orders = [$orders];
+    }
+
+    // 配列内の位置をマップして返すクロージャ
+    $position = function ($columns, $order) {
+        return array_map(function ($v) use ($order) {
+            $ndx = array_search($v, $order, true);
+            return $ndx === false ? count($order) : $ndx;
+        }, $columns);
+    };
+
+    // 全要素は舐めてられないので最初の要素を代表選手としてピックアップ
+    $first = reset($array);
+    $is_scalar = is_scalar($first) || is_null($first);
+
+    // array_multisort 用の配列を生成
+    $args = [];
+    foreach ($orders as $key => $order) {
+        if ($is_scalar) {
+            $firstval = reset($array);
+            $columns = $array;
+        }
+        else {
+            if (!array_key_exists($key, $first)) {
+                throw new \InvalidArgumentException("$key is undefined.");
+            }
+            $firstval = $first[$key];
+            $columns = array_column($array, $key);
+        }
+
+        // bool は ASC, DESC
+        if (is_bool($order)) {
+            $args[] = $columns;
+            $args[] = $order ? SORT_ASC : SORT_DESC;
+            $args[] = is_string($firstval) ? SORT_STRING : SORT_NUMERIC;
+        }
+        // int は SORT_*****
+        else if (is_int($order)) {
+            $args[] = $columns;
+            $args[] = $order > 0 ? SORT_ASC : SORT_DESC;
+            $args[] = abs($order);
+        }
+        // 配列はその並び
+        else if (is_array($order)) {
+            $args[] = $position($columns, $order);
+            $args[] = SORT_ASC;
+            $args[] = SORT_NUMERIC;
+        }
+        // クロージャは色々
+        else if ($order instanceof \Closure) {
+            $ref = new \ReflectionFunction($order);
+            // 引数2個なら比較関数
+            if ($ref->getNumberOfParameters() === 2) {
+                $map = $columns;
+                usort($map, $order);
+                $args[] = $position($columns, $map);
+                $args[] = SORT_ASC;
+                $args[] = SORT_NUMERIC;
+            }
+            // でないなら通した値で比較
+            else {
+                $arg = array_map($order, $columns);
+                // @codeCoverageIgnoreStart
+                if (method_exists($ref, 'hasReturnType') && $ref->hasReturnType()) {
+                    // getReturnType があるならそれに基づく
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $type = (string) $ref->getReturnType();
+                }
+                // @codeCoverageIgnoreEnd
+                else {
+                    // ないなら返り値の型から推測
+                    $type = gettype(reset($arg));
+                }
+                $args[] = $arg;
+                $args[] = SORT_ASC;
+                $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
+            }
+        }
+        else {
+            throw new \DomainException('$order is invalid.');
+        }
+    }
+
+    // array_multisort はキーを保持しないので、ソートされる配列にキー配列を加えて後で combine する
+    if ($preserve_keys) {
+        $keys = array_keys($array);
+        $args[] =& $array;
+        $args[] =& $keys;
+        call_user_func_array('array_multisort', $args);
+        return array_combine($keys, $array);
+    }
+    // キーを保持しないなら単純呼び出しで OK
+    else {
+        $args[] =& $array;
+        call_user_func_array('array_multisort', $args);
+        return $array;
+    }
+}
+
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * 値の優先順位を逆にした array_intersect_key
+ *
+ * array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。
+ * 「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。
+ *
+ * Example:
+ * ```php
+ * $array1 = ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'];
+ * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
+ * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
+ * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
+ * assert(array_shrink_key($array1, $array2, $array3) === ['c' => 'C3']);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param array $arrays 比較する配列
+ * @return array 新しい配列
+ */
+function array_shrink_key(array $array)
+{
+    $args = func_get_args();
+    array_unshift($args, call_user_func_array('array_replace', $args));
+    return call_user_func_array('array_intersect_key', $args);
+}
+
+/**
  * 全要素に対して array_column する
  *
  * 行列が逆転するイメージ。
@@ -990,6 +1175,7 @@ function class_replace($class, $register, $dirname = null)
     }
     // php7.0 から無名クラスが使えるのでそのクラス名でエイリアスする
     if (is_object($newclass)) {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $newclass = get_class($newclass);
     }
 
@@ -1806,6 +1992,34 @@ function try_catch_finally($try, $catch = null, $finally = null)
     }
     return $return;
 }
+/**
+ * 値が複合型でないか検査する
+ *
+ * 「複合型」とはオブジェクトとクラスのこと。
+ * つまり
+ *
+ * - is_scalar($var) || is_null($var) || is_resource($var)
+ *
+ * と同義（!is_array($var) && !is_object($var) とも言える）。
+ *
+ * Example:
+ * ```php
+ * assert(is_primitive(null)          === true);
+ * assert(is_primitive(false)         === true);
+ * assert(is_primitive(123)           === true);
+ * assert(is_primitive(STDIN)         === true);
+ * assert(is_primitive(new \stdClass) === false);
+ * assert(is_primitive(['array'])     === false);
+ * ```
+ *
+ * @param mixed $var 調べる値
+ * @return bool 複合型なら false
+ */
+function is_primitive($var)
+{
+    return is_scalar($var) || is_null($var) || is_resource($var);
+}
+
 /**
  * 組み込みの var_export をいい感じにしたもの
  *
