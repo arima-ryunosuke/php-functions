@@ -3,6 +3,20 @@ namespace ryunosuke\Test\package;
 
 class VarTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_is_primitive()
+    {
+        $this->assertTrue(is_primitive(null));
+        $this->assertTrue(is_primitive(false));
+        $this->assertTrue(is_primitive(true));
+        $this->assertTrue(is_primitive(123));
+        $this->assertTrue(is_primitive(123.456));
+        $this->assertTrue(is_primitive('hoge'));
+        $this->assertTrue(is_primitive(STDIN));
+
+        $this->assertFalse(is_primitive(['array']));
+        $this->assertFalse(is_primitive(new \stdClass()));
+    }
+
     function test_var_export2()
     {
         $value = [

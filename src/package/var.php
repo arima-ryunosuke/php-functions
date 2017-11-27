@@ -6,6 +6,34 @@
  */
 
 /**
+ * 値が複合型でないか検査する
+ *
+ * 「複合型」とはオブジェクトとクラスのこと。
+ * つまり
+ *
+ * - is_scalar($var) || is_null($var) || is_resource($var)
+ *
+ * と同義（!is_array($var) && !is_object($var) とも言える）。
+ *
+ * Example:
+ * ```php
+ * assert(is_primitive(null)          === true);
+ * assert(is_primitive(false)         === true);
+ * assert(is_primitive(123)           === true);
+ * assert(is_primitive(STDIN)         === true);
+ * assert(is_primitive(new \stdClass) === false);
+ * assert(is_primitive(['array'])     === false);
+ * ```
+ *
+ * @param mixed $var 調べる値
+ * @return bool 複合型なら false
+ */
+function is_primitive($var)
+{
+    return is_scalar($var) || is_null($var) || is_resource($var);
+}
+
+/**
  * 組み込みの var_export をいい感じにしたもの
  *
  * 下記の点が異なる。
