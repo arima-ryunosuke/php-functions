@@ -279,6 +279,316 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         ]));
     }
 
+    function test_array_order()
+    {
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9], array_order([2, 4, 5, 1, 8, 6, 9, 3, 7], true));
+        $this->assertEquals(['g', 'f', 'e', 'd', 'c', 'b', 'a'], array_order(['b', 'd', 'g', 'a', 'f', 'e', 'c'], false));
+        $this->assertEquals(['a', 'a', 'b', 'b', 'c', 'c', 'z'], array_order(['b', 'c', 'z', 'b', 'a', 'c', 'a'], ['a', 'b', 'c']));
+    }
+
+    function test_array_order_list()
+    {
+        $data = [
+            0 => '111',
+            1 => '1',
+            2 => '011',
+            3 => '111',
+            4 => '1',
+            5 => '11',
+            6 => '1',
+        ];
+
+        $actual = array_order($data, true, true);
+        $this->assertSame([
+            2 => '011',
+            1 => '1',
+            4 => '1',
+            6 => '1',
+            5 => '11',
+            0 => '111',
+            3 => '111',
+        ], $actual);
+
+        $actual = array_order($data, -SORT_NATURAL, true);
+        $this->assertSame([
+            0 => '111',
+            3 => '111',
+            2 => '011',
+            5 => '11',
+            1 => '1',
+            4 => '1',
+            6 => '1',
+        ], $actual);
+    }
+
+    function test_array_order_hash()
+    {
+        $data = [
+            'a' => '111',
+            'b' => '1',
+            'c' => '011',
+            'd' => '111',
+            'e' => '1',
+            'f' => '11',
+            'g' => '1',
+        ];
+
+        $actual = array_order($data, true, true);
+        $this->assertSame([
+            'c' => '011',
+            'b' => '1',
+            'e' => '1',
+            'g' => '1',
+            'f' => '11',
+            'a' => '111',
+            'd' => '111',
+        ], $actual);
+
+        $actual = array_order($data, -SORT_NATURAL, true);
+        $this->assertSame([
+            'a' => '111',
+            'd' => '111',
+            'c' => '011',
+            'f' => '11',
+            'b' => '1',
+            'e' => '1',
+            'g' => '1',
+        ], $actual);
+    }
+
+    function test_array_order_bool()
+    {
+        $data = [
+            0 => ['string' => 'aa', 'integer' => 7],
+            1 => ['string' => 'cc', 'integer' => 1],
+            2 => ['string' => 'aa', 'integer' => 2],
+            3 => ['string' => 'bb', 'integer' => 6],
+            4 => ['string' => 'dd', 'integer' => 2],
+            5 => ['string' => 'cc', 'integer' => 6],
+            6 => ['string' => 'cc', 'integer' => 2],
+        ];
+
+        // 文字降順・数値昇順
+        $actual = array_order($data, [
+            'string'  => false,
+            'integer' => true,
+        ], true);
+        $this->assertSame([
+            4 => ['string' => 'dd', 'integer' => 2],
+            1 => ['string' => 'cc', 'integer' => 1],
+            6 => ['string' => 'cc', 'integer' => 2],
+            5 => ['string' => 'cc', 'integer' => 6],
+            3 => ['string' => 'bb', 'integer' => 6],
+            2 => ['string' => 'aa', 'integer' => 2],
+            0 => ['string' => 'aa', 'integer' => 7],
+        ], $actual);
+
+        // 文字昇順・数値降順
+        $actual = array_order($data, [
+            'string'  => true,
+            'integer' => false,
+        ], true);
+        $this->assertSame([
+            0 => ['string' => 'aa', 'integer' => 7],
+            2 => ['string' => 'aa', 'integer' => 2],
+            3 => ['string' => 'bb', 'integer' => 6],
+            5 => ['string' => 'cc', 'integer' => 6],
+            6 => ['string' => 'cc', 'integer' => 2],
+            1 => ['string' => 'cc', 'integer' => 1],
+            4 => ['string' => 'dd', 'integer' => 2],
+        ], $actual);
+
+        // 数値降順・文字昇順
+        $actual = array_order($data, [
+            'integer' => false,
+            'string'  => true,
+        ], true);
+        $this->assertSame([
+            0 => ['string' => 'aa', 'integer' => 7],
+            3 => ['string' => 'bb', 'integer' => 6],
+            5 => ['string' => 'cc', 'integer' => 6],
+            2 => ['string' => 'aa', 'integer' => 2],
+            6 => ['string' => 'cc', 'integer' => 2],
+            4 => ['string' => 'dd', 'integer' => 2],
+            1 => ['string' => 'cc', 'integer' => 1],
+        ], $actual);
+
+        // 数値昇順・文字降順
+        $actual = array_order($data, [
+            'integer' => true,
+            'string'  => false,
+        ], true);
+        $this->assertSame([
+            1 => ['string' => 'cc', 'integer' => 1],
+            4 => ['string' => 'dd', 'integer' => 2],
+            6 => ['string' => 'cc', 'integer' => 2],
+            2 => ['string' => 'aa', 'integer' => 2],
+            5 => ['string' => 'cc', 'integer' => 6],
+            3 => ['string' => 'bb', 'integer' => 6],
+            0 => ['string' => 'aa', 'integer' => 7],
+        ], $actual);
+    }
+
+    function test_array_order_int()
+    {
+        $data = [
+            0 => ['string' => '111', 'integer' => '7a'],
+            1 => ['string' => '1', 'integer' => '1g'],
+            2 => ['string' => '011', 'integer' => '2w'],
+            3 => ['string' => '111', 'integer' => '6u'],
+            4 => ['string' => '1', 'integer' => '2r'],
+            5 => ['string' => '11', 'integer' => '6t'],
+            6 => ['string' => '1', 'integer' => '2i'],
+        ];
+
+        // 文字自然降順・数値昇順
+        $actual = array_order($data, [
+            'string'  => SORT_NATURAL,
+            'integer' => SORT_NUMERIC,
+        ], true);
+        $this->assertSame([
+            1 => ['string' => '1', 'integer' => '1g'],
+            6 => ['string' => '1', 'integer' => '2i'],
+            4 => ['string' => '1', 'integer' => '2r'],
+            2 => ['string' => '011', 'integer' => '2w'],
+            5 => ['string' => '11', 'integer' => '6t'],
+            3 => ['string' => '111', 'integer' => '6u'],
+            0 => ['string' => '111', 'integer' => '7a'],
+        ], $actual);
+
+        // 文字自然昇順・数値降順
+        $actual = array_order($data, [
+            'string'  => -SORT_NATURAL,
+            'integer' => -SORT_NUMERIC,
+        ], true);
+        $this->assertSame([
+            0 => ['string' => '111', 'integer' => '7a'],
+            3 => ['string' => '111', 'integer' => '6u'],
+            5 => ['string' => '11', 'integer' => '6t'],
+            2 => ['string' => '011', 'integer' => '2w'],
+            6 => ['string' => '1', 'integer' => '2i'],
+            4 => ['string' => '1', 'integer' => '2r'],
+            1 => ['string' => '1', 'integer' => '1g'],
+        ], $actual);
+    }
+
+    function test_array_order_array()
+    {
+        $data = [
+            0 => ['string' => 'aa', 'integer' => 7],
+            1 => ['string' => 'cc', 'integer' => 1],
+            2 => ['string' => 'aa', 'integer' => 2],
+            3 => ['string' => 'bb', 'integer' => 6],
+            4 => ['string' => 'dd', 'integer' => 2],
+            5 => ['string' => 'cc', 'integer' => 6],
+            6 => ['string' => 'cc', 'integer' => 2],
+        ];
+
+        $actual = array_order($data, [
+            'string'  => ['bb', 'aa', 'dd', 'cc'],
+            'integer' => [2, 6, 7],
+        ], true);
+        $this->assertSame([
+            3 => ['string' => 'bb', 'integer' => 6],
+            2 => ['string' => 'aa', 'integer' => 2],
+            0 => ['string' => 'aa', 'integer' => 7],
+            4 => ['string' => 'dd', 'integer' => 2],
+            6 => ['string' => 'cc', 'integer' => 2],
+            5 => ['string' => 'cc', 'integer' => 6],
+            1 => ['string' => 'cc', 'integer' => 1],
+        ], $actual);
+    }
+
+    function test_array_order_closure1()
+    {
+        $data = [
+            0 => ['string' => 'aa', 'integer' => 7],
+            1 => ['string' => 'cc', 'integer' => 1],
+            2 => ['string' => 'aa', 'integer' => 2],
+            3 => ['string' => 'bb', 'integer' => 6],
+            4 => ['string' => 'dd', 'integer' => 2],
+            5 => ['string' => 'cc', 'integer' => 6],
+            6 => ['string' => 'cc', 'integer' => 2],
+        ];
+
+        $actual = array_order($data, [
+            'integer' => function ($v) {
+                // 6は0とみなす
+                return $v === 6 ? 0 : $v;
+            },
+            'string'  => function ($v) {
+                // "aa"は"zz"とみなす
+                return $v === 'aa' ? 'zz' : $v;
+            },
+        ], true);
+        $this->assertSame([
+            3 => ['string' => 'bb', 'integer' => 6],
+            5 => ['string' => 'cc', 'integer' => 6],
+            1 => ['string' => 'cc', 'integer' => 1],
+            6 => ['string' => 'cc', 'integer' => 2],
+            4 => ['string' => 'dd', 'integer' => 2],
+            2 => ['string' => 'aa', 'integer' => 2],
+            0 => ['string' => 'aa', 'integer' => 7],
+        ], $actual);
+    }
+
+    function test_array_order_closure2()
+    {
+        $data = [
+            0 => ['string' => 'aa', 'array' => [7, 3]],
+            1 => ['string' => 'cc', 'array' => [1, 5]],
+            2 => ['string' => 'aa', 'array' => [2, 2]],
+            3 => ['string' => 'bb', 'array' => [6, 3]],
+            4 => ['string' => 'dd', 'array' => [2, 1]],
+            5 => ['string' => 'cc', 'array' => [6, 5]],
+            6 => ['string' => 'cc', 'array' => [2, 2]],
+        ];
+
+        $actual = array_order($data, [
+            'string' => function ($a, $b) { return strcmp($a, $b); },
+            'array'  => function ($a, $b) { return array_sum($b) - array_sum($a); },
+        ], true);
+        $this->assertSame([
+            0 => ['string' => 'aa', 'array' => [7, 3]],
+            2 => ['string' => 'aa', 'array' => [2, 2]],
+            3 => ['string' => 'bb', 'array' => [6, 3]],
+            5 => ['string' => 'cc', 'array' => [6, 5]],
+            1 => ['string' => 'cc', 'array' => [1, 5]],
+            6 => ['string' => 'cc', 'array' => [2, 2]],
+            4 => ['string' => 'dd', 'array' => [2, 1]],
+        ], $actual);
+    }
+
+    function test_array_order_ex()
+    {
+        $this->assertEquals([], array_order([], [[]]));
+        $this->assertEquals([1], array_order([1], [[]]));
+
+        $this->assertException(new \InvalidArgumentException('x is undefined'), function () {
+            array_order([['a' => 1], ['a' => 2]], ['x' => true]);
+        });
+
+        $this->assertException(new \DomainException('$order is invalid'), function () {
+            array_order([['a' => 1], ['a' => 2]], ['a' => new \stdClass()]);
+        });
+    }
+
+    function test_array_order_misc()
+    {
+        // 1000 rows, 26 cols, 5 order is in 1 seconds
+        $data = array_fill(0, 999, array_fill_keys(range('a', 'z'), 1));
+        $t = microtime(true);
+        array_order($data, [
+            'a' => true,
+            'b' => false,
+            'c' => [1, 2, 3],
+            'd' => function ($v) { return "$v"; },
+            'e' => function ($a, $b) { return strcmp($a, $b); },
+        ]);
+        $t = microtime(true) - $t;
+        $this->assertLessThan(1.0, $t, "$t milliseconds is too slow.");
+    }
+
     function test_array_columns()
     {
         $array = [

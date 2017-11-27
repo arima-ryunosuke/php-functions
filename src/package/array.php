@@ -819,6 +819,144 @@ function array_assort($array, $rules)
 }
 
 /**
+ * 配列を $orders に従って並べ替える
+ *
+ * データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' => 'value'])にも対応している。
+ * その場合 $orders に配列ではなく直値を渡せば良い。
+ *
+ * $orders には下記のような配列を渡す。
+ *
+ * ```php
+ * $orders = [
+ * 'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
+ * 'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+ * 'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
+ * 'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+ * 'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+ * ];
+ * ```
+ *
+ * Example:
+ * ```php
+ * $v1 = ['id' => '1', 'no' => 'a03', 'name' => 'yyy'];
+ * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
+ * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
+ * // name 昇順, no 自然降順
+ * assert(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]) === [$v3, $v2, $v1]);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param mixed $orders ソート順
+ * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
+ * @return array 並び替えられた配列
+ */
+function array_order(array $array, $orders, $preserve_keys = false)
+{
+    if (count($array) <= 1) {
+        return $array;
+    }
+
+    if (!is_array($orders) || !is_hasharray($orders)) {
+        $orders = [$orders];
+    }
+
+    // 配列内の位置をマップして返すクロージャ
+    $position = function ($columns, $order) {
+        return array_map(function ($v) use ($order) {
+            $ndx = array_search($v, $order, true);
+            return $ndx === false ? count($order) : $ndx;
+        }, $columns);
+    };
+
+    // 全要素は舐めてられないので最初の要素を代表選手としてピックアップ
+    $first = reset($array);
+    $is_scalar = is_scalar($first) || is_null($first);
+
+    // array_multisort 用の配列を生成
+    $args = [];
+    foreach ($orders as $key => $order) {
+        if ($is_scalar) {
+            $firstval = reset($array);
+            $columns = $array;
+        }
+        else {
+            if (!array_key_exists($key, $first)) {
+                throw new \InvalidArgumentException("$key is undefined.");
+            }
+            $firstval = $first[$key];
+            $columns = array_column($array, $key);
+        }
+
+        // bool は ASC, DESC
+        if (is_bool($order)) {
+            $args[] = $columns;
+            $args[] = $order ? SORT_ASC : SORT_DESC;
+            $args[] = is_string($firstval) ? SORT_STRING : SORT_NUMERIC;
+        }
+        // int は SORT_*****
+        else if (is_int($order)) {
+            $args[] = $columns;
+            $args[] = $order > 0 ? SORT_ASC : SORT_DESC;
+            $args[] = abs($order);
+        }
+        // 配列はその並び
+        else if (is_array($order)) {
+            $args[] = $position($columns, $order);
+            $args[] = SORT_ASC;
+            $args[] = SORT_NUMERIC;
+        }
+        // クロージャは色々
+        else if ($order instanceof \Closure) {
+            $ref = new \ReflectionFunction($order);
+            // 引数2個なら比較関数
+            if ($ref->getNumberOfParameters() === 2) {
+                $map = $columns;
+                usort($map, $order);
+                $args[] = $position($columns, $map);
+                $args[] = SORT_ASC;
+                $args[] = SORT_NUMERIC;
+            }
+            // でないなら通した値で比較
+            else {
+                $arg = array_map($order, $columns);
+                // @codeCoverageIgnoreStart
+                if (method_exists($ref, 'hasReturnType') && $ref->hasReturnType()) {
+                    // getReturnType があるならそれに基づく
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $type = (string) $ref->getReturnType();
+                }
+                // @codeCoverageIgnoreEnd
+                else {
+                    // ないなら返り値の型から推測
+                    $type = gettype(reset($arg));
+                }
+                $args[] = $arg;
+                $args[] = SORT_ASC;
+                $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
+            }
+        }
+        else {
+            throw new \DomainException('$order is invalid.');
+        }
+    }
+
+    // array_multisort はキーを保持しないので、ソートされる配列にキー配列を加えて後で combine する
+    if ($preserve_keys) {
+        $keys = array_keys($array);
+        $args[] =& $array;
+        $args[] =& $keys;
+        call_user_func_array('array_multisort', $args);
+        return array_combine($keys, $array);
+    }
+    // キーを保持しないなら単純呼び出しで OK
+    else {
+        $args[] =& $array;
+        call_user_func_array('array_multisort', $args);
+        return $array;
+    }
+}
+
+/**
  * 全要素に対して array_column する
  *
  * 行列が逆転するイメージ。
