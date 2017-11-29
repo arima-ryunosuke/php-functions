@@ -589,6 +589,19 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertLessThan(1.0, $t, "$t milliseconds is too slow.");
     }
 
+    function test_array_shrink_key()
+    {
+        $array = [0 => 'first', 'a' => 'A', 'b' => 'B', 'c' => 'C', 'x' => 'X', 'y' => 'Y', 'z' => 'Z', 99 => 'end'];
+        $array1 = [0 => 'first2', 'b' => 'B1', 'a' => 'A1', 'c' => 'C1'];
+        $array2 = [1 => 'second', 'b' => 'B2', 'a' => 'A2', 'c' => 'C2', 'x' => 'X2'];
+        $array3 = ['b' => 'B3', 'a' => 'A3', 'c' => 'C3', 'y' => 'Y2', 100 => 'end'];
+
+        // array_intersect_key は左方優先だが・・・
+        $this->assertSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], array_intersect_key($array, $array1, $array2, $array3));
+        // array_shrink_key は右方優先
+        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], array_shrink_key($array, $array1, $array2, $array3));
+    }
+
     function test_array_columns()
     {
         $array = [

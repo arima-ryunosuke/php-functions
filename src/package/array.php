@@ -956,6 +956,33 @@ function array_order(array $array, $orders, $preserve_keys = false)
     }
 }
 
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * 値の優先順位を逆にした array_intersect_key
+ *
+ * array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。
+ * 「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。
+ *
+ * Example:
+ * ```php
+ * $array1 = ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'];
+ * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
+ * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
+ * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
+ * assert(array_shrink_key($array1, $array2, $array3) === ['c' => 'C3']);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param array $arrays 比較する配列
+ * @return array 新しい配列
+ */
+function array_shrink_key(array $array)
+{
+    $args = func_get_args();
+    array_unshift($args, call_user_func_array('array_replace', $args));
+    return call_user_func_array('array_intersect_key', $args);
+}
+
 /**
  * 全要素に対して array_column する
  *
