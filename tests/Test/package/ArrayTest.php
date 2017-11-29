@@ -21,44 +21,55 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
     function test_first_key()
     {
         $this->assertEquals(0, first_key(['a', 'b', 'c']));
-        $this->assertException(new \OutOfBoundsException('empty'), first_key, []);
+        $this->assertEquals(0, first_key(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', first_key([], 'def'));
+        $this->assertEquals(null, first_key([]));
     }
 
     function test_first_value()
     {
         $this->assertEquals('a', first_value(['a', 'b', 'c']));
-        $this->assertException(new \OutOfBoundsException('empty'), first_value, []);
+        $this->assertEquals('a', first_value(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', first_value([], 'def'));
+        $this->assertEquals(null, first_value([]));
     }
 
     function test_first_keyvalue()
     {
         $this->assertEquals([0, 'a'], first_keyvalue(['a', 'b', 'c']));
-        $this->assertException(new \OutOfBoundsException('empty'), first_keyvalue, []);
+        $this->assertEquals([0, 'a'], first_keyvalue(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', first_keyvalue([], 'def'));
+        $this->assertEquals(null, first_keyvalue([]));
     }
 
     function test_last_key()
     {
         $this->assertEquals(2, last_key(['a', 'b', 'c']));
-        $this->assertException(new \OutOfBoundsException('empty'), last_key, []);
+        $this->assertEquals(2, last_key(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', last_key([], 'def'));
+        $this->assertEquals(null, last_key([]));
     }
 
     function test_last_value()
     {
         $this->assertEquals('c', last_value(['a', 'b', 'c']));
-        $this->assertException(new \OutOfBoundsException('empty'), last_value, []);
+        $this->assertEquals('c', last_value(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', last_value([], 'def'));
+        $this->assertEquals(null, last_value([]));
     }
 
     function test_last_keyvalue()
     {
         $this->assertEquals([2, 'c'], last_keyvalue(['a', 'b', 'c']));
-        $this->assertException(new \OutOfBoundsException('empty'), last_keyvalue, []);
+        $this->assertEquals([2, 'c'], last_keyvalue(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', last_keyvalue([], 'def'));
+        $this->assertEquals(null, last_keyvalue([]));
     }
 
     function test_array_get()
     {
         $this->assertEquals('b', array_get(['a', 'b', 'c'], 1));
         $this->assertEquals(999, array_get(['a', 'b', 'c'], 9, 999));
-        $this->assertException(new \OutOfBoundsException('undefined'), array_get, [], 'hoge');
     }
 
     function test_array_pos()
@@ -103,7 +114,6 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
     {
         $this->assertEquals('vvv', array_dive(['a' => ['b' => ['c' => 'vvv']]], 'a.b.c'));
         $this->assertEquals(9, array_dive(['a' => ['b' => ['c' => 'vvv']]], 'a.b.x', 9));
-        $this->assertException(new \OutOfBoundsException('undefined'), array_dive, [], 'hoge');
     }
 
     function test_array_exists()

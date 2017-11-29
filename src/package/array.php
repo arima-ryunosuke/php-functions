@@ -65,7 +65,7 @@ function is_hasharray(array $array)
 /**
  * 配列の最初のキーを返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -79,18 +79,18 @@ function is_hasharray(array $array)
  */
 function first_key($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = first_keyvalue($array);
-        return $k;
+    if (empty($array)) {
+        return $default;
     }
-    return first_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = first_keyvalue($array);
+    return $k;
 }
 
 /**
  * 配列の最初の値を返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -104,18 +104,18 @@ function first_key($array, $default = null)
  */
 function first_value($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = first_keyvalue($array);
-        return $v;
+    if (empty($array)) {
+        return $default;
     }
-    return first_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = first_keyvalue($array);
+    return $v;
 }
 
 /**
  * 配列の最初のキー/値ペアをタプルで返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -132,16 +132,13 @@ function first_keyvalue($array, $default = null)
     foreach ($array as $k => $v) {
         return [$k, $v];
     }
-    if (func_num_args() === 1) {
-        throw new \OutOfBoundsException("array is empty.");
-    }
     return $default;
 }
 
 /**
  * 配列の最後のキーを返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -155,18 +152,18 @@ function first_keyvalue($array, $default = null)
  */
 function last_key($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = last_keyvalue($array);
-        return $k;
+    if (empty($array)) {
+        return $default;
     }
-    return last_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = last_keyvalue($array);
+    return $k;
 }
 
 /**
  * 配列の最後の値を返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -180,18 +177,18 @@ function last_key($array, $default = null)
  */
 function last_value($array, $default = null)
 {
-    if (func_num_args() === 1) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = last_keyvalue($array);
-        return $v;
+    if (empty($array)) {
+        return $default;
     }
-    return last_keyvalue($array, $default);
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    list($k, $v) = last_keyvalue($array);
+    return $v;
 }
 
 /**
  * 配列の最後のキー/値ペアをタプルで返す
  *
- * 空の場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 空の場合は $default を返す。
  *
  * Example:
  * ```php
@@ -213,9 +210,6 @@ function last_keyvalue($array, $default = null)
     if (isset($k)) {
         /** @noinspection PhpUndefinedVariableInspection */
         return [$k, $v];
-    }
-    if (func_num_args() === 1) {
-        throw new \OutOfBoundsException("array is empty.");
     }
     return $default;
 }
@@ -265,7 +259,7 @@ function array_pos($array, $position, $return_key = false)
 /**
  * デフォルト値付きの配列値取得
  *
- * 存在しない場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 存在しない場合は $default を返す。
  *
  * Example:
  * ```php
@@ -282,9 +276,6 @@ function array_get($array, $key, $default = null)
 {
     if (array_key_exists($key, $array)) {
         return $array[$key];
-    }
-    if (func_num_args() === 2) {
-        throw new \OutOfBoundsException("undefined '$key'.");
     }
     return $default;
 }
@@ -349,7 +340,7 @@ function array_unset(&$array, $key, $default = null)
 /**
  * パス形式で配列値を取得
  *
- * 存在しない場合は $default を返すが、$default を省略した場合は例外が飛ぶ。
+ * 存在しない場合は $default を返す。
  *
  * Example:
  * ```php
@@ -374,9 +365,6 @@ function array_dive($array, $path, $default = null, $delimiter = '.')
 {
     foreach (explode($delimiter, $path) as $key) {
         if (!array_key_exists($key, $array)) {
-            if (func_num_args() === 2) {
-                throw new \OutOfBoundsException("undefined '$key'.");
-            }
             return $default;
         }
         $array = $array[$key];
