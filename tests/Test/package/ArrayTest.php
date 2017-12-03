@@ -66,10 +66,11 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(null, last_keyvalue([]));
     }
 
-    function test_array_get()
+    function test_array_add()
     {
-        $this->assertEquals('b', array_get(['a', 'b', 'c'], 1));
-        $this->assertEquals(999, array_get(['a', 'b', 'c'], 9, 999));
+        $this->assertEquals(['a', 'b', 'c'], array_add(['a', 'b', 'c'], ['d']));
+        $this->assertEquals(['a', 'b', 'c', 'd'], array_add(['a', 'b', 'c'], [3 => 'd']));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e'], array_add(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
     }
 
     function test_array_pos()
@@ -85,6 +86,12 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
 
         // 範囲外は例外が飛ぶ
         $this->assertException('OutOfBoundsException', array_pos, ['x', 'y', 'z'], 9, true);
+    }
+
+    function test_array_get()
+    {
+        $this->assertEquals('b', array_get(['a', 'b', 'c'], 1));
+        $this->assertEquals(999, array_get(['a', 'b', 'c'], 9, 999));
     }
 
     function test_array_set()

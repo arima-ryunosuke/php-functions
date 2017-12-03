@@ -214,6 +214,30 @@ function last_keyvalue($array, $default = null)
     return $default;
 }
 
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * 配列の+演算子の関数版
+ *
+ * Example:
+ * ```php
+ * // ただの加算の関数版なので同じキーは上書きされない
+ * assert(array_add(['a', 'b', 'c'], ['X'])        === ['a', 'b', 'c']);
+ * // 異なるキーは生える
+ * assert(array_add(['a', 'b', 'c'], ['x' => 'X']) === ['a', 'b', 'c', 'x' => 'X']);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param array $variadic 足す配列
+ * @return array 足された配列
+ */
+function array_add($array)
+{
+    foreach (array_slice(func_get_args(), 1) as $arg) {
+        $array += $arg;
+    }
+    return $array;
+}
+
 /**
  * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
  *
