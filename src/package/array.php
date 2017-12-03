@@ -281,6 +281,37 @@ function array_get($array, $key, $default = null)
 }
 
 /**
+ * キー指定の配列値設定
+ *
+ * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
+ *
+ * Example:
+ * ```php
+ * $array = ['a' => 'A', 'B'];
+ * assert(array_set($array, 'Z')      === 1);
+ * assert($array                      === ['a' => 'A', 'B', 'Z']);
+ * assert(array_set($array, 'Z', 'z') === 'z');
+ * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+ * ```
+ *
+ * @param array $array 配列
+ * @param mixed $value 設定する値
+ * @param string|int $key 設定するキー
+ * @return string|int 設定したキー
+ */
+function array_set(&$array, $value, $key = null)
+{
+    if ($key === null) {
+        $array[] = $value;
+        $key = last_key($array);
+    }
+    else {
+        $array[$key] = $value;
+    }
+    return $key;
+}
+
+/**
  * 伏せると同時にその値を返す
  *
  * $key に配列を与えると全て伏せて配列で返す。

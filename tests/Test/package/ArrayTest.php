@@ -87,6 +87,17 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('OutOfBoundsException', array_pos, ['x', 'y', 'z'], 9, true);
     }
 
+    function test_array_set()
+    {
+        $array = ['a' => 'A', 'B'];
+        $this->assertEquals(1, array_set($array, 'Z'));
+        $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
+        $this->assertEquals('z', array_set($array, 'Z', 'z'));
+        $this->assertEquals(['a' => 'A', 'B', 'Z', 'z' => 'Z'], $array);
+        $this->assertEquals('a', array_set($array, 'X', 'a'));
+        $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z'], $array);
+    }
+
     function test_array_unset()
     {
         // single
