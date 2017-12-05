@@ -215,6 +215,30 @@ function last_keyvalue($array, $default = null)
     return $default;
 }
 
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * 配列の+演算子の関数版
+ *
+ * Example:
+ * ```php
+ * // ただの加算の関数版なので同じキーは上書きされない
+ * assert(array_add(['a', 'b', 'c'], ['X'])        === ['a', 'b', 'c']);
+ * // 異なるキーは生える
+ * assert(array_add(['a', 'b', 'c'], ['x' => 'X']) === ['a', 'b', 'c', 'x' => 'X']);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param array $variadic 足す配列
+ * @return array 足された配列
+ */
+function array_add($array)
+{
+    foreach (array_slice(func_get_args(), 1) as $arg) {
+        $array += $arg;
+    }
+    return $array;
+}
+
 /**
  * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
  *
@@ -279,6 +303,37 @@ function array_get($array, $key, $default = null)
         return $array[$key];
     }
     return $default;
+}
+
+/**
+ * キー指定の配列値設定
+ *
+ * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
+ *
+ * Example:
+ * ```php
+ * $array = ['a' => 'A', 'B'];
+ * assert(array_set($array, 'Z')      === 1);
+ * assert($array                      === ['a' => 'A', 'B', 'Z']);
+ * assert(array_set($array, 'Z', 'z') === 'z');
+ * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+ * ```
+ *
+ * @param array $array 配列
+ * @param mixed $value 設定する値
+ * @param string|int $key 設定するキー
+ * @return string|int 設定したキー
+ */
+function array_set(&$array, $value, $key = null)
+{
+    if ($key === null) {
+        $array[] = $value;
+        $key = last_key($array);
+    }
+    else {
+        $array[$key] = $value;
+    }
+    return $key;
 }
 
 /**
@@ -1908,6 +1963,50 @@ function render_file($template_file, $array)
 function returns($v)
 {
     return $v;
+}
+
+/**
+ * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
+ *
+ * null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。
+ * 基本的には null を返すが、return type が規約されている場合は null 以外を返すこともある。
+ *
+ * 取得系呼び出しを想定しているので、設定系呼び出しは行うべきではない。
+ * __set のような明らかに設定が意図されているものは例外が飛ぶ。
+ *
+ * Example:
+ * ```php
+ * // null を返すかもしれないステートメント
+ * $getobject = function () {return null;};
+ * // メソッド呼び出しは null を返す
+ * assert(optional($getobject())->method()          === null);
+ * // プロパティアクセスは null を返す
+ * assert(optional($getobject())->property          === null);
+ * // empty は true を返す
+ * assert(empty(optional($getobject())->nothing)    === true);
+ * // __isset は false を返す
+ * assert(isset(optional($getobject())->nothing)    === false);
+ * // __toString は '' を返す
+ * assert(strval(optional($getobject()))            === '');
+ * // __invoke は null を返す
+ * assert(call_user_func(optional($getobject()))    === null);
+ * // 配列アクセスは null を返す
+ * assert($getobject()['hoge']                      === null);
+ * // 空イテレータを返す
+ * assert(iterator_to_array(optional($getobject())) === []);
+ * ```
+ *
+ * @param object|null $object オブジェクト
+ * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
+ */
+function optional($object)
+{
+    if (is_object($object)) {
+        return $object;
+    }
+
+    static $nullobject = null;
+    return $nullobject = $nullobject ?: new \ryunosuke\Functions\NullObject();
 }
 
 /**

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Function optional</title>
+
+	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
+	<link rel="stylesheet" href="resources/style.css?4bb6454ea5dbd127d475d6edffaf8eda279d79a3">
+
+</head>
+
+<body>
+	<nav id="navigation" class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a href="index.html" class="navbar-brand">Overview</a>
+			</div>
+			<div class="collapse navbar-collapse">
+
+                <form id="search" class="navbar-form navbar-left" role="search">
+                    <input type="hidden" name="cx" value="">
+                    <input type="hidden" name="ie" value="UTF-8">
+                    <div class="form-group">
+                        <input type="text" name="q" class="search-query form-control" placeholder="Search">
+					</div>
+				</form>
+
+				<ul class="nav navbar-nav">
+					<li>
+<span>Package</span>					</li>
+					<li class="active">
+<span>Function</span>					</li>
+
+
+
+
+
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div id="left">
+	<div id="menu">
+
+		<div id="groups">
+				<h3>Packages</h3>
+			<ul>
+					<li>
+						<a href="package-array.html">
+							array						</a>
+							</li>
+					<li>
+						<a href="package-callable.html">
+							callable						</a>
+							</li>
+					<li>
+						<a href="package-class.html">
+							class						</a>
+							</li>
+					<li>
+						<a href="package-filesystem.html">
+							filesystem						</a>
+							</li>
+					<li>
+						<a href="package-string.html">
+							string						</a>
+							</li>
+					<li>
+						<a href="package-syntax.html">
+							syntax						</a>
+							</li>
+					<li>
+						<a href="package-var.html">
+							var						</a>
+							</li>
+			</ul>
+		</div>
+
+
+		<div id="elements">
+
+
+
+
+
+			<h3>Functions</h3>
+			<ul>
+				<li class="active"><a href="function-optional.html">optional<small class="summary">: オブジェクトならそれを、オブジェクトでないなら NullObject を返す</small></a></li>
+				<li><a href="function-returns.html">returns<small class="summary">: 引数をそのまま返す</small></a></li>
+				<li><a href="function-throws.html">throws<small class="summary">: throw の関数版</small></a></li>
+				<li><a href="function-try_catch.html">try_catch<small class="summary">: try ～ catch 構文の関数版</small></a></li>
+				<li><a href="function-try_catch_finally.html">try_catch_finally<small class="summary">: try ～ catch ～ finally 構文の関数版</small></a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+	<div id="rightInner">
+<div id="content" class="function">
+	<h1>Function optional</h1>
+
+
+	<div class="description">
+	<p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
+
+<p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。
+基本的には null を返すが、return type が規約されている場合は null 以外を返すこともある。</p>
+
+<p>取得系呼び出しを想定しているので、設定系呼び出しは行うべきではない。
+__set のような明らかに設定が意図されているものは例外が飛ぶ。</p>
+
+<p>Example:</p>
+
+<pre><span class="php-comment">// null を返すかもしれないステートメント</span>
+<span class="php-var">$getobject</span> = <span class="php-keyword1">function</span> () {<span class="php-keyword1">return</span> <span class="php-keyword1">null</span>;};
+<span class="php-comment">// メソッド呼び出しは null を返す</span>
+<span class="php-keyword2">assert</span>(optional(<span class="php-var">$getobject</span>())-&gt;method()          === <span class="php-keyword1">null</span>);
+<span class="php-comment">// プロパティアクセスは null を返す</span>
+<span class="php-keyword2">assert</span>(optional(<span class="php-var">$getobject</span>())-&gt;property          === <span class="php-keyword1">null</span>);
+<span class="php-comment">// empty は true を返す</span>
+<span class="php-keyword2">assert</span>(<span class="php-keyword1">empty</span>(optional(<span class="php-var">$getobject</span>())-&gt;nothing)    === <span class="php-keyword1">true</span>);
+<span class="php-comment">// __isset は false を返す</span>
+<span class="php-keyword2">assert</span>(<span class="php-keyword1">isset</span>(optional(<span class="php-var">$getobject</span>())-&gt;nothing)    === <span class="php-keyword1">false</span>);
+<span class="php-comment">// __toString は '' を返す</span>
+<span class="php-keyword2">assert</span>(<span class="php-keyword2">strval</span>(optional(<span class="php-var">$getobject</span>()))            === <span class="php-quote">''</span>);
+<span class="php-comment">// __invoke は null を返す</span>
+<span class="php-keyword2">assert</span>(<span class="php-keyword2">call_user_func</span>(optional(<span class="php-var">$getobject</span>()))    === <span class="php-keyword1">null</span>);
+<span class="php-comment">// 配列アクセスは null を返す</span>
+<span class="php-keyword2">assert</span>(<span class="php-var">$getobject</span>()[<span class="php-quote">'hoge'</span>]                      === <span class="php-keyword1">null</span>);
+<span class="php-comment">// 空イテレータを返す</span>
+<span class="php-keyword2">assert</span>(<span class="php-keyword2">iterator_to_array</span>(optional(<span class="php-var">$getobject</span>())) === []);</pre>
+	</div>
+
+
+	<div class="panel panel-default">
+        <div class="panel-heading"><h2>Parameters summary</h2></div>
+		<table class="summary table table-bordered" id="parameters">
+		<tr id="$object">
+			<td class="name"><code>object|null</code></td>
+			<td class="value"><code><var>$object</var></code></td>
+			<td>オブジェクト</td>
+		</tr>
+		</table>
+	</div>
+
+	<div class="panel panel-default">
+        <div class="panel-heading"><h2>Return value summary</h2></div>
+		<table class="summary table table-bordered" id="returns">
+		<tr>
+			<td class="name"><code>
+				mixed
+			</code></td>
+			<td>
+				$object がオブジェクトならそのまま返し、違うなら NullObject を返す
+			</td>
+		</tr>
+		</table>
+	</div>
+
+
+	<div class="alert alert-info">
+		
+		<b>Package:</b> <a href="package-syntax.html">syntax</a><br>
+		<b>Located at</b>
+		<a href="source-function-optional.html#27-69" title="Go to source code">
+			syntax.php
+		</a><br>
+	</div>
+
+</div>
+	</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+<script src="resources/combined.js?64829dd0598cd54a3fd46ce58f8efe7e2fac9ecc"></script>
+<script src="elementlist.js?f91d6677db9503d59bab3a54a365febdc14b01da"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Function array_filter_eval</title>
+	<title>Function array_add</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?4bb6454ea5dbd127d475d6edffaf8eda279d79a3">
@@ -87,13 +87,13 @@
 
 			<h3>Functions</h3>
 			<ul>
-				<li><a href="function-array_add.html">array_add<small class="summary">: 配列の+演算子の関数版</small></a></li>
+				<li class="active"><a href="function-array_add.html">array_add<small class="summary">: 配列の+演算子の関数版</small></a></li>
 				<li><a href="function-array_assort.html">array_assort<small class="summary">: 配列をコールバックに従って分類する</small></a></li>
 				<li><a href="function-array_columns.html">array_columns<small class="summary">: 全要素に対して array_column する</small></a></li>
 				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
-				<li class="active"><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
+				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
 				<li><a href="function-array_filter_key.html">array_filter_key<small class="summary">: キーを主軸とした array_filter</small></a></li>
 				<li><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
 				<li><a href="function-array_get.html">array_get<small class="summary">: デフォルト値付きの配列値取得</small></a></li>
@@ -129,18 +129,18 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="function">
-	<h1>Function array_filter_eval</h1>
+	<h1>Function array_add</h1>
 
 
 	<div class="description">
-	<p>eval で評価して array_filter する</p>
-
-<p>キーは $k, 値は $v で宣言される。</p>
+	<p>配列の+演算子の関数版</p>
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$k !== 1'</span>)   === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
-<span class="php-keyword2">assert</span>(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$v !== &quot;b&quot;'</span>) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);</pre>
+<pre><span class="php-comment">// ただの加算の関数版なので同じキーは上書きされない</span>
+<span class="php-keyword2">assert</span>(array_add([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-quote">'X'</span>])        === [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>]);
+<span class="php-comment">// 異なるキーは生える</span>
+<span class="php-keyword2">assert</span>(array_add([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-quote">'x'</span> =&gt; <span class="php-quote">'X'</span>]) === [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>, <span class="php-quote">'x'</span> =&gt; <span class="php-quote">'X'</span>]);</pre>
 	</div>
 
 
@@ -148,14 +148,14 @@
         <div class="panel-heading"><h2>Parameters summary</h2></div>
 		<table class="summary table table-bordered" id="parameters">
 		<tr id="$array">
-			<td class="name"><code>array|Traversable</code></td>
+			<td class="name"><code>array</code></td>
 			<td class="value"><code><var>$array</var></code></td>
 			<td>対象配列</td>
 		</tr>
-		<tr id="$expression">
-			<td class="name"><code>string</code></td>
-			<td class="value"><code><var>$expression</var></code></td>
-			<td>eval コード</td>
+		<tr id="$variadic">
+			<td class="name"><code>array</code></td>
+			<td class="value"><code><var>$variadic</var>,…</code></td>
+			<td>足す配列</td>
 		</tr>
 		</table>
 	</div>
@@ -168,7 +168,7 @@
 				array
 			</code></td>
 			<td>
-				$expression が true を返した新しい配列
+				足された配列
 			</td>
 		</tr>
 		</table>
@@ -179,7 +179,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_filter_eval.html#557-581" title="Go to source code">
+		<a href="source-function-array_add.html#218-239" title="Go to source code">
 			array.php
 		</a><br>
 	</div>

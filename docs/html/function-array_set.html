@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Function array_filter_eval</title>
+	<title>Function array_set</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?4bb6454ea5dbd127d475d6edffaf8eda279d79a3">
@@ -93,7 +93,7 @@
 				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
-				<li class="active"><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
+				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
 				<li><a href="function-array_filter_key.html">array_filter_key<small class="summary">: キーを主軸とした array_filter</small></a></li>
 				<li><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
 				<li><a href="function-array_get.html">array_get<small class="summary">: デフォルト値付きの配列値取得</small></a></li>
@@ -107,7 +107,7 @@
 				<li><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
 				<li><a href="function-array_pos.html">array_pos<small class="summary">: 配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small></a></li>
 				<li><a href="function-array_rmap.html">array_rmap<small class="summary">: 要素値を $callback の最右に適用して array_map する</small></a></li>
-				<li><a href="function-array_set.html">array_set<small class="summary">: キー指定の配列値設定</small></a></li>
+				<li class="active"><a href="function-array_set.html">array_set<small class="summary">: キー指定の配列値設定</small></a></li>
 				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
 				<li><a href="function-array_uncolumns.html">array_uncolumns<small class="summary">: array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する</small></a></li>
 				<li><a href="function-array_unset.html">array_unset<small class="summary">: 伏せると同時にその値を返す</small></a></li>
@@ -129,18 +129,21 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="function">
-	<h1>Function array_filter_eval</h1>
+	<h1>Function array_set</h1>
 
 
 	<div class="description">
-	<p>eval で評価して array_filter する</p>
+	<p>キー指定の配列値設定</p>
 
-<p>キーは $k, 値は $v で宣言される。</p>
+<p>第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。</p>
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$k !== 1'</span>)   === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
-<span class="php-keyword2">assert</span>(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$v !== &quot;b&quot;'</span>) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);</pre>
+<pre><span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>];
+<span class="php-keyword2">assert</span>(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>)      === <span class="php-num">1</span>);
+<span class="php-keyword2">assert</span>(<span class="php-var">$array</span>                      === [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>]);
+<span class="php-keyword2">assert</span>(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span>) === <span class="php-quote">'z'</span>);
+<span class="php-keyword2">assert</span>(<span class="php-var">$array</span>                      === [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>]);</pre>
 	</div>
 
 
@@ -148,14 +151,19 @@
         <div class="panel-heading"><h2>Parameters summary</h2></div>
 		<table class="summary table table-bordered" id="parameters">
 		<tr id="$array">
-			<td class="name"><code>array|Traversable</code></td>
-			<td class="value"><code><var>$array</var></code></td>
-			<td>対象配列</td>
+			<td class="name"><code>array</code></td>
+			<td class="value"><code><var>&amp; $array</var></code></td>
+			<td>配列</td>
 		</tr>
-		<tr id="$expression">
-			<td class="name"><code>string</code></td>
-			<td class="value"><code><var>$expression</var></code></td>
-			<td>eval コード</td>
+		<tr id="$value">
+			<td class="name"><code>mixed</code></td>
+			<td class="value"><code><var>$value</var></code></td>
+			<td>設定する値</td>
+		</tr>
+		<tr id="$key">
+			<td class="name"><code>string|integer</code></td>
+			<td class="value"><code><var>$key</var> = <span class="php-keyword1">null</span></code></td>
+			<td>設定するキー</td>
 		</tr>
 		</table>
 	</div>
@@ -165,10 +173,10 @@
 		<table class="summary table table-bordered" id="returns">
 		<tr>
 			<td class="name"><code>
-				array
+				string|integer
 			</code></td>
 			<td>
-				$expression が true を返した新しい配列
+				設定したキー
 			</td>
 		</tr>
 		</table>
@@ -179,7 +187,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_filter_eval.html#557-581" title="Go to source code">
+		<a href="source-function-array_set.html#307-336" title="Go to source code">
 			array.php
 		</a><br>
 	</div>
