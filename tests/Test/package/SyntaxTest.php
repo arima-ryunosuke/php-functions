@@ -17,6 +17,57 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(123, returns(clone $o)->hoge);
     }
 
+    function test_optional()
+    {
+        $o = new \Concrete('hoge');
+        $o->hoge = 'hoge';
+        $o->value = 'hoge';
+
+        // method
+        $this->assertSame('hoge', optional($o)->getName());
+        // property
+        $this->assertSame('hoge', optional($o)->value);
+        // __isset
+        $this->assertSame(true, isset(optional($o)->hoge));
+        // __get
+        $this->assertSame('hoge', optional($o)->hoge);
+        // __call
+        $this->assertSame('hoge', optional($o)->hoge());
+        // __invoke
+        $this->assertSame('Concrete::__invoke', call_user_func(optional($o)));
+        // __toString
+        $this->assertSame('hoge', (string) optional($o));
+        // offsetExists
+        $this->assertSame(false, empty(optional($o)['hoge']));
+        // offsetGet
+        $this->assertSame('hoge', optional($o)['hoge']);
+        // iterator
+        $this->assertNotEmpty(iterator_to_array(optional($o)));
+
+        $o = null;
+
+        // method
+        $this->assertSame(null, optional($o)->getName());
+        // property
+        $this->assertSame(null, optional($o)->value);
+        // __isset
+        $this->assertSame(false, isset(optional($o)->hoge));
+        // __get
+        $this->assertSame(null, optional($o)->hoge);
+        // __call
+        $this->assertSame(null, optional($o)->hoge());
+        // __invoke
+        $this->assertSame(null, call_user_func(optional($o)));
+        // __toString
+        $this->assertSame('', (string) optional($o));
+        // offsetExists
+        $this->assertSame(true, empty(optional($o)['hoge']));
+        // offsetGet
+        $this->assertSame(null, optional($o)['hoge']);
+        // iterator
+        $this->assertEmpty(iterator_to_array(optional($o)));
+    }
+
     function test_throws()
     {
         // ユースケースとしては例えば or throw がしたいことがある
