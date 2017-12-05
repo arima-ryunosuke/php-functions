@@ -10,6 +10,12 @@
 
 - no todo
 
+## 1.0.2
+
+- [feature][array] array_set 追加
+- [feature][array] array_add 追加
+- [feature][syntax] optional 追加
+
 ## 1.0.1
 
 - [change][array] array_unset の複数対応
