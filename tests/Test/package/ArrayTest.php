@@ -92,6 +92,11 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
     {
         $this->assertEquals('b', array_get(['a', 'b', 'c'], 1));
         $this->assertEquals(999, array_get(['a', 'b', 'c'], 9, 999));
+
+        $this->assertEquals([0 => 'a', 2 => 'c'], array_get(['a', 'b', 'c'], [0, 2]));
+        $this->assertEquals([0 => 'a'], array_get(['a', 'b', 'c'], [0, 9]));
+        $this->assertEquals([], array_get(['a', 'b', 'c'], [9]));
+        $this->assertEquals(null, array_get(['a', 'b', 'c'], [9], null));
     }
 
     function test_array_set()

@@ -285,19 +285,43 @@ function array_pos($array, $position, $return_key = false)
  *
  * 存在しない場合は $default を返す。
  *
+ * $key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。
+ * その場合、$default が活きるのは「全て無かった場合」となる。
+ * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
+ *
  * Example:
  * ```php
+ * // 単純取得
  * assert(array_get(['a', 'b', 'c'], 1)      === 'b');
+ * // 単純デフォルト
  * assert(array_get(['a', 'b', 'c'], 9, 999) === 999);
+ * // 配列取得
+ * assert(array_get(['a', 'b', 'c'], [0, 2]) === [0 => 'a', 2 => 'c']);
+ * // 配列部分取得
+ * assert(array_get(['a', 'b', 'c'], [0, 9]) === [0 => 'a']);
+ * // 配列デフォルト（null ではなく [] を返す）
+ * assert(array_get(['a', 'b', 'c'], [9])    === []);
  * ```
  *
  * @param array $array 配列
- * @param string|int $key 取得したいキー
+ * @param string|int|array $key 取得したいキー
  * @param mixed $default 無かった場合のデフォルト値
  * @return mixed 指定したキーの値
  */
 function array_get($array, $key, $default = null)
 {
+    if (is_array($key)) {
+        $result = array_intersect_key($array, array_flip($key));
+        if (!$result) {
+            // 明示的に与えられていないなら [] を使用する
+            if (func_num_args() === 2) {
+                $default = [];
+            }
+            return $default;
+        }
+        return $result;
+    }
+
     if (array_key_exists($key, $array)) {
         return $array[$key];
     }
