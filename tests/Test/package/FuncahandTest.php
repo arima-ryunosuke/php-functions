@@ -37,6 +37,12 @@ class FuncahandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($not_strlen(''));
     }
 
+    function test_eval_func()
+    {
+        $this->assertEquals(4, call_user_func(eval_func('4')));
+        $this->assertEquals(7, call_user_func(eval_func('$a + $b', 'a', 'b'), 3, 4));
+    }
+
     function test_reflect_callable()
     {
         // タイプ 0: クロージャ

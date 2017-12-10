@@ -84,6 +84,34 @@ function not_func($callable)
     return function () use ($callable) { return !call_user_func_array($callable, func_get_args()); };
 }
 
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * 指定コードで eval するクロージャを返す
+ *
+ * create_function のクロージャ版みたいなもの。
+ * 参照渡しは未対応。
+ *
+ * Example:
+ * ```php
+ * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
+ * assert($evalfunc(1, 2, 3) === 6);
+ * ```
+ *
+ * @param string $expression eval コード
+ * @param mixed $variadic 引数名（可変引数）
+ * @return \Closure 新しいクロージャ
+ */
+function eval_func($expression)
+{
+    $args = array_slice(func_get_args(), 1);
+    return function () use ($expression, $args) {
+        return call_user_func(function () {
+            extract(func_get_arg(1));
+            return eval("return " . func_get_arg(0) . ";");
+        }, $expression, array_combine($args, func_get_args()));
+    };
+}
+
 /**
  * callable から ReflectionFunctionAbstract を生成する
  *
