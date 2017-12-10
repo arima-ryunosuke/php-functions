@@ -284,7 +284,7 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([1, 2, 'x1', 'x2', 3], array_insert([1, 2, 3], ['x1', 'x2'], -1));
 
         // 連想配列もOK
-        $this->assertEquals(['x' => 'X', 'x1', 'x2', 'y' => 'Y', 'z' => 'Z'], array_insert(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'x2'], 1));
+        $this->assertEquals(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z'], array_insert(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1));
     }
 
     function test_array_assort()

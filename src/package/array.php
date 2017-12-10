@@ -817,14 +817,14 @@ function array_depth($array)
  *
  * $position を省略すると最後に挿入される（≒ array_push）。
  * $position に負数を与えると後ろから数えられる。
- * $value には配列も与えられるが、キーは死ぬ。
+ * $value には配列も与えられるが、その場合数値キーは振り直される
  *
  * Example:
  * ```php
  * assert(array_insert([1, 2, 3], 'x')                         === [1, 2, 3, 'x']);
  * assert(array_insert([1, 2, 3], 'x', 1)                      === [1, 'x', 2, 3]);
  * assert(array_insert([1, 2, 3], 'x', -1)                     === [1, 2, 'x', 3]);
- * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'A', 'B', 2, 3]);
+ * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'a' => 'A', 'b' => 'B', 2, 3]);
  * ```
  *
  * @param array $array 対象配列
@@ -839,8 +839,9 @@ function array_insert($array, $value, $position = null)
     }
 
     $position = is_null($position) ? count($array) : intval($position);
-    array_splice($array, $position, 0, $value);
-    return $array;
+
+    $sarray = array_splice($array, 0, $position);
+    return array_merge($sarray, $value, $array);
 }
 
 /**
