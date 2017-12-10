@@ -10,6 +10,15 @@
 
 - no todo
 
+## 1.0.3
+
+- [feature][strings] str_contains 追加
+- [feature][funchand] not_func 追加
+- [feature][funchand] eval_func 追加
+- [feature][array] array_where 追加
+- [change][array] array_get の配列対応
+- [*change][array] array_insert のキー対応
+
 ## 1.0.2
 
 - [feature][array] array_set 追加
