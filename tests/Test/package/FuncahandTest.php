@@ -30,6 +30,13 @@ class FuncahandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([1, 2, 3, 4, 'X', 'Y'], $arrayize_rXY(1, 2, 3, 4));
     }
 
+    function test_not_func()
+    {
+        $not_strlen = not_func('strlen');
+        $this->assertFalse($not_strlen('hoge'));
+        $this->assertTrue($not_strlen(''));
+    }
+
     function test_reflect_callable()
     {
         // タイプ 0: クロージャ

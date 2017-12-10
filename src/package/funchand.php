@@ -67,6 +67,24 @@ function rbind($callable)
 }
 
 /**
+ * 返り値の真偽値を逆転した新しいクロージャを返す
+ *
+ * Example:
+ * ```php
+ * $not_strlen = not_func('strlen');
+ * assert($not_strlen('hoge') === false);
+ * assert($not_strlen('')     === true);
+ * ```
+ *
+ * @param callable $callable 対象 callable
+ * @return \Closure 新しいクロージャ
+ */
+function not_func($callable)
+{
+    return function () use ($callable) { return !call_user_func_array($callable, func_get_args()); };
+}
+
+/**
  * callable から ReflectionFunctionAbstract を生成する
  *
  * Example:
