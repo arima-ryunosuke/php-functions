@@ -51,6 +51,45 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue(str_equals($ex, $ex));
     }
 
+    function test_str_contains()
+    {
+        // single
+        $this->assertTrue(str_contains('abcdef', 'cd'));
+        $this->assertFalse(str_contains('abcdef', 'xx'));
+
+        // single int
+        $this->assertTrue(str_contains('12345', 5));
+        $this->assertFalse(str_contains('12345', 9));
+
+        // empty
+        $this->assertFalse(str_contains('', ''));
+        $this->assertFalse(str_contains('abcdef', ''));
+
+        // single case_insensitivity
+        $this->assertTrue(str_contains('abcdef', 'CD', true));
+        $this->assertFalse(str_contains('abcdef', 'XX', true));
+
+        // multi or
+        $this->assertTrue(str_contains('abcdef', ['cd', 'XX'], false, false));
+        $this->assertFalse(str_contains('abcdef', ['XX', 'YY'], false, false));
+
+        // multi and
+        $this->assertTrue(str_contains('abcdef', ['cd', 'ef'], false, true));
+        $this->assertFalse(str_contains('abcdef', ['cd', 'XX'], false, true));
+
+        // multi case_insensitivity
+        $this->assertTrue(str_contains('abcdef', ['CD', 'XX'], true, false));
+        $this->assertFalse(str_contains('abcdef', ['XX', 'YY'], true, false));
+        $this->assertTrue(str_contains('abcdef', ['CD', 'EF'], true, true));
+        $this->assertFalse(str_contains('abcdef', ['CD', 'XX'], true, true));
+
+        // stringable object
+        $this->assertTrue(str_contains(new \Concrete('abcdef'), new \Concrete('cd')));
+        $this->assertFalse(str_contains(new \Concrete('abcdef'), new \Concrete('xx')));
+        $this->assertTrue(str_contains(new \Concrete('abcdef'), new \Concrete('CD'), true, false));
+        $this->assertFalse(str_contains(new \Concrete('abcdef'), new \Concrete('XX'), true));
+    }
+
     function test_starts_with()
     {
         $this->assertTrue(starts_with('abcdef', 'abc'));
