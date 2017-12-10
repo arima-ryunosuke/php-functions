@@ -1,7 +1,7 @@
 <?php
 namespace ryunosuke\Test\package;
 
-class FuncahandTest extends \ryunosuke\Test\AbstractTestCase
+class FunchandTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_nbind()
     {
