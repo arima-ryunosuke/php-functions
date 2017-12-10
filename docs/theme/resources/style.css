@@ -83,7 +83,7 @@ pre code {
 /* Left side */
 #left {
 	overflow: auto;
-	width: 400px;
+	width: 31%;
 	height: 100%;
 	position: fixed;
 }
@@ -212,7 +212,7 @@ pre code {
 /* Right side */
 #right {
 	overflow: auto;
-	margin-left: 405px;
+	margin-left: calc(31% + 5px);
 	height: 100%;
 	position: relative;
 	left: 0;
@@ -376,7 +376,7 @@ td.name, td.attributes {
 	position: fixed;
 	height: 100%;
 	width: 5px;
-	left: 400px;
+	left: 31%;
 	background: #E7E7E7 url('resize.png') left center no-repeat;
 	cursor: e-resize;
 }
