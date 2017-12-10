@@ -522,7 +522,7 @@ function array_map_key($array, $callback)
  */
 function array_filter_not($array, $callback)
 {
-    return array_filter($array, function ($v) use ($callback) { return !$callback($v); });
+    return array_filter($array, not_func($callback));
 }
 
 /**
@@ -571,13 +571,7 @@ function array_filter_key($array, $callback)
  */
 function array_filter_eval($array, $expression)
 {
-    return array_filter_key($array, function (
-        /** @noinspection PhpUnusedParameterInspection */
-        $k,
-        $v
-    ) use ($expression) {
-        return eval("return $expression;");
-    });
+    return array_filter_key($array, eval_func($expression, 'k', 'v'));
 }
 
 /**
