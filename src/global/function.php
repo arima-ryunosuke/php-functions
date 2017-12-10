@@ -285,19 +285,43 @@ function array_pos($array, $position, $return_key = false)
  *
  * 存在しない場合は $default を返す。
  *
+ * $key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。
+ * その場合、$default が活きるのは「全て無かった場合」となる。
+ * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
+ *
  * Example:
  * ```php
+ * // 単純取得
  * assert(array_get(['a', 'b', 'c'], 1)      === 'b');
+ * // 単純デフォルト
  * assert(array_get(['a', 'b', 'c'], 9, 999) === 999);
+ * // 配列取得
+ * assert(array_get(['a', 'b', 'c'], [0, 2]) === [0 => 'a', 2 => 'c']);
+ * // 配列部分取得
+ * assert(array_get(['a', 'b', 'c'], [0, 9]) === [0 => 'a']);
+ * // 配列デフォルト（null ではなく [] を返す）
+ * assert(array_get(['a', 'b', 'c'], [9])    === []);
  * ```
  *
  * @param array $array 配列
- * @param string|int $key 取得したいキー
+ * @param string|int|array $key 取得したいキー
  * @param mixed $default 無かった場合のデフォルト値
  * @return mixed 指定したキーの値
  */
 function array_get($array, $key, $default = null)
 {
+    if (is_array($key)) {
+        $result = array_intersect_key($array, array_flip($key));
+        if (!$result) {
+            // 明示的に与えられていないなら [] を使用する
+            if (func_num_args() === 2) {
+                $default = [];
+            }
+            return $default;
+        }
+        return $result;
+    }
+
     if (array_key_exists($key, $array)) {
         return $array[$key];
     }
@@ -522,7 +546,7 @@ function array_map_key($array, $callback)
  */
 function array_filter_not($array, $callback)
 {
-    return array_filter($array, function ($v) use ($callback) { return !$callback($v); });
+    return array_filter($array, not_func($callback));
 }
 
 /**
@@ -571,13 +595,86 @@ function array_filter_key($array, $callback)
  */
 function array_filter_eval($array, $expression)
 {
-    return array_filter_key($array, function (
-        /** @noinspection PhpUnusedParameterInspection */
-        $k,
-        $v
-    ) use ($expression) {
-        return eval("return $expression;");
-    });
+    return array_filter_key($array, eval_func($expression, 'k', 'v'));
+}
+
+/**
+ * 指定キーの要素で array_filter する
+ *
+ * array_column があるなら array_where があってもいいはず。
+ *
+ * $column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。
+ * $where は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
+ * つまり $column も $where も省略した場合、実質的に array_filter と同じ動作になる。
+ *
+ * $column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。
+ *
+ * $where が要求するならキーも渡ってくる。
+ *
+ * Example:
+ * ```php
+ * $array = [
+ * 0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+ * 1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+ * 2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+ * ];
+ * // 'flag' が true 相当のものだけ返す
+ * assert(array_where($array, 'flag')                           === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+ * // 'name' に 'h' を含むものだけ返す
+ * $contain_h = function($name){return strpos($name, 'h') !== false;};
+ * assert(array_where($array, 'name', $contain_h)               === [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
+ * // $where が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
+ * $equal_2 = function($row, $key){return $key === 2;};
+ * assert(array_where($array, null, $equal_2)                   === [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+ * // $column に配列を渡すと共通項が渡ってくる
+ * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
+ * assert(array_where($array, ['id', 'name'], $idname_is_2fuga) === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+ * ```
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param string|array|null $column キー名
+ * @param callable $where 評価クロージャ
+ * @return array $where が真を返した新しい配列
+ */
+function array_where($array, $column = null, $where = null)
+{
+    $is_array = is_array($column);
+    if ($is_array) {
+        $column = array_flip($column);
+    }
+
+    $plength = 0;
+    if ($where !== null) {
+        $plength = parameter_length($where, true);
+    }
+
+    $result = [];
+    foreach ($array as $k => $v) {
+        if ($column === null) {
+            $value = $v;
+        }
+        else if ($is_array) {
+            $value = array_intersect_key($v, $column);
+        }
+        else {
+            $value = $v[$column];
+        }
+
+        if ($where === null) {
+            $match = $value;
+        }
+        else if ($plength === 1) {
+            $match = $where($value);
+        }
+        else {
+            $match = $where($value, $k);
+        }
+
+        if ($match) {
+            $result[$k] = $v;
+        }
+    }
+    return $result;
 }
 
 /**
@@ -799,14 +896,14 @@ function array_depth($array)
  *
  * $position を省略すると最後に挿入される（≒ array_push）。
  * $position に負数を与えると後ろから数えられる。
- * $value には配列も与えられるが、キーは死ぬ。
+ * $value には配列も与えられるが、その場合数値キーは振り直される
  *
  * Example:
  * ```php
  * assert(array_insert([1, 2, 3], 'x')                         === [1, 2, 3, 'x']);
  * assert(array_insert([1, 2, 3], 'x', 1)                      === [1, 'x', 2, 3]);
  * assert(array_insert([1, 2, 3], 'x', -1)                     === [1, 2, 'x', 3]);
- * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'A', 'B', 2, 3]);
+ * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'a' => 'A', 'b' => 'B', 2, 3]);
  * ```
  *
  * @param array $array 対象配列
@@ -821,8 +918,9 @@ function array_insert($array, $value, $position = null)
     }
 
     $position = is_null($position) ? count($array) : intval($position);
-    array_splice($array, $position, 0, $value);
-    return $array;
+
+    $sarray = array_splice($array, 0, $position);
+    return array_merge($sarray, $value, $array);
 }
 
 /**
@@ -1430,6 +1528,52 @@ function rbind($callable)
 }
 
 /**
+ * 返り値の真偽値を逆転した新しいクロージャを返す
+ *
+ * Example:
+ * ```php
+ * $not_strlen = not_func('strlen');
+ * assert($not_strlen('hoge') === false);
+ * assert($not_strlen('')     === true);
+ * ```
+ *
+ * @param callable $callable 対象 callable
+ * @return \Closure 新しいクロージャ
+ */
+function not_func($callable)
+{
+    return function () use ($callable) { return !call_user_func_array($callable, func_get_args()); };
+}
+
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * 指定コードで eval するクロージャを返す
+ *
+ * create_function のクロージャ版みたいなもの。
+ * 参照渡しは未対応。
+ *
+ * Example:
+ * ```php
+ * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
+ * assert($evalfunc(1, 2, 3) === 6);
+ * ```
+ *
+ * @param string $expression eval コード
+ * @param mixed $variadic 引数名（可変引数）
+ * @return \Closure 新しいクロージャ
+ */
+function eval_func($expression)
+{
+    $args = array_slice(func_get_args(), 1);
+    return function () use ($expression, $args) {
+        return call_user_func(function () {
+            extract(func_get_arg(1));
+            return eval("return " . func_get_arg(0) . ";");
+        }, $expression, array_combine($args, func_get_args()));
+    };
+}
+
+/**
  * callable から ReflectionFunctionAbstract を生成する
  *
  * Example:
@@ -1641,6 +1785,48 @@ function str_equals($str1, $str2, $case_insensitivity = false)
     }
 
     return $str1 === $str2;
+}
+
+/**
+ * 指定文字列を含むか返す
+ *
+ * Example:
+ * ```php
+ * assert(str_contains('abc', 'b')                      === true);
+ * assert(str_contains('abc', 'B', true)                === true);
+ * assert(str_contains('abc', ['b', 'x'], false, false) === true);
+ * assert(str_contains('abc', ['b', 'x'], false, true)  === false);
+ * ```
+ *
+ * @param string $haystack 対象文字列
+ * @param string|array $needle 調べる文字列
+ * @param bool $case_insensitivity 大文字小文字を区別するか
+ * @param bool $and_flag すべて含む場合に true を返すか
+ * @return bool $needle を含むなら true
+ */
+function str_contains($haystack, $needle, $case_insensitivity = false, $and_flag = false)
+{
+    if (!is_array($needle)) {
+        $needle = [$needle];
+    }
+
+    // あくまで文字列としての判定に徹する（strpos の第2引数は闇が深い気がする）
+    $haystack = (string) $haystack;
+    $needle = array_map('strval', $needle);
+
+    foreach ($needle as $str) {
+        if ($str === '') {
+            continue;
+        }
+        $pos = $case_insensitivity ? stripos($haystack, $str) : strpos($haystack, $str);
+        if ($and_flag && $pos === false) {
+            return false;
+        }
+        if (!$and_flag && $pos !== false) {
+            return true;
+        }
+    }
+    return !!$and_flag;
 }
 
 /**

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Function array_filter_not</title>
+	<title>Function array_where</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?23faeebd7cd7ff50c657f933aca130a3ad9d1159">
@@ -95,7 +95,7 @@
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
 				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
 				<li><a href="function-array_filter_key.html">array_filter_key<small class="summary">: キーを主軸とした array_filter</small></a></li>
-				<li class="active"><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
+				<li><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
 				<li><a href="function-array_get.html">array_get<small class="summary">: デフォルト値付きの配列値取得</small></a></li>
 				<li><a href="function-array_grep_key.html">array_grep_key<small class="summary">: キーを正規表現でフィルタする</small></a></li>
 				<li><a href="function-array_insert.html">array_insert<small class="summary">: 配列・連想配列を問わず任意の位置に値を挿入する</small></a></li>
@@ -111,7 +111,7 @@
 				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
 				<li><a href="function-array_uncolumns.html">array_uncolumns<small class="summary">: array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する</small></a></li>
 				<li><a href="function-array_unset.html">array_unset<small class="summary">: 伏せると同時にその値を返す</small></a></li>
-				<li><a href="function-array_where.html">array_where<small class="summary">: 指定キーの要素で array_filter する</small></a></li>
+				<li class="active"><a href="function-array_where.html">array_where<small class="summary">: 指定キーの要素で array_filter する</small></a></li>
 				<li><a href="function-arrayize.html">arrayize<small class="summary">: 引数の配列を生成する。</small></a></li>
 				<li><a href="function-first_key.html">first_key<small class="summary">: 配列の最初のキーを返す</small></a></li>
 				<li><a href="function-first_keyvalue.html">first_keyvalue<small class="summary">: 配列の最初のキー/値ペアをタプルで返す</small></a></li>
@@ -130,17 +130,40 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="function">
-	<h1>Function array_filter_not</h1>
+	<h1>Function array_where</h1>
 
 
 	<div class="description">
-	<p>array_filter の否定版</p>
+	<p>指定キーの要素で array_filter する</p>
 
-<p>単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。</p>
+<p>array_column があるなら array_where があってもいいはず。</p>
+
+<p>$column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。
+$where は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
+つまり $column も $where も省略した場合、実質的に array_filter と同じ動作になる。</p>
+
+<p>$column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。</p>
+
+<p>$where が要求するならキーも渡ってくる。</p>
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_filter_not([<span class="php-quote">'a'</span>, <span class="php-quote">''</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'strlen'</span>) === [<span class="php-num">1</span> =&gt; <span class="php-quote">''</span>]);</pre>
+<pre><span class="php-var">$array</span> = [
+<span class="php-num">0</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'hoge'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">false</span>],
+<span class="php-num">1</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'fuga'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">true</span>],
+<span class="php-num">2</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'piyo'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">false</span>],
+];
+<span class="php-comment">// 'flag' が true 相当のものだけ返す</span>
+<span class="php-keyword2">assert</span>(array_where(<span class="php-var">$array</span>, <span class="php-quote">'flag'</span>)                           === [<span class="php-num">1</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'fuga'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">true</span>]]);
+<span class="php-comment">// 'name' に 'h' を含むものだけ返す</span>
+<span class="php-var">$contain_h</span> = <span class="php-keyword1">function</span>(<span class="php-var">$name</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">strpos</span>(<span class="php-var">$name</span>, <span class="php-quote">'h'</span>) !== <span class="php-keyword1">false</span>;};
+<span class="php-keyword2">assert</span>(array_where(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-var">$contain_h</span>)               === [<span class="php-num">0</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'hoge'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">false</span>]]);
+<span class="php-comment">// $where が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）</span>
+<span class="php-var">$equal_2</span> = <span class="php-keyword1">function</span>(<span class="php-var">$row</span>, <span class="php-var">$key</span>){<span class="php-keyword1">return</span> <span class="php-var">$key</span> === <span class="php-num">2</span>;};
+<span class="php-keyword2">assert</span>(array_where(<span class="php-var">$array</span>, <span class="php-keyword1">null</span>, <span class="php-var">$equal_2</span>)                   === [<span class="php-num">2</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'piyo'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">false</span>]]);
+<span class="php-comment">// $column に配列を渡すと共通項が渡ってくる</span>
+<span class="php-var">$idname_is_2fuga</span> = <span class="php-keyword1">function</span>(<span class="php-var">$idname</span>){<span class="php-keyword1">return</span> (<span class="php-var">$idname</span>[<span class="php-quote">'id'</span>] . <span class="php-var">$idname</span>[<span class="php-quote">'name'</span>]) === <span class="php-quote">'2fuga'</span>;};
+<span class="php-keyword2">assert</span>(array_where(<span class="php-var">$array</span>, [<span class="php-quote">'id'</span>, <span class="php-quote">'name'</span>], <span class="php-var">$idname_is_2fuga</span>) === [<span class="php-num">1</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'fuga'</span>, <span class="php-quote">'flag'</span> =&gt; <span class="php-keyword1">true</span>]]);</pre>
 	</div>
 
 
@@ -152,10 +175,15 @@
 			<td class="value"><code><var>$array</var></code></td>
 			<td>対象配列</td>
 		</tr>
-		<tr id="$callback">
+		<tr id="$column">
+			<td class="name"><code>string|array|null</code></td>
+			<td class="value"><code><var>$column</var> = <span class="php-keyword1">null</span></code></td>
+			<td>キー名</td>
+		</tr>
+		<tr id="$where">
 			<td class="name"><code>callable</code></td>
-			<td class="value"><code><var>$callback</var></code></td>
-			<td>評価 callable</td>
+			<td class="value"><code><var>$where</var> = <span class="php-keyword1">null</span></code></td>
+			<td>評価クロージャ</td>
 		</tr>
 		</table>
 	</div>
@@ -168,7 +196,7 @@
 				array
 			</code></td>
 			<td>
-				$callback が false を返した新しい配列
+				$where が真を返した新しい配列
 			</td>
 		</tr>
 		</table>
@@ -179,7 +207,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_filter_not.html#533-550" title="Go to source code">
+		<a href="source-function-array_where.html#601-678" title="Go to source code">
 			array.php
 		</a><br>
 	</div>

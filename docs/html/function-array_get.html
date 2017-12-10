@@ -6,7 +6,7 @@
 	<title>Function array_get</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
-	<link rel="stylesheet" href="resources/style.css?4bb6454ea5dbd127d475d6edffaf8eda279d79a3">
+	<link rel="stylesheet" href="resources/style.css?23faeebd7cd7ff50c657f933aca130a3ad9d1159">
 
 </head>
 
@@ -111,6 +111,7 @@
 				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
 				<li><a href="function-array_uncolumns.html">array_uncolumns<small class="summary">: array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する</small></a></li>
 				<li><a href="function-array_unset.html">array_unset<small class="summary">: 伏せると同時にその値を返す</small></a></li>
+				<li><a href="function-array_where.html">array_where<small class="summary">: 指定キーの要素で array_filter する</small></a></li>
 				<li><a href="function-arrayize.html">arrayize<small class="summary">: 引数の配列を生成する。</small></a></li>
 				<li><a href="function-first_key.html">first_key<small class="summary">: 配列の最初のキーを返す</small></a></li>
 				<li><a href="function-first_keyvalue.html">first_keyvalue<small class="summary">: 配列の最初のキー/値ペアをタプルで返す</small></a></li>
@@ -137,10 +138,22 @@
 
 <p>存在しない場合は $default を返す。</p>
 
+<p>$key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。
+その場合、$default が活きるのは「全て無かった場合」となる。
+さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。</p>
+
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">1</span>)      === <span class="php-quote">'b'</span>);
-<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">9</span>, <span class="php-num">999</span>) === <span class="php-num">999</span>);</pre>
+<pre><span class="php-comment">// 単純取得</span>
+<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">1</span>)      === <span class="php-quote">'b'</span>);
+<span class="php-comment">// 単純デフォルト</span>
+<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">9</span>, <span class="php-num">999</span>) === <span class="php-num">999</span>);
+<span class="php-comment">// 配列取得</span>
+<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">0</span>, <span class="php-num">2</span>]) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
+<span class="php-comment">// 配列部分取得</span>
+<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">0</span>, <span class="php-num">9</span>]) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>]);
+<span class="php-comment">// 配列デフォルト（null ではなく [] を返す）</span>
+<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">9</span>])    === []);</pre>
 	</div>
 
 
@@ -153,7 +166,7 @@
 			<td>配列</td>
 		</tr>
 		<tr id="$key">
-			<td class="name"><code>string|integer</code></td>
+			<td class="name"><code>string|integer|array</code></td>
 			<td class="value"><code><var>$key</var></code></td>
 			<td>取得したいキー</td>
 		</tr>
@@ -184,7 +197,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_get.html#283-305" title="Go to source code">
+		<a href="source-function-array_get.html#283-329" title="Go to source code">
 			array.php
 		</a><br>
 	</div>
@@ -197,6 +210,6 @@
 	</div>
 </div>
 <script src="resources/combined.js?64829dd0598cd54a3fd46ce58f8efe7e2fac9ecc"></script>
-<script src="elementlist.js?f91d6677db9503d59bab3a54a365febdc14b01da"></script>
+<script src="elementlist.js?a5f243ccf3c59c84e8389952b3fea701fcfc1f72"></script>
 </body>
 </html>
