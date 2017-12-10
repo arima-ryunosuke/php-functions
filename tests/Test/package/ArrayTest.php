@@ -179,6 +179,45 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a', 2 => 'c'], array_filter_eval(['a', 'b', 'c'], '$v !== "b"'));
     }
 
+    function test_array_where()
+    {
+        $array = [
+            0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+            1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ];
+
+        // 省略すればそのまま
+        $this->assertEquals($array, array_where($array));
+
+        // flag 値で true フィルタ
+        $this->assertEquals([
+            1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+        ], array_where($array, 'flag'));
+
+        // name 値でクロージャフィルタ（'o' を含む）
+        $this->assertEquals([
+            0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ], array_where($array, 'name', function ($name) {
+            return strpos($name, 'o') !== false;
+        }));
+
+        // id, name 値でクロージャフィルタ（id === 3 && 'o' を含む）
+        $this->assertEquals([
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ], array_where($array, ['id', 'name'], function ($id_name) {
+            return $id_name['id'] === 3 && strpos($id_name['name'], 'o') !== false;
+        }));
+
+        // キーでクロージャフィルタ（key === 2）
+        $this->assertEquals([
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ], array_where($array, null, function ($name, $key) {
+            return $key === 2;
+        }));
+    }
+
     function test_array_map_filter()
     {
         // strict:false なので 0 が除外される

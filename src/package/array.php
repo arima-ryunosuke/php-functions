@@ -599,6 +599,85 @@ function array_filter_eval($array, $expression)
 }
 
 /**
+ * 指定キーの要素で array_filter する
+ *
+ * array_column があるなら array_where があってもいいはず。
+ *
+ * $column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。
+ * $where は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
+ * つまり $column も $where も省略した場合、実質的に array_filter と同じ動作になる。
+ *
+ * $column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。
+ *
+ * $where が要求するならキーも渡ってくる。
+ *
+ * Example:
+ * ```php
+ * $array = [
+ * 0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+ * 1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+ * 2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+ * ];
+ * // 'flag' が true 相当のものだけ返す
+ * assert(array_where($array, 'flag')                           === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+ * // 'name' に 'h' を含むものだけ返す
+ * $contain_h = function($name){return strpos($name, 'h') !== false;};
+ * assert(array_where($array, 'name', $contain_h)               === [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
+ * // $where が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
+ * $equal_2 = function($row, $key){return $key === 2;};
+ * assert(array_where($array, null, $equal_2)                   === [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+ * // $column に配列を渡すと共通項が渡ってくる
+ * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
+ * assert(array_where($array, ['id', 'name'], $idname_is_2fuga) === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+ * ```
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param string|array|null $column キー名
+ * @param callable $where 評価クロージャ
+ * @return array $where が真を返した新しい配列
+ */
+function array_where($array, $column = null, $where = null)
+{
+    $is_array = is_array($column);
+    if ($is_array) {
+        $column = array_flip($column);
+    }
+
+    $plength = 0;
+    if ($where !== null) {
+        $plength = parameter_length($where, true);
+    }
+
+    $result = [];
+    foreach ($array as $k => $v) {
+        if ($column === null) {
+            $value = $v;
+        }
+        else if ($is_array) {
+            $value = array_intersect_key($v, $column);
+        }
+        else {
+            $value = $v[$column];
+        }
+
+        if ($where === null) {
+            $match = $value;
+        }
+        else if ($plength === 1) {
+            $match = $where($value);
+        }
+        else {
+            $match = $where($value, $k);
+        }
+
+        if ($match) {
+            $result[$k] = $v;
+        }
+    }
+    return $result;
+}
+
+/**
  * array_map + array_filter する
  *
  * コールバックを適用して、結果が true 相当の要素のみ取り出す。
