@@ -215,6 +215,92 @@ function last_keyvalue($array, $default = null)
     return $default;
 }
 
+/**
+ * 配列の指定キーの前のキーを返す
+ *
+ * $key が最初のキーだった場合は null を返す。
+ * $key が存在しない場合は false を返す。
+ *
+ * Example:
+ * ```php
+ * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 'b' キーの前は 'a'
+ * assert(prev_key($array, 'b') === 'a');
+ * // 'a' キーの前は無いので null
+ * assert(prev_key($array, 'a') === null);
+ * // 'x' キーはそもそも存在しないので false
+ * assert(prev_key($array, 'x') === false);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param string|int $key 調べるキー
+ * @return string|int|bool|null $key の前のキー
+ */
+function prev_key($array, $key)
+{
+    $key = (string) $key;
+    $current = null;
+    foreach ($array as $k => $v) {
+        if ($key === (string) $k) {
+            return $current;
+        }
+        $current = $k;
+    }
+    return false;
+}
+
+/**
+ * 配列の指定キーの次のキーを返す
+ *
+ * $key が最後のキーだった場合は null を返す。
+ * $key が存在しない場合は false を返す。
+ * $key が未指定だと「次に生成されるキー」（$array[]='hoge' で生成されるキー）を返す。
+ *
+ * $array[] = 'hoge' で作成されるキーには完全準拠しない（標準は unset すると結構乱れる）。公式マニュアルを参照。
+ *
+ * Example:
+ * ```php
+ * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 'b' キーの次は 'c'
+ * assert(next_key($array, 'b') === 'c');
+ * // 'c' キーの次は無いので null
+ * assert(next_key($array, 'c') === null);
+ * // 'x' キーはそもそも存在しないので false
+ * assert(next_key($array, 'x') === false);
+ * // 次に生成されるキーは 10
+ * assert(next_key($array, null) === 10);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param string|int|null $key 調べるキー
+ * @return string|int|bool|null $key の次のキー
+ */
+function next_key($array, $key = null)
+{
+    $keynull = $key === null;
+    $key = (string) $key;
+    $current = false;
+    $max = -1;
+    foreach ($array as $k => $v) {
+        if ($current !== false) {
+            return $k;
+        }
+        if ($key === (string) $k) {
+            $current = null;
+        }
+        if ($keynull && is_int($k) && $k > $max) {
+            $max = $k;
+        }
+    }
+    if ($keynull) {
+        // PHP 4.3.0 以降は0以下にはならない
+        return max(0, $max + 1);
+    }
+    else {
+        return $current;
+    }
+}
+
 /** @noinspection PhpDocSignatureInspection */
 /**
  * 配列の+演算子の関数版
@@ -279,6 +365,38 @@ function array_pos($array, $position, $return_key = false)
     }
 
     throw new \OutOfBoundsException("$position is not found.");
+}
+
+/**
+ * 配列を与えると指定キーの値を返すクロージャを返す
+ *
+ * 存在しない場合は $default を返す。
+ *
+ * $key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。
+ * その場合、$default が活きるのは「全て無かった場合」となる。
+ * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
+ *
+ * Example:
+ * ```php
+ * $fuga_of_array = array_of('fuga');
+ * assert($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']) === 'FUGA');
+ * ```
+ *
+ * @param string|int|array $key 取得したいキー
+ * @param mixed $default デフォルト値
+ * @return \Closure $key の値を返すクロージャ
+ */
+function array_of($key, $default = null)
+{
+    $nodefault = func_num_args() === 1;
+    return function (array $array) use ($key, $default, $nodefault) {
+        if ($nodefault) {
+            return array_get($array, $key);
+        }
+        else {
+            return array_get($array, $key, $default);
+        }
+    };
 }
 
 /**
@@ -568,11 +686,9 @@ function array_filter_not($array, $callback)
  */
 function array_filter_key($array, $callback)
 {
-    $plength = parameter_length($callback, true);
     $result = [];
     foreach ($array as $k => $v) {
-        $vv = $plength === 1 ? $callback($k) : $callback($k, $v);
-        if ($vv) {
+        if ($callback($k, $v)) {
             $result[$k] = $v;
         }
     }
@@ -605,12 +721,12 @@ function array_filter_eval($array, $expression)
  * array_column があるなら array_where があってもいいはず。
  *
  * $column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。
- * $where は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
- * つまり $column も $where も省略した場合、実質的に array_filter と同じ動作になる。
+ * $callback は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
+ * つまり $column も $callback も省略した場合、実質的に array_filter と同じ動作になる。
  *
  * $column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。
  *
- * $where が要求するならキーも渡ってくる。
+ * $callback が要求するならキーも渡ってくる。
  *
  * Example:
  * ```php
@@ -624,7 +740,7 @@ function array_filter_eval($array, $expression)
  * // 'name' に 'h' を含むものだけ返す
  * $contain_h = function($name){return strpos($name, 'h') !== false;};
  * assert(array_where($array, 'name', $contain_h)               === [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
- * // $where が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
+ * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
  * $equal_2 = function($row, $key){return $key === 2;};
  * assert(array_where($array, null, $equal_2)                   === [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
  * // $column に配列を渡すと共通項が渡ってくる
@@ -634,44 +750,31 @@ function array_filter_eval($array, $expression)
  *
  * @param array|\Traversable $array 対象配列
  * @param string|array|null $column キー名
- * @param callable $where 評価クロージャ
+ * @param callable $callback 評価クロージャ
  * @return array $where が真を返した新しい配列
  */
-function array_where($array, $column = null, $where = null)
+function array_where($array, $column = null, $callback = null)
 {
     $is_array = is_array($column);
     if ($is_array) {
         $column = array_flip($column);
     }
 
-    $plength = 0;
-    if ($where !== null) {
-        $plength = parameter_length($where, true);
-    }
+    $callback = func_user_func_array($callback);
 
     $result = [];
     foreach ($array as $k => $v) {
         if ($column === null) {
-            $value = $v;
+            $vv = $v;
         }
         else if ($is_array) {
-            $value = array_intersect_key($v, $column);
+            $vv = array_intersect_key($v, $column);
         }
         else {
-            $value = $v[$column];
+            $vv = $v[$column];
         }
 
-        if ($where === null) {
-            $match = $value;
-        }
-        else if ($plength === 1) {
-            $match = $where($value);
-        }
-        else {
-            $match = $where($value, $k);
-        }
-
-        if ($match) {
+        if ($callback($vv, $k)) {
             $result[$k] = $v;
         }
     }
@@ -699,10 +802,10 @@ function array_where($array, $column = null, $where = null)
  */
 function array_map_filter($array, $callback, $strict = false)
 {
-    $plength = parameter_length($callback, true);
+    $callback = func_user_func_array($callback);
     $result = [];
     foreach ($array as $k => $v) {
-        $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
+        $vv = $callback($v, $k);
         if (($strict && $vv !== null) || (!$strict && $vv)) {
             $result[$k] = $vv;
         }
@@ -949,15 +1052,111 @@ function array_assort($array, $rules)
 {
     $result = array_fill_keys(array_keys($rules), []);
     foreach ($rules as $name => $rule) {
-        $plength = parameter_length($rule, true);
+        $rule = func_user_func_array($rule);
         foreach ($array as $k => $v) {
-            $vv = $plength === 1 ? $rule($v) : $rule($v, $k);
-            if ($vv) {
+            if ($rule($v, $k)) {
                 $result[$name][$k] = $v;
             }
         }
     }
     return $result;
+}
+
+/**
+ * 配列をコールバックの返り値でグループ化する
+ *
+ * Example:
+ * ```php
+ * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
+ * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
+ * ```
+ *
+ * @param array|\Traversable 対象配列
+ * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+ * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
+ * @return array グルーピングされた配列
+ */
+function array_group($array, $callback = null, $preserve_keys = false)
+{
+    $callback = func_user_func_array($callback);
+
+    $result = [];
+    foreach ($array as $k => $v) {
+        $vv = $callback($v, $k);
+        if (!$preserve_keys && is_int($k)) {
+            $result[$vv][] = $v;
+        }
+        else {
+            $result[$vv][$k] = $v;
+        }
+    }
+    return $result;
+}
+
+/**
+ * 全要素が true になるなら true を返す（1つでも false なら false を返す）
+ *
+ * $callback が要求するならキーも渡ってくる。
+ *
+ * Example:
+ * ```php
+ * assert(array_all([true, true])   === true);
+ * assert(array_all([true, false])  === false);
+ * assert(array_all([false, false]) === false);
+ * ```
+ *
+ * @param array|\Traversable 対象配列
+ * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+ * @param bool|mixed $default 空配列の場合のデフォルト値
+ * @return bool 全要素が true なら true
+ */
+function array_all($array, $callback = null, $default = true)
+{
+    if (empty($array)) {
+        return $default;
+    }
+
+    $callback = func_user_func_array($callback);
+
+    foreach ($array as $k => $v) {
+        if (!$callback($v, $k)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * 全要素が false になるなら false を返す（1つでも true なら true を返す）
+ *
+ * $callback が要求するならキーも渡ってくる。
+ *
+ * Example:
+ * ```php
+ * assert(array_any([true, true])   === true);
+ * assert(array_any([true, false])  === true);
+ * assert(array_any([false, false]) === false);
+ * ```
+ *
+ * @param array|\Traversable 対象配列
+ * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+ * @param bool|mixed $default 空配列の場合のデフォルト値
+ * @return bool 全要素が false なら false
+ */
+function array_any($array, $callback = null, $default = false)
+{
+    if (empty($array)) {
+        return $default;
+    }
+
+    $callback = func_user_func_array($callback);
+
+    foreach ($array as $k => $v) {
+        if ($callback($v, $k)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -1022,11 +1221,17 @@ function array_order(array $array, $orders, $preserve_keys = false)
             $columns = $array;
         }
         else {
-            if (!array_key_exists($key, $first)) {
+            if ($key !== '' && !array_key_exists($key, $first)) {
                 throw new \InvalidArgumentException("$key is undefined.");
             }
-            $firstval = $first[$key];
-            $columns = array_column($array, $key);
+            if ($key === '') {
+                $columns = array_keys($array);
+                $firstval = reset($columns);
+            }
+            else {
+                $firstval = $first[$key];
+                $columns = array_column($array, $key);
+            }
         }
 
         // bool は ASC, DESC
@@ -1051,7 +1256,7 @@ function array_order(array $array, $orders, $preserve_keys = false)
         else if ($order instanceof \Closure) {
             $ref = new \ReflectionFunction($order);
             // 引数2個なら比較関数
-            if ($ref->getNumberOfParameters() === 2) {
+            if ($ref->getNumberOfRequiredParameters() === 2) {
                 $map = $columns;
                 usort($map, $order);
                 $args[] = $position($columns, $map);
@@ -1196,6 +1401,118 @@ function array_uncolumns($array, $template = null)
     }
     return $result;
 }
+
+/**
+ * 配列の各要素に再帰的にコールバックを適用して変換する
+ *
+ * $callback は下記の仕様。
+ *
+ * 引数は (キー, 値, 元配列, 大元配列) で渡ってくる。
+ * 返り値は新しいキーを返す。
+ * - 文字列や数値を返すとそれがキーとして使われる
+ * - null を返すと元のキーがそのまま使われる
+ * - true を返すと数値連番が振られる
+ * - false を返すとその要素は無かったことになる
+ * - 配列を返すとその配列で完全に置換される
+ *
+ * $apply_array=false で要素が配列の場合は再帰され、コールバックが適用されない（array_walk_recursive と同じ仕様）。
+ *
+ * $apply_array=true だと配列かは問わず全ての要素にコールバックが適用される。
+ * 配列も渡ってきてしまうのでコールバック内部で is_array 判定が必要になる場合がある。
+ *
+ * 「map も filter も可能でキー変更可能かつ再帰的」というとてもマッチョな関数。
+ * 複雑だが実質的には「キーも設定できる array_walk_recursive」のように振る舞う（そしてそのような使い方を想定している）。
+ *
+ * Example:
+ * ```php
+ * $array = [
+ *     'k1' => 'v1',
+ *     'k2' => [
+ *         'k21' => 'v21',
+ *         'k22' => [
+ *             'k221' => 'v221',
+ *             'k222' => 'v222',
+ *         ],
+ *     ],
+ * ];
+ * // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k22' はまるごと伏せる。さらに 'k21' はそのままとする
+ * $callback = function($k, &$v){if ($k === 'k22') return false; if ($k === 'k21') return null; if(!is_array($v)) $v = "prefix-$v"; return "_$k";};
+ * assert(array_convert($array, $callback, true) === [
+ *     '_k1' => 'prefix-v1',
+ *     '_k2' => [
+ *         'k21' => 'v21',
+ *     ],
+ * ]);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param callable $callback 適用するコールバック
+ * @param bool $apply_array 配列要素にもコールバックを適用するか
+ * @return array 変換された配列
+ */
+function array_convert($array, $callback, $apply_array = false)
+{
+    $recursive = function (&$result, $array, $source, $callback) use (&$recursive, $apply_array) {
+        $sequences = [];
+        foreach ($array as $key => $value) {
+            $is_array = is_array($value);
+            $newkey = $key;
+            // 配列で $apply_array あるいは非配列の場合にコールバック適用
+            if (($is_array && $apply_array) || !$is_array) {
+                $newkey = $callback($key, $value, $array, $source);
+            }
+            // 配列は置換
+            if (is_array($newkey)) {
+                foreach ($newkey as $k => $v) {
+                    $result[$k] = $v;
+                }
+                continue;
+            }
+            // false はスルー
+            if ($newkey === false) {
+                continue;
+            }
+            // true は数値連番
+            if ($newkey === true) {
+                if ($is_array) {
+                    $sequences["_$key"] = $value;
+                }
+                else {
+                    $sequences[] = $value;
+                }
+                continue;
+            }
+            // null は元のキー
+            if ($newkey === null) {
+                $newkey = $key;
+            }
+            // 配列と非配列で代入の仕方が異なる
+            if ($is_array) {
+                $result[$newkey] = [];
+                $recursive($result[$newkey], $value, $source, $callback);
+            }
+            else {
+                $result[$newkey] = $value;
+            }
+        }
+        // 数値連番は上書きを防ぐためにあとでやる
+        foreach ($sequences as $key => $value) {
+            if (is_string($key)) {
+                $v = [];
+                $result[] = &$v;
+                $recursive($v, $value, $source, $callback);
+                unset($v);
+            }
+            else {
+                $result[] = $value;
+            }
+        }
+    };
+
+    $result = [];
+    $recursive($result, $array, $array, $callback);
+    return $result;
+}
 /**
  * composer のクラスローダを返す
  *
@@ -1216,7 +1533,7 @@ function class_loader($startdir = null)
             $dir = $startdir ?: __DIR__;
             while ($dir !== ($pdir = dirname($dir))) {
                 $dir = $pdir;
-                if (file_exists($file = "$dir/autoload.php") | file_exists($file = "$dir/vendor/autoload.php")) {
+                if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
                     $cache = $file;
                     break;
                 }
@@ -1311,7 +1628,7 @@ function class_replace($class, $register, $dirname = null)
     $fname = rtrim(($dirname ?: sys_get_temp_dir()), '/\\') . '/' . str_replace('\\', '/', $class) . '.php';
     if (func_num_args() === 2 || !file_exists($fname)) {
         $content = file_get_contents($classfile);
-        $content = preg_replace("#class\\s+[a-z0-9_]#ui", '$0_', $content);
+        $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
         file_set_contents($fname, $content);
     }
     require_once $fname;
@@ -1367,6 +1684,75 @@ function has_class_methods($class, $method_name)
     });
     return isset($cache[$class][strtolower($method_name)]);
 }
+/**
+ * ファイル一覧を配列で返す
+ *
+ * @param string $dirname 調べるディレクトリ名
+ * @param \Closure|array $filter_condition フィルタ条件
+ * @return array|false ファイルの配列
+ */
+function file_list($dirname, $filter_condition = null)
+{
+    $dirname = realpath($dirname);
+    if (!file_exists($dirname)) {
+        return false;
+    }
+
+    $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS);
+    $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+
+    $result = [];
+    foreach ($rii as $it) {
+        if (!$it->isDir()) {
+            if ($filter_condition === null || $filter_condition($it->getPathname())) {
+                $result[] = $it->getPathname();
+            }
+        }
+    }
+    return $result;
+}
+
+/**
+ * ディレクトリ階層をツリー構造で返す
+ *
+ * @param string $dirname 調べるディレクトリ名
+ * @param \Closure|array $filter_condition フィルタ条件
+ * @return array|false ツリー構造の配列
+ */
+function file_tree($dirname, $filter_condition = null)
+{
+    $dirname = realpath($dirname);
+    if (!file_exists($dirname)) {
+        return false;
+    }
+
+    $basedir = basename($dirname);
+
+    $result = [];
+    foreach (new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS) as $item) {
+        if (!isset($result[$basedir])) {
+            $result[$basedir] = [];
+        }
+        if ($item->isDir()) {
+            $result[$basedir] += file_tree($item->getPathname(), $filter_condition);
+        }
+        else {
+            if ($filter_condition === null || $filter_condition($item->getPathname())) {
+                $result[$basedir][$item->getBasename()] = $item->getPathname();
+            }
+        }
+    }
+    // フィルタで全除去されると空エントリになるので明示的に削除
+    if (!$result[$basedir]) {
+        unset($result[$basedir]);
+    }
+    // ファイルの方が強いファイル名順
+    else {
+        $result[$basedir] = array_order($result[$basedir], ['is_array', return_arg(1)], true);
+    }
+    return $result;
+}
+
 /**
  * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
  *
@@ -1424,11 +1810,31 @@ function file_set_contents($filename, $data, $umask = 0002)
     }
 
     if (!is_dir($dirname = dirname($filename))) {
-        if (!@mkdir($dirname, 0777 & (~$umask), true)) {
+        if (!@mkdir_p($dirname, $umask)) {
             throw new \RuntimeException("failed to mkdir($dirname)");
         }
     }
     return file_put_contents($filename, $data);
+}
+
+/**
+ * ディレクトリを再帰的に掘る
+ *
+ * @param string $dirname ディレクトリ名
+ * @param int $umask ディレクトリを掘る際の umask
+ * @return bool 作成したら true
+ */
+function mkdir_p($dirname, $umask = 0002)
+{
+    if (func_num_args() === 1) {
+        $umask = umask();
+    }
+
+    if (file_exists($dirname)) {
+        return false;
+    }
+
+    return mkdir($dirname, 0777 & (~$umask), true);
 }
 
 /**
@@ -1529,6 +1935,23 @@ function rbind($callable)
 }
 
 /**
+ * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
+ *
+ * @param int $n $n 番目の引数
+ * @return \Closure $n 番目の引数をそのまま返すクロージャ
+ */
+function return_arg($n)
+{
+    static $cache = [];
+    if (!isset($cache[$n])) {
+        $cache[$n] = function () use ($n) {
+            return func_get_arg($n);
+        };
+    }
+    return $cache[$n];
+}
+
+/**
  * 返り値の真偽値を逆転した新しいクロージャを返す
  *
  * Example:
@@ -1589,7 +2012,7 @@ function eval_func($expression)
 function reflect_callable($callable)
 {
     // callable チェック兼 $call_name 取得
-    if (!is_callable($callable, false, $call_name)) {
+    if (!is_callable($callable, true, $call_name)) {
         throw new \InvalidArgumentException("'$call_name' is not callable");
     }
 
@@ -1639,6 +2062,67 @@ function closurize($callable)
         }
     }
     return $ref->getClosure();
+}
+
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * エラーを例外に変換するブロックでコールバックを実行する
+ *
+ * Example:
+ * ```php
+ * try {
+ * call_safely(function(){return $v;});
+ * }
+ * catch (\Exception $ex) {
+ * assert($ex->getMessage() === 'Undefined variable: v');
+ * }
+ * ```
+ *
+ * @param callable $callback 実行するコールバック
+ * @param mixed $variadic $callback に渡される引数（可変引数）
+ * @return mixed $callback の返り値
+ */
+function call_safely($callback)
+{
+    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+    });
+
+    try {
+        $return = call_user_func_array($callback, array_slice(func_get_args(), 1));
+        restore_error_handler();
+        return $return;
+    }
+    catch (\Exception $ex) {
+        restore_error_handler();
+        throw $ex;
+    }
+}
+
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * ob_start ～ ob_get_clean のブロックでコールバックを実行する
+ *
+ * Example:
+ * ```php
+ * assert(ob_capture(function(){echo 123;}) === '123');
+ * ```
+ *
+ * @param callable $callback 実行するコールバック
+ * @param mixed $variadic $callback に渡される引数（可変引数）
+ * @return string オフスリーンバッファの文字列
+ */
+function ob_capture($callback)
+{
+    ob_start();
+    try {
+        call_user_func_array($callback, array_slice(func_get_args(), 1));
+        return ob_get_clean();
+    }
+    catch (\Exception $ex) {
+        ob_end_clean();
+        throw $ex;
+    }
 }
 
 /**
@@ -1694,6 +2178,37 @@ function function_shorten($function)
 {
     $parts = explode('\\', $function);
     return array_pop($parts);
+}
+
+/**
+ * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
+ *
+ * デフォルト引数はカウントされない。必須パラメータの数で呼び出す。
+ * もちろん可変引数は未対応。
+ *
+ * $callback に null を与えると例外的に「第1引数を返すクロージャ」を返す。
+ *
+ * php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。
+ *
+ * Example:
+ * ```php
+ * // strlen に2つの引数を渡してもエラーにならない
+ * $strlen = func_user_func_array('strlen');
+ * assert($strlen('abc', null)       === 3);
+ * ```
+ *
+ * @param callable $callback 呼び出すクロージャ
+ * @return \Closure 引数ぴったりで呼び出すクロージャ
+ */
+function func_user_func_array($callback)
+{
+    if ($callback === null) {
+        return function ($v) { return $v; };
+    }
+    $plength = parameter_length($callback, true);
+    return function () use ($callback, $plength) {
+        return call_user_func_array($callback, array_slice(func_get_args(), 0, $plength));
+    };
 }
 /** @noinspection PhpDocSignatureInspection */
 /**
@@ -2278,6 +2793,159 @@ function try_catch_finally($try, $catch = null, $finally = null)
     }
     return $return;
 }
+/**
+ * 簡易ベンチマークを取る
+ *
+ * 「指定ミリ秒内で何回コールできるか？」でベンチする。
+ *
+ * $suite は ['表示名' => $callable] 形式の配列。
+ * 表示名が与えられていない場合、それらしい名前で表示する。
+ *
+ * Example:
+ * ```php
+ * // intval と int キャストはどちらが早いか調べる
+ * benchmark([
+ * 'intval',
+ * 'intcast' => function($v){return (int)$v;},
+ * ], 10, ['12345']);
+ * ```
+ *
+ * @param array|callable $suite ベンチ対象処理
+ * @param int $millisec 呼び出しミリ秒
+ * @param array $args 各ケースに与えられる引数
+ * @param bool $output true だと標準出力に出力される
+ * @return array ベンチ結果の配列
+ */
+function benchmark($suite, $millisec = 1000, $args = [], $output = true)
+{
+    $benchset = [];
+    foreach (arrayize($suite) as $name => $caller) {
+        if (!is_callable($caller, false, $callname)) {
+            throw new \InvalidArgumentException('caller is not callable.');
+        }
+
+        if (is_int($name)) {
+            // クロージャは "Closure::__invoke" になるので "ファイル#開始行-終了行" にする
+            if ($caller instanceof \Closure) {
+                $ref = new \ReflectionFunction($caller);
+                $callname = $ref->getFileName() . '#' . $ref->getStartLine() . '-' . $ref->getEndLine();
+            }
+            $name = $callname;
+        }
+
+        if (isset($benchset[$name])) {
+            throw new \InvalidArgumentException('duplicated benchname.');
+        }
+
+        $benchset[$name] = closurize($caller);
+    }
+
+    if (!$benchset) {
+        throw new \InvalidArgumentException('benchset is empty.');
+    }
+
+    // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
+    $assertions = call_safely(function ($benchset, $args) {
+        return array_lmap($benchset, 'call_user_func_array', $args);
+    }, $benchset, $args);
+
+    // 返り値の検証（ベンチマークという性質上、基本的に戻り値が一致しないのはおかしい）
+    // rand/mt_rand, md5/sha1 のような例外はあるが、そんなのベンチしないし、クロージャでラップすればいいし、それでも邪魔なら @ で黙らせればいい
+    foreach ($assertions as $name1 => $return1) {
+        foreach ($assertions as $name2 => $return2) {
+            if ($return1 !== null && $return2 !== null && $return1 !== $return2) {
+                $returns1 = stringify($return1);
+                $returns2 = stringify($return2);
+                trigger_error("Results of $name1 and $name2 are different. ($returns1, $returns2)");
+            }
+        }
+    }
+
+    // ベンチ
+    $counts = [];
+    foreach ($benchset as $name => $caller) {
+        $end = microtime(true) + $millisec / 1000;
+        for ($n = 0; microtime(true) <= $end; $n++) {
+            call_user_func_array($caller, $args);
+        }
+        $counts[$name] = $n;
+    }
+
+    // 結果配列
+    $result = [];
+    $maxcount = max($counts);
+    arsort($counts);
+    foreach ($counts as $name => $count) {
+        $result[] = [
+            'name'   => $name,
+            'called' => $count,
+            'ratio'  => $count / $maxcount,
+        ];
+    }
+
+    // 出力するなら出力
+    if ($output) {
+        $nlength = max(5, max(array_map('strlen', array_keys($benchset))));
+        $slength = 9;
+        $rlength = 6;
+        $defformat = "| %-{$nlength}s | %{$slength}s | %{$rlength}s |";
+        $sepformat = "| %'-{$nlength}s | %'-{$slength}s:| %'-{$rlength}s:|";
+
+        $template = <<<'RESULT'
+Running %count$s cases (between %millsec$s ms):
+%header$s
+%separator$s
+%summary$s
+
+RESULT;
+        echo kvsprintf($template, [
+            'count'     => count($benchset),
+            'millsec'   => number_format($millisec),
+            'header'    => sprintf($defformat, 'name', 'called', 'ratio'),
+            'separator' => sprintf($sepformat, '', '', ''),
+            'summary'   => implode("\n", array_map(function ($data) use ($defformat) {
+                return sprintf($defformat, $data['name'], number_format($data['called']), number_format($data['ratio'], 3));
+            }, $result)),
+        ]);
+    }
+
+    return $result;
+}
+/**
+ * 値を何とかして文字列化する
+ *
+ * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
+ *
+ * @param mixed $var 文字列化する値
+ * @return string $var を文字列化したもの
+ */
+function stringify($var)
+{
+    $type = gettype($var);
+    switch ($type) {
+        case 'NULL':
+            return 'null';
+        case 'boolean':
+            return $var ? 'true' : 'false';
+        case 'array':
+            return var_export2($var, true);
+        case 'object':
+            if (has_class_methods($var, '__toString')) {
+                return (string) $var;
+            }
+            if ($var instanceof \Serializable) {
+                return serialize($var);
+            }
+            if ($var instanceof \JsonSerializable) {
+                return get_class($var) . ':' . json_encode($var, JSON_UNESCAPED_UNICODE);
+            }
+            return get_class($var);
+
+        default:
+            return (string) $var;
+    }
+}
+
 /**
  * 値が複合型でないか検査する
  *

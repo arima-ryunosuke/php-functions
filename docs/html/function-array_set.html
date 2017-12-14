@@ -72,6 +72,10 @@
 							syntax						</a>
 							</li>
 					<li>
+						<a href="package-utility.html">
+							utility						</a>
+							</li>
+					<li>
 						<a href="package-var.html">
 							var						</a>
 							</li>
@@ -88,8 +92,11 @@
 			<h3>Functions</h3>
 			<ul>
 				<li><a href="function-array_add.html">array_add<small class="summary">: 配列の+演算子の関数版</small></a></li>
+				<li><a href="function-array_all.html">array_all<small class="summary">: 全要素が true になるなら true を返す（1つでも false なら false を返す）</small></a></li>
+				<li><a href="function-array_any.html">array_any<small class="summary">: 全要素が false になるなら false を返す（1つでも true なら true を返す）</small></a></li>
 				<li><a href="function-array_assort.html">array_assort<small class="summary">: 配列をコールバックに従って分類する</small></a></li>
 				<li><a href="function-array_columns.html">array_columns<small class="summary">: 全要素に対して array_column する</small></a></li>
+				<li><a href="function-array_convert.html">array_convert<small class="summary">: 配列の各要素に再帰的にコールバックを適用して変換する</small></a></li>
 				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
@@ -98,12 +105,14 @@
 				<li><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
 				<li><a href="function-array_get.html">array_get<small class="summary">: デフォルト値付きの配列値取得</small></a></li>
 				<li><a href="function-array_grep_key.html">array_grep_key<small class="summary">: キーを正規表現でフィルタする</small></a></li>
+				<li><a href="function-array_group.html">array_group<small class="summary">: 配列をコールバックの返り値でグループ化する</small></a></li>
 				<li><a href="function-array_insert.html">array_insert<small class="summary">: 配列・連想配列を問わず任意の位置に値を挿入する</small></a></li>
 				<li><a href="function-array_lmap.html">array_lmap<small class="summary">: 要素値を $callback の最左に適用して array_map する</small></a></li>
 				<li><a href="function-array_map_filter.html">array_map_filter<small class="summary">: array_map + array_filter する</small></a></li>
 				<li><a href="function-array_map_key.html">array_map_key<small class="summary">: キーをマップして変換する</small></a></li>
 				<li><a href="function-array_map_method.html">array_map_method<small class="summary">: メソッドを指定できるようにした array_map</small></a></li>
 				<li><a href="function-array_nmap.html">array_nmap<small class="summary">: 要素値を $callback の n 番目(0ベース)に適用して array_map する</small></a></li>
+				<li><a href="function-array_of.html">array_of<small class="summary">: 配列を与えると指定キーの値を返すクロージャを返す</small></a></li>
 				<li><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
 				<li><a href="function-array_pos.html">array_pos<small class="summary">: 配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small></a></li>
 				<li><a href="function-array_rmap.html">array_rmap<small class="summary">: 要素値を $callback の最右に適用して array_map する</small></a></li>
@@ -120,6 +129,8 @@
 				<li><a href="function-last_key.html">last_key<small class="summary">: 配列の最後のキーを返す</small></a></li>
 				<li><a href="function-last_keyvalue.html">last_keyvalue<small class="summary">: 配列の最後のキー/値ペアをタプルで返す</small></a></li>
 				<li><a href="function-last_value.html">last_value<small class="summary">: 配列の最後の値を返す</small></a></li>
+				<li><a href="function-next_key.html">next_key<small class="summary">: 配列の指定キーの次のキーを返す</small></a></li>
+				<li><a href="function-prev_key.html">prev_key<small class="summary">: 配列の指定キーの前のキーを返す</small></a></li>
 			</ul>
 		</div>
 	</div>
@@ -188,7 +199,7 @@
 		
 		<b>Package:</b> <a href="package-array.html">array</a><br>
 		<b>Located at</b>
-		<a href="source-function-array_set.html#331-360" title="Go to source code">
+		<a href="source-function-array_set.html#449-478" title="Go to source code">
 			array.php
 		</a><br>
 	</div>
@@ -201,6 +212,6 @@
 	</div>
 </div>
 <script src="resources/combined.js?64829dd0598cd54a3fd46ce58f8efe7e2fac9ecc"></script>
-<script src="elementlist.js?a5f243ccf3c59c84e8389952b3fea701fcfc1f72"></script>
+<script src="elementlist.js?f554b0e480ce78b6911ba1fee415e6d243a964d1"></script>
 </body>
 </html>
