@@ -88,6 +88,21 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('OutOfBoundsException', array_pos, ['x', 'y', 'z'], 9, true);
     }
 
+    function test_array_of()
+    {
+        $hoge_of = array_of('hoge');
+        $this->assertEquals('HOGE', $hoge_of(['hoge' => 'HOGE']));
+        $this->assertEquals(null, $hoge_of(['fuga' => 'FUGA']));
+
+        $hoge_of = array_of('hoge', 'HOGE');
+        $this->assertEquals('HOGE', $hoge_of(['fuga' => 'FUGA']));
+
+        $this->assertEquals([0 => 'a', 2 => 'c'], call_user_func(array_of([0, 2]), ['a', 'b', 'c']));
+        $this->assertEquals([0 => 'a'], call_user_func(array_of([0, 9]), ['a', 'b', 'c']));
+        $this->assertEquals([], call_user_func(array_of([9]), ['a', 'b', 'c']));
+        $this->assertEquals(null, call_user_func(array_of([9], null), ['a', 'b', 'c']));
+    }
+
     function test_array_get()
     {
         $this->assertEquals('b', array_get(['a', 'b', 'c'], 1));
