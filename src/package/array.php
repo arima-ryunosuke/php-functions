@@ -992,6 +992,90 @@ function array_assort($array, $rules)
 }
 
 /**
+ * 全要素が true になるなら true を返す（1つでも false なら false を返す）
+ *
+ * $callback が要求するならキーも渡ってくる。
+ *
+ * Example:
+ * ```php
+ * assert(array_all([true, true])   === true);
+ * assert(array_all([true, false])  === false);
+ * assert(array_all([false, false]) === false);
+ * ```
+ *
+ * @param array|\Traversable 対象配列
+ * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+ * @param bool|mixed $default 空配列の場合のデフォルト値
+ * @return bool 全要素が true なら true
+ */
+function array_all($array, $callback = null, $default = true)
+{
+    if (empty($array)) {
+        return $default;
+    }
+
+    $plength = 0;
+    if ($callback !== null) {
+        $plength = parameter_length($callback, true);
+    }
+
+    foreach ($array as $k => $v) {
+        if ($callback === null) {
+            $vv = $v;
+        }
+        else {
+            $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
+        }
+        if (!$vv) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * 全要素が false になるなら false を返す（1つでも true なら true を返す）
+ *
+ * $callback が要求するならキーも渡ってくる。
+ *
+ * Example:
+ * ```php
+ * assert(array_any([true, true])   === true);
+ * assert(array_any([true, false])  === true);
+ * assert(array_any([false, false]) === false);
+ * ```
+ *
+ * @param array|\Traversable 対象配列
+ * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+ * @param bool|mixed $default 空配列の場合のデフォルト値
+ * @return bool 全要素が false なら false
+ */
+function array_any($array, $callback = null, $default = false)
+{
+    if (empty($array)) {
+        return $default;
+    }
+
+    $plength = 0;
+    if ($callback !== null) {
+        $plength = parameter_length($callback, true);
+    }
+
+    foreach ($array as $k => $v) {
+        if ($callback === null) {
+            $vv = $v;
+        }
+        else {
+            $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
+        }
+        if ($vv) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * 配列を $orders に従って並べ替える
  *
  * データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' => 'value'])にも対応している。

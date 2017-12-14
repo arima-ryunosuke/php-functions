@@ -366,6 +366,48 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         ]));
     }
 
+    function test_array_all()
+    {
+        $array = [
+            0 => ['id' => 1, 'name' => '', 'flag' => false],
+            1 => ['id' => 2, 'name' => '', 'flag' => true],
+            2 => ['id' => 3, 'name' => '', 'flag' => false],
+        ];
+
+        $this->assertTrue(array_all([], null));
+        $this->assertFalse(array_all([], null, false));
+
+        $this->assertTrue(array_all([true, true]));
+        $this->assertFalse(array_all([true, false]));
+        $this->assertFalse(array_all([false, false]));
+
+        $this->assertTrue(array_all($array, function ($v) { return $v['id']; }));
+        $this->assertFalse(array_all($array, function ($v) { return $v['flag']; }));
+        $this->assertFalse(array_all($array, function ($v) { return $v['name']; }));
+        $this->assertFalse(array_all($array, function ($v, $k) { return $k && $v['flag']; }));
+    }
+
+    function test_array_any()
+    {
+        $array = [
+            0 => ['id' => 1, 'name' => '', 'flag' => false],
+            1 => ['id' => 2, 'name' => '', 'flag' => true],
+            2 => ['id' => 3, 'name' => '', 'flag' => false],
+        ];
+
+        $this->assertFalse(array_any([], null));
+        $this->assertTrue(array_any([], null, true));
+
+        $this->assertTrue(array_any([true, true]));
+        $this->assertTrue(array_any([true, false]));
+        $this->assertFalse(array_any([false, false]));
+
+        $this->assertTrue(array_any($array, function ($v) { return $v['id']; }));
+        $this->assertTrue(array_any($array, function ($v) { return $v['flag']; }));
+        $this->assertFalse(array_any($array, function ($v) { return $v['name']; }));
+        $this->assertTrue(array_any($array, function ($v, $k) { return $k && $v['flag']; }));
+    }
+
     function test_array_order()
     {
         $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9], array_order([2, 4, 5, 1, 8, 6, 9, 3, 7], true));
