@@ -366,6 +366,34 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         ]));
     }
 
+    function test_array_group()
+    {
+        $this->assertEquals([
+            1 => [1],
+            2 => [2],
+            3 => [3],
+            4 => [4],
+            5 => [5],
+        ], array_group([1, 2, 3, 4, 5]));
+
+        $this->assertEquals([
+            0 => [2, 4],
+            1 => [1, 3, 5],
+        ], array_group([1, 2, 3, 4, 5], function ($v) { return $v % 2; }));
+
+        $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
+        $row2 = ['id' => 2, 'group' => 'B', 'flag' => true];
+        $row3 = ['id' => 3, 'group' => 'A', 'flag' => false];
+        $array = [
+            'k1' => $row1,
+            'k2' => $row2,
+            3    => $row3,
+        ];
+
+        $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], array_group($array, array_of('group')));
+        $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], array_group($array, array_of('group'), true));
+    }
+
     function test_array_all()
     {
         $array = [

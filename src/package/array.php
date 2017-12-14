@@ -992,6 +992,45 @@ function array_assort($array, $rules)
 }
 
 /**
+ * 配列をコールバックの返り値でグループ化する
+ *
+ * Example:
+ * ```php
+ * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
+ * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
+ * ```
+ *
+ * @param array|\Traversable 対象配列
+ * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+ * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
+ * @return array グルーピングされた配列
+ */
+function array_group($array, $callback = null, $preserve_keys = false)
+{
+    $plength = 0;
+    if ($callback !== null) {
+        $plength = parameter_length($callback, true);
+    }
+
+    $result = [];
+    foreach ($array as $k => $v) {
+        if ($callback === null) {
+            $vv = $v;
+        }
+        else {
+            $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
+        }
+        if (!$preserve_keys && is_int($k)) {
+            $result[$vv][] = $v;
+        }
+        else {
+            $result[$vv][$k] = $v;
+        }
+    }
+    return $result;
+}
+
+/**
  * 全要素が true になるなら true を返す（1つでも false なら false を返す）
  *
  * $callback が要求するならキーも渡ってくる。
