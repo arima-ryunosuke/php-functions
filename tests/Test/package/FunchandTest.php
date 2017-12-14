@@ -95,6 +95,31 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('Concrete::__invoke', call_user_func(closurize(new \Concrete('hoge'))));
     }
 
+    function test_call_safely()
+    {
+        $h = function () { };
+        set_error_handler($h);
+
+        // 正常なら返り値を返す
+        $this->assertEquals(999, call_safely(function ($v) { return $v; }, 999));
+        // エラーハンドラが戻っている
+        $this->assertSame($h, set_error_handler(function () { }));
+        restore_error_handler();
+
+        // エラーが出たら例外を投げる
+        $this->assertException('Undefined variable', function () {
+            call_safely(function () {
+                /** @noinspection PhpUndefinedVariableInspection */
+                return $v;
+            });
+        });
+        // エラーハンドラが戻っている
+        $this->assertSame($h, set_error_handler(function () { }));
+        restore_error_handler();
+
+        restore_error_handler();
+    }
+
     function test_parameter_length()
     {
         // タイプ 0: クロージャ

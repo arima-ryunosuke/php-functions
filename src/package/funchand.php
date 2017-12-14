@@ -179,6 +179,41 @@ function closurize($callable)
     return $ref->getClosure();
 }
 
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * エラーを例外に変換するブロックでコールバックを実行する
+ *
+ * Example:
+ * ```php
+ * try {
+ * call_safely(function(){return $v;});
+ * }
+ * catch (\Exception $ex) {
+ * assert($ex->getMessage() === 'Undefined variable: v');
+ * }
+ * ```
+ *
+ * @param callable $callback 実行するコールバック
+ * @param mixed $variadic $callback に渡される引数（可変引数）
+ * @return mixed $callback の返り値
+ */
+function call_safely($callback)
+{
+    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+    });
+
+    try {
+        $return = call_user_func_array($callback, array_slice(func_get_args(), 1));
+        restore_error_handler();
+        return $return;
+    }
+    catch (\Exception $ex) {
+        restore_error_handler();
+        throw $ex;
+    }
+}
+
 /**
  * callable の引数の数を返す
  *
