@@ -3,6 +3,22 @@ namespace ryunosuke\Test\package;
 
 class VarTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_stringify()
+    {
+        $this->assertEquals('null', stringify(null));
+        $this->assertEquals('false', stringify(false));
+        $this->assertEquals('true', stringify(true));
+        $this->assertEquals('123', stringify(123));
+        $this->assertEquals('123.456', stringify(123.456));
+        $this->assertEquals('hoge', stringify('hoge'));
+        $this->assertEquals('Resource id #1', stringify(STDIN));
+        $this->assertEquals('[\'array\']', stringify(['array']));
+        $this->assertEquals('stdClass', stringify(new \stdClass()));
+        $this->assertEquals('hoge', stringify(new \Concrete('hoge')));
+        $this->assertEquals('C:11:"ArrayObject":36:{x:i:0;a:1:{i:0;s:4:"hoge";};m:a:0:{}}', stringify(new \ArrayObject(['hoge'])));
+        $this->assertEquals('JsonObject:["hoge"]', stringify(new \JsonObject(['hoge'])));
+    }
+
     function test_is_primitive()
     {
         $this->assertTrue(is_primitive(null));

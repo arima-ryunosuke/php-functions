@@ -115,6 +115,21 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
     }
 }
 
+class JsonObject implements \JsonSerializable
+{
+    private $values;
+
+    public function __construct($values = [])
+    {
+        $this->values = $values;
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->values;
+    }
+}
+
 // php 7 の ParseError を模倣したクラス
 if (!class_exists('ParseError', false)) {
     class ParseError extends \Exception
