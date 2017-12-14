@@ -214,6 +214,32 @@ function call_safely($callback)
     }
 }
 
+/** @noinspection PhpDocSignatureInspection */
+/**
+ * ob_start ～ ob_get_clean のブロックでコールバックを実行する
+ *
+ * Example:
+ * ```php
+ * assert(ob_capture(function(){echo 123;}) === '123');
+ * ```
+ *
+ * @param callable $callback 実行するコールバック
+ * @param mixed $variadic $callback に渡される引数（可変引数）
+ * @return string オフスリーンバッファの文字列
+ */
+function ob_capture($callback)
+{
+    ob_start();
+    try {
+        call_user_func_array($callback, array_slice(func_get_args(), 1));
+        return ob_get_clean();
+    }
+    catch (\Exception $ex) {
+        ob_end_clean();
+        throw $ex;
+    }
+}
+
 /**
  * callable の引数の数を返す
  *

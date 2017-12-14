@@ -120,6 +120,27 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         restore_error_handler();
     }
 
+    function test_ob_capture()
+    {
+        $current = ob_get_level();
+
+        // コールバックの出力が返される
+        $this->assertEquals('hoge', ob_capture(function ($v) {
+            echo $v;
+        }, 'hoge'));
+        // ob レベルは変わらない
+        $this->assertEquals($current, ob_get_level());
+
+        // 処理中に飛んだ例外が飛ぶ
+        $this->assertException('inob', function () {
+            ob_capture(function ($v) {
+                throw new \Exception('inob');
+            }, 'hoge');
+        });
+        // ob レベルは変わらない
+        $this->assertEquals($current, ob_get_level());
+    }
+
     function test_parameter_length()
     {
         // タイプ 0: クロージャ
