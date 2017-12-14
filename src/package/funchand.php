@@ -233,3 +233,34 @@ function function_shorten($function)
     $parts = explode('\\', $function);
     return array_pop($parts);
 }
+
+/**
+ * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
+ *
+ * デフォルト引数はカウントされない。必須パラメータの数で呼び出す。
+ * もちろん可変引数は未対応。
+ *
+ * $callback に null を与えると例外的に「第1引数を返すクロージャ」を返す。
+ *
+ * php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。
+ *
+ * Example:
+ * ```php
+ * // strlen に2つの引数を渡してもエラーにならない
+ * $strlen = func_user_func_array('strlen');
+ * assert($strlen('abc', null)       === 3);
+ * ```
+ *
+ * @param callable $callback 呼び出すクロージャ
+ * @return \Closure 引数ぴったりで呼び出すクロージャ
+ */
+function func_user_func_array($callback)
+{
+    if ($callback === null) {
+        return function ($v) { return $v; };
+    }
+    $plength = parameter_length($callback, true);
+    return function () use ($callback, $plength) {
+        return call_user_func_array($callback, array_slice(func_get_args(), 0, $plength));
+    };
+}

@@ -128,4 +128,21 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(1, parameter_length(new \Concrete('')));
         $this->assertEquals(0, parameter_length(new \Concrete(''), true));
     }
+
+    function test_func_user_func_array()
+    {
+        // null
+        $null = func_user_func_array(null);
+        $this->assertEquals('abc', $null('abc'));
+
+        // 標準関数
+        $strlen = func_user_func_array('strlen');
+        $this->assertEquals(3, $strlen('abc', null, 'dummy'));
+
+        // 自前関数兼デフォルト引数
+        $pascal_case = func_user_func_array(pascal_case);
+        $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen'));
+        // 第2引数を与えても意味を為さない
+        $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen', '-'));
+    }
 }

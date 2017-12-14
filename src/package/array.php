@@ -685,11 +685,9 @@ function array_filter_not($array, $callback)
  */
 function array_filter_key($array, $callback)
 {
-    $plength = parameter_length($callback, true);
     $result = [];
     foreach ($array as $k => $v) {
-        $vv = $plength === 1 ? $callback($k) : $callback($k, $v);
-        if ($vv) {
+        if ($callback($k, $v)) {
             $result[$k] = $v;
         }
     }
@@ -722,12 +720,12 @@ function array_filter_eval($array, $expression)
  * array_column があるなら array_where があってもいいはず。
  *
  * $column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。
- * $where は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
- * つまり $column も $where も省略した場合、実質的に array_filter と同じ動作になる。
+ * $callback は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
+ * つまり $column も $callback も省略した場合、実質的に array_filter と同じ動作になる。
  *
  * $column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。
  *
- * $where が要求するならキーも渡ってくる。
+ * $callback が要求するならキーも渡ってくる。
  *
  * Example:
  * ```php
@@ -741,7 +739,7 @@ function array_filter_eval($array, $expression)
  * // 'name' に 'h' を含むものだけ返す
  * $contain_h = function($name){return strpos($name, 'h') !== false;};
  * assert(array_where($array, 'name', $contain_h)               === [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
- * // $where が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
+ * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
  * $equal_2 = function($row, $key){return $key === 2;};
  * assert(array_where($array, null, $equal_2)                   === [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
  * // $column に配列を渡すと共通項が渡ってくる
@@ -751,44 +749,31 @@ function array_filter_eval($array, $expression)
  *
  * @param array|\Traversable $array 対象配列
  * @param string|array|null $column キー名
- * @param callable $where 評価クロージャ
+ * @param callable $callback 評価クロージャ
  * @return array $where が真を返した新しい配列
  */
-function array_where($array, $column = null, $where = null)
+function array_where($array, $column = null, $callback = null)
 {
     $is_array = is_array($column);
     if ($is_array) {
         $column = array_flip($column);
     }
 
-    $plength = 0;
-    if ($where !== null) {
-        $plength = parameter_length($where, true);
-    }
+    $callback = func_user_func_array($callback);
 
     $result = [];
     foreach ($array as $k => $v) {
         if ($column === null) {
-            $value = $v;
+            $vv = $v;
         }
         else if ($is_array) {
-            $value = array_intersect_key($v, $column);
+            $vv = array_intersect_key($v, $column);
         }
         else {
-            $value = $v[$column];
+            $vv = $v[$column];
         }
 
-        if ($where === null) {
-            $match = $value;
-        }
-        else if ($plength === 1) {
-            $match = $where($value);
-        }
-        else {
-            $match = $where($value, $k);
-        }
-
-        if ($match) {
+        if ($callback($vv, $k)) {
             $result[$k] = $v;
         }
     }
@@ -816,10 +801,10 @@ function array_where($array, $column = null, $where = null)
  */
 function array_map_filter($array, $callback, $strict = false)
 {
-    $plength = parameter_length($callback, true);
+    $callback = func_user_func_array($callback);
     $result = [];
     foreach ($array as $k => $v) {
-        $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
+        $vv = $callback($v, $k);
         if (($strict && $vv !== null) || (!$strict && $vv)) {
             $result[$k] = $vv;
         }
@@ -1066,10 +1051,9 @@ function array_assort($array, $rules)
 {
     $result = array_fill_keys(array_keys($rules), []);
     foreach ($rules as $name => $rule) {
-        $plength = parameter_length($rule, true);
+        $rule = func_user_func_array($rule);
         foreach ($array as $k => $v) {
-            $vv = $plength === 1 ? $rule($v) : $rule($v, $k);
-            if ($vv) {
+            if ($rule($v, $k)) {
                 $result[$name][$k] = $v;
             }
         }
@@ -1093,19 +1077,11 @@ function array_assort($array, $rules)
  */
 function array_group($array, $callback = null, $preserve_keys = false)
 {
-    $plength = 0;
-    if ($callback !== null) {
-        $plength = parameter_length($callback, true);
-    }
+    $callback = func_user_func_array($callback);
 
     $result = [];
     foreach ($array as $k => $v) {
-        if ($callback === null) {
-            $vv = $v;
-        }
-        else {
-            $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
-        }
+        $vv = $callback($v, $k);
         if (!$preserve_keys && is_int($k)) {
             $result[$vv][] = $v;
         }
@@ -1139,19 +1115,10 @@ function array_all($array, $callback = null, $default = true)
         return $default;
     }
 
-    $plength = 0;
-    if ($callback !== null) {
-        $plength = parameter_length($callback, true);
-    }
+    $callback = func_user_func_array($callback);
 
     foreach ($array as $k => $v) {
-        if ($callback === null) {
-            $vv = $v;
-        }
-        else {
-            $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
-        }
-        if (!$vv) {
+        if (!$callback($v, $k)) {
             return false;
         }
     }
@@ -1181,19 +1148,10 @@ function array_any($array, $callback = null, $default = false)
         return $default;
     }
 
-    $plength = 0;
-    if ($callback !== null) {
-        $plength = parameter_length($callback, true);
-    }
+    $callback = func_user_func_array($callback);
 
     foreach ($array as $k => $v) {
-        if ($callback === null) {
-            $vv = $v;
-        }
-        else {
-            $vv = $plength === 1 ? $callback($v) : $callback($v, $k);
-        }
-        if ($vv) {
+        if ($callback($v, $k)) {
             return true;
         }
     }
