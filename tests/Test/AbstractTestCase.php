@@ -46,22 +46,4 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
         }
         self::fail(get_class($e) . ' is not thrown.');
     }
-
-    function tearDown()
-    {
-        $name = preg_replace('#^test_#', '', $this->getName());
-        if (is_callable($name)) {
-            $ref = new \ReflectionFunction($name);
-            $doccomment = $ref->getDocComment();
-            $dir = basename($ref->getFileName(), '.php');
-
-            preg_match_all('#```php(.*?)```#us', $doccomment, $matches, PREG_SET_ORDER);
-            foreach ($matches as $match) {
-                $exfile = __DIR__ . '/../example-code/' . $dir . '/' . $name . '.php';
-                @mkdir(dirname($exfile));
-                file_put_contents($exfile, '<?php ' . preg_replace('#^ \* ?#um', '', $match[1]));
-                include $exfile;
-            }
-        }
-    }
 }
