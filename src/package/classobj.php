@@ -120,7 +120,7 @@ function class_replace($class, $register, $dirname = null)
     $fname = rtrim(($dirname ?: sys_get_temp_dir()), '/\\') . '/' . str_replace('\\', '/', $class) . '.php';
     if (func_num_args() === 2 || !file_exists($fname)) {
         $content = file_get_contents($classfile);
-        $content = preg_replace("#class\\s+[a-z0-9_]#ui", '$0_', $content);
+        $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
         file_set_contents($fname, $content);
     }
     require_once $fname;
