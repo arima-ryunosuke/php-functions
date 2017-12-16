@@ -50,8 +50,7 @@
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
     ],
     "document": [
-      "rm -rf docs/html",
-      "vendor/bin/apigen generate -s src/package -d docs/html --template-config docs/theme/config.neon"
+      "echo yes | vendor/bin/apigen generate -s src/package -d docs/html --template-config docs/theme/config.neon"
     ]
   }
 }
