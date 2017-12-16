@@ -25,7 +25,7 @@ function class_loader($startdir = null)
             $dir = $startdir ?: __DIR__;
             while ($dir !== ($pdir = dirname($dir))) {
                 $dir = $pdir;
-                if (file_exists($file = "$dir/autoload.php") | file_exists($file = "$dir/vendor/autoload.php")) {
+                if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
                     $cache = $file;
                     break;
                 }
