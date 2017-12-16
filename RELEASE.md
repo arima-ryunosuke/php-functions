@@ -10,6 +10,29 @@
 
 - no todo
 
+## 1.0.4
+
+- [feature][array] array_of 追加
+- [feature][array] array_all 追加
+- [feature][array] array_any 追加
+- [feature][array] array_group 追加
+- [feature][array] array_convert 追加
+- [feature][array] prev_key 追加
+- [feature][array] next_key 追加
+- [feature][array] array_order のキー対応
+- [feature][var] stringify 追加
+- [feature][funchand] func_user_func_array 追加
+- [feature][funchand] call_safely 追加
+- [feature][funchand] ob_capture 追加
+- [feature][funchand] return_arg 追加
+- [feature][filesystem] mkdir_p 追加
+- [feature][filesystem] file_list 追加
+- [feature][filesystem] file_tree 追加
+- [feature][utility] benchmark 追加
+- [fixbug][classobj] class_loader でうまく発見できない不具合を修正
+- [fixbug][classobj] class_replace でクラス名がおかしくなる不具合を修正
+- [fixbug][funchand] reflect_callable がスコープを見ていた不具合を修正
+
 ## 1.0.3
 
 - [feature][strings] str_contains 追加
