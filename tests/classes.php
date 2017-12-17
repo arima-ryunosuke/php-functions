@@ -22,6 +22,11 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
 
     private $name;
 
+    protected function protectedMethod()
+    {
+        return __METHOD__;
+    }
+
     public function __construct($name)
     {
         $this->name = $name;
@@ -113,6 +118,11 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
     {
         unset($this->$offset);
     }
+}
+
+class PrivateClass
+{
+    private function privateMethod() { }
 }
 
 class JsonObject implements \JsonSerializable

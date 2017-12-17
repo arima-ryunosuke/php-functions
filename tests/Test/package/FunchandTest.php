@@ -72,8 +72,17 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         // タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
         $this->assertInstanceOf('\ReflectionMethod', reflect_callable(new \Concrete('')));
 
-        $this->assertException('is not callable', function () {
+        // タイプ X: メソッドスコープ
+        $this->assertInstanceOf('\ReflectionMethod', reflect_callable(['PrivateClass', 'privateMethod']));
+
+        // そんなものは存在しない
+        $this->assertException('does not exist', function () {
             reflect_callable('hogefuga');
+        });
+
+        // そもそも形式がおかしい
+        $this->assertException('is not callable', function () {
+            reflect_callable([]);
         });
     }
 

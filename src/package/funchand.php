@@ -144,7 +144,7 @@ function eval_func($expression)
 function reflect_callable($callable)
 {
     // callable チェック兼 $call_name 取得
-    if (!is_callable($callable, false, $call_name)) {
+    if (!is_callable($callable, true, $call_name)) {
         throw new \InvalidArgumentException("'$call_name' is not callable");
     }
 
