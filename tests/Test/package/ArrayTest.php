@@ -833,4 +833,164 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
             'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
         ], ['x' => null, 'y' => null, 'zzz' => 999]));
     }
+
+    function test_array_convert()
+    {
+        $array = [
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+                'k22' => [
+                    'k221' => 'v221',
+                    'k222' => 'v222',
+                ],
+            ],
+        ];
+
+        // 全要素に 'prefix-' を付与する。キーには '_' をつける
+        $this->assertEquals([
+            '_k1' => 'prefix-v1',
+            '_k2' => [
+                '_k21' => 'prefix-v21',
+                '_k22' => [
+                    '_k221' => 'prefix-v221',
+                    '_k222' => 'prefix-v222',
+                ],
+            ],
+        ], array_convert($array, function ($k, &$v) {
+            if (!is_array($v)) {
+                $v = "prefix-$v";
+            }
+            return "_$k";
+        }, true));
+
+        // キー 'k21', 'k222' を取り除く
+        $this->assertEquals([
+            'k1' => 'v1',
+            'k2' => [
+                'k22' => [
+                    'k221' => 'v221',
+                ],
+            ],
+        ], array_convert($array, function ($k, $v) {
+            return in_array($k, ['k21', 'k222']) ? false : null;
+        }));
+
+        // キー 'k21', 'k221', 'k222' を取り除く
+        $this->assertEquals([
+            'k1' => 'v1',
+            'k2' => [
+                'k22' => [],
+            ],
+        ], array_convert($array, function ($k, $v) {
+            return in_array($k, ['k21', 'k221', 'k222']) ? false : null;
+        }));
+
+        // キー 'k22' を取り除く
+        $this->assertEquals([
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+            ],
+        ], array_convert($array, function ($k, $v) {
+            return in_array($k, ['k22']) ? false : null;
+        }, true));
+
+        // キー 'k22' に要素を生やす
+        $this->assertEquals([
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+                'k22' => [
+                    'k221' => 'v221',
+                    'k222' => 'v222',
+                    'new1' => 'new1val',
+                    'new2' => 'new2val',
+                ],
+            ],
+        ], array_convert($array, function ($k, &$v) {
+            if ($k === 'k22') {
+                $v = array_merge($v, ['new1' => 'new1val', 'new2' => 'new2val']);
+            }
+        }, true));
+
+        // 常に null を返せば実質的に array_walk_recursive と同じ
+        $this->assertEquals([
+            'k1' => 'prefix-v1',
+            'k2' => [
+                'k21' => 'prefix-v21',
+                'k22' => [
+                    'k221' => 'prefix-v221',
+                    'k222' => 'prefix-v222',
+                ],
+            ],
+        ], array_convert($array, function ($k, &$v) {
+            $v = "prefix-$v";
+            return null;
+        }));
+    }
+
+    function test_array_convert_seq()
+    {
+        $array = [
+            'k1' => 'v1',
+            'k2' => [
+                'v21',
+                'k22' => ['v221', 'v222',],
+            ],
+            9    => 'v2',
+        ];
+
+        // キー 'k1' を数値連番にする
+        $this->assertEquals([
+            'k2' => [
+                'v21',
+                'k22' => ['v221', 'v222'],
+            ],
+            9    => 'v2',
+            10   => 'v1',
+        ], array_convert($array, function ($k) {
+            if ($k === 'k1') {
+                return true;
+            }
+        }));
+
+        // 値 v221 を数値連番にする
+        $this->assertEquals([
+            'k1' => 'v1',
+            'k2' => [
+                'v21',
+                'k22' => [1 => 'v222', 2 => 'v221',],
+            ],
+            9    => 'v2',
+        ], array_convert($array, function ($k, $v) {
+            if ($v === 'v221') {
+                return true;
+            }
+        }));
+
+        // 常に true を返せば実質的に array_values(再帰的) と同じ
+        $array = [
+            5 => 1,
+            8 => 2,
+            7 => [
+                6 => 11,
+                3 => 21,
+                4 => 31,
+            ],
+            9 => 3,
+        ];
+        $this->assertEquals([
+            0 => 1,
+            1 => 2,
+            2 => [
+                0 => 11,
+                1 => 21,
+                2 => 31,
+            ],
+            3 => 3,
+        ], array_convert($array, function ($k, $v) {
+            return true;
+        }, true));
+    }
 }
