@@ -750,6 +750,20 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
             2 => ['string' => 'aa', 'integer' => 2],
             0 => ['string' => 'aa', 'integer' => 7],
         ], $actual);
+
+        $actual = array_order($data, [
+            'string' => return_arg(0),
+            ''       => return_arg(0),
+        ], true);
+        $this->assertSame([
+            0 => ['string' => 'aa', 'integer' => 7],
+            2 => ['string' => 'aa', 'integer' => 2],
+            3 => ['string' => 'bb', 'integer' => 6],
+            1 => ['string' => 'cc', 'integer' => 1],
+            5 => ['string' => 'cc', 'integer' => 6],
+            6 => ['string' => 'cc', 'integer' => 2],
+            4 => ['string' => 'dd', 'integer' => 2],
+        ], $actual);
     }
 
     function test_array_order_closure2()

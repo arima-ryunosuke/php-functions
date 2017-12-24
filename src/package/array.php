@@ -1262,11 +1262,17 @@ function array_order(array $array, $orders, $preserve_keys = false)
             $columns = $array;
         }
         else {
-            if (!array_key_exists($key, $first)) {
+            if ($key !== '' && !array_key_exists($key, $first)) {
                 throw new \InvalidArgumentException("$key is undefined.");
             }
-            $firstval = $first[$key];
-            $columns = array_column($array, $key);
+            if ($key === '') {
+                $columns = array_keys($array);
+                $firstval = reset($columns);
+            }
+            else {
+                $firstval = $first[$key];
+                $columns = array_column($array, $key);
+            }
         }
 
         // bool は ASC, DESC
@@ -1291,7 +1297,7 @@ function array_order(array $array, $orders, $preserve_keys = false)
         else if ($order instanceof \Closure) {
             $ref = new \ReflectionFunction($order);
             // 引数2個なら比較関数
-            if ($ref->getNumberOfParameters() === 2) {
+            if ($ref->getNumberOfRequiredParameters() === 2) {
                 $map = $columns;
                 usort($map, $order);
                 $args[] = $position($columns, $map);
