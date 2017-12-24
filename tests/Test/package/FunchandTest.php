@@ -30,6 +30,12 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([1, 2, 3, 4, 'X', 'Y'], $arrayize_rXY(1, 2, 3, 4));
     }
 
+    function test_return_arg()
+    {
+        $return1 = return_arg(1);
+        $this->assertEquals(2, $return1(1, 2, 3));
+    }
+
     function test_not_func()
     {
         $not_strlen = not_func('strlen');

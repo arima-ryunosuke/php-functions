@@ -67,6 +67,23 @@ function rbind($callable)
 }
 
 /**
+ * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
+ *
+ * @param int $n $n 番目の引数
+ * @return \Closure $n 番目の引数をそのまま返すクロージャ
+ */
+function return_arg($n)
+{
+    static $cache = [];
+    if (!isset($cache[$n])) {
+        $cache[$n] = function () use ($n) {
+            return func_get_arg($n);
+        };
+    }
+    return $cache[$n];
+}
+
+/**
  * 返り値の真偽値を逆転した新しいクロージャを返す
  *
  * Example:
