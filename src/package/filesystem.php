@@ -62,11 +62,31 @@ function file_set_contents($filename, $data, $umask = 0002)
     }
 
     if (!is_dir($dirname = dirname($filename))) {
-        if (!@mkdir($dirname, 0777 & (~$umask), true)) {
+        if (!@mkdir_p($dirname, $umask)) {
             throw new \RuntimeException("failed to mkdir($dirname)");
         }
     }
     return file_put_contents($filename, $data);
+}
+
+/**
+ * ディレクトリを再帰的に掘る
+ *
+ * @param string $dirname ディレクトリ名
+ * @param int $umask ディレクトリを掘る際の umask
+ * @return bool 作成したら true
+ */
+function mkdir_p($dirname, $umask = 0002)
+{
+    if (func_num_args() === 1) {
+        $umask = umask();
+    }
+
+    if (file_exists($dirname)) {
+        return false;
+    }
+
+    return mkdir($dirname, 0777 & (~$umask), true);
 }
 
 /**

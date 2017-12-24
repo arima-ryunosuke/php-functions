@@ -39,6 +39,15 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         });
     }
 
+    function test_mkdir_p()
+    {
+        $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
+        rm_rf($dir);
+        $this->assertTrue(mkdir_p($dir));
+        $this->assertFileExists($dir);
+        $this->assertFalse(mkdir_p($dir));
+    }
+
     function test_rm_rf()
     {
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3';
