@@ -3,6 +3,110 @@ namespace ryunosuke\Test\package;
 
 class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_file_list()
+    {
+        $base = sys_get_temp_dir() . '/tree';
+        rm_rf($base);
+        file_set_contents($base . '/a/a1.txt', '');
+        file_set_contents($base . '/a/a2.txt', '');
+        file_set_contents($base . '/a//b/ab1.txt', '');
+        file_set_contents($base . '/a//b/ab2.log', 'xxx');
+        file_set_contents($base . '/a//b/c/abc1.log', 'xxxxx');
+        file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
+
+        $this->assertFalse(file_list('/notfound'));
+
+        // 単純列挙
+        $tree = file_list($base);
+        $this->assertSame([
+            realpath($base . '/a/a1.txt'),
+            realpath($base . '/a/a2.txt'),
+            realpath($base . '/a/b/ab1.txt'),
+            realpath($base . '/a/b/ab2.log'),
+            realpath($base . '/a/b/c/abc1.log'),
+            realpath($base . '/a/b/c/abc2.log'),
+        ], $tree);
+
+        // 拡張子でフィルタ
+        $tree = file_list($base, function ($fname) { return file_extension($fname) === 'txt'; });
+        $this->assertSame([
+            realpath($base . '/a/a1.txt'),
+            realpath($base . '/a/a2.txt'),
+            realpath($base . '/a/b/ab1.txt'),
+        ], $tree);
+
+        // ファイルサイズでフィルタ
+        $tree = file_list($base, function ($fname) { return filesize($fname) > 0; });
+        $this->assertSame([
+            realpath($base . '/a/b/ab2.log'),
+            realpath($base . '/a/b/c/abc1.log'),
+            realpath($base . '/a/b/c/abc2.log'),
+        ], $tree);
+    }
+
+    function test_file_tree()
+    {
+        $base = sys_get_temp_dir() . '/tree';
+        rm_rf($base);
+        file_set_contents($base . '/a/a1.txt', '');
+        file_set_contents($base . '/a/a2.txt', '');
+        file_set_contents($base . '/a//b/ab1.txt', '');
+        file_set_contents($base . '/a//b/ab2.log', 'xxx');
+        file_set_contents($base . '/a//b/c/abc1.log', 'xxxxx');
+        file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
+
+        $this->assertFalse(file_tree('/notfound'));
+
+        // 単純列挙
+        $tree = file_tree($base);
+        $this->assertSame([
+            'tree' => [
+                'a' => [
+                    'a1.txt' => realpath($base . '/a/a1.txt'),
+                    'a2.txt' => realpath($base . '/a/a2.txt'),
+                    'b'      => [
+                        'ab1.txt' => realpath($base . '/a/b/ab1.txt'),
+                        'ab2.log' => realpath($base . '/a/b/ab2.log'),
+                        'c'       => [
+                            'abc1.log' => realpath($base . '/a/b/c/abc1.log'),
+                            'abc2.log' => realpath($base . '/a/b/c/abc2.log'),
+                        ]
+                    ],
+                ],
+            ],
+        ], $tree);
+
+        // 拡張子でフィルタ
+        $tree = file_tree($base, function ($fname) { return file_extension($fname) === 'txt'; });
+        $this->assertSame([
+            'tree' => [
+                'a' => [
+                    'a1.txt' => realpath($base . '/a/a1.txt'),
+                    'a2.txt' => realpath($base . '/a/a2.txt'),
+                    'b'      => [
+                        'ab1.txt' => realpath($base . '/a/b/ab1.txt'),
+                    ],
+                ],
+            ]
+        ], $tree);
+
+        // ファイルサイズでフィルタ
+        $tree = file_tree($base, function ($fname) { return filesize($fname) > 0; });
+        $this->assertSame([
+            'tree' => [
+                'a' => [
+                    'b' => [
+                        'ab2.log' => realpath($base . '/a/b/ab2.log'),
+                        'c'       => [
+                            'abc1.log' => realpath($base . '/a/b/c/abc1.log'),
+                            'abc2.log' => realpath($base . '/a/b/c/abc2.log'),
+                        ]
+                    ],
+                ],
+            ],
+        ], $tree);
+    }
+
     function test_file_extension()
     {
         $DS = DIRECTORY_SEPARATOR;

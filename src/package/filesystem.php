@@ -6,6 +6,75 @@
  */
 
 /**
+ * ファイル一覧を配列で返す
+ *
+ * @param string $dirname 調べるディレクトリ名
+ * @param \Closure|array $filter_condition フィルタ条件
+ * @return array|false ファイルの配列
+ */
+function file_list($dirname, $filter_condition = null)
+{
+    $dirname = realpath($dirname);
+    if (!file_exists($dirname)) {
+        return false;
+    }
+
+    $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS);
+    $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+
+    $result = [];
+    foreach ($rii as $it) {
+        if (!$it->isDir()) {
+            if ($filter_condition === null || $filter_condition($it->getPathname())) {
+                $result[] = $it->getPathname();
+            }
+        }
+    }
+    return $result;
+}
+
+/**
+ * ディレクトリ階層をツリー構造で返す
+ *
+ * @param string $dirname 調べるディレクトリ名
+ * @param \Closure|array $filter_condition フィルタ条件
+ * @return array|false ツリー構造の配列
+ */
+function file_tree($dirname, $filter_condition = null)
+{
+    $dirname = realpath($dirname);
+    if (!file_exists($dirname)) {
+        return false;
+    }
+
+    $basedir = basename($dirname);
+
+    $result = [];
+    foreach (new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS) as $item) {
+        if (!isset($result[$basedir])) {
+            $result[$basedir] = [];
+        }
+        if ($item->isDir()) {
+            $result[$basedir] += file_tree($item->getPathname(), $filter_condition);
+        }
+        else {
+            if ($filter_condition === null || $filter_condition($item->getPathname())) {
+                $result[$basedir][$item->getBasename()] = $item->getPathname();
+            }
+        }
+    }
+    // フィルタで全除去されると空エントリになるので明示的に削除
+    if (!$result[$basedir]) {
+        unset($result[$basedir]);
+    }
+    // ファイルの方が強いファイル名順
+    else {
+        $result[$basedir] = array_order($result[$basedir], ['is_array', return_arg(1)], true);
+    }
+    return $result;
+}
+
+/**
  * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
  *
  * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
