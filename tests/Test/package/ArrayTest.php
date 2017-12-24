@@ -66,6 +66,69 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(null, last_keyvalue([]));
     }
 
+    function test_prev_key()
+    {
+        // 数値キーのみ
+        $array = ['a', 'b', 'c'];
+        $this->assertSame(0, prev_key($array, 1));
+        $this->assertSame(null, prev_key($array, 0));
+        $this->assertSame(false, prev_key($array, 'xxx'));
+        // 文字キーのみ
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertSame('a', prev_key($array, 'b'));
+        $this->assertSame(null, prev_key($array, 'a'));
+        $this->assertSame(false, prev_key($array, 'xxx'));
+        // 混在キー
+        $array = ['a', 'b' => 'B', 'c'];
+        $this->assertSame(0, prev_key($array, 'b'));
+        $this->assertSame(null, prev_key($array, 0));
+        $this->assertSame(false, prev_key($array, 'xxx'));
+        // 負数キー
+        $array = [-4 => 'a', -3 => 'b', -2 => 'c'];
+        $this->assertSame(-4, prev_key($array, -3));
+        $this->assertSame(null, prev_key($array, -4));
+        $this->assertSame(false, prev_key($array, 'xxx'));
+        // めっちゃバラバラキー
+        $array = [-4 => 1, 3 => 2, 1 => 3, 2 => 4, -3 => 5, 'x' => 6];
+        $this->assertSame(1, prev_key($array, 2));
+        $this->assertSame(null, prev_key($array, -4));
+        $this->assertSame(false, prev_key($array, 'xxx'));
+    }
+
+    function test_next_key()
+    {
+        // 数値キーのみ
+        $array = ['a', 'b', 'c'];
+        $this->assertSame(3, next_key($array));
+        $this->assertSame(2, next_key($array, 1));
+        $this->assertSame(null, next_key($array, 2));
+        $this->assertSame(false, next_key($array, 'xxx'));
+        // 文字キーのみ
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertSame(0, next_key($array));
+        $this->assertSame('b', next_key($array, 'a'));
+        $this->assertSame(null, next_key($array, 'c'));
+        $this->assertSame(false, next_key($array, 'xxx'));
+        // 混在キー
+        $array = ['a', 'b' => 'B', 'c'];
+        $this->assertSame(2, next_key($array));
+        $this->assertSame(1, next_key($array, 'b'));
+        $this->assertSame(null, next_key($array, 1));
+        $this->assertSame(false, next_key($array, 'xxx'));
+        // 負数キー
+        $array = [-4 => 'a', -3 => 'b', -2 => 'c'];
+        $this->assertSame(0, next_key($array));
+        $this->assertSame(-2, next_key($array, -3));
+        $this->assertSame(null, next_key($array, -2));
+        $this->assertSame(false, next_key($array, 'xxx'));
+        // めっちゃバラバラキー
+        $array = [-4 => 1, 3 => 2, 1 => 3, 2 => 4, -3 => 5, 'x' => 6];
+        $this->assertSame(4, next_key($array));
+        $this->assertSame(-3, next_key($array, 2));
+        $this->assertSame(null, next_key($array, 'x'));
+        $this->assertSame(false, next_key($array, 'xxx'));
+    }
+
     function test_array_add()
     {
         $this->assertEquals(['a', 'b', 'c'], array_add(['a', 'b', 'c'], ['d']));
@@ -992,5 +1055,29 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         ], array_convert($array, function ($k, $v) {
             return true;
         }, true));
+    }
+
+    function test_array_convert_array()
+    {
+        $array = [
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+                'k22' => 123,
+            ],
+        ];
+        $this->assertEquals([
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+                1,
+                2,
+                3,
+            ],
+        ], array_convert($array, function ($k, $v) {
+            if ($k === 'k22') {
+                return [1, 2, 3];
+            }
+        }));
     }
 }

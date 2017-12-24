@@ -214,6 +214,92 @@ function last_keyvalue($array, $default = null)
     return $default;
 }
 
+/**
+ * 配列の指定キーの前のキーを返す
+ *
+ * $key が最初のキーだった場合は null を返す。
+ * $key が存在しない場合は false を返す。
+ *
+ * Example:
+ * ```php
+ * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 'b' キーの前は 'a'
+ * assert(prev_key($array, 'b') === 'a');
+ * // 'a' キーの前は無いので null
+ * assert(prev_key($array, 'a') === null);
+ * // 'x' キーはそもそも存在しないので false
+ * assert(prev_key($array, 'x') === false);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param string|int $key 調べるキー
+ * @return string|int|bool|null $key の前のキー
+ */
+function prev_key($array, $key)
+{
+    $key = (string) $key;
+    $current = null;
+    foreach ($array as $k => $v) {
+        if ($key === (string) $k) {
+            return $current;
+        }
+        $current = $k;
+    }
+    return false;
+}
+
+/**
+ * 配列の指定キーの次のキーを返す
+ *
+ * $key が最後のキーだった場合は null を返す。
+ * $key が存在しない場合は false を返す。
+ * $key が未指定だと「次に生成されるキー」（$array[]='hoge' で生成されるキー）を返す。
+ *
+ * $array[] = 'hoge' で作成されるキーには完全準拠しない（標準は unset すると結構乱れる）。公式マニュアルを参照。
+ *
+ * Example:
+ * ```php
+ * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
+ * // 'b' キーの次は 'c'
+ * assert(next_key($array, 'b') === 'c');
+ * // 'c' キーの次は無いので null
+ * assert(next_key($array, 'c') === null);
+ * // 'x' キーはそもそも存在しないので false
+ * assert(next_key($array, 'x') === false);
+ * // 次に生成されるキーは 10
+ * assert(next_key($array, null) === 10);
+ * ```
+ *
+ * @param array $array 対象配列
+ * @param string|int|null $key 調べるキー
+ * @return string|int|bool|null $key の次のキー
+ */
+function next_key($array, $key = null)
+{
+    $keynull = $key === null;
+    $key = (string) $key;
+    $current = false;
+    $max = -1;
+    foreach ($array as $k => $v) {
+        if ($current !== false) {
+            return $k;
+        }
+        if ($key === (string) $k) {
+            $current = null;
+        }
+        if ($keynull && is_int($k) && $k > $max) {
+            $max = $k;
+        }
+    }
+    if ($keynull) {
+        // PHP 4.3.0 以降は0以下にはならない
+        return max(0, $max + 1);
+    }
+    else {
+        return $current;
+    }
+}
+
 /** @noinspection PhpDocSignatureInspection */
 /**
  * 配列の+演算子の関数版
@@ -1362,6 +1448,7 @@ function array_uncolumns($array, $template = null)
  * - null を返すと元のキーがそのまま使われる
  * - true を返すと数値連番が振られる
  * - false を返すとその要素は無かったことになる
+ * - 配列を返すとその配列で完全に置換される
  *
  * $apply_array=false で要素が配列の場合は再帰され、コールバックが適用されない（array_walk_recursive と同じ仕様）。
  *
@@ -1400,7 +1487,7 @@ function array_uncolumns($array, $template = null)
  */
 function array_convert($array, $callback, $apply_array = false)
 {
-    $recursive = function (&$result, $array, $source) use (&$recursive, $callback, $apply_array) {
+    $recursive = function (&$result, $array, $source, $callback) use (&$recursive, $apply_array) {
         $sequences = [];
         foreach ($array as $key => $value) {
             $is_array = is_array($value);
@@ -1408,6 +1495,13 @@ function array_convert($array, $callback, $apply_array = false)
             // 配列で $apply_array あるいは非配列の場合にコールバック適用
             if (($is_array && $apply_array) || !$is_array) {
                 $newkey = $callback($key, $value, $array, $source);
+            }
+            // 配列は置換
+            if (is_array($newkey)) {
+                foreach ($newkey as $k => $v) {
+                    $result[$k] = $v;
+                }
+                continue;
             }
             // false はスルー
             if ($newkey === false) {
@@ -1430,7 +1524,7 @@ function array_convert($array, $callback, $apply_array = false)
             // 配列と非配列で代入の仕方が異なる
             if ($is_array) {
                 $result[$newkey] = [];
-                $recursive($result[$newkey], $value, $source);
+                $recursive($result[$newkey], $value, $source, $callback);
             }
             else {
                 $result[$newkey] = $value;
@@ -1441,7 +1535,7 @@ function array_convert($array, $callback, $apply_array = false)
             if (is_string($key)) {
                 $v = [];
                 $result[] = &$v;
-                $recursive($v, $value, $source);
+                $recursive($v, $value, $source, $callback);
                 unset($v);
             }
             else {
@@ -1451,6 +1545,6 @@ function array_convert($array, $callback, $apply_array = false)
     };
 
     $result = [];
-    $recursive($result, $array, $array);
+    $recursive($result, $array, $array, $callback);
     return $result;
 }
