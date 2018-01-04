@@ -5,6 +5,56 @@
  * @package callable
  */
 
+/**
+ * 指定 callable を指定クロージャで実行するクロージャを返す
+ *
+ * ほぼ内部向けで外から呼ぶことはあまり想定していない。
+ *
+ * @param \Closure $invoker クロージャを実行するためのクロージャ（実処理）
+ * @param callable $callable 最終的に実行したいクロージャ
+ * @param int $arity 引数の数
+ * @return \Closure $callable を実行するクロージャ
+ */
+function delegate($invoker, $callable, $arity = null)
+{
+    if ($arity === null) {
+        $arity = parameter_length($callable, true);
+    }
+    $arity = $arity < 0 ? 0 : $arity;
+
+    switch ($arity) {
+        case 0:
+            return function () use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 1:
+            return function ($_1) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 2:
+            return function ($_1, $_2) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 3:
+            return function ($_1, $_2, $_3) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 4:
+            return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 5:
+            return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        default:
+            $argstring = array_rmap(range(1, $arity), strcat, '$_');
+            return eval('return function (' . implode(', ', $argstring) . ') use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };');
+    }
+}
+
 /** @noinspection PhpDocSignatureInspection */
 /**
  * $callable の指定位置に引数を束縛したクロージャを返す
@@ -22,10 +72,10 @@
  */
 function nbind($callable, $n)
 {
-    $args = array_slice(func_get_args(), 2);
-    return function () use ($callable, $n, $args) {
-        return call_user_func_array($callable, array_insert(func_get_args(), $args, $n));
-    };
+    $binded = array_slice(func_get_args(), 2);
+    return delegate(function ($callable, $args) use ($binded, $n) {
+        return call_user_func_array($callable, array_insert($args, $binded, $n));
+    }, $callable, parameter_length($callable, true) - count($binded));
 }
 
 /** @noinspection PhpDocSignatureInspection */
@@ -98,7 +148,9 @@ function return_arg($n)
  */
 function not_func($callable)
 {
-    return function () use ($callable) { return !call_user_func_array($callable, func_get_args()); };
+    return delegate(function ($callable, $args) {
+        return !call_user_func_array($callable, $args);
+    }, $callable);
 }
 
 /** @noinspection PhpDocSignatureInspection */
@@ -120,13 +172,13 @@ function not_func($callable)
  */
 function eval_func($expression)
 {
-    $args = array_slice(func_get_args(), 1);
-    return function () use ($expression, $args) {
+    $eargs = array_slice(func_get_args(), 1);
+    return delegate(function ($expression, $args) use ($eargs) {
         return call_user_func(function () {
             extract(func_get_arg(1));
             return eval("return " . func_get_arg(0) . ";");
-        }, $expression, array_combine($args, func_get_args()));
-    };
+        }, $expression, array_combine($eargs, $args));
+    }, $expression, count($eargs));
 }
 
 /**
@@ -338,7 +390,7 @@ function func_user_func_array($callback)
         return function ($v) { return $v; };
     }
     $plength = parameter_length($callback, true);
-    return function () use ($callback, $plength) {
-        return call_user_func_array($callback, array_slice(func_get_args(), 0, $plength));
-    };
+    return delegate(function ($callback, $args) use ($plength) {
+        return call_user_func_array($callback, array_slice($args, 0, $plength));
+    }, $callback, $plength);
 }

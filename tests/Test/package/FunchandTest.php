@@ -12,6 +12,37 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([1, 2, 3, 'X', 'Y', 4], $arrayize_3XY(1, 2, 3, 4));
     }
 
+    function test_nbind_arity()
+    {
+        // 引数を7個要求するクロージャ
+        $func7 = function ($_0, $_1, $_2, $_3, $_4, $_5, $_6) { return func_get_args(); };
+        $func6 = nbind($func7, 6, 'g');// 引数を6個要求するクロージャ
+        $func5 = nbind($func6, 5, 'f');// 引数を5個要求するクロージャ
+        $func4 = nbind($func5, 4, 'e');// 引数を4個要求するクロージャ
+        $func3 = nbind($func4, 3, 'd');// 引数を3個要求するクロージャ
+        $func2 = nbind($func3, 2, 'c');// 引数を2個要求するクロージャ
+        $func1 = nbind($func2, 1, 'b');// 引数を1個要求するクロージャ
+        $func0 = nbind($func1, 0, 'a');// 引数を0個要求するクロージャ
+
+        $this->assertEquals(0, parameter_length($func0));
+        $this->assertEquals(1, parameter_length($func1));
+        $this->assertEquals(2, parameter_length($func2));
+        $this->assertEquals(3, parameter_length($func3));
+        $this->assertEquals(4, parameter_length($func4));
+        $this->assertEquals(5, parameter_length($func5));
+        $this->assertEquals(6, parameter_length($func6));
+        $this->assertEquals(7, parameter_length($func7));
+
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f', 'g'], $func0());
+        $this->assertEquals(['A', 'b', 'c', 'd', 'e', 'f', 'g'], $func1('A'));
+        $this->assertEquals(['A', 'B', 'c', 'd', 'e', 'f', 'g'], $func2('A', 'B'));
+        $this->assertEquals(['A', 'B', 'C', 'd', 'e', 'f', 'g'], $func3('A', 'B', 'C'));
+        $this->assertEquals(['A', 'B', 'C', 'D', 'e', 'f', 'g'], $func4('A', 'B', 'C', 'D'));
+        $this->assertEquals(['A', 'B', 'C', 'D', 'E', 'f', 'g'], $func5('A', 'B', 'C', 'D', 'E'));
+        $this->assertEquals(['A', 'B', 'C', 'D', 'E', 'F', 'g'], $func6('A', 'B', 'C', 'D', 'E', 'F'));
+        $this->assertEquals(['A', 'B', 'C', 'D', 'E', 'F', 'G'], $func7('A', 'B', 'C', 'D', 'E', 'F', 'G'));
+    }
+
     function test_lbind()
     {
         $arrayize_lX = lbind(arrayize, 'X');
@@ -41,12 +72,18 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $not_strlen = not_func('strlen');
         $this->assertFalse($not_strlen('hoge'));
         $this->assertTrue($not_strlen(''));
+
+        $this->assertEquals(1, parameter_length(not_func('strlen')));
     }
 
     function test_eval_func()
     {
         $this->assertEquals(4, call_user_func(eval_func('4')));
         $this->assertEquals(7, call_user_func(eval_func('$a + $b', 'a', 'b'), 3, 4));
+
+        $this->assertEquals(0, parameter_length(eval_func('$v')));
+        $this->assertEquals(1, parameter_length(eval_func('$v', 'a')));
+        $this->assertEquals(2, parameter_length(eval_func('$v', 'a', 'b')));
     }
 
     function test_reflect_callable()
