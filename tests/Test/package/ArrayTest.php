@@ -458,6 +458,28 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
 
         $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], array_group($array, array_of('group')));
         $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], array_group($array, array_of('group'), true));
+
+        $this->assertEquals([
+            'A' => [
+                1 => [
+                    'id'    => 1,
+                    'group' => 'A',
+                    'flag'  => false,
+                ],
+                3 => [
+                    'id'    => 3,
+                    'group' => 'A',
+                    'flag'  => false,
+                ],
+            ],
+            'B' => [
+                2 => [
+                    'id'    => 2,
+                    'group' => 'B',
+                    'flag'  => true,
+                ],
+            ],
+        ], array_group([$row1, $row2, $row3], array_of(['group', 'id'])));
     }
 
     function test_array_all()

@@ -1070,10 +1070,17 @@ function array_assort($array, $rules)
 /**
  * 配列をコールバックの返り値でグループ化する
  *
+ * コールバックが配列を返すと入れ子としてグループする。
+ *
  * Example:
  * ```php
  * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
  * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
+ * $row1 = ['id' => 1, 'group' => 'hoge'];
+ * $row2 = ['id' => 2, 'group' => 'fuga'];
+ * $row3 = ['id' => 3, 'group' => 'hoge'];
+ * // group -> id で入れ子グループにする
+ * assert(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}) === ['hoge' => [1 => $row1, 3 => $row3], 'fuga' => [2 => $row2]]);
  * ```
  *
  * @param array|\Traversable 対象配列
@@ -1088,7 +1095,16 @@ function array_group($array, $callback = null, $preserve_keys = false)
     $result = [];
     foreach ($array as $k => $v) {
         $vv = $callback($v, $k);
-        if (!$preserve_keys && is_int($k)) {
+        // 配列は潜る
+        if (is_array($vv)) {
+            $tmp = &$result;
+            foreach ($vv as $vvv) {
+                $tmp = &$tmp[$vvv];
+            }
+            $tmp = $v;
+            unset($tmp);
+        }
+        else if (!$preserve_keys && is_int($k)) {
             $result[$vv][] = $v;
         }
         else {
