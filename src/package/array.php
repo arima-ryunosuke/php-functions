@@ -429,7 +429,13 @@ function array_of($key, $default = null)
 function array_get($array, $key, $default = null)
 {
     if (is_array($key)) {
-        $result = array_intersect_key($array, array_flip($key));
+        // $result = array_shrink_key(array_flip($key), $array);
+        $result = [];
+        foreach ($key as $k) {
+            if (array_key_exists($k, $array)) {
+                $result[$k] = $array[$k];
+            }
+        }
         if (!$result) {
             // 明示的に与えられていないなら [] を使用する
             if (func_num_args() === 2) {

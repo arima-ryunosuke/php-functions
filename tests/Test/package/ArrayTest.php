@@ -175,6 +175,9 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([0 => 'a'], array_get(['a', 'b', 'c'], [0, 9]));
         $this->assertEquals([], array_get(['a', 'b', 'c'], [9]));
         $this->assertEquals(null, array_get(['a', 'b', 'c'], [9], null));
+
+        // 配列を与えたときの順番は指定したものを優先
+        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], array_get(['a', 'b', 'c'], [2, 1, 0]));
     }
 
     function test_array_set()
