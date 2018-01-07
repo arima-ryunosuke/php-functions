@@ -3,6 +3,22 @@ namespace ryunosuke\Test\package;
 
 class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_stdclass()
+    {
+        $fields = ['a', 'b'];
+        $stdclass = stdclass($fields);
+        $this->assertInstanceOf('stdClass', $stdclass);
+        $this->assertEquals($fields, get_object_vars($stdclass));
+        $this->assertTrue(property_exists($stdclass, '0'));
+        $this->assertEquals('a', $stdclass->{'0'});
+
+        // キャストでもいいが、こういうことはできん
+        $stdclass = (object) $fields;
+        $this->assertInstanceOf('stdClass', $stdclass);
+        // $this->assertEquals([], get_object_vars($stdclass)); php7 から OK になっている？
+        $this->assertFalse(property_exists($stdclass, '0'));
+    }
+
     function test_class_loader()
     {
         $this->assertException('not found', function () {

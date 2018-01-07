@@ -6,6 +6,36 @@
  */
 
 /**
+ * 初期フィールド値を与えて stdClass を生成する
+ *
+ * 手元にある配列でサクッと stdClass を作りたいことがまれによくあるはず。
+ *
+ * object キャストでもいいんだが、 Iterator/Traversable とかも stdClass 化したいかもしれない。
+ * それにキャストだとコールバックで呼べなかったり、数値キーが死んだりして微妙に使いづらいところがある。
+ *
+ * Example:
+ * ```php
+ * // 基本的には object キャストと同じ
+ * $fields = ['a' => 'A', 'b' => 'B'];
+ * assert(stdclass($fields) == (object) $fields);
+ * // ただしこういうことはキャストでは出来ない
+ * assert(array_map('stdclass', [$fields]) == [(object) $fields]); // コールバックとして利用する
+ * assert(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+ * ```
+ *
+ * @param array|\Traversable $fields フィールド配列
+ * @return \stdClass 生成した stdClass インスタンス
+ */
+function stdclass($fields = [])
+{
+    $stdclass = new \stdClass();
+    foreach ($fields as $key => $value) {
+        $stdclass->$key = $value;
+    }
+    return $stdclass;
+}
+
+/**
  * composer のクラスローダを返す
  *
  * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
