@@ -10,9 +10,9 @@
  * 文字列結合の関数版
  *
  * Example:
- * ```php
+ * <code>
  * assert(strcat('a', 'b', 'c') === 'abc');
- * ```
+ * </code>
  *
  * @param mixed $variadic 結合する文字列（可変引数）
  * @return string 結合した文字列
@@ -32,11 +32,11 @@ function strcat()
  * つまり「除外は trim したいが結果配列にはしたくない」はできない。
  *
  * Example:
- * ```php
+ * <code>
  * assert(split_noempty(',', 'a, b, c')            === ['a', 'b', 'c']);
  * assert(split_noempty(',', 'a, , , b, c')        === ['a', 'b', 'c']);
  * assert(split_noempty(',', 'a, , , b, c', false) === ['a', ' ', ' ', ' b', ' c']);
- * ```
+ * </code>
  *
  * @param string $delimiter 区切り文字
  * @param string $string 対象文字
@@ -65,11 +65,11 @@ function split_noempty($delimiter, $string, $trimchars = true)
  * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。
  *
  * Example:
- * ```php
+ * <code>
  * assert(str_equals('abc', 'abc')       === true);
  * assert(str_equals('abc', 'ABC', true) === true);
  * assert(str_equals('\0abc', '\0abc')   === true);
- * ```
+ * </code>
  *
  * @param string $str1 文字列1
  * @param string $str2 文字列2
@@ -102,12 +102,12 @@ function str_equals($str1, $str2, $case_insensitivity = false)
  * 指定文字列を含むか返す
  *
  * Example:
- * ```php
+ * <code>
  * assert(str_contains('abc', 'b')                      === true);
  * assert(str_contains('abc', 'B', true)                === true);
  * assert(str_contains('abc', ['b', 'x'], false, false) === true);
  * assert(str_contains('abc', ['b', 'x'], false, true)  === false);
- * ```
+ * </code>
  *
  * @param string $haystack 対象文字列
  * @param string|array $needle 調べる文字列
@@ -144,11 +144,11 @@ function str_contains($haystack, $needle, $case_insensitivity = false, $and_flag
  * 指定文字列で始まるか調べる
  *
  * Example:
- * ```php
+ * <code>
  * assert(starts_with('abcdef', 'abc')       === true);
  * assert(starts_with('abcdef', 'ABC', true) === true);
  * assert(starts_with('abcdef', 'xyz')       === false);
- * ```
+ * </code>
  *
  * @param string $string 探される文字列
  * @param string $with 探す文字列
@@ -168,11 +168,11 @@ function starts_with($string, $with, $case_insensitivity = false)
  * 指定文字列で終わるか調べる
  *
  * Example:
- * ```php
+ * <code>
  * assert(ends_with('abcdef', 'def')       === true);
  * assert(ends_with('abcdef', 'DEF', true) === true);
  * assert(ends_with('abcdef', 'xyz')       === false);
- * ```
+ * </code>
  *
  * @param string $string 探される文字列
  * @param string $with 探す文字列
@@ -192,9 +192,9 @@ function ends_with($string, $with, $case_insensitivity = false)
  * camelCase に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(camel_case('this_is_a_pen') === 'thisIsAPen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -209,9 +209,9 @@ function camel_case($string, $delimiter = '_')
  * PascalCase に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(pascal_case('this_is_a_pen') === 'ThisIsAPen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -226,9 +226,9 @@ function pascal_case($string, $delimiter = '_')
  * snake_case に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(snake_case('ThisIsAPen') === 'this_is_a_pen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -243,9 +243,9 @@ function snake_case($string, $delimiter = '_')
  * chain-case に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(chain_case('ThisIsAPen') === 'this-is-a-pen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -319,9 +319,9 @@ function random_string($length = 8, $charlist = '0123456789abcdefghijklmnopqrstu
  * sprintf の順序指定構文('%1$d')にキーを指定できる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']) === 'ThisIs 3');
- * ```
+ * </code>
  *
  * @param string $format フォーマット文字列
  * @param array $array フォーマット引数
@@ -367,7 +367,7 @@ function kvsprintf($format, array $array)
  * また、 `{$_(syntax(""))}` のように {$_()} 構文で " も使えなくなるので \' を使用しなければならない。
  *
  * Example:
- * ```php
+ * <code>
  * // 数値キーが参照できる
  * assert(render_string('${0}', ['number'])                                          === 'number');
  * // クロージャは呼び出し結果が埋め込まれる
@@ -377,7 +377,7 @@ function kvsprintf($format, array $array)
  * // 要するに '$_()' の中に php の式が書けるようになる
  * assert(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']])  === 'a,n,z');
  * assert(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]])                   === '9');
- * ```
+ * </code>
  *
  * @param string $template レンダリング文字列
  * @param array $array レンダリング変数

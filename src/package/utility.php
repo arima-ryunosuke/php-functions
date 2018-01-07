@@ -14,13 +14,13 @@
  * 表示名が与えられていない場合、それらしい名前で表示する。
  *
  * Example:
- * ```php
+ * <code>
  * // intval と int キャストはどちらが早いか調べる
  * benchmark([
- * 'intval',
- * 'intcast' => function($v){return (int)$v;},
+ *     'intval',
+ *     'intcast' => function($v){return (int)$v;},
  * ], 10, ['12345']);
- * ```
+ * </code>
  *
  * @param array|callable $suite ベンチ対象処理
  * @param int $millisec 呼び出しミリ秒

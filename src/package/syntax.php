@@ -11,10 +11,10 @@
  * clone などでそのまま返す関数が欲しいことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $object = new \stdClass();
  * assert(returns($object) === $object);
- * ```
+ * </code>
  *
  * @param mixed $v return する値
  * @return mixed $v を返す
@@ -34,7 +34,7 @@ function returns($v)
  * __set のような明らかに設定が意図されているものは例外が飛ぶ。
  *
  * Example:
- * ```php
+ * <code>
  * // null を返すかもしれないステートメント
  * $getobject = function () {return null;};
  * // メソッド呼び出しは null を返す
@@ -53,7 +53,7 @@ function returns($v)
  * assert($getobject()['hoge']                      === null);
  * // 空イテレータを返す
  * assert(iterator_to_array(optional($getobject())) === []);
- * ```
+ * </code>
  *
  * @param object|null $object オブジェクト
  * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
@@ -74,14 +74,14 @@ function optional($object)
  * hoge() or throw などしたいことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * try {
  *     throws(new \Exception('throws'));
  * }
  * catch (\Exception $ex) {
  *     assert($ex->getMessage() === 'throws');
  * }
- * ```
+ * </code>
  *
  * @param \Exception $ex 投げる例外
  */
@@ -100,16 +100,16 @@ function throws($ex)
  * ?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。
  *
  * Example:
- * ```php
+ * <code>
  * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
  * $heavyfunc = function($v){return $v;};
  * // $heavyfunc(1) ?? 'default' とほぼ同義
  * assert(ifelse($heavyfunc(1), false, 'default')     === $heavyfunc(1));
- * // $heavyfunc(0) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
+ * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
  * assert(ifelse($heavyfunc(null), false, 'default')  === $heavyfunc(null));
  * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
  * assert(ifelse($heavyfunc(false), false, 'default') === 'default');
- * ```
+ * </code>
  *
  * @param mixed $actual 調べる値（左辺値）
  * @param mixed $expected 比較する値（右辺値）
@@ -136,10 +136,10 @@ function ifelse($actual, $expected, $then, $else = null)
  * 例外機構構文が冗長なことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $ex = new \Exception('try_catch');
  * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
- * ```
+ * </code>
  *
  * @param callable $try try ブロッククロージャ
  * @param callable $catch catch ブロッククロージャ
@@ -156,10 +156,10 @@ function try_catch($try, $catch = null)
  * php < 5.5 にはないし、例外機構構文が冗長なことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $ex = new \Exception('try_catch');
  * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
- * ```
+ * </code>
  *
  * @param callable $try try ブロッククロージャ
  * @param callable $catch catch ブロッククロージャ

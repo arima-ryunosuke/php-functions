@@ -14,12 +14,12 @@
  * iterable や Traversable は考慮せずあくまで「配列」としてチェックする。
  *
  * Example:
- * ```php
+ * <code>
  * assert(arrayize(1, 2, 3)                   === [1, 2, 3]);
  * assert(arrayize([1], [2], [3])             === [1, 2, 3]);
  * $object = new \stdClass();
  * assert(arrayize($object, false, [1, 2, 3]) === [$object, false, 1, 2, 3]);
- * ```
+ * </code>
  *
  * @param mixed $variadic 生成する要素（可変引数）
  * @return array 引数を配列化したもの
@@ -42,11 +42,11 @@ function arrayize()
  * 空の配列は普通の配列とみなす。
  *
  * Example:
- * ```php
+ * <code>
  * assert(is_hasharray([])           === false);
  * assert(is_hasharray([1, 2, 3])    === false);
  * assert(is_hasharray(['x' => 'X']) === true);
- * ```
+ * </code>
  *
  * @param array $array 調べる配列
  * @return bool 連想配列なら true
@@ -68,10 +68,10 @@ function is_hasharray(array $array)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(first_key(['a', 'b', 'c']) === 0);
  * assert(first_key([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -93,10 +93,10 @@ function first_key($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(first_value(['a', 'b', 'c']) === 'a');
  * assert(first_value([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -118,10 +118,10 @@ function first_value($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(first_keyvalue(['a', 'b', 'c']) === [0, 'a']);
  * assert(first_keyvalue([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -141,10 +141,10 @@ function first_keyvalue($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(last_key(['a', 'b', 'c']) === 2);
  * assert(last_key([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -166,10 +166,10 @@ function last_key($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(last_value(['a', 'b', 'c']) === 'c');
  * assert(last_value([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -191,10 +191,10 @@ function last_value($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(last_keyvalue(['a', 'b', 'c']) === [2, 'c']);
  * assert(last_keyvalue([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -221,7 +221,7 @@ function last_keyvalue($array, $default = null)
  * $key が存在しない場合は false を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
  * // 'b' キーの前は 'a'
  * assert(prev_key($array, 'b') === 'a');
@@ -229,7 +229,7 @@ function last_keyvalue($array, $default = null)
  * assert(prev_key($array, 'a') === null);
  * // 'x' キーはそもそも存在しないので false
  * assert(prev_key($array, 'x') === false);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param string|int $key 調べるキー
@@ -258,7 +258,7 @@ function prev_key($array, $key)
  * $array[] = 'hoge' で作成されるキーには完全準拠しない（標準は unset すると結構乱れる）。公式マニュアルを参照。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
  * // 'b' キーの次は 'c'
  * assert(next_key($array, 'b') === 'c');
@@ -268,7 +268,7 @@ function prev_key($array, $key)
  * assert(next_key($array, 'x') === false);
  * // 次に生成されるキーは 10
  * assert(next_key($array, null) === 10);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param string|int|null $key 調べるキー
@@ -305,12 +305,12 @@ function next_key($array, $key = null)
  * 配列の+演算子の関数版
  *
  * Example:
- * ```php
+ * <code>
  * // ただの加算の関数版なので同じキーは上書きされない
  * assert(array_add(['a', 'b', 'c'], ['X'])        === ['a', 'b', 'c']);
  * // 異なるキーは生える
  * assert(array_add(['a', 'b', 'c'], ['x' => 'X']) === ['a', 'b', 'c', 'x' => 'X']);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param array $variadic 足す配列
@@ -330,12 +330,12 @@ function array_add($array)
  * 負数を与えると逆から N 番目となる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_pos([1, 2, 3], 1)                                  === 2);
  * assert(array_pos([1, 2, 3], -1)                                 === 3);
  * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1)       === 'B');
  * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true) === 'b');
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param int $position 取得する位置
@@ -376,10 +376,10 @@ function array_pos($array, $position, $return_key = false)
  * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
  *
  * Example:
- * ```php
+ * <code>
  * $fuga_of_array = array_of('fuga');
  * assert($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']) === 'FUGA');
- * ```
+ * </code>
  *
  * @param string|int|array $key 取得したいキー
  * @param mixed $default デフォルト値
@@ -408,7 +408,7 @@ function array_of($key, $default = null)
  * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
  *
  * Example:
- * ```php
+ * <code>
  * // 単純取得
  * assert(array_get(['a', 'b', 'c'], 1)      === 'b');
  * // 単純デフォルト
@@ -419,7 +419,7 @@ function array_of($key, $default = null)
  * assert(array_get(['a', 'b', 'c'], [0, 9]) === [0 => 'a']);
  * // 配列デフォルト（null ではなく [] を返す）
  * assert(array_get(['a', 'b', 'c'], [9])    === []);
- * ```
+ * </code>
  *
  * @param array $array 配列
  * @param string|int|array $key 取得したいキー
@@ -458,13 +458,13 @@ function array_get($array, $key, $default = null)
  * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
  *
  * Example:
- * ```php
+ * <code>
  * $array = ['a' => 'A', 'B'];
  * assert(array_set($array, 'Z')      === 1);
  * assert($array                      === ['a' => 'A', 'B', 'Z']);
  * assert(array_set($array, 'Z', 'z') === 'z');
  * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
- * ```
+ * </code>
  *
  * @param array $array 配列
  * @param mixed $value 設定する値
@@ -496,7 +496,7 @@ function array_set(&$array, $value, $key = null, $require_return = true)
  * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
  *
  * Example:
- * ```php
+ * <code>
  * $array = ['a' => 'A', 'b' => 'B'];
  * // ない場合は $default を返す
  * assert(array_unset($array, 'x', 'X') === 'X');
@@ -512,7 +512,7 @@ function array_set(&$array, $value, $key = null, $require_return = true)
  * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
  * // 配列のキーは返されるキーを表す。順番も維持される
  * assert(array_unset($array, ['x2' => 'b', 'x1' => 'a']) === ['x2' => 'B', 'x1' => 'A']);
- * ```
+ * </code>
  *
  * @param array $array 配列
  * @param string|int|array $key 伏せたいキー。配列を与えると全て伏せる
@@ -549,7 +549,7 @@ function array_unset(&$array, $key, $default = null)
  * 存在しない場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
  *     'a' => [
  *         'b' => [
@@ -561,7 +561,7 @@ function array_unset(&$array, $key, $default = null)
  * assert(array_dive($array, 'a.b.x', 9) === 9);
  * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
  * assert(array_dive($array, ['a', 'b', 'c'])    === 'vvv');
- * ```
+ * </code>
  *
  * @param array $array 調べる配列
  * @param string|array $path パス文字列。配列も与えられる
@@ -588,10 +588,10 @@ function array_dive($array, $path, $default = null, $delimiter = '.')
  * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_exists(['a', 'b', '9'], 'ctype_digit')                    === 2);
  * assert(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 調べる配列
  * @param callable $callback 評価コールバック
@@ -611,10 +611,10 @@ function array_exists($array, $callback)
  * キーを正規表現でフィルタする
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#')       === ['a' => 'A', 'aa' => 'AA']);
  * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true) === ['b' => 'B']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string $regex 正規表現
@@ -639,10 +639,10 @@ function array_grep_key($array, $regex, $not = false)
  * $callback が null を返すとその要素は取り除かれる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper') === ['A' => 'A', 'B' => 'B']);
  * assert(array_map_key(['a' => 'A', 'b' => 'B'], function(){}) === []);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -666,9 +666,9 @@ function array_map_key($array, $callback)
  * 単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_filter_not(['a', '', 'c'], 'strlen') === [1 => '']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価 callable
@@ -686,10 +686,10 @@ function array_filter_not($array, $callback)
  * ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; })   === [0 => 'a', 2 => 'c']);
  * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }) === [0 => 'a', 2 => 'c']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -712,10 +712,10 @@ function array_filter_key($array, $callback)
  * キーは $k, 値は $v で宣言される。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_filter_eval(['a', 'b', 'c'], '$k !== 1')   === [0 => 'a', 2 => 'c']);
  * assert(array_filter_eval(['a', 'b', 'c'], '$v !== "b"') === [0 => 'a', 2 => 'c']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string $expression eval コード
@@ -740,11 +740,11 @@ function array_filter_eval($array, $expression)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
- * 0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
- * 1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
- * 2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+ *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+ *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+ *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
  * ];
  * // 'flag' が true 相当のものだけ返す
  * assert(array_where($array, 'flag')                           === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
@@ -757,7 +757,7 @@ function array_filter_eval($array, $expression)
  * // $column に配列を渡すと共通項が渡ってくる
  * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
  * assert(array_where($array, ['id', 'name'], $idname_is_2fuga) === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string|array|null $column キー名
@@ -801,10 +801,10 @@ function array_where($array, $column = null, $callback = null)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_map_filter([' a ', ' b ', ''], 'trim')       === ['a', 'b']);
  * assert(array_map_filter([' a ', ' b ', ''], 'trim', true) === ['a', 'b', '']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -832,7 +832,7 @@ function array_map_filter($array, $callback, $strict = false)
  * $ignore=null とすると 何もせずそのまま要素を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
  * // getMessage で map される
  * assert(array_map_method([$exa, $exb], 'getMessage')                       === ['a', 'b']);
@@ -840,7 +840,7 @@ function array_map_filter($array, $callback, $strict = false)
  * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true) === ['a', 'b']);
  * // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
  * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null) === ['a', 'b', $std, null]);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string $method メソッド
@@ -871,14 +871,14 @@ function array_map_method($array, $method, $args = [], $ignore = false)
  * その際、「挿入後の番目」ではなく、単純に「元の引数の番目」であることに留意。キー・値が同じ位置を指定している場合はキーが先にくる。
  *
  * Example:
- * ```php
+ * <code>
  * // 1番目に値を渡して map
  * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
  * assert(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix')   === ['prefix-a-suffix', 'prefix-b-suffix']);
  * // 1番目にキー、2番目に値を渡して map
  * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
  * assert(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c') === ['k' => 'a k b v c']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -941,10 +941,10 @@ function array_nmap($array, $callback, $n)
  * 要素値を $callback の最左に適用して array_map する
  *
  * Example:
- * ```php
+ * <code>
  * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
  * assert(array_lmap(['a', 'b'], $sprintf, '-suffix') === ['a-suffix', 'b-suffix']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -961,10 +961,10 @@ function array_lmap($array, $callback)
  * 要素値を $callback の最右に適用して array_map する
  *
  * Example:
- * ```php
+ * <code>
  * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
  * assert(array_rmap(['a', 'b'], $sprintf, 'prefix-') === ['prefix-a', 'prefix-b']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -983,11 +983,11 @@ function array_rmap($array, $callback)
  * つまり、配列を与える限りは 0 以下を返すことはない。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_depth([])                       === 1);
  * assert(array_depth(['hoge'])                 === 1);
  * assert(array_depth([['nest1' => ['nest2']]]) === 3);
- * ```
+ * </code>
  *
  * @param array $array 調べる配列
  * @return int 次元数。素のフラット配列は 1
@@ -1014,12 +1014,12 @@ function array_depth($array)
  * $value には配列も与えられるが、その場合数値キーは振り直される
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_insert([1, 2, 3], 'x')                         === [1, 2, 3, 'x']);
  * assert(array_insert([1, 2, 3], 'x', 1)                      === [1, 'x', 2, 3]);
  * assert(array_insert([1, 2, 3], 'x', -1)                     === [1, 2, 'x', 3]);
  * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'a' => 'A', 'b' => 'B', 2, 3]);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param mixed $value 挿入値
@@ -1048,12 +1048,14 @@ function array_insert($array, $value, $position = null)
  * $rule が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * // lt2(2より小さい)で分類
- * assert(array_assort([1, 2, 3], ['lt2' => function($v){return $v < 2;}])                               === ['lt2' => [1]]);
+ * $lt2 = function($v){return $v < 2;};
+ * assert(array_assort([1, 2, 3], ['lt2' => $lt2])                               === ['lt2' => [1]]);
  * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
- * assert(array_assort(['1', '2', '3'], ['lt3' => function($v){return $v < 3;}, 'ctd' => 'ctype_digit']) === ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
- * ```
+ * $lt3 = function($v){return $v < 3;};
+ * assert(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']) === ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable[] $rules 分類ルール。[key => callable] 形式
@@ -1079,15 +1081,23 @@ function array_assort($array, $rules)
  * コールバックが配列を返すと入れ子としてグループする。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
  * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
+ * // group -> id で入れ子グループにする
  * $row1 = ['id' => 1, 'group' => 'hoge'];
  * $row2 = ['id' => 2, 'group' => 'fuga'];
  * $row3 = ['id' => 3, 'group' => 'hoge'];
- * // group -> id で入れ子グループにする
- * assert(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}) === ['hoge' => [1 => $row1, 3 => $row3], 'fuga' => [2 => $row2]]);
- * ```
+ * assert(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}) === [
+ *     'hoge' => [
+ *         1 => $row1,
+ *         3 => $row3,
+ *     ],
+ *     'fuga' => [
+ *         2 => $row2,
+ *     ],
+ * ]);
+ * </code>
  *
  * @param array|\Traversable 対象配列
  * @param callable $callback 評価クロージャ。 null なら値そのもので評価
@@ -1126,11 +1136,11 @@ function array_group($array, $callback = null, $preserve_keys = false)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_all([true, true])   === true);
  * assert(array_all([true, false])  === false);
  * assert(array_all([false, false]) === false);
- * ```
+ * </code>
  *
  * @param array|\Traversable 対象配列
  * @param callable $callback 評価クロージャ。 null なら値そのもので評価
@@ -1159,11 +1169,11 @@ function array_all($array, $callback = null, $default = true)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_any([true, true])   === true);
  * assert(array_any([true, false])  === true);
  * assert(array_any([false, false]) === false);
- * ```
+ * </code>
  *
  * @param array|\Traversable 対象配列
  * @param callable $callback 評価クロージャ。 null なら値そのもので評価
@@ -1194,24 +1204,24 @@ function array_any($array, $callback = null, $default = false)
  *
  * $orders には下記のような配列を渡す。
  *
- * ```php
+ * <code>
  * $orders = [
- * 'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
- * 'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
- * 'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
- * 'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
- * 'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+ *     'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
+ *     'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+ *     'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
+ *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+ *     'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
  * ];
- * ```
+ * </code>
  *
  * Example:
- * ```php
+ * <code>
  * $v1 = ['id' => '1', 'no' => 'a03', 'name' => 'yyy'];
  * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
  * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
  * // name 昇順, no 自然降順
  * assert(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]) === [$v3, $v2, $v1]);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param mixed $orders ソート順
@@ -1338,13 +1348,13 @@ function array_order(array $array, $orders, $preserve_keys = false)
  * 「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $array1 = ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'];
  * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
  * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
  * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
  * assert(array_shrink_key($array1, $array2, $array3) === ['c' => 'C3']);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param array $arrays 比較する配列
@@ -1363,7 +1373,7 @@ function array_shrink_key(array $array)
  * array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
  * // 第3引数を渡せば array_column と全く同じ
  * assert(array_lookup($array, 'name', 'id') === array_column($array, 'name', 'id'));
@@ -1371,7 +1381,7 @@ function array_shrink_key(array $array)
  * // 省略すればキーが保存される
  * assert(array_lookup($array, 'name')       === [11 => 'name1', 12 => 'name2', 13 => 'name3']);
  * assert(array_lookup($array)               === $array);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string|null $column_key 値となるキー
@@ -1411,11 +1421,14 @@ function array_lookup($array, $column_key = null, $index_key = null)
  * 行列が逆転するイメージ。
  *
  * Example:
- * ```php
- * assert(array_columns([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']])               === ['id' => [1, 2], 'name' => ['A', 'B']]);
- * assert(array_columns([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']], 'id')         === ['id' => [1, 2]]);
- * assert(array_columns([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']], 'name', 'id') === ['name' => [1 => 'A', 2 => 'B']]);
- * ```
+ * <code>
+ * $row1 = ['id' => 1, 'name' => 'A'];
+ * $row2 = ['id' => 2, 'name' => 'B'];
+ * $rows = [$row1, $row2];
+ * assert(array_columns($rows)               === ['id' => [1, 2], 'name' => ['A', 'B']]);
+ * assert(array_columns($rows, 'id')         === ['id' => [1, 2]]);
+ * assert(array_columns($rows, 'name', 'id') === ['name' => [1 => 'A', 2 => 'B']]);
+ * </code>
  *
  * @param array $array 対象配列
  * @param string|array $column_keys 引っ張ってくるキー名
@@ -1446,9 +1459,12 @@ function array_columns($array, $column_keys = null, $index_key = null)
  * キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。
  *
  * Example:
- * ```php
- * assert(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]) === [['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']]);
- * ```
+ * <code>
+ * assert(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]) === [
+ *     ['id' => 1, 'name' => 'A'],
+ *     ['id' => 2, 'name' => 'B'],
+ * ]);
+ * </code>
  *
  * @param array $array 対象配列
  * @param array $template 抽出要素とそのデフォルト値
@@ -1499,26 +1515,34 @@ function array_uncolumns($array, $template = null)
  * 複雑だが実質的には「キーも設定できる array_walk_recursive」のように振る舞う（そしてそのような使い方を想定している）。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
- *     'k1' => 'v1',
- *     'k2' => [
- *         'k21' => 'v21',
- *         'k22' => [
- *             'k221' => 'v221',
- *             'k222' => 'v222',
- *         ],
- *     ],
+ *    'k1' => 'v1',
+ *    'k2' => [
+ *        'k21' => 'v21',
+ *        'k22' => [
+ *            'k221' => 'v221',
+ *            'k222' => 'v222',
+ *        ],
+ *        'k23' => 'v23',
+ *    ],
  * ];
- * // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k22' はまるごと伏せる。さらに 'k21' はそのままとする
- * $callback = function($k, &$v){if ($k === 'k22') return false; if ($k === 'k21') return null; if(!is_array($v)) $v = "prefix-$v"; return "_$k";};
+ * // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k21' はそのままとする。さらに 'k22' はまるごと伏せる。 'k23' は数値キーになる
+ * $callback = function($k, &$v){
+ *     if ($k === 'k21') return null;
+ *     if ($k === 'k22') return false;
+ *     if ($k === 'k23') return true;
+ *     if (!is_array($v)) $v = "prefix-$v";
+ *     return "_$k";
+ * };
  * assert(array_convert($array, $callback, true) === [
  *     '_k1' => 'prefix-v1',
  *     '_k2' => [
  *         'k21' => 'v21',
+ *         0     => 'v23',
  *     ],
  * ]);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param callable $callback 適用するコールバック
@@ -1597,7 +1621,7 @@ function array_convert($array, $callback, $apply_array = false)
  * $delimiter = null の場合に本当の配列で返す（巷の実装と同じ）。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
  *    'k1' => 'v1',
  *    'k2' => [
@@ -1629,7 +1653,7 @@ function array_convert($array, $callback, $apply_array = false)
  *    'k2.k22.k223.1' => 2,
  *    'k2.k22.k223.2' => 3,
  * ]);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる

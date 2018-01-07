@@ -14,14 +14,14 @@
  * それにキャストだとコールバックで呼べなかったり、数値キーが死んだりして微妙に使いづらいところがある。
  *
  * Example:
- * ```php
+ * <code>
  * // 基本的には object キャストと同じ
  * $fields = ['a' => 'A', 'b' => 'B'];
  * assert(stdclass($fields) == (object) $fields);
  * // ただしこういうことはキャストでは出来ない
  * assert(array_map('stdclass', [$fields]) == [(object) $fields]); // コールバックとして利用する
  * assert(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
- * ```
+ * </code>
  *
  * @param array|\Traversable $fields フィールド配列
  * @return \stdClass 生成した stdClass インスタンス
@@ -41,9 +41,9 @@ function stdclass($fields = [])
  * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(class_loader() instanceof \Composer\Autoload\ClassLoader);
- * ```
+ * </code>
  *
  * @param string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
  * @return \Composer\Autoload\ClassLoader クラスローダ
@@ -73,9 +73,9 @@ function class_loader($startdir = null)
  * クラスの名前空間部分を取得する
  *
  * Example:
- * ```php
+ * <code>
  * assert(class_namespace('vendor\\namespace\\ClassName') === 'vendor\\namespace');
- * ```
+ * </code>
  *
  * @param string|object $class 対象クラス・オブジェクト
  * @return string クラスの名前空間
@@ -95,9 +95,9 @@ function class_namespace($class)
  * クラスの名前空間部分を除いた短い名前を取得する
  *
  * Example:
- * ```php
+ * <code>
  * assert(class_shorten('vendor\\namespace\\ClassName') === 'ClassName');
- * ```
+ * </code>
  *
  * @param string|object $class 対象クラス・オブジェクト
  * @return string クラスの短い名前
@@ -179,11 +179,11 @@ function class_replace($class, $register, $dirname = null)
  * クラスにメソッドがあるかを返す
  *
  * Example:
- * ```php
+ * <code>
  * assert(has_class_methods('Exception', 'getMessage') === true);
  * assert(has_class_methods('Exception', 'getmessage') === true);
  * assert(has_class_methods('Exception', 'undefined')  === false);
- * ```
+ * </code>
  *
  * @param string|object $class 対象クラス・オブジェクト
  * @param string $method_name 調べるメソッド名

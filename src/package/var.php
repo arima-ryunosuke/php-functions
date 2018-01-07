@@ -43,7 +43,7 @@ function stringify($var)
 /**
  * 値が複合型でないか検査する
  *
- * 「複合型」とはオブジェクトとクラスのこと。
+ * 「複合型」とはオブジェクトと配列のこと。
  * つまり
  *
  * - is_scalar($var) || is_null($var) || is_resource($var)
@@ -51,14 +51,14 @@ function stringify($var)
  * と同義（!is_array($var) && !is_object($var) とも言える）。
  *
  * Example:
- * ```php
+ * <code>
  * assert(is_primitive(null)          === true);
  * assert(is_primitive(false)         === true);
  * assert(is_primitive(123)           === true);
  * assert(is_primitive(STDIN)         === true);
  * assert(is_primitive(new \stdClass) === false);
  * assert(is_primitive(['array'])     === false);
- * ```
+ * </code>
  *
  * @param mixed $var 調べる値
  * @return bool 複合型なら false
@@ -72,16 +72,16 @@ function is_primitive($var)
  * 変数が再帰参照を含むか調べる
  *
  * Example:
- * ```php
+ * <code>
  * // 配列の再帰
  * $array = [];
  * $array['recursive'] = &$array;
- * assert(is_recursive($array) === true);
+ * assert(is_recursive($array)  === true);
  * // オブジェクトの再帰
  * $object = new \stdClass();
  * $object->recursive = $object;
  * assert(is_recursive($object) === true);
- * ```
+ * </code>
  *
  * @param mixed $var 調べる値
  * @return bool 再帰参照を含むなら true
@@ -125,11 +125,11 @@ function is_recursive($var)
  * - インデントは 4 固定
  * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
  * - null は null（小文字）
- * - 再帰構造を渡しても警告がでない（さらに NULL ではなく '*RECURSION*' という文字列になる）
+ * - 再帰構造を渡しても警告がでない（さらに NULL ではなく `'*RECURSION*'` という文字列になる）
  * - 配列の再帰構造の出力が異なる（Example参照）
  *
  * Example:
- * ```php
+ * <code>
  * // 単純なエクスポート
  * assert(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true) === "[
  *     'array' => [1, 2, 3],
@@ -162,11 +162,11 @@ function is_recursive($var)
  *         ]),
  *     ]),
  * ]");
- * ```
+ * </code>
  *
  * @param mixed $value 出力する値
  * @param bool $return 返すなら true 出すなら false
- * @return string|void $return=true の場合は出力せず結果を返す
+ * @return string|null $return=true の場合は出力せず結果を返す
  */
 function var_export2($value, $return = false)
 {
@@ -298,11 +298,11 @@ function var_html($value)
  * 名前空間指定の呼び出しは未対応。use して関数名だけで呼び出す必要がある。
  *
  * Example:
- * ```php
+ * <code>
  * $hoge = 'HOGE';
  * $fuga = 'FUGA';
  * assert(hashvar($hoge, $fuga) === ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
- * ```
+ * </code>
  *
  * @param mixed $var 変数（可変引数）
  * @return array 引数の変数を変数名で compact した配列

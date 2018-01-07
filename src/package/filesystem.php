@@ -80,11 +80,11 @@ function file_tree($dirname, $filter_condition = null)
  * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(file_extension('filename.ext')        === 'ext');
  * assert(file_extension('filename.ext', 'txt') === 'filename.txt');
  * assert(file_extension('filename.ext', '')    === 'filename');
- * ```
+ * </code>
  *
  * @param string $filename 調べるファイル名
  * @param string $extension 拡張子。nullや空文字なら拡張子削除
@@ -114,10 +114,10 @@ function file_extension($filename, $extension = '')
  * ディレクトリも掘る file_put_contents
  *
  * Example:
- * ```php
+ * <code>
  * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
  * assert(file_get_contents(sys_get_temp_dir() . '/not/filename.ext') === 'hoge');
- * ```
+ * </code>
  *
  * @param string $filename 書き込むファイル名
  * @param string $data 書き込む内容
@@ -141,6 +141,8 @@ function file_set_contents($filename, $data, $umask = 0002)
 /**
  * ディレクトリを再帰的に掘る
  *
+ * 既に存在する場合は何もしない（エラーも出さない）。
+ *
  * @param string $dirname ディレクトリ名
  * @param int $umask ディレクトリを掘る際の umask
  * @return bool 作成したら true
@@ -162,11 +164,11 @@ function mkdir_p($dirname, $umask = 0002)
  * 中身があっても消せる rmdir
  *
  * Example:
- * ```php
+ * <code>
  * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
  * rm_rf(sys_get_temp_dir() . '/new');
  * assert(file_exists(sys_get_temp_dir() . '/new') === false);
- * ```
+ * </code>
  *
  * @param string $dirname 削除するディレクトリ名
  * @param bool $self 自分自身も含めるか。false を与えると中身だけを消す

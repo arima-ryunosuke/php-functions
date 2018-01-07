@@ -60,10 +60,10 @@ function delegate($invoker, $callable, $arity = null)
  * $callable の指定位置に引数を束縛したクロージャを返す
  *
  * Example:
- * ```php
+ * <code>
  * $bind = nbind('sprintf', 2, 'X');
  * assert($bind('%s%s%s', 'N', 'N') === 'NXN');
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param int $n 挿入する引数位置
@@ -83,10 +83,10 @@ function nbind($callable, $n)
  * $callable の最左に引数を束縛した callable を返す
  *
  * Example:
- * ```php
+ * <code>
  * $bind = lbind('sprintf', '%s%s');
  * assert($bind('N', 'M') === 'NM');
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param mixed $variadic 本来の引数（可変引数）
@@ -102,10 +102,10 @@ function lbind($callable)
  * $callable の最右に引数を束縛した callable を返す
  *
  * Example:
- * ```php
+ * <code>
  * $bind = rbind('sprintf', 'X');
  * assert($bind('%s%s', 'N') === 'NX');
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param mixed $variadic 本来の引数（可変引数）
@@ -118,6 +118,14 @@ function rbind($callable)
 
 /**
  * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
+ *
+ * Example:
+ * <code>
+ * $arg0 = return_arg(0);
+ * assert($arg0('hoge')          === 'hoge');
+ * $arg1 = return_arg(1);
+ * assert($arg1('dummy', 'hoge') === 'hoge');
+ * </code>
  *
  * @param int $n $n 番目の引数
  * @return \Closure $n 番目の引数をそのまま返すクロージャ
@@ -137,11 +145,11 @@ function return_arg($n)
  * 返り値の真偽値を逆転した新しいクロージャを返す
  *
  * Example:
- * ```php
+ * <code>
  * $not_strlen = not_func('strlen');
  * assert($not_strlen('hoge') === false);
  * assert($not_strlen('')     === true);
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @return \Closure 新しいクロージャ
@@ -161,10 +169,10 @@ function not_func($callable)
  * 参照渡しは未対応。
  *
  * Example:
- * ```php
+ * <code>
  * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
  * assert($evalfunc(1, 2, 3) === 6);
- * ```
+ * </code>
  *
  * @param string $expression eval コード
  * @param mixed $variadic 引数名（可変引数）
@@ -185,10 +193,10 @@ function eval_func($expression)
  * callable から ReflectionFunctionAbstract を生成する
  *
  * Example:
- * ```php
+ * <code>
  * assert(reflect_callable('sprintf')        instanceof \ReflectionFunction);
  * assert(reflect_callable('\Closure::bind') instanceof \ReflectionMethod);
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @return \ReflectionFunction|\ReflectionMethod リフレクションインスタンス
@@ -220,11 +228,11 @@ function reflect_callable($callable)
  * php7.1 の fromCallable みたいなもの。
  *
  * Example:
- * ```php
+ * <code>
  * $sprintf = closurize('sprintf');
  * assert($sprintf                            instanceof \Closure);
  * assert($sprintf('%s %s', 'hello', 'world') ===        'hello world');
- * ```
+ * </code>
  *
  * @param callable $callable 変換する callable
  * @return \Closure 変換したクロージャ
@@ -253,14 +261,14 @@ function closurize($callable)
  * エラーを例外に変換するブロックでコールバックを実行する
  *
  * Example:
- * ```php
+ * <code>
  * try {
- * call_safely(function(){return $v;});
+ *     call_safely(function(){return $v;});
  * }
  * catch (\Exception $ex) {
- * assert($ex->getMessage() === 'Undefined variable: v');
+ *     assert($ex->getMessage() === 'Undefined variable: v');
  * }
- * ```
+ * </code>
  *
  * @param callable $callback 実行するコールバック
  * @param mixed $variadic $callback に渡される引数（可変引数）
@@ -288,9 +296,9 @@ function call_safely($callback)
  * ob_start ～ ob_get_clean のブロックでコールバックを実行する
  *
  * Example:
- * ```php
+ * <code>
  * assert(ob_capture(function(){echo 123;}) === '123');
- * ```
+ * </code>
  *
  * @param callable $callback 実行するコールバック
  * @param mixed $variadic $callback に渡される引数（可変引数）
@@ -317,12 +325,12 @@ function ob_capture($callback)
  * ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。
  *
  * Example:
- * ```php
+ * <code>
  * // trim の引数は2つ
  * assert(parameter_length('trim')       === 2);
  * // trim の必須引数は1つ
  * assert(parameter_length('trim', true) === 1);
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param bool $require_only true を渡すと必須パラメータの数を返す
@@ -375,11 +383,11 @@ function function_shorten($function)
  * php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。
  *
  * Example:
- * ```php
+ * <code>
  * // strlen に2つの引数を渡してもエラーにならない
  * $strlen = func_user_func_array('strlen');
  * assert($strlen('abc', null)       === 3);
- * ```
+ * </code>
  *
  * @param callable $callback 呼び出すクロージャ
  * @return \Closure 引数ぴったりで呼び出すクロージャ
