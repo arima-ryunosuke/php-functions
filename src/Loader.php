@@ -35,24 +35,28 @@ class Loader
      * グローバル・名前空間にエクスポートする
      *
      * composer command 用で、明示的には呼ばれない
+     *
+     * @param string $dir 書き出すディレクトリを指定できるが、使う側は気にしなくて良い
      */
-    public static function export()
+    public static function export($dir = null)
     {
+        $dir = is_object($dir) ? null : $dir;
+
         $contents = "\n";
         foreach (self::getFunctions() as $function) {
             $contents .= "const $function = '{$function}';\n";
         }
-        $fn = realpath(__DIR__ . "/../tests/symbol.php");
+        $fn = $dir ? "$dir/symbol.php" : __DIR__ . "/../tests/symbol.php";
         file_put_contents($fn, self::render("echo '<?php' ?><?php echo \$contents ?>", [
             'namespace' => '',
             'contents'  => $contents,
         ]));
         echo "generated '$fn'\n";
 
-        foreach (self::exportToGlobal() as $fn) {
+        foreach (self::exportToGlobal($dir ? "$dir/global" : null) as $fn) {
             echo "generated '$fn'\n";
         }
-        foreach (self::exportToNamespace() as $fn) {
+        foreach (self::exportToNamespace($dir ? "$dir/namespace" : null) as $fn) {
             echo "generated '$fn'\n";
         }
     }
@@ -60,7 +64,7 @@ class Loader
     /**
      * グローバルにエクスポートする
      *
-     * @param string $dir 読み込みディレクトリを指定できるが、使う側は気にしなくて良い
+     * @param string $dir 書き出すディレクトリを指定できるが、使う側は気にしなくて良い
      * @return array 書き出したファイル名配列
      */
     public static function exportToGlobal($dir = null)
@@ -71,7 +75,7 @@ class Loader
     /**
      * 名前空間にエクスポートする
      *
-     * @param string $dir 読み込みディレクトリを指定できるが、使う側は気にしなくて良い
+     * @param string $dir 書き出すディレクトリを指定できるが、使う側は気にしなくて良い
      * @param string $namespace 書き出す名前空間名
      * @return array 書き出したファイル名配列
      */
