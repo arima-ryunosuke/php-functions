@@ -836,6 +836,25 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], array_shrink_key($array, $array1, $array2, $array3));
     }
 
+    function test_array_lookup()
+    {
+        $arrays = [
+            11 => ['id' => 1, 'name' => 'name1'],
+            12 => ['id' => 2, 'name' => 'name2'],
+            13 => ['id' => 3, 'name' => 'name3'],
+        ];
+
+        $objects = array_map(stdclass, $arrays);
+
+        // 第3引数を与えれば array_column と全く同じ
+        $this->assertSame(array_column($arrays, 'name', 'id'), array_lookup($arrays, 'name', 'id'));
+        // 与えなければキーが保存される array_column のような動作になる
+        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], array_lookup($arrays, 'name'));
+        $this->assertSame(array_combine(array_keys($arrays), array_column($arrays, null)), array_lookup($arrays, null));
+        // オブジェクトもOK
+        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], array_lookup($objects, 'name'));
+    }
+
     function test_array_columns()
     {
         $array = [

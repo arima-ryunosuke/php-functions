@@ -1330,6 +1330,54 @@ function array_shrink_key(array $array)
 }
 
 /**
+ * キー保存可能な array_column
+ *
+ * array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。
+ *
+ * Example:
+ * ```php
+ * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
+ * // 第3引数を渡せば array_column と全く同じ
+ * assert(array_lookup($array, 'name', 'id') === array_column($array, 'name', 'id'));
+ * assert(array_lookup($array, 'name', null) === array_column($array, 'name', null));
+ * // 省略すればキーが保存される
+ * assert(array_lookup($array, 'name')       === [11 => 'name1', 12 => 'name2', 13 => 'name3']);
+ * assert(array_lookup($array)               === $array);
+ * ```
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param string|null $column_key 値となるキー
+ * @param string|null $index_key キーとなるキー
+ * @return array 新しい配列
+ */
+function array_lookup($array, $column_key = null, $index_key = null)
+{
+    if (func_num_args() === 3) {
+        return array_column($array, $column_key, $index_key);
+    }
+
+    // null 対応できないし、php7 からオブジェクトに対応してるらしいので止め。ベタにやる
+    // return array_map(array_of($column_keys), $array);
+
+    // 実質的にはこれで良いはずだが、オブジェクト対応が救えないので止め。ベタにやる
+    // return array_combine(array_keys($array), array_column($array, $column_key));
+
+    $result = [];
+    foreach ($array as $k => $v) {
+        if ($column_key === null) {
+            $result[$k] = $v;
+        }
+        else if (is_array($v) && array_key_exists($column_key, $v)) {
+            $result[$k] = $v[$column_key];
+        }
+        else if (is_object($v) && (isset($v->$column_key) || property_exists($v, $column_key))) {
+            $result[$k] = $v->$column_key;
+        }
+    }
+    return $result;
+}
+
+/**
  * 全要素に対して array_column する
  *
  * 行列が逆転するイメージ。
