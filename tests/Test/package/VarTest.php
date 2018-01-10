@@ -33,6 +33,43 @@ class VarTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse(is_primitive(new \stdClass()));
     }
 
+    function test_is_recursive()
+    {
+        $this->assertFalse(is_recursive(null));
+        $this->assertFalse(is_recursive(false));
+        $this->assertFalse(is_recursive(true));
+        $this->assertFalse(is_recursive(123));
+        $this->assertFalse(is_recursive(123.456));
+        $this->assertFalse(is_recursive('hoge'));
+        $this->assertFalse(is_recursive(STDIN));
+        $this->assertFalse(is_recursive(['hoge']));
+        $this->assertFalse(is_recursive((object) ['hoge' => 'hoge']));
+
+        $rarray = [];
+        $rarray = ['rec' => &$rarray];
+        $this->assertTrue(is_recursive($rarray));
+
+        $rnestarray = [];
+        $rnestarray = [
+            'parent' => [
+                'child' => [
+                    'grand' => &$rnestarray
+                ]
+            ]
+        ];
+        $this->assertTrue(is_recursive($rnestarray));
+
+        $robject = new \stdClass();
+        $robject->rec = $robject;
+        $this->assertTrue(is_recursive($robject));
+
+        $rnestobject = new \stdClass();
+        $rnestobject->parent = new \stdClass();
+        $rnestobject->parent->child = new \stdClass();
+        $rnestobject->parent->child->grand = $rnestobject;
+        $this->assertTrue(is_recursive($rnestobject));
+    }
+
     function test_var_export2()
     {
         $value = [
