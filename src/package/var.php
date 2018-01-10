@@ -125,9 +125,12 @@ function is_recursive($var)
  * - インデントは 4 固定
  * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
  * - null は null（小文字）
+ * - 再帰構造を渡しても警告がでない（さらに NULL ではなく '*RECURSION*' という文字列になる）
+ * - 配列の再帰構造の出力が異なる（Example参照）
  *
  * Example:
  * ```php
+ * // 単純なエクスポート
  * assert(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true) === "[
  *     'array' => [1, 2, 3],
  *     'hash'  => [
@@ -135,6 +138,29 @@ function is_recursive($var)
  *         'b' => 'B',
  *         'c' => 'C',
  *     ],
+ * ]");
+ * // 再帰構造を含むエクスポート（標準の var_export は形式が異なる。 var_export すれば分かる）
+ * $rarray = [];
+ * $rarray['a']['b']['c'] = &$rarray;
+ * $robject = new \stdClass();
+ * $robject->a = new \stdClass();
+ * $robject->a->b = new \stdClass();
+ * $robject->a->b->c = $robject;
+ * assert(var_export2(compact('rarray', 'robject'), true) === "[
+ *     'rarray'  => [
+ *         'a' => [
+ *             'b' => [
+ *                 'c' => '*RECURSION*',
+ *             ],
+ *         ],
+ *     ],
+ *     'robject' => stdClass::__set_state([
+ *         'a' => stdClass::__set_state([
+ *             'b' => stdClass::__set_state([
+ *                 'c' => '*RECURSION*',
+ *             ]),
+ *         ]),
+ *     ]),
  * ]");
  * ```
  *
@@ -147,8 +173,17 @@ function var_export2($value, $return = false)
     // インデントの空白数
     $INDENT = 4;
 
+    // オリジナルの var_export（返り値版）
+    $var_export = function ($v) { return var_export($v, true); };
+
     // 再帰用クロージャ
-    $export = function ($value, $nest = 0) use (&$export, $INDENT) {
+    $export = function ($nest, $value, $parents) use (&$export, $INDENT, $var_export) {
+        // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+        foreach ($parents as $parent) {
+            if ($parent === $value) {
+                return var_export('*RECURSION*', true);
+            }
+        }
         // 配列は連想判定したり再帰したり色々
         if (is_array($value)) {
             // 空配列は固定文字列
@@ -162,13 +197,15 @@ function var_export2($value, $return = false)
             // ただの配列
             if ($value === array_values($value)) {
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (array_filter($value, function ($v) { return is_scalar($v) || is_null($v); })) {
-                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                if (array_all($value, is_primitive)) {
+                    $vals = array_map($var_export, $value);
+                    return '[' . implode(', ', $vals) . ']';
                 }
                 // スカラー値以外が含まれているならキーを含めない
                 $kvl = '';
+                $parents[] = $value;
                 foreach ($value as $k => $v) {
-                    $kvl .= $spacer1 . $export($v, $nest + 1) . ",\n";
+                    $kvl .= $spacer1 . $export($nest + 1, $v, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -176,28 +213,47 @@ function var_export2($value, $return = false)
             // 連想配列はキーを含めて桁あわせ
             $maxlen = max(array_map('strlen', array_keys($value)));
             $kvl = '';
+            $parents[] = $value;
             foreach ($value as $k => $v) {
                 $align = str_repeat(' ', $maxlen - strlen($k));
-                $kvl .= $spacer1 . var_export($k, true) . $align . ' => ' . $export($v, $nest + 1) . ",\n";
+                $kvl .= $spacer1 . $var_export($k) . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
             }
             return "[\n{$kvl}{$spacer2}]";
+        }
+        // オブジェクトは単にプロパティを __set_state する文字列を出力する
+        else if (is_object($value)) {
+            // クラスごとに \ReflectionProperty をキャッシュしておく
+            static $refs = [];
+            $class = get_class($value);
+            if (!isset($refs[$class])) {
+                $refs[$class] = array_reduce((new \ReflectionClass($value))->getProperties(), function ($carry, \ReflectionProperty $rp) {
+                    if (!$rp->isStatic()) {
+                        $rp->setAccessible(true);
+                        $carry[$rp->getName()] = $rp;
+                    }
+                    return $carry;
+                }, []);
+            }
+
+            // 単純に配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
+            $vars = array_map_method($refs[$class], 'getValue', [$value]);
+            $vars += get_object_vars($value);
+
+            $parents[] = $value;
+            return get_class($value) . '::__set_state(' . $export($nest, $vars, $parents) . ')';
         }
         // null は小文字で居て欲しい
         else if (is_null($value)) {
             return 'null';
         }
-        // オブジェクトは単にプロパティを __set_state する文字列が出力される（っぽい）ので、その引数部分だけ再帰
-        else if (is_object($value)) {
-            return get_class($value) . '::__set_state(' . $export((array) $value, $nest) . ')';
-        }
         // それ以外は標準に従う
         else {
-            return var_export($value, true);
+            return $var_export($value);
         }
     };
 
     // 結果を返したり出力したり
-    $result = $export($value, 0);
+    $result = $export(0, $value, []);
     if ($return) {
         return $result;
     }

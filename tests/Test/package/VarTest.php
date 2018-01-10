@@ -106,6 +106,61 @@ class VarTest extends \ryunosuke\Test\AbstractTestCase
         var_export2('hoge');
     }
 
+    function test_var_export2_private()
+    {
+        $concrete = new \Concrete('hoge');
+
+        $this->assertEquals(<<<'VAR'
+Concrete::__set_state([
+    'value' => null,
+    'name'  => 'hoge',
+])
+VAR
+            , var_export2($concrete, true));
+
+        $concrete->external = 'aaa';
+        $this->assertEquals(<<<'VAR'
+Concrete::__set_state([
+    'value'    => null,
+    'name'     => 'hoge',
+    'external' => 'aaa',
+])
+VAR
+            , var_export2($concrete, true));
+    }
+
+    function test_var_export2_recursive()
+    {
+        $rarray = [];
+        $rarray['parent']['child']['grand'] = &$rarray;
+        $this->assertEquals(<<<'VAR'
+[
+    'parent' => [
+        'child' => [
+            'grand' => '*RECURSION*',
+        ],
+    ],
+]
+VAR
+            , var_export2($rarray, true));
+
+        $robject = new \stdClass();
+        $robject->parent = new \stdClass();
+        $robject->parent->child = new \stdClass();
+        $robject->parent->child->grand = $robject;
+        $this->assertEquals(<<<'VAR'
+stdClass::__set_state([
+    'parent' => stdClass::__set_state([
+        'child' => stdClass::__set_state([
+            'grand' => '*RECURSION*',
+        ]),
+    ]),
+])
+VAR
+            , var_export2($robject, true));
+
+    }
+
     function test_hashvar()
     {
         $hoge = 1;
