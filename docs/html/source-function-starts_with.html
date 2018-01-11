@@ -104,11 +104,13 @@
 				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
 				<li><a href="function-array_filter_key.html">array_filter_key<small class="summary">: キーを主軸とした array_filter</small></a></li>
 				<li><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
+				<li><a href="function-array_flatten.html">array_flatten<small class="summary">: 多階層配列をフラットに展開する</small></a></li>
 				<li><a href="function-array_get.html">array_get<small class="summary">: デフォルト値付きの配列値取得</small></a></li>
 				<li><a href="function-array_grep_key.html">array_grep_key<small class="summary">: キーを正規表現でフィルタする</small></a></li>
 				<li><a href="function-array_group.html">array_group<small class="summary">: 配列をコールバックの返り値でグループ化する</small></a></li>
 				<li><a href="function-array_insert.html">array_insert<small class="summary">: 配列・連想配列を問わず任意の位置に値を挿入する</small></a></li>
 				<li><a href="function-array_lmap.html">array_lmap<small class="summary">: 要素値を $callback の最左に適用して array_map する</small></a></li>
+				<li><a href="function-array_lookup.html">array_lookup<small class="summary">: キー保存可能な array_column</small></a></li>
 				<li><a href="function-array_map_filter.html">array_map_filter<small class="summary">: array_map + array_filter する</small></a></li>
 				<li><a href="function-array_map_key.html">array_map_key<small class="summary">: キーをマップして変換する</small></a></li>
 				<li><a href="function-array_map_method.html">array_map_method<small class="summary">: メソッドを指定できるようにした array_map</small></a></li>
@@ -132,6 +134,7 @@
 				<li><a href="function-class_replace.html">class_replace<small class="summary">: 既存（未読み込みに限る）クラスを強制的に置換する</small></a></li>
 				<li><a href="function-class_shorten.html">class_shorten<small class="summary">: クラスの名前空間部分を除いた短い名前を取得する</small></a></li>
 				<li><a href="function-closurize.html">closurize<small class="summary">: callable を Closure に変換する</small></a></li>
+				<li><a href="function-delegate.html">delegate<small class="summary">: 指定 callable を指定クロージャで実行するクロージャを返す</small></a></li>
 				<li><a href="function-ends_with.html">ends_with<small class="summary">: 指定文字列で終わるか調べる</small></a></li>
 				<li><a href="function-eval_func.html">eval_func<small class="summary">: 指定コードで eval するクロージャを返す</small></a></li>
 				<li><a href="function-file_extension.html">file_extension<small class="summary">: ファイルの拡張子を変更する。引数を省略すると拡張子を返す</small></a></li>
@@ -145,8 +148,10 @@
 				<li><a href="function-function_shorten.html">function_shorten<small class="summary">: 関数の名前空間部分を除いた短い名前を取得する</small></a></li>
 				<li><a href="function-has_class_methods.html">has_class_methods<small class="summary">: クラスにメソッドがあるかを返す</small></a></li>
 				<li><a href="function-hashvar.html">hashvar<small class="summary">: 変数指定をできるようにした compact</small></a></li>
+				<li><a href="function-ifelse.html">ifelse<small class="summary">: if ～ else 構文の関数版</small></a></li>
 				<li><a href="function-is_hasharray.html">is_hasharray<small class="summary">: 配列が連想配列か調べる</small></a></li>
 				<li><a href="function-is_primitive.html">is_primitive<small class="summary">: 値が複合型でないか検査する</small></a></li>
+				<li><a href="function-is_recursive.html">is_recursive<small class="summary">: 変数が再帰参照を含むか調べる</small></a></li>
 				<li><a href="function-kvsprintf.html">kvsprintf<small class="summary">: 連想配列を指定できるようにした vsprintf</small></a></li>
 				<li><a href="function-last_key.html">last_key<small class="summary">: 配列の最後のキーを返す</small></a></li>
 				<li><a href="function-last_keyvalue.html">last_keyvalue<small class="summary">: 配列の最後のキー/値ペアをタプルで返す</small></a></li>
@@ -172,6 +177,7 @@
 				<li><a href="function-snake_case.html">snake_case<small class="summary">: snake_case に変換する</small></a></li>
 				<li><a href="function-split_noempty.html">split_noempty<small class="summary">: 空文字を除外する文字列分割</small></a></li>
 				<li><a href="function-starts_with.html">starts_with<small class="summary">: 指定文字列で始まるか調べる</small></a></li>
+				<li><a href="function-stdclass.html">stdclass<small class="summary">: 初期フィールド値を与えて stdClass を生成する</small></a></li>
 				<li><a href="function-str_contains.html">str_contains<small class="summary">: 指定文字列を含むか返す</small></a></li>
 				<li><a href="function-str_equals.html">str_equals<small class="summary">: 文字列比較の関数版</small></a></li>
 				<li><a href="function-strcat.html">strcat<small class="summary">: 文字列結合の関数版</small></a></li>
@@ -180,6 +186,7 @@
 				<li><a href="function-try_catch.html">try_catch<small class="summary">: try ～ catch 構文の関数版</small></a></li>
 				<li><a href="function-try_catch_finally.html">try_catch_finally<small class="summary">: try ～ catch ～ finally 構文の関数版</small></a></li>
 				<li><a href="function-var_export2.html">var_export2<small class="summary">: 組み込みの var_export をいい感じにしたもの</small></a></li>
+				<li><a href="function-var_html.html">var_html<small class="summary">: var_export2 を html コンテキストに特化させたもの</small></a></li>
 			</ul>
 		</div>
 	</div>
@@ -203,9 +210,9 @@
 </span></span><span id="10" class="l"><span class="php-comment"> * 文字列結合の関数版
 </span></span><span id="11" class="l"><span class="php-comment"> *
 </span></span><span id="12" class="l"><span class="php-comment"> * Example:
-</span></span><span id="13" class="l"><span class="php-comment"> * ```php
+</span></span><span id="13" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="14" class="l"><span class="php-comment"> * assert(strcat('a', 'b', 'c') === 'abc');
-</span></span><span id="15" class="l"><span class="php-comment"> * ```
+</span></span><span id="15" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="16" class="l"><span class="php-comment"> *
 </span></span><span id="17" class="l"><span class="php-comment"> * @param mixed $variadic 結合する文字列（可変引数）
 </span></span><span id="18" class="l"><span class="php-comment"> * @return string 結合した文字列
@@ -225,11 +232,11 @@
 </span></span><span id="32" class="l"><span class="php-comment"> * つまり「除外は trim したいが結果配列にはしたくない」はできない。
 </span></span><span id="33" class="l"><span class="php-comment"> *
 </span></span><span id="34" class="l"><span class="php-comment"> * Example:
-</span></span><span id="35" class="l"><span class="php-comment"> * ```php
+</span></span><span id="35" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="36" class="l"><span class="php-comment"> * assert(split_noempty(',', 'a, b, c')            === ['a', 'b', 'c']);
 </span></span><span id="37" class="l"><span class="php-comment"> * assert(split_noempty(',', 'a, , , b, c')        === ['a', 'b', 'c']);
 </span></span><span id="38" class="l"><span class="php-comment"> * assert(split_noempty(',', 'a, , , b, c', false) === ['a', ' ', ' ', ' b', ' c']);
-</span></span><span id="39" class="l"><span class="php-comment"> * ```
+</span></span><span id="39" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="40" class="l"><span class="php-comment"> *
 </span></span><span id="41" class="l"><span class="php-comment"> * @param string $delimiter 区切り文字
 </span></span><span id="42" class="l"><span class="php-comment"> * @param string $string 対象文字
@@ -258,11 +265,11 @@
 </span></span><span id="65" class="l"><span class="php-comment"> * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。
 </span></span><span id="66" class="l"><span class="php-comment"> *
 </span></span><span id="67" class="l"><span class="php-comment"> * Example:
-</span></span><span id="68" class="l"><span class="php-comment"> * ```php
+</span></span><span id="68" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="69" class="l"><span class="php-comment"> * assert(str_equals('abc', 'abc')       === true);
 </span></span><span id="70" class="l"><span class="php-comment"> * assert(str_equals('abc', 'ABC', true) === true);
 </span></span><span id="71" class="l"><span class="php-comment"> * assert(str_equals('\0abc', '\0abc')   === true);
-</span></span><span id="72" class="l"><span class="php-comment"> * ```
+</span></span><span id="72" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="73" class="l"><span class="php-comment"> *
 </span></span><span id="74" class="l"><span class="php-comment"> * @param string $str1 文字列1
 </span></span><span id="75" class="l"><span class="php-comment"> * @param string $str2 文字列2
@@ -295,12 +302,12 @@
 </span></span><span id="102" class="l"><span class="php-comment"> * 指定文字列を含むか返す
 </span></span><span id="103" class="l"><span class="php-comment"> *
 </span></span><span id="104" class="l"><span class="php-comment"> * Example:
-</span></span><span id="105" class="l"><span class="php-comment"> * ```php
+</span></span><span id="105" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="106" class="l"><span class="php-comment"> * assert(str_contains('abc', 'b')                      === true);
 </span></span><span id="107" class="l"><span class="php-comment"> * assert(str_contains('abc', 'B', true)                === true);
 </span></span><span id="108" class="l"><span class="php-comment"> * assert(str_contains('abc', ['b', 'x'], false, false) === true);
 </span></span><span id="109" class="l"><span class="php-comment"> * assert(str_contains('abc', ['b', 'x'], false, true)  === false);
-</span></span><span id="110" class="l"><span class="php-comment"> * ```
+</span></span><span id="110" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="111" class="l"><span class="php-comment"> *
 </span></span><span id="112" class="l"><span class="php-comment"> * @param string $haystack 対象文字列
 </span></span><span id="113" class="l"><span class="php-comment"> * @param string|array $needle 調べる文字列
@@ -337,11 +344,11 @@
 </span></span><span id="144" class="l"><span class="php-comment"> * 指定文字列で始まるか調べる
 </span></span><span id="145" class="l"><span class="php-comment"> *
 </span></span><span id="146" class="l"><span class="php-comment"> * Example:
-</span></span><span id="147" class="l"><span class="php-comment"> * ```php
+</span></span><span id="147" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="148" class="l"><span class="php-comment"> * assert(starts_with('abcdef', 'abc')       === true);
 </span></span><span id="149" class="l"><span class="php-comment"> * assert(starts_with('abcdef', 'ABC', true) === true);
 </span></span><span id="150" class="l"><span class="php-comment"> * assert(starts_with('abcdef', 'xyz')       === false);
-</span></span><span id="151" class="l"><span class="php-comment"> * ```
+</span></span><span id="151" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="152" class="l"><span class="php-comment"> *
 </span></span><span id="153" class="l"><span class="php-comment"> * @param string $string 探される文字列
 </span></span><span id="154" class="l"><span class="php-comment"> * @param string $with 探す文字列
@@ -361,11 +368,11 @@
 </span></span><span id="168" class="l"><span class="php-comment"> * 指定文字列で終わるか調べる
 </span></span><span id="169" class="l"><span class="php-comment"> *
 </span></span><span id="170" class="l"><span class="php-comment"> * Example:
-</span></span><span id="171" class="l"><span class="php-comment"> * ```php
+</span></span><span id="171" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="172" class="l"><span class="php-comment"> * assert(ends_with('abcdef', 'def')       === true);
 </span></span><span id="173" class="l"><span class="php-comment"> * assert(ends_with('abcdef', 'DEF', true) === true);
 </span></span><span id="174" class="l"><span class="php-comment"> * assert(ends_with('abcdef', 'xyz')       === false);
-</span></span><span id="175" class="l"><span class="php-comment"> * ```
+</span></span><span id="175" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="176" class="l"><span class="php-comment"> *
 </span></span><span id="177" class="l"><span class="php-comment"> * @param string $string 探される文字列
 </span></span><span id="178" class="l"><span class="php-comment"> * @param string $with 探す文字列
@@ -385,9 +392,9 @@
 </span></span><span id="192" class="l"><span class="php-comment"> * camelCase に変換する
 </span></span><span id="193" class="l"><span class="php-comment"> *
 </span></span><span id="194" class="l"><span class="php-comment"> * Example:
-</span></span><span id="195" class="l"><span class="php-comment"> * ```php
+</span></span><span id="195" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="196" class="l"><span class="php-comment"> * assert(camel_case('this_is_a_pen') === 'thisIsAPen');
-</span></span><span id="197" class="l"><span class="php-comment"> * ```
+</span></span><span id="197" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="198" class="l"><span class="php-comment"> *
 </span></span><span id="199" class="l"><span class="php-comment"> * @param string $string 対象文字列
 </span></span><span id="200" class="l"><span class="php-comment"> * @param string $delimiter デリミタ
@@ -402,9 +409,9 @@
 </span></span><span id="209" class="l"><span class="php-comment"> * PascalCase に変換する
 </span></span><span id="210" class="l"><span class="php-comment"> *
 </span></span><span id="211" class="l"><span class="php-comment"> * Example:
-</span></span><span id="212" class="l"><span class="php-comment"> * ```php
+</span></span><span id="212" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="213" class="l"><span class="php-comment"> * assert(pascal_case('this_is_a_pen') === 'ThisIsAPen');
-</span></span><span id="214" class="l"><span class="php-comment"> * ```
+</span></span><span id="214" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="215" class="l"><span class="php-comment"> *
 </span></span><span id="216" class="l"><span class="php-comment"> * @param string $string 対象文字列
 </span></span><span id="217" class="l"><span class="php-comment"> * @param string $delimiter デリミタ
@@ -419,9 +426,9 @@
 </span></span><span id="226" class="l"><span class="php-comment"> * snake_case に変換する
 </span></span><span id="227" class="l"><span class="php-comment"> *
 </span></span><span id="228" class="l"><span class="php-comment"> * Example:
-</span></span><span id="229" class="l"><span class="php-comment"> * ```php
+</span></span><span id="229" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="230" class="l"><span class="php-comment"> * assert(snake_case('ThisIsAPen') === 'this_is_a_pen');
-</span></span><span id="231" class="l"><span class="php-comment"> * ```
+</span></span><span id="231" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="232" class="l"><span class="php-comment"> *
 </span></span><span id="233" class="l"><span class="php-comment"> * @param string $string 対象文字列
 </span></span><span id="234" class="l"><span class="php-comment"> * @param string $delimiter デリミタ
@@ -436,9 +443,9 @@
 </span></span><span id="243" class="l"><span class="php-comment"> * chain-case に変換する
 </span></span><span id="244" class="l"><span class="php-comment"> *
 </span></span><span id="245" class="l"><span class="php-comment"> * Example:
-</span></span><span id="246" class="l"><span class="php-comment"> * ```php
+</span></span><span id="246" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="247" class="l"><span class="php-comment"> * assert(chain_case('ThisIsAPen') === 'this-is-a-pen');
-</span></span><span id="248" class="l"><span class="php-comment"> * ```
+</span></span><span id="248" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="249" class="l"><span class="php-comment"> *
 </span></span><span id="250" class="l"><span class="php-comment"> * @param string $string 対象文字列
 </span></span><span id="251" class="l"><span class="php-comment"> * @param string $delimiter デリミタ
@@ -512,9 +519,9 @@
 </span></span><span id="319" class="l"><span class="php-comment"> * sprintf の順序指定構文('%1$d')にキーを指定できる。
 </span></span><span id="320" class="l"><span class="php-comment"> *
 </span></span><span id="321" class="l"><span class="php-comment"> * Example:
-</span></span><span id="322" class="l"><span class="php-comment"> * ```php
+</span></span><span id="322" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="323" class="l"><span class="php-comment"> * assert(kvsprintf('%hoge$s %fuga$d', ['hoge' =&gt; 'ThisIs', 'fuga' =&gt; '3.14']) === 'ThisIs 3');
-</span></span><span id="324" class="l"><span class="php-comment"> * ```
+</span></span><span id="324" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="325" class="l"><span class="php-comment"> *
 </span></span><span id="326" class="l"><span class="php-comment"> * @param string $format フォーマット文字列
 </span></span><span id="327" class="l"><span class="php-comment"> * @param array $array フォーマット引数
@@ -560,7 +567,7 @@
 </span></span><span id="367" class="l"><span class="php-comment"> * また、 `{$_(syntax(&quot;&quot;))}` のように {$_()} 構文で &quot; も使えなくなるので \' を使用しなければならない。
 </span></span><span id="368" class="l"><span class="php-comment"> *
 </span></span><span id="369" class="l"><span class="php-comment"> * Example:
-</span></span><span id="370" class="l"><span class="php-comment"> * ```php
+</span></span><span id="370" class="l"><span class="php-comment"> * &lt;code&gt;
 </span></span><span id="371" class="l"><span class="php-comment"> * // 数値キーが参照できる
 </span></span><span id="372" class="l"><span class="php-comment"> * assert(render_string('${0}', ['number'])                                          === 'number');
 </span></span><span id="373" class="l"><span class="php-comment"> * // クロージャは呼び出し結果が埋め込まれる
@@ -570,7 +577,7 @@
 </span></span><span id="377" class="l"><span class="php-comment"> * // 要するに '$_()' の中に php の式が書けるようになる
 </span></span><span id="378" class="l"><span class="php-comment"> * assert(render_string('{$_(implode(\',\', $strs))}', ['strs' =&gt; ['a', 'n', 'z']])  === 'a,n,z');
 </span></span><span id="379" class="l"><span class="php-comment"> * assert(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]])                   === '9');
-</span></span><span id="380" class="l"><span class="php-comment"> * ```
+</span></span><span id="380" class="l"><span class="php-comment"> * &lt;/code&gt;
 </span></span><span id="381" class="l"><span class="php-comment"> *
 </span></span><span id="382" class="l"><span class="php-comment"> * @param string $template レンダリング文字列
 </span></span><span id="383" class="l"><span class="php-comment"> * @param array $array レンダリング変数
@@ -643,7 +650,7 @@
 		 API documentation generated by <a href="http://apigen.org">ApiGen</a>
 	</div>
 </div>
-<script src="resources/combined.js?64829dd0598cd54a3fd46ce58f8efe7e2fac9ecc"></script>
-<script src="elementlist.js?f554b0e480ce78b6911ba1fee415e6d243a964d1"></script>
+<script src="resources/combined.js?77bf4ed6d948f5dd4dd9f6cbf1ce64bd694cd6d6"></script>
+<script src="elementlist.js?578bd9b73ab76b517a9e10f622c86010a70e2a15"></script>
 </body>
 </html>

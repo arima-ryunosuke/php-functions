@@ -1053,7 +1053,14 @@ jQuery.fn.sortElements = (function(){
 	var $rightInner = $('#rightInner');
 	var $splitter = $('#splitter');
 	var $groups = $('#groups');
+	var $elements = $('#elements');
 	var $content = $('#content');
+	
+	// Save/Restore elements scroll posiition
+	$left.scrollTop(sessionStorage.getItem('left.scroll-top') || 0)
+	$elements.on('click', 'ul > li > a', function(ev) {
+		sessionStorage.setItem('left.scroll-top', $left.scrollTop())
+	})
 
 	// Menu
 
@@ -1160,7 +1167,7 @@ jQuery.fn.sortElements = (function(){
 			var order = $this.data('order') || 'natural';
 			order = 'natural' === order ? 'alphabetical' : 'natural';
 			$this.data('order', order);
-			$.cookie('order', order, {expires: 365});
+			localStorage.setItem('order', order);
 			var attr = 'alphabetical' === order ? 'data-order' : 'data-order-natural';
 			$this
 				.next('table')
@@ -1171,7 +1178,7 @@ jQuery.fn.sortElements = (function(){
 		})
 		.addClass('switchable')
 		.attr('title', 'Switch between natural and alphabetical order');
-	if ((null === $.cookie('order') && 'alphabetical' === ApiGen.config.options.elementsOrder) || 'alphabetical' === $.cookie('order')) {
+	if ((null === localStorage.getItem('order') && 'alphabetical' === ApiGen.config.options.elementsOrder) || 'alphabetical' === localStorage.getItem('order')) {
 		$caption.click();
 	}
 
@@ -1192,8 +1199,8 @@ jQuery.fn.sortElements = (function(){
 
 	// Splitter
 	var splitterWidth = $splitter.width();
-	var splitterPosition = $.cookie('splitter') ? parseInt($.cookie('splitter')) : null;
-	var splitterPositionBackup = $.cookie('splitterBackup') ? parseInt($.cookie('splitterBackup')) : null;
+	var splitterPosition = localStorage.getItem('splitter') ? parseInt(localStorage.getItem('splitter')) : null;
+	var splitterPositionBackup = localStorage.getItem('splitterBackup') ? parseInt(localStorage.getItem('splitterBackup')) : null;
 	function setSplitterPosition(position)
 	{
 		splitterPosition = position;
@@ -1237,7 +1244,7 @@ jQuery.fn.sortElements = (function(){
 							.unbind('mousemove')
 							.unbind('mouseup');
 
-						$.cookie('splitter', splitterPosition, {expires: 365});
+						localStorage.setItem('splitter', splitterPosition);
 					});
 
 			return false;
@@ -1253,8 +1260,8 @@ jQuery.fn.sortElements = (function(){
 
 		setContentWidth();
 
-		$.cookie('splitter', splitterPosition, {expires: 365});
-		$.cookie('splitterBackup', splitterPositionBackup, {expires: 365});
+		localStorage.setItem('splitter', splitterPosition);
+		localStorage.setItem('splitterBackup', splitterPositionBackup);
 	});
 	if (null !== splitterPosition) {
 		setSplitterPosition(splitterPosition);

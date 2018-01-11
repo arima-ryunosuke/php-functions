@@ -14,12 +14,12 @@
  * iterable や Traversable は考慮せずあくまで「配列」としてチェックする。
  *
  * Example:
- * ```php
+ * <code>
  * assert(arrayize(1, 2, 3)                   === [1, 2, 3]);
  * assert(arrayize([1], [2], [3])             === [1, 2, 3]);
  * $object = new \stdClass();
  * assert(arrayize($object, false, [1, 2, 3]) === [$object, false, 1, 2, 3]);
- * ```
+ * </code>
  *
  * @param mixed $variadic 生成する要素（可変引数）
  * @return array 引数を配列化したもの
@@ -42,11 +42,11 @@ function arrayize()
  * 空の配列は普通の配列とみなす。
  *
  * Example:
- * ```php
+ * <code>
  * assert(is_hasharray([])           === false);
  * assert(is_hasharray([1, 2, 3])    === false);
  * assert(is_hasharray(['x' => 'X']) === true);
- * ```
+ * </code>
  *
  * @param array $array 調べる配列
  * @return bool 連想配列なら true
@@ -68,10 +68,10 @@ function is_hasharray(array $array)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(first_key(['a', 'b', 'c']) === 0);
  * assert(first_key([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -93,10 +93,10 @@ function first_key($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(first_value(['a', 'b', 'c']) === 'a');
  * assert(first_value([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -118,10 +118,10 @@ function first_value($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(first_keyvalue(['a', 'b', 'c']) === [0, 'a']);
  * assert(first_keyvalue([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -141,10 +141,10 @@ function first_keyvalue($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(last_key(['a', 'b', 'c']) === 2);
  * assert(last_key([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -166,10 +166,10 @@ function last_key($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(last_value(['a', 'b', 'c']) === 'c');
  * assert(last_value([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -191,10 +191,10 @@ function last_value($array, $default = null)
  * 空の場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * assert(last_keyvalue(['a', 'b', 'c']) === [2, 'c']);
  * assert(last_keyvalue([], 999)         === 999);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param mixed $default 無かった場合のデフォルト値
@@ -221,7 +221,7 @@ function last_keyvalue($array, $default = null)
  * $key が存在しない場合は false を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
  * // 'b' キーの前は 'a'
  * assert(prev_key($array, 'b') === 'a');
@@ -229,7 +229,7 @@ function last_keyvalue($array, $default = null)
  * assert(prev_key($array, 'a') === null);
  * // 'x' キーはそもそも存在しないので false
  * assert(prev_key($array, 'x') === false);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param string|int $key 調べるキー
@@ -258,7 +258,7 @@ function prev_key($array, $key)
  * $array[] = 'hoge' で作成されるキーには完全準拠しない（標準は unset すると結構乱れる）。公式マニュアルを参照。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
  * // 'b' キーの次は 'c'
  * assert(next_key($array, 'b') === 'c');
@@ -268,7 +268,7 @@ function prev_key($array, $key)
  * assert(next_key($array, 'x') === false);
  * // 次に生成されるキーは 10
  * assert(next_key($array, null) === 10);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param string|int|null $key 調べるキー
@@ -305,12 +305,12 @@ function next_key($array, $key = null)
  * 配列の+演算子の関数版
  *
  * Example:
- * ```php
+ * <code>
  * // ただの加算の関数版なので同じキーは上書きされない
  * assert(array_add(['a', 'b', 'c'], ['X'])        === ['a', 'b', 'c']);
  * // 異なるキーは生える
  * assert(array_add(['a', 'b', 'c'], ['x' => 'X']) === ['a', 'b', 'c', 'x' => 'X']);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param array $variadic 足す配列
@@ -330,12 +330,12 @@ function array_add($array)
  * 負数を与えると逆から N 番目となる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_pos([1, 2, 3], 1)                                  === 2);
  * assert(array_pos([1, 2, 3], -1)                                 === 3);
  * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1)       === 'B');
  * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true) === 'b');
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param int $position 取得する位置
@@ -376,10 +376,10 @@ function array_pos($array, $position, $return_key = false)
  * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
  *
  * Example:
- * ```php
+ * <code>
  * $fuga_of_array = array_of('fuga');
  * assert($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']) === 'FUGA');
- * ```
+ * </code>
  *
  * @param string|int|array $key 取得したいキー
  * @param mixed $default デフォルト値
@@ -408,7 +408,7 @@ function array_of($key, $default = null)
  * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
  *
  * Example:
- * ```php
+ * <code>
  * // 単純取得
  * assert(array_get(['a', 'b', 'c'], 1)      === 'b');
  * // 単純デフォルト
@@ -419,7 +419,7 @@ function array_of($key, $default = null)
  * assert(array_get(['a', 'b', 'c'], [0, 9]) === [0 => 'a']);
  * // 配列デフォルト（null ではなく [] を返す）
  * assert(array_get(['a', 'b', 'c'], [9])    === []);
- * ```
+ * </code>
  *
  * @param array $array 配列
  * @param string|int|array $key 取得したいキー
@@ -429,7 +429,13 @@ function array_of($key, $default = null)
 function array_get($array, $key, $default = null)
 {
     if (is_array($key)) {
-        $result = array_intersect_key($array, array_flip($key));
+        // $result = array_shrink_key(array_flip($key), $array);
+        $result = [];
+        foreach ($key as $k) {
+            if (array_key_exists($k, $array)) {
+                $result[$k] = $array[$k];
+            }
+        }
         if (!$result) {
             // 明示的に与えられていないなら [] を使用する
             if (func_num_args() === 2) {
@@ -452,24 +458,27 @@ function array_get($array, $key, $default = null)
  * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
  *
  * Example:
- * ```php
+ * <code>
  * $array = ['a' => 'A', 'B'];
  * assert(array_set($array, 'Z')      === 1);
  * assert($array                      === ['a' => 'A', 'B', 'Z']);
  * assert(array_set($array, 'Z', 'z') === 'z');
  * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
- * ```
+ * </code>
  *
  * @param array $array 配列
  * @param mixed $value 設定する値
  * @param string|int $key 設定するキー
+ * @param bool $require_return 返り値が不要なら false を渡す
  * @return string|int 設定したキー
  */
-function array_set(&$array, $value, $key = null)
+function array_set(&$array, $value, $key = null, $require_return = true)
 {
     if ($key === null) {
         $array[] = $value;
-        $key = last_key($array);
+        if ($require_return === true) {
+            $key = last_key($array);
+        }
     }
     else {
         $array[$key] = $value;
@@ -487,7 +496,7 @@ function array_set(&$array, $value, $key = null)
  * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
  *
  * Example:
- * ```php
+ * <code>
  * $array = ['a' => 'A', 'b' => 'B'];
  * // ない場合は $default を返す
  * assert(array_unset($array, 'x', 'X') === 'X');
@@ -503,7 +512,7 @@ function array_set(&$array, $value, $key = null)
  * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
  * // 配列のキーは返されるキーを表す。順番も維持される
  * assert(array_unset($array, ['x2' => 'b', 'x1' => 'a']) === ['x2' => 'B', 'x1' => 'A']);
- * ```
+ * </code>
  *
  * @param array $array 配列
  * @param string|int|array $key 伏せたいキー。配列を与えると全て伏せる
@@ -540,7 +549,7 @@ function array_unset(&$array, $key, $default = null)
  * 存在しない場合は $default を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
  *     'a' => [
  *         'b' => [
@@ -550,17 +559,20 @@ function array_unset(&$array, $key, $default = null)
  * ];
  * assert(array_dive($array, 'a.b.c')    === 'vvv');
  * assert(array_dive($array, 'a.b.x', 9) === 9);
- * ```
+ * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
+ * assert(array_dive($array, ['a', 'b', 'c'])    === 'vvv');
+ * </code>
  *
  * @param array $array 調べる配列
- * @param string $path パス文字列
+ * @param string|array $path パス文字列。配列も与えられる
  * @param mixed $default 無かった場合のデフォルト値
  * @param string $delimiter パスの区切り文字。大抵は '.' か '/'
  * @return mixed パスが示す配列の値
  */
 function array_dive($array, $path, $default = null, $delimiter = '.')
 {
-    foreach (explode($delimiter, $path) as $key) {
+    $keys = is_array($path) ? $path : explode($delimiter, $path);
+    foreach ($keys as $key) {
         if (!array_key_exists($key, $array)) {
             return $default;
         }
@@ -576,10 +588,10 @@ function array_dive($array, $path, $default = null, $delimiter = '.')
  * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_exists(['a', 'b', '9'], 'ctype_digit')                    === 2);
  * assert(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 調べる配列
  * @param callable $callback 評価コールバック
@@ -599,10 +611,10 @@ function array_exists($array, $callback)
  * キーを正規表現でフィルタする
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#')       === ['a' => 'A', 'aa' => 'AA']);
  * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true) === ['b' => 'B']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string $regex 正規表現
@@ -627,10 +639,10 @@ function array_grep_key($array, $regex, $not = false)
  * $callback が null を返すとその要素は取り除かれる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper') === ['A' => 'A', 'B' => 'B']);
  * assert(array_map_key(['a' => 'A', 'b' => 'B'], function(){}) === []);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -654,9 +666,9 @@ function array_map_key($array, $callback)
  * 単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_filter_not(['a', '', 'c'], 'strlen') === [1 => '']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価 callable
@@ -674,10 +686,10 @@ function array_filter_not($array, $callback)
  * ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; })   === [0 => 'a', 2 => 'c']);
  * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }) === [0 => 'a', 2 => 'c']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -700,10 +712,10 @@ function array_filter_key($array, $callback)
  * キーは $k, 値は $v で宣言される。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_filter_eval(['a', 'b', 'c'], '$k !== 1')   === [0 => 'a', 2 => 'c']);
  * assert(array_filter_eval(['a', 'b', 'c'], '$v !== "b"') === [0 => 'a', 2 => 'c']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string $expression eval コード
@@ -728,11 +740,11 @@ function array_filter_eval($array, $expression)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
- * 0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
- * 1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
- * 2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+ *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+ *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+ *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
  * ];
  * // 'flag' が true 相当のものだけ返す
  * assert(array_where($array, 'flag')                           === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
@@ -745,7 +757,7 @@ function array_filter_eval($array, $expression)
  * // $column に配列を渡すと共通項が渡ってくる
  * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
  * assert(array_where($array, ['id', 'name'], $idname_is_2fuga) === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string|array|null $column キー名
@@ -789,10 +801,10 @@ function array_where($array, $column = null, $callback = null)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_map_filter([' a ', ' b ', ''], 'trim')       === ['a', 'b']);
  * assert(array_map_filter([' a ', ' b ', ''], 'trim', true) === ['a', 'b', '']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -820,7 +832,7 @@ function array_map_filter($array, $callback, $strict = false)
  * $ignore=null とすると 何もせずそのまま要素を返す。
  *
  * Example:
- * ```php
+ * <code>
  * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
  * // getMessage で map される
  * assert(array_map_method([$exa, $exb], 'getMessage')                       === ['a', 'b']);
@@ -828,7 +840,7 @@ function array_map_filter($array, $callback, $strict = false)
  * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true) === ['a', 'b']);
  * // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
  * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null) === ['a', 'b', $std, null]);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param string $method メソッド
@@ -859,14 +871,14 @@ function array_map_method($array, $method, $args = [], $ignore = false)
  * その際、「挿入後の番目」ではなく、単純に「元の引数の番目」であることに留意。キー・値が同じ位置を指定している場合はキーが先にくる。
  *
  * Example:
- * ```php
+ * <code>
  * // 1番目に値を渡して map
  * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
  * assert(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix')   === ['prefix-a-suffix', 'prefix-b-suffix']);
  * // 1番目にキー、2番目に値を渡して map
  * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
  * assert(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c') === ['k' => 'a k b v c']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -929,10 +941,10 @@ function array_nmap($array, $callback, $n)
  * 要素値を $callback の最左に適用して array_map する
  *
  * Example:
- * ```php
+ * <code>
  * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
  * assert(array_lmap(['a', 'b'], $sprintf, '-suffix') === ['a-suffix', 'b-suffix']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -949,10 +961,10 @@ function array_lmap($array, $callback)
  * 要素値を $callback の最右に適用して array_map する
  *
  * Example:
- * ```php
+ * <code>
  * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
  * assert(array_rmap(['a', 'b'], $sprintf, 'prefix-') === ['prefix-a', 'prefix-b']);
- * ```
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable $callback 評価クロージャ
@@ -971,11 +983,11 @@ function array_rmap($array, $callback)
  * つまり、配列を与える限りは 0 以下を返すことはない。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_depth([])                       === 1);
  * assert(array_depth(['hoge'])                 === 1);
  * assert(array_depth([['nest1' => ['nest2']]]) === 3);
- * ```
+ * </code>
  *
  * @param array $array 調べる配列
  * @return int 次元数。素のフラット配列は 1
@@ -1002,12 +1014,12 @@ function array_depth($array)
  * $value には配列も与えられるが、その場合数値キーは振り直される
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_insert([1, 2, 3], 'x')                         === [1, 2, 3, 'x']);
  * assert(array_insert([1, 2, 3], 'x', 1)                      === [1, 'x', 2, 3]);
  * assert(array_insert([1, 2, 3], 'x', -1)                     === [1, 2, 'x', 3]);
  * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'a' => 'A', 'b' => 'B', 2, 3]);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param mixed $value 挿入値
@@ -1036,12 +1048,14 @@ function array_insert($array, $value, $position = null)
  * $rule が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * // lt2(2より小さい)で分類
- * assert(array_assort([1, 2, 3], ['lt2' => function($v){return $v < 2;}])                               === ['lt2' => [1]]);
+ * $lt2 = function($v){return $v < 2;};
+ * assert(array_assort([1, 2, 3], ['lt2' => $lt2])                               === ['lt2' => [1]]);
  * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
- * assert(array_assort(['1', '2', '3'], ['lt3' => function($v){return $v < 3;}, 'ctd' => 'ctype_digit']) === ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
- * ```
+ * $lt3 = function($v){return $v < 3;};
+ * assert(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']) === ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
+ * </code>
  *
  * @param array|\Traversable $array 対象配列
  * @param callable[] $rules 分類ルール。[key => callable] 形式
@@ -1064,11 +1078,26 @@ function array_assort($array, $rules)
 /**
  * 配列をコールバックの返り値でグループ化する
  *
+ * コールバックが配列を返すと入れ子としてグループする。
+ *
  * Example:
- * ```php
+ * <code>
  * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
  * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
- * ```
+ * // group -> id で入れ子グループにする
+ * $row1 = ['id' => 1, 'group' => 'hoge'];
+ * $row2 = ['id' => 2, 'group' => 'fuga'];
+ * $row3 = ['id' => 3, 'group' => 'hoge'];
+ * assert(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}) === [
+ *     'hoge' => [
+ *         1 => $row1,
+ *         3 => $row3,
+ *     ],
+ *     'fuga' => [
+ *         2 => $row2,
+ *     ],
+ * ]);
+ * </code>
  *
  * @param array|\Traversable 対象配列
  * @param callable $callback 評価クロージャ。 null なら値そのもので評価
@@ -1082,7 +1111,16 @@ function array_group($array, $callback = null, $preserve_keys = false)
     $result = [];
     foreach ($array as $k => $v) {
         $vv = $callback($v, $k);
-        if (!$preserve_keys && is_int($k)) {
+        // 配列は潜る
+        if (is_array($vv)) {
+            $tmp = &$result;
+            foreach ($vv as $vvv) {
+                $tmp = &$tmp[$vvv];
+            }
+            $tmp = $v;
+            unset($tmp);
+        }
+        else if (!$preserve_keys && is_int($k)) {
             $result[$vv][] = $v;
         }
         else {
@@ -1098,11 +1136,11 @@ function array_group($array, $callback = null, $preserve_keys = false)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_all([true, true])   === true);
  * assert(array_all([true, false])  === false);
  * assert(array_all([false, false]) === false);
- * ```
+ * </code>
  *
  * @param array|\Traversable 対象配列
  * @param callable $callback 評価クロージャ。 null なら値そのもので評価
@@ -1131,11 +1169,11 @@ function array_all($array, $callback = null, $default = true)
  * $callback が要求するならキーも渡ってくる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(array_any([true, true])   === true);
  * assert(array_any([true, false])  === true);
  * assert(array_any([false, false]) === false);
- * ```
+ * </code>
  *
  * @param array|\Traversable 対象配列
  * @param callable $callback 評価クロージャ。 null なら値そのもので評価
@@ -1166,24 +1204,24 @@ function array_any($array, $callback = null, $default = false)
  *
  * $orders には下記のような配列を渡す。
  *
- * ```php
+ * <code>
  * $orders = [
- * 'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
- * 'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
- * 'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
- * 'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
- * 'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+ *     'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
+ *     'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+ *     'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
+ *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+ *     'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
  * ];
- * ```
+ * </code>
  *
  * Example:
- * ```php
+ * <code>
  * $v1 = ['id' => '1', 'no' => 'a03', 'name' => 'yyy'];
  * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
  * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
  * // name 昇順, no 自然降順
  * assert(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]) === [$v3, $v2, $v1]);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param mixed $orders ソート順
@@ -1310,13 +1348,13 @@ function array_order(array $array, $orders, $preserve_keys = false)
  * 「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $array1 = ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'];
  * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
  * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
  * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
  * assert(array_shrink_key($array1, $array2, $array3) === ['c' => 'C3']);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param array $arrays 比較する配列
@@ -1330,16 +1368,67 @@ function array_shrink_key(array $array)
 }
 
 /**
+ * キー保存可能な array_column
+ *
+ * array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。
+ *
+ * Example:
+ * <code>
+ * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
+ * // 第3引数を渡せば array_column と全く同じ
+ * assert(array_lookup($array, 'name', 'id') === array_column($array, 'name', 'id'));
+ * assert(array_lookup($array, 'name', null) === array_column($array, 'name', null));
+ * // 省略すればキーが保存される
+ * assert(array_lookup($array, 'name')       === [11 => 'name1', 12 => 'name2', 13 => 'name3']);
+ * assert(array_lookup($array)               === $array);
+ * </code>
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param string|null $column_key 値となるキー
+ * @param string|null $index_key キーとなるキー
+ * @return array 新しい配列
+ */
+function array_lookup($array, $column_key = null, $index_key = null)
+{
+    if (func_num_args() === 3) {
+        return array_column($array, $column_key, $index_key);
+    }
+
+    // null 対応できないし、php7 からオブジェクトに対応してるらしいので止め。ベタにやる
+    // return array_map(array_of($column_keys), $array);
+
+    // 実質的にはこれで良いはずだが、オブジェクト対応が救えないので止め。ベタにやる
+    // return array_combine(array_keys($array), array_column($array, $column_key));
+
+    $result = [];
+    foreach ($array as $k => $v) {
+        if ($column_key === null) {
+            $result[$k] = $v;
+        }
+        else if (is_array($v) && array_key_exists($column_key, $v)) {
+            $result[$k] = $v[$column_key];
+        }
+        else if (is_object($v) && (isset($v->$column_key) || property_exists($v, $column_key))) {
+            $result[$k] = $v->$column_key;
+        }
+    }
+    return $result;
+}
+
+/**
  * 全要素に対して array_column する
  *
  * 行列が逆転するイメージ。
  *
  * Example:
- * ```php
- * assert(array_columns([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']])               === ['id' => [1, 2], 'name' => ['A', 'B']]);
- * assert(array_columns([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']], 'id')         === ['id' => [1, 2]]);
- * assert(array_columns([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']], 'name', 'id') === ['name' => [1 => 'A', 2 => 'B']]);
- * ```
+ * <code>
+ * $row1 = ['id' => 1, 'name' => 'A'];
+ * $row2 = ['id' => 2, 'name' => 'B'];
+ * $rows = [$row1, $row2];
+ * assert(array_columns($rows)               === ['id' => [1, 2], 'name' => ['A', 'B']]);
+ * assert(array_columns($rows, 'id')         === ['id' => [1, 2]]);
+ * assert(array_columns($rows, 'name', 'id') === ['name' => [1 => 'A', 2 => 'B']]);
+ * </code>
  *
  * @param array $array 対象配列
  * @param string|array $column_keys 引っ張ってくるキー名
@@ -1370,9 +1459,12 @@ function array_columns($array, $column_keys = null, $index_key = null)
  * キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。
  *
  * Example:
- * ```php
- * assert(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]) === [['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B']]);
- * ```
+ * <code>
+ * assert(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]) === [
+ *     ['id' => 1, 'name' => 'A'],
+ *     ['id' => 2, 'name' => 'B'],
+ * ]);
+ * </code>
  *
  * @param array $array 対象配列
  * @param array $template 抽出要素とそのデフォルト値
@@ -1423,26 +1515,34 @@ function array_uncolumns($array, $template = null)
  * 複雑だが実質的には「キーも設定できる array_walk_recursive」のように振る舞う（そしてそのような使い方を想定している）。
  *
  * Example:
- * ```php
+ * <code>
  * $array = [
- *     'k1' => 'v1',
- *     'k2' => [
- *         'k21' => 'v21',
- *         'k22' => [
- *             'k221' => 'v221',
- *             'k222' => 'v222',
- *         ],
- *     ],
+ *    'k1' => 'v1',
+ *    'k2' => [
+ *        'k21' => 'v21',
+ *        'k22' => [
+ *            'k221' => 'v221',
+ *            'k222' => 'v222',
+ *        ],
+ *        'k23' => 'v23',
+ *    ],
  * ];
- * // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k22' はまるごと伏せる。さらに 'k21' はそのままとする
- * $callback = function($k, &$v){if ($k === 'k22') return false; if ($k === 'k21') return null; if(!is_array($v)) $v = "prefix-$v"; return "_$k";};
+ * // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k21' はそのままとする。さらに 'k22' はまるごと伏せる。 'k23' は数値キーになる
+ * $callback = function($k, &$v){
+ *     if ($k === 'k21') return null;
+ *     if ($k === 'k22') return false;
+ *     if ($k === 'k23') return true;
+ *     if (!is_array($v)) $v = "prefix-$v";
+ *     return "_$k";
+ * };
  * assert(array_convert($array, $callback, true) === [
  *     '_k1' => 'prefix-v1',
  *     '_k2' => [
  *         'k21' => 'v21',
+ *         0     => 'v23',
  *     ],
  * ]);
- * ```
+ * </code>
  *
  * @param array $array 対象配列
  * @param callable $callback 適用するコールバック
@@ -1512,15 +1612,122 @@ function array_convert($array, $callback, $apply_array = false)
     $recursive($result, $array, $array, $callback);
     return $result;
 }
+
+/**
+ * 多階層配列をフラットに展開する
+ *
+ * 巷にあふれている実装と違って、 ["$pkey.$ckey" => $value] 形式の配列でも返せる。
+ * $delimiter で区切り文字を指定した場合にそのようになる。
+ * $delimiter = null の場合に本当の配列で返す（巷の実装と同じ）。
+ *
+ * Example:
+ * <code>
+ * $array = [
+ *    'k1' => 'v1',
+ *    'k2' => [
+ *        'k21' => 'v21',
+ *        'k22' => [
+ *            'k221' => 'v221',
+ *            'k222' => 'v222',
+ *            'k223' => [1, 2, 3],
+ *        ],
+ *    ],
+ * ];
+ * // 区切り文字指定なし
+ * assert(array_flatten($array) === [
+ *    0 => 'v1',
+ *    1 => 'v21',
+ *    2 => 'v221',
+ *    3 => 'v222',
+ *    4 => 1,
+ *    5 => 2,
+ *    6 => 3,
+ * ]);
+ * // 区切り文字指定
+ * assert(array_flatten($array, '.') === [
+ *    'k1'            => 'v1',
+ *    'k2.k21'        => 'v21',
+ *    'k2.k22.k221'   => 'v221',
+ *    'k2.k22.k222'   => 'v222',
+ *    'k2.k22.k223.0' => 1,
+ *    'k2.k22.k223.1' => 2,
+ *    'k2.k22.k223.2' => 3,
+ * ]);
+ * </code>
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
+ * @return array フラット化された配列
+ */
+function array_flatten($array, $delimiter = null)
+{
+    // 要素追加について、 array_set だと目に見えて速度低下したのでベタに if else で分岐する
+    $core = function ($array, $delimiter) use (&$core) {
+        $result = [];
+        foreach ($array as $k => $v) {
+            if (is_array($v)) {
+                foreach ($core($v, $delimiter) as $ik => $iv) {
+                    if ($delimiter === null) {
+                        $result[] = $iv;
+                    }
+                    else {
+                        $result[$k . $delimiter . $ik] = $iv;
+                    }
+                }
+            }
+            else {
+                if ($delimiter === null) {
+                    $result[] = $v;
+                }
+                else {
+                    $result[$k] = $v;
+                }
+            }
+        }
+        return $result;
+    };
+
+    return $core($array, $delimiter);
+}
+/**
+ * 初期フィールド値を与えて stdClass を生成する
+ *
+ * 手元にある配列でサクッと stdClass を作りたいことがまれによくあるはず。
+ *
+ * object キャストでもいいんだが、 Iterator/Traversable とかも stdClass 化したいかもしれない。
+ * それにキャストだとコールバックで呼べなかったり、数値キーが死んだりして微妙に使いづらいところがある。
+ *
+ * Example:
+ * <code>
+ * // 基本的には object キャストと同じ
+ * $fields = ['a' => 'A', 'b' => 'B'];
+ * assert(stdclass($fields) == (object) $fields);
+ * // ただしこういうことはキャストでは出来ない
+ * assert(array_map('stdclass', [$fields]) == [(object) $fields]); // コールバックとして利用する
+ * assert(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+ * </code>
+ *
+ * @param array|\Traversable $fields フィールド配列
+ * @return \stdClass 生成した stdClass インスタンス
+ */
+function stdclass($fields = [])
+{
+    $stdclass = new \stdClass();
+    foreach ($fields as $key => $value) {
+        $stdclass->$key = $value;
+    }
+    return $stdclass;
+}
+
 /**
  * composer のクラスローダを返す
  *
  * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(class_loader() instanceof \Composer\Autoload\ClassLoader);
- * ```
+ * </code>
  *
  * @param string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
  * @return \Composer\Autoload\ClassLoader クラスローダ
@@ -1550,9 +1757,9 @@ function class_loader($startdir = null)
  * クラスの名前空間部分を取得する
  *
  * Example:
- * ```php
+ * <code>
  * assert(class_namespace('vendor\\namespace\\ClassName') === 'vendor\\namespace');
- * ```
+ * </code>
  *
  * @param string|object $class 対象クラス・オブジェクト
  * @return string クラスの名前空間
@@ -1572,9 +1779,9 @@ function class_namespace($class)
  * クラスの名前空間部分を除いた短い名前を取得する
  *
  * Example:
- * ```php
+ * <code>
  * assert(class_shorten('vendor\\namespace\\ClassName') === 'ClassName');
- * ```
+ * </code>
  *
  * @param string|object $class 対象クラス・オブジェクト
  * @return string クラスの短い名前
@@ -1656,11 +1863,11 @@ function class_replace($class, $register, $dirname = null)
  * クラスにメソッドがあるかを返す
  *
  * Example:
- * ```php
+ * <code>
  * assert(has_class_methods('Exception', 'getMessage') === true);
  * assert(has_class_methods('Exception', 'getmessage') === true);
  * assert(has_class_methods('Exception', 'undefined')  === false);
- * ```
+ * </code>
  *
  * @param string|object $class 対象クラス・オブジェクト
  * @param string $method_name 調べるメソッド名
@@ -1758,11 +1965,11 @@ function file_tree($dirname, $filter_condition = null)
  * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(file_extension('filename.ext')        === 'ext');
  * assert(file_extension('filename.ext', 'txt') === 'filename.txt');
  * assert(file_extension('filename.ext', '')    === 'filename');
- * ```
+ * </code>
  *
  * @param string $filename 調べるファイル名
  * @param string $extension 拡張子。nullや空文字なら拡張子削除
@@ -1792,10 +1999,10 @@ function file_extension($filename, $extension = '')
  * ディレクトリも掘る file_put_contents
  *
  * Example:
- * ```php
+ * <code>
  * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
  * assert(file_get_contents(sys_get_temp_dir() . '/not/filename.ext') === 'hoge');
- * ```
+ * </code>
  *
  * @param string $filename 書き込むファイル名
  * @param string $data 書き込む内容
@@ -1819,6 +2026,8 @@ function file_set_contents($filename, $data, $umask = 0002)
 /**
  * ディレクトリを再帰的に掘る
  *
+ * 既に存在する場合は何もしない（エラーも出さない）。
+ *
  * @param string $dirname ディレクトリ名
  * @param int $umask ディレクトリを掘る際の umask
  * @return bool 作成したら true
@@ -1840,11 +2049,11 @@ function mkdir_p($dirname, $umask = 0002)
  * 中身があっても消せる rmdir
  *
  * Example:
- * ```php
+ * <code>
  * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
  * rm_rf(sys_get_temp_dir() . '/new');
  * assert(file_exists(sys_get_temp_dir() . '/new') === false);
- * ```
+ * </code>
  *
  * @param string $dirname 削除するディレクトリ名
  * @param bool $self 自分自身も含めるか。false を与えると中身だけを消す
@@ -1872,15 +2081,65 @@ function rm_rf($dirname, $self = true)
         return rmdir($dirname);
     }
 }
+/**
+ * 指定 callable を指定クロージャで実行するクロージャを返す
+ *
+ * ほぼ内部向けで外から呼ぶことはあまり想定していない。
+ *
+ * @param \Closure $invoker クロージャを実行するためのクロージャ（実処理）
+ * @param callable $callable 最終的に実行したいクロージャ
+ * @param int $arity 引数の数
+ * @return \Closure $callable を実行するクロージャ
+ */
+function delegate($invoker, $callable, $arity = null)
+{
+    if ($arity === null) {
+        $arity = parameter_length($callable, true);
+    }
+    $arity = $arity < 0 ? 0 : $arity;
+
+    switch ($arity) {
+        case 0:
+            return function () use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 1:
+            return function ($_1) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 2:
+            return function ($_1, $_2) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 3:
+            return function ($_1, $_2, $_3) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 4:
+            return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        case 5:
+            return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };
+        default:
+            $argstring = array_rmap(range(1, $arity), strcat, '$_');
+            return eval('return function (' . implode(', ', $argstring) . ') use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };');
+    }
+}
+
 /** @noinspection PhpDocSignatureInspection */
 /**
  * $callable の指定位置に引数を束縛したクロージャを返す
  *
  * Example:
- * ```php
+ * <code>
  * $bind = nbind('sprintf', 2, 'X');
  * assert($bind('%s%s%s', 'N', 'N') === 'NXN');
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param int $n 挿入する引数位置
@@ -1889,10 +2148,10 @@ function rm_rf($dirname, $self = true)
  */
 function nbind($callable, $n)
 {
-    $args = array_slice(func_get_args(), 2);
-    return function () use ($callable, $n, $args) {
-        return call_user_func_array($callable, array_insert(func_get_args(), $args, $n));
-    };
+    $binded = array_slice(func_get_args(), 2);
+    return delegate(function ($callable, $args) use ($binded, $n) {
+        return call_user_func_array($callable, array_insert($args, $binded, $n));
+    }, $callable, parameter_length($callable, true) - count($binded));
 }
 
 /** @noinspection PhpDocSignatureInspection */
@@ -1900,10 +2159,10 @@ function nbind($callable, $n)
  * $callable の最左に引数を束縛した callable を返す
  *
  * Example:
- * ```php
+ * <code>
  * $bind = lbind('sprintf', '%s%s');
  * assert($bind('N', 'M') === 'NM');
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param mixed $variadic 本来の引数（可変引数）
@@ -1919,10 +2178,10 @@ function lbind($callable)
  * $callable の最右に引数を束縛した callable を返す
  *
  * Example:
- * ```php
+ * <code>
  * $bind = rbind('sprintf', 'X');
  * assert($bind('%s%s', 'N') === 'NX');
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param mixed $variadic 本来の引数（可変引数）
@@ -1935,6 +2194,14 @@ function rbind($callable)
 
 /**
  * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
+ *
+ * Example:
+ * <code>
+ * $arg0 = return_arg(0);
+ * assert($arg0('hoge')          === 'hoge');
+ * $arg1 = return_arg(1);
+ * assert($arg1('dummy', 'hoge') === 'hoge');
+ * </code>
  *
  * @param int $n $n 番目の引数
  * @return \Closure $n 番目の引数をそのまま返すクロージャ
@@ -1954,18 +2221,20 @@ function return_arg($n)
  * 返り値の真偽値を逆転した新しいクロージャを返す
  *
  * Example:
- * ```php
+ * <code>
  * $not_strlen = not_func('strlen');
  * assert($not_strlen('hoge') === false);
  * assert($not_strlen('')     === true);
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @return \Closure 新しいクロージャ
  */
 function not_func($callable)
 {
-    return function () use ($callable) { return !call_user_func_array($callable, func_get_args()); };
+    return delegate(function ($callable, $args) {
+        return !call_user_func_array($callable, $args);
+    }, $callable);
 }
 
 /** @noinspection PhpDocSignatureInspection */
@@ -1976,10 +2245,10 @@ function not_func($callable)
  * 参照渡しは未対応。
  *
  * Example:
- * ```php
+ * <code>
  * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
  * assert($evalfunc(1, 2, 3) === 6);
- * ```
+ * </code>
  *
  * @param string $expression eval コード
  * @param mixed $variadic 引数名（可変引数）
@@ -1987,23 +2256,23 @@ function not_func($callable)
  */
 function eval_func($expression)
 {
-    $args = array_slice(func_get_args(), 1);
-    return function () use ($expression, $args) {
+    $eargs = array_slice(func_get_args(), 1);
+    return delegate(function ($expression, $args) use ($eargs) {
         return call_user_func(function () {
             extract(func_get_arg(1));
             return eval("return " . func_get_arg(0) . ";");
-        }, $expression, array_combine($args, func_get_args()));
-    };
+        }, $expression, array_combine($eargs, $args));
+    }, $expression, count($eargs));
 }
 
 /**
  * callable から ReflectionFunctionAbstract を生成する
  *
  * Example:
- * ```php
+ * <code>
  * assert(reflect_callable('sprintf')        instanceof \ReflectionFunction);
  * assert(reflect_callable('\Closure::bind') instanceof \ReflectionMethod);
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @return \ReflectionFunction|\ReflectionMethod リフレクションインスタンス
@@ -2035,11 +2304,11 @@ function reflect_callable($callable)
  * php7.1 の fromCallable みたいなもの。
  *
  * Example:
- * ```php
+ * <code>
  * $sprintf = closurize('sprintf');
  * assert($sprintf                            instanceof \Closure);
  * assert($sprintf('%s %s', 'hello', 'world') ===        'hello world');
- * ```
+ * </code>
  *
  * @param callable $callable 変換する callable
  * @return \Closure 変換したクロージャ
@@ -2068,14 +2337,14 @@ function closurize($callable)
  * エラーを例外に変換するブロックでコールバックを実行する
  *
  * Example:
- * ```php
+ * <code>
  * try {
- * call_safely(function(){return $v;});
+ *     call_safely(function(){return $v;});
  * }
  * catch (\Exception $ex) {
- * assert($ex->getMessage() === 'Undefined variable: v');
+ *     assert($ex->getMessage() === 'Undefined variable: v');
  * }
- * ```
+ * </code>
  *
  * @param callable $callback 実行するコールバック
  * @param mixed $variadic $callback に渡される引数（可変引数）
@@ -2103,9 +2372,9 @@ function call_safely($callback)
  * ob_start ～ ob_get_clean のブロックでコールバックを実行する
  *
  * Example:
- * ```php
+ * <code>
  * assert(ob_capture(function(){echo 123;}) === '123');
- * ```
+ * </code>
  *
  * @param callable $callback 実行するコールバック
  * @param mixed $variadic $callback に渡される引数（可変引数）
@@ -2132,12 +2401,12 @@ function ob_capture($callback)
  * ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。
  *
  * Example:
- * ```php
+ * <code>
  * // trim の引数は2つ
  * assert(parameter_length('trim')       === 2);
  * // trim の必須引数は1つ
  * assert(parameter_length('trim', true) === 1);
- * ```
+ * </code>
  *
  * @param callable $callable 対象 callable
  * @param bool $require_only true を渡すと必須パラメータの数を返す
@@ -2190,11 +2459,11 @@ function function_shorten($function)
  * php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。
  *
  * Example:
- * ```php
+ * <code>
  * // strlen に2つの引数を渡してもエラーにならない
  * $strlen = func_user_func_array('strlen');
  * assert($strlen('abc', null)       === 3);
- * ```
+ * </code>
  *
  * @param callable $callback 呼び出すクロージャ
  * @return \Closure 引数ぴったりで呼び出すクロージャ
@@ -2205,18 +2474,18 @@ function func_user_func_array($callback)
         return function ($v) { return $v; };
     }
     $plength = parameter_length($callback, true);
-    return function () use ($callback, $plength) {
-        return call_user_func_array($callback, array_slice(func_get_args(), 0, $plength));
-    };
+    return delegate(function ($callback, $args) use ($plength) {
+        return call_user_func_array($callback, array_slice($args, 0, $plength));
+    }, $callback, $plength);
 }
 /** @noinspection PhpDocSignatureInspection */
 /**
  * 文字列結合の関数版
  *
  * Example:
- * ```php
+ * <code>
  * assert(strcat('a', 'b', 'c') === 'abc');
- * ```
+ * </code>
  *
  * @param mixed $variadic 結合する文字列（可変引数）
  * @return string 結合した文字列
@@ -2236,11 +2505,11 @@ function strcat()
  * つまり「除外は trim したいが結果配列にはしたくない」はできない。
  *
  * Example:
- * ```php
+ * <code>
  * assert(split_noempty(',', 'a, b, c')            === ['a', 'b', 'c']);
  * assert(split_noempty(',', 'a, , , b, c')        === ['a', 'b', 'c']);
  * assert(split_noempty(',', 'a, , , b, c', false) === ['a', ' ', ' ', ' b', ' c']);
- * ```
+ * </code>
  *
  * @param string $delimiter 区切り文字
  * @param string $string 対象文字
@@ -2269,11 +2538,11 @@ function split_noempty($delimiter, $string, $trimchars = true)
  * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。
  *
  * Example:
- * ```php
+ * <code>
  * assert(str_equals('abc', 'abc')       === true);
  * assert(str_equals('abc', 'ABC', true) === true);
  * assert(str_equals('\0abc', '\0abc')   === true);
- * ```
+ * </code>
  *
  * @param string $str1 文字列1
  * @param string $str2 文字列2
@@ -2306,12 +2575,12 @@ function str_equals($str1, $str2, $case_insensitivity = false)
  * 指定文字列を含むか返す
  *
  * Example:
- * ```php
+ * <code>
  * assert(str_contains('abc', 'b')                      === true);
  * assert(str_contains('abc', 'B', true)                === true);
  * assert(str_contains('abc', ['b', 'x'], false, false) === true);
  * assert(str_contains('abc', ['b', 'x'], false, true)  === false);
- * ```
+ * </code>
  *
  * @param string $haystack 対象文字列
  * @param string|array $needle 調べる文字列
@@ -2348,11 +2617,11 @@ function str_contains($haystack, $needle, $case_insensitivity = false, $and_flag
  * 指定文字列で始まるか調べる
  *
  * Example:
- * ```php
+ * <code>
  * assert(starts_with('abcdef', 'abc')       === true);
  * assert(starts_with('abcdef', 'ABC', true) === true);
  * assert(starts_with('abcdef', 'xyz')       === false);
- * ```
+ * </code>
  *
  * @param string $string 探される文字列
  * @param string $with 探す文字列
@@ -2372,11 +2641,11 @@ function starts_with($string, $with, $case_insensitivity = false)
  * 指定文字列で終わるか調べる
  *
  * Example:
- * ```php
+ * <code>
  * assert(ends_with('abcdef', 'def')       === true);
  * assert(ends_with('abcdef', 'DEF', true) === true);
  * assert(ends_with('abcdef', 'xyz')       === false);
- * ```
+ * </code>
  *
  * @param string $string 探される文字列
  * @param string $with 探す文字列
@@ -2396,9 +2665,9 @@ function ends_with($string, $with, $case_insensitivity = false)
  * camelCase に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(camel_case('this_is_a_pen') === 'thisIsAPen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -2413,9 +2682,9 @@ function camel_case($string, $delimiter = '_')
  * PascalCase に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(pascal_case('this_is_a_pen') === 'ThisIsAPen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -2430,9 +2699,9 @@ function pascal_case($string, $delimiter = '_')
  * snake_case に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(snake_case('ThisIsAPen') === 'this_is_a_pen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -2447,9 +2716,9 @@ function snake_case($string, $delimiter = '_')
  * chain-case に変換する
  *
  * Example:
- * ```php
+ * <code>
  * assert(chain_case('ThisIsAPen') === 'this-is-a-pen');
- * ```
+ * </code>
  *
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
@@ -2523,9 +2792,9 @@ function random_string($length = 8, $charlist = '0123456789abcdefghijklmnopqrstu
  * sprintf の順序指定構文('%1$d')にキーを指定できる。
  *
  * Example:
- * ```php
+ * <code>
  * assert(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']) === 'ThisIs 3');
- * ```
+ * </code>
  *
  * @param string $format フォーマット文字列
  * @param array $array フォーマット引数
@@ -2571,7 +2840,7 @@ function kvsprintf($format, array $array)
  * また、 `{$_(syntax(""))}` のように {$_()} 構文で " も使えなくなるので \' を使用しなければならない。
  *
  * Example:
- * ```php
+ * <code>
  * // 数値キーが参照できる
  * assert(render_string('${0}', ['number'])                                          === 'number');
  * // クロージャは呼び出し結果が埋め込まれる
@@ -2581,7 +2850,7 @@ function kvsprintf($format, array $array)
  * // 要するに '$_()' の中に php の式が書けるようになる
  * assert(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']])  === 'a,n,z');
  * assert(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]])                   === '9');
- * ```
+ * </code>
  *
  * @param string $template レンダリング文字列
  * @param array $array レンダリング変数
@@ -2652,10 +2921,10 @@ function render_file($template_file, $array)
  * clone などでそのまま返す関数が欲しいことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $object = new \stdClass();
  * assert(returns($object) === $object);
- * ```
+ * </code>
  *
  * @param mixed $v return する値
  * @return mixed $v を返す
@@ -2675,7 +2944,7 @@ function returns($v)
  * __set のような明らかに設定が意図されているものは例外が飛ぶ。
  *
  * Example:
- * ```php
+ * <code>
  * // null を返すかもしれないステートメント
  * $getobject = function () {return null;};
  * // メソッド呼び出しは null を返す
@@ -2694,7 +2963,7 @@ function returns($v)
  * assert($getobject()['hoge']                      === null);
  * // 空イテレータを返す
  * assert(iterator_to_array(optional($getobject())) === []);
- * ```
+ * </code>
  *
  * @param object|null $object オブジェクト
  * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
@@ -2715,14 +2984,14 @@ function optional($object)
  * hoge() or throw などしたいことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * try {
  *     throws(new \Exception('throws'));
  * }
  * catch (\Exception $ex) {
  *     assert($ex->getMessage() === 'throws');
  * }
- * ```
+ * </code>
  *
  * @param \Exception $ex 投げる例外
  */
@@ -2732,15 +3001,55 @@ function throws($ex)
 }
 
 /**
+ * if ～ else 構文の関数版
+ *
+ * 一言で言えば `$actual === $expected ? $then : $else` という動作になる。
+ * ただし、 $expected が callable の場合は呼び出した結果を緩い bool 判定する。
+ * つまり `ifelse('hoge', 'is_string', true, false)` は常に true を返すので注意。
+ *
+ * ?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。
+ *
+ * Example:
+ * <code>
+ * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
+ * $heavyfunc = function($v){return $v;};
+ * // $heavyfunc(1) ?? 'default' とほぼ同義
+ * assert(ifelse($heavyfunc(1), false, 'default')     === $heavyfunc(1));
+ * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
+ * assert(ifelse($heavyfunc(null), false, 'default')  === $heavyfunc(null));
+ * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
+ * assert(ifelse($heavyfunc(false), false, 'default') === 'default');
+ * </code>
+ *
+ * @param mixed $actual 調べる値（左辺値）
+ * @param mixed $expected 比較する値（右辺値）
+ * @param mixed $then 真の場合の値
+ * @param mixed $else 偽の場合の値。省略時は $actual
+ * @return mixed $then or $else
+ */
+function ifelse($actual, $expected, $then, $else = null)
+{
+    // $else 省略時は $actual を返す
+    if (func_num_args() === 3) {
+        $else = $actual;
+    }
+
+    if (is_callable($expected)) {
+        return $expected($actual) ? $then : $else;
+    }
+    return $expected === $actual ? $then : $else;
+}
+
+/**
  * try ～ catch 構文の関数版
  *
  * 例外機構構文が冗長なことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $ex = new \Exception('try_catch');
  * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
- * ```
+ * </code>
  *
  * @param callable $try try ブロッククロージャ
  * @param callable $catch catch ブロッククロージャ
@@ -2757,10 +3066,10 @@ function try_catch($try, $catch = null)
  * php < 5.5 にはないし、例外機構構文が冗長なことがまれによくあるはず。
  *
  * Example:
- * ```php
+ * <code>
  * $ex = new \Exception('try_catch');
  * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
- * ```
+ * </code>
  *
  * @param callable $try try ブロッククロージャ
  * @param callable $catch catch ブロッククロージャ
@@ -2801,13 +3110,13 @@ function try_catch_finally($try, $catch = null, $finally = null)
  * 表示名が与えられていない場合、それらしい名前で表示する。
  *
  * Example:
- * ```php
+ * <code>
  * // intval と int キャストはどちらが早いか調べる
  * benchmark([
- * 'intval',
- * 'intcast' => function($v){return (int)$v;},
+ *     'intval',
+ *     'intcast' => function($v){return (int)$v;},
  * ], 10, ['12345']);
- * ```
+ * </code>
  *
  * @param array|callable $suite ベンチ対象処理
  * @param int $millisec 呼び出しミリ秒
@@ -2948,7 +3257,7 @@ function stringify($var)
 /**
  * 値が複合型でないか検査する
  *
- * 「複合型」とはオブジェクトとクラスのこと。
+ * 「複合型」とはオブジェクトと配列のこと。
  * つまり
  *
  * - is_scalar($var) || is_null($var) || is_resource($var)
@@ -2956,14 +3265,14 @@ function stringify($var)
  * と同義（!is_array($var) && !is_object($var) とも言える）。
  *
  * Example:
- * ```php
+ * <code>
  * assert(is_primitive(null)          === true);
  * assert(is_primitive(false)         === true);
  * assert(is_primitive(123)           === true);
  * assert(is_primitive(STDIN)         === true);
  * assert(is_primitive(new \stdClass) === false);
  * assert(is_primitive(['array'])     === false);
- * ```
+ * </code>
  *
  * @param mixed $var 調べる値
  * @return bool 複合型なら false
@@ -2971,6 +3280,54 @@ function stringify($var)
 function is_primitive($var)
 {
     return is_scalar($var) || is_null($var) || is_resource($var);
+}
+
+/**
+ * 変数が再帰参照を含むか調べる
+ *
+ * Example:
+ * <code>
+ * // 配列の再帰
+ * $array = [];
+ * $array['recursive'] = &$array;
+ * assert(is_recursive($array)  === true);
+ * // オブジェクトの再帰
+ * $object = new \stdClass();
+ * $object->recursive = $object;
+ * assert(is_recursive($object) === true);
+ * </code>
+ *
+ * @param mixed $var 調べる値
+ * @return bool 再帰参照を含むなら true
+ */
+function is_recursive($var)
+{
+    $core = function ($var, $parents) use (&$core) {
+        // 複合型でないなら間違いなく false
+        if (is_primitive($var)) {
+            return false;
+        }
+
+        // 「親と同じ子」は再帰以外あり得ない。よって === で良い（オブジェクトに関してはそもそも等値比較で絶対に一致しない）
+        // sql_object_hash とか serialize でキーに保持して isset の方が速いか？
+        // → ベンチ取ったところ in_array の方が10倍くらい速い。多分生成コストに起因
+        // raw な比較であれば瞬時に比較できるが、isset だと文字列化が必要でかなり無駄が生じていると考えられる
+        foreach ($parents as $parent) {
+            if ($parent === $var) {
+                return true;
+            }
+        }
+
+        // 全要素を再帰的にチェック
+        $parents[] = $var;
+        foreach ($var as $k => $v) {
+            if ($core($v, $parents)) {
+                return true;
+            }
+        }
+        return false;
+    };
+    return $core($var, []);
 }
 
 /**
@@ -2982,9 +3339,12 @@ function is_primitive($var)
  * - インデントは 4 固定
  * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
  * - null は null（小文字）
+ * - 再帰構造を渡しても警告がでない（さらに NULL ではなく `'*RECURSION*'` という文字列になる）
+ * - 配列の再帰構造の出力が異なる（Example参照）
  *
  * Example:
- * ```php
+ * <code>
+ * // 単純なエクスポート
  * assert(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true) === "[
  *     'array' => [1, 2, 3],
  *     'hash'  => [
@@ -2993,19 +3353,51 @@ function is_primitive($var)
  *         'c' => 'C',
  *     ],
  * ]");
- * ```
+ * // 再帰構造を含むエクスポート（標準の var_export は形式が異なる。 var_export すれば分かる）
+ * $rarray = [];
+ * $rarray['a']['b']['c'] = &$rarray;
+ * $robject = new \stdClass();
+ * $robject->a = new \stdClass();
+ * $robject->a->b = new \stdClass();
+ * $robject->a->b->c = $robject;
+ * assert(var_export2(compact('rarray', 'robject'), true) === "[
+ *     'rarray'  => [
+ *         'a' => [
+ *             'b' => [
+ *                 'c' => '*RECURSION*',
+ *             ],
+ *         ],
+ *     ],
+ *     'robject' => stdClass::__set_state([
+ *         'a' => stdClass::__set_state([
+ *             'b' => stdClass::__set_state([
+ *                 'c' => '*RECURSION*',
+ *             ]),
+ *         ]),
+ *     ]),
+ * ]");
+ * </code>
  *
  * @param mixed $value 出力する値
  * @param bool $return 返すなら true 出すなら false
- * @return string|void $return=true の場合は出力せず結果を返す
+ * @return string|null $return=true の場合は出力せず結果を返す
  */
 function var_export2($value, $return = false)
 {
     // インデントの空白数
     $INDENT = 4;
 
+    // オリジナルの var_export（返り値版）
+    $var_export = function ($v) { return var_export($v, true); };
+
     // 再帰用クロージャ
-    $export = function ($value, $nest = 0) use (&$export, $INDENT) {
+    $export = function ($nest, $value, $parents) use (&$export, $INDENT, $var_export) {
+        // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+        foreach ($parents as $parent) {
+            if ($parent === $value) {
+                return var_export('*RECURSION*', true);
+            }
+        }
         // 配列は連想判定したり再帰したり色々
         if (is_array($value)) {
             // 空配列は固定文字列
@@ -3019,13 +3411,15 @@ function var_export2($value, $return = false)
             // ただの配列
             if ($value === array_values($value)) {
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (array_filter($value, function ($v) { return is_scalar($v) || is_null($v); })) {
-                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                if (array_all($value, is_primitive)) {
+                    $vals = array_map($var_export, $value);
+                    return '[' . implode(', ', $vals) . ']';
                 }
                 // スカラー値以外が含まれているならキーを含めない
                 $kvl = '';
+                $parents[] = $value;
                 foreach ($value as $k => $v) {
-                    $kvl .= $spacer1 . $export($v, $nest + 1) . ",\n";
+                    $kvl .= $spacer1 . $export($nest + 1, $v, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -3033,31 +3427,81 @@ function var_export2($value, $return = false)
             // 連想配列はキーを含めて桁あわせ
             $maxlen = max(array_map('strlen', array_keys($value)));
             $kvl = '';
+            $parents[] = $value;
             foreach ($value as $k => $v) {
                 $align = str_repeat(' ', $maxlen - strlen($k));
-                $kvl .= $spacer1 . var_export($k, true) . $align . ' => ' . $export($v, $nest + 1) . ",\n";
+                $kvl .= $spacer1 . $var_export($k) . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
             }
             return "[\n{$kvl}{$spacer2}]";
+        }
+        // オブジェクトは単にプロパティを __set_state する文字列を出力する
+        else if (is_object($value)) {
+            // クラスごとに \ReflectionProperty をキャッシュしておく
+            static $refs = [];
+            $class = get_class($value);
+            if (!isset($refs[$class])) {
+                $refs[$class] = array_reduce((new \ReflectionClass($value))->getProperties(), function ($carry, \ReflectionProperty $rp) {
+                    if (!$rp->isStatic()) {
+                        $rp->setAccessible(true);
+                        $carry[$rp->getName()] = $rp;
+                    }
+                    return $carry;
+                }, []);
+            }
+
+            // 単純に配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
+            $vars = array_map_method($refs[$class], 'getValue', [$value]);
+            $vars += get_object_vars($value);
+
+            $parents[] = $value;
+            return get_class($value) . '::__set_state(' . $export($nest, $vars, $parents) . ')';
         }
         // null は小文字で居て欲しい
         else if (is_null($value)) {
             return 'null';
         }
-        // オブジェクトは単にプロパティを __set_state する文字列が出力される（っぽい）ので、その引数部分だけ再帰
-        else if (is_object($value)) {
-            return get_class($value) . '::__set_state(' . $export((array) $value, $nest) . ')';
-        }
         // それ以外は標準に従う
         else {
-            return var_export($value, true);
+            return $var_export($value);
         }
     };
 
     // 結果を返したり出力したり
-    $result = $export($value, 0);
+    $result = $export(0, $value, []);
     if ($return) {
         return $result;
     }
+    echo $result;
+}
+
+/**
+ * var_export2 を html コンテキストに特化させたもの
+ *
+ * 下記のような出力になる。
+ * - `<pre class='var_html'> ～ </pre>` で囲まれる
+ * - php 構文なのでハイライトされて表示される
+ * - Content-Type が強制的に text/html になる
+ *
+ * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
+ *
+ * @param mixed $value 出力する値
+ */
+function var_html($value)
+{
+    $result = var_export2($value, true);
+    $result = highlight_string("<?php " . $result, true);
+    $result = preg_replace('#&lt;\\?php(\s|&nbsp;)#', '', $result, 1);
+    $result = "<pre class='var_html'>$result</pre>";
+
+    // text/html を強制する（でないと見やすいどころか見づらくなる）
+    // @codeCoverageIgnoreStart
+    if (!headers_sent()) {
+        header_remove('Content-Type');
+        ob_end_flush();
+        header('Content-Type: text/html');
+    }
+    // @codeCoverageIgnoreEnd
+
     echo $result;
 }
 
@@ -3068,11 +3512,11 @@ function var_export2($value, $return = false)
  * 名前空間指定の呼び出しは未対応。use して関数名だけで呼び出す必要がある。
  *
  * Example:
- * ```php
+ * <code>
  * $hoge = 'HOGE';
  * $fuga = 'FUGA';
  * assert(hashvar($hoge, $fuga) === ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
- * ```
+ * </code>
  *
  * @param mixed $var 変数（可変引数）
  * @return array 引数の変数を変数名で compact した配列
