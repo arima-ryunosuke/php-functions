@@ -1141,4 +1141,40 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
             }
         }));
     }
+
+    function test_array_flatten()
+    {
+        $o = new \stdClass();
+        $array = [
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+                'k22' => 123,
+                'k23' => [1, 2, 3],
+            ],
+            'o'  => $o,
+        ];
+
+        // 区切り文字指定なし
+        $this->assertSame([
+            'v1',
+            'v21',
+            123,
+            1,
+            2,
+            3,
+            $o,
+        ], array_flatten($array));
+
+        // 区切り文字指定
+        $this->assertSame([
+            'k1'       => 'v1',
+            'k2.k21'   => 'v21',
+            'k2.k22'   => 123,
+            'k2.k23.0' => 1,
+            'k2.k23.1' => 2,
+            'k2.k23.2' => 3,
+            'o'        => $o,
+        ], array_flatten($array, '.'));
+    }
 }

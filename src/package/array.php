@@ -1588,3 +1588,80 @@ function array_convert($array, $callback, $apply_array = false)
     $recursive($result, $array, $array, $callback);
     return $result;
 }
+
+/**
+ * 多階層配列をフラットに展開する
+ *
+ * 巷にあふれている実装と違って、 ["$pkey.$ckey" => $value] 形式の配列でも返せる。
+ * $delimiter で区切り文字を指定した場合にそのようになる。
+ * $delimiter = null の場合に本当の配列で返す（巷の実装と同じ）。
+ *
+ * Example:
+ * ```php
+ * $array = [
+ *    'k1' => 'v1',
+ *    'k2' => [
+ *        'k21' => 'v21',
+ *        'k22' => [
+ *            'k221' => 'v221',
+ *            'k222' => 'v222',
+ *            'k223' => [1, 2, 3],
+ *        ],
+ *    ],
+ * ];
+ * // 区切り文字指定なし
+ * assert(array_flatten($array) === [
+ *    0 => 'v1',
+ *    1 => 'v21',
+ *    2 => 'v221',
+ *    3 => 'v222',
+ *    4 => 1,
+ *    5 => 2,
+ *    6 => 3,
+ * ]);
+ * // 区切り文字指定
+ * assert(array_flatten($array, '.') === [
+ *    'k1'            => 'v1',
+ *    'k2.k21'        => 'v21',
+ *    'k2.k22.k221'   => 'v221',
+ *    'k2.k22.k222'   => 'v222',
+ *    'k2.k22.k223.0' => 1,
+ *    'k2.k22.k223.1' => 2,
+ *    'k2.k22.k223.2' => 3,
+ * ]);
+ * ```
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
+ * @return array フラット化された配列
+ */
+function array_flatten($array, $delimiter = null)
+{
+    // 要素追加について、 array_set だと目に見えて速度低下したのでベタに if else で分岐する
+    $core = function ($array, $delimiter) use (&$core) {
+        $result = [];
+        foreach ($array as $k => $v) {
+            if (is_array($v)) {
+                foreach ($core($v, $delimiter) as $ik => $iv) {
+                    if ($delimiter === null) {
+                        $result[] = $iv;
+                    }
+                    else {
+                        $result[$k . $delimiter . $ik] = $iv;
+                    }
+                }
+            }
+            else {
+                if ($delimiter === null) {
+                    $result[] = $v;
+                }
+                else {
+                    $result[$k] = $v;
+                }
+            }
+        }
+        return $result;
+    };
+
+    return $core($array, $delimiter);
+}
