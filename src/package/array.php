@@ -469,13 +469,16 @@ function array_get($array, $key, $default = null)
  * @param array $array 配列
  * @param mixed $value 設定する値
  * @param string|int $key 設定するキー
+ * @param bool $require_return 返り値が不要なら false を渡す
  * @return string|int 設定したキー
  */
-function array_set(&$array, $value, $key = null)
+function array_set(&$array, $value, $key = null, $require_return = true)
 {
     if ($key === null) {
         $array[] = $value;
-        $key = last_key($array);
+        if ($require_return === true) {
+            $key = last_key($array);
+        }
     }
     else {
         $array[$key] = $value;

@@ -189,6 +189,8 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a' => 'A', 'B', 'Z', 'z' => 'Z'], $array);
         $this->assertEquals('a', array_set($array, 'X', 'a'));
         $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z'], $array);
+        $this->assertEquals(null, array_set($array, 'Z', null, false));
+        $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z', 'Z'], $array);
     }
 
     function test_array_unset()
