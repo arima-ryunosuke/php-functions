@@ -10,6 +10,25 @@
 
 - no todo
 
+## 1.0.5
+
+- [feature][syntax] ifelse 追加
+- [feature][funchand] delegate 追加
+- [fixbug][funchand] nbind の引数数問題修正
+- [feature][classobj] stdclass 追加
+- [feature][array] array_lookup 追加
+- [*change][array] array_get で配列を与えたときの結果順序を変更
+- [change][array] array_group の階層化に対応
+- [feature][array] array_dive の配列対応
+- [feature][array] array_set に第4引数を追加
+- [feature][array] array_flatten 追加
+- [feature][var] var_html 追加
+- [feature][var] is_recursive 追加
+- [*fixbug][var] var_export2 の不具合を修正
+  - 再帰構造を渡すと無限ループになっていた
+  - 「スカラー値のみなら」が「スカラー値を含むなら」になっていた
+  - オブジェクトの private フィールドがヌル文字付きで出力されていた
+
 ## 1.0.4
 
 - [feature][array] array_of 追加
