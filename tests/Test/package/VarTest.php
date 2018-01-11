@@ -161,6 +161,38 @@ VAR
 
     }
 
+    function test_var_html()
+    {
+        $value = [
+            'array'       => [1, 2, 3,],
+            'hash'        => [
+                'a' => 'A',
+                'b' => 'B',
+            ],
+            'empty'       => [],
+            'emptyempty'  => [[]],
+            'emptyempty1' => [[[1]]],
+            'nest'        => [
+                'hash'  => [
+                    'a'    => 'A',
+                    'b'    => 'B',
+                    'hash' => [
+                        'x' => 'X',
+                    ],
+                ],
+                'array' => [
+                    [1, 2, 3, ['X']]
+                ],
+            ],
+            'null'        => null,
+            'int'         => 123,
+            'string'      => 'ABC',
+            'object'      => new \DateTime(),
+        ];
+        $this->expectOutputRegex('#<pre class=\'var_html\'>#');
+        var_html($value);
+    }
+
     function test_hashvar()
     {
         $hoge = 1;

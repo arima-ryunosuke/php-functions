@@ -260,6 +260,37 @@ function var_export2($value, $return = false)
     echo $result;
 }
 
+/**
+ * var_export2 を html コンテキストに特化させたもの
+ *
+ * 下記のような出力になる。
+ * - `<pre class='var_html'> ～ </pre>` で囲まれる
+ * - php 構文なのでハイライトされて表示される
+ * - Content-Type が強制的に text/html になる
+ *
+ * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
+ *
+ * @param mixed $value 出力する値
+ */
+function var_html($value)
+{
+    $result = var_export2($value, true);
+    $result = highlight_string("<?php " . $result, true);
+    $result = preg_replace('#&lt;\\?php(\s|&nbsp;)#', '', $result, 1);
+    $result = "<pre class='var_html'>$result</pre>";
+
+    // text/html を強制する（でないと見やすいどころか見づらくなる）
+    // @codeCoverageIgnoreStart
+    if (!headers_sent()) {
+        header_remove('Content-Type');
+        ob_end_flush();
+        header('Content-Type: text/html');
+    }
+    // @codeCoverageIgnoreEnd
+
+    echo $result;
+}
+
 /** @noinspection PhpDocSignatureInspection */
 /**
  * 変数指定をできるようにした compact
