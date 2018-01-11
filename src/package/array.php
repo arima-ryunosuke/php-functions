@@ -556,17 +556,20 @@ function array_unset(&$array, $key, $default = null)
  * ];
  * assert(array_dive($array, 'a.b.c')    === 'vvv');
  * assert(array_dive($array, 'a.b.x', 9) === 9);
+ * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
+ * assert(array_dive($array, ['a', 'b', 'c'])    === 'vvv');
  * ```
  *
  * @param array $array 調べる配列
- * @param string $path パス文字列
+ * @param string|array $path パス文字列。配列も与えられる
  * @param mixed $default 無かった場合のデフォルト値
  * @param string $delimiter パスの区切り文字。大抵は '.' か '/'
  * @return mixed パスが示す配列の値
  */
 function array_dive($array, $path, $default = null, $delimiter = '.')
 {
-    foreach (explode($delimiter, $path) as $key) {
+    $keys = is_array($path) ? $path : explode($delimiter, $path);
+    foreach ($keys as $key) {
         if (!array_key_exists($key, $array)) {
             return $default;
         }

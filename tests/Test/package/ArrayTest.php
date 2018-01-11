@@ -218,6 +218,7 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
     {
         $this->assertEquals('vvv', array_dive(['a' => ['b' => ['c' => 'vvv']]], 'a.b.c'));
         $this->assertEquals(9, array_dive(['a' => ['b' => ['c' => 'vvv']]], 'a.b.x', 9));
+        $this->assertEquals('vvv', array_dive(['a' => ['b' => ['c' => 'vvv']]], ['a', 'b', 'c']));
     }
 
     function test_array_exists()
