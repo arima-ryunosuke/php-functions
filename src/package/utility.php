@@ -19,16 +19,16 @@
  * benchmark([
  *     'intval',
  *     'intcast' => function($v){return (int)$v;},
- * ], 10, ['12345']);
+ * ], ['12345'], 10);
  * </code>
  *
  * @param array|callable $suite ベンチ対象処理
- * @param int $millisec 呼び出しミリ秒
  * @param array $args 各ケースに与えられる引数
+ * @param int $millisec 呼び出しミリ秒
  * @param bool $output true だと標準出力に出力される
  * @return array ベンチ結果の配列
  */
-function benchmark($suite, $millisec = 1000, $args = [], $output = true)
+function benchmark($suite, $args = [], $millisec = 1000, $output = true)
 {
     $benchset = [];
     foreach (arrayize($suite) as $name => $caller) {
@@ -91,6 +91,7 @@ function benchmark($suite, $millisec = 1000, $args = [], $output = true)
         $result[] = [
             'name'   => $name,
             'called' => $count,
+            'mills'  => $millisec / $count,
             'ratio'  => $count / $maxcount,
         ];
     }
@@ -99,9 +100,10 @@ function benchmark($suite, $millisec = 1000, $args = [], $output = true)
     if ($output) {
         $nlength = max(5, max(array_map('strlen', array_keys($benchset))));
         $slength = 9;
+        $olength = 12;
         $rlength = 6;
-        $defformat = "| %-{$nlength}s | %{$slength}s | %{$rlength}s |";
-        $sepformat = "| %'-{$nlength}s | %'-{$slength}s:| %'-{$rlength}s:|";
+        $defformat = "| %-{$nlength}s | %{$slength}s | %{$olength}s | %{$rlength}s |";
+        $sepformat = "| %'-{$nlength}s | %'-{$slength}s:| %'-{$olength}s:| %'-{$rlength}s:|";
 
         $template = <<<'RESULT'
 Running %count$s cases (between %millsec$s ms):
@@ -113,10 +115,16 @@ RESULT;
         echo kvsprintf($template, [
             'count'     => count($benchset),
             'millsec'   => number_format($millisec),
-            'header'    => sprintf($defformat, 'name', 'called', 'ratio'),
-            'separator' => sprintf($sepformat, '', '', ''),
+            'header'    => sprintf($defformat, 'name', 'called', '1 call(ms)', 'ratio'),
+            'separator' => sprintf($sepformat, '', '', '', ''),
             'summary'   => implode("\n", array_map(function ($data) use ($defformat) {
-                return sprintf($defformat, $data['name'], number_format($data['called']), number_format($data['ratio'], 3));
+                return vsprintf($defformat, [
+                        $data['name'],
+                        number_format($data['called']),
+                        number_format($data['mills'] * 1000, 6),
+                        number_format($data['ratio'], 3),
+                    ]
+                );
             }, $result)),
         ]);
     }

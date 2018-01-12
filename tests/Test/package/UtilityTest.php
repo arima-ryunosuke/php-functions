@@ -11,7 +11,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
             $return = benchmark([
                 [new \Concrete('hoge'), 'getName'],
                 function () { return 'hoge'; },
-            ], 100);
+            ], [], 100);
         });
 
         // 2関数を100でベンチするので 200ms～400ms の間のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
@@ -29,7 +29,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertContains(__FILE__, $output);
 
         // return 検証
-        @benchmark(['md5', 'sha1'], 10, ['hoge'], false);
+        @benchmark(['md5', 'sha1'], ['hoge'], 10, false);
         $this->assertContains('Results of sha1 and md5 are different', error_get_last()['message']);
 
         // 例外系
