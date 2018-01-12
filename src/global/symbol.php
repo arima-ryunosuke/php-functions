@@ -4,7 +4,6 @@
  * Don't touch this code. This is auto generated.
  */
 
-
 const arrayize = 'arrayize';
 const is_hasharray = 'is_hasharray';
 const first_key = 'first_key';
@@ -37,6 +36,7 @@ const array_rmap = 'array_rmap';
 const array_depth = 'array_depth';
 const array_insert = 'array_insert';
 const array_assort = 'array_assort';
+const array_count = 'array_count';
 const array_group = 'array_group';
 const array_all = 'array_all';
 const array_any = 'array_any';
@@ -47,6 +47,7 @@ const array_columns = 'array_columns';
 const array_uncolumns = 'array_uncolumns';
 const array_convert = 'array_convert';
 const array_flatten = 'array_flatten';
+const array_nest = 'array_nest';
 const stdclass = 'stdclass';
 const class_loader = 'class_loader';
 const class_namespace = 'class_namespace';
@@ -59,10 +60,12 @@ const file_extension = 'file_extension';
 const file_set_contents = 'file_set_contents';
 const mkdir_p = 'mkdir_p';
 const rm_rf = 'rm_rf';
+const tmpname = 'tmpname';
 const delegate = 'delegate';
 const nbind = 'nbind';
 const lbind = 'lbind';
 const rbind = 'rbind';
+const composite = 'composite';
 const return_arg = 'return_arg';
 const not_func = 'not_func';
 const eval_func = 'eval_func';
@@ -77,6 +80,7 @@ const strcat = 'strcat';
 const split_noempty = 'split_noempty';
 const str_equals = 'str_equals';
 const str_contains = 'str_contains';
+const str_putcsv = 'str_putcsv';
 const starts_with = 'starts_with';
 const ends_with = 'ends_with';
 const camel_case = 'camel_case';
@@ -93,6 +97,7 @@ const throws = 'throws';
 const ifelse = 'ifelse';
 const try_catch = 'try_catch';
 const try_catch_finally = 'try_catch_finally';
+const cache = 'cache';
 const benchmark = 'benchmark';
 const stringify = 'stringify';
 const is_primitive = 'is_primitive';

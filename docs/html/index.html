@@ -97,6 +97,7 @@
 				<li><a href="function-array_assort.html">array_assort<small class="summary">: 配列をコールバックに従って分類する</small></a></li>
 				<li><a href="function-array_columns.html">array_columns<small class="summary">: 全要素に対して array_column する</small></a></li>
 				<li><a href="function-array_convert.html">array_convert<small class="summary">: 配列の各要素に再帰的にコールバックを適用して変換する</small></a></li>
+				<li><a href="function-array_count.html">array_count<small class="summary">: 配列をコールバックに従ってカウントする</small></a></li>
 				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
 				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
@@ -113,6 +114,7 @@
 				<li><a href="function-array_map_filter.html">array_map_filter<small class="summary">: array_map + array_filter する</small></a></li>
 				<li><a href="function-array_map_key.html">array_map_key<small class="summary">: キーをマップして変換する</small></a></li>
 				<li><a href="function-array_map_method.html">array_map_method<small class="summary">: メソッドを指定できるようにした array_map</small></a></li>
+				<li><a href="function-array_nest.html">array_nest<small class="summary">: シンプルな [キー => 値] な配列から階層配列を生成する</small></a></li>
 				<li><a href="function-array_nmap.html">array_nmap<small class="summary">: 要素値を $callback の n 番目(0ベース)に適用して array_map する</small></a></li>
 				<li><a href="function-array_of.html">array_of<small class="summary">: 配列を与えると指定キーの値を返すクロージャを返す</small></a></li>
 				<li><a href="function-array_order.html">array_order<small class="summary">: 配列を $orders に従って並べ替える</small></a></li>
@@ -125,6 +127,7 @@
 				<li><a href="function-array_where.html">array_where<small class="summary">: 指定キーの要素で array_filter する</small></a></li>
 				<li><a href="function-arrayize.html">arrayize<small class="summary">: 引数の配列を生成する。</small></a></li>
 				<li><a href="function-benchmark.html">benchmark<small class="summary">: 簡易ベンチマークを取る</small></a></li>
+				<li><a href="function-cache.html">cache<small class="summary">: シンプルにキャッシュする</small></a></li>
 				<li><a href="function-call_safely.html">call_safely<small class="summary">: エラーを例外に変換するブロックでコールバックを実行する</small></a></li>
 				<li><a href="function-camel_case.html">camel_case<small class="summary">: camelCase に変換する</small></a></li>
 				<li><a href="function-chain_case.html">chain_case<small class="summary">: chain-case に変換する</small></a></li>
@@ -133,6 +136,7 @@
 				<li><a href="function-class_replace.html">class_replace<small class="summary">: 既存（未読み込みに限る）クラスを強制的に置換する</small></a></li>
 				<li><a href="function-class_shorten.html">class_shorten<small class="summary">: クラスの名前空間部分を除いた短い名前を取得する</small></a></li>
 				<li><a href="function-closurize.html">closurize<small class="summary">: callable を Closure に変換する</small></a></li>
+				<li><a href="function-composite.html">composite<small class="summary">: 合成関数を返す</small></a></li>
 				<li><a href="function-delegate.html">delegate<small class="summary">: 指定 callable を指定クロージャで実行するクロージャを返す</small></a></li>
 				<li><a href="function-ends_with.html">ends_with<small class="summary">: 指定文字列で終わるか調べる</small></a></li>
 				<li><a href="function-eval_func.html">eval_func<small class="summary">: 指定コードで eval するクロージャを返す</small></a></li>
@@ -145,7 +149,7 @@
 				<li><a href="function-first_value.html">first_value<small class="summary">: 配列の最初の値を返す</small></a></li>
 				<li><a href="function-func_user_func_array.html">func_user_func_array<small class="summary">: パラメータ定義数に応じて呼び出し引数を可変にしてコールする</small></a></li>
 				<li><a href="function-function_shorten.html">function_shorten<small class="summary">: 関数の名前空間部分を除いた短い名前を取得する</small></a></li>
-				<li><a href="function-has_class_methods.html">has_class_methods<small class="summary">: クラスにメソッドがあるかを返す</small></a></li>
+				<li><a href="function-has_class_methods.html" class="deprecated">has_class_methods<small class="summary">: クラスにメソッドがあるかを返す</small></a></li>
 				<li><a href="function-hashvar.html">hashvar<small class="summary">: 変数指定をできるようにした compact</small></a></li>
 				<li><a href="function-ifelse.html">ifelse<small class="summary">: if ～ else 構文の関数版</small></a></li>
 				<li><a href="function-is_hasharray.html">is_hasharray<small class="summary">: 配列が連想配列か調べる</small></a></li>
@@ -179,9 +183,11 @@
 				<li><a href="function-stdclass.html">stdclass<small class="summary">: 初期フィールド値を与えて stdClass を生成する</small></a></li>
 				<li><a href="function-str_contains.html">str_contains<small class="summary">: 指定文字列を含むか返す</small></a></li>
 				<li><a href="function-str_equals.html">str_equals<small class="summary">: 文字列比較の関数版</small></a></li>
+				<li><a href="function-str_putcsv.html">str_putcsv<small class="summary">: fputcsv の文字列版（str_getcsv の put 版）</small></a></li>
 				<li><a href="function-strcat.html">strcat<small class="summary">: 文字列結合の関数版</small></a></li>
 				<li><a href="function-stringify.html">stringify<small class="summary">: 値を何とかして文字列化する</small></a></li>
 				<li><a href="function-throws.html">throws<small class="summary">: throw の関数版</small></a></li>
+				<li><a href="function-tmpname.html">tmpname<small class="summary">: 終了時に削除される一時ファイル名を生成する</small></a></li>
 				<li><a href="function-try_catch.html">try_catch<small class="summary">: try ～ catch 構文の関数版</small></a></li>
 				<li><a href="function-try_catch_finally.html">try_catch_finally<small class="summary">: try ～ catch ～ finally 構文の関数版</small></a></li>
 				<li><a href="function-var_export2.html">var_export2<small class="summary">: 組み込みの var_export をいい感じにしたもの</small></a></li>
@@ -254,6 +260,6 @@
 	</div>
 </div>
 <script src="resources/combined.js?77bf4ed6d948f5dd4dd9f6cbf1ce64bd694cd6d6"></script>
-<script src="elementlist.js?578bd9b73ab76b517a9e10f622c86010a70e2a15"></script>
+<script src="elementlist.js?27cf69657862b045956d9df6f67f94f704cb883b"></script>
 </body>
 </html>

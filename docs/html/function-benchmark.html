@@ -92,6 +92,7 @@
 			<h3>Functions</h3>
 			<ul>
 				<li class="active"><a href="function-benchmark.html">benchmark<small class="summary">: 簡易ベンチマークを取る</small></a></li>
+				<li><a href="function-cache.html">cache<small class="summary">: シンプルにキャッシュする</small></a></li>
 			</ul>
 		</div>
 	</div>
@@ -119,7 +120,7 @@
 benchmark([
     <span class="php-quote">'intval'</span>,
     <span class="php-quote">'intcast'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> (int)<span class="php-var">$v</span>;},
-], <span class="php-num">10</span>, [<span class="php-quote">'12345'</span>]);</pre>
+], [<span class="php-quote">'12345'</span>], <span class="php-num">10</span>);</pre>
 	</div>
 
 
@@ -131,15 +132,15 @@ benchmark([
 			<td class="value"><code><var>$suite</var></code></td>
 			<td>ベンチ対象処理</td>
 		</tr>
-		<tr id="$millisec">
-			<td class="name"><code>integer</code></td>
-			<td class="value"><code><var>$millisec</var> = <span class="php-num">1000</span></code></td>
-			<td>呼び出しミリ秒</td>
-		</tr>
 		<tr id="$args">
 			<td class="name"><code>array</code></td>
 			<td class="value"><code><var>$args</var> = []</code></td>
 			<td>各ケースに与えられる引数</td>
+		</tr>
+		<tr id="$millisec">
+			<td class="name"><code>integer</code></td>
+			<td class="value"><code><var>$millisec</var> = <span class="php-num">1000</span></code></td>
+			<td>呼び出しミリ秒</td>
 		</tr>
 		<tr id="$output">
 			<td class="name"><code>boolean</code></td>
@@ -168,7 +169,7 @@ benchmark([
 		
 		<b>Package:</b> <a href="package-utility.html">utility</a><br>
 		<b>Located at</b>
-		<a href="source-function-benchmark.html#8-125" title="Go to source code">
+		<a href="source-function-benchmark.html#52-177" title="Go to source code">
 			utility.php
 		</a><br>
 	</div>
@@ -181,6 +182,6 @@ benchmark([
 	</div>
 </div>
 <script src="resources/combined.js?77bf4ed6d948f5dd4dd9f6cbf1ce64bd694cd6d6"></script>
-<script src="elementlist.js?578bd9b73ab76b517a9e10f622c86010a70e2a15"></script>
+<script src="elementlist.js?27cf69657862b045956d9df6f67f94f704cb883b"></script>
 </body>
 </html>
