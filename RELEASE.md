@@ -10,6 +10,22 @@
 
 - no todo
 
+## 1.0.6
+
+- [refactor] 定義済み関数をスキップするように変更
+- [refactor] 名前空間 export した場合はキャッシュが無効になるように変更
+- [change][classobj] has_class_methods を deprecated にした
+- [feature][array] array_nest 追加
+- [feature][array] array_count 追加
+- [feature][strings] str_putcsv 追加
+- [feature][filesystem] tmpname 追加
+- [feature][funchand] composite 追加
+- [fixbug][funchand] call_safely で@付きの場合は例外を投げないように修正
+- [feature][utility] cache 追加
+- [*change][utility] benchmark を修正
+  - 引数順と出力形態を変更
+  - 互換性破壊だが運用で使う関数ではないのでバージョンは上げない
+
 ## 1.0.5
 
 - [feature][syntax] ifelse 追加
