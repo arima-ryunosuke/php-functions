@@ -11,24 +11,34 @@ class Loader
      * グローバルに関数をインポートする
      *
      * @param string $dir 読み込みディレクトリを指定できるが、使う側は気にしなくて良い
+     * @param array $excluded_functions 定義したくない関数名を配列で指定する
      */
-    public static function importAsGlobal($dir = null)
+    public static function importAsGlobal($dir = null, array $excluded_functions = [])
     {
         $dir = $dir ?: __DIR__ . '/global/';
-        require_once $dir . '/symbol.php';
-        require_once $dir . '/function.php';
+        $excluded_functions = array_flip($excluded_functions);
+        call_user_func(function ($dir, $excluded_functions) {
+            require_once $dir . '/symbol.php';
+            require_once $dir . '/function.php';
+            return $excluded_functions; // 特に意味はない
+        }, $dir, $excluded_functions);
     }
 
     /**
      * 名前空間に関数をインポートする
      *
      * @param string $dir 読み込みディレクトリを指定できるが、使う側は気にしなくて良い
+     * @param array $excluded_functions 定義したくない関数名を配列で指定する
      */
-    public static function importAsNamespace($dir = null)
+    public static function importAsNamespace($dir = null, array $excluded_functions = [])
     {
         $dir = $dir ?: __DIR__ . '/namespace/';
-        require_once $dir . '/symbol.php';
-        require_once $dir . '/function.php';
+        $excluded_functions = array_flip($excluded_functions);
+        call_user_func(function ($dir, $excluded_functions) {
+            require_once $dir . '/symbol.php';
+            require_once $dir . '/function.php';
+            return $excluded_functions; // 特に意味はない
+        }, $dir, $excluded_functions);
     }
 
     /**
@@ -43,7 +53,7 @@ class Loader
         $dir = is_object($dir) ? null : $dir;
 
         $contents = "\n";
-        foreach (self::getFunctions() as $function) {
+        foreach (self::getFunctions() as $function => $declare) {
             $contents .= "const $function = '{$function}';\n";
         }
         $fn = $dir ? "$dir/symbol.php" : __DIR__ . "/../tests/symbol.php";
@@ -91,32 +101,30 @@ class Loader
 /**
  * Don\'t touch this code. This is auto generated.
  */
-
-<?php echo $namespace ? "namespace $namespace;\n" : "" ?>
+<?php echo $namespace ? "\nnamespace $namespace;\n" : "" ?>
 
 <?php echo $contents ?>
 ';
 
+        $functions = self::getFunctions();
+
         // 定数を出力
-        $contents = '';
-        foreach (self::getFunctions() as $function) {
-            $contents .= "const $function = " . var_export("{$namespace}{$function}", true) . ";\n";
-        }
         file_put_contents("$dir/symbol.php", self::render($template, [
             'namespace' => trim($namespace, '\\'),
-            'contents'  => $contents,
+            'contents'  => implode("", array_map(function ($function) use ($namespace) {
+                $value = var_export("{$namespace}{$function}", true);
+                return "const $function = $value;\n";
+            }, array_keys($functions))),
         ]));
 
         // 関数コードを出力
-        $contents = '';
-        foreach (glob(__DIR__ . '/package/*.php') as $filename) {
-            $lines = file($filename);
-            unset($lines[0], $lines[1], $lines[2], $lines[3], $lines[4], $lines[5], $lines[6]);
-            $contents .= implode("", $lines);
-        }
         file_put_contents("$dir/function.php", self::render($template, [
             'namespace' => trim($namespace, '\\'),
-            'contents'  => $contents,
+            'contents'  => implode("\n", array_map(function ($function, $declare) use ($namespace) {
+                $local = var_export($function, true);
+                $value = var_export("{$namespace}{$function}", true);
+                return "if (!isset(\$excluded_functions[$local]) && (!function_exists($value) || (new \ReflectionFunction($value))->isInternal())) {\n$declare}\n";
+            }, array_keys($functions), $functions)),
         ]));
 
         return ["$dir/symbol.php", "$dir/function.php"];
@@ -124,22 +132,29 @@ class Loader
 
     private static function getFunctions()
     {
-        // グローバルに定義されてしまうので別プロセスに閉じ込めなければならない
-        $packagedir = __DIR__ . DIRECTORY_SEPARATOR . "package";
-        $code = '<?php
-        foreach (glob(' . var_export($packagedir . '/*.php', true) . ') as $filename) {
-            require_once $filename;
-        }
-        foreach (get_defined_functions()["user"] as $function) {
-            $ref = new \ReflectionFunction($function);
-            if (dirname($ref->getFileName()) === ' . var_export($packagedir, true) . ') {
-                echo "$function\n";
+        static $functions = [];
+        if (!$functions) {
+            $files = [];
+            $namespace = 'rf\\temporary' . sha1(uniqid('rf-', true));
+            foreach (glob(__DIR__ . '/package/*.php') as $filename) {
+                $contents = preg_replace('#^<\?php#', "<?php\nnamespace $namespace;", file_get_contents($filename));
+                $tn = tempnam(sys_get_temp_dir(), 'rf-');
+                file_put_contents($tn, $contents);
+                require_once $tn;
+                $files[] = $tn;
             }
-        }';
-        $tmp = tempnam(sys_get_temp_dir(), 'rf-');
-        file_put_contents($tmp, $code);
-        $output = shell_exec(PHP_BINARY . " $tmp");
-        return array_filter(explode("\n", $output), 'strlen');
+            foreach (get_defined_functions()['user'] as $function) {
+                $ref = new \ReflectionFunction($function);
+                if ($ref->getNamespaceName() === $namespace) {
+                    $sline = $ref->getStartLine();
+                    $eline = $ref->getEndLine();
+                    $code = array_slice(file($ref->getFileName()), $sline - 1, $eline - $sline + 1);
+                    $functions[$ref->getShortName()] = $ref->getDocComment() . "\n" . implode("", $code);
+                }
+            }
+            array_map('unlink', $files);
+        }
+        return $functions;
     }
 
     private static function render($template, $vars)
