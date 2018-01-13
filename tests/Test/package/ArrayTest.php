@@ -1214,4 +1214,44 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
             'o'        => $o,
         ], array_flatten($array, '.'));
     }
+
+    function test_array_nest()
+    {
+        $this->assertEquals([
+            'k1' => 'v2'
+        ],
+            array_nest([
+                'k1.k2' => 'v1',
+                'k1'    => 'v2',
+            ])
+        );
+        $this->assertEquals([
+            'k1' => [
+                0    => 'v1',
+                'k2' => 'v2',
+            ]
+        ],
+            array_nest([
+                'k1'    => ['v1'],
+                'k1.k2' => 'v2',
+            ])
+        );
+        $this->assertEquals([
+            'k1' => [
+                0    => 'v1',
+                'k2' => 'v2',
+            ]
+        ],
+            array_nest([
+                'k1.0'  => 'v1',
+                'k1.k2' => 'v2',
+            ])
+        );
+        $this->assertException('already exists', function () {
+            array_nest([
+                'k1'    => 'v1',
+                'k1.k2' => 'v2',
+            ]);
+        });
+    }
 }
