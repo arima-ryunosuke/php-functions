@@ -169,4 +169,23 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFileExists($dir1); // 自身は残る
         $this->assertFileNotExists($dir2); // 子は消える
     }
+
+    function test_tmpname()
+    {
+        $wd = sys_get_temp_dir() . '/tmpname';
+        mkdir_p(sys_get_temp_dir() . '/tmpname');
+
+        $list = [
+            tmpname(null, $wd),
+            tmpname(null, $wd),
+            tmpname(null, $wd),
+        ];
+        $files = (new \ReflectionFunction(tmpname))->getStaticVariables()['files'];
+        $this->assertArraySubset($list, $files);
+
+        // こういうこともできるっぽいが多分黒魔術（カバレッジもされないし…）まぁコケてはくれるので許容する
+        register_shutdown_function(function ($wd) {
+            $this->assertEquals([], glob("$wd/*"));
+        }, $wd);
+    }
 }

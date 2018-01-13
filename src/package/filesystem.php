@@ -196,3 +196,47 @@ function rm_rf($dirname, $self = true)
         return rmdir($dirname);
     }
 }
+
+/**
+ * 終了時に削除される一時ファイル名を生成する
+ *
+ * tempnam とほぼ同じで違いは下記。
+ * - 引数が逆
+ * - 終了時に削除される
+ * - 失敗時に false を返すのではなく例外を投げる
+ *
+ * @param string $prefix ファイル名プレフィックス
+ * @param string $dir 生成ディレクトリ。省略時は sys_get_temp_dir()
+ * @return string 一時ファイル名
+ */
+function tmpname($prefix = 'rft', $dir = null)
+{
+    // デフォルト付きで tempnam を呼ぶ
+    $dir = $dir ?: sys_get_temp_dir();
+    $tempfile = tempnam($dir, $prefix);
+
+    // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？
+    if ($tempfile === false) {
+        throw new \UnexpectedValueException("tmpname($dir, $prefix) failed.");// @codeCoverageIgnore
+    }
+
+    // 生成したファイルを覚えておいて最後に消す
+    static $files = [];
+    $files[] = $tempfile;
+    // ただし、 shutdown_function にあまり大量に追加したくないので初回のみ登録する（$files は参照で渡す）
+    if (count($files) === 1) {
+        register_shutdown_function(function () use (&$files) {
+            // @codeCoverageIgnoreStart
+            foreach ($files as $file) {
+                // 明示的に消されたかもしれないので file_exists してから消す
+                if (file_exists($file)) {
+                    // レースコンディションのため @ を付ける
+                    @unlink($file);
+                }
+            }
+            // @codeCoverageIgnoreEnd
+        });
+    }
+
+    return $tempfile;
+}
