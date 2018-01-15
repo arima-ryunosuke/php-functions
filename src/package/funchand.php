@@ -277,6 +277,9 @@ function closurize($callable)
 function call_safely($callback)
 {
     set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+        if (error_reporting() === 0) {
+            return false;
+        }
         throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     });
 

@@ -154,9 +154,6 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
 
         // 正常なら返り値を返す
         $this->assertEquals(999, call_safely(function ($v) { return $v; }, 999));
-        // エラーハンドラが戻っている
-        $this->assertSame($h, set_error_handler(function () { }));
-        restore_error_handler();
 
         // エラーが出たら例外を投げる
         $this->assertException('Undefined variable', function () {
@@ -165,6 +162,13 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
                 return $v;
             });
         });
+
+        // @で抑制した場合は例外は飛ばない
+        $this->assertSame(null, call_safely(function () {
+            /** @noinspection PhpUndefinedVariableInspection */
+            return @$v;
+        }));
+
         // エラーハンドラが戻っている
         $this->assertSame($h, set_error_handler(function () { }));
         restore_error_handler();
