@@ -90,6 +90,18 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse(str_contains(new \Concrete('abcdef'), new \Concrete('XX'), true));
     }
 
+    function test_str_putcsv()
+    {
+        $this->assertEquals("1,2,3", str_putcsv([1, 2, 3]));
+        $this->assertEquals("1\t2\t3", str_putcsv([1, 2, 3], "\t"));
+        $this->assertEquals("1,`,`,3", str_putcsv([1, ",", 3], ",", '`'));
+        $this->assertEquals("1,`\t`,`@``", str_putcsv([1, "\t", '@`'], ",", '`', "@"));
+
+        $this->assertException('single character', function () {
+            str_putcsv([], 'aa');
+        });
+    }
+
     function test_starts_with()
     {
         $this->assertTrue(starts_with('abcdef', 'abc'));

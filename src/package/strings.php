@@ -141,6 +141,49 @@ function str_contains($haystack, $needle, $case_insensitivity = false, $and_flag
 }
 
 /**
+ * fputcsv の文字列版（str_getcsv の put 版）
+ *
+ * 特に難しいことはないシンプルな実装。ただし、エラーは例外に変換される。
+ *
+ * Example:
+ * <code>
+ * assert(str_putcsv(['a', 'b', 'c'])             === "a,b,c");
+ * assert(str_putcsv(['a', 'b', 'c'], "\t")       === "a\tb\tc");
+ * assert(str_putcsv(['a', ' b ', 'c'], " ", "'") === "a ' b ' c");
+ * </code>
+ *
+ * @param array $array 値の配列
+ * @param string $delimiter フィールド区切り文字
+ * @param string $enclosure フィールドを囲む文字
+ * @param string $escape エスケープ文字
+ * @return string CSV 文字列
+ */
+function str_putcsv($array, $delimiter = ',', $enclosure = '"', $escape = "\\")
+{
+    try {
+        $fp = fopen('php://memory', 'rw+');
+        return call_safely(function ($fp, $array, $delimiter, $enclosure, $escape) {
+            if (version_compare(PHP_VERSION, '5.5.4')>= 0) {
+                fputcsv($fp, $array, $delimiter, $enclosure, $escape);
+            }
+            else {
+                fputcsv($fp, $array, $delimiter, $enclosure); // @codeCoverageIgnore
+            }
+            rewind($fp);
+            $result = stream_get_contents($fp);
+            fclose($fp);
+            return rtrim($result, "\n");
+        }, $fp, $array, $delimiter, $enclosure, $escape);
+    }
+    catch (\ErrorException $ex) {
+        if (isset($fp) && $fp) {
+            fclose($fp);
+        }
+        throw $ex;
+    }
+}
+
+/**
  * 指定文字列で始まるか調べる
  *
  * Example:
