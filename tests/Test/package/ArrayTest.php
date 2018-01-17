@@ -821,6 +821,43 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
     }
 
+    function test_array_order_closure3()
+    {
+        if (version_compare(PHP_VERSION, '7.0.0') < 0) {
+            return;
+        }
+        $data = [
+            '33',
+            '111',
+            '222',
+            '11',
+            '333',
+            '22',
+        ];
+
+        // returnType が int なら数値的にソートされる
+        $actual = array_order($data, function ($v): int { return $v; });
+        $this->assertSame([
+            '11',
+            '22',
+            '33',
+            '111',
+            '222',
+            '333',
+        ], $actual);
+
+        // returnType が string なら文字的にソートされる
+        $actual = array_order($data, function ($v): string { return $v; });
+        $this->assertSame([
+            '11',
+            '111',
+            '22',
+            '222',
+            '33',
+            '333',
+        ], $actual);
+    }
+
     function test_array_order_ex()
     {
         $this->assertEquals([], array_order([], [[]]));

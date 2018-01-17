@@ -1303,13 +1303,10 @@ function array_order(array $array, $orders, $preserve_keys = false)
             // でないなら通した値で比較
             else {
                 $arg = array_map($order, $columns);
-                // @codeCoverageIgnoreStart
                 if (method_exists($ref, 'hasReturnType') && $ref->hasReturnType()) {
                     // getReturnType があるならそれに基づく
-                    /** @noinspection PhpUndefinedMethodInspection */
                     $type = (string) $ref->getReturnType();
                 }
-                // @codeCoverageIgnoreEnd
                 else {
                     // ないなら返り値の型から推測
                     $type = gettype(reset($arg));
