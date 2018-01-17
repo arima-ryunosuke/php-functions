@@ -61,6 +61,35 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([1, 2, 3, 4, 'X', 'Y'], $arrayize_rXY(1, 2, 3, 4));
     }
 
+    function test_composite()
+    {
+        // arrayable:false モード
+        $add5 = function ($v) { return $v + 5; };
+        $mul3 = function ($v) { return $v * 3; };
+        $split = function ($v) { return str_split($v); };
+        $union = function ($v) { return $v[0] + $v[1]; };
+        $composite = composite(false, $add5, $mul3, $split, $union);
+        $this->assertEquals(9, $composite(7));
+        $this->assertEquals(12, $composite(17));
+
+        // arrayable:true モード
+        $xy_xyz = function ($x, $y) { return [$x, $y, $x + $y]; }; // ただの配列を返すと次の引数に展開される
+        $xyz_X = function ($x, $y, $z) { return $x + $y + $z; };   // 単値を返すとそのまま
+        $X_xX = function ($X) { return ['x' => $X]; };             // 連想配列を返してもそのまま
+        $xX_Xx = function ($xX) { return array_flip($xX); };       //
+        $composite = composite(true, $xy_xyz, $xyz_X, $X_xX, $xX_Xx);
+        $this->assertEquals([20 => 'x'], $composite(1, 9));
+
+        // 1 arg
+        $trim = composite('trim');
+        $this->assertEquals('a', $trim(' a '));
+        $trim = composite(false, 'trim');
+        $this->assertEquals('a', $trim(' a '));
+
+        $this->assertException('too few', function () { composite(); });
+        $this->assertException('too few', function () { composite(true); });
+    }
+
     function test_return_arg()
     {
         $return1 = return_arg(1);
