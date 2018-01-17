@@ -435,6 +435,42 @@ class ArrayTest extends \ryunosuke\Test\AbstractTestCase
         ]));
     }
 
+    function test_array_count()
+    {
+        $array = ['a', 'b', 'c'];
+
+        // 普通に使う分には count(array_filter()) と同じ
+        $eq_b = function ($v) { return $v === 'b'; };
+        $this->assertEquals(count(array_filter($array, $eq_b)), array_count($array, $eq_b));
+
+        $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
+        $row2 = ['id' => 2, 'group' => 'B', 'flag' => true];
+        $row3 = ['id' => 3, 'group' => 'B', 'flag' => false];
+        $array = [
+            'k1' => $row1,
+            'k2' => $row2,
+            3    => $row3,
+        ];
+
+        // flag をカウント
+        $this->assertEquals(1, array_count($array, array_of('flag')));
+        $this->assertEquals(2, array_count($array, not_func(array_of('flag'))));
+
+        // group: 'B' をカウント。ただし、数値キーの場合のみ
+        $this->assertEquals(1, array_count($array, function ($v, $k) {
+            return is_int($k) && $v['group'] === 'B';
+        }));
+
+        // group: 'A', 'B' をそれぞれカウント
+        $this->assertEquals([
+            'A' => 1,
+            'B' => 2,
+        ], array_count($array, [
+            'A' => composite(array_of('group'), lbind(str_equals, 'A')),
+            'B' => function ($v) { return $v['group'] === 'B'; },
+        ]));
+    }
+
     function test_array_group()
     {
         $this->assertEquals([

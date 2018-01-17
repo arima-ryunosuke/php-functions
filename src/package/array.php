@@ -1076,6 +1076,56 @@ function array_assort($array, $rules)
 }
 
 /**
+ * 配列をコールバックに従ってカウントする
+ *
+ * コールバックが true 相当を返した要素をカウントして返す。
+ * 普通に使う分には `count(array_filter($array, $callback))` とほとんど同じだが、下記の点が微妙に異なる。
+ * - $callback が要求するならキーも渡ってくる
+ * - $callback には配列が渡せる。配列を渡した場合は件数を配列で返す（Example 参照）
+ *
+ * Example:
+ * <code>
+ * $array = ['hoge', 'fuga', 'piyo'];
+ * // 'o' を含むものの数（2個）
+ * assert(array_count($array, function($s){return strpos($s, 'o') !== false;}) === 2);
+ * // 'a' と 'o' を含むものをそれぞれ（1個と2個）
+ * assert(array_count($array, [
+ *     'a' => function($s){return strpos($s, 'a') !== false;},
+ *     'o' => function($s){return strpos($s, 'o') !== false;},
+ * ]) === ['a' => 1, 'o' => 2]);
+ * </code>
+ *
+ * @param array|\Traversable $array 対象配列
+ * @param callable $callback カウントルール。配列も渡せる
+ * @return int|array 条件一致した件数
+ */
+function array_count($array, $callback)
+{
+    // 配列が来た場合はまるで動作が異なる（再帰でもいいがそれだと旨味がない。複数欲しいなら呼び出し元で複数回呼べば良い。ワンループに閉じ込めるからこそメリットがある））
+    if (is_array($callback) && !is_callable($callback)) {
+        $result = array_fill_keys(array_keys($callback), 0);
+        foreach ($callback as $name => $rule) {
+            $rule = func_user_func_array($rule);
+            foreach ($array as $k => $v) {
+                if ($rule($v, $k)) {
+                    $result[$name]++;
+                }
+            }
+        }
+        return $result;
+    }
+
+    $callback = func_user_func_array($callback);
+    $result = 0;
+    foreach ($array as $k => $v) {
+        if ($callback($v, $k)) {
+            $result++;
+        }
+    }
+    return $result;
+}
+
+/**
  * 配列をコールバックの返り値でグループ化する
  *
  * コールバックが配列を返すと入れ子としてグループする。
