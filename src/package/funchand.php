@@ -347,17 +347,14 @@ function parameter_length($callable, $require_only = false)
     // $call_name 取得
     is_callable($callable, false, $call_name);
 
-    $cache = \ryunosuke\Functions\Cacher::put(__FILE__, __FUNCTION__, function ($cache) use ($callable, $call_name) {
-        if (!isset($cache[$call_name])) {
-            $ref = reflect_callable($callable);
-            $cache[$call_name] = [
-                false => $ref->getNumberOfParameters(),
-                true  => $ref->getNumberOfRequiredParameters(),
-            ];
-        }
-        return $cache;
-    });
-    return $cache[$call_name][$require_only];
+    $cache = cache($call_name, function () use ($callable) {
+        $ref = reflect_callable($callable);
+        return [
+            false => $ref->getNumberOfParameters(),
+            true  => $ref->getNumberOfRequiredParameters(),
+        ];
+    }, __FUNCTION__);
+    return $cache[$require_only];
 }
 
 /**

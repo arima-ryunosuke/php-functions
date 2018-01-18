@@ -50,22 +50,20 @@ function stdclass($fields = [])
  */
 function class_loader($startdir = null)
 {
-    $file = \ryunosuke\Functions\Cacher::put(__FILE__, __FUNCTION__, function ($cache) use ($startdir) {
-        if (!isset($cache)) {
-            $dir = $startdir ?: __DIR__;
-            while ($dir !== ($pdir = dirname($dir))) {
-                $dir = $pdir;
-                if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
-                    $cache = $file;
-                    break;
-                }
-            }
-            if ($cache === null) {
-                throw new \DomainException('autoloader is not found.');
+    $file = cache('path', function () use ($startdir) {
+        $dir = $startdir ?: __DIR__;
+        while ($dir !== ($pdir = dirname($dir))) {
+            $dir = $pdir;
+            if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
+                $cache = $file;
+                break;
             }
         }
+        if (!isset($cache)) {
+            throw new \DomainException('autoloader is not found.');
+        }
         return $cache;
-    });
+    }, __FUNCTION__);
     return require $file;
 }
 

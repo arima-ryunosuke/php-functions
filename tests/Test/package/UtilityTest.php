@@ -3,6 +3,22 @@ namespace ryunosuke\Test\package;
 
 class UtilityTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_cache()
+    {
+        $provider = function () {
+            return sha1(uniqid(mt_rand(), true));
+        };
+
+        // 何度呼んでもキャッシュされるので 1 になる
+        $current = cache('test', $provider, null, false);
+        $this->assertEquals($current, cache('test', $provider, null, false));
+        $this->assertEquals($current, cache('test', $provider, null, false));
+        $this->assertEquals($current, cache('test', $provider, null, false));
+
+        // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
+        $this->assertNotEquals($current, cache('test', $provider, __FUNCTION__, false));
+    }
+
     function test_benchmark()
     {
         $return = '';

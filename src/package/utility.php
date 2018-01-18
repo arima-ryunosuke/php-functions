@@ -6,6 +6,50 @@
  */
 
 /**
+ * シンプルにキャッシュする
+ *
+ * この関数は get/set を兼ねる。
+ * キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。
+ *
+ * 内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。
+ * 内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。
+ *
+ * Example:
+ * <code>
+ * // 乱数を返す処理だが、キャッシュされるので同じ値になる
+ * $rand1 = cache('rand', function(){return rand();});
+ * $rand2 = cache('rand', function(){return rand();});
+ * assert($rand1 === $rand2);
+ * </code>
+ *
+ * @param string $key キャッシュのキー
+ * @param callable $provider キャッシュがない場合にコールされる callable
+ * @param string $namespace 名前空間
+ * @param bool $use_internal 内部キャッシュオブジェクトを使うか
+ * @return mixed キャッシュ
+ */
+function cache($key, $provider, $namespace = null, $use_internal = true)
+{
+    if ($namespace === null) {
+        $namespace = __FILE__;
+    }
+
+    // 内部オブジェクトが使えるなら使う
+    if ($use_internal && class_exists('\\ryunosuke\\Functions\\Cacher')) {
+        return \ryunosuke\Functions\Cacher::put($namespace, $key, $provider);
+    }
+
+    static $cache = [];
+    if (!isset($cache[$namespace])) {
+        $cache[$namespace] = [];
+    }
+    if (!array_key_exists($key, $cache[$namespace])) {
+        $cache[$namespace][$key] = $provider();
+    }
+    return $cache[$namespace][$key];
+}
+
+/**
  * 簡易ベンチマークを取る
  *
  * 「指定ミリ秒内で何回コールできるか？」でベンチする。

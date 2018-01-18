@@ -31,7 +31,7 @@ class FileCache implements CacheInterface
         if ($this->cachedir !== null) {
             // 変更されているもののみ保存
             foreach ($this->changed as $namespace => $dummy) {
-                $filepath = $this->cachedir . '/' . basename($namespace);
+                $filepath = $this->cachedir . '/' . rawurlencode($namespace);
                 $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
 
                 $temppath = tempnam(sys_get_temp_dir(), 'cache');
@@ -60,7 +60,7 @@ class FileCache implements CacheInterface
         // 名前空間自体がないなら作る or 読む
         if (!isset($this->cache[$namespace])) {
             $nsarray = [];
-            $cachpath = $this->cachedir . '/' . basename($namespace);
+            $cachpath = $this->cachedir . '/' . rawurldecode($namespace);
             if (file_exists($cachpath)) {
                 $nsarray = require $cachpath;
             }

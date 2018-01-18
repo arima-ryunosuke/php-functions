@@ -317,63 +317,60 @@ function hashvar()
     $line = $trace['line'];
     $function = function_shorten($trace['function']);
 
-    $cache = \ryunosuke\Functions\Cacher::put(__FILE__, __FUNCTION__, function ($cache) use ($file, $line, $function) {
-        if (!isset($cache[$file][$line])) {
-            // 呼び出し元の1行を取得
-            $lines = file($file, FILE_IGNORE_NEW_LINES);
-            $target = $lines[$line - 1];
+    $cache = cache($file . '#' . $line, function () use ($file, $line, $function) {
+        // 呼び出し元の1行を取得
+        $lines = file($file, FILE_IGNORE_NEW_LINES);
+        $target = $lines[$line - 1];
 
-            // 1行内で複数呼んでいる場合のための配列
-            $caller = [];
-            $callers = [];
+        // 1行内で複数呼んでいる場合のための配列
+        $caller = [];
+        $callers = [];
 
-            // php パーシング
-            $starting = false;
-            $tokens = token_get_all('<?php ' . $target);
-            foreach ($tokens as $token) {
-                // トークン配列の場合
-                if (is_array($token)) {
-                    // 自身の呼び出しが始まった
-                    if (!$starting && $token[0] === T_STRING && $token[1] === $function) {
-                        $starting = true;
-                    }
-                    // 呼び出し中でかつ変数トークンなら変数名を確保
-                    else if ($starting && $token[0] === T_VARIABLE) {
-                        $caller[] = ltrim($token[1], '$');
-                    }
-                    // 上記以外の呼び出し中のトークンは空白しか許されない
-                    else if ($starting && $token[0] !== T_WHITESPACE) {
-                        throw new \UnexpectedValueException('argument allows variable only.');
-                    }
+        // php パーシング
+        $starting = false;
+        $tokens = token_get_all('<?php ' . $target);
+        foreach ($tokens as $token) {
+            // トークン配列の場合
+            if (is_array($token)) {
+                // 自身の呼び出しが始まった
+                if (!$starting && $token[0] === T_STRING && $token[1] === $function) {
+                    $starting = true;
                 }
-                // 1文字単位の文字列の場合
-                else {
-                    // 自身の呼び出しが終わった
-                    if ($starting && $token === ')') {
-                        $callers[] = $caller;
-                        $caller = [];
-                        $starting = false;
-                    }
+                // 呼び出し中でかつ変数トークンなら変数名を確保
+                else if ($starting && $token[0] === T_VARIABLE) {
+                    $caller[] = ltrim($token[1], '$');
+                }
+                // 上記以外の呼び出し中のトークンは空白しか許されない
+                else if ($starting && $token[0] !== T_WHITESPACE) {
+                    throw new \UnexpectedValueException('argument allows variable only.');
                 }
             }
-
-            // 同じ引数の数の呼び出しは区別することが出来ない
-            $length = count($callers);
-            for ($i = 0; $i < $length; $i++) {
-                for ($j = $i + 1; $j < $length; $j++) {
-                    if (count($callers[$i]) === count($callers[$j])) {
-                        throw new \UnexpectedValueException('argument is ambiguous.');
-                    }
+            // 1文字単位の文字列の場合
+            else {
+                // 自身の呼び出しが終わった
+                if ($starting && $token === ')') {
+                    $callers[] = $caller;
+                    $caller = [];
+                    $starting = false;
                 }
             }
-
-            $cache[$file][$line] = $callers;
         }
-        return $cache;
-    });
+
+        // 同じ引数の数の呼び出しは区別することが出来ない
+        $length = count($callers);
+        for ($i = 0; $i < $length; $i++) {
+            for ($j = $i + 1; $j < $length; $j++) {
+                if (count($callers[$i]) === count($callers[$j])) {
+                    throw new \UnexpectedValueException('argument is ambiguous.');
+                }
+            }
+        }
+
+        return $callers;
+    }, __FUNCTION__);
 
     // 引数の数が一致する呼び出しを返す
-    foreach ($cache[$file][$line] as $caller) {
+    foreach ($cache as $caller) {
         if (count($caller) === $num) {
             return array_combine($caller, $args);
         }

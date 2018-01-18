@@ -78,14 +78,15 @@ class Cacher
      *
      * @param string $namespace 名前空間
      * @param string $key キー
-     * @param callable $provider 現キャッシュを引数にとり、新キャッシュを返すクロージャ
+     * @param callable $provider 無かった場合に値を返すクロージャ
      * @return mixed
      */
     public static function put($namespace, $key, $provider)
     {
         self::initialize();
-        $current = self::has($namespace, $key) ? self::get($namespace, $key) : null;
-        self::set($namespace, $key, $provider($current));
+        if (!self::has($namespace, $key)) {
+            self::set($namespace, $key, $provider());
+        }
         return self::get($namespace, $key);
     }
 
