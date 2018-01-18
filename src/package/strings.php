@@ -79,10 +79,10 @@ function split_noempty($delimiter, $string, $trimchars = true)
 function str_equals($str1, $str2, $case_insensitivity = false)
 {
     // __toString 実装のオブジェクトは文字列化する（strcmp がそうなっているから）
-    if (is_object($str1) && has_class_methods($str1, '__toString')) {
+    if (is_object($str1) && method_exists($str1, '__toString')) {
         $str1 = (string) $str1;
     }
-    if (is_object($str2) && has_class_methods($str2, '__toString')) {
+    if (is_object($str2) && method_exists($str2, '__toString')) {
         $str2 = (string) $str2;
     }
 

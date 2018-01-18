@@ -185,24 +185,13 @@ function class_replace($class, $register, $dirname = null)
  * assert(has_class_methods('Exception', 'undefined')  === false);
  * </code>
  *
+ * @deprecated use method_exists
+ *
  * @param string|object $class 対象クラス・オブジェクト
  * @param string $method_name 調べるメソッド名
  * @return bool 持っているなら true
  */
 function has_class_methods($class, $method_name)
 {
-    if (is_object($class)) {
-        $class = get_class($class);
-    }
-
-    // php はクラス名の大文字小文字を区別しない。
-    // が、そんな頻繁にバラバラに与えられないだろうし動作は変わらないし変換するコストの方が大きそうなので考慮しない
-    $cache = \ryunosuke\Functions\Cacher::put(__FILE__, __FUNCTION__, function ($cache) use ($class) {
-        if (!isset($cache[$class])) {
-            // php はメソッドの大文字小文字を区別しない
-            $cache[$class] = array_change_key_case(array_flip(get_class_methods($class)), CASE_LOWER);
-        }
-        return $cache;
-    });
-    return isset($cache[$class][strtolower($method_name)]);
+    return method_exists($class, $method_name);
 }

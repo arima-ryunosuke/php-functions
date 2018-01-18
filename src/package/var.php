@@ -24,7 +24,7 @@ function stringify($var)
         case 'array':
             return var_export2($var, true);
         case 'object':
-            if (has_class_methods($var, '__toString')) {
+            if (method_exists($var, '__toString')) {
                 return (string) $var;
             }
             if ($var instanceof \Serializable) {
