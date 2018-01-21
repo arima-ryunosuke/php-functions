@@ -10,6 +10,13 @@
 
 - no todo
 
+## 1.0.7
+
+- [feature][strings] preg_capture 追加
+- [feature][funchand] function_alias 追加
+- [feature][syntax] optional に第2引数追加
+- [fixbug][syntax] optional が export 時に動かない不具合を修正
+
 ## 1.0.6
 
 - [refactor] 定義済み関数をスキップするように変更
