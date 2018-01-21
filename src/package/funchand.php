@@ -473,3 +473,91 @@ function func_user_func_array($callback)
         return call_user_func_array($callback, array_slice($args, 0, $plength));
     }, $callback, $plength);
 }
+
+/**
+ * 関数のエイリアスを作成する
+ *
+ * 単に移譲するだけではなく、参照渡し・参照返しも模倣される。
+ * その代わり、単純なエイリアスではなく別定義で吐き出すので「エイリアス」ではなく「処理が同じな別関数」と思ったほうがよい。
+ *
+ * 静的であればクラスメソッドも呼べる。
+ *
+ * Example:
+ * <code>
+ * // trim のエイリアス
+ * function_alias('trim', 'trim_alias');
+ * assert(trim_alias(' abc ') === 'abc');
+ * </code>
+ *
+ * @param callable $original 元となる関数
+ * @param string $alias 関数のエイリアス名
+ * @param string|bool $cachedir キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す
+ */
+function function_alias($original, $alias, $cachedir = false)
+{
+    // クロージャとか __invoke とかは無理なので例外を投げる
+    if (is_object($original)) {
+        throw new \InvalidArgumentException('$original must not be object.');
+    }
+    // callname の取得と非静的のチェック
+    is_callable($original, true, $calllname);
+    $ref = reflect_callable($original);
+    if ($ref instanceof \ReflectionMethod && !$ref->isStatic()) {
+        throw new \InvalidArgumentException("$calllname is non-static method.");
+    }
+    // エイリアスが既に存在している
+    if (function_exists($alias)) {
+        throw new \InvalidArgumentException("$alias is already declared.");
+    }
+
+    // キャッシュ指定有りなら読み込むだけで eval しない
+    $cachedir = ifelse($cachedir, true, sys_get_temp_dir());
+    $cachefile = $cachedir ? $cachedir . '/' . rawurlencode($calllname . '-' . $alias) . '.php' : null;
+    if ($cachefile && file_exists($cachefile)) {
+        require $cachefile;
+        return;
+    }
+
+    // 仮引数と実引数の構築
+    $params = [];
+    $args = [];
+    foreach ($ref->getParameters() as $param) {
+        $default = '';
+        if ($param->isOptional()) {
+            // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
+            if ($param->isDefaultValueAvailable()) {
+                $defval = var_export($param->getDefaultValue(), true);
+            }
+            // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
+            // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
+            else {
+                $defval = 'null';
+            }
+            $default = ' = ' . $defval;
+        }
+        $varname = ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
+        $params[] = $varname . $default;
+        $args[] = $varname;
+    }
+
+    $parts = explode('\\', ltrim($alias, '\\'));
+    $funcname = ($ref->returnsReference() ? '&' : '') . array_pop($parts);
+    $namespace = implode('\\', $parts);
+
+    $caller = var_export($original, true);
+    $params = implode(', ', $params);
+    $args = implode(', ', $args);
+
+    $code = <<<CODE
+namespace $namespace {
+    function $funcname($params) {
+        return call_user_func_array($caller, array_slice([$args] + func_get_args(), 0, func_num_args()));
+    }
+}
+CODE;
+
+    eval($code);
+    if ($cachefile) {
+        file_put_contents($cachefile, "<?php\n" . $code);
+    }
+}

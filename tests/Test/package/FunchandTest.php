@@ -276,4 +276,99 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         // 第2引数を与えても意味を為さない
         $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen', '-'));
     }
+
+    function test_function_alias()
+    {
+        require_once __DIR__ . '/Funchand/function_alias.php';
+        /** @noinspection PhpUndefinedFunctionInspection */
+        {
+            // シンプル：組み込み関数
+            function_alias('strtoupper', 'strtoupper2');
+            $this->assertEquals('AAA', strtoupper2('aaa'));
+            // シンプル：ユーザー定義関数（グローバル）
+            function_alias('_strtoupper', 'strtoupper3');
+            $this->assertEquals('AAA', strtoupper3('aaa'));
+            // シンプル：ユーザー定義関数（名前空間）
+            function_alias('FA\\_strtoupper', 'strtoupper4');
+            $this->assertEquals('AAA', strtoupper4('aaa'));
+
+            // 参照渡し：組み込み関数
+            function_alias('sort', 'sort2');
+            $array = [3, 2, 11];
+            $this->assertTrue(sort2($array));
+            $this->assertEquals([2, 3, 11], $array);
+            $this->assertTrue(sort2($array, SORT_STRING));
+            $this->assertEquals([11, 2, 3], $array);
+            // 参照渡し：ユーザー定義関数（グローバル）
+            function_alias('_sort', 'sort3');
+            $array = [3, 2, 11];
+            $this->assertTrue(sort3($array));
+            $this->assertEquals([2, 3, 11], $array);
+            $this->assertTrue(sort3($array, SORT_STRING));
+            $this->assertEquals([11, 2, 3], $array);
+            // 参照渡し：ユーザー定義関数（名前空間）
+            function_alias('FA\\_sort', 'sort4');
+            $array = [3, 2, 11];
+            $this->assertTrue(sort4($array));
+            $this->assertEquals([2, 3, 11], $array);
+            $this->assertTrue(sort4($array, SORT_STRING));
+            $this->assertEquals([11, 2, 3], $array);
+
+            // デフォルト引数：組み込み関数
+            function_alias('trim', 'trim2');
+            $this->assertEquals('aXa', trim2(' aXa '));
+            $this->assertEquals('X', trim2('aXa', 'a'));
+            // デフォルト引数：ユーザー定義関数（グローバル）
+            function_alias('_trim', 'trim3');
+            $this->assertEquals('aXa', trim3(' aXa '));
+            $this->assertEquals('X', trim3('aXa', 'a'));
+            // デフォルト引数：ユーザー定義関数（名前空間）
+            function_alias('FA\\_trim', 'trim4');
+            $this->assertEquals('aXa', trim4(' aXa '));
+            $this->assertEquals('X', trim4('aXa', 'a'));
+
+            // リファレンス返し
+            function_alias('_ref', '_ref3');
+            $vals = &_ref3();
+            $vals[] = 'add';
+            $this->assertEquals(['add'], _ref3());
+
+            // 静的メソッド
+            function_alias('\Concrete::staticMethod', 'staticMethod2');
+            $this->assertEquals('Concrete::staticMethod', staticMethod2());
+
+            // 名前空間への吐き出し：ユーザー定義関数（グローバル）
+            function_alias('_trim', 'O\\trim3');
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $this->assertEquals('aXa', \O\trim3(' aXa '));
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $this->assertEquals('X', \O\trim3('aXa', 'a'));
+            // 名前空間への吐き出し：ユーザー定義関数（名前空間）
+            function_alias('FA\\_trim', 'O\\trim4');
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $this->assertEquals('aXa', \O\trim4(' aXa '));
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $this->assertEquals('X', \O\trim4('aXa', 'a'));
+
+            // キャッシュ
+            $cachedir = sys_get_temp_dir() . '/rf-fa';
+            mkdir_p($cachedir);
+            rm_rf($cachedir, false);
+            file_put_contents("$cachedir/trim-trim000.php", '<?php function trim000(){return "000";}');
+            function_alias('trim', 'trim000', $cachedir);
+            function_alias('trim', 'trim998', $cachedir);
+            function_alias('FA\\_trim', 'trim999', $cachedir);
+            $this->assertEquals('000', trim000());
+        }
+
+        // 例外
+        $this->assertException('must not be object', function () { function_alias(function () { }, 'xx'); });
+        $this->assertException('does not exist', function () { function_alias('x', 'xx'); });
+        $this->assertException('non-static method', function () { function_alias([new \Concrete('u'), 'getName'], 'xx'); });
+        $this->assertException('already declared', function () { function_alias('implode', 'implode'); });
+    }
 }
