@@ -53,15 +53,21 @@ function returns($v)
  * assert($getobject()['hoge']                      === null);
  * // 空イテレータを返す
  * assert(iterator_to_array(optional($getobject())) === []);
+ *
+ * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
+ * assert(optional(new \ArrayObject([1]), 'stdClass')->count() === null);
  * </code>
  *
  * @param object|null $object オブジェクト
+ * @param string $expected 期待するクラス名。指定した場合は is_a される
  * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
  */
-function optional($object)
+function optional($object, $expected = null)
 {
     if (is_object($object)) {
-        return $object;
+        if ($expected === null || is_a($object, $expected)) {
+            return $object;
+        }
     }
 
     static $nullobject = null;

@@ -66,6 +66,10 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(null, optional($o)['hoge']);
         // iterator
         $this->assertEmpty(iterator_to_array(optional($o)));
+
+        // 型指定
+        $this->assertEquals(1, optional(new \ArrayObject([1]))->count());
+        $this->assertNull(optional(new \ArrayObject([1]), 'stdClass')->count());
     }
 
     function test_throws()
