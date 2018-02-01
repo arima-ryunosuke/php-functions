@@ -2837,6 +2837,96 @@ function func_user_func_array($callback)
 }
 }
 
+if (!isset($excluded_functions['function_alias']) && (!function_exists('function_alias') || (new \ReflectionFunction('function_alias'))->isInternal())) {
+/**
+ * 関数のエイリアスを作成する
+ *
+ * 単に移譲するだけではなく、参照渡し・参照返しも模倣される。
+ * その代わり、単純なエイリアスではなく別定義で吐き出すので「エイリアス」ではなく「処理が同じな別関数」と思ったほうがよい。
+ *
+ * 静的であればクラスメソッドも呼べる。
+ *
+ * Example:
+ * <code>
+ * // trim のエイリアス
+ * function_alias('trim', 'trim_alias');
+ * assert(trim_alias(' abc ') === 'abc');
+ * </code>
+ *
+ * @param callable $original 元となる関数
+ * @param string $alias 関数のエイリアス名
+ * @param string|bool $cachedir キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す
+ */
+function function_alias($original, $alias, $cachedir = false)
+{
+    // クロージャとか __invoke とかは無理なので例外を投げる
+    if (is_object($original)) {
+        throw new \InvalidArgumentException('$original must not be object.');
+    }
+    // callname の取得と非静的のチェック
+    is_callable($original, true, $calllname);
+    $ref = reflect_callable($original);
+    if ($ref instanceof \ReflectionMethod && !$ref->isStatic()) {
+        throw new \InvalidArgumentException("$calllname is non-static method.");
+    }
+    // エイリアスが既に存在している
+    if (function_exists($alias)) {
+        throw new \InvalidArgumentException("$alias is already declared.");
+    }
+
+    // キャッシュ指定有りなら読み込むだけで eval しない
+    $cachedir = ifelse($cachedir, true, sys_get_temp_dir());
+    $cachefile = $cachedir ? $cachedir . '/' . rawurlencode($calllname . '-' . $alias) . '.php' : null;
+    if ($cachefile && file_exists($cachefile)) {
+        require $cachefile;
+        return;
+    }
+
+    // 仮引数と実引数の構築
+    $params = [];
+    $args = [];
+    foreach ($ref->getParameters() as $param) {
+        $default = '';
+        if ($param->isOptional()) {
+            // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
+            if ($param->isDefaultValueAvailable()) {
+                $defval = var_export($param->getDefaultValue(), true);
+            }
+            // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
+            // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
+            else {
+                $defval = 'null';
+            }
+            $default = ' = ' . $defval;
+        }
+        $varname = ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
+        $params[] = $varname . $default;
+        $args[] = $varname;
+    }
+
+    $parts = explode('\\', ltrim($alias, '\\'));
+    $funcname = ($ref->returnsReference() ? '&' : '') . array_pop($parts);
+    $namespace = implode('\\', $parts);
+
+    $caller = var_export($original, true);
+    $params = implode(', ', $params);
+    $args = implode(', ', $args);
+
+    $code = <<<CODE
+namespace $namespace {
+    function $funcname($params) {
+        return call_user_func_array($caller, array_slice([$args], 0, func_num_args()));
+    }
+}
+CODE;
+
+    eval($code);
+    if ($cachefile) {
+        file_put_contents($cachefile, "<?php\n" . $code);
+    }
+}
+}
+
 if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (new \ReflectionFunction('strcat'))->isInternal())) {
 /**
  * 文字列結合の関数版
@@ -3249,6 +3339,47 @@ function kvsprintf($format, array $array)
 }
 }
 
+if (!isset($excluded_functions['preg_capture']) && (!function_exists('preg_capture') || (new \ReflectionFunction('preg_capture'))->isInternal())) {
+/**
+ * キャプチャを主軸においた preg_match
+ *
+ * $pattern で $subject をマッチングして $default で埋めて返す。$default はフィルタも兼ねる。
+ * 空文字マッチは「マッチしていない」とみなすので注意（$default が使用される）。
+ *
+ * キャプチャを主軸においているので「マッチしなかった」は検出不可能。
+ * $default がそのまま返ってくる。
+ *
+ * Example:
+ * <code>
+ * $pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
+ * $default = [1 => '2000', 2 => '1', 4 => '1'];
+ * // 完全にマッチするのでそれぞれ返ってくる
+ * assert(preg_capture($pattern, '2014/12/24', $default) === [1 => '2014', 2 => '12', 4 => '24']);
+ * // 最後の \d{1,2} はマッチしないのでデフォルト値が使われる
+ * assert(preg_capture($pattern, '2014/12', $default)    === [1 => '2014', 2 => '12', 4 => '1']);
+ * // 一切マッチしないので全てデフォルト値が使われる
+ * assert(preg_capture($pattern, 'hoge', $default)       === [1 => '2000', 2 => '1', 4 => '1']);
+ * </code>
+ *
+ * @param string $pattern 正規表現
+ * @param string $subject 対象文字列
+ * @param array $default デフォルト値
+ * @return array キャプチャした配列
+ */
+function preg_capture($pattern, $subject, $default)
+{
+    preg_match($pattern, $subject, $matches);
+
+    foreach ($matches as $n => $match) {
+        if (array_key_exists($n, $default) && strlen($match)) {
+            $default[$n] = $match;
+        }
+    }
+
+    return $default;
+}
+}
+
 if (!isset($excluded_functions['render_string']) && (!function_exists('render_string') || (new \ReflectionFunction('render_string'))->isInternal())) {
 /**
  * "hoge {$hoge}" 形式のレンダリング
@@ -3398,19 +3529,46 @@ if (!isset($excluded_functions['optional']) && (!function_exists('optional') || 
  * assert($getobject()['hoge']                      === null);
  * // 空イテレータを返す
  * assert(iterator_to_array(optional($getobject())) === []);
+ *
+ * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
+ * assert(optional(new \ArrayObject([1]), 'stdClass')->count() === null);
  * </code>
  *
  * @param object|null $object オブジェクト
+ * @param string $expected 期待するクラス名。指定した場合は is_a される
  * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
  */
-function optional($object)
+function optional($object, $expected = null)
 {
     if (is_object($object)) {
-        return $object;
+        if ($expected === null || is_a($object, $expected)) {
+            return $object;
+        }
     }
 
     static $nullobject = null;
-    return $nullobject = $nullobject ?: new \ryunosuke\Functions\NullObject();
+    if ($nullobject === null) {
+        // @formatter:off
+        class NullObject implements \ArrayAccess, \IteratorAggregate
+        {
+            public function __isset($name) { return false; }
+            public function __get($name) { return null; }
+            public function __set($name, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+            public function __unset($name) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+            public function __call($name, $arguments) { return null; }
+            public function __invoke() { return null; }
+            public function __toString() { return ''; }
+            public function offsetExists($offset) { return false; }
+            public function offsetGet($offset) { return null; }
+            public function offsetSet($offset, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+            public function offsetUnset($offset) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+            public function getIterator() { return new \ArrayIterator([]); }
+        }
+        // @formatter:on
+
+        $nullobject = new NullObject();
+    }
+    return $nullobject;
 }
 }
 

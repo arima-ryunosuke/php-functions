@@ -138,7 +138,10 @@ __set のような明らかに設定が意図されているものは例外が�
 <span class="php-comment">// 配列アクセスは null を返す</span>
 <span class="php-keyword2">assert</span>(<span class="php-var">$getobject</span>()[<span class="php-quote">'hoge'</span>]                      === <span class="php-keyword1">null</span>);
 <span class="php-comment">// 空イテレータを返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">iterator_to_array</span>(optional(<span class="php-var">$getobject</span>())) === []);</pre>
+<span class="php-keyword2">assert</span>(<span class="php-keyword2">iterator_to_array</span>(optional(<span class="php-var">$getobject</span>())) === []);
+
+<span class="php-comment">// $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）</span>
+<span class="php-keyword2">assert</span>(optional(<span class="php-keyword1">new</span> \ArrayObject([<span class="php-num">1</span>]), <span class="php-quote">'stdClass'</span>)-&gt;<span class="php-keyword2">count</span>() === <span class="php-keyword1">null</span>);</pre>
 	</div>
 
 
@@ -149,6 +152,11 @@ __set のような明らかに設定が意図されているものは例外が�
 			<td class="name"><code>object|null</code></td>
 			<td class="value"><code><var>$object</var></code></td>
 			<td>オブジェクト</td>
+		</tr>
+		<tr id="$expected">
+			<td class="name"><code>string</code></td>
+			<td class="value"><code><var>$expected</var> = <span class="php-keyword1">null</span></code></td>
+			<td>期待するクラス名。指定した場合は is_a される</td>
 		</tr>
 		</table>
 	</div>
@@ -172,7 +180,7 @@ __set のような明らかに設定が意図されているものは例外が�
 		
 		<b>Package:</b> <a href="package-syntax.html">syntax</a><br>
 		<b>Located at</b>
-		<a href="source-function-optional.html#27-69" title="Go to source code">
+		<a href="source-function-optional.html#27-96" title="Go to source code">
 			syntax.php
 		</a><br>
 	</div>
@@ -185,6 +193,6 @@ __set のような明らかに設定が意図されているものは例外が�
 	</div>
 </div>
 <script src="resources/combined.js?77bf4ed6d948f5dd4dd9f6cbf1ce64bd694cd6d6"></script>
-<script src="elementlist.js?27cf69657862b045956d9df6f67f94f704cb883b"></script>
+<script src="elementlist.js?ac9900c217b90cd59818e1fc6f450a6c3b726965"></script>
 </body>
 </html>
