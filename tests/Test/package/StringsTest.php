@@ -288,6 +288,36 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         });
     }
 
+    public function test_preg_capture()
+    {
+        $this->assertEquals([], preg_capture('#([a-z])([0-9])([A-Z])#', 'a0Z', []));
+        $this->assertEquals([1 => 'a'], preg_capture('#([a-z])([0-9])([A-Z])#', 'a0Z', [1 => '']));
+        $this->assertEquals([4 => ''], preg_capture('#([a-z])([0-9])([A-Z])#', 'a0Z', [4 => '']));
+
+        $this->assertEquals([], preg_capture('#([a-z])([0-9])([A-Z]?)#', 'a0', []));
+        $this->assertEquals([3 => ''], preg_capture('#([a-z])([0-9])([A-Z]?)#', 'a0', [3 => '']));
+        $this->assertEquals([3 => 'Z'], preg_capture('#([a-z])([0-9])([A-Z]?)#', 'a0Z', [3 => '']));
+
+        $this->assertEquals([
+            'one' => 'a',
+            'two' => '0',
+            'thr' => 'Z',
+        ], preg_capture('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0Z', [
+            'one' => 'ONE',
+            'two' => 'TWO',
+            'thr' => 'THR',
+        ]));
+        $this->assertEquals([
+            'one' => 'a',
+            'two' => '0',
+            'thr' => 'THR',
+        ], preg_capture('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0', [
+            'one' => 'ONE',
+            'two' => 'TWO',
+            'thr' => 'THR',
+        ]));
+    }
+
     public function test_render_string()
     {
         // single
