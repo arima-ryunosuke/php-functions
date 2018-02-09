@@ -1,7 +1,7 @@
 {
   "config": {
     "platform": {
-      "php": "5.4.16"
+      "php": "5.6"
     }
   },
   "name": "ryunosuke/functions",
@@ -24,13 +24,12 @@
     }
   },
   "require": {
-    "php": ">=5.4",
-    "psr/simple-cache": "^1.0",
-    "symfony/polyfill-php55": "*"
+    "php": ">=5.6",
+    "psr/simple-cache": "^1.0"
   },
   "require-dev": {
     "apigen/apigen": "4.1.*",
-    "phpunit/phpunit": "4.*"
+    "phpunit/phpunit": "5.*"
   },
   "scripts": {
     "build": [
@@ -39,18 +38,19 @@
       "@composer document"
     ],
     "export": [
-      "ryunosuke\\Functions\\Loader::export"
+      "ryunosuke\\Functions\\Transporter::exportAll"
     ],
     "test": [
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml",
       "env TEST_TARGET=global    vendor/bin/phpunit --configuration=tests/phpunit.xml",
-      "env TEST_TARGET=namespace vendor/bin/phpunit --configuration=tests/phpunit.xml"
+      "env TEST_TARGET=namespace vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=extern    vendor/bin/phpunit --configuration=tests/phpunit.xml"
     ],
     "test-coverage": [
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
     ],
     "document": [
-      "echo yes | vendor/bin/apigen generate -s src/package -d docs/html --template-config docs/theme/config.neon"
+      "echo yes | vendor/bin/apigen generate -s include/global/function.php -d docs/html --template-config docs/theme/config.neon"
     ]
   }
 }
