@@ -1,4 +1,5 @@
 <?php
+
 namespace ryunosuke\Test;
 
 use ryunosuke\Functions\Cacher;

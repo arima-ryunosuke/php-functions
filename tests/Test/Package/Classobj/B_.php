@@ -1,7 +1,7 @@
 <?php
 
 /** @noinspection PhpUndefinedClassInspection */
-class B extends \ryunosuke\Test\package\Classobj\B_
+class B extends \ryunosuke\Test\Package\Classobj\B_
 {
     function f()
     {

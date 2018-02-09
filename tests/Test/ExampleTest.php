@@ -1,4 +1,5 @@
 <?php
+
 namespace ryunosuke\Test;
 
 class ExampleTest extends \ryunosuke\Test\AbstractTestCase

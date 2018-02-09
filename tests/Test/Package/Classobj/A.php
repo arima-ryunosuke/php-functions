@@ -1,5 +1,6 @@
 <?php
-namespace ryunosuke\Test\package\Classobj;
+
+namespace ryunosuke\Test\Package\Classobj;
 
 class A
 {

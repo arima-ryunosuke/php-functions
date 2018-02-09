@@ -3,4 +3,3 @@ $closure is closure.
 ${0} is index 0.
 {$_('123' . '456')} is expression.
 {$_(123 + 456)} is expression.
-{$_(render_string('$a $b $c', ['a' => 'a', 'b' => 'b', 'c' => 'c']))} is expression.
