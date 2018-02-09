@@ -1,8 +1,6 @@
 <?php
 
-/**
- * Don't touch this code. This is auto generated.
- */
+/** Don't touch this code. This is auto generated. */
 
 const arrayize = 'arrayize';
 const is_hasharray = 'is_hasharray';

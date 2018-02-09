@@ -1,8 +1,6 @@
 <?php
 
-/**
- * Don't touch this code. This is auto generated.
- */
+/** Don't touch this code. This is auto generated. */
 
 namespace ryunosuke\Functions;
 
