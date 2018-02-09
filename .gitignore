@@ -3,8 +3,10 @@
 /tests/coverage
 /tests/namespace/*
 !/tests/namespace/.gitkeep
-/tests/example-code/*
-!/tests/example-code/.gitkeep
+/tests/klass/*
+!/tests/klass/.gitkeep
+/tests/examples/*
+!/tests/examples/.gitkeep
 /tests/temporary/*
 !/tests/temporary/.gitkeep
 /tests/phpunit.xml
