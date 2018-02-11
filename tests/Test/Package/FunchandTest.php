@@ -99,6 +99,23 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('too few', $composite, true);
     }
 
+    function test_composite_variadic()
+    {
+        $composite = composite;
+        $variadic1 = function (...$v) {
+            return array_map(function ($v) { return $v + 1; }, $v);
+        };
+        $variadic2 = function (...$v) {
+            return array_map(function ($v) { return $v * 2; }, $v);
+        };
+        $variadic3 = function (...$v) {
+            return array_map(function ($v) { return $v ** 2; }, $v);
+        };
+        // +1 して *2 して ** 2 して返す可変引数の合成関数
+        $compositeF = $composite(true, $variadic1, $variadic2, $variadic3);
+        $this->assertEquals([16, 36, 64, 100, 144], $compositeF(1, 2, 3, 4, 5));
+    }
+
     function test_return_arg()
     {
         $return_arg = return_arg;
@@ -269,6 +286,14 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(0, $parameter_length(new \Concrete(''), true));
     }
 
+    function test_function_shorten()
+    {
+        $function_shorten = function_shorten;
+        require_once __DIR__ . '/Funchand/function_shorten.php';
+        $this->assertEquals('hoge', $function_shorten('FS\\hoge'));
+        $this->assertEquals('strlen', $function_shorten('strlen'));
+    }
+
     function test_func_user_func_array()
     {
         $func_user_func_array = func_user_func_array;
@@ -279,6 +304,11 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         // 標準関数
         $strlen = $func_user_func_array('strlen');
         $this->assertEquals(3, $strlen('abc', null, 'dummy'));
+
+        // 可変引数
+        $variadic = function (...$v) { return $v; };
+        $vcall = $func_user_func_array($variadic);
+        $this->assertEquals(['abc', null, 'dummy'], $vcall('abc', null, 'dummy'));
 
         // 自前関数兼デフォルト引数
         $pascal_case = $func_user_func_array(pascal_case);

@@ -94,7 +94,7 @@ class Transporter
                 $params = [];
                 foreach ($method->getParameters() as $param) {
                     $default = '';
-                    if ($param->isOptional()) {
+                    if ($param->isOptional() && !$param->isVariadic()) {
                         // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
                         if ($param->isDefaultValueAvailable()) {
                             $defval = $param->getDefaultValue() === [] ? '[]' : $ve($param->getDefaultValue());
@@ -106,7 +106,7 @@ class Transporter
                         }
                         $default = ' = ' . $defval;
                     }
-                    $varname = ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
+                    $varname = ($param->isVariadic() ? '...' : '') . ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
                     $params[] = $varname . $default;
                 }
 

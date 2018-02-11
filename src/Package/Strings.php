@@ -4,7 +4,6 @@ namespace ryunosuke\Functions\Package;
 
 class Strings
 {
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 文字列結合の関数版
      *
@@ -18,9 +17,9 @@ class Strings
      * @param mixed $variadic 結合する文字列（可変引数）
      * @return string 結合した文字列
      */
-    public static function strcat()
+    public static function strcat(...$variadic)
     {
-        return implode('', func_get_args());
+        return implode('', $variadic);
     }
 
     /**

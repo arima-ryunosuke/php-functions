@@ -300,7 +300,6 @@ class Vars
         echo $result;
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 変数指定をできるようにした compact
      *
@@ -315,13 +314,12 @@ class Vars
      *
      * @package Var
      *
-     * @param mixed $var 変数（可変引数）
+     * @param mixed $vars 変数（可変引数）
      * @return array 引数の変数を変数名で compact した配列
      */
-    public static function hashvar()
+    public static function hashvar(...$vars)
     {
-        $args = func_get_args();
-        $num = func_num_args();
+        $num = count($vars);
 
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $file = $trace['file'];
@@ -383,7 +381,7 @@ class Vars
         // 引数の数が一致する呼び出しを返す
         foreach ($cache as $caller) {
             if (count($caller) === $num) {
-                return array_combine($caller, $args);
+                return array_combine($caller, $vars);
             }
         }
 

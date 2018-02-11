@@ -19,10 +19,16 @@ class Funchand
     public static function delegate($invoker, $callable, $arity = null)
     {
         if ($arity === null) {
-            $arity = call_user_func(parameter_length, $callable, true);
+            $arity = call_user_func(parameter_length, $callable, true, true);
         }
-        $arity = $arity < 0 ? 0 : $arity;
 
+        if (is_infinite($arity)) {
+            return eval('return function (...$_) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };');
+        }
+
+        $arity = abs($arity);
         switch ($arity) {
             case 0:
                 return function () use ($invoker, $callable) {
@@ -51,12 +57,11 @@ class Funchand
             default:
                 $argstring = call_user_func(array_rmap, range(1, $arity), strcat, '$_');
                 return eval('return function (' . implode(', ', $argstring) . ') use ($invoker, $callable) {
-                return $invoker($callable, func_get_args());
-            };');
+                    return $invoker($callable, func_get_args());
+                };');
         }
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * $callable の指定位置に引数を束縛したクロージャを返す
      *
@@ -73,15 +78,13 @@ class Funchand
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
      */
-    public static function nbind($callable, $n)
+    public static function nbind($callable, $n, ...$variadic)
     {
-        $binded = array_slice(func_get_args(), 2);
-        return call_user_func(delegate, function ($callable, $args) use ($binded, $n) {
-            return call_user_func_array($callable, call_user_func(array_insert, $args, $binded, $n));
-        }, $callable, call_user_func(parameter_length, $callable, true) - count($binded));
+        return call_user_func(delegate, function ($callable, $args) use ($variadic, $n) {
+            return call_user_func_array($callable, call_user_func(array_insert, $args, $variadic, $n));
+        }, $callable, call_user_func(parameter_length, $callable, true) - count($variadic));
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * $callable の最左に引数を束縛した callable を返す
      *
@@ -97,12 +100,11 @@ class Funchand
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
      */
-    public static function lbind($callable)
+    public static function lbind($callable, ...$variadic)
     {
         return call_user_func_array(nbind, call_user_func(array_insert, func_get_args(), 0, 1));
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * $callable の最右に引数を束縛した callable を返す
      *
@@ -118,12 +120,11 @@ class Funchand
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
      */
-    public static function rbind($callable)
+    public static function rbind($callable, ...$variadic)
     {
         return call_user_func_array(nbind, call_user_func(array_insert, func_get_args(), null, 1));
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 合成関数を返す
      *
@@ -165,7 +166,7 @@ class Funchand
      * @param callable[] $variadic 合成する関数（可変引数）
      * @return \Closure 合成関数
      */
-    public static function composite($arrayalbe = true)
+    public static function composite($arrayalbe = true, ...$variadic)
     {
         $callables = func_get_args();
 
@@ -245,7 +246,6 @@ class Funchand
         }, $callable);
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 指定コードで eval するクロージャを返す
      *
@@ -264,9 +264,9 @@ class Funchand
      * @param mixed $variadic 引数名（可変引数）
      * @return \Closure 新しいクロージャ
      */
-    public static function eval_func($expression)
+    public static function eval_func($expression, ...$variadic)
     {
-        $eargs = array_slice(func_get_args(), 1);
+        $eargs = $variadic;
         return call_user_func(delegate, function ($expression, $args) use ($eargs) {
             return call_user_func(function () {
                 extract(func_get_arg(1));
@@ -346,7 +346,6 @@ class Funchand
         return $ref->getClosure();
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * エラーを例外に変換するブロックでコールバックを実行する
      *
@@ -366,7 +365,7 @@ class Funchand
      * @param mixed $variadic $callback に渡される引数（可変引数）
      * @return mixed $callback の返り値
      */
-    public static function call_safely($callback)
+    public static function call_safely($callback, ...$variadic)
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             if (error_reporting() === 0) {
@@ -376,7 +375,7 @@ class Funchand
         });
 
         try {
-            $return = call_user_func_array($callback, array_slice(func_get_args(), 1));
+            $return = call_user_func_array($callback, $variadic);
             restore_error_handler();
             return $return;
         }
@@ -386,7 +385,6 @@ class Funchand
         }
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
      *
@@ -401,11 +399,11 @@ class Funchand
      * @param mixed $variadic $callback に渡される引数（可変引数）
      * @return string オフスリーンバッファの文字列
      */
-    public static function ob_capture($callback)
+    public static function ob_capture($callback, ...$variadic)
     {
         ob_start();
         try {
-            call_user_func_array($callback, array_slice(func_get_args(), 1));
+            call_user_func_array($callback, $variadic);
             return ob_get_clean();
         }
         catch (\Exception $ex) {
@@ -433,27 +431,40 @@ class Funchand
      *
      * @param callable $callable 対象 callable
      * @param bool $require_only true を渡すと必須パラメータの数を返す
+     * @param bool $thought_variadic 可変引数を考慮するか。 true を渡すと可変引数の場合に無限長を返す
      * @return int 引数の数
      */
-    public static function parameter_length($callable, $require_only = false)
+    public static function parameter_length($callable, $require_only = false, $thought_variadic = false)
     {
         // クロージャの $call_name には一意性がないのでキャッシュできない（spl_object_hash でもいいが、かなり重複するので完全ではない）
         if ($callable instanceof \Closure) {
+            /** @var \ReflectionFunctionAbstract $ref */
             $ref = call_user_func(reflect_callable, $callable);
-            return $require_only ? $ref->getNumberOfRequiredParameters() : $ref->getNumberOfParameters();
+            if ($thought_variadic && $ref->isVariadic()) {
+                return INF;
+            }
+            elseif ($require_only) {
+                return $ref->getNumberOfRequiredParameters();
+            }
+            else {
+                return $ref->getNumberOfParameters();
+            }
         }
 
         // $call_name 取得
         is_callable($callable, false, $call_name);
 
         $cache = call_user_func(cache, $call_name, function () use ($callable) {
+            /** @var \ReflectionFunctionAbstract $ref */
             $ref = call_user_func(reflect_callable, $callable);
             return [
-                false => $ref->getNumberOfParameters(),
-                true  => $ref->getNumberOfRequiredParameters(),
+                '00' => $ref->getNumberOfParameters(),
+                '01' => $ref->isVariadic() ? INF : $ref->getNumberOfParameters(),
+                '10' => $ref->getNumberOfRequiredParameters(),
+                '11' => $ref->isVariadic() ? INF : $ref->getNumberOfRequiredParameters(),
             ];
         }, __FUNCTION__);
-        return $cache[$require_only];
+        return $cache[(int) $require_only . (int) $thought_variadic];
     }
 
     /**
@@ -497,8 +508,11 @@ class Funchand
         if ($callback === null) {
             return function ($v) { return $v; };
         }
-        $plength = call_user_func(parameter_length, $callback, true);
+        $plength = call_user_func(parameter_length, $callback, true, true);
         return call_user_func(delegate, function ($callback, $args) use ($plength) {
+            if (is_infinite($plength)) {
+                return call_user_func_array($callback, $args);
+            }
             return call_user_func_array($callback, array_slice($args, 0, $plength));
         }, $callback, $plength);
     }

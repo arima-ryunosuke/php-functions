@@ -4,7 +4,6 @@ namespace ryunosuke\Functions\Package;
 
 class Arrays
 {
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 引数の配列を生成する。
      *
@@ -25,10 +24,10 @@ class Arrays
      * @param mixed $variadic 生成する要素（可変引数）
      * @return array 引数を配列化したもの
      */
-    public static function arrayize()
+    public static function arrayize(...$variadic)
     {
         $result = [];
-        foreach (func_get_args() as $arg) {
+        foreach ($variadic as $arg) {
             if (!is_array($arg)) {
                 $arg = [$arg];
             }
@@ -319,7 +318,6 @@ class Arrays
         }
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 配列の+演算子の関数版
      *
@@ -337,9 +335,9 @@ class Arrays
      * @param array $variadic 足す配列
      * @return array 足された配列
      */
-    public static function array_add($array)
+    public static function array_add($array, ...$variadic)
     {
-        foreach (array_slice(func_get_args(), 1) as $arg) {
+        foreach ($variadic as $arg) {
             $array += $arg;
         }
         return $array;
@@ -914,7 +912,6 @@ class Arrays
         }, $array);
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
      *
@@ -939,13 +936,13 @@ class Arrays
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
-    public static function array_nmap($array, $callback, $n)
+    public static function array_nmap($array, $callback, $n, ...$variadic)
     {
         /** @var $kn */
         /** @var $vn */
 
         $is_array = is_array($n);
-        $args = array_slice(func_get_args(), 3);
+        $args = $variadic;
 
         // 配列が来たら [キー番目 => 値番目] とみなす
         if ($is_array) {
@@ -989,7 +986,6 @@ class Arrays
         return $result;
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 要素値を $callback の最左に適用して array_map する
      *
@@ -1006,12 +1002,11 @@ class Arrays
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
-    public static function array_lmap($array, $callback)
+    public static function array_lmap($array, $callback, ...$variadic)
     {
         return call_user_func_array(array_nmap, call_user_func(array_insert, func_get_args(), 0, 2));
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 要素値を $callback の最右に適用して array_map する
      *
@@ -1028,7 +1023,7 @@ class Arrays
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
-    public static function array_rmap($array, $callback)
+    public static function array_rmap($array, $callback, ...$variadic)
     {
         return call_user_func_array(array_nmap, call_user_func(array_insert, func_get_args(), func_num_args() - 2, 2));
     }
@@ -1460,7 +1455,6 @@ class Arrays
         }
     }
 
-    /** @noinspection PhpDocSignatureInspection */
     /**
      * 値の優先順位を逆にした array_intersect_key
      *
@@ -1479,10 +1473,10 @@ class Arrays
      * @package Array
      *
      * @param array $array 対象配列
-     * @param array $arrays 比較する配列
+     * @param array $variadic 比較する配列
      * @return array 新しい配列
      */
-    public static function array_shrink_key(array $array)
+    public static function array_shrink_key(array $array, ...$variadic)
     {
         $args = func_get_args();
         array_unshift($args, call_user_func_array('array_replace', $args));
