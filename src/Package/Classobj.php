@@ -181,27 +181,4 @@ class Classobj
 
         class_alias($newclass, $class);
     }
-
-    /**
-     * クラスにメソッドがあるかを返す
-     *
-     * Example:
-     * <code>
-     * assert(has_class_methods('Exception', 'getMessage') === true);
-     * assert(has_class_methods('Exception', 'getmessage') === true);
-     * assert(has_class_methods('Exception', 'undefined')  === false);
-     * </code>
-     *
-     * @package ClassObject
-     *
-     * @deprecated use method_exists
-     *
-     * @param string|object $class 対象クラス・オブジェクト
-     * @param string $method_name 調べるメソッド名
-     * @return bool 持っているなら true
-     */
-    public static function has_class_methods($class, $method_name)
-    {
-        return method_exists($class, $method_name);
-    }
 }
