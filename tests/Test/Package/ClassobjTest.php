@@ -21,6 +21,17 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse(property_exists($stdclass, '0'));
     }
 
+    function test_detect_namespace()
+    {
+        $detect_namespace = detect_namespace;
+        $this->assertEquals('ryunosuke\\Test\\Package', $detect_namespace(__DIR__));
+        $this->assertEquals('ryunosuke\\Test\\Package\\Classobj', $detect_namespace(__DIR__ . '/Classobj'));
+        $this->assertEquals('ryunosuke\\Test\\Package\\Classobj\\NS', $detect_namespace(__DIR__ . '/Classobj/NS'));
+        $this->assertEquals('A\\B\\C', $detect_namespace(__DIR__ . '/Classobj/NS/Valid'));
+        $this->assertEquals('ryunosuke\\Functions\\Package', $detect_namespace(__DIR__ . '/../../../src/Package'));
+        $this->assertException('can not detect namespace', $detect_namespace, '/a/b/c/d/e/f/g/h/i/j/k/l/m/n');
+    }
+
     function test_class_loader()
     {
         $class_loader = class_loader;
