@@ -2,9 +2,6 @@
 
 namespace ryunosuke\Functions;
 
-/**
- * @codeCoverageIgnore グローバル汚染があるのでテストはほぼ無理（こいつがだめならあらゆるテストが死ぬのでそれで担保）
- */
 class Transporter
 {
     /**
@@ -52,10 +49,12 @@ class Transporter
      * グローバル・名前空間にエクスポートする
      *
      * test, composer 用で、明示的には呼ばれない
+     *
+     * @param string $dir エクスポートするディレクトリ
      */
-    public static function exportAll()
+    public static function exportAll($dir = null)
     {
-        $dir = __DIR__ . '/../include';
+        $dir = is_object($dir) || $dir === null ? __DIR__ . '/../include' : $dir;
 
         $files = self::exportFunction(null, false);
         file_put_contents("$dir/global/constant.php", $files['constant']);
@@ -74,7 +73,8 @@ class Transporter
         if ($source) {
             foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
                 $content = file_get_contents($fn);
-                $content = str_replace('namespace ryunosuke\\Functions\\Package', "namespace $namespace", $content);
+                $content = str_replace('namespace ryunosuke\\Functions\\Package', "/** Don't touch this code. This is auto generated. */\n
+namespace $namespace", $content);
                 file_put_contents($source . '/' . basename($fn), $content);
             }
         }
@@ -97,14 +97,8 @@ class Transporter
                     if ($param->isOptional() && !$param->isVariadic()) {
                         // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
                         if ($param->isDefaultValueAvailable()) {
-                            $defval = $param->getDefaultValue() === [] ? '[]' : $ve($param->getDefaultValue());
+                            $default = ' = ' . ($param->getDefaultValue() === [] ? '[]' : $ve($param->getDefaultValue()));
                         }
-                        // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
-                        // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
-                        else {
-                            $defval = 'null';
-                        }
-                        $default = ' = ' . $defval;
                     }
                     $varname = ($param->isVariadic() ? '...' : '') . ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
                     $params[] = $varname . $default;
