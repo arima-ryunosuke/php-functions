@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test;
 
+use ryunosuke\Functions\Package\Funchand;
+
 class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -45,5 +47,10 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
             return;
         }
         self::fail(get_class($e) . ' is not thrown.');
+    }
+
+    public function __invoke($f)
+    {
+        return Funchand::closurize($f);
     }
 }

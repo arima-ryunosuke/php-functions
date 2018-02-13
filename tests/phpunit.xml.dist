@@ -9,10 +9,6 @@
     <filter>
         <whitelist>
             <directory suffix=".php">../src</directory>
-            <exclude>
-                <directory suffix=".php">../src/global</directory>
-                <directory suffix=".php">../src/namespace</directory>
-            </exclude>
         </whitelist>
     </filter>
 </phpunit>

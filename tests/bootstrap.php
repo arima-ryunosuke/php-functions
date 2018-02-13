@@ -1,4 +1,5 @@
 <?php
+
 namespace ryunosuke\Test;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -7,32 +8,38 @@ require __DIR__ . '/classes.php';
 \ryunosuke\Functions\Cacher::initialize(new \ryunosuke\Functions\FileCache(__DIR__ . '/temporary'));
 \ryunosuke\Functions\Cacher::clear();
 
+\ryunosuke\Functions\Transporter::exportAll();
+
+function require_nons($file)
+{
+    $constants = file_exists($file) ? file_get_contents($file) : $file;
+    $constants = preg_replace('#^namespace .*$#um', '', $constants, 1);
+    eval('?>' . $constants);
+}
+
 switch (getenv('TEST_TARGET')) {
     default:
     case 'package':
-        foreach (glob(__DIR__ . '/../src/package/*.php') as $filename) {
-            require_once $filename;
-        }
-        foreach (get_defined_functions()["user"] as $function) {
-            $ref = new \ReflectionFunction($function);
-            if (dirname($ref->getFileName()) === realpath(__DIR__ . '/../src/package/')) {
-                define($function, $function);
-            }
-        };
+        require_nons(__DIR__ . '/../include/constant.php');
+        assert(arrayize === ['ryunosuke\\Functions\\Package\\Arrays', 'arrayize']);
         break;
 
     case 'global':
-        \ryunosuke\Functions\Loader::importAsGlobal();
-        // 排他的な定義でないとテストにならない
-        assert(function_exists('arrayize'));
-        assert(!function_exists('ryunosuke\\Test\\arrayize'));
+        require_nons(__DIR__ . '/../include/global/constant.php');
+        require(__DIR__ . '/../include/global/function.php');
+        assert(arrayize === 'arrayize');
         break;
 
     case 'namespace':
-        \ryunosuke\Functions\Loader::exportToNamespace(__DIR__ . '/namespace', 'ryunosuke\\Test\\package');
-        \ryunosuke\Functions\Loader::importAsNamespace(__DIR__ . '/namespace');
-        // 排他的な定義でないとテストにならない
-        assert(!function_exists('arrayize'));
-        assert(function_exists('ryunosuke\\Test\\package\\arrayize'));
+        require_nons(__DIR__ . '/../include/namespace/constant.php');
+        require(__DIR__ . '/../include/namespace/function.php');
+        assert(arrayize === 'ryunosuke\\Functions\\arrayize');
+        break;
+
+    case 'extern':
+        $incdir = __DIR__;
+        $files = \ryunosuke\Functions\Transporter::exportFunction('ryunosuke\\Klass', true, "$incdir/klass");
+        require_nons($files['constant']);
+        assert(arrayize === ['ryunosuke\\Klass\\Arrays', 'arrayize']);
         break;
 }
