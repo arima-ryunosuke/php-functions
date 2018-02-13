@@ -183,55 +183,30 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('empty', $random_string, 256, '');
     }
 
-    function test_random_string_misc()
+    /**
+     * @runInSeparateProcess
+     */
+    function test_random_string_provider()
     {
-        $random_string = random_string;
-        if (!function_exists('uopz_delete') || !function_exists('uopz_function')) {
+        if (getenv('TEST_TARGET') !== false && getenv('TEST_TARGET') !== 'package') {
             return;
         }
 
-        // 一旦全部伏せる
-        if (function_exists('random_bytes')) {
-            uopz_delete('random_bytes');
-        }
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            uopz_delete('openssl_random_pseudo_bytes');
-        }
-        if (function_exists('mcrypt_create_iv')) {
-            uopz_delete('mcrypt_create_iv');
-        }
+        $random_string = random_string;
+        require_once __DIR__ . '/Strings/random_string.php';
 
-        // 提供関数が存在しない例外
-        $this->assertException('enabled function is not exists', $random_string, 256, 'x');
+        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x', 'random_bytes'));
+        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x', 'mcrypt_create_iv'));
+        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x', 'openssl_random_pseudo_bytes'));
+        $this->assertException('enabled function is not exists', $random_string, 10, 'x', 'undefined');
 
-        // random_bytes を定義
-        uopz_function('mcrypt_create_iv', function ($length) {
-            return str_repeat(chr(60), $length);
-        });
-        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x'));
+        \ryunosuke\Functions\Package\switch_zerobyte(true);
+        $this->assertException('bytes length is 0', $random_string, 10, 'x', 'random_bytes');
+        $this->assertException('bytes length is 0', $random_string, 10, 'x', 'mcrypt_create_iv');
+        $this->assertException('bytes length is 0', $random_string, 10, 'x', 'openssl_random_pseudo_bytes');
 
-        // openssl_random_pseudo_bytes を定義
-        uopz_function('openssl_random_pseudo_bytes', function ($length, &$crypto_strong) {
-            if ($length === 1) {
-                $crypto_strong = false;
-            }
-            return str_repeat(chr(60), $length);
-        });
-        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x'));
-        $this->assertException('$crypto_strong is false', $random_string, 1, 'x');
-
-        // random_bytes を定義
-        uopz_function('random_bytes', function ($length) {
-            return str_repeat(chr(60), $length);
-        });
-        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x'));
-
-        // random_bytes を再定義
-        uopz_delete('random_bytes');
-        uopz_function('random_bytes', function () {
-            return false;
-        });
-        $this->assertException('bytes length is 0', $random_string, 1, 'x');
+        \ryunosuke\Functions\Package\switch_strong(false);
+        $this->assertException('$crypto_strong is false', $random_string, 10, 'x', 'openssl_random_pseudo_bytes');
     }
 
     public function test_kvsprintf()

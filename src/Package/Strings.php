@@ -336,6 +336,13 @@ class Strings
      */
     public static function random_string($length = 8, $charlist = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
+        // テスト＋カバレッジのための隠し引数
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $args = func_get_args();
+        $pf = true;
+
+        assert('$pf = count($args) > 2 ? $args[2] : true;');
+
         if ($length <= 0) {
             throw new \InvalidArgumentException('$length must be positive number.');
         }
@@ -346,20 +353,20 @@ class Strings
         }
 
         // 使えるなら最も優秀なはず
-        if (function_exists('random_bytes')) {
+        if ((function_exists('random_bytes') && $pf === true) || $pf === 'random_bytes') {
             $bytes = random_bytes($length);
         }
         // 次点
-        elseif (function_exists('openssl_random_pseudo_bytes')) {
+        elseif ((function_exists('openssl_random_pseudo_bytes') && $pf === true) || $pf === 'openssl_random_pseudo_bytes') {
             $bytes = openssl_random_pseudo_bytes($length, $crypto_strong);
             if ($crypto_strong === false) {
                 throw new \Exception('failed to random_string ($crypto_strong is false).');
             }
         }
         // よく分からない？
-        elseif (function_exists('mcrypt_create_iv')) {
+        elseif ((function_exists('mcrypt_create_iv') && $pf === true) || $pf === 'mcrypt_create_iv') {
             /** @noinspection PhpDeprecationInspection */
-            $bytes = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM);
+            $bytes = mcrypt_create_iv($length);
         }
         // どれもないなら例外
         else {
