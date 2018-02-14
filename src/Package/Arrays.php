@@ -1640,7 +1640,7 @@ class Arrays
      *
      * $callback は下記の仕様。
      *
-     * 引数は (キー, 値, 元配列, 大元配列) で渡ってくる。
+     * 引数は (キー, 値, 今まで処理したキー配列) で渡ってくる。
      * 返り値は新しいキーを返す。
      * - 文字列や数値を返すとそれがキーとして使われる
      * - null を返すと元のキーがそのまま使われる
@@ -1695,14 +1695,14 @@ class Arrays
      */
     public static function array_convert($array, $callback, $apply_array = false)
     {
-        $recursive = function (&$result, $array, $source, $callback) use (&$recursive, $apply_array) {
+        $recursive = function (&$result, $array, $history, $callback) use (&$recursive, $apply_array) {
             $sequences = [];
             foreach ($array as $key => $value) {
                 $is_array = is_array($value);
                 $newkey = $key;
                 // 配列で $apply_array あるいは非配列の場合にコールバック適用
                 if (($is_array && $apply_array) || !$is_array) {
-                    $newkey = $callback($key, $value, $array, $source);
+                    $newkey = $callback($key, $value, $history);
                 }
                 // 配列は置換
                 if (is_array($newkey)) {
@@ -1731,8 +1731,10 @@ class Arrays
                 }
                 // 配列と非配列で代入の仕方が異なる
                 if ($is_array) {
+                    $history[] = $key;
                     $result[$newkey] = [];
-                    $recursive($result[$newkey], $value, $source, $callback);
+                    $recursive($result[$newkey], $value, $history, $callback);
+                    array_pop($history);
                 }
                 else {
                     $result[$newkey] = $value;
@@ -1741,9 +1743,11 @@ class Arrays
             // 数値連番は上書きを防ぐためにあとでやる
             foreach ($sequences as $key => $value) {
                 if (is_string($key)) {
+                    $history[] = substr($key, 1);
                     $v = [];
                     $result[] = &$v;
-                    $recursive($v, $value, $source, $callback);
+                    $recursive($v, $value, $history, $callback);
+                    array_pop($history);
                     unset($v);
                 }
                 else {
@@ -1753,7 +1757,7 @@ class Arrays
         };
 
         $result = [];
-        $recursive($result, $array, $array, $callback);
+        $recursive($result, $array, [], $callback);
         return $result;
     }
 

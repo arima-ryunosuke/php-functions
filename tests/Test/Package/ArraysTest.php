@@ -1281,6 +1281,31 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         }));
     }
 
+    function test_array_convert_arg()
+    {
+        $array_convert = array_convert;
+        $array = [
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => 'v21',
+                'k22' => [
+                    'k221' => 'v221',
+                    'k222' => 'v222',
+                ],
+            ],
+        ];
+        $array_convert($array, function ($k, $v, $history) {
+            static $n = 0;
+            $expected = [
+                [],
+                ['k2'],
+                ['k2', 'k22'],
+                ['k2', 'k22'],
+            ];
+            $this->assertEquals($expected[$n++], $history);
+        });
+    }
+
     function test_array_flatten()
     {
         $array_flatten = array_flatten;
