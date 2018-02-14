@@ -481,26 +481,46 @@ class Arrays
      * キー指定の配列値設定
      *
      * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
+     * 第3引数に配列を指定すると潜って設定する。
      *
      * Example:
      * <code>
      * $array = ['a' => 'A', 'B'];
-     * assert(array_set($array, 'Z')      === 1);
-     * assert($array                      === ['a' => 'A', 'B', 'Z']);
+     * // 第3引数省略（最後に連番キーで設定）
+     * assert(array_set($array, 'Z') === 1);
+     * assert($array                 === ['a' => 'A', 'B', 'Z']);
+     * // 第3引数でキーを指定
      * assert(array_set($array, 'Z', 'z') === 'z');
      * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+     * assert(array_set($array, 'Z', 'z') === 'z');
+     * // 第3引数で配列を指定
+     * assert(array_set($array, 'Z', ['x', 'y', 'z']) === 'z');
+     * assert($array                                  === ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * </code>
      *
      * @package Array
      *
      * @param array $array 配列
      * @param mixed $value 設定する値
-     * @param string|int $key 設定するキー
+     * @param array|string|int|null $key 設定するキー
      * @param bool $require_return 返り値が不要なら false を渡す
      * @return string|int 設定したキー
      */
     public static function array_set(&$array, $value, $key = null, $require_return = true)
     {
+        if (is_array($key)) {
+            $k = array_shift($key);
+            if ($key) {
+                if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
+                    throw new \InvalidArgumentException('$array[$k] is not array.');
+                }
+                return call_user_func_array(array_set, [&$array[$k], $value, $key, $require_return]);
+            }
+            else {
+                return call_user_func_array(array_set, [&$array, $value, $k, $require_return]);
+            }
+        }
+
         if ($key === null) {
             $array[] = $value;
             if ($require_return === true) {

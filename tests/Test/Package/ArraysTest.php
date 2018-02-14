@@ -200,6 +200,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_set()
     {
         $array_set = array_set;
+        // single
         $array = ['a' => 'A', 'B'];
         $this->assertEquals(1, $array_set($array, 'Z'));
         $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
@@ -209,6 +210,22 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z'], $array);
         $this->assertEquals(null, $array_set($array, 'Z', null, false));
         $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z', 'Z'], $array);
+
+        // array
+        $array = ['a' => 'A', 'b' => ['B']];
+        $this->assertEquals('x', $array_set($array, 'X', ['x']));
+        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X'], $array);
+        $this->assertEquals('z', $array_set($array, 'X', ['y', 'z']));
+        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']], $array);
+        $this->assertEquals('b', $array_set($array, 'W', ['b']));
+        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']], $array);
+        $this->assertEquals(0, $array_set($array, 'Y2', ['y', null]));
+        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']], $array);
+        $this->assertException('is not array', function () {
+            $array_set = array_set;
+            $array = ['a' => ['b' => 's']];
+            $array_set($array, 'X', ['a', 'b', 'c']);
+        });
     }
 
     function test_array_unset()
