@@ -393,6 +393,49 @@ class Arrays
     }
 
     /**
+     * 配列のキー・要素に文字列を付加する
+     *
+     * $key_prefix, $val_prefix でそれぞれ「キーに付与する文字列」「値に付与する文字列」が指定できる。
+     * 配列を与えると [サフィックス, プレフィックス] という意味になる。
+     * デフォルト（ただの文字列）はプレフィックス（値だけに付与したいなら array_map で十分なので）。
+     *
+     * Example:
+     * <code>
+     * $array = ['key1' => 'val1', 'key2' => 'val2'];
+     * // キーにプレフィックス付与
+     * assert(array_strpad($array, 'prefix-')       === ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
+     * // 値にサフィックス付与
+     * assert(array_strpad($array, '', ['-suffix']) === ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param string|array $key_prefix キー側の付加文字列
+     * @param string|array $val_prefix 値側の付加文字列
+     * @return array 文字列付与された配列
+     */
+    public static function array_strpad($array, $key_prefix, $val_prefix = '')
+    {
+        $key_suffix = '';
+        if (is_array($key_prefix)) {
+            list($key_suffix, $key_prefix) = $key_prefix + [1 => ''];
+        }
+        $val_suffix = '';
+        if (is_array($val_prefix)) {
+            list($val_suffix, $val_prefix) = $val_prefix + [1 => ''];
+        }
+
+        $result = [];
+        foreach ($array as $key => $val) {
+            $key = $key_prefix . $key . $key_suffix;
+            $val = $val_prefix . $val . $val_suffix;
+            $result[$key] = $val;
+        }
+        return $result;
+    }
+
+    /**
      * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
      *
      * 負数を与えると逆から N 番目となる。

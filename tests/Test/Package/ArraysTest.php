@@ -165,6 +165,35 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('kv-aA,kv-bB,kv-cC', $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }, ','));
     }
 
+    function test_array_strpad()
+    {
+        $array_strpad = array_strpad;
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+
+        // prefix key
+        $this->assertEquals(['Ka' => 'A', 'Kb' => 'B', 'Kc' => 'C'], $array_strpad($array, 'K'));
+        // prefix val
+        $this->assertEquals(['a' => 'VA', 'b' => 'VB', 'c' => 'VC'], $array_strpad($array, '', 'V'));
+        // prefix key-val
+        $this->assertEquals(['Ka' => 'VA', 'Kb' => 'VB', 'Kc' => 'VC'], $array_strpad($array, 'K', 'V'));
+
+        // suffix key
+        $this->assertEquals(['aK' => 'A', 'bK' => 'B', 'cK' => 'C'], $array_strpad($array, ['K']));
+        // suffix val
+        $this->assertEquals(['a' => 'AV', 'b' => 'BV', 'c' => 'CV'], $array_strpad($array, '', ['V']));
+        // suffix key-val
+        $this->assertEquals(['aK' => 'AV', 'bK' => 'BV', 'cK' => 'CV'], $array_strpad($array, ['K'], ['V']));
+
+        // prefix suffix key
+        $this->assertEquals(['KaK' => 'A', 'KbK' => 'B', 'KcK' => 'C'], $array_strpad($array, ['K', 'K']));
+        // prefix suffix val
+        $this->assertEquals(['a' => 'VAV', 'b' => 'VBV', 'c' => 'VCV'], $array_strpad($array, '', ['V', 'V']));
+        // prefix suffix key-val
+        $this->assertEquals(['KaK' => 'VAV', 'KbK' => 'VBV', 'KcK' => 'VCV'], $array_strpad($array, ['K', 'K'], ['V', 'V']));
+        // prefix key, suffix val
+        $this->assertEquals(['Ka' => 'AV', 'Kb' => 'BV', 'Kc' => 'CV'], $array_strpad($array, 'K', ['V']));
+    }
+
     function test_array_pos()
     {
         $array_pos = array_pos;
