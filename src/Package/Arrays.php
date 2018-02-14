@@ -344,6 +344,55 @@ class Arrays
     }
 
     /**
+     * キーと値で sprintf する
+     *
+     * 配列の各要素を文字列化して返すイメージ。
+     * $glue を与えるとさらに implode して返す（返り値が文字列になる）。
+     *
+     * $format は書式文字列（$v, $k）。
+     * callable を与えると sprintf ではなくコールバック処理になる（$v, $k）。
+     *
+     * Example:
+     * <code>
+     * $array = ['key1' => 'val1', 'key2' => 'val2'];
+     * // key, value を利用した sprintf
+     * assert(array_sprintf($array, '%2$s=%1$s')      === ['key1=val1', 'key2=val2']);
+     * // 第3引数を与えるとさらに implode される
+     * assert(array_sprintf($array, '%2$s=%1$s', ' ') === 'key1=val1 key2=val2');
+     * // クロージャを与えるとコールバック動作になる
+     * $closure = function($v, $k){return "$k=" . strtoupper($v);};
+     * assert(array_sprintf($array, $closure, ' ')    === 'key1=VAL1 key2=VAL2');
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param string|callable $format 書式文字列あるいはクロージャ
+     * @param string $glue 結合文字列。未指定時は implode しない
+     * @return array|string sprintf された配列
+     */
+    public static function array_sprintf($array, $format, $glue = null)
+    {
+        if (is_callable($format)) {
+            $callback = call_user_func(func_user_func_array, $format);
+        }
+        else {
+            $callback = function ($v, $k) use ($format) { return sprintf($format, $v, $k); };
+        }
+
+        $result = [];
+        foreach ($array as $k => $v) {
+            $result[] = $callback($v, $k);
+        }
+
+        if ($glue !== null) {
+            return implode($glue, $result);
+        }
+
+        return $result;
+    }
+
+    /**
      * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
      *
      * 負数を与えると逆から N 番目となる。

@@ -150,6 +150,21 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a', 'b', 'c', 'd', 'e'], $array_add(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
     }
 
+    function test_array_sprintf()
+    {
+        $array_sprintf = array_sprintf;
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+
+        $this->assertEquals(['A:a', 'B:b', 'C:c'], $array_sprintf($array, '%s:%s'));
+        $this->assertEquals('A:a,B:b,C:c', $array_sprintf($array, '%s:%s', ','));
+
+        $this->assertEquals(['v-A', 'v-B', 'v-C'], $array_sprintf($array, function ($v) { return "v-$v"; }));
+        $this->assertEquals('v-A,v-B,v-C', $array_sprintf($array, function ($v) { return "v-$v"; }, ','));
+
+        $this->assertEquals(['kv-aA', 'kv-bB', 'kv-cC'], $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }));
+        $this->assertEquals('kv-aA,kv-bB,kv-cC', $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }, ','));
+    }
+
     function test_array_pos()
     {
         $array_pos = array_pos;
