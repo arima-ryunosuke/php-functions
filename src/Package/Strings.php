@@ -192,6 +192,77 @@ class Strings
     }
 
     /**
+     * 指定文字列を置換する
+     *
+     * $subject 内の $search を $replaces に置換する。
+     * str_replace とは「N 番目のみ置換できる」点で異なる。
+     * つまり、$subject='hoge', $replace=[2 => 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。
+     *
+     * $replace に空配列を与えると何もしない。
+     * 負数キーは後ろから数える動作となる。
+     * また、置換後の文字列は置換対象にはならない。
+     *
+     * N 番目の検索文字列が見つからない場合は例外を投げる。
+     *
+     * Example:
+     * <code>
+     * // 1番目（0ベースなので2番目）の x を X に置換
+     * assert(str_subreplace('xxx', 'x', [1 => 'X'])                === 'xXx');
+     * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
+     * assert(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']) === '!XaxXz!');
+     * // 置換結果は置換対象にならない
+     * assert(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X'])    === 'xxxXx');
+     * </code>
+     *
+     * @package String
+     *
+     * @param string $subject 対象文字列
+     * @param string $search 検索文字列
+     * @param array $replaces 置換文字列
+     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @return string 置換された文字列
+     */
+    public static function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
+    {
+        // 空はそのまま返す
+        if (empty($replaces)) {
+            return $subject;
+        }
+
+        // 負数対応のために逆数計算（ついでに整数チェック）
+        $subcount = substr_count($subject, $search);
+        $mapping = [];
+        foreach ($replaces as $n => $replace) {
+            if (!is_int($n)) {
+                throw new \InvalidArgumentException('$replaces key must be integer.');
+            }
+            if ($n < 0) {
+                $n += $subcount;
+            }
+            if ($n < 0) {
+                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
+            }
+            $mapping[$n] = $replace;
+        }
+        $maxseq = max(array_keys($mapping));
+        $offset = 0;
+        for ($n = 0; $n <= $maxseq; $n++) {
+            $pos = $case_insensitivity ? stripos($subject, $search, $offset) : strpos($subject, $search, $offset);
+            if ($pos === false) {
+                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
+            }
+            if (isset($mapping[$n])) {
+                $subject = substr_replace($subject, $mapping[$n], $pos, strlen($search));
+                $offset = $pos + strlen($mapping[$n]);
+            }
+            else {
+                $offset = $pos + strlen($search);
+            }
+        }
+        return $subject;
+    }
+
+    /**
      * 指定文字列で始まるか調べる
      *
      * Example:

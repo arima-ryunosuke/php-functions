@@ -106,6 +106,35 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('single character', $str_putcsv, [], 'aa');
     }
 
+    function test_str_subreplace()
+    {
+        $str_subreplace = str_subreplace;
+        $string = 'xxxxx';
+
+        // empty
+        $this->assertEquals('xxxxx', $str_subreplace($string, 'x', []));
+        // all
+        $this->assertEquals('X1X2X3X4X5', $str_subreplace($string, 'x', ['X1', 'X2', 'X3', 'X4', 'X5']));
+        // 3rd
+        $this->assertEquals('xxX3xx', $str_subreplace($string, 'x', [2 => 'X3']));
+        // 1st, 4th
+        $this->assertEquals('X1xX3xx', $str_subreplace($string, 'x', [0 => 'X1', 2 => 'X3']));
+        $this->assertEquals('X1xX3xx', $str_subreplace($string, 'x', [2 => 'X3', 0 => 'X1']));
+        // overlap
+        $this->assertEquals('xxxZxxx', $str_subreplace($string, 'x', [0 => 'xxx', 1 => 'Z']));
+        // negative
+        $this->assertEquals('xxxxZ', $str_subreplace($string, 'x', [-1 => 'Z']));
+        $this->assertEquals('Zxxxx', $str_subreplace($string, 'x', [-5 => 'Z']));
+        // case insensitivity
+        $this->assertEquals('i1xxxx', $str_subreplace($string, 'X', ['i1'], true));
+        // no number
+        $this->assertException("key must be integer", $str_subreplace, $string, 'x', ['s' => '']);
+        // out od range
+        $this->assertException("'x' of 5th.", $str_subreplace, $string, 'x', [5 => 'nodef']);
+        $this->assertException("'x' of -1th.", $str_subreplace, $string, 'x', [-6 => 'nodef']);
+        $this->assertException("'n' of 0th.", $str_subreplace, $string, 'n', ['']);
+    }
+
     function test_starts_with()
     {
         $starts_with = starts_with;
