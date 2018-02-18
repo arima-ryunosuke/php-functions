@@ -1611,6 +1611,32 @@ class Arrays
     }
 
     /**
+     * shuffle のキーが保存される＋参照渡しではない版
+     *
+     * Example:
+     * <code>
+     * srand(4);mt_srand(4);
+     * assert(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']) === ['b' => 'B', 'a' => 'A', 'c' => 'C']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array $array 対象配列
+     * @return array shuffle された配列
+     */
+    public static function array_shuffle($array)
+    {
+        $keys = array_keys($array);
+        shuffle($keys);
+
+        $result = [];
+        foreach ($keys as $key) {
+            $result[$key] = $array[$key];
+        }
+        return $result;
+    }
+
+    /**
      * 値の優先順位を逆にした array_intersect_key
      *
      * array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。

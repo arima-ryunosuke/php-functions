@@ -1036,6 +1036,15 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertLessThan(1.0, $t, "$t milliseconds is too slow.");
     }
 
+    function test_array_shuffle()
+    {
+        $array_shuffle = array_shuffle;
+        srand(123);
+        mt_srand(123);
+        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], $array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']));
+        $this->assertNotSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], $array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']));
+    }
+
     function test_array_shrink_key()
     {
         $array_shrink_key = array_shrink_key;
