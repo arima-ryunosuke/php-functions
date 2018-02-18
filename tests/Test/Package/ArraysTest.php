@@ -150,6 +150,15 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a', 'b', 'c', 'd', 'e'], $array_add(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
     }
 
+    function test_array_implode()
+    {
+        $array_implode = array_implode;
+        $this->assertEquals(['a', ',', 'b', ',', 'c'], $array_implode(['a', 'b', 'c'], ','));
+        $this->assertEquals(['a', ',', 'b', ',', 'c'], $array_implode(',', 'a', 'b', 'c'));
+        $this->assertEquals(['a' => 'A', ',', 'b' => 'B', ',', 'c' => 'C'], $array_implode(['a' => 'A', 'b' => 'B', 'c' => 'C'], ','));
+        $this->assertEquals(['a', ',', 'b', ',', 'c'], $array_implode([1 => 'a', 0 => 'b', 2 => 'c'], ','));
+    }
+
     function test_array_sprintf()
     {
         $array_sprintf = array_sprintf;

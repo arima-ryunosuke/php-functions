@@ -344,6 +344,49 @@ class Arrays
     }
 
     /**
+     * 配列の各要素の間に要素を差し込む
+     *
+     * 歴史的な理由はないが、引数をどちらの順番でも受けつけることが可能。
+     * ただし、$glue を先に渡すパターンの場合は配列指定が可変引数渡しになる。
+     *
+     * 文字キーは保存されるが数値キーは再割り振りされる。
+     *
+     * Example:
+     * <code>
+     * // (配列, 要素) の呼び出し
+     * assert(array_implode(['a', 'b', 'c'], 'X') === ['a', 'X', 'b', 'X', 'c']);
+     * // (要素, ...配列) の呼び出し
+     * assert(array_implode('X', 'a', 'b', 'c')   === ['a', 'X', 'b', 'X', 'c']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable|string $array 対象配列
+     * @param string $glue 差し込む要素
+     * @return array 差し込まれた配列
+     */
+    public static function array_implode($array, $glue)
+    {
+        // 第1引数が回せない場合は引数を入れ替えて可変引数パターン
+        if (!is_array($array) && !$array instanceof \Traversable) {
+            return call_user_func(array_implode, array_slice(func_get_args(), 1), $array);
+        }
+
+        $result = [];
+        foreach ($array as $k => $v) {
+            if (is_int($k)) {
+                $result[] = $v;
+            }
+            else {
+                $result[$k] = $v;
+            }
+            $result[] = $glue;
+        }
+        array_pop($result);
+        return $result;
+    }
+
+    /**
      * キーと値で sprintf する
      *
      * 配列の各要素を文字列化して返すイメージ。
