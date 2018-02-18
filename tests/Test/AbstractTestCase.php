@@ -49,6 +49,19 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
         self::fail(get_class($e) . ' is not thrown.');
     }
 
+    /**
+     * 範囲チェックアサーション
+     *
+     * @param mixed $min
+     * @param mixed $max
+     * @param mixed $actual
+     */
+    public static function assertRange($min, $max, $actual)
+    {
+        self::assertGreaterThan($min, $actual);
+        self::assertLessThan($max, $actual);
+    }
+
     public function __invoke($f)
     {
         return Funchand::closurize($f);
