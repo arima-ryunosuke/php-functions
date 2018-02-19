@@ -156,6 +156,55 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertInstanceOf('\RuntimeException', $try_catch($try));
     }
 
+    function test_try_finally()
+    {
+        $try_finally = try_finally;
+        $try1 = function ($v) {
+            return strtoupper($v);
+        };
+        $try2 = function () {
+            throw new \RuntimeException();
+        };
+        $finally_count = 0;
+        $finally = function () use (&$finally_count) {
+            $finally_count++;
+        };
+
+        // ユースケースとしては例えば投げっぱなしだが finally だけはしたいことがある
+        // 下記は出来ない…こともないが若干冗長
+        /*
+        try {
+            $return = $try();
+            $finally();
+            return $return;
+        }
+        catch (\Exception $ex) {
+            $finally();
+            throw $ex;
+        }
+        php5.6 ならこうも書けるがやはり長い（特に縦に）
+        try {
+            return $try();
+        }
+        finally {
+            $finally();
+        }
+        */
+
+        // 引数は渡るし返り値は正しいし $finally も呼ばれている
+        $this->assertEquals('HOGE', $try_finally($try1, $finally, 'hoge'));
+        $this->assertEquals(1, $finally_count);
+
+        // 例外が投げられるが $finally は呼ばれている
+        try {
+            $try_finally($try2, $finally);
+        }
+        catch (\Exception $ex) {
+            // 握りつぶし
+        };
+        $this->assertEquals(2, $finally_count);
+    }
+
     function test_try_catch_finally()
     {
         $try_catch_finally = try_catch_finally;

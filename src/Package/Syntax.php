@@ -174,19 +174,55 @@ NO;
      *
      * Example:
      * <code>
-     * $ex = new \Exception('try_catch');
-     * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
+     * // 例外が飛ばない場合は平和極まりない
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assert(try_catch($try, null, 1, 2, 3) === [1, 2, 3]);
+     * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
+     * $try = function(){throw new \Exception('tried');};
+     * assert(try_catch($try)->getMessage() === 'tried');
      * </code>
      *
      * @package Syntax
      *
      * @param callable $try try ブロッククロージャ
      * @param callable $catch catch ブロッククロージャ
+     * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    public static function try_catch($try, $catch = null)
+    public static function try_catch($try, $catch = null, ...$variadic)
     {
-        return call_user_func(try_catch_finally, $try, $catch, null);
+        return call_user_func(try_catch_finally, $try, $catch, null, ...$variadic);
+    }
+
+    /**
+     * try ～ finally 構文の関数版
+     *
+     * 例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。
+     *
+     * Example:
+     * <code>
+     * $finally_count = 0;
+     * $finally = function()use(&$finally_count){$finally_count++;};
+     * // 例外が飛ぼうと飛ぶまいと $finally は実行される
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assert(try_finally($try, $finally, 1, 2, 3) === [1, 2, 3]);
+     * assert($finally_count                       === 1); // 呼ばれている
+     * // 例外は投げっぱなすが、 $finally は実行される
+     * $try = function(){throw new \Exception('tried');};
+     * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
+     * assert($finally_count                       === 2); // 呼ばれている
+     * </code>
+     *
+     * @package Syntax
+     *
+     * @param callable $try try ブロッククロージャ
+     * @param callable $finally finally ブロッククロージャ
+     * @param array $variadic $try に渡る引数
+     * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
+     */
+    public static function try_finally($try, $finally = null, ...$variadic)
+    {
+        return call_user_func(try_catch_finally, $try, throws, $finally, ...$variadic);
     }
 
     /**
@@ -196,8 +232,16 @@ NO;
      *
      * Example:
      * <code>
-     * $ex = new \Exception('try_catch');
-     * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
+     * $finally_count = 0;
+     * $finally = function()use(&$finally_count){$finally_count++;};
+     * // 例外が飛ぼうと飛ぶまいと $finally は実行される
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)               === [1, 2, 3]);
+     * assert($finally_count                                                 === 1); // 呼ばれている
+     * // 例外を投げるが、 $catch で握りつぶす
+     * $try = function(){throw new \Exception('tried');};
+     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage() === 'tried');
+     * assert($finally_count                                                 === 2); // 呼ばれている
      * </code>
      *
      * @package Syntax
@@ -205,31 +249,30 @@ NO;
      * @param callable $try try ブロッククロージャ
      * @param callable $catch catch ブロッククロージャ
      * @param callable $finally finally ブロッククロージャ
+     * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    public static function try_catch_finally($try, $catch = null, $finally = null)
+    public static function try_catch_finally($try, $catch = null, $finally = null, ...$variadic)
     {
         if ($catch === null) {
             $catch = function ($v) { return $v; };
         }
 
         try {
-            $return = $try();
+            return $try(...$variadic);
         }
         catch (\Exception $tried_ex) {
             try {
-                $return = $catch($tried_ex);
+                return $catch($tried_ex);
             }
             catch (\Exception $catched_ex) {
-                if ($finally !== null) {
-                    $finally();
-                }
                 throw $catched_ex;
             }
         }
-        if ($finally !== null) {
-            $finally();
+        finally {
+            if ($finally !== null) {
+                $finally();
+            }
         }
-        return $return;
     }
 }
