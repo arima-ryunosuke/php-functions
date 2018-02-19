@@ -1068,6 +1068,58 @@ class Arrays
     }
 
     /**
+     * 複数コールバックを指定できる array_map
+     *
+     * 指定したコールバックで複数回回してマップする。
+     * `array_maps($array, $f, $g)` は `array_map($g, array_map($f, $array))` とほぼ等しい。
+     * ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。
+     *
+     * 少し変わった仕様として、コールバックに [$method => $args] を付けるとそれはメソッド呼び出しになる。
+     * つまり各要素 $v に対して `$v->$method(...$args)` がマップ結果になる。
+     * さらに引数が不要なら `@method` とするだけで良い。
+     *
+     * Example:
+     * <code>
+     * // 値を3乗したあと16進表記にして大文字化する
+     * assert(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper')    === ['1', '8', '1B', '40', '7D']);
+     * // キーも渡ってくる
+     * assert(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}) === ['a' => 'a:A', 'b' => 'b:B']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable[] $callbacks 評価クロージャ配列
+     * @return array 評価クロージャを通した新しい配列
+     */
+    public static function array_maps($array, ...$callbacks)
+    {
+        $result = $array;
+        foreach ($callbacks as $callback) {
+            if (is_string($callback) && $callback[0] === '@') {
+                $margs = [];
+                $callback = substr($callback, 1);
+            }
+            elseif (is_array($callback) && count($callback) === 1) {
+                $margs = reset($callback);
+                $callback = key($callback);
+            }
+            else {
+                $callback = call_user_func(func_user_func_array, $callback);
+            }
+            foreach ($result as $k => $v) {
+                if (isset($margs)) {
+                    $result[$k] = call_user_func_array([$v, $callback], $margs);
+                }
+                else {
+                    $result[$k] = $callback($v, $k);
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
      *
      * 引数 $n に配列を与えると [キー番目 => 値番目] とみなしてキー・値も渡される（Example 参照）。

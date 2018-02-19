@@ -439,6 +439,26 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException(new \PHPUnit_Framework_Error_Warning('', 0, '', 0), $array_map_method, [$o1, null, 123], 'getName');
     }
 
+    function test_array_maps()
+    {
+        $array_maps = array_maps;
+        $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], 'strtoupper', Funchand::lbind(strcat, '_')));
+        // これでも同じ
+        $composite = Funchand::composite(false, 'strtoupper', Funchand::lbind(strcat, '_'));
+        $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], $composite));
+
+        $this->assertEquals(['a' => 'Aaa', 'b' => 'Bbb'], $array_maps(['a' => 'A', 'b' => 'B'], strcat, strcat));
+
+        // メソッドモード
+        $ex = new \Exception('msg1', 1, new \Exception('msg2', 2, new \Exception('msg3', 3)));
+        $this->assertEquals(['msg1', 'msg1', 'msg1'], $array_maps([$ex, $ex, $ex], '@getMessage'));
+        $this->assertEquals([2, 2, 2], $array_maps([$ex, $ex, $ex], '@getPrevious', '@getCode'));
+        $this->assertEquals([3, 3, 3], $array_maps([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'));
+
+        $objs = [new \Concrete('a'), new \Concrete('b'), new \Concrete('c')];
+        $this->assertEquals(['P-A', 'P-B', 'P-C'], $array_maps($objs, ['getName' => ['p-', true]]));
+    }
+
     function test_array_nmap()
     {
         $array_nmap = array_nmap;
