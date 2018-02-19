@@ -75,12 +75,9 @@ class FileCache implements CacheInterface
     {
         list($namespace, $key) = explode('@', $key, 2);
 
-        // 変更履歴がなくて・・・
-        if (!isset($this->changed[$namespace])) {
-            // 新しい値が来たら変更フラグを立てる
-            if (!isset($this->cache[$namespace][$key]) || $this->cache[$namespace][$key] !== $value) {
-                $this->changed[$namespace] = true;
-            }
+        // 新しい値が来たら変更フラグを立てる
+        if (!isset($this->cache[$namespace][$key]) || $this->cache[$namespace][$key] !== $value) {
+            $this->changed[$namespace] = true;
         }
 
         // 値をセット
@@ -101,7 +98,14 @@ class FileCache implements CacheInterface
         }
     }
 
-    public function delete($key) { /* not use */ }
+    public function delete($key)
+    {
+        list($namespace, $key) = explode('@', $key, 2);
+        $this->changed[$namespace] = true;
+        $return = isset($this->cache[$namespace][$key]);
+        unset($this->cache[$namespace][$key]);
+        return $return;
+    }
 
     public function getMultiple($keys, $default = null) { /* not use */ }
 

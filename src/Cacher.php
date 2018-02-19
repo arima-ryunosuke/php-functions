@@ -91,6 +91,19 @@ class Cacher
     }
 
     /**
+     * 値を削除
+     *
+     * @param string $namespace 名前空間
+     * @param string $key キー
+     * @return mixed
+     */
+    public static function delete($namespace, $key)
+    {
+        self::initialize();
+        return self::$cache->delete($namespace . '@' . $key);
+    }
+
+    /**
      * キャッシュをクリア
      *
      * @return bool

@@ -13,7 +13,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
             return sha1(uniqid(mt_rand(), true));
         };
 
-        // 何度呼んでもキャッシュされるので 1 になる
+        // 何度呼んでもキャッシュされるので一致する
         $current = $cache('test', $provider, null, false);
         $this->assertEquals($current, $cache('test', $provider, null, false));
         $this->assertEquals($current, $cache('test', $provider, null, false));
@@ -21,7 +21,37 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
 
         // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
         $this->assertNotEquals($current, $cache('test', $provider, __FUNCTION__, false));
+
+        // null を与えると削除される
+        $this->assertTrue($cache('test', null, __FUNCTION__, false));
+        $this->assertEquals(1, $cache('test', function () { return 1; }, __FUNCTION__, false));
     }
+
+    function test_cache_internal()
+    {
+        if (DIRECTORY_SEPARATOR !== '\\') {
+            return;
+        }
+
+        $cache = cache;
+        $provider = function () {
+            return sha1(uniqid(mt_rand(), true));
+        };
+
+        // 何度呼んでもキャッシュされるので一致する
+        $current = $cache('test', $provider, null, true);
+        $this->assertEquals($current, $cache('test', $provider, null, true));
+        $this->assertEquals($current, $cache('test', $provider, null, true));
+        $this->assertEquals($current, $cache('test', $provider, null, true));
+
+        // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
+        $this->assertNotEquals($current, $cache('test', $provider, __FUNCTION__, true));
+
+        // null を与えると削除される
+        $this->assertTrue($cache('test', null, __FUNCTION__, true));
+        $this->assertEquals(1, $cache('test', function () { return 1; }, __FUNCTION__, true));
+    }
+
 
     function test_benchmark()
     {

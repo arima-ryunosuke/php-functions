@@ -34,6 +34,10 @@ class FileCacheTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('that value1', $cacher->get('fuga@a1'));
         $this->assertEquals('that value2', $cacher->get('fuga@a2'));
 
+        // del
+        $this->assertTrue($cacher->delete('fuga@a2'));
+        $this->assertFalse($cacher->has('fuga@a2'));
+
         // has
         $this->assertTrue($cacher->has('hoge@a1'));
         $cacher->clear();

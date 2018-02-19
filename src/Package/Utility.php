@@ -13,12 +13,19 @@ class Utility
      * 内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。
      * 内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。
      *
+     * $provider に null を与えるとキャッシュの削除となる。
+     *
      * Example:
      * <code>
+     * $provider = function(){return rand();};
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
-     * $rand1 = cache('rand', function(){return rand();});
-     * $rand2 = cache('rand', function(){return rand();});
+     * $rand1 = cache('rand', $provider);
+     * $rand2 = cache('rand', $provider);
      * assert($rand1 === $rand2);
+     * // $provider に null を与えると削除される
+     * cache('rand', null);
+     * $rand3 = cache('rand', $provider);
+     * assert($rand1 !== $rand3);
      * </code>
      *
      * @package Utility
@@ -36,11 +43,19 @@ class Utility
         }
 
         // 内部オブジェクトが使えるなら使う
-        if ($use_internal && class_exists('\\ryunosuke\\Functions\\Cacher')) {
+        if ($use_internal && class_exists(\ryunosuke\Functions\Cacher::class)) {
+            if ($provider === null) {
+                return \ryunosuke\Functions\Cacher::delete($namespace, $key);
+            }
             return \ryunosuke\Functions\Cacher::put($namespace, $key, $provider);
         }
 
         static $cache = [];
+        if ($provider === null) {
+            $return = isset($cache[$namespace][$key]);
+            unset($cache[$namespace][$key]);
+            return $return;
+        }
         if (!isset($cache[$namespace])) {
             $cache[$namespace] = [];
         }
