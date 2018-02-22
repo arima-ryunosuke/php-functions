@@ -780,6 +780,7 @@ class Arrays
      * </code>
      *
      * @package Array
+     * @deprecated array_exists という名前で真偽値を返さないのは直感に反する。 キーが欲しい用途には array_find を使う
      *
      * @param array|\Traversable $array 調べる配列
      * @param callable $callback 評価コールバック
@@ -790,6 +791,48 @@ class Arrays
         foreach ($array as $k => $v) {
             if ($callback($v)) {
                 return $k;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * array_search のクロージャ版のようなもの
+     *
+     * コールバックの返り値が true 相当のものを返す。
+     * $is_key に true を与えるとそのキーを返す（デフォルトの動作）。
+     * $is_key に false を与えるとコールバックの結果を返す。
+     *
+     * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
+     *
+     * Example:
+     * <code>
+     * // 最初に見つかったキーを返す
+     * assert(array_find(['a', 'b', '9'], 'ctype_digit')                    === 2);
+     * assert(array_find(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
+     * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
+     * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
+     * assert(array_find(['a', 'b', '9'], $ifnumeric2power, false)          === 81);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 調べる配列
+     * @param callable $callback 評価コールバック
+     * @param bool $is_key キーを返すか否か
+     * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
+     */
+    public static function array_find($array, $callback, $is_key = true)
+    {
+        $callback = call_user_func(func_user_func_array, $callback);
+
+        foreach ($array as $k => $v) {
+            $result = $callback($v, $k);
+            if ($result) {
+                if ($is_key) {
+                    return $k;
+                }
+                return $result;
             }
         }
         return false;

@@ -322,6 +322,25 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(false, $array_exists(['a', 'b', 'c'], function ($v) { }));
     }
 
+    function test_array_find()
+    {
+        $array_find = array_find;
+        $this->assertEquals(2, $array_find(['a', 'b', '9'], 'ctype_digit'));
+        $this->assertEquals('b', $array_find(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }));
+        $this->assertSame(0, $array_find(['9', 'b', 'c'], 'ctype_digit'));
+        $this->assertSame(false, $array_find(['a', 'b', 'c'], function ($v) { }));
+
+        $this->assertEquals('A', $array_find(['a', 'b', '9'], function ($v) {
+            return ctype_digit($v) ? false : strtoupper($v);
+        }, false));
+        $this->assertEquals('B', $array_find(['9', 'b', 'c'], function ($v) {
+            return ctype_digit($v) ? false : strtoupper($v);
+        }, false));
+        $this->assertEquals(5, $array_find([1, 2, 3, 4, -5, -6], function ($v) {
+            return $v < 0 ? abs($v) : false;
+        }, false));
+    }
+
     function test_array_grep_key()
     {
         $array_grep_key = array_grep_key;
