@@ -589,10 +589,10 @@ class Arrays
     public static function array_get($array, $key, $default = null)
     {
         if (is_array($key)) {
-            // $result = array_shrink_key(array_flip($key), $array);
             $result = [];
             foreach ($key as $k) {
-                if (array_key_exists($k, $array)) {
+                // 深遠な事情で少しでも高速化したかったので isset || array_key_exists にしてある
+                if (isset($array[$k]) || array_key_exists($k, $array)) {
                     $result[$k] = $array[$k];
                 }
             }
