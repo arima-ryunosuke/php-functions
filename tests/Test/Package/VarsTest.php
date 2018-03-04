@@ -23,6 +23,46 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('JsonObject:["hoge"]', $stringify(new \JsonObject(['hoge'])));
     }
 
+    function test_numberize()
+    {
+        $numberify = numberify;
+        $this->assertSame(0, $numberify(null));
+        $this->assertSame(0, $numberify(false));
+        $this->assertSame(1, $numberify(true));
+        $this->assertSame(0.0, $numberify(null, true));
+        $this->assertSame(0.0, $numberify(false, true));
+        $this->assertSame(1.0, $numberify(true, true));
+        $this->assertSame(3, $numberify([1, 2, 3]));
+        $this->assertSame(3.0, $numberify([1, 2, 3], true));
+        $this->assertSame((int) STDIN, $numberify(STDIN));
+        $this->assertSame(123, $numberify(new \Concrete('a12s3b')));
+
+        $this->assertSame(123, $numberify(123));
+        $this->assertSame(12, $numberify(12.3));
+
+        $this->assertSame(123.0, $numberify(123, true));
+        $this->assertSame(12.3, $numberify(12.3, true));
+
+        $this->assertSame(123, $numberify('aaa123bbb'));
+        $this->assertSame(123, $numberify('a1b2c3'));
+        $this->assertSame(-123, $numberify('-a1b2c3'));
+
+        $this->assertSame(12, $numberify('aaa12.3bbb'));
+        $this->assertSame(12, $numberify('a1b2.c3'));
+        $this->assertSame(-12, $numberify('-a1b2c.3'));
+
+        $this->assertSame(12.3, $numberify('aaa12.3bbb', true));
+        $this->assertSame(12.3, $numberify('a1b2.c3', true));
+        $this->assertSame(-12.3, $numberify('-a1b2c.3', true));
+
+        $this->assertException('is not numeric', $numberify, 'aaa');
+        $this->assertException('is not numeric', $numberify, 'a.a');
+        $this->assertException('is not numeric', $numberify, '1.2.3', true);
+        if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+            $this->assertException('could not be converted to string', $numberify, new \stdClass());
+        }
+    }
+
     function test_is_primitive()
     {
         $is_primitive = is_primitive;
