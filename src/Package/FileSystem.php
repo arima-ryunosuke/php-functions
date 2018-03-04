@@ -170,6 +170,41 @@ class FileSystem
     }
 
     /**
+     * コールバックが true 相当を返すまで親ディレクトリを辿り続ける
+     *
+     * コールバックには親ディレクトリが引数として渡ってくる。
+     *
+     * Example:
+     * <code>
+     * // //tmp/a/b/file.txt を作っておく
+     * $tmp = sys_get_temp_dir();
+     * file_set_contents("$tmp/a/b/file.txt", 'hoge');
+     * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
+     * $callback = function($path){return realpath("$path/file.txt");};
+     * assert(dirname_r("$tmp/a/b/c/d/e/f", $callback) === realpath("$tmp/a/b/file.txt"));
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $path パス名
+     * @param callable $callback コールバック
+     * @return mixed $callback の返り値。頂上まで辿ったら false
+     */
+    public static function dirname_r($path, $callback)
+    {
+        $return = $callback($path);
+        if ($return) {
+            return $return;
+        }
+
+        $dirname = dirname($path);
+        if ($dirname === $path) {
+            return false;
+        }
+        return call_user_func(dirname_r, $dirname, $callback);
+    }
+
+    /**
      * 中身があっても消せる rmdir
      *
      * Example:

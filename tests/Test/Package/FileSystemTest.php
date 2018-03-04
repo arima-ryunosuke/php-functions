@@ -148,6 +148,31 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('failed to mkdir', $file_set_contents, '/dev/null/::::::/a', '');
     }
 
+    function test_dirname_r()
+    {
+        $dirname_r = dirname_r;
+        // composer.json が見つかるまで親を辿って見つかったらそのパスを返す
+        $this->assertEquals(realpath(__DIR__ . '/../../../composer.json'), $dirname_r(__DIR__, function ($path) {
+            return realpath("$path/composer.json");
+        }));
+        // 見つからない場合は false を返す
+        $this->assertEquals(false, $dirname_r(__DIR__, function ($path) {
+            return realpath("$path/notfound.ext");
+        }));
+        // 使い方の毛色は違うが、このようにすると各構成要素が得られる
+        $paths = [];
+        $this->assertEquals(false, $dirname_r('/root/path/to/something', function ($path) use (&$paths) {
+            $paths[] = $path;
+        }));
+        $this->assertEquals([
+            '/root/path/to/something',
+            '/root/path/to',
+            '/root/path',
+            '/root',
+            DIRECTORY_SEPARATOR,
+        ], $paths);
+    }
+
     function test_mkdir_p()
     {
         $mkdir_p = mkdir_p;
