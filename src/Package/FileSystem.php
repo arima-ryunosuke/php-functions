@@ -205,6 +205,40 @@ class FileSystem
     }
 
     /**
+     * パスが絶対パスか判定する
+     *
+     * Example:
+     * <code>
+     * assert(path_is_absolute('/absolute/path') === true);
+     * assert(path_is_absolute('relative/path')  === false);
+     * // Windows 環境では下記も true になる
+     * if (DIRECTORY_SEPARATOR === '\\') {
+     *     assert(path_is_absolute('\\absolute\\path')    === true);
+     *     assert(path_is_absolute('C:\\absolute\\path')  === true);
+     * }
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $path パス文字列
+     * @return bool 絶対パスなら true
+     */
+    public static function path_is_absolute($path)
+    {
+        if (substr($path, 0, 1) == '/') {
+            return true;
+        }
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            if (preg_match('#^([a-z]+:(\\\\|\\/|$)|\\\\)#i', $path) !== 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * 中身があっても消せる rmdir
      *
      * Example:

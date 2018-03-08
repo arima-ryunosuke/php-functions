@@ -173,6 +173,20 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $paths);
     }
 
+    function test_path_is_absolute()
+    {
+        $path_is_absolute = path_is_absolute;
+        $this->assertFalse($path_is_absolute('a/b/c'));
+        $this->assertTrue($path_is_absolute('/a/b/c'));
+        $DS = DIRECTORY_SEPARATOR;
+        if ($DS === '\\') {
+            $this->assertTrue($path_is_absolute("C:"));
+            $this->assertTrue($path_is_absolute("C:\\path"));
+            $this->assertTrue($path_is_absolute("\\a\\/b\\c"));
+            $this->assertFalse($path_is_absolute('a\\b\\c'));
+        }
+    }
+
     function test_mkdir_p()
     {
         $mkdir_p = mkdir_p;
