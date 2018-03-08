@@ -199,6 +199,37 @@ class Vars
     }
 
     /**
+     * 値の型を取得する（gettype + get_class）
+     *
+     * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
+     * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
+     *
+     * Example:
+     * <code>
+     * // プリミティブ型は gettype と同義
+     * assert(var_type(false)      === 'boolean');
+     * assert(var_type(123)        === 'integer');
+     * assert(var_type(3.14)       === 'double');
+     * assert(var_type([1, 2, 3])  === 'array');
+     * // オブジェクトは型名を返す
+     * assert(var_type(new \stdClass)    === '\\stdClass');
+     * assert(var_type(new \Exception()) === '\\Exception');
+     * </code>
+     *
+     * @package Var
+     *
+     * @param mixed $var 型を取得する値
+     * @return string 型名
+     */
+    public static function var_type($var)
+    {
+        if (is_object($var)) {
+            return '\\' . get_class($var);
+        }
+        return gettype($var);
+    }
+
+    /**
      * 組み込みの var_export をいい感じにしたもの
      *
      * 下記の点が異なる。

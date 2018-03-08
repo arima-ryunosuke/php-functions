@@ -116,6 +116,21 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($is_recursive($rnestobject));
     }
 
+    function test_var_type()
+    {
+        $var_type = var_type;
+        $this->assertEquals('NULL', $var_type(null));
+        $this->assertEquals('boolean', $var_type(false));
+        $this->assertEquals('boolean', $var_type(true));
+        $this->assertEquals('integer', $var_type(123));
+        $this->assertEquals('double', $var_type(123.456));
+        $this->assertEquals('string', $var_type('hoge'));
+        $this->assertEquals('resource', $var_type(STDIN));
+        $this->assertEquals('array', $var_type(['array']));
+        $this->assertEquals('\\' . \stdClass::class, $var_type(new \stdClass()));
+        $this->assertEquals('\\' . \Concrete::class, $var_type(new \Concrete('hoge')));
+    }
+
     function test_var_export2()
     {
         $var_export2 = var_export2;
