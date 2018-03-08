@@ -187,6 +187,20 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         }
     }
 
+    function test_path_resolve()
+    {
+        $path_resolve = path_resolve;
+        $DS = DIRECTORY_SEPARATOR;
+        $this->assertEquals(getcwd() . "{$DS}a{$DS}b{$DS}c", $path_resolve('a/b/c'));
+        $this->assertEquals("{$DS}a{$DS}b{$DS}c", $path_resolve('/a/b/c'));
+        $this->assertEquals("{$DS}root{$DS}a{$DS}b{$DS}c", $path_resolve('/root', 'a/b/c'));
+        $this->assertEquals("{$DS}a{$DS}b{$DS}c", $path_resolve('/root', '../a/b/c'));
+        $this->assertEquals(getcwd() . "{$DS}root{$DS}a{$DS}b{$DS}c", $path_resolve('root', 'a/b/c'));
+        if ($DS === '\\') {
+            $this->assertEquals('C:\\a\\b\\c', $path_resolve('C:\\a\\b\\c'));
+        }
+    }
+
     function test_mkdir_p()
     {
         $mkdir_p = mkdir_p;

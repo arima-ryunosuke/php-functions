@@ -239,6 +239,38 @@ class FileSystem
     }
 
     /**
+     * パスを絶対パスに変換して正規化する
+     *
+     * 可変引数で与えられた文字列群を結合して絶対パス化して返す。
+     * 出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。
+     *
+     * Example:
+     * <code>
+     * $DS = DIRECTORY_SEPARATOR;
+     * assert(path_resolve('/absolute/path') === "{$DS}absolute{$DS}path");
+     * assert(path_resolve('absolute/path')  === getcwd() . "{$DS}absolute{$DS}path");
+     * assert(path_resolve('/absolute/path/through', '../current/./path') === "{$DS}absolute{$DS}path{$DS}current{$DS}path");
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param array $paths パス文字列（可変引数）
+     * @return string 絶対パス
+     */
+    public static function path_resolve(...$paths)
+    {
+        $DS = DIRECTORY_SEPARATOR;
+
+        $path = implode($DS, $paths);
+
+        if (!call_user_func(path_is_absolute, $path)) {
+            $path = getcwd() . $DS . $path;
+        }
+
+        return call_user_func(path_normalize, $path);
+    }
+
+    /**
      * 中身があっても消せる rmdir
      *
      * Example:
