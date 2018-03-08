@@ -201,6 +201,31 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         }
     }
 
+    function test_path_normalize()
+    {
+        $path_normalize = path_normalize;
+        $DS = DIRECTORY_SEPARATOR;
+        // 単純な相対
+        $this->assertEquals("{$DS}a{$DS}b{$DS}d{$DS}e", $path_normalize('/a/b/c/../d/./e'));
+        // 相対パス
+        $this->assertEquals("a{$DS}d{$DS}e", $path_normalize('a/b/c/../../d/./e'));
+        // 連続ドット
+        $this->assertEquals("{$DS}a.b{$DS}c..d", $path_normalize('/a.b/c..d'));
+        // 連続区切り
+        $this->assertEquals("{$DS}a{$DS}b", $path_normalize('//a//b//'));
+        // Windows
+        if ($DS === '\\') {
+            // \\ 区切り
+            $this->assertEquals('C:\\a\\b\\d', $path_normalize('C:\\//a\\/b/\\c/../\\d'));
+            // 連続区切り
+            $this->assertEquals("{$DS}a{$DS}b", $path_normalize('\\/a/\\\\/\\b'));
+        }
+        // いきなり親をたどると例外
+        $this->assertException('is invalid', $path_normalize, '../');
+        // 辿りすぎも例外
+        $this->assertException('is invalid', $path_normalize, 'a/b/c/../../../..');
+    }
+
     function test_mkdir_p()
     {
         $mkdir_p = mkdir_p;

@@ -271,6 +271,52 @@ class FileSystem
     }
 
     /**
+     * パスを正規化する
+     *
+     * 具体的には ./ や ../ を取り除いたり連続したディレクトリ区切りをまとめたりする。
+     * realpath ではない。のでシンボリックリンクの解決などはしない。その代わりファイルが存在しなくても使用することができる。
+     *
+     * Example:
+     * <code>
+     * $DS = DIRECTORY_SEPARATOR;
+     * assert(path_normalize('/path/to/something')                    === "{$DS}path{$DS}to{$DS}something");
+     * assert(path_normalize('/path/through/../something')            === "{$DS}path{$DS}something");
+     * assert(path_normalize('./path/current/./through/../something') === "path{$DS}current{$DS}something");
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $path パス文字列
+     * @return string 正規化されたパス
+     */
+    public static function path_normalize($path)
+    {
+        $ds = '/';
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $ds .= '\\\\';
+        }
+
+        $result = [];
+        foreach (preg_split("#[$ds]#u", $path) as $n => $part) {
+            if ($n > 0 && $part === '') {
+                continue;
+            }
+            if ($part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                if (empty($result)) {
+                    throw new \InvalidArgumentException("'$path' is invalid as path string.");
+                }
+                array_pop($result);
+                continue;
+            }
+            $result[] = $part;
+        }
+        return implode(DIRECTORY_SEPARATOR, $result);
+    }
+
+    /**
      * 中身があっても消せる rmdir
      *
      * Example:
