@@ -135,6 +135,69 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException("'n' of 0th.", $str_subreplace, $string, 'n', ['']);
     }
 
+    function test_str_between()
+    {
+        $str_between = str_between;
+        ////////// 0123456789A1234567891B23456789C123456789D
+        $string = '{simple}, "{enclose}", \\{{escape\\}}';
+        $n = 0;
+        $this->assertSame('simple', $str_between($string, '{', '}', $n));
+        $this->assertSame(8, $n);
+        $this->assertSame('escape\\}', $str_between($string, '{', '}', $n));
+        $this->assertSame(35, $n);
+        $this->assertSame(false, $str_between($string, '{', '}', $n));
+        $this->assertSame(35, $n);
+
+        // ずっとエスケープ中なので見つからない
+        $string = '"{a}{b}{c}{d}{e}{f}{g}"';
+        $n = 0;
+        $this->assertSame(false, $str_between($string, '{', '}', $n));
+
+        // from to が複数文字の場合
+        $string = '{{name}}, {{hobby}}';
+        $n = 0;
+        $this->assertSame('name', $str_between($string, '{{', '}}', $n));
+        $this->assertSame('hobby', $str_between($string, '{{', '}}', $n));
+        $this->assertSame(false, $str_between($string, '{{', '}}', $n));
+
+        // 中身が空の場合
+        $string = '{{}} {{}} {{}}';
+        $n = 0;
+        $this->assertSame('', $str_between($string, '{{', '}}', $n));
+        $this->assertSame('', $str_between($string, '{{', '}}', $n));
+        $this->assertSame('', $str_between($string, '{{', '}}', $n));
+        $this->assertSame(false, $str_between($string, '{{', '}}', $n));
+
+        // くっついている場合
+        $string = '{{first}}{{second}}{{third}}';
+        $n = 0;
+        $this->assertSame('first', $str_between($string, '{{', '}}', $n));
+        $this->assertSame('second', $str_between($string, '{{', '}}', $n));
+        $this->assertSame('third', $str_between($string, '{{', '}}', $n));
+        $this->assertSame(false, $str_between($string, '{{', '}}', $n));
+
+        // 開始終了が一致していない場合
+        $string = '{first}}}}}} and {second}';
+        $n = 0;
+        $this->assertSame('first', $str_between($string, '{', '}', $n));
+        $this->assertSame('second', $str_between($string, '{', '}', $n));
+        $this->assertSame(false, $str_between($string, '{', '}', $n));
+
+        // 開始終了に包含関係がある場合
+        $this->assertSame('first', $str_between('!first!!', '!', '!!'));
+        $this->assertSame('first', $str_between('!!first!', '!!', '!'));
+        $this->assertSame('first', $str_between('!!first!!', '!!', '!!'));
+
+        // enclosure も escape もしない単純な場合
+        $n = 0;
+        $this->assertSame('first', $str_between('{first}"{second}"\\{third\\}', '{', '}', $n, null, null));
+        $this->assertSame('second', $str_between('{first}"{second}"\\{third\\}', '{', '}', $n, null, null));
+        $this->assertSame('third\\', $str_between('{first}"{second}"\\{third\\}', '{', '}', $n, null, null));
+
+        // ネストしている場合
+        $this->assertSame('nest1{nest2{nest3}}', $str_between('{nest1{nest2{nest3}}}', '{', '}'));
+    }
+
     function test_starts_with()
     {
         $starts_with = starts_with;
