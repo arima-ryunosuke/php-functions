@@ -142,6 +142,40 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(false, $next_key($array, 'xxx'));
     }
 
+    function test_in_array_and()
+    {
+        $in_array_and = in_array_and;
+        $this->assertFalse($in_array_and([], []));
+        $this->assertFalse($in_array_and(['a'], []));
+
+        $this->assertTrue($in_array_and(['a'], ['a', 'b', 'c']));
+        $this->assertTrue($in_array_and(['a', 'b'], ['a', 'b', 'c']));
+        $this->assertTrue($in_array_and(['a', 'b', 'c'], ['a', 'b', 'c']));
+        $this->assertFalse($in_array_and(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
+        $this->assertFalse($in_array_and(['z'], ['a', 'b', 'c']));
+
+        $this->assertTrue($in_array_and(['1', 2], [1, 2, 3], false));
+        $this->assertFalse($in_array_and(['1', 2], [1, 2, 3], true));
+        $this->assertFalse($in_array_and(['1', '2'], [1, 2, 3], true));
+    }
+
+    function test_in_array_or()
+    {
+        $in_array_or = in_array_or;
+        $this->assertFalse($in_array_or([], []));
+        $this->assertFalse($in_array_or(['a'], []));
+
+        $this->assertTrue($in_array_or(['a'], ['a', 'b', 'c']));
+        $this->assertTrue($in_array_or(['a', 'b'], ['a', 'b', 'c']));
+        $this->assertTrue($in_array_or(['a', 'b', 'c'], ['a', 'b', 'c']));
+        $this->assertTrue($in_array_or(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
+        $this->assertFalse($in_array_or(['z'], ['a', 'b', 'c']));
+
+        $this->assertTrue($in_array_or(['1', 2], [1, 2, 3], false));
+        $this->assertTrue($in_array_or(['1', 2], [1, 2, 3], true));
+        $this->assertFalse($in_array_or(['1', '2'], [1, 2, 3], true));
+    }
+
     function test_array_add()
     {
         $array_add = array_add;

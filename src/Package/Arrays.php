@@ -319,6 +319,80 @@ class Arrays
     }
 
     /**
+     * in_array の複数版（AND）
+     *
+     * 配列 $haystack が $needle の「すべてを含む」ときに true を返す。
+     *
+     * $needle が非配列の場合は配列化される。
+     * $needle が空の場合は常に false を返す。
+     *
+     * Example:
+     * <code>
+     * assert(in_array_and([1], [1, 2, 3])    === true);
+     * assert(in_array_and([9], [1, 2, 3])    === false);
+     * assert(in_array_and([1, 9], [1, 2, 3]) === false);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|mixed $needle 調べる値
+     * @param array $haystack 調べる配列
+     * @param bool $strict 厳密フラグ
+     * @return bool $needle のすべてが含まれているなら true
+     */
+    public static function in_array_and($needle, $haystack, $strict = false)
+    {
+        $needle = is_array($needle) ? $needle : [$needle];
+        if (empty($needle)) {
+            return false;
+        }
+
+        foreach ($needle as $v) {
+            if (!in_array($v, $haystack, $strict)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * in_array の複数版（OR）
+     *
+     * 配列 $haystack が $needle の「どれかを含む」ときに true を返す。
+     *
+     * $needle が非配列の場合は配列化される。
+     * $needle が空の場合は常に false を返す。
+     *
+     * Example:
+     * <code>
+     * assert(in_array_or([1], [1, 2, 3])    === true);
+     * assert(in_array_or([9], [1, 2, 3])    === false);
+     * assert(in_array_or([1, 9], [1, 2, 3]) === true);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|mixed $needle 調べる値
+     * @param array $haystack 調べる配列
+     * @param bool $strict 厳密フラグ
+     * @return bool $needle のどれかが含まれているなら true
+     */
+    public static function in_array_or($needle, $haystack, $strict = false)
+    {
+        $needle = is_array($needle) ? $needle : [$needle];
+        if (empty($needle)) {
+            return false;
+        }
+
+        foreach ($needle as $v) {
+            if (in_array($v, $haystack, $strict)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 配列の+演算子の関数版
      *
      * Example:
