@@ -23,10 +23,10 @@ if (!isset($excluded_functions['arrayize']) && (!function_exists('arrayize') || 
      * @param mixed $variadic 生成する要素（可変引数）
      * @return array 引数を配列化したもの
      */
-    function arrayize()
+    function arrayize(...$variadic)
     {
         $result = [];
-        foreach (func_get_args() as $arg) {
+        foreach ($variadic as $arg) {
             if (!is_array($arg)) {
                 $arg = [$arg];
             }
@@ -326,6 +326,82 @@ if (!isset($excluded_functions['next_key']) && (!function_exists('next_key') || 
         }
     }
 }
+if (!isset($excluded_functions['in_array_and']) && (!function_exists('in_array_and') || (new \ReflectionFunction('in_array_and'))->isInternal())) {
+    /**
+     * in_array の複数版（AND）
+     *
+     * 配列 $haystack が $needle の「すべてを含む」ときに true を返す。
+     *
+     * $needle が非配列の場合は配列化される。
+     * $needle が空の場合は常に false を返す。
+     *
+     * Example:
+     * <code>
+     * assert(in_array_and([1], [1, 2, 3])    === true);
+     * assert(in_array_and([9], [1, 2, 3])    === false);
+     * assert(in_array_and([1, 9], [1, 2, 3]) === false);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|mixed $needle 調べる値
+     * @param array $haystack 調べる配列
+     * @param bool $strict 厳密フラグ
+     * @return bool $needle のすべてが含まれているなら true
+     */
+    function in_array_and($needle, $haystack, $strict = false)
+    {
+        $needle = is_array($needle) ? $needle : [$needle];
+        if (empty($needle)) {
+            return false;
+        }
+
+        foreach ($needle as $v) {
+            if (!in_array($v, $haystack, $strict)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+if (!isset($excluded_functions['in_array_or']) && (!function_exists('in_array_or') || (new \ReflectionFunction('in_array_or'))->isInternal())) {
+    /**
+     * in_array の複数版（OR）
+     *
+     * 配列 $haystack が $needle の「どれかを含む」ときに true を返す。
+     *
+     * $needle が非配列の場合は配列化される。
+     * $needle が空の場合は常に false を返す。
+     *
+     * Example:
+     * <code>
+     * assert(in_array_or([1], [1, 2, 3])    === true);
+     * assert(in_array_or([9], [1, 2, 3])    === false);
+     * assert(in_array_or([1, 9], [1, 2, 3]) === true);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|mixed $needle 調べる値
+     * @param array $haystack 調べる配列
+     * @param bool $strict 厳密フラグ
+     * @return bool $needle のどれかが含まれているなら true
+     */
+    function in_array_or($needle, $haystack, $strict = false)
+    {
+        $needle = is_array($needle) ? $needle : [$needle];
+        if (empty($needle)) {
+            return false;
+        }
+
+        foreach ($needle as $v) {
+            if (in_array($v, $haystack, $strict)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') || (new \ReflectionFunction('array_add'))->isInternal())) {
     /**
      * 配列の+演算子の関数版
@@ -344,12 +420,150 @@ if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') |
      * @param array $variadic 足す配列
      * @return array 足された配列
      */
-    function array_add($array)
+    function array_add($array, ...$variadic)
     {
-        foreach (array_slice(func_get_args(), 1) as $arg) {
+        foreach ($variadic as $arg) {
             $array += $arg;
         }
         return $array;
+    }
+}
+if (!isset($excluded_functions['array_implode']) && (!function_exists('array_implode') || (new \ReflectionFunction('array_implode'))->isInternal())) {
+    /**
+     * 配列の各要素の間に要素を差し込む
+     *
+     * 歴史的な理由はないが、引数をどちらの順番でも受けつけることが可能。
+     * ただし、$glue を先に渡すパターンの場合は配列指定が可変引数渡しになる。
+     *
+     * 文字キーは保存されるが数値キーは再割り振りされる。
+     *
+     * Example:
+     * <code>
+     * // (配列, 要素) の呼び出し
+     * assert(array_implode(['a', 'b', 'c'], 'X') === ['a', 'X', 'b', 'X', 'c']);
+     * // (要素, ...配列) の呼び出し
+     * assert(array_implode('X', 'a', 'b', 'c')   === ['a', 'X', 'b', 'X', 'c']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable|string $array 対象配列
+     * @param string $glue 差し込む要素
+     * @return array 差し込まれた配列
+     */
+    function array_implode($array, $glue)
+    {
+        // 第1引数が回せない場合は引数を入れ替えて可変引数パターン
+        if (!is_array($array) && !$array instanceof \Traversable) {
+            return call_user_func(array_implode, array_slice(func_get_args(), 1), $array);
+        }
+
+        $result = [];
+        foreach ($array as $k => $v) {
+            if (is_int($k)) {
+                $result[] = $v;
+            }
+            else {
+                $result[$k] = $v;
+            }
+            $result[] = $glue;
+        }
+        array_pop($result);
+        return $result;
+    }
+}
+if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_sprintf') || (new \ReflectionFunction('array_sprintf'))->isInternal())) {
+    /**
+     * キーと値で sprintf する
+     *
+     * 配列の各要素を文字列化して返すイメージ。
+     * $glue を与えるとさらに implode して返す（返り値が文字列になる）。
+     *
+     * $format は書式文字列（$v, $k）。
+     * callable を与えると sprintf ではなくコールバック処理になる（$v, $k）。
+     *
+     * Example:
+     * <code>
+     * $array = ['key1' => 'val1', 'key2' => 'val2'];
+     * // key, value を利用した sprintf
+     * assert(array_sprintf($array, '%2$s=%1$s')      === ['key1=val1', 'key2=val2']);
+     * // 第3引数を与えるとさらに implode される
+     * assert(array_sprintf($array, '%2$s=%1$s', ' ') === 'key1=val1 key2=val2');
+     * // クロージャを与えるとコールバック動作になる
+     * $closure = function($v, $k){return "$k=" . strtoupper($v);};
+     * assert(array_sprintf($array, $closure, ' ')    === 'key1=VAL1 key2=VAL2');
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param string|callable $format 書式文字列あるいはクロージャ
+     * @param string $glue 結合文字列。未指定時は implode しない
+     * @return array|string sprintf された配列
+     */
+    function array_sprintf($array, $format, $glue = NULL)
+    {
+        if (is_callable($format)) {
+            $callback = call_user_func(func_user_func_array, $format);
+        }
+        else {
+            $callback = function ($v, $k) use ($format) { return sprintf($format, $v, $k); };
+        }
+
+        $result = [];
+        foreach ($array as $k => $v) {
+            $result[] = $callback($v, $k);
+        }
+
+        if ($glue !== null) {
+            return implode($glue, $result);
+        }
+
+        return $result;
+    }
+}
+if (!isset($excluded_functions['array_strpad']) && (!function_exists('array_strpad') || (new \ReflectionFunction('array_strpad'))->isInternal())) {
+    /**
+     * 配列のキー・要素に文字列を付加する
+     *
+     * $key_prefix, $val_prefix でそれぞれ「キーに付与する文字列」「値に付与する文字列」が指定できる。
+     * 配列を与えると [サフィックス, プレフィックス] という意味になる。
+     * デフォルト（ただの文字列）はプレフィックス（値だけに付与したいなら array_map で十分なので）。
+     *
+     * Example:
+     * <code>
+     * $array = ['key1' => 'val1', 'key2' => 'val2'];
+     * // キーにプレフィックス付与
+     * assert(array_strpad($array, 'prefix-')       === ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
+     * // 値にサフィックス付与
+     * assert(array_strpad($array, '', ['-suffix']) === ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param string|array $key_prefix キー側の付加文字列
+     * @param string|array $val_prefix 値側の付加文字列
+     * @return array 文字列付与された配列
+     */
+    function array_strpad($array, $key_prefix, $val_prefix = '')
+    {
+        $key_suffix = '';
+        if (is_array($key_prefix)) {
+            list($key_suffix, $key_prefix) = $key_prefix + [1 => ''];
+        }
+        $val_suffix = '';
+        if (is_array($val_prefix)) {
+            list($val_suffix, $val_prefix) = $val_prefix + [1 => ''];
+        }
+
+        $result = [];
+        foreach ($array as $key => $val) {
+            $key = $key_prefix . $key . $key_suffix;
+            $val = $val_prefix . $val . $val_suffix;
+            $result[$key] = $val;
+        }
+        return $result;
     }
 }
 if (!isset($excluded_functions['array_pos']) && (!function_exists('array_pos') || (new \ReflectionFunction('array_pos'))->isInternal())) {
@@ -466,10 +680,10 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
     function array_get($array, $key, $default = NULL)
     {
         if (is_array($key)) {
-            // $result = array_shrink_key(array_flip($key), $array);
             $result = [];
             foreach ($key as $k) {
-                if (array_key_exists($k, $array)) {
+                // 深遠な事情で少しでも高速化したかったので isset || array_key_exists にしてある
+                if (isset($array[$k]) || array_key_exists($k, $array)) {
                     $result[$k] = $array[$k];
                 }
             }
@@ -494,26 +708,46 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('array_set') |
      * キー指定の配列値設定
      *
      * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
+     * 第3引数に配列を指定すると潜って設定する。
      *
      * Example:
      * <code>
      * $array = ['a' => 'A', 'B'];
-     * assert(array_set($array, 'Z')      === 1);
-     * assert($array                      === ['a' => 'A', 'B', 'Z']);
+     * // 第3引数省略（最後に連番キーで設定）
+     * assert(array_set($array, 'Z') === 1);
+     * assert($array                 === ['a' => 'A', 'B', 'Z']);
+     * // 第3引数でキーを指定
      * assert(array_set($array, 'Z', 'z') === 'z');
      * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+     * assert(array_set($array, 'Z', 'z') === 'z');
+     * // 第3引数で配列を指定
+     * assert(array_set($array, 'Z', ['x', 'y', 'z']) === 'z');
+     * assert($array                                  === ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * </code>
      *
      * @package Array
      *
      * @param array $array 配列
      * @param mixed $value 設定する値
-     * @param string|int $key 設定するキー
+     * @param array|string|int|null $key 設定するキー
      * @param bool $require_return 返り値が不要なら false を渡す
      * @return string|int 設定したキー
      */
     function array_set(&$array, $value, $key = NULL, $require_return = true)
     {
+        if (is_array($key)) {
+            $k = array_shift($key);
+            if ($key) {
+                if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
+                    throw new \InvalidArgumentException('$array[$k] is not array.');
+                }
+                return call_user_func_array(array_set, [&$array[$k], $value, $key, $require_return]);
+            }
+            else {
+                return call_user_func_array(array_set, [&$array, $value, $k, $require_return]);
+            }
+        }
+
         if ($key === null) {
             $array[] = $value;
             if ($require_return === true) {
@@ -641,6 +875,7 @@ if (!isset($excluded_functions['array_exists']) && (!function_exists('array_exis
      * </code>
      *
      * @package Array
+     * @deprecated array_exists という名前で真偽値を返さないのは直感に反する。 キーが欲しい用途には array_find を使う
      *
      * @param array|\Traversable $array 調べる配列
      * @param callable $callback 評価コールバック
@@ -651,6 +886,49 @@ if (!isset($excluded_functions['array_exists']) && (!function_exists('array_exis
         foreach ($array as $k => $v) {
             if ($callback($v)) {
                 return $k;
+            }
+        }
+        return false;
+    }
+}
+if (!isset($excluded_functions['array_find']) && (!function_exists('array_find') || (new \ReflectionFunction('array_find'))->isInternal())) {
+    /**
+     * array_search のクロージャ版のようなもの
+     *
+     * コールバックの返り値が true 相当のものを返す。
+     * $is_key に true を与えるとそのキーを返す（デフォルトの動作）。
+     * $is_key に false を与えるとコールバックの結果を返す。
+     *
+     * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
+     *
+     * Example:
+     * <code>
+     * // 最初に見つかったキーを返す
+     * assert(array_find(['a', 'b', '9'], 'ctype_digit')                    === 2);
+     * assert(array_find(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
+     * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
+     * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
+     * assert(array_find(['a', 'b', '9'], $ifnumeric2power, false)          === 81);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 調べる配列
+     * @param callable $callback 評価コールバック
+     * @param bool $is_key キーを返すか否か
+     * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
+     */
+    function array_find($array, $callback, $is_key = true)
+    {
+        $callback = call_user_func(func_user_func_array, $callback);
+
+        foreach ($array as $k => $v) {
+            $result = $callback($v, $k);
+            if ($result) {
+                if ($is_key) {
+                    return $k;
+                }
+                return $result;
             }
         }
         return false;
@@ -936,6 +1214,59 @@ if (!isset($excluded_functions['array_map_method']) && (!function_exists('array_
         }, $array);
     }
 }
+if (!isset($excluded_functions['array_maps']) && (!function_exists('array_maps') || (new \ReflectionFunction('array_maps'))->isInternal())) {
+    /**
+     * 複数コールバックを指定できる array_map
+     *
+     * 指定したコールバックで複数回回してマップする。
+     * `array_maps($array, $f, $g)` は `array_map($g, array_map($f, $array))` とほぼ等しい。
+     * ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。
+     *
+     * 少し変わった仕様として、コールバックに [$method => $args] を付けるとそれはメソッド呼び出しになる。
+     * つまり各要素 $v に対して `$v->$method(...$args)` がマップ結果になる。
+     * さらに引数が不要なら `@method` とするだけで良い。
+     *
+     * Example:
+     * <code>
+     * // 値を3乗したあと16進表記にして大文字化する
+     * assert(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper')    === ['1', '8', '1B', '40', '7D']);
+     * // キーも渡ってくる
+     * assert(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}) === ['a' => 'a:A', 'b' => 'b:B']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable[] $callbacks 評価クロージャ配列
+     * @return array 評価クロージャを通した新しい配列
+     */
+    function array_maps($array, ...$callbacks)
+    {
+        $result = $array;
+        foreach ($callbacks as $callback) {
+            if (is_string($callback) && $callback[0] === '@') {
+                $margs = [];
+                $callback = substr($callback, 1);
+            }
+            elseif (is_array($callback) && count($callback) === 1) {
+                $margs = reset($callback);
+                $callback = key($callback);
+            }
+            else {
+                $callback = call_user_func(func_user_func_array, $callback);
+            }
+            foreach ($result as $k => $v) {
+                if (isset($margs)) {
+                    $result[$k] = call_user_func_array([$v, $callback], $margs);
+                }
+                else {
+                    $result[$k] = $callback($v, $k);
+                }
+            }
+        }
+        return $result;
+    }
+}
 if (!isset($excluded_functions['array_nmap']) && (!function_exists('array_nmap') || (new \ReflectionFunction('array_nmap'))->isInternal())) {
     /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
@@ -961,13 +1292,13 @@ if (!isset($excluded_functions['array_nmap']) && (!function_exists('array_nmap')
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
-    function array_nmap($array, $callback, $n)
+    function array_nmap($array, $callback, $n, ...$variadic)
     {
         /** @var $kn */
         /** @var $vn */
 
         $is_array = is_array($n);
-        $args = array_slice(func_get_args(), 3);
+        $args = $variadic;
 
         // 配列が来たら [キー番目 => 値番目] とみなす
         if ($is_array) {
@@ -1028,7 +1359,7 @@ if (!isset($excluded_functions['array_lmap']) && (!function_exists('array_lmap')
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
-    function array_lmap($array, $callback)
+    function array_lmap($array, $callback, ...$variadic)
     {
         return call_user_func_array(array_nmap, call_user_func(array_insert, func_get_args(), 0, 2));
     }
@@ -1050,7 +1381,7 @@ if (!isset($excluded_functions['array_rmap']) && (!function_exists('array_rmap')
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
-    function array_rmap($array, $callback)
+    function array_rmap($array, $callback, ...$variadic)
     {
         return call_user_func_array(array_nmap, call_user_func(array_insert, func_get_args(), func_num_args() - 2, 2));
     }
@@ -1490,6 +1821,33 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('array_order
         }
     }
 }
+if (!isset($excluded_functions['array_shuffle']) && (!function_exists('array_shuffle') || (new \ReflectionFunction('array_shuffle'))->isInternal())) {
+    /**
+     * shuffle のキーが保存される＋参照渡しではない版
+     *
+     * Example:
+     * <code>
+     * srand(4);mt_srand(4);
+     * assert(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']) === ['b' => 'B', 'a' => 'A', 'c' => 'C']);
+     * </code>
+     *
+     * @package Array
+     *
+     * @param array $array 対象配列
+     * @return array shuffle された配列
+     */
+    function array_shuffle($array)
+    {
+        $keys = array_keys($array);
+        shuffle($keys);
+
+        $result = [];
+        foreach ($keys as $key) {
+            $result[$key] = $array[$key];
+        }
+        return $result;
+    }
+}
 if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('array_shrink_key') || (new \ReflectionFunction('array_shrink_key'))->isInternal())) {
     /**
      * 値の優先順位を逆にした array_intersect_key
@@ -1509,10 +1867,10 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('array_
      * @package Array
      *
      * @param array $array 対象配列
-     * @param array $arrays 比較する配列
+     * @param array $variadic 比較する配列
      * @return array 新しい配列
      */
-    function array_shrink_key($array)
+    function array_shrink_key($array, ...$variadic)
     {
         $args = func_get_args();
         array_unshift($args, call_user_func_array('array_replace', $args));
@@ -1660,7 +2018,7 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
      *
      * $callback は下記の仕様。
      *
-     * 引数は (キー, 値, 元配列, 大元配列) で渡ってくる。
+     * 引数は (キー, 値, 今まで処理したキー配列) で渡ってくる。
      * 返り値は新しいキーを返す。
      * - 文字列や数値を返すとそれがキーとして使われる
      * - null を返すと元のキーがそのまま使われる
@@ -1715,14 +2073,14 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
      */
     function array_convert($array, $callback, $apply_array = false)
     {
-        $recursive = function (&$result, $array, $source, $callback) use (&$recursive, $apply_array) {
+        $recursive = function (&$result, $array, $history, $callback) use (&$recursive, $apply_array) {
             $sequences = [];
             foreach ($array as $key => $value) {
                 $is_array = is_array($value);
                 $newkey = $key;
                 // 配列で $apply_array あるいは非配列の場合にコールバック適用
                 if (($is_array && $apply_array) || !$is_array) {
-                    $newkey = $callback($key, $value, $array, $source);
+                    $newkey = $callback($key, $value, $history);
                 }
                 // 配列は置換
                 if (is_array($newkey)) {
@@ -1751,8 +2109,10 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
                 }
                 // 配列と非配列で代入の仕方が異なる
                 if ($is_array) {
+                    $history[] = $key;
                     $result[$newkey] = [];
-                    $recursive($result[$newkey], $value, $source, $callback);
+                    $recursive($result[$newkey], $value, $history, $callback);
+                    array_pop($history);
                 }
                 else {
                     $result[$newkey] = $value;
@@ -1761,9 +2121,11 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
             // 数値連番は上書きを防ぐためにあとでやる
             foreach ($sequences as $key => $value) {
                 if (is_string($key)) {
+                    $history[] = substr($key, 1);
                     $v = [];
                     $result[] = &$v;
-                    $recursive($v, $value, $source, $callback);
+                    $recursive($v, $value, $history, $callback);
+                    array_pop($history);
                     unset($v);
                 }
                 else {
@@ -1773,7 +2135,7 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
         };
 
         $result = [];
-        $recursive($result, $array, $array, $callback);
+        $recursive($result, $array, [], $callback);
         return $result;
     }
 }
@@ -1969,6 +2331,64 @@ if (!isset($excluded_functions['stdclass']) && (!function_exists('stdclass') || 
         return $stdclass;
     }
 }
+if (!isset($excluded_functions['detect_namespace']) && (!function_exists('detect_namespace') || (new \ReflectionFunction('detect_namespace'))->isInternal())) {
+    /**
+     * ディレクトリ構造から名前空間を推測して返す
+     *
+     * 指定パスに名前空間を持つような php ファイルが有るならその名前空間を返す。
+     * 指定パスに名前空間を持つような php ファイルが無いなら親をたどる。
+     * 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。
+     *
+     * 言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。
+     *
+     * @package ClassObject
+     *
+     * @param string $directory ディレクトリ名
+     * @return string 名前空間
+     */
+    function detect_namespace($directory)
+    {
+        // php をパースして名前空間部分を得るクロージャ
+        $detectNS = function ($phpfile) {
+            $tokens = token_get_all(file_get_contents($phpfile));
+            $count = count($tokens);
+
+            $namespace = [];
+            foreach ($tokens as $n => $token) {
+                if (is_array($token) && $token[0] === T_NAMESPACE) {
+                    // T_NAMESPACE と T_WHITESPACE で最低でも2つは読み飛ばしてよい
+                    for ($m = $n + 2; $m < $count; $m++) {
+                        // よほどのことがないと T_NAMESPACE の次の T_STRING は名前空間の一部
+                        if (is_array($tokens[$m]) && $tokens[$m][0] === T_STRING) {
+                            $namespace[] = $tokens[$m][1];
+                        }
+                        // 終わりが来たら結合して返す
+                        if ($tokens[$m] === ';') {
+                            return implode('\\', $namespace);
+                        }
+                    }
+                }
+            }
+            return null;
+        };
+
+        // 指定パスの兄弟ファイルを調べた後、親ディレクトリを辿っていく
+        $basenames = [];
+        do {
+            $files = array_filter(glob("$directory/*.php"), 'is_file');
+            foreach ($files as $file) {
+                $namespace = $detectNS($file);
+                if ($namespace !== null) {
+                    $localspace = implode('\\', array_reverse($basenames));
+                    return rtrim($namespace . '\\' . $localspace, '\\');
+                }
+            }
+            $basenames[] = basename($directory);
+        } while (($dummy = $directory) !== $directory = dirname($directory));
+
+        throw new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.');
+    }
+}
 if (!isset($excluded_functions['class_loader']) && (!function_exists('class_loader') || (new \ReflectionFunction('class_loader'))->isInternal())) {
     /**
      * composer のクラスローダを返す
@@ -2117,30 +2537,6 @@ if (!isset($excluded_functions['class_replace']) && (!function_exists('class_rep
         }
 
         class_alias($newclass, $class);
-    }
-}
-if (!isset($excluded_functions['has_class_methods']) && (!function_exists('has_class_methods') || (new \ReflectionFunction('has_class_methods'))->isInternal())) {
-    /**
-     * クラスにメソッドがあるかを返す
-     *
-     * Example:
-     * <code>
-     * assert(has_class_methods('Exception', 'getMessage') === true);
-     * assert(has_class_methods('Exception', 'getmessage') === true);
-     * assert(has_class_methods('Exception', 'undefined')  === false);
-     * </code>
-     *
-     * @package ClassObject
-     *
-     * @deprecated use method_exists
-     *
-     * @param string|object $class 対象クラス・オブジェクト
-     * @param string $method_name 調べるメソッド名
-     * @return bool 持っているなら true
-     */
-    function has_class_methods($class, $method_name)
-    {
-        return method_exists($class, $method_name);
     }
 }
 if (!isset($excluded_functions['file_list']) && (!function_exists('file_list') || (new \ReflectionFunction('file_list'))->isInternal())) {
@@ -2313,6 +2709,157 @@ if (!isset($excluded_functions['mkdir_p']) && (!function_exists('mkdir_p') || (n
         return mkdir($dirname, 0777 & (~$umask), true);
     }
 }
+if (!isset($excluded_functions['dirname_r']) && (!function_exists('dirname_r') || (new \ReflectionFunction('dirname_r'))->isInternal())) {
+    /**
+     * コールバックが true 相当を返すまで親ディレクトリを辿り続ける
+     *
+     * コールバックには親ディレクトリが引数として渡ってくる。
+     *
+     * Example:
+     * <code>
+     * // //tmp/a/b/file.txt を作っておく
+     * $tmp = sys_get_temp_dir();
+     * file_set_contents("$tmp/a/b/file.txt", 'hoge');
+     * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
+     * $callback = function($path){return realpath("$path/file.txt");};
+     * assert(dirname_r("$tmp/a/b/c/d/e/f", $callback) === realpath("$tmp/a/b/file.txt"));
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $path パス名
+     * @param callable $callback コールバック
+     * @return mixed $callback の返り値。頂上まで辿ったら false
+     */
+    function dirname_r($path, $callback)
+    {
+        $return = $callback($path);
+        if ($return) {
+            return $return;
+        }
+
+        $dirname = dirname($path);
+        if ($dirname === $path) {
+            return false;
+        }
+        return call_user_func(dirname_r, $dirname, $callback);
+    }
+}
+if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('path_is_absolute') || (new \ReflectionFunction('path_is_absolute'))->isInternal())) {
+    /**
+     * パスが絶対パスか判定する
+     *
+     * Example:
+     * <code>
+     * assert(path_is_absolute('/absolute/path') === true);
+     * assert(path_is_absolute('relative/path')  === false);
+     * // Windows 環境では下記も true になる
+     * if (DIRECTORY_SEPARATOR === '\\') {
+     *     assert(path_is_absolute('\\absolute\\path')    === true);
+     *     assert(path_is_absolute('C:\\absolute\\path')  === true);
+     * }
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $path パス文字列
+     * @return bool 絶対パスなら true
+     */
+    function path_is_absolute($path)
+    {
+        if (substr($path, 0, 1) == '/') {
+            return true;
+        }
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            if (preg_match('#^([a-z]+:(\\\\|\\/|$)|\\\\)#i', $path) !== 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+if (!isset($excluded_functions['path_resolve']) && (!function_exists('path_resolve') || (new \ReflectionFunction('path_resolve'))->isInternal())) {
+    /**
+     * パスを絶対パスに変換して正規化する
+     *
+     * 可変引数で与えられた文字列群を結合して絶対パス化して返す。
+     * 出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。
+     *
+     * Example:
+     * <code>
+     * $DS = DIRECTORY_SEPARATOR;
+     * assert(path_resolve('/absolute/path') === "{$DS}absolute{$DS}path");
+     * assert(path_resolve('absolute/path')  === getcwd() . "{$DS}absolute{$DS}path");
+     * assert(path_resolve('/absolute/path/through', '../current/./path') === "{$DS}absolute{$DS}path{$DS}current{$DS}path");
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param array $paths パス文字列（可変引数）
+     * @return string 絶対パス
+     */
+    function path_resolve(...$paths)
+    {
+        $DS = DIRECTORY_SEPARATOR;
+
+        $path = implode($DS, $paths);
+
+        if (!call_user_func(path_is_absolute, $path)) {
+            $path = getcwd() . $DS . $path;
+        }
+
+        return call_user_func(path_normalize, $path);
+    }
+}
+if (!isset($excluded_functions['path_normalize']) && (!function_exists('path_normalize') || (new \ReflectionFunction('path_normalize'))->isInternal())) {
+    /**
+     * パスを正規化する
+     *
+     * 具体的には ./ や ../ を取り除いたり連続したディレクトリ区切りをまとめたりする。
+     * realpath ではない。のでシンボリックリンクの解決などはしない。その代わりファイルが存在しなくても使用することができる。
+     *
+     * Example:
+     * <code>
+     * $DS = DIRECTORY_SEPARATOR;
+     * assert(path_normalize('/path/to/something')                    === "{$DS}path{$DS}to{$DS}something");
+     * assert(path_normalize('/path/through/../something')            === "{$DS}path{$DS}something");
+     * assert(path_normalize('./path/current/./through/../something') === "path{$DS}current{$DS}something");
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $path パス文字列
+     * @return string 正規化されたパス
+     */
+    function path_normalize($path)
+    {
+        $ds = '/';
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $ds .= '\\\\';
+        }
+
+        $result = [];
+        foreach (preg_split("#[$ds]#u", $path) as $n => $part) {
+            if ($n > 0 && $part === '') {
+                continue;
+            }
+            if ($part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                if (empty($result)) {
+                    throw new \InvalidArgumentException("'$path' is invalid as path string.");
+                }
+                array_pop($result);
+                continue;
+            }
+            $result[] = $part;
+        }
+        return implode(DIRECTORY_SEPARATOR, $result);
+    }
+}
 if (!isset($excluded_functions['rm_rf']) && (!function_exists('rm_rf') || (new \ReflectionFunction('rm_rf'))->isInternal())) {
     /**
      * 中身があっても消せる rmdir
@@ -2416,10 +2963,16 @@ if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || 
     function delegate($invoker, $callable, $arity = NULL)
     {
         if ($arity === null) {
-            $arity = call_user_func(parameter_length, $callable, true);
+            $arity = call_user_func(parameter_length, $callable, true, true);
         }
-        $arity = $arity < 0 ? 0 : $arity;
 
+        if (is_infinite($arity)) {
+            return eval('return function (...$_) use ($invoker, $callable) {
+                return $invoker($callable, func_get_args());
+            };');
+        }
+
+        $arity = abs($arity);
         switch ($arity) {
             case 0:
                 return function () use ($invoker, $callable) {
@@ -2448,8 +3001,8 @@ if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || 
             default:
                 $argstring = call_user_func(array_rmap, range(1, $arity), strcat, '$_');
                 return eval('return function (' . implode(', ', $argstring) . ') use ($invoker, $callable) {
-                return $invoker($callable, func_get_args());
-            };');
+                    return $invoker($callable, func_get_args());
+                };');
         }
     }
 }
@@ -2470,12 +3023,11 @@ if (!isset($excluded_functions['nbind']) && (!function_exists('nbind') || (new \
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
      */
-    function nbind($callable, $n)
+    function nbind($callable, $n, ...$variadic)
     {
-        $binded = array_slice(func_get_args(), 2);
-        return call_user_func(delegate, function ($callable, $args) use ($binded, $n) {
-            return call_user_func_array($callable, call_user_func(array_insert, $args, $binded, $n));
-        }, $callable, call_user_func(parameter_length, $callable, true) - count($binded));
+        return call_user_func(delegate, function ($callable, $args) use ($variadic, $n) {
+            return call_user_func_array($callable, call_user_func(array_insert, $args, $variadic, $n));
+        }, $callable, call_user_func(parameter_length, $callable, true) - count($variadic));
     }
 }
 if (!isset($excluded_functions['lbind']) && (!function_exists('lbind') || (new \ReflectionFunction('lbind'))->isInternal())) {
@@ -2494,7 +3046,7 @@ if (!isset($excluded_functions['lbind']) && (!function_exists('lbind') || (new \
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
      */
-    function lbind($callable)
+    function lbind($callable, ...$variadic)
     {
         return call_user_func_array(nbind, call_user_func(array_insert, func_get_args(), 0, 1));
     }
@@ -2515,7 +3067,7 @@ if (!isset($excluded_functions['rbind']) && (!function_exists('rbind') || (new \
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
      */
-    function rbind($callable)
+    function rbind($callable, ...$variadic)
     {
         return call_user_func_array(nbind, call_user_func(array_insert, func_get_args(), null, 1));
     }
@@ -2562,7 +3114,7 @@ if (!isset($excluded_functions['composite']) && (!function_exists('composite') |
      * @param callable[] $variadic 合成する関数（可変引数）
      * @return \Closure 合成関数
      */
-    function composite($arrayalbe = true)
+    function composite($arrayalbe = true, ...$variadic)
     {
         $callables = func_get_args();
 
@@ -2663,9 +3215,9 @@ if (!isset($excluded_functions['eval_func']) && (!function_exists('eval_func') |
      * @param mixed $variadic 引数名（可変引数）
      * @return \Closure 新しいクロージャ
      */
-    function eval_func($expression)
+    function eval_func($expression, ...$variadic)
     {
-        $eargs = array_slice(func_get_args(), 1);
+        $eargs = $variadic;
         return call_user_func(delegate, function ($expression, $args) use ($eargs) {
             return call_user_func(function () {
                 extract(func_get_arg(1));
@@ -2767,7 +3319,7 @@ if (!isset($excluded_functions['call_safely']) && (!function_exists('call_safely
      * @param mixed $variadic $callback に渡される引数（可変引数）
      * @return mixed $callback の返り値
      */
-    function call_safely($callback)
+    function call_safely($callback, ...$variadic)
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             if (error_reporting() === 0) {
@@ -2777,7 +3329,7 @@ if (!isset($excluded_functions['call_safely']) && (!function_exists('call_safely
         });
 
         try {
-            $return = call_user_func_array($callback, array_slice(func_get_args(), 1));
+            $return = call_user_func_array($callback, $variadic);
             restore_error_handler();
             return $return;
         }
@@ -2802,11 +3354,11 @@ if (!isset($excluded_functions['ob_capture']) && (!function_exists('ob_capture')
      * @param mixed $variadic $callback に渡される引数（可変引数）
      * @return string オフスリーンバッファの文字列
      */
-    function ob_capture($callback)
+    function ob_capture($callback, ...$variadic)
     {
         ob_start();
         try {
-            call_user_func_array($callback, array_slice(func_get_args(), 1));
+            call_user_func_array($callback, $variadic);
             return ob_get_clean();
         }
         catch (\Exception $ex) {
@@ -2835,27 +3387,40 @@ if (!isset($excluded_functions['parameter_length']) && (!function_exists('parame
      *
      * @param callable $callable 対象 callable
      * @param bool $require_only true を渡すと必須パラメータの数を返す
+     * @param bool $thought_variadic 可変引数を考慮するか。 true を渡すと可変引数の場合に無限長を返す
      * @return int 引数の数
      */
-    function parameter_length($callable, $require_only = false)
+    function parameter_length($callable, $require_only = false, $thought_variadic = false)
     {
         // クロージャの $call_name には一意性がないのでキャッシュできない（spl_object_hash でもいいが、かなり重複するので完全ではない）
         if ($callable instanceof \Closure) {
+            /** @var \ReflectionFunctionAbstract $ref */
             $ref = call_user_func(reflect_callable, $callable);
-            return $require_only ? $ref->getNumberOfRequiredParameters() : $ref->getNumberOfParameters();
+            if ($thought_variadic && $ref->isVariadic()) {
+                return INF;
+            }
+            elseif ($require_only) {
+                return $ref->getNumberOfRequiredParameters();
+            }
+            else {
+                return $ref->getNumberOfParameters();
+            }
         }
 
         // $call_name 取得
         is_callable($callable, false, $call_name);
 
         $cache = call_user_func(cache, $call_name, function () use ($callable) {
+            /** @var \ReflectionFunctionAbstract $ref */
             $ref = call_user_func(reflect_callable, $callable);
             return [
-                false => $ref->getNumberOfParameters(),
-                true  => $ref->getNumberOfRequiredParameters(),
+                '00' => $ref->getNumberOfParameters(),
+                '01' => $ref->isVariadic() ? INF : $ref->getNumberOfParameters(),
+                '10' => $ref->getNumberOfRequiredParameters(),
+                '11' => $ref->isVariadic() ? INF : $ref->getNumberOfRequiredParameters(),
             ];
         }, __FUNCTION__);
-        return $cache[$require_only];
+        return $cache[(int) $require_only . (int) $thought_variadic];
     }
 }
 if (!isset($excluded_functions['function_shorten']) && (!function_exists('function_shorten') || (new \ReflectionFunction('function_shorten'))->isInternal())) {
@@ -2901,8 +3466,11 @@ if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('fu
         if ($callback === null) {
             return function ($v) { return $v; };
         }
-        $plength = call_user_func(parameter_length, $callback, true);
+        $plength = call_user_func(parameter_length, $callback, true, true);
         return call_user_func(delegate, function ($callback, $args) use ($plength) {
+            if (is_infinite($plength)) {
+                return call_user_func_array($callback, $args);
+            }
             return call_user_func_array($callback, array_slice($args, 0, $plength));
         }, $callback, $plength);
     }
@@ -3000,6 +3568,263 @@ CODE;
         }
     }
 }
+if (!isset($excluded_functions['minimum']) && (!function_exists('minimum') || (new \ReflectionFunction('minimum'))->isInternal())) {
+    /**
+     * 引数の最小値を返す
+     *
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * assert(minimum(-1, 0, 1) === -1);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return mixed 最小値
+     */
+    function minimum(...$variadic)
+    {
+        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        return min($args);
+    }
+}
+if (!isset($excluded_functions['maximum']) && (!function_exists('maximum') || (new \ReflectionFunction('maximum'))->isInternal())) {
+    /**
+     * 引数の最大値を返す
+     *
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * assert(maximum(-1, 0, 1) === 1);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return mixed 最大値
+     */
+    function maximum(...$variadic)
+    {
+        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        return max($args);
+    }
+}
+if (!isset($excluded_functions['mode']) && (!function_exists('mode') || (new \ReflectionFunction('mode'))->isInternal())) {
+    /**
+     * 引数の最頻値を返す
+     *
+     * - 等価比較は文字列で行う。小数時は注意。おそらく php.ini の precision に従うはず
+     * - 等価値が複数ある場合の返り値は不定
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * assert(mode(0, 1, 2, 2, 3, 3, 3) === 3);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return mixed 最頻値
+     */
+    function mode(...$variadic)
+    {
+        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $vals = array_map(function ($v) {
+            if (is_object($v)) {
+                // ここに特別扱いのオブジェクトを列挙していく
+                if ($v instanceof \DateTimeInterface) {
+                    return $v->getTimestamp();
+                }
+                // それ以外は stringify へ移譲（__toString もここに含まれている）
+                return call_user_func(stringify, $v);
+            }
+            return (string) $v;
+        }, $args);
+        $args = array_combine($vals, $args);
+        $counts = array_count_values($vals);
+        arsort($counts);
+        reset($counts);
+        return $args[key($counts)];
+    }
+}
+if (!isset($excluded_functions['mean']) && (!function_exists('mean') || (new \ReflectionFunction('mean'))->isInternal())) {
+    /**
+     * 引数の相加平均値を返す
+     *
+     * - is_numeric でない値は除外される（計算結果に影響しない）
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * assert(mean(1, 2, 3, 4, 5, 6) === 3.5);
+     * assert(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6) === 3.5);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return int|float 相加平均値
+     */
+    function mean(...$variadic)
+    {
+        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or call_user_func(throws, new \LengthException("argument's must be contain munber."));
+        return array_sum($args) / count($args);
+    }
+}
+if (!isset($excluded_functions['median']) && (!function_exists('median') || (new \ReflectionFunction('median'))->isInternal())) {
+    /**
+     * 引数の中央値を返す
+     *
+     * - 要素数が奇数の場合は完全な中央値/偶数の場合は中2つの平均。「平均」という概念が存在しない値なら中2つの後の値
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * // 偶数個なので中2つの平均
+     * assert(median(1, 2, 3, 4, 5, 6) === 3.5);
+     * // 奇数個なのでど真ん中
+     * assert(median(1, 2, 3, 4, 5) === 3);
+     * // 偶数個だが文字列なので中2つの後
+     * assert(median('a', 'b', 'c', 'd') === 'c');
+     * </code>
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return mixed 中央値
+     */
+    function median(...$variadic)
+    {
+        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $count = count($args);
+        $center = (int) ($count / 2);
+        sort($args);
+        // 偶数で共に数値なら平均値
+        if ($count % 2 === 0 && (is_numeric($args[$center - 1]) && is_numeric($args[$center]))) {
+            return ($args[$center - 1] + $args[$center]) / 2;
+        }
+        // 奇数なら単純に中央値
+        else {
+            return $args[$center];
+        }
+    }
+}
+if (!isset($excluded_functions['average']) && (!function_exists('average') || (new \ReflectionFunction('average'))->isInternal())) {
+    /**
+     * 引数の意味平均値を返す
+     *
+     * - 3座標の重心座標とか日付の平均とかそういうもの
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return mixed 意味平均値
+     */
+    function average(...$variadic)
+    {
+        // 用意したはいいが統一的なうまい実装が思いつかない（関数ベースじゃ無理だと思う）
+        // average は意味平均、mean は相加平均を明示するために定義は残しておく
+        assert(is_array($variadic));
+        throw new \DomainException('not implement yet.');
+    }
+}
+if (!isset($excluded_functions['sum']) && (!function_exists('sum') || (new \ReflectionFunction('sum'))->isInternal())) {
+    /**
+     * 引数の合計値を返す
+     *
+     * - is_numeric でない値は除外される（計算結果に影響しない）
+     * - 配列は個数ではなくフラット展開した要素を対象にする
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * assert(sum(1, 2, 3, 4, 5, 6) === 21);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param mixed $variadic 対象の変数・配列・リスト
+     * @return mixed 合計値
+     */
+    function sum(...$variadic)
+    {
+        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or call_user_func(throws, new \LengthException("argument's must be contain munber."));
+        return array_sum($args);
+    }
+}
+if (!isset($excluded_functions['random_at']) && (!function_exists('random_at') || (new \ReflectionFunction('random_at'))->isInternal())) {
+    /**
+     * 引数をランダムで返す
+     *
+     * - 候補がない場合はエラーではなく例外を投げる
+     *
+     * Example:
+     * <code>
+     * srand(1);mt_srand(1);
+     * assert(random_at(1, 2, 3, 4, 5, 6) === 4);
+     * assert(random_at(1, 2, 3, 4, 5, 6) === 1);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param array $args 候補
+     * @return mixed 引数のうちどれか
+     */
+    function random_at(...$args)
+    {
+        return $args[mt_rand(0, count($args) - 1)];
+    }
+}
+if (!isset($excluded_functions['probability']) && (!function_exists('probability') || (new \ReflectionFunction('probability'))->isInternal())) {
+    /**
+     * 一定確率で true を返す
+     *
+     * 具体的には $probability / $divisor の確率で true を返す。
+     * $divisor のデフォルトは 100 にしてあるので、 $probability だけ与えれば $probability パーセントで true を返すことになる。
+     *
+     * Example:
+     * <code>
+     * srand(1);mt_srand(1);
+     * assert(probability(50) === false);
+     * assert(probability(50) === true);
+     * </code>
+     *
+     * @package Math
+     *
+     * @param int $probability 分子
+     * @param int $divisor 分母
+     * @return bool true or false
+     */
+    function probability($probability, $divisor = 100)
+    {
+        $probability = (int) $probability;
+        if ($probability < 0) {
+            throw new \InvalidArgumentException('$probability must be positive number.');
+        }
+        $divisor = (int) $divisor;
+        if ($divisor < 0) {
+            throw new \InvalidArgumentException('$divisor must be positive number.');
+        }
+        // 不等号の向きや=の有無が怪しかったのでメモ
+        // 1. $divisor に 100 が与えられたとすると、取り得る範囲は 0 ～ 99（100個）
+        // 2. $probability が 1 だとするとこの式を満たす数は 0 の1個のみ
+        // 3. 100 個中1個なので 1%
+        return $probability > mt_rand(0, $divisor - 1);
+    }
+}
 if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (new \ReflectionFunction('strcat'))->isInternal())) {
     /**
      * 文字列結合の関数版
@@ -3014,9 +3839,9 @@ if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (new
      * @param mixed $variadic 結合する文字列（可変引数）
      * @return string 結合した文字列
      */
-    function strcat()
+    function strcat(...$variadic)
     {
-        return implode('', func_get_args());
+        return implode('', $variadic);
     }
 }
 if (!isset($excluded_functions['split_noempty']) && (!function_exists('split_noempty') || (new \ReflectionFunction('split_noempty'))->isInternal())) {
@@ -3192,6 +4017,155 @@ if (!isset($excluded_functions['str_putcsv']) && (!function_exists('str_putcsv')
         }
     }
 }
+if (!isset($excluded_functions['str_subreplace']) && (!function_exists('str_subreplace') || (new \ReflectionFunction('str_subreplace'))->isInternal())) {
+    /**
+     * 指定文字列を置換する
+     *
+     * $subject 内の $search を $replaces に置換する。
+     * str_replace とは「N 番目のみ置換できる」点で異なる。
+     * つまり、$subject='hoge', $replace=[2 => 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。
+     *
+     * $replace に空配列を与えると何もしない。
+     * 負数キーは後ろから数える動作となる。
+     * また、置換後の文字列は置換対象にはならない。
+     *
+     * N 番目の検索文字列が見つからない場合は例外を投げる。
+     *
+     * Example:
+     * <code>
+     * // 1番目（0ベースなので2番目）の x を X に置換
+     * assert(str_subreplace('xxx', 'x', [1 => 'X'])                === 'xXx');
+     * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
+     * assert(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']) === '!XaxXz!');
+     * // 置換結果は置換対象にならない
+     * assert(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X'])    === 'xxxXx');
+     * </code>
+     *
+     * @package String
+     *
+     * @param string $subject 対象文字列
+     * @param string $search 検索文字列
+     * @param array $replaces 置換文字列
+     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @return string 置換された文字列
+     */
+    function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
+    {
+        // 空はそのまま返す
+        if (empty($replaces)) {
+            return $subject;
+        }
+
+        // 負数対応のために逆数計算（ついでに整数チェック）
+        $subcount = substr_count($subject, $search);
+        $mapping = [];
+        foreach ($replaces as $n => $replace) {
+            if (!is_int($n)) {
+                throw new \InvalidArgumentException('$replaces key must be integer.');
+            }
+            if ($n < 0) {
+                $n += $subcount;
+            }
+            if ($n < 0) {
+                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
+            }
+            $mapping[$n] = $replace;
+        }
+        $maxseq = max(array_keys($mapping));
+        $offset = 0;
+        for ($n = 0; $n <= $maxseq; $n++) {
+            $pos = $case_insensitivity ? stripos($subject, $search, $offset) : strpos($subject, $search, $offset);
+            if ($pos === false) {
+                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
+            }
+            if (isset($mapping[$n])) {
+                $subject = substr_replace($subject, $mapping[$n], $pos, strlen($search));
+                $offset = $pos + strlen($mapping[$n]);
+            }
+            else {
+                $offset = $pos + strlen($search);
+            }
+        }
+        return $subject;
+    }
+}
+if (!isset($excluded_functions['str_between']) && (!function_exists('str_between') || (new \ReflectionFunction('str_between'))->isInternal())) {
+    /**
+     * 指定文字で囲まれた文字列を取得する
+     *
+     * $from, $to で指定した文字間を取得する（$from, $to 自体は結果に含まれない）。
+     * ネストしている場合、一番外側の文字間を返す。
+     *
+     * $enclosure で「特定文字に囲まれている」場合を無視することができる。
+     * $escape で「特定文字が前にある」場合を無視することができる。
+     *
+     * $position を与えた場合、その場所から走査を開始する。
+     * さらに結果があった場合、 $position には「次の走査開始位置」が代入される。
+     * これを使用すると連続で「次の文字, 次の文字, ...」と言った動作が可能になる。
+     *
+     * Example:
+     * <code>
+     * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
+     * $n = 0;
+     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'first');
+     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'second');
+     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'third');
+     * // ネストしている場合は最も外側を返す
+     * assert(str_between('{nest1{nest2{nest3}}}', '{', '}') === 'nest1{nest2{nest3}}');
+     * </code>
+     *
+     * @package String
+     *
+     * @param string $string 対象文字列
+     * @param string $from 開始文字列
+     * @param string $to 終了文字列
+     * @param int $position 開始位置。渡した場合次の開始位置が設定される
+     * @param string $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
+     * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+     * @return string|bool $from, $to で囲まれた文字。見つからなかった場合は false
+     */
+    function str_between($string, $from, $to, &$position = 0, $enclosure = '\'"', $escape = '\\')
+    {
+        $strlen = strlen($string);
+        $fromlen = strlen($from);
+        $tolen = strlen($to);
+        $enclosing = null;
+        $nesting = 0;
+        $start = null;
+        for ($i = $position; $i < $strlen; $i++) {
+            if ($i !== 0 && $string[$i - 1] === $escape) {
+                continue;
+            }
+            if (strpos($enclosure, $string[$i]) !== false) {
+                if ($enclosing === null) {
+                    $enclosing = $string[$i];
+                }
+                elseif ($enclosing === $string[$i]) {
+                    $enclosing = null;
+                }
+                continue;
+            }
+
+            // 開始文字と終了文字が重複している可能性があるので $to からチェックする
+            if ($enclosing === null && substr_compare($string, $to, $i, $tolen) === 0) {
+                if (--$nesting === 0) {
+                    $position = $i + $tolen;
+                    return substr($string, $start, $i - $start);
+                }
+                // いきなり終了文字が来た場合は無視する
+                if ($nesting < 0) {
+                    $nesting = 0;
+                }
+            }
+            if ($enclosing === null && substr_compare($string, $from, $i, $fromlen) === 0) {
+                if ($nesting++ === 0) {
+                    $start = $i + $fromlen;
+                }
+            }
+        }
+        return false;
+    }
+}
 if (!isset($excluded_functions['starts_with']) && (!function_exists('starts_with') || (new \ReflectionFunction('starts_with'))->isInternal())) {
     /**
      * 指定文字列で始まるか調べる
@@ -3344,6 +4318,13 @@ if (!isset($excluded_functions['random_string']) && (!function_exists('random_st
      */
     function random_string($length = 8, $charlist = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
+        // テスト＋カバレッジのための隠し引数
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $args = func_get_args();
+        $pf = true;
+
+        assert('$pf = count($args) > 2 ? $args[2] : true;');
+
         if ($length <= 0) {
             throw new \InvalidArgumentException('$length must be positive number.');
         }
@@ -3354,20 +4335,20 @@ if (!isset($excluded_functions['random_string']) && (!function_exists('random_st
         }
 
         // 使えるなら最も優秀なはず
-        if (function_exists('random_bytes')) {
+        if ((function_exists('random_bytes') && $pf === true) || $pf === 'random_bytes') {
             $bytes = random_bytes($length);
         }
         // 次点
-        elseif (function_exists('openssl_random_pseudo_bytes')) {
+        elseif ((function_exists('openssl_random_pseudo_bytes') && $pf === true) || $pf === 'openssl_random_pseudo_bytes') {
             $bytes = openssl_random_pseudo_bytes($length, $crypto_strong);
             if ($crypto_strong === false) {
                 throw new \Exception('failed to random_string ($crypto_strong is false).');
             }
         }
         // よく分からない？
-        elseif (function_exists('mcrypt_create_iv')) {
+        elseif ((function_exists('mcrypt_create_iv') && $pf === true) || $pf === 'mcrypt_create_iv') {
             /** @noinspection PhpDeprecationInspection */
-            $bytes = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM);
+            $bytes = mcrypt_create_iv($length);
         }
         // どれもないなら例外
         else {
@@ -3742,19 +4723,56 @@ if (!isset($excluded_functions['try_catch']) && (!function_exists('try_catch') |
      *
      * Example:
      * <code>
-     * $ex = new \Exception('try_catch');
-     * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
+     * // 例外が飛ばない場合は平和極まりない
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assert(try_catch($try, null, 1, 2, 3) === [1, 2, 3]);
+     * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
+     * $try = function(){throw new \Exception('tried');};
+     * assert(try_catch($try)->getMessage() === 'tried');
      * </code>
      *
      * @package Syntax
      *
      * @param callable $try try ブロッククロージャ
      * @param callable $catch catch ブロッククロージャ
+     * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    function try_catch($try, $catch = NULL)
+    function try_catch($try, $catch = NULL, ...$variadic)
     {
-        return call_user_func(try_catch_finally, $try, $catch, null);
+        return call_user_func(try_catch_finally, $try, $catch, null, ...$variadic);
+    }
+}
+if (!isset($excluded_functions['try_finally']) && (!function_exists('try_finally') || (new \ReflectionFunction('try_finally'))->isInternal())) {
+    /**
+     * try ～ finally 構文の関数版
+     *
+     * 例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。
+     *
+     * Example:
+     * <code>
+     * $finally_count = 0;
+     * $finally = function()use(&$finally_count){$finally_count++;};
+     * // 例外が飛ぼうと飛ぶまいと $finally は実行される
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assert(try_finally($try, $finally, 1, 2, 3) === [1, 2, 3]);
+     * assert($finally_count                       === 1); // 呼ばれている
+     * // 例外は投げっぱなすが、 $finally は実行される
+     * $try = function(){throw new \Exception('tried');};
+     * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
+     * assert($finally_count                       === 2); // 呼ばれている
+     * </code>
+     *
+     * @package Syntax
+     *
+     * @param callable $try try ブロッククロージャ
+     * @param callable $finally finally ブロッククロージャ
+     * @param array $variadic $try に渡る引数
+     * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
+     */
+    function try_finally($try, $finally = NULL, ...$variadic)
+    {
+        return call_user_func(try_catch_finally, $try, throws, $finally, ...$variadic);
     }
 }
 if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_catch_finally') || (new \ReflectionFunction('try_catch_finally'))->isInternal())) {
@@ -3765,8 +4783,16 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
      *
      * Example:
      * <code>
-     * $ex = new \Exception('try_catch');
-     * assert(try_catch(function() use ($ex) { throw $ex; }) === $ex);
+     * $finally_count = 0;
+     * $finally = function()use(&$finally_count){$finally_count++;};
+     * // 例外が飛ぼうと飛ぶまいと $finally は実行される
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)               === [1, 2, 3]);
+     * assert($finally_count                                                 === 1); // 呼ばれている
+     * // 例外を投げるが、 $catch で握りつぶす
+     * $try = function(){throw new \Exception('tried');};
+     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage() === 'tried');
+     * assert($finally_count                                                 === 2); // 呼ばれている
      * </code>
      *
      * @package Syntax
@@ -3774,32 +4800,31 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
      * @param callable $try try ブロッククロージャ
      * @param callable $catch catch ブロッククロージャ
      * @param callable $finally finally ブロッククロージャ
+     * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    function try_catch_finally($try, $catch = NULL, $finally = NULL)
+    function try_catch_finally($try, $catch = NULL, $finally = NULL, ...$variadic)
     {
         if ($catch === null) {
             $catch = function ($v) { return $v; };
         }
 
         try {
-            $return = $try();
+            return $try(...$variadic);
         }
         catch (\Exception $tried_ex) {
             try {
-                $return = $catch($tried_ex);
+                return $catch($tried_ex);
             }
             catch (\Exception $catched_ex) {
-                if ($finally !== null) {
-                    $finally();
-                }
                 throw $catched_ex;
             }
         }
-        if ($finally !== null) {
-            $finally();
+        finally {
+            if ($finally !== null) {
+                $finally();
+            }
         }
-        return $return;
     }
 }
 if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (new \ReflectionFunction('cache'))->isInternal())) {
@@ -3812,12 +4837,19 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (new \
      * 内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。
      * 内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。
      *
+     * $provider に null を与えるとキャッシュの削除となる。
+     *
      * Example:
      * <code>
+     * $provider = function(){return rand();};
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
-     * $rand1 = cache('rand', function(){return rand();});
-     * $rand2 = cache('rand', function(){return rand();});
+     * $rand1 = cache('rand', $provider);
+     * $rand2 = cache('rand', $provider);
      * assert($rand1 === $rand2);
+     * // $provider に null を与えると削除される
+     * cache('rand', null);
+     * $rand3 = cache('rand', $provider);
+     * assert($rand1 !== $rand3);
      * </code>
      *
      * @package Utility
@@ -3835,11 +4867,19 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (new \
         }
 
         // 内部オブジェクトが使えるなら使う
-        if ($use_internal && class_exists('\\ryunosuke\\Functions\\Cacher')) {
+        if ($use_internal && class_exists(\ryunosuke\Functions\Cacher::class)) {
+            if ($provider === null) {
+                return \ryunosuke\Functions\Cacher::delete($namespace, $key);
+            }
             return \ryunosuke\Functions\Cacher::put($namespace, $key, $provider);
         }
 
         static $cache = [];
+        if ($provider === null) {
+            $return = isset($cache[$namespace][$key]);
+            unset($cache[$namespace][$key]);
+            return $return;
+        }
         if (!isset($cache[$namespace])) {
             $cache[$namespace] = [];
         }
@@ -4017,6 +5057,84 @@ if (!isset($excluded_functions['stringify']) && (!function_exists('stringify') |
         }
     }
 }
+if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') || (new \ReflectionFunction('numberify'))->isInternal())) {
+    /**
+     * 値を何とかして数値化する
+     *
+     * - 配列は要素数
+     * - int/float はそのまま（ただし $decimal に応じた型にキャストされる）
+     * - resource はリソースID（php 標準の int キャスト）
+     * - null/bool はその int 値（php 標準の int キャストだが $decimal を見る）
+     * - それ以外（文字列・オブジェクト）は文字列表現から数値以外を取り除いたもの
+     *
+     * 文字列・オブジェクト以外の変換は互換性を考慮しない。頻繁に変更される可能性がある（特に配列）。
+     *
+     * -記号は受け入れるが+記号は受け入れない。
+     *
+     * Example:
+     * <code>
+     * // 配列は要素数となる
+     * assert(numberify([1, 2, 3])       === 3);
+     * // int/float は基本的にそのまま
+     * assert(numberify(123)             === 123);
+     * assert(numberify(123.45)          === 123);
+     * assert(numberify(123.45, true)    === 123.45);
+     * // 文字列は数値抽出
+     * assert(numberify('a1b2c3')        === 123);
+     * assert(numberify('a1b2.c3', true) === 12.3);
+     * </code>
+     *
+     * @package Var
+     *
+     * @param string $var 対象の値
+     * @param bool $decimal 小数として扱うか
+     * @return int|float 数値化した値
+     */
+    function numberify($var, $decimal = false)
+    {
+        // resource はその int 値を返す
+        if (is_resource($var)) {
+            return (int) $var;
+        }
+
+        // 配列は要素数を返す・・・が、$decimal を見るので後段へフォールスルー
+        if (is_array($var)) {
+            $var = count($var);
+        }
+        // null/bool はその int 値を返す・・・が、$decimal を見るので後段へフォールスルー
+        if ($var === null || $var === false || $var === true) {
+            $var = (int) $var;
+        }
+
+        // int はそのまま返す・・・と言いたいところだが $decimal をみてキャストして返す
+        if (is_int($var)) {
+            if ($decimal) {
+                $var = (float) $var;
+            }
+            return $var;
+        }
+        // float はそのまま返す・・・と言いたいところだが $decimal をみてキャストして返す
+        if (is_float($var)) {
+            if (!$decimal) {
+                $var = (int) $var;
+            }
+            return $var;
+        }
+
+        // 上記以外は文字列として扱い、数値のみでフィルタする（__toString 未実装は標準に任せる。多分 fatal error）
+        $number = preg_replace("#[^-.0-9]#u", '', $var);
+
+        // 正規表現レベルでチェックもできそうだけど大変な匂いがするので is_numeric に日和る
+        if (!is_numeric($number)) {
+            throw new \UnexpectedValueException("$var to $number, this is not numeric.");
+        }
+
+        if ($decimal) {
+            return (float) $number;
+        }
+        return (int) $number;
+    }
+}
 if (!isset($excluded_functions['is_primitive']) && (!function_exists('is_primitive') || (new \ReflectionFunction('is_primitive'))->isInternal())) {
     /**
      * 値が複合型でないか検査する
@@ -4097,6 +5215,38 @@ if (!isset($excluded_functions['is_recursive']) && (!function_exists('is_recursi
             return false;
         };
         return $core($var, []);
+    }
+}
+if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || (new \ReflectionFunction('var_type'))->isInternal())) {
+    /**
+     * 値の型を取得する（gettype + get_class）
+     *
+     * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
+     * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
+     *
+     * Example:
+     * <code>
+     * // プリミティブ型は gettype と同義
+     * assert(var_type(false)      === 'boolean');
+     * assert(var_type(123)        === 'integer');
+     * assert(var_type(3.14)       === 'double');
+     * assert(var_type([1, 2, 3])  === 'array');
+     * // オブジェクトは型名を返す
+     * assert(var_type(new \stdClass)    === '\\stdClass');
+     * assert(var_type(new \Exception()) === '\\Exception');
+     * </code>
+     *
+     * @package Var
+     *
+     * @param mixed $var 型を取得する値
+     * @return string 型名
+     */
+    function var_type($var)
+    {
+        if (is_object($var)) {
+            return '\\' . get_class($var);
+        }
+        return gettype($var);
     }
 }
 if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2') || (new \ReflectionFunction('var_export2'))->isInternal())) {
@@ -4197,12 +5347,13 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $maxlen = max(array_map('strlen', array_keys($value)));
+                $values = call_user_func(array_map_key, $value, $var_export);
+                $maxlen = max(array_map('strlen', array_keys($values)));
                 $kvl = '';
                 $parents[] = $value;
-                foreach ($value as $k => $v) {
+                foreach ($values as $k => $v) {
                     $align = str_repeat(' ', $maxlen - strlen($k));
-                    $kvl .= $spacer1 . $var_export($k) . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
+                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -4295,13 +5446,12 @@ if (!isset($excluded_functions['hashvar']) && (!function_exists('hashvar') || (n
      *
      * @package Var
      *
-     * @param mixed $var 変数（可変引数）
+     * @param mixed $vars 変数（可変引数）
      * @return array 引数の変数を変数名で compact した配列
      */
-    function hashvar()
+    function hashvar(...$vars)
     {
-        $args = func_get_args();
-        $num = func_num_args();
+        $num = count($vars);
 
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $file = $trace['file'];
@@ -4363,7 +5513,7 @@ if (!isset($excluded_functions['hashvar']) && (!function_exists('hashvar') || (n
         // 引数の数が一致する呼び出しを返す
         foreach ($cache as $caller) {
             if (count($caller) === $num) {
-                return array_combine($caller, $args);
+                return array_combine($caller, $vars);
             }
         }
 

@@ -48,36 +48,40 @@
 				<h3>Packages</h3>
 			<ul>
 					<li>
-						<a href="package-array.html">
-							array						</a>
+						<a href="package-Array.html">
+							Array						</a>
 							</li>
 					<li>
-						<a href="package-callable.html">
-							callable						</a>
+						<a href="package-Callable.html">
+							Callable						</a>
 							</li>
 					<li>
-						<a href="package-class.html">
-							class						</a>
+						<a href="package-ClassObject.html">
+							ClassObject						</a>
 							</li>
 					<li>
-						<a href="package-filesystem.html">
-							filesystem						</a>
+						<a href="package-FileSystem.html">
+							FileSystem						</a>
 							</li>
 					<li>
-						<a href="package-string.html">
-							string						</a>
+						<a href="package-Math.html">
+							Math						</a>
 							</li>
 					<li>
-						<a href="package-syntax.html">
-							syntax						</a>
+						<a href="package-String.html">
+							String						</a>
 							</li>
 					<li>
-						<a href="package-utility.html">
-							utility						</a>
+						<a href="package-Syntax.html">
+							Syntax						</a>
 							</li>
 					<li>
-						<a href="package-var.html">
-							var						</a>
+						<a href="package-Utility.html">
+							Utility						</a>
+							</li>
+					<li>
+						<a href="package-Var.html">
+							Var						</a>
 							</li>
 			</ul>
 		</div>
@@ -100,20 +104,23 @@
 				<li><a href="function-array_count.html">array_count<small class="summary">: 配列をコールバックに従ってカウントする</small></a></li>
 				<li><a href="function-array_depth.html">array_depth<small class="summary">: 配列の次元数を返す</small></a></li>
 				<li><a href="function-array_dive.html">array_dive<small class="summary">: パス形式で配列値を取得</small></a></li>
-				<li><a href="function-array_exists.html">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
+				<li><a href="function-array_exists.html" class="deprecated">array_exists<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
 				<li><a href="function-array_filter_eval.html">array_filter_eval<small class="summary">: eval で評価して array_filter する</small></a></li>
 				<li><a href="function-array_filter_key.html">array_filter_key<small class="summary">: キーを主軸とした array_filter</small></a></li>
 				<li><a href="function-array_filter_not.html">array_filter_not<small class="summary">: array_filter の否定版</small></a></li>
+				<li><a href="function-array_find.html">array_find<small class="summary">: array_search のクロージャ版のようなもの</small></a></li>
 				<li><a href="function-array_flatten.html">array_flatten<small class="summary">: 多階層配列をフラットに展開する</small></a></li>
 				<li><a href="function-array_get.html">array_get<small class="summary">: デフォルト値付きの配列値取得</small></a></li>
 				<li><a href="function-array_grep_key.html">array_grep_key<small class="summary">: キーを正規表現でフィルタする</small></a></li>
 				<li><a href="function-array_group.html">array_group<small class="summary">: 配列をコールバックの返り値でグループ化する</small></a></li>
+				<li><a href="function-array_implode.html">array_implode<small class="summary">: 配列の各要素の間に要素を差し込む</small></a></li>
 				<li><a href="function-array_insert.html">array_insert<small class="summary">: 配列・連想配列を問わず任意の位置に値を挿入する</small></a></li>
 				<li><a href="function-array_lmap.html">array_lmap<small class="summary">: 要素値を $callback の最左に適用して array_map する</small></a></li>
 				<li><a href="function-array_lookup.html">array_lookup<small class="summary">: キー保存可能な array_column</small></a></li>
 				<li><a href="function-array_map_filter.html">array_map_filter<small class="summary">: array_map + array_filter する</small></a></li>
 				<li><a href="function-array_map_key.html">array_map_key<small class="summary">: キーをマップして変換する</small></a></li>
 				<li><a href="function-array_map_method.html">array_map_method<small class="summary">: メソッドを指定できるようにした array_map</small></a></li>
+				<li><a href="function-array_maps.html">array_maps<small class="summary">: 複数コールバックを指定できる array_map</small></a></li>
 				<li><a href="function-array_nest.html">array_nest<small class="summary">: シンプルな [キー => 値] な配列から階層配列を生成する</small></a></li>
 				<li><a href="function-array_nmap.html">array_nmap<small class="summary">: 要素値を $callback の n 番目(0ベース)に適用して array_map する</small></a></li>
 				<li><a href="function-array_of.html">array_of<small class="summary">: 配列を与えると指定キーの値を返すクロージャを返す</small></a></li>
@@ -122,10 +129,14 @@
 				<li><a href="function-array_rmap.html">array_rmap<small class="summary">: 要素値を $callback の最右に適用して array_map する</small></a></li>
 				<li><a href="function-array_set.html">array_set<small class="summary">: キー指定の配列値設定</small></a></li>
 				<li><a href="function-array_shrink_key.html">array_shrink_key<small class="summary">: 値の優先順位を逆にした array_intersect_key</small></a></li>
+				<li><a href="function-array_shuffle.html">array_shuffle<small class="summary">: shuffle のキーが保存される＋参照渡しではない版</small></a></li>
+				<li><a href="function-array_sprintf.html">array_sprintf<small class="summary">: キーと値で sprintf する</small></a></li>
+				<li><a href="function-array_strpad.html">array_strpad<small class="summary">: 配列のキー・要素に文字列を付加する</small></a></li>
 				<li><a href="function-array_uncolumns.html">array_uncolumns<small class="summary">: array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する</small></a></li>
 				<li><a href="function-array_unset.html">array_unset<small class="summary">: 伏せると同時にその値を返す</small></a></li>
 				<li><a href="function-array_where.html">array_where<small class="summary">: 指定キーの要素で array_filter する</small></a></li>
 				<li><a href="function-arrayize.html">arrayize<small class="summary">: 引数の配列を生成する。</small></a></li>
+				<li><a href="function-average.html">average<small class="summary">: 引数の意味平均値を返す</small></a></li>
 				<li><a href="function-benchmark.html">benchmark<small class="summary">: 簡易ベンチマークを取る</small></a></li>
 				<li><a href="function-cache.html">cache<small class="summary">: シンプルにキャッシュする</small></a></li>
 				<li><a href="function-call_safely.html">call_safely<small class="summary">: エラーを例外に変換するブロックでコールバックを実行する</small></a></li>
@@ -138,6 +149,8 @@
 				<li><a href="function-closurize.html">closurize<small class="summary">: callable を Closure に変換する</small></a></li>
 				<li><a href="function-composite.html">composite<small class="summary">: 合成関数を返す</small></a></li>
 				<li><a href="function-delegate.html">delegate<small class="summary">: 指定 callable を指定クロージャで実行するクロージャを返す</small></a></li>
+				<li><a href="function-detect_namespace.html">detect_namespace<small class="summary">: ディレクトリ構造から名前空間を推測して返す</small></a></li>
+				<li><a href="function-dirname_r.html">dirname_r<small class="summary">: コールバックが true 相当を返すまで親ディレクトリを辿り続ける</small></a></li>
 				<li><a href="function-ends_with.html">ends_with<small class="summary">: 指定文字列で終わるか調べる</small></a></li>
 				<li><a href="function-eval_func.html">eval_func<small class="summary">: 指定コードで eval するクロージャを返す</small></a></li>
 				<li><a href="function-file_extension.html">file_extension<small class="summary">: ファイルの拡張子を変更する。引数を省略すると拡張子を返す</small></a></li>
@@ -150,9 +163,10 @@
 				<li><a href="function-func_user_func_array.html">func_user_func_array<small class="summary">: パラメータ定義数に応じて呼び出し引数を可変にしてコールする</small></a></li>
 				<li><a href="function-function_alias.html">function_alias<small class="summary">: 関数のエイリアスを作成する</small></a></li>
 				<li><a href="function-function_shorten.html">function_shorten<small class="summary">: 関数の名前空間部分を除いた短い名前を取得する</small></a></li>
-				<li><a href="function-has_class_methods.html" class="deprecated">has_class_methods<small class="summary">: クラスにメソッドがあるかを返す</small></a></li>
 				<li><a href="function-hashvar.html">hashvar<small class="summary">: 変数指定をできるようにした compact</small></a></li>
 				<li><a href="function-ifelse.html">ifelse<small class="summary">: if ～ else 構文の関数版</small></a></li>
+				<li><a href="function-in_array_and.html">in_array_and<small class="summary">: in_array の複数版（AND）</small></a></li>
+				<li><a href="function-in_array_or.html">in_array_or<small class="summary">: in_array の複数版（OR）</small></a></li>
 				<li><a href="function-is_hasharray.html">is_hasharray<small class="summary">: 配列が連想配列か調べる</small></a></li>
 				<li><a href="function-is_primitive.html">is_primitive<small class="summary">: 値が複合型でないか検査する</small></a></li>
 				<li><a href="function-is_recursive.html">is_recursive<small class="summary">: 変数が再帰参照を含むか調べる</small></a></li>
@@ -161,16 +175,27 @@
 				<li><a href="function-last_keyvalue.html">last_keyvalue<small class="summary">: 配列の最後のキー/値ペアをタプルで返す</small></a></li>
 				<li><a href="function-last_value.html">last_value<small class="summary">: 配列の最後の値を返す</small></a></li>
 				<li><a href="function-lbind.html">lbind<small class="summary">: $callable の最左に引数を束縛した callable を返す</small></a></li>
+				<li><a href="function-maximum.html">maximum<small class="summary">: 引数の最大値を返す</small></a></li>
+				<li><a href="function-mean.html">mean<small class="summary">: 引数の相加平均値を返す</small></a></li>
+				<li><a href="function-median.html">median<small class="summary">: 引数の中央値を返す</small></a></li>
+				<li><a href="function-minimum.html">minimum<small class="summary">: 引数の最小値を返す</small></a></li>
 				<li><a href="function-mkdir_p.html">mkdir_p<small class="summary">: ディレクトリを再帰的に掘る</small></a></li>
+				<li><a href="function-mode.html">mode<small class="summary">: 引数の最頻値を返す</small></a></li>
 				<li><a href="function-nbind.html">nbind<small class="summary">: $callable の指定位置に引数を束縛したクロージャを返す</small></a></li>
 				<li><a href="function-next_key.html">next_key<small class="summary">: 配列の指定キーの次のキーを返す</small></a></li>
 				<li><a href="function-not_func.html">not_func<small class="summary">: 返り値の真偽値を逆転した新しいクロージャを返す</small></a></li>
+				<li><a href="function-numberify.html">numberify<small class="summary">: 値を何とかして数値化する</small></a></li>
 				<li><a href="function-ob_capture.html">ob_capture<small class="summary">: ob_start ～ ob_get_clean のブロックでコールバックを実行する</small></a></li>
 				<li><a href="function-optional.html">optional<small class="summary">: オブジェクトならそれを、オブジェクトでないなら NullObject を返す</small></a></li>
 				<li><a href="function-parameter_length.html">parameter_length<small class="summary">: callable の引数の数を返す</small></a></li>
 				<li><a href="function-pascal_case.html">pascal_case<small class="summary">: PascalCase に変換する</small></a></li>
+				<li><a href="function-path_is_absolute.html">path_is_absolute<small class="summary">: パスが絶対パスか判定する</small></a></li>
+				<li><a href="function-path_normalize.html">path_normalize<small class="summary">: パスを正規化する</small></a></li>
+				<li><a href="function-path_resolve.html">path_resolve<small class="summary">: パスを絶対パスに変換して正規化する</small></a></li>
 				<li><a href="function-preg_capture.html">preg_capture<small class="summary">: キャプチャを主軸においた preg_match</small></a></li>
 				<li><a href="function-prev_key.html">prev_key<small class="summary">: 配列の指定キーの前のキーを返す</small></a></li>
+				<li><a href="function-probability.html">probability<small class="summary">: 一定確率で true を返す</small></a></li>
+				<li><a href="function-random_at.html">random_at<small class="summary">: 引数をランダムで返す</small></a></li>
 				<li><a href="function-random_string.html">random_string<small class="summary">: 安全な乱数文字列を生成する</small></a></li>
 				<li><a href="function-rbind.html">rbind<small class="summary">: $callable の最右に引数を束縛した callable を返す</small></a></li>
 				<li><a href="function-reflect_callable.html">reflect_callable<small class="summary">: callable から ReflectionFunctionAbstract を生成する</small></a></li>
@@ -183,17 +208,22 @@
 				<li><a href="function-split_noempty.html">split_noempty<small class="summary">: 空文字を除外する文字列分割</small></a></li>
 				<li><a href="function-starts_with.html">starts_with<small class="summary">: 指定文字列で始まるか調べる</small></a></li>
 				<li><a href="function-stdclass.html">stdclass<small class="summary">: 初期フィールド値を与えて stdClass を生成する</small></a></li>
+				<li><a href="function-str_between.html">str_between<small class="summary">: 指定文字で囲まれた文字列を取得する</small></a></li>
 				<li><a href="function-str_contains.html">str_contains<small class="summary">: 指定文字列を含むか返す</small></a></li>
 				<li><a href="function-str_equals.html">str_equals<small class="summary">: 文字列比較の関数版</small></a></li>
 				<li><a href="function-str_putcsv.html">str_putcsv<small class="summary">: fputcsv の文字列版（str_getcsv の put 版）</small></a></li>
+				<li><a href="function-str_subreplace.html">str_subreplace<small class="summary">: 指定文字列を置換する</small></a></li>
 				<li><a href="function-strcat.html">strcat<small class="summary">: 文字列結合の関数版</small></a></li>
 				<li><a href="function-stringify.html">stringify<small class="summary">: 値を何とかして文字列化する</small></a></li>
+				<li><a href="function-sum.html">sum<small class="summary">: 引数の合計値を返す</small></a></li>
 				<li><a href="function-throws.html">throws<small class="summary">: throw の関数版</small></a></li>
 				<li><a href="function-tmpname.html">tmpname<small class="summary">: 終了時に削除される一時ファイル名を生成する</small></a></li>
 				<li><a href="function-try_catch.html">try_catch<small class="summary">: try ～ catch 構文の関数版</small></a></li>
 				<li><a href="function-try_catch_finally.html">try_catch_finally<small class="summary">: try ～ catch ～ finally 構文の関数版</small></a></li>
+				<li><a href="function-try_finally.html">try_finally<small class="summary">: try ～ finally 構文の関数版</small></a></li>
 				<li><a href="function-var_export2.html">var_export2<small class="summary">: 組み込みの var_export をいい感じにしたもの</small></a></li>
 				<li><a href="function-var_html.html">var_html<small class="summary">: var_export2 を html コンテキストに特化させたもの</small></a></li>
+				<li><a href="function-var_type.html">var_type<small class="summary">: 値の型を取得する（gettype + get_class）</small></a></li>
 			</ul>
 		</div>
 	</div>
@@ -213,42 +243,47 @@
 			<table class="summary table table-bordered" id="packages">
 					<tr>
 						<td class="name">
-							<a href="package-array.html">array</a>
+							<a href="package-Array.html">Array</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-callable.html">callable</a>
+							<a href="package-Callable.html">Callable</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-class.html">class</a>
+							<a href="package-ClassObject.html">ClassObject</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-filesystem.html">filesystem</a>
+							<a href="package-FileSystem.html">FileSystem</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-string.html">string</a>
+							<a href="package-Math.html">Math</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-syntax.html">syntax</a>
+							<a href="package-String.html">String</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-utility.html">utility</a>
+							<a href="package-Syntax.html">Syntax</a>
 						</td>
 					</tr>
 					<tr>
 						<td class="name">
-							<a href="package-var.html">var</a>
+							<a href="package-Utility.html">Utility</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="name">
+							<a href="package-Var.html">Var</a>
 						</td>
 					</tr>
 			</table>
@@ -262,6 +297,6 @@
 	</div>
 </div>
 <script src="resources/combined.js?77bf4ed6d948f5dd4dd9f6cbf1ce64bd694cd6d6"></script>
-<script src="elementlist.js?ac9900c217b90cd59818e1fc6f450a6c3b726965"></script>
+<script src="elementlist.js?a01d666e5cb4bdfd24188cd5c0407b15900cc441"></script>
 </body>
 </html>

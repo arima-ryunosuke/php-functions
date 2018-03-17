@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Function numberify</title>
+
+	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
+	<link rel="stylesheet" href="resources/style.css?23faeebd7cd7ff50c657f933aca130a3ad9d1159">
+
+</head>
+
+<body>
+	<nav id="navigation" class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a href="index.html" class="navbar-brand">Overview</a>
+			</div>
+			<div class="collapse navbar-collapse">
+
+                <form id="search" class="navbar-form navbar-left" role="search">
+                    <input type="hidden" name="cx" value="">
+                    <input type="hidden" name="ie" value="UTF-8">
+                    <div class="form-group">
+                        <input type="text" name="q" class="search-query form-control" placeholder="Search">
+					</div>
+				</form>
+
+				<ul class="nav navbar-nav">
+					<li>
+<span>Package</span>					</li>
+					<li class="active">
+<span>Function</span>					</li>
+
+
+
+
+
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div id="left">
+	<div id="menu">
+
+		<div id="groups">
+				<h3>Packages</h3>
+			<ul>
+					<li>
+						<a href="package-Array.html">
+							Array						</a>
+							</li>
+					<li>
+						<a href="package-Callable.html">
+							Callable						</a>
+							</li>
+					<li>
+						<a href="package-ClassObject.html">
+							ClassObject						</a>
+							</li>
+					<li>
+						<a href="package-FileSystem.html">
+							FileSystem						</a>
+							</li>
+					<li>
+						<a href="package-Math.html">
+							Math						</a>
+							</li>
+					<li>
+						<a href="package-String.html">
+							String						</a>
+							</li>
+					<li>
+						<a href="package-Syntax.html">
+							Syntax						</a>
+							</li>
+					<li>
+						<a href="package-Utility.html">
+							Utility						</a>
+							</li>
+					<li>
+						<a href="package-Var.html">
+							Var						</a>
+							</li>
+			</ul>
+		</div>
+
+
+		<div id="elements">
+
+
+
+
+
+			<h3>Functions</h3>
+			<ul>
+				<li><a href="function-hashvar.html">hashvar<small class="summary">: 変数指定をできるようにした compact</small></a></li>
+				<li><a href="function-is_primitive.html">is_primitive<small class="summary">: 値が複合型でないか検査する</small></a></li>
+				<li><a href="function-is_recursive.html">is_recursive<small class="summary">: 変数が再帰参照を含むか調べる</small></a></li>
+				<li class="active"><a href="function-numberify.html">numberify<small class="summary">: 値を何とかして数値化する</small></a></li>
+				<li><a href="function-stringify.html">stringify<small class="summary">: 値を何とかして文字列化する</small></a></li>
+				<li><a href="function-var_export2.html">var_export2<small class="summary">: 組み込みの var_export をいい感じにしたもの</small></a></li>
+				<li><a href="function-var_html.html">var_html<small class="summary">: var_export2 を html コンテキストに特化させたもの</small></a></li>
+				<li><a href="function-var_type.html">var_type<small class="summary">: 値の型を取得する（gettype + get_class）</small></a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+	<div id="rightInner">
+<div id="content" class="function">
+	<h1>Function numberify</h1>
+
+
+	<div class="description">
+	<p>値を何とかして数値化する</p>
+
+<ul>
+<li>配列は要素数</li>
+<li>int/float はそのまま（ただし $decimal に応じた型にキャストされる）</li>
+<li>resource はリソースID（php 標準の int キャスト）</li>
+<li>null/bool はその int 値（php 標準の int キャストだが $decimal を見る）</li>
+<li>それ以外（文字列・オブジェクト）は文字列表現から数値以外を取り除いたもの</li>
+</ul>
+
+<p>文字列・オブジェクト以外の変換は互換性を考慮しない。頻繁に変更される可能性がある（特に配列）。</p>
+
+<p>-記号は受け入れるが+記号は受け入れない。</p>
+
+<p>Example:</p>
+
+<pre><span class="php-comment">// 配列は要素数となる</span>
+<span class="php-keyword2">assert</span>(numberify([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>])       === <span class="php-num">3</span>);
+<span class="php-comment">// int/float は基本的にそのまま</span>
+<span class="php-keyword2">assert</span>(numberify(<span class="php-num">123</span>)             === <span class="php-num">123</span>);
+<span class="php-keyword2">assert</span>(numberify(<span class="php-num">123.45</span>)          === <span class="php-num">123</span>);
+<span class="php-keyword2">assert</span>(numberify(<span class="php-num">123.45</span>, <span class="php-keyword1">true</span>)    === <span class="php-num">123.45</span>);
+<span class="php-comment">// 文字列は数値抽出</span>
+<span class="php-keyword2">assert</span>(numberify(<span class="php-quote">'a1b2c3'</span>)        === <span class="php-num">123</span>);
+<span class="php-keyword2">assert</span>(numberify(<span class="php-quote">'a1b2.c3'</span>, <span class="php-keyword1">true</span>) === <span class="php-num">12.3</span>);</pre>
+	</div>
+
+
+	<div class="panel panel-default">
+        <div class="panel-heading"><h2>Parameters summary</h2></div>
+		<table class="summary table table-bordered" id="parameters">
+		<tr id="$var">
+			<td class="name"><code>string</code></td>
+			<td class="value"><code><var>$var</var></code></td>
+			<td>対象の値</td>
+		</tr>
+		<tr id="$decimal">
+			<td class="name"><code>boolean</code></td>
+			<td class="value"><code><var>$decimal</var> = <span class="php-keyword1">false</span></code></td>
+			<td>小数として扱うか</td>
+		</tr>
+		</table>
+	</div>
+
+	<div class="panel panel-default">
+        <div class="panel-heading"><h2>Return value summary</h2></div>
+		<table class="summary table table-bordered" id="returns">
+		<tr>
+			<td class="name"><code>
+				integer|float
+			</code></td>
+			<td>
+				数値化した値
+			</td>
+		</tr>
+		</table>
+	</div>
+
+
+	<div class="alert alert-info">
+		
+		<b>Package:</b> <a href="package-Var.html">Var</a><br>
+		<b>Located at</b>
+		<a href="source-function-numberify.html#5061-5136" title="Go to source code">
+			
+		</a><br>
+	</div>
+
+</div>
+	</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+<script src="resources/combined.js?77bf4ed6d948f5dd4dd9f6cbf1ce64bd694cd6d6"></script>
+<script src="elementlist.js?a01d666e5cb4bdfd24188cd5c0407b15900cc441"></script>
+</body>
+</html>
