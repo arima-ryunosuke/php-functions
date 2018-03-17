@@ -10,6 +10,49 @@
 
 - no todo
 
+## 1.1.0
+
+- [*change] 対応バージョンを 5.6 以降に変更
+- [*change] クラスベースに変更
+- [feature] クラスごとエクスポートに対応
+- [*change] 読み込みクラスを Transporter にリネーム
+- [*change][Classobj] has_class_methods を削除
+- [feature][Classobj] detect_namespace を追加
+- [feature][Strings] str_subreplace を追加
+- [feature][Strings] str_between を追加
+- [feature][Vars] numberify を追加
+- [feature][Vars] var_type を追加
+- [fixbug][Vars] var_export2 の位置合わせを修正
+- [feature][FileSystem] dirname_r を追加
+- [feature][FileSystem] path_normalize を追加
+- [feature][FileSystem] path_resolve を追加
+- [feature][FileSystem] path_is_absolute を追加
+- [feature][Syntax] try_finally を追加
+- [change][Syntax] try_* 系の引数を指定可能に変更
+- [feature][Arrays] array_set の配列対応
+- [feature][Arrays] array_strpad を追加
+- [feature][Arrays] array_sprintf を追加
+- [feature][Arrays] array_implode を追加
+- [feature][Arrays] array_shuffle を追加
+- [feature][Arrays] array_maps を追加
+- [feature][Arrays] array_find を追加
+- [feature][Arrays] in_array_and を追加
+- [feature][Arrays] in_array_or を追加
+- [change][Arrays] array_exists を deprecated
+- [feature][Utility] cache のキャッシュ削除機能を追加
+- [feature][Math] Math を追加
+  - minimun
+  - maximum
+  - mode
+  - mean
+  - median
+  - average
+  - sum
+  - random_at
+  - probability
+- [*change][Arrays] array_convert のコールバック引数を変更
+  - キー, 値, 元配列, 大本配列 -> キー, 値, 今まで処理したキー配列
+
 ## 1.0.7
 
 - [feature][strings] preg_capture 追加

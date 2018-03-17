@@ -22,13 +22,15 @@ php-function
 require __DIR__ . '/vendor/autoload.php';
 
 // グローバルへ展開
-\ryunosuke\Functions\Loader::importAsGlobal();
+\ryunosuke\Functions\Transporter::importAsGlobal();
 // 名前空間へ展開
-\ryunosuke\Functions\Loader::importAsNamespace();
+\ryunosuke\Functions\Transporter::importAsNamespace();
+// クラス定数のみインポート
+\ryunosuke\Functions\Transporter::importAsClass();
 ```
 
-グローバル展開はまさにグローバルへ展開されます。
-名前空間展開は `\ryunosuke\Functions\functionname` で定義されます。
+`importAsGlobal` はまさにグローバルへ展開されます。
+`importAsNamespace` は `\ryunosuke\Functions\functionname` で定義されます。
 
 php 5.6 未満だと関数の use が出来ないのでグローバルのほうが利便性があるでしょう。
 5.6 以降なら名前空間の方がいいでしょう（use が増えますけど）。
@@ -49,6 +51,9 @@ php 5.6 未満だと関数の use が出来ないのでグローバルのほう�
 また、 `importAsGlobal` `importAsNamespace` の第2引数でインポートしない関数を指定できます。
 万が一標準関数で同じ名前のものが定義されたら個別指定で除外することが可能です。
 
+`importAsClass` はクラス定数のみインポートします。
+関数ベースではなく、 `Arrays::arrayize` のような静的メソッドでの使用になります。
+
 ### export
 
 下記のようにすると指定ディレクトリへ指定名前空間でファイル自体が吐き出されます。
@@ -57,14 +62,19 @@ php 5.6 未満だと関数の use が出来ないのでグローバルのほう�
 require __DIR__ . '/vendor/autoload.php';
 
 // 任意の名前空間へ出力
-\ryunosuke\Functions\Loader::exportToNamespace('/path/to/namespace', 'vendor\\Functions');
+\ryunosuke\Functions\Transporter::exportFunction('namespace');
+// 任意の名前空間へクラスとして出力
+\ryunosuke\Functions\Transporter::exportFunction('namespace', true, '/dir/to/export');
 ```
 
 あとはプロジェクト固有の include.php などで吐き出したファイルを読み込めば OK です。
 これの利点は名前空間を変更できる点と、管理下のディレクトリに吐き出せることでカスタムができる点です。
 逆に言えば既存の処理しか使わないなら任意名前空間に吐き出すメリットはあまりありません。
 
-名前空間 export を使うと後述のキャッシュはほぼ無効になります（リクエスト中はキャッシュされるがリクエストをまたいだキャッシュは無効になる）。
+名前空間エクスポートを使うと後述のキャッシュはほぼ無効になります（リクエスト中はキャッシュされるがリクエストをまたいだキャッシュは無効になる）。
+
+クラスとして出力すると完全に別個のクラスとして動作します（実質的にはコピーして名前空間を変更しているようなものです）。
+依存を増やしたくないときに有用です。
 
 ### constant
 
@@ -76,7 +86,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 use const ryunosuke\Functions\strcat;
 
-\ryunosuke\Functions\Loader::importAsNamespace();
+\ryunosuke\Functions\Transporter::importAsNamespace();
 
 // しんどい
 array_map('\\ryunosuke\\Functions\\strcat', ['something array']);
@@ -103,14 +113,10 @@ initialize に渡すオブジェクトは PSR-16 の simple-cache 実装オブ�
 
 ## Development
 
-基本的に触るのは `src/package` 以下のみです。他の似たようなファイルは自動生成です。
+基本的に触るのは `src/Package` 以下のみです。他の似たようなファイルは自動生成です。
 
 同じ関数があちこちにバラけるので、IDE によるジャンプが活かせません。
-phpstorm 等なら下記のディレクトリを Exclude するといいでしょう。
-
-- src/global
-- src/namespace
-- tests/namespace
+phpstorm 等なら 'include' を Exclude するといいでしょう。
 
 composer subcommand として下記が定義されています。
 
