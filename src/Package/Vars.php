@@ -326,12 +326,13 @@ class Vars
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $maxlen = max(array_map('strlen', array_keys($value)));
+                $values = call_user_func(array_map_key, $value, $var_export);
+                $maxlen = max(array_map('strlen', array_keys($values)));
                 $kvl = '';
                 $parents[] = $value;
-                foreach ($value as $k => $v) {
+                foreach ($values as $k => $v) {
                     $align = str_repeat(' ', $maxlen - strlen($k));
-                    $kvl .= $spacer1 . $var_export($k) . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
+                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }

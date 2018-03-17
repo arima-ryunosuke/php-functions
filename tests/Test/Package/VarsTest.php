@@ -164,6 +164,17 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $a2 = $var_export2($value, true);
         $this->assertEquals(eval("return $a1;"), eval("return $a2;"));
 
+        $this->assertSame(<<<'EXPECTED'
+[
+    '\'' . "\0" . '\'' => 123,
+    'key'              => 456,
+]
+EXPECTED
+            , $var_export2([
+                "'\0'" => 123,
+                'key'  => 456,
+            ], true));
+
         $this->expectOutputRegex('#hoge#');
         $var_export2('hoge');
     }
