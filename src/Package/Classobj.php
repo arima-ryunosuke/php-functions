@@ -47,10 +47,10 @@ class Classobj
      *
      * @package ClassObject
      *
-     * @param string $directory ディレクトリ名
+     * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
      * @return string 名前空間
      */
-    public static function detect_namespace($directory)
+    public static function detect_namespace($location)
     {
         // php をパースして名前空間部分を得るクロージャ
         $detectNS = function ($phpfile) {
@@ -78,19 +78,16 @@ class Classobj
 
         // 指定パスの兄弟ファイルを調べた後、親ディレクトリを辿っていく
         $basenames = [];
-        do {
-            $files = array_filter(glob("$directory/*.php"), 'is_file');
-            foreach ($files as $file) {
+        return call_user_func(dirname_r, $location, function ($directory) use ($detectNS, &$basenames) {
+            foreach (array_filter(glob("$directory/*.php"), 'is_file') as $file) {
                 $namespace = $detectNS($file);
                 if ($namespace !== null) {
                     $localspace = implode('\\', array_reverse($basenames));
                     return rtrim($namespace . '\\' . $localspace, '\\');
                 }
             }
-            $basenames[] = basename($directory);
-        } while (($dummy = $directory) !== $directory = dirname($directory));
-
-        throw new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.');
+            $basenames[] = pathinfo($directory, PATHINFO_FILENAME);
+        }) ?: call_user_func(throws, new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 
     /**

@@ -28,6 +28,7 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('ryunosuke\\Test\\Package\\Classobj', $detect_namespace(__DIR__ . '/Classobj'));
         $this->assertEquals('ryunosuke\\Test\\Package\\Classobj\\NS', $detect_namespace(__DIR__ . '/Classobj/NS'));
         $this->assertEquals('A\\B\\C', $detect_namespace(__DIR__ . '/Classobj/NS/Valid'));
+        $this->assertEquals('A\\B\\C\\Hoge', $detect_namespace(__DIR__ . '/Classobj/NS/Valid/Hoge.php'));
         $this->assertEquals('ryunosuke\\Functions\\Package', $detect_namespace(__DIR__ . '/../../../src/Package'));
         $this->assertException('can not detect namespace', $detect_namespace, '/a/b/c/d/e/f/g/h/i/j/k/l/m/n');
     }
