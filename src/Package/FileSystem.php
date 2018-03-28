@@ -84,9 +84,9 @@ class FileSystem
      *
      * Example:
      * <code>
-     * assert(file_extension('filename.ext')        === 'ext');
-     * assert(file_extension('filename.ext', 'txt') === 'filename.txt');
-     * assert(file_extension('filename.ext', '')    === 'filename');
+     * assertSame(file_extension('filename.ext'), 'ext');
+     * assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
+     * assertSame(file_extension('filename.ext', ''), 'filename');
      * </code>
      *
      * @package FileSystem
@@ -121,7 +121,7 @@ class FileSystem
      * Example:
      * <code>
      * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
-     * assert(file_get_contents(sys_get_temp_dir() . '/not/filename.ext') === 'hoge');
+     * assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
      * </code>
      *
      * @package FileSystem
@@ -181,7 +181,7 @@ class FileSystem
      * file_set_contents("$tmp/a/b/file.txt", 'hoge');
      * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
      * $callback = function($path){return realpath("$path/file.txt");};
-     * assert(dirname_r("$tmp/a/b/c/d/e/f", $callback) === realpath("$tmp/a/b/file.txt"));
+     * assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
      * </code>
      *
      * @package FileSystem
@@ -209,12 +209,12 @@ class FileSystem
      *
      * Example:
      * <code>
-     * assert(path_is_absolute('/absolute/path') === true);
-     * assert(path_is_absolute('relative/path')  === false);
+     * assertTrue(path_is_absolute('/absolute/path'));
+     * assertFalse(path_is_absolute('relative/path'));
      * // Windows 環境では下記も true になる
      * if (DIRECTORY_SEPARATOR === '\\') {
-     *     assert(path_is_absolute('\\absolute\\path')    === true);
-     *     assert(path_is_absolute('C:\\absolute\\path')  === true);
+     *     assertTrue(path_is_absolute('\\absolute\\path'));
+     *     assertTrue(path_is_absolute('C:\\absolute\\path'));
      * }
      * </code>
      *
@@ -247,9 +247,9 @@ class FileSystem
      * Example:
      * <code>
      * $DS = DIRECTORY_SEPARATOR;
-     * assert(path_resolve('/absolute/path') === "{$DS}absolute{$DS}path");
-     * assert(path_resolve('absolute/path')  === getcwd() . "{$DS}absolute{$DS}path");
-     * assert(path_resolve('/absolute/path/through', '../current/./path') === "{$DS}absolute{$DS}path{$DS}current{$DS}path");
+     * assertSame(path_resolve('/absolute/path'), "{$DS}absolute{$DS}path");
+     * assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
+     * assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");
      * </code>
      *
      * @package FileSystem
@@ -279,9 +279,9 @@ class FileSystem
      * Example:
      * <code>
      * $DS = DIRECTORY_SEPARATOR;
-     * assert(path_normalize('/path/to/something')                    === "{$DS}path{$DS}to{$DS}something");
-     * assert(path_normalize('/path/through/../something')            === "{$DS}path{$DS}something");
-     * assert(path_normalize('./path/current/./through/../something') === "path{$DS}current{$DS}something");
+     * assertSame(path_normalize('/path/to/something'), "{$DS}path{$DS}to{$DS}something");
+     * assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}something");
+     * assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");
      * </code>
      *
      * @package FileSystem
@@ -323,7 +323,7 @@ class FileSystem
      * <code>
      * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
      * rm_rf(sys_get_temp_dir() . '/new');
-     * assert(file_exists(sys_get_temp_dir() . '/new') === false);
+     * assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
      * </code>
      *
      * @package FileSystem

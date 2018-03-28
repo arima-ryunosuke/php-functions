@@ -16,10 +16,10 @@ class Classobj
      * <code>
      * // 基本的には object キャストと同じ
      * $fields = ['a' => 'A', 'b' => 'B'];
-     * assert(stdclass($fields) == (object) $fields);
+     * assertEquals(stdclass($fields), (object) $fields);
      * // ただしこういうことはキャストでは出来ない
-     * assert(array_map('stdclass', [$fields]) == [(object) $fields]); // コールバックとして利用する
-     * assert(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+     * assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
+     * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
      * </code>
      *
      * @package ClassObject
@@ -100,7 +100,7 @@ class Classobj
      *
      * Example:
      * <code>
-     * assert(class_loader() instanceof \Composer\Autoload\ClassLoader);
+     * assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
      * </code>
      *
      * @package ClassObject
@@ -132,7 +132,7 @@ class Classobj
      *
      * Example:
      * <code>
-     * assert(class_namespace('vendor\\namespace\\ClassName') === 'vendor\\namespace');
+     * assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
      * </code>
      *
      * @package ClassObject
@@ -156,7 +156,7 @@ class Classobj
      *
      * Example:
      * <code>
-     * assert(class_shorten('vendor\\namespace\\ClassName') === 'ClassName');
+     * assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
      * </code>
      *
      * @package ClassObject

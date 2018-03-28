@@ -57,14 +57,14 @@ class Vars
      * Example:
      * <code>
      * // 配列は要素数となる
-     * assert(numberify([1, 2, 3])       === 3);
+     * assertSame(numberify([1, 2, 3]), 3);
      * // int/float は基本的にそのまま
-     * assert(numberify(123)             === 123);
-     * assert(numberify(123.45)          === 123);
-     * assert(numberify(123.45, true)    === 123.45);
+     * assertSame(numberify(123), 123);
+     * assertSame(numberify(123.45), 123);
+     * assertSame(numberify(123.45, true), 123.45);
      * // 文字列は数値抽出
-     * assert(numberify('a1b2c3')        === 123);
-     * assert(numberify('a1b2.c3', true) === 12.3);
+     * assertSame(numberify('a1b2c3'), 123);
+     * assertSame(numberify('a1b2.c3', true), 12.3);
      * </code>
      *
      * @package Var
@@ -130,12 +130,12 @@ class Vars
      *
      * Example:
      * <code>
-     * assert(is_primitive(null)          === true);
-     * assert(is_primitive(false)         === true);
-     * assert(is_primitive(123)           === true);
-     * assert(is_primitive(STDIN)         === true);
-     * assert(is_primitive(new \stdClass) === false);
-     * assert(is_primitive(['array'])     === false);
+     * assertTrue(is_primitive(null));
+     * assertTrue(is_primitive(false));
+     * assertTrue(is_primitive(123));
+     * assertTrue(is_primitive(STDIN));
+     * assertFalse(is_primitive(new \stdClass));
+     * assertFalse(is_primitive(['array']));
      * </code>
      *
      * @package Var
@@ -156,11 +156,11 @@ class Vars
      * // 配列の再帰
      * $array = [];
      * $array['recursive'] = &$array;
-     * assert(is_recursive($array)  === true);
+     * assertTrue(is_recursive($array));
      * // オブジェクトの再帰
      * $object = new \stdClass();
      * $object->recursive = $object;
-     * assert(is_recursive($object) === true);
+     * assertTrue(is_recursive($object));
      * </code>
      *
      * @package Var
@@ -207,13 +207,13 @@ class Vars
      * Example:
      * <code>
      * // プリミティブ型は gettype と同義
-     * assert(var_type(false)      === 'boolean');
-     * assert(var_type(123)        === 'integer');
-     * assert(var_type(3.14)       === 'double');
-     * assert(var_type([1, 2, 3])  === 'array');
+     * assertSame(var_type(false), 'boolean');
+     * assertSame(var_type(123), 'integer');
+     * assertSame(var_type(3.14), 'double');
+     * assertSame(var_type([1, 2, 3]), 'array');
      * // オブジェクトは型名を返す
-     * assert(var_type(new \stdClass)    === '\\stdClass');
-     * assert(var_type(new \Exception()) === '\\Exception');
+     * assertSame(var_type(new \stdClass), '\\stdClass');
+     * assertSame(var_type(new \Exception()), '\\Exception');
      * </code>
      *
      * @package Var
@@ -244,7 +244,7 @@ class Vars
      * Example:
      * <code>
      * // 単純なエクスポート
-     * assert(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true) === "[
+     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), "[
      *     'array' => [1, 2, 3],
      *     'hash'  => [
      *         'a' => 'A',
@@ -259,7 +259,7 @@ class Vars
      * $robject->a = new \stdClass();
      * $robject->a->b = new \stdClass();
      * $robject->a->b->c = $robject;
-     * assert(var_export2(compact('rarray', 'robject'), true) === "[
+     * assertSame(var_export2(compact('rarray', 'robject'), true), "[
      *     'rarray'  => [
      *         'a' => [
      *             'b' => [
@@ -418,7 +418,7 @@ class Vars
      * <code>
      * $hoge = 'HOGE';
      * $fuga = 'FUGA';
-     * assert(hashvar($hoge, $fuga) === ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * assertSame(hashvar($hoge, $fuga), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
      * </code>
      *
      * @package Var

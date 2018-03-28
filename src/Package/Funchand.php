@@ -68,7 +68,7 @@ class Funchand
      * Example:
      * <code>
      * $bind = nbind('sprintf', 2, 'X');
-     * assert($bind('%s%s%s', 'N', 'N') === 'NXN');
+     * assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
      * </code>
      *
      * @package Callable
@@ -91,7 +91,7 @@ class Funchand
      * Example:
      * <code>
      * $bind = lbind('sprintf', '%s%s');
-     * assert($bind('N', 'M') === 'NM');
+     * assertSame($bind('N', 'M'), 'NM');
      * </code>
      *
      * @package Callable
@@ -111,7 +111,7 @@ class Funchand
      * Example:
      * <code>
      * $bind = rbind('sprintf', 'X');
-     * assert($bind('%s%s', 'N') === 'NX');
+     * assertSame($bind('%s%s', 'N'), 'NX');
      * </code>
      *
      * @package Callable
@@ -148,7 +148,7 @@ class Funchand
      * $composite = composite(false, $add5, $mul3, $split, $union);// 上記を合成したクロージャ
      * // false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）
      * // 7 + 5 -> 12 |> 12 * 3 -> 36 |> 36 -> [3, 6] |> 3 + 6 |> 9
-     * assert($composite(7) === 9);
+     * assertSame($composite(7), 9);
      *
      * $upper = function ($s) { return [$s, strtoupper($s)]; };   // 来た値と大文字化したものを配列で返すクロージャ
      * $prefix = function ($s, $S) { return 'pre-' . $s . $S; };  // 来た値を結合して'pre-'を付けるクロージャ
@@ -157,7 +157,7 @@ class Funchand
      * $composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成したクロージャ
      * // true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
      * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
-     * assert($composite('hoge') === 'EGOHegoh-erp');
+     * assertSame($composite('hoge'), 'EGOHegoh-erp');
      * </code>
      *
      * @package Callable
@@ -203,9 +203,9 @@ class Funchand
      * Example:
      * <code>
      * $arg0 = return_arg(0);
-     * assert($arg0('hoge')          === 'hoge');
+     * assertSame($arg0('hoge'), 'hoge');
      * $arg1 = return_arg(1);
-     * assert($arg1('dummy', 'hoge') === 'hoge');
+     * assertSame($arg1('dummy', 'hoge'), 'hoge');
      * </code>
      *
      * @package Callable
@@ -230,8 +230,8 @@ class Funchand
      * Example:
      * <code>
      * $not_strlen = not_func('strlen');
-     * assert($not_strlen('hoge') === false);
-     * assert($not_strlen('')     === true);
+     * assertFalse($not_strlen('hoge'));
+     * assertTrue($not_strlen(''));
      * </code>
      *
      * @package Callable
@@ -255,7 +255,7 @@ class Funchand
      * Example:
      * <code>
      * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
-     * assert($evalfunc(1, 2, 3) === 6);
+     * assertSame($evalfunc(1, 2, 3), 6);
      * </code>
      *
      * @package Callable
@@ -280,8 +280,8 @@ class Funchand
      *
      * Example:
      * <code>
-     * assert(reflect_callable('sprintf')        instanceof \ReflectionFunction);
-     * assert(reflect_callable('\Closure::bind') instanceof \ReflectionMethod);
+     * assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
+     * assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
      * </code>
      *
      * @package Callable
@@ -318,8 +318,8 @@ class Funchand
      * Example:
      * <code>
      * $sprintf = closurize('sprintf');
-     * assert($sprintf                            instanceof \Closure);
-     * assert($sprintf('%s %s', 'hello', 'world') ===        'hello world');
+     * assertInstanceof(\Closure::class, $sprintf);
+     * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
      * </code>
      *
      * @package Callable
@@ -355,7 +355,7 @@ class Funchand
      *     call_safely(function(){return $v;});
      * }
      * catch (\Exception $ex) {
-     *     assert($ex->getMessage() === 'Undefined variable: v');
+     *     assertSame($ex->getMessage(), 'Undefined variable: v');
      * }
      * </code>
      *
@@ -390,7 +390,7 @@ class Funchand
      *
      * Example:
      * <code>
-     * assert(ob_capture(function(){echo 123;}) === '123');
+     * assertSame(ob_capture(function(){echo 123;}), '123');
      * </code>
      *
      * @package Callable
@@ -422,9 +422,9 @@ class Funchand
      * Example:
      * <code>
      * // trim の引数は2つ
-     * assert(parameter_length('trim')       === 2);
+     * assertSame(parameter_length('trim'), 2);
      * // trim の必須引数は1つ
-     * assert(parameter_length('trim', true) === 1);
+     * assertSame(parameter_length('trim', true), 1);
      * </code>
      *
      * @package Callable
@@ -495,7 +495,7 @@ class Funchand
      * <code>
      * // strlen に2つの引数を渡してもエラーにならない
      * $strlen = func_user_func_array('strlen');
-     * assert($strlen('abc', null)       === 3);
+     * assertSame($strlen('abc', null), 3);
      * </code>
      *
      * @package Callable
@@ -529,7 +529,7 @@ class Funchand
      * <code>
      * // trim のエイリアス
      * function_alias('trim', 'trim_alias');
-     * assert(trim_alias(' abc ') === 'abc');
+     * assertSame(trim_alias(' abc '), 'abc');
      * </code>
      *
      * @package Callable

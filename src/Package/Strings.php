@@ -9,7 +9,7 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(strcat('a', 'b', 'c') === 'abc');
+     * assertSame(strcat('a', 'b', 'c'), 'abc');
      * </code>
      *
      * @package String
@@ -33,9 +33,9 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(split_noempty(',', 'a, b, c')            === ['a', 'b', 'c']);
-     * assert(split_noempty(',', 'a, , , b, c')        === ['a', 'b', 'c']);
-     * assert(split_noempty(',', 'a, , , b, c', false) === ['a', ' ', ' ', ' b', ' c']);
+     * assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
+     * assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
+     * assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
      * </code>
      *
      * @package String
@@ -68,9 +68,9 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(str_equals('abc', 'abc')       === true);
-     * assert(str_equals('abc', 'ABC', true) === true);
-     * assert(str_equals('\0abc', '\0abc')   === true);
+     * assertTrue(str_equals('abc', 'abc'));
+     * assertTrue(str_equals('abc', 'ABC', true));
+     * assertTrue(str_equals('\0abc', '\0abc'));
      * </code>
      *
      * @package String
@@ -107,10 +107,10 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(str_contains('abc', 'b')                      === true);
-     * assert(str_contains('abc', 'B', true)                === true);
-     * assert(str_contains('abc', ['b', 'x'], false, false) === true);
-     * assert(str_contains('abc', ['b', 'x'], false, true)  === false);
+     * assertTrue(str_contains('abc', 'b'));
+     * assertTrue(str_contains('abc', 'B', true));
+     * assertTrue(str_contains('abc', ['b', 'x'], false, false));
+     * assertFalse(str_contains('abc', ['b', 'x'], false, true));
      * </code>
      *
      * @package String
@@ -153,9 +153,9 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(str_putcsv(['a', 'b', 'c'])             === "a,b,c");
-     * assert(str_putcsv(['a', 'b', 'c'], "\t")       === "a\tb\tc");
-     * assert(str_putcsv(['a', ' b ', 'c'], " ", "'") === "a ' b ' c");
+     * assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
+     * assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
+     * assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
      * </code>
      *
      * @package String
@@ -207,11 +207,11 @@ class Strings
      * Example:
      * <code>
      * // 1番目（0ベースなので2番目）の x を X に置換
-     * assert(str_subreplace('xxx', 'x', [1 => 'X'])                === 'xXx');
+     * assertSame(str_subreplace('xxx', 'x', [1 => 'X']), 'xXx');
      * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
-     * assert(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']) === '!XaxXz!');
+     * assertSame(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']), '!XaxXz!');
      * // 置換結果は置換対象にならない
-     * assert(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X'])    === 'xxxXx');
+     * assertSame(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']), 'xxxXx');
      * </code>
      *
      * @package String
@@ -279,11 +279,11 @@ class Strings
      * <code>
      * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
      * $n = 0;
-     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'first');
-     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'second');
-     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'third');
+     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
+     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
+     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
      * // ネストしている場合は最も外側を返す
-     * assert(str_between('{nest1{nest2{nest3}}}', '{', '}') === 'nest1{nest2{nest3}}');
+     * assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
      * </code>
      *
      * @package String
@@ -343,9 +343,9 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(starts_with('abcdef', 'abc')       === true);
-     * assert(starts_with('abcdef', 'ABC', true) === true);
-     * assert(starts_with('abcdef', 'xyz')       === false);
+     * assertTrue(starts_with('abcdef', 'abc'));
+     * assertTrue(starts_with('abcdef', 'ABC', true));
+     * assertFalse(starts_with('abcdef', 'xyz'));
      * </code>
      *
      * @package String
@@ -369,9 +369,9 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(ends_with('abcdef', 'def')       === true);
-     * assert(ends_with('abcdef', 'DEF', true) === true);
-     * assert(ends_with('abcdef', 'xyz')       === false);
+     * assertTrue(ends_with('abcdef', 'def'));
+     * assertTrue(ends_with('abcdef', 'DEF', true));
+     * assertFalse(ends_with('abcdef', 'xyz'));
      * </code>
      *
      * @package String
@@ -395,7 +395,7 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(camel_case('this_is_a_pen') === 'thisIsAPen');
+     * assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
      * </code>
      *
      * @package String
@@ -414,7 +414,7 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(pascal_case('this_is_a_pen') === 'ThisIsAPen');
+     * assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
      * </code>
      *
      * @package String
@@ -433,7 +433,7 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(snake_case('ThisIsAPen') === 'this_is_a_pen');
+     * assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
      * </code>
      *
      * @package String
@@ -452,7 +452,7 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(chain_case('ThisIsAPen') === 'this-is-a-pen');
+     * assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
      * </code>
      *
      * @package String
@@ -539,7 +539,7 @@ class Strings
      *
      * Example:
      * <code>
-     * assert(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']) === 'ThisIs 3');
+     * assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']), 'ThisIs 3');
      * </code>
      *
      * @package String
@@ -584,11 +584,11 @@ class Strings
      * $pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
      * $default = [1 => '2000', 2 => '1', 4 => '1'];
      * // 完全にマッチするのでそれぞれ返ってくる
-     * assert(preg_capture($pattern, '2014/12/24', $default) === [1 => '2014', 2 => '12', 4 => '24']);
+     * assertSame(preg_capture($pattern, '2014/12/24', $default), [1 => '2014', 2 => '12', 4 => '24']);
      * // 最後の \d{1,2} はマッチしないのでデフォルト値が使われる
-     * assert(preg_capture($pattern, '2014/12', $default)    === [1 => '2014', 2 => '12', 4 => '1']);
+     * assertSame(preg_capture($pattern, '2014/12', $default), [1 => '2014', 2 => '12', 4 => '1']);
      * // 一切マッチしないので全てデフォルト値が使われる
-     * assert(preg_capture($pattern, 'hoge', $default)       === [1 => '2000', 2 => '1', 4 => '1']);
+     * assertSame(preg_capture($pattern, 'hoge', $default), [1 => '2000', 2 => '1', 4 => '1']);
      * </code>
      *
      * @package String
@@ -631,14 +631,14 @@ class Strings
      * Example:
      * <code>
      * // 数値キーが参照できる
-     * assert(render_string('${0}', ['number'])                                          === 'number');
+     * assertSame(render_string('${0}', ['number']), 'number');
      * // クロージャは呼び出し結果が埋め込まれる
-     * assert(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]) === 'c-closure');
+     * assertSame(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]), 'c-closure');
      * // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
-     * assert(render_string('{$_(123 + 456)}', [])                                       === '579');
+     * assertSame(render_string('{$_(123 + 456)}', []), '579');
      * // 要するに '$_()' の中に php の式が書けるようになる
-     * assert(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']])  === 'a,n,z');
-     * assert(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]])                   === '9');
+     * assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']]), 'a,n,z');
+     * assertSame(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]), '9');
      * </code>
      *
      * @package String

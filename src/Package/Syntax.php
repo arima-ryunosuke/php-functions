@@ -12,7 +12,7 @@ class Syntax
      * Example:
      * <code>
      * $object = new \stdClass();
-     * assert(returns($object) === $object);
+     * assertSame(returns($object), $object);
      * </code>
      *
      * @package Syntax
@@ -39,24 +39,24 @@ class Syntax
      * // null を返すかもしれないステートメント
      * $getobject = function () {return null;};
      * // メソッド呼び出しは null を返す
-     * assert(optional($getobject())->method()          === null);
+     * assertSame(optional($getobject())->method(), null);
      * // プロパティアクセスは null を返す
-     * assert(optional($getobject())->property          === null);
+     * assertSame(optional($getobject())->property, null);
      * // empty は true を返す
-     * assert(empty(optional($getobject())->nothing)    === true);
+     * assertSame(empty(optional($getobject())->nothing), true);
      * // __isset は false を返す
-     * assert(isset(optional($getobject())->nothing)    === false);
+     * assertSame(isset(optional($getobject())->nothing), false);
      * // __toString は '' を返す
-     * assert(strval(optional($getobject()))            === '');
+     * assertSame(strval(optional($getobject())), '');
      * // __invoke は null を返す
-     * assert(call_user_func(optional($getobject()))    === null);
+     * assertSame(call_user_func(optional($getobject())), null);
      * // 配列アクセスは null を返す
-     * assert($getobject()['hoge']                      === null);
+     * assertSame($getobject()['hoge'], null);
      * // 空イテレータを返す
-     * assert(iterator_to_array(optional($getobject())) === []);
+     * assertSame(iterator_to_array(optional($getobject())), []);
      *
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
-     * assert(optional(new \ArrayObject([1]), 'stdClass')->count() === null);
+     * assertSame(optional(new \ArrayObject([1]), 'stdClass')->count(), null);
      * </code>
      *
      * @package Syntax
@@ -112,7 +112,7 @@ NO;
      *     throws(new \Exception('throws'));
      * }
      * catch (\Exception $ex) {
-     *     assert($ex->getMessage() === 'throws');
+     *     assertSame($ex->getMessage(), 'throws');
      * }
      * </code>
      *
@@ -139,11 +139,11 @@ NO;
      * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
      * $heavyfunc = function($v){return $v;};
      * // $heavyfunc(1) ?? 'default' とほぼ同義
-     * assert(ifelse($heavyfunc(1), false, 'default')     === $heavyfunc(1));
+     * assertSame(ifelse($heavyfunc(1), false, 'default'), $heavyfunc(1));
      * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-     * assert(ifelse($heavyfunc(null), false, 'default')  === $heavyfunc(null));
+     * assertSame(ifelse($heavyfunc(null), false, 'default'), $heavyfunc(null));
      * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
-     * assert(ifelse($heavyfunc(false), false, 'default') === 'default');
+     * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
      * </code>
      *
      * @package Syntax
@@ -176,10 +176,10 @@ NO;
      * <code>
      * // 例外が飛ばない場合は平和極まりない
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assert(try_catch($try, null, 1, 2, 3) === [1, 2, 3]);
+     * assertSame(try_catch($try, null, 1, 2, 3), [1, 2, 3]);
      * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
      * $try = function(){throw new \Exception('tried');};
-     * assert(try_catch($try)->getMessage() === 'tried');
+     * assertSame(try_catch($try)->getMessage(), 'tried');
      * </code>
      *
      * @package Syntax
@@ -205,12 +205,12 @@ NO;
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assert(try_finally($try, $finally, 1, 2, 3) === [1, 2, 3]);
-     * assert($finally_count                       === 1); // 呼ばれている
+     * assertSame(try_finally($try, $finally, 1, 2, 3), [1, 2, 3]);
+     * assertSame($finally_count, 1); // 呼ばれている
      * // 例外は投げっぱなすが、 $finally は実行される
      * $try = function(){throw new \Exception('tried');};
      * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
-     * assert($finally_count                       === 2); // 呼ばれている
+     * assertSame($finally_count, 2); // 呼ばれている
      * </code>
      *
      * @package Syntax
@@ -236,12 +236,12 @@ NO;
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)               === [1, 2, 3]);
-     * assert($finally_count                                                 === 1); // 呼ばれている
+     * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3), [1, 2, 3]);
+     * assertSame($finally_count, 1); // 呼ばれている
      * // 例外を投げるが、 $catch で握りつぶす
      * $try = function(){throw new \Exception('tried');};
-     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage() === 'tried');
-     * assert($finally_count                                                 === 2); // 呼ばれている
+     * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage(), 'tried');
+     * assertSame($finally_count, 2); // 呼ばれている
      * </code>
      *
      * @package Syntax

@@ -21,11 +21,11 @@ class Utility
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
      * $rand1 = cache('rand', $provider);
      * $rand2 = cache('rand', $provider);
-     * assert($rand1 === $rand2);
+     * assertSame($rand1, $rand2);
      * // $provider に null を与えると削除される
      * cache('rand', null);
      * $rand3 = cache('rand', $provider);
-     * assert($rand1 !== $rand3);
+     * assertNotSame($rand1, $rand3);
      * </code>
      *
      * @package Utility

@@ -13,10 +13,10 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(arrayize(1, 2, 3)                   === [1, 2, 3]);
-     * assert(arrayize([1], [2], [3])             === [1, 2, 3]);
+     * assertSame(arrayize(1, 2, 3), [1, 2, 3]);
+     * assertSame(arrayize([1], [2], [3]), [1, 2, 3]);
      * $object = new \stdClass();
-     * assert(arrayize($object, false, [1, 2, 3]) === [$object, false, 1, 2, 3]);
+     * assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
      * </code>
      *
      * @package Array
@@ -43,9 +43,9 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(is_hasharray([])           === false);
-     * assert(is_hasharray([1, 2, 3])    === false);
-     * assert(is_hasharray(['x' => 'X']) === true);
+     * assertFalse(is_hasharray([]));
+     * assertFalse(is_hasharray([1, 2, 3]));
+     * assertTrue(is_hasharray(['x' => 'X']));
      * </code>
      *
      * @package Array
@@ -71,8 +71,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(first_key(['a', 'b', 'c']) === 0);
-     * assert(first_key([], 999)         === 999);
+     * assertSame(first_key(['a', 'b', 'c']), 0);
+     * assertSame(first_key([], 999), 999);
      * </code>
      *
      * @package Array
@@ -98,8 +98,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(first_value(['a', 'b', 'c']) === 'a');
-     * assert(first_value([], 999)         === 999);
+     * assertSame(first_value(['a', 'b', 'c']), 'a');
+     * assertSame(first_value([], 999), 999);
      * </code>
      *
      * @package Array
@@ -125,8 +125,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(first_keyvalue(['a', 'b', 'c']) === [0, 'a']);
-     * assert(first_keyvalue([], 999)         === 999);
+     * assertSame(first_keyvalue(['a', 'b', 'c']), [0, 'a']);
+     * assertSame(first_keyvalue([], 999), 999);
      * </code>
      *
      * @package Array
@@ -150,8 +150,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(last_key(['a', 'b', 'c']) === 2);
-     * assert(last_key([], 999)         === 999);
+     * assertSame(last_key(['a', 'b', 'c']), 2);
+     * assertSame(last_key([], 999), 999);
      * </code>
      *
      * @package Array
@@ -177,8 +177,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(last_value(['a', 'b', 'c']) === 'c');
-     * assert(last_value([], 999)         === 999);
+     * assertSame(last_value(['a', 'b', 'c']), 'c');
+     * assertSame(last_value([], 999), 999);
      * </code>
      *
      * @package Array
@@ -204,8 +204,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(last_keyvalue(['a', 'b', 'c']) === [2, 'c']);
-     * assert(last_keyvalue([], 999)         === 999);
+     * assertSame(last_keyvalue(['a', 'b', 'c']), [2, 'c']);
+     * assertSame(last_keyvalue([], 999), 999);
      * </code>
      *
      * @package Array
@@ -238,11 +238,11 @@ class Arrays
      * <code>
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの前は 'a'
-     * assert(prev_key($array, 'b') === 'a');
+     * assertSame(prev_key($array, 'b'), 'a');
      * // 'a' キーの前は無いので null
-     * assert(prev_key($array, 'a') === null);
+     * assertSame(prev_key($array, 'a'), null);
      * // 'x' キーはそもそも存在しないので false
-     * assert(prev_key($array, 'x') === false);
+     * assertSame(prev_key($array, 'x'), false);
      * </code>
      *
      * @package Array
@@ -277,13 +277,13 @@ class Arrays
      * <code>
      * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの次は 'c'
-     * assert(next_key($array, 'b') === 'c');
+     * assertSame(next_key($array, 'b'), 'c');
      * // 'c' キーの次は無いので null
-     * assert(next_key($array, 'c') === null);
+     * assertSame(next_key($array, 'c'), null);
      * // 'x' キーはそもそも存在しないので false
-     * assert(next_key($array, 'x') === false);
+     * assertSame(next_key($array, 'x'), false);
      * // 次に生成されるキーは 10
-     * assert(next_key($array, null) === 10);
+     * assertSame(next_key($array, null), 10);
      * </code>
      *
      * @package Array
@@ -328,9 +328,9 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(in_array_and([1], [1, 2, 3])    === true);
-     * assert(in_array_and([9], [1, 2, 3])    === false);
-     * assert(in_array_and([1, 9], [1, 2, 3]) === false);
+     * assertTrue(in_array_and([1], [1, 2, 3]));
+     * assertFalse(in_array_and([9], [1, 2, 3]));
+     * assertFalse(in_array_and([1, 9], [1, 2, 3]));
      * </code>
      *
      * @package Array
@@ -365,9 +365,9 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(in_array_or([1], [1, 2, 3])    === true);
-     * assert(in_array_or([9], [1, 2, 3])    === false);
-     * assert(in_array_or([1, 9], [1, 2, 3]) === true);
+     * assertTrue(in_array_or([1], [1, 2, 3]), true);
+     * assertFalse(in_array_or([9], [1, 2, 3]), false);
+     * assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
      * </code>
      *
      * @package Array
@@ -398,9 +398,9 @@ class Arrays
      * Example:
      * <code>
      * // ただの加算の関数版なので同じキーは上書きされない
-     * assert(array_add(['a', 'b', 'c'], ['X'])        === ['a', 'b', 'c']);
+     * assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
      * // 異なるキーは生える
-     * assert(array_add(['a', 'b', 'c'], ['x' => 'X']) === ['a', 'b', 'c', 'x' => 'X']);
+     * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
      * </code>
      *
      * @package Array
@@ -428,9 +428,9 @@ class Arrays
      * Example:
      * <code>
      * // (配列, 要素) の呼び出し
-     * assert(array_implode(['a', 'b', 'c'], 'X') === ['a', 'X', 'b', 'X', 'c']);
+     * assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
      * // (要素, ...配列) の呼び出し
-     * assert(array_implode('X', 'a', 'b', 'c')   === ['a', 'X', 'b', 'X', 'c']);
+     * assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
      * </code>
      *
      * @package Array
@@ -473,12 +473,12 @@ class Arrays
      * <code>
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // key, value を利用した sprintf
-     * assert(array_sprintf($array, '%2$s=%1$s')      === ['key1=val1', 'key2=val2']);
+     * assertSame(array_sprintf($array, '%2$s=%1$s'), ['key1=val1', 'key2=val2']);
      * // 第3引数を与えるとさらに implode される
-     * assert(array_sprintf($array, '%2$s=%1$s', ' ') === 'key1=val1 key2=val2');
+     * assertSame(array_sprintf($array, '%2$s=%1$s', ' '), 'key1=val1 key2=val2');
      * // クロージャを与えるとコールバック動作になる
      * $closure = function($v, $k){return "$k=" . strtoupper($v);};
-     * assert(array_sprintf($array, $closure, ' ')    === 'key1=VAL1 key2=VAL2');
+     * assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
      * </code>
      *
      * @package Array
@@ -520,9 +520,9 @@ class Arrays
      * <code>
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // キーにプレフィックス付与
-     * assert(array_strpad($array, 'prefix-')       === ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
+     * assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
      * // 値にサフィックス付与
-     * assert(array_strpad($array, '', ['-suffix']) === ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
+     * assertSame(array_strpad($array, '', ['-suffix']), ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
      * </code>
      *
      * @package Array
@@ -559,10 +559,10 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_pos([1, 2, 3], 1)                                  === 2);
-     * assert(array_pos([1, 2, 3], -1)                                 === 3);
-     * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1)       === 'B');
-     * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true) === 'b');
+     * assertSame(array_pos([1, 2, 3], 1), 2);
+     * assertSame(array_pos([1, 2, 3], -1), 3);
+     * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1), 'B');
+     * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true), 'b');
      * </code>
      *
      * @package Array
@@ -608,7 +608,7 @@ class Arrays
      * Example:
      * <code>
      * $fuga_of_array = array_of('fuga');
-     * assert($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']) === 'FUGA');
+     * assertSame($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']), 'FUGA');
      * </code>
      *
      * @package Array
@@ -642,15 +642,15 @@ class Arrays
      * Example:
      * <code>
      * // 単純取得
-     * assert(array_get(['a', 'b', 'c'], 1)      === 'b');
+     * assertSame(array_get(['a', 'b', 'c'], 1), 'b');
      * // 単純デフォルト
-     * assert(array_get(['a', 'b', 'c'], 9, 999) === 999);
+     * assertSame(array_get(['a', 'b', 'c'], 9, 999), 999);
      * // 配列取得
-     * assert(array_get(['a', 'b', 'c'], [0, 2]) === [0 => 'a', 2 => 'c']);
+     * assertSame(array_get(['a', 'b', 'c'], [0, 2]), [0 => 'a', 2 => 'c']);
      * // 配列部分取得
-     * assert(array_get(['a', 'b', 'c'], [0, 9]) === [0 => 'a']);
+     * assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 => 'a']);
      * // 配列デフォルト（null ではなく [] を返す）
-     * assert(array_get(['a', 'b', 'c'], [9])    === []);
+     * assertSame(array_get(['a', 'b', 'c'], [9]), []);
      * </code>
      *
      * @package Array
@@ -696,15 +696,15 @@ class Arrays
      * <code>
      * $array = ['a' => 'A', 'B'];
      * // 第3引数省略（最後に連番キーで設定）
-     * assert(array_set($array, 'Z') === 1);
-     * assert($array                 === ['a' => 'A', 'B', 'Z']);
+     * assertSame(array_set($array, 'Z'), 1);
+     * assertSame($array, ['a' => 'A', 'B', 'Z']);
      * // 第3引数でキーを指定
-     * assert(array_set($array, 'Z', 'z') === 'z');
-     * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
-     * assert(array_set($array, 'Z', 'z') === 'z');
+     * assertSame(array_set($array, 'Z', 'z'), 'z');
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+     * assertSame(array_set($array, 'Z', 'z'), 'z');
      * // 第3引数で配列を指定
-     * assert(array_set($array, 'Z', ['x', 'y', 'z']) === 'z');
-     * assert($array                                  === ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
+     * assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * </code>
      *
      * @package Array
@@ -755,19 +755,19 @@ class Arrays
      * <code>
      * $array = ['a' => 'A', 'b' => 'B'];
      * // ない場合は $default を返す
-     * assert(array_unset($array, 'x', 'X') === 'X');
+     * assertSame(array_unset($array, 'x', 'X'), 'X');
      * // 指定したキーを返す。そのキーは伏せられている
-     * assert(array_unset($array, 'a') === 'A');
-     * assert($array === ['b' => 'B']);
+     * assertSame(array_unset($array, 'a'), 'A');
+     * assertSame($array, ['b' => 'B']);
      *
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列を与えるとそれらを返す。そのキーは全て伏せられている
-     * assert(array_unset($array, ['a', 'b', 'x']) === ['A', 'B']);
-     * assert($array === ['c' => 'C']);
+     * assertSame(array_unset($array, ['a', 'b', 'x']), ['A', 'B']);
+     * assertSame($array, ['c' => 'C']);
      *
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列のキーは返されるキーを表す。順番も維持される
-     * assert(array_unset($array, ['x2' => 'b', 'x1' => 'a']) === ['x2' => 'B', 'x1' => 'A']);
+     * assertSame(array_unset($array, ['x2' => 'b', 'x1' => 'a']), ['x2' => 'B', 'x1' => 'A']);
      * </code>
      *
      * @package Array
@@ -815,10 +815,10 @@ class Arrays
      *         ]
      *     ]
      * ];
-     * assert(array_dive($array, 'a.b.c')    === 'vvv');
-     * assert(array_dive($array, 'a.b.x', 9) === 9);
+     * assertSame(array_dive($array, 'a.b.c'), 'vvv');
+     * assertSame(array_dive($array, 'a.b.x', 9), 9);
      * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
-     * assert(array_dive($array, ['a', 'b', 'c'])    === 'vvv');
+     * assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
      * </code>
      *
      * @package Array
@@ -849,8 +849,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_exists(['a', 'b', '9'], 'ctype_digit')                    === 2);
-     * assert(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
+     * assertSame(array_exists(['a', 'b', '9'], 'ctype_digit'), 2);
+     * assertSame(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
      * </code>
      *
      * @package Array
@@ -882,11 +882,11 @@ class Arrays
      * Example:
      * <code>
      * // 最初に見つかったキーを返す
-     * assert(array_find(['a', 'b', '9'], 'ctype_digit')                    === 2);
-     * assert(array_find(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
+     * assertSame(array_find(['a', 'b', '9'], 'ctype_digit'), 2);
+     * assertSame(array_find(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
      * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
-     * assert(array_find(['a', 'b', '9'], $ifnumeric2power, false)          === 81);
+     * assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
      * </code>
      *
      * @package Array
@@ -917,8 +917,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#')       === ['a' => 'A', 'aa' => 'AA']);
-     * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true) === ['b' => 'B']);
+     * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#'), ['a' => 'A', 'aa' => 'AA']);
+     * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true), ['b' => 'B']);
      * </code>
      *
      * @package Array
@@ -947,8 +947,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper') === ['A' => 'A', 'B' => 'B']);
-     * assert(array_map_key(['a' => 'A', 'b' => 'B'], function(){}) === []);
+     * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'), ['A' => 'A', 'B' => 'B']);
+     * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], function(){}), []);
      * </code>
      *
      * @package Array
@@ -976,7 +976,7 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_filter_not(['a', '', 'c'], 'strlen') === [1 => '']);
+     * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
      * </code>
      *
      * @package Array
@@ -998,8 +998,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; })   === [0 => 'a', 2 => 'c']);
-     * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }) === [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 => 'a', 2 => 'c']);
      * </code>
      *
      * @package Array
@@ -1026,8 +1026,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_filter_eval(['a', 'b', 'c'], '$k !== 1')   === [0 => 'a', 2 => 'c']);
-     * assert(array_filter_eval(['a', 'b', 'c'], '$v !== "b"') === [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
      * </code>
      *
      * @package Array
@@ -1062,16 +1062,16 @@ class Arrays
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ];
      * // 'flag' が true 相当のものだけ返す
-     * assert(array_where($array, 'flag')                           === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, 'flag'), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
      * // 'name' に 'h' を含むものだけ返す
      * $contain_h = function($name){return strpos($name, 'h') !== false;};
-     * assert(array_where($array, 'name', $contain_h)               === [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
+     * assertSame(array_where($array, 'name', $contain_h), [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
      * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
      * $equal_2 = function($row, $key){return $key === 2;};
-     * assert(array_where($array, null, $equal_2)                   === [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * assertSame(array_where($array, null, $equal_2), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-     * assert(array_where($array, ['id', 'name'], $idname_is_2fuga) === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
      * </code>
      *
      * @package Array
@@ -1119,8 +1119,8 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_map_filter([' a ', ' b ', ''], 'trim')       === ['a', 'b']);
-     * assert(array_map_filter([' a ', ' b ', ''], 'trim', true) === ['a', 'b', '']);
+     * assertSame(array_map_filter([' a ', ' b ', ''], 'trim'), ['a', 'b']);
+     * assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
      * </code>
      *
      * @package Array
@@ -1154,11 +1154,11 @@ class Arrays
      * <code>
      * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
      * // getMessage で map される
-     * assert(array_map_method([$exa, $exb], 'getMessage')                       === ['a', 'b']);
+     * assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
-     * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true) === ['a', 'b']);
+     * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
-     * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null) === ['a', 'b', $std, null]);
+     * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
      * </code>
      *
      * @package Array
@@ -1198,9 +1198,9 @@ class Arrays
      * Example:
      * <code>
      * // 値を3乗したあと16進表記にして大文字化する
-     * assert(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper')    === ['1', '8', '1B', '40', '7D']);
+     * assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
-     * assert(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}) === ['a' => 'a:A', 'b' => 'b:B']);
+     * assertSame(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}), ['a' => 'a:A', 'b' => 'b:B']);
      * </code>
      *
      * @package Array
@@ -1246,10 +1246,10 @@ class Arrays
      * <code>
      * // 1番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
-     * assert(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix')   === ['prefix-a-suffix', 'prefix-b-suffix']);
+     * assertSame(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'), ['prefix-a-suffix', 'prefix-b-suffix']);
      * // 1番目にキー、2番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
-     * assert(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c') === ['k' => 'a k b v c']);
+     * assertSame(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'), ['k' => 'a k b v c']);
      * </code>
      *
      * @package Array
@@ -1316,7 +1316,7 @@ class Arrays
      * Example:
      * <code>
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
-     * assert(array_lmap(['a', 'b'], $sprintf, '-suffix') === ['a-suffix', 'b-suffix']);
+     * assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
      * </code>
      *
      * @package Array
@@ -1337,7 +1337,7 @@ class Arrays
      * Example:
      * <code>
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
-     * assert(array_rmap(['a', 'b'], $sprintf, 'prefix-') === ['prefix-a', 'prefix-b']);
+     * assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
      * </code>
      *
      * @package Array
@@ -1360,9 +1360,9 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_depth([])                       === 1);
-     * assert(array_depth(['hoge'])                 === 1);
-     * assert(array_depth([['nest1' => ['nest2']]]) === 3);
+     * assertSame(array_depth([]), 1);
+     * assertSame(array_depth(['hoge']), 1);
+     * assertSame(array_depth([['nest1' => ['nest2']]]), 3);
      * </code>
      *
      * @package Array
@@ -1393,10 +1393,10 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_insert([1, 2, 3], 'x')                         === [1, 2, 3, 'x']);
-     * assert(array_insert([1, 2, 3], 'x', 1)                      === [1, 'x', 2, 3]);
-     * assert(array_insert([1, 2, 3], 'x', -1)                     === [1, 2, 'x', 3]);
-     * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'a' => 'A', 'b' => 'B', 2, 3]);
+     * assertSame(array_insert([1, 2, 3], 'x'), [1, 2, 3, 'x']);
+     * assertSame(array_insert([1, 2, 3], 'x', 1), [1, 'x', 2, 3]);
+     * assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
+     * assertSame(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1), [1, 'a' => 'A', 'b' => 'B', 2, 3]);
      * </code>
      *
      * @package Array
@@ -1431,10 +1431,10 @@ class Arrays
      * <code>
      * // lt2(2より小さい)で分類
      * $lt2 = function($v){return $v < 2;};
-     * assert(array_assort([1, 2, 3], ['lt2' => $lt2])                               === ['lt2' => [1]]);
+     * assertSame(array_assort([1, 2, 3], ['lt2' => $lt2]), ['lt2' => [1]]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
      * $lt3 = function($v){return $v < 3;};
-     * assert(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']) === ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
+     * assertSame(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']), ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
      * </code>
      *
      * @package Array
@@ -1469,12 +1469,12 @@ class Arrays
      * <code>
      * $array = ['hoge', 'fuga', 'piyo'];
      * // 'o' を含むものの数（2個）
-     * assert(array_count($array, function($s){return strpos($s, 'o') !== false;}) === 2);
+     * assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}), 2);
      * // 'a' と 'o' を含むものをそれぞれ（1個と2個）
-     * assert(array_count($array, [
+     * assertSame(array_count($array, [
      *     'a' => function($s){return strpos($s, 'a') !== false;},
      *     'o' => function($s){return strpos($s, 'o') !== false;},
-     * ]) === ['a' => 1, 'o' => 2]);
+     * ]), ['a' => 1, 'o' => 2]);
      * </code>
      *
      * @package Array
@@ -1516,13 +1516,13 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
-     * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
+     * assertSame(array_group([1, 1, 1]), [1 => [1, 1, 1]]);
+     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 => [1, 3], 0 => [2]]);
      * // group -> id で入れ子グループにする
      * $row1 = ['id' => 1, 'group' => 'hoge'];
      * $row2 = ['id' => 2, 'group' => 'fuga'];
      * $row3 = ['id' => 3, 'group' => 'hoge'];
-     * assert(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}) === [
+     * assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}), [
      *     'hoge' => [
      *         1 => $row1,
      *         3 => $row3,
@@ -1573,9 +1573,9 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_all([true, true])   === true);
-     * assert(array_all([true, false])  === false);
-     * assert(array_all([false, false]) === false);
+     * assertTrue(array_all([true, true]));
+     * assertFalse(array_all([true, false]));
+     * assertFalse(array_all([false, false]));
      * </code>
      *
      * @package Array
@@ -1608,9 +1608,9 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_any([true, true])   === true);
-     * assert(array_any([true, false])  === true);
-     * assert(array_any([false, false]) === false);
+     * assertTrue(array_any([true, true]));
+     * assertTrue(array_any([true, false]));
+     * assertFalse(array_any([false, false]));
      * </code>
      *
      * @package Array
@@ -1660,7 +1660,7 @@ class Arrays
      * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
      * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
      * // name 昇順, no 自然降順
-     * assert(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]) === [$v3, $v2, $v1]);
+     * assertSame(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]), [$v3, $v2, $v1]);
      * </code>
      *
      * @package Array
@@ -1785,7 +1785,7 @@ class Arrays
      * Example:
      * <code>
      * srand(4);mt_srand(4);
-     * assert(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']) === ['b' => 'B', 'a' => 'A', 'c' => 'C']);
+     * assertSame(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['b' => 'B', 'a' => 'A', 'c' => 'C']);
      * </code>
      *
      * @package Array
@@ -1817,7 +1817,7 @@ class Arrays
      * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
      * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
      * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
-     * assert(array_shrink_key($array1, $array2, $array3) === ['c' => 'C3']);
+     * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
      * </code>
      *
      * @package Array
@@ -1842,11 +1842,11 @@ class Arrays
      * <code>
      * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
      * // 第3引数を渡せば array_column と全く同じ
-     * assert(array_lookup($array, 'name', 'id') === array_column($array, 'name', 'id'));
-     * assert(array_lookup($array, 'name', null) === array_column($array, 'name', null));
+     * assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
+     * assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
      * // 省略すればキーが保存される
-     * assert(array_lookup($array, 'name')       === [11 => 'name1', 12 => 'name2', 13 => 'name3']);
-     * assert(array_lookup($array)               === $array);
+     * assertSame(array_lookup($array, 'name'), [11 => 'name1', 12 => 'name2', 13 => 'name3']);
+     * assertSame(array_lookup($array), $array);
      * </code>
      *
      * @package Array
@@ -1893,9 +1893,9 @@ class Arrays
      * $row1 = ['id' => 1, 'name' => 'A'];
      * $row2 = ['id' => 2, 'name' => 'B'];
      * $rows = [$row1, $row2];
-     * assert(array_columns($rows)               === ['id' => [1, 2], 'name' => ['A', 'B']]);
-     * assert(array_columns($rows, 'id')         === ['id' => [1, 2]]);
-     * assert(array_columns($rows, 'name', 'id') === ['name' => [1 => 'A', 2 => 'B']]);
+     * assertSame(array_columns($rows), ['id' => [1, 2], 'name' => ['A', 'B']]);
+     * assertSame(array_columns($rows, 'id'), ['id' => [1, 2]]);
+     * assertSame(array_columns($rows, 'name', 'id'), ['name' => [1 => 'A', 2 => 'B']]);
      * </code>
      *
      * @package Array
@@ -1930,7 +1930,7 @@ class Arrays
      *
      * Example:
      * <code>
-     * assert(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]) === [
+     * assertSame(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]), [
      *     ['id' => 1, 'name' => 'A'],
      *     ['id' => 2, 'name' => 'B'],
      * ]);
@@ -2007,7 +2007,7 @@ class Arrays
      *     if (!is_array($v)) $v = "prefix-$v";
      *     return "_$k";
      * };
-     * assert(array_convert($array, $callback, true) === [
+     * assertSame(array_convert($array, $callback, true), [
      *     '_k1' => 'prefix-v1',
      *     '_k2' => [
      *         'k21' => 'v21',
@@ -2112,7 +2112,7 @@ class Arrays
      *    ],
      * ];
      * // 区切り文字指定なし
-     * assert(array_flatten($array) === [
+     * assertSame(array_flatten($array), [
      *    0 => 'v1',
      *    1 => 'v21',
      *    2 => 'v221',
@@ -2122,7 +2122,7 @@ class Arrays
      *    6 => 3,
      * ]);
      * // 区切り文字指定
-     * assert(array_flatten($array, '.') === [
+     * assertSame(array_flatten($array, '.'), [
      *    'k1'            => 'v1',
      *    'k2.k21'        => 'v21',
      *    'k2.k22.k221'   => 'v221',
@@ -2190,7 +2190,7 @@ class Arrays
      *    'k2.k22.k223.1' => 2,
      *    'k2.k22.k223.2' => 3,
      * ];
-     * assert(array_nest($array) === [
+     * assertSame(array_nest($array), [
      *    'k1' => 'v1',
      *    'k2' => [
      *        'k21' => 'v21',
@@ -2206,7 +2206,7 @@ class Arrays
      *    'k1.k2' => 'v1', // この時点で 'k1' は配列になるが・・・
      *    'k1'    => 'v2', // この時点で 'k1' は文字列として上書きされる
      * ];
-     * assert(array_nest($array) === [
+     * assertSame(array_nest($array), [
      *    'k1' => 'v2',
      * ]);
      * // 上書きすら出来ない場合は例外が飛ぶ
@@ -2218,7 +2218,7 @@ class Arrays
      *     array_nest($array);
      * }
      * catch (\Exception $e) {
-     *     assert($e instanceof \InvalidArgumentException);
+     *     assertInstanceof(\InvalidArgumentException::class, $e);
      * }
      * </code>
      *

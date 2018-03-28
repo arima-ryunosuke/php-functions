@@ -12,7 +12,7 @@ class Math
      *
      * Example:
      * <code>
-     * assert(minimum(-1, 0, 1) === -1);
+     * assertSame(minimum(-1, 0, 1), -1);
      * </code>
      *
      * @package Math
@@ -34,7 +34,7 @@ class Math
      *
      * Example:
      * <code>
-     * assert(maximum(-1, 0, 1) === 1);
+     * assertSame(maximum(-1, 0, 1), 1);
      * </code>
      *
      * @package Math
@@ -58,7 +58,7 @@ class Math
      *
      * Example:
      * <code>
-     * assert(mode(0, 1, 2, 2, 3, 3, 3) === 3);
+     * assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
      * </code>
      *
      * @package Math
@@ -96,8 +96,8 @@ class Math
      *
      * Example:
      * <code>
-     * assert(mean(1, 2, 3, 4, 5, 6) === 3.5);
-     * assert(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6) === 3.5);
+     * assertSame(mean(1, 2, 3, 4, 5, 6), 3.5);
+     * assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
      * </code>
      *
      * @package Math
@@ -122,11 +122,11 @@ class Math
      * Example:
      * <code>
      * // 偶数個なので中2つの平均
-     * assert(median(1, 2, 3, 4, 5, 6) === 3.5);
+     * assertSame(median(1, 2, 3, 4, 5, 6), 3.5);
      * // 奇数個なのでど真ん中
-     * assert(median(1, 2, 3, 4, 5) === 3);
+     * assertSame(median(1, 2, 3, 4, 5), 3);
      * // 偶数個だが文字列なので中2つの後
-     * assert(median('a', 'b', 'c', 'd') === 'c');
+     * assertSame(median('a', 'b', 'c', 'd'), 'c');
      * </code>
      *
      * @package Math
@@ -179,7 +179,7 @@ class Math
      *
      * Example:
      * <code>
-     * assert(sum(1, 2, 3, 4, 5, 6) === 21);
+     * assertSame(sum(1, 2, 3, 4, 5, 6), 21);
      * </code>
      *
      * @package Math
@@ -202,8 +202,8 @@ class Math
      * Example:
      * <code>
      * srand(1);mt_srand(1);
-     * assert(random_at(1, 2, 3, 4, 5, 6) === 4);
-     * assert(random_at(1, 2, 3, 4, 5, 6) === 1);
+     * assertSame(random_at(1, 2, 3, 4, 5, 6), 4);
+     * assertSame(random_at(1, 2, 3, 4, 5, 6), 1);
      * </code>
      *
      * @package Math
@@ -225,8 +225,8 @@ class Math
      * Example:
      * <code>
      * srand(1);mt_srand(1);
-     * assert(probability(50) === false);
-     * assert(probability(50) === true);
+     * assertFalse(probability(50));
+     * assertTrue(probability(50));
      * </code>
      *
      * @package Math
