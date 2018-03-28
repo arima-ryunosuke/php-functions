@@ -133,7 +133,7 @@
 <p>Example:</p>
 
 <pre><span class="php-comment">// 単純なエクスポート</span>
-<span class="php-keyword2">assert</span>(var_export2([<span class="php-quote">'array'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], <span class="php-quote">'hash'</span> =&gt; [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]], <span class="php-keyword1">true</span>) === <span class="php-quote">&quot;[
+assertSame(var_export2([<span class="php-quote">'array'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], <span class="php-quote">'hash'</span> =&gt; [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]], <span class="php-keyword1">true</span>), <span class="php-quote">&quot;[
     'array' =&gt; [1, 2, 3],
     'hash'  =&gt; [
         'a' =&gt; 'A',
@@ -148,7 +148,7 @@
 <span class="php-var">$robject</span>-&gt;a = <span class="php-keyword1">new</span> \stdClass();
 <span class="php-var">$robject</span>-&gt;a-&gt;b = <span class="php-keyword1">new</span> \stdClass();
 <span class="php-var">$robject</span>-&gt;a-&gt;b-&gt;c = <span class="php-var">$robject</span>;
-<span class="php-keyword2">assert</span>(var_export2(<span class="php-keyword2">compact</span>(<span class="php-quote">'rarray'</span>, <span class="php-quote">'robject'</span>), <span class="php-keyword1">true</span>) === <span class="php-quote">&quot;[
+assertSame(var_export2(<span class="php-keyword2">compact</span>(<span class="php-quote">'rarray'</span>, <span class="php-quote">'robject'</span>), <span class="php-keyword1">true</span>), <span class="php-quote">&quot;[
     'rarray'  =&gt; [
         'a' =&gt; [
             'b' =&gt; [
@@ -202,7 +202,7 @@
 		
 		<b>Package:</b> <a href="package-Var.html">Var</a><br>
 		<b>Located at</b>
-		<a href="source-function-var_export2.html#5253-5398" title="Go to source code">
+		<a href="source-function-var_export2.html#5250-5395" title="Go to source code">
 			
 		</a><br>
 	</div>

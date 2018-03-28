@@ -125,13 +125,13 @@
 <p>Example:</p>
 
 <pre><span class="php-comment">// プリミティブ型は gettype と同義</span>
-<span class="php-keyword2">assert</span>(var_type(<span class="php-keyword1">false</span>)      === <span class="php-quote">'boolean'</span>);
-<span class="php-keyword2">assert</span>(var_type(<span class="php-num">123</span>)        === <span class="php-quote">'integer'</span>);
-<span class="php-keyword2">assert</span>(var_type(<span class="php-num">3.14</span>)       === <span class="php-quote">'double'</span>);
-<span class="php-keyword2">assert</span>(var_type([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>])  === <span class="php-quote">'array'</span>);
+assertSame(var_type(<span class="php-keyword1">false</span>), <span class="php-quote">'boolean'</span>);
+assertSame(var_type(<span class="php-num">123</span>), <span class="php-quote">'integer'</span>);
+assertSame(var_type(<span class="php-num">3.14</span>), <span class="php-quote">'double'</span>);
+assertSame(var_type([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]), <span class="php-quote">'array'</span>);
 <span class="php-comment">// オブジェクトは型名を返す</span>
-<span class="php-keyword2">assert</span>(var_type(<span class="php-keyword1">new</span> \stdClass)    === <span class="php-quote">'\\stdClass'</span>);
-<span class="php-keyword2">assert</span>(var_type(<span class="php-keyword1">new</span> \Exception()) === <span class="php-quote">'\\Exception'</span>);</pre>
+assertSame(var_type(<span class="php-keyword1">new</span> \stdClass), <span class="php-quote">'\\stdClass'</span>);
+assertSame(var_type(<span class="php-keyword1">new</span> \Exception()), <span class="php-quote">'\\Exception'</span>);</pre>
 	</div>
 
 
@@ -165,7 +165,7 @@
 		
 		<b>Package:</b> <a href="package-Var.html">Var</a><br>
 		<b>Located at</b>
-		<a href="source-function-var_type.html#5221-5250" title="Go to source code">
+		<a href="source-function-var_type.html#5218-5247" title="Go to source code">
 			
 		</a><br>
 	</div>

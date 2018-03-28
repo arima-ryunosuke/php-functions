@@ -170,9 +170,9 @@
 <pre><span class="php-var">$row1</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'A'</span>];
 <span class="php-var">$row2</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'B'</span>];
 <span class="php-var">$rows</span> = [<span class="php-var">$row1</span>, <span class="php-var">$row2</span>];
-<span class="php-keyword2">assert</span>(array_columns(<span class="php-var">$rows</span>)               === [<span class="php-quote">'id'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>], <span class="php-quote">'name'</span> =&gt; [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]]);
-<span class="php-keyword2">assert</span>(array_columns(<span class="php-var">$rows</span>, <span class="php-quote">'id'</span>)         === [<span class="php-quote">'id'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>]]);
-<span class="php-keyword2">assert</span>(array_columns(<span class="php-var">$rows</span>, <span class="php-quote">'name'</span>, <span class="php-quote">'id'</span>) === [<span class="php-quote">'name'</span> =&gt; [<span class="php-num">1</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'B'</span>]]);</pre>
+assertSame(array_columns(<span class="php-var">$rows</span>), [<span class="php-quote">'id'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>], <span class="php-quote">'name'</span> =&gt; [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]]);
+assertSame(array_columns(<span class="php-var">$rows</span>, <span class="php-quote">'id'</span>), [<span class="php-quote">'id'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>]]);
+assertSame(array_columns(<span class="php-var">$rows</span>, <span class="php-quote">'name'</span>, <span class="php-quote">'id'</span>), [<span class="php-quote">'name'</span> =&gt; [<span class="php-num">1</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'B'</span>]]);</pre>
 	</div>
 
 

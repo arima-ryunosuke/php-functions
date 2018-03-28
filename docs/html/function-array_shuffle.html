@@ -166,7 +166,7 @@
 <p>Example:</p>
 
 <pre><span class="php-keyword2">srand</span>(<span class="php-num">4</span>);<span class="php-keyword2">mt_srand</span>(<span class="php-num">4</span>);
-<span class="php-keyword2">assert</span>(array_shuffle([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]) === [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]);</pre>
+assertSame(array_shuffle([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]), [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]);</pre>
 	</div>
 
 

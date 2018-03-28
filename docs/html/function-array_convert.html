@@ -202,7 +202,7 @@
     <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$v</span>)) <span class="php-var">$v</span> = <span class="php-quote">&quot;prefix-</span><span class="php-var">$v</span><span class="php-quote">&quot;</span>;
     <span class="php-keyword1">return</span> <span class="php-quote">&quot;_</span><span class="php-var">$k</span><span class="php-quote">&quot;</span>;
 };
-<span class="php-keyword2">assert</span>(array_convert(<span class="php-var">$array</span>, <span class="php-var">$callback</span>, <span class="php-keyword1">true</span>) === [
+assertSame(array_convert(<span class="php-var">$array</span>, <span class="php-var">$callback</span>, <span class="php-keyword1">true</span>), [
     <span class="php-quote">'_k1'</span> =&gt; <span class="php-quote">'prefix-v1'</span>,
     <span class="php-quote">'_k2'</span> =&gt; [
         <span class="php-quote">'k21'</span> =&gt; <span class="php-quote">'v21'</span>,

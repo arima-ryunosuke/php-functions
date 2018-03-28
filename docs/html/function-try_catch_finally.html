@@ -126,12 +126,12 @@
 <span class="php-var">$finally</span> = <span class="php-keyword1">function</span>()<span class="php-keyword1">use</span>(&amp;<span class="php-var">$finally_count</span>){<span class="php-var">$finally_count</span>++;};
 <span class="php-comment">// 例外が飛ぼうと飛ぶまいと $finally は実行される</span>
 <span class="php-var">$try</span> = <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>, <span class="php-var">$c</span>){<span class="php-keyword1">return</span> [<span class="php-var">$a</span>, <span class="php-var">$b</span>, <span class="php-var">$c</span>];};
-<span class="php-keyword2">assert</span>(try_catch_finally(<span class="php-var">$try</span>, <span class="php-keyword1">null</span>, <span class="php-var">$finally</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>)               === [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);
-<span class="php-keyword2">assert</span>(<span class="php-var">$finally_count</span>                                                 === <span class="php-num">1</span>); <span class="php-comment">// 呼ばれている</span>
+assertSame(try_catch_finally(<span class="php-var">$try</span>, <span class="php-keyword1">null</span>, <span class="php-var">$finally</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>), [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);
+assertSame(<span class="php-var">$finally_count</span>, <span class="php-num">1</span>); <span class="php-comment">// 呼ばれている</span>
 <span class="php-comment">// 例外を投げるが、 $catch で握りつぶす</span>
 <span class="php-var">$try</span> = <span class="php-keyword1">function</span>(){<span class="php-keyword1">throw</span> <span class="php-keyword1">new</span> \Exception(<span class="php-quote">'tried'</span>);};
-<span class="php-keyword2">assert</span>(try_catch_finally(<span class="php-var">$try</span>, <span class="php-keyword1">null</span>, <span class="php-var">$finally</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>)-&gt;getMessage() === <span class="php-quote">'tried'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$finally_count</span>                                                 === <span class="php-num">2</span>); <span class="php-comment">// 呼ばれている</span></pre>
+assertSame(try_catch_finally(<span class="php-var">$try</span>, <span class="php-keyword1">null</span>, <span class="php-var">$finally</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>)-&gt;getMessage(), <span class="php-quote">'tried'</span>);
+assertSame(<span class="php-var">$finally_count</span>, <span class="php-num">2</span>); <span class="php-comment">// 呼ばれている</span></pre>
 	</div>
 
 
@@ -180,7 +180,7 @@
 		
 		<b>Package:</b> <a href="package-Syntax.html">Syntax</a><br>
 		<b>Located at</b>
-		<a href="source-function-try_catch_finally.html#4779-4828" title="Go to source code">
+		<a href="source-function-try_catch_finally.html#4776-4825" title="Go to source code">
 			
 		</a><br>
 	</div>

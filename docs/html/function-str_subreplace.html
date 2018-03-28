@@ -142,11 +142,11 @@ str_replace とは「N 番目のみ置換できる」点で異なる。
 <p>Example:</p>
 
 <pre><span class="php-comment">// 1番目（0ベースなので2番目）の x を X に置換</span>
-<span class="php-keyword2">assert</span>(str_subreplace(<span class="php-quote">'xxx'</span>, <span class="php-quote">'x'</span>, [<span class="php-num">1</span> =&gt; <span class="php-quote">'X'</span>])                === <span class="php-quote">'xXx'</span>);
+assertSame(str_subreplace(<span class="php-quote">'xxx'</span>, <span class="php-quote">'x'</span>, [<span class="php-num">1</span> =&gt; <span class="php-quote">'X'</span>]), <span class="php-quote">'xXx'</span>);
 <span class="php-comment">// 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換</span>
-<span class="php-keyword2">assert</span>(str_subreplace(<span class="php-quote">'!xxx!'</span>, <span class="php-quote">'x'</span>, [<span class="php-num">0</span> =&gt; <span class="php-quote">'Xa'</span>, -<span class="php-num">1</span> =&gt; <span class="php-quote">'Xz'</span>]) === <span class="php-quote">'!XaxXz!'</span>);
+assertSame(str_subreplace(<span class="php-quote">'!xxx!'</span>, <span class="php-quote">'x'</span>, [<span class="php-num">0</span> =&gt; <span class="php-quote">'Xa'</span>, -<span class="php-num">1</span> =&gt; <span class="php-quote">'Xz'</span>]), <span class="php-quote">'!XaxXz!'</span>);
 <span class="php-comment">// 置換結果は置換対象にならない</span>
-<span class="php-keyword2">assert</span>(str_subreplace(<span class="php-quote">'xxx'</span>, <span class="php-quote">'x'</span>, [<span class="php-num">0</span> =&gt; <span class="php-quote">'xxx'</span>, <span class="php-num">1</span> =&gt; <span class="php-quote">'X'</span>])    === <span class="php-quote">'xxxXx'</span>);</pre>
+assertSame(str_subreplace(<span class="php-quote">'xxx'</span>, <span class="php-quote">'x'</span>, [<span class="php-num">0</span> =&gt; <span class="php-quote">'xxx'</span>, <span class="php-num">1</span> =&gt; <span class="php-quote">'X'</span>]), <span class="php-quote">'xxxXx'</span>);</pre>
 	</div>
 
 
@@ -195,7 +195,7 @@ str_replace とは「N 番目のみ置換できる」点で異なる。
 		
 		<b>Package:</b> <a href="package-String.html">String</a><br>
 		<b>Located at</b>
-		<a href="source-function-str_subreplace.html#4021-4090" title="Go to source code">
+		<a href="source-function-str_subreplace.html#4018-4087" title="Go to source code">
 			
 		</a><br>
 	</div>

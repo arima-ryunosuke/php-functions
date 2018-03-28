@@ -129,11 +129,11 @@
 <pre><span class="php-comment">// とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）</span>
 <span class="php-var">$heavyfunc</span> = <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span>;};
 <span class="php-comment">// $heavyfunc(1) ?? 'default' とほぼ同義</span>
-<span class="php-keyword2">assert</span>(ifelse(<span class="php-var">$heavyfunc</span>(<span class="php-num">1</span>), <span class="php-keyword1">false</span>, <span class="php-quote">'default'</span>)     === <span class="php-var">$heavyfunc</span>(<span class="php-num">1</span>));
+assertSame(ifelse(<span class="php-var">$heavyfunc</span>(<span class="php-num">1</span>), <span class="php-keyword1">false</span>, <span class="php-quote">'default'</span>), <span class="php-var">$heavyfunc</span>(<span class="php-num">1</span>));
 <span class="php-comment">// $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す</span>
-<span class="php-keyword2">assert</span>(ifelse(<span class="php-var">$heavyfunc</span>(<span class="php-keyword1">null</span>), <span class="php-keyword1">false</span>, <span class="php-quote">'default'</span>)  === <span class="php-var">$heavyfunc</span>(<span class="php-keyword1">null</span>));
+assertSame(ifelse(<span class="php-var">$heavyfunc</span>(<span class="php-keyword1">null</span>), <span class="php-keyword1">false</span>, <span class="php-quote">'default'</span>), <span class="php-var">$heavyfunc</span>(<span class="php-keyword1">null</span>));
 <span class="php-comment">// $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す</span>
-<span class="php-keyword2">assert</span>(ifelse(<span class="php-var">$heavyfunc</span>(<span class="php-keyword1">false</span>), <span class="php-keyword1">false</span>, <span class="php-quote">'default'</span>) === <span class="php-quote">'default'</span>);</pre>
+assertSame(ifelse(<span class="php-var">$heavyfunc</span>(<span class="php-keyword1">false</span>), <span class="php-keyword1">false</span>, <span class="php-quote">'default'</span>), <span class="php-quote">'default'</span>);</pre>
 	</div>
 
 
@@ -182,7 +182,7 @@
 		
 		<b>Package:</b> <a href="package-Syntax.html">Syntax</a><br>
 		<b>Located at</b>
-		<a href="source-function-ifelse.html#4676-4716" title="Go to source code">
+		<a href="source-function-ifelse.html#4673-4713" title="Go to source code">
 			
 		</a><br>
 	</div>

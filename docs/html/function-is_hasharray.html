@@ -167,9 +167,9 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(is_hasharray([])           === <span class="php-keyword1">false</span>);
-<span class="php-keyword2">assert</span>(is_hasharray([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>])    === <span class="php-keyword1">false</span>);
-<span class="php-keyword2">assert</span>(is_hasharray([<span class="php-quote">'x'</span> =&gt; <span class="php-quote">'X'</span>]) === <span class="php-keyword1">true</span>);</pre>
+<pre>assertFalse(is_hasharray([]));
+assertFalse(is_hasharray([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]));
+assertTrue(is_hasharray([<span class="php-quote">'x'</span> =&gt; <span class="php-quote">'X'</span>]));</pre>
 	</div>
 
 

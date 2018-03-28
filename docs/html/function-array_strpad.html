@@ -171,9 +171,9 @@
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'key1'</span> =&gt; <span class="php-quote">'val1'</span>, <span class="php-quote">'key2'</span> =&gt; <span class="php-quote">'val2'</span>];
 <span class="php-comment">// キーにプレフィックス付与</span>
-<span class="php-keyword2">assert</span>(array_strpad(<span class="php-var">$array</span>, <span class="php-quote">'prefix-'</span>)       === [<span class="php-quote">'prefix-key1'</span> =&gt; <span class="php-quote">'val1'</span>, <span class="php-quote">'prefix-key2'</span> =&gt; <span class="php-quote">'val2'</span>]);
+assertSame(array_strpad(<span class="php-var">$array</span>, <span class="php-quote">'prefix-'</span>), [<span class="php-quote">'prefix-key1'</span> =&gt; <span class="php-quote">'val1'</span>, <span class="php-quote">'prefix-key2'</span> =&gt; <span class="php-quote">'val2'</span>]);
 <span class="php-comment">// 値にサフィックス付与</span>
-<span class="php-keyword2">assert</span>(array_strpad(<span class="php-var">$array</span>, <span class="php-quote">''</span>, [<span class="php-quote">'-suffix'</span>]) === [<span class="php-quote">'key1'</span> =&gt; <span class="php-quote">'val1-suffix'</span>, <span class="php-quote">'key2'</span> =&gt; <span class="php-quote">'val2-suffix'</span>]);</pre>
+assertSame(array_strpad(<span class="php-var">$array</span>, <span class="php-quote">''</span>, [<span class="php-quote">'-suffix'</span>]), [<span class="php-quote">'key1'</span> =&gt; <span class="php-quote">'val1-suffix'</span>, <span class="php-quote">'key2'</span> =&gt; <span class="php-quote">'val2-suffix'</span>]);</pre>
 	</div>
 
 

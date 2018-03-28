@@ -130,9 +130,9 @@
 <p>Example:</p>
 
 <pre><span class="php-var">$arg0</span> = return_arg(<span class="php-num">0</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$arg0</span>(<span class="php-quote">'hoge'</span>)          === <span class="php-quote">'hoge'</span>);
+assertSame(<span class="php-var">$arg0</span>(<span class="php-quote">'hoge'</span>), <span class="php-quote">'hoge'</span>);
 <span class="php-var">$arg1</span> = return_arg(<span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$arg1</span>(<span class="php-quote">'dummy'</span>, <span class="php-quote">'hoge'</span>) === <span class="php-quote">'hoge'</span>);</pre>
+assertSame(<span class="php-var">$arg1</span>(<span class="php-quote">'dummy'</span>, <span class="php-quote">'hoge'</span>), <span class="php-quote">'hoge'</span>);</pre>
 	</div>
 
 
@@ -166,7 +166,7 @@
 		
 		<b>Package:</b> <a href="package-Callable.html">Callable</a><br>
 		<b>Located at</b>
-		<a href="source-function-return_arg.html#3149-3174" title="Go to source code">
+		<a href="source-function-return_arg.html#3146-3171" title="Go to source code">
 			
 		</a><br>
 	</div>

@@ -169,10 +169,10 @@ iterable や Traversable は考慮せずあくまで「配列」としてチェ�
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(arrayize(<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>)                   === [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);
-<span class="php-keyword2">assert</span>(arrayize([<span class="php-num">1</span>], [<span class="php-num">2</span>], [<span class="php-num">3</span>])             === [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);
+<pre>assertSame(arrayize(<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>), [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);
+assertSame(arrayize([<span class="php-num">1</span>], [<span class="php-num">2</span>], [<span class="php-num">3</span>]), [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);
 <span class="php-var">$object</span> = <span class="php-keyword1">new</span> \stdClass();
-<span class="php-keyword2">assert</span>(arrayize(<span class="php-var">$object</span>, <span class="php-keyword1">false</span>, [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]) === [<span class="php-var">$object</span>, <span class="php-keyword1">false</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);</pre>
+assertSame(arrayize(<span class="php-var">$object</span>, <span class="php-keyword1">false</span>, [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]), [<span class="php-var">$object</span>, <span class="php-keyword1">false</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]);</pre>
 	</div>
 
 

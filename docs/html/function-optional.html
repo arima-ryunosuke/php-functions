@@ -129,24 +129,24 @@ __set のような明らかに設定が意図されているものは例外が�
 <pre><span class="php-comment">// null を返すかもしれないステートメント</span>
 <span class="php-var">$getobject</span> = <span class="php-keyword1">function</span> () {<span class="php-keyword1">return</span> <span class="php-keyword1">null</span>;};
 <span class="php-comment">// メソッド呼び出しは null を返す</span>
-<span class="php-keyword2">assert</span>(optional(<span class="php-var">$getobject</span>())-&gt;method()          === <span class="php-keyword1">null</span>);
+assertSame(optional(<span class="php-var">$getobject</span>())-&gt;method(), <span class="php-keyword1">null</span>);
 <span class="php-comment">// プロパティアクセスは null を返す</span>
-<span class="php-keyword2">assert</span>(optional(<span class="php-var">$getobject</span>())-&gt;property          === <span class="php-keyword1">null</span>);
+assertSame(optional(<span class="php-var">$getobject</span>())-&gt;property, <span class="php-keyword1">null</span>);
 <span class="php-comment">// empty は true を返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword1">empty</span>(optional(<span class="php-var">$getobject</span>())-&gt;nothing)    === <span class="php-keyword1">true</span>);
+assertSame(<span class="php-keyword1">empty</span>(optional(<span class="php-var">$getobject</span>())-&gt;nothing), <span class="php-keyword1">true</span>);
 <span class="php-comment">// __isset は false を返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword1">isset</span>(optional(<span class="php-var">$getobject</span>())-&gt;nothing)    === <span class="php-keyword1">false</span>);
+assertSame(<span class="php-keyword1">isset</span>(optional(<span class="php-var">$getobject</span>())-&gt;nothing), <span class="php-keyword1">false</span>);
 <span class="php-comment">// __toString は '' を返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">strval</span>(optional(<span class="php-var">$getobject</span>()))            === <span class="php-quote">''</span>);
+assertSame(<span class="php-keyword2">strval</span>(optional(<span class="php-var">$getobject</span>())), <span class="php-quote">''</span>);
 <span class="php-comment">// __invoke は null を返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">call_user_func</span>(optional(<span class="php-var">$getobject</span>()))    === <span class="php-keyword1">null</span>);
+assertSame(<span class="php-keyword2">call_user_func</span>(optional(<span class="php-var">$getobject</span>())), <span class="php-keyword1">null</span>);
 <span class="php-comment">// 配列アクセスは null を返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-var">$getobject</span>()[<span class="php-quote">'hoge'</span>]                      === <span class="php-keyword1">null</span>);
+assertSame(<span class="php-var">$getobject</span>()[<span class="php-quote">'hoge'</span>], <span class="php-keyword1">null</span>);
 <span class="php-comment">// 空イテレータを返す</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">iterator_to_array</span>(optional(<span class="php-var">$getobject</span>())) === []);
+assertSame(<span class="php-keyword2">iterator_to_array</span>(optional(<span class="php-var">$getobject</span>())), []);
 
 <span class="php-comment">// $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）</span>
-<span class="php-keyword2">assert</span>(optional(<span class="php-keyword1">new</span> \ArrayObject([<span class="php-num">1</span>]), <span class="php-quote">'stdClass'</span>)-&gt;<span class="php-keyword2">count</span>() === <span class="php-keyword1">null</span>);</pre>
+assertSame(optional(<span class="php-keyword1">new</span> \ArrayObject([<span class="php-num">1</span>]), <span class="php-quote">'stdClass'</span>)-&gt;<span class="php-keyword2">count</span>(), <span class="php-keyword1">null</span>);</pre>
 	</div>
 
 
@@ -185,7 +185,7 @@ __set のような明らかに設定が意図されているものは例外が�
 		
 		<b>Package:</b> <a href="package-Syntax.html">Syntax</a><br>
 		<b>Located at</b>
-		<a href="source-function-optional.html#4574-4648" title="Go to source code">
+		<a href="source-function-optional.html#4571-4645" title="Go to source code">
 			
 		</a><br>
 	</div>

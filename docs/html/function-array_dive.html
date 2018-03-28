@@ -174,10 +174,10 @@
         ]
     ]
 ];
-<span class="php-keyword2">assert</span>(array_dive(<span class="php-var">$array</span>, <span class="php-quote">'a.b.c'</span>)    === <span class="php-quote">'vvv'</span>);
-<span class="php-keyword2">assert</span>(array_dive(<span class="php-var">$array</span>, <span class="php-quote">'a.b.x'</span>, <span class="php-num">9</span>) === <span class="php-num">9</span>);
+assertSame(array_dive(<span class="php-var">$array</span>, <span class="php-quote">'a.b.c'</span>), <span class="php-quote">'vvv'</span>);
+assertSame(array_dive(<span class="php-var">$array</span>, <span class="php-quote">'a.b.x'</span>, <span class="php-num">9</span>), <span class="php-num">9</span>);
 <span class="php-comment">// 配列を与えても良い。その場合 $delimiter 引数は意味をなさない</span>
-<span class="php-keyword2">assert</span>(array_dive(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>])    === <span class="php-quote">'vvv'</span>);</pre>
+assertSame(array_dive(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>]), <span class="php-quote">'vvv'</span>);</pre>
 	</div>
 
 

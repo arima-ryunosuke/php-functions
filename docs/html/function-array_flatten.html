@@ -181,7 +181,7 @@ $delimiter = null の場合に本当の配列で返す（巷の実装と同じ�
    ],
 ];
 <span class="php-comment">// 区切り文字指定なし</span>
-<span class="php-keyword2">assert</span>(array_flatten(<span class="php-var">$array</span>) === [
+assertSame(array_flatten(<span class="php-var">$array</span>), [
    <span class="php-num">0</span> =&gt; <span class="php-quote">'v1'</span>,
    <span class="php-num">1</span> =&gt; <span class="php-quote">'v21'</span>,
    <span class="php-num">2</span> =&gt; <span class="php-quote">'v221'</span>,
@@ -191,7 +191,7 @@ $delimiter = null の場合に本当の配列で返す（巷の実装と同じ�
    <span class="php-num">6</span> =&gt; <span class="php-num">3</span>,
 ]);
 <span class="php-comment">// 区切り文字指定</span>
-<span class="php-keyword2">assert</span>(array_flatten(<span class="php-var">$array</span>, <span class="php-quote">'.'</span>) === [
+assertSame(array_flatten(<span class="php-var">$array</span>, <span class="php-quote">'.'</span>), [
    <span class="php-quote">'k1'</span>            =&gt; <span class="php-quote">'v1'</span>,
    <span class="php-quote">'k2.k21'</span>        =&gt; <span class="php-quote">'v21'</span>,
    <span class="php-quote">'k2.k22.k221'</span>   =&gt; <span class="php-quote">'v221'</span>,

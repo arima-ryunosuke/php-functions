@@ -124,11 +124,11 @@
 <pre><span class="php-comment">// 配列の再帰</span>
 <span class="php-var">$array</span> = [];
 <span class="php-var">$array</span>[<span class="php-quote">'recursive'</span>] = &amp;<span class="php-var">$array</span>;
-<span class="php-keyword2">assert</span>(is_recursive(<span class="php-var">$array</span>)  === <span class="php-keyword1">true</span>);
+assertTrue(is_recursive(<span class="php-var">$array</span>));
 <span class="php-comment">// オブジェクトの再帰</span>
 <span class="php-var">$object</span> = <span class="php-keyword1">new</span> \stdClass();
 <span class="php-var">$object</span>-&gt;recursive = <span class="php-var">$object</span>;
-<span class="php-keyword2">assert</span>(is_recursive(<span class="php-var">$object</span>) === <span class="php-keyword1">true</span>);</pre>
+assertTrue(is_recursive(<span class="php-var">$object</span>));</pre>
 	</div>
 
 
@@ -162,7 +162,7 @@
 		
 		<b>Package:</b> <a href="package-Var.html">Var</a><br>
 		<b>Located at</b>
-		<a href="source-function-is_recursive.html#5170-5218" title="Go to source code">
+		<a href="source-function-is_recursive.html#5167-5215" title="Go to source code">
 			
 		</a><br>
 	</div>

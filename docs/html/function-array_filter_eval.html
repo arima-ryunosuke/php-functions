@@ -167,8 +167,8 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$k !== 1'</span>)   === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
-<span class="php-keyword2">assert</span>(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$v !== &quot;b&quot;'</span>) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);</pre>
+<pre>assertSame(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$k !== 1'</span>), [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
+assertSame(array_filter_eval([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'$v !== &quot;b&quot;'</span>), [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);</pre>
 	</div>
 
 

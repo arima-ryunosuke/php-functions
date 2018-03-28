@@ -173,13 +173,13 @@ $key が未指定だと「次に生成されるキー」（$array[]='hoge' で�
 
 <pre><span class="php-var">$array</span> = [<span class="php-num">9</span> =&gt; <span class="php-num">9</span>, <span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>];
 <span class="php-comment">// 'b' キーの次は 'c'</span>
-<span class="php-keyword2">assert</span>(next_key(<span class="php-var">$array</span>, <span class="php-quote">'b'</span>) === <span class="php-quote">'c'</span>);
+assertSame(next_key(<span class="php-var">$array</span>, <span class="php-quote">'b'</span>), <span class="php-quote">'c'</span>);
 <span class="php-comment">// 'c' キーの次は無いので null</span>
-<span class="php-keyword2">assert</span>(next_key(<span class="php-var">$array</span>, <span class="php-quote">'c'</span>) === <span class="php-keyword1">null</span>);
+assertSame(next_key(<span class="php-var">$array</span>, <span class="php-quote">'c'</span>), <span class="php-keyword1">null</span>);
 <span class="php-comment">// 'x' キーはそもそも存在しないので false</span>
-<span class="php-keyword2">assert</span>(next_key(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>) === <span class="php-keyword1">false</span>);
+assertSame(next_key(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>), <span class="php-keyword1">false</span>);
 <span class="php-comment">// 次に生成されるキーは 10</span>
-<span class="php-keyword2">assert</span>(next_key(<span class="php-var">$array</span>, <span class="php-keyword1">null</span>) === <span class="php-num">10</span>);</pre>
+assertSame(next_key(<span class="php-var">$array</span>, <span class="php-keyword1">null</span>), <span class="php-num">10</span>);</pre>
 	</div>
 
 

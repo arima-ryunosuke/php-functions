@@ -143,11 +143,11 @@ $escape で「特定文字が前にある」場合を無視することができ
 
 <pre><span class="php-comment">// $position を利用して &quot;first&quot;, &quot;second&quot;, &quot;third&quot; を得る（&quot;で囲まれた &quot;blank&quot; は返ってこない）。</span>
 <span class="php-var">$n</span> = <span class="php-num">0</span>;
-<span class="php-keyword2">assert</span>(str_between(<span class="php-quote">'{first} and {second} and &quot;{blank}&quot; and {third}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>, <span class="php-var">$n</span>) === <span class="php-quote">'first'</span>);
-<span class="php-keyword2">assert</span>(str_between(<span class="php-quote">'{first} and {second} and &quot;{blank}&quot; and {third}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>, <span class="php-var">$n</span>) === <span class="php-quote">'second'</span>);
-<span class="php-keyword2">assert</span>(str_between(<span class="php-quote">'{first} and {second} and &quot;{blank}&quot; and {third}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>, <span class="php-var">$n</span>) === <span class="php-quote">'third'</span>);
+assertSame(str_between(<span class="php-quote">'{first} and {second} and &quot;{blank}&quot; and {third}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>, <span class="php-var">$n</span>), <span class="php-quote">'first'</span>);
+assertSame(str_between(<span class="php-quote">'{first} and {second} and &quot;{blank}&quot; and {third}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>, <span class="php-var">$n</span>), <span class="php-quote">'second'</span>);
+assertSame(str_between(<span class="php-quote">'{first} and {second} and &quot;{blank}&quot; and {third}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>, <span class="php-var">$n</span>), <span class="php-quote">'third'</span>);
 <span class="php-comment">// ネストしている場合は最も外側を返す</span>
-<span class="php-keyword2">assert</span>(str_between(<span class="php-quote">'{nest1{nest2{nest3}}}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>) === <span class="php-quote">'nest1{nest2{nest3}}'</span>);</pre>
+assertSame(str_between(<span class="php-quote">'{nest1{nest2{nest3}}}'</span>, <span class="php-quote">'{'</span>, <span class="php-quote">'}'</span>), <span class="php-quote">'nest1{nest2{nest3}}'</span>);</pre>
 	</div>
 
 
@@ -206,7 +206,7 @@ $escape で「特定文字が前にある」場合を無視することができ
 		
 		<b>Package:</b> <a href="package-String.html">String</a><br>
 		<b>Located at</b>
-		<a href="source-function-str_between.html#4093-4167" title="Go to source code">
+		<a href="source-function-str_between.html#4090-4164" title="Go to source code">
 			
 		</a><br>
 	</div>

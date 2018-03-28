@@ -126,10 +126,10 @@
 
 <pre><span class="php-comment">// 基本的には object キャストと同じ</span>
 <span class="php-var">$fields</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>];
-<span class="php-keyword2">assert</span>(stdclass(<span class="php-var">$fields</span>) == (object) <span class="php-var">$fields</span>);
+assertEquals(stdclass(<span class="php-var">$fields</span>), (object) <span class="php-var">$fields</span>);
 <span class="php-comment">// ただしこういうことはキャストでは出来ない</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">array_map</span>(<span class="php-quote">'stdclass'</span>, [<span class="php-var">$fields</span>]) == [(object) <span class="php-var">$fields</span>]); <span class="php-comment">// コールバックとして利用する</span>
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">property_exists</span>(stdclass([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>]), <span class="php-quote">'0'</span>)); <span class="php-comment">// 数値キー付きオブジェクトにする</span></pre>
+assertEquals(<span class="php-keyword2">array_map</span>(<span class="php-quote">'stdclass'</span>, [<span class="php-var">$fields</span>]), [(object) <span class="php-var">$fields</span>]); <span class="php-comment">// コールバックとして利用する</span>
+assertTrue(<span class="php-keyword2">property_exists</span>(stdclass([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>]), <span class="php-quote">'0'</span>)); <span class="php-comment">// 数値キー付きオブジェクトにする</span></pre>
 	</div>
 
 

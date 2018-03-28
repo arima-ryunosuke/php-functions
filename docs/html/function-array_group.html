@@ -167,13 +167,13 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_group([<span class="php-num">1</span>, <span class="php-num">1</span>, <span class="php-num">1</span>])                                 === [<span class="php-num">1</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">1</span>, <span class="php-num">1</span>]]);
-<span class="php-keyword2">assert</span>(array_group([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span> % <span class="php-num">2</span>;})   === [<span class="php-num">1</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">3</span>], <span class="php-num">0</span> =&gt; [<span class="php-num">2</span>]]);
+<pre>assertSame(array_group([<span class="php-num">1</span>, <span class="php-num">1</span>, <span class="php-num">1</span>]), [<span class="php-num">1</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">1</span>, <span class="php-num">1</span>]]);
+assertSame(array_group([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span> % <span class="php-num">2</span>;}), [<span class="php-num">1</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">3</span>], <span class="php-num">0</span> =&gt; [<span class="php-num">2</span>]]);
 <span class="php-comment">// group -&gt; id で入れ子グループにする</span>
 <span class="php-var">$row1</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'group'</span> =&gt; <span class="php-quote">'hoge'</span>];
 <span class="php-var">$row2</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'group'</span> =&gt; <span class="php-quote">'fuga'</span>];
 <span class="php-var">$row3</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'group'</span> =&gt; <span class="php-quote">'hoge'</span>];
-<span class="php-keyword2">assert</span>(array_group([<span class="php-var">$row1</span>, <span class="php-var">$row2</span>, <span class="php-var">$row3</span>], <span class="php-keyword1">function</span>(<span class="php-var">$row</span>){<span class="php-keyword1">return</span> [<span class="php-var">$row</span>[<span class="php-quote">'group'</span>], <span class="php-var">$row</span>[<span class="php-quote">'id'</span>]];}) === [
+assertSame(array_group([<span class="php-var">$row1</span>, <span class="php-var">$row2</span>, <span class="php-var">$row3</span>], <span class="php-keyword1">function</span>(<span class="php-var">$row</span>){<span class="php-keyword1">return</span> [<span class="php-var">$row</span>[<span class="php-quote">'group'</span>], <span class="php-var">$row</span>[<span class="php-quote">'id'</span>]];}), [
     <span class="php-quote">'hoge'</span> =&gt; [
         <span class="php-num">1</span> =&gt; <span class="php-var">$row1</span>,
         <span class="php-num">3</span> =&gt; <span class="php-var">$row3</span>,

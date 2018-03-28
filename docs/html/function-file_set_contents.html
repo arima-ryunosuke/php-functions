@@ -125,7 +125,7 @@
 <p>Example:</p>
 
 <pre>file_set_contents(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/not/filename.ext'</span>, <span class="php-quote">'hoge'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">file_get_contents</span>(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/not/filename.ext'</span>) === <span class="php-quote">'hoge'</span>);</pre>
+assertSame(<span class="php-keyword2">file_get_contents</span>(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/not/filename.ext'</span>), <span class="php-quote">'hoge'</span>);</pre>
 	</div>
 
 
@@ -169,7 +169,7 @@
 		
 		<b>Package:</b> <a href="package-FileSystem.html">FileSystem</a><br>
 		<b>Located at</b>
-		<a href="source-function-file_set_contents.html#2657-2685" title="Go to source code">
+		<a href="source-function-file_set_contents.html#2654-2682" title="Go to source code">
 			
 		</a><br>
 	</div>

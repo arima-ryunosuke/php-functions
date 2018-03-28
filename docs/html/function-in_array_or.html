@@ -170,9 +170,9 @@ $needle が空の場合は常に false を返す。</p>
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(in_array_or([<span class="php-num">1</span>], [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>])    === <span class="php-keyword1">true</span>);
-<span class="php-keyword2">assert</span>(in_array_or([<span class="php-num">9</span>], [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>])    === <span class="php-keyword1">false</span>);
-<span class="php-keyword2">assert</span>(in_array_or([<span class="php-num">1</span>, <span class="php-num">9</span>], [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]) === <span class="php-keyword1">true</span>);</pre>
+<pre>assertTrue(in_array_or([<span class="php-num">1</span>], [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]), <span class="php-keyword1">true</span>);
+assertFalse(in_array_or([<span class="php-num">9</span>], [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]), <span class="php-keyword1">false</span>);
+assertTrue(in_array_or([<span class="php-num">1</span>, <span class="php-num">9</span>], [<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]), <span class="php-keyword1">true</span>);</pre>
 	</div>
 
 

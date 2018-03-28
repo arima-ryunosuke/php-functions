@@ -127,8 +127,8 @@
 <p>Example:</p>
 
 <pre><span class="php-keyword2">srand</span>(<span class="php-num">1</span>);<span class="php-keyword2">mt_srand</span>(<span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(random_at(<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>, <span class="php-num">4</span>, <span class="php-num">5</span>, <span class="php-num">6</span>) === <span class="php-num">4</span>);
-<span class="php-keyword2">assert</span>(random_at(<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>, <span class="php-num">4</span>, <span class="php-num">5</span>, <span class="php-num">6</span>) === <span class="php-num">1</span>);</pre>
+assertSame(random_at(<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>, <span class="php-num">4</span>, <span class="php-num">5</span>, <span class="php-num">6</span>), <span class="php-num">4</span>);
+assertSame(random_at(<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>, <span class="php-num">4</span>, <span class="php-num">5</span>, <span class="php-num">6</span>), <span class="php-num">1</span>);</pre>
 	</div>
 
 
@@ -162,7 +162,7 @@
 		
 		<b>Package:</b> <a href="package-Math.html">Math</a><br>
 		<b>Located at</b>
-		<a href="source-function-random_at.html#3769-3789" title="Go to source code">
+		<a href="source-function-random_at.html#3766-3786" title="Go to source code">
 			
 		</a><br>
 	</div>

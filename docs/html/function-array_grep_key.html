@@ -165,8 +165,8 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_grep_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'aa'</span> =&gt; <span class="php-quote">'AA'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-quote">'#^a#'</span>)       === [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'aa'</span> =&gt; <span class="php-quote">'AA'</span>]);
-<span class="php-keyword2">assert</span>(array_grep_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'aa'</span> =&gt; <span class="php-quote">'AA'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-quote">'#^a#'</span>, <span class="php-keyword1">true</span>) === [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>]);</pre>
+<pre>assertSame(array_grep_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'aa'</span> =&gt; <span class="php-quote">'AA'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-quote">'#^a#'</span>), [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'aa'</span> =&gt; <span class="php-quote">'AA'</span>]);
+assertSame(array_grep_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'aa'</span> =&gt; <span class="php-quote">'AA'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-quote">'#^a#'</span>, <span class="php-keyword1">true</span>), [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>]);</pre>
 	</div>
 
 

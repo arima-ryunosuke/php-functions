@@ -171,11 +171,11 @@ $ignore=null とすると 何もせずそのまま要素を返す。</p>
 
 <pre><span class="php-var">$exa</span> = <span class="php-keyword1">new</span> \Exception(<span class="php-quote">'a'</span>); <span class="php-var">$exb</span> = <span class="php-keyword1">new</span> \Exception(<span class="php-quote">'b'</span>); <span class="php-var">$std</span> = <span class="php-keyword1">new</span> \stdClass();
 <span class="php-comment">// getMessage で map される</span>
-<span class="php-keyword2">assert</span>(array_map_method([<span class="php-var">$exa</span>, <span class="php-var">$exb</span>], <span class="php-quote">'getMessage'</span>)                       === [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>]);
+assertSame(array_map_method([<span class="php-var">$exa</span>, <span class="php-var">$exb</span>], <span class="php-quote">'getMessage'</span>), [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>]);
 <span class="php-comment">// getMessage で map されるが、メソッドが存在しない場合は取り除かれる</span>
-<span class="php-keyword2">assert</span>(array_map_method([<span class="php-var">$exa</span>, <span class="php-var">$exb</span>, <span class="php-var">$std</span>, <span class="php-keyword1">null</span>], <span class="php-quote">'getMessage'</span>, [], <span class="php-keyword1">true</span>) === [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>]);
+assertSame(array_map_method([<span class="php-var">$exa</span>, <span class="php-var">$exb</span>, <span class="php-var">$std</span>, <span class="php-keyword1">null</span>], <span class="php-quote">'getMessage'</span>, [], <span class="php-keyword1">true</span>), [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>]);
 <span class="php-comment">// getMessage で map されるが、メソッドが存在しない場合はそのまま返す</span>
-<span class="php-keyword2">assert</span>(array_map_method([<span class="php-var">$exa</span>, <span class="php-var">$exb</span>, <span class="php-var">$std</span>, <span class="php-keyword1">null</span>], <span class="php-quote">'getMessage'</span>, [], <span class="php-keyword1">null</span>) === [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-var">$std</span>, <span class="php-keyword1">null</span>]);</pre>
+assertSame(array_map_method([<span class="php-var">$exa</span>, <span class="php-var">$exb</span>, <span class="php-var">$std</span>, <span class="php-keyword1">null</span>], <span class="php-quote">'getMessage'</span>, [], <span class="php-keyword1">null</span>), [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-var">$std</span>, <span class="php-keyword1">null</span>]);</pre>
 	</div>
 
 

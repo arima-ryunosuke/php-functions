@@ -172,15 +172,15 @@
 <p>Example:</p>
 
 <pre><span class="php-comment">// 単純取得</span>
-<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">1</span>)      === <span class="php-quote">'b'</span>);
+assertSame(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">1</span>), <span class="php-quote">'b'</span>);
 <span class="php-comment">// 単純デフォルト</span>
-<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">9</span>, <span class="php-num">999</span>) === <span class="php-num">999</span>);
+assertSame(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-num">9</span>, <span class="php-num">999</span>), <span class="php-num">999</span>);
 <span class="php-comment">// 配列取得</span>
-<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">0</span>, <span class="php-num">2</span>]) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
+assertSame(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">0</span>, <span class="php-num">2</span>]), [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'c'</span>]);
 <span class="php-comment">// 配列部分取得</span>
-<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">0</span>, <span class="php-num">9</span>]) === [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>]);
+assertSame(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">0</span>, <span class="php-num">9</span>]), [<span class="php-num">0</span> =&gt; <span class="php-quote">'a'</span>]);
 <span class="php-comment">// 配列デフォルト（null ではなく [] を返す）</span>
-<span class="php-keyword2">assert</span>(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">9</span>])    === []);</pre>
+assertSame(array_get([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], [<span class="php-num">9</span>]), []);</pre>
 	</div>
 
 

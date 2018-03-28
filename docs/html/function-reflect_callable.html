@@ -129,8 +129,8 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(reflect_callable(<span class="php-quote">'sprintf'</span>)        <span class="php-keyword1">instanceof</span> \ReflectionFunction);
-<span class="php-keyword2">assert</span>(reflect_callable(<span class="php-quote">'\Closure::bind'</span>) <span class="php-keyword1">instanceof</span> \ReflectionMethod);</pre>
+<pre>assertInstanceof(\ReflectionFunction::<span class="php-keyword1">class</span>, reflect_callable(<span class="php-quote">'sprintf'</span>));
+assertInstanceof(\ReflectionMethod::<span class="php-keyword1">class</span>, reflect_callable(<span class="php-quote">'\Closure::bind'</span>));</pre>
 	</div>
 
 
@@ -164,7 +164,7 @@
 		
 		<b>Package:</b> <a href="package-Callable.html">Callable</a><br>
 		<b>Located at</b>
-		<a href="source-function-reflect_callable.html#3230-3263" title="Go to source code">
+		<a href="source-function-reflect_callable.html#3227-3260" title="Go to source code">
 			
 		</a><br>
 	</div>

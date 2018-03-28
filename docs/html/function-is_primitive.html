@@ -130,12 +130,12 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(is_primitive(<span class="php-keyword1">null</span>)          === <span class="php-keyword1">true</span>);
-<span class="php-keyword2">assert</span>(is_primitive(<span class="php-keyword1">false</span>)         === <span class="php-keyword1">true</span>);
-<span class="php-keyword2">assert</span>(is_primitive(<span class="php-num">123</span>)           === <span class="php-keyword1">true</span>);
-<span class="php-keyword2">assert</span>(is_primitive(STDIN)         === <span class="php-keyword1">true</span>);
-<span class="php-keyword2">assert</span>(is_primitive(<span class="php-keyword1">new</span> \stdClass) === <span class="php-keyword1">false</span>);
-<span class="php-keyword2">assert</span>(is_primitive([<span class="php-quote">'array'</span>])     === <span class="php-keyword1">false</span>);</pre>
+<pre>assertTrue(is_primitive(<span class="php-keyword1">null</span>));
+assertTrue(is_primitive(<span class="php-keyword1">false</span>));
+assertTrue(is_primitive(<span class="php-num">123</span>));
+assertTrue(is_primitive(STDIN));
+assertFalse(is_primitive(<span class="php-keyword1">new</span> \stdClass));
+assertFalse(is_primitive([<span class="php-quote">'array'</span>]));</pre>
 	</div>
 
 
@@ -169,7 +169,7 @@
 		
 		<b>Package:</b> <a href="package-Var.html">Var</a><br>
 		<b>Located at</b>
-		<a href="source-function-is_primitive.html#5139-5167" title="Go to source code">
+		<a href="source-function-is_primitive.html#5136-5164" title="Go to source code">
 			
 		</a><br>
 	</div>

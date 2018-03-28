@@ -172,11 +172,11 @@ $is_key に false を与えるとコールバックの結果を返す。</p>
 <p>Example:</p>
 
 <pre><span class="php-comment">// 最初に見つかったキーを返す</span>
-<span class="php-keyword2">assert</span>(array_find([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'9'</span>], <span class="php-quote">'ctype_digit'</span>)                    === <span class="php-num">2</span>);
-<span class="php-keyword2">assert</span>(array_find([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'9'</span>], <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span> === <span class="php-quote">'b'</span>;}) === <span class="php-num">1</span>);
+assertSame(array_find([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'9'</span>], <span class="php-quote">'ctype_digit'</span>), <span class="php-num">2</span>);
+assertSame(array_find([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'9'</span>], <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span> === <span class="php-quote">'b'</span>;}), <span class="php-num">1</span>);
 <span class="php-comment">// 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）</span>
 <span class="php-var">$ifnumeric2power</span> = <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">ctype_digit</span>(<span class="php-var">$v</span>) ? <span class="php-var">$v</span> * <span class="php-var">$v</span> : <span class="php-keyword1">false</span>;};
-<span class="php-keyword2">assert</span>(array_find([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'9'</span>], <span class="php-var">$ifnumeric2power</span>, <span class="php-keyword1">false</span>)          === <span class="php-num">81</span>);</pre>
+assertSame(array_find([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'9'</span>], <span class="php-var">$ifnumeric2power</span>, <span class="php-keyword1">false</span>), <span class="php-num">81</span>);</pre>
 	</div>
 
 

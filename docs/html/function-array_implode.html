@@ -171,9 +171,9 @@
 <p>Example:</p>
 
 <pre><span class="php-comment">// (配列, 要素) の呼び出し</span>
-<span class="php-keyword2">assert</span>(array_implode([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'X'</span>) === [<span class="php-quote">'a'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'c'</span>]);
+assertSame(array_implode([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">'X'</span>), [<span class="php-quote">'a'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'c'</span>]);
 <span class="php-comment">// (要素, ...配列) の呼び出し</span>
-<span class="php-keyword2">assert</span>(array_implode(<span class="php-quote">'X'</span>, <span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>)   === [<span class="php-quote">'a'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'c'</span>]);</pre>
+assertSame(array_implode(<span class="php-quote">'X'</span>, <span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>), [<span class="php-quote">'a'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'X'</span>, <span class="php-quote">'c'</span>]);</pre>
 	</div>
 
 

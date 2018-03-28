@@ -133,7 +133,7 @@
     call_safely(<span class="php-keyword1">function</span>(){<span class="php-keyword1">return</span> <span class="php-var">$v</span>;});
 }
 <span class="php-keyword1">catch</span> (\Exception <span class="php-var">$ex</span>) {
-    <span class="php-keyword2">assert</span>(<span class="php-var">$ex</span>-&gt;getMessage() === <span class="php-quote">'Undefined variable: v'</span>);
+    assertSame(<span class="php-var">$ex</span>-&gt;getMessage(), <span class="php-quote">'Undefined variable: v'</span>);
 }</pre>
 	</div>
 
@@ -173,7 +173,7 @@
 		
 		<b>Package:</b> <a href="package-Callable.html">Callable</a><br>
 		<b>Located at</b>
-		<a href="source-function-call_safely.html#3303-3340" title="Go to source code">
+		<a href="source-function-call_safely.html#3300-3337" title="Go to source code">
 			
 		</a><br>
 	</div>

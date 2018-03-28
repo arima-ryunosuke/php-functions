@@ -126,7 +126,7 @@
     throws(<span class="php-keyword1">new</span> \Exception(<span class="php-quote">'throws'</span>));
 }
 <span class="php-keyword1">catch</span> (\Exception <span class="php-var">$ex</span>) {
-    <span class="php-keyword2">assert</span>(<span class="php-var">$ex</span>-&gt;getMessage() === <span class="php-quote">'throws'</span>);
+    assertSame(<span class="php-var">$ex</span>-&gt;getMessage(), <span class="php-quote">'throws'</span>);
 }</pre>
 	</div>
 
@@ -148,7 +148,7 @@
 		
 		<b>Package:</b> <a href="package-Syntax.html">Syntax</a><br>
 		<b>Located at</b>
-		<a href="source-function-throws.html#4651-4673" title="Go to source code">
+		<a href="source-function-throws.html#4648-4670" title="Go to source code">
 			
 		</a><br>
 	</div>

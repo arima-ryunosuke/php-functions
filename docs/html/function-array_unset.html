@@ -173,19 +173,19 @@
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>];
 <span class="php-comment">// ない場合は $default を返す</span>
-<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>, <span class="php-quote">'X'</span>) === <span class="php-quote">'X'</span>);
+assertSame(array_unset(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>, <span class="php-quote">'X'</span>), <span class="php-quote">'X'</span>);
 <span class="php-comment">// 指定したキーを返す。そのキーは伏せられている</span>
-<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, <span class="php-quote">'a'</span>) === <span class="php-quote">'A'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$array</span> === [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>]);
+assertSame(array_unset(<span class="php-var">$array</span>, <span class="php-quote">'a'</span>), <span class="php-quote">'A'</span>);
+assertSame(<span class="php-var">$array</span>, [<span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>]);
 
 <span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>];
 <span class="php-comment">// 配列を与えるとそれらを返す。そのキーは全て伏せられている</span>
-<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'x'</span>]) === [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]);
-<span class="php-keyword2">assert</span>(<span class="php-var">$array</span> === [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]);
+assertSame(array_unset(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'x'</span>]), [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]);
+assertSame(<span class="php-var">$array</span>, [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>]);
 
 <span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>];
 <span class="php-comment">// 配列のキーは返されるキーを表す。順番も維持される</span>
-<span class="php-keyword2">assert</span>(array_unset(<span class="php-var">$array</span>, [<span class="php-quote">'x2'</span> =&gt; <span class="php-quote">'b'</span>, <span class="php-quote">'x1'</span> =&gt; <span class="php-quote">'a'</span>]) === [<span class="php-quote">'x2'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'x1'</span> =&gt; <span class="php-quote">'A'</span>]);</pre>
+assertSame(array_unset(<span class="php-var">$array</span>, [<span class="php-quote">'x2'</span> =&gt; <span class="php-quote">'b'</span>, <span class="php-quote">'x1'</span> =&gt; <span class="php-quote">'a'</span>]), [<span class="php-quote">'x2'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'x1'</span> =&gt; <span class="php-quote">'A'</span>]);</pre>
 	</div>
 
 

@@ -172,12 +172,12 @@
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'hoge'</span>, <span class="php-quote">'fuga'</span>, <span class="php-quote">'piyo'</span>];
 <span class="php-comment">// 'o' を含むものの数（2個）</span>
-<span class="php-keyword2">assert</span>(array_count(<span class="php-var">$array</span>, <span class="php-keyword1">function</span>(<span class="php-var">$s</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">strpos</span>(<span class="php-var">$s</span>, <span class="php-quote">'o'</span>) !== <span class="php-keyword1">false</span>;}) === <span class="php-num">2</span>);
+assertSame(array_count(<span class="php-var">$array</span>, <span class="php-keyword1">function</span>(<span class="php-var">$s</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">strpos</span>(<span class="php-var">$s</span>, <span class="php-quote">'o'</span>) !== <span class="php-keyword1">false</span>;}), <span class="php-num">2</span>);
 <span class="php-comment">// 'a' と 'o' を含むものをそれぞれ（1個と2個）</span>
-<span class="php-keyword2">assert</span>(array_count(<span class="php-var">$array</span>, [
+assertSame(array_count(<span class="php-var">$array</span>, [
     <span class="php-quote">'a'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$s</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">strpos</span>(<span class="php-var">$s</span>, <span class="php-quote">'a'</span>) !== <span class="php-keyword1">false</span>;},
     <span class="php-quote">'o'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$s</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">strpos</span>(<span class="php-var">$s</span>, <span class="php-quote">'o'</span>) !== <span class="php-keyword1">false</span>;},
-]) === [<span class="php-quote">'a'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'o'</span> =&gt; <span class="php-num">2</span>]);</pre>
+]), [<span class="php-quote">'a'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'o'</span> =&gt; <span class="php-num">2</span>]);</pre>
 	</div>
 
 

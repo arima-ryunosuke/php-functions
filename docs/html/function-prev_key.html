@@ -170,11 +170,11 @@ $key が存在しない場合は false を返す。</p>
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>];
 <span class="php-comment">// 'b' キーの前は 'a'</span>
-<span class="php-keyword2">assert</span>(prev_key(<span class="php-var">$array</span>, <span class="php-quote">'b'</span>) === <span class="php-quote">'a'</span>);
+assertSame(prev_key(<span class="php-var">$array</span>, <span class="php-quote">'b'</span>), <span class="php-quote">'a'</span>);
 <span class="php-comment">// 'a' キーの前は無いので null</span>
-<span class="php-keyword2">assert</span>(prev_key(<span class="php-var">$array</span>, <span class="php-quote">'a'</span>) === <span class="php-keyword1">null</span>);
+assertSame(prev_key(<span class="php-var">$array</span>, <span class="php-quote">'a'</span>), <span class="php-keyword1">null</span>);
 <span class="php-comment">// 'x' キーはそもそも存在しないので false</span>
-<span class="php-keyword2">assert</span>(prev_key(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>) === <span class="php-keyword1">false</span>);</pre>
+assertSame(prev_key(<span class="php-var">$array</span>, <span class="php-quote">'x'</span>), <span class="php-keyword1">false</span>);</pre>
 	</div>
 
 

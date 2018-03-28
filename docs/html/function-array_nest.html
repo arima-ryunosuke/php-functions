@@ -180,7 +180,7 @@ $delimiter で階層を表現する。</p>
    <span class="php-quote">'k2.k22.k223.1'</span> =&gt; <span class="php-num">2</span>,
    <span class="php-quote">'k2.k22.k223.2'</span> =&gt; <span class="php-num">3</span>,
 ];
-<span class="php-keyword2">assert</span>(array_nest(<span class="php-var">$array</span>) === [
+assertSame(array_nest(<span class="php-var">$array</span>), [
    <span class="php-quote">'k1'</span> =&gt; <span class="php-quote">'v1'</span>,
    <span class="php-quote">'k2'</span> =&gt; [
        <span class="php-quote">'k21'</span> =&gt; <span class="php-quote">'v21'</span>,
@@ -196,7 +196,7 @@ $delimiter で階層を表現する。</p>
    <span class="php-quote">'k1.k2'</span> =&gt; <span class="php-quote">'v1'</span>, <span class="php-comment">// この時点で 'k1' は配列になるが・・・</span>
    <span class="php-quote">'k1'</span>    =&gt; <span class="php-quote">'v2'</span>, <span class="php-comment">// この時点で 'k1' は文字列として上書きされる</span>
 ];
-<span class="php-keyword2">assert</span>(array_nest(<span class="php-var">$array</span>) === [
+assertSame(array_nest(<span class="php-var">$array</span>), [
    <span class="php-quote">'k1'</span> =&gt; <span class="php-quote">'v2'</span>,
 ]);
 <span class="php-comment">// 上書きすら出来ない場合は例外が飛ぶ</span>
@@ -208,7 +208,7 @@ $delimiter で階層を表現する。</p>
     array_nest(<span class="php-var">$array</span>);
 }
 <span class="php-keyword1">catch</span> (\Exception <span class="php-var">$e</span>) {
-    <span class="php-keyword2">assert</span>(<span class="php-var">$e</span> <span class="php-keyword1">instanceof</span> \InvalidArgumentException);
+    assertInstanceof(\InvalidArgumentException::<span class="php-keyword1">class</span>, <span class="php-var">$e</span>);
 }</pre>
 	</div>
 

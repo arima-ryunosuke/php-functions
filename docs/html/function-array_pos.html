@@ -167,10 +167,10 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_pos([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], <span class="php-num">1</span>)                                  === <span class="php-num">2</span>);
-<span class="php-keyword2">assert</span>(array_pos([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], -<span class="php-num">1</span>)                                 === <span class="php-num">3</span>);
-<span class="php-keyword2">assert</span>(array_pos([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>], <span class="php-num">1</span>)       === <span class="php-quote">'B'</span>);
-<span class="php-keyword2">assert</span>(array_pos([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>], <span class="php-num">1</span>, <span class="php-keyword1">true</span>) === <span class="php-quote">'b'</span>);</pre>
+<pre>assertSame(array_pos([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], <span class="php-num">1</span>), <span class="php-num">2</span>);
+assertSame(array_pos([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], -<span class="php-num">1</span>), <span class="php-num">3</span>);
+assertSame(array_pos([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>], <span class="php-num">1</span>), <span class="php-quote">'B'</span>);
+assertSame(array_pos([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>, <span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C'</span>], <span class="php-num">1</span>, <span class="php-keyword1">true</span>), <span class="php-quote">'b'</span>);</pre>
 	</div>
 
 

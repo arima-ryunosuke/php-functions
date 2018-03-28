@@ -169,11 +169,11 @@
 
 <pre><span class="php-var">$array</span> = [<span class="php-num">11</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'name1'</span>], <span class="php-num">12</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'name2'</span>], <span class="php-num">13</span> =&gt; [<span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'name3'</span>]];
 <span class="php-comment">// 第3引数を渡せば array_column と全く同じ</span>
-<span class="php-keyword2">assert</span>(array_lookup(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-quote">'id'</span>) === array_column(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-quote">'id'</span>));
-<span class="php-keyword2">assert</span>(array_lookup(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-keyword1">null</span>) === array_column(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-keyword1">null</span>));
+assertSame(array_lookup(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-quote">'id'</span>), array_column(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-quote">'id'</span>));
+assertSame(array_lookup(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-keyword1">null</span>), array_column(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>, <span class="php-keyword1">null</span>));
 <span class="php-comment">// 省略すればキーが保存される</span>
-<span class="php-keyword2">assert</span>(array_lookup(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>)       === [<span class="php-num">11</span> =&gt; <span class="php-quote">'name1'</span>, <span class="php-num">12</span> =&gt; <span class="php-quote">'name2'</span>, <span class="php-num">13</span> =&gt; <span class="php-quote">'name3'</span>]);
-<span class="php-keyword2">assert</span>(array_lookup(<span class="php-var">$array</span>)               === <span class="php-var">$array</span>);</pre>
+assertSame(array_lookup(<span class="php-var">$array</span>, <span class="php-quote">'name'</span>), [<span class="php-num">11</span> =&gt; <span class="php-quote">'name1'</span>, <span class="php-num">12</span> =&gt; <span class="php-quote">'name2'</span>, <span class="php-num">13</span> =&gt; <span class="php-quote">'name3'</span>]);
+assertSame(array_lookup(<span class="php-var">$array</span>), <span class="php-var">$array</span>);</pre>
 	</div>
 
 

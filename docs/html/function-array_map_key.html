@@ -167,8 +167,8 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_map_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-quote">'strtoupper'</span>) === [<span class="php-quote">'A'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span> =&gt; <span class="php-quote">'B'</span>]);
-<span class="php-keyword2">assert</span>(array_map_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-keyword1">function</span>(){}) === []);</pre>
+<pre>assertSame(array_map_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-quote">'strtoupper'</span>), [<span class="php-quote">'A'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span> =&gt; <span class="php-quote">'B'</span>]);
+assertSame(array_map_key([<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B'</span>], <span class="php-keyword1">function</span>(){}), []);</pre>
 	</div>
 
 

@@ -128,9 +128,9 @@ realpath ではない。のでシンボリックリンクの解決などはし�
 <p>Example:</p>
 
 <pre><span class="php-var">$DS</span> = DIRECTORY_SEPARATOR;
-<span class="php-keyword2">assert</span>(path_normalize(<span class="php-quote">'/path/to/something'</span>)                    === <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">path</span><span class="php-var">{$DS}</span><span class="php-quote">to</span><span class="php-var">{$DS}</span><span class="php-quote">something&quot;</span>);
-<span class="php-keyword2">assert</span>(path_normalize(<span class="php-quote">'/path/through/../something'</span>)            === <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">path</span><span class="php-var">{$DS}</span><span class="php-quote">something&quot;</span>);
-<span class="php-keyword2">assert</span>(path_normalize(<span class="php-quote">'./path/current/./through/../something'</span>) === <span class="php-quote">&quot;path</span><span class="php-var">{$DS}</span><span class="php-quote">current</span><span class="php-var">{$DS}</span><span class="php-quote">something&quot;</span>);</pre>
+assertSame(path_normalize(<span class="php-quote">'/path/to/something'</span>), <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">path</span><span class="php-var">{$DS}</span><span class="php-quote">to</span><span class="php-var">{$DS}</span><span class="php-quote">something&quot;</span>);
+assertSame(path_normalize(<span class="php-quote">'/path/through/../something'</span>), <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">path</span><span class="php-var">{$DS}</span><span class="php-quote">something&quot;</span>);
+assertSame(path_normalize(<span class="php-quote">'./path/current/./through/../something'</span>), <span class="php-quote">&quot;path</span><span class="php-var">{$DS}</span><span class="php-quote">current</span><span class="php-var">{$DS}</span><span class="php-quote">something&quot;</span>);</pre>
 	</div>
 
 
@@ -164,7 +164,7 @@ realpath ではない。のでシンボリックリンクの解決などはし�
 		
 		<b>Package:</b> <a href="package-FileSystem.html">FileSystem</a><br>
 		<b>Located at</b>
-		<a href="source-function-path_normalize.html#2817-2861" title="Go to source code">
+		<a href="source-function-path_normalize.html#2814-2858" title="Go to source code">
 			
 		</a><br>
 	</div>

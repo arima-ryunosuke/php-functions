@@ -173,10 +173,10 @@
 
 <pre><span class="php-comment">// lt2(2より小さい)で分類</span>
 <span class="php-var">$lt2</span> = <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span> &lt; <span class="php-num">2</span>;};
-<span class="php-keyword2">assert</span>(array_assort([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], [<span class="php-quote">'lt2'</span> =&gt; <span class="php-var">$lt2</span>])                               === [<span class="php-quote">'lt2'</span> =&gt; [<span class="php-num">1</span>]]);
+assertSame(array_assort([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>], [<span class="php-quote">'lt2'</span> =&gt; <span class="php-var">$lt2</span>]), [<span class="php-quote">'lt2'</span> =&gt; [<span class="php-num">1</span>]]);
 <span class="php-comment">// lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）</span>
 <span class="php-var">$lt3</span> = <span class="php-keyword1">function</span>(<span class="php-var">$v</span>){<span class="php-keyword1">return</span> <span class="php-var">$v</span> &lt; <span class="php-num">3</span>;};
-<span class="php-keyword2">assert</span>(array_assort([<span class="php-quote">'1'</span>, <span class="php-quote">'2'</span>, <span class="php-quote">'3'</span>], [<span class="php-quote">'lt3'</span> =&gt; <span class="php-var">$lt3</span>, <span class="php-quote">'ctd'</span> =&gt; <span class="php-quote">'ctype_digit'</span>]) === [<span class="php-quote">'lt3'</span> =&gt; [<span class="php-quote">'1'</span>, <span class="php-quote">'2'</span>], <span class="php-quote">'ctd'</span> =&gt; [<span class="php-quote">'1'</span>, <span class="php-quote">'2'</span>, <span class="php-quote">'3'</span>]]);</pre>
+assertSame(array_assort([<span class="php-quote">'1'</span>, <span class="php-quote">'2'</span>, <span class="php-quote">'3'</span>], [<span class="php-quote">'lt3'</span> =&gt; <span class="php-var">$lt3</span>, <span class="php-quote">'ctd'</span> =&gt; <span class="php-quote">'ctype_digit'</span>]), [<span class="php-quote">'lt3'</span> =&gt; [<span class="php-quote">'1'</span>, <span class="php-quote">'2'</span>], <span class="php-quote">'ctd'</span> =&gt; [<span class="php-quote">'1'</span>, <span class="php-quote">'2'</span>, <span class="php-quote">'3'</span>]]);</pre>
 	</div>
 
 

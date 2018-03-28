@@ -172,7 +172,7 @@
 <span class="php-var">$array2</span> = [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C2'</span>, <span class="php-quote">'b'</span> =&gt; <span class="php-quote">'B2'</span>, <span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A2'</span>];
 <span class="php-var">$array3</span> = [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C3'</span>, <span class="php-quote">'dummy'</span> =&gt; <span class="php-quote">'DUMMY'</span>];
 <span class="php-comment">// 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる</span>
-<span class="php-keyword2">assert</span>(array_shrink_key(<span class="php-var">$array1</span>, <span class="php-var">$array2</span>, <span class="php-var">$array3</span>) === [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C3'</span>]);</pre>
+assertSame(array_shrink_key(<span class="php-var">$array1</span>, <span class="php-var">$array2</span>, <span class="php-var">$array3</span>), [<span class="php-quote">'c'</span> =&gt; <span class="php-quote">'C3'</span>]);</pre>
 	</div>
 
 

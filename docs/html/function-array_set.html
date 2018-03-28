@@ -170,15 +170,15 @@
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>];
 <span class="php-comment">// 第3引数省略（最後に連番キーで設定）</span>
-<span class="php-keyword2">assert</span>(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>) === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$array</span>                 === [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>]);
+assertSame(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>), <span class="php-num">1</span>);
+assertSame(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>]);
 <span class="php-comment">// 第3引数でキーを指定</span>
-<span class="php-keyword2">assert</span>(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span>) === <span class="php-quote">'z'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$array</span>                      === [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>]);
-<span class="php-keyword2">assert</span>(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span>) === <span class="php-quote">'z'</span>);
+assertSame(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span>), <span class="php-quote">'z'</span>);
+assertSame(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>]);
+assertSame(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span>), <span class="php-quote">'z'</span>);
 <span class="php-comment">// 第3引数で配列を指定</span>
-<span class="php-keyword2">assert</span>(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, [<span class="php-quote">'x'</span>, <span class="php-quote">'y'</span>, <span class="php-quote">'z'</span>]) === <span class="php-quote">'z'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$array</span>                                  === [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>, <span class="php-quote">'x'</span> =&gt; [<span class="php-quote">'y'</span> =&gt; [<span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>]]]);</pre>
+assertSame(array_set(<span class="php-var">$array</span>, <span class="php-quote">'Z'</span>, [<span class="php-quote">'x'</span>, <span class="php-quote">'y'</span>, <span class="php-quote">'z'</span>]), <span class="php-quote">'z'</span>);
+assertSame(<span class="php-var">$array</span>, [<span class="php-quote">'a'</span> =&gt; <span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>, <span class="php-quote">'Z'</span>, <span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>, <span class="php-quote">'x'</span> =&gt; [<span class="php-quote">'y'</span> =&gt; [<span class="php-quote">'z'</span> =&gt; <span class="php-quote">'Z'</span>]]]);</pre>
 	</div>
 
 

@@ -127,11 +127,11 @@
 <span class="php-comment">// 乱数を返す処理だが、キャッシュされるので同じ値になる</span>
 <span class="php-var">$rand1</span> = cache(<span class="php-quote">'rand'</span>, <span class="php-var">$provider</span>);
 <span class="php-var">$rand2</span> = cache(<span class="php-quote">'rand'</span>, <span class="php-var">$provider</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$rand1</span> === <span class="php-var">$rand2</span>);
+assertSame(<span class="php-var">$rand1</span>, <span class="php-var">$rand2</span>);
 <span class="php-comment">// $provider に null を与えると削除される</span>
 cache(<span class="php-quote">'rand'</span>, <span class="php-keyword1">null</span>);
 <span class="php-var">$rand3</span> = cache(<span class="php-quote">'rand'</span>, <span class="php-var">$provider</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$rand1</span> !== <span class="php-var">$rand3</span>);</pre>
+assertNotSame(<span class="php-var">$rand1</span>, <span class="php-var">$rand3</span>);</pre>
 	</div>
 
 
@@ -180,7 +180,7 @@ cache(<span class="php-quote">'rand'</span>, <span class="php-keyword1">null</sp
 		
 		<b>Package:</b> <a href="package-Utility.html">Utility</a><br>
 		<b>Located at</b>
-		<a href="source-function-cache.html#4831-4890" title="Go to source code">
+		<a href="source-function-cache.html#4828-4887" title="Go to source code">
 			
 		</a><br>
 	</div>

@@ -128,9 +128,9 @@
 <p>Example:</p>
 
 <pre><span class="php-var">$DS</span> = DIRECTORY_SEPARATOR;
-<span class="php-keyword2">assert</span>(path_resolve(<span class="php-quote">'/absolute/path'</span>) === <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">absolute</span><span class="php-var">{$DS}</span><span class="php-quote">path&quot;</span>);
-<span class="php-keyword2">assert</span>(path_resolve(<span class="php-quote">'absolute/path'</span>)  === <span class="php-keyword2">getcwd</span>() . <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">absolute</span><span class="php-var">{$DS}</span><span class="php-quote">path&quot;</span>);
-<span class="php-keyword2">assert</span>(path_resolve(<span class="php-quote">'/absolute/path/through'</span>, <span class="php-quote">'../current/./path'</span>) === <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">absolute</span><span class="php-var">{$DS}</span><span class="php-quote">path</span><span class="php-var">{$DS}</span><span class="php-quote">current</span><span class="php-var">{$DS}</span><span class="php-quote">path&quot;</span>);</pre>
+assertSame(path_resolve(<span class="php-quote">'/absolute/path'</span>), <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">absolute</span><span class="php-var">{$DS}</span><span class="php-quote">path&quot;</span>);
+assertSame(path_resolve(<span class="php-quote">'absolute/path'</span>), <span class="php-keyword2">getcwd</span>() . <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">absolute</span><span class="php-var">{$DS}</span><span class="php-quote">path&quot;</span>);
+assertSame(path_resolve(<span class="php-quote">'/absolute/path/through'</span>, <span class="php-quote">'../current/./path'</span>), <span class="php-quote">&quot;</span><span class="php-var">{$DS}</span><span class="php-quote">absolute</span><span class="php-var">{$DS}</span><span class="php-quote">path</span><span class="php-var">{$DS}</span><span class="php-quote">current</span><span class="php-var">{$DS}</span><span class="php-quote">path&quot;</span>);</pre>
 	</div>
 
 
@@ -164,7 +164,7 @@
 		
 		<b>Package:</b> <a href="package-FileSystem.html">FileSystem</a><br>
 		<b>Located at</b>
-		<a href="source-function-path_resolve.html#2784-2814" title="Go to source code">
+		<a href="source-function-path_resolve.html#2781-2811" title="Go to source code">
 			
 		</a><br>
 	</div>

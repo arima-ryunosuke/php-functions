@@ -167,8 +167,8 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(first_keyvalue([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>]) === [<span class="php-num">0</span>, <span class="php-quote">'a'</span>]);
-<span class="php-keyword2">assert</span>(first_keyvalue([], <span class="php-num">999</span>)         === <span class="php-num">999</span>);</pre>
+<pre>assertSame(first_keyvalue([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>]), [<span class="php-num">0</span>, <span class="php-quote">'a'</span>]);
+assertSame(first_keyvalue([], <span class="php-num">999</span>), <span class="php-num">999</span>);</pre>
 	</div>
 
 

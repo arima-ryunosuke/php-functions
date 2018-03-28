@@ -126,7 +126,7 @@
 
 <pre><span class="php-keyword2">mkdir</span>(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/new/make/dir'</span>, <span class="php-num">0777</span>, <span class="php-keyword1">true</span>);
 rm_rf(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/new'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-keyword2">file_exists</span>(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/new'</span>) === <span class="php-keyword1">false</span>);</pre>
+assertSame(<span class="php-keyword2">file_exists</span>(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-quote">'/new'</span>), <span class="php-keyword1">false</span>);</pre>
 	</div>
 
 
@@ -165,7 +165,7 @@ rm_rf(<span class="php-keyword2">sys_get_temp_dir</span>() . <span class="php-qu
 		
 		<b>Package:</b> <a href="package-FileSystem.html">FileSystem</a><br>
 		<b>Located at</b>
-		<a href="source-function-rm_rf.html#2864-2901" title="Go to source code">
+		<a href="source-function-rm_rf.html#2861-2898" title="Go to source code">
 			
 		</a><br>
 	</div>

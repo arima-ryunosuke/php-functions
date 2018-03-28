@@ -140,11 +140,11 @@ $default がそのまま返ってくる。</p>
 <pre><span class="php-var">$pattern</span> = <span class="php-quote">'#(\d{4})/(\d{1,2})(/(\d{1,2}))?#'</span>;
 <span class="php-var">$default</span> = [<span class="php-num">1</span> =&gt; <span class="php-quote">'2000'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'1'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'1'</span>];
 <span class="php-comment">// 完全にマッチするのでそれぞれ返ってくる</span>
-<span class="php-keyword2">assert</span>(preg_capture(<span class="php-var">$pattern</span>, <span class="php-quote">'2014/12/24'</span>, <span class="php-var">$default</span>) === [<span class="php-num">1</span> =&gt; <span class="php-quote">'2014'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'12'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'24'</span>]);
+assertSame(preg_capture(<span class="php-var">$pattern</span>, <span class="php-quote">'2014/12/24'</span>, <span class="php-var">$default</span>), [<span class="php-num">1</span> =&gt; <span class="php-quote">'2014'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'12'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'24'</span>]);
 <span class="php-comment">// 最後の \d{1,2} はマッチしないのでデフォルト値が使われる</span>
-<span class="php-keyword2">assert</span>(preg_capture(<span class="php-var">$pattern</span>, <span class="php-quote">'2014/12'</span>, <span class="php-var">$default</span>)    === [<span class="php-num">1</span> =&gt; <span class="php-quote">'2014'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'12'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'1'</span>]);
+assertSame(preg_capture(<span class="php-var">$pattern</span>, <span class="php-quote">'2014/12'</span>, <span class="php-var">$default</span>), [<span class="php-num">1</span> =&gt; <span class="php-quote">'2014'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'12'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'1'</span>]);
 <span class="php-comment">// 一切マッチしないので全てデフォルト値が使われる</span>
-<span class="php-keyword2">assert</span>(preg_capture(<span class="php-var">$pattern</span>, <span class="php-quote">'hoge'</span>, <span class="php-var">$default</span>)       === [<span class="php-num">1</span> =&gt; <span class="php-quote">'2000'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'1'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'1'</span>]);</pre>
+assertSame(preg_capture(<span class="php-var">$pattern</span>, <span class="php-quote">'hoge'</span>, <span class="php-var">$default</span>), [<span class="php-num">1</span> =&gt; <span class="php-quote">'2000'</span>, <span class="php-num">2</span> =&gt; <span class="php-quote">'1'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'1'</span>]);</pre>
 	</div>
 
 
@@ -188,7 +188,7 @@ $default がそのまま返ってくる。</p>
 		
 		<b>Package:</b> <a href="package-String.html">String</a><br>
 		<b>Located at</b>
-		<a href="source-function-preg_capture.html#4410-4449" title="Go to source code">
+		<a href="source-function-preg_capture.html#4407-4446" title="Go to source code">
 			
 		</a><br>
 	</div>

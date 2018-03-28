@@ -14,10 +14,10 @@ if (!isset($excluded_functions['arrayize']) && (!function_exists('ryunosuke\\Fun
      *
      * Example:
      * <code>
-     * assert(arrayize(1, 2, 3)                   === [1, 2, 3]);
-     * assert(arrayize([1], [2], [3])             === [1, 2, 3]);
+     * assertSame(arrayize(1, 2, 3), [1, 2, 3]);
+     * assertSame(arrayize([1], [2], [3]), [1, 2, 3]);
      * $object = new \stdClass();
-     * assert(arrayize($object, false, [1, 2, 3]) === [$object, false, 1, 2, 3]);
+     * assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
      * </code>
      *
      * @package Array
@@ -45,9 +45,9 @@ if (!isset($excluded_functions['is_hasharray']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(is_hasharray([])           === false);
-     * assert(is_hasharray([1, 2, 3])    === false);
-     * assert(is_hasharray(['x' => 'X']) === true);
+     * assertFalse(is_hasharray([]));
+     * assertFalse(is_hasharray([1, 2, 3]));
+     * assertTrue(is_hasharray(['x' => 'X']));
      * </code>
      *
      * @package Array
@@ -74,8 +74,8 @@ if (!isset($excluded_functions['first_key']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * <code>
-     * assert(first_key(['a', 'b', 'c']) === 0);
-     * assert(first_key([], 999)         === 999);
+     * assertSame(first_key(['a', 'b', 'c']), 0);
+     * assertSame(first_key([], 999), 999);
      * </code>
      *
      * @package Array
@@ -102,8 +102,8 @@ if (!isset($excluded_functions['first_value']) && (!function_exists('ryunosuke\\
      *
      * Example:
      * <code>
-     * assert(first_value(['a', 'b', 'c']) === 'a');
-     * assert(first_value([], 999)         === 999);
+     * assertSame(first_value(['a', 'b', 'c']), 'a');
+     * assertSame(first_value([], 999), 999);
      * </code>
      *
      * @package Array
@@ -130,8 +130,8 @@ if (!isset($excluded_functions['first_keyvalue']) && (!function_exists('ryunosuk
      *
      * Example:
      * <code>
-     * assert(first_keyvalue(['a', 'b', 'c']) === [0, 'a']);
-     * assert(first_keyvalue([], 999)         === 999);
+     * assertSame(first_keyvalue(['a', 'b', 'c']), [0, 'a']);
+     * assertSame(first_keyvalue([], 999), 999);
      * </code>
      *
      * @package Array
@@ -156,8 +156,8 @@ if (!isset($excluded_functions['last_key']) && (!function_exists('ryunosuke\\Fun
      *
      * Example:
      * <code>
-     * assert(last_key(['a', 'b', 'c']) === 2);
-     * assert(last_key([], 999)         === 999);
+     * assertSame(last_key(['a', 'b', 'c']), 2);
+     * assertSame(last_key([], 999), 999);
      * </code>
      *
      * @package Array
@@ -184,8 +184,8 @@ if (!isset($excluded_functions['last_value']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(last_value(['a', 'b', 'c']) === 'c');
-     * assert(last_value([], 999)         === 999);
+     * assertSame(last_value(['a', 'b', 'c']), 'c');
+     * assertSame(last_value([], 999), 999);
      * </code>
      *
      * @package Array
@@ -212,8 +212,8 @@ if (!isset($excluded_functions['last_keyvalue']) && (!function_exists('ryunosuke
      *
      * Example:
      * <code>
-     * assert(last_keyvalue(['a', 'b', 'c']) === [2, 'c']);
-     * assert(last_keyvalue([], 999)         === 999);
+     * assertSame(last_keyvalue(['a', 'b', 'c']), [2, 'c']);
+     * assertSame(last_keyvalue([], 999), 999);
      * </code>
      *
      * @package Array
@@ -247,11 +247,11 @@ if (!isset($excluded_functions['prev_key']) && (!function_exists('ryunosuke\\Fun
      * <code>
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの前は 'a'
-     * assert(prev_key($array, 'b') === 'a');
+     * assertSame(prev_key($array, 'b'), 'a');
      * // 'a' キーの前は無いので null
-     * assert(prev_key($array, 'a') === null);
+     * assertSame(prev_key($array, 'a'), null);
      * // 'x' キーはそもそも存在しないので false
-     * assert(prev_key($array, 'x') === false);
+     * assertSame(prev_key($array, 'x'), false);
      * </code>
      *
      * @package Array
@@ -287,13 +287,13 @@ if (!isset($excluded_functions['next_key']) && (!function_exists('ryunosuke\\Fun
      * <code>
      * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの次は 'c'
-     * assert(next_key($array, 'b') === 'c');
+     * assertSame(next_key($array, 'b'), 'c');
      * // 'c' キーの次は無いので null
-     * assert(next_key($array, 'c') === null);
+     * assertSame(next_key($array, 'c'), null);
      * // 'x' キーはそもそも存在しないので false
-     * assert(next_key($array, 'x') === false);
+     * assertSame(next_key($array, 'x'), false);
      * // 次に生成されるキーは 10
-     * assert(next_key($array, null) === 10);
+     * assertSame(next_key($array, null), 10);
      * </code>
      *
      * @package Array
@@ -339,9 +339,9 @@ if (!isset($excluded_functions['in_array_and']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(in_array_and([1], [1, 2, 3])    === true);
-     * assert(in_array_and([9], [1, 2, 3])    === false);
-     * assert(in_array_and([1, 9], [1, 2, 3]) === false);
+     * assertTrue(in_array_and([1], [1, 2, 3]));
+     * assertFalse(in_array_and([9], [1, 2, 3]));
+     * assertFalse(in_array_and([1, 9], [1, 2, 3]));
      * </code>
      *
      * @package Array
@@ -377,9 +377,9 @@ if (!isset($excluded_functions['in_array_or']) && (!function_exists('ryunosuke\\
      *
      * Example:
      * <code>
-     * assert(in_array_or([1], [1, 2, 3])    === true);
-     * assert(in_array_or([9], [1, 2, 3])    === false);
-     * assert(in_array_or([1, 9], [1, 2, 3]) === true);
+     * assertTrue(in_array_or([1], [1, 2, 3]), true);
+     * assertFalse(in_array_or([9], [1, 2, 3]), false);
+     * assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
      * </code>
      *
      * @package Array
@@ -411,9 +411,9 @@ if (!isset($excluded_functions['array_add']) && (!function_exists('ryunosuke\\Fu
      * Example:
      * <code>
      * // ただの加算の関数版なので同じキーは上書きされない
-     * assert(array_add(['a', 'b', 'c'], ['X'])        === ['a', 'b', 'c']);
+     * assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
      * // 異なるキーは生える
-     * assert(array_add(['a', 'b', 'c'], ['x' => 'X']) === ['a', 'b', 'c', 'x' => 'X']);
+     * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
      * </code>
      *
      * @package Array
@@ -442,9 +442,9 @@ if (!isset($excluded_functions['array_implode']) && (!function_exists('ryunosuke
      * Example:
      * <code>
      * // (配列, 要素) の呼び出し
-     * assert(array_implode(['a', 'b', 'c'], 'X') === ['a', 'X', 'b', 'X', 'c']);
+     * assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
      * // (要素, ...配列) の呼び出し
-     * assert(array_implode('X', 'a', 'b', 'c')   === ['a', 'X', 'b', 'X', 'c']);
+     * assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
      * </code>
      *
      * @package Array
@@ -488,12 +488,12 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('ryunosuke
      * <code>
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // key, value を利用した sprintf
-     * assert(array_sprintf($array, '%2$s=%1$s')      === ['key1=val1', 'key2=val2']);
+     * assertSame(array_sprintf($array, '%2$s=%1$s'), ['key1=val1', 'key2=val2']);
      * // 第3引数を与えるとさらに implode される
-     * assert(array_sprintf($array, '%2$s=%1$s', ' ') === 'key1=val1 key2=val2');
+     * assertSame(array_sprintf($array, '%2$s=%1$s', ' '), 'key1=val1 key2=val2');
      * // クロージャを与えるとコールバック動作になる
      * $closure = function($v, $k){return "$k=" . strtoupper($v);};
-     * assert(array_sprintf($array, $closure, ' ')    === 'key1=VAL1 key2=VAL2');
+     * assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
      * </code>
      *
      * @package Array
@@ -536,9 +536,9 @@ if (!isset($excluded_functions['array_strpad']) && (!function_exists('ryunosuke\
      * <code>
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // キーにプレフィックス付与
-     * assert(array_strpad($array, 'prefix-')       === ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
+     * assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
      * // 値にサフィックス付与
-     * assert(array_strpad($array, '', ['-suffix']) === ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
+     * assertSame(array_strpad($array, '', ['-suffix']), ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
      * </code>
      *
      * @package Array
@@ -576,10 +576,10 @@ if (!isset($excluded_functions['array_pos']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * <code>
-     * assert(array_pos([1, 2, 3], 1)                                  === 2);
-     * assert(array_pos([1, 2, 3], -1)                                 === 3);
-     * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1)       === 'B');
-     * assert(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true) === 'b');
+     * assertSame(array_pos([1, 2, 3], 1), 2);
+     * assertSame(array_pos([1, 2, 3], -1), 3);
+     * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1), 'B');
+     * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true), 'b');
      * </code>
      *
      * @package Array
@@ -626,7 +626,7 @@ if (!isset($excluded_functions['array_of']) && (!function_exists('ryunosuke\\Fun
      * Example:
      * <code>
      * $fuga_of_array = array_of('fuga');
-     * assert($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']) === 'FUGA');
+     * assertSame($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']), 'FUGA');
      * </code>
      *
      * @package Array
@@ -661,15 +661,15 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('ryunosuke\\Fu
      * Example:
      * <code>
      * // 単純取得
-     * assert(array_get(['a', 'b', 'c'], 1)      === 'b');
+     * assertSame(array_get(['a', 'b', 'c'], 1), 'b');
      * // 単純デフォルト
-     * assert(array_get(['a', 'b', 'c'], 9, 999) === 999);
+     * assertSame(array_get(['a', 'b', 'c'], 9, 999), 999);
      * // 配列取得
-     * assert(array_get(['a', 'b', 'c'], [0, 2]) === [0 => 'a', 2 => 'c']);
+     * assertSame(array_get(['a', 'b', 'c'], [0, 2]), [0 => 'a', 2 => 'c']);
      * // 配列部分取得
-     * assert(array_get(['a', 'b', 'c'], [0, 9]) === [0 => 'a']);
+     * assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 => 'a']);
      * // 配列デフォルト（null ではなく [] を返す）
-     * assert(array_get(['a', 'b', 'c'], [9])    === []);
+     * assertSame(array_get(['a', 'b', 'c'], [9]), []);
      * </code>
      *
      * @package Array
@@ -716,15 +716,15 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('ryunosuke\\Fu
      * <code>
      * $array = ['a' => 'A', 'B'];
      * // 第3引数省略（最後に連番キーで設定）
-     * assert(array_set($array, 'Z') === 1);
-     * assert($array                 === ['a' => 'A', 'B', 'Z']);
+     * assertSame(array_set($array, 'Z'), 1);
+     * assertSame($array, ['a' => 'A', 'B', 'Z']);
      * // 第3引数でキーを指定
-     * assert(array_set($array, 'Z', 'z') === 'z');
-     * assert($array                      === ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
-     * assert(array_set($array, 'Z', 'z') === 'z');
+     * assertSame(array_set($array, 'Z', 'z'), 'z');
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+     * assertSame(array_set($array, 'Z', 'z'), 'z');
      * // 第3引数で配列を指定
-     * assert(array_set($array, 'Z', ['x', 'y', 'z']) === 'z');
-     * assert($array                                  === ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
+     * assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * </code>
      *
      * @package Array
@@ -776,19 +776,19 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('ryunosuke\\
      * <code>
      * $array = ['a' => 'A', 'b' => 'B'];
      * // ない場合は $default を返す
-     * assert(array_unset($array, 'x', 'X') === 'X');
+     * assertSame(array_unset($array, 'x', 'X'), 'X');
      * // 指定したキーを返す。そのキーは伏せられている
-     * assert(array_unset($array, 'a') === 'A');
-     * assert($array === ['b' => 'B']);
+     * assertSame(array_unset($array, 'a'), 'A');
+     * assertSame($array, ['b' => 'B']);
      *
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列を与えるとそれらを返す。そのキーは全て伏せられている
-     * assert(array_unset($array, ['a', 'b', 'x']) === ['A', 'B']);
-     * assert($array === ['c' => 'C']);
+     * assertSame(array_unset($array, ['a', 'b', 'x']), ['A', 'B']);
+     * assertSame($array, ['c' => 'C']);
      *
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列のキーは返されるキーを表す。順番も維持される
-     * assert(array_unset($array, ['x2' => 'b', 'x1' => 'a']) === ['x2' => 'B', 'x1' => 'A']);
+     * assertSame(array_unset($array, ['x2' => 'b', 'x1' => 'a']), ['x2' => 'B', 'x1' => 'A']);
      * </code>
      *
      * @package Array
@@ -837,10 +837,10 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('ryunosuke\\F
      *         ]
      *     ]
      * ];
-     * assert(array_dive($array, 'a.b.c')    === 'vvv');
-     * assert(array_dive($array, 'a.b.x', 9) === 9);
+     * assertSame(array_dive($array, 'a.b.c'), 'vvv');
+     * assertSame(array_dive($array, 'a.b.x', 9), 9);
      * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
-     * assert(array_dive($array, ['a', 'b', 'c'])    === 'vvv');
+     * assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
      * </code>
      *
      * @package Array
@@ -872,8 +872,8 @@ if (!isset($excluded_functions['array_exists']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(array_exists(['a', 'b', '9'], 'ctype_digit')                    === 2);
-     * assert(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
+     * assertSame(array_exists(['a', 'b', '9'], 'ctype_digit'), 2);
+     * assertSame(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
      * </code>
      *
      * @package Array
@@ -906,11 +906,11 @@ if (!isset($excluded_functions['array_find']) && (!function_exists('ryunosuke\\F
      * Example:
      * <code>
      * // 最初に見つかったキーを返す
-     * assert(array_find(['a', 'b', '9'], 'ctype_digit')                    === 2);
-     * assert(array_find(['a', 'b', '9'], function($v){return $v === 'b';}) === 1);
+     * assertSame(array_find(['a', 'b', '9'], 'ctype_digit'), 2);
+     * assertSame(array_find(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
      * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
-     * assert(array_find(['a', 'b', '9'], $ifnumeric2power, false)          === 81);
+     * assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
      * </code>
      *
      * @package Array
@@ -942,8 +942,8 @@ if (!isset($excluded_functions['array_grep_key']) && (!function_exists('ryunosuk
      *
      * Example:
      * <code>
-     * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#')       === ['a' => 'A', 'aa' => 'AA']);
-     * assert(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true) === ['b' => 'B']);
+     * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#'), ['a' => 'A', 'aa' => 'AA']);
+     * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true), ['b' => 'B']);
      * </code>
      *
      * @package Array
@@ -973,8 +973,8 @@ if (!isset($excluded_functions['array_map_key']) && (!function_exists('ryunosuke
      *
      * Example:
      * <code>
-     * assert(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper') === ['A' => 'A', 'B' => 'B']);
-     * assert(array_map_key(['a' => 'A', 'b' => 'B'], function(){}) === []);
+     * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'), ['A' => 'A', 'B' => 'B']);
+     * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], function(){}), []);
      * </code>
      *
      * @package Array
@@ -1003,7 +1003,7 @@ if (!isset($excluded_functions['array_filter_not']) && (!function_exists('ryunos
      *
      * Example:
      * <code>
-     * assert(array_filter_not(['a', '', 'c'], 'strlen') === [1 => '']);
+     * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
      * </code>
      *
      * @package Array
@@ -1026,8 +1026,8 @@ if (!isset($excluded_functions['array_filter_key']) && (!function_exists('ryunos
      *
      * Example:
      * <code>
-     * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; })   === [0 => 'a', 2 => 'c']);
-     * assert(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }) === [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 => 'a', 2 => 'c']);
      * </code>
      *
      * @package Array
@@ -1055,8 +1055,8 @@ if (!isset($excluded_functions['array_filter_eval']) && (!function_exists('ryuno
      *
      * Example:
      * <code>
-     * assert(array_filter_eval(['a', 'b', 'c'], '$k !== 1')   === [0 => 'a', 2 => 'c']);
-     * assert(array_filter_eval(['a', 'b', 'c'], '$v !== "b"') === [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 => 'a', 2 => 'c']);
+     * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
      * </code>
      *
      * @package Array
@@ -1092,16 +1092,16 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('ryunosuke\\
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ];
      * // 'flag' が true 相当のものだけ返す
-     * assert(array_where($array, 'flag')                           === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, 'flag'), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
      * // 'name' に 'h' を含むものだけ返す
      * $contain_h = function($name){return strpos($name, 'h') !== false;};
-     * assert(array_where($array, 'name', $contain_h)               === [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
+     * assertSame(array_where($array, 'name', $contain_h), [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
      * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
      * $equal_2 = function($row, $key){return $key === 2;};
-     * assert(array_where($array, null, $equal_2)                   === [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * assertSame(array_where($array, null, $equal_2), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-     * assert(array_where($array, ['id', 'name'], $idname_is_2fuga) === [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
      * </code>
      *
      * @package Array
@@ -1150,8 +1150,8 @@ if (!isset($excluded_functions['array_map_filter']) && (!function_exists('ryunos
      *
      * Example:
      * <code>
-     * assert(array_map_filter([' a ', ' b ', ''], 'trim')       === ['a', 'b']);
-     * assert(array_map_filter([' a ', ' b ', ''], 'trim', true) === ['a', 'b', '']);
+     * assertSame(array_map_filter([' a ', ' b ', ''], 'trim'), ['a', 'b']);
+     * assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
      * </code>
      *
      * @package Array
@@ -1186,11 +1186,11 @@ if (!isset($excluded_functions['array_map_method']) && (!function_exists('ryunos
      * <code>
      * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
      * // getMessage で map される
-     * assert(array_map_method([$exa, $exb], 'getMessage')                       === ['a', 'b']);
+     * assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
-     * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true) === ['a', 'b']);
+     * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
-     * assert(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null) === ['a', 'b', $std, null]);
+     * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
      * </code>
      *
      * @package Array
@@ -1231,9 +1231,9 @@ if (!isset($excluded_functions['array_maps']) && (!function_exists('ryunosuke\\F
      * Example:
      * <code>
      * // 値を3乗したあと16進表記にして大文字化する
-     * assert(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper')    === ['1', '8', '1B', '40', '7D']);
+     * assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
-     * assert(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}) === ['a' => 'a:A', 'b' => 'b:B']);
+     * assertSame(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}), ['a' => 'a:A', 'b' => 'b:B']);
      * </code>
      *
      * @package Array
@@ -1280,10 +1280,10 @@ if (!isset($excluded_functions['array_nmap']) && (!function_exists('ryunosuke\\F
      * <code>
      * // 1番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
-     * assert(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix')   === ['prefix-a-suffix', 'prefix-b-suffix']);
+     * assertSame(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'), ['prefix-a-suffix', 'prefix-b-suffix']);
      * // 1番目にキー、2番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
-     * assert(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c') === ['k' => 'a k b v c']);
+     * assertSame(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'), ['k' => 'a k b v c']);
      * </code>
      *
      * @package Array
@@ -1351,7 +1351,7 @@ if (!isset($excluded_functions['array_lmap']) && (!function_exists('ryunosuke\\F
      * Example:
      * <code>
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
-     * assert(array_lmap(['a', 'b'], $sprintf, '-suffix') === ['a-suffix', 'b-suffix']);
+     * assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
      * </code>
      *
      * @package Array
@@ -1373,7 +1373,7 @@ if (!isset($excluded_functions['array_rmap']) && (!function_exists('ryunosuke\\F
      * Example:
      * <code>
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
-     * assert(array_rmap(['a', 'b'], $sprintf, 'prefix-') === ['prefix-a', 'prefix-b']);
+     * assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
      * </code>
      *
      * @package Array
@@ -1397,9 +1397,9 @@ if (!isset($excluded_functions['array_depth']) && (!function_exists('ryunosuke\\
      *
      * Example:
      * <code>
-     * assert(array_depth([])                       === 1);
-     * assert(array_depth(['hoge'])                 === 1);
-     * assert(array_depth([['nest1' => ['nest2']]]) === 3);
+     * assertSame(array_depth([]), 1);
+     * assertSame(array_depth(['hoge']), 1);
+     * assertSame(array_depth([['nest1' => ['nest2']]]), 3);
      * </code>
      *
      * @package Array
@@ -1431,10 +1431,10 @@ if (!isset($excluded_functions['array_insert']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(array_insert([1, 2, 3], 'x')                         === [1, 2, 3, 'x']);
-     * assert(array_insert([1, 2, 3], 'x', 1)                      === [1, 'x', 2, 3]);
-     * assert(array_insert([1, 2, 3], 'x', -1)                     === [1, 2, 'x', 3]);
-     * assert(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1) === [1, 'a' => 'A', 'b' => 'B', 2, 3]);
+     * assertSame(array_insert([1, 2, 3], 'x'), [1, 2, 3, 'x']);
+     * assertSame(array_insert([1, 2, 3], 'x', 1), [1, 'x', 2, 3]);
+     * assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
+     * assertSame(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1), [1, 'a' => 'A', 'b' => 'B', 2, 3]);
      * </code>
      *
      * @package Array
@@ -1470,10 +1470,10 @@ if (!isset($excluded_functions['array_assort']) && (!function_exists('ryunosuke\
      * <code>
      * // lt2(2より小さい)で分類
      * $lt2 = function($v){return $v < 2;};
-     * assert(array_assort([1, 2, 3], ['lt2' => $lt2])                               === ['lt2' => [1]]);
+     * assertSame(array_assort([1, 2, 3], ['lt2' => $lt2]), ['lt2' => [1]]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
      * $lt3 = function($v){return $v < 3;};
-     * assert(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']) === ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
+     * assertSame(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']), ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
      * </code>
      *
      * @package Array
@@ -1509,12 +1509,12 @@ if (!isset($excluded_functions['array_count']) && (!function_exists('ryunosuke\\
      * <code>
      * $array = ['hoge', 'fuga', 'piyo'];
      * // 'o' を含むものの数（2個）
-     * assert(array_count($array, function($s){return strpos($s, 'o') !== false;}) === 2);
+     * assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}), 2);
      * // 'a' と 'o' を含むものをそれぞれ（1個と2個）
-     * assert(array_count($array, [
+     * assertSame(array_count($array, [
      *     'a' => function($s){return strpos($s, 'a') !== false;},
      *     'o' => function($s){return strpos($s, 'o') !== false;},
-     * ]) === ['a' => 1, 'o' => 2]);
+     * ]), ['a' => 1, 'o' => 2]);
      * </code>
      *
      * @package Array
@@ -1557,13 +1557,13 @@ if (!isset($excluded_functions['array_group']) && (!function_exists('ryunosuke\\
      *
      * Example:
      * <code>
-     * assert(array_group([1, 1, 1])                                 === [1 => [1, 1, 1]]);
-     * assert(array_group([1, 2, 3], function($v){return $v % 2;})   === [1 => [1, 3], 0 => [2]]);
+     * assertSame(array_group([1, 1, 1]), [1 => [1, 1, 1]]);
+     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 => [1, 3], 0 => [2]]);
      * // group -> id で入れ子グループにする
      * $row1 = ['id' => 1, 'group' => 'hoge'];
      * $row2 = ['id' => 2, 'group' => 'fuga'];
      * $row3 = ['id' => 3, 'group' => 'hoge'];
-     * assert(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}) === [
+     * assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}), [
      *     'hoge' => [
      *         1 => $row1,
      *         3 => $row3,
@@ -1615,9 +1615,9 @@ if (!isset($excluded_functions['array_all']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * <code>
-     * assert(array_all([true, true])   === true);
-     * assert(array_all([true, false])  === false);
-     * assert(array_all([false, false]) === false);
+     * assertTrue(array_all([true, true]));
+     * assertFalse(array_all([true, false]));
+     * assertFalse(array_all([false, false]));
      * </code>
      *
      * @package Array
@@ -1651,9 +1651,9 @@ if (!isset($excluded_functions['array_any']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * <code>
-     * assert(array_any([true, true])   === true);
-     * assert(array_any([true, false])  === true);
-     * assert(array_any([false, false]) === false);
+     * assertTrue(array_any([true, true]));
+     * assertTrue(array_any([true, false]));
+     * assertFalse(array_any([false, false]));
      * </code>
      *
      * @package Array
@@ -1704,7 +1704,7 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('ryunosuke\\
      * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
      * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
      * // name 昇順, no 自然降順
-     * assert(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]) === [$v3, $v2, $v1]);
+     * assertSame(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]), [$v3, $v2, $v1]);
      * </code>
      *
      * @package Array
@@ -1830,7 +1830,7 @@ if (!isset($excluded_functions['array_shuffle']) && (!function_exists('ryunosuke
      * Example:
      * <code>
      * srand(4);mt_srand(4);
-     * assert(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']) === ['b' => 'B', 'a' => 'A', 'c' => 'C']);
+     * assertSame(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['b' => 'B', 'a' => 'A', 'c' => 'C']);
      * </code>
      *
      * @package Array
@@ -1863,7 +1863,7 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('ryunos
      * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
      * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
      * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
-     * assert(array_shrink_key($array1, $array2, $array3) === ['c' => 'C3']);
+     * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
      * </code>
      *
      * @package Array
@@ -1889,11 +1889,11 @@ if (!isset($excluded_functions['array_lookup']) && (!function_exists('ryunosuke\
      * <code>
      * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
      * // 第3引数を渡せば array_column と全く同じ
-     * assert(array_lookup($array, 'name', 'id') === array_column($array, 'name', 'id'));
-     * assert(array_lookup($array, 'name', null) === array_column($array, 'name', null));
+     * assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
+     * assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
      * // 省略すればキーが保存される
-     * assert(array_lookup($array, 'name')       === [11 => 'name1', 12 => 'name2', 13 => 'name3']);
-     * assert(array_lookup($array)               === $array);
+     * assertSame(array_lookup($array, 'name'), [11 => 'name1', 12 => 'name2', 13 => 'name3']);
+     * assertSame(array_lookup($array), $array);
      * </code>
      *
      * @package Array
@@ -1941,9 +1941,9 @@ if (!isset($excluded_functions['array_columns']) && (!function_exists('ryunosuke
      * $row1 = ['id' => 1, 'name' => 'A'];
      * $row2 = ['id' => 2, 'name' => 'B'];
      * $rows = [$row1, $row2];
-     * assert(array_columns($rows)               === ['id' => [1, 2], 'name' => ['A', 'B']]);
-     * assert(array_columns($rows, 'id')         === ['id' => [1, 2]]);
-     * assert(array_columns($rows, 'name', 'id') === ['name' => [1 => 'A', 2 => 'B']]);
+     * assertSame(array_columns($rows), ['id' => [1, 2], 'name' => ['A', 'B']]);
+     * assertSame(array_columns($rows, 'id'), ['id' => [1, 2]]);
+     * assertSame(array_columns($rows, 'name', 'id'), ['name' => [1 => 'A', 2 => 'B']]);
      * </code>
      *
      * @package Array
@@ -1979,7 +1979,7 @@ if (!isset($excluded_functions['array_uncolumns']) && (!function_exists('ryunosu
      *
      * Example:
      * <code>
-     * assert(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]) === [
+     * assertSame(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]), [
      *     ['id' => 1, 'name' => 'A'],
      *     ['id' => 2, 'name' => 'B'],
      * ]);
@@ -2057,7 +2057,7 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('ryunosuke
      *     if (!is_array($v)) $v = "prefix-$v";
      *     return "_$k";
      * };
-     * assert(array_convert($array, $callback, true) === [
+     * assertSame(array_convert($array, $callback, true), [
      *     '_k1' => 'prefix-v1',
      *     '_k2' => [
      *         'k21' => 'v21',
@@ -2163,7 +2163,7 @@ if (!isset($excluded_functions['array_flatten']) && (!function_exists('ryunosuke
      *    ],
      * ];
      * // 区切り文字指定なし
-     * assert(array_flatten($array) === [
+     * assertSame(array_flatten($array), [
      *    0 => 'v1',
      *    1 => 'v21',
      *    2 => 'v221',
@@ -2173,7 +2173,7 @@ if (!isset($excluded_functions['array_flatten']) && (!function_exists('ryunosuke
      *    6 => 3,
      * ]);
      * // 区切り文字指定
-     * assert(array_flatten($array, '.') === [
+     * assertSame(array_flatten($array, '.'), [
      *    'k1'            => 'v1',
      *    'k2.k21'        => 'v21',
      *    'k2.k22.k221'   => 'v221',
@@ -2242,7 +2242,7 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('ryunosuke\\F
      *    'k2.k22.k223.1' => 2,
      *    'k2.k22.k223.2' => 3,
      * ];
-     * assert(array_nest($array) === [
+     * assertSame(array_nest($array), [
      *    'k1' => 'v1',
      *    'k2' => [
      *        'k21' => 'v21',
@@ -2258,7 +2258,7 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('ryunosuke\\F
      *    'k1.k2' => 'v1', // この時点で 'k1' は配列になるが・・・
      *    'k1'    => 'v2', // この時点で 'k1' は文字列として上書きされる
      * ];
-     * assert(array_nest($array) === [
+     * assertSame(array_nest($array), [
      *    'k1' => 'v2',
      * ]);
      * // 上書きすら出来ない場合は例外が飛ぶ
@@ -2270,7 +2270,7 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('ryunosuke\\F
      *     array_nest($array);
      * }
      * catch (\Exception $e) {
-     *     assert($e instanceof \InvalidArgumentException);
+     *     assertInstanceof(\InvalidArgumentException::class, $e);
      * }
      * </code>
      *
@@ -2313,10 +2313,10 @@ if (!isset($excluded_functions['stdclass']) && (!function_exists('ryunosuke\\Fun
      * <code>
      * // 基本的には object キャストと同じ
      * $fields = ['a' => 'A', 'b' => 'B'];
-     * assert(stdclass($fields) == (object) $fields);
+     * assertEquals(stdclass($fields), (object) $fields);
      * // ただしこういうことはキャストでは出来ない
-     * assert(array_map('stdclass', [$fields]) == [(object) $fields]); // コールバックとして利用する
-     * assert(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+     * assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
+     * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
      * </code>
      *
      * @package ClassObject
@@ -2345,10 +2345,10 @@ if (!isset($excluded_functions['detect_namespace']) && (!function_exists('ryunos
      *
      * @package ClassObject
      *
-     * @param string $directory ディレクトリ名
+     * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
      * @return string 名前空間
      */
-    function detect_namespace($directory)
+    function detect_namespace($location)
     {
         // php をパースして名前空間部分を得るクロージャ
         $detectNS = function ($phpfile) {
@@ -2376,19 +2376,16 @@ if (!isset($excluded_functions['detect_namespace']) && (!function_exists('ryunos
 
         // 指定パスの兄弟ファイルを調べた後、親ディレクトリを辿っていく
         $basenames = [];
-        do {
-            $files = array_filter(glob("$directory/*.php"), 'is_file');
-            foreach ($files as $file) {
+        return call_user_func(dirname_r, $location, function ($directory) use ($detectNS, &$basenames) {
+            foreach (array_filter(glob("$directory/*.php"), 'is_file') as $file) {
                 $namespace = $detectNS($file);
                 if ($namespace !== null) {
                     $localspace = implode('\\', array_reverse($basenames));
                     return rtrim($namespace . '\\' . $localspace, '\\');
                 }
             }
-            $basenames[] = basename($directory);
-        } while (($dummy = $directory) !== $directory = dirname($directory));
-
-        throw new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.');
+            $basenames[] = pathinfo($directory, PATHINFO_FILENAME);
+        }) ?: call_user_func(throws, new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 }
 if (!isset($excluded_functions['class_loader']) && (!function_exists('ryunosuke\\Functions\\class_loader') || (new \ReflectionFunction('ryunosuke\\Functions\\class_loader'))->isInternal())) {
@@ -2399,7 +2396,7 @@ if (!isset($excluded_functions['class_loader']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(class_loader() instanceof \Composer\Autoload\ClassLoader);
+     * assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
      * </code>
      *
      * @package ClassObject
@@ -2432,7 +2429,7 @@ if (!isset($excluded_functions['class_namespace']) && (!function_exists('ryunosu
      *
      * Example:
      * <code>
-     * assert(class_namespace('vendor\\namespace\\ClassName') === 'vendor\\namespace');
+     * assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
      * </code>
      *
      * @package ClassObject
@@ -2457,7 +2454,7 @@ if (!isset($excluded_functions['class_shorten']) && (!function_exists('ryunosuke
      *
      * Example:
      * <code>
-     * assert(class_shorten('vendor\\namespace\\ClassName') === 'ClassName');
+     * assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
      * </code>
      *
      * @package ClassObject
@@ -2624,9 +2621,9 @@ if (!isset($excluded_functions['file_extension']) && (!function_exists('ryunosuk
      *
      * Example:
      * <code>
-     * assert(file_extension('filename.ext')        === 'ext');
-     * assert(file_extension('filename.ext', 'txt') === 'filename.txt');
-     * assert(file_extension('filename.ext', '')    === 'filename');
+     * assertSame(file_extension('filename.ext'), 'ext');
+     * assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
+     * assertSame(file_extension('filename.ext', ''), 'filename');
      * </code>
      *
      * @package FileSystem
@@ -2662,7 +2659,7 @@ if (!isset($excluded_functions['file_set_contents']) && (!function_exists('ryuno
      * Example:
      * <code>
      * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
-     * assert(file_get_contents(sys_get_temp_dir() . '/not/filename.ext') === 'hoge');
+     * assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
      * </code>
      *
      * @package FileSystem
@@ -2724,7 +2721,7 @@ if (!isset($excluded_functions['dirname_r']) && (!function_exists('ryunosuke\\Fu
      * file_set_contents("$tmp/a/b/file.txt", 'hoge');
      * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
      * $callback = function($path){return realpath("$path/file.txt");};
-     * assert(dirname_r("$tmp/a/b/c/d/e/f", $callback) === realpath("$tmp/a/b/file.txt"));
+     * assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
      * </code>
      *
      * @package FileSystem
@@ -2753,12 +2750,12 @@ if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('ryunos
      *
      * Example:
      * <code>
-     * assert(path_is_absolute('/absolute/path') === true);
-     * assert(path_is_absolute('relative/path')  === false);
+     * assertTrue(path_is_absolute('/absolute/path'));
+     * assertFalse(path_is_absolute('relative/path'));
      * // Windows 環境では下記も true になる
      * if (DIRECTORY_SEPARATOR === '\\') {
-     *     assert(path_is_absolute('\\absolute\\path')    === true);
-     *     assert(path_is_absolute('C:\\absolute\\path')  === true);
+     *     assertTrue(path_is_absolute('\\absolute\\path'));
+     *     assertTrue(path_is_absolute('C:\\absolute\\path'));
      * }
      * </code>
      *
@@ -2792,9 +2789,9 @@ if (!isset($excluded_functions['path_resolve']) && (!function_exists('ryunosuke\
      * Example:
      * <code>
      * $DS = DIRECTORY_SEPARATOR;
-     * assert(path_resolve('/absolute/path') === "{$DS}absolute{$DS}path");
-     * assert(path_resolve('absolute/path')  === getcwd() . "{$DS}absolute{$DS}path");
-     * assert(path_resolve('/absolute/path/through', '../current/./path') === "{$DS}absolute{$DS}path{$DS}current{$DS}path");
+     * assertSame(path_resolve('/absolute/path'), "{$DS}absolute{$DS}path");
+     * assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
+     * assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");
      * </code>
      *
      * @package FileSystem
@@ -2825,9 +2822,9 @@ if (!isset($excluded_functions['path_normalize']) && (!function_exists('ryunosuk
      * Example:
      * <code>
      * $DS = DIRECTORY_SEPARATOR;
-     * assert(path_normalize('/path/to/something')                    === "{$DS}path{$DS}to{$DS}something");
-     * assert(path_normalize('/path/through/../something')            === "{$DS}path{$DS}something");
-     * assert(path_normalize('./path/current/./through/../something') === "path{$DS}current{$DS}something");
+     * assertSame(path_normalize('/path/to/something'), "{$DS}path{$DS}to{$DS}something");
+     * assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}something");
+     * assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");
      * </code>
      *
      * @package FileSystem
@@ -2870,7 +2867,7 @@ if (!isset($excluded_functions['rm_rf']) && (!function_exists('ryunosuke\\Functi
      * <code>
      * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
      * rm_rf(sys_get_temp_dir() . '/new');
-     * assert(file_exists(sys_get_temp_dir() . '/new') === false);
+     * assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
      * </code>
      *
      * @package FileSystem
@@ -3015,7 +3012,7 @@ if (!isset($excluded_functions['nbind']) && (!function_exists('ryunosuke\\Functi
      * Example:
      * <code>
      * $bind = nbind('sprintf', 2, 'X');
-     * assert($bind('%s%s%s', 'N', 'N') === 'NXN');
+     * assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
      * </code>
      *
      * @package Callable
@@ -3039,7 +3036,7 @@ if (!isset($excluded_functions['lbind']) && (!function_exists('ryunosuke\\Functi
      * Example:
      * <code>
      * $bind = lbind('sprintf', '%s%s');
-     * assert($bind('N', 'M') === 'NM');
+     * assertSame($bind('N', 'M'), 'NM');
      * </code>
      *
      * @package Callable
@@ -3060,7 +3057,7 @@ if (!isset($excluded_functions['rbind']) && (!function_exists('ryunosuke\\Functi
      * Example:
      * <code>
      * $bind = rbind('sprintf', 'X');
-     * assert($bind('%s%s', 'N') === 'NX');
+     * assertSame($bind('%s%s', 'N'), 'NX');
      * </code>
      *
      * @package Callable
@@ -3098,7 +3095,7 @@ if (!isset($excluded_functions['composite']) && (!function_exists('ryunosuke\\Fu
      * $composite = composite(false, $add5, $mul3, $split, $union);// 上記を合成したクロージャ
      * // false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）
      * // 7 + 5 -> 12 |> 12 * 3 -> 36 |> 36 -> [3, 6] |> 3 + 6 |> 9
-     * assert($composite(7) === 9);
+     * assertSame($composite(7), 9);
      *
      * $upper = function ($s) { return [$s, strtoupper($s)]; };   // 来た値と大文字化したものを配列で返すクロージャ
      * $prefix = function ($s, $S) { return 'pre-' . $s . $S; };  // 来た値を結合して'pre-'を付けるクロージャ
@@ -3107,7 +3104,7 @@ if (!isset($excluded_functions['composite']) && (!function_exists('ryunosuke\\Fu
      * $composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成したクロージャ
      * // true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
      * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
-     * assert($composite('hoge') === 'EGOHegoh-erp');
+     * assertSame($composite('hoge'), 'EGOHegoh-erp');
      * </code>
      *
      * @package Callable
@@ -3154,9 +3151,9 @@ if (!isset($excluded_functions['return_arg']) && (!function_exists('ryunosuke\\F
      * Example:
      * <code>
      * $arg0 = return_arg(0);
-     * assert($arg0('hoge')          === 'hoge');
+     * assertSame($arg0('hoge'), 'hoge');
      * $arg1 = return_arg(1);
-     * assert($arg1('dummy', 'hoge') === 'hoge');
+     * assertSame($arg1('dummy', 'hoge'), 'hoge');
      * </code>
      *
      * @package Callable
@@ -3182,8 +3179,8 @@ if (!isset($excluded_functions['not_func']) && (!function_exists('ryunosuke\\Fun
      * Example:
      * <code>
      * $not_strlen = not_func('strlen');
-     * assert($not_strlen('hoge') === false);
-     * assert($not_strlen('')     === true);
+     * assertFalse($not_strlen('hoge'));
+     * assertTrue($not_strlen(''));
      * </code>
      *
      * @package Callable
@@ -3208,7 +3205,7 @@ if (!isset($excluded_functions['eval_func']) && (!function_exists('ryunosuke\\Fu
      * Example:
      * <code>
      * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
-     * assert($evalfunc(1, 2, 3) === 6);
+     * assertSame($evalfunc(1, 2, 3), 6);
      * </code>
      *
      * @package Callable
@@ -3234,8 +3231,8 @@ if (!isset($excluded_functions['reflect_callable']) && (!function_exists('ryunos
      *
      * Example:
      * <code>
-     * assert(reflect_callable('sprintf')        instanceof \ReflectionFunction);
-     * assert(reflect_callable('\Closure::bind') instanceof \ReflectionMethod);
+     * assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
+     * assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
      * </code>
      *
      * @package Callable
@@ -3273,8 +3270,8 @@ if (!isset($excluded_functions['closurize']) && (!function_exists('ryunosuke\\Fu
      * Example:
      * <code>
      * $sprintf = closurize('sprintf');
-     * assert($sprintf                            instanceof \Closure);
-     * assert($sprintf('%s %s', 'hello', 'world') ===        'hello world');
+     * assertInstanceof(\Closure::class, $sprintf);
+     * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
      * </code>
      *
      * @package Callable
@@ -3311,7 +3308,7 @@ if (!isset($excluded_functions['call_safely']) && (!function_exists('ryunosuke\\
      *     call_safely(function(){return $v;});
      * }
      * catch (\Exception $ex) {
-     *     assert($ex->getMessage() === 'Undefined variable: v');
+     *     assertSame($ex->getMessage(), 'Undefined variable: v');
      * }
      * </code>
      *
@@ -3347,7 +3344,7 @@ if (!isset($excluded_functions['ob_capture']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(ob_capture(function(){echo 123;}) === '123');
+     * assertSame(ob_capture(function(){echo 123;}), '123');
      * </code>
      *
      * @package Callable
@@ -3380,9 +3377,9 @@ if (!isset($excluded_functions['parameter_length']) && (!function_exists('ryunos
      * Example:
      * <code>
      * // trim の引数は2つ
-     * assert(parameter_length('trim')       === 2);
+     * assertSame(parameter_length('trim'), 2);
      * // trim の必須引数は1つ
-     * assert(parameter_length('trim', true) === 1);
+     * assertSame(parameter_length('trim', true), 1);
      * </code>
      *
      * @package Callable
@@ -3455,7 +3452,7 @@ if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('ry
      * <code>
      * // strlen に2つの引数を渡してもエラーにならない
      * $strlen = func_user_func_array('strlen');
-     * assert($strlen('abc', null)       === 3);
+     * assertSame($strlen('abc', null), 3);
      * </code>
      *
      * @package Callable
@@ -3490,7 +3487,7 @@ if (!isset($excluded_functions['function_alias']) && (!function_exists('ryunosuk
      * <code>
      * // trim のエイリアス
      * function_alias('trim', 'trim_alias');
-     * assert(trim_alias(' abc ') === 'abc');
+     * assertSame(trim_alias(' abc '), 'abc');
      * </code>
      *
      * @package Callable
@@ -3579,7 +3576,7 @@ if (!isset($excluded_functions['minimum']) && (!function_exists('ryunosuke\\Func
      *
      * Example:
      * <code>
-     * assert(minimum(-1, 0, 1) === -1);
+     * assertSame(minimum(-1, 0, 1), -1);
      * </code>
      *
      * @package Math
@@ -3602,7 +3599,7 @@ if (!isset($excluded_functions['maximum']) && (!function_exists('ryunosuke\\Func
      *
      * Example:
      * <code>
-     * assert(maximum(-1, 0, 1) === 1);
+     * assertSame(maximum(-1, 0, 1), 1);
      * </code>
      *
      * @package Math
@@ -3627,7 +3624,7 @@ if (!isset($excluded_functions['mode']) && (!function_exists('ryunosuke\\Functio
      *
      * Example:
      * <code>
-     * assert(mode(0, 1, 2, 2, 3, 3, 3) === 3);
+     * assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
      * </code>
      *
      * @package Math
@@ -3666,8 +3663,8 @@ if (!isset($excluded_functions['mean']) && (!function_exists('ryunosuke\\Functio
      *
      * Example:
      * <code>
-     * assert(mean(1, 2, 3, 4, 5, 6) === 3.5);
-     * assert(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6) === 3.5);
+     * assertSame(mean(1, 2, 3, 4, 5, 6), 3.5);
+     * assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
      * </code>
      *
      * @package Math
@@ -3693,11 +3690,11 @@ if (!isset($excluded_functions['median']) && (!function_exists('ryunosuke\\Funct
      * Example:
      * <code>
      * // 偶数個なので中2つの平均
-     * assert(median(1, 2, 3, 4, 5, 6) === 3.5);
+     * assertSame(median(1, 2, 3, 4, 5, 6), 3.5);
      * // 奇数個なのでど真ん中
-     * assert(median(1, 2, 3, 4, 5) === 3);
+     * assertSame(median(1, 2, 3, 4, 5), 3);
      * // 偶数個だが文字列なので中2つの後
-     * assert(median('a', 'b', 'c', 'd') === 'c');
+     * assertSame(median('a', 'b', 'c', 'd'), 'c');
      * </code>
      *
      * @package Math
@@ -3752,7 +3749,7 @@ if (!isset($excluded_functions['sum']) && (!function_exists('ryunosuke\\Function
      *
      * Example:
      * <code>
-     * assert(sum(1, 2, 3, 4, 5, 6) === 21);
+     * assertSame(sum(1, 2, 3, 4, 5, 6), 21);
      * </code>
      *
      * @package Math
@@ -3776,8 +3773,8 @@ if (!isset($excluded_functions['random_at']) && (!function_exists('ryunosuke\\Fu
      * Example:
      * <code>
      * srand(1);mt_srand(1);
-     * assert(random_at(1, 2, 3, 4, 5, 6) === 4);
-     * assert(random_at(1, 2, 3, 4, 5, 6) === 1);
+     * assertSame(random_at(1, 2, 3, 4, 5, 6), 4);
+     * assertSame(random_at(1, 2, 3, 4, 5, 6), 1);
      * </code>
      *
      * @package Math
@@ -3800,8 +3797,8 @@ if (!isset($excluded_functions['probability']) && (!function_exists('ryunosuke\\
      * Example:
      * <code>
      * srand(1);mt_srand(1);
-     * assert(probability(50) === false);
-     * assert(probability(50) === true);
+     * assertFalse(probability(50));
+     * assertTrue(probability(50));
      * </code>
      *
      * @package Math
@@ -3833,7 +3830,7 @@ if (!isset($excluded_functions['strcat']) && (!function_exists('ryunosuke\\Funct
      *
      * Example:
      * <code>
-     * assert(strcat('a', 'b', 'c') === 'abc');
+     * assertSame(strcat('a', 'b', 'c'), 'abc');
      * </code>
      *
      * @package String
@@ -3858,9 +3855,9 @@ if (!isset($excluded_functions['split_noempty']) && (!function_exists('ryunosuke
      *
      * Example:
      * <code>
-     * assert(split_noempty(',', 'a, b, c')            === ['a', 'b', 'c']);
-     * assert(split_noempty(',', 'a, , , b, c')        === ['a', 'b', 'c']);
-     * assert(split_noempty(',', 'a, , , b, c', false) === ['a', ' ', ' ', ' b', ' c']);
+     * assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
+     * assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
+     * assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
      * </code>
      *
      * @package String
@@ -3894,9 +3891,9 @@ if (!isset($excluded_functions['str_equals']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(str_equals('abc', 'abc')       === true);
-     * assert(str_equals('abc', 'ABC', true) === true);
-     * assert(str_equals('\0abc', '\0abc')   === true);
+     * assertTrue(str_equals('abc', 'abc'));
+     * assertTrue(str_equals('abc', 'ABC', true));
+     * assertTrue(str_equals('\0abc', '\0abc'));
      * </code>
      *
      * @package String
@@ -3934,10 +3931,10 @@ if (!isset($excluded_functions['str_contains']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(str_contains('abc', 'b')                      === true);
-     * assert(str_contains('abc', 'B', true)                === true);
-     * assert(str_contains('abc', ['b', 'x'], false, false) === true);
-     * assert(str_contains('abc', ['b', 'x'], false, true)  === false);
+     * assertTrue(str_contains('abc', 'b'));
+     * assertTrue(str_contains('abc', 'B', true));
+     * assertTrue(str_contains('abc', ['b', 'x'], false, false));
+     * assertFalse(str_contains('abc', ['b', 'x'], false, true));
      * </code>
      *
      * @package String
@@ -3981,9 +3978,9 @@ if (!isset($excluded_functions['str_putcsv']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(str_putcsv(['a', 'b', 'c'])             === "a,b,c");
-     * assert(str_putcsv(['a', 'b', 'c'], "\t")       === "a\tb\tc");
-     * assert(str_putcsv(['a', ' b ', 'c'], " ", "'") === "a ' b ' c");
+     * assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
+     * assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
+     * assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
      * </code>
      *
      * @package String
@@ -4036,11 +4033,11 @@ if (!isset($excluded_functions['str_subreplace']) && (!function_exists('ryunosuk
      * Example:
      * <code>
      * // 1番目（0ベースなので2番目）の x を X に置換
-     * assert(str_subreplace('xxx', 'x', [1 => 'X'])                === 'xXx');
+     * assertSame(str_subreplace('xxx', 'x', [1 => 'X']), 'xXx');
      * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
-     * assert(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']) === '!XaxXz!');
+     * assertSame(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']), '!XaxXz!');
      * // 置換結果は置換対象にならない
-     * assert(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X'])    === 'xxxXx');
+     * assertSame(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']), 'xxxXx');
      * </code>
      *
      * @package String
@@ -4109,11 +4106,11 @@ if (!isset($excluded_functions['str_between']) && (!function_exists('ryunosuke\\
      * <code>
      * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
      * $n = 0;
-     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'first');
-     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'second');
-     * assert(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n) === 'third');
+     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
+     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
+     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
      * // ネストしている場合は最も外側を返す
-     * assert(str_between('{nest1{nest2{nest3}}}', '{', '}') === 'nest1{nest2{nest3}}');
+     * assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
      * </code>
      *
      * @package String
@@ -4174,9 +4171,9 @@ if (!isset($excluded_functions['starts_with']) && (!function_exists('ryunosuke\\
      *
      * Example:
      * <code>
-     * assert(starts_with('abcdef', 'abc')       === true);
-     * assert(starts_with('abcdef', 'ABC', true) === true);
-     * assert(starts_with('abcdef', 'xyz')       === false);
+     * assertTrue(starts_with('abcdef', 'abc'));
+     * assertTrue(starts_with('abcdef', 'ABC', true));
+     * assertFalse(starts_with('abcdef', 'xyz'));
      * </code>
      *
      * @package String
@@ -4201,9 +4198,9 @@ if (!isset($excluded_functions['ends_with']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * <code>
-     * assert(ends_with('abcdef', 'def')       === true);
-     * assert(ends_with('abcdef', 'DEF', true) === true);
-     * assert(ends_with('abcdef', 'xyz')       === false);
+     * assertTrue(ends_with('abcdef', 'def'));
+     * assertTrue(ends_with('abcdef', 'DEF', true));
+     * assertFalse(ends_with('abcdef', 'xyz'));
      * </code>
      *
      * @package String
@@ -4228,7 +4225,7 @@ if (!isset($excluded_functions['camel_case']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(camel_case('this_is_a_pen') === 'thisIsAPen');
+     * assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
      * </code>
      *
      * @package String
@@ -4248,7 +4245,7 @@ if (!isset($excluded_functions['pascal_case']) && (!function_exists('ryunosuke\\
      *
      * Example:
      * <code>
-     * assert(pascal_case('this_is_a_pen') === 'ThisIsAPen');
+     * assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
      * </code>
      *
      * @package String
@@ -4268,7 +4265,7 @@ if (!isset($excluded_functions['snake_case']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(snake_case('ThisIsAPen') === 'this_is_a_pen');
+     * assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
      * </code>
      *
      * @package String
@@ -4288,7 +4285,7 @@ if (!isset($excluded_functions['chain_case']) && (!function_exists('ryunosuke\\F
      *
      * Example:
      * <code>
-     * assert(chain_case('ThisIsAPen') === 'this-is-a-pen');
+     * assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
      * </code>
      *
      * @package String
@@ -4377,7 +4374,7 @@ if (!isset($excluded_functions['kvsprintf']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * <code>
-     * assert(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']) === 'ThisIs 3');
+     * assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']), 'ThisIs 3');
      * </code>
      *
      * @package String
@@ -4423,11 +4420,11 @@ if (!isset($excluded_functions['preg_capture']) && (!function_exists('ryunosuke\
      * $pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
      * $default = [1 => '2000', 2 => '1', 4 => '1'];
      * // 完全にマッチするのでそれぞれ返ってくる
-     * assert(preg_capture($pattern, '2014/12/24', $default) === [1 => '2014', 2 => '12', 4 => '24']);
+     * assertSame(preg_capture($pattern, '2014/12/24', $default), [1 => '2014', 2 => '12', 4 => '24']);
      * // 最後の \d{1,2} はマッチしないのでデフォルト値が使われる
-     * assert(preg_capture($pattern, '2014/12', $default)    === [1 => '2014', 2 => '12', 4 => '1']);
+     * assertSame(preg_capture($pattern, '2014/12', $default), [1 => '2014', 2 => '12', 4 => '1']);
      * // 一切マッチしないので全てデフォルト値が使われる
-     * assert(preg_capture($pattern, 'hoge', $default)       === [1 => '2000', 2 => '1', 4 => '1']);
+     * assertSame(preg_capture($pattern, 'hoge', $default), [1 => '2000', 2 => '1', 4 => '1']);
      * </code>
      *
      * @package String
@@ -4471,14 +4468,14 @@ if (!isset($excluded_functions['render_string']) && (!function_exists('ryunosuke
      * Example:
      * <code>
      * // 数値キーが参照できる
-     * assert(render_string('${0}', ['number'])                                          === 'number');
+     * assertSame(render_string('${0}', ['number']), 'number');
      * // クロージャは呼び出し結果が埋め込まれる
-     * assert(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]) === 'c-closure');
+     * assertSame(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]), 'c-closure');
      * // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
-     * assert(render_string('{$_(123 + 456)}', [])                                       === '579');
+     * assertSame(render_string('{$_(123 + 456)}', []), '579');
      * // 要するに '$_()' の中に php の式が書けるようになる
-     * assert(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']])  === 'a,n,z');
-     * assert(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]])                   === '9');
+     * assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']]), 'a,n,z');
+     * assertSame(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]), '9');
      * </code>
      *
      * @package String
@@ -4559,7 +4556,7 @@ if (!isset($excluded_functions['returns']) && (!function_exists('ryunosuke\\Func
      * Example:
      * <code>
      * $object = new \stdClass();
-     * assert(returns($object) === $object);
+     * assertSame(returns($object), $object);
      * </code>
      *
      * @package Syntax
@@ -4587,24 +4584,24 @@ if (!isset($excluded_functions['optional']) && (!function_exists('ryunosuke\\Fun
      * // null を返すかもしれないステートメント
      * $getobject = function () {return null;};
      * // メソッド呼び出しは null を返す
-     * assert(optional($getobject())->method()          === null);
+     * assertSame(optional($getobject())->method(), null);
      * // プロパティアクセスは null を返す
-     * assert(optional($getobject())->property          === null);
+     * assertSame(optional($getobject())->property, null);
      * // empty は true を返す
-     * assert(empty(optional($getobject())->nothing)    === true);
+     * assertSame(empty(optional($getobject())->nothing), true);
      * // __isset は false を返す
-     * assert(isset(optional($getobject())->nothing)    === false);
+     * assertSame(isset(optional($getobject())->nothing), false);
      * // __toString は '' を返す
-     * assert(strval(optional($getobject()))            === '');
+     * assertSame(strval(optional($getobject())), '');
      * // __invoke は null を返す
-     * assert(call_user_func(optional($getobject()))    === null);
+     * assertSame(call_user_func(optional($getobject())), null);
      * // 配列アクセスは null を返す
-     * assert($getobject()['hoge']                      === null);
+     * assertSame($getobject()['hoge'], null);
      * // 空イテレータを返す
-     * assert(iterator_to_array(optional($getobject())) === []);
+     * assertSame(iterator_to_array(optional($getobject())), []);
      *
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
-     * assert(optional(new \ArrayObject([1]), 'stdClass')->count() === null);
+     * assertSame(optional(new \ArrayObject([1]), 'stdClass')->count(), null);
      * </code>
      *
      * @package Syntax
@@ -4661,7 +4658,7 @@ if (!isset($excluded_functions['throws']) && (!function_exists('ryunosuke\\Funct
      *     throws(new \Exception('throws'));
      * }
      * catch (\Exception $ex) {
-     *     assert($ex->getMessage() === 'throws');
+     *     assertSame($ex->getMessage(), 'throws');
      * }
      * </code>
      *
@@ -4689,11 +4686,11 @@ if (!isset($excluded_functions['ifelse']) && (!function_exists('ryunosuke\\Funct
      * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
      * $heavyfunc = function($v){return $v;};
      * // $heavyfunc(1) ?? 'default' とほぼ同義
-     * assert(ifelse($heavyfunc(1), false, 'default')     === $heavyfunc(1));
+     * assertSame(ifelse($heavyfunc(1), false, 'default'), $heavyfunc(1));
      * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-     * assert(ifelse($heavyfunc(null), false, 'default')  === $heavyfunc(null));
+     * assertSame(ifelse($heavyfunc(null), false, 'default'), $heavyfunc(null));
      * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
-     * assert(ifelse($heavyfunc(false), false, 'default') === 'default');
+     * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
      * </code>
      *
      * @package Syntax
@@ -4727,10 +4724,10 @@ if (!isset($excluded_functions['try_catch']) && (!function_exists('ryunosuke\\Fu
      * <code>
      * // 例外が飛ばない場合は平和極まりない
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assert(try_catch($try, null, 1, 2, 3) === [1, 2, 3]);
+     * assertSame(try_catch($try, null, 1, 2, 3), [1, 2, 3]);
      * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
      * $try = function(){throw new \Exception('tried');};
-     * assert(try_catch($try)->getMessage() === 'tried');
+     * assertSame(try_catch($try)->getMessage(), 'tried');
      * </code>
      *
      * @package Syntax
@@ -4757,12 +4754,12 @@ if (!isset($excluded_functions['try_finally']) && (!function_exists('ryunosuke\\
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assert(try_finally($try, $finally, 1, 2, 3) === [1, 2, 3]);
-     * assert($finally_count                       === 1); // 呼ばれている
+     * assertSame(try_finally($try, $finally, 1, 2, 3), [1, 2, 3]);
+     * assertSame($finally_count, 1); // 呼ばれている
      * // 例外は投げっぱなすが、 $finally は実行される
      * $try = function(){throw new \Exception('tried');};
      * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
-     * assert($finally_count                       === 2); // 呼ばれている
+     * assertSame($finally_count, 2); // 呼ばれている
      * </code>
      *
      * @package Syntax
@@ -4789,12 +4786,12 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('ryuno
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)               === [1, 2, 3]);
-     * assert($finally_count                                                 === 1); // 呼ばれている
+     * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3), [1, 2, 3]);
+     * assertSame($finally_count, 1); // 呼ばれている
      * // 例外を投げるが、 $catch で握りつぶす
      * $try = function(){throw new \Exception('tried');};
-     * assert(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage() === 'tried');
-     * assert($finally_count                                                 === 2); // 呼ばれている
+     * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage(), 'tried');
+     * assertSame($finally_count, 2); // 呼ばれている
      * </code>
      *
      * @package Syntax
@@ -4847,11 +4844,11 @@ if (!isset($excluded_functions['cache']) && (!function_exists('ryunosuke\\Functi
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
      * $rand1 = cache('rand', $provider);
      * $rand2 = cache('rand', $provider);
-     * assert($rand1 === $rand2);
+     * assertSame($rand1, $rand2);
      * // $provider に null を与えると削除される
      * cache('rand', null);
      * $rand3 = cache('rand', $provider);
-     * assert($rand1 !== $rand3);
+     * assertNotSame($rand1, $rand3);
      * </code>
      *
      * @package Utility
@@ -5076,14 +5073,14 @@ if (!isset($excluded_functions['numberify']) && (!function_exists('ryunosuke\\Fu
      * Example:
      * <code>
      * // 配列は要素数となる
-     * assert(numberify([1, 2, 3])       === 3);
+     * assertSame(numberify([1, 2, 3]), 3);
      * // int/float は基本的にそのまま
-     * assert(numberify(123)             === 123);
-     * assert(numberify(123.45)          === 123);
-     * assert(numberify(123.45, true)    === 123.45);
+     * assertSame(numberify(123), 123);
+     * assertSame(numberify(123.45), 123);
+     * assertSame(numberify(123.45, true), 123.45);
      * // 文字列は数値抽出
-     * assert(numberify('a1b2c3')        === 123);
-     * assert(numberify('a1b2.c3', true) === 12.3);
+     * assertSame(numberify('a1b2c3'), 123);
+     * assertSame(numberify('a1b2.c3', true), 12.3);
      * </code>
      *
      * @package Var
@@ -5150,12 +5147,12 @@ if (!isset($excluded_functions['is_primitive']) && (!function_exists('ryunosuke\
      *
      * Example:
      * <code>
-     * assert(is_primitive(null)          === true);
-     * assert(is_primitive(false)         === true);
-     * assert(is_primitive(123)           === true);
-     * assert(is_primitive(STDIN)         === true);
-     * assert(is_primitive(new \stdClass) === false);
-     * assert(is_primitive(['array'])     === false);
+     * assertTrue(is_primitive(null));
+     * assertTrue(is_primitive(false));
+     * assertTrue(is_primitive(123));
+     * assertTrue(is_primitive(STDIN));
+     * assertFalse(is_primitive(new \stdClass));
+     * assertFalse(is_primitive(['array']));
      * </code>
      *
      * @package Var
@@ -5177,11 +5174,11 @@ if (!isset($excluded_functions['is_recursive']) && (!function_exists('ryunosuke\
      * // 配列の再帰
      * $array = [];
      * $array['recursive'] = &$array;
-     * assert(is_recursive($array)  === true);
+     * assertTrue(is_recursive($array));
      * // オブジェクトの再帰
      * $object = new \stdClass();
      * $object->recursive = $object;
-     * assert(is_recursive($object) === true);
+     * assertTrue(is_recursive($object));
      * </code>
      *
      * @package Var
@@ -5229,13 +5226,13 @@ if (!isset($excluded_functions['var_type']) && (!function_exists('ryunosuke\\Fun
      * Example:
      * <code>
      * // プリミティブ型は gettype と同義
-     * assert(var_type(false)      === 'boolean');
-     * assert(var_type(123)        === 'integer');
-     * assert(var_type(3.14)       === 'double');
-     * assert(var_type([1, 2, 3])  === 'array');
+     * assertSame(var_type(false), 'boolean');
+     * assertSame(var_type(123), 'integer');
+     * assertSame(var_type(3.14), 'double');
+     * assertSame(var_type([1, 2, 3]), 'array');
      * // オブジェクトは型名を返す
-     * assert(var_type(new \stdClass)    === '\\stdClass');
-     * assert(var_type(new \Exception()) === '\\Exception');
+     * assertSame(var_type(new \stdClass), '\\stdClass');
+     * assertSame(var_type(new \Exception()), '\\Exception');
      * </code>
      *
      * @package Var
@@ -5267,7 +5264,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
      * Example:
      * <code>
      * // 単純なエクスポート
-     * assert(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true) === "[
+     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), "[
      *     'array' => [1, 2, 3],
      *     'hash'  => [
      *         'a' => 'A',
@@ -5282,7 +5279,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
      * $robject->a = new \stdClass();
      * $robject->a->b = new \stdClass();
      * $robject->a->b->c = $robject;
-     * assert(var_export2(compact('rarray', 'robject'), true) === "[
+     * assertSame(var_export2(compact('rarray', 'robject'), true), "[
      *     'rarray'  => [
      *         'a' => [
      *             'b' => [
@@ -5443,7 +5440,7 @@ if (!isset($excluded_functions['hashvar']) && (!function_exists('ryunosuke\\Func
      * <code>
      * $hoge = 'HOGE';
      * $fuga = 'FUGA';
-     * assert(hashvar($hoge, $fuga) === ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * assertSame(hashvar($hoge, $fuga), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
      * </code>
      *
      * @package Var

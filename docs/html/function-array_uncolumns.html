@@ -168,7 +168,7 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_uncolumns([<span class="php-quote">'id'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>], <span class="php-quote">'name'</span> =&gt; [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]]) === [
+<pre>assertSame(array_uncolumns([<span class="php-quote">'id'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">2</span>], <span class="php-quote">'name'</span> =&gt; [<span class="php-quote">'A'</span>, <span class="php-quote">'B'</span>]]), [
     [<span class="php-quote">'id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'A'</span>],
     [<span class="php-quote">'id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'B'</span>],
 ]);</pre>

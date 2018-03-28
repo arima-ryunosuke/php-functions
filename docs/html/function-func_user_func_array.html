@@ -138,7 +138,7 @@
 
 <pre><span class="php-comment">// strlen に2つの引数を渡してもエラーにならない</span>
 <span class="php-var">$strlen</span> = func_user_func_array(<span class="php-quote">'strlen'</span>);
-<span class="php-keyword2">assert</span>(<span class="php-var">$strlen</span>(<span class="php-quote">'abc'</span>, <span class="php-keyword1">null</span>)       === <span class="php-num">3</span>);</pre>
+assertSame(<span class="php-var">$strlen</span>(<span class="php-quote">'abc'</span>, <span class="php-keyword1">null</span>), <span class="php-num">3</span>);</pre>
 	</div>
 
 
@@ -172,7 +172,7 @@
 		
 		<b>Package:</b> <a href="package-Callable.html">Callable</a><br>
 		<b>Located at</b>
-		<a href="source-function-func_user_func_array.html#3442-3476" title="Go to source code">
+		<a href="source-function-func_user_func_array.html#3439-3473" title="Go to source code">
 			
 		</a><br>
 	</div>

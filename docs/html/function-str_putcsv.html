@@ -133,9 +133,9 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(str_putcsv([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>])             === <span class="php-quote">&quot;a,b,c&quot;</span>);
-<span class="php-keyword2">assert</span>(str_putcsv([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">&quot;\t&quot;</span>)       === <span class="php-quote">&quot;a\tb\tc&quot;</span>);
-<span class="php-keyword2">assert</span>(str_putcsv([<span class="php-quote">'a'</span>, <span class="php-quote">' b '</span>, <span class="php-quote">'c'</span>], <span class="php-quote">&quot; &quot;</span>, <span class="php-quote">&quot;'&quot;</span>) === <span class="php-quote">&quot;a ' b ' c&quot;</span>);</pre>
+<pre>assertSame(str_putcsv([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>]), <span class="php-quote">&quot;a,b,c&quot;</span>);
+assertSame(str_putcsv([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>], <span class="php-quote">&quot;\t&quot;</span>), <span class="php-quote">&quot;a\tb\tc&quot;</span>);
+assertSame(str_putcsv([<span class="php-quote">'a'</span>, <span class="php-quote">' b '</span>, <span class="php-quote">'c'</span>], <span class="php-quote">&quot; &quot;</span>, <span class="php-quote">&quot;'&quot;</span>), <span class="php-quote">&quot;a ' b ' c&quot;</span>);</pre>
 	</div>
 
 
@@ -184,7 +184,7 @@
 		
 		<b>Package:</b> <a href="package-String.html">String</a><br>
 		<b>Located at</b>
-		<a href="source-function-str_putcsv.html#3975-4018" title="Go to source code">
+		<a href="source-function-str_putcsv.html#3972-4015" title="Go to source code">
 			
 		</a><br>
 	</div>

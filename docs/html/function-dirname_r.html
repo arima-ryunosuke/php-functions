@@ -131,7 +131,7 @@
 file_set_contents(<span class="php-quote">&quot;</span><span class="php-var">$tmp</span><span class="php-quote">/a/b/file.txt&quot;</span>, <span class="php-quote">'hoge'</span>);
 <span class="php-comment">// /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定</span>
 <span class="php-var">$callback</span> = <span class="php-keyword1">function</span>(<span class="php-var">$path</span>){<span class="php-keyword1">return</span> <span class="php-keyword2">realpath</span>(<span class="php-quote">&quot;</span><span class="php-var">$path</span><span class="php-quote">/file.txt&quot;</span>);};
-<span class="php-keyword2">assert</span>(dirname_r(<span class="php-quote">&quot;</span><span class="php-var">$tmp</span><span class="php-quote">/a/b/c/d/e/f&quot;</span>, <span class="php-var">$callback</span>) === <span class="php-keyword2">realpath</span>(<span class="php-quote">&quot;</span><span class="php-var">$tmp</span><span class="php-quote">/a/b/file.txt&quot;</span>));</pre>
+assertSame(dirname_r(<span class="php-quote">&quot;</span><span class="php-var">$tmp</span><span class="php-quote">/a/b/c/d/e/f&quot;</span>, <span class="php-var">$callback</span>), <span class="php-keyword2">realpath</span>(<span class="php-quote">&quot;</span><span class="php-var">$tmp</span><span class="php-quote">/a/b/file.txt&quot;</span>));</pre>
 	</div>
 
 
@@ -170,7 +170,7 @@ file_set_contents(<span class="php-quote">&quot;</span><span class="php-var">$tm
 		
 		<b>Package:</b> <a href="package-FileSystem.html">FileSystem</a><br>
 		<b>Located at</b>
-		<a href="source-function-dirname_r.html#2713-2746" title="Go to source code">
+		<a href="source-function-dirname_r.html#2710-2743" title="Go to source code">
 			
 		</a><br>
 	</div>

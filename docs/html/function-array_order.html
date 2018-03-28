@@ -182,7 +182,7 @@
 <span class="php-var">$v2</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-quote">'2'</span>, <span class="php-quote">'no'</span> =&gt; <span class="php-quote">'a4'</span>,  <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'yyy'</span>];
 <span class="php-var">$v3</span> = [<span class="php-quote">'id'</span> =&gt; <span class="php-quote">'3'</span>, <span class="php-quote">'no'</span> =&gt; <span class="php-quote">'a12'</span>, <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'xxx'</span>];
 <span class="php-comment">// name 昇順, no 自然降順</span>
-<span class="php-keyword2">assert</span>(array_order([<span class="php-var">$v1</span>, <span class="php-var">$v2</span>, <span class="php-var">$v3</span>], [<span class="php-quote">'name'</span> =&gt; <span class="php-keyword1">true</span>, <span class="php-quote">'no'</span> =&gt; -SORT_NATURAL]) === [<span class="php-var">$v3</span>, <span class="php-var">$v2</span>, <span class="php-var">$v1</span>]);</pre>
+assertSame(array_order([<span class="php-var">$v1</span>, <span class="php-var">$v2</span>, <span class="php-var">$v3</span>], [<span class="php-quote">'name'</span> =&gt; <span class="php-keyword1">true</span>, <span class="php-quote">'no'</span> =&gt; -SORT_NATURAL]), [<span class="php-var">$v3</span>, <span class="php-var">$v2</span>, <span class="php-var">$v1</span>]);</pre>
 	</div>
 
 

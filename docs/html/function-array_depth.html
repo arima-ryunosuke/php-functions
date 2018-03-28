@@ -168,9 +168,9 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(array_depth([])                       === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(array_depth([<span class="php-quote">'hoge'</span>])                 === <span class="php-num">1</span>);
-<span class="php-keyword2">assert</span>(array_depth([[<span class="php-quote">'nest1'</span> =&gt; [<span class="php-quote">'nest2'</span>]]]) === <span class="php-num">3</span>);</pre>
+<pre>assertSame(array_depth([]), <span class="php-num">1</span>);
+assertSame(array_depth([<span class="php-quote">'hoge'</span>]), <span class="php-num">1</span>);
+assertSame(array_depth([[<span class="php-quote">'nest1'</span> =&gt; [<span class="php-quote">'nest2'</span>]]]), <span class="php-num">3</span>);</pre>
 	</div>
 
 

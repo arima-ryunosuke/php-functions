@@ -173,12 +173,12 @@ callable を与えると sprintf ではなくコールバック処理になる�
 
 <pre><span class="php-var">$array</span> = [<span class="php-quote">'key1'</span> =&gt; <span class="php-quote">'val1'</span>, <span class="php-quote">'key2'</span> =&gt; <span class="php-quote">'val2'</span>];
 <span class="php-comment">// key, value を利用した sprintf</span>
-<span class="php-keyword2">assert</span>(array_sprintf(<span class="php-var">$array</span>, <span class="php-quote">'%2$s=%1$s'</span>)      === [<span class="php-quote">'key1=val1'</span>, <span class="php-quote">'key2=val2'</span>]);
+assertSame(array_sprintf(<span class="php-var">$array</span>, <span class="php-quote">'%2$s=%1$s'</span>), [<span class="php-quote">'key1=val1'</span>, <span class="php-quote">'key2=val2'</span>]);
 <span class="php-comment">// 第3引数を与えるとさらに implode される</span>
-<span class="php-keyword2">assert</span>(array_sprintf(<span class="php-var">$array</span>, <span class="php-quote">'%2$s=%1$s'</span>, <span class="php-quote">' '</span>) === <span class="php-quote">'key1=val1 key2=val2'</span>);
+assertSame(array_sprintf(<span class="php-var">$array</span>, <span class="php-quote">'%2$s=%1$s'</span>, <span class="php-quote">' '</span>), <span class="php-quote">'key1=val1 key2=val2'</span>);
 <span class="php-comment">// クロージャを与えるとコールバック動作になる</span>
 <span class="php-var">$closure</span> = <span class="php-keyword1">function</span>(<span class="php-var">$v</span>, <span class="php-var">$k</span>){<span class="php-keyword1">return</span> <span class="php-quote">&quot;</span><span class="php-var">$k</span><span class="php-quote">=&quot;</span> . <span class="php-keyword2">strtoupper</span>(<span class="php-var">$v</span>);};
-<span class="php-keyword2">assert</span>(array_sprintf(<span class="php-var">$array</span>, <span class="php-var">$closure</span>, <span class="php-quote">' '</span>)    === <span class="php-quote">'key1=VAL1 key2=VAL2'</span>);</pre>
+assertSame(array_sprintf(<span class="php-var">$array</span>, <span class="php-var">$closure</span>, <span class="php-quote">' '</span>), <span class="php-quote">'key1=VAL1 key2=VAL2'</span>);</pre>
 	</div>
 
 

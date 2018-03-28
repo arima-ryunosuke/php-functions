@@ -170,10 +170,10 @@
 
 <pre><span class="php-comment">// 1番目に値を渡して map</span>
 <span class="php-var">$sprintf</span> = <span class="php-keyword1">function</span>(){<span class="php-keyword1">return</span> <span class="php-keyword2">vsprintf</span>(<span class="php-quote">'%s%s%s'</span>, <span class="php-keyword2">func_get_args</span>());};
-<span class="php-keyword2">assert</span>(array_nmap([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>], <span class="php-var">$sprintf</span>, <span class="php-num">1</span>, <span class="php-quote">'prefix-'</span>, <span class="php-quote">'-suffix'</span>)   === [<span class="php-quote">'prefix-a-suffix'</span>, <span class="php-quote">'prefix-b-suffix'</span>]);
+assertSame(array_nmap([<span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>], <span class="php-var">$sprintf</span>, <span class="php-num">1</span>, <span class="php-quote">'prefix-'</span>, <span class="php-quote">'-suffix'</span>), [<span class="php-quote">'prefix-a-suffix'</span>, <span class="php-quote">'prefix-b-suffix'</span>]);
 <span class="php-comment">// 1番目にキー、2番目に値を渡して map</span>
 <span class="php-var">$sprintf</span> = <span class="php-keyword1">function</span>(){<span class="php-keyword1">return</span> <span class="php-keyword2">vsprintf</span>(<span class="php-quote">'%s %s %s %s %s'</span>, <span class="php-keyword2">func_get_args</span>());};
-<span class="php-keyword2">assert</span>(array_nmap([<span class="php-quote">'k'</span> =&gt; <span class="php-quote">'v'</span>], <span class="php-var">$sprintf</span>, [<span class="php-num">1</span> =&gt; <span class="php-num">2</span>], <span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>) === [<span class="php-quote">'k'</span> =&gt; <span class="php-quote">'a k b v c'</span>]);</pre>
+assertSame(array_nmap([<span class="php-quote">'k'</span> =&gt; <span class="php-quote">'v'</span>], <span class="php-var">$sprintf</span>, [<span class="php-num">1</span> =&gt; <span class="php-num">2</span>], <span class="php-quote">'a'</span>, <span class="php-quote">'b'</span>, <span class="php-quote">'c'</span>), [<span class="php-quote">'k'</span> =&gt; <span class="php-quote">'a k b v c'</span>]);</pre>
 	</div>
 
 

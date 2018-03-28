@@ -134,14 +134,14 @@
 <p>Example:</p>
 
 <pre><span class="php-comment">// 配列は要素数となる</span>
-<span class="php-keyword2">assert</span>(numberify([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>])       === <span class="php-num">3</span>);
+assertSame(numberify([<span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>]), <span class="php-num">3</span>);
 <span class="php-comment">// int/float は基本的にそのまま</span>
-<span class="php-keyword2">assert</span>(numberify(<span class="php-num">123</span>)             === <span class="php-num">123</span>);
-<span class="php-keyword2">assert</span>(numberify(<span class="php-num">123.45</span>)          === <span class="php-num">123</span>);
-<span class="php-keyword2">assert</span>(numberify(<span class="php-num">123.45</span>, <span class="php-keyword1">true</span>)    === <span class="php-num">123.45</span>);
+assertSame(numberify(<span class="php-num">123</span>), <span class="php-num">123</span>);
+assertSame(numberify(<span class="php-num">123.45</span>), <span class="php-num">123</span>);
+assertSame(numberify(<span class="php-num">123.45</span>, <span class="php-keyword1">true</span>), <span class="php-num">123.45</span>);
 <span class="php-comment">// 文字列は数値抽出</span>
-<span class="php-keyword2">assert</span>(numberify(<span class="php-quote">'a1b2c3'</span>)        === <span class="php-num">123</span>);
-<span class="php-keyword2">assert</span>(numberify(<span class="php-quote">'a1b2.c3'</span>, <span class="php-keyword1">true</span>) === <span class="php-num">12.3</span>);</pre>
+assertSame(numberify(<span class="php-quote">'a1b2c3'</span>), <span class="php-num">123</span>);
+assertSame(numberify(<span class="php-quote">'a1b2.c3'</span>, <span class="php-keyword1">true</span>), <span class="php-num">12.3</span>);</pre>
 	</div>
 
 
@@ -180,7 +180,7 @@
 		
 		<b>Package:</b> <a href="package-Var.html">Var</a><br>
 		<b>Located at</b>
-		<a href="source-function-numberify.html#5061-5136" title="Go to source code">
+		<a href="source-function-numberify.html#5058-5133" title="Go to source code">
 			
 		</a><br>
 	</div>

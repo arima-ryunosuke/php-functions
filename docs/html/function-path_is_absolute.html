@@ -124,12 +124,12 @@
 
 <p>Example:</p>
 
-<pre><span class="php-keyword2">assert</span>(path_is_absolute(<span class="php-quote">'/absolute/path'</span>) === <span class="php-keyword1">true</span>);
-<span class="php-keyword2">assert</span>(path_is_absolute(<span class="php-quote">'relative/path'</span>)  === <span class="php-keyword1">false</span>);
+<pre>assertTrue(path_is_absolute(<span class="php-quote">'/absolute/path'</span>));
+assertFalse(path_is_absolute(<span class="php-quote">'relative/path'</span>));
 <span class="php-comment">// Windows 環境では下記も true になる</span>
 <span class="php-keyword1">if</span> (DIRECTORY_SEPARATOR === <span class="php-quote">'\\'</span>) {
-    <span class="php-keyword2">assert</span>(path_is_absolute(<span class="php-quote">'\\absolute\\path'</span>)    === <span class="php-keyword1">true</span>);
-    <span class="php-keyword2">assert</span>(path_is_absolute(<span class="php-quote">'C:\\absolute\\path'</span>)  === <span class="php-keyword1">true</span>);
+    assertTrue(path_is_absolute(<span class="php-quote">'\\absolute\\path'</span>));
+    assertTrue(path_is_absolute(<span class="php-quote">'C:\\absolute\\path'</span>));
 }</pre>
 	</div>
 
@@ -164,7 +164,7 @@
 		
 		<b>Package:</b> <a href="package-FileSystem.html">FileSystem</a><br>
 		<b>Located at</b>
-		<a href="source-function-path_is_absolute.html#2749-2781" title="Go to source code">
+		<a href="source-function-path_is_absolute.html#2746-2778" title="Go to source code">
 			
 		</a><br>
 	</div>

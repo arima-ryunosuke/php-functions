@@ -148,14 +148,14 @@
 <p>Example:</p>
 
 <pre><span class="php-comment">// 数値キーが参照できる</span>
-<span class="php-keyword2">assert</span>(render_string(<span class="php-quote">'${0}'</span>, [<span class="php-quote">'number'</span>])                                          === <span class="php-quote">'number'</span>);
+assertSame(render_string(<span class="php-quote">'${0}'</span>, [<span class="php-quote">'number'</span>]), <span class="php-quote">'number'</span>);
 <span class="php-comment">// クロージャは呼び出し結果が埋め込まれる</span>
-<span class="php-keyword2">assert</span>(render_string(<span class="php-quote">'$c'</span>, [<span class="php-quote">'c'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$vars</span>, <span class="php-var">$k</span>){<span class="php-keyword1">return</span> <span class="php-var">$k</span> . <span class="php-quote">'-closure'</span>;}]) === <span class="php-quote">'c-closure'</span>);
+assertSame(render_string(<span class="php-quote">'$c'</span>, [<span class="php-quote">'c'</span> =&gt; <span class="php-keyword1">function</span>(<span class="php-var">$vars</span>, <span class="php-var">$k</span>){<span class="php-keyword1">return</span> <span class="php-var">$k</span> . <span class="php-quote">'-closure'</span>;}]), <span class="php-quote">'c-closure'</span>);
 <span class="php-comment">// 引数をそのまま返すだけの特殊な変数 $_ が宣言される</span>
-<span class="php-keyword2">assert</span>(render_string(<span class="php-quote">'{$_(123 + 456)}'</span>, [])                                       === <span class="php-quote">'579'</span>);
+assertSame(render_string(<span class="php-quote">'{$_(123 + 456)}'</span>, []), <span class="php-quote">'579'</span>);
 <span class="php-comment">// 要するに '$_()' の中に php の式が書けるようになる</span>
-<span class="php-keyword2">assert</span>(render_string(<span class="php-quote">'{$_(implode(\',\', $strs))}'</span>, [<span class="php-quote">'strs'</span> =&gt; [<span class="php-quote">'a'</span>, <span class="php-quote">'n'</span>, <span class="php-quote">'z'</span>]])  === <span class="php-quote">'a,n,z'</span>);
-<span class="php-keyword2">assert</span>(render_string(<span class="php-quote">'{$_(max($nums))}'</span>, [<span class="php-quote">'nums'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">9</span>, <span class="php-num">3</span>]])                   === <span class="php-quote">'9'</span>);</pre>
+assertSame(render_string(<span class="php-quote">'{$_(implode(\',\', $strs))}'</span>, [<span class="php-quote">'strs'</span> =&gt; [<span class="php-quote">'a'</span>, <span class="php-quote">'n'</span>, <span class="php-quote">'z'</span>]]), <span class="php-quote">'a,n,z'</span>);
+assertSame(render_string(<span class="php-quote">'{$_(max($nums))}'</span>, [<span class="php-quote">'nums'</span> =&gt; [<span class="php-num">1</span>, <span class="php-num">9</span>, <span class="php-num">3</span>]]), <span class="php-quote">'9'</span>);</pre>
 	</div>
 
 
@@ -194,7 +194,7 @@
 		
 		<b>Package:</b> <a href="package-String.html">String</a><br>
 		<b>Located at</b>
-		<a href="source-function-render_string.html#4452-4532" title="Go to source code">
+		<a href="source-function-render_string.html#4449-4529" title="Go to source code">
 			
 		</a><br>
 	</div>

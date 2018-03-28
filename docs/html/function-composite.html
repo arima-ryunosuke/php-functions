@@ -147,7 +147,7 @@ e.g. <code>[1, 2, 3]</code> を配列として渡したいが $arrayalbe=true �
 <span class="php-var">$composite</span> = composite(<span class="php-keyword1">false</span>, <span class="php-var">$add5</span>, <span class="php-var">$mul3</span>, <span class="php-var">$split</span>, <span class="php-var">$union</span>);<span class="php-comment">// 上記を合成したクロージャ</span>
 <span class="php-comment">// false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）</span>
 <span class="php-comment">// 7 + 5 -&gt; 12 |&gt; 12 * 3 -&gt; 36 |&gt; 36 -&gt; [3, 6] |&gt; 3 + 6 |&gt; 9</span>
-<span class="php-keyword2">assert</span>(<span class="php-var">$composite</span>(<span class="php-num">7</span>) === <span class="php-num">9</span>);
+assertSame(<span class="php-var">$composite</span>(<span class="php-num">7</span>), <span class="php-num">9</span>);
 
 <span class="php-var">$upper</span> = <span class="php-keyword1">function</span> (<span class="php-var">$s</span>) { <span class="php-keyword1">return</span> [<span class="php-var">$s</span>, <span class="php-keyword2">strtoupper</span>(<span class="php-var">$s</span>)]; };   <span class="php-comment">// 来た値と大文字化したものを配列で返すクロージャ</span>
 <span class="php-var">$prefix</span> = <span class="php-keyword1">function</span> (<span class="php-var">$s</span>, <span class="php-var">$S</span>) { <span class="php-keyword1">return</span> <span class="php-quote">'pre-'</span> . <span class="php-var">$s</span> . <span class="php-var">$S</span>; };  <span class="php-comment">// 来た値を結合して'pre-'を付けるクロージャ</span>
@@ -156,7 +156,7 @@ e.g. <code>[1, 2, 3]</code> を配列として渡したいが $arrayalbe=true �
 <span class="php-var">$composite</span> = composite(<span class="php-keyword1">true</span>, <span class="php-var">$upper</span>, <span class="php-var">$prefix</span>, <span class="php-var">$hash</span>, <span class="php-var">$key</span>);<span class="php-comment">// 上記を合成したクロージャ</span>
 <span class="php-comment">// true を渡すとただの配列は引数として、連想配列は単値として渡ってくる</span>
 <span class="php-comment">// ['hoge', 'HOGE'] |&gt; 'pre-hogeHOGE' |&gt; ['sS' =&gt; 'pre-hogeHOGE'] |&gt; 'EGOHegoh-erp'</span>
-<span class="php-keyword2">assert</span>(<span class="php-var">$composite</span>(<span class="php-quote">'hoge'</span>) === <span class="php-quote">'EGOHegoh-erp'</span>);</pre>
+assertSame(<span class="php-var">$composite</span>(<span class="php-quote">'hoge'</span>), <span class="php-quote">'EGOHegoh-erp'</span>);</pre>
 	</div>
 
 
@@ -195,7 +195,7 @@ e.g. <code>[1, 2, 3]</code> を配列として渡したいが $arrayalbe=true �
 		
 		<b>Package:</b> <a href="package-Callable.html">Callable</a><br>
 		<b>Located at</b>
-		<a href="source-function-composite.html#3076-3146" title="Go to source code">
+		<a href="source-function-composite.html#3073-3143" title="Go to source code">
 			
 		</a><br>
 	</div>
