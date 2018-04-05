@@ -2589,7 +2589,14 @@ if (!isset($excluded_functions['file_tree']) && (!function_exists('ryunosuke\\Fu
         $basedir = basename($dirname);
 
         $result = [];
-        foreach (new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS) as $item) {
+        $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS));
+        usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
+            if ($a->isDir() xor $b->isDir()) {
+                return $a->isDir() - $b->isDir();
+            }
+            return strcmp($a->getPathname(), $b->getPathname());
+        });
+        foreach ($items as $item) {
             if (!isset($result[$basedir])) {
                 $result[$basedir] = [];
             }
@@ -2605,10 +2612,6 @@ if (!isset($excluded_functions['file_tree']) && (!function_exists('ryunosuke\\Fu
         // フィルタで全除去されると空エントリになるので明示的に削除
         if (!$result[$basedir]) {
             unset($result[$basedir]);
-        }
-        // ファイルの方が強いファイル名順
-        else {
-            $result[$basedir] = call_user_func(array_order, $result[$basedir], ['is_array', call_user_func(return_arg, 1)], true);
         }
         return $result;
     }
@@ -2857,6 +2860,78 @@ if (!isset($excluded_functions['path_normalize']) && (!function_exists('ryunosuk
             $result[] = $part;
         }
         return implode(DIRECTORY_SEPARATOR, $result);
+    }
+}
+if (!isset($excluded_functions['cp_rf']) && (!function_exists('ryunosuke\\Functions\\cp_rf') || (new \ReflectionFunction('ryunosuke\\Functions\\cp_rf'))->isInternal())) {
+    /**
+     * ディレクトリのコピー
+     *
+     * $dst に / を付けると「$dst に自身をコピー」する。付けないと「$dst に中身をコピー」するという動作になる。
+     *
+     * ディレクトリではなくファイルを与えても動作する（copy とほぼ同じ動作になるが、対象にディレクトリを指定できる点が異なる）。
+     *
+     * Example:
+     * <code>
+     * // /tmp/src/hoge.txt, /tmp/src/dir/fuga.txt を作っておく
+     * $tmp = sys_get_temp_dir();
+     * file_set_contents("$tmp/src/hoge.txt", 'hoge');
+     * file_set_contents("$tmp/src/dir/fuga.txt", 'fuga');
+     *
+     * // "/" を付けないと中身コピー
+     * cp_rf("$tmp/src", "$tmp/dst1");
+     * assertStringEqualsFile("$tmp/dst1/hoge.txt", 'hoge');
+     * assertStringEqualsFile("$tmp/dst1/dir/fuga.txt", 'fuga');
+     * // "/" を付けると自身コピー
+     * cp_rf("$tmp/src", "$tmp/dst2/");
+     * assertStringEqualsFile("$tmp/dst2/src/hoge.txt", 'hoge');
+     * assertStringEqualsFile("$tmp/dst2/src/dir/fuga.txt", 'fuga');
+     *
+     * // $src はファイルでもいい（$dst に "/" を付けるとそのディレクトリにコピーする）
+     * cp_rf("$tmp/src/hoge.txt", "$tmp/dst3/");
+     * assertStringEqualsFile("$tmp/dst3/hoge.txt", 'hoge');
+     * // $dst に "/" を付けないとそのパスとしてコピー（copy と完全に同じ）
+     * cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
+     * assertStringEqualsFile("$tmp/dst4", 'hoge');
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $src コピー元パス
+     * @param string $dst コピー先パス。末尾/でディレクトリであることを明示できる
+     * @return bool 成功した場合に TRUE を、失敗した場合に FALSE を返します
+     */
+    function cp_rf($src, $dst)
+    {
+        $dss = '/' . (DIRECTORY_SEPARATOR === '\\' ? '\\\\' : '');
+        $dirmode = preg_match("#[$dss]$#u", $dst);
+
+        // ディレクトリでないなら copy へ移譲
+        if (!is_dir($src)) {
+            if ($dirmode) {
+                call_user_func(mkdir_p, $dst);
+                return copy($src, $dst . basename($src));
+            }
+            else {
+                call_user_func(mkdir_p, dirname($dst));
+                return copy($src, $dst);
+            }
+        }
+
+        if ($dirmode) {
+            return call_user_func(cp_rf, $src, $dst . basename($src));
+        }
+
+        call_user_func(mkdir_p, $dst);
+
+        foreach (glob("$src/*") as $file) {
+            if (is_dir($file)) {
+                call_user_func(cp_rf, $file, "$dst/" . basename($file));
+            }
+            else {
+                copy($file, "$dst/" . basename($file));
+            }
+        }
+        return file_exists($dst);
     }
 }
 if (!isset($excluded_functions['rm_rf']) && (!function_exists('ryunosuke\\Functions\\rm_rf') || (new \ReflectionFunction('ryunosuke\\Functions\\rm_rf'))->isInternal())) {
@@ -5308,11 +5383,8 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
         // インデントの空白数
         $INDENT = 4;
 
-        // オリジナルの var_export（返り値版）
-        $var_export = function ($v) { return var_export($v, true); };
-
         // 再帰用クロージャ
-        $export = function ($nest, $value, $parents) use (&$export, $INDENT, $var_export) {
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT) {
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
@@ -5333,26 +5405,26 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
                 if ($value === array_values($value)) {
                     // スカラー値のみで構成されているならシンプルな再帰
                     if (call_user_func(array_all, $value, is_primitive)) {
-                        $vals = array_map($var_export, $value);
+                        $vals = array_map($export, $value);
                         return '[' . implode(', ', $vals) . ']';
                     }
                     // スカラー値以外が含まれているならキーを含めない
                     $kvl = '';
                     $parents[] = $value;
                     foreach ($value as $k => $v) {
-                        $kvl .= $spacer1 . $export($nest + 1, $v, $parents) . ",\n";
+                        $kvl .= $spacer1 . $export($v, $nest + 1, $parents) . ",\n";
                     }
                     return "[\n{$kvl}{$spacer2}]";
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $values = call_user_func(array_map_key, $value, $var_export);
+                $values = call_user_func(array_map_key, $value, $export);
                 $maxlen = max(array_map('strlen', array_keys($values)));
                 $kvl = '';
                 $parents[] = $value;
                 foreach ($values as $k => $v) {
                     $align = str_repeat(' ', $maxlen - strlen($k));
-                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
+                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($v, $nest + 1, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -5376,7 +5448,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
                 $vars += get_object_vars($value);
 
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export($nest, $vars, $parents) . ')';
+                return get_class($value) . '::__set_state(' . $export($vars, $nest, $parents) . ')';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -5384,12 +5456,12 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
             }
             // それ以外は標準に従う
             else {
-                return $var_export($value);
+                return var_export($value, true);
             }
         };
 
         // 結果を返したり出力したり
-        $result = $export(0, $value, []);
+        $result = $export($value);
         if ($return) {
             return $result;
         }

@@ -69,6 +69,7 @@ const dirname_r = 'dirname_r';
 const path_is_absolute = 'path_is_absolute';
 const path_resolve = 'path_resolve';
 const path_normalize = 'path_normalize';
+const cp_rf = 'cp_rf';
 const rm_rf = 'rm_rf';
 const tmpname = 'tmpname';
 const delegate = 'delegate';

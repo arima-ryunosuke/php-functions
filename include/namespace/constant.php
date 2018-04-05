@@ -71,6 +71,7 @@ const dirname_r = 'ryunosuke\\Functions\\dirname_r';
 const path_is_absolute = 'ryunosuke\\Functions\\path_is_absolute';
 const path_resolve = 'ryunosuke\\Functions\\path_resolve';
 const path_normalize = 'ryunosuke\\Functions\\path_normalize';
+const cp_rf = 'ryunosuke\\Functions\\cp_rf';
 const rm_rf = 'ryunosuke\\Functions\\rm_rf';
 const tmpname = 'ryunosuke\\Functions\\tmpname';
 const delegate = 'ryunosuke\\Functions\\delegate';

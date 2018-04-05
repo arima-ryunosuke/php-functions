@@ -2,7 +2,7 @@
 
 /** Don't touch this code. This is auto generated. */
 
-namespace ryunosuke\Functions;
+namespace ryunosuke\Functions\Package;
 
 const arrayize = ['ryunosuke\\Functions\\Package\\Arrays', 'arrayize'];
 const is_hasharray = ['ryunosuke\\Functions\\Package\\Arrays', 'is_hasharray'];
@@ -71,6 +71,7 @@ const dirname_r = ['ryunosuke\\Functions\\Package\\FileSystem', 'dirname_r'];
 const path_is_absolute = ['ryunosuke\\Functions\\Package\\FileSystem', 'path_is_absolute'];
 const path_resolve = ['ryunosuke\\Functions\\Package\\FileSystem', 'path_resolve'];
 const path_normalize = ['ryunosuke\\Functions\\Package\\FileSystem', 'path_normalize'];
+const cp_rf = ['ryunosuke\\Functions\\Package\\FileSystem', 'cp_rf'];
 const rm_rf = ['ryunosuke\\Functions\\Package\\FileSystem', 'rm_rf'];
 const tmpname = ['ryunosuke\\Functions\\Package\\FileSystem', 'tmpname'];
 const delegate = ['ryunosuke\\Functions\\Package\\Funchand', 'delegate'];
