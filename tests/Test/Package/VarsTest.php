@@ -168,11 +168,15 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
 [
     '\'' . "\0" . '\'' => 123,
     'key'              => 456,
+    'null'             => null,
+    'nulls'            => [null],
 ]
 EXPECTED
             , $var_export2([
-                "'\0'" => 123,
-                'key'  => 456,
+                "'\0'"  => 123,
+                'key'   => 456,
+                'null'  => null,
+                'nulls' => [null],
             ], true));
 
         $this->expectOutputRegex('#hoge#');

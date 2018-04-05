@@ -288,11 +288,8 @@ class Vars
         // インデントの空白数
         $INDENT = 4;
 
-        // オリジナルの var_export（返り値版）
-        $var_export = function ($v) { return var_export($v, true); };
-
         // 再帰用クロージャ
-        $export = function ($nest, $value, $parents) use (&$export, $INDENT, $var_export) {
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT) {
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
@@ -313,26 +310,26 @@ class Vars
                 if ($value === array_values($value)) {
                     // スカラー値のみで構成されているならシンプルな再帰
                     if (call_user_func(array_all, $value, is_primitive)) {
-                        $vals = array_map($var_export, $value);
+                        $vals = array_map($export, $value);
                         return '[' . implode(', ', $vals) . ']';
                     }
                     // スカラー値以外が含まれているならキーを含めない
                     $kvl = '';
                     $parents[] = $value;
                     foreach ($value as $k => $v) {
-                        $kvl .= $spacer1 . $export($nest + 1, $v, $parents) . ",\n";
+                        $kvl .= $spacer1 . $export($v, $nest + 1, $parents) . ",\n";
                     }
                     return "[\n{$kvl}{$spacer2}]";
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $values = call_user_func(array_map_key, $value, $var_export);
+                $values = call_user_func(array_map_key, $value, $export);
                 $maxlen = max(array_map('strlen', array_keys($values)));
                 $kvl = '';
                 $parents[] = $value;
                 foreach ($values as $k => $v) {
                     $align = str_repeat(' ', $maxlen - strlen($k));
-                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($nest + 1, $v, $parents) . ",\n";
+                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($v, $nest + 1, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -356,7 +353,7 @@ class Vars
                 $vars += get_object_vars($value);
 
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export($nest, $vars, $parents) . ')';
+                return get_class($value) . '::__set_state(' . $export($vars, $nest, $parents) . ')';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -364,12 +361,12 @@ class Vars
             }
             // それ以外は標準に従う
             else {
-                return $var_export($value);
+                return var_export($value, true);
             }
         };
 
         // 結果を返したり出力したり
-        $result = $export(0, $value, []);
+        $result = $export($value);
         if ($return) {
             return $result;
         }
