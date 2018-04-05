@@ -65,6 +65,8 @@ require __DIR__ . '/vendor/autoload.php';
 \ryunosuke\Functions\Transporter::exportFunction('namespace');
 // 任意の名前空間へクラスとして出力
 \ryunosuke\Functions\Transporter::exportFunction('namespace', true, '/dir/to/export');
+// phar として出力
+\ryunosuke\Functions\Transporter::exportPhar('namespace', '/path/to/phar');
 ```
 
 あとはプロジェクト固有の include.php などで吐き出したファイルを読み込めば OK です。
@@ -75,6 +77,9 @@ require __DIR__ . '/vendor/autoload.php';
 
 クラスとして出力すると完全に別個のクラスとして動作します（実質的にはコピーして名前空間を変更しているようなものです）。
 依存を増やしたくないときに有用です。
+
+phar として出力した場合は `require '/path/to/phar';` だけで動作します。
+名前空間が変えられる上、 phar に閉じ込められるので依存を増やすこともなく、持ち回しが可能になります。この方法がおすすめです。
 
 ### constant
 

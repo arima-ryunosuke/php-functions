@@ -10,6 +10,15 @@
 
 - no todo
 
+## 1.1.1
+
+- [change][ClassObj] detect_namespace がファイル名を受けられるように修正
+- [fixbug][FileSystem] file_tree が特定条件下でエラーを吐いていたので修正
+- [feature][FileSystem] cp_rf を追加
+- [fixbug][Vars] var_export2 でネストされた null が "NULL" になっていたのを修正
+- [fixbug][Transporter] package エクスポートのパッケージ名が異なっていたので修正
+- [feature][Transporter] phar 吐き出し機能の実装
+
 ## 1.1.0
 
 - [*change] 対応バージョンを 5.6 以降に変更
