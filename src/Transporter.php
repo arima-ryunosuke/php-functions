@@ -64,7 +64,7 @@ class Transporter
         file_put_contents("$dir/namespace/constant.php", $files['constant']);
         file_put_contents("$dir/namespace/function.php", $files['function']);
 
-        $files = self::exportFunction(__NAMESPACE__, true);
+        $files = self::exportFunction(__NAMESPACE__ . '\\Package', true);
         file_put_contents("$dir/constant.php", $files['constant']);
     }
 
