@@ -78,14 +78,14 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         }
 
         // この時点では undefined
-        $this->assertFalse(defined("ryunosuke\\Functions\\arrayize"));
-        $this->assertFalse(defined("ryunosuke\\Functions\\strcat"));
+        $this->assertFalse(defined("ryunosuke\\Functions\\Package\\arrayize"));
+        $this->assertFalse(defined("ryunosuke\\Functions\\Package\\strcat"));
 
         Transporter::importAsClass();
 
         // 定義されてるはず
-        $this->assertTrue(defined("ryunosuke\\Functions\\arrayize"));
-        $this->assertTrue(defined("ryunosuke\\Functions\\strcat"));
+        $this->assertTrue(defined("ryunosuke\\Functions\\Package\\arrayize"));
+        $this->assertTrue(defined("ryunosuke\\Functions\\Package\\strcat"));
     }
 
     /**
@@ -126,5 +126,26 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
 
         $this->assertContains('namespace test\hoge;', $files['constant']);
         $this->assertContains('namespace test\hoge;', $files['function']);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_exportPhar()
+    {
+        $dir = sys_get_temp_dir() . '/rfe';
+        call_user_func(rm_rf, $dir);
+        call_user_func(mkdir_p, $dir);
+        touch("$dir/package.phar");
+
+        Transporter::exportPhar('test\\hoge', "$dir/package.phar");
+        require_once "$dir/package.phar";
+
+        // 定義されてるし呼び出せるはず
+        $this->assertTrue(defined("test\\hoge\\arrayize"));
+        /** @noinspection PhpUndefinedClassInspection */
+        /** @noinspection PhpUndefinedNamespaceInspection */
+        $this->assertEquals([1, 2, 3], \test\hoge\Arrays::arrayize(1, 2, 3));
     }
 }

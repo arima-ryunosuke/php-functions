@@ -137,4 +137,43 @@ CODE;
             'function' => $prefix . $namespace . implode("\n", $functions) . "\n",
         ];
     }
+
+    public static function exportPhar($namespace, $pharpath)
+    {
+        $ve = function ($v) { return var_export($v, true); };
+        if (is_file($pharpath)) {
+            unlink($pharpath);
+        }
+        $phar = new \Phar($pharpath);
+
+        $constants = [];
+        foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
+            require_once $fn;
+            $refclass = new \ReflectionClass('ryunosuke\\Functions\\Package\\' . basename($fn, '.php'));
+            $methods = $refclass->getMethods(\ReflectionMethod::IS_PUBLIC || \ReflectionMethod::IS_STATIC);
+            foreach ($methods as $method) {
+                $mname = $method->getName();
+                $const = '[' . $ve($namespace . "\\" . $refclass->getShortName()) . ', ' . $ve($mname) . ']';
+                $constants[] = "const $mname = $const;";
+            }
+
+            $content = file_get_contents($fn);
+            $content = str_replace('namespace ryunosuke\\Functions\\Package;', "namespace $namespace;", $content);
+            $phar->addFromString(str_replace('\\', '/', $namespace) . '/' . basename($fn), $content);
+        }
+        $phar->addFromString('constants.php', "<?php\nnamespace $namespace;\n" . implode("\n", $constants) . "\n");
+
+        $phar->setStub(<<<'PHP'
+<?php
+require "phar://" . __FILE__ . DIRECTORY_SEPARATOR . "constants.php";
+spl_autoload_register(function ($class) {
+    $path = 'phar://' . __FILE__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+    if (is_file($path)) {
+        require $path;
+    }
+});
+__HALT_COMPILER();
+PHP
+        );
+    }
 }
