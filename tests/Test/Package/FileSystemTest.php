@@ -238,6 +238,59 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($mkdir_p($dir));
     }
 
+    function test_cp_rf()
+    {
+        $cp_rf = cp_rf;
+        $tmpdir = sys_get_temp_dir() . '/cp_rf';
+
+        $src = "$tmpdir/src";
+        FileSystem::rm_rf($src);
+        FileSystem::file_set_contents("$src/a/b/c.txt", 'aaa');
+        FileSystem::file_set_contents("$src/a/b/c1/d1.txt", '');
+        FileSystem::file_set_contents("$src/a/b/c2/d2.txt", '');
+
+        $dst = "$tmpdir/dst";
+        FileSystem::mkdir_p($dst);
+
+        // ただのファイル（"/" なし）
+        $cp_rf("$src/a/b/c.txt", "$dst/x.txt");
+        $this->assertStringEqualsFile("$dst/x.txt", 'aaa');
+
+        // ただのファイル（"/" あり）
+        $cp_rf("$src/a/b/c.txt", "$dst/");
+        $this->assertStringEqualsFile("$dst/c.txt", 'aaa');
+
+        // "/" なし（dst 自身にコピー）
+        FileSystem::rm_rf($dst);
+        FileSystem::file_set_contents("$dst/xxx.txt", '');
+        $cp_rf("$src/", $dst);
+        // 置換のような動作は行わないので元あったものは保持されているはず
+        $this->assertFileExists("$dst/xxx.txt");
+        // ツリーを確認（コピーされているはず）
+        $srctree = FileSystem::file_tree($src);
+        $dsttree = FileSystem::file_tree($dst);
+        $this->assertEquals(['xxx.txt', 'a'], array_keys($dsttree['dst']));
+        $this->assertEquals(array_keys($srctree['src']['a']), array_keys($dsttree['dst']['a']));
+        $this->assertEquals(array_keys($srctree['src']['a']['b']), array_keys($dsttree['dst']['a']['b']));
+        $this->assertEquals(array_keys($srctree['src']['a']['b']['c1']), array_keys($dsttree['dst']['a']['b']['c1']));
+        $this->assertEquals(array_keys($srctree['src']['a']['b']['c2']), array_keys($dsttree['dst']['a']['b']['c2']));
+
+        // "/" あり（dst の中にコピー）
+        FileSystem::rm_rf($dst);
+        FileSystem::file_set_contents("$dst/xxx.txt", '');
+        $cp_rf("$src/", "$dst/");
+        // 置換のような動作は行わないので元あったものは保持されているはず
+        $this->assertFileExists("$dst/xxx.txt");
+        // ツリーを確認（コピーされているはず）
+        $srctree = FileSystem::file_tree($src);
+        $dsttree = FileSystem::file_tree($dst);
+        $this->assertEquals(array_keys($srctree['src']), array_keys($dsttree['dst']['src']));
+        $this->assertEquals(array_keys($srctree['src']['a']), array_keys($dsttree['dst']['src']['a']));
+        $this->assertEquals(array_keys($srctree['src']['a']['b']), array_keys($dsttree['dst']['src']['a']['b']));
+        $this->assertEquals(array_keys($srctree['src']['a']['b']['c1']), array_keys($dsttree['dst']['src']['a']['b']['c1']));
+        $this->assertEquals(array_keys($srctree['src']['a']['b']['c2']), array_keys($dsttree['dst']['src']['a']['b']['c2']));
+    }
+
     function test_rm_rf()
     {
         $rm_rf = rm_rf;

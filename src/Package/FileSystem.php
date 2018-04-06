@@ -320,6 +320,77 @@ class FileSystem
     }
 
     /**
+     * ディレクトリのコピー
+     *
+     * $dst に / を付けると「$dst に自身をコピー」する。付けないと「$dst に中身をコピー」するという動作になる。
+     *
+     * ディレクトリではなくファイルを与えても動作する（copy とほぼ同じ動作になるが、対象にディレクトリを指定できる点が異なる）。
+     *
+     * Example:
+     * <code>
+     * // /tmp/src/hoge.txt, /tmp/src/dir/fuga.txt を作っておく
+     * $tmp = sys_get_temp_dir();
+     * file_set_contents("$tmp/src/hoge.txt", 'hoge');
+     * file_set_contents("$tmp/src/dir/fuga.txt", 'fuga');
+     *
+     * // "/" を付けないと中身コピー
+     * cp_rf("$tmp/src", "$tmp/dst1");
+     * assertStringEqualsFile("$tmp/dst1/hoge.txt", 'hoge');
+     * assertStringEqualsFile("$tmp/dst1/dir/fuga.txt", 'fuga');
+     * // "/" を付けると自身コピー
+     * cp_rf("$tmp/src", "$tmp/dst2/");
+     * assertStringEqualsFile("$tmp/dst2/src/hoge.txt", 'hoge');
+     * assertStringEqualsFile("$tmp/dst2/src/dir/fuga.txt", 'fuga');
+     *
+     * // $src はファイルでもいい（$dst に "/" を付けるとそのディレクトリにコピーする）
+     * cp_rf("$tmp/src/hoge.txt", "$tmp/dst3/");
+     * assertStringEqualsFile("$tmp/dst3/hoge.txt", 'hoge');
+     * // $dst に "/" を付けないとそのパスとしてコピー（copy と完全に同じ）
+     * cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
+     * assertStringEqualsFile("$tmp/dst4", 'hoge');
+     * </code>
+     *
+     * @package FileSystem
+     *
+     * @param string $src コピー元パス
+     * @param string $dst コピー先パス。末尾/でディレクトリであることを明示できる
+     * @return bool 成功した場合に TRUE を、失敗した場合に FALSE を返します
+     */
+    public static function cp_rf($src, $dst)
+    {
+        $dss = '/' . (DIRECTORY_SEPARATOR === '\\' ? '\\\\' : '');
+        $dirmode = preg_match("#[$dss]$#u", $dst);
+
+        // ディレクトリでないなら copy へ移譲
+        if (!is_dir($src)) {
+            if ($dirmode) {
+                call_user_func(mkdir_p, $dst);
+                return copy($src, $dst . basename($src));
+            }
+            else {
+                call_user_func(mkdir_p, dirname($dst));
+                return copy($src, $dst);
+            }
+        }
+
+        if ($dirmode) {
+            return call_user_func(cp_rf, $src, $dst . basename($src));
+        }
+
+        call_user_func(mkdir_p, $dst);
+
+        foreach (glob("$src/*") as $file) {
+            if (is_dir($file)) {
+                call_user_func(cp_rf, $file, "$dst/" . basename($file));
+            }
+            else {
+                copy($file, "$dst/" . basename($file));
+            }
+        }
+        return file_exists($dst);
+    }
+
+    /**
      * 中身があっても消せる rmdir
      *
      * Example:
