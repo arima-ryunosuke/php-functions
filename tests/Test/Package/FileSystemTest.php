@@ -59,6 +59,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         FileSystem::file_set_contents($base . '/a//b/ab2.log', 'xxx');
         FileSystem::file_set_contents($base . '/a//b/c/abc1.log', 'xxxxx');
         FileSystem::file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
+        FileSystem::file_set_contents($base . '/x.ext', '');
 
         $this->assertFalse($file_tree('/notfound'));
 
@@ -66,7 +67,8 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $tree = $file_tree($base);
         $this->assertSame([
             'tree' => [
-                'a' => [
+                'x.ext' => realpath($base . '/x.ext'),
+                'a'     => [
                     'a1.txt' => realpath($base . '/a/a1.txt'),
                     'a2.txt' => realpath($base . '/a/a2.txt'),
                     'b'      => [

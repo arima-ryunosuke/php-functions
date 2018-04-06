@@ -53,7 +53,14 @@ class FileSystem
         $basedir = basename($dirname);
 
         $result = [];
-        foreach (new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS) as $item) {
+        $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS));
+        usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
+            if ($a->isDir() xor $b->isDir()) {
+                return $a->isDir() - $b->isDir();
+            }
+            return strcmp($a->getPathname(), $b->getPathname());
+        });
+        foreach ($items as $item) {
             if (!isset($result[$basedir])) {
                 $result[$basedir] = [];
             }
@@ -69,10 +76,6 @@ class FileSystem
         // フィルタで全除去されると空エントリになるので明示的に削除
         if (!$result[$basedir]) {
             unset($result[$basedir]);
-        }
-        // ファイルの方が強いファイル名順
-        else {
-            $result[$basedir] = call_user_func(array_order, $result[$basedir], ['is_array', call_user_func(return_arg, 1)], true);
         }
         return $result;
     }
