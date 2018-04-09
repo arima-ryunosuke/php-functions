@@ -29,7 +29,6 @@
     "seld/phar-utils": "1.0.*"
   },
   "require-dev": {
-    "apigen/apigen": "4.1.*",
     "phpunit/phpunit": "5.*"
   },
   "scripts": {
@@ -51,7 +50,7 @@
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
     ],
     "document": [
-      "echo yes | vendor/bin/apigen generate -s include/global/function.php -d docs/html --template-config docs/theme/config.neon"
+      "@php documentize.phar generate src/Package docs --force --contain ryunosuke --template-config docs/config.php"
     ]
   }
 }
