@@ -86,11 +86,11 @@ class FileSystem
      * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(file_extension('filename.ext'), 'ext');
      * assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
      * assertSame(file_extension('filename.ext', ''), 'filename');
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -122,10 +122,10 @@ class FileSystem
      * ディレクトリも掘る file_put_contents
      *
      * Example:
-     * <code>
+     * ```php
      * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
      * assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -178,14 +178,14 @@ class FileSystem
      * コールバックには親ディレクトリが引数として渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * // //tmp/a/b/file.txt を作っておく
      * $tmp = sys_get_temp_dir();
      * file_set_contents("$tmp/a/b/file.txt", 'hoge');
      * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
      * $callback = function($path){return realpath("$path/file.txt");};
      * assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -211,7 +211,7 @@ class FileSystem
      * パスが絶対パスか判定する
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(path_is_absolute('/absolute/path'));
      * assertFalse(path_is_absolute('relative/path'));
      * // Windows 環境では下記も true になる
@@ -219,7 +219,7 @@ class FileSystem
      *     assertTrue(path_is_absolute('\\absolute\\path'));
      *     assertTrue(path_is_absolute('C:\\absolute\\path'));
      * }
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -248,12 +248,12 @@ class FileSystem
      * 出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。
      *
      * Example:
-     * <code>
+     * ```php
      * $DS = DIRECTORY_SEPARATOR;
      * assertSame(path_resolve('/absolute/path'), "{$DS}absolute{$DS}path");
      * assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
      * assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -280,12 +280,12 @@ class FileSystem
      * realpath ではない。のでシンボリックリンクの解決などはしない。その代わりファイルが存在しなくても使用することができる。
      *
      * Example:
-     * <code>
+     * ```php
      * $DS = DIRECTORY_SEPARATOR;
      * assertSame(path_normalize('/path/to/something'), "{$DS}path{$DS}to{$DS}something");
      * assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}something");
      * assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -327,7 +327,7 @@ class FileSystem
      * ディレクトリではなくファイルを与えても動作する（copy とほぼ同じ動作になるが、対象にディレクトリを指定できる点が異なる）。
      *
      * Example:
-     * <code>
+     * ```php
      * // /tmp/src/hoge.txt, /tmp/src/dir/fuga.txt を作っておく
      * $tmp = sys_get_temp_dir();
      * file_set_contents("$tmp/src/hoge.txt", 'hoge');
@@ -348,7 +348,7 @@ class FileSystem
      * // $dst に "/" を付けないとそのパスとしてコピー（copy と完全に同じ）
      * cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
      * assertStringEqualsFile("$tmp/dst4", 'hoge');
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -394,11 +394,11 @@ class FileSystem
      * 中身があっても消せる rmdir
      *
      * Example:
-     * <code>
+     * ```php
      * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
      * rm_rf(sys_get_temp_dir() . '/new');
      * assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
-     * </code>
+     * ```
      *
      * @package FileSystem
      *

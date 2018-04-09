@@ -13,14 +13,14 @@ class Classobj
      * それにキャストだとコールバックで呼べなかったり、数値キーが死んだりして微妙に使いづらいところがある。
      *
      * Example:
-     * <code>
+     * ```php
      * // 基本的には object キャストと同じ
      * $fields = ['a' => 'A', 'b' => 'B'];
      * assertEquals(stdclass($fields), (object) $fields);
      * // ただしこういうことはキャストでは出来ない
      * assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
      * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -96,9 +96,9 @@ class Classobj
      * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -128,9 +128,9 @@ class Classobj
      * クラスの名前空間部分を取得する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -152,9 +152,9 @@ class Classobj
      * クラスの名前空間部分を除いた短い名前を取得する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
-     * </code>
+     * ```
      *
      * @package ClassObject
      *

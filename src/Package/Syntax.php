@@ -10,10 +10,10 @@ class Syntax
      * clone などでそのまま返す関数が欲しいことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $object = new \stdClass();
      * assertSame(returns($object), $object);
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -35,7 +35,7 @@ class Syntax
      * __set のような明らかに設定が意図されているものは例外が飛ぶ。
      *
      * Example:
-     * <code>
+     * ```php
      * // null を返すかもしれないステートメント
      * $getobject = function () {return null;};
      * // メソッド呼び出しは null を返す
@@ -57,7 +57,7 @@ class Syntax
      *
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
      * assertSame(optional(new \ArrayObject([1]), 'stdClass')->count(), null);
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -107,14 +107,14 @@ NO;
      * hoge() or throw などしたいことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * try {
      *     throws(new \Exception('throws'));
      * }
      * catch (\Exception $ex) {
      *     assertSame($ex->getMessage(), 'throws');
      * }
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -135,7 +135,7 @@ NO;
      * ?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。
      *
      * Example:
-     * <code>
+     * ```php
      * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
      * $heavyfunc = function($v){return $v;};
      * // $heavyfunc(1) ?? 'default' とほぼ同義
@@ -144,7 +144,7 @@ NO;
      * assertSame(ifelse($heavyfunc(null), false, 'default'), $heavyfunc(null));
      * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
      * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -173,14 +173,14 @@ NO;
      * 例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * // 例外が飛ばない場合は平和極まりない
      * $try = function($a, $b, $c){return [$a, $b, $c];};
      * assertSame(try_catch($try, null, 1, 2, 3), [1, 2, 3]);
      * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
      * $try = function(){throw new \Exception('tried');};
      * assertSame(try_catch($try)->getMessage(), 'tried');
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -200,7 +200,7 @@ NO;
      * 例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $finally_count = 0;
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
@@ -211,7 +211,7 @@ NO;
      * $try = function(){throw new \Exception('tried');};
      * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
      * assertSame($finally_count, 2); // 呼ばれている
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -231,7 +231,7 @@ NO;
      * php < 5.5 にはないし、例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $finally_count = 0;
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
@@ -242,7 +242,7 @@ NO;
      * $try = function(){throw new \Exception('tried');};
      * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage(), 'tried');
      * assertSame($finally_count, 2); // 呼ばれている
-     * </code>
+     * ```
      *
      * @package Syntax
      *

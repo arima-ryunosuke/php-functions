@@ -55,7 +55,7 @@ class Vars
      * -記号は受け入れるが+記号は受け入れない。
      *
      * Example:
-     * <code>
+     * ```php
      * // 配列は要素数となる
      * assertSame(numberify([1, 2, 3]), 3);
      * // int/float は基本的にそのまま
@@ -65,7 +65,7 @@ class Vars
      * // 文字列は数値抽出
      * assertSame(numberify('a1b2c3'), 123);
      * assertSame(numberify('a1b2.c3', true), 12.3);
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -129,14 +129,14 @@ class Vars
      * と同義（!is_array($var) && !is_object($var) とも言える）。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(is_primitive(null));
      * assertTrue(is_primitive(false));
      * assertTrue(is_primitive(123));
      * assertTrue(is_primitive(STDIN));
      * assertFalse(is_primitive(new \stdClass));
      * assertFalse(is_primitive(['array']));
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -152,7 +152,7 @@ class Vars
      * 変数が再帰参照を含むか調べる
      *
      * Example:
-     * <code>
+     * ```php
      * // 配列の再帰
      * $array = [];
      * $array['recursive'] = &$array;
@@ -161,7 +161,7 @@ class Vars
      * $object = new \stdClass();
      * $object->recursive = $object;
      * assertTrue(is_recursive($object));
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -205,7 +205,7 @@ class Vars
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
      *
      * Example:
-     * <code>
+     * ```php
      * // プリミティブ型は gettype と同義
      * assertSame(var_type(false), 'boolean');
      * assertSame(var_type(123), 'integer');
@@ -214,7 +214,7 @@ class Vars
      * // オブジェクトは型名を返す
      * assertSame(var_type(new \stdClass), '\\stdClass');
      * assertSame(var_type(new \Exception()), '\\Exception');
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -242,7 +242,7 @@ class Vars
      * - 配列の再帰構造の出力が異なる（Example参照）
      *
      * Example:
-     * <code>
+     * ```php
      * // 単純なエクスポート
      * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), "[
      *     'array' => [1, 2, 3],
@@ -275,7 +275,7 @@ class Vars
      *         ]),
      *     ]),
      * ]");
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -412,11 +412,11 @@ class Vars
      * 名前空間指定の呼び出しは未対応。use して関数名だけで呼び出す必要がある。
      *
      * Example:
-     * <code>
+     * ```php
      * $hoge = 'HOGE';
      * $fuga = 'FUGA';
      * assertSame(hashvar($hoge, $fuga), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
-     * </code>
+     * ```
      *
      * @package Var
      *

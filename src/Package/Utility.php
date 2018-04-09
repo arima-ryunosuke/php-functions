@@ -16,7 +16,7 @@ class Utility
      * $provider に null を与えるとキャッシュの削除となる。
      *
      * Example:
-     * <code>
+     * ```php
      * $provider = function(){return rand();};
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
      * $rand1 = cache('rand', $provider);
@@ -26,7 +26,7 @@ class Utility
      * cache('rand', null);
      * $rand3 = cache('rand', $provider);
      * assertNotSame($rand1, $rand3);
-     * </code>
+     * ```
      *
      * @package Utility
      *
@@ -137,13 +137,13 @@ class Utility
      * 表示名が与えられていない場合、それらしい名前で表示する。
      *
      * Example:
-     * <code>
+     * ```php
      * // intval と int キャストはどちらが早いか調べる
      * benchmark([
      *     'intval',
      *     'intcast' => function($v){return (int)$v;},
      * ], ['12345'], 10);
-     * </code>
+     * ```
      *
      * @package Utility
      *

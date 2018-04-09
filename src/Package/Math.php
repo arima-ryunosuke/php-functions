@@ -11,9 +11,9 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(minimum(-1, 0, 1), -1);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -33,9 +33,9 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(maximum(-1, 0, 1), 1);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -57,9 +57,9 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -95,10 +95,10 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(mean(1, 2, 3, 4, 5, 6), 3.5);
      * assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -120,14 +120,14 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * // 偶数個なので中2つの平均
      * assertSame(median(1, 2, 3, 4, 5, 6), 3.5);
      * // 奇数個なのでど真ん中
      * assertSame(median(1, 2, 3, 4, 5), 3);
      * // 偶数個だが文字列なので中2つの後
      * assertSame(median('a', 'b', 'c', 'd'), 'c');
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -178,9 +178,9 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(sum(1, 2, 3, 4, 5, 6), 21);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -200,11 +200,11 @@ class Math
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * srand(1);mt_srand(1);
      * assertSame(random_at(1, 2, 3, 4, 5, 6), 4);
      * assertSame(random_at(1, 2, 3, 4, 5, 6), 1);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -223,11 +223,11 @@ class Math
      * $divisor のデフォルトは 100 にしてあるので、 $probability だけ与えれば $probability パーセントで true を返すことになる。
      *
      * Example:
-     * <code>
+     * ```php
      * srand(1);mt_srand(1);
      * assertFalse(probability(50));
      * assertTrue(probability(50));
-     * </code>
+     * ```
      *
      * @package Math
      *

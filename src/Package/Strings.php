@@ -8,9 +8,9 @@ class Strings
      * 文字列結合の関数版
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(strcat('a', 'b', 'c'), 'abc');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -32,11 +32,11 @@ class Strings
      * つまり「除外は trim したいが結果配列にはしたくない」はできない。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
      * assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
      * assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -67,11 +67,11 @@ class Strings
      * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(str_equals('abc', 'abc'));
      * assertTrue(str_equals('abc', 'ABC', true));
      * assertTrue(str_equals('\0abc', '\0abc'));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -106,12 +106,12 @@ class Strings
      * 指定文字列を含むか返す
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(str_contains('abc', 'b'));
      * assertTrue(str_contains('abc', 'B', true));
      * assertTrue(str_contains('abc', ['b', 'x'], false, false));
      * assertFalse(str_contains('abc', ['b', 'x'], false, true));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -152,11 +152,11 @@ class Strings
      * 特に難しいことはないシンプルな実装。ただし、エラーは例外に変換される。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
      * assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
      * assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -205,14 +205,14 @@ class Strings
      * N 番目の検索文字列が見つからない場合は例外を投げる。
      *
      * Example:
-     * <code>
+     * ```php
      * // 1番目（0ベースなので2番目）の x を X に置換
      * assertSame(str_subreplace('xxx', 'x', [1 => 'X']), 'xXx');
      * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
      * assertSame(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']), '!XaxXz!');
      * // 置換結果は置換対象にならない
      * assertSame(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']), 'xxxXx');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -276,7 +276,7 @@ class Strings
      * これを使用すると連続で「次の文字, 次の文字, ...」と言った動作が可能になる。
      *
      * Example:
-     * <code>
+     * ```php
      * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
      * $n = 0;
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
@@ -284,7 +284,7 @@ class Strings
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
      * // ネストしている場合は最も外側を返す
      * assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -342,11 +342,11 @@ class Strings
      * 指定文字列で始まるか調べる
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(starts_with('abcdef', 'abc'));
      * assertTrue(starts_with('abcdef', 'ABC', true));
      * assertFalse(starts_with('abcdef', 'xyz'));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -368,11 +368,11 @@ class Strings
      * 指定文字列で終わるか調べる
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(ends_with('abcdef', 'def'));
      * assertTrue(ends_with('abcdef', 'DEF', true));
      * assertFalse(ends_with('abcdef', 'xyz'));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -394,9 +394,9 @@ class Strings
      * camelCase に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -413,9 +413,9 @@ class Strings
      * PascalCase に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -432,9 +432,9 @@ class Strings
      * snake_case に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -451,9 +451,9 @@ class Strings
      * chain-case に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -538,9 +538,9 @@ class Strings
      * sprintf の順序指定構文('%1$d')にキーを指定できる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']), 'ThisIs 3');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -580,7 +580,7 @@ class Strings
      * $default がそのまま返ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * $pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
      * $default = [1 => '2000', 2 => '1', 4 => '1'];
      * // 完全にマッチするのでそれぞれ返ってくる
@@ -589,7 +589,7 @@ class Strings
      * assertSame(preg_capture($pattern, '2014/12', $default), [1 => '2014', 2 => '12', 4 => '1']);
      * // 一切マッチしないので全てデフォルト値が使われる
      * assertSame(preg_capture($pattern, 'hoge', $default), [1 => '2000', 2 => '1', 4 => '1']);
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -629,7 +629,7 @@ class Strings
      * また、 `{$_(syntax(""))}` のように {$_()} 構文で " も使えなくなるので \' を使用しなければならない。
      *
      * Example:
-     * <code>
+     * ```php
      * // 数値キーが参照できる
      * assertSame(render_string('${0}', ['number']), 'number');
      * // クロージャは呼び出し結果が埋め込まれる
@@ -639,7 +639,7 @@ class Strings
      * // 要するに '$_()' の中に php の式が書けるようになる
      * assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']]), 'a,n,z');
      * assertSame(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]), '9');
-     * </code>
+     * ```
      *
      * @package String
      *

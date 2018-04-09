@@ -66,10 +66,10 @@ class Funchand
      * $callable の指定位置に引数を束縛したクロージャを返す
      *
      * Example:
-     * <code>
+     * ```php
      * $bind = nbind('sprintf', 2, 'X');
      * assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -89,10 +89,10 @@ class Funchand
      * $callable の最左に引数を束縛した callable を返す
      *
      * Example:
-     * <code>
+     * ```php
      * $bind = lbind('sprintf', '%s%s');
      * assertSame($bind('N', 'M'), 'NM');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -109,10 +109,10 @@ class Funchand
      * $callable の最右に引数を束縛した callable を返す
      *
      * Example:
-     * <code>
+     * ```php
      * $bind = rbind('sprintf', 'X');
      * assertSame($bind('%s%s', 'N'), 'NX');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -140,7 +140,7 @@ class Funchand
      * いずれにせよ $arrayalbe は必須ではなく、第1引数が bool ならオプションだと判断し、そうでないなら true とみなす。
      *
      * Example:
-     * <code>
+     * ```php
      * $add5 = function ($v) { return $v + 5; };            // 来た値を +5 するクロージャ
      * $mul3 = function ($v) { return $v * 3; };            // 来た値を *3 するクロージャ
      * $split = function ($v) { return str_split($v); };    // 文字列的に桁分割するクロージャ
@@ -158,7 +158,7 @@ class Funchand
      * // true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
      * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
      * assertSame($composite('hoge'), 'EGOHegoh-erp');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -201,12 +201,12 @@ class Funchand
      * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
      *
      * Example:
-     * <code>
+     * ```php
      * $arg0 = return_arg(0);
      * assertSame($arg0('hoge'), 'hoge');
      * $arg1 = return_arg(1);
      * assertSame($arg1('dummy', 'hoge'), 'hoge');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -228,11 +228,11 @@ class Funchand
      * 返り値の真偽値を逆転した新しいクロージャを返す
      *
      * Example:
-     * <code>
+     * ```php
      * $not_strlen = not_func('strlen');
      * assertFalse($not_strlen('hoge'));
      * assertTrue($not_strlen(''));
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -253,10 +253,10 @@ class Funchand
      * 参照渡しは未対応。
      *
      * Example:
-     * <code>
+     * ```php
      * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
      * assertSame($evalfunc(1, 2, 3), 6);
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -279,10 +279,10 @@ class Funchand
      * callable から ReflectionFunctionAbstract を生成する
      *
      * Example:
-     * <code>
+     * ```php
      * assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
      * assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -316,11 +316,11 @@ class Funchand
      * php7.1 の fromCallable みたいなもの。
      *
      * Example:
-     * <code>
+     * ```php
      * $sprintf = closurize('sprintf');
      * assertInstanceof(\Closure::class, $sprintf);
      * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -350,14 +350,14 @@ class Funchand
      * エラーを例外に変換するブロックでコールバックを実行する
      *
      * Example:
-     * <code>
+     * ```php
      * try {
      *     call_safely(function(){return $v;});
      * }
      * catch (\Exception $ex) {
      *     assertSame($ex->getMessage(), 'Undefined variable: v');
      * }
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -389,9 +389,9 @@ class Funchand
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(ob_capture(function(){echo 123;}), '123');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -420,12 +420,12 @@ class Funchand
      * ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。
      *
      * Example:
-     * <code>
+     * ```php
      * // trim の引数は2つ
      * assertSame(parameter_length('trim'), 2);
      * // trim の必須引数は1つ
      * assertSame(parameter_length('trim', true), 1);
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -492,11 +492,11 @@ class Funchand
      * php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。
      *
      * Example:
-     * <code>
+     * ```php
      * // strlen に2つの引数を渡してもエラーにならない
      * $strlen = func_user_func_array('strlen');
      * assertSame($strlen('abc', null), 3);
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -526,11 +526,11 @@ class Funchand
      * 静的であればクラスメソッドも呼べる。
      *
      * Example:
-     * <code>
+     * ```php
      * // trim のエイリアス
      * function_alias('trim', 'trim_alias');
      * assertSame(trim_alias(' abc '), 'abc');
-     * </code>
+     * ```
      *
      * @package Callable
      *
