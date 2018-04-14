@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Functions;
 
+use Seld\PharUtils\Timestamps;
+
 class Transporter
 {
     /**
@@ -147,7 +149,8 @@ CODE;
         $phar = new \Phar($pharpath);
 
         $constants = [];
-        foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
+        $files = glob(__DIR__ . '/Package/*.php');
+        foreach ($files as $fn) {
             require_once $fn;
             $refclass = new \ReflectionClass('ryunosuke\\Functions\\Package\\' . basename($fn, '.php'));
             $methods = $refclass->getMethods(\ReflectionMethod::IS_PUBLIC || \ReflectionMethod::IS_STATIC);
@@ -175,5 +178,12 @@ spl_autoload_register(function ($class) {
 __HALT_COMPILER();
 PHP
         );
+
+        // phar 内の ctime や mtime が要因で生成のたびに差分が出てしまうので、元ファイルの mtime 統一する
+        $timestamp = new Timestamps($pharpath);
+        $timestamp->updateTimestamps(max(array_map('filemtime', $files)));
+        $timestamp->save($pharpath, \Phar::SHA512);
+
+        return $phar;
     }
 }
