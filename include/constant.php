@@ -125,6 +125,7 @@ const try_catch = ['ryunosuke\\Functions\\Package\\Syntax', 'try_catch'];
 const try_finally = ['ryunosuke\\Functions\\Package\\Syntax', 'try_finally'];
 const try_catch_finally = ['ryunosuke\\Functions\\Package\\Syntax', 'try_catch_finally'];
 const cache = ['ryunosuke\\Functions\\Package\\Utility', 'cache'];
+const error = ['ryunosuke\\Functions\\Package\\Utility', 'error'];
 const benchmark = ['ryunosuke\\Functions\\Package\\Utility', 'benchmark'];
 const stringify = ['ryunosuke\\Functions\\Package\\Vars', 'stringify'];
 const numberify = ['ryunosuke\\Functions\\Package\\Vars', 'numberify'];

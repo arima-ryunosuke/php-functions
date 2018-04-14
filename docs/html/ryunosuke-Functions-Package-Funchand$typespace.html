@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Funchand)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L611" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Funchand</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L7-L63" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::delegate()" tabindex="-1" class="structure-title ">
+                        delegate						<small>($invoker, $callable, $arity = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定 callable を指定クロージャで実行するクロージャを返す</p>
+<p>ほぼ内部向けで外から呼ぶことはあまり想定していない。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+				<td class="rest">$invoker</td>
+				<td class="desc">クロージャを実行するためのクロージャ（実処理）
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">最終的に実行したいクロージャ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$arity = null</td>
+				<td class="desc">引数の数
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">$callable を実行するクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L65-L86" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::nbind()" tabindex="-1" class="structure-title ">
+                        nbind						<small>($callable, $n, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>$callable の指定位置に引数を束縛したクロージャを返す</p>
+<p>Example:</p>
+<pre><code class="language-php">$bind = nbind('sprintf', 2, 'X');
+assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">対象 callable
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$n</td>
+				<td class="desc">挿入する引数位置
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">本来の引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">束縛したクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L88-L106" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::lbind()" tabindex="-1" class="structure-title ">
+                        lbind						<small>($callable, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>$callable の最左に引数を束縛した callable を返す</p>
+<p>Example:</p>
+<pre><code class="language-php">$bind = lbind('sprintf', '%s%s');
+assertSame($bind('N', 'M'), 'NM');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">対象 callable
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">本来の引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">束縛したクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L108-L126" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::rbind()" tabindex="-1" class="structure-title ">
+                        rbind						<small>($callable, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>$callable の最右に引数を束縛した callable を返す</p>
+<p>Example:</p>
+<pre><code class="language-php">$bind = rbind('sprintf', 'X');
+assertSame($bind('%s%s', 'N'), 'NX');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">対象 callable
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">本来の引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">束縛したクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L128-L198" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::composite()" tabindex="-1" class="structure-title ">
+                        composite						<small>($arrayalbe = true, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>合成関数を返す</p>
+<p>基本的には callable を可変引数で呼び出せばそれらの合成関数を返す。<br />
+ただし $arrayalbe=true のときは若干挙動が異なり、連鎖のときに「前の返り値を<strong>配列として</strong>次の引数へ渡す」動作になる。<br />
+つまり、前の関数が <code>[1, 2, 3]</code> を返せば次の関数へは <code>f(1, 2, 3)</code> が渡る（ただしただの配列の場合のみ。連想配列は単値で渡る）。<br />
+$arrayalbe=false のときは渡る引数は常に単値（単値というか素直に渡すだけ）。<br />
+上の例で言えば、前の関数が <code>[1, 2, 3]</code> を返せば次の関数へは <code>f($array=[1, 2, 3])</code> が渡る。</p>
+<p>$arrayalbe=true の方が利便性は高い。が、「本当にただの配列を渡したいとき」が判断できないので誤動作の原因にもなる。<br />
+e.g. <code>[1, 2, 3]</code> を配列として渡したいが $arrayalbe=true だと3つの引数として渡ってしまう</p>
+<p>いずれにせよ $arrayalbe は必須ではなく、第1引数が bool ならオプションだと判断し、そうでないなら true とみなす。</p>
+<p>Example:</p>
+<pre><code class="language-php">$add5 = function ($v) { return $v + 5; };            // 来た値を +5 するクロージャ
+$mul3 = function ($v) { return $v * 3; };            // 来た値を *3 するクロージャ
+$split = function ($v) { return str_split($v); };    // 文字列的に桁分割するクロージャ
+$union = function ($v) { return $v[0] + $v[1]; };    // 来た配列を足すクロージャ
+$composite = composite(false, $add5, $mul3, $split, $union);// 上記を合成したクロージャ
+// false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）
+// 7 + 5 -&gt; 12 |&gt; 12 * 3 -&gt; 36 |&gt; 36 -&gt; [3, 6] |&gt; 3 + 6 |&gt; 9
+assertSame($composite(7), 9);
+
+$upper = function ($s) { return [$s, strtoupper($s)]; };   // 来た値と大文字化したものを配列で返すクロージャ
+$prefix = function ($s, $S) { return 'pre-' . $s . $S; };  // 来た値を結合して'pre-'を付けるクロージャ
+$hash = function ($sS) { return ['sS' =&gt; $sS]; };          // 来た値を連想配列にするクロージャ
+$key = function ($sSsS) { return strrev(reset($sSsS));};   // 来た配列の値をstrrevして返すクロージャ
+$composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成したクロージャ
+// true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
+// ['hoge', 'HOGE'] |&gt; 'pre-hogeHOGE' |&gt; ['sS' =&gt; 'pre-hogeHOGE'] |&gt; 'EGOHegoh-erp'
+assertSame($composite('hoge'), 'EGOHegoh-erp');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$arrayalbe = true</td>
+				<td class="desc">呼び出しチェーンを配列として扱うか
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable[]</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">合成する関数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">合成関数</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L200-L225" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::return_arg()" tabindex="-1" class="structure-title ">
+                        return_arg						<small>($n)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>$n 番目の引数（0 ベース）をそのまま返すクロージャを返す</p>
+<p>Example:</p>
+<pre><code class="language-php">$arg0 = return_arg(0);
+assertSame($arg0('hoge'), 'hoge');
+$arg1 = return_arg(1);
+assertSame($arg1('dummy', 'hoge'), 'hoge');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$n</td>
+				<td class="desc">$n 番目の引数
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">$n 番目の引数をそのまま返すクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L227-L247" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::not_func()" tabindex="-1" class="structure-title ">
+                        not_func						<small>($callable)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>返り値の真偽値を逆転した新しいクロージャを返す</p>
+<p>Example:</p>
+<pre><code class="language-php">$not_strlen = not_func('strlen');
+assertFalse($not_strlen('hoge'));
+assertTrue($not_strlen(''));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">対象 callable
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">新しいクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L249-L276" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::eval_func()" tabindex="-1" class="structure-title ">
+                        eval_func						<small>($expression, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定コードで eval するクロージャを返す</p>
+<p>create_function のクロージャ版みたいなもの。<br />
+参照渡しは未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">$evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
+assertSame($evalfunc(1, 2, 3), 6);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$expression</td>
+				<td class="desc">eval コード
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">引数名（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">新しいクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L278-L311" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::reflect_callable()" tabindex="-1" class="structure-title ">
+                        reflect_callable						<small>($callable)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>callable から ReflectionFunctionAbstract を生成する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
+assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">対象 callable
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.reflectionfunction.php" class="fqsen" target="_blank">\ReflectionFunction</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionmethod.php" class="fqsen" target="_blank">\ReflectionMethod</a></td>
+			<td class="desc">リフレクションインスタンス</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L313-L347" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::closurize()" tabindex="-1" class="structure-title ">
+                        closurize						<small>($callable)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>callable を Closure に変換する</p>
+<p>php7.1 の fromCallable みたいなもの。</p>
+<p>Example:</p>
+<pre><code class="language-php">$sprintf = closurize('sprintf');
+assertInstanceof(\Closure::class, $sprintf);
+assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">変換する callable
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">変換したクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L349-L386" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::call_safely()" tabindex="-1" class="structure-title ">
+                        call_safely						<small>($callback, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>エラーを例外に変換するブロックでコールバックを実行する</p>
+<p>Example:</p>
+<pre><code class="language-php">try {
+    call_safely(function(){return $v;});
+}
+catch (\Exception $ex) {
+    assertSame($ex-&gt;getMessage(), 'Undefined variable: v');
+}</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">実行するコールバック
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">$callback に渡される引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">$callback の返り値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L388-L413" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::ob_capture()" tabindex="-1" class="structure-title ">
+                        ob_capture						<small>($callback, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ob_start ～ ob_get_clean のブロックでコールバックを実行する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(ob_capture(function(){echo 123;}), '123');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">実行するコールバック
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">$callback に渡される引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">オフスリーンバッファの文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L415-L468" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::parameter_length()" tabindex="-1" class="structure-title ">
+                        parameter_length						<small>($callable, $require_only = false, $thought_variadic = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>callable の引数の数を返す</p>
+<p>クロージャはキャッシュされない。毎回リフレクションを生成し、引数の数を調べてそれを返す。<br />
+（クロージャには一意性がないので key-value なキャッシュが適用できない）。<br />
+ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。</p>
+<p>Example:</p>
+<pre><code class="language-php">// trim の引数は2つ
+assertSame(parameter_length('trim'), 2);
+// trim の必須引数は1つ
+assertSame(parameter_length('trim', true), 1);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc">対象 callable
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$require_only = false</td>
+				<td class="desc">true を渡すと必須パラメータの数を返す
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$thought_variadic = false</td>
+				<td class="desc">可変引数を考慮するか。 true を渡すと可変引数の場合に無限長を返す
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int</td>
+			<td class="desc">引数の数</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L470-L482" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::function_shorten()" tabindex="-1" class="structure-title ">
+                        function_shorten						<small>($function)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>関数の名前空間部分を除いた短い名前を取得する</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$function</td>
+				<td class="desc">短くする関数名
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">短い関数名</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L484-L518" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" tabindex="-1" class="structure-title ">
+                        func_user_func_array						<small>($callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>パラメータ定義数に応じて呼び出し引数を可変にしてコールする</p>
+<p>デフォルト引数はカウントされない。必須パラメータの数で呼び出す。<br />
+もちろん可変引数は未対応。</p>
+<p>$callback に null を与えると例外的に「第1引数を返すクロージャ」を返す。</p>
+<p>php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。</p>
+<p>Example:</p>
+<pre><code class="language-php">// strlen に2つの引数を渡してもエラーにならない
+$strlen = func_user_func_array('strlen');
+assertSame($strlen('abc', null), 3);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">呼び出すクロージャ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">引数ぴったりで呼び出すクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L520-L610" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::function_alias()" tabindex="-1" class="structure-title ">
+                        function_alias						<small>($original, $alias, $cachedir = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>関数のエイリアスを作成する</p>
+<p>単に移譲するだけではなく、参照渡し・参照返しも模倣される。<br />
+その代わり、単純なエイリアスではなく別定義で吐き出すので「エイリアス」ではなく「処理が同じな別関数」と思ったほうがよい。</p>
+<p>静的であればクラスメソッドも呼べる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// trim のエイリアス
+function_alias('trim', 'trim_alias');
+assertSame(trim_alias(' abc '), 'abc');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$original</td>
+				<td class="desc">元となる関数
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$alias</td>
+				<td class="desc">関数のエイリアス名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>bool</td>
+				<td class="rest">$cachedir = false</td>
+				<td class="desc">キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">void</td>
+			<td class="desc"></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

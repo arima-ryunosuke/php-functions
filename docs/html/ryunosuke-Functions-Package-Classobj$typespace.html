@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Classobj)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L238" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L7-L37" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::stdclass()" tabindex="-1" class="structure-title ">
+                        stdclass						<small>($fields = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>初期フィールド値を与えて stdClass を生成する</p>
+<p>手元にある配列でサクッと stdClass を作りたいことがまれによくあるはず。</p>
+<p>object キャストでもいいんだが、 Iterator/Traversable とかも stdClass 化したいかもしれない。<br />
+それにキャストだとコールバックで呼べなかったり、数値キーが死んだりして微妙に使いづらいところがある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 基本的には object キャストと同じ
+$fields = ['a' =&gt; 'A', 'b' =&gt; 'B'];
+assertEquals(stdclass($fields), (object) $fields);
+// ただしこういうことはキャストでは出来ない
+assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
+assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$fields = []</td>
+				<td class="desc">フィールド配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></td>
+			<td class="desc">生成した stdClass インスタンス</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L39-L91" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
+                        detect_namespace						<small>($location)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ディレクトリ構造から名前空間を推測して返す</p>
+<p>指定パスに名前空間を持つような php ファイルが有るならその名前空間を返す。<br />
+指定パスに名前空間を持つような php ファイルが無いなら親をたどる。<br />
+親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。</p>
+<p>言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$location</td>
+				<td class="desc">配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">名前空間</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L93-L125" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
+                        class_loader						<small>($startdir = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>composer のクラスローダを返す</p>
+<p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$startdir = null</td>
+				<td class="desc">高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></td>
+			<td class="desc">クラスローダ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L127-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
+                        class_namespace						<small>($class)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>クラスの名前空間部分を取得する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>object</td>
+				<td class="rest">$class</td>
+				<td class="desc">対象クラス・オブジェクト
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">クラスの名前空間</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L151-L172" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
+                        class_shorten						<small>($class)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>クラスの名前空間部分を除いた短い名前を取得する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>object</td>
+				<td class="rest">$class</td>
+				<td class="desc">対象クラス・オブジェクト
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">クラスの短い名前</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L174-L237" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
+                        class_replace						<small>($class, $register, $dirname = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>既存（未読み込みに限る）クラスを強制的に置換する</p>
+<p>例えば継承ツリーが下記の場合を考える。</p>
+<p>classA &lt;- classB &lt;- classC</p>
+<p>この場合、「classC は classB に」「classB は classA に」それぞれ依存している、と考えることができる。<br />
+これは静的に決定的であり、この依存を壊したり注入したりする手段は存在しない。<br />
+例えば classA の実装を差し替えたいときに、いかに classA を継承した classAA を定義したとしても classB の親は classA で決して変わらない。</p>
+<p>この関数を使うと本当に classA そのものを弄るので、継承ツリーを下記のように変えることができる。</p>
+<p>classA &lt;- classAA &lt;- classB &lt;- classC</p>
+<p>つまり、classA を継承した classAA を定義してそれを classA とみなすことが可能になる。<br />
+ただし、内部的には class_alias を使用して実現しているので厳密には異なるクラスとなる。</p>
+<p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$class</td>
+				<td class="desc">対象クラス名
+</td>
+			</tr>
+        			<tr>
+				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+				<td class="rest">$register</td>
+				<td class="desc">置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dirname = null</td>
+				<td class="desc">一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">void</td>
+			<td class="desc"></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

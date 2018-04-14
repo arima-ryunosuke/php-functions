@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Utility)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L259" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L7-L66" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::cache()" tabindex="-1" class="structure-title ">
+                        cache						<small>($key, $provider, $namespace = null, $use_internal = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>シンプルにキャッシュする</p>
+<p>この関数は get/set を兼ねる。<br />
+キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
+<p>内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。<br />
+内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。</p>
+<p>$provider に null を与えるとキャッシュの削除となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$provider = function(){return rand();};
+// 乱数を返す処理だが、キャッシュされるので同じ値になる
+$rand1 = cache('rand', $provider);
+$rand2 = cache('rand', $provider);
+assertSame($rand1, $rand2);
+// $provider に null を与えると削除される
+cache('rand', null);
+$rand3 = cache('rand', $provider);
+assertNotSame($rand1, $rand3);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$key</td>
+				<td class="desc">キャッシュのキー
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$provider</td>
+				<td class="desc">キャッシュがない場合にコールされる callable
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$namespace = null</td>
+				<td class="desc">名前空間
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$use_internal = true</td>
+				<td class="desc">内部キャッシュオブジェクトを使うか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">キャッシュ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L68-L129" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
+                        error						<small>($message, $destination = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>エラー出力する</p>
+<p>第1引数 $message はそれらしく文字列化されて出力される。基本的にはあらゆる型を与えて良い。</p>
+<p>第2引数 $destination で出力対象を指定する。省略すると error_log 設定に従う。<br />
+文字列を与えるとファイル名とみなし、ファイルに追記される。<br />
+ファイルを開くが、<strong>ファイルは閉じない</strong>。閉じ処理は php の終了処理に身を任せる。<br />
+したがって閉じる必要がある場合はファイルポインタを渡す必要がある。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$message</td>
+				<td class="desc">出力メッセージ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">resource<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$destination = null</td>
+				<td class="desc">出力先
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int</td>
+			<td class="desc">書き込んだバイト数</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L131-L258" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
+                        benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>簡易ベンチマークを取る</p>
+<p>「指定ミリ秒内で何回コールできるか？」でベンチする。</p>
+<p>$suite は ['表示名' =&gt; $callable] 形式の配列。<br />
+表示名が与えられていない場合、それらしい名前で表示する。</p>
+<p>Example:</p>
+<pre><code class="language-php">// intval と int キャストはどちらが早いか調べる
+benchmark([
+    'intval',
+    'intcast' =&gt; function($v){return (int)$v;},
+], ['12345'], 10);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>callable</td>
+				<td class="rest">$suite</td>
+				<td class="desc">ベンチ対象処理
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$args = []</td>
+				<td class="desc">各ケースに与えられる引数
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$millisec = 1000</td>
+				<td class="desc">呼び出しミリ秒
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$output = true</td>
+				<td class="desc">true だと標準出力に出力される
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">ベンチ結果の配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

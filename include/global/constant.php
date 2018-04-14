@@ -123,6 +123,7 @@ const try_catch = 'try_catch';
 const try_finally = 'try_finally';
 const try_catch_finally = 'try_catch_finally';
 const cache = 'cache';
+const error = 'error';
 const benchmark = 'benchmark';
 const stringify = 'stringify';
 const numberify = 'numberify';

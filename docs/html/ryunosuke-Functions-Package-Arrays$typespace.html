@@ -1,0 +1,3379 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Arrays)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L2250" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L7-L37" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::arrayize()" tabindex="-1" class="structure-title ">
+                        arrayize						<small>(...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>引数の配列を生成する。</p>
+<p>配列以外を渡すと配列化されて追加される。<br />
+連想配列は未対応。あくまで普通の配列化のみ。<br />
+iterable や Traversable は考慮せずあくまで「配列」としてチェックする。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(arrayize(1, 2, 3), [1, 2, 3]);
+assertSame(arrayize([1], [2], [3]), [1, 2, 3]);
+$object = new \stdClass();
+assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">生成する要素（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">引数を配列化したもの</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L39-L65" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::is_hasharray()" tabindex="-1" class="structure-title ">
+                        is_hasharray						<small>($array)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列が連想配列か調べる</p>
+<p>空の配列は普通の配列とみなす。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertFalse(is_hasharray([]));
+assertFalse(is_hasharray([1, 2, 3]));
+assertTrue(is_hasharray(['x' =&gt; 'X']));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">連想配列なら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L67-L92" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::first_key()" tabindex="-1" class="structure-title ">
+                        first_key						<small>($array, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の最初のキーを返す</p>
+<p>空の場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(first_key(['a', 'b', 'c']), 0);
+assertSame(first_key([], 999), 999);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">最初のキー</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L94-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::first_value()" tabindex="-1" class="structure-title ">
+                        first_value						<small>($array, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の最初の値を返す</p>
+<p>空の場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(first_value(['a', 'b', 'c']), 'a');
+assertSame(first_value([], 999), 999);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">最初の値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L121-L144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::first_keyvalue()" tabindex="-1" class="structure-title ">
+                        first_keyvalue						<small>($array, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の最初のキー/値ペアをタプルで返す</p>
+<p>空の場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(first_keyvalue(['a', 'b', 'c']), [0, 'a']);
+assertSame(first_keyvalue([], 999), 999);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">[最初のキー, 最初の値]</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L146-L171" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::last_key()" tabindex="-1" class="structure-title ">
+                        last_key						<small>($array, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の最後のキーを返す</p>
+<p>空の場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(last_key(['a', 'b', 'c']), 2);
+assertSame(last_key([], 999), 999);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">最後のキー</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L173-L198" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::last_value()" tabindex="-1" class="structure-title ">
+                        last_value						<small>($array, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の最後の値を返す</p>
+<p>空の場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(last_value(['a', 'b', 'c']), 'c');
+assertSame(last_value([], 999), 999);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">最後の値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L200-L229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::last_keyvalue()" tabindex="-1" class="structure-title ">
+                        last_keyvalue						<small>($array, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の最後のキー/値ペアをタプルで返す</p>
+<p>空の場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(last_keyvalue(['a', 'b', 'c']), [2, 'c']);
+assertSame(last_keyvalue([], 999), 999);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">[最後のキー, 最後の値]</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L231-L265" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::prev_key()" tabindex="-1" class="structure-title ">
+                        prev_key						<small>($array, $key)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の指定キーの前のキーを返す</p>
+<p>$key が最初のキーだった場合は null を返す。<br />
+$key が存在しない場合は false を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// 'b' キーの前は 'a'
+assertSame(prev_key($array, 'b'), 'a');
+// 'a' キーの前は無いので null
+assertSame(prev_key($array, 'a'), null);
+// 'x' キーはそもそも存在しないので false
+assertSame(prev_key($array, 'x'), false);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int</td>
+				<td class="rest">$key</td>
+				<td class="desc">調べるキー
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>bool<span class="type-separator"></span><wbr>null</td>
+			<td class="desc">$key の前のキー</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L267-L319" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::next_key()" tabindex="-1" class="structure-title ">
+                        next_key						<small>($array, $key = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の指定キーの次のキーを返す</p>
+<p>$key が最後のキーだった場合は null を返す。<br />
+$key が存在しない場合は false を返す。<br />
+$key が未指定だと「次に生成されるキー」（$array[]='hoge' で生成されるキー）を返す。</p>
+<p>$array[] = 'hoge' で作成されるキーには完全準拠しない（標準は unset すると結構乱れる）。公式マニュアルを参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [9 =&gt; 9, 'a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// 'b' キーの次は 'c'
+assertSame(next_key($array, 'b'), 'c');
+// 'c' キーの次は無いので null
+assertSame(next_key($array, 'c'), null);
+// 'x' キーはそもそも存在しないので false
+assertSame(next_key($array, 'x'), false);
+// 次に生成されるキーは 10
+assertSame(next_key($array, null), 10);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$key = null</td>
+				<td class="desc">調べるキー
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>bool<span class="type-separator"></span><wbr>null</td>
+			<td class="desc">$key の次のキー</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L321-L356" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::in_array_and()" tabindex="-1" class="structure-title ">
+                        in_array_and						<small>($needle, $haystack, $strict = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>in_array の複数版（AND）</p>
+<p>配列 $haystack が $needle の「すべてを含む」ときに true を返す。</p>
+<p>$needle が非配列の場合は配列化される。<br />
+$needle が空の場合は常に false を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(in_array_and([1], [1, 2, 3]));
+assertFalse(in_array_and([9], [1, 2, 3]));
+assertFalse(in_array_and([1, 9], [1, 2, 3]));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$needle</td>
+				<td class="desc">調べる値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$haystack</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$strict = false</td>
+				<td class="desc">厳密フラグ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">$needle のすべてが含まれているなら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L358-L393" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::in_array_or()" tabindex="-1" class="structure-title ">
+                        in_array_or						<small>($needle, $haystack, $strict = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>in_array の複数版（OR）</p>
+<p>配列 $haystack が $needle の「どれかを含む」ときに true を返す。</p>
+<p>$needle が非配列の場合は配列化される。<br />
+$needle が空の場合は常に false を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(in_array_or([1], [1, 2, 3]), true);
+assertFalse(in_array_or([9], [1, 2, 3]), false);
+assertTrue(in_array_or([1, 9], [1, 2, 3]), true);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$needle</td>
+				<td class="desc">調べる値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$haystack</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$strict = false</td>
+				<td class="desc">厳密フラグ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">$needle のどれかが含まれているなら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L395-L418" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_add()" tabindex="-1" class="structure-title ">
+                        array_add						<small>($array, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の+演算子の関数版</p>
+<p>Example:</p>
+<pre><code class="language-php">// ただの加算の関数版なので同じキーは上書きされない
+assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
+// 異なるキーは生える
+assertSame(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']), ['a', 'b', 'c', 'x' =&gt; 'X']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">足す配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">足された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L420-L461" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_implode()" tabindex="-1" class="structure-title ">
+                        array_implode						<small>($array, $glue)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の各要素の間に要素を差し込む</p>
+<p>歴史的な理由はないが、引数をどちらの順番でも受けつけることが可能。<br />
+ただし、$glue を先に渡すパターンの場合は配列指定が可変引数渡しになる。</p>
+<p>文字キーは保存されるが数値キーは再割り振りされる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// (配列, 要素) の呼び出し
+assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
+// (要素, ...配列) の呼び出し
+assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr>string</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$glue</td>
+				<td class="desc">差し込む要素
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">差し込まれた配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L463-L510" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_sprintf()" tabindex="-1" class="structure-title ">
+                        array_sprintf						<small>($array, $format, $glue = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キーと値で sprintf する</p>
+<p>配列の各要素を文字列化して返すイメージ。<br />
+$glue を与えるとさらに implode して返す（返り値が文字列になる）。</p>
+<p>$format は書式文字列（$v, $k）。<br />
+callable を与えると sprintf ではなくコールバック処理になる（$v, $k）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['key1' =&gt; 'val1', 'key2' =&gt; 'val2'];
+// key, value を利用した sprintf
+assertSame(array_sprintf($array, '%2$s=%1$s'), ['key1=val1', 'key2=val2']);
+// 第3引数を与えるとさらに implode される
+assertSame(array_sprintf($array, '%2$s=%1$s', ' '), 'key1=val1 key2=val2');
+// クロージャを与えるとコールバック動作になる
+$closure = function($v, $k){return "$k=" . strtoupper($v);};
+assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>callable</td>
+				<td class="rest">$format</td>
+				<td class="desc">書式文字列あるいはクロージャ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$glue = null</td>
+				<td class="desc">結合文字列。未指定時は implode しない
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array<span class="type-separator"></span><wbr>string</td>
+			<td class="desc">sprintf された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L512-L553" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_strpad()" tabindex="-1" class="structure-title ">
+                        array_strpad						<small>($array, $key_prefix, $val_prefix = &#039;&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列のキー・要素に文字列を付加する</p>
+<p>$key_prefix, $val_prefix でそれぞれ「キーに付与する文字列」「値に付与する文字列」が指定できる。<br />
+配列を与えると [サフィックス, プレフィックス] という意味になる。<br />
+デフォルト（ただの文字列）はプレフィックス（値だけに付与したいなら array_map で十分なので）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['key1' =&gt; 'val1', 'key2' =&gt; 'val2'];
+// キーにプレフィックス付与
+assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' =&gt; 'val1', 'prefix-key2' =&gt; 'val2']);
+// 値にサフィックス付与
+assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', 'key2' =&gt; 'val2-suffix']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$key_prefix</td>
+				<td class="desc">キー側の付加文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$val_prefix = &#039;&#039;</td>
+				<td class="desc">値側の付加文字列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">文字列付与された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L555-L597" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_pos()" tabindex="-1" class="structure-title ">
+                        array_pos						<small>($array, $position, $return_key = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列・連想配列を問わず「N番目(0ベース)」の要素を返す</p>
+<p>負数を与えると逆から N 番目となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_pos([1, 2, 3], 1), 2);
+assertSame(array_pos([1, 2, 3], -1), 3);
+assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1), 'B');
+assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true), 'b');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$position</td>
+				<td class="desc">取得する位置
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$return_key = false</td>
+				<td class="desc">true にすると値ではなくキーを返す
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">指定位置の値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L599-L631" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_of()" tabindex="-1" class="structure-title ">
+                        array_of						<small>($key, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列を与えると指定キーの値を返すクロージャを返す</p>
+<p>存在しない場合は $default を返す。</p>
+<p>$key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。<br />
+その場合、$default が活きるのは「全て無かった場合」となる。<br />
+さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。</p>
+<p>Example:</p>
+<pre><code class="language-php">$fuga_of_array = array_of('fuga');
+assertSame($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']), 'FUGA');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$key</td>
+				<td class="desc">取得したいキー
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">デフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc">$key の値を返すクロージャ</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L633-L687" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_get()" tabindex="-1" class="structure-title ">
+                        array_get						<small>($array, $key, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>デフォルト値付きの配列値取得</p>
+<p>存在しない場合は $default を返す。</p>
+<p>$key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。<br />
+その場合、$default が活きるのは「全て無かった場合」となる。<br />
+さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 単純取得
+assertSame(array_get(['a', 'b', 'c'], 1), 'b');
+// 単純デフォルト
+assertSame(array_get(['a', 'b', 'c'], 9, 999), 999);
+// 配列取得
+assertSame(array_get(['a', 'b', 'c'], [0, 2]), [0 =&gt; 'a', 2 =&gt; 'c']);
+// 配列部分取得
+assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 =&gt; 'a']);
+// 配列デフォルト（null ではなく [] を返す）
+assertSame(array_get(['a', 'b', 'c'], [9]), []);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$key</td>
+				<td class="desc">取得したいキー
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">指定したキーの値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L689-L743" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_set()" tabindex="-1" class="structure-title ">
+                        array_set						<small>(&amp;$array, $value, $key = null, $require_return = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キー指定の配列値設定</p>
+<p>第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。<br />
+第3引数に配列を指定すると潜って設定する。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'B'];
+// 第3引数省略（最後に連番キーで設定）
+assertSame(array_set($array, 'Z'), 1);
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z']);
+// 第3引数でキーを指定
+assertSame(array_set($array, 'Z', 'z'), 'z');
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z']);
+assertSame(array_set($array, 'Z', 'z'), 'z');
+// 第3引数で配列を指定
+assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">&amp;$array</td>
+				<td class="desc">配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$value</td>
+				<td class="desc">設定する値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$key = null</td>
+				<td class="desc">設定するキー
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$require_return = true</td>
+				<td class="desc">返り値が不要なら false を渡す
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr>int</td>
+			<td class="desc">設定したキー</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L745-L802" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_unset()" tabindex="-1" class="structure-title ">
+                        array_unset						<small>(&amp;$array, $key, $default = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>伏せると同時にその値を返す</p>
+<p>$key に配列を与えると全て伏せて配列で返す。<br />
+その場合、$default が活きるのは「全て無かった場合」となる。</p>
+<p>配列を与えた場合の返り値は与えた配列の順番・キーが活きる。<br />
+これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B'];
+// ない場合は $default を返す
+assertSame(array_unset($array, 'x', 'X'), 'X');
+// 指定したキーを返す。そのキーは伏せられている
+assertSame(array_unset($array, 'a'), 'A');
+assertSame($array, ['b' =&gt; 'B']);
+
+$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// 配列を与えるとそれらを返す。そのキーは全て伏せられている
+assertSame(array_unset($array, ['a', 'b', 'x']), ['A', 'B']);
+assertSame($array, ['c' =&gt; 'C']);
+
+$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// 配列のキーは返されるキーを表す。順番も維持される
+assertSame(array_unset($array, ['x2' =&gt; 'b', 'x1' =&gt; 'a']), ['x2' =&gt; 'B', 'x1' =&gt; 'A']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">&amp;$array</td>
+				<td class="desc">配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$key</td>
+				<td class="desc">伏せたいキー。配列を与えると全て伏せる
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">指定したキーの値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L804-L842" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_dive()" tabindex="-1" class="structure-title ">
+                        array_dive						<small>($array, $path, $default = null, $delimiter = &#039;.&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>パス形式で配列値を取得</p>
+<p>存在しない場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+    'a' =&gt; [
+        'b' =&gt; [
+            'c' =&gt; 'vvv'
+        ]
+    ]
+];
+assertSame(array_dive($array, 'a.b.c'), 'vvv');
+assertSame(array_dive($array, 'a.b.x', 9), 9);
+// 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
+assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$path</td>
+				<td class="desc">パス文字列。配列も与えられる
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc">無かった場合のデフォルト値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;.&#039;</td>
+				<td class="desc">パスの区切り文字。大抵は &#039;.&#039; か &#039;/&#039;
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">パスが示す配列の値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated">deprecated </span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L844-L871" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_exists()" tabindex="-1" class="structure-title strike">
+                        array_exists						<small>($array, $callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>array_search のクロージャ版のようなもの</p>
+<p>コールバックが true 相当を返す最初のキーを返す。<br />
+この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_exists(['a', 'b', '9'], 'ctype_digit'), 2);
+assertSame(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}), 1);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価コールバック
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">コールバックが true を返した最初のキー。存在しなかったら false</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L873-L913" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_find()" tabindex="-1" class="structure-title ">
+                        array_find						<small>($array, $callback, $is_key = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>array_search のクロージャ版のようなもの</p>
+<p>コールバックの返り値が true 相当のものを返す。<br />
+$is_key に true を与えるとそのキーを返す（デフォルトの動作）。<br />
+$is_key に false を与えるとコールバックの結果を返す。</p>
+<p>この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 最初に見つかったキーを返す
+assertSame(array_find(['a', 'b', '9'], 'ctype_digit'), 2);
+assertSame(array_find(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
+// 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
+$ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
+assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価コールバック
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$is_key = true</td>
+				<td class="desc">キーを返すか否か
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">コールバックが true を返した最初のキー。存在しなかったら false</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L915-L941" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_grep_key()" tabindex="-1" class="structure-title ">
+                        array_grep_key						<small>($array, $regex, $not = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キーを正規表現でフィルタする</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#'), ['a' =&gt; 'A', 'aa' =&gt; 'AA']);
+assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', true), ['b' =&gt; 'B']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$regex</td>
+				<td class="desc">正規表現
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$not = false</td>
+				<td class="desc">true にすると「マッチしない」でフィルタする
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">正規表現でフィルタされた配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L943-L970" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_key()" tabindex="-1" class="structure-title ">
+                        array_map_key						<small>($array, $callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キーをマップして変換する</p>
+<p>$callback が null を返すとその要素は取り除かれる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], 'strtoupper'), ['A' =&gt; 'A', 'B' =&gt; 'B']);
+assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">キーが変換された新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L972-L991" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_not()" tabindex="-1" class="structure-title ">
+                        array_filter_not						<small>($array, $callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>array_filter の否定版</p>
+<p>単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 =&gt; '']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価 callable
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">$callback が false を返した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L993-L1020" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_key()" tabindex="-1" class="structure-title ">
+                        array_filter_key						<small>($array, $callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キーを主軸とした array_filter</p>
+<p>$callback が要求するなら値も渡ってくる。 php 5.6 の array_filter の ARRAY_FILTER_USE_BOTH と思えばよい。<br />
+ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 =&gt; 'a', 2 =&gt; 'c']);
+assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 =&gt; 'a', 2 =&gt; 'c']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">$callback が true を返した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1022-L1042" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_eval()" tabindex="-1" class="structure-title ">
+                        array_filter_eval						<small>($array, $expression)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>eval で評価して array_filter する</p>
+<p>キーは $k, 値は $v で宣言される。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 =&gt; 'a', 2 =&gt; 'c']);
+assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&gt; 'c']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$expression</td>
+				<td class="desc">eval コード
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">$expression が true を返した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1044-L1110" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_where()" tabindex="-1" class="structure-title ">
+                        array_where						<small>($array, $column = null, $callback = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定キーの要素で array_filter する</p>
+<p>array_column があるなら array_where があってもいいはず。</p>
+<p>$column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。<br />
+$callback は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。<br />
+つまり $column も $callback も省略した場合、実質的に array_filter と同じ動作になる。</p>
+<p>$column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。</p>
+<p>$callback が要求するならキーも渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+    0 =&gt; ['id' =&gt; 1, 'name' =&gt; 'hoge', 'flag' =&gt; false],
+    1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
+    2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
+];
+// 'flag' が true 相当のものだけ返す
+assertSame(array_where($array, 'flag'), [1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true]]);
+// 'name' に 'h' を含むものだけ返す
+$contain_h = function($name){return strpos($name, 'h') !== false;};
+assertSame(array_where($array, 'name', $contain_h), [0 =&gt; ['id' =&gt; 1, 'name' =&gt; 'hoge', 'flag' =&gt; false]]);
+// $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
+$equal_2 = function($row, $key){return $key === 2;};
+assertSame(array_where($array, null, $equal_2), [2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false]]);
+// $column に配列を渡すと共通項が渡ってくる
+$idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
+assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true]]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$column = null</td>
+				<td class="desc">キー名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback = null</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">$where が真を返した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1112-L1144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_filter()" tabindex="-1" class="structure-title ">
+                        array_map_filter						<small>($array, $callback, $strict = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>array_map + array_filter する</p>
+<p>コールバックを適用して、結果が true 相当の要素のみ取り出す。<br />
+$strict に true を与えると「null でない」要素のみ返される。</p>
+<p>$callback が要求するならキーも渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_map_filter([' a ', ' b ', ''], 'trim'), ['a', 'b']);
+assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$strict = false</td>
+				<td class="desc">厳密比較フラグ。 true だと null のみが偽とみなされる
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">$callback が真を返した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1146-L1185" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_method()" tabindex="-1" class="structure-title ">
+                        array_map_method						<small>($array, $method, $args = [], $ignore = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>メソッドを指定できるようにした array_map</p>
+<p>配列内の要素は全て同一（少なくともシグネチャが同じ $method が存在する）オブジェクトでなければならない。<br />
+スルーする場合は $ignore=true とする。スルーした場合 map ではなく filter される（結果配列に含まれない）。<br />
+$ignore=null とすると 何もせずそのまま要素を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
+// getMessage で map される
+assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
+// getMessage で map されるが、メソッドが存在しない場合は取り除かれる
+assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), ['a', 'b']);
+// getMessage で map されるが、メソッドが存在しない場合はそのまま返す
+assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$method</td>
+				<td class="desc">メソッド
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$args = []</td>
+				<td class="desc">メソッドに渡る引数
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$ignore = false</td>
+				<td class="desc">メソッドが存在しない場合にスルーするか。null を渡すと要素そのものを返す
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">$method が true を返した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1187-L1237" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_maps()" tabindex="-1" class="structure-title ">
+                        array_maps						<small>($array, ...$callbacks)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>複数コールバックを指定できる array_map</p>
+<p>指定したコールバックで複数回回してマップする。<br />
+<code>array_maps($array, $f, $g)</code> は <code>array_map($g, array_map($f, $array))</code> とほぼ等しい。<br />
+ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。</p>
+<p>少し変わった仕様として、コールバックに [$method =&gt; $args] を付けるとそれはメソッド呼び出しになる。<br />
+つまり各要素 $v に対して <code>$v-&gt;$method(...$args)</code> がマップ結果になる。<br />
+さらに引数が不要なら <code>@method</code> とするだけで良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 値を3乗したあと16進表記にして大文字化する
+assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
+// キーも渡ってくる
+assertSame(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}), ['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable[]</td>
+				<td class="rest">...$callbacks</td>
+				<td class="desc">評価クロージャ配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">評価クロージャを通した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1239-L1311" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_nmap()" tabindex="-1" class="structure-title ">
+                        array_nmap						<small>($array, $callback, $n, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>要素値を $callback の n 番目(0ベース)に適用して array_map する</p>
+<p>引数 $n に配列を与えると [キー番目 =&gt; 値番目] とみなしてキー・値も渡される（Example 参照）。<br />
+その際、「挿入後の番目」ではなく、単純に「元の引数の番目」であることに留意。キー・値が同じ位置を指定している場合はキーが先にくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 1番目に値を渡して map
+$sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
+assertSame(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'), ['prefix-a-suffix', 'prefix-b-suffix']);
+// 1番目にキー、2番目に値を渡して map
+$sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
+assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['k' =&gt; 'a k b v c']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$n</td>
+				<td class="desc">要素値を入れる引数番目。配列を渡すとキー・値の両方を指定でき、両方が渡ってくる
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">$callback に渡され、改変される引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">評価クロージャを通した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1313-L1332" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_lmap()" tabindex="-1" class="structure-title ">
+                        array_lmap						<small>($array, $callback, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>要素値を $callback の最左に適用して array_map する</p>
+<p>Example:</p>
+<pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
+assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">$callback に渡され、改変される引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">評価クロージャを通した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1334-L1353" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_rmap()" tabindex="-1" class="structure-title ">
+                        array_rmap						<small>($array, $callback, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>要素値を $callback の最右に適用して array_map する</p>
+<p>Example:</p>
+<pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
+assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">評価クロージャ
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">$callback に渡され、改変される引数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">評価クロージャを通した新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1355-L1385" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_depth()" tabindex="-1" class="structure-title ">
+                        array_depth						<small>($array)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の次元数を返す</p>
+<p>フラット配列は 1 と定義する。<br />
+つまり、配列を与える限りは 0 以下を返すことはない。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_depth([]), 1);
+assertSame(array_depth(['hoge']), 1);
+assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">調べる配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int</td>
+			<td class="desc">次元数。素のフラット配列は 1</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1387-L1419" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_insert()" tabindex="-1" class="structure-title ">
+                        array_insert						<small>($array, $value, $position = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列・連想配列を問わず任意の位置に値を挿入する</p>
+<p>$position を省略すると最後に挿入される（≒ array_push）。<br />
+$position に負数を与えると後ろから数えられる。<br />
+$value には配列も与えられるが、その場合数値キーは振り直される</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_insert([1, 2, 3], 'x'), [1, 2, 3, 'x']);
+assertSame(array_insert([1, 2, 3], 'x', 1), [1, 'x', 2, 3]);
+assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
+assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =&gt; 'A', 'b' =&gt; 'B', 2, 3]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$value</td>
+				<td class="desc">挿入値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$position = null</td>
+				<td class="desc">挿入位置
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">挿入された新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1421-L1458" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_assort()" tabindex="-1" class="structure-title ">
+                        array_assort						<small>($array, $rules)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列をコールバックに従って分類する</p>
+<p>コールバックは配列で複数与える。そのキーが結果配列のキーになるが、一切マッチしなくてもキー自体は作られる。<br />
+複数のコールバックにマッチしたらその分代入されるし、どれにもマッチしなければ代入されない。<br />
+つまり5個の配列を分類したからと言って、全要素数が5個になるとは限らない（多い場合も少ない場合もある）。</p>
+<p>$rule が要求するならキーも渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// lt2(2より小さい)で分類
+$lt2 = function($v){return $v &lt; 2;};
+assertSame(array_assort([1, 2, 3], ['lt2' =&gt; $lt2]), ['lt2' =&gt; [1]]);
+// lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
+$lt3 = function($v){return $v &lt; 3;};
+assertSame(array_assort(['1', '2', '3'], ['lt3' =&gt; $lt3, 'ctd' =&gt; 'ctype_digit']), ['lt3' =&gt; ['1', '2'], 'ctd' =&gt; ['1', '2', '3']]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable[]</td>
+				<td class="rest">$rules</td>
+				<td class="desc">分類ルール。[key =&gt; callable] 形式
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">分類された新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1460-L1510" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_count()" tabindex="-1" class="structure-title ">
+                        array_count						<small>($array, $callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列をコールバックに従ってカウントする</p>
+<p>コールバックが true 相当を返した要素をカウントして返す。<br />
+普通に使う分には <code>count(array_filter($array, $callback))</code> とほとんど同じだが、下記の点が微妙に異なる。</p>
+<ul>
+<li>$callback が要求するならキーも渡ってくる</li>
+<li>$callback には配列が渡せる。配列を渡した場合は件数を配列で返す（Example 参照）</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['hoge', 'fuga', 'piyo'];
+// 'o' を含むものの数（2個）
+assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}), 2);
+// 'a' と 'o' を含むものをそれぞれ（1個と2個）
+assertSame(array_count($array, [
+    'a' =&gt; function($s){return strpos($s, 'a') !== false;},
+    'o' =&gt; function($s){return strpos($s, 'o') !== false;},
+]), ['a' =&gt; 1, 'o' =&gt; 2]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">カウントルール。配列も渡せる
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int<span class="type-separator"></span><wbr>array</td>
+			<td class="desc">条件一致した件数</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1512-L1567" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_group()" tabindex="-1" class="structure-title ">
+                        array_group						<small>($array, $callback = null, $preserve_keys = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列をコールバックの返り値でグループ化する</p>
+<p>コールバックが配列を返すと入れ子としてグループする。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_group([1, 1, 1]), [1 =&gt; [1, 1, 1]]);
+assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 =&gt; [1, 3], 0 =&gt; [2]]);
+// group -&gt; id で入れ子グループにする
+$row1 = ['id' =&gt; 1, 'group' =&gt; 'hoge'];
+$row2 = ['id' =&gt; 2, 'group' =&gt; 'fuga'];
+$row3 = ['id' =&gt; 3, 'group' =&gt; 'hoge'];
+assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}), [
+    'hoge' =&gt; [
+        1 =&gt; $row1,
+        3 =&gt; $row3,
+    ],
+    'fuga' =&gt; [
+        2 =&gt; $row2,
+    ],
+]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type"></td>
+				<td class="rest">$array</td>
+				<td class="desc"></td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback = null</td>
+				<td class="desc">評価クロージャ。 null なら値そのもので評価
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$preserve_keys = false</td>
+				<td class="desc">キーを保存するか。 false の場合数値キーは振り直される
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">グルーピングされた配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1569-L1602" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_all()" tabindex="-1" class="structure-title ">
+                        array_all						<small>($array, $callback = null, $default = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>全要素が true になるなら true を返す（1つでも false なら false を返す）</p>
+<p>$callback が要求するならキーも渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(array_all([true, true]));
+assertFalse(array_all([true, false]));
+assertFalse(array_all([false, false]));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type"></td>
+				<td class="rest">$array</td>
+				<td class="desc"></td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback = null</td>
+				<td class="desc">評価クロージャ。 null なら値そのもので評価
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$default = true</td>
+				<td class="desc">空配列の場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">全要素が true なら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1604-L1637" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_any()" tabindex="-1" class="structure-title ">
+                        array_any						<small>($array, $callback = null, $default = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>全要素が false になるなら false を返す（1つでも true なら true を返す）</p>
+<p>$callback が要求するならキーも渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(array_any([true, true]));
+assertTrue(array_any([true, false]));
+assertFalse(array_any([false, false]));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type"></td>
+				<td class="rest">$array</td>
+				<td class="desc"></td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback = null</td>
+				<td class="desc">評価クロージャ。 null なら値そのもので評価
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$default = false</td>
+				<td class="desc">空配列の場合のデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">全要素が false なら false</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1639-L1780" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_order()" tabindex="-1" class="structure-title ">
+                        array_order						<small>($array, $orders, $preserve_keys = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列を $orders に従って並べ替える</p>
+<p>データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' =&gt; 'value'])にも対応している。<br />
+その場合 $orders に配列ではなく直値を渡せば良い。</p>
+<p>$orders には下記のような配列を渡す。</p>
+<pre><code class="language-php">$orders = [
+    'col1' =&gt; true,                               // true: 昇順, false: 降順。照合は型に依存
+    'col2' =&gt; SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+    'col3' =&gt; ['sort', 'this', 'order'],          // 指定した配列順で昇順
+    'col4' =&gt; function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+    'col5' =&gt; function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+];</code></pre>
+<p>Example:</p>
+<pre><code class="language-php">$v1 = ['id' =&gt; '1', 'no' =&gt; 'a03', 'name' =&gt; 'yyy'];
+$v2 = ['id' =&gt; '2', 'no' =&gt; 'a4',  'name' =&gt; 'yyy'];
+$v3 = ['id' =&gt; '3', 'no' =&gt; 'a12', 'name' =&gt; 'xxx'];
+// name 昇順, no 自然降順
+assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL]), [$v3, $v2, $v1]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$orders</td>
+				<td class="desc">ソート順
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$preserve_keys = false</td>
+				<td class="desc">キーを保存するか。 false の場合数値キーは振り直される
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">並び替えられた配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1782-L1806" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_shuffle()" tabindex="-1" class="structure-title ">
+                        array_shuffle						<small>($array)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>shuffle のキーが保存される＋参照渡しではない版</p>
+<p>Example:</p>
+<pre><code class="language-php">srand(4);mt_srand(4);
+assertSame(array_shuffle(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']), ['b' =&gt; 'B', 'a' =&gt; 'A', 'c' =&gt; 'C']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">shuffle された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1808-L1834" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" tabindex="-1" class="structure-title ">
+                        array_shrink_key						<small>($array, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>値の優先順位を逆にした array_intersect_key</p>
+<p>array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。<br />
+「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array1 = ['a' =&gt; 'A1', 'b' =&gt; 'B1', 'c' =&gt; 'C1'];
+$array2 = ['c' =&gt; 'C2', 'b' =&gt; 'B2', 'a' =&gt; 'A2'];
+$array3 = ['c' =&gt; 'C3', 'dummy' =&gt; 'DUMMY'];
+// 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
+assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">比較する配列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1836-L1884" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_lookup()" tabindex="-1" class="structure-title ">
+                        array_lookup						<small>($array, $column_key = null, $index_key = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キー保存可能な array_column</p>
+<p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [11 =&gt; ['id' =&gt; 1, 'name' =&gt; 'name1'], 12 =&gt; ['id' =&gt; 2, 'name' =&gt; 'name2'], 13 =&gt; ['id' =&gt; 3, 'name' =&gt; 'name3']];
+// 第3引数を渡せば array_column と全く同じ
+assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
+assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
+// 省略すればキーが保存される
+assertSame(array_lookup($array, 'name'), [11 =&gt; 'name1', 12 =&gt; 'name2', 13 =&gt; 'name3']);
+assertSame(array_lookup($array), $array);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$column_key = null</td>
+				<td class="desc">値となるキー
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$index_key = null</td>
+				<td class="desc">キーとなるキー
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1886-L1923" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_columns()" tabindex="-1" class="structure-title ">
+                        array_columns						<small>($array, $column_keys = null, $index_key = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>全要素に対して array_column する</p>
+<p>行列が逆転するイメージ。</p>
+<p>Example:</p>
+<pre><code class="language-php">$row1 = ['id' =&gt; 1, 'name' =&gt; 'A'];
+$row2 = ['id' =&gt; 2, 'name' =&gt; 'B'];
+$rows = [$row1, $row2];
+assertSame(array_columns($rows), ['id' =&gt; [1, 2], 'name' =&gt; ['A', 'B']]);
+assertSame(array_columns($rows, 'id'), ['id' =&gt; [1, 2]]);
+assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&gt; 'B']]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$column_keys = null</td>
+				<td class="desc">引っ張ってくるキー名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$index_key = null</td>
+				<td class="desc">新しい配列のキーとなるキー名
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1925-L1966" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" tabindex="-1" class="structure-title ">
+                        array_uncolumns						<small>($array, $template = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>array_columns のほぼ逆で [キー =&gt; [要素]] 配列から連想配列の配列を生成する</p>
+<p>$template を指定すると「それに含まれる配列かつ値がデフォルト」になる（要するに $default みたいなもの）。<br />
+キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_uncolumns(['id' =&gt; [1, 2], 'name' =&gt; ['A', 'B']]), [
+    ['id' =&gt; 1, 'name' =&gt; 'A'],
+    ['id' =&gt; 2, 'name' =&gt; 'B'],
+]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$template = null</td>
+				<td class="desc">抽出要素とそのデフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">新しい配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1968-L2092" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_convert()" tabindex="-1" class="structure-title ">
+                        array_convert						<small>($array, $callback, $apply_array = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の各要素に再帰的にコールバックを適用して変換する</p>
+<p>$callback は下記の仕様。</p>
+<p>引数は (キー, 値, 今まで処理したキー配列) で渡ってくる。<br />
+返り値は新しいキーを返す。</p>
+<ul>
+<li>文字列や数値を返すとそれがキーとして使われる</li>
+<li>null を返すと元のキーがそのまま使われる</li>
+<li>true を返すと数値連番が振られる</li>
+<li>false を返すとその要素は無かったことになる</li>
+<li>配列を返すとその配列で完全に置換される</li>
+</ul>
+<p>$apply_array=false で要素が配列の場合は再帰され、コールバックが適用されない（array_walk_recursive と同じ仕様）。</p>
+<p>$apply_array=true だと配列かは問わず全ての要素にコールバックが適用される。<br />
+配列も渡ってきてしまうのでコールバック内部で is_array 判定が必要になる場合がある。</p>
+<p>「map も filter も可能でキー変更可能かつ再帰的」というとてもマッチョな関数。<br />
+複雑だが実質的には「キーも設定できる array_walk_recursive」のように振る舞う（そしてそのような使い方を想定している）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+   'k1' =&gt; 'v1',
+   'k2' =&gt; [
+       'k21' =&gt; 'v21',
+       'k22' =&gt; [
+           'k221' =&gt; 'v221',
+           'k222' =&gt; 'v222',
+       ],
+       'k23' =&gt; 'v23',
+   ],
+];
+// 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k21' はそのままとする。さらに 'k22' はまるごと伏せる。 'k23' は数値キーになる
+$callback = function($k, &amp;$v){
+    if ($k === 'k21') return null;
+    if ($k === 'k22') return false;
+    if ($k === 'k23') return true;
+    if (!is_array($v)) $v = "prefix-$v";
+    return "_$k";
+};
+assertSame(array_convert($array, $callback, true), [
+    '_k1' =&gt; 'prefix-v1',
+    '_k2' =&gt; [
+        'k21' =&gt; 'v21',
+        0     =&gt; 'v23',
+    ],
+]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">適用するコールバック
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$apply_array = false</td>
+				<td class="desc">配列要素にもコールバックを適用するか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">変換された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2094-L2171" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_flatten()" tabindex="-1" class="structure-title ">
+                        array_flatten						<small>($array, $delimiter = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>多階層配列をフラットに展開する</p>
+<p>巷にあふれている実装と違って、 [&quot;$pkey.$ckey&quot; =&gt; $value] 形式の配列でも返せる。<br />
+$delimiter で区切り文字を指定した場合にそのようになる。<br />
+$delimiter = null の場合に本当の配列で返す（巷の実装と同じ）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+   'k1' =&gt; 'v1',
+   'k2' =&gt; [
+       'k21' =&gt; 'v21',
+       'k22' =&gt; [
+           'k221' =&gt; 'v221',
+           'k222' =&gt; 'v222',
+           'k223' =&gt; [1, 2, 3],
+       ],
+   ],
+];
+// 区切り文字指定なし
+assertSame(array_flatten($array), [
+   0 =&gt; 'v1',
+   1 =&gt; 'v21',
+   2 =&gt; 'v221',
+   3 =&gt; 'v222',
+   4 =&gt; 1,
+   5 =&gt; 2,
+   6 =&gt; 3,
+]);
+// 区切り文字指定
+assertSame(array_flatten($array, '.'), [
+   'k1'            =&gt; 'v1',
+   'k2.k21'        =&gt; 'v21',
+   'k2.k22.k221'   =&gt; 'v221',
+   'k2.k22.k222'   =&gt; 'v222',
+   'k2.k22.k223.0' =&gt; 1,
+   'k2.k22.k223.1' =&gt; 2,
+   'k2.k22.k223.2' =&gt; 3,
+]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$delimiter = null</td>
+				<td class="desc">キーの区切り文字。 null を与えると連番になる
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">フラット化された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2173-L2249" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
+                        array_nest						<small>($array, $delimiter = &#039;.&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>シンプルな [キー =&gt; 値] な配列から階層配列を生成する</p>
+<p>定義的に array_flatten の逆関数のような扱いになる。<br />
+$delimiter で階層を表現する。</p>
+<p>同名とみなされるキーは上書きされるか例外が飛ぶ。具体的には Example を参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 単純な階層展開
+$array = [
+   'k1'            =&gt; 'v1',
+   'k2.k21'        =&gt; 'v21',
+   'k2.k22.k221'   =&gt; 'v221',
+   'k2.k22.k222'   =&gt; 'v222',
+   'k2.k22.k223.0' =&gt; 1,
+   'k2.k22.k223.1' =&gt; 2,
+   'k2.k22.k223.2' =&gt; 3,
+];
+assertSame(array_nest($array), [
+   'k1' =&gt; 'v1',
+   'k2' =&gt; [
+       'k21' =&gt; 'v21',
+       'k22' =&gt; [
+           'k221' =&gt; 'v221',
+           'k222' =&gt; 'v222',
+           'k223' =&gt; [1, 2, 3],
+       ],
+   ],
+]);
+// 同名になるようなキーは上書きされる
+$array = [
+   'k1.k2' =&gt; 'v1', // この時点で 'k1' は配列になるが・・・
+   'k1'    =&gt; 'v2', // この時点で 'k1' は文字列として上書きされる
+];
+assertSame(array_nest($array), [
+   'k1' =&gt; 'v2',
+]);
+// 上書きすら出来ない場合は例外が飛ぶ
+$array = [
+   'k1'    =&gt; 'v1', // この時点で 'k1' は文字列になるが・・・
+   'k1.k2' =&gt; 'v2', // この時点で 'k1' にインデックスアクセスすることになるので例外が飛ぶ
+];
+try {
+    array_nest($array);
+}
+catch (\Exception $e) {
+    assertInstanceof(\InvalidArgumentException::class, $e);
+}</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc">対象配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;.&#039;</td>
+				<td class="desc">キーの区切り文字
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">階層化された配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

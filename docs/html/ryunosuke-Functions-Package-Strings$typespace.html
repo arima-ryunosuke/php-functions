@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Strings)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L711" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Strings</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L7-L23" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::strcat()" tabindex="-1" class="structure-title ">
+                        strcat						<small>(...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>文字列結合の関数版</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(strcat('a', 'b', 'c'), 'abc');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc">結合する文字列（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">結合した文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L25-L62" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::split_noempty()" tabindex="-1" class="structure-title ">
+                        split_noempty						<small>($delimiter, $string, $trimchars = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>空文字を除外する文字列分割</p>
+<ul>
+<li>空文字を任意の区切り文字で分割しても常に空配列</li>
+<li>キーは連番で返す（歯抜けがないただの配列）</li>
+</ul>
+<p>$triming を指定した場合、結果配列にも影響する。<br />
+つまり「除外は trim したいが結果配列にはしたくない」はできない。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
+assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
+assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter</td>
+				<td class="desc">区切り文字
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">対象文字
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>bool</td>
+				<td class="rest">$trimchars = true</td>
+				<td class="desc">指定した文字を trim する。true を指定すると trim する
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">指定文字で分割して空文字を除いた配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L64-L103" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::str_equals()" tabindex="-1" class="structure-title ">
+                        str_equals						<small>($str1, $str2, $case_insensitivity = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>文字列比較の関数版</p>
+<p>文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(str_equals('abc', 'abc'));
+assertTrue(str_equals('abc', 'ABC', true));
+assertTrue(str_equals('\0abc', '\0abc'));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$str1</td>
+				<td class="desc">文字列1
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$str2</td>
+				<td class="desc">文字列2
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$case_insensitivity = false</td>
+				<td class="desc">大文字小文字を区別するか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">同じ文字列なら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L105-L147" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::str_contains()" tabindex="-1" class="structure-title ">
+                        str_contains						<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定文字列を含むか返す</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(str_contains('abc', 'b'));
+assertTrue(str_contains('abc', 'B', true));
+assertTrue(str_contains('abc', ['b', 'x'], false, false));
+assertFalse(str_contains('abc', ['b', 'x'], false, true));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$haystack</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$needle</td>
+				<td class="desc">調べる文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$case_insensitivity = false</td>
+				<td class="desc">大文字小文字を区別するか
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$and_flag = false</td>
+				<td class="desc">すべて含む場合に true を返すか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">$needle を含むなら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L149-L192" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::str_putcsv()" tabindex="-1" class="structure-title ">
+                        str_putcsv						<small>($array, $delimiter = &#039;,&#039;, $enclosure = &#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>fputcsv の文字列版（str_getcsv の put 版）</p>
+<p>特に難しいことはないシンプルな実装。ただし、エラーは例外に変換される。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
+assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
+assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">値の配列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;,&#039;</td>
+				<td class="desc">フィールド区切り文字
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$enclosure = &#039;&quot;&#039;</td>
+				<td class="desc">フィールドを囲む文字
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$escape = &#039;\\&#039;</td>
+				<td class="desc">エスケープ文字
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">CSV 文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L194-L263" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::str_subreplace()" tabindex="-1" class="structure-title ">
+                        str_subreplace						<small>($subject, $search, $replaces, $case_insensitivity = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定文字列を置換する</p>
+<p>$subject 内の $search を $replaces に置換する。<br />
+str_replace とは「N 番目のみ置換できる」点で異なる。<br />
+つまり、$subject='hoge', $replace=[2 =&gt; 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。</p>
+<p>$replace に空配列を与えると何もしない。<br />
+負数キーは後ろから数える動作となる。<br />
+また、置換後の文字列は置換対象にはならない。</p>
+<p>N 番目の検索文字列が見つからない場合は例外を投げる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 1番目（0ベースなので2番目）の x を X に置換
+assertSame(str_subreplace('xxx', 'x', [1 =&gt; 'X']), 'xXx');
+// 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
+assertSame(str_subreplace('!xxx!', 'x', [0 =&gt; 'Xa', -1 =&gt; 'Xz']), '!XaxXz!');
+// 置換結果は置換対象にならない
+assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$subject</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$search</td>
+				<td class="desc">検索文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$replaces</td>
+				<td class="desc">置換文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$case_insensitivity = false</td>
+				<td class="desc">大文字小文字を区別するか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">置換された文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L265-L339" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::str_between()" tabindex="-1" class="structure-title ">
+                        str_between						<small>($string, $from, $to, &amp;$position = 0, $enclosure = &#039;\&#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定文字で囲まれた文字列を取得する</p>
+<p>$from, $to で指定した文字間を取得する（$from, $to 自体は結果に含まれない）。<br />
+ネストしている場合、一番外側の文字間を返す。</p>
+<p>$enclosure で「特定文字に囲まれている」場合を無視することができる。<br />
+$escape で「特定文字が前にある」場合を無視することができる。</p>
+<p>$position を与えた場合、その場所から走査を開始する。<br />
+さらに結果があった場合、 $position には「次の走査開始位置」が代入される。<br />
+これを使用すると連続で「次の文字, 次の文字, ...」と言った動作が可能になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
+$n = 0;
+assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
+assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
+assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
+// ネストしている場合は最も外側を返す
+assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$from</td>
+				<td class="desc">開始文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$to</td>
+				<td class="desc">終了文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">&amp;$position = 0</td>
+				<td class="desc">開始位置。渡した場合次の開始位置が設定される
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$enclosure = &#039;\&#039;&quot;&#039;</td>
+				<td class="desc">囲い文字。この文字中にいる $from, $to 文字は走査外になる
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$escape = &#039;\\&#039;</td>
+				<td class="desc">エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr>bool</td>
+			<td class="desc">$from, $to で囲まれた文字。見つからなかった場合は false</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L341-L365" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::starts_with()" tabindex="-1" class="structure-title ">
+                        starts_with						<small>($string, $with, $case_insensitivity = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定文字列で始まるか調べる</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(starts_with('abcdef', 'abc'));
+assertTrue(starts_with('abcdef', 'ABC', true));
+assertFalse(starts_with('abcdef', 'xyz'));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">探される文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$with</td>
+				<td class="desc">探す文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$case_insensitivity = false</td>
+				<td class="desc">大文字小文字を区別するか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">指定文字列で始まるなら true を返す</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L367-L391" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::ends_with()" tabindex="-1" class="structure-title ">
+                        ends_with						<small>($string, $with, $case_insensitivity = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>指定文字列で終わるか調べる</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(ends_with('abcdef', 'def'));
+assertTrue(ends_with('abcdef', 'DEF', true));
+assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">探される文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$with</td>
+				<td class="desc">探す文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$case_insensitivity = false</td>
+				<td class="desc">大文字小文字を区別するか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">対象文字列で終わるなら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L393-L410" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::camel_case()" tabindex="-1" class="structure-title ">
+                        camel_case						<small>($string, $delimiter = &#039;_&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>camelCase に変換する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;_&#039;</td>
+				<td class="desc">デリミタ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">変換した文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L412-L429" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::pascal_case()" tabindex="-1" class="structure-title ">
+                        pascal_case						<small>($string, $delimiter = &#039;_&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>PascalCase に変換する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;_&#039;</td>
+				<td class="desc">デリミタ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">変換した文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L431-L448" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::snake_case()" tabindex="-1" class="structure-title ">
+                        snake_case						<small>($string, $delimiter = &#039;_&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>snake_case に変換する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;_&#039;</td>
+				<td class="desc">デリミタ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">変換した文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L450-L467" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::chain_case()" tabindex="-1" class="structure-title ">
+                        chain_case						<small>($string, $delimiter = &#039;-&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>chain-case に変換する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$delimiter = &#039;-&#039;</td>
+				<td class="desc">デリミタ
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">変換した文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L469-L533" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::random_string()" tabindex="-1" class="structure-title ">
+                        random_string						<small>($length = 8, $charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>安全な乱数文字列を生成する</p>
+<p>下記のいずれかを記述順の優先度で使用する。</p>
+<ul>
+<li>random_bytes: 汎用だが php7 以降のみ</li>
+<li>openssl_random_pseudo_bytes: openSsl が必要</li>
+<li>mcrypt_create_iv: Mcrypt が必要</li>
+</ul></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$length = 8</td>
+				<td class="desc">生成文字列長
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;</td>
+				<td class="desc">使用する文字セット
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">乱数文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L535-L571" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::kvsprintf()" tabindex="-1" class="structure-title ">
+                        kvsprintf						<small>($format, $array)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>連想配列を指定できるようにした vsprintf</p>
+<p>sprintf の順序指定構文('%1$d')にキーを指定できる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' =&gt; 'ThisIs', 'fuga' =&gt; '3.14']), 'ThisIs 3');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$format</td>
+				<td class="desc">フォーマット文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">フォーマット引数
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">フォーマットされた文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L573-L612" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::preg_capture()" tabindex="-1" class="structure-title ">
+                        preg_capture						<small>($pattern, $subject, $default)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キャプチャを主軸においた preg_match</p>
+<p>$pattern で $subject をマッチングして $default で埋めて返す。$default はフィルタも兼ねる。<br />
+空文字マッチは「マッチしていない」とみなすので注意（$default が使用される）。</p>
+<p>キャプチャを主軸においているので「マッチしなかった」は検出不可能。<br />
+$default がそのまま返ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
+$default = [1 =&gt; '2000', 2 =&gt; '1', 4 =&gt; '1'];
+// 完全にマッチするのでそれぞれ返ってくる
+assertSame(preg_capture($pattern, '2014/12/24', $default), [1 =&gt; '2014', 2 =&gt; '12', 4 =&gt; '24']);
+// 最後の \d{1,2} はマッチしないのでデフォルト値が使われる
+assertSame(preg_capture($pattern, '2014/12', $default), [1 =&gt; '2014', 2 =&gt; '12', 4 =&gt; '1']);
+// 一切マッチしないので全てデフォルト値が使われる
+assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1', 4 =&gt; '1']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$pattern</td>
+				<td class="desc">正規表現
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$subject</td>
+				<td class="desc">対象文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$default</td>
+				<td class="desc">デフォルト値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">キャプチャした配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L614-L694" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::render_string()" tabindex="-1" class="structure-title ">
+                        render_string						<small>($template, $array)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>&quot;hoge {$hoge}&quot; 形式のレンダリング</p>
+<p>文字列を eval して &quot;hoge {$hoge}&quot; 形式の文字列に変数を埋め込む。<br />
+基本処理は <code>eval("return '" . addslashes($template) . "';");</code> と考えて良いが、下記が異なる。</p>
+<ul>
+<li>数値キーが参照できる</li>
+<li>クロージャは呼び出し結果が埋め込まれる。引数は (変数配列, 自身のキー文字列)</li>
+<li>引数をそのまま返すだけの特殊な変数 $_ が宣言される</li>
+<li>シングルクォートのエスケープは外される</li>
+</ul>
+<p>$<em> が宣言されるのは変数配列に '</em>' を含んでいないときのみ（上書きを防止するため）。<br />
+この $_ は php の埋め込み変数の闇を利用するととんでもないことが出来たりする（サンプルやテストコードを参照）。</p>
+<p>ダブルクオートはエスケープされるので文字列からの脱出はできない。<br />
+また、 <code>{$_(syntax(""))}</code> のように {$_()} 構文で &quot; も使えなくなるので \' を使用しなければならない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 数値キーが参照できる
+assertSame(render_string('${0}', ['number']), 'number');
+// クロージャは呼び出し結果が埋め込まれる
+assertSame(render_string('$c', ['c' =&gt; function($vars, $k){return $k . '-closure';}]), 'c-closure');
+// 引数をそのまま返すだけの特殊な変数 $_ が宣言される
+assertSame(render_string('{$_(123 + 456)}', []), '579');
+// 要するに '$_()' の中に php の式が書けるようになる
+assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' =&gt; ['a', 'n', 'z']]), 'a,n,z');
+assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$template</td>
+				<td class="desc">レンダリング文字列
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">レンダリング変数
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">レンダリングされた文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L696-L710" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::render_file()" tabindex="-1" class="structure-title ">
+                        render_file						<small>($template_file, $array)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>&quot;hoge {$hoge}&quot; 形式のレンダリングのファイル版</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$template_file</td>
+				<td class="desc">レンダリングするファイル名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc">レンダリング変数
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">レンダリングされた文字列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            	<table class="table">
+		<caption>See</caption>
+		<tbody>
+        			<tr>
+				<td class="type">
+                                            <a href="render_string$typespace.html#render_string" class="fqsen ">render_string</a>                    				</td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+    					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

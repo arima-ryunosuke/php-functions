@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Vars)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L497" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Vars</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L7-L42" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::stringify()" tabindex="-1" class="structure-title ">
+                        stringify						<small>($var)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>値を何とかして文字列化する</p>
+<p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$var</td>
+				<td class="desc">文字列化する値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">$var を文字列化したもの</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L44-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::numberify()" tabindex="-1" class="structure-title ">
+                        numberify						<small>($var, $decimal = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>値を何とかして数値化する</p>
+<ul>
+<li>配列は要素数</li>
+<li>int/float はそのまま（ただし $decimal に応じた型にキャストされる）</li>
+<li>resource はリソースID（php 標準の int キャスト）</li>
+<li>null/bool はその int 値（php 標準の int キャストだが $decimal を見る）</li>
+<li>それ以外（文字列・オブジェクト）は文字列表現から数値以外を取り除いたもの</li>
+</ul>
+<p>文字列・オブジェクト以外の変換は互換性を考慮しない。頻繁に変更される可能性がある（特に配列）。</p>
+<p>-記号は受け入れるが+記号は受け入れない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 配列は要素数となる
+assertSame(numberify([1, 2, 3]), 3);
+// int/float は基本的にそのまま
+assertSame(numberify(123), 123);
+assertSame(numberify(123.45), 123);
+assertSame(numberify(123.45, true), 123.45);
+// 文字列は数値抽出
+assertSame(numberify('a1b2c3'), 123);
+assertSame(numberify('a1b2.c3', true), 12.3);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$var</td>
+				<td class="desc">対象の値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$decimal = false</td>
+				<td class="desc">小数として扱うか
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int<span class="type-separator"></span><wbr>float</td>
+			<td class="desc">数値化した値</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L121-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::is_primitive()" tabindex="-1" class="structure-title ">
+                        is_primitive						<small>($var)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>値が複合型でないか検査する</p>
+<p>「複合型」とはオブジェクトと配列のこと。<br />
+つまり</p>
+<ul>
+<li>is_scalar($var) || is_null($var) || is_resource($var)</li>
+</ul>
+<p>と同義（!is_array($var) &amp;&amp; !is_object($var) とも言える）。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(is_primitive(null));
+assertTrue(is_primitive(false));
+assertTrue(is_primitive(123));
+assertTrue(is_primitive(STDIN));
+assertFalse(is_primitive(new \stdClass));
+assertFalse(is_primitive(['array']));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$var</td>
+				<td class="desc">調べる値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">複合型なら false</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L151-L199" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::is_recursive()" tabindex="-1" class="structure-title ">
+                        is_recursive						<small>($var)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>変数が再帰参照を含むか調べる</p>
+<p>Example:</p>
+<pre><code class="language-php">// 配列の再帰
+$array = [];
+$array['recursive'] = &amp;$array;
+assertTrue(is_recursive($array));
+// オブジェクトの再帰
+$object = new \stdClass();
+$object-&gt;recursive = $object;
+assertTrue(is_recursive($object));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$var</td>
+				<td class="desc">調べる値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">再帰参照を含むなら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L201-L230" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::var_type()" tabindex="-1" class="structure-title ">
+                        var_type						<small>($var)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>値の型を取得する（gettype + get_class）</p>
+<p>プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。<br />
+ただし、オブジェクトの場合は先頭に '\' が必ず付く。</p>
+<p>Example:</p>
+<pre><code class="language-php">// プリミティブ型は gettype と同義
+assertSame(var_type(false), 'boolean');
+assertSame(var_type(123), 'integer');
+assertSame(var_type(3.14), 'double');
+assertSame(var_type([1, 2, 3]), 'array');
+// オブジェクトは型名を返す
+assertSame(var_type(new \stdClass), '\\stdClass');
+assertSame(var_type(new \Exception()), '\\Exception');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$var</td>
+				<td class="desc">型を取得する値
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">型名</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L232-L374" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::var_export2()" tabindex="-1" class="structure-title ">
+                        var_export2						<small>($value, $return = false)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>組み込みの var_export をいい感じにしたもの</p>
+<p>下記の点が異なる。</p>
+<ul>
+<li>配列は 5.4 以降のショートシンタックス（[]）で出力</li>
+<li>インデントは 4 固定</li>
+<li>ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり</li>
+<li>null は null（小文字）</li>
+<li>再帰構造を渡しても警告がでない（さらに NULL ではなく <code>'*RECURSION*'</code> という文字列になる）</li>
+<li>配列の再帰構造の出力が異なる（Example参照）</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// 単純なエクスポート
+assertSame(var_export2(['array' =&gt; [1, 2, 3], 'hash' =&gt; ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']], true), "[
+    'array' =&gt; [1, 2, 3],
+    'hash'  =&gt; [
+        'a' =&gt; 'A',
+        'b' =&gt; 'B',
+        'c' =&gt; 'C',
+    ],
+]");
+// 再帰構造を含むエクスポート（標準の var_export は形式が異なる。 var_export すれば分かる）
+$rarray = [];
+$rarray['a']['b']['c'] = &amp;$rarray;
+$robject = new \stdClass();
+$robject-&gt;a = new \stdClass();
+$robject-&gt;a-&gt;b = new \stdClass();
+$robject-&gt;a-&gt;b-&gt;c = $robject;
+assertSame(var_export2(compact('rarray', 'robject'), true), "[
+    'rarray'  =&gt; [
+        'a' =&gt; [
+            'b' =&gt; [
+                'c' =&gt; '*RECURSION*',
+            ],
+        ],
+    ],
+    'robject' =&gt; stdClass::__set_state([
+        'a' =&gt; stdClass::__set_state([
+            'b' =&gt; stdClass::__set_state([
+                'c' =&gt; '*RECURSION*',
+            ]),
+        ]),
+    ]),
+]");</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$value</td>
+				<td class="desc">出力する値
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$return = false</td>
+				<td class="desc">返すなら true 出すなら false
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr>null</td>
+			<td class="desc">$return=true の場合は出力せず結果を返す</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L376-L407" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::var_html()" tabindex="-1" class="structure-title ">
+                        var_html						<small>($value)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>var_export2 を html コンテキストに特化させたもの</p>
+<p>下記のような出力になる。</p>
+<ul>
+<li><code>&lt;pre class='var_html'&gt; ～ &lt;/pre&gt;</code> で囲まれる</li>
+<li>php 構文なのでハイライトされて表示される</li>
+<li>Content-Type が強制的に text/html になる</li>
+</ul>
+<p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$value</td>
+				<td class="desc">出力する値</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">void</td>
+			<td class="desc"></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L409-L496" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::hashvar()" tabindex="-1" class="structure-title ">
+                        hashvar						<small>(...$vars)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>変数指定をできるようにした compact</p>
+<p>名前空間指定の呼び出しは未対応。use して関数名だけで呼び出す必要がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">$hoge = 'HOGE';
+$fuga = 'FUGA';
+assertSame(hashvar($hoge, $fuga), ['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$vars</td>
+				<td class="desc">変数（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc">引数の変数を変数名で compact した配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

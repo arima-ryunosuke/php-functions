@@ -1,0 +1,448 @@
+/* elements */
+
+html {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+body {
+    background-color: #fff;
+}
+
+div.nheader {
+    position: sticky;
+    top: 30px;
+    background-color: #F2F2F2;
+    z-index: 9990;
+}
+
+@-webkit-keyframes anchor {
+    0% {
+        padding-top: 30px;
+        margin-top: -30px;
+    }
+    100% {
+        padding-top: 0;
+        margin-top: 0;
+    }
+}
+
+@keyframes anchor {
+    0% {
+        padding-top: 30px;
+        margin-top: -30px;
+    }
+    100% {
+        padding-top: 0;
+        margin-top: 0;
+    }
+}
+
+a[id]:target, [tabindex]:target {
+    -webkit-animation: anchor 0.01s;
+    animation: anchor 0.01s;
+}
+
+a[id]:focus, [tabindex]:focus {
+    color: red;
+    outline: none;
+    background-color: antiquewhite;
+}
+
+h1 {
+    position: fixed;
+    top: 0;
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 4px;
+    background: #336699;
+    color: #fff;
+    width: 100%;
+    z-index: 10000;
+}
+
+h1 a {
+    color: #fff;
+}
+
+h1 small {
+    color: #eee;
+}
+
+h2 {
+    color: #793862;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 0;
+    border-bottom: 2px solid #dddddd;
+}
+
+h3 {
+    color: #793862;
+    font-size: 17px;
+    font-weight: bold;
+    border-bottom: 1px solid #dddddd;
+}
+
+h4 {
+    color: #555;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 6px;
+}
+
+h5 {
+    color: #333;
+    font-size: 15px;
+    margin: 4px 0;
+}
+
+h6 {
+    color: #333;
+    font-size: 14px;
+    margin: 2px 0;
+}
+
+hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+pre {
+    padding: 0;
+}
+
+small {
+    font-size: 81% !important;
+    color: #555;
+}
+
+var {
+    font-family: monospace;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 81%;
+    color: #555;
+    white-space: pre-wrap;
+}
+
+caption {
+    padding: 0;
+    border-bottom: 1px solid #ddd;
+}
+
+blockquote {
+    font-size: 1em;
+    border-left: 5px solid #ddd;
+}
+
+ul {
+    padding: 0;
+}
+
+ul li {
+    list-style: none;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background: #e1e1e1;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: #a9a9a9;
+}
+
+/* utility */
+
+.attract {
+    color: red;
+}
+
+.display-none {
+    display: none;
+}
+
+.switch-holding {
+    cursor: pointer;
+}
+
+.holding {
+    display: none;
+}
+
+.has-indent {
+    margin-left: 16px;
+}
+
+.indent {
+    position: relative;
+    padding-left: 0.15em;
+}
+
+.indent:before {
+    content: "";
+    position: absolute;
+    top: 0.2em;
+    left: -0.6em;
+    height: calc(100% + 0.6em);
+    border-left: 1px solid #aaa;
+}
+
+.indent:last-child:before {
+    height: 0.6em;
+}
+
+.indent:after {
+    content: "";
+    position: absolute;
+    top: 0.7em;
+    left: -0.6em;
+    width: 0.6em;
+    border-bottom: 1px solid #aaa;
+}
+
+.iblock {
+    display: inline-block;
+}
+
+.italic {
+    font-style: italic !important;
+}
+
+.bold {
+    font-weight: bold !important;
+}
+
+.strike {
+    text-decoration: line-through !important;
+}
+
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.faint {
+    opacity: 0.65;
+}
+
+.spacer {
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+.type-separator:before {
+    content: '|';
+    color: #a1a1a1;
+    margin: 0 2px;
+}
+
+/* usecase */
+
+.main-wrapper {
+    padding: 0 0.7em;
+    margin-top: 36px;
+}
+
+#search {
+    font-weight: normal;
+    font-size: 14px;
+    display: inline;
+    width: calc(100% - 9.1em);
+    height: 100%;
+    padding: 2px;
+}
+
+.typeahead.dropdown-menu {
+    z-index: 10002;
+    left: 0 !important;
+    width: 100%;
+}
+
+.hierarchy {
+    max-height: 12em;
+    overflow-y: auto;
+}
+
+.hierarchy:empty {
+    display: none;
+}
+
+.description {
+    word-break: break-all;
+    margin-bottom: 12px;
+    padding-top: 5px;
+}
+
+.description:last-child {
+    margin-bottom: 4px;
+}
+
+.description:empty {
+    display: none;
+}
+
+.description > * {
+    margin-bottom: 0.75em;
+}
+
+.description ul li {
+    margin-left: 2.0rem;
+    list-style: disc;
+}
+
+.using li {
+    margin-left: 2.0rem;
+}
+
+.category-name {
+    font-size: 111%;
+    font-weight: normal;
+    color: #333;
+}
+
+td.type {
+    width: 35%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+td.desc {
+    width: 40%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+td.rest {
+    width: 25%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.source-link {
+    vertical-align: middle;
+}
+
+.attribute {
+    float: right;
+    border-radius: 4px;
+    padding: 3px 3px 3px 0;
+}
+
+.structure-item {
+    white-space: normal;
+    border-radius: 2px;
+    border: 1px solid #beadb0;
+    margin-bottom: 6px;
+    padding: 0;
+    background-color: #fff;
+}
+
+.structure-item .structure-title {
+    padding: 6px;
+    margin: 0;
+    background: #f3f3f3;
+}
+
+.structure-item .inner-item {
+    border-top: 1px solid #beadb0;
+    padding: 0 6px;
+}
+
+.structure-item .description:empty {
+    display: block;
+}
+
+.structure-item .description:empty:before {
+    content: '- no description -';
+    color: #aaa;
+}
+
+/* bootstrap */
+
+.table {
+    margin-bottom: 10px;
+    table-layout: fixed;
+}
+
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    padding: 2px 8px 0;
+    border-top: none;
+    border-bottom: 1px dashed #ddd;
+}
+
+.label-icon {
+    font-size: 12px;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    padding: 1px 0 0 0;
+}
+
+.label-namespace {
+    background-color: #505050;
+}
+
+.label-constant {
+    background-color: #808080;
+}
+
+.label-function {
+    background-color: #5cb85c;
+}
+
+.label-interface {
+    background-color: #b4a7e5;
+}
+
+.label-trait {
+    background-color: #f0ad4e;
+}
+
+.label-class {
+    background-color: #337ab7;
+}
+
+.label-property {
+    background-color: #f792a3;
+}
+
+.label-method {
+    background-color: #070880;
+}
+
+.label-internal {
+    background-color: #707070;
+}
+
+.label-deprecated {
+    background-color: #222222;
+}
+
+.label-private {
+    background-color: #d9534f;
+}
+
+.label-protected {
+    background-color: #f0ad4e;
+}
+
+.label-public {
+    background-color: #5cb85c;
+}
+
+.label-magic {
+    background-color: #337ab7;
+}

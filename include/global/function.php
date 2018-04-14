@@ -11,12 +11,12 @@ if (!isset($excluded_functions['arrayize']) && (!function_exists('arrayize') || 
      * iterable や Traversable は考慮せずあくまで「配列」としてチェックする。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(arrayize(1, 2, 3), [1, 2, 3]);
      * assertSame(arrayize([1], [2], [3]), [1, 2, 3]);
      * $object = new \stdClass();
      * assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -42,11 +42,11 @@ if (!isset($excluded_functions['is_hasharray']) && (!function_exists('is_hasharr
      * 空の配列は普通の配列とみなす。
      *
      * Example:
-     * <code>
+     * ```php
      * assertFalse(is_hasharray([]));
      * assertFalse(is_hasharray([1, 2, 3]));
      * assertTrue(is_hasharray(['x' => 'X']));
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -71,10 +71,10 @@ if (!isset($excluded_functions['first_key']) && (!function_exists('first_key') |
      * 空の場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(first_key(['a', 'b', 'c']), 0);
      * assertSame(first_key([], 999), 999);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -99,10 +99,10 @@ if (!isset($excluded_functions['first_value']) && (!function_exists('first_value
      * 空の場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(first_value(['a', 'b', 'c']), 'a');
      * assertSame(first_value([], 999), 999);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -127,10 +127,10 @@ if (!isset($excluded_functions['first_keyvalue']) && (!function_exists('first_ke
      * 空の場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(first_keyvalue(['a', 'b', 'c']), [0, 'a']);
      * assertSame(first_keyvalue([], 999), 999);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -153,10 +153,10 @@ if (!isset($excluded_functions['last_key']) && (!function_exists('last_key') || 
      * 空の場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(last_key(['a', 'b', 'c']), 2);
      * assertSame(last_key([], 999), 999);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -181,10 +181,10 @@ if (!isset($excluded_functions['last_value']) && (!function_exists('last_value')
      * 空の場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(last_value(['a', 'b', 'c']), 'c');
      * assertSame(last_value([], 999), 999);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -209,10 +209,10 @@ if (!isset($excluded_functions['last_keyvalue']) && (!function_exists('last_keyv
      * 空の場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(last_keyvalue(['a', 'b', 'c']), [2, 'c']);
      * assertSame(last_keyvalue([], 999), 999);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -242,7 +242,7 @@ if (!isset($excluded_functions['prev_key']) && (!function_exists('prev_key') || 
      * $key が存在しない場合は false を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの前は 'a'
      * assertSame(prev_key($array, 'b'), 'a');
@@ -250,7 +250,7 @@ if (!isset($excluded_functions['prev_key']) && (!function_exists('prev_key') || 
      * assertSame(prev_key($array, 'a'), null);
      * // 'x' キーはそもそも存在しないので false
      * assertSame(prev_key($array, 'x'), false);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -282,7 +282,7 @@ if (!isset($excluded_functions['next_key']) && (!function_exists('next_key') || 
      * $array[] = 'hoge' で作成されるキーには完全準拠しない（標準は unset すると結構乱れる）。公式マニュアルを参照。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの次は 'c'
      * assertSame(next_key($array, 'b'), 'c');
@@ -292,7 +292,7 @@ if (!isset($excluded_functions['next_key']) && (!function_exists('next_key') || 
      * assertSame(next_key($array, 'x'), false);
      * // 次に生成されるキーは 10
      * assertSame(next_key($array, null), 10);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -336,11 +336,11 @@ if (!isset($excluded_functions['in_array_and']) && (!function_exists('in_array_a
      * $needle が空の場合は常に false を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(in_array_and([1], [1, 2, 3]));
      * assertFalse(in_array_and([9], [1, 2, 3]));
      * assertFalse(in_array_and([1, 9], [1, 2, 3]));
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -374,11 +374,11 @@ if (!isset($excluded_functions['in_array_or']) && (!function_exists('in_array_or
      * $needle が空の場合は常に false を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(in_array_or([1], [1, 2, 3]), true);
      * assertFalse(in_array_or([9], [1, 2, 3]), false);
      * assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -407,12 +407,12 @@ if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') |
      * 配列の+演算子の関数版
      *
      * Example:
-     * <code>
+     * ```php
      * // ただの加算の関数版なので同じキーは上書きされない
      * assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
      * // 異なるキーは生える
      * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -438,12 +438,12 @@ if (!isset($excluded_functions['array_implode']) && (!function_exists('array_imp
      * 文字キーは保存されるが数値キーは再割り振りされる。
      *
      * Example:
-     * <code>
+     * ```php
      * // (配列, 要素) の呼び出し
      * assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
      * // (要素, ...配列) の呼び出し
      * assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -483,7 +483,7 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
      * callable を与えると sprintf ではなくコールバック処理になる（$v, $k）。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // key, value を利用した sprintf
      * assertSame(array_sprintf($array, '%2$s=%1$s'), ['key1=val1', 'key2=val2']);
@@ -492,7 +492,7 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
      * // クロージャを与えるとコールバック動作になる
      * $closure = function($v, $k){return "$k=" . strtoupper($v);};
      * assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -531,13 +531,13 @@ if (!isset($excluded_functions['array_strpad']) && (!function_exists('array_strp
      * デフォルト（ただの文字列）はプレフィックス（値だけに付与したいなら array_map で十分なので）。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // キーにプレフィックス付与
      * assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
      * // 値にサフィックス付与
      * assertSame(array_strpad($array, '', ['-suffix']), ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -573,12 +573,12 @@ if (!isset($excluded_functions['array_pos']) && (!function_exists('array_pos') |
      * 負数を与えると逆から N 番目となる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_pos([1, 2, 3], 1), 2);
      * assertSame(array_pos([1, 2, 3], -1), 3);
      * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1), 'B');
      * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true), 'b');
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -622,10 +622,10 @@ if (!isset($excluded_functions['array_of']) && (!function_exists('array_of') || 
      * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
      *
      * Example:
-     * <code>
+     * ```php
      * $fuga_of_array = array_of('fuga');
      * assertSame($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']), 'FUGA');
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -657,7 +657,7 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
      * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
      *
      * Example:
-     * <code>
+     * ```php
      * // 単純取得
      * assertSame(array_get(['a', 'b', 'c'], 1), 'b');
      * // 単純デフォルト
@@ -668,7 +668,7 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
      * assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 => 'a']);
      * // 配列デフォルト（null ではなく [] を返す）
      * assertSame(array_get(['a', 'b', 'c'], [9]), []);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -711,7 +711,7 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('array_set') |
      * 第3引数に配列を指定すると潜って設定する。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = ['a' => 'A', 'B'];
      * // 第3引数省略（最後に連番キーで設定）
      * assertSame(array_set($array, 'Z'), 1);
@@ -723,7 +723,7 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('array_set') |
      * // 第3引数で配列を指定
      * assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
      * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -771,7 +771,7 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
      * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = ['a' => 'A', 'b' => 'B'];
      * // ない場合は $default を返す
      * assertSame(array_unset($array, 'x', 'X'), 'X');
@@ -787,7 +787,7 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列のキーは返されるキーを表す。順番も維持される
      * assertSame(array_unset($array, ['x2' => 'b', 'x1' => 'a']), ['x2' => 'B', 'x1' => 'A']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -827,7 +827,7 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive')
      * 存在しない場合は $default を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = [
      *     'a' => [
      *         'b' => [
@@ -839,7 +839,7 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive')
      * assertSame(array_dive($array, 'a.b.x', 9), 9);
      * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
      * assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -869,10 +869,10 @@ if (!isset($excluded_functions['array_exists']) && (!function_exists('array_exis
      * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_exists(['a', 'b', '9'], 'ctype_digit'), 2);
      * assertSame(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
-     * </code>
+     * ```
      *
      * @package Array
      * @deprecated array_exists という名前で真偽値を返さないのは直感に反する。 キーが欲しい用途には array_find を使う
@@ -902,14 +902,14 @@ if (!isset($excluded_functions['array_find']) && (!function_exists('array_find')
      * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
      *
      * Example:
-     * <code>
+     * ```php
      * // 最初に見つかったキーを返す
      * assertSame(array_find(['a', 'b', '9'], 'ctype_digit'), 2);
      * assertSame(array_find(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
      * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
      * assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -939,10 +939,10 @@ if (!isset($excluded_functions['array_grep_key']) && (!function_exists('array_gr
      * キーを正規表現でフィルタする
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#'), ['a' => 'A', 'aa' => 'AA']);
      * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true), ['b' => 'B']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -970,10 +970,10 @@ if (!isset($excluded_functions['array_map_key']) && (!function_exists('array_map
      * $callback が null を返すとその要素は取り除かれる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'), ['A' => 'A', 'B' => 'B']);
      * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], function(){}), []);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1000,9 +1000,9 @@ if (!isset($excluded_functions['array_filter_not']) && (!function_exists('array_
      * 単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1023,10 +1023,10 @@ if (!isset($excluded_functions['array_filter_key']) && (!function_exists('array_
      * ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 => 'a', 2 => 'c']);
      * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 => 'a', 2 => 'c']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1052,10 +1052,10 @@ if (!isset($excluded_functions['array_filter_eval']) && (!function_exists('array
      * キーは $k, 値は $v で宣言される。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 => 'a', 2 => 'c']);
      * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1083,7 +1083,7 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
      * $callback が要求するならキーも渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = [
      *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
      *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
@@ -1100,7 +1100,7 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
      * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1147,10 +1147,10 @@ if (!isset($excluded_functions['array_map_filter']) && (!function_exists('array_
      * $callback が要求するならキーも渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_map_filter([' a ', ' b ', ''], 'trim'), ['a', 'b']);
      * assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1181,7 +1181,7 @@ if (!isset($excluded_functions['array_map_method']) && (!function_exists('array_
      * $ignore=null とすると 何もせずそのまま要素を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
      * // getMessage で map される
      * assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
@@ -1189,7 +1189,7 @@ if (!isset($excluded_functions['array_map_method']) && (!function_exists('array_
      * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
      * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1227,12 +1227,12 @@ if (!isset($excluded_functions['array_maps']) && (!function_exists('array_maps')
      * さらに引数が不要なら `@method` とするだけで良い。
      *
      * Example:
-     * <code>
+     * ```php
      * // 値を3乗したあと16進表記にして大文字化する
      * assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
      * assertSame(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}), ['a' => 'a:A', 'b' => 'b:B']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1275,14 +1275,14 @@ if (!isset($excluded_functions['array_nmap']) && (!function_exists('array_nmap')
      * その際、「挿入後の番目」ではなく、単純に「元の引数の番目」であることに留意。キー・値が同じ位置を指定している場合はキーが先にくる。
      *
      * Example:
-     * <code>
+     * ```php
      * // 1番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
      * assertSame(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'), ['prefix-a-suffix', 'prefix-b-suffix']);
      * // 1番目にキー、2番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
      * assertSame(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'), ['k' => 'a k b v c']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1347,10 +1347,10 @@ if (!isset($excluded_functions['array_lmap']) && (!function_exists('array_lmap')
      * 要素値を $callback の最左に適用して array_map する
      *
      * Example:
-     * <code>
+     * ```php
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
      * assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1369,10 +1369,10 @@ if (!isset($excluded_functions['array_rmap']) && (!function_exists('array_rmap')
      * 要素値を $callback の最右に適用して array_map する
      *
      * Example:
-     * <code>
+     * ```php
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
      * assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1394,11 +1394,11 @@ if (!isset($excluded_functions['array_depth']) && (!function_exists('array_depth
      * つまり、配列を与える限りは 0 以下を返すことはない。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_depth([]), 1);
      * assertSame(array_depth(['hoge']), 1);
      * assertSame(array_depth([['nest1' => ['nest2']]]), 3);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1428,12 +1428,12 @@ if (!isset($excluded_functions['array_insert']) && (!function_exists('array_inse
      * $value には配列も与えられるが、その場合数値キーは振り直される
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_insert([1, 2, 3], 'x'), [1, 2, 3, 'x']);
      * assertSame(array_insert([1, 2, 3], 'x', 1), [1, 'x', 2, 3]);
      * assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
      * assertSame(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1), [1, 'a' => 'A', 'b' => 'B', 2, 3]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1465,14 +1465,14 @@ if (!isset($excluded_functions['array_assort']) && (!function_exists('array_asso
      * $rule が要求するならキーも渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * // lt2(2より小さい)で分類
      * $lt2 = function($v){return $v < 2;};
      * assertSame(array_assort([1, 2, 3], ['lt2' => $lt2]), ['lt2' => [1]]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
      * $lt3 = function($v){return $v < 3;};
      * assertSame(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']), ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1504,7 +1504,7 @@ if (!isset($excluded_functions['array_count']) && (!function_exists('array_count
      * - $callback には配列が渡せる。配列を渡した場合は件数を配列で返す（Example 参照）
      *
      * Example:
-     * <code>
+     * ```php
      * $array = ['hoge', 'fuga', 'piyo'];
      * // 'o' を含むものの数（2個）
      * assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}), 2);
@@ -1513,7 +1513,7 @@ if (!isset($excluded_functions['array_count']) && (!function_exists('array_count
      *     'a' => function($s){return strpos($s, 'a') !== false;},
      *     'o' => function($s){return strpos($s, 'o') !== false;},
      * ]), ['a' => 1, 'o' => 2]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1554,7 +1554,7 @@ if (!isset($excluded_functions['array_group']) && (!function_exists('array_group
      * コールバックが配列を返すと入れ子としてグループする。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_group([1, 1, 1]), [1 => [1, 1, 1]]);
      * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 => [1, 3], 0 => [2]]);
      * // group -> id で入れ子グループにする
@@ -1570,7 +1570,7 @@ if (!isset($excluded_functions['array_group']) && (!function_exists('array_group
      *         2 => $row2,
      *     ],
      * ]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1612,11 +1612,11 @@ if (!isset($excluded_functions['array_all']) && (!function_exists('array_all') |
      * $callback が要求するならキーも渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(array_all([true, true]));
      * assertFalse(array_all([true, false]));
      * assertFalse(array_all([false, false]));
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1648,11 +1648,11 @@ if (!isset($excluded_functions['array_any']) && (!function_exists('array_any') |
      * $callback が要求するならキーも渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(array_any([true, true]));
      * assertTrue(array_any([true, false]));
      * assertFalse(array_any([false, false]));
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1686,7 +1686,7 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('array_order
      *
      * $orders には下記のような配列を渡す。
      *
-     * <code>
+     * ```php
      * $orders = [
      *     'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
      *     'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
@@ -1694,16 +1694,16 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('array_order
      *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
      *     'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
      * ];
-     * </code>
+     * ```
      *
      * Example:
-     * <code>
+     * ```php
      * $v1 = ['id' => '1', 'no' => 'a03', 'name' => 'yyy'];
      * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
      * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
      * // name 昇順, no 自然降順
      * assertSame(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]), [$v3, $v2, $v1]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1826,10 +1826,10 @@ if (!isset($excluded_functions['array_shuffle']) && (!function_exists('array_shu
      * shuffle のキーが保存される＋参照渡しではない版
      *
      * Example:
-     * <code>
+     * ```php
      * srand(4);mt_srand(4);
      * assertSame(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['b' => 'B', 'a' => 'A', 'c' => 'C']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1856,13 +1856,13 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('array_
      * 「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $array1 = ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'];
      * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
      * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
      * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
      * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1884,7 +1884,7 @@ if (!isset($excluded_functions['array_lookup']) && (!function_exists('array_look
      * array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
      * // 第3引数を渡せば array_column と全く同じ
      * assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
@@ -1892,7 +1892,7 @@ if (!isset($excluded_functions['array_lookup']) && (!function_exists('array_look
      * // 省略すればキーが保存される
      * assertSame(array_lookup($array, 'name'), [11 => 'name1', 12 => 'name2', 13 => 'name3']);
      * assertSame(array_lookup($array), $array);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1935,14 +1935,14 @@ if (!isset($excluded_functions['array_columns']) && (!function_exists('array_col
      * 行列が逆転するイメージ。
      *
      * Example:
-     * <code>
+     * ```php
      * $row1 = ['id' => 1, 'name' => 'A'];
      * $row2 = ['id' => 2, 'name' => 'B'];
      * $rows = [$row1, $row2];
      * assertSame(array_columns($rows), ['id' => [1, 2], 'name' => ['A', 'B']]);
      * assertSame(array_columns($rows, 'id'), ['id' => [1, 2]]);
      * assertSame(array_columns($rows, 'name', 'id'), ['name' => [1 => 'A', 2 => 'B']]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -1976,12 +1976,12 @@ if (!isset($excluded_functions['array_uncolumns']) && (!function_exists('array_u
      * キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]), [
      *     ['id' => 1, 'name' => 'A'],
      *     ['id' => 2, 'name' => 'B'],
      * ]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -2035,7 +2035,7 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
      * 複雑だが実質的には「キーも設定できる array_walk_recursive」のように振る舞う（そしてそのような使い方を想定している）。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = [
      *    'k1' => 'v1',
      *    'k2' => [
@@ -2062,7 +2062,7 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
      *         0     => 'v23',
      *     ],
      * ]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -2148,7 +2148,7 @@ if (!isset($excluded_functions['array_flatten']) && (!function_exists('array_fla
      * $delimiter = null の場合に本当の配列で返す（巷の実装と同じ）。
      *
      * Example:
-     * <code>
+     * ```php
      * $array = [
      *    'k1' => 'v1',
      *    'k2' => [
@@ -2180,7 +2180,7 @@ if (!isset($excluded_functions['array_flatten']) && (!function_exists('array_fla
      *    'k2.k22.k223.1' => 2,
      *    'k2.k22.k223.2' => 3,
      * ]);
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -2229,7 +2229,7 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('array_nest')
      * 同名とみなされるキーは上書きされるか例外が飛ぶ。具体的には Example を参照。
      *
      * Example:
-     * <code>
+     * ```php
      * // 単純な階層展開
      * $array = [
      *    'k1'            => 'v1',
@@ -2270,7 +2270,7 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('array_nest')
      * catch (\Exception $e) {
      *     assertInstanceof(\InvalidArgumentException::class, $e);
      * }
-     * </code>
+     * ```
      *
      * @package Array
      *
@@ -2308,14 +2308,14 @@ if (!isset($excluded_functions['stdclass']) && (!function_exists('stdclass') || 
      * それにキャストだとコールバックで呼べなかったり、数値キーが死んだりして微妙に使いづらいところがある。
      *
      * Example:
-     * <code>
+     * ```php
      * // 基本的には object キャストと同じ
      * $fields = ['a' => 'A', 'b' => 'B'];
      * assertEquals(stdclass($fields), (object) $fields);
      * // ただしこういうことはキャストでは出来ない
      * assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
      * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -2393,9 +2393,9 @@ if (!isset($excluded_functions['class_loader']) && (!function_exists('class_load
      * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -2426,9 +2426,9 @@ if (!isset($excluded_functions['class_namespace']) && (!function_exists('class_n
      * クラスの名前空間部分を取得する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -2451,9 +2451,9 @@ if (!isset($excluded_functions['class_shorten']) && (!function_exists('class_sho
      * クラスの名前空間部分を除いた短い名前を取得する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
-     * </code>
+     * ```
      *
      * @package ClassObject
      *
@@ -2621,11 +2621,11 @@ if (!isset($excluded_functions['file_extension']) && (!function_exists('file_ext
      * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(file_extension('filename.ext'), 'ext');
      * assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
      * assertSame(file_extension('filename.ext', ''), 'filename');
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2658,10 +2658,10 @@ if (!isset($excluded_functions['file_set_contents']) && (!function_exists('file_
      * ディレクトリも掘る file_put_contents
      *
      * Example:
-     * <code>
+     * ```php
      * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
      * assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2716,14 +2716,14 @@ if (!isset($excluded_functions['dirname_r']) && (!function_exists('dirname_r') |
      * コールバックには親ディレクトリが引数として渡ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * // //tmp/a/b/file.txt を作っておく
      * $tmp = sys_get_temp_dir();
      * file_set_contents("$tmp/a/b/file.txt", 'hoge');
      * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
      * $callback = function($path){return realpath("$path/file.txt");};
      * assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2750,7 +2750,7 @@ if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('path_i
      * パスが絶対パスか判定する
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(path_is_absolute('/absolute/path'));
      * assertFalse(path_is_absolute('relative/path'));
      * // Windows 環境では下記も true になる
@@ -2758,7 +2758,7 @@ if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('path_i
      *     assertTrue(path_is_absolute('\\absolute\\path'));
      *     assertTrue(path_is_absolute('C:\\absolute\\path'));
      * }
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2788,12 +2788,12 @@ if (!isset($excluded_functions['path_resolve']) && (!function_exists('path_resol
      * 出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。
      *
      * Example:
-     * <code>
+     * ```php
      * $DS = DIRECTORY_SEPARATOR;
      * assertSame(path_resolve('/absolute/path'), "{$DS}absolute{$DS}path");
      * assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
      * assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2821,12 +2821,12 @@ if (!isset($excluded_functions['path_normalize']) && (!function_exists('path_nor
      * realpath ではない。のでシンボリックリンクの解決などはしない。その代わりファイルが存在しなくても使用することができる。
      *
      * Example:
-     * <code>
+     * ```php
      * $DS = DIRECTORY_SEPARATOR;
      * assertSame(path_normalize('/path/to/something'), "{$DS}path{$DS}to{$DS}something");
      * assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}something");
      * assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2869,7 +2869,7 @@ if (!isset($excluded_functions['cp_rf']) && (!function_exists('cp_rf') || (new \
      * ディレクトリではなくファイルを与えても動作する（copy とほぼ同じ動作になるが、対象にディレクトリを指定できる点が異なる）。
      *
      * Example:
-     * <code>
+     * ```php
      * // /tmp/src/hoge.txt, /tmp/src/dir/fuga.txt を作っておく
      * $tmp = sys_get_temp_dir();
      * file_set_contents("$tmp/src/hoge.txt", 'hoge');
@@ -2890,7 +2890,7 @@ if (!isset($excluded_functions['cp_rf']) && (!function_exists('cp_rf') || (new \
      * // $dst に "/" を付けないとそのパスとしてコピー（copy と完全に同じ）
      * cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
      * assertStringEqualsFile("$tmp/dst4", 'hoge');
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -2937,11 +2937,11 @@ if (!isset($excluded_functions['rm_rf']) && (!function_exists('rm_rf') || (new \
      * 中身があっても消せる rmdir
      *
      * Example:
-     * <code>
+     * ```php
      * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
      * rm_rf(sys_get_temp_dir() . '/new');
      * assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
-     * </code>
+     * ```
      *
      * @package FileSystem
      *
@@ -3083,10 +3083,10 @@ if (!isset($excluded_functions['nbind']) && (!function_exists('nbind') || (new \
      * $callable の指定位置に引数を束縛したクロージャを返す
      *
      * Example:
-     * <code>
+     * ```php
      * $bind = nbind('sprintf', 2, 'X');
      * assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3107,10 +3107,10 @@ if (!isset($excluded_functions['lbind']) && (!function_exists('lbind') || (new \
      * $callable の最左に引数を束縛した callable を返す
      *
      * Example:
-     * <code>
+     * ```php
      * $bind = lbind('sprintf', '%s%s');
      * assertSame($bind('N', 'M'), 'NM');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3128,10 +3128,10 @@ if (!isset($excluded_functions['rbind']) && (!function_exists('rbind') || (new \
      * $callable の最右に引数を束縛した callable を返す
      *
      * Example:
-     * <code>
+     * ```php
      * $bind = rbind('sprintf', 'X');
      * assertSame($bind('%s%s', 'N'), 'NX');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3160,7 +3160,7 @@ if (!isset($excluded_functions['composite']) && (!function_exists('composite') |
      * いずれにせよ $arrayalbe は必須ではなく、第1引数が bool ならオプションだと判断し、そうでないなら true とみなす。
      *
      * Example:
-     * <code>
+     * ```php
      * $add5 = function ($v) { return $v + 5; };            // 来た値を +5 するクロージャ
      * $mul3 = function ($v) { return $v * 3; };            // 来た値を *3 するクロージャ
      * $split = function ($v) { return str_split($v); };    // 文字列的に桁分割するクロージャ
@@ -3178,7 +3178,7 @@ if (!isset($excluded_functions['composite']) && (!function_exists('composite') |
      * // true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
      * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
      * assertSame($composite('hoge'), 'EGOHegoh-erp');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3222,12 +3222,12 @@ if (!isset($excluded_functions['return_arg']) && (!function_exists('return_arg')
      * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
      *
      * Example:
-     * <code>
+     * ```php
      * $arg0 = return_arg(0);
      * assertSame($arg0('hoge'), 'hoge');
      * $arg1 = return_arg(1);
      * assertSame($arg1('dummy', 'hoge'), 'hoge');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3250,11 +3250,11 @@ if (!isset($excluded_functions['not_func']) && (!function_exists('not_func') || 
      * 返り値の真偽値を逆転した新しいクロージャを返す
      *
      * Example:
-     * <code>
+     * ```php
      * $not_strlen = not_func('strlen');
      * assertFalse($not_strlen('hoge'));
      * assertTrue($not_strlen(''));
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3276,10 +3276,10 @@ if (!isset($excluded_functions['eval_func']) && (!function_exists('eval_func') |
      * 参照渡しは未対応。
      *
      * Example:
-     * <code>
+     * ```php
      * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
      * assertSame($evalfunc(1, 2, 3), 6);
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3303,10 +3303,10 @@ if (!isset($excluded_functions['reflect_callable']) && (!function_exists('reflec
      * callable から ReflectionFunctionAbstract を生成する
      *
      * Example:
-     * <code>
+     * ```php
      * assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
      * assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3341,11 +3341,11 @@ if (!isset($excluded_functions['closurize']) && (!function_exists('closurize') |
      * php7.1 の fromCallable みたいなもの。
      *
      * Example:
-     * <code>
+     * ```php
      * $sprintf = closurize('sprintf');
      * assertInstanceof(\Closure::class, $sprintf);
      * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3376,14 +3376,14 @@ if (!isset($excluded_functions['call_safely']) && (!function_exists('call_safely
      * エラーを例外に変換するブロックでコールバックを実行する
      *
      * Example:
-     * <code>
+     * ```php
      * try {
      *     call_safely(function(){return $v;});
      * }
      * catch (\Exception $ex) {
      *     assertSame($ex->getMessage(), 'Undefined variable: v');
      * }
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3416,9 +3416,9 @@ if (!isset($excluded_functions['ob_capture']) && (!function_exists('ob_capture')
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(ob_capture(function(){echo 123;}), '123');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3448,12 +3448,12 @@ if (!isset($excluded_functions['parameter_length']) && (!function_exists('parame
      * ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。
      *
      * Example:
-     * <code>
+     * ```php
      * // trim の引数は2つ
      * assertSame(parameter_length('trim'), 2);
      * // trim の必須引数は1つ
      * assertSame(parameter_length('trim', true), 1);
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3522,11 +3522,11 @@ if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('fu
      * php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。
      *
      * Example:
-     * <code>
+     * ```php
      * // strlen に2つの引数を渡してもエラーにならない
      * $strlen = func_user_func_array('strlen');
      * assertSame($strlen('abc', null), 3);
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3557,11 +3557,11 @@ if (!isset($excluded_functions['function_alias']) && (!function_exists('function
      * 静的であればクラスメソッドも呼べる。
      *
      * Example:
-     * <code>
+     * ```php
      * // trim のエイリアス
      * function_alias('trim', 'trim_alias');
      * assertSame(trim_alias(' abc '), 'abc');
-     * </code>
+     * ```
      *
      * @package Callable
      *
@@ -3648,9 +3648,9 @@ if (!isset($excluded_functions['minimum']) && (!function_exists('minimum') || (n
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(minimum(-1, 0, 1), -1);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3671,9 +3671,9 @@ if (!isset($excluded_functions['maximum']) && (!function_exists('maximum') || (n
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(maximum(-1, 0, 1), 1);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3696,9 +3696,9 @@ if (!isset($excluded_functions['mode']) && (!function_exists('mode') || (new \Re
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3735,10 +3735,10 @@ if (!isset($excluded_functions['mean']) && (!function_exists('mean') || (new \Re
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(mean(1, 2, 3, 4, 5, 6), 3.5);
      * assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3761,14 +3761,14 @@ if (!isset($excluded_functions['median']) && (!function_exists('median') || (new
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * // 偶数個なので中2つの平均
      * assertSame(median(1, 2, 3, 4, 5, 6), 3.5);
      * // 奇数個なのでど真ん中
      * assertSame(median(1, 2, 3, 4, 5), 3);
      * // 偶数個だが文字列なので中2つの後
      * assertSame(median('a', 'b', 'c', 'd'), 'c');
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3821,9 +3821,9 @@ if (!isset($excluded_functions['sum']) && (!function_exists('sum') || (new \Refl
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(sum(1, 2, 3, 4, 5, 6), 21);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3844,11 +3844,11 @@ if (!isset($excluded_functions['random_at']) && (!function_exists('random_at') |
      * - 候補がない場合はエラーではなく例外を投げる
      *
      * Example:
-     * <code>
+     * ```php
      * srand(1);mt_srand(1);
      * assertSame(random_at(1, 2, 3, 4, 5, 6), 4);
      * assertSame(random_at(1, 2, 3, 4, 5, 6), 1);
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3868,11 +3868,11 @@ if (!isset($excluded_functions['probability']) && (!function_exists('probability
      * $divisor のデフォルトは 100 にしてあるので、 $probability だけ与えれば $probability パーセントで true を返すことになる。
      *
      * Example:
-     * <code>
+     * ```php
      * srand(1);mt_srand(1);
      * assertFalse(probability(50));
      * assertTrue(probability(50));
-     * </code>
+     * ```
      *
      * @package Math
      *
@@ -3902,9 +3902,9 @@ if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (new
      * 文字列結合の関数版
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(strcat('a', 'b', 'c'), 'abc');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -3927,11 +3927,11 @@ if (!isset($excluded_functions['split_noempty']) && (!function_exists('split_noe
      * つまり「除外は trim したいが結果配列にはしたくない」はできない。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
      * assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
      * assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -3963,11 +3963,11 @@ if (!isset($excluded_functions['str_equals']) && (!function_exists('str_equals')
      * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(str_equals('abc', 'abc'));
      * assertTrue(str_equals('abc', 'ABC', true));
      * assertTrue(str_equals('\0abc', '\0abc'));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4003,12 +4003,12 @@ if (!isset($excluded_functions['str_contains']) && (!function_exists('str_contai
      * 指定文字列を含むか返す
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(str_contains('abc', 'b'));
      * assertTrue(str_contains('abc', 'B', true));
      * assertTrue(str_contains('abc', ['b', 'x'], false, false));
      * assertFalse(str_contains('abc', ['b', 'x'], false, true));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4050,11 +4050,11 @@ if (!isset($excluded_functions['str_putcsv']) && (!function_exists('str_putcsv')
      * 特に難しいことはないシンプルな実装。ただし、エラーは例外に変換される。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
      * assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
      * assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4104,14 +4104,14 @@ if (!isset($excluded_functions['str_subreplace']) && (!function_exists('str_subr
      * N 番目の検索文字列が見つからない場合は例外を投げる。
      *
      * Example:
-     * <code>
+     * ```php
      * // 1番目（0ベースなので2番目）の x を X に置換
      * assertSame(str_subreplace('xxx', 'x', [1 => 'X']), 'xXx');
      * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
      * assertSame(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']), '!XaxXz!');
      * // 置換結果は置換対象にならない
      * assertSame(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']), 'xxxXx');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4176,7 +4176,7 @@ if (!isset($excluded_functions['str_between']) && (!function_exists('str_between
      * これを使用すると連続で「次の文字, 次の文字, ...」と言った動作が可能になる。
      *
      * Example:
-     * <code>
+     * ```php
      * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
      * $n = 0;
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
@@ -4184,7 +4184,7 @@ if (!isset($excluded_functions['str_between']) && (!function_exists('str_between
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
      * // ネストしている場合は最も外側を返す
      * assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4243,11 +4243,11 @@ if (!isset($excluded_functions['starts_with']) && (!function_exists('starts_with
      * 指定文字列で始まるか調べる
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(starts_with('abcdef', 'abc'));
      * assertTrue(starts_with('abcdef', 'ABC', true));
      * assertFalse(starts_with('abcdef', 'xyz'));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4270,11 +4270,11 @@ if (!isset($excluded_functions['ends_with']) && (!function_exists('ends_with') |
      * 指定文字列で終わるか調べる
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(ends_with('abcdef', 'def'));
      * assertTrue(ends_with('abcdef', 'DEF', true));
      * assertFalse(ends_with('abcdef', 'xyz'));
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4297,9 +4297,9 @@ if (!isset($excluded_functions['camel_case']) && (!function_exists('camel_case')
      * camelCase に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4317,9 +4317,9 @@ if (!isset($excluded_functions['pascal_case']) && (!function_exists('pascal_case
      * PascalCase に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4337,9 +4337,9 @@ if (!isset($excluded_functions['snake_case']) && (!function_exists('snake_case')
      * snake_case に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4357,9 +4357,9 @@ if (!isset($excluded_functions['chain_case']) && (!function_exists('chain_case')
      * chain-case に変換する
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4446,9 +4446,9 @@ if (!isset($excluded_functions['kvsprintf']) && (!function_exists('kvsprintf') |
      * sprintf の順序指定構文('%1$d')にキーを指定できる。
      *
      * Example:
-     * <code>
+     * ```php
      * assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']), 'ThisIs 3');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4489,7 +4489,7 @@ if (!isset($excluded_functions['preg_capture']) && (!function_exists('preg_captu
      * $default がそのまま返ってくる。
      *
      * Example:
-     * <code>
+     * ```php
      * $pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
      * $default = [1 => '2000', 2 => '1', 4 => '1'];
      * // 完全にマッチするのでそれぞれ返ってくる
@@ -4498,7 +4498,7 @@ if (!isset($excluded_functions['preg_capture']) && (!function_exists('preg_captu
      * assertSame(preg_capture($pattern, '2014/12', $default), [1 => '2014', 2 => '12', 4 => '1']);
      * // 一切マッチしないので全てデフォルト値が使われる
      * assertSame(preg_capture($pattern, 'hoge', $default), [1 => '2000', 2 => '1', 4 => '1']);
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4539,7 +4539,7 @@ if (!isset($excluded_functions['render_string']) && (!function_exists('render_st
      * また、 `{$_(syntax(""))}` のように {$_()} 構文で " も使えなくなるので \' を使用しなければならない。
      *
      * Example:
-     * <code>
+     * ```php
      * // 数値キーが参照できる
      * assertSame(render_string('${0}', ['number']), 'number');
      * // クロージャは呼び出し結果が埋め込まれる
@@ -4549,7 +4549,7 @@ if (!isset($excluded_functions['render_string']) && (!function_exists('render_st
      * // 要するに '$_()' の中に php の式が書けるようになる
      * assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']]), 'a,n,z');
      * assertSame(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]), '9');
-     * </code>
+     * ```
      *
      * @package String
      *
@@ -4627,10 +4627,10 @@ if (!isset($excluded_functions['returns']) && (!function_exists('returns') || (n
      * clone などでそのまま返す関数が欲しいことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $object = new \stdClass();
      * assertSame(returns($object), $object);
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4653,7 +4653,7 @@ if (!isset($excluded_functions['optional']) && (!function_exists('optional') || 
      * __set のような明らかに設定が意図されているものは例外が飛ぶ。
      *
      * Example:
-     * <code>
+     * ```php
      * // null を返すかもしれないステートメント
      * $getobject = function () {return null;};
      * // メソッド呼び出しは null を返す
@@ -4675,7 +4675,7 @@ if (!isset($excluded_functions['optional']) && (!function_exists('optional') || 
      *
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
      * assertSame(optional(new \ArrayObject([1]), 'stdClass')->count(), null);
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4726,14 +4726,14 @@ if (!isset($excluded_functions['throws']) && (!function_exists('throws') || (new
      * hoge() or throw などしたいことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * try {
      *     throws(new \Exception('throws'));
      * }
      * catch (\Exception $ex) {
      *     assertSame($ex->getMessage(), 'throws');
      * }
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4755,7 +4755,7 @@ if (!isset($excluded_functions['ifelse']) && (!function_exists('ifelse') || (new
      * ?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。
      *
      * Example:
-     * <code>
+     * ```php
      * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
      * $heavyfunc = function($v){return $v;};
      * // $heavyfunc(1) ?? 'default' とほぼ同義
@@ -4764,7 +4764,7 @@ if (!isset($excluded_functions['ifelse']) && (!function_exists('ifelse') || (new
      * assertSame(ifelse($heavyfunc(null), false, 'default'), $heavyfunc(null));
      * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
      * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4794,14 +4794,14 @@ if (!isset($excluded_functions['try_catch']) && (!function_exists('try_catch') |
      * 例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * // 例外が飛ばない場合は平和極まりない
      * $try = function($a, $b, $c){return [$a, $b, $c];};
      * assertSame(try_catch($try, null, 1, 2, 3), [1, 2, 3]);
      * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
      * $try = function(){throw new \Exception('tried');};
      * assertSame(try_catch($try)->getMessage(), 'tried');
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4822,7 +4822,7 @@ if (!isset($excluded_functions['try_finally']) && (!function_exists('try_finally
      * 例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $finally_count = 0;
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
@@ -4833,7 +4833,7 @@ if (!isset($excluded_functions['try_finally']) && (!function_exists('try_finally
      * $try = function(){throw new \Exception('tried');};
      * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
      * assertSame($finally_count, 2); // 呼ばれている
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4854,7 +4854,7 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
      * php < 5.5 にはないし、例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
-     * <code>
+     * ```php
      * $finally_count = 0;
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
@@ -4865,7 +4865,7 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
      * $try = function(){throw new \Exception('tried');};
      * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage(), 'tried');
      * assertSame($finally_count, 2); // 呼ばれている
-     * </code>
+     * ```
      *
      * @package Syntax
      *
@@ -4912,7 +4912,7 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (new \
      * $provider に null を与えるとキャッシュの削除となる。
      *
      * Example:
-     * <code>
+     * ```php
      * $provider = function(){return rand();};
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
      * $rand1 = cache('rand', $provider);
@@ -4922,7 +4922,7 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (new \
      * cache('rand', null);
      * $rand3 = cache('rand', $provider);
      * assertNotSame($rand1, $rand3);
-     * </code>
+     * ```
      *
      * @package Utility
      *
@@ -4961,6 +4961,70 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (new \
         return $cache[$namespace][$key];
     }
 }
+if (!isset($excluded_functions['error']) && (!function_exists('error') || (new \ReflectionFunction('error'))->isInternal())) {
+    /**
+     * エラー出力する
+     *
+     * 第1引数 $message はそれらしく文字列化されて出力される。基本的にはあらゆる型を与えて良い。
+     *
+     * 第2引数 $destination で出力対象を指定する。省略すると error_log 設定に従う。
+     * 文字列を与えるとファイル名とみなし、ファイルに追記される。
+     * ファイルを開くが、**ファイルは閉じない**。閉じ処理は php の終了処理に身を任せる。
+     * したがって閉じる必要がある場合はファイルポインタを渡す必要がある。
+     *
+     * @package Utility
+     *
+     * @param string|mixed $message 出力メッセージ
+     * @param resource|string|mixed $destination 出力先
+     * @return int 書き込んだバイト数
+     */
+    function error($message, $destination = NULL)
+    {
+        static $persistences = [];
+
+        $time = date('d-M-Y H:i:s e');
+        $content = call_user_func(stringify, $message);
+        $location = '';
+        if (!($message instanceof \Exception || $message instanceof \Throwable)) {
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
+                if (isset($trace['file'], $trace['line'])) {
+                    $location = " in {$trace['file']} on line {$trace['line']}";
+                    break;
+                }
+            }
+        }
+        $line = "[$time] PHP Log:  $content$location\n";
+
+        if ($destination === null) {
+            $destination = ini_get('error_log');
+        }
+
+        if ($destination === 'syslog') {
+            syslog(LOG_INFO, $message);
+            return strlen($line);
+        }
+
+        if (is_resource($destination)) {
+            $fp = $destination;
+        }
+        elseif (is_string($destination)) {
+            if (!isset($persistences[$destination])) {
+                $persistences[$destination] = fopen($destination, 'a');
+            }
+            $fp = $persistences[$destination];
+        }
+
+        if (empty($fp)) {
+            throw new \InvalidArgumentException('$destination must be resource or string.');
+        }
+
+        flock($fp, LOCK_EX);
+        fwrite($fp, $line);
+        flock($fp, LOCK_UN);
+
+        return strlen($line);
+    }
+}
 if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') || (new \ReflectionFunction('benchmark'))->isInternal())) {
     /**
      * 簡易ベンチマークを取る
@@ -4971,13 +5035,13 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') |
      * 表示名が与えられていない場合、それらしい名前で表示する。
      *
      * Example:
-     * <code>
+     * ```php
      * // intval と int キャストはどちらが早いか調べる
      * benchmark([
      *     'intval',
      *     'intcast' => function($v){return (int)$v;},
      * ], ['12345'], 10);
-     * </code>
+     * ```
      *
      * @package Utility
      *
@@ -5144,7 +5208,7 @@ if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') |
      * -記号は受け入れるが+記号は受け入れない。
      *
      * Example:
-     * <code>
+     * ```php
      * // 配列は要素数となる
      * assertSame(numberify([1, 2, 3]), 3);
      * // int/float は基本的にそのまま
@@ -5154,7 +5218,7 @@ if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') |
      * // 文字列は数値抽出
      * assertSame(numberify('a1b2c3'), 123);
      * assertSame(numberify('a1b2.c3', true), 12.3);
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -5219,14 +5283,14 @@ if (!isset($excluded_functions['is_primitive']) && (!function_exists('is_primiti
      * と同義（!is_array($var) && !is_object($var) とも言える）。
      *
      * Example:
-     * <code>
+     * ```php
      * assertTrue(is_primitive(null));
      * assertTrue(is_primitive(false));
      * assertTrue(is_primitive(123));
      * assertTrue(is_primitive(STDIN));
      * assertFalse(is_primitive(new \stdClass));
      * assertFalse(is_primitive(['array']));
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -5243,7 +5307,7 @@ if (!isset($excluded_functions['is_recursive']) && (!function_exists('is_recursi
      * 変数が再帰参照を含むか調べる
      *
      * Example:
-     * <code>
+     * ```php
      * // 配列の再帰
      * $array = [];
      * $array['recursive'] = &$array;
@@ -5252,7 +5316,7 @@ if (!isset($excluded_functions['is_recursive']) && (!function_exists('is_recursi
      * $object = new \stdClass();
      * $object->recursive = $object;
      * assertTrue(is_recursive($object));
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -5297,7 +5361,7 @@ if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || 
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
      *
      * Example:
-     * <code>
+     * ```php
      * // プリミティブ型は gettype と同義
      * assertSame(var_type(false), 'boolean');
      * assertSame(var_type(123), 'integer');
@@ -5306,7 +5370,7 @@ if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || 
      * // オブジェクトは型名を返す
      * assertSame(var_type(new \stdClass), '\\stdClass');
      * assertSame(var_type(new \Exception()), '\\Exception');
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -5335,7 +5399,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
      * - 配列の再帰構造の出力が異なる（Example参照）
      *
      * Example:
-     * <code>
+     * ```php
      * // 単純なエクスポート
      * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), "[
      *     'array' => [1, 2, 3],
@@ -5368,7 +5432,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
      *         ]),
      *     ]),
      * ]");
-     * </code>
+     * ```
      *
      * @package Var
      *
@@ -5507,11 +5571,11 @@ if (!isset($excluded_functions['hashvar']) && (!function_exists('hashvar') || (n
      * 名前空間指定の呼び出しは未対応。use して関数名だけで呼び出す必要がある。
      *
      * Example:
-     * <code>
+     * ```php
      * $hoge = 'HOGE';
      * $fuga = 'FUGA';
      * assertSame(hashvar($hoge, $fuga), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
-     * </code>
+     * ```
      *
      * @package Var
      *

@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script src="common.js"></script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\FileSystem)</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L477" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\FileSystem</span></h2>
+
+	<div class="description"></div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L7-L35" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::file_list()" tabindex="-1" class="structure-title ">
+                        file_list						<small>($dirname, $filter_condition = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ファイル一覧を配列で返す</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dirname</td>
+				<td class="desc">調べるディレクトリ名
+</td>
+			</tr>
+        			<tr>
+				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a><span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$filter_condition = null</td>
+				<td class="desc">フィルタ条件
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array<span class="type-separator"></span><wbr>false</td>
+			<td class="desc">ファイルの配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L37-L81" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::file_tree()" tabindex="-1" class="structure-title ">
+                        file_tree						<small>($dirname, $filter_condition = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ディレクトリ階層をツリー構造で返す</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dirname</td>
+				<td class="desc">調べるディレクトリ名
+</td>
+			</tr>
+        			<tr>
+				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a><span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$filter_condition = null</td>
+				<td class="desc">フィルタ条件
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array<span class="type-separator"></span><wbr>false</td>
+			<td class="desc">ツリー構造の配列</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L83-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::file_extension()" tabindex="-1" class="structure-title ">
+                        file_extension						<small>($filename, $extension = &#039;&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ファイルの拡張子を変更する。引数を省略すると拡張子を返す</p>
+<p>pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(file_extension('filename.ext'), 'ext');
+assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
+assertSame(file_extension('filename.ext', ''), 'filename');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$filename</td>
+				<td class="desc">調べるファイル名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$extension = &#039;&#039;</td>
+				<td class="desc">拡張子。nullや空文字なら拡張子削除
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">拡張子変換後のファイル名 or 拡張子</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L121-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::file_set_contents()" tabindex="-1" class="structure-title ">
+                        file_set_contents						<small>($filename, $data, $umask = 2)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ディレクトリも掘る file_put_contents</p>
+<p>Example:</p>
+<pre><code class="language-php">file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
+assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$filename</td>
+				<td class="desc">書き込むファイル名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$data</td>
+				<td class="desc">書き込む内容
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$umask = 2</td>
+				<td class="desc">ディレクトリを掘る際の umask
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int</td>
+			<td class="desc">書き込まれたバイト数</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L151-L173" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::mkdir_p()" tabindex="-1" class="structure-title ">
+                        mkdir_p						<small>($dirname, $umask = 2)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ディレクトリを再帰的に掘る</p>
+<p>既に存在する場合は何もしない（エラーも出さない）。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dirname</td>
+				<td class="desc">ディレクトリ名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$umask = 2</td>
+				<td class="desc">ディレクトリを掘る際の umask
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">作成したら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L175-L208" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::dirname_r()" tabindex="-1" class="structure-title ">
+                        dirname_r						<small>($path, $callback)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>コールバックが true 相当を返すまで親ディレクトリを辿り続ける</p>
+<p>コールバックには親ディレクトリが引数として渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// //tmp/a/b/file.txt を作っておく
+$tmp = sys_get_temp_dir();
+file_set_contents("$tmp/a/b/file.txt", 'hoge');
+// /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
+$callback = function($path){return realpath("$path/file.txt");};
+assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$path</td>
+				<td class="desc">パス名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callback</td>
+				<td class="desc">コールバック
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc">$callback の返り値。頂上まで辿ったら false</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L210-L242" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::path_is_absolute()" tabindex="-1" class="structure-title ">
+                        path_is_absolute						<small>($path)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>パスが絶対パスか判定する</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(path_is_absolute('/absolute/path'));
+assertFalse(path_is_absolute('relative/path'));
+// Windows 環境では下記も true になる
+if (DIRECTORY_SEPARATOR === '\\') {
+    assertTrue(path_is_absolute('\\absolute\\path'));
+    assertTrue(path_is_absolute('C:\\absolute\\path'));
+}</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$path</td>
+				<td class="desc">パス文字列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">絶対パスなら true</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L244-L274" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::path_resolve()" tabindex="-1" class="structure-title ">
+                        path_resolve						<small>(...$paths)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>パスを絶対パスに変換して正規化する</p>
+<p>可変引数で与えられた文字列群を結合して絶対パス化して返す。<br />
+出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$DS = DIRECTORY_SEPARATOR;
+assertSame(path_resolve('/absolute/path'), "{$DS}absolute{$DS}path");
+assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
+assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">...$paths</td>
+				<td class="desc">パス文字列（可変引数）
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">絶対パス</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L276-L320" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::path_normalize()" tabindex="-1" class="structure-title ">
+                        path_normalize						<small>($path)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>パスを正規化する</p>
+<p>具体的には ./ や ../ を取り除いたり連続したディレクトリ区切りをまとめたりする。<br />
+realpath ではない。のでシンボリックリンクの解決などはしない。その代わりファイルが存在しなくても使用することができる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$DS = DIRECTORY_SEPARATOR;
+assertSame(path_normalize('/path/to/something'), "{$DS}path{$DS}to{$DS}something");
+assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}something");
+assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$path</td>
+				<td class="desc">パス文字列
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">正規化されたパス</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L322-L391" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::cp_rf()" tabindex="-1" class="structure-title ">
+                        cp_rf						<small>($src, $dst)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ディレクトリのコピー</p>
+<p>$dst に / を付けると「$dst に自身をコピー」する。付けないと「$dst に中身をコピー」するという動作になる。</p>
+<p>ディレクトリではなくファイルを与えても動作する（copy とほぼ同じ動作になるが、対象にディレクトリを指定できる点が異なる）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// /tmp/src/hoge.txt, /tmp/src/dir/fuga.txt を作っておく
+$tmp = sys_get_temp_dir();
+file_set_contents("$tmp/src/hoge.txt", 'hoge');
+file_set_contents("$tmp/src/dir/fuga.txt", 'fuga');
+
+// "/" を付けないと中身コピー
+cp_rf("$tmp/src", "$tmp/dst1");
+assertStringEqualsFile("$tmp/dst1/hoge.txt", 'hoge');
+assertStringEqualsFile("$tmp/dst1/dir/fuga.txt", 'fuga');
+// "/" を付けると自身コピー
+cp_rf("$tmp/src", "$tmp/dst2/");
+assertStringEqualsFile("$tmp/dst2/src/hoge.txt", 'hoge');
+assertStringEqualsFile("$tmp/dst2/src/dir/fuga.txt", 'fuga');
+
+// $src はファイルでもいい（$dst に "/" を付けるとそのディレクトリにコピーする）
+cp_rf("$tmp/src/hoge.txt", "$tmp/dst3/");
+assertStringEqualsFile("$tmp/dst3/hoge.txt", 'hoge');
+// $dst に "/" を付けないとそのパスとしてコピー（copy と完全に同じ）
+cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
+assertStringEqualsFile("$tmp/dst4", 'hoge');</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$src</td>
+				<td class="desc">コピー元パス
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dst</td>
+				<td class="desc">コピー先パス。末尾/でディレクトリであることを明示できる
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">成功した場合に TRUE を、失敗した場合に FALSE を返します</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L393-L430" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::rm_rf()" tabindex="-1" class="structure-title ">
+                        rm_rf						<small>($dirname, $self = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>中身があっても消せる rmdir</p>
+<p>Example:</p>
+<pre><code class="language-php">mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
+rm_rf(sys_get_temp_dir() . '/new');
+assertSame(file_exists(sys_get_temp_dir() . '/new'), false);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dirname</td>
+				<td class="desc">削除するディレクトリ名
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$self = true</td>
+				<td class="desc">自分自身も含めるか。false を与えると中身だけを消す
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc">成功した場合に TRUE を、失敗した場合に FALSE を返します</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L432-L476" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\FileSystem::tmpname()" tabindex="-1" class="structure-title ">
+                        tmpname						<small>($prefix = &#039;rft&#039;, $dir = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>終了時に削除される一時ファイル名を生成する</p>
+<p>tempnam とほぼ同じで違いは下記。</p>
+<ul>
+<li>引数が逆</li>
+<li>終了時に削除される</li>
+<li>失敗時に false を返すのではなく例外を投げる</li>
+</ul></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$prefix = &#039;rft&#039;</td>
+				<td class="desc">ファイル名プレフィックス
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$dir = null</td>
+				<td class="desc">生成ディレクトリ。省略時は sys_get_temp_dir()
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc">一時ファイル名</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>
