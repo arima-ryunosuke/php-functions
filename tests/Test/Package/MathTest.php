@@ -140,11 +140,18 @@ class MathTest extends \ryunosuke\Test\AbstractTestCase
         // 1つでも OK
         $this->assertEquals(9, $random_at(9));
 
-        // 境界値テストとして種を固定して最小・最大が出るまでテストする
-        mt_srand(4);
-        $this->assertEquals(1, $random_at(1, 2, 3));
-        $this->assertEquals(3, $random_at(1, 2, 3));
-        $this->assertEquals(2, $random_at(1, 2, 3));
+        // 境界値テストとして最小・最大が出るまでテストする
+        $r = [];
+        for ($i = 0; $i < 1000; $i++) {
+            $r[$random_at(1, 2, 3)] = true;
+            if (count($r) === 3) {
+                break;
+            }
+        }
+        // 1000 回やって出ないのは何かがおかしい
+        if ($i === 1000) {
+            $this->fail('invisible [1, 2, 3]');
+        }
     }
 
     function test_probability()

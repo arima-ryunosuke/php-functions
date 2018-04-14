@@ -316,6 +316,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 
         $wd = sys_get_temp_dir() . '/tmpname';
         FileSystem::mkdir_p(sys_get_temp_dir() . '/tmpname');
+        FileSystem::rm_rf(sys_get_temp_dir() . '/tmpname', false);
 
         $list = [
             FileSystem::tmpname(null, $wd),
