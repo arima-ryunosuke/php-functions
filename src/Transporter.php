@@ -77,7 +77,9 @@ class Transporter
                 $content = file_get_contents($fn);
                 $content = str_replace('namespace ryunosuke\\Functions\\Package', "/** Don't touch this code. This is auto generated. */\n
 namespace $namespace", $content);
-                file_put_contents($source . '/' . basename($fn), $content);
+                $path = $source . '/' . basename($fn);
+                file_put_contents($path, $content);
+                touch($path, filemtime($fn));
             }
         }
 
