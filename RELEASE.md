@@ -10,6 +10,10 @@
 
 - no todo
 
+## 1.1.2
+
+- [feature][Utility] error を追加
+
 ## 1.1.1
 
 - [change][ClassObj] detect_namespace がファイル名を受けられるように修正
