@@ -10,6 +10,18 @@
 
 - no todo
 
+## 1.1.3
+
+- [fixbug][Strings] str_between を修正
+- [feature][Arrays] array_each を追加
+- [feature][Funchand] by_builtin を追加
+- [feature][Strings] preg_splice を追加
+- [feature][Strings] multiexplode を追加
+- [feature][Strings] str_putcsv の複数行対応
+- [feature][Vars] is_iterable を追加
+- [feature][Vars] is_countable を追加
+- [feature][Transporter] polyfill で組み込み関数のチェックを無効化できるように変更
+
 ## 1.1.2
 
 - [feature][Utility] error を追加
