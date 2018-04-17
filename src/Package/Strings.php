@@ -62,6 +62,50 @@ class Strings
     }
 
     /**
+     * explode の配列対応と $limit の挙動を変えたもの
+     *
+     * $delimiter には配列が使える。いわゆる「複数文字列での分割」の動作になる。
+     *
+     * $limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。
+     * 素の explode の負数 $limit の動作が微妙に気に入らない（implode 正数と対称性がない）ので再実装。
+     *
+     * Example:
+     * ```php
+     * // 配列を与えると複数文字列での分割
+     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d'), ['a', 'b', 'c', 'd']);
+     * // 負数を与えると前詰め
+     * assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
+     * // もちろん上記2つは共存できる
+     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b,c', 'd']);
+     * ```
+     *
+     * @package String
+     *
+     * @param string|array $delimiter 分割文字列。配列可
+     * @param string $string 対象文字列
+     * @param int $limit 分割数
+     * @return array 分割された配列
+     */
+    public static function multiexplode($delimiter, $string, $limit = PHP_INT_MAX)
+    {
+        if (is_array($delimiter)) {
+            $representative = reset($delimiter);
+            $string = str_replace($delimiter, $representative, $string);
+            $delimiter = $representative;
+        }
+
+        if ($limit < 0) {
+            $parts = explode($delimiter, $string);
+            $sub = array_splice($parts, 0, $limit + 1);
+            if ($sub) {
+                array_unshift($parts, implode($delimiter, $sub));
+            }
+            return $parts;
+        }
+        return explode($delimiter, $string, $limit);
+    }
+
+    /**
      * 文字列比較の関数版
      *
      * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。

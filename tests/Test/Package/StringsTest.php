@@ -35,6 +35,29 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['A', 'B', 'C'], $split_noempty(',', 'A,,B,,,C'));
     }
 
+    function test_multiexplode()
+    {
+        $multiexplode = multiexplode;
+        $target = 'one|two|three|four';
+
+        // 配列だと複数文字列で分割
+        $this->assertEquals(['one', 'two', 'three', 'four'], $multiexplode(['|'], $target));
+        $this->assertEquals(['', 'ne|tw', '|three|f', 'ur'], $multiexplode(['o'], $target));
+        $this->assertEquals(['', 'ne', 'tw', '', 'three', 'f', 'ur',], $multiexplode(['|', 'o'], $target));
+
+        // 負数は前詰めで返す
+        $this->assertEquals(['one|two|three|four'], $multiexplode('|', $target, -0));
+        $this->assertEquals(['one|two|three', 'four'], $multiexplode('|', $target, -2));
+        $this->assertEquals(['one|two', 'three', 'four'], $multiexplode('|', $target, -3));
+        $this->assertEquals(['one', 'two', 'three', 'four'], $multiexplode('|', $target, -999));
+
+        // ただの文字列・正数の挙動は素の explode と変わらない
+        $this->assertEquals(['one|two|three|four'], $multiexplode('|', $target, 0));
+        $this->assertEquals(['one', 'two|three|four'], $multiexplode('|', $target, 2));
+        $this->assertEquals(['one', 'two', 'three|four'], $multiexplode('|', $target, 3));
+        $this->assertEquals(['one', 'two', 'three', 'four'], $multiexplode('|', $target, 999));
+    }
+
     function test_str_equals()
     {
         $str_equals = str_equals;
