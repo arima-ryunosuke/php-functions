@@ -4,11 +4,27 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
-	<link rel="stylesheet" type="text/css" href="common.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
-	<script src="common.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function (cachekey) {
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+            });
+        })(window.parent.CACHEKEY || 'nocache');
+	</script>
     </head>
 <body>
 <a id="anchor" href="./" style="display: none"></a>
@@ -25,7 +41,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L477" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L493" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\FileSystem</span></h2>
@@ -53,27 +69,39 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L7-L35" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L7-L50" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_list()" tabindex="-1" class="structure-title ">
                         file_list						<small>($dirname, $filter_condition = null)</small>
 					</h4>
 					<div class="inner-item">
-						<div class="description"><p>ファイル一覧を配列で返す</p></div>
+						<div class="description"><p>ファイル一覧を配列で返す</p>
+<p>Example:</p>
+<pre><code class="language-php">// 適当にファイルを用意
+$DS = DIRECTORY_SEPARATOR;
+$tmp = sys_get_temp_dir() . "{$DS}file_list";
+rm_rf($tmp, false);
+file_set_contents("$tmp/a.txt", 'a');
+file_set_contents("$tmp/dir/b.txt", 'b');
+file_set_contents("$tmp/dir/dir/c.txt", 'c');
+// ファイル一覧が取得できる
+assertEquals(file_list($tmp), [
+    "$tmp{$DS}a.txt",
+    "$tmp{$DS}dir{$DS}b.txt",
+    "$tmp{$DS}dir{$DS}dir{$DS}c.txt",
+]);</code></pre></div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dirname</td>
-				<td class="desc">調べるディレクトリ名
-</td>
+				<td class="desc"><p>調べるディレクトリ名</p></td>
 			</tr>
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a><span class="type-separator"></span><wbr>array</td>
 				<td class="rest">$filter_condition = null</td>
-				<td class="desc">フィルタ条件
-</td>
+				<td class="desc"><p>フィルタ条件</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -82,7 +110,7 @@
 		<tbody>
 		<tr>
 			<td class="type">array<span class="type-separator"></span><wbr>false</td>
-			<td class="desc">ファイルの配列</td>
+			<td class="desc"><p>ファイルの配列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -104,27 +132,45 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L37-L81" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L52-L117" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_tree()" tabindex="-1" class="structure-title ">
                         file_tree						<small>($dirname, $filter_condition = null)</small>
 					</h4>
 					<div class="inner-item">
-						<div class="description"><p>ディレクトリ階層をツリー構造で返す</p></div>
+						<div class="description"><p>ディレクトリ階層をツリー構造で返す</p>
+<p>Example:</p>
+<pre><code class="language-php">// 適当にファイルを用意
+$DS = DIRECTORY_SEPARATOR;
+$tmp = sys_get_temp_dir() . "{$DS}file_tree";
+rm_rf($tmp, false);
+file_set_contents("$tmp/a.txt", 'a');
+file_set_contents("$tmp/dir/b.txt", 'b');
+file_set_contents("$tmp/dir/dir/c.txt", 'c');
+// ファイルツリーが取得できる
+assertEquals(file_tree($tmp), [
+    'file_tree' =&gt; [
+        'a.txt' =&gt; "$tmp{$DS}a.txt",
+        'dir'   =&gt; [
+            'b.txt' =&gt; "$tmp{$DS}dir{$DS}b.txt",
+            'dir'   =&gt; [
+                'c.txt' =&gt; "$tmp{$DS}dir{$DS}dir{$DS}c.txt",
+            ],
+        ],
+    ],
+]);</code></pre></div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dirname</td>
-				<td class="desc">調べるディレクトリ名
-</td>
+				<td class="desc"><p>調べるディレクトリ名</p></td>
 			</tr>
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a><span class="type-separator"></span><wbr>array</td>
 				<td class="rest">$filter_condition = null</td>
-				<td class="desc">フィルタ条件
-</td>
+				<td class="desc"><p>フィルタ条件</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -133,7 +179,7 @@
 		<tbody>
 		<tr>
 			<td class="type">array<span class="type-separator"></span><wbr>false</td>
-			<td class="desc">ツリー構造の配列</td>
+			<td class="desc"><p>ツリー構造の配列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -155,7 +201,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L83-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L119-L153" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_extension()" tabindex="-1" class="structure-title ">
                         file_extension						<small>($filename, $extension = &#039;&#039;)</small>
@@ -173,14 +219,12 @@ assertSame(file_extension('filename.ext', ''), 'filename');</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$filename</td>
-				<td class="desc">調べるファイル名
-</td>
+				<td class="desc"><p>調べるファイル名</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$extension = &#039;&#039;</td>
-				<td class="desc">拡張子。nullや空文字なら拡張子削除
-</td>
+				<td class="desc"><p>拡張子。nullや空文字なら拡張子削除</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -189,7 +233,7 @@ assertSame(file_extension('filename.ext', ''), 'filename');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">拡張子変換後のファイル名 or 拡張子</td>
+			<td class="desc"><p>拡張子変換後のファイル名 or 拡張子</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -211,7 +255,7 @@ assertSame(file_extension('filename.ext', ''), 'filename');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L121-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L155-L181" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_set_contents()" tabindex="-1" class="structure-title ">
                         file_set_contents						<small>($filename, $data, $umask = 2)</small>
@@ -227,20 +271,17 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$filename</td>
-				<td class="desc">書き込むファイル名
-</td>
+				<td class="desc"><p>書き込むファイル名</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$data</td>
-				<td class="desc">書き込む内容
-</td>
+				<td class="desc"><p>書き込む内容</p></td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$umask = 2</td>
-				<td class="desc">ディレクトリを掘る際の umask
-</td>
+				<td class="desc"><p>ディレクトリを掘る際の umask</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -249,7 +290,7 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
 		<tbody>
 		<tr>
 			<td class="type">int</td>
-			<td class="desc">書き込まれたバイト数</td>
+			<td class="desc"><p>書き込まれたバイト数</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -271,7 +312,7 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L151-L173" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L183-L203" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::mkdir_p()" tabindex="-1" class="structure-title ">
                         mkdir_p						<small>($dirname, $umask = 2)</small>
@@ -285,14 +326,12 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dirname</td>
-				<td class="desc">ディレクトリ名
-</td>
+				<td class="desc"><p>ディレクトリ名</p></td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$umask = 2</td>
-				<td class="desc">ディレクトリを掘る際の umask
-</td>
+				<td class="desc"><p>ディレクトリを掘る際の umask</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -301,7 +340,7 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">作成したら true</td>
+			<td class="desc"><p>作成したら true</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -323,7 +362,7 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L175-L208" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L205-L236" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::dirname_r()" tabindex="-1" class="structure-title ">
                         dirname_r						<small>($path, $callback)</small>
@@ -344,14 +383,12 @@ assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$path</td>
-				<td class="desc">パス名
-</td>
+				<td class="desc"><p>パス名</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callback</td>
-				<td class="desc">コールバック
-</td>
+				<td class="desc"><p>コールバック</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -360,7 +397,7 @@ assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc">$callback の返り値。頂上まで辿ったら false</td>
+			<td class="desc"><p>$callback の返り値。頂上まで辿ったら false</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -382,7 +419,7 @@ assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L210-L242" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L238-L268" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::path_is_absolute()" tabindex="-1" class="structure-title ">
                         path_is_absolute						<small>($path)</small>
@@ -403,8 +440,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$path</td>
-				<td class="desc">パス文字列
-</td>
+				<td class="desc"><p>パス文字列</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -413,7 +449,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">絶対パスなら true</td>
+			<td class="desc"><p>絶対パスなら true</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -435,7 +471,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L244-L274" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L270-L298" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::path_resolve()" tabindex="-1" class="structure-title ">
                         path_resolve						<small>(...$paths)</small>
@@ -455,8 +491,7 @@ assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}ab
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$paths</td>
-				<td class="desc">パス文字列（可変引数）
-</td>
+				<td class="desc"><p>パス文字列（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -465,7 +500,7 @@ assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}ab
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">絶対パス</td>
+			<td class="desc"><p>絶対パス</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -487,7 +522,7 @@ assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}ab
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L276-L320" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L300-L342" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::path_normalize()" tabindex="-1" class="structure-title ">
                         path_normalize						<small>($path)</small>
@@ -507,8 +542,7 @@ assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}cu
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$path</td>
-				<td class="desc">パス文字列
-</td>
+				<td class="desc"><p>パス文字列</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -517,7 +551,7 @@ assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}cu
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">正規化されたパス</td>
+			<td class="desc"><p>正規化されたパス</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -539,7 +573,7 @@ assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}cu
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L322-L391" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L344-L411" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::cp_rf()" tabindex="-1" class="structure-title ">
                         cp_rf						<small>($src, $dst)</small>
@@ -575,14 +609,12 @@ assertStringEqualsFile("$tmp/dst4", 'hoge');</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$src</td>
-				<td class="desc">コピー元パス
-</td>
+				<td class="desc"><p>コピー元パス</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dst</td>
-				<td class="desc">コピー先パス。末尾/でディレクトリであることを明示できる
-</td>
+				<td class="desc"><p>コピー先パス。末尾/でディレクトリであることを明示できる</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -591,7 +623,7 @@ assertStringEqualsFile("$tmp/dst4", 'hoge');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">成功した場合に TRUE を、失敗した場合に FALSE を返します</td>
+			<td class="desc"><p>成功した場合に TRUE を、失敗した場合に FALSE を返します</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -613,7 +645,7 @@ assertStringEqualsFile("$tmp/dst4", 'hoge');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L393-L430" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L413-L448" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::rm_rf()" tabindex="-1" class="structure-title ">
                         rm_rf						<small>($dirname, $self = true)</small>
@@ -630,14 +662,12 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dirname</td>
-				<td class="desc">削除するディレクトリ名
-</td>
+				<td class="desc"><p>削除するディレクトリ名</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$self = true</td>
-				<td class="desc">自分自身も含めるか。false を与えると中身だけを消す
-</td>
+				<td class="desc"><p>自分自身も含めるか。false を与えると中身だけを消す</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -646,7 +676,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">成功した場合に TRUE を、失敗した場合に FALSE を返します</td>
+			<td class="desc"><p>成功した場合に TRUE を、失敗した場合に FALSE を返します</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -668,7 +698,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L432-L476" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L450-L492" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::tmpname()" tabindex="-1" class="structure-title ">
                         tmpname						<small>($prefix = &#039;rft&#039;, $dir = null)</small>
@@ -687,14 +717,12 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$prefix = &#039;rft&#039;</td>
-				<td class="desc">ファイル名プレフィックス
-</td>
+				<td class="desc"><p>ファイル名プレフィックス</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dir = null</td>
-				<td class="desc">生成ディレクトリ。省略時は sys_get_temp_dir()
-</td>
+				<td class="desc"><p>生成ディレクトリ。省略時は sys_get_temp_dir()</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -703,7 +731,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">一時ファイル名</td>
+			<td class="desc"><p>一時ファイル名</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>

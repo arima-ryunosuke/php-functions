@@ -1,7 +1,19 @@
+/* print */
+
+@media print {
+    a[href]:after {
+        content: "" !important;
+    }
+
+    abbr[title]:after {
+        content: "" !important;
+    }
+}
+
 /* elements */
 
 html {
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: scroll;
 }
 
@@ -12,35 +24,8 @@ body {
 div.nheader {
     position: sticky;
     top: 30px;
-    background-color: #F2F2F2;
+    background-color: #fff;
     z-index: 9990;
-}
-
-@-webkit-keyframes anchor {
-    0% {
-        padding-top: 30px;
-        margin-top: -30px;
-    }
-    100% {
-        padding-top: 0;
-        margin-top: 0;
-    }
-}
-
-@keyframes anchor {
-    0% {
-        padding-top: 30px;
-        margin-top: -30px;
-    }
-    100% {
-        padding-top: 0;
-        margin-top: 0;
-    }
-}
-
-a[id]:target, [tabindex]:target {
-    -webkit-animation: anchor 0.01s;
-    animation: anchor 0.01s;
 }
 
 a[id]:focus, [tabindex]:focus {
@@ -137,11 +122,12 @@ blockquote {
     border-left: 5px solid #ddd;
 }
 
-ul {
+ul,
+ol {
     padding: 0;
 }
 
-ul li {
+ul > li {
     list-style: none;
 }
 
@@ -179,33 +165,32 @@ ul li {
 }
 
 .has-indent {
-    margin-left: 16px;
+    margin-left: 14px;
 }
 
 .indent {
     position: relative;
-    padding-left: 0.15em;
 }
 
 .indent:before {
     content: "";
     position: absolute;
-    top: 0.2em;
-    left: -0.6em;
-    height: calc(100% + 0.6em);
+    top: 0;
+    left: -0.5em;
+    height: 100%;
     border-left: 1px solid #aaa;
 }
 
 .indent:last-child:before {
-    height: 0.6em;
+    height: 1rem;
 }
 
 .indent:after {
     content: "";
     position: absolute;
-    top: 0.7em;
-    left: -0.6em;
-    width: 0.6em;
+    top: 1rem;
+    left: -0.5em;
+    width: 0.5em;
     border-bottom: 1px solid #aaa;
 }
 
@@ -233,11 +218,6 @@ ul li {
 
 .faint {
     opacity: 0.65;
-}
-
-.spacer {
-    margin-bottom: 4px;
-    margin-top: 4px;
 }
 
 .type-separator:before {
@@ -295,9 +275,51 @@ ul li {
     margin-bottom: 0.75em;
 }
 
-.description ul li {
+.description h1,
+.description h2,
+.description h3,
+.description h4,
+.description h5,
+.description h6 {
+    position: static;
+    color: #592842;
+    background: #eef3ff;
+    margin: 2px 0;
+    padding: 4px;
+    border: none;
+    font-weight: bold;
+}
+
+.description li {
     margin-left: 2.0rem;
+}
+
+.description ul > li {
     list-style: disc;
+}
+
+.description ol > li {
+    list-style: decimal;
+}
+
+.description ol > li > ol > li {
+    list-style: lower-alpha;
+}
+
+.description ol > li > ol > li > ol > li {
+    list-style: lower-roman;
+}
+
+.description table.table {
+    table-layout: auto;
+}
+
+.description table.table > thead {
+    white-space: nowrap;
+}
+
+.description code {
+    font-size: 12px;
 }
 
 .using li {
@@ -380,6 +402,10 @@ td.rest {
     padding: 2px 8px 0;
     border-top: none;
     border-bottom: 1px dashed #ddd;
+}
+
+.glyphicon {
+    vertical-align: text-top;
 }
 
 .label-icon {

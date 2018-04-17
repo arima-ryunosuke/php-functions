@@ -4,11 +4,27 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
-	<link rel="stylesheet" type="text/css" href="common.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
-	<script src="common.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function (cachekey) {
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+            });
+        })(window.parent.CACHEKEY || 'nocache');
+	</script>
     </head>
 <body>
 <a id="anchor" href="./" style="display: none"></a>
@@ -25,7 +41,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L611" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L633" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Funchand</span></h2>
@@ -53,7 +69,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L7-L63" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L7-L61" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::delegate()" tabindex="-1" class="structure-title ">
                         delegate						<small>($invoker, $callable, $arity = null)</small>
@@ -67,20 +83,17 @@
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
 				<td class="rest">$invoker</td>
-				<td class="desc">クロージャを実行するためのクロージャ（実処理）
-</td>
+				<td class="desc"><p>クロージャを実行するためのクロージャ（実処理）</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">最終的に実行したいクロージャ
-</td>
+				<td class="desc"><p>最終的に実行したいクロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$arity = null</td>
-				<td class="desc">引数の数
-</td>
+				<td class="desc"><p>引数の数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -89,7 +102,7 @@
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">$callable を実行するクロージャ</td>
+			<td class="desc"><p>$callable を実行するクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -111,7 +124,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L65-L86" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L63-L82" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::nbind()" tabindex="-1" class="structure-title ">
                         nbind						<small>($callable, $n, ...$variadic)</small>
@@ -127,20 +140,17 @@ assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">対象 callable
-</td>
+				<td class="desc"><p>対象 callable</p></td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$n</td>
-				<td class="desc">挿入する引数位置
-</td>
+				<td class="desc"><p>挿入する引数位置</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">本来の引数（可変引数）
-</td>
+				<td class="desc"><p>本来の引数（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -149,7 +159,7 @@ assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">束縛したクロージャ</td>
+			<td class="desc"><p>束縛したクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -171,7 +181,7 @@ assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L88-L106" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L84-L100" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::lbind()" tabindex="-1" class="structure-title ">
                         lbind						<small>($callable, ...$variadic)</small>
@@ -187,14 +197,12 @@ assertSame($bind('N', 'M'), 'NM');</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">対象 callable
-</td>
+				<td class="desc"><p>対象 callable</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">本来の引数（可変引数）
-</td>
+				<td class="desc"><p>本来の引数（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -203,7 +211,7 @@ assertSame($bind('N', 'M'), 'NM');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">束縛したクロージャ</td>
+			<td class="desc"><p>束縛したクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -225,7 +233,7 @@ assertSame($bind('N', 'M'), 'NM');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L108-L126" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L102-L118" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::rbind()" tabindex="-1" class="structure-title ">
                         rbind						<small>($callable, ...$variadic)</small>
@@ -241,14 +249,12 @@ assertSame($bind('%s%s', 'N'), 'NX');</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">対象 callable
-</td>
+				<td class="desc"><p>対象 callable</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">本来の引数（可変引数）
-</td>
+				<td class="desc"><p>本来の引数（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -257,7 +263,7 @@ assertSame($bind('%s%s', 'N'), 'NX');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">束縛したクロージャ</td>
+			<td class="desc"><p>束縛したクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -279,7 +285,7 @@ assertSame($bind('%s%s', 'N'), 'NX');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L128-L198" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L120-L188" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::composite()" tabindex="-1" class="structure-title ">
                         composite						<small>($arrayalbe = true, ...$variadic)</small>
@@ -318,14 +324,12 @@ assertSame($composite('hoge'), 'EGOHegoh-erp');</code></pre></div>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$arrayalbe = true</td>
-				<td class="desc">呼び出しチェーンを配列として扱うか
-</td>
+				<td class="desc"><p>呼び出しチェーンを配列として扱うか</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable[]</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">合成する関数（可変引数）
-</td>
+				<td class="desc"><p>合成する関数（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -334,7 +338,7 @@ assertSame($composite('hoge'), 'EGOHegoh-erp');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">合成関数</td>
+			<td class="desc"><p>合成関数</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -356,7 +360,7 @@ assertSame($composite('hoge'), 'EGOHegoh-erp');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L200-L225" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L190-L213" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::return_arg()" tabindex="-1" class="structure-title ">
                         return_arg						<small>($n)</small>
@@ -374,8 +378,7 @@ assertSame($arg1('dummy', 'hoge'), 'hoge');</code></pre></div>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$n</td>
-				<td class="desc">$n 番目の引数
-</td>
+				<td class="desc"><p>$n 番目の引数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -384,7 +387,7 @@ assertSame($arg1('dummy', 'hoge'), 'hoge');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">$n 番目の引数をそのまま返すクロージャ</td>
+			<td class="desc"><p>$n 番目の引数をそのまま返すクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -406,7 +409,7 @@ assertSame($arg1('dummy', 'hoge'), 'hoge');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L227-L247" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L215-L233" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::not_func()" tabindex="-1" class="structure-title ">
                         not_func						<small>($callable)</small>
@@ -423,8 +426,7 @@ assertTrue($not_strlen(''));</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">対象 callable
-</td>
+				<td class="desc"><p>対象 callable</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -433,7 +435,7 @@ assertTrue($not_strlen(''));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">新しいクロージャ</td>
+			<td class="desc"><p>新しいクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -455,7 +457,7 @@ assertTrue($not_strlen(''));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L249-L276" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L235-L260" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::eval_func()" tabindex="-1" class="structure-title ">
                         eval_func						<small>($expression, ...$variadic)</small>
@@ -473,14 +475,12 @@ assertSame($evalfunc(1, 2, 3), 6);</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$expression</td>
-				<td class="desc">eval コード
-</td>
+				<td class="desc"><p>eval コード</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">引数名（可変引数）
-</td>
+				<td class="desc"><p>引数名（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -489,7 +489,7 @@ assertSame($evalfunc(1, 2, 3), 6);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">新しいクロージャ</td>
+			<td class="desc"><p>新しいクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -511,7 +511,7 @@ assertSame($evalfunc(1, 2, 3), 6);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L278-L311" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L262-L293" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::reflect_callable()" tabindex="-1" class="structure-title ">
                         reflect_callable						<small>($callable)</small>
@@ -527,8 +527,7 @@ assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));<
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">対象 callable
-</td>
+				<td class="desc"><p>対象 callable</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -537,7 +536,7 @@ assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));<
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.reflectionfunction.php" class="fqsen" target="_blank">\ReflectionFunction</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionmethod.php" class="fqsen" target="_blank">\ReflectionMethod</a></td>
-			<td class="desc">リフレクションインスタンス</td>
+			<td class="desc"><p>リフレクションインスタンス</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -559,7 +558,7 @@ assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));<
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L313-L347" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L295-L327" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::closurize()" tabindex="-1" class="structure-title ">
                         closurize						<small>($callable)</small>
@@ -577,8 +576,7 @@ assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');</code></pre></di
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">変換する callable
-</td>
+				<td class="desc"><p>変換する callable</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -587,7 +585,7 @@ assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');</code></pre></di
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">変換したクロージャ</td>
+			<td class="desc"><p>変換したクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -609,7 +607,7 @@ assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');</code></pre></di
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L349-L386" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L329-L361" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::call_safely()" tabindex="-1" class="structure-title ">
                         call_safely						<small>($callback, ...$variadic)</small>
@@ -629,14 +627,12 @@ catch (\Exception $ex) {
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callback</td>
-				<td class="desc">実行するコールバック
-</td>
+				<td class="desc"><p>実行するコールバック</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">$callback に渡される引数（可変引数）
-</td>
+				<td class="desc"><p>$callback に渡される引数（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -645,7 +641,7 @@ catch (\Exception $ex) {
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc">$callback の返り値</td>
+			<td class="desc"><p>$callback の返り値</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -667,7 +663,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L388-L413" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L363-L385" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::ob_capture()" tabindex="-1" class="structure-title ">
                         ob_capture						<small>($callback, ...$variadic)</small>
@@ -682,14 +678,12 @@ catch (\Exception $ex) {
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callback</td>
-				<td class="desc">実行するコールバック
-</td>
+				<td class="desc"><p>実行するコールバック</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">$callback に渡される引数（可変引数）
-</td>
+				<td class="desc"><p>$callback に渡される引数（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -698,7 +692,7 @@ catch (\Exception $ex) {
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">オフスリーンバッファの文字列</td>
+			<td class="desc"><p>オフスリーンバッファの文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -720,7 +714,69 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L415-L468" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L387-L443" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::by_builtin()" tabindex="-1" class="structure-title ">
+                        by_builtin						<small>($class, $function)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す</p>
+<p>Countable#count, Serializable#serialize のように「インターフェースのメソッド名」と「ネイティブ関数名」が一致している必要がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">class CountClass implements \Countable
+{
+    public function count() {
+        // count 経由なら 1 を、メソッド経由なら 0 を返す
+        return (int) by_builtin($this, 'count');
+    }
+}
+$counter = new CountClass();
+assertSame(count($counter), 1);
+assertSame($counter-&gt;count(), 0);</code></pre>
+<p>のように判定できる。</p></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">object<span class="type-separator"></span><wbr>string</td>
+				<td class="rest">$class</td>
+				<td class="desc"></td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$function</td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc"><p>ネイティブなら true</p></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L445-L496" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::parameter_length()" tabindex="-1" class="structure-title ">
                         parameter_length						<small>($callable, $require_only = false, $thought_variadic = false)</small>
@@ -741,20 +797,17 @@ assertSame(parameter_length('trim', true), 1);</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc">対象 callable
-</td>
+				<td class="desc"><p>対象 callable</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$require_only = false</td>
-				<td class="desc">true を渡すと必須パラメータの数を返す
-</td>
+				<td class="desc"><p>true を渡すと必須パラメータの数を返す</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$thought_variadic = false</td>
-				<td class="desc">可変引数を考慮するか。 true を渡すと可変引数の場合に無限長を返す
-</td>
+				<td class="desc"><p>可変引数を考慮するか。 true を渡すと可変引数の場合に無限長を返す</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -763,7 +816,7 @@ assertSame(parameter_length('trim', true), 1);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">int</td>
-			<td class="desc">引数の数</td>
+			<td class="desc"><p>引数の数</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -785,7 +838,7 @@ assertSame(parameter_length('trim', true), 1);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L470-L482" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L498-L508" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_shorten()" tabindex="-1" class="structure-title ">
                         function_shorten						<small>($function)</small>
@@ -798,8 +851,7 @@ assertSame(parameter_length('trim', true), 1);</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$function</td>
-				<td class="desc">短くする関数名
-</td>
+				<td class="desc"><p>短くする関数名</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -808,7 +860,7 @@ assertSame(parameter_length('trim', true), 1);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">短い関数名</td>
+			<td class="desc"><p>短い関数名</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -830,7 +882,7 @@ assertSame(parameter_length('trim', true), 1);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L484-L518" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L510-L542" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" tabindex="-1" class="structure-title ">
                         func_user_func_array						<small>($callback)</small>
@@ -851,8 +903,7 @@ assertSame($strlen('abc', null), 3);</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callback</td>
-				<td class="desc">呼び出すクロージャ
-</td>
+				<td class="desc"><p>呼び出すクロージャ</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -861,7 +912,7 @@ assertSame($strlen('abc', null), 3);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
-			<td class="desc">引数ぴったりで呼び出すクロージャ</td>
+			<td class="desc"><p>引数ぴったりで呼び出すクロージャ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -883,7 +934,7 @@ assertSame($strlen('abc', null), 3);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L520-L610" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L544-L632" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_alias()" tabindex="-1" class="structure-title ">
                         function_alias						<small>($original, $alias, $cachedir = false)</small>
@@ -903,19 +954,17 @@ assertSame(trim_alias(' abc '), 'abc');</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$original</td>
-				<td class="desc">元となる関数
-</td>
+				<td class="desc"><p>元となる関数</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$alias</td>
-				<td class="desc">関数のエイリアス名
-</td>
+				<td class="desc"><p>関数のエイリアス名</p></td>
 			</tr>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>bool</td>
 				<td class="rest">$cachedir = false</td>
-				<td class="desc">キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す</td>
+				<td class="desc"><p>キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す</p></td>
 			</tr>
         		</tbody>
 	</table>

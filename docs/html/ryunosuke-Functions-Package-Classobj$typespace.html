@@ -4,11 +4,27 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
-	<link rel="stylesheet" type="text/css" href="common.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
-	<script src="common.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function (cachekey) {
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+            });
+        })(window.parent.CACHEKEY || 'nocache');
+	</script>
     </head>
 <body>
 <a id="anchor" href="./" style="display: none"></a>
@@ -25,7 +41,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L238" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L226" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -53,7 +69,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L7-L37" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L7-L35" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::stdclass()" tabindex="-1" class="structure-title ">
                         stdclass						<small>($fields = [])</small>
@@ -76,8 +92,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
 				<td class="rest">$fields = []</td>
-				<td class="desc">フィールド配列
-</td>
+				<td class="desc"><p>フィールド配列</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -86,7 +101,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></td>
-			<td class="desc">生成した stdClass インスタンス</td>
+			<td class="desc"><p>生成した stdClass インスタンス</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -108,7 +123,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L39-L91" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L37-L87" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
                         detect_namespace						<small>($location)</small>
@@ -125,8 +140,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$location</td>
-				<td class="desc">配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
-</td>
+				<td class="desc"><p>配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -135,7 +149,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">名前空間</td>
+			<td class="desc"><p>名前空間</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -157,7 +171,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L93-L125" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L89-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader						<small>($startdir = null)</small>
@@ -173,8 +187,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$startdir = null</td>
-				<td class="desc">高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
-</td>
+				<td class="desc"><p>高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -183,7 +196,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type"><a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></td>
-			<td class="desc">クラスローダ</td>
+			<td class="desc"><p>クラスローダ</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -205,7 +218,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L127-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L121-L141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace						<small>($class)</small>
@@ -220,8 +233,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>object</td>
 				<td class="rest">$class</td>
-				<td class="desc">対象クラス・オブジェクト
-</td>
+				<td class="desc"><p>対象クラス・オブジェクト</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -230,7 +242,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">クラスの名前空間</td>
+			<td class="desc"><p>クラスの名前空間</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -252,7 +264,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L151-L172" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L143-L162" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten						<small>($class)</small>
@@ -267,8 +279,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>object</td>
 				<td class="rest">$class</td>
-				<td class="desc">対象クラス・オブジェクト
-</td>
+				<td class="desc"><p>対象クラス・オブジェクト</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -277,7 +288,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">クラスの短い名前</td>
+			<td class="desc"><p>クラスの短い名前</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -299,7 +310,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L174-L237" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L164-L225" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace						<small>($class, $register, $dirname = null)</small>
@@ -322,19 +333,17 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$class</td>
-				<td class="desc">対象クラス名
-</td>
+				<td class="desc"><p>対象クラス名</p></td>
 			</tr>
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
 				<td class="rest">$register</td>
-				<td class="desc">置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ
-</td>
+				<td class="desc"><p>置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dirname = null</td>
-				<td class="desc">一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う</td>
+				<td class="desc"><p>一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う</p></td>
 			</tr>
         		</tbody>
 	</table>

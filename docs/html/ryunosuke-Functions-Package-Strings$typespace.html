@@ -4,11 +4,27 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
-	<link rel="stylesheet" type="text/css" href="common.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
-	<script src="common.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function (cachekey) {
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+            });
+        })(window.parent.CACHEKEY || 'nocache');
+	</script>
     </head>
 <body>
 <a id="anchor" href="./" style="display: none"></a>
@@ -25,7 +41,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L711" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L758" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Strings</span></h2>
@@ -53,7 +69,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L7-L23" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L7-L21" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::strcat()" tabindex="-1" class="structure-title ">
                         strcat						<small>(...$variadic)</small>
@@ -68,8 +84,7 @@
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">結合する文字列（可変引数）
-</td>
+				<td class="desc"><p>結合する文字列（可変引数）</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -78,7 +93,7 @@
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">結合した文字列</td>
+			<td class="desc"><p>結合した文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -100,7 +115,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L25-L62" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L23-L58" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::split_noempty()" tabindex="-1" class="structure-title ">
                         split_noempty						<small>($delimiter, $string, $trimchars = true)</small>
@@ -123,20 +138,17 @@ assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$delimiter</td>
-				<td class="desc">区切り文字
-</td>
+				<td class="desc"><p>区切り文字</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">対象文字
-</td>
+				<td class="desc"><p>対象文字</p></td>
 			</tr>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>bool</td>
 				<td class="rest">$trimchars = true</td>
-				<td class="desc">指定した文字を trim する。true を指定すると trim する
-</td>
+				<td class="desc"><p>指定した文字を trim する。true を指定すると trim する</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -145,7 +157,7 @@ assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']
 		<tbody>
 		<tr>
 			<td class="type">array</td>
-			<td class="desc">指定文字で分割して空文字を除いた配列</td>
+			<td class="desc"><p>指定文字で分割して空文字を除いた配列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -167,7 +179,71 @@ assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L64-L103" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L60-L100" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::multiexplode()" tabindex="-1" class="structure-title ">
+                        multiexplode						<small>($delimiter, $string, $limit = ryunosuke\Functions\Package\PHP_INT_MAX)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>explode の配列対応と $limit の挙動を変えたもの</p>
+<p>$delimiter には配列が使える。いわゆる「複数文字列での分割」の動作になる。</p>
+<p>$limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。<br />
+素の explode の負数 $limit の動作が微妙に気に入らない（implode 正数と対称性がない）ので再実装。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 配列を与えると複数文字列での分割
+assertSame(multiexplode([',', ' ', '|'], 'a,b c|d'), ['a', 'b', 'c', 'd']);
+// 負数を与えると前詰め
+assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
+// もちろん上記2つは共存できる
+assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b,c', 'd']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$delimiter</td>
+				<td class="desc"><p>分割文字列。配列可</p></td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc"><p>対象文字列</p></td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$limit = ryunosuke\Functions\Package\PHP_INT_MAX</td>
+				<td class="desc"><p>分割数</p></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>分割された配列</p></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L102-L139" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_equals()" tabindex="-1" class="structure-title ">
                         str_equals						<small>($str1, $str2, $case_insensitivity = false)</small>
@@ -185,20 +261,17 @@ assertTrue(str_equals('\0abc', '\0abc'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$str1</td>
-				<td class="desc">文字列1
-</td>
+				<td class="desc"><p>文字列1</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$str2</td>
-				<td class="desc">文字列2
-</td>
+				<td class="desc"><p>文字列2</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$case_insensitivity = false</td>
-				<td class="desc">大文字小文字を区別するか
-</td>
+				<td class="desc"><p>大文字小文字を区別するか</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -207,7 +280,7 @@ assertTrue(str_equals('\0abc', '\0abc'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">同じ文字列なら true</td>
+			<td class="desc"><p>同じ文字列なら true</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -229,7 +302,7 @@ assertTrue(str_equals('\0abc', '\0abc'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L105-L147" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L141-L181" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_contains()" tabindex="-1" class="structure-title ">
                         str_contains						<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false)</small>
@@ -247,26 +320,22 @@ assertFalse(str_contains('abc', ['b', 'x'], false, true));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$haystack</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>array</td>
 				<td class="rest">$needle</td>
-				<td class="desc">調べる文字列
-</td>
+				<td class="desc"><p>調べる文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$case_insensitivity = false</td>
-				<td class="desc">大文字小文字を区別するか
-</td>
+				<td class="desc"><p>大文字小文字を区別するか</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$and_flag = false</td>
-				<td class="desc">すべて含む場合に true を返すか
-</td>
+				<td class="desc"><p>すべて含む場合に true を返すか</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -275,7 +344,7 @@ assertFalse(str_contains('abc', ['b', 'x'], false, true));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">$needle を含むなら true</td>
+			<td class="desc"><p>$needle を含むなら true</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -297,44 +366,50 @@ assertFalse(str_contains('abc', ['b', 'x'], false, true));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L149-L192" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L183-L230" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_putcsv()" tabindex="-1" class="structure-title ">
                         str_putcsv						<small>($array, $delimiter = &#039;,&#039;, $enclosure = &#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>fputcsv の文字列版（str_getcsv の put 版）</p>
-<p>特に難しいことはないシンプルな実装。ただし、エラーは例外に変換される。</p>
+<p>エラーは例外に変換される。</p>
+<p>普通の配列を与えるとシンプルに &quot;a,b,c&quot; のような1行を返す。<br />
+多次元配列（2次元のみを想定）や Traversable を与えるとループして &quot;a,b,c\nd,e,f&quot; のような複数行を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
+<pre><code class="language-php">// シンプルな1行を返す
+assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
 assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
-assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");</code></pre></div>
+assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
+
+// 複数行を返す
+assertSame(str_putcsv([['a', 'b', 'c'], ['d', 'e', 'f']]), "a,b,c\nd,e,f");
+assertSame(str_putcsv((function() {
+    yield ['a', 'b', 'c'];
+    yield ['d', 'e', 'f'];
+})()), "a,b,c\nd,e,f");</code></pre></div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array</td>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
 				<td class="rest">$array</td>
-				<td class="desc">値の配列
-</td>
+				<td class="desc"><p>値の配列 or 値の配列の配列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$delimiter = &#039;,&#039;</td>
-				<td class="desc">フィールド区切り文字
-</td>
+				<td class="desc"><p>フィールド区切り文字</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$enclosure = &#039;&quot;&#039;</td>
-				<td class="desc">フィールドを囲む文字
-</td>
+				<td class="desc"><p>フィールドを囲む文字</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$escape = &#039;\\&#039;</td>
-				<td class="desc">エスケープ文字
-</td>
+				<td class="desc"><p>エスケープ文字</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -343,7 +418,7 @@ assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");</code></pre></
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">CSV 文字列</td>
+			<td class="desc"><p>CSV 文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -365,7 +440,7 @@ assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");</code></pre></
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L194-L263" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L232-L299" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_subreplace()" tabindex="-1" class="structure-title ">
                         str_subreplace						<small>($subject, $search, $replaces, $case_insensitivity = false)</small>
@@ -392,26 +467,22 @@ assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');</
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$subject</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$search</td>
-				<td class="desc">検索文字列
-</td>
+				<td class="desc"><p>検索文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$replaces</td>
-				<td class="desc">置換文字列
-</td>
+				<td class="desc"><p>置換文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$case_insensitivity = false</td>
-				<td class="desc">大文字小文字を区別するか
-</td>
+				<td class="desc"><p>大文字小文字を区別するか</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -420,7 +491,7 @@ assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');</
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">置換された文字列</td>
+			<td class="desc"><p>置換された文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -442,7 +513,7 @@ assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');</
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L265-L339" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L301-L373" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_between()" tabindex="-1" class="structure-title ">
                         str_between						<small>($string, $from, $to, &amp;$position = 0, $enclosure = &#039;\&#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
@@ -458,7 +529,6 @@ $escape で「特定文字が前にある」場合を無視することができ
 これを使用すると連続で「次の文字, 次の文字, ...」と言った動作が可能になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
-$n = 0;
 assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
 assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
 assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
@@ -470,38 +540,32 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$from</td>
-				<td class="desc">開始文字列
-</td>
+				<td class="desc"><p>開始文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$to</td>
-				<td class="desc">終了文字列
-</td>
+				<td class="desc"><p>終了文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">&amp;$position = 0</td>
-				<td class="desc">開始位置。渡した場合次の開始位置が設定される
-</td>
+				<td class="desc"><p>開始位置。渡した場合次の開始位置が設定される</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$enclosure = &#039;\&#039;&quot;&#039;</td>
-				<td class="desc">囲い文字。この文字中にいる $from, $to 文字は走査外になる
-</td>
+				<td class="desc"><p>囲い文字。この文字中にいる $from, $to 文字は走査外になる</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$escape = &#039;\\&#039;</td>
-				<td class="desc">エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
-</td>
+				<td class="desc"><p>エスケープ文字。この文字が前にある $from, $to 文字は走査外になる</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -510,7 +574,7 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
 		<tbody>
 		<tr>
 			<td class="type">string<span class="type-separator"></span><wbr>bool</td>
-			<td class="desc">$from, $to で囲まれた文字。見つからなかった場合は false</td>
+			<td class="desc"><p>$from, $to で囲まれた文字。見つからなかった場合は false</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -532,7 +596,7 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L341-L365" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L375-L397" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::starts_with()" tabindex="-1" class="structure-title ">
                         starts_with						<small>($string, $with, $case_insensitivity = false)</small>
@@ -549,20 +613,17 @@ assertFalse(starts_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">探される文字列
-</td>
+				<td class="desc"><p>探される文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$with</td>
-				<td class="desc">探す文字列
-</td>
+				<td class="desc"><p>探す文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$case_insensitivity = false</td>
-				<td class="desc">大文字小文字を区別するか
-</td>
+				<td class="desc"><p>大文字小文字を区別するか</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -571,7 +632,7 @@ assertFalse(starts_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">指定文字列で始まるなら true を返す</td>
+			<td class="desc"><p>指定文字列で始まるなら true を返す</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -593,7 +654,7 @@ assertFalse(starts_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L367-L391" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L399-L421" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ends_with()" tabindex="-1" class="structure-title ">
                         ends_with						<small>($string, $with, $case_insensitivity = false)</small>
@@ -610,20 +671,17 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">探される文字列
-</td>
+				<td class="desc"><p>探される文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$with</td>
-				<td class="desc">探す文字列
-</td>
+				<td class="desc"><p>探す文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$case_insensitivity = false</td>
-				<td class="desc">大文字小文字を区別するか
-</td>
+				<td class="desc"><p>大文字小文字を区別するか</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -632,7 +690,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">bool</td>
-			<td class="desc">対象文字列で終わるなら true</td>
+			<td class="desc"><p>対象文字列で終わるなら true</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -654,7 +712,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L393-L410" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L423-L438" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::camel_case()" tabindex="-1" class="structure-title ">
                         camel_case						<small>($string, $delimiter = &#039;_&#039;)</small>
@@ -669,14 +727,12 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$delimiter = &#039;_&#039;</td>
-				<td class="desc">デリミタ
-</td>
+				<td class="desc"><p>デリミタ</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -685,7 +741,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">変換した文字列</td>
+			<td class="desc"><p>変換した文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -707,7 +763,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L412-L429" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L440-L455" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::pascal_case()" tabindex="-1" class="structure-title ">
                         pascal_case						<small>($string, $delimiter = &#039;_&#039;)</small>
@@ -722,14 +778,12 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$delimiter = &#039;_&#039;</td>
-				<td class="desc">デリミタ
-</td>
+				<td class="desc"><p>デリミタ</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -738,7 +792,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">変換した文字列</td>
+			<td class="desc"><p>変換した文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -760,7 +814,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L431-L448" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L457-L472" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::snake_case()" tabindex="-1" class="structure-title ">
                         snake_case						<small>($string, $delimiter = &#039;_&#039;)</small>
@@ -775,14 +829,12 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$delimiter = &#039;_&#039;</td>
-				<td class="desc">デリミタ
-</td>
+				<td class="desc"><p>デリミタ</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -791,7 +843,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">変換した文字列</td>
+			<td class="desc"><p>変換した文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -813,7 +865,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L450-L467" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L474-L489" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::chain_case()" tabindex="-1" class="structure-title ">
                         chain_case						<small>($string, $delimiter = &#039;-&#039;)</small>
@@ -828,14 +880,12 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$string</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$delimiter = &#039;-&#039;</td>
-				<td class="desc">デリミタ
-</td>
+				<td class="desc"><p>デリミタ</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -844,7 +894,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">変換した文字列</td>
+			<td class="desc"><p>変換した文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -866,7 +916,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L469-L533" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L491-L553" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::random_string()" tabindex="-1" class="structure-title ">
                         random_string						<small>($length = 8, $charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;)</small>
@@ -885,14 +935,12 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$length = 8</td>
-				<td class="desc">生成文字列長
-</td>
+				<td class="desc"><p>生成文字列長</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;</td>
-				<td class="desc">使用する文字セット
-</td>
+				<td class="desc"><p>使用する文字セット</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -901,7 +949,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">乱数文字列</td>
+			<td class="desc"><p>乱数文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -923,7 +971,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L535-L571" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L555-L589" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::kvsprintf()" tabindex="-1" class="structure-title ">
                         kvsprintf						<small>($format, $array)</small>
@@ -939,14 +987,12 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$format</td>
-				<td class="desc">フォーマット文字列
-</td>
+				<td class="desc"><p>フォーマット文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$array</td>
-				<td class="desc">フォーマット引数
-</td>
+				<td class="desc"><p>フォーマット引数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -955,7 +1001,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">フォーマットされた文字列</td>
+			<td class="desc"><p>フォーマットされた文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -977,7 +1023,7 @@ assertFalse(ends_with('abcdef', 'xyz'));</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L573-L612" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L591-L628" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_capture()" tabindex="-1" class="structure-title ">
                         preg_capture						<small>($pattern, $subject, $default)</small>
@@ -1003,20 +1049,17 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$pattern</td>
-				<td class="desc">正規表現
-</td>
+				<td class="desc"><p>正規表現</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$subject</td>
-				<td class="desc">対象文字列
-</td>
+				<td class="desc"><p>対象文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$default</td>
-				<td class="desc">デフォルト値
-</td>
+				<td class="desc"><p>デフォルト値</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -1025,7 +1068,7 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
 		<tbody>
 		<tr>
 			<td class="type">array</td>
-			<td class="desc">キャプチャした配列</td>
+			<td class="desc"><p>キャプチャした配列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -1047,7 +1090,82 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L614-L694" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L630-L671" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::preg_splice()" tabindex="-1" class="structure-title ">
+                        preg_splice						<small>($pattern, $replacement, $subject, &amp;$matches = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キャプチャも行える preg_replace</p>
+<p>「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。</p>
+<p>$replacement に callable を渡すと preg_replace_callback がコールされる。<br />
+callable と入っても単純文字列 callble （&quot;strtoupper&quot; など）は callable とはみなされない。<br />
+配列形式の callable や クロージャのみ preg_replace_callback になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 数字を除去しつつその除去された数字を得る
+assertSame(preg_splice('#\\d+#', '', 'abc123', $m), 'abc');
+assertSame($m, ['123']);
+
+// callable だと preg_replace_callback が呼ばれる
+assertSame(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m), 'ABC123');
+assertSame($m, ['abc']);
+
+// ただし、 文字列 callable は文字列として扱う
+assertSame(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123');
+assertSame($m, ['abc']);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$pattern</td>
+				<td class="desc"><p>正規表現</p></td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>callable</td>
+				<td class="rest">$replacement</td>
+				<td class="desc"><p>置換文字列</p></td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$subject</td>
+				<td class="desc"><p>対象文字列</p></td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">&amp;$matches = []</td>
+				<td class="desc"><p>キャプチャ配列が格納される</p></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc"><p>置換された文字列</p></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L673-L743" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_string()" tabindex="-1" class="structure-title ">
                         render_string						<small>($template, $array)</small>
@@ -1082,14 +1200,12 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</c
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$template</td>
-				<td class="desc">レンダリング文字列
-</td>
+				<td class="desc"><p>レンダリング文字列</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$array</td>
-				<td class="desc">レンダリング変数
-</td>
+				<td class="desc"><p>レンダリング変数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -1098,7 +1214,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</c
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">レンダリングされた文字列</td>
+			<td class="desc"><p>レンダリングされた文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -1120,7 +1236,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</c
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L696-L710" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L745-L757" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_file()" tabindex="-1" class="structure-title ">
                         render_file						<small>($template_file, $array)</small>
@@ -1133,14 +1249,12 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</c
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$template_file</td>
-				<td class="desc">レンダリングするファイル名
-</td>
+				<td class="desc"><p>レンダリングするファイル名</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$array</td>
-				<td class="desc">レンダリング変数
-</td>
+				<td class="desc"><p>レンダリング変数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -1149,7 +1263,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</c
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc">レンダリングされた文字列</td>
+			<td class="desc"><p>レンダリングされた文字列</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -1159,7 +1273,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');</c
 		<tbody>
         			<tr>
 				<td class="type">
-                                            <a href="render_string$typespace.html#render_string" class="fqsen ">render_string</a>                    				</td>
+                                            <a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()" class="fqsen "><small>ryunosuke\Functions\Package\</small><wbr>Strings::render_string()</a>                    				</td>
 				<td class="desc"></td>
 			</tr>
         		</tbody>

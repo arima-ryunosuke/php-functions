@@ -4,11 +4,27 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
-	<link rel="stylesheet" type="text/css" href="common.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
-	<script src="common.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function (cachekey) {
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+            });
+        })(window.parent.CACHEKEY || 'nocache');
+	</script>
     </head>
 <body>
 <a id="anchor" href="./" style="display: none"></a>
@@ -25,7 +41,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L278" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L264" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -53,7 +69,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L7-L26" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L7-L24" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::returns()" tabindex="-1" class="structure-title ">
                         returns						<small>($v)</small>
@@ -70,8 +86,7 @@ assertSame(returns($object), $object);</code></pre></div>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$v</td>
-				<td class="desc">return する値
-</td>
+				<td class="desc"><p>return する値</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -80,7 +95,7 @@ assertSame(returns($object), $object);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc">$v を返す</td>
+			<td class="desc"><p>$v を返す</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -102,16 +117,16 @@ assertSame(returns($object), $object);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L28-L102" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L26-L98" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::optional()" tabindex="-1" class="structure-title ">
                         optional						<small>($object, $expected = null)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
-<p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。<br />
-基本的には null を返すが、return type が規約されている場合は null 以外を返すこともある。</p>
-<p>取得系呼び出しを想定しているので、設定系呼び出しは行うべきではない。<br />
+<p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。</p>
+<p>NullObject は 基本的に null を返すが、return type が規約されている場合は null 以外を返すこともある。<br />
+取得系呼び出しを想定しているので、設定系呼び出しは行うべきではない。<br />
 __set のような明らかに設定が意図されているものは例外が飛ぶ。</p>
 <p>Example:</p>
 <pre><code class="language-php">// null を返すかもしれないステートメント
@@ -141,14 +156,12 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code
         			<tr>
 				<td class="type">object<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$object</td>
-				<td class="desc">オブジェクト
-</td>
+				<td class="desc"><p>オブジェクト</p></td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$expected = null</td>
-				<td class="desc">期待するクラス名。指定した場合は is_a される
-</td>
+				<td class="desc"><p>期待するクラス名。指定した場合は is_a される</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -157,7 +170,7 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc">$object がオブジェクトならそのまま返し、違うなら NullObject を返す</td>
+			<td class="desc"><p>$object がオブジェクトならそのまま返し、違うなら NullObject を返す</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -179,7 +192,7 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L104-L126" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L100-L120" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
                         throws						<small>($ex)</small>
@@ -200,7 +213,7 @@ catch (\Exception $ex) {
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a></td>
 				<td class="rest">$ex</td>
-				<td class="desc">投げる例外</td>
+				<td class="desc"><p>投げる例外</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -231,7 +244,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L128-L168" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L122-L160" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::ifelse()" tabindex="-1" class="structure-title ">
                         ifelse						<small>($actual, $expected, $then, $else = null)</small>
@@ -246,9 +259,9 @@ catch (\Exception $ex) {
 <pre><code class="language-php">// とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
 $heavyfunc = function($v){return $v;};
 // $heavyfunc(1) ?? 'default' とほぼ同義
-assertSame(ifelse($heavyfunc(1), false, 'default'), $heavyfunc(1));
+assertSame(ifelse($heavyfunc(1), false, 'default'), 1);
 // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-assertSame(ifelse($heavyfunc(null), false, 'default'), $heavyfunc(null));
+assertSame(ifelse($heavyfunc(null), false, 'default'), null);
 // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
 assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre></div>
                         	<table class="table">
@@ -257,26 +270,22 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$actual</td>
-				<td class="desc">調べる値（左辺値）
-</td>
+				<td class="desc"><p>調べる値（左辺値）</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$expected</td>
-				<td class="desc">比較する値（右辺値）
-</td>
+				<td class="desc"><p>比較する値（右辺値）</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$then</td>
-				<td class="desc">真の場合の値
-</td>
+				<td class="desc"><p>真の場合の値</p></td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$else = null</td>
-				<td class="desc">偽の場合の値。省略時は $actual
-</td>
+				<td class="desc"><p>偽の場合の値。省略時は $actual</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -285,7 +294,7 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre>
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc">$then or $else</td>
+			<td class="desc"><p>$then or $else</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -307,7 +316,7 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L170-L195" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L162-L185" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch						<small>($try, $catch = null, ...$variadic)</small>
@@ -328,20 +337,17 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$try</td>
-				<td class="desc">try ブロッククロージャ
-</td>
+				<td class="desc"><p>try ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$catch = null</td>
-				<td class="desc">catch ブロッククロージャ
-</td>
+				<td class="desc"><p>catch ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">$try に渡る引数
-</td>
+				<td class="desc"><p>$try に渡る引数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -350,7 +356,7 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</td>
-			<td class="desc">例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -372,7 +378,7 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L197-L226" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L187-L214" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally						<small>($try, $finally = null, ...$variadic)</small>
@@ -397,20 +403,17 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$try</td>
-				<td class="desc">try ブロッククロージャ
-</td>
+				<td class="desc"><p>try ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$finally = null</td>
-				<td class="desc">finally ブロッククロージャ
-</td>
+				<td class="desc"><p>finally ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">$try に渡る引数
-</td>
+				<td class="desc"><p>$try に渡る引数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -419,7 +422,7 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</td>
-			<td class="desc">例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -441,7 +444,7 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L228-L277" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L216-L263" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally						<small>($try, $catch = null, $finally = null, ...$variadic)</small>
@@ -466,26 +469,22 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$try</td>
-				<td class="desc">try ブロッククロージャ
-</td>
+				<td class="desc"><p>try ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$catch = null</td>
-				<td class="desc">catch ブロッククロージャ
-</td>
+				<td class="desc"><p>catch ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$finally = null</td>
-				<td class="desc">finally ブロッククロージャ
-</td>
+				<td class="desc"><p>finally ブロッククロージャ</p></td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc">$try に渡る引数
-</td>
+				<td class="desc"><p>$try に渡る引数</p></td>
 			</tr>
         		</tbody>
 	</table>
@@ -494,7 +493,7 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</td>
-			<td class="desc">例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p></td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
