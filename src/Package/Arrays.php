@@ -1784,8 +1784,7 @@ class Arrays
      *
      * Example:
      * ```php
-     * srand(4);mt_srand(4);
-     * assertSame(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['b' => 'B', 'a' => 'A', 'c' => 'C']);
+     * assertEquals(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['b' => 'B', 'a' => 'A', 'c' => 'C']);
      * ```
      *
      * @package Array

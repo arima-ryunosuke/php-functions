@@ -201,9 +201,8 @@ class Math
      *
      * Example:
      * ```php
-     * srand(1);mt_srand(1);
-     * assertSame(random_at(1, 2, 3, 4, 5, 6), 4);
-     * assertSame(random_at(1, 2, 3, 4, 5, 6), 1);
+     * // 1 ～ 6 のどれかを返す
+     * assertContains(random_at(1, 2, 3, 4, 5, 6), [1, 2, 3, 4, 5, 6]);
      * ```
      *
      * @package Math
@@ -224,9 +223,10 @@ class Math
      *
      * Example:
      * ```php
-     * srand(1);mt_srand(1);
-     * assertFalse(probability(50));
-     * assertTrue(probability(50));
+     * // 50% の確率で "hello" を出す
+     * if (probability(50)) {
+     *     echo "hello";
+     * }
      * ```
      *
      * @package Math

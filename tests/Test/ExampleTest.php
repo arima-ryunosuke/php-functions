@@ -18,7 +18,7 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
         defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
         foreach (glob(__DIR__ . '/../../src/Package/*.php') as $file) {
-            preg_match_all('#<code>(.*?)</code>.*?function (.+?)\\(#us', file_get_contents($file), $matches, PREG_SET_ORDER);
+            preg_match_all('#```php(.*?)```.*?function (.+?)\\(#us', file_get_contents($file), $matches, PREG_SET_ORDER);
             $contents = [];
             foreach ($matches as $match) {
                 $contents[] = '//' . $match[2] . preg_replace('#^     \* ?#um', '', $match[1]);
