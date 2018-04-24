@@ -121,10 +121,18 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
     function test_str_putcsv()
     {
         $str_putcsv = str_putcsv;
+        // シンプル
         $this->assertEquals("1,2,3", $str_putcsv([1, 2, 3]));
         $this->assertEquals("1\t2\t3", $str_putcsv([1, 2, 3], "\t"));
         $this->assertEquals("1,`,`,3", $str_putcsv([1, ",", 3], ",", '`'));
         $this->assertEquals("1,`\t`,`@``", $str_putcsv([1, "\t", '@`'], ",", '`', "@"));
+        // コンプレックス
+        $this->assertEquals("1,2,3\n4,5,6", $str_putcsv([[1, 2, 3], [4, 5, 6]]));
+        $this->assertEquals("1,2,3\n4,5,6", $str_putcsv(new \ArrayIterator([[1, 2, 3], [4, 5, 6]])));
+        $this->assertEquals("1,2,3\n4,5,6", $str_putcsv((function () {
+            yield [1, 2, 3];
+            yield [4, 5, 6];
+        })()));
 
         $this->assertException('single character', $str_putcsv, [], 'aa');
     }

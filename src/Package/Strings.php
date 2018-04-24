@@ -193,18 +193,29 @@ class Strings
     /**
      * fputcsv の文字列版（str_getcsv の put 版）
      *
-     * 特に難しいことはないシンプルな実装。ただし、エラーは例外に変換される。
+     * エラーは例外に変換される。
+     *
+     * 普通の配列を与えるとシンプルに "a,b,c" のような1行を返す。
+     * 多次元配列（2次元のみを想定）や Traversable を与えるとループして "a,b,c\nd,e,f" のような複数行を返す。
      *
      * Example:
      * ```php
+     * // シンプルな1行を返す
      * assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
      * assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
      * assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
+     *
+     * // 複数行を返す
+     * assertSame(str_putcsv([['a', 'b', 'c'], ['d', 'e', 'f']]), "a,b,c\nd,e,f");
+     * assertSame(str_putcsv((function() {
+     *     yield ['a', 'b', 'c'];
+     *     yield ['d', 'e', 'f'];
+     * })()), "a,b,c\nd,e,f");
      * ```
      *
      * @package String
      *
-     * @param array $array 値の配列
+     * @param array|\Traversable $array 値の配列 or 値の配列の配列
      * @param string $delimiter フィールド区切り文字
      * @param string $enclosure フィールドを囲む文字
      * @param string $escape エスケープ文字
@@ -212,26 +223,21 @@ class Strings
      */
     public static function str_putcsv($array, $delimiter = ',', $enclosure = '"', $escape = "\\")
     {
+        $fp = fopen('php://memory', 'rw+');
         try {
-            $fp = fopen('php://memory', 'rw+');
+            if (is_array($array) && call_user_func(array_depth, $array) === 1) {
+                $array = [$array];
+            }
             return call_user_func(call_safely, function ($fp, $array, $delimiter, $enclosure, $escape) {
-                if (version_compare(PHP_VERSION, '5.5.4') >= 0) {
-                    fputcsv($fp, $array, $delimiter, $enclosure, $escape);
-                }
-                else {
-                    fputcsv($fp, $array, $delimiter, $enclosure); // @codeCoverageIgnore
+                foreach ($array as $line) {
+                    fputcsv($fp, $line, $delimiter, $enclosure, $escape);
                 }
                 rewind($fp);
-                $result = stream_get_contents($fp);
-                fclose($fp);
-                return rtrim($result, "\n");
+                return rtrim(stream_get_contents($fp), "\n");
             }, $fp, $array, $delimiter, $enclosure, $escape);
         }
-        catch (\ErrorException $ex) {
-            if (isset($fp) && $fp) {
-                fclose($fp);
-            }
-            throw $ex;
+        finally {
+            fclose($fp);
         }
     }
 
