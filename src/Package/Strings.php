@@ -762,7 +762,7 @@ class Strings
         }
 
         try {
-            $return = call_user_func(function () {
+            return call_user_func(function () {
                 // extract は数値キーを展開してくれないので自前ループで展開
                 foreach (func_get_arg(1) as $k => $v) {
                     $$k = $v;
@@ -775,17 +775,9 @@ class Strings
                 return eval(func_get_arg(0));
             }, $evalcode, $vars);
         }
-            /** @noinspection PhpUndefinedClassInspection */
         catch (\ParseError $ex) {
-            // for php 7
-            $return = false;
+            throw new \RuntimeException('failed to eval code.' . $evalcode, 0, $ex);
         }
-
-        if ($return === false) {
-            throw new \RuntimeException('failed to eval code.' . $evalcode);
-        }
-
-        return $return;
     }
 
     /**

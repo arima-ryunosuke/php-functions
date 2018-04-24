@@ -375,13 +375,10 @@ class Funchand
         });
 
         try {
-            $return = call_user_func_array($callback, $variadic);
-            restore_error_handler();
-            return $return;
+            return call_user_func_array($callback, $variadic);
         }
-        catch (\Exception $ex) {
+        finally {
             restore_error_handler();
-            throw $ex;
         }
     }
 
@@ -404,11 +401,10 @@ class Funchand
         ob_start();
         try {
             call_user_func_array($callback, $variadic);
-            return ob_get_clean();
+            return ob_get_contents();
         }
-        catch (\Exception $ex) {
+        finally {
             ob_end_clean();
-            throw $ex;
         }
     }
 
