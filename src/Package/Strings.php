@@ -328,7 +328,6 @@ class Strings
      * Example:
      * ```php
      * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
-     * $n = 0;
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
      * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
@@ -351,6 +350,7 @@ class Strings
         $strlen = strlen($string);
         $fromlen = strlen($from);
         $tolen = strlen($to);
+        $position = intval($position);
         $enclosing = null;
         $nesting = 0;
         $start = null;
