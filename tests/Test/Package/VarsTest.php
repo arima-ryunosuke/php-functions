@@ -127,6 +127,17 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($is_iterable(new \stdClass()));
     }
 
+    function test_is_countable()
+    {
+        $is_countable = is_countable;
+        $this->assertTrue($is_countable([1, 2, 3]));
+        $this->assertTrue($is_countable(new \ArrayObject()));
+
+        $this->assertFalse($is_countable((function () { yield 1; })()));
+        $this->assertFalse($is_countable(1));
+        $this->assertFalse($is_countable(new \stdClass()));
+    }
+
     function test_var_type()
     {
         $var_type = var_type;

@@ -224,6 +224,28 @@ class Vars
     }
 
     /**
+     * 変数が count でカウントできるか調べる
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_countable([1, 2, 3]));
+     * assertTrue(is_countable(new \ArrayObject()));
+     * assertFalse(is_countable((function () { yield 1; })()));
+     * assertFalse(is_countable(1));
+     * assertFalse(is_countable(new \stdClass()));
+     * ```
+     *
+     * @package Var
+     *
+     * @param mixed $var 調べる値
+     * @return bool count でカウントできるなら true
+     */
+    public static function is_countable($var)
+    {
+        return is_array($var) || $var instanceof \Countable;
+    }
+
+    /**
      * 値の型を取得する（gettype + get_class）
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
