@@ -199,6 +199,31 @@ class Vars
     }
 
     /**
+     * 変数が foreach で回せるか調べる
+     *
+     * オブジェクトの場合は \Traversable のみ。
+     * 要するに {@link http://php.net/manual/ja/function.is-iterable.php is_iterable} の polyfill。
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_iterable([1, 2, 3]));
+     * assertTrue(is_iterable((function () { yield 1; })()));
+     * assertFalse(is_iterable(1));
+     * assertFalse(is_iterable(new \stdClass()));
+     * ```
+     *
+     * @package Var
+     * @polyfill
+     *
+     * @param mixed $var 調べる値
+     * @return bool foreach で回せるなら true
+     */
+    public static function is_iterable($var)
+    {
+        return is_array($var) || $var instanceof \Traversable;
+    }
+
+    /**
      * 値の型を取得する（gettype + get_class）
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。

@@ -116,6 +116,17 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($is_recursive($rnestobject));
     }
 
+    function test_is_iterable()
+    {
+        $is_iterable = is_iterable;
+        $this->assertTrue($is_iterable([1, 2, 3]));
+        $this->assertTrue($is_iterable(new \ArrayIterator([1, 2, 3])));
+        $this->assertTrue($is_iterable((function () { yield 1; })()));
+
+        $this->assertFalse($is_iterable(1));
+        $this->assertFalse($is_iterable(new \stdClass()));
+    }
+
     function test_var_type()
     {
         $var_type = var_type;
