@@ -109,6 +109,7 @@ namespace $namespace", $content);
                 }
 
                 $doccomment = $method->getDocComment();
+                $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
                 $mname = $method->getName();
                 $funcname = ($method->returnsReference() ? '&' : '') . $mname;
                 $const = $methodmode ? '[' . $ve($method->class) . ', ' . $ve($mname) . ']' : $ve(ltrim("$namespace\\$mname", '\\'));
@@ -126,7 +127,7 @@ $block
 CODE;
 
                 $constants[] = "const $mname = $const;";
-                $functions[] = "if (!isset(\$excluded_functions[{$ve($mname)}]) && (!function_exists($full) || (new \ReflectionFunction($full))->isInternal())) {\n$code}";
+                $functions[] = "if (!isset(\$excluded_functions[{$ve($mname)}]) && (!function_exists($full) || (!$polyfill && (new \\ReflectionFunction($full))->isInternal()))) {\n$code}";
             }
         }
 
