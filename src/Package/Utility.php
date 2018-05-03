@@ -217,7 +217,7 @@ class Utility
                 'name'   => $name,
                 'called' => $count,
                 'mills'  => $millisec / $count,
-                'ratio'  => $count / $maxcount,
+                'ratio'  => $maxcount / $count,
             ];
         }
 
