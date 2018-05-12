@@ -22,8 +22,6 @@ class Classobj
      * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
      * ```
      *
-     * @package ClassObject
-     *
      * @param array|\Traversable $fields フィールド配列
      * @return \stdClass 生成した stdClass インスタンス
      */
@@ -44,8 +42,6 @@ class Classobj
      * 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。
      *
      * 言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。
-     *
-     * @package ClassObject
      *
      * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
      * @return string 名前空間
@@ -100,8 +96,6 @@ class Classobj
      * assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
      * ```
      *
-     * @package ClassObject
-     *
      * @param string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
      * @return \Composer\Autoload\ClassLoader クラスローダ
      */
@@ -132,8 +126,6 @@ class Classobj
      * assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
      * ```
      *
-     * @package ClassObject
-     *
      * @param string|object $class 対象クラス・オブジェクト
      * @return string クラスの名前空間
      */
@@ -155,8 +147,6 @@ class Classobj
      * ```php
      * assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
      * ```
-     *
-     * @package ClassObject
      *
      * @param string|object $class 対象クラス・オブジェクト
      * @return string クラスの短い名前
@@ -190,8 +180,6 @@ class Classobj
      * ただし、内部的には class_alias を使用して実現しているので厳密には異なるクラスとなる。
      *
      * 実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。
-     *
-     * @package ClassObject
      *
      * @param string $class 対象クラス名
      * @param \Closure $register 置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ

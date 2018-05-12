@@ -9,8 +9,6 @@ class Funchand
      *
      * ほぼ内部向けで外から呼ぶことはあまり想定していない。
      *
-     * @package Callable
-     *
      * @param \Closure $invoker クロージャを実行するためのクロージャ（実処理）
      * @param callable $callable 最終的に実行したいクロージャ
      * @param int $arity 引数の数
@@ -71,8 +69,6 @@ class Funchand
      * assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
      * ```
      *
-     * @package Callable
-     *
      * @param callable $callable 対象 callable
      * @param int $n 挿入する引数位置
      * @param mixed $variadic 本来の引数（可変引数）
@@ -94,8 +90,6 @@ class Funchand
      * assertSame($bind('N', 'M'), 'NM');
      * ```
      *
-     * @package Callable
-     *
      * @param callable $callable 対象 callable
      * @param mixed $variadic 本来の引数（可変引数）
      * @return \Closure 束縛したクロージャ
@@ -113,8 +107,6 @@ class Funchand
      * $bind = rbind('sprintf', 'X');
      * assertSame($bind('%s%s', 'N'), 'NX');
      * ```
-     *
-     * @package Callable
      *
      * @param callable $callable 対象 callable
      * @param mixed $variadic 本来の引数（可変引数）
@@ -159,8 +151,6 @@ class Funchand
      * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
      * assertSame($composite('hoge'), 'EGOHegoh-erp');
      * ```
-     *
-     * @package Callable
      *
      * @param bool $arrayalbe 呼び出しチェーンを配列として扱うか
      * @param callable[] $variadic 合成する関数（可変引数）
@@ -208,8 +198,6 @@ class Funchand
      * assertSame($arg1('dummy', 'hoge'), 'hoge');
      * ```
      *
-     * @package Callable
-     *
      * @param int $n $n 番目の引数
      * @return \Closure $n 番目の引数をそのまま返すクロージャ
      */
@@ -234,8 +222,6 @@ class Funchand
      * assertTrue($not_strlen(''));
      * ```
      *
-     * @package Callable
-     *
      * @param callable $callable 対象 callable
      * @return \Closure 新しいクロージャ
      */
@@ -257,8 +243,6 @@ class Funchand
      * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
      * assertSame($evalfunc(1, 2, 3), 6);
      * ```
-     *
-     * @package Callable
      *
      * @param string $expression eval コード
      * @param mixed $variadic 引数名（可変引数）
@@ -283,8 +267,6 @@ class Funchand
      * assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
      * assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
      * ```
-     *
-     * @package Callable
      *
      * @param callable $callable 対象 callable
      * @return \ReflectionFunction|\ReflectionMethod リフレクションインスタンス
@@ -322,8 +304,6 @@ class Funchand
      * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
      * ```
      *
-     * @package Callable
-     *
      * @param callable $callable 変換する callable
      * @return \Closure 変換したクロージャ
      */
@@ -359,8 +339,6 @@ class Funchand
      * }
      * ```
      *
-     * @package Callable
-     *
      * @param callable $callback 実行するコールバック
      * @param mixed $variadic $callback に渡される引数（可変引数）
      * @return mixed $callback の返り値
@@ -389,8 +367,6 @@ class Funchand
      * ```php
      * assertSame(ob_capture(function(){echo 123;}), '123');
      * ```
-     *
-     * @package Callable
      *
      * @param callable $callback 実行するコールバック
      * @param mixed $variadic $callback に渡される引数（可変引数）
@@ -428,7 +404,6 @@ class Funchand
      * ```
      *
      * のように判定できる。
-     *
      *
      * @param object|string $class
      * @param string $function
@@ -482,8 +457,6 @@ class Funchand
      * assertSame(parameter_length('trim', true), 1);
      * ```
      *
-     * @package Callable
-     *
      * @param callable $callable 対象 callable
      * @param bool $require_only true を渡すと必須パラメータの数を返す
      * @param bool $thought_variadic 可変引数を考慮するか。 true を渡すと可変引数の場合に無限長を返す
@@ -525,8 +498,6 @@ class Funchand
     /**
      * 関数の名前空間部分を除いた短い名前を取得する
      *
-     * @package Callable
-     *
      * @param string $function 短くする関数名
      * @return string 短い関数名
      */
@@ -552,8 +523,6 @@ class Funchand
      * $strlen = func_user_func_array('strlen');
      * assertSame($strlen('abc', null), 3);
      * ```
-     *
-     * @package Callable
      *
      * @param callable $callback 呼び出すクロージャ
      * @return \Closure 引数ぴったりで呼び出すクロージャ
@@ -586,8 +555,6 @@ class Funchand
      * function_alias('trim', 'trim_alias');
      * assertSame(trim_alias(' abc '), 'abc');
      * ```
-     *
-     * @package Callable
      *
      * @param callable $original 元となる関数
      * @param string $alias 関数のエイリアス名

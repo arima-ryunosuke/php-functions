@@ -15,8 +15,6 @@ class Syntax
      * assertSame(returns($object), $object);
      * ```
      *
-     * @package Syntax
-     *
      * @param mixed $v return する値
      * @return mixed $v を返す
      */
@@ -29,8 +27,8 @@ class Syntax
      * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
      *
      * null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。
-     * 基本的には null を返すが、return type が規約されている場合は null 以外を返すこともある。
      *
+     * NullObject は 基本的に null を返すが、return type が規約されている場合は null 以外を返すこともある。
      * 取得系呼び出しを想定しているので、設定系呼び出しは行うべきではない。
      * __set のような明らかに設定が意図されているものは例外が飛ぶ。
      *
@@ -58,8 +56,6 @@ class Syntax
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
      * assertSame(optional(new \ArrayObject([1]), 'stdClass')->count(), null);
      * ```
-     *
-     * @package Syntax
      *
      * @param object|null $object オブジェクト
      * @param string $expected 期待するクラス名。指定した場合は is_a される
@@ -116,8 +112,6 @@ NO;
      * }
      * ```
      *
-     * @package Syntax
-     *
      * @param \Exception $ex 投げる例外
      */
     public static function throws($ex)
@@ -139,14 +133,12 @@ NO;
      * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
      * $heavyfunc = function($v){return $v;};
      * // $heavyfunc(1) ?? 'default' とほぼ同義
-     * assertSame(ifelse($heavyfunc(1), false, 'default'), $heavyfunc(1));
+     * assertSame(ifelse($heavyfunc(1), false, 'default'), 1);
      * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-     * assertSame(ifelse($heavyfunc(null), false, 'default'), $heavyfunc(null));
+     * assertSame(ifelse($heavyfunc(null), false, 'default'), null);
      * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
      * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
      * ```
-     *
-     * @package Syntax
      *
      * @param mixed $actual 調べる値（左辺値）
      * @param mixed $expected 比較する値（右辺値）
@@ -182,8 +174,6 @@ NO;
      * assertSame(try_catch($try)->getMessage(), 'tried');
      * ```
      *
-     * @package Syntax
-     *
      * @param callable $try try ブロッククロージャ
      * @param callable $catch catch ブロッククロージャ
      * @param array $variadic $try に渡る引数
@@ -213,8 +203,6 @@ NO;
      * assertSame($finally_count, 2); // 呼ばれている
      * ```
      *
-     * @package Syntax
-     *
      * @param callable $try try ブロッククロージャ
      * @param callable $finally finally ブロッククロージャ
      * @param array $variadic $try に渡る引数
@@ -243,8 +231,6 @@ NO;
      * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage(), 'tried');
      * assertSame($finally_count, 2); // 呼ばれている
      * ```
-     *
-     * @package Syntax
      *
      * @param callable $try try ブロッククロージャ
      * @param callable $catch catch ブロッククロージャ

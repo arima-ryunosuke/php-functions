@@ -9,8 +9,6 @@ class Vars
      *
      * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
      *
-     * @package Var
-     *
      * @param mixed $var 文字列化する値
      * @return string $var を文字列化したもの
      */
@@ -66,8 +64,6 @@ class Vars
      * assertSame(numberify('a1b2c3'), 123);
      * assertSame(numberify('a1b2.c3', true), 12.3);
      * ```
-     *
-     * @package Var
      *
      * @param string $var 対象の値
      * @param bool $decimal 小数として扱うか
@@ -138,8 +134,6 @@ class Vars
      * assertFalse(is_primitive(['array']));
      * ```
      *
-     * @package Var
-     *
      * @param mixed $var 調べる値
      * @return bool 複合型なら false
      */
@@ -162,8 +156,6 @@ class Vars
      * $object->recursive = $object;
      * assertTrue(is_recursive($object));
      * ```
-     *
-     * @package Var
      *
      * @param mixed $var 調べる値
      * @return bool 再帰参照を含むなら true
@@ -212,7 +204,6 @@ class Vars
      * assertFalse(is_iterable(new \stdClass()));
      * ```
      *
-     * @package Var
      * @polyfill
      *
      * @param mixed $var 調べる値
@@ -234,8 +225,6 @@ class Vars
      * assertFalse(is_countable(1));
      * assertFalse(is_countable(new \stdClass()));
      * ```
-     *
-     * @package Var
      *
      * @param mixed $var 調べる値
      * @return bool count でカウントできるなら true
@@ -262,8 +251,6 @@ class Vars
      * assertSame(var_type(new \stdClass), '\\stdClass');
      * assertSame(var_type(new \Exception()), '\\Exception');
      * ```
-     *
-     * @package Var
      *
      * @param mixed $var 型を取得する値
      * @return string 型名
@@ -323,8 +310,6 @@ class Vars
      *     ]),
      * ]");
      * ```
-     *
-     * @package Var
      *
      * @param mixed $value 出力する値
      * @param bool $return 返すなら true 出すなら false
@@ -430,8 +415,6 @@ class Vars
      *
      * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
      *
-     * @package Var
-     *
      * @param mixed $value 出力する値
      */
     public static function var_html($value)
@@ -464,8 +447,6 @@ class Vars
      * $fuga = 'FUGA';
      * assertSame(hashvar($hoge, $fuga), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
      * ```
-     *
-     * @package Var
      *
      * @param mixed $vars 変数（可変引数）
      * @return array 引数の変数を変数名で compact した配列

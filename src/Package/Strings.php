@@ -12,8 +12,6 @@ class Strings
      * assertSame(strcat('a', 'b', 'c'), 'abc');
      * ```
      *
-     * @package String
-     *
      * @param mixed $variadic 結合する文字列（可変引数）
      * @return string 結合した文字列
      */
@@ -37,8 +35,6 @@ class Strings
      * assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
      * assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
      * ```
-     *
-     * @package String
      *
      * @param string $delimiter 区切り文字
      * @param string $string 対象文字
@@ -79,8 +75,6 @@ class Strings
      * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b,c', 'd']);
      * ```
      *
-     * @package String
-     *
      * @param string|array $delimiter 分割文字列。配列可
      * @param string $string 対象文字列
      * @param int $limit 分割数
@@ -116,8 +110,6 @@ class Strings
      * assertTrue(str_equals('abc', 'ABC', true));
      * assertTrue(str_equals('\0abc', '\0abc'));
      * ```
-     *
-     * @package String
      *
      * @param string $str1 文字列1
      * @param string $str2 文字列2
@@ -156,8 +148,6 @@ class Strings
      * assertTrue(str_contains('abc', ['b', 'x'], false, false));
      * assertFalse(str_contains('abc', ['b', 'x'], false, true));
      * ```
-     *
-     * @package String
      *
      * @param string $haystack 対象文字列
      * @param string|array $needle 調べる文字列
@@ -213,8 +203,6 @@ class Strings
      * })()), "a,b,c\nd,e,f");
      * ```
      *
-     * @package String
-     *
      * @param array|\Traversable $array 値の配列 or 値の配列の配列
      * @param string $delimiter フィールド区切り文字
      * @param string $enclosure フィールドを囲む文字
@@ -263,8 +251,6 @@ class Strings
      * // 置換結果は置換対象にならない
      * assertSame(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']), 'xxxXx');
      * ```
-     *
-     * @package String
      *
      * @param string $subject 対象文字列
      * @param string $search 検索文字列
@@ -335,8 +321,6 @@ class Strings
      * assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
      * ```
      *
-     * @package String
-     *
      * @param string $string 対象文字列
      * @param string $from 開始文字列
      * @param string $to 終了文字列
@@ -398,8 +382,6 @@ class Strings
      * assertFalse(starts_with('abcdef', 'xyz'));
      * ```
      *
-     * @package String
-     *
      * @param string $string 探される文字列
      * @param string $with 探す文字列
      * @param bool $case_insensitivity 大文字小文字を区別するか
@@ -424,8 +406,6 @@ class Strings
      * assertFalse(ends_with('abcdef', 'xyz'));
      * ```
      *
-     * @package String
-     *
      * @param string $string 探される文字列
      * @param string $with 探す文字列
      * @param bool $case_insensitivity 大文字小文字を区別するか
@@ -448,8 +428,6 @@ class Strings
      * assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
      * ```
      *
-     * @package String
-     *
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
      * @return string 変換した文字列
@@ -466,8 +444,6 @@ class Strings
      * ```php
      * assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
      * ```
-     *
-     * @package String
      *
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
@@ -486,8 +462,6 @@ class Strings
      * assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
      * ```
      *
-     * @package String
-     *
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
      * @return string 変換した文字列
@@ -504,8 +478,6 @@ class Strings
      * ```php
      * assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
      * ```
-     *
-     * @package String
      *
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
@@ -524,8 +496,6 @@ class Strings
      * - random_bytes: 汎用だが php7 以降のみ
      * - openssl_random_pseudo_bytes: openSsl が必要
      * - mcrypt_create_iv: Mcrypt が必要
-     *
-     * @package String
      *
      * @param int $length 生成文字列長
      * @param string $charlist 使用する文字セット
@@ -592,8 +562,6 @@ class Strings
      * assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']), 'ThisIs 3');
      * ```
      *
-     * @package String
-     *
      * @param string $format フォーマット文字列
      * @param array $array フォーマット引数
      * @return string フォーマットされた文字列
@@ -641,8 +609,6 @@ class Strings
      * assertSame(preg_capture($pattern, 'hoge', $default), [1 => '2000', 2 => '1', 4 => '1']);
      * ```
      *
-     * @package String
-     *
      * @param string $pattern 正規表現
      * @param string $subject 対象文字列
      * @param array $default デフォルト値
@@ -684,8 +650,6 @@ class Strings
      * assertSame(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123');
      * assertSame($m, ['abc']);
      * ```
-     *
-     * @package String
      *
      * @param string $pattern 正規表現
      * @param string|callable $replacement 置換文字列
@@ -736,8 +700,6 @@ class Strings
      * assertSame(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]), '9');
      * ```
      *
-     * @package String
-     *
      * @param string $template レンダリング文字列
      * @param array $array レンダリング変数
      * @return string レンダリングされた文字列
@@ -783,9 +745,7 @@ class Strings
     /**
      * "hoge {$hoge}" 形式のレンダリングのファイル版
      *
-     * @package String
-     *
-     * @see render_string
+     * @see render_string()
      *
      * @param string $template_file レンダリングするファイル名
      * @param array $array レンダリング変数

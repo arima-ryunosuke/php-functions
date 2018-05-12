@@ -15,8 +15,6 @@ class Math
      * assertSame(minimum(-1, 0, 1), -1);
      * ```
      *
-     * @package Math
-     *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return mixed 最小値
      */
@@ -36,8 +34,6 @@ class Math
      * ```php
      * assertSame(maximum(-1, 0, 1), 1);
      * ```
-     *
-     * @package Math
      *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return mixed 最大値
@@ -60,8 +56,6 @@ class Math
      * ```php
      * assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
      * ```
-     *
-     * @package Math
      *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return mixed 最頻値
@@ -100,8 +94,6 @@ class Math
      * assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
      * ```
      *
-     * @package Math
-     *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return int|float 相加平均値
      */
@@ -129,8 +121,6 @@ class Math
      * assertSame(median('a', 'b', 'c', 'd'), 'c');
      * ```
      *
-     * @package Math
-     *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return mixed 中央値
      */
@@ -157,8 +147,6 @@ class Math
      * - 配列は個数ではなくフラット展開した要素を対象にする
      * - 候補がない場合はエラーではなく例外を投げる
      *
-     * @package Math
-     *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return mixed 意味平均値
      */
@@ -182,8 +170,6 @@ class Math
      * assertSame(sum(1, 2, 3, 4, 5, 6), 21);
      * ```
      *
-     * @package Math
-     *
      * @param mixed $variadic 対象の変数・配列・リスト
      * @return mixed 合計値
      */
@@ -204,8 +190,6 @@ class Math
      * // 1 ～ 6 のどれかを返す
      * assertContains(random_at(1, 2, 3, 4, 5, 6), [1, 2, 3, 4, 5, 6]);
      * ```
-     *
-     * @package Math
      *
      * @param array $args 候補
      * @return mixed 引数のうちどれか
@@ -228,8 +212,6 @@ class Math
      *     echo "hello";
      * }
      * ```
-     *
-     * @package Math
      *
      * @param int $probability 分子
      * @param int $divisor 分母
