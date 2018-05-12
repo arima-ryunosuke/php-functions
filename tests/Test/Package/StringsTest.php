@@ -418,6 +418,18 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         ]));
     }
 
+    public function test_preg_splice()
+    {
+        $preg_splice = preg_splice;
+        $m = [];
+        $this->assertEquals("abc", $preg_splice('#\d+#', '', 'abc123', $m));
+        $this->assertEquals(['123'], $m);
+        $this->assertEquals("ABC123", $preg_splice('#([a-z]+)#', function ($m) { return strtoupper($m[1]); }, 'abc123', $m));
+        $this->assertEquals(['abc', 'abc'], $m);
+        $this->assertEquals($preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123');
+        $this->assertEquals($m, ['abc']);
+    }
+
     public function test_render_string()
     {
         $render_string = render_string;
