@@ -251,6 +251,36 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals($current, ob_get_level());
     }
 
+    function test_by_builtin()
+    {
+        $by_builtin = by_builtin;
+        $object = new \BuiltIn();
+
+        $count = 'count';
+        $this->assertEquals(1, $count($object));
+        $this->assertEquals(0, $object->$count());
+
+        $this->assertEquals(1, count($object));
+        $this->assertEquals(0, $object->count());
+
+        $this->assertEquals(1, call_user_func('count', $object));
+        $this->assertEquals(0, call_user_func([$object, 'count']));
+
+        $this->assertEquals(1, call_user_func_array('count', [$object]));
+        $this->assertEquals(0, call_user_func_array([$object, 'count'], []));
+
+        $this->assertEquals(1, (new \ReflectionFunction('count'))->invoke($object));
+        $this->assertEquals(0, (new \ReflectionMethod($object, 'count'))->invoke($object));
+
+        $this->assertEquals(1, (new \ReflectionFunction('count'))->invokeArgs([$object]));
+        $this->assertEquals(0, (new \ReflectionMethod($object, 'count'))->invokeArgs($object, []));
+
+        $this->assertEquals(1, call_user_func(function () use ($object) { return count($object); }));
+        $this->assertEquals(0, call_user_func(function () use ($object) { return $object->count(); }));
+
+        $this->assertException('backtrace', $by_builtin, '', '');
+    }
+
     function test_parameter_length()
     {
         $parameter_length = parameter_length;

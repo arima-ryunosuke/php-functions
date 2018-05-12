@@ -142,6 +142,15 @@ class JsonObject implements \JsonSerializable
     }
 }
 
+class BuiltIn implements \Countable
+{
+    public function count()
+    {
+        return (int) \ryunosuke\Functions\Package\Funchand::by_builtin($this, 'count');
+    }
+}
+
+
 // php 7 の ParseError を模倣したクラス
 if (!class_exists('ParseError', false)) {
     class ParseError extends \Exception
