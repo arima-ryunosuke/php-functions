@@ -547,6 +547,37 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a--z1', 'a--z2'], $array_rmap([1, 2], strcat, 'a-', '-z'));
     }
 
+    function test_array_each()
+    {
+        $array_each = array_each;
+        assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''), '12345');
+        assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []), [
+            1 => 1,
+            2 => 4,
+            3 => 9,
+            4 => 16,
+            5 => 25,
+        ]);
+        assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k) {
+            if ($k === 3) {
+                return false;
+            }
+            $carry[$v] = $v * $v;
+        }, []), [
+            1 => 1,
+            2 => 4,
+            3 => 9,
+        ]);
+
+        // こういう使い方（オブジェクトの配列からメソッド由来の連想配列を作成）を想定しているのでテスト
+        $ex_a = new \Exception('a');
+        $ex_b = new \Exception('b');
+        $ex_c = new \Exception('c');
+        $this->assertSame(['a' => $ex_a, 'b' => $ex_b, 'c' => $ex_c], $array_each([$ex_a, $ex_b, $ex_c], function (&$carry, \Exception $ex) {
+            $carry[$ex->getMessage()] = $ex;
+        }));
+    }
+
     function test_array_depth()
     {
         $array_depth = array_depth;

@@ -1353,6 +1353,61 @@ class Arrays
     }
 
     /**
+     * array_reduce の参照版（のようなもの）
+     *
+     * 配列をループで回し、その途中経過、値、キーをコールバック引数で渡して最終的な結果を返り値として返す。
+     * array_reduce と少し似てるが、下記の点が異なる。
+     *
+     * - いわゆる $carry は返り値で表すのではなく、参照引数で表す
+     * - 値だけでなくキーも渡ってくる
+     * - 巨大配列の場合でも速度劣化が少ない（array_reduce に巨大配列を渡すと実用にならないレベルで遅くなる）
+     *
+     * 返り値ではなく参照引数なので return する必要はない（ワンライナーが書きやすくなる）。
+     * 返り値が空くのでループ制御に用いる。
+     * 今のところ $callback が false を返すとそこで break するのみ。
+     *
+     * Example:
+     * ```php
+     * // 全要素を文字列的に足し合わせる
+     * assertSame(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry .= $v;}, ''), '12345');
+     * // 値をキーにして要素を2乗値にする
+     * assertSame(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry[$v] = $v * $v;}, []), [
+     *     1 => 1,
+     *     2 => 4,
+     *     3 => 9,
+     *     4 => 16,
+     *     5 => 25,
+     * ]);
+     * // 上記と同じ。ただし、3 で break する
+     * assertSame(array_each([1, 2, 3, 4, 5], function(&$carry, $v, $k){
+     *     if ($k === 3) return false;
+     *     $carry[$v] = $v * $v;
+     * }, []), [
+     *     1 => 1,
+     *     2 => 4,
+     *     3 => 9,
+     * ]);
+     * ```
+     *
+     * @package Arrays
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable $callback 評価クロージャ。(&$carry, $key, $value) を受ける
+     * @param mixed $default ループの最初や空の場合に適用される値
+     * @return mixed each した結果
+     */
+    public static function array_each($array, $callback, $default = null)
+    {
+        foreach ($array as $k => $v) {
+            $return = $callback($default, $v, $k);
+            if ($return === false) {
+                break;
+            }
+        }
+        return $default;
+    }
+
+    /**
      * 配列の次元数を返す
      *
      * フラット配列は 1 と定義する。

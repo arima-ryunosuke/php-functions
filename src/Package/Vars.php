@@ -386,12 +386,12 @@ class Vars
                 static $refs = [];
                 $class = get_class($value);
                 if (!isset($refs[$class])) {
-                    $refs[$class] = array_reduce((new \ReflectionClass($value))->getProperties(), function ($carry, \ReflectionProperty $rp) {
+                    $props = (new \ReflectionClass($value))->getProperties();
+                    $refs[$class] = call_user_func(array_each, $props, function (&$carry, \ReflectionProperty $rp) {
                         if (!$rp->isStatic()) {
                             $rp->setAccessible(true);
                             $carry[$rp->getName()] = $rp;
                         }
-                        return $carry;
                     }, []);
                 }
 
