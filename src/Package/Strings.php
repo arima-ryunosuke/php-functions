@@ -100,6 +100,71 @@ class Strings
     }
 
     /**
+     * エスケープやクオートに対応した explode
+     *
+     * $enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。
+     *
+     * Example:
+     * ```php
+     * // シンプルな例
+     * assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
+     *     'a', // 普通に分割される
+     *     'b', // 普通に分割される
+     *     'c\\,d', // \\ でエスケープしているので区切り文字とみなされない
+     *     '"e,f"', // "" でクオートされているので区切り文字とみなされない
+     * ]);
+     *
+     * // $enclosures で囲い文字の開始・終了文字を明示できる
+     * assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' => '}']), [
+     *     'a', // 普通に分割される
+     *     'b', // 普通に分割される
+     *     '{e,f}', // { } で囲まれているので区切り文字とみなされない
+     * ]);
+     * ```
+     *
+     * @param string $delimiter 分割文字列
+     * @param string $string 対象文字列
+     * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
+     * @param string $escape エスケープ文字
+     * @return array 分割された配列
+     */
+    public static function quoteexplode($delimiter, $string, $enclosures = "'\"", $escape = '\\')
+    {
+        if (is_string($enclosures)) {
+            $chars = str_split($enclosures);
+            $enclosures = array_combine($chars, $chars);
+        }
+
+        $delimiterlen = strlen($delimiter);
+        $starts = implode('', array_keys($enclosures));
+        $ends = implode('', $enclosures);
+        $enclosing = [];
+        $current = 0;
+        $result = [];
+        for ($i = 0, $l = strlen($string); $i < $l; $i++) {
+            if ($i !== 0 && $string[$i - 1] === $escape) {
+                continue;
+            }
+            if (strpos($ends, $string[$i]) !== false) {
+                if ($enclosing && $enclosures[$enclosing[count($enclosing) - 1]] === $string[$i]) {
+                    array_pop($enclosing);
+                    continue;
+                }
+            }
+            if (strpos($starts, $string[$i]) !== false) {
+                $enclosing[] = $string[$i];
+                continue;
+            }
+            if (empty($enclosing) && substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
+                $result[] = substr($string, $current, $i - $current);
+                $current = $i + $delimiterlen;
+            }
+        }
+        $result[] = substr($string, $current, $i);
+        return $result;
+    }
+
+    /**
      * 文字列比較の関数版
      *
      * 文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。

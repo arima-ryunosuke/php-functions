@@ -58,6 +58,47 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['one', 'two', 'three', 'four'], $multiexplode('|', $target, 999));
     }
 
+    function test_quoteexplode()
+    {
+        $quoteexplode = quoteexplode;
+        $this->assertEquals([
+            'a',
+            '"x,y"',
+            '["y", "z"]',
+            'c\,d',
+            "'e,f'"
+        ], $quoteexplode(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+
+        assertEquals($quoteexplode(',', 'a,b,{e,f}', ['{' => '}']), [
+            'a',
+            'b',
+            '{e,f}',
+        ]);
+
+        $this->assertEquals([
+            'a',
+            '"x---y"',
+            '["y" --- "z"]',
+            'c\---d',
+            "'e---f'"
+        ], $quoteexplode('---', 'a---"x---y"---["y" --- "z"]---c\\---d---\'e---f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+
+        $this->assertEquals([
+            'a',
+            '"b c"',
+            "'d e'"
+        ], $quoteexplode(' ', 'a "b c" \'d e\'', '"\''));
+
+        $this->assertEquals([
+            'a"bc"',
+        ], $quoteexplode(' ', 'a"bc"', '"'));
+
+        $this->assertEquals([
+            'a"bc "',
+            '',
+        ], $quoteexplode(' ', 'a"bc " ', '"'));
+    }
+
     function test_str_equals()
     {
         $str_equals = str_equals;
