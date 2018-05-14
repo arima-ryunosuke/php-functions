@@ -10,6 +10,13 @@
 
 - no todo
 
+## 1.1.4
+
+- [feature][FileSystem] fnmatch_and/or を追加
+- [feature][Strings] quoteexplode を追加
+- [change][Strings] str_subreplace で非配列引数を受け入れられるように変更
+- [change][Strings] random_string で random_compat を使うように変更
+
 ## 1.1.3
 
 - [fixbug][Strings] str_between を修正
