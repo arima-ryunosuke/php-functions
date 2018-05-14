@@ -306,32 +306,6 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('empty', $random_string, 256, '');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
-    function test_random_string_provider()
-    {
-        if (getenv('TEST_TARGET') !== false && getenv('TEST_TARGET') !== 'package') {
-            return;
-        }
-
-        $random_string = random_string;
-        require_once __DIR__ . '/Strings/random_string.php';
-
-        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x', 'random_bytes'));
-        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x', 'mcrypt_create_iv'));
-        $this->assertEquals('xxxxxxxxxx', $random_string(10, 'x', 'openssl_random_pseudo_bytes'));
-        $this->assertException('enabled function is not exists', $random_string, 10, 'x', 'undefined');
-
-        \ryunosuke\Functions\Package\switch_zerobyte(true);
-        $this->assertException('bytes length is 0', $random_string, 10, 'x', 'random_bytes');
-        $this->assertException('bytes length is 0', $random_string, 10, 'x', 'mcrypt_create_iv');
-        $this->assertException('bytes length is 0', $random_string, 10, 'x', 'openssl_random_pseudo_bytes');
-
-        \ryunosuke\Functions\Package\switch_strong(false);
-        $this->assertException('$crypto_strong is false', $random_string, 10, 'x', 'openssl_random_pseudo_bytes');
-    }
-
     public function test_kvsprintf()
     {
         $kvsprintf = kvsprintf;

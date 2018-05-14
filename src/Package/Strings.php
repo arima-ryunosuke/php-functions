@@ -491,25 +491,12 @@ class Strings
     /**
      * 安全な乱数文字列を生成する
      *
-     * 下記のいずれかを記述順の優先度で使用する。
-     *
-     * - random_bytes: 汎用だが php7 以降のみ
-     * - openssl_random_pseudo_bytes: openSsl が必要
-     * - mcrypt_create_iv: Mcrypt が必要
-     *
      * @param int $length 生成文字列長
      * @param string $charlist 使用する文字セット
      * @return string 乱数文字列
      */
     public static function random_string($length = 8, $charlist = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
-        // テスト＋カバレッジのための隠し引数
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $args = func_get_args();
-        $pf = true;
-
-        assert('$pf = count($args) > 2 ? $args[2] : true;');
-
         if ($length <= 0) {
             throw new \InvalidArgumentException('$length must be positive number.');
         }
@@ -519,30 +506,7 @@ class Strings
             throw new \InvalidArgumentException('charlist is empty.');
         }
 
-        // 使えるなら最も優秀なはず
-        if ((function_exists('random_bytes') && $pf === true) || $pf === 'random_bytes') {
-            $bytes = random_bytes($length);
-        }
-        // 次点
-        elseif ((function_exists('openssl_random_pseudo_bytes') && $pf === true) || $pf === 'openssl_random_pseudo_bytes') {
-            $bytes = openssl_random_pseudo_bytes($length, $crypto_strong);
-            if ($crypto_strong === false) {
-                throw new \Exception('failed to random_string ($crypto_strong is false).');
-            }
-        }
-        // よく分からない？
-        elseif ((function_exists('mcrypt_create_iv') && $pf === true) || $pf === 'mcrypt_create_iv') {
-            /** @noinspection PhpDeprecationInspection */
-            $bytes = mcrypt_create_iv($length);
-        }
-        // どれもないなら例外
-        else {
-            throw new \Exception('failed to random_string (enabled function is not exists).');
-        }
-
-        if (strlen($bytes) === 0) {
-            throw new \Exception('failed to random_string (bytes length is 0).');
-        }
+        $bytes = random_bytes($length);
 
         // 1文字1バイト使う。文字種によっては出現率に差が出るがう～ん
         $string = '';
