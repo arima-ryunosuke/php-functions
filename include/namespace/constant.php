@@ -1,6 +1,6 @@
 <?php
 
-/** Don't touch this code. This is auto generated. */
+# Don't touch this code. This is auto generated.
 
 namespace ryunosuke\Functions;
 
@@ -69,6 +69,8 @@ const file_extension = 'ryunosuke\\Functions\\file_extension';
 const file_set_contents = 'ryunosuke\\Functions\\file_set_contents';
 const mkdir_p = 'ryunosuke\\Functions\\mkdir_p';
 const dirname_r = 'ryunosuke\\Functions\\dirname_r';
+const fnmatch_and = 'ryunosuke\\Functions\\fnmatch_and';
+const fnmatch_or = 'ryunosuke\\Functions\\fnmatch_or';
 const path_is_absolute = 'ryunosuke\\Functions\\path_is_absolute';
 const path_resolve = 'ryunosuke\\Functions\\path_resolve';
 const path_normalize = 'ryunosuke\\Functions\\path_normalize';
@@ -104,6 +106,7 @@ const probability = 'ryunosuke\\Functions\\probability';
 const strcat = 'ryunosuke\\Functions\\strcat';
 const split_noempty = 'ryunosuke\\Functions\\split_noempty';
 const multiexplode = 'ryunosuke\\Functions\\multiexplode';
+const quoteexplode = 'ryunosuke\\Functions\\quoteexplode';
 const str_equals = 'ryunosuke\\Functions\\str_equals';
 const str_contains = 'ryunosuke\\Functions\\str_contains';
 const str_putcsv = 'ryunosuke\\Functions\\str_putcsv';

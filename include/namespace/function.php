@@ -1,6 +1,6 @@
 <?php
 
-/** Don't touch this code. This is auto generated. */
+# Don't touch this code. This is auto generated.
 
 namespace ryunosuke\Functions;
 
@@ -2715,6 +2715,76 @@ if (!isset($excluded_functions['dirname_r']) && (!function_exists('ryunosuke\\Fu
         return call_user_func(dirname_r, $dirname, $callback);
     }
 }
+if (!isset($excluded_functions['fnmatch_and']) && (!function_exists('ryunosuke\\Functions\\fnmatch_and') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\fnmatch_and'))->isInternal()))) {
+    /**
+     * fnmatch の AND 版
+     *
+     * $patterns のうちどれか一つでもマッチしなかったら false を返す。
+     * $patterns が空だと例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // すべてにマッチするので true
+     * assertTrue(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'));
+     * // aaa にはマッチするが bbb にはマッチしないので false
+     * assertFalse(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
+     * ```
+     *
+     * @param array|string $patterns パターン配列（単一文字列可）
+     * @param string $string 調べる文字列
+     * @param int $flags FNM_***
+     * @return bool すべてにマッチしたら true
+     */
+    function fnmatch_and($patterns, $string, $flags = 0)
+    {
+        $patterns = call_user_func(is_iterable, $patterns) ? $patterns : [$patterns];
+        if (empty($patterns)) {
+            throw new \InvalidArgumentException('$patterns must be not empty.');
+        }
+
+        foreach ($patterns as $pattern) {
+            if (!fnmatch($pattern, $string, $flags)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+if (!isset($excluded_functions['fnmatch_or']) && (!function_exists('ryunosuke\\Functions\\fnmatch_or') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\fnmatch_or'))->isInternal()))) {
+    /**
+     * fnmatch の OR 版
+     *
+     * $patterns のうちどれか一つでもマッチしたら true を返す。
+     * $patterns が空だと例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // aaa にマッチするので true
+     * assertTrue(fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'));
+     * // どれともマッチしないので false
+     * assertFalse(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
+     * ```
+     *
+     * @param array|string $patterns パターン配列（単一文字列可）
+     * @param string $string 調べる文字列
+     * @param int $flags FNM_***
+     * @return bool どれかにマッチしたら true
+     */
+    function fnmatch_or($patterns, $string, $flags = 0)
+    {
+        $patterns = call_user_func(is_iterable, $patterns) ? $patterns : [$patterns];
+        if (empty($patterns)) {
+            throw new \InvalidArgumentException('$patterns must be not empty.');
+        }
+
+        foreach ($patterns as $pattern) {
+            if (fnmatch($pattern, $string, $flags)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('ryunosuke\\Functions\\path_is_absolute') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\path_is_absolute'))->isInternal()))) {
     /**
      * パスが絶対パスか判定する
@@ -3958,6 +4028,72 @@ if (!isset($excluded_functions['multiexplode']) && (!function_exists('ryunosuke\
         return explode($delimiter, $string, $limit);
     }
 }
+if (!isset($excluded_functions['quoteexplode']) && (!function_exists('ryunosuke\\Functions\\quoteexplode') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\quoteexplode'))->isInternal()))) {
+    /**
+     * エスケープやクオートに対応した explode
+     *
+     * $enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。
+     *
+     * Example:
+     * ```php
+     * // シンプルな例
+     * assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
+     *     'a', // 普通に分割される
+     *     'b', // 普通に分割される
+     *     'c\\,d', // \\ でエスケープしているので区切り文字とみなされない
+     *     '"e,f"', // "" でクオートされているので区切り文字とみなされない
+     * ]);
+     *
+     * // $enclosures で囲い文字の開始・終了文字を明示できる
+     * assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' => '}']), [
+     *     'a', // 普通に分割される
+     *     'b', // 普通に分割される
+     *     '{e,f}', // { } で囲まれているので区切り文字とみなされない
+     * ]);
+     * ```
+     *
+     * @param string $delimiter 分割文字列
+     * @param string $string 対象文字列
+     * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
+     * @param string $escape エスケープ文字
+     * @return array 分割された配列
+     */
+    function quoteexplode($delimiter, $string, $enclosures = '\'"', $escape = '\\')
+    {
+        if (is_string($enclosures)) {
+            $chars = str_split($enclosures);
+            $enclosures = array_combine($chars, $chars);
+        }
+
+        $delimiterlen = strlen($delimiter);
+        $starts = implode('', array_keys($enclosures));
+        $ends = implode('', $enclosures);
+        $enclosing = [];
+        $current = 0;
+        $result = [];
+        for ($i = 0, $l = strlen($string); $i < $l; $i++) {
+            if ($i !== 0 && $string[$i - 1] === $escape) {
+                continue;
+            }
+            if (strpos($ends, $string[$i]) !== false) {
+                if ($enclosing && $enclosures[$enclosing[count($enclosing) - 1]] === $string[$i]) {
+                    array_pop($enclosing);
+                    continue;
+                }
+            }
+            if (strpos($starts, $string[$i]) !== false) {
+                $enclosing[] = $string[$i];
+                continue;
+            }
+            if (empty($enclosing) && substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
+                $result[] = substr($string, $current, $i - $current);
+                $current = $i + $delimiterlen;
+            }
+        }
+        $result[] = substr($string, $current, $i);
+        return $result;
+    }
+}
 if (!isset($excluded_functions['str_equals']) && (!function_exists('ryunosuke\\Functions\\str_equals') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\str_equals'))->isInternal()))) {
     /**
      * 文字列比較の関数版
@@ -4099,6 +4235,9 @@ if (!isset($excluded_functions['str_subreplace']) && (!function_exists('ryunosuk
      * str_replace とは「N 番目のみ置換できる」点で異なる。
      * つまり、$subject='hoge', $replace=[2 => 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。
      *
+     * $replace に 非配列を与えた場合は配列化される。
+     * つまり `$replaces = 'hoge'` は `$replaces = [0 => 'hoge']` と同じ（最初のマッチを置換する）。
+     *
      * $replace に空配列を与えると何もしない。
      * 負数キーは後ろから数える動作となる。
      * また、置換後の文字列は置換対象にはならない。
@@ -4117,12 +4256,16 @@ if (!isset($excluded_functions['str_subreplace']) && (!function_exists('ryunosuk
      *
      * @param string $subject 対象文字列
      * @param string $search 検索文字列
-     * @param array $replaces 置換文字列
+     * @param array|string $replaces 置換文字列配列（単一指定は配列化される）
      * @param bool $case_insensitivity 大文字小文字を区別するか
      * @return string 置換された文字列
      */
     function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
     {
+        if (!is_array($replaces)) {
+            $replaces = [$replaces];
+        }
+
         // 空はそのまま返す
         if (empty($replaces)) {
             return $subject;
@@ -4362,25 +4505,12 @@ if (!isset($excluded_functions['random_string']) && (!function_exists('ryunosuke
     /**
      * 安全な乱数文字列を生成する
      *
-     * 下記のいずれかを記述順の優先度で使用する。
-     *
-     * - random_bytes: 汎用だが php7 以降のみ
-     * - openssl_random_pseudo_bytes: openSsl が必要
-     * - mcrypt_create_iv: Mcrypt が必要
-     *
      * @param int $length 生成文字列長
      * @param string $charlist 使用する文字セット
      * @return string 乱数文字列
      */
     function random_string($length = 8, $charlist = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
-        // テスト＋カバレッジのための隠し引数
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $args = func_get_args();
-        $pf = true;
-
-        assert('$pf = count($args) > 2 ? $args[2] : true;');
-
         if ($length <= 0) {
             throw new \InvalidArgumentException('$length must be positive number.');
         }
@@ -4390,30 +4520,7 @@ if (!isset($excluded_functions['random_string']) && (!function_exists('ryunosuke
             throw new \InvalidArgumentException('charlist is empty.');
         }
 
-        // 使えるなら最も優秀なはず
-        if ((function_exists('random_bytes') && $pf === true) || $pf === 'random_bytes') {
-            $bytes = random_bytes($length);
-        }
-        // 次点
-        elseif ((function_exists('openssl_random_pseudo_bytes') && $pf === true) || $pf === 'openssl_random_pseudo_bytes') {
-            $bytes = openssl_random_pseudo_bytes($length, $crypto_strong);
-            if ($crypto_strong === false) {
-                throw new \Exception('failed to random_string ($crypto_strong is false).');
-            }
-        }
-        // よく分からない？
-        elseif ((function_exists('mcrypt_create_iv') && $pf === true) || $pf === 'mcrypt_create_iv') {
-            /** @noinspection PhpDeprecationInspection */
-            $bytes = mcrypt_create_iv($length);
-        }
-        // どれもないなら例外
-        else {
-            throw new \Exception('failed to random_string (enabled function is not exists).');
-        }
-
-        if (strlen($bytes) === 0) {
-            throw new \Exception('failed to random_string (bytes length is 0).');
-        }
+        $bytes = random_bytes($length);
 
         // 1文字1バイト使う。文字種によっては出現率に差が出るがう～ん
         $string = '';
@@ -5362,7 +5469,7 @@ if (!isset($excluded_functions['is_iterable']) && (!function_exists('ryunosuke\\
         return is_array($var) || $var instanceof \Traversable;
     }
 }
-if (!isset($excluded_functions['is_countable']) && (!function_exists('ryunosuke\\Functions\\is_countable') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\is_countable'))->isInternal()))) {
+if (!isset($excluded_functions['is_countable']) && (!function_exists('ryunosuke\\Functions\\is_countable') || (!true && (new \ReflectionFunction('ryunosuke\\Functions\\is_countable'))->isInternal()))) {
     /**
      * 変数が count でカウントできるか調べる
      *
@@ -5374,6 +5481,8 @@ if (!isset($excluded_functions['is_countable']) && (!function_exists('ryunosuke\
      * assertFalse(is_countable(1));
      * assertFalse(is_countable(new \stdClass()));
      * ```
+     *
+     * @polyfill
      *
      * @param mixed $var 調べる値
      * @return bool count でカウントできるなら true

@@ -1,6 +1,6 @@
 <?php
 
-/** Don't touch this code. This is auto generated. */
+# Don't touch this code. This is auto generated.
 
 namespace ryunosuke\Functions\Package;
 
@@ -69,6 +69,8 @@ const file_extension = ['ryunosuke\\Functions\\Package\\FileSystem', 'file_exten
 const file_set_contents = ['ryunosuke\\Functions\\Package\\FileSystem', 'file_set_contents'];
 const mkdir_p = ['ryunosuke\\Functions\\Package\\FileSystem', 'mkdir_p'];
 const dirname_r = ['ryunosuke\\Functions\\Package\\FileSystem', 'dirname_r'];
+const fnmatch_and = ['ryunosuke\\Functions\\Package\\FileSystem', 'fnmatch_and'];
+const fnmatch_or = ['ryunosuke\\Functions\\Package\\FileSystem', 'fnmatch_or'];
 const path_is_absolute = ['ryunosuke\\Functions\\Package\\FileSystem', 'path_is_absolute'];
 const path_resolve = ['ryunosuke\\Functions\\Package\\FileSystem', 'path_resolve'];
 const path_normalize = ['ryunosuke\\Functions\\Package\\FileSystem', 'path_normalize'];
@@ -104,6 +106,7 @@ const probability = ['ryunosuke\\Functions\\Package\\Math', 'probability'];
 const strcat = ['ryunosuke\\Functions\\Package\\Strings', 'strcat'];
 const split_noempty = ['ryunosuke\\Functions\\Package\\Strings', 'split_noempty'];
 const multiexplode = ['ryunosuke\\Functions\\Package\\Strings', 'multiexplode'];
+const quoteexplode = ['ryunosuke\\Functions\\Package\\Strings', 'quoteexplode'];
 const str_equals = ['ryunosuke\\Functions\\Package\\Strings', 'str_equals'];
 const str_contains = ['ryunosuke\\Functions\\Package\\Strings', 'str_contains'];
 const str_putcsv = ['ryunosuke\\Functions\\Package\\Strings', 'str_putcsv'];

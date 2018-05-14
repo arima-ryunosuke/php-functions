@@ -1,6 +1,6 @@
 <?php
 
-/** Don't touch this code. This is auto generated. */
+# Don't touch this code. This is auto generated.
 
 const arrayize = 'arrayize';
 const is_hasharray = 'is_hasharray';
@@ -67,6 +67,8 @@ const file_extension = 'file_extension';
 const file_set_contents = 'file_set_contents';
 const mkdir_p = 'mkdir_p';
 const dirname_r = 'dirname_r';
+const fnmatch_and = 'fnmatch_and';
+const fnmatch_or = 'fnmatch_or';
 const path_is_absolute = 'path_is_absolute';
 const path_resolve = 'path_resolve';
 const path_normalize = 'path_normalize';
@@ -102,6 +104,7 @@ const probability = 'probability';
 const strcat = 'strcat';
 const split_noempty = 'split_noempty';
 const multiexplode = 'multiexplode';
+const quoteexplode = 'quoteexplode';
 const str_equals = 'str_equals';
 const str_contains = 'str_contains';
 const str_putcsv = 'str_putcsv';
