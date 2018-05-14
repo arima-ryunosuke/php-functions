@@ -550,15 +550,15 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_each()
     {
         $array_each = array_each;
-        assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''), '12345');
-        assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []), [
+        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''), '12345');
+        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []), [
             1 => 1,
             2 => 4,
             3 => 9,
             4 => 16,
             5 => 25,
         ]);
-        assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k) {
+        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k) {
             if ($k === 3) {
                 return false;
             }
