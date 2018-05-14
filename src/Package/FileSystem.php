@@ -236,6 +236,74 @@ class FileSystem
     }
 
     /**
+     * fnmatch の AND 版
+     *
+     * $patterns のうちどれか一つでもマッチしなかったら false を返す。
+     * $patterns が空だと例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // すべてにマッチするので true
+     * assertTrue(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'));
+     * // aaa にはマッチするが bbb にはマッチしないので false
+     * assertFalse(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
+     * ```
+     *
+     * @param array|string $patterns パターン配列（単一文字列可）
+     * @param string $string 調べる文字列
+     * @param int $flags FNM_***
+     * @return bool すべてにマッチしたら true
+     */
+    public static function fnmatch_and($patterns, $string, $flags = 0)
+    {
+        $patterns = call_user_func(is_iterable, $patterns) ? $patterns : [$patterns];
+        if (empty($patterns)) {
+            throw new \InvalidArgumentException('$patterns must be not empty.');
+        }
+
+        foreach ($patterns as $pattern) {
+            if (!fnmatch($pattern, $string, $flags)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * fnmatch の OR 版
+     *
+     * $patterns のうちどれか一つでもマッチしたら true を返す。
+     * $patterns が空だと例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // aaa にマッチするので true
+     * assertTrue(fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'));
+     * // どれともマッチしないので false
+     * assertFalse(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
+     * ```
+     *
+     * @param array|string $patterns パターン配列（単一文字列可）
+     * @param string $string 調べる文字列
+     * @param int $flags FNM_***
+     * @return bool どれかにマッチしたら true
+     */
+    public static function fnmatch_or($patterns, $string, $flags = 0)
+    {
+        $patterns = call_user_func(is_iterable, $patterns) ? $patterns : [$patterns];
+        if (empty($patterns)) {
+            throw new \InvalidArgumentException('$patterns must be not empty.');
+        }
+
+        foreach ($patterns as $pattern) {
+            if (fnmatch($pattern, $string, $flags)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * パスが絶対パスか判定する
      *
      * Example:

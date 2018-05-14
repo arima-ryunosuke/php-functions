@@ -175,6 +175,24 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $paths);
     }
 
+    function test_fnmatch_and()
+    {
+        $fnmatch_and = fnmatch_and;
+        $this->assertTrue($fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'));
+        $this->assertFalse($fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
+
+        $this->assertException('empty', $fnmatch_and, [], '');
+    }
+
+    function test_fnmatch_or()
+    {
+        $fnmatch_or = fnmatch_or;
+        $this->assertTrue($fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'));
+        $this->assertFalse($fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
+
+        $this->assertException('empty', $fnmatch_or, [], '');
+    }
+
     function test_path_is_absolute()
     {
         $path_is_absolute = path_is_absolute;
