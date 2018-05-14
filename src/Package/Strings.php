@@ -236,6 +236,9 @@ class Strings
      * str_replace とは「N 番目のみ置換できる」点で異なる。
      * つまり、$subject='hoge', $replace=[2 => 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。
      *
+     * $replace に 非配列を与えた場合は配列化される。
+     * つまり `$replaces = 'hoge'` は `$replaces = [0 => 'hoge']` と同じ（最初のマッチを置換する）。
+     *
      * $replace に空配列を与えると何もしない。
      * 負数キーは後ろから数える動作となる。
      * また、置換後の文字列は置換対象にはならない。
@@ -254,12 +257,16 @@ class Strings
      *
      * @param string $subject 対象文字列
      * @param string $search 検索文字列
-     * @param array $replaces 置換文字列
+     * @param array|string $replaces 置換文字列配列（単一指定は配列化される）
      * @param bool $case_insensitivity 大文字小文字を区別するか
      * @return string 置換された文字列
      */
     public static function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
     {
+        if (!is_array($replaces)) {
+            $replaces = [$replaces];
+        }
+
         // 空はそのまま返す
         if (empty($replaces)) {
             return $subject;

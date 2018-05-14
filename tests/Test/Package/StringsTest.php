@@ -144,6 +144,8 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
 
         // empty
         $this->assertEquals('xxxxx', $str_subreplace($string, 'x', []));
+        // string
+        $this->assertEquals('Xxxxx', $str_subreplace($string, 'x', 'X'));
         // all
         $this->assertEquals('X1X2X3X4X5', $str_subreplace($string, 'x', ['X1', 'X2', 'X3', 'X4', 'X5']));
         // 3rd
