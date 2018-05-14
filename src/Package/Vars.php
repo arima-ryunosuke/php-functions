@@ -226,6 +226,8 @@ class Vars
      * assertFalse(is_countable(new \stdClass()));
      * ```
      *
+     * @polyfill
+     *
      * @param mixed $var 調べる値
      * @return bool count でカウントできるなら true
      */
