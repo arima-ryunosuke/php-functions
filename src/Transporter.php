@@ -72,10 +72,12 @@ class Transporter
 
     public static function exportFunction($namespace, $methodmode, $source = null)
     {
+        $PREFIX = "Don't touch this code. This is auto generated.";
+
         if ($source) {
             foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
                 $content = file_get_contents($fn);
-                $content = str_replace('namespace ryunosuke\\Functions\\Package', "/** Don't touch this code. This is auto generated. */\n
+                $content = str_replace('namespace ryunosuke\\Functions\\Package', "# $PREFIX\n
 namespace $namespace", $content);
                 $path = $source . '/' . basename($fn);
                 file_put_contents($path, $content);
@@ -131,15 +133,13 @@ CODE;
             }
         }
 
-        $prefix = "<?php\n\n/** Don't touch this code. This is auto generated. */\n\n";
-
         if ($namespace) {
             $namespace = "namespace " . $namespace . ";\n\n";
         }
 
         return [
-            'constant' => $prefix . $namespace . implode("\n", $constants) . "\n",
-            'function' => $prefix . $namespace . implode("\n", $functions) . "\n",
+            'constant' => "<?php\n\n# $PREFIX\n\n" . $namespace . implode("\n", $constants) . "\n",
+            'function' => "<?php\n\n# $PREFIX\n\n" . $namespace . implode("\n", $functions) . "\n",
         ];
     }
 
