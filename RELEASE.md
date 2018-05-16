@@ -10,6 +10,16 @@
 
 - no todo
 
+## 1.1.5
+
+- [feature][Syntax] throw_if を追加
+- [feature][Arrays] array_keys_exists を追加
+- [feature][Arrays] array_each の第3引数を省略した場合の自動検出
+- [feature][Strings] concat を追加
+- [feature][Vars] is_empty を追加
+- [feature][Transporter] オールインワン吐き出し機能の実装
+- [fixbug][Transporter] デフォルト値の出力がおかしかった不具合を修正
+
 ## 1.1.4
 
 - [feature][FileSystem] fnmatch_and/or を追加
