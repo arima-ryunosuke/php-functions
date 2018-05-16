@@ -115,6 +115,57 @@ class Vars
     }
 
     /**
+     * 値が空か検査する
+     *
+     * `empty` とほぼ同じ。ただし
+     *
+     * - string: "0"
+     * - あらゆる object
+     *
+     * は false 判定する。
+     *
+     * なお、関数の仕様上、未定義変数を true 判定することはできない。
+     * 未定義変数をチェックしたい状況は大抵の場合コードが悪いが `$array['key1']['key2']` を調べたいことはある。
+     * そういう時には使えない（?? する必要がある）。
+     *
+     * 「 `if ($var) {}` で十分なんだけど "0" が…」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // この辺は empty と全く同じ
+     * assertTrue(is_empty(null));
+     * assertTrue(is_empty(false));
+     * assertTrue(is_empty(0));
+     * assertTrue(is_empty(''));
+     * // この辺だけが異なる
+     * assertFalse(is_empty('0'));
+     * assertFalse(is_empty(new \SimpleXMLElement('<foo></foo>')));
+     * ```
+     *
+     * @param mixed $var 判定する値
+     * @return bool 空なら true
+     */
+    public static function is_empty($var)
+    {
+        // empty で空でない判定ならそれで良い
+        if (!empty($var)) {
+            return false;
+        }
+
+        // "0" は false
+        if ($var === '0') {
+            return false;
+        }
+
+        // object は false
+        if (is_object($var)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 値が複合型でないか検査する
      *
      * 「複合型」とはオブジェクトと配列のこと。

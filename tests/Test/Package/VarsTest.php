@@ -63,6 +63,33 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         }
     }
 
+    function test_is_empty()
+    {
+        $is_empty = is_empty;
+        $stdclass = new \stdClass();
+        $xmlelem1 = new \SimpleXMLElement('<foo>1</foo>');
+        $xmlelem2 = new \SimpleXMLElement('<foo></foo>');
+        // この辺は empty と全く同じ（true）
+        $this->assertSame(empty(null), $is_empty(null));
+        $this->assertSame(empty(false), $is_empty(false));
+        $this->assertSame(empty(0), $is_empty(0));
+        $this->assertSame(empty(0.0), $is_empty(0.0));
+        $this->assertSame(empty(''), $is_empty(''));
+        $this->assertSame(empty([]), $is_empty([]));
+        // この辺は empty と全く同じ（false）
+        $this->assertSame(empty($stdclass), $is_empty($stdclass));
+        $this->assertSame(empty($xmlelem1), $is_empty($xmlelem1));
+        $this->assertSame(empty(true), $is_empty(true));
+        $this->assertSame(empty(1), $is_empty(1));
+        $this->assertSame(empty(1.0), $is_empty(1.0));
+        $this->assertSame(empty('0.0'), $is_empty('0.0'));
+        $this->assertSame(empty('00'), $is_empty('00'));
+        $this->assertSame(empty([1]), $is_empty([1]));
+        // この辺は差異がある
+        $this->assertNotSame(empty('0'), $is_empty('0'));
+        $this->assertNotSame(empty($xmlelem2), $is_empty($xmlelem2));
+    }
+
     function test_is_primitive()
     {
         $is_primitive = is_primitive;
