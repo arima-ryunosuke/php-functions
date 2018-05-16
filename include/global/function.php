@@ -49,7 +49,7 @@ if (!isset($excluded_functions['is_hasharray']) && (!function_exists('is_hasharr
      * @param array $array 調べる配列
      * @return bool 連想配列なら true
      */
-    function is_hasharray($array)
+    function is_hasharray(array $array)
     {
         $i = 0;
         foreach ($array as $k => $dummy) {
@@ -76,7 +76,7 @@ if (!isset($excluded_functions['first_key']) && (!function_exists('first_key') |
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最初のキー
      */
-    function first_key($array, $default = NULL)
+    function first_key($array, $default = null)
     {
         if (empty($array)) {
             return $default;
@@ -102,7 +102,7 @@ if (!isset($excluded_functions['first_value']) && (!function_exists('first_value
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最初の値
      */
-    function first_value($array, $default = NULL)
+    function first_value($array, $default = null)
     {
         if (empty($array)) {
             return $default;
@@ -128,7 +128,7 @@ if (!isset($excluded_functions['first_keyvalue']) && (!function_exists('first_ke
      * @param mixed $default 無かった場合のデフォルト値
      * @return array [最初のキー, 最初の値]
      */
-    function first_keyvalue($array, $default = NULL)
+    function first_keyvalue($array, $default = null)
     {
         foreach ($array as $k => $v) {
             return [$k, $v];
@@ -152,7 +152,7 @@ if (!isset($excluded_functions['last_key']) && (!function_exists('last_key') || 
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最後のキー
      */
-    function last_key($array, $default = NULL)
+    function last_key($array, $default = null)
     {
         if (empty($array)) {
             return $default;
@@ -178,7 +178,7 @@ if (!isset($excluded_functions['last_value']) && (!function_exists('last_value')
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最後の値
      */
-    function last_value($array, $default = NULL)
+    function last_value($array, $default = null)
     {
         if (empty($array)) {
             return $default;
@@ -204,7 +204,7 @@ if (!isset($excluded_functions['last_keyvalue']) && (!function_exists('last_keyv
      * @param mixed $default 無かった場合のデフォルト値
      * @return array [最後のキー, 最後の値]
      */
-    function last_keyvalue($array, $default = NULL)
+    function last_keyvalue($array, $default = null)
     {
         /** @noinspection PhpStatementHasEmptyBodyInspection */
         foreach ($array as $k => $v) {
@@ -280,7 +280,7 @@ if (!isset($excluded_functions['next_key']) && (!function_exists('next_key') || 
      * @param string|int|null $key 調べるキー
      * @return string|int|bool|null $key の次のキー
      */
-    function next_key($array, $key = NULL)
+    function next_key($array, $key = null)
     {
         $keynull = $key === null;
         $key = (string) $key;
@@ -471,7 +471,7 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
      * @param string $glue 結合文字列。未指定時は implode しない
      * @return array|string sprintf された配列
      */
-    function array_sprintf($array, $format, $glue = NULL)
+    function array_sprintf($array, $format, $glue = null)
     {
         if (is_callable($format)) {
             $callback = call_user_func(func_user_func_array, $format);
@@ -597,7 +597,7 @@ if (!isset($excluded_functions['array_of']) && (!function_exists('array_of') || 
      * @param mixed $default デフォルト値
      * @return \Closure $key の値を返すクロージャ
      */
-    function array_of($key, $default = NULL)
+    function array_of($key, $default = null)
     {
         $nodefault = func_num_args() === 1;
         return function (array $array) use ($key, $default, $nodefault) {
@@ -639,7 +639,7 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
-    function array_get($array, $key, $default = NULL)
+    function array_get($array, $key, $default = null)
     {
         if (is_array($key)) {
             $result = [];
@@ -693,7 +693,7 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('array_set') |
      * @param bool $require_return 返り値が不要なら false を渡す
      * @return string|int 設定したキー
      */
-    function array_set(&$array, $value, $key = NULL, $require_return = true)
+    function array_set(&$array, $value, $key = null, $require_return = true)
     {
         if (is_array($key)) {
             $k = array_shift($key);
@@ -754,7 +754,7 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
-    function array_unset(&$array, $key, $default = NULL)
+    function array_unset(&$array, $key, $default = null)
     {
         if (is_array($key)) {
             $result = [];
@@ -805,7 +805,7 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive')
      * @param string $delimiter パスの区切り文字。大抵は '.' か '/'
      * @return mixed パスが示す配列の値
      */
-    function array_dive($array, $path, $default = NULL, $delimiter = '.')
+    function array_dive($array, $path, $default = null, $delimiter = '.')
     {
         $keys = is_array($path) ? $path : explode($delimiter, $path);
         foreach ($keys as $key) {
@@ -815,6 +815,62 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive')
             $array = $array[$key];
         }
         return $array;
+    }
+}
+if (!isset($excluded_functions['array_keys_exist']) && (!function_exists('array_keys_exist') || (!false && (new \ReflectionFunction('array_keys_exist'))->isInternal()))) {
+    /**
+     * array_key_exists の複数版
+     *
+     * 指定キーが全て存在するなら true を返す。
+     * 配列ではなく単一文字列を与えても動作する（array_key_exists と全く同じ動作になる）。
+     *
+     * $keys に空を与えると例外を投げる。
+     * $keys に配列を与えるとキーで潜ってチェックする（Example 参照）。
+     *
+     * Example:
+     * ```php
+     * // すべて含むので true
+     * assertTrue(array_keys_exist(['a', 'b', 'c'], ['a' => 'A', 'b' => 'B', 'c' => 'C']));
+     * // N は含まないので false
+     * assertFalse(array_keys_exist(['a', 'b', 'N'], ['a' => 'A', 'b' => 'B', 'c' => 'C']));
+     * // 配列を与えると潜る（日本語で言えば「a というキーと、x というキーとその中に x1, x2 というキーがあるか？」）
+     * assertTrue(array_keys_exist(['a', 'x' => ['x1', 'x2']], ['a' => 'A', 'x' => ['x1' => 'X1', 'x2' => 'X2']]));
+     * ```
+     *
+     * @param array|string $keys 調べるキー
+     * @param array|\ArrayAccess $array 調べる配列
+     * @return bool 指定キーが全て存在するなら true
+     */
+    function array_keys_exist($keys, $array)
+    {
+        $keys = (array) $keys;
+        if (empty($keys)) {
+            throw new \InvalidArgumentException('$keys is empty.');
+        }
+
+        $is_arrayaccess = $array instanceof \ArrayAccess;
+
+        foreach ($keys as $k => $key) {
+            if (is_array($key)) {
+                // まずそのキーをチェックして
+                if (!call_user_func(array_keys_exist, $k, $array)) {
+                    return false;
+                }
+                // あるなら再帰する
+                if (!call_user_func(array_keys_exist, $key, $array[$k])) {
+                    return false;
+                }
+            }
+            elseif ($is_arrayaccess) {
+                if (!isset($array[$key])) {
+                    return false;
+                }
+            }
+            elseif (!array_key_exists($key, $array)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 if (!isset($excluded_functions['array_exists']) && (!function_exists('array_exists') || (!false && (new \ReflectionFunction('array_exists'))->isInternal()))) {
@@ -1050,7 +1106,7 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
      * @param callable $callback 評価クロージャ
      * @return array $where が真を返した新しい配列
      */
-    function array_where($array, $column = NULL, $callback = NULL)
+    function array_where($array, $column = null, $callback = null)
     {
         $is_array = is_array($column);
         if ($is_array) {
@@ -1332,6 +1388,11 @@ if (!isset($excluded_functions['array_each']) && (!function_exists('array_each')
      * 返り値が空くのでループ制御に用いる。
      * 今のところ $callback が false を返すとそこで break するのみ。
      *
+     * 第3引数を省略した場合、**クロージャの第1引数のデフォルト値が使われる**。
+     * これは特筆すべき動作で、不格好な第3引数を完全に省略することができる（サンプルコードを参照）。
+     * ただし「php の文法違反（今のところエラーにはならないし、全てにデフォルト値をつければ一応回避可能）」「リフレクションを使う（ほんの少し遅くなる）」などの弊害が有るので推奨はしない。
+     * （ただ、「意図していることをコードで表す」といった観点ではこの記法の方が正しいとも思う）。
+     *
      * Example:
      * ```php
      * // 全要素を文字列的に足し合わせる
@@ -1353,6 +1414,17 @@ if (!isset($excluded_functions['array_each']) && (!function_exists('array_each')
      *     2 => 4,
      *     3 => 9,
      * ]);
+     *
+     * // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
+     * assertSame(
+     *     array_each([1, 2, 3], function(&$carry = [], $v) {
+     *         $carry[$v] = $v * $v;
+     *     }),
+     *     array_each([1, 2, 3], function(&$carry, $v) {
+     *         $carry[$v] = $v * $v;
+     *     }, [])
+     *     // 個人的に↑のようなぶら下がり引数があまり好きではない（クロージャを最後の引数にしたい）
+     * );
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -1360,8 +1432,17 @@ if (!isset($excluded_functions['array_each']) && (!function_exists('array_each')
      * @param mixed $default ループの最初や空の場合に適用される値
      * @return mixed each した結果
      */
-    function array_each($array, $callback, $default = NULL)
+    function array_each($array, $callback, $default = null)
     {
+        if (func_num_args() === 2) {
+            /** @var \ReflectionFunction $ref */
+            $ref = call_user_func(reflect_callable, $callback);
+            $params = $ref->getParameters();
+            if ($params[0]->isDefaultValueAvailable()) {
+                $default = $params[0]->getDefaultValue();
+            }
+        }
+
         foreach ($array as $k => $v) {
             $return = $callback($default, $v, $k);
             if ($return === false) {
@@ -1423,7 +1504,7 @@ if (!isset($excluded_functions['array_insert']) && (!function_exists('array_inse
      * @param int|null $position 挿入位置
      * @return array 挿入された新しい配列
      */
-    function array_insert($array, $value, $position = NULL)
+    function array_insert($array, $value, $position = null)
     {
         if (!is_array($value)) {
             $value = [$value];
@@ -1554,7 +1635,7 @@ if (!isset($excluded_functions['array_group']) && (!function_exists('array_group
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
      */
-    function array_group($array, $callback = NULL, $preserve_keys = false)
+    function array_group($array, $callback = null, $preserve_keys = false)
     {
         $callback = call_user_func(func_user_func_array, $callback);
 
@@ -1598,7 +1679,7 @@ if (!isset($excluded_functions['array_all']) && (!function_exists('array_all') |
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が true なら true
      */
-    function array_all($array, $callback = NULL, $default = true)
+    function array_all($array, $callback = null, $default = true)
     {
         if (empty($array)) {
             return $default;
@@ -1632,7 +1713,7 @@ if (!isset($excluded_functions['array_any']) && (!function_exists('array_any') |
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が false なら false
      */
-    function array_any($array, $callback = NULL, $default = false)
+    function array_any($array, $callback = null, $default = false)
     {
         if (empty($array)) {
             return $default;
@@ -1681,7 +1762,7 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('array_order
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array 並び替えられた配列
      */
-    function array_order($array, $orders, $preserve_keys = false)
+    function array_order(array $array, $orders, $preserve_keys = false)
     {
         if (count($array) <= 1) {
             return $array;
@@ -1834,7 +1915,7 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('array_
      * @param array $variadic 比較する配列
      * @return array 新しい配列
      */
-    function array_shrink_key($array, ...$variadic)
+    function array_shrink_key(array $array, ...$variadic)
     {
         $args = func_get_args();
         array_unshift($args, call_user_func_array('array_replace', $args));
@@ -1863,7 +1944,7 @@ if (!isset($excluded_functions['array_lookup']) && (!function_exists('array_look
      * @param string|null $index_key キーとなるキー
      * @return array 新しい配列
      */
-    function array_lookup($array, $column_key = NULL, $index_key = NULL)
+    function array_lookup($array, $column_key = null, $index_key = null)
     {
         if (func_num_args() === 3) {
             return array_column($array, $column_key, $index_key);
@@ -1911,7 +1992,7 @@ if (!isset($excluded_functions['array_columns']) && (!function_exists('array_col
      * @param mixed $index_key 新しい配列のキーとなるキー名
      * @return array 新しい配列
      */
-    function array_columns($array, $column_keys = NULL, $index_key = NULL)
+    function array_columns($array, $column_keys = null, $index_key = null)
     {
         if (count($array) === 0 && $column_keys === null) {
             throw new \InvalidArgumentException("can't auto detect keys.");
@@ -1947,7 +2028,7 @@ if (!isset($excluded_functions['array_uncolumns']) && (!function_exists('array_u
      * @param array $template 抽出要素とそのデフォルト値
      * @return array 新しい配列
      */
-    function array_uncolumns($array, $template = NULL)
+    function array_uncolumns($array, $template = null)
     {
         // 指定されていないなら生のまま
         if (func_num_args() === 1) {
@@ -2142,7 +2223,7 @@ if (!isset($excluded_functions['array_flatten']) && (!function_exists('array_fla
      * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
      * @return array フラット化された配列
      */
-    function array_flatten($array, $delimiter = NULL)
+    function array_flatten($array, $delimiter = null)
     {
         // 要素追加について、 array_set だと目に見えて速度低下したのでベタに if else で分岐する
         $core = function ($array, $delimiter) use (&$core) {
@@ -2348,7 +2429,7 @@ if (!isset($excluded_functions['class_loader']) && (!function_exists('class_load
      * @param string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
      * @return \Composer\Autoload\ClassLoader クラスローダ
      */
-    function class_loader($startdir = NULL)
+    function class_loader($startdir = null)
     {
         $file = call_user_func(cache, 'path', function () use ($startdir) {
             $dir = $startdir ?: __DIR__;
@@ -2437,7 +2518,7 @@ if (!isset($excluded_functions['class_replace']) && (!function_exists('class_rep
      * @param \Closure $register 置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ
      * @param string $dirname 一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う
      */
-    function class_replace($class, $register, $dirname = NULL)
+    function class_replace($class, $register, $dirname = null)
     {
         $class = ltrim($class, '\\');
 
@@ -2501,7 +2582,7 @@ if (!isset($excluded_functions['file_list']) && (!function_exists('file_list') |
      * @param \Closure|array $filter_condition フィルタ条件
      * @return array|false ファイルの配列
      */
-    function file_list($dirname, $filter_condition = NULL)
+    function file_list($dirname, $filter_condition = null)
     {
         $dirname = realpath($dirname);
         if (!file_exists($dirname)) {
@@ -2553,7 +2634,7 @@ if (!isset($excluded_functions['file_tree']) && (!function_exists('file_tree') |
      * @param \Closure|array $filter_condition フィルタ条件
      * @return array|false ツリー構造の配列
      */
-    function file_tree($dirname, $filter_condition = NULL)
+    function file_tree($dirname, $filter_condition = null)
     {
         $dirname = realpath($dirname);
         if (!file_exists($dirname)) {
@@ -2642,7 +2723,7 @@ if (!isset($excluded_functions['file_set_contents']) && (!function_exists('file_
      * @param int $umask ディレクトリを掘る際の umask
      * @return int 書き込まれたバイト数
      */
-    function file_set_contents($filename, $data, $umask = 2)
+    function file_set_contents($filename, $data, $umask = 0002)
     {
         if (func_num_args() === 2) {
             $umask = umask();
@@ -2666,7 +2747,7 @@ if (!isset($excluded_functions['mkdir_p']) && (!function_exists('mkdir_p') || (!
      * @param int $umask ディレクトリを掘る際の umask
      * @return bool 作成したら true
      */
-    function mkdir_p($dirname, $umask = 2)
+    function mkdir_p($dirname, $umask = 0002)
     {
         if (func_num_args() === 1) {
             $umask = umask();
@@ -3013,7 +3094,7 @@ if (!isset($excluded_functions['tmpname']) && (!function_exists('tmpname') || (!
      * @param string $dir 生成ディレクトリ。省略時は sys_get_temp_dir()
      * @return string 一時ファイル名
      */
-    function tmpname($prefix = 'rft', $dir = NULL)
+    function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
         $dir = $dir ?: sys_get_temp_dir();
@@ -3056,7 +3137,7 @@ if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || 
      * @param int $arity 引数の数
      * @return \Closure $callable を実行するクロージャ
      */
-    function delegate($invoker, $callable, $arity = NULL)
+    function delegate($invoker, $callable, $arity = null)
     {
         if ($arity === null) {
             $arity = call_user_func(parameter_length, $callable, true, true);
@@ -3945,6 +4026,36 @@ if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (!fa
         return implode('', $variadic);
     }
 }
+if (!isset($excluded_functions['concat']) && (!function_exists('concat') || (!false && (new \ReflectionFunction('concat'))->isInternal()))) {
+    /**
+     * strcat の空文字回避版
+     *
+     * 基本は strcat と同じ。ただし、**引数の内1つでも空文字を含むなら空文字を返す**。
+     *
+     * 「プレフィックスやサフィックスを付けたいんだけど、空文字の場合はそのままで居て欲しい」という状況はまれによくあるはず。
+     * コードで言えば `strlen($string) ? 'prefix-' . $string : '';` のようなもの。
+     * 可変引数なので 端的に言えば mysql の CONCAT みたいな動作になる（あっちは NULL だが）。
+     *
+     * ```php
+     * assertSame(concat('prefix-', 'middle', '-suffix'), 'prefix-middle-suffix');
+     * assertSame(concat('prefix-', '', '-suffix'), '');
+     * ```
+     *
+     * @param mixed $variadic 結合する文字列（可変引数）
+     * @return string 結合した文字列
+     */
+    function concat(...$variadic)
+    {
+        $result = '';
+        foreach ($variadic as $s) {
+            if (strlen($s) === 0) {
+                return '';
+            }
+            $result .= $s;
+        }
+        return $result;
+    }
+}
 if (!isset($excluded_functions['split_noempty']) && (!function_exists('split_noempty') || (!false && (new \ReflectionFunction('split_noempty'))->isInternal()))) {
     /**
      * 空文字を除外する文字列分割
@@ -4007,7 +4118,7 @@ if (!isset($excluded_functions['multiexplode']) && (!function_exists('multiexplo
      * @param int $limit 分割数
      * @return array 分割された配列
      */
-    function multiexplode($delimiter, $string, $limit = 9223372036854775807)
+    function multiexplode($delimiter, $string, $limit = \PHP_INT_MAX)
     {
         if (is_array($delimiter)) {
             $representative = reset($delimiter);
@@ -4056,7 +4167,7 @@ if (!isset($excluded_functions['quoteexplode']) && (!function_exists('quoteexplo
      * @param string $escape エスケープ文字
      * @return array 分割された配列
      */
-    function quoteexplode($delimiter, $string, $enclosures = '\'"', $escape = '\\')
+    function quoteexplode($delimiter, $string, $enclosures = "'\"", $escape = '\\')
     {
         if (is_string($enclosures)) {
             $chars = str_split($enclosures);
@@ -4205,7 +4316,7 @@ if (!isset($excluded_functions['str_putcsv']) && (!function_exists('str_putcsv')
      * @param string $escape エスケープ文字
      * @return string CSV 文字列
      */
-    function str_putcsv($array, $delimiter = ',', $enclosure = '"', $escape = '\\')
+    function str_putcsv($array, $delimiter = ',', $enclosure = '"', $escape = "\\")
     {
         $fp = fopen('php://memory', 'rw+');
         try {
@@ -4543,7 +4654,7 @@ if (!isset($excluded_functions['kvsprintf']) && (!function_exists('kvsprintf') |
      * @param array $array フォーマット引数
      * @return string フォーマットされた文字列
      */
-    function kvsprintf($format, $array)
+    function kvsprintf($format, array $array)
     {
         $keys = array_flip(array_keys($array));
         $vals = array_values($array);
@@ -4796,7 +4907,7 @@ if (!isset($excluded_functions['optional']) && (!function_exists('optional') || 
      * @param string $expected 期待するクラス名。指定した場合は is_a される
      * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
      */
-    function optional($object, $expected = NULL)
+    function optional($object, $expected = null)
     {
         if (is_object($object)) {
             if ($expected === null || is_a($object, $expected)) {
@@ -4806,28 +4917,29 @@ if (!isset($excluded_functions['optional']) && (!function_exists('optional') || 
 
         static $nullobject = null;
         if ($nullobject === null) {
-            // @formatter:off
-            $declare = <<<'NO'
-            class NULLObject implements \ArrayAccess, \IteratorAggregate
-            {
-                public function __isset($name) { return false; }
-                public function __get($name) { return null; }
-                public function __set($name, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function __unset($name) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function __call($name, $arguments) { return null; }
-                public function __invoke() { return null; }
-                public function __toString() { return ''; }
-                public function offsetExists($offset) { return false; }
-                public function offsetGet($offset) { return null; }
-                public function offsetSet($offset, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function offsetUnset($offset) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function getIterator() { return new \ArrayIterator([]); }
+            // php 7 になったら匿名クラスを使う
+            if (!class_exists('NullObject', false)) {
+                eval(<<<'NO'
+                class NullObject implements \ArrayAccess, \IteratorAggregate
+                {
+                    public function __isset($name) { return false; }
+                    public function __get($name) { return null; }
+                    public function __set($name, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function __unset($name) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function __call($name, $arguments) { return null; }
+                    public function __invoke() { return null; }
+                    public function __toString() { return ''; }
+                    public function offsetExists($offset) { return false; }
+                    public function offsetGet($offset) { return null; }
+                    public function offsetSet($offset, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function offsetUnset($offset) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function getIterator() { return new \ArrayIterator([]); }
+                }
+NO
+                );
             }
-            return new NULLObject();
-NO;
-
-            $nullobject = eval("$declare;");
-            // @formatter:on
+            /** @noinspection PhpUndefinedClassInspection */
+            $nullobject = new \NullObject();
         }
         return $nullobject;
     }
@@ -4853,6 +4965,36 @@ if (!isset($excluded_functions['throws']) && (!function_exists('throws') || (!fa
     function throws($ex)
     {
         throw $ex;
+    }
+}
+if (!isset($excluded_functions['throw_if']) && (!function_exists('throw_if') || (!false && (new \ReflectionFunction('throw_if'))->isInternal()))) {
+    /**
+     * 条件付き throw
+     *
+     * 第1引数が true 相当のときに例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // 投げない
+     * throw_if(false, new \Exception());
+     * // 投げる
+     * try{throw_if(true, new \Exception());}catch(\Exception $ex){}
+     * // クラス指定で投げる
+     * try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
+     * ```
+     *
+     * @param bool|mixed $flag true 相当値を与えると例外を投げる
+     * @param \Exception|string $ex 投げる例外。クラス名の場合は中で new する
+     * @param array $ex_args $ex にクラス名を与えたときの引数（可変引数）
+     */
+    function throw_if($flag, $ex, ...$ex_args)
+    {
+        if ($flag) {
+            if (is_string($ex)) {
+                $ex = new $ex(...$ex_args);
+            }
+            throw $ex;
+        }
     }
 }
 if (!isset($excluded_functions['ifelse']) && (!function_exists('ifelse') || (!false && (new \ReflectionFunction('ifelse'))->isInternal()))) {
@@ -4883,7 +5025,7 @@ if (!isset($excluded_functions['ifelse']) && (!function_exists('ifelse') || (!fa
      * @param mixed $else 偽の場合の値。省略時は $actual
      * @return mixed $then or $else
      */
-    function ifelse($actual, $expected, $then, $else = NULL)
+    function ifelse($actual, $expected, $then, $else = null)
     {
         // $else 省略時は $actual を返す
         if (func_num_args() === 3) {
@@ -4917,7 +5059,7 @@ if (!isset($excluded_functions['try_catch']) && (!function_exists('try_catch') |
      * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    function try_catch($try, $catch = NULL, ...$variadic)
+    function try_catch($try, $catch = null, ...$variadic)
     {
         return call_user_func(try_catch_finally, $try, $catch, null, ...$variadic);
     }
@@ -4947,7 +5089,7 @@ if (!isset($excluded_functions['try_finally']) && (!function_exists('try_finally
      * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    function try_finally($try, $finally = NULL, ...$variadic)
+    function try_finally($try, $finally = null, ...$variadic)
     {
         return call_user_func(try_catch_finally, $try, throws, $finally, ...$variadic);
     }
@@ -4978,7 +5120,7 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
      * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
-    function try_catch_finally($try, $catch = NULL, $finally = NULL, ...$variadic)
+    function try_catch_finally($try, $catch = null, $finally = null, ...$variadic)
     {
         if ($catch === null) {
             $catch = function ($v) { return $v; };
@@ -5033,7 +5175,7 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (!fals
      * @param bool $use_internal 内部キャッシュオブジェクトを使うか
      * @return mixed キャッシュ
      */
-    function cache($key, $provider, $namespace = NULL, $use_internal = true)
+    function cache($key, $provider, $namespace = null, $use_internal = true)
     {
         if ($namespace === null) {
             $namespace = __FILE__;
@@ -5077,7 +5219,7 @@ if (!isset($excluded_functions['error']) && (!function_exists('error') || (!fals
      * @param resource|string|mixed $destination 出力先
      * @return int 書き込んだバイト数
      */
-    function error($message, $destination = NULL)
+    function error($message, $destination = null)
     {
         static $persistences = [];
 
@@ -5362,6 +5504,58 @@ if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') |
             return (float) $number;
         }
         return (int) $number;
+    }
+}
+if (!isset($excluded_functions['is_empty']) && (!function_exists('is_empty') || (!false && (new \ReflectionFunction('is_empty'))->isInternal()))) {
+    /**
+     * 値が空か検査する
+     *
+     * `empty` とほぼ同じ。ただし
+     *
+     * - string: "0"
+     * - あらゆる object
+     *
+     * は false 判定する。
+     *
+     * なお、関数の仕様上、未定義変数を true 判定することはできない。
+     * 未定義変数をチェックしたい状況は大抵の場合コードが悪いが `$array['key1']['key2']` を調べたいことはある。
+     * そういう時には使えない（?? する必要がある）。
+     *
+     * 「 `if ($var) {}` で十分なんだけど "0" が…」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // この辺は empty と全く同じ
+     * assertTrue(is_empty(null));
+     * assertTrue(is_empty(false));
+     * assertTrue(is_empty(0));
+     * assertTrue(is_empty(''));
+     * // この辺だけが異なる
+     * assertFalse(is_empty('0'));
+     * assertFalse(is_empty(new \SimpleXMLElement('<foo></foo>')));
+     * ```
+     *
+     * @param mixed $var 判定する値
+     * @return bool 空なら true
+     */
+    function is_empty($var)
+    {
+        // empty で空でない判定ならそれで良い
+        if (!empty($var)) {
+            return false;
+        }
+
+        // "0" は false
+        if ($var === '0') {
+            return false;
+        }
+
+        // object は false
+        if (is_object($var)) {
+            return false;
+        }
+
+        return true;
     }
 }
 if (!isset($excluded_functions['is_primitive']) && (!function_exists('is_primitive') || (!false && (new \ReflectionFunction('is_primitive'))->isInternal()))) {
