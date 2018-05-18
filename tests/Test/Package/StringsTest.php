@@ -15,6 +15,15 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals("a{$e}z", $strcat('a', $e, 'z'));
     }
 
+    function test_concat()
+    {
+        $concat = concat;
+        $this->assertSame($concat('prefix-', 'middle', '-suffix'), 'prefix-middle-suffix');
+        $this->assertSame($concat('', 'middle', '-suffix'), '');
+        $this->assertSame($concat('prefix-', '', '-suffix'), '');
+        $this->assertSame($concat('prefix-', 'middle', ''), '');
+    }
+
     function test_split_noempty()
     {
         $split_noempty = split_noempty;

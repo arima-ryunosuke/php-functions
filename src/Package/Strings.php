@@ -21,6 +21,35 @@ class Strings
     }
 
     /**
+     * strcat の空文字回避版
+     *
+     * 基本は strcat と同じ。ただし、**引数の内1つでも空文字を含むなら空文字を返す**。
+     *
+     * 「プレフィックスやサフィックスを付けたいんだけど、空文字の場合はそのままで居て欲しい」という状況はまれによくあるはず。
+     * コードで言えば `strlen($string) ? 'prefix-' . $string : '';` のようなもの。
+     * 可変引数なので 端的に言えば mysql の CONCAT みたいな動作になる（あっちは NULL だが）。
+     *
+     * ```php
+     * assertSame(concat('prefix-', 'middle', '-suffix'), 'prefix-middle-suffix');
+     * assertSame(concat('prefix-', '', '-suffix'), '');
+     * ```
+     *
+     * @param mixed $variadic 結合する文字列（可変引数）
+     * @return string 結合した文字列
+     */
+    public static function concat(...$variadic)
+    {
+        $result = '';
+        foreach ($variadic as $s) {
+            if (strlen($s) === 0) {
+                return '';
+            }
+            $result .= $s;
+        }
+        return $result;
+    }
+
+    /**
      * 空文字を除外する文字列分割
      *
      * - 空文字を任意の区切り文字で分割しても常に空配列
