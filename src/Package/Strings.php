@@ -80,7 +80,7 @@ class Strings
      * @param int $limit 分割数
      * @return array 分割された配列
      */
-    public static function multiexplode($delimiter, $string, $limit = PHP_INT_MAX)
+    public static function multiexplode($delimiter, $string, $limit = \PHP_INT_MAX)
     {
         if (is_array($delimiter)) {
             $representative = reset($delimiter);

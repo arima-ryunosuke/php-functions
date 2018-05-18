@@ -97,34 +97,19 @@ namespace $namespace", $content);
             $methods = $refclass->getMethods(\ReflectionMethod::IS_PUBLIC || \ReflectionMethod::IS_STATIC);
             $lines = file($refclass->getFileName());
             foreach ($methods as $method) {
-                $params = [];
-                foreach ($method->getParameters() as $param) {
-                    $default = '';
-                    if ($param->isOptional() && !$param->isVariadic()) {
-                        // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
-                        if ($param->isDefaultValueAvailable()) {
-                            $default = ' = ' . ($param->getDefaultValue() === [] ? '[]' : $ve($param->getDefaultValue()));
-                        }
-                    }
-                    $varname = ($param->isVariadic() ? '...' : '') . ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
-                    $params[] = $varname . $default;
-                }
-
                 $doccomment = $method->getDocComment();
                 $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
                 $mname = $method->getName();
-                $funcname = ($method->returnsReference() ? '&' : '') . $mname;
                 $const = $methodmode ? '[' . $ve($method->class) . ', ' . $ve($mname) . ']' : $ve(ltrim("$namespace\\$mname", '\\'));
                 $full = $ve($namespace ? "$namespace\\$mname" : $mname);
-                $params = implode(', ', $params);
 
                 $sl = $method->getStartLine();
                 $el = $method->getEndLine();
-                $block = implode('', array_slice($lines, $sl, $el - $sl));
+                $block = implode('', array_slice($lines, $sl - 1, $el - $sl + 1));
+                $block = preg_replace('#public static #', '', $block, 1);
 
                 $code = <<<CODE
     $doccomment
-    function $funcname($params)
 $block
 CODE;
 
