@@ -71,28 +71,29 @@ class Syntax
 
         static $nullobject = null;
         if ($nullobject === null) {
-            // @formatter:off
-            $declare = <<<'NO'
-            class NULLObject implements \ArrayAccess, \IteratorAggregate
-            {
-                public function __isset($name) { return false; }
-                public function __get($name) { return null; }
-                public function __set($name, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function __unset($name) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function __call($name, $arguments) { return null; }
-                public function __invoke() { return null; }
-                public function __toString() { return ''; }
-                public function offsetExists($offset) { return false; }
-                public function offsetGet($offset) { return null; }
-                public function offsetSet($offset, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function offsetUnset($offset) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function getIterator() { return new \ArrayIterator([]); }
+            // php 7 になったら匿名クラスを使う
+            if (!class_exists('NullObject', false)) {
+                eval(<<<'NO'
+                class NullObject implements \ArrayAccess, \IteratorAggregate
+                {
+                    public function __isset($name) { return false; }
+                    public function __get($name) { return null; }
+                    public function __set($name, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function __unset($name) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function __call($name, $arguments) { return null; }
+                    public function __invoke() { return null; }
+                    public function __toString() { return ''; }
+                    public function offsetExists($offset) { return false; }
+                    public function offsetGet($offset) { return null; }
+                    public function offsetSet($offset, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function offsetUnset($offset) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                    public function getIterator() { return new \ArrayIterator([]); }
+                }
+NO
+                );
             }
-            return new NULLObject();
-NO;
-
-            $nullobject = eval("$declare;");
-            // @formatter:on
+            /** @noinspection PhpUndefinedClassInspection */
+            $nullobject = new \NullObject();
         }
         return $nullobject;
     }
