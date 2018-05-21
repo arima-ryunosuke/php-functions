@@ -1297,6 +1297,11 @@ class Arrays
      * 返り値が空くのでループ制御に用いる。
      * 今のところ $callback が false を返すとそこで break するのみ。
      *
+     * 第3引数を省略した場合、**クロージャの第1引数のデフォルト値が使われる**。
+     * これは特筆すべき動作で、不格好な第3引数を完全に省略することができる（サンプルコードを参照）。
+     * ただし「php の文法違反（今のところエラーにはならないし、全てにデフォルト値をつければ一応回避可能）」「リフレクションを使う（ほんの少し遅くなる）」などの弊害が有るので推奨はしない。
+     * （ただ、「意図していることをコードで表す」といった観点ではこの記法の方が正しいとも思う）。
+     *
      * Example:
      * ```php
      * // 全要素を文字列的に足し合わせる
@@ -1318,6 +1323,17 @@ class Arrays
      *     2 => 4,
      *     3 => 9,
      * ]);
+     *
+     * // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
+     * assertSame(
+     *     array_each([1, 2, 3], function(&$carry = [], $v) {
+     *         $carry[$v] = $v * $v;
+     *     }),
+     *     array_each([1, 2, 3], function(&$carry, $v) {
+     *         $carry[$v] = $v * $v;
+     *     }, [])
+     *     // 個人的に↑のようなぶら下がり引数があまり好きではない（クロージャを最後の引数にしたい）
+     * );
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -1327,6 +1343,15 @@ class Arrays
      */
     public static function array_each($array, $callback, $default = null)
     {
+        if (func_num_args() === 2) {
+            /** @var \ReflectionFunction $ref */
+            $ref = call_user_func(reflect_callable, $callback);
+            $params = $ref->getParameters();
+            if ($params[0]->isDefaultValueAvailable()) {
+                $default = $params[0]->getDefaultValue();
+            }
+        }
+
         foreach ($array as $k => $v) {
             $return = $callback($default, $v, $k);
             if ($return === false) {

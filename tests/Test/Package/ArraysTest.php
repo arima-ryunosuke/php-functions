@@ -576,6 +576,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['a' => $ex_a, 'b' => $ex_b, 'c' => $ex_c], $array_each([$ex_a, $ex_b, $ex_c], function (&$carry, \Exception $ex) {
             $carry[$ex->getMessage()] = $ex;
         }));
+
+        // 推奨しないが見た目が気に入っている使い方
+        $this->assertSame('start123', $array_each([1, 2, 3], function (&$carry = 'start', $v) { $carry .= $v; }));
+        $this->assertSame('start', $array_each([], function (&$carry = 'start', $v) { $carry .= $v; }));
+        $this->assertSame(null, $array_each([], function (&$carry, $v) { $carry .= $v; }));
     }
 
     function test_array_depth()
