@@ -132,6 +132,23 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
+    function test_exportNamespace()
+    {
+        $dir = sys_get_temp_dir() . '/rfe';
+        call_user_func(rm_rf, $dir);
+        call_user_func(mkdir_p, $dir);
+
+        $contents = Transporter::exportNamespace('test\hoge');
+
+        $this->assertContains('namespace test\hoge;', $contents);
+        $this->assertContains('const arrayize = ', $contents);
+        $this->assertContains('function arrayize', $contents);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     function test_exportPhar()
     {
         $dir = sys_get_temp_dir() . '/rfe';

@@ -128,6 +128,43 @@ CODE;
         ];
     }
 
+    public static function exportNamespace($namespace)
+    {
+        $PREFIX = "Don't touch this code. This is auto generated.";
+
+        $ve = function ($v) { return var_export($v, true); };
+        $contents = [];
+
+        foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
+            require_once $fn;
+            preg_match('#namespace (.*?);#', file_get_contents($fn), $m);
+            $refclass = new \ReflectionClass($m[1] . '\\' . basename($fn, '.php'));
+            $methods = $refclass->getMethods(\ReflectionMethod::IS_PUBLIC || \ReflectionMethod::IS_STATIC);
+            $lines = file($refclass->getFileName());
+            foreach ($methods as $method) {
+                $doccomment = $method->getDocComment();
+                $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
+                $mname = $method->getName();
+                $const = $ve(ltrim("$namespace\\$mname", '\\'));
+                $full = $ve("$namespace\\$mname");
+
+                $sl = $method->getStartLine();
+                $el = $method->getEndLine();
+                $block = implode('', array_slice($lines, $sl - 1, $el - $sl + 1));
+                $block = preg_replace('#public static #', '', $block, 1);
+                $code = <<<CODE
+    $doccomment
+$block
+CODE;
+
+                $contents[] = "const $mname = $const;";
+                $contents[] = "if (!isset(\$excluded_functions[{$ve($mname)}]) && (!function_exists($full) || (!$polyfill && (new \\ReflectionFunction($full))->isInternal()))) {\n$code}\n";
+            }
+        }
+
+        return "<?php\n\n# $PREFIX\n\n" . "namespace $namespace;\n\n" . implode("\n", $contents) . "\n";
+    }
+
     public static function exportPhar($namespace, $pharpath)
     {
         $ve = function ($v) { return var_export($v, true); };
