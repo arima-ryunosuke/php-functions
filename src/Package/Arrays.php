@@ -798,6 +798,61 @@ class Arrays
     }
 
     /**
+     * array_key_exists の複数版
+     *
+     * 指定キーが全て存在するなら true を返す。
+     * 配列ではなく単一文字列を与えても動作する（array_key_exists と全く同じ動作になる）。
+     *
+     * $keys に空を与えると例外を投げる。
+     * $keys に配列を与えるとキーで潜ってチェックする（Example 参照）。
+     *
+     * Example:
+     * ```php
+     * // すべて含むので true
+     * assertTrue(array_keys_exist(['a', 'b', 'c'], ['a' => 'A', 'b' => 'B', 'c' => 'C']));
+     * // N は含まないので false
+     * assertFalse(array_keys_exist(['a', 'b', 'N'], ['a' => 'A', 'b' => 'B', 'c' => 'C']));
+     * // 配列を与えると潜る（日本語で言えば「a というキーと、x というキーとその中に x1, x2 というキーがあるか？」）
+     * assertTrue(array_keys_exist(['a', 'x' => ['x1', 'x2']], ['a' => 'A', 'x' => ['x1' => 'X1', 'x2' => 'X2']]));
+     * ```
+     *
+     * @param array|string $keys 調べるキー
+     * @param array|\ArrayAccess $array 調べる配列
+     * @return bool 指定キーが全て存在するなら true
+     */
+    public static function array_keys_exist($keys, $array)
+    {
+        $keys = (array) $keys;
+        if (empty($keys)) {
+            throw new \InvalidArgumentException('$keys is empty.');
+        }
+
+        $is_arrayaccess = $array instanceof \ArrayAccess;
+
+        foreach ($keys as $k => $key) {
+            if (is_array($key)) {
+                // まずそのキーをチェックして
+                if (!call_user_func(array_keys_exist, $k, $array)) {
+                    return false;
+                }
+                // あるなら再帰する
+                if (!call_user_func(array_keys_exist, $key, $array[$k])) {
+                    return false;
+                }
+            }
+            elseif ($is_arrayaccess) {
+                if (!isset($array[$key])) {
+                    return false;
+                }
+            }
+            elseif (!array_key_exists($key, $array)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * array_search のクロージャ版のようなもの
      *
      * コールバックが true 相当を返す最初のキーを返す。

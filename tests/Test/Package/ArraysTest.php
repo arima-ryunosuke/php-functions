@@ -347,6 +347,70 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('vvv', $array_dive(['a' => ['b' => ['c' => 'vvv']]], ['a', 'b', 'c']));
     }
 
+    function test_array_keys_exist()
+    {
+        $array_keys_exist = array_keys_exist;
+        $array = [
+            'a' => 'A',
+            'b' => 'B',
+            'c' => 'C',
+            'x' => [
+                'x1' => 'X1',
+                'x2' => 'X2',
+                'y'  => [
+                    'y1' => 'Y1',
+                    'y2' => 'Y2',
+                ],
+            ]
+        ];
+        // すべて含む
+        $this->assertTrue($array_keys_exist(['a', 'b', 'c'], $array));
+        // 単一文字指定で含む
+        $this->assertTrue($array_keys_exist('a', $array));
+        // 1つ含まない
+        $this->assertFalse($array_keys_exist(['a', 'b', 'n'], $array));
+        // 単一文字指定で含まない
+        $this->assertFalse($array_keys_exist('X', $array));
+        // 空は例外
+        $this->assertException('empty', $array_keys_exist, [], $array);
+
+        // ネスト調査
+        $this->assertTrue($array_keys_exist([
+            'x' => ['x1', 'x2', 'y'],
+        ], $array));
+        $this->assertTrue($array_keys_exist([
+            'x' => [
+                'x1',
+                'x2',
+                'y' => [
+                    'y1',
+                    'y2',
+                ],
+            ]
+        ], $array));
+        $this->assertFalse($array_keys_exist([
+            'nx' => ['x1', 'x2', 'y'],
+        ], $array));
+        $this->assertFalse($array_keys_exist([
+            'x' => [
+                'x1',
+                'x2',
+                'y' => [
+                    'y1',
+                    'y9',
+                ],
+            ],
+        ], $array));
+
+        // \ArrayAccess
+        $array = new \ArrayObject([], \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS);
+        $array['x'] = ['y' => 'z'];
+        $this->assertTrue($array_keys_exist(['x' => ['y']], $array));
+        $this->assertTrue($array_keys_exist(['x' => ['y']], $array));
+        $this->assertFalse($array_keys_exist(['nx'], $array));
+        $this->assertFalse($array_keys_exist(['nx' => ['y']], $array));
+    }
+
     function test_array_exists()
     {
         $array_exists = array_exists;
