@@ -90,6 +90,14 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         });
     }
 
+    function test_throw_if()
+    {
+        $throw_if = throw_if;
+        $throw_if(false, new \Exception('message', 123));
+        $this->assertException(new \Exception('message', 123), $throw_if, true, new \Exception('message', 123));
+        $this->assertException(new \Exception('message', 123), $throw_if, true, \Exception::class, 'message', 123);
+    }
+
     function test_ifelse()
     {
         $ifelse = ifelse;
