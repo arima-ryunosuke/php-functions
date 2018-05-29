@@ -112,6 +112,10 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         @$benchmark(['md5', 'sha1'], ['hoge'], 10, false);
         $this->assertContains('Results of sha1 and md5 are different', error_get_last()['message']);
 
+        // 参照渡しも呼べる
+        $benchmark(['reset', 'end'], [['hoge']], 10, false);
+        // エラーが出なければいいので assert はナシ
+
         // 例外系
         $this->assertException('caller is not callable', $benchmark, ['notfunc']);
         $this->assertException('benchset is empty', $benchmark, []);

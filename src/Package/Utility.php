@@ -178,9 +178,22 @@ class Utility
             throw new \InvalidArgumentException('benchset is empty.');
         }
 
+        // 5.6 で ... 呼び出しで zval が書き換わる不具合？があったのでループで引数配列を生成（異なる zval を返す）
+        $copy = function ($array) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                $result[$k] = $v;
+            }
+            return $result;
+        };
+
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-        $assertions = call_user_func(call_safely, function ($benchset, $args) {
-            return call_user_func(array_lmap, $benchset, 'call_user_func_array', $args);
+        $assertions = call_user_func(call_safely, function ($benchset, $args) use ($copy) {
+            $result = [];
+            foreach ($benchset as $name => $caller) {
+                $result[$name] = $caller(...$copy($args));
+            }
+            return $result;
         }, $benchset, $args);
 
         // 返り値の検証（ベンチマークという性質上、基本的に戻り値が一致しないのはおかしい）
@@ -199,8 +212,9 @@ class Utility
         $counts = [];
         foreach ($benchset as $name => $caller) {
             $end = microtime(true) + $millisec / 1000;
+            $avg = $copy($args);
             for ($n = 0; microtime(true) <= $end; $n++) {
-                call_user_func_array($caller, $args);
+                $caller(...$avg);
             }
             $counts[$name] = $n;
         }
