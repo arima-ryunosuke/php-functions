@@ -10,6 +10,19 @@
 
 - no todo
 
+## 1.1.6
+
+- [feature][Vars] varcmp を追加
+- [feature][Vars] var_apply/var_applys を追加
+- [feature][Vars] numval を追加
+- [feature][Vars] arrayval を追加
+- [feature][Funchand] func_user_func_array を高速化
+- [feature][Arrays] kvsort を追加
+- [feature][Arrays] array_unset のクロージャ対応
+- [feature][Utility] arguments を追加
+- [feature][Utility] timer を追加
+- [fixbug][Utility] benchmark の参照渡し対応
+
 ## 1.1.5
 
 - [feature][Syntax] throw_if を追加
