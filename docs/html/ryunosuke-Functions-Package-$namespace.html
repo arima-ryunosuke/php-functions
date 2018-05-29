@@ -11,7 +11,14 @@
 	<script data-src="common.js"></script>
 
 	<script>
-        (function (cachekey) {
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
             $('link[data-href]').attr('href', function () {
                 return this.dataset.href + '?' + cachekey;
             });
@@ -21,9 +28,9 @@
 
             $(document).on('click', 'a[href]:not(.cachekey)', function () {
                 this.classList.add('cachekey');
-                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+                this.href = this.href.replace('.html', '.html?' + cachekey);
             });
-        })(window.parent.CACHEKEY || 'nocache');
+        })();
 	</script>
     </head>
 <body>
@@ -34,24 +41,27 @@
 </h1>
 <div class="main-wrapper">
 	<h2>namespace <span class="category-name">ryunosuke\Functions\Package\</span></h2>
+	<div class="inner-item">
+		<div class="description"></div>
+	</div>
 
     
                                     			<h3>Classes</h3>
 			<ul>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Arrays">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L2281" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L2379" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Arrays" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays">Arrays</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>配列関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -59,20 +69,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Classobj">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L226" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Classobj" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj">Classobj</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -80,20 +90,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\FileSystem">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L561" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L564" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\FileSystem" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem">FileSystem</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>ファイルシステム関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -101,20 +111,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Funchand">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L633" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L650" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Funchand" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand">Funchand</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>callable 関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -122,20 +132,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Math">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L5-L236" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L5-L239" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Math" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math">Math</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>数学関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -143,20 +153,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Strings">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L823" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L826" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Strings" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings">Strings</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>文字列関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -164,20 +174,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Syntax">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L294" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L297" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Syntax" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax">Syntax</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>構文関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -185,20 +195,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Utility">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L253" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L439" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Utility" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility">Utility</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>汎用的なユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -206,20 +216,20 @@
 						</div>
 						<div class="clearfix"></div>
 					</li>
-                					<li class="structure-item" data-parent-id="ryunosuke\Functions\Package\Vars">
+                					<li class="structure-item">
 						<div class="attribute">
 							<span class="label label-danger"></span>
 							<span class="label label-warning"></span>
 							<span class="label label-info"></span>
 							<span class="label label-info"></span>
 							<span class="label label-deprecated"></span>
-                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L578" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                            			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L796" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             						</div>
 						<h4 id="ryunosuke\Functions\Package\Vars" tabindex="-1" class="structure-title ">
 							<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars">Vars</a>
 						</h4>
 						<div class="inner-item">
-							<div class="description"></div>
+							<div class="description"><p>変数関連のユーティリティ</p></div>
 						</div>
 						<div class="attribute">
 							<span class="label label-default"></span>
@@ -230,6 +240,11 @@
                 			</ul>
             
     
-    </div>
+    	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
 </body>
 </html>

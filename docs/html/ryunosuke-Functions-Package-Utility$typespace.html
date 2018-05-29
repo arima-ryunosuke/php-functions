@@ -11,7 +11,14 @@
 	<script data-src="common.js"></script>
 
 	<script>
-        (function (cachekey) {
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
             $('link[data-href]').attr('href', function () {
                 return this.dataset.href + '?' + cachekey;
             });
@@ -21,9 +28,9 @@
 
             $(document).on('click', 'a[href]:not(.cachekey)', function () {
                 this.classList.add('cachekey');
-                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+                this.href = this.href.replace('.html', '.html?' + cachekey);
             });
-        })(window.parent.CACHEKEY || 'nocache');
+        })();
 	</script>
     </head>
 <body>
@@ -41,12 +48,12 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L253" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L439" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
 
-	<div class="description"></div>
+	<div class="description"><p>汎用的なユーティリティ</p></div>
 
 	<h3>Construction</h3>
                 
@@ -69,7 +76,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L7-L64" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L10-L67" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::cache()" tabindex="-1" class="structure-title ">
                         cache						<small>($key, $provider, $namespace = null, $use_internal = true)</small>
@@ -143,7 +150,105 @@ assertNotSame($rand1, $rand3);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L66-L125" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L69-L207" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
+                        arguments						<small>($rule, $argv = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>コマンドライン引数をパースして引数とオプションを返す</p>
+<p>少しリッチな <tag_link data-kind='uri' data-type='http://php.net/manual/function.getopt.php' data-description='getopt'>getopt</tag_link> として使える（shell 由来のオプション構文(a:b::)はどうも馴染みにくい）。<br />
+ただし「値が必須なオプション」はサポートしない。<br />
+もっとも、オプションとして空文字が来ることはほぼ無いのでデフォルト値を空文字にすることで対応可能。</p>
+<p>$rule に従って <code>--noval filename --opt optval</code> のような文字列・配列をパースする。<br />
+$rule 配列の仕様は下記。</p>
+<ul>
+<li>キーは「オプション名」を指定する。ただし・・・
+<ul>
+<li>数値キーは「引数」を意味する</li>
+<li>スペースの後に「ショート名」を与えられる</li>
+</ul></li>
+<li>値は「デフォルト値」を指定する。ただし・・・
+<ul>
+<li><code>[]</code> は「複数値オプション」を意味する（配列にしない限り同オプションの多重指定は許されない）</li>
+<li><code>null</code> は「値なしオプション」を意味する（スイッチングオプション）</li>
+</ul></li>
+</ul>
+<p>上記の仕様でパースして「引数は数値連番、オプションはオプション名をキーとした配列」を返す。<br />
+なお、いわゆる「引数」はどこに来ても良い（前オプション、後オプションの区別がない）。</p>
+<p>$argv には配列や文字列が与えられるが、ほとんどテスト用に近く、普通は未指定で $argv を使うはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">// いくつか織り交ぜたスタンダードな例
+$rule = [
+    'opt'       =&gt; 'def',    // 基本的には「デフォルト値」を表す
+    'longopt l' =&gt; '',       // スペース区切りで「ショート名」を意味する
+    1           =&gt; 'defarg', // 数値キーは「引数」を意味する
+];
+assertSame(arguments($rule, '--opt optval arg1 -l longval'), [
+    'opt'     =&gt; 'optval',  // optval と指定している
+    'longopt' =&gt; 'longval', // ショート名指定でも本来の名前で返ってくる
+    'arg1',   // いわゆるコマンドライン引数（optval は opt に飲まれるので含まれない）
+    'defarg', // いわゆるコマンドライン引数（与えられていないが、ルールの 1 =&gt; 'defarg' が活きている）
+]);
+
+// 「値なしオプション」と「複数値オプション」の例
+$rule = [
+    'noval1 l'  =&gt; null, // null は「値なしオプション」を意味する（指定されていれば true されていなければ false を返す）
+    'noval2 m'  =&gt; null, // 同上
+    'noval3 n'  =&gt; null, // 同上
+    'opts o' =&gt; [],      // 配列を与えると「複数値オプション」を表す
+];
+assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
+    'noval1' =&gt; true,  // -ln で同時指定されているので true
+    'noval2' =&gt; false, // -ln で同時指定されてないので false
+    'noval3' =&gt; true,  // -ln の同時指定されているので true
+    'opts'   =&gt; ['o1', 'o2', 'o3'], // ロング、ショート混在でも OK
+    'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
+    'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
+]);</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$rule</td>
+				<td class="desc"><p>オプションルール</p></td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$argv = null</td>
+				<td class="desc"><p>パースするコマンドライン引数。未指定時は $argv が使用される</p></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>コマンドライン引数＋オプション</p></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L209-L268" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error						<small>($message, $destination = null)</small>
@@ -197,7 +302,60 @@ assertNotSame($rand1, $rand3);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L127-L252" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L270-L297" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
+                        timer						<small>($callable, $count = 1)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>処理時間を計測する</p>
+<p>第1引数 $callable を $count 回回してその処理時間を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 0.01 秒を 10 回回すので 0.1 秒は超える
+assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));</code></pre></div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc"><p>処理クロージャ</p></td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$count = 1</td>
+				<td class="desc"><p>ループ回数</p></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">float</td>
+			<td class="desc"><p>処理時間</p></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L299-L438" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>

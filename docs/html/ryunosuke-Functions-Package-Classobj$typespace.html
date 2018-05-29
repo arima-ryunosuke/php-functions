@@ -11,7 +11,14 @@
 	<script data-src="common.js"></script>
 
 	<script>
-        (function (cachekey) {
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
             $('link[data-href]').attr('href', function () {
                 return this.dataset.href + '?' + cachekey;
             });
@@ -21,9 +28,9 @@
 
             $(document).on('click', 'a[href]:not(.cachekey)', function () {
                 this.classList.add('cachekey');
-                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+                this.href = this.href.replace('.html', '.html?' + cachekey);
             });
-        })(window.parent.CACHEKEY || 'nocache');
+        })();
 	</script>
     </head>
 <body>
@@ -41,12 +48,12 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L226" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
 
-	<div class="description"></div>
+	<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p></div>
 
 	<h3>Construction</h3>
                 
@@ -69,7 +76,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L7-L35" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::stdclass()" tabindex="-1" class="structure-title ">
                         stdclass						<small>($fields = [])</small>
@@ -123,7 +130,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L37-L87" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L40-L90" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
                         detect_namespace						<small>($location)</small>
@@ -171,7 +178,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L89-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L92-L122" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader						<small>($startdir = null)</small>
@@ -218,7 +225,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L121-L141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L124-L144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace						<small>($class)</small>
@@ -264,7 +271,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L143-L162" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L146-L165" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten						<small>($class)</small>
@@ -310,7 +317,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L164-L225" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L167-L228" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace						<small>($class, $register, $dirname = null)</small>

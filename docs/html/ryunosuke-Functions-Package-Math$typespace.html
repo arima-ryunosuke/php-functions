@@ -11,7 +11,14 @@
 	<script data-src="common.js"></script>
 
 	<script>
-        (function (cachekey) {
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
             $('link[data-href]').attr('href', function () {
                 return this.dataset.href + '?' + cachekey;
             });
@@ -21,9 +28,9 @@
 
             $(document).on('click', 'a[href]:not(.cachekey)', function () {
                 this.classList.add('cachekey');
-                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+                this.href = this.href.replace('.html', '.html?' + cachekey);
             });
-        })(window.parent.CACHEKEY || 'nocache');
+        })();
 	</script>
     </head>
 <body>
@@ -41,12 +48,12 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L5-L236" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L5-L239" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Math</span></h2>
 
-	<div class="description"></div>
+	<div class="description"><p>数学関連のユーティリティ</p></div>
 
 	<h3>Construction</h3>
                 
@@ -69,7 +76,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L7-L25" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L10-L28" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::minimum()" tabindex="-1" class="structure-title ">
                         minimum						<small>(...$variadic)</small>
@@ -119,7 +126,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L27-L45" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L30-L48" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::maximum()" tabindex="-1" class="structure-title ">
                         maximum						<small>(...$variadic)</small>
@@ -169,7 +176,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L47-L82" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L50-L85" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::mode()" tabindex="-1" class="structure-title ">
                         mode						<small>(...$variadic)</small>
@@ -221,7 +228,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L84-L105" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L87-L108" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::mean()" tabindex="-1" class="structure-title ">
                         mean						<small>(...$variadic)</small>
@@ -273,7 +280,7 @@ assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L107-L141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L110-L144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::median()" tabindex="-1" class="structure-title ">
                         median						<small>(...$variadic)</small>
@@ -329,7 +336,7 @@ assertSame(median('a', 'b', 'c', 'd'), 'c');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L143-L159" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L146-L162" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::average()" tabindex="-1" class="structure-title ">
                         average						<small>(...$variadic)</small>
@@ -378,7 +385,7 @@ assertSame(median('a', 'b', 'c', 'd'), 'c');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L161-L181" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L164-L184" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::sum()" tabindex="-1" class="structure-title ">
                         sum						<small>(...$variadic)</small>
@@ -429,7 +436,7 @@ assertSame(median('a', 'b', 'c', 'd'), 'c');</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L183-L200" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L186-L203" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::random_at()" tabindex="-1" class="structure-title ">
                         random_at						<small>(...$args)</small>
@@ -479,7 +486,7 @@ assertContains(random_at(1, 2, 3, 4, 5, 6), [1, 2, 3, 4, 5, 6]);</code></pre></d
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L202-L235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Math.php#L205-L238" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             					</div>
 					<h4 id="ryunosuke\Functions\Package\Math::probability()" tabindex="-1" class="structure-title ">
                         probability						<small>($probability, $divisor = 100)</small>

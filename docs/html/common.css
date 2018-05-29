@@ -28,7 +28,7 @@ div.nheader {
     z-index: 9990;
 }
 
-a[id]:focus, [tabindex]:focus {
+.focused, a[id]:focus, [tabindex]:focus {
     color: red;
     outline: none;
     background-color: antiquewhite;
@@ -147,10 +147,6 @@ ul > li {
 }
 
 /* utility */
-
-.attract {
-    color: red;
-}
 
 .display-none {
     display: none;
@@ -406,6 +402,35 @@ td.rest {
 
 .glyphicon {
     vertical-align: text-top;
+}
+
+.glyphicon-accessible {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.glyphicon-private::before {
+    font-size: 6px;
+    content: "\e033";
+    color: #f05e4e;
+}
+
+.glyphicon-protected::before {
+    font-size: 6px;
+    content: "\e063";
+    color: #ff9418;
+}
+
+.glyphicon-public::before {
+    font-size: 6px;
+    content: "\e135";
+    color: #337ab7;
+}
+
+.glyphicon-magic::before {
+    font-size: 6px;
+    content: "\e165";
+    color: #337ab7;
 }
 
 .label-icon {

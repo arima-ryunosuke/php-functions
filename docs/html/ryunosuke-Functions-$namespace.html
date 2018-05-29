@@ -11,7 +11,14 @@
 	<script data-src="common.js"></script>
 
 	<script>
-        (function (cachekey) {
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
             $('link[data-href]').attr('href', function () {
                 return this.dataset.href + '?' + cachekey;
             });
@@ -21,9 +28,9 @@
 
             $(document).on('click', 'a[href]:not(.cachekey)', function () {
                 this.classList.add('cachekey');
-                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+                this.href = this.href.replace('.html', '.html?' + cachekey);
             });
-        })(window.parent.CACHEKEY || 'nocache');
+        })();
 	</script>
     </head>
 <body>
@@ -34,19 +41,34 @@
 </h1>
 <div class="main-wrapper">
 	<h2>namespace <span class="category-name">ryunosuke\Functions\</span></h2>
+	<div class="inner-item">
+		<div class="description"></div>
+	</div>
 
     		<h3>Namespaces</h3>
 		<ul>
-            				<li class="">
-					<div class="ellipsis">
-						<a id="ryunosuke\Functions\Package\" href="ryunosuke-Functions-Package-$namespace.html#ryunosuke\Functions\Package\" class="bold" target="main">
-							<small>ryunosuke\Functions\</small>Package						</a>
+            				<li class="structure-item">
+					<h4 id="ryunosuke\Functions\Package\" tabindex="-1" class="structure-title ">
+						<a href="ryunosuke-Functions-Package-$namespace.html#ryunosuke\Functions\Package\">Package</a>
+					</h4>
+					<div class="inner-item">
+						<div class="description"></div>
 					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
 				</li>
             		</ul>
     
                                         
     
-    </div>
+    	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
 </body>
 </html>

@@ -11,7 +11,14 @@
 	<script data-src="common.js"></script>
 
 	<script>
-        (function (cachekey) {
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
             $('link[data-href]').attr('href', function () {
                 return this.dataset.href + '?' + cachekey;
             });
@@ -21,9 +28,9 @@
 
             $(document).on('click', 'a[href]:not(.cachekey)', function () {
                 this.classList.add('cachekey');
-                this.href = this.href.replace('.html', '.html?' + window.parent.CACHEKEY);
+                this.href = this.href.replace('.html', '.html?' + cachekey);
             });
-        })(window.parent.CACHEKEY || 'nocache');
+        })();
 	</script>
     </head>
 <body>
@@ -33,7 +40,7 @@
 </h1>
 <div class="main-wrapper">
     	<ul class="namespaces">
-                    	<li class="text-nowrap holding-wrapper " data-namespace="ryunosuke\">
+                    	<li class="text-nowrap holding-wrapper ">
 		<div class="nheader ellipsis">
 			<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-namespace">N</span>
 			<a id="ryunosuke\" href="ryunosuke-$namespace.html#ryunosuke\" class="bold" target="main">
@@ -41,402 +48,464 @@
                                 ryunosuke			</a>
 		</div>
 		<ul class="has-indent holding">
-                            	<li class="text-nowrap holding-wrapper indent" data-namespace="ryunosuke\Functions\">
+                            	<li class="text-nowrap holding-wrapper indent">
 		<div class="nheader ellipsis">
 			<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-namespace">N</span>
 			<a id="ryunosuke\Functions\" href="ryunosuke-Functions-$namespace.html#ryunosuke\Functions\" class="bold" target="main">
                                 Functions			</a>
 		</div>
 		<ul class="has-indent holding">
-                            	<li class="text-nowrap holding-wrapper indent" data-namespace="ryunosuke\Functions\Package\">
+                            	<li class="text-nowrap holding-wrapper indent">
 		<div class="nheader ellipsis">
 			<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-namespace">N</span>
 			<a id="ryunosuke\Functions\Package\" href="ryunosuke-Functions-Package-$namespace.html#ryunosuke\Functions\Package\" class="bold" target="main">
                                 Package			</a>
 		</div>
 		<ul class="has-indent holding">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        					<li class="indent text-nowrap holding-wrapper holding-class">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Arrays" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays" class="" target="main">Arrays</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">配列関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::arrayize()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrayize()" class="" target="main">arrayize</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::arrayize()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrayize()" class="" target="main">arrayize</a>
 										<small class="ellipsis-text">引数の配列を生成する。</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::is_hasharray()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_hasharray()" class="" target="main">is_hasharray</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::is_hasharray()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_hasharray()" class="" target="main">is_hasharray</a>
 										<small class="ellipsis-text">配列が連想配列か調べる</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::first_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_key()" class="" target="main">first_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::first_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_key()" class="" target="main">first_key</a>
 										<small class="ellipsis-text">配列の最初のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::first_value()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_value()" class="" target="main">first_value</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::first_value()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_value()" class="" target="main">first_value</a>
 										<small class="ellipsis-text">配列の最初の値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::first_keyvalue()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_keyvalue()" class="" target="main">first_keyvalue</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::first_keyvalue()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_keyvalue()" class="" target="main">first_keyvalue</a>
 										<small class="ellipsis-text">配列の最初のキー/値ペアをタプルで返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::last_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_key()" class="" target="main">last_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::last_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_key()" class="" target="main">last_key</a>
 										<small class="ellipsis-text">配列の最後のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::last_value()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_value()" class="" target="main">last_value</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::last_value()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_value()" class="" target="main">last_value</a>
 										<small class="ellipsis-text">配列の最後の値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::last_keyvalue()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_keyvalue()" class="" target="main">last_keyvalue</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::last_keyvalue()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_keyvalue()" class="" target="main">last_keyvalue</a>
 										<small class="ellipsis-text">配列の最後のキー/値ペアをタプルで返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::prev_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::prev_key()" class="" target="main">prev_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::prev_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::prev_key()" class="" target="main">prev_key</a>
 										<small class="ellipsis-text">配列の指定キーの前のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::next_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::next_key()" class="" target="main">next_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::next_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::next_key()" class="" target="main">next_key</a>
 										<small class="ellipsis-text">配列の指定キーの次のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::in_array_and()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_and()" class="" target="main">in_array_and</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::in_array_and()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_and()" class="" target="main">in_array_and</a>
 										<small class="ellipsis-text">in_array の複数版（AND）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::in_array_or()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_or()" class="" target="main">in_array_or</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::in_array_or()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_or()" class="" target="main">in_array_or</a>
 										<small class="ellipsis-text">in_array の複数版（OR）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_add()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_add()" class="" target="main">array_add</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::kvsort()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::kvsort()" class="" target="main">kvsort</a>
+										<small class="ellipsis-text">比較関数にキーも渡ってくる安定ソート</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_add()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_add()" class="" target="main">array_add</a>
 										<small class="ellipsis-text">配列の+演算子の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_implode()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_implode()" class="" target="main">array_implode</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_implode()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_implode()" class="" target="main">array_implode</a>
 										<small class="ellipsis-text">配列の各要素の間に要素を差し込む</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_sprintf()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_sprintf()" class="" target="main">array_sprintf</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_sprintf()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_sprintf()" class="" target="main">array_sprintf</a>
 										<small class="ellipsis-text">キーと値で sprintf する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_strpad()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_strpad()" class="" target="main">array_strpad</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_strpad()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_strpad()" class="" target="main">array_strpad</a>
 										<small class="ellipsis-text">配列のキー・要素に文字列を付加する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_pos()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos()" class="" target="main">array_pos</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_pos()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos()" class="" target="main">array_pos</a>
 										<small class="ellipsis-text">配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_of()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_of()" class="" target="main">array_of</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_of()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_of()" class="" target="main">array_of</a>
 										<small class="ellipsis-text">配列を与えると指定キーの値を返すクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_get()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_get()" class="" target="main">array_get</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_get()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_get()" class="" target="main">array_get</a>
 										<small class="ellipsis-text">デフォルト値付きの配列値取得</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_set()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_set()" class="" target="main">array_set</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_set()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_set()" class="" target="main">array_set</a>
 										<small class="ellipsis-text">キー指定の配列値設定</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_unset()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_unset()" class="" target="main">array_unset</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_unset()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_unset()" class="" target="main">array_unset</a>
 										<small class="ellipsis-text">伏せると同時にその値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_dive()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_dive()" class="" target="main">array_dive</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_dive()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_dive()" class="" target="main">array_dive</a>
 										<small class="ellipsis-text">パス形式で配列値を取得</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_keys_exist()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_keys_exist()" class="" target="main">array_keys_exist</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_keys_exist()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_keys_exist()" class="" target="main">array_keys_exist</a>
 										<small class="ellipsis-text">array_key_exists の複数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_exists()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_exists()" class="strike" target="main">array_exists</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_exists()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_exists()" class="strike" target="main">array_exists</a>
 										<small class="ellipsis-text">array_search のクロージャ版のようなもの</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_find()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_find()" class="" target="main">array_find</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_find()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_find()" class="" target="main">array_find</a>
 										<small class="ellipsis-text">array_search のクロージャ版のようなもの</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_grep_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_grep_key()" class="" target="main">array_grep_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_grep_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_grep_key()" class="" target="main">array_grep_key</a>
 										<small class="ellipsis-text">キーを正規表現でフィルタする</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_map_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_key()" class="" target="main">array_map_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_map_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_key()" class="" target="main">array_map_key</a>
 										<small class="ellipsis-text">キーをマップして変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_filter_not()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_not()" class="" target="main">array_filter_not</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_filter_not()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_not()" class="" target="main">array_filter_not</a>
 										<small class="ellipsis-text">array_filter の否定版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_filter_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_key()" class="" target="main">array_filter_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_filter_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_key()" class="" target="main">array_filter_key</a>
 										<small class="ellipsis-text">キーを主軸とした array_filter</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_filter_eval()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_eval()" class="" target="main">array_filter_eval</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_filter_eval()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_eval()" class="" target="main">array_filter_eval</a>
 										<small class="ellipsis-text">eval で評価して array_filter する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_where()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_where()" class="" target="main">array_where</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_where()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_where()" class="" target="main">array_where</a>
 										<small class="ellipsis-text">指定キーの要素で array_filter する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_map_filter()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_filter()" class="" target="main">array_map_filter</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_map_filter()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_filter()" class="" target="main">array_map_filter</a>
 										<small class="ellipsis-text">array_map + array_filter する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_map_method()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_method()" class="" target="main">array_map_method</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_map_method()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_method()" class="" target="main">array_map_method</a>
 										<small class="ellipsis-text">メソッドを指定できるようにした array_map</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_maps()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_maps()" class="" target="main">array_maps</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_maps()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_maps()" class="" target="main">array_maps</a>
 										<small class="ellipsis-text">複数コールバックを指定できる array_map</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_nmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nmap()" class="" target="main">array_nmap</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_nmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nmap()" class="" target="main">array_nmap</a>
 										<small class="ellipsis-text">要素値を $callback の n 番目(0ベース)に適用して array_map する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_lmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lmap()" class="" target="main">array_lmap</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_lmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lmap()" class="" target="main">array_lmap</a>
 										<small class="ellipsis-text">要素値を $callback の最左に適用して array_map する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_rmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rmap()" class="" target="main">array_rmap</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_rmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rmap()" class="" target="main">array_rmap</a>
 										<small class="ellipsis-text">要素値を $callback の最右に適用して array_map する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_each()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_each()" class="" target="main">array_each</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_each()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_each()" class="" target="main">array_each</a>
 										<small class="ellipsis-text">array_reduce の参照版（のようなもの）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_depth()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_depth()" class="" target="main">array_depth</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_depth()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_depth()" class="" target="main">array_depth</a>
 										<small class="ellipsis-text">配列の次元数を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_insert()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_insert()" class="" target="main">array_insert</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_insert()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_insert()" class="" target="main">array_insert</a>
 										<small class="ellipsis-text">配列・連想配列を問わず任意の位置に値を挿入する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_assort()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_assort()" class="" target="main">array_assort</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_assort()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_assort()" class="" target="main">array_assort</a>
 										<small class="ellipsis-text">配列をコールバックに従って分類する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_count()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()" class="" target="main">array_count</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_count()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()" class="" target="main">array_count</a>
 										<small class="ellipsis-text">配列をコールバックに従ってカウントする</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_group()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_group()" class="" target="main">array_group</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_group()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_group()" class="" target="main">array_group</a>
 										<small class="ellipsis-text">配列をコールバックの返り値でグループ化する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_all()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_all()" class="" target="main">array_all</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_all()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_all()" class="" target="main">array_all</a>
 										<small class="ellipsis-text">全要素が true になるなら true を返す（1つでも false なら false を返す）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_any()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_any()" class="" target="main">array_any</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_any()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_any()" class="" target="main">array_any</a>
 										<small class="ellipsis-text">全要素が false になるなら false を返す（1つでも true なら true を返す）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_order()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_order()" class="" target="main">array_order</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_order()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_order()" class="" target="main">array_order</a>
 										<small class="ellipsis-text">配列を $orders に従って並べ替える</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_shuffle()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shuffle()" class="" target="main">array_shuffle</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_shuffle()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shuffle()" class="" target="main">array_shuffle</a>
 										<small class="ellipsis-text">shuffle のキーが保存される＋参照渡しではない版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shrink_key()" class="" target="main">array_shrink_key</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shrink_key()" class="" target="main">array_shrink_key</a>
 										<small class="ellipsis-text">値の優先順位を逆にした array_intersect_key</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_lookup()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()" class="" target="main">array_lookup</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_lookup()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()" class="" target="main">array_lookup</a>
 										<small class="ellipsis-text">キー保存可能な array_column</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_columns()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_columns()" class="" target="main">array_columns</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_columns()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_columns()" class="" target="main">array_columns</a>
 										<small class="ellipsis-text">全要素に対して array_column する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_uncolumns()" class="" target="main">array_uncolumns</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_uncolumns()" class="" target="main">array_uncolumns</a>
 										<small class="ellipsis-text">array_columns のほぼ逆で [キー =&gt; [要素]] 配列から連想配列の配列を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_convert()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_convert()" class="" target="main">array_convert</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_convert()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_convert()" class="" target="main">array_convert</a>
 										<small class="ellipsis-text">配列の各要素に再帰的にコールバックを適用して変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_flatten()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_flatten()" class="" target="main">array_flatten</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_flatten()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_flatten()" class="" target="main">array_flatten</a>
 										<small class="ellipsis-text">多階層配列をフラットに展開する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Arrays::array_nest()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nest()" class="" target="main">array_nest</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_nest()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nest()" class="" target="main">array_nest</a>
 										<small class="ellipsis-text">シンプルな [キー =&gt; 値] な配列から階層配列を生成する</small>
 									</div>
 								</li>
@@ -446,48 +515,54 @@
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Classobj" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj" class="" target="main">Classobj</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">クラス・オブジェクト関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Classobj::stdclass()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()" class="" target="main">stdclass</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Classobj::stdclass()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()" class="" target="main">stdclass</a>
 										<small class="ellipsis-text">初期フィールド値を与えて stdClass を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Classobj::detect_namespace()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::detect_namespace()" class="" target="main">detect_namespace</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Classobj::detect_namespace()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::detect_namespace()" class="" target="main">detect_namespace</a>
 										<small class="ellipsis-text">ディレクトリ構造から名前空間を推測して返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Classobj::class_loader()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()" class="" target="main">class_loader</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Classobj::class_loader()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()" class="" target="main">class_loader</a>
 										<small class="ellipsis-text">composer のクラスローダを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Classobj::class_namespace()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_namespace()" class="" target="main">class_namespace</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Classobj::class_namespace()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_namespace()" class="" target="main">class_namespace</a>
 										<small class="ellipsis-text">クラスの名前空間部分を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Classobj::class_shorten()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_shorten()" class="" target="main">class_shorten</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Classobj::class_shorten()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_shorten()" class="" target="main">class_shorten</a>
 										<small class="ellipsis-text">クラスの名前空間部分を除いた短い名前を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Classobj::class_replace()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_replace()" class="" target="main">class_replace</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Classobj::class_replace()" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_replace()" class="" target="main">class_replace</a>
 										<small class="ellipsis-text">既存（未読み込みに限る）クラスを強制的に置換する</small>
 									</div>
 								</li>
@@ -497,104 +572,118 @@
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\FileSystem" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem" class="" target="main">FileSystem</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">ファイルシステム関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::file_list()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_list()" class="" target="main">file_list</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::file_list()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_list()" class="" target="main">file_list</a>
 										<small class="ellipsis-text">ファイル一覧を配列で返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::file_tree()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_tree()" class="" target="main">file_tree</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::file_tree()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_tree()" class="" target="main">file_tree</a>
 										<small class="ellipsis-text">ディレクトリ階層をツリー構造で返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::file_extension()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_extension()" class="" target="main">file_extension</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::file_extension()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_extension()" class="" target="main">file_extension</a>
 										<small class="ellipsis-text">ファイルの拡張子を変更する。引数を省略すると拡張子を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::file_set_contents()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_set_contents()" class="" target="main">file_set_contents</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::file_set_contents()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_set_contents()" class="" target="main">file_set_contents</a>
 										<small class="ellipsis-text">ディレクトリも掘る file_put_contents</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::mkdir_p()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::mkdir_p()" class="" target="main">mkdir_p</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::mkdir_p()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::mkdir_p()" class="" target="main">mkdir_p</a>
 										<small class="ellipsis-text">ディレクトリを再帰的に掘る</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::dirname_r()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::dirname_r()" class="" target="main">dirname_r</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::dirname_r()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::dirname_r()" class="" target="main">dirname_r</a>
 										<small class="ellipsis-text">コールバックが true 相当を返すまで親ディレクトリを辿り続ける</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::fnmatch_and()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_and()" class="" target="main">fnmatch_and</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::fnmatch_and()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_and()" class="" target="main">fnmatch_and</a>
 										<small class="ellipsis-text">fnmatch の AND 版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::fnmatch_or()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_or()" class="" target="main">fnmatch_or</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::fnmatch_or()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_or()" class="" target="main">fnmatch_or</a>
 										<small class="ellipsis-text">fnmatch の OR 版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::path_is_absolute()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_is_absolute()" class="" target="main">path_is_absolute</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::path_is_absolute()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_is_absolute()" class="" target="main">path_is_absolute</a>
 										<small class="ellipsis-text">パスが絶対パスか判定する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::path_resolve()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_resolve()" class="" target="main">path_resolve</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::path_resolve()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_resolve()" class="" target="main">path_resolve</a>
 										<small class="ellipsis-text">パスを絶対パスに変換して正規化する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::path_normalize()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_normalize()" class="" target="main">path_normalize</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::path_normalize()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_normalize()" class="" target="main">path_normalize</a>
 										<small class="ellipsis-text">パスを正規化する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::cp_rf()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::cp_rf()" class="" target="main">cp_rf</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::cp_rf()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::cp_rf()" class="" target="main">cp_rf</a>
 										<small class="ellipsis-text">ディレクトリのコピー</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::rm_rf()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::rm_rf()" class="" target="main">rm_rf</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::rm_rf()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::rm_rf()" class="" target="main">rm_rf</a>
 										<small class="ellipsis-text">中身があっても消せる rmdir</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\FileSystem::tmpname()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::tmpname()" class="" target="main">tmpname</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\FileSystem::tmpname()" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::tmpname()" class="" target="main">tmpname</a>
 										<small class="ellipsis-text">終了時に削除される一時ファイル名を生成する</small>
 									</div>
 								</li>
@@ -604,125 +693,142 @@
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Funchand" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand" class="" target="main">Funchand</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">callable 関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::delegate()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::delegate()" class="" target="main">delegate</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::delegate()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::delegate()" class="" target="main">delegate</a>
 										<small class="ellipsis-text">指定 callable を指定クロージャで実行するクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::nbind()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::nbind()" class="" target="main">nbind</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::nbind()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::nbind()" class="" target="main">nbind</a>
 										<small class="ellipsis-text">$callable の指定位置に引数を束縛したクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::lbind()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::lbind()" class="" target="main">lbind</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::lbind()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::lbind()" class="" target="main">lbind</a>
 										<small class="ellipsis-text">$callable の最左に引数を束縛した callable を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::rbind()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::rbind()" class="" target="main">rbind</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::rbind()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::rbind()" class="" target="main">rbind</a>
 										<small class="ellipsis-text">$callable の最右に引数を束縛した callable を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::composite()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::composite()" class="" target="main">composite</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::composite()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::composite()" class="" target="main">composite</a>
 										<small class="ellipsis-text">合成関数を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::return_arg()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::return_arg()" class="" target="main">return_arg</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::return_arg()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::return_arg()" class="" target="main">return_arg</a>
 										<small class="ellipsis-text">$n 番目の引数（0 ベース）をそのまま返すクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::not_func()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::not_func()" class="" target="main">not_func</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::not_func()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::not_func()" class="" target="main">not_func</a>
 										<small class="ellipsis-text">返り値の真偽値を逆転した新しいクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::eval_func()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::eval_func()" class="" target="main">eval_func</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::eval_func()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::eval_func()" class="" target="main">eval_func</a>
 										<small class="ellipsis-text">指定コードで eval するクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::reflect_callable()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::reflect_callable()" class="" target="main">reflect_callable</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::reflect_callable()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::reflect_callable()" class="" target="main">reflect_callable</a>
 										<small class="ellipsis-text">callable から ReflectionFunctionAbstract を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::closurize()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::closurize()" class="" target="main">closurize</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::closurize()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::closurize()" class="" target="main">closurize</a>
 										<small class="ellipsis-text">callable を Closure に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::call_safely()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::call_safely()" class="" target="main">call_safely</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::call_safely()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::call_safely()" class="" target="main">call_safely</a>
 										<small class="ellipsis-text">エラーを例外に変換するブロックでコールバックを実行する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::ob_capture()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ob_capture()" class="" target="main">ob_capture</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::ob_capture()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ob_capture()" class="" target="main">ob_capture</a>
 										<small class="ellipsis-text">ob_start ～ ob_get_clean のブロックでコールバックを実行する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::by_builtin()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::by_builtin()" class="" target="main">by_builtin</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::by_builtin()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::by_builtin()" class="" target="main">by_builtin</a>
 										<small class="ellipsis-text">Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::parameter_length()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::parameter_length()" class="" target="main">parameter_length</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::parameter_length()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::parameter_length()" class="" target="main">parameter_length</a>
 										<small class="ellipsis-text">callable の引数の数を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::function_shorten()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_shorten()" class="" target="main">function_shorten</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::function_shorten()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_shorten()" class="" target="main">function_shorten</a>
 										<small class="ellipsis-text">関数の名前空間部分を除いた短い名前を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_user_func_array()" class="" target="main">func_user_func_array</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_user_func_array()" class="" target="main">func_user_func_array</a>
 										<small class="ellipsis-text">パラメータ定義数に応じて呼び出し引数を可変にしてコールする</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Funchand::function_alias()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_alias()" class="" target="main">function_alias</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Funchand::function_alias()" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_alias()" class="" target="main">function_alias</a>
 										<small class="ellipsis-text">関数のエイリアスを作成する</small>
 									</div>
 								</li>
@@ -732,69 +838,78 @@
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Math" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math" class="" target="main">Math</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">数学関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::minimum()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::minimum()" class="" target="main">minimum</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::minimum()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::minimum()" class="" target="main">minimum</a>
 										<small class="ellipsis-text">引数の最小値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::maximum()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::maximum()" class="" target="main">maximum</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::maximum()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::maximum()" class="" target="main">maximum</a>
 										<small class="ellipsis-text">引数の最大値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::mode()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mode()" class="" target="main">mode</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::mode()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mode()" class="" target="main">mode</a>
 										<small class="ellipsis-text">引数の最頻値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::mean()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mean()" class="" target="main">mean</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::mean()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mean()" class="" target="main">mean</a>
 										<small class="ellipsis-text">引数の相加平均値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::median()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::median()" class="" target="main">median</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::median()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::median()" class="" target="main">median</a>
 										<small class="ellipsis-text">引数の中央値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::average()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::average()" class="" target="main">average</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::average()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::average()" class="" target="main">average</a>
 										<small class="ellipsis-text">引数の意味平均値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::sum()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::sum()" class="" target="main">sum</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::sum()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::sum()" class="" target="main">sum</a>
 										<small class="ellipsis-text">引数の合計値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::random_at()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::random_at()" class="" target="main">random_at</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::random_at()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::random_at()" class="" target="main">random_at</a>
 										<small class="ellipsis-text">引数をランダムで返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Math::probability()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::probability()" class="" target="main">probability</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Math::probability()" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::probability()" class="" target="main">probability</a>
 										<small class="ellipsis-text">一定確率で true を返す</small>
 									</div>
 								</li>
@@ -804,160 +919,182 @@
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Strings" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings" class="" target="main">Strings</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">文字列関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::strcat()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()" class="" target="main">strcat</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::strcat()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()" class="" target="main">strcat</a>
 										<small class="ellipsis-text">文字列結合の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::concat()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::concat()" class="" target="main">concat</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::concat()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::concat()" class="" target="main">concat</a>
 										<small class="ellipsis-text">strcat の空文字回避版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::split_noempty()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::split_noempty()" class="" target="main">split_noempty</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::split_noempty()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::split_noempty()" class="" target="main">split_noempty</a>
 										<small class="ellipsis-text">空文字を除外する文字列分割</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::multiexplode()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::multiexplode()" class="" target="main">multiexplode</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::multiexplode()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::multiexplode()" class="" target="main">multiexplode</a>
 										<small class="ellipsis-text">explode の配列対応と $limit の挙動を変えたもの</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::quoteexplode()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::quoteexplode()" class="" target="main">quoteexplode</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::quoteexplode()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::quoteexplode()" class="" target="main">quoteexplode</a>
 										<small class="ellipsis-text">エスケープやクオートに対応した explode</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::str_equals()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_equals()" class="" target="main">str_equals</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::str_equals()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_equals()" class="" target="main">str_equals</a>
 										<small class="ellipsis-text">文字列比較の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::str_contains()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_contains()" class="" target="main">str_contains</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::str_contains()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_contains()" class="" target="main">str_contains</a>
 										<small class="ellipsis-text">指定文字列を含むか返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::str_putcsv()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_putcsv()" class="" target="main">str_putcsv</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::str_putcsv()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_putcsv()" class="" target="main">str_putcsv</a>
 										<small class="ellipsis-text">fputcsv の文字列版（str_getcsv の put 版）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::str_subreplace()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_subreplace()" class="" target="main">str_subreplace</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::str_subreplace()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_subreplace()" class="" target="main">str_subreplace</a>
 										<small class="ellipsis-text">指定文字列を置換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::str_between()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_between()" class="" target="main">str_between</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::str_between()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_between()" class="" target="main">str_between</a>
 										<small class="ellipsis-text">指定文字で囲まれた文字列を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::starts_with()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()" class="" target="main">starts_with</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::starts_with()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()" class="" target="main">starts_with</a>
 										<small class="ellipsis-text">指定文字列で始まるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::ends_with()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ends_with()" class="" target="main">ends_with</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::ends_with()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ends_with()" class="" target="main">ends_with</a>
 										<small class="ellipsis-text">指定文字列で終わるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::camel_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::camel_case()" class="" target="main">camel_case</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::camel_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::camel_case()" class="" target="main">camel_case</a>
 										<small class="ellipsis-text">camelCase に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::pascal_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::pascal_case()" class="" target="main">pascal_case</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::pascal_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::pascal_case()" class="" target="main">pascal_case</a>
 										<small class="ellipsis-text">PascalCase に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::snake_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::snake_case()" class="" target="main">snake_case</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::snake_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::snake_case()" class="" target="main">snake_case</a>
 										<small class="ellipsis-text">snake_case に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::chain_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::chain_case()" class="" target="main">chain_case</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::chain_case()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::chain_case()" class="" target="main">chain_case</a>
 										<small class="ellipsis-text">chain-case に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::random_string()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::random_string()" class="" target="main">random_string</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::random_string()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::random_string()" class="" target="main">random_string</a>
 										<small class="ellipsis-text">安全な乱数文字列を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::kvsprintf()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::kvsprintf()" class="" target="main">kvsprintf</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::kvsprintf()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::kvsprintf()" class="" target="main">kvsprintf</a>
 										<small class="ellipsis-text">連想配列を指定できるようにした vsprintf</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::preg_capture()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_capture()" class="" target="main">preg_capture</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::preg_capture()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_capture()" class="" target="main">preg_capture</a>
 										<small class="ellipsis-text">キャプチャを主軸においた preg_match</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::preg_splice()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_splice()" class="" target="main">preg_splice</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::preg_splice()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_splice()" class="" target="main">preg_splice</a>
 										<small class="ellipsis-text">キャプチャも行える preg_replace</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::render_string()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()" class="" target="main">render_string</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::render_string()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()" class="" target="main">render_string</a>
 										<small class="ellipsis-text">&quot;hoge {$hoge}&quot; 形式のレンダリング</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Strings::render_file()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_file()" class="" target="main">render_file</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Strings::render_file()" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_file()" class="" target="main">render_file</a>
 										<small class="ellipsis-text">&quot;hoge {$hoge}&quot; 形式のレンダリングのファイル版</small>
 									</div>
 								</li>
@@ -967,178 +1104,256 @@
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Syntax" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax" class="" target="main">Syntax</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">構文関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::returns()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()" class="" target="main">returns</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::returns()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()" class="" target="main">returns</a>
 										<small class="ellipsis-text">引数をそのまま返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::optional()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()" class="" target="main">optional</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::optional()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()" class="" target="main">optional</a>
 										<small class="ellipsis-text">オブジェクトならそれを、オブジェクトでないなら NullObject を返す</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::throws()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throws()" class="" target="main">throws</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::throws()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throws()" class="" target="main">throws</a>
 										<small class="ellipsis-text">throw の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::throw_if()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throw_if()" class="" target="main">throw_if</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::throw_if()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throw_if()" class="" target="main">throw_if</a>
 										<small class="ellipsis-text">条件付き throw</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::ifelse()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::ifelse()" class="" target="main">ifelse</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::ifelse()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::ifelse()" class="" target="main">ifelse</a>
 										<small class="ellipsis-text">if ～ else 構文の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::try_catch()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch()" class="" target="main">try_catch</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::try_catch()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch()" class="" target="main">try_catch</a>
 										<small class="ellipsis-text">try ～ catch 構文の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::try_finally()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_finally()" class="" target="main">try_finally</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::try_finally()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_finally()" class="" target="main">try_finally</a>
 										<small class="ellipsis-text">try ～ finally 構文の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch_finally()" class="" target="main">try_catch_finally</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch_finally()" class="" target="main">try_catch_finally</a>
 										<small class="ellipsis-text">try ～ catch ～ finally 構文の関数版</small>
 									</div>
 								</li>
                                                         -->						</ul>
 					</li>
-                                                                                                                                                                                                                                    					<li class="indent text-nowrap holding-wrapper holding-class">
+                                                                                                                                                                                                                                                                                                                            					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Utility" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility" class="" target="main">Utility</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">汎用的なユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Utility::cache()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cache()" class="" target="main">cache</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Utility::cache()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cache()" class="" target="main">cache</a>
 										<small class="ellipsis-text">シンプルにキャッシュする</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Utility::error()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::error()" class="" target="main">error</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Utility::arguments()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::arguments()" class="" target="main">arguments</a>
+										<small class="ellipsis-text">コマンドライン引数をパースして引数とオプションを返す</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Utility::error()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::error()" class="" target="main">error</a>
 										<small class="ellipsis-text">エラー出力する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Utility::benchmark()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::benchmark()" class="" target="main">benchmark</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Utility::timer()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::timer()" class="" target="main">timer</a>
+										<small class="ellipsis-text">処理時間を計測する</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Utility::benchmark()" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::benchmark()" class="" target="main">benchmark</a>
 										<small class="ellipsis-text">簡易ベンチマークを取る</small>
 									</div>
 								</li>
                                                         -->						</ul>
 					</li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    					<li class="indent text-nowrap holding-wrapper holding-class">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Vars" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars" class="" target="main">Vars</a>
-							<small class="ellipsis-text"></small>
+							<small class="ellipsis-text">変数関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent  ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::stringify()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::stringify()" class="" target="main">stringify</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::stringify()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::stringify()" class="" target="main">stringify</a>
 										<small class="ellipsis-text">値を何とかして文字列化する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::numberify()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numberify()" class="" target="main">numberify</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::numberify()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numberify()" class="" target="main">numberify</a>
 										<small class="ellipsis-text">値を何とかして数値化する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::is_empty()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_empty()" class="" target="main">is_empty</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::numval()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numval()" class="" target="main">numval</a>
+										<small class="ellipsis-text">値を数値化する</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::arrayval()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::arrayval()" class="" target="main">arrayval</a>
+										<small class="ellipsis-text">array キャストの関数版</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::is_empty()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_empty()" class="" target="main">is_empty</a>
 										<small class="ellipsis-text">値が空か検査する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::is_primitive()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_primitive()" class="" target="main">is_primitive</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::is_primitive()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_primitive()" class="" target="main">is_primitive</a>
 										<small class="ellipsis-text">値が複合型でないか検査する</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::is_recursive()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_recursive()" class="" target="main">is_recursive</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::is_recursive()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_recursive()" class="" target="main">is_recursive</a>
 										<small class="ellipsis-text">変数が再帰参照を含むか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::is_iterable()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()" class="" target="main">is_iterable</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::is_iterable()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()" class="" target="main">is_iterable</a>
 										<small class="ellipsis-text">変数が foreach で回せるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::is_countable()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()" class="" target="main">is_countable</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::is_countable()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()" class="" target="main">is_countable</a>
 										<small class="ellipsis-text">変数が count でカウントできるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::var_type()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_type()" class="" target="main">var_type</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::varcmp()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()" class="" target="main">varcmp</a>
+										<small class="ellipsis-text">php7 の `` の関数版</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::var_type()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_type()" class="" target="main">var_type</a>
 										<small class="ellipsis-text">値の型を取得する（gettype + get_class）</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::var_export2()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_export2()" class="" target="main">var_export2</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::var_apply()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_apply()" class="" target="main">var_apply</a>
+										<small class="ellipsis-text">値にコールバックを適用する</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::var_applys()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_applys()" class="" target="main">var_applys</a>
+										<small class="ellipsis-text">配列にコールバックを適用する</small>
+									</div>
+								</li>
+                            								<li class="indent ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::var_export2()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_export2()" class="" target="main">var_export2</a>
 										<small class="ellipsis-text">組み込みの var_export をいい感じにしたもの</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::var_html()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_html()" class="" target="main">var_html</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::var_html()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_html()" class="" target="main">var_html</a>
 										<small class="ellipsis-text">var_export2 を html コンテキストに特化させたもの</small>
 									</div>
 								</li>
-                            								<li class="indent  ">
+                            								<li class="indent ">
 									<div class="ellipsis">
-										<span class="label label-icon label-method">M</span>
-										<a id="ryunosuke\Functions\Package\Vars::hashvar()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::hashvar()" class="" target="main">hashvar</a>
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Vars::hashvar()" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::hashvar()" class="" target="main">hashvar</a>
 										<small class="ellipsis-text">変数指定をできるようにした compact</small>
 									</div>
 								</li>
@@ -1152,7 +1367,7 @@
 	</li>
             	</ul>
 	<script>
-        $('#search').data('source', ["ryunosuke\\Functions\\Package\\Arrays","ryunosuke\\Functions\\Package\\Arrays::arrayize()","ryunosuke\\Functions\\Package\\Arrays::is_hasharray()","ryunosuke\\Functions\\Package\\Arrays::first_key()","ryunosuke\\Functions\\Package\\Arrays::first_value()","ryunosuke\\Functions\\Package\\Arrays::first_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::last_key()","ryunosuke\\Functions\\Package\\Arrays::last_value()","ryunosuke\\Functions\\Package\\Arrays::last_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::prev_key()","ryunosuke\\Functions\\Package\\Arrays::next_key()","ryunosuke\\Functions\\Package\\Arrays::in_array_and()","ryunosuke\\Functions\\Package\\Arrays::in_array_or()","ryunosuke\\Functions\\Package\\Arrays::array_add()","ryunosuke\\Functions\\Package\\Arrays::array_implode()","ryunosuke\\Functions\\Package\\Arrays::array_sprintf()","ryunosuke\\Functions\\Package\\Arrays::array_strpad()","ryunosuke\\Functions\\Package\\Arrays::array_pos()","ryunosuke\\Functions\\Package\\Arrays::array_of()","ryunosuke\\Functions\\Package\\Arrays::array_get()","ryunosuke\\Functions\\Package\\Arrays::array_set()","ryunosuke\\Functions\\Package\\Arrays::array_unset()","ryunosuke\\Functions\\Package\\Arrays::array_dive()","ryunosuke\\Functions\\Package\\Arrays::array_keys_exist()","ryunosuke\\Functions\\Package\\Arrays::array_exists()","ryunosuke\\Functions\\Package\\Arrays::array_find()","ryunosuke\\Functions\\Package\\Arrays::array_grep_key()","ryunosuke\\Functions\\Package\\Arrays::array_map_key()","ryunosuke\\Functions\\Package\\Arrays::array_filter_not()","ryunosuke\\Functions\\Package\\Arrays::array_filter_key()","ryunosuke\\Functions\\Package\\Arrays::array_filter_eval()","ryunosuke\\Functions\\Package\\Arrays::array_where()","ryunosuke\\Functions\\Package\\Arrays::array_map_filter()","ryunosuke\\Functions\\Package\\Arrays::array_map_method()","ryunosuke\\Functions\\Package\\Arrays::array_maps()","ryunosuke\\Functions\\Package\\Arrays::array_nmap()","ryunosuke\\Functions\\Package\\Arrays::array_lmap()","ryunosuke\\Functions\\Package\\Arrays::array_rmap()","ryunosuke\\Functions\\Package\\Arrays::array_each()","ryunosuke\\Functions\\Package\\Arrays::array_depth()","ryunosuke\\Functions\\Package\\Arrays::array_insert()","ryunosuke\\Functions\\Package\\Arrays::array_assort()","ryunosuke\\Functions\\Package\\Arrays::array_count()","ryunosuke\\Functions\\Package\\Arrays::array_group()","ryunosuke\\Functions\\Package\\Arrays::array_all()","ryunosuke\\Functions\\Package\\Arrays::array_any()","ryunosuke\\Functions\\Package\\Arrays::array_order()","ryunosuke\\Functions\\Package\\Arrays::array_shuffle()","ryunosuke\\Functions\\Package\\Arrays::array_shrink_key()","ryunosuke\\Functions\\Package\\Arrays::array_lookup()","ryunosuke\\Functions\\Package\\Arrays::array_columns()","ryunosuke\\Functions\\Package\\Arrays::array_uncolumns()","ryunosuke\\Functions\\Package\\Arrays::array_convert()","ryunosuke\\Functions\\Package\\Arrays::array_flatten()","ryunosuke\\Functions\\Package\\Arrays::array_nest()","ryunosuke\\Functions\\Package\\Classobj","ryunosuke\\Functions\\Package\\Classobj::stdclass()","ryunosuke\\Functions\\Package\\Classobj::detect_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_loader()","ryunosuke\\Functions\\Package\\Classobj::class_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_shorten()","ryunosuke\\Functions\\Package\\Classobj::class_replace()","ryunosuke\\Functions\\Package\\FileSystem","ryunosuke\\Functions\\Package\\FileSystem::file_list()","ryunosuke\\Functions\\Package\\FileSystem::file_tree()","ryunosuke\\Functions\\Package\\FileSystem::file_extension()","ryunosuke\\Functions\\Package\\FileSystem::file_set_contents()","ryunosuke\\Functions\\Package\\FileSystem::mkdir_p()","ryunosuke\\Functions\\Package\\FileSystem::dirname_r()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_and()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_or()","ryunosuke\\Functions\\Package\\FileSystem::path_is_absolute()","ryunosuke\\Functions\\Package\\FileSystem::path_resolve()","ryunosuke\\Functions\\Package\\FileSystem::path_normalize()","ryunosuke\\Functions\\Package\\FileSystem::cp_rf()","ryunosuke\\Functions\\Package\\FileSystem::rm_rf()","ryunosuke\\Functions\\Package\\FileSystem::tmpname()","ryunosuke\\Functions\\Package\\Funchand","ryunosuke\\Functions\\Package\\Funchand::delegate()","ryunosuke\\Functions\\Package\\Funchand::nbind()","ryunosuke\\Functions\\Package\\Funchand::lbind()","ryunosuke\\Functions\\Package\\Funchand::rbind()","ryunosuke\\Functions\\Package\\Funchand::composite()","ryunosuke\\Functions\\Package\\Funchand::return_arg()","ryunosuke\\Functions\\Package\\Funchand::not_func()","ryunosuke\\Functions\\Package\\Funchand::eval_func()","ryunosuke\\Functions\\Package\\Funchand::reflect_callable()","ryunosuke\\Functions\\Package\\Funchand::closurize()","ryunosuke\\Functions\\Package\\Funchand::call_safely()","ryunosuke\\Functions\\Package\\Funchand::ob_capture()","ryunosuke\\Functions\\Package\\Funchand::by_builtin()","ryunosuke\\Functions\\Package\\Funchand::parameter_length()","ryunosuke\\Functions\\Package\\Funchand::function_shorten()","ryunosuke\\Functions\\Package\\Funchand::func_user_func_array()","ryunosuke\\Functions\\Package\\Funchand::function_alias()","ryunosuke\\Functions\\Package\\Math","ryunosuke\\Functions\\Package\\Math::minimum()","ryunosuke\\Functions\\Package\\Math::maximum()","ryunosuke\\Functions\\Package\\Math::mode()","ryunosuke\\Functions\\Package\\Math::mean()","ryunosuke\\Functions\\Package\\Math::median()","ryunosuke\\Functions\\Package\\Math::average()","ryunosuke\\Functions\\Package\\Math::sum()","ryunosuke\\Functions\\Package\\Math::random_at()","ryunosuke\\Functions\\Package\\Math::probability()","ryunosuke\\Functions\\Package\\Strings","ryunosuke\\Functions\\Package\\Strings::strcat()","ryunosuke\\Functions\\Package\\Strings::concat()","ryunosuke\\Functions\\Package\\Strings::split_noempty()","ryunosuke\\Functions\\Package\\Strings::multiexplode()","ryunosuke\\Functions\\Package\\Strings::quoteexplode()","ryunosuke\\Functions\\Package\\Strings::str_equals()","ryunosuke\\Functions\\Package\\Strings::str_contains()","ryunosuke\\Functions\\Package\\Strings::str_putcsv()","ryunosuke\\Functions\\Package\\Strings::str_subreplace()","ryunosuke\\Functions\\Package\\Strings::str_between()","ryunosuke\\Functions\\Package\\Strings::starts_with()","ryunosuke\\Functions\\Package\\Strings::ends_with()","ryunosuke\\Functions\\Package\\Strings::camel_case()","ryunosuke\\Functions\\Package\\Strings::pascal_case()","ryunosuke\\Functions\\Package\\Strings::snake_case()","ryunosuke\\Functions\\Package\\Strings::chain_case()","ryunosuke\\Functions\\Package\\Strings::random_string()","ryunosuke\\Functions\\Package\\Strings::kvsprintf()","ryunosuke\\Functions\\Package\\Strings::preg_capture()","ryunosuke\\Functions\\Package\\Strings::preg_splice()","ryunosuke\\Functions\\Package\\Strings::render_string()","ryunosuke\\Functions\\Package\\Strings::render_file()","ryunosuke\\Functions\\Package\\Syntax","ryunosuke\\Functions\\Package\\Syntax::returns()","ryunosuke\\Functions\\Package\\Syntax::optional()","ryunosuke\\Functions\\Package\\Syntax::throws()","ryunosuke\\Functions\\Package\\Syntax::throw_if()","ryunosuke\\Functions\\Package\\Syntax::ifelse()","ryunosuke\\Functions\\Package\\Syntax::try_catch()","ryunosuke\\Functions\\Package\\Syntax::try_finally()","ryunosuke\\Functions\\Package\\Syntax::try_catch_finally()","ryunosuke\\Functions\\Package\\Utility","ryunosuke\\Functions\\Package\\Utility::cache()","ryunosuke\\Functions\\Package\\Utility::error()","ryunosuke\\Functions\\Package\\Utility::benchmark()","ryunosuke\\Functions\\Package\\Vars","ryunosuke\\Functions\\Package\\Vars::stringify()","ryunosuke\\Functions\\Package\\Vars::numberify()","ryunosuke\\Functions\\Package\\Vars::is_empty()","ryunosuke\\Functions\\Package\\Vars::is_primitive()","ryunosuke\\Functions\\Package\\Vars::is_recursive()","ryunosuke\\Functions\\Package\\Vars::is_iterable()","ryunosuke\\Functions\\Package\\Vars::is_countable()","ryunosuke\\Functions\\Package\\Vars::var_type()","ryunosuke\\Functions\\Package\\Vars::var_export2()","ryunosuke\\Functions\\Package\\Vars::var_html()","ryunosuke\\Functions\\Package\\Vars::hashvar()"]);
+        $('#search').data('source', ["ryunosuke\\Functions\\Package\\Arrays","ryunosuke\\Functions\\Package\\Arrays::arrayize()","ryunosuke\\Functions\\Package\\Arrays::is_hasharray()","ryunosuke\\Functions\\Package\\Arrays::first_key()","ryunosuke\\Functions\\Package\\Arrays::first_value()","ryunosuke\\Functions\\Package\\Arrays::first_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::last_key()","ryunosuke\\Functions\\Package\\Arrays::last_value()","ryunosuke\\Functions\\Package\\Arrays::last_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::prev_key()","ryunosuke\\Functions\\Package\\Arrays::next_key()","ryunosuke\\Functions\\Package\\Arrays::in_array_and()","ryunosuke\\Functions\\Package\\Arrays::in_array_or()","ryunosuke\\Functions\\Package\\Arrays::kvsort()","ryunosuke\\Functions\\Package\\Arrays::array_add()","ryunosuke\\Functions\\Package\\Arrays::array_implode()","ryunosuke\\Functions\\Package\\Arrays::array_sprintf()","ryunosuke\\Functions\\Package\\Arrays::array_strpad()","ryunosuke\\Functions\\Package\\Arrays::array_pos()","ryunosuke\\Functions\\Package\\Arrays::array_of()","ryunosuke\\Functions\\Package\\Arrays::array_get()","ryunosuke\\Functions\\Package\\Arrays::array_set()","ryunosuke\\Functions\\Package\\Arrays::array_unset()","ryunosuke\\Functions\\Package\\Arrays::array_dive()","ryunosuke\\Functions\\Package\\Arrays::array_keys_exist()","ryunosuke\\Functions\\Package\\Arrays::array_exists()","ryunosuke\\Functions\\Package\\Arrays::array_find()","ryunosuke\\Functions\\Package\\Arrays::array_grep_key()","ryunosuke\\Functions\\Package\\Arrays::array_map_key()","ryunosuke\\Functions\\Package\\Arrays::array_filter_not()","ryunosuke\\Functions\\Package\\Arrays::array_filter_key()","ryunosuke\\Functions\\Package\\Arrays::array_filter_eval()","ryunosuke\\Functions\\Package\\Arrays::array_where()","ryunosuke\\Functions\\Package\\Arrays::array_map_filter()","ryunosuke\\Functions\\Package\\Arrays::array_map_method()","ryunosuke\\Functions\\Package\\Arrays::array_maps()","ryunosuke\\Functions\\Package\\Arrays::array_nmap()","ryunosuke\\Functions\\Package\\Arrays::array_lmap()","ryunosuke\\Functions\\Package\\Arrays::array_rmap()","ryunosuke\\Functions\\Package\\Arrays::array_each()","ryunosuke\\Functions\\Package\\Arrays::array_depth()","ryunosuke\\Functions\\Package\\Arrays::array_insert()","ryunosuke\\Functions\\Package\\Arrays::array_assort()","ryunosuke\\Functions\\Package\\Arrays::array_count()","ryunosuke\\Functions\\Package\\Arrays::array_group()","ryunosuke\\Functions\\Package\\Arrays::array_all()","ryunosuke\\Functions\\Package\\Arrays::array_any()","ryunosuke\\Functions\\Package\\Arrays::array_order()","ryunosuke\\Functions\\Package\\Arrays::array_shuffle()","ryunosuke\\Functions\\Package\\Arrays::array_shrink_key()","ryunosuke\\Functions\\Package\\Arrays::array_lookup()","ryunosuke\\Functions\\Package\\Arrays::array_columns()","ryunosuke\\Functions\\Package\\Arrays::array_uncolumns()","ryunosuke\\Functions\\Package\\Arrays::array_convert()","ryunosuke\\Functions\\Package\\Arrays::array_flatten()","ryunosuke\\Functions\\Package\\Arrays::array_nest()","ryunosuke\\Functions\\Package\\Classobj","ryunosuke\\Functions\\Package\\Classobj::stdclass()","ryunosuke\\Functions\\Package\\Classobj::detect_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_loader()","ryunosuke\\Functions\\Package\\Classobj::class_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_shorten()","ryunosuke\\Functions\\Package\\Classobj::class_replace()","ryunosuke\\Functions\\Package\\FileSystem","ryunosuke\\Functions\\Package\\FileSystem::file_list()","ryunosuke\\Functions\\Package\\FileSystem::file_tree()","ryunosuke\\Functions\\Package\\FileSystem::file_extension()","ryunosuke\\Functions\\Package\\FileSystem::file_set_contents()","ryunosuke\\Functions\\Package\\FileSystem::mkdir_p()","ryunosuke\\Functions\\Package\\FileSystem::dirname_r()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_and()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_or()","ryunosuke\\Functions\\Package\\FileSystem::path_is_absolute()","ryunosuke\\Functions\\Package\\FileSystem::path_resolve()","ryunosuke\\Functions\\Package\\FileSystem::path_normalize()","ryunosuke\\Functions\\Package\\FileSystem::cp_rf()","ryunosuke\\Functions\\Package\\FileSystem::rm_rf()","ryunosuke\\Functions\\Package\\FileSystem::tmpname()","ryunosuke\\Functions\\Package\\Funchand","ryunosuke\\Functions\\Package\\Funchand::delegate()","ryunosuke\\Functions\\Package\\Funchand::nbind()","ryunosuke\\Functions\\Package\\Funchand::lbind()","ryunosuke\\Functions\\Package\\Funchand::rbind()","ryunosuke\\Functions\\Package\\Funchand::composite()","ryunosuke\\Functions\\Package\\Funchand::return_arg()","ryunosuke\\Functions\\Package\\Funchand::not_func()","ryunosuke\\Functions\\Package\\Funchand::eval_func()","ryunosuke\\Functions\\Package\\Funchand::reflect_callable()","ryunosuke\\Functions\\Package\\Funchand::closurize()","ryunosuke\\Functions\\Package\\Funchand::call_safely()","ryunosuke\\Functions\\Package\\Funchand::ob_capture()","ryunosuke\\Functions\\Package\\Funchand::by_builtin()","ryunosuke\\Functions\\Package\\Funchand::parameter_length()","ryunosuke\\Functions\\Package\\Funchand::function_shorten()","ryunosuke\\Functions\\Package\\Funchand::func_user_func_array()","ryunosuke\\Functions\\Package\\Funchand::function_alias()","ryunosuke\\Functions\\Package\\Math","ryunosuke\\Functions\\Package\\Math::minimum()","ryunosuke\\Functions\\Package\\Math::maximum()","ryunosuke\\Functions\\Package\\Math::mode()","ryunosuke\\Functions\\Package\\Math::mean()","ryunosuke\\Functions\\Package\\Math::median()","ryunosuke\\Functions\\Package\\Math::average()","ryunosuke\\Functions\\Package\\Math::sum()","ryunosuke\\Functions\\Package\\Math::random_at()","ryunosuke\\Functions\\Package\\Math::probability()","ryunosuke\\Functions\\Package\\Strings","ryunosuke\\Functions\\Package\\Strings::strcat()","ryunosuke\\Functions\\Package\\Strings::concat()","ryunosuke\\Functions\\Package\\Strings::split_noempty()","ryunosuke\\Functions\\Package\\Strings::multiexplode()","ryunosuke\\Functions\\Package\\Strings::quoteexplode()","ryunosuke\\Functions\\Package\\Strings::str_equals()","ryunosuke\\Functions\\Package\\Strings::str_contains()","ryunosuke\\Functions\\Package\\Strings::str_putcsv()","ryunosuke\\Functions\\Package\\Strings::str_subreplace()","ryunosuke\\Functions\\Package\\Strings::str_between()","ryunosuke\\Functions\\Package\\Strings::starts_with()","ryunosuke\\Functions\\Package\\Strings::ends_with()","ryunosuke\\Functions\\Package\\Strings::camel_case()","ryunosuke\\Functions\\Package\\Strings::pascal_case()","ryunosuke\\Functions\\Package\\Strings::snake_case()","ryunosuke\\Functions\\Package\\Strings::chain_case()","ryunosuke\\Functions\\Package\\Strings::random_string()","ryunosuke\\Functions\\Package\\Strings::kvsprintf()","ryunosuke\\Functions\\Package\\Strings::preg_capture()","ryunosuke\\Functions\\Package\\Strings::preg_splice()","ryunosuke\\Functions\\Package\\Strings::render_string()","ryunosuke\\Functions\\Package\\Strings::render_file()","ryunosuke\\Functions\\Package\\Syntax","ryunosuke\\Functions\\Package\\Syntax::returns()","ryunosuke\\Functions\\Package\\Syntax::optional()","ryunosuke\\Functions\\Package\\Syntax::throws()","ryunosuke\\Functions\\Package\\Syntax::throw_if()","ryunosuke\\Functions\\Package\\Syntax::ifelse()","ryunosuke\\Functions\\Package\\Syntax::try_catch()","ryunosuke\\Functions\\Package\\Syntax::try_finally()","ryunosuke\\Functions\\Package\\Syntax::try_catch_finally()","ryunosuke\\Functions\\Package\\Utility","ryunosuke\\Functions\\Package\\Utility::cache()","ryunosuke\\Functions\\Package\\Utility::arguments()","ryunosuke\\Functions\\Package\\Utility::error()","ryunosuke\\Functions\\Package\\Utility::timer()","ryunosuke\\Functions\\Package\\Utility::benchmark()","ryunosuke\\Functions\\Package\\Vars","ryunosuke\\Functions\\Package\\Vars::stringify()","ryunosuke\\Functions\\Package\\Vars::numberify()","ryunosuke\\Functions\\Package\\Vars::numval()","ryunosuke\\Functions\\Package\\Vars::arrayval()","ryunosuke\\Functions\\Package\\Vars::is_empty()","ryunosuke\\Functions\\Package\\Vars::is_primitive()","ryunosuke\\Functions\\Package\\Vars::is_recursive()","ryunosuke\\Functions\\Package\\Vars::is_iterable()","ryunosuke\\Functions\\Package\\Vars::is_countable()","ryunosuke\\Functions\\Package\\Vars::varcmp()","ryunosuke\\Functions\\Package\\Vars::var_type()","ryunosuke\\Functions\\Package\\Vars::var_apply()","ryunosuke\\Functions\\Package\\Vars::var_applys()","ryunosuke\\Functions\\Package\\Vars::var_export2()","ryunosuke\\Functions\\Package\\Vars::var_html()","ryunosuke\\Functions\\Package\\Vars::hashvar()"]);
 	</script>
 </div>
 </body>

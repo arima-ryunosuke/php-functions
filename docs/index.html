@@ -45,11 +45,17 @@
 		}
 	</style>
 	<script>
-        var CACHEKEY = 1527406777;
+        var CACHEKEY = "1887ea63a477e55cd79cded3ab567e90";
+        var FRONTPAGE = "ryunosuke\\Functions\\Package\\";
         document.addEventListener('DOMContentLoaded', function () {
             if (location.hash) {
                 document.getElementsByName('menu')[0].addEventListener('load', function () {
                     this.contentWindow.$.open(window.location.hash.substring(1));
+                });
+            }
+            else if (FRONTPAGE) {
+                document.getElementsByName('menu')[0].addEventListener('load', function () {
+                    this.contentWindow.document.querySelector('#' + FRONTPAGE.replace(/[\\:()]/g, '\\$&')).click();
                 });
             }
             else {
@@ -62,7 +68,7 @@
 	<title>ryunosuke function</title>
 </head>
 <body>
-<iframe name="menu" src="html/menu.html?1527406777"></iframe>
+<iframe name="menu" src="html/menu.html?1887ea63a477e55cd79cded3ab567e90"></iframe>
 <iframe name="main"></iframe>
 </body>
 </html>

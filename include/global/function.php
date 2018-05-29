@@ -378,6 +378,80 @@ if (!isset($excluded_functions['in_array_or']) && (!function_exists('in_array_or
         return false;
     }
 }
+if (!isset($excluded_functions['kvsort']) && (!function_exists('kvsort') || (!false && (new \ReflectionFunction('kvsort'))->isInternal()))) {
+    /**
+     * 比較関数にキーも渡ってくる安定ソート
+     *
+     * 比較関数は ($avalue, $bvalue, $akey, $bkey) という引数を取る。
+     * 「値で比較して同値だったらキーも見たい」という状況はまれによくあるはず。
+     * さらに安定ソートであり、同値だとしても元の並び順は維持される。
+     *
+     * $comparator は省略できる。省略した場合、型に基づいてよしなにソートする。
+     * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）
+     *
+     * ただし、標準のソート関数とは異なり、参照渡しではなくソートして返り値で返す。
+     * また、いわゆる asort であり、キー・値は常に維持される。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'a'  => 3,
+     *     'b'  => 1,
+     *     'c'  => 2,
+     *     'x1' => 9,
+     *     'x2' => 9,
+     *     'x3' => 9,
+     * ];
+     * // 普通のソート
+     * assertSame(kvsort($array), [
+     *     'b'  => 1,
+     *     'c'  => 2,
+     *     'a'  => 3,
+     *     'x1' => 9,
+     *     'x2' => 9,
+     *     'x3' => 9,
+     * ]);
+     * // キーを使用したソート
+     * assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}), [
+     *     'x3' => 9,
+     *     'x2' => 9,
+     *     'x1' => 9,
+     *     'c'  => 2,
+     *     'b'  => 1,
+     *     'a'  => 3,
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable|string $array 対象配列
+     * @param callable|int $comparator 比較関数。SORT_XXX も使える
+     * @return array ソートされた配列
+     */
+    function kvsort($array, $comparator = null)
+    {
+        if ($comparator === null || is_int($comparator)) {
+            $sort_flg = $comparator;
+            $comparator = function ($av, $bv, $ak, $bk) use ($sort_flg) {
+                return call_user_func(varcmp, $av, $bv, $sort_flg);
+            };
+        }
+
+        $n = 0;
+        $tmp = [];
+        foreach ($array as $k => $v) {
+            $tmp[$k] = [$n++, $k, $v];
+        }
+
+        uasort($tmp, function ($a, $b) use ($comparator) {
+            return $comparator($a[2], $b[2], $a[1], $b[1]) ?: ($a[0] - $b[0]);
+        });
+
+        foreach ($tmp as $k => $v) {
+            $tmp[$k] = $v[2];
+        }
+
+        return $tmp;
+    }
+}
 if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') || (!false && (new \ReflectionFunction('array_add'))->isInternal()))) {
     /**
      * 配列の+演算子の関数版
@@ -730,6 +804,9 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
      * 配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
      * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
      *
+     * 同様に、$key にクロージャを与えると、その返り値が true 相当のものを伏せて配列で返す。
+     * callable ではなくクロージャのみ対応する。
+     *
      * Example:
      * ```php
      * $array = ['a' => 'A', 'b' => 'B'];
@@ -747,10 +824,15 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列のキーは返されるキーを表す。順番も維持される
      * assertSame(array_unset($array, ['x2' => 'b', 'x1' => 'a']), ['x2' => 'B', 'x1' => 'A']);
+     *
+     * $array = ['hoge' => 'HOGE', 'fuga' => 'FUGA', 'piyo' => 'PIYO'];
+     * // 値に "G" を含むものを返す。その要素は伏せられている
+     * assertSame(array_unset($array, function($v){return strpos($v, 'G') !== false;}), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * assertSame($array, ['piyo' => 'PIYO']);
      * ```
      *
      * @param array $array 配列
-     * @param string|int|array $key 伏せたいキー。配列を与えると全て伏せる
+     * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を返す
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
@@ -762,6 +844,20 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
                 if (array_key_exists($ak, $array)) {
                     $result[$rk] = $array[$ak];
                     unset($array[$ak]);
+                }
+            }
+            if (!$result) {
+                return $default;
+            }
+            return $result;
+        }
+
+        if ($key instanceof \Closure) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                if ($key($v, $k)) {
+                    $result[$k] = $v;
+                    unset($array[$k]);
                 }
             }
             if (!$result) {
@@ -3139,12 +3235,15 @@ if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || 
      */
     function delegate($invoker, $callable, $arity = null)
     {
+        // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
+        $__rfunc_delegate_marker = true;
+
         if ($arity === null) {
             $arity = call_user_func(parameter_length, $callable, true, true);
         }
 
         if (is_infinite($arity)) {
-            return eval('return function (...$_) use ($invoker, $callable) {
+            return eval('return function (...$_) use ($__rfunc_delegate_marker, $invoker, $callable) {
                 return $invoker($callable, func_get_args());
             };');
         }
@@ -3152,32 +3251,32 @@ if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || 
         $arity = abs($arity);
         switch ($arity) {
             case 0:
-                return function () use ($invoker, $callable) {
+                return function () use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 1:
-                return function ($_1) use ($invoker, $callable) {
+                return function ($_1) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 2:
-                return function ($_1, $_2) use ($invoker, $callable) {
+                return function ($_1, $_2) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 3:
-                return function ($_1, $_2, $_3) use ($invoker, $callable) {
+                return function ($_1, $_2, $_3) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 4:
-                return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) {
+                return function ($_1, $_2, $_3, $_4) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 5:
-                return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) {
+                return function ($_1, $_2, $_3, $_4, $_5) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             default:
                 $argstring = call_user_func(array_rmap, range(1, $arity), strcat, '$_');
-                return eval('return function (' . implode(', ', $argstring) . ') use ($invoker, $callable) {
+                return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
         }
@@ -3667,9 +3766,20 @@ if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('fu
      */
     function func_user_func_array($callback)
     {
+        // null は第1引数を返す特殊仕様
         if ($callback === null) {
             return function ($v) { return $v; };
         }
+        // クロージャはユーザ定義しかありえないので調べる必要がない
+        if ($callback instanceof \Closure) {
+            // が、組み込みをバイパスする delegate はクロージャなのでそれだけは除外
+            $uses = call_user_func(reflect_callable, $callback)->getStaticVariables();
+            if (!isset($uses['__rfunc_delegate_marker'])) {
+                return $callback;
+            }
+        }
+
+        // 上記以外は「引数ぴったりで削ぎ落としてコールするクロージャ」を返す
         $plength = call_user_func(parameter_length, $callback, true, true);
         return call_user_func(delegate, function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
@@ -5204,6 +5314,147 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (!fals
         return $cache[$namespace][$key];
     }
 }
+if (!isset($excluded_functions['arguments']) && (!function_exists('arguments') || (!false && (new \ReflectionFunction('arguments'))->isInternal()))) {
+    /**
+     * コマンドライン引数をパースして引数とオプションを返す
+     *
+     * 少しリッチな {@link http://php.net/manual/function.getopt.php getopt} として使える（shell 由来のオプション構文(a:b::)はどうも馴染みにくい）。
+     * ただし「値が必須なオプション」はサポートしない。
+     * もっとも、オプションとして空文字が来ることはほぼ無いのでデフォルト値を空文字にすることで対応可能。
+     *
+     * $rule に従って `--noval filename --opt optval` のような文字列・配列をパースする。
+     * $rule 配列の仕様は下記。
+     *
+     * - キーは「オプション名」を指定する。ただし・・・
+     *     - 数値キーは「引数」を意味する
+     *     - スペースの後に「ショート名」を与えられる
+     * - 値は「デフォルト値」を指定する。ただし・・・
+     *     - `[]` は「複数値オプション」を意味する（配列にしない限り同オプションの多重指定は許されない）
+     *     - `null` は「値なしオプション」を意味する（スイッチングオプション）
+     *
+     * 上記の仕様でパースして「引数は数値連番、オプションはオプション名をキーとした配列」を返す。
+     * なお、いわゆる「引数」はどこに来ても良い（前オプション、後オプションの区別がない）。
+     *
+     * $argv には配列や文字列が与えられるが、ほとんどテスト用に近く、普通は未指定で $argv を使うはず。
+     *
+     * Example:
+     * ```php
+     * // いくつか織り交ぜたスタンダードな例
+     * $rule = [
+     *     'opt'       => 'def',    // 基本的には「デフォルト値」を表す
+     *     'longopt l' => '',       // スペース区切りで「ショート名」を意味する
+     *     1           => 'defarg', // 数値キーは「引数」を意味する
+     * ];
+     * assertSame(arguments($rule, '--opt optval arg1 -l longval'), [
+     *     'opt'     => 'optval',  // optval と指定している
+     *     'longopt' => 'longval', // ショート名指定でも本来の名前で返ってくる
+     *     'arg1',   // いわゆるコマンドライン引数（optval は opt に飲まれるので含まれない）
+     *     'defarg', // いわゆるコマンドライン引数（与えられていないが、ルールの 1 => 'defarg' が活きている）
+     * ]);
+     *
+     * // 「値なしオプション」と「複数値オプション」の例
+     * $rule = [
+     *     'noval1 l'  => null, // null は「値なしオプション」を意味する（指定されていれば true されていなければ false を返す）
+     *     'noval2 m'  => null, // 同上
+     *     'noval3 n'  => null, // 同上
+     *     'opts o' => [],      // 配列を与えると「複数値オプション」を表す
+     * ];
+     * assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
+     *     'noval1' => true,  // -ln で同時指定されているので true
+     *     'noval2' => false, // -ln で同時指定されてないので false
+     *     'noval3' => true,  // -ln の同時指定されているので true
+     *     'opts'   => ['o1', 'o2', 'o3'], // ロング、ショート混在でも OK
+     *     'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
+     *     'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
+     * ]);
+     * ```
+     *
+     * @param array $rule オプションルール
+     * @param array|string|null $argv パースするコマンドライン引数。未指定時は $argv が使用される
+     * @return array コマンドライン引数＋オプション
+     */
+    function arguments($rule, $argv = null)
+    {
+        if ($argv === null) {
+            $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
+        }
+        if (is_string($argv)) {
+            $argv = preg_split('#\s+#', $argv, -1, PREG_SPLIT_NO_EMPTY);
+        }
+        $argv = array_values($argv);
+
+        $shortmap = [];
+        $argsdefaults = [];
+        $optsdefaults = [];
+        foreach ($rule as $name => $default) {
+            if (is_int($name)) {
+                $argsdefaults[$name] = $default;
+                continue;
+            }
+            list($longname, $shortname) = preg_split('#\s+#', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
+            if ($shortname !== null) {
+                if (array_key_exists($shortname, $shortmap)) {
+                    throw new \InvalidArgumentException("duplicated short option name '$shortname'");
+                }
+                $shortmap[$shortname] = $longname;
+            }
+            if (array_key_exists($longname, $optsdefaults)) {
+                throw new \InvalidArgumentException("duplicated option name '$shortname'");
+            }
+            $optsdefaults[$longname] = $default;
+        }
+
+        $n = 0;
+        $already = [];
+        $result = array_map(function ($v) { return $v === null ? false : $v; }, $optsdefaults);
+        while (($token = array_shift($argv)) !== null) {
+            if (strlen($token) >= 2 && $token[0] === '-') {
+                if ($token[1] === '-') {
+                    $optname = substr($token, 2);
+                }
+                else {
+                    $shortname = substr($token, 1);
+                    if (strlen($shortname) > 1) {
+                        array_unshift($argv, '-' . substr($shortname, 1));
+                        $shortname = substr($shortname, 0, 1);
+                    }
+                    if (!isset($shortmap[$shortname])) {
+                        throw new \InvalidArgumentException("undefined short option name '$shortname'.");
+                    }
+                    $optname = $shortmap[$shortname];
+                }
+
+                if (!array_key_exists($optname, $optsdefaults)) {
+                    throw new \InvalidArgumentException("undefined option name '$optname'.");
+                }
+                if (isset($already[$optname]) && !is_array($result[$optname])) {
+                    throw new \InvalidArgumentException("'$optname' is specified already.");
+                }
+                $already[$optname] = true;
+
+                if ($optsdefaults[$optname] === null) {
+                    $result[$optname] = true;
+                }
+                else {
+                    if (!isset($argv[0]) || strpos($argv[0], '-') === 0) {
+                        throw new \InvalidArgumentException("'$optname' requires value.");
+                    }
+                    if (is_array($result[$optname])) {
+                        $result[$optname][] = array_shift($argv);
+                    }
+                    else {
+                        $result[$optname] = array_shift($argv);
+                    }
+                }
+            }
+            else {
+                $result[$n++] = $token;
+            }
+        }
+
+        return $result + $argsdefaults;
+    }
+}
 if (!isset($excluded_functions['error']) && (!function_exists('error') || (!false && (new \ReflectionFunction('error'))->isInternal()))) {
     /**
      * エラー出力する
@@ -5266,6 +5517,36 @@ if (!isset($excluded_functions['error']) && (!function_exists('error') || (!fals
         return strlen($line);
     }
 }
+if (!isset($excluded_functions['timer']) && (!function_exists('timer') || (!false && (new \ReflectionFunction('timer'))->isInternal()))) {
+    /**
+     * 処理時間を計測する
+     *
+     * 第1引数 $callable を $count 回回してその処理時間を返す。
+     *
+     * Example:
+     * ```php
+     * // 0.01 秒を 10 回回すので 0.1 秒は超える
+     * assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
+     * ```
+     *
+     * @param callable $callable 処理クロージャ
+     * @param int $count ループ回数
+     * @return float 処理時間
+     */
+    function timer(callable $callable, $count = 1)
+    {
+        $count = (int) $count;
+        if ($count < 1) {
+            throw new \InvalidArgumentException("\$count must be greater than 0 (specified $count).");
+        }
+
+        $t = microtime(true);
+        for ($i = 0; $i < $count; $i++) {
+            $callable();
+        }
+        return microtime(true) - $t;
+    }
+}
 if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') || (!false && (new \ReflectionFunction('benchmark'))->isInternal()))) {
     /**
      * 簡易ベンチマークを取る
@@ -5318,9 +5599,22 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') |
             throw new \InvalidArgumentException('benchset is empty.');
         }
 
+        // 5.6 で ... 呼び出しで zval が書き換わる不具合？があったのでループで引数配列を生成（異なる zval を返す）
+        $copy = function ($array) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                $result[$k] = $v;
+            }
+            return $result;
+        };
+
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-        $assertions = call_user_func(call_safely, function ($benchset, $args) {
-            return call_user_func(array_lmap, $benchset, 'call_user_func_array', $args);
+        $assertions = call_user_func(call_safely, function ($benchset, $args) use ($copy) {
+            $result = [];
+            foreach ($benchset as $name => $caller) {
+                $result[$name] = $caller(...$copy($args));
+            }
+            return $result;
         }, $benchset, $args);
 
         // 返り値の検証（ベンチマークという性質上、基本的に戻り値が一致しないのはおかしい）
@@ -5339,8 +5633,9 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') |
         $counts = [];
         foreach ($benchset as $name => $caller) {
             $end = microtime(true) + $millisec / 1000;
+            $avg = $copy($args);
             for ($n = 0; microtime(true) <= $end; $n++) {
-                call_user_func_array($caller, $args);
+                $caller(...$avg);
             }
             $counts[$name] = $n;
         }
@@ -5504,6 +5799,84 @@ if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') |
             return (float) $number;
         }
         return (int) $number;
+    }
+}
+if (!isset($excluded_functions['numval']) && (!function_exists('numval') || (!false && (new \ReflectionFunction('numval'))->isInternal()))) {
+    /**
+     * 値を数値化する
+     *
+     * int か float ならそのまま返す。
+     * 文字列の場合、一言で言えば「.を含むなら float、含まないなら int」を返す。
+     * int でも float でも stringable でもない場合は実装依存（ただの int キャスト）。
+     *
+     * Example:
+     * ```php
+     * assertSame(numval(3.14), 3.14);   // int や float はそのまま返す
+     * assertSame(numval('3.14'), 3.14); // . を含む文字列は float を返す
+     * assertSame(numval('11', 8), 9);   // 基数が指定できる
+     * ```
+     *
+     * @param mixed $var 数値化する値
+     * @param int $base 基数。int 的な値のときしか意味をなさない
+     * @return int|float 数値化した値
+     */
+    function numval($var, $base = 10)
+    {
+        if (is_int($var) || is_float($var)) {
+            return $var;
+        }
+        if (is_object($var)) {
+            $var = (string) $var;
+        }
+        if (is_string($var) && strpos($var, '.') !== false) {
+            return (float) $var;
+        }
+        return intval($var, $base);
+    }
+}
+if (!isset($excluded_functions['arrayval']) && (!function_exists('arrayval') || (!false && (new \ReflectionFunction('arrayval'))->isInternal()))) {
+    /**
+     * array キャストの関数版
+     *
+     * intval とか strval とかの array 版。
+     * ただキャストするだけだが、関数なのでコールバックとして使える。
+     *
+     * $recursive を true にすると再帰的に適用する（デフォルト）。
+     * 入れ子オブジェクトを配列化するときなどに使える。
+     *
+     * Example:
+     * ```php
+     * // キャストなので基本的には配列化される
+     * assertSame(arrayval(123), [123]);
+     * assertSame(arrayval('str'), ['str']);
+     * assertSame(arrayval([123]), [123]); // 配列は配列のまま
+     *
+     * // $recursive = false にしない限り再帰的に適用される
+     * $stdclass = stdclass(['key' => 'val']);
+     * assertSame(arrayval([$stdclass], true), [['key' => 'val']]); // true なので中身も配列化される
+     * assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので中身は変わらない
+     * ```
+     *
+     * @param mixed $var array 化する値
+     * @param bool $recursive 再帰的に行うなら true
+     * @return array array 化した配列
+     */
+    function arrayval($var, $recursive = true)
+    {
+        if (!$recursive || call_user_func(is_primitive, $var)) {
+            return (array) $var;
+        }
+
+        // return json_decode(json_encode($var), true);
+
+        $result = [];
+        foreach ($var as $k => $v) {
+            if (!call_user_func(is_primitive, $v)) {
+                $v = call_user_func(arrayval, $v, true);
+            }
+            $result[$k] = $v;
+        }
+        return $result;
     }
 }
 if (!isset($excluded_functions['is_empty']) && (!function_exists('is_empty') || (!false && (new \ReflectionFunction('is_empty'))->isInternal()))) {
@@ -5684,6 +6057,69 @@ if (!isset($excluded_functions['is_countable']) && (!function_exists('is_countab
         return is_array($var) || $var instanceof \Countable;
     }
 }
+if (!isset($excluded_functions['varcmp']) && (!function_exists('varcmp') || (!false && (new \ReflectionFunction('varcmp'))->isInternal()))) {
+    /**
+     * php7 の `<=>` の関数版
+     *
+     * 引数で大文字小文字とか自然順とか型モードとかが指定できる。
+     *
+     * Example:
+     * ```php
+     * // 'a' と 'z' なら 'z' の方が大きい
+     * assertTrue(varcmp('z', 'a') > 0);
+     * assertTrue(varcmp('a', 'z') < 0);
+     * assertTrue(varcmp('a', 'a') === 0);
+     *
+     * // 'a' と 'Z' なら 'a' の方が大きい…が SORT_FLAG_CASE なので 'Z' のほうが大きい
+     * assertTrue(varcmp('Z', 'a', SORT_FLAG_CASE) > 0);
+     * assertTrue(varcmp('a', 'Z', SORT_FLAG_CASE) < 0);
+     * assertTrue(varcmp('a', 'A', SORT_FLAG_CASE) === 0);
+     *
+     * // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
+     * assertTrue(varcmp('12', '2', SORT_NATURAL) > 0);
+     * assertTrue(varcmp('2', '12', SORT_NATURAL) < 0);
+     * ```
+     *
+     * @param mixed $a 比較する値1
+     * @param mixed $b 比較する値2
+     * @param int $mode 比較モード（SORT_XXX）。省略すると型でよしなに選択
+     * @return int 等しいなら 0、 $a のほうが大きいなら > 0、 $bのほうが大きいなら < 0
+     */
+    function varcmp($a, $b, $mode = null)
+    {
+        // null が来たらよしなにする（なるべく型に寄せるが SORT_REGULAR はキモいので避ける）
+        if ($mode === null || $mode === SORT_FLAG_CASE) {
+            if ((is_int($a) || is_float($a)) && (is_int($b) || is_float($b))) {
+                $mode = SORT_NUMERIC;
+            }
+            elseif (is_string($a) && is_string($b)) {
+                $mode = SORT_STRING | $mode; // SORT_FLAG_CASE が単品で来てるかもしれないので混ぜる
+            }
+        }
+
+        $flag_case = $mode & SORT_FLAG_CASE;
+        $mode = $mode & ~SORT_FLAG_CASE;
+
+        if ($mode === SORT_NUMERIC) {
+            return $a - $b;
+        }
+        if ($mode === SORT_STRING) {
+            if ($flag_case) {
+                return strcasecmp($a, $b);
+            }
+            return strcmp($a, $b);
+        }
+        if ($mode === SORT_NATURAL) {
+            if ($flag_case) {
+                return strnatcasecmp($a, $b);
+            }
+            return strnatcmp($a, $b);
+        }
+
+        // for SORT_REGULAR
+        return $a == $b ? 0 : ($a > $b ? 1 : -1);
+    }
+}
 if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || (!false && (new \ReflectionFunction('var_type'))->isInternal()))) {
     /**
      * 値の型を取得する（gettype + get_class）
@@ -5712,6 +6148,85 @@ if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || 
             return '\\' . get_class($var);
         }
         return gettype($var);
+    }
+}
+if (!isset($excluded_functions['var_apply']) && (!function_exists('var_apply') || (!false && (new \ReflectionFunction('var_apply'))->isInternal()))) {
+    /**
+     * 値にコールバックを適用する
+     *
+     * 普通のスカラー値であれば `$callback($var)` と全く同じ。
+     * この関数は「$var が配列だったら中身に適用して返す（再帰）」という点で上記とは異なる。
+     *
+     * 「配列が与えられたら要素に適用して配列で返す、配列じゃないなら直に適用してそれを返す」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // 素の値は素の呼び出しと同じ
+     * assertSame(var_apply(' x ', 'trim'), 'x');
+     * // 配列は中身に適用して配列で返す（再帰）
+     * assertSame(var_apply([' x ', ' y ', [' z ']], 'trim'), ['x', 'y', ['z']]);
+     * // 第3引数以降は残り引数を意味する
+     * assertSame(var_apply(['!x!', '!y!'], 'trim', '!'), ['x', 'y']);
+     * // 「まれによくある」の具体例
+     * assertSame(var_apply(['<x>', ['<y>']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'), ['&lt;x&gt;', ['&lt;y&gt;']]);
+     * ```
+     *
+     * @param mixed $var $callback を適用する値
+     * @param callable $callback 値変換コールバック
+     * @param array $args $callback の残り引数（可変引数）
+     * @return mixed|array $callback が適用された値。元が配列なら配列で返す
+     */
+    function var_apply($var, $callback, ...$args)
+    {
+        $iterable = call_user_func(is_iterable, $var);
+        if ($iterable) {
+            $result = [];
+            foreach ($var as $k => $v) {
+                $result[$k] = call_user_func(var_apply, $v, $callback, ...$args);
+            }
+            return $result;
+        }
+
+        return $callback($var, ...$args);
+    }
+}
+if (!isset($excluded_functions['var_applys']) && (!function_exists('var_applys') || (!false && (new \ReflectionFunction('var_applys'))->isInternal()))) {
+    /**
+     * 配列にコールバックを適用する
+     *
+     * 配列であれば `$callback($var)` と全く同じ。
+     * この関数は「$var がスカラー値だったら配列化して適用してスカラーで返す」という点で上記とは異なる。
+     *
+     * 「配列を受け取って配列を返す関数があるが、手元にスカラー値しか無い」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // 配列を受け取って中身を大文字化して返すクロージャ
+     * $upper = function($array){return array_map('strtoupper', $array);};
+     * // 普通はこうやって使うが・・・
+     * assertSame($upper(['a', 'b', 'c']), ['A', 'B', 'C']);
+     * // 手元に配列ではなくスカラー値しか無いときはこうせざるをえない
+     * assertSame($upper(['a'])[0], 'A');
+     * // var_applys を使うと配列でもスカラーでも統一的に記述することができる
+     * assertSame(var_applys(['a', 'b', 'c'], $upper), ['A', 'B', 'C']);
+     * assertSame(var_applys('a', $upper), 'A');
+     * # 要するに「大文字化したい」だけなわけだが、$upper が配列を前提としているので、「大文字化」部分を得るには配列化しなければならなくなっている
+     * # 「strtoupper だけ切り出せばよいのでは？」と思うかもしれないが、「（外部ライブラリなどで）手元に配列しか受け取ってくれない処理しかない」状況がまれによくある
+     * ```
+     *
+     * @param mixed $var $callback を適用する値
+     * @param callable $callback 値変換コールバック
+     * @param array $args $callback の残り引数（可変引数）
+     * @return mixed|array $callback が適用された値。元が配列なら配列で返す
+     */
+    function var_applys($var, $callback, ...$args)
+    {
+        $iterable = call_user_func(is_iterable, $var);
+        if (!$iterable) {
+            $var = [$var];
+        }
+        $var = $callback($var, ...$args);
+        return $iterable ? $var : $var[0];
     }
 }
 if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2') || (!false && (new \ReflectionFunction('var_export2'))->isInternal()))) {

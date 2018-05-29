@@ -9,7 +9,11 @@ $.open = function (fqsen, noclick) {
     if (!fqsen) {
         return;
     }
-    var menuFrame = window.parent.document.getElementsByName('menu')[0];
+    try {
+        var menuFrame = window.parent.document.getElementsByName('menu')[0];
+    } catch (e) {
+        return;
+    }
     var parts = fqsen.split('::');
     // 遅延ロードしてるので dom として存在しないことがある
     if (parts.length > 1) {
@@ -67,8 +71,9 @@ hljs.initHighlightingOnLoad();
 if (window.name === 'main') {
     $.open(window.location.hash.substring(1));
     $window.on('hashchange', function () {
-        window.parent.history.replaceState('', '', '#' + window.location.hash.substring(1));
         $window.scrollTop($window.scrollTop() - $('h1:first').innerHeight() - 3);
+        window.parent.history.replaceState('', '', '#' + window.location.hash.substring(1));
+        window.history.replaceState('', '', '#'); // クリアして次の hashchange を促す
     });
     $(function () {
         $window.trigger('hashchange');
@@ -85,6 +90,11 @@ $document.on('click', '.switch-holding', function () {
 });
 $document.on('click', 'a[target=main]', function () {
     $(this).closest('.holding-wrapper').collapse(true, true);
+});
+// attract focus
+$document.on('focus', 'a[id], [tabindex]', function () {
+    $('.focused').removeClass('focused');
+    $(this).addClass('focused');
 });
 // reverse menu
 $document.on('click', '.structure-title', function () {
@@ -139,7 +149,8 @@ $(function () {
         }
         else {
             var fqsen = $this.data('type-fqsen');
-            $a.attr('href', fqsen.split('::')[0].split('\\').join('-') + '$typespace.html#' + fqsen);
+            var suffix = fqsen.slice(-1) === '\\' ? '$namespace' : '$typespace';
+            $a.attr('href', fqsen.split('::')[0].split('\\').join('-') + suffix + '.html#' + fqsen);
         }
         $a.text($this.data('description'));
         $this.before($a).hide();
