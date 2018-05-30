@@ -82,6 +82,18 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('must be resource or string', $error, 'int', 1);
     }
 
+    function test_timer()
+    {
+        $timer = timer;
+        $time = $timer(function () {
+            usleep(10 * 1000);
+        }, 10);
+        // 0.01 秒を 10 回回すので 0.1 秒は超えるはず
+        $this->assertGreaterThan(0.1, $time);
+
+        $this->assertException('must be greater than', $timer, function () { }, 0);
+    }
+
     function test_benchmark()
     {
         $benchmark = benchmark;
