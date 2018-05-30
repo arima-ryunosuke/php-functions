@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * 変数関連のユーティリティ
+ */
 class Vars
 {
     /**

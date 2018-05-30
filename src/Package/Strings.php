@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * 文字列関連のユーティリティ
+ */
 class Strings
 {
     /**

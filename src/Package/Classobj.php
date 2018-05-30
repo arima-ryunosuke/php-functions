@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * クラス・オブジェクト関連のユーティリティ
+ */
 class Classobj
 {
     /**

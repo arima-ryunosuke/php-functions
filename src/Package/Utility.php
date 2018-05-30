@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * 汎用的なユーティリティ
+ */
 class Utility
 {
     /**

@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * 配列関連のユーティリティ
+ */
 class Arrays
 {
     /**

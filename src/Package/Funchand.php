@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * callable 関連のユーティリティ
+ */
 class Funchand
 {
     /**

@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * 構文関連のユーティリティ
+ */
 class Syntax
 {
     /**

@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * 数学関連のユーティリティ
+ */
 class Math
 {
     /**

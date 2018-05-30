@@ -2,6 +2,9 @@
 
 namespace ryunosuke\Functions\Package;
 
+/**
+ * ファイルシステム関連のユーティリティ
+ */
 class FileSystem
 {
     /**
