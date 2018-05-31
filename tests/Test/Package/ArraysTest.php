@@ -337,6 +337,74 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['B', 'A'], $array_unset($array, ['b', 'a']));
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
         $this->assertSame([1 => 'A', 0 => 'B'], $array_unset($array, [1 => 'a', 0 => 'b']));
+
+        $array = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'first',
+            'second',
+            'third',
+            99     => 99,
+            100    => 100,
+            101    => 101,
+        ];
+
+        // まずキーが数値でないものを抽出
+        $extract = $array_unset($array, function ($v, $k) { return !is_int($k); });
+        $this->assertEquals([
+            'key1' => 'value1',
+            'key2' => 'value2',
+        ], $extract);
+        $this->assertEquals([
+            'first',
+            'second',
+            'third',
+            99  => 99,
+            100 => 100,
+            101 => 101,
+        ], $array);
+
+        // さらに値が100以上のものを抽出
+        $extract = $array_unset($array, function ($v, $k) { return $v >= 100; });
+        $this->assertEquals([
+            100 => 100,
+            101 => 101,
+        ], $extract);
+        $this->assertEquals([
+            'first',
+            'second',
+            'third',
+            99 => 99,
+        ], $array);
+
+        // さらに値が "second" のものを抽出
+        $extract = $array_unset($array, function ($v, $k) { return $v === 'second'; });
+        $this->assertEquals([
+            1 => 'second',
+        ], $extract);
+        $this->assertEquals([
+            'first',
+            2  => 'third',
+            99 => 99,
+        ], $array);
+
+        // さらに値がオブジェクトのものを抽出（そんなものはない）
+        $extract = $array_unset($array, function ($v, $k) { return is_object($v); });
+        $this->assertEquals(null, $extract);
+        $this->assertEquals([
+            'first',
+            2  => 'third',
+            99 => 99,
+        ], $array);
+
+        // さらにキー数値のものを抽出（全て）
+        $extract = $array_unset($array, function ($v, $k) { return is_int($k); });
+        $this->assertEquals([
+            'first',
+            2  => 'third',
+            99 => 99,
+        ], $extract);
+        $this->assertEquals([], $array);
     }
 
     function test_array_dive()

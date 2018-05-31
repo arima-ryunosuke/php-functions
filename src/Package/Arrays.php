@@ -714,6 +714,9 @@ class Arrays
      * 配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
      * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
      *
+     * 同様に、$key にクロージャを与えると、その返り値が true 相当のものを伏せて配列で返す。
+     * callable ではなくクロージャのみ対応する。
+     *
      * Example:
      * ```php
      * $array = ['a' => 'A', 'b' => 'B'];
@@ -731,10 +734,15 @@ class Arrays
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列のキーは返されるキーを表す。順番も維持される
      * assertSame(array_unset($array, ['x2' => 'b', 'x1' => 'a']), ['x2' => 'B', 'x1' => 'A']);
+     *
+     * $array = ['hoge' => 'HOGE', 'fuga' => 'FUGA', 'piyo' => 'PIYO'];
+     * // 値に "G" を含むものを返す。その要素は伏せられている
+     * assertSame(array_unset($array, function($v){return strpos($v, 'G') !== false;}), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * assertSame($array, ['piyo' => 'PIYO']);
      * ```
      *
      * @param array $array 配列
-     * @param string|int|array $key 伏せたいキー。配列を与えると全て伏せる
+     * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を返す
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
@@ -746,6 +754,20 @@ class Arrays
                 if (array_key_exists($ak, $array)) {
                     $result[$rk] = $array[$ak];
                     unset($array[$ak]);
+                }
+            }
+            if (!$result) {
+                return $default;
+            }
+            return $result;
+        }
+
+        if ($key instanceof \Closure) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                if ($key($v, $k)) {
+                    $result[$k] = $v;
+                    unset($array[$k]);
                 }
             }
             if (!$result) {
