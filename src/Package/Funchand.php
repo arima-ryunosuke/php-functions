@@ -19,12 +19,15 @@ class Funchand
      */
     public static function delegate($invoker, $callable, $arity = null)
     {
+        // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
+        $__rfunc_delegate_marker = true;
+
         if ($arity === null) {
             $arity = call_user_func(parameter_length, $callable, true, true);
         }
 
         if (is_infinite($arity)) {
-            return eval('return function (...$_) use ($invoker, $callable) {
+            return eval('return function (...$_) use ($__rfunc_delegate_marker, $invoker, $callable) {
                 return $invoker($callable, func_get_args());
             };');
         }
@@ -32,32 +35,32 @@ class Funchand
         $arity = abs($arity);
         switch ($arity) {
             case 0:
-                return function () use ($invoker, $callable) {
+                return function () use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 1:
-                return function ($_1) use ($invoker, $callable) {
+                return function ($_1) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 2:
-                return function ($_1, $_2) use ($invoker, $callable) {
+                return function ($_1, $_2) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 3:
-                return function ($_1, $_2, $_3) use ($invoker, $callable) {
+                return function ($_1, $_2, $_3) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 4:
-                return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) {
+                return function ($_1, $_2, $_3, $_4) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             case 5:
-                return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) {
+                return function ($_1, $_2, $_3, $_4, $_5) use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };
             default:
                 $argstring = call_user_func(array_rmap, range(1, $arity), strcat, '$_');
-                return eval('return function (' . implode(', ', $argstring) . ') use ($invoker, $callable) {
+                return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
         }
@@ -532,9 +535,20 @@ class Funchand
      */
     public static function func_user_func_array($callback)
     {
+        // null は第1引数を返す特殊仕様
         if ($callback === null) {
             return function ($v) { return $v; };
         }
+        // クロージャはユーザ定義しかありえないので調べる必要がない
+        if ($callback instanceof \Closure) {
+            // が、組み込みをバイパスする delegate はクロージャなのでそれだけは除外
+            $uses = call_user_func(reflect_callable, $callback)->getStaticVariables();
+            if (!isset($uses['__rfunc_delegate_marker'])) {
+                return $callback;
+            }
+        }
+
+        // 上記以外は「引数ぴったりで削ぎ落としてコールするクロージャ」を返す
         $plength = call_user_func(parameter_length, $callback, true, true);
         return call_user_func(delegate, function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
