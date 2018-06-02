@@ -53,6 +53,103 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(1, $cache('test', function () { return 1; }, __FUNCTION__, true));
     }
 
+    function test_arguments()
+    {
+        $arguments = arguments;
+        // 超シンプル
+        $this->assertSame(['arg1', 'arg2'], $arguments([], 'arg1 arg2'));
+
+        // 普通のオプション＋デフォルト引数
+        $this->assertSame([
+            'opt1' => 'O1',
+            'opt2' => 'O2',
+            'arg1',
+            'arg2',
+            'def3',
+            'def4',
+        ], $arguments([
+            'opt1' => '',
+            'opt2' => '',
+            'arg1',
+            'arg2',
+            'def3',
+            'def4',
+        ], '--opt1 O1 --opt2 O2 arg1 arg2'));
+
+        // ショートオプション
+        $this->assertSame([
+            'opt1' => 'O1',
+            'opt2' => 'O2',
+            'arg1',
+            'arg2',
+        ], $arguments([
+            'opt1 a' => '',
+            'opt2 b' => '',
+        ], '-a O1 -b O2 arg1 arg2'));
+
+        // 値なしオプション
+        $this->assertSame([
+            'opt1' => true,
+            'opt2' => false,
+            'arg1',
+            'arg2',
+        ], $arguments([
+            'opt1 a' => null,
+            'opt2 b' => null,
+        ], '-a arg1 arg2'));
+
+        // 値なしショートオプションの同時指定
+        $this->assertSame([
+            'opt1' => true,
+            'opt2' => false,
+            'opt3' => true,
+            'arg1',
+            'arg2',
+        ], $arguments([
+            'opt1 a' => null,
+            'opt2 b' => null,
+            'opt3 c' => null,
+        ], '-ac arg1 arg2'));
+
+        // デフォルト値オプション
+        $this->assertSame([
+            'opt1' => 'O1',
+            'opt2' => 'def2',
+            'arg1',
+            'arg2',
+        ], $arguments([
+            'opt1 a' => 'def1',
+            'opt2 b' => 'def2',
+        ], '-a O1 arg1 arg2'));
+
+        // 複数値オプション
+        $this->assertSame([
+            'opt1' => ['O11', 'O12'],
+            'opt2' => ['O21'],
+            'arg1',
+            'arg2',
+        ], $arguments([
+            'opt1 a' => [],
+            'opt2 b' => [],
+        ], '-a O11 -a O12 -b O21 arg1 arg2'));
+
+        // ルール不正
+        $this->assertException('duplicated option name', $arguments, ['opt1' => null, 'opt1 o' => null]);
+        $this->assertException('duplicated short option', $arguments, ['opt1 o' => null, 'opt2 o' => null]);
+
+        // 知らんオプションが与えられた
+        $this->assertException('undefined option name', $arguments, [], 'arg1 arg2 --hoge');
+        $this->assertException('undefined short option', $arguments, [], 'arg1 arg2 -h');
+        $this->assertException('undefined short option', $arguments, ['o1 a' => null, 'o2 b' => null], 'arg1 arg2 -abc');
+
+        // 複数指定された
+        $this->assertException('specified already', $arguments, ['noreq n' => null], '--noreq arg1 arg2 -n');
+        $this->assertException('specified already', $arguments, ['opt a' => ''], '--opt O1 arg1 arg2 -a O2');
+
+        // 値が指定されていない
+        $this->assertException('requires value', $arguments, ['req' => 'hoge'], 'arg1 arg2 --req');
+    }
+
     function test_error()
     {
         $error = error;
