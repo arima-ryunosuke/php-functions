@@ -396,6 +396,83 @@ class Vars
     }
 
     /**
+     * 値にコールバックを適用する
+     *
+     * 普通のスカラー値であれば `$callback($var)` と全く同じ。
+     * この関数は「$var が配列だったら中身に適用して返す（再帰）」という点で上記とは異なる。
+     *
+     * 「配列が与えられたら要素に適用して配列で返す、配列じゃないなら直に適用してそれを返す」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // 素の値は素の呼び出しと同じ
+     * assertSame(var_apply(' x ', 'trim'), 'x');
+     * // 配列は中身に適用して配列で返す（再帰）
+     * assertSame(var_apply([' x ', ' y ', [' z ']], 'trim'), ['x', 'y', ['z']]);
+     * // 第3引数以降は残り引数を意味する
+     * assertSame(var_apply(['!x!', '!y!'], 'trim', '!'), ['x', 'y']);
+     * // 「まれによくある」の具体例
+     * assertSame(var_apply(['<x>', ['<y>']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'), ['&lt;x&gt;', ['&lt;y&gt;']]);
+     * ```
+     *
+     * @param mixed $var $callback を適用する値
+     * @param callable $callback 値変換コールバック
+     * @param array $args $callback の残り引数（可変引数）
+     * @return mixed|array $callback が適用された値。元が配列なら配列で返す
+     */
+    public static function var_apply($var, $callback, ...$args)
+    {
+        $iterable = call_user_func(is_iterable, $var);
+        if ($iterable) {
+            $result = [];
+            foreach ($var as $k => $v) {
+                $result[$k] = call_user_func(var_apply, $v, $callback, ...$args);
+            }
+            return $result;
+        }
+
+        return $callback($var, ...$args);
+    }
+
+    /**
+     * 配列にコールバックを適用する
+     *
+     * 配列であれば `$callback($var)` と全く同じ。
+     * この関数は「$var がスカラー値だったら配列化して適用してスカラーで返す」という点で上記とは異なる。
+     *
+     * 「配列を受け取って配列を返す関数があるが、手元にスカラー値しか無い」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // 配列を受け取って中身を大文字化して返すクロージャ
+     * $upper = function($array){return array_map('strtoupper', $array);};
+     * // 普通はこうやって使うが・・・
+     * assertSame($upper(['a', 'b', 'c']), ['A', 'B', 'C']);
+     * // 手元に配列ではなくスカラー値しか無いときはこうせざるをえない
+     * assertSame($upper(['a'])[0], 'A');
+     * // var_applys を使うと配列でもスカラーでも統一的に記述することができる
+     * assertSame(var_applys(['a', 'b', 'c'], $upper), ['A', 'B', 'C']);
+     * assertSame(var_applys('a', $upper), 'A');
+     * # 要するに「大文字化したい」だけなわけだが、$upper が配列を前提としているので、「大文字化」部分を得るには配列化しなければならなくなっている
+     * # 「strtoupper だけ切り出せばよいのでは？」と思うかもしれないが、「（外部ライブラリなどで）手元に配列しか受け取ってくれない処理しかない」状況がまれによくある
+     * ```
+     *
+     * @param mixed $var $callback を適用する値
+     * @param callable $callback 値変換コールバック
+     * @param array $args $callback の残り引数（可変引数）
+     * @return mixed|array $callback が適用された値。元が配列なら配列で返す
+     */
+    public static function var_applys($var, $callback, ...$args)
+    {
+        $iterable = call_user_func(is_iterable, $var);
+        if (!$iterable) {
+            $var = [$var];
+        }
+        $var = $callback($var, ...$args);
+        return $iterable ? $var : $var[0];
+    }
+
+    /**
      * 組み込みの var_export をいい感じにしたもの
      *
      * 下記の点が異なる。

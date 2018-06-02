@@ -238,6 +238,29 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('\\' . \Concrete::class, $var_type(new \Concrete('hoge')));
     }
 
+    function test_var_apply()
+    {
+        $var_apply = var_apply;
+        // 単値であればそのまま適用される
+        $this->assertSame(123, $var_apply('123', numval));
+        $this->assertSame(83, $var_apply('123', numval, 8));
+        // 配列なら中身に適用される
+        $this->assertSame([123, 456], $var_apply(['123', '456'], numval));
+        $this->assertSame([83, 302], $var_apply(['123', '456'], numval, 8));
+        // 再帰で処理される
+        $this->assertSame([123, 456, 'a' => [789]], $var_apply(['123', '456', 'a' => ['789']], numval));
+        // よくあるやつ
+        $this->assertSame(['&lt;x&gt;', ['&lt;y&gt;']], $var_apply(['<x>', ['<y>']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'));
+    }
+
+    function test_var_applys()
+    {
+        $var_applys = var_applys;
+        $upper = function ($array) { return array_map('strtoupper', $array); };
+        $this->assertSame($var_applys('a', $upper), 'A');
+        $this->assertSame($var_applys(['a', 'b'], $upper), ['A', 'B']);
+    }
+
     function test_var_export2()
     {
         $var_export2 = var_export2;
