@@ -118,6 +118,50 @@ class Vars
     }
 
     /**
+     * array キャストの関数版
+     *
+     * intval とか strval とかの array 版。
+     * ただキャストするだけだが、関数なのでコールバックとして使える。
+     *
+     * $recursive を true にすると再帰的に適用する（デフォルト）。
+     * 入れ子オブジェクトを配列化するときなどに使える。
+     *
+     * Example:
+     * ```php
+     * // キャストなので基本的には配列化される
+     * assertSame(arrayval(123), [123]);
+     * assertSame(arrayval('str'), ['str']);
+     * assertSame(arrayval([123]), [123]); // 配列は配列のまま
+     *
+     * // $recursive = false にしない限り再帰的に適用される
+     * $stdclass = stdclass(['key' => 'val']);
+     * assertSame(arrayval([$stdclass], true), [['key' => 'val']]); // true なので中身も配列化される
+     * assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので中身は変わらない
+     * ```
+     *
+     * @param mixed $var array 化する値
+     * @param bool $recursive 再帰的に行うなら true
+     * @return array array 化した配列
+     */
+    public static function arrayval($var, $recursive = true)
+    {
+        if (!$recursive || call_user_func(is_primitive, $var)) {
+            return (array) $var;
+        }
+
+        // return json_decode(json_encode($var), true);
+
+        $result = [];
+        foreach ($var as $k => $v) {
+            if (!call_user_func(is_primitive, $v)) {
+                $v = call_user_func(arrayval, $v, true);
+            }
+            $result[$k] = $v;
+        }
+        return $result;
+    }
+
+    /**
      * 値が空か検査する
      *
      * `empty` とほぼ同じ。ただし

@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use ryunosuke\Functions\Package\Classobj;
 use ryunosuke\Functions\Package\Vars;
 
 class VarsTest extends \ryunosuke\Test\AbstractTestCase
@@ -61,6 +62,44 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
             $this->assertException('could not be converted to string', $numberify, new \stdClass());
         }
+    }
+
+    function test_arrayval()
+    {
+        $arrayval = arrayval;
+        $this->assertEquals(['str'], $arrayval('str'));
+        $this->assertEquals(['array'], $arrayval(['array']));
+        $this->assertEquals(array_map($arrayval, [1, 'str', ['array']]), [
+            [1],
+            ['str'],
+            ['array'],
+        ]);
+
+        $inner = Classobj::stdclass([
+            'inner-scalar2',
+            Classobj::stdclass([
+                'lastleaf',
+            ]),
+        ]);
+        $stdclass = Classobj::stdclass([
+            'key'   => 'inner-scalar1',
+            'inner' => $inner
+        ]);
+
+        $this->assertSame([
+            'key'   => 'inner-scalar1',
+            'inner' => [
+                'inner-scalar2',
+                [
+                    'lastleaf'
+                ]
+            ]
+        ], $arrayval($stdclass, true));
+
+        $this->assertSame([
+            'key'   => 'inner-scalar1',
+            'inner' => $inner
+        ], $arrayval($stdclass, false));
     }
 
     function test_is_empty()
