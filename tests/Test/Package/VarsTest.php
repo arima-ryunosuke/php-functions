@@ -64,6 +64,25 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         }
     }
 
+    function test_numval()
+    {
+        $numval = numval;
+        $this->assertSame(3, $numval(3));
+        $this->assertSame(3.14, $numval(3.14));
+        $this->assertSame(3, $numval('3'));
+        $this->assertSame(3.14, $numval('3.14'));
+        $this->assertSame(3.0, $numval('3.'));
+        $this->assertSame(0.3, $numval('.3'));
+        $this->assertSame(3.14, $numval(new \Concrete('3.14')));
+        $this->assertSame(0, $numval([]));
+        $this->assertSame(1, $numval([1, 2]));
+
+        $this->assertSame(30, $numval(30, 8));
+        $this->assertSame(30.0, $numval(30.0, 8));
+        $this->assertSame(24, $numval("30", 8));
+        $this->assertSame(48, $numval("30", 16));
+    }
+
     function test_arrayval()
     {
         $arrayval = arrayval;
