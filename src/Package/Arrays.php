@@ -372,6 +372,79 @@ class Arrays
     }
 
     /**
+     * 比較関数にキーも渡ってくる安定ソート
+     *
+     * 比較関数は ($avalue, $bvalue, $akey, $bkey) という引数を取る。
+     * 「値で比較して同値だったらキーも見たい」という状況はまれによくあるはず。
+     * さらに安定ソートであり、同値だとしても元の並び順は維持される。
+     *
+     * $comparator は省略できる。省略した場合、型に基づいてよしなにソートする。
+     * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）
+     *
+     * ただし、標準のソート関数とは異なり、参照渡しではなくソートして返り値で返す。
+     * また、いわゆる asort であり、キー・値は常に維持される。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'a'  => 3,
+     *     'b'  => 1,
+     *     'c'  => 2,
+     *     'x1' => 9,
+     *     'x2' => 9,
+     *     'x3' => 9,
+     * ];
+     * // 普通のソート
+     * assertSame(kvsort($array), [
+     *     'b'  => 1,
+     *     'c'  => 2,
+     *     'a'  => 3,
+     *     'x1' => 9,
+     *     'x2' => 9,
+     *     'x3' => 9,
+     * ]);
+     * // キーを使用したソート
+     * assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}), [
+     *     'x3' => 9,
+     *     'x2' => 9,
+     *     'x1' => 9,
+     *     'c'  => 2,
+     *     'b'  => 1,
+     *     'a'  => 3,
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable|string $array 対象配列
+     * @param callable|int $comparator 比較関数。SORT_XXX も使える
+     * @return array ソートされた配列
+     */
+    public static function kvsort($array, $comparator = null)
+    {
+        if ($comparator === null || is_int($comparator)) {
+            $sort_flg = $comparator;
+            $comparator = function ($av, $bv, $ak, $bk) use ($sort_flg) {
+                return call_user_func(varcmp, $av, $bv, $sort_flg);
+            };
+        }
+
+        $n = 0;
+        $tmp = [];
+        foreach ($array as $k => $v) {
+            $tmp[$k] = [$n++, $k, $v];
+        }
+
+        uasort($tmp, function ($a, $b) use ($comparator) {
+            return $comparator($a[2], $b[2], $a[1], $b[1]) ?: ($a[0] - $b[0]);
+        });
+
+        foreach ($tmp as $k => $v) {
+            $tmp[$k] = $v[2];
+        }
+
+        return $tmp;
+    }
+
+    /**
      * 配列の+演算子の関数版
      *
      * Example:

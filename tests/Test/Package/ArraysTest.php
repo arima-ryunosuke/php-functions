@@ -176,6 +176,34 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($in_array_or(['1', '2'], [1, 2, 3], true));
     }
 
+    function test_kvsort()
+    {
+        $kvsort = kvsort;
+        $array = array_fill_keys(range('a', 'z'), 9);
+
+        // asort は安定ソートではない
+        $native = $array;
+        asort($native);
+        $this->assertNotSame($array, $native);
+
+        // kvsort は安定ソートである
+        $this->assertSame($array, $kvsort($array));
+
+        // キーでソートできる
+        $this->assertSame(array_reverse(array_keys($array)), array_keys($kvsort($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })));
+
+        // 配列じゃなくても Traversable ならソート可能
+        $this->assertSame([1 => 1, 0 => 2, 2 => 3], $kvsort(call_user_func(function () {
+            yield 2;
+            yield 1;
+            yield 3;
+        })));
+
+        // 上記は挙動のテストであってソートのテストを行っていないのでテスト
+        $array = array_combine(range('a', 'z'), range('a', 'z'));
+        $this->assertSame($array, $kvsort(Arrays::array_shuffle($array), function ($a, $b) { return strcmp($a, $b); }));
+    }
+
     function test_array_add()
     {
         $array_add = array_add;
