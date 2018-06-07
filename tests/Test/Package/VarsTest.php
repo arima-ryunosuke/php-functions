@@ -223,6 +223,94 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($is_countable(new \stdClass()));
     }
 
+    function test_varcmp()
+    {
+        $varcmp = varcmp;
+        // regular int
+        $this->assertGreaterThan(0, $varcmp(1, 0));
+        $this->assertLessThan(0, $varcmp(0, 1));
+        $this->assertEquals(0, $varcmp(0, 0));
+        $this->assertEquals(0, $varcmp(1, 1));
+
+        // regular float
+        $this->assertGreaterThan(0, $varcmp(1.1, 1));
+        $this->assertLessThan(0, $varcmp(1, 1.1));
+        $this->assertEquals(0, $varcmp(1.1, 1.1));
+
+        // regular string
+        $this->assertGreaterThan(0, $varcmp('1.1', '1'));
+        $this->assertLessThan(0, $varcmp('1', '1.1'));
+        $this->assertEquals(0, $varcmp('1.1', '1.1'));
+
+        // string int
+        $this->assertGreaterThan(0, $varcmp('1', '0', SORT_NUMERIC));
+        $this->assertLessThan(0, $varcmp('0', '1', SORT_NUMERIC));
+        $this->assertEquals(0, $varcmp('0', '0', SORT_NUMERIC));
+        $this->assertEquals(0, $varcmp('1', '1', SORT_NUMERIC));
+
+        // string float
+        $this->assertGreaterThan(0, $varcmp('1.1', '1', SORT_NUMERIC));
+        $this->assertLessThan(0, $varcmp('1', '1.1', SORT_NUMERIC));
+        $this->assertEquals(0, $varcmp('1.1', '1.1', SORT_NUMERIC));
+
+        // string
+        $this->assertGreaterThan(0, $varcmp('a', 'A', SORT_STRING));
+        $this->assertLessThan(0, $varcmp('A', 'a', SORT_STRING));
+        $this->assertEquals(0, $varcmp('abc', 'abc', SORT_STRING));
+
+        // string(icase)
+        $this->assertGreaterThan(0, $varcmp('A2', 'a1', SORT_STRING | SORT_FLAG_CASE));
+        $this->assertLessThan(0, $varcmp('a1', 'A2', SORT_STRING | SORT_FLAG_CASE));
+        $this->assertEquals(0, $varcmp('ABC', 'abc', SORT_STRING | SORT_FLAG_CASE));
+
+        // string natural
+        $this->assertGreaterThan(0, $varcmp('12', '2', SORT_NATURAL));
+        $this->assertLessThan(0, $varcmp('2', '12', SORT_NATURAL));
+        $this->assertEquals(0, $varcmp('0', '0', SORT_NATURAL));
+
+        // string natural(icase)
+        $this->assertGreaterThan(0, $varcmp('a12', 'A2', SORT_NATURAL | SORT_FLAG_CASE));
+        $this->assertLessThan(0, $varcmp('A2', 'a12', SORT_NATURAL | SORT_FLAG_CASE));
+        $this->assertEquals(0, $varcmp('ABC', 'abc', SORT_NATURAL | SORT_FLAG_CASE));
+
+        // string(SORT_FLAG_CASE only)
+        $this->assertGreaterThan(0, $varcmp('A2', 'a1', SORT_FLAG_CASE));
+        $this->assertLessThan(0, $varcmp('a1', 'A2', SORT_FLAG_CASE));
+        $this->assertEquals(0, $varcmp('ABC', 'abc', SORT_FLAG_CASE));
+
+        // string(transitive )
+        $a = '1f1';
+        $b = '1E1';
+        $c = '9';
+        $this->assertGreaterThan(0, $varcmp($a, $b, SORT_FLAG_CASE));
+        $this->assertGreaterThan(0, $varcmp($c, $a, SORT_FLAG_CASE));
+        $this->assertGreaterThan(0, $varcmp($c, $b, SORT_FLAG_CASE));
+
+        // array
+        $a = [1, 2, 3, 9];
+        $b = [1, 2, 3, 0];
+        $x = [1, 2, 3, 9];
+        $this->assertGreaterThan(0, $varcmp($a, $b));
+        $this->assertLessThan(0, $varcmp($b, $a));
+        $this->assertEquals(0, $varcmp($a, $x));
+
+        // object
+        $a = Classobj::stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
+        $b = Classobj::stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 0]);
+        $x = Classobj::stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
+        $this->assertGreaterThan(0, $varcmp($a, $b));
+        $this->assertLessThan(0, $varcmp($b, $a));
+        $this->assertEquals(0, $varcmp($a, $x));
+
+        // DateTime
+        $a = new \DateTime('2011/12/23 12:34:56');
+        $b = new \DateTime('2010/12/23 12:34:56');
+        $x = new \DateTime('2011/12/23 12:34:56');
+        $this->assertGreaterThan(0, $varcmp($a, $b));
+        $this->assertLessThan(0, $varcmp($b, $a));
+        $this->assertEquals(0, $varcmp($a, $x));
+    }
+
     function test_var_type()
     {
         $var_type = var_type;

@@ -367,6 +367,68 @@ class Vars
     }
 
     /**
+     * php7 の `<=>` の関数版
+     *
+     * 引数で大文字小文字とか自然順とか型モードとかが指定できる。
+     *
+     * Example:
+     * ```php
+     * // 'a' と 'z' なら 'z' の方が大きい
+     * assertTrue(varcmp('z', 'a') > 0);
+     * assertTrue(varcmp('a', 'z') < 0);
+     * assertTrue(varcmp('a', 'a') === 0);
+     *
+     * // 'a' と 'Z' なら 'a' の方が大きい…が SORT_FLAG_CASE なので 'Z' のほうが大きい
+     * assertTrue(varcmp('Z', 'a', SORT_FLAG_CASE) > 0);
+     * assertTrue(varcmp('a', 'Z', SORT_FLAG_CASE) < 0);
+     * assertTrue(varcmp('a', 'A', SORT_FLAG_CASE) === 0);
+     *
+     * // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
+     * assertTrue(varcmp('12', '2', SORT_NATURAL) > 0);
+     * assertTrue(varcmp('2', '12', SORT_NATURAL) < 0);
+     * ```
+     *
+     * @param mixed $a 比較する値1
+     * @param mixed $b 比較する値2
+     * @param int $mode 比較モード（SORT_XXX）。省略すると型でよしなに選択
+     * @return int 等しいなら 0、 $a のほうが大きいなら > 0、 $bのほうが大きいなら < 0
+     */
+    public static function varcmp($a, $b, $mode = null)
+    {
+        // null が来たらよしなにする（なるべく型に寄せるが SORT_REGULAR はキモいので避ける）
+        if ($mode === null || $mode === SORT_FLAG_CASE) {
+            if ((is_int($a) || is_float($a)) && (is_int($b) || is_float($b))) {
+                $mode = SORT_NUMERIC;
+            }
+            elseif (is_string($a) && is_string($b)) {
+                $mode = SORT_STRING | $mode; // SORT_FLAG_CASE が単品で来てるかもしれないので混ぜる
+            }
+        }
+
+        $flag_case = $mode & SORT_FLAG_CASE;
+        $mode = $mode & ~SORT_FLAG_CASE;
+
+        if ($mode === SORT_NUMERIC) {
+            return $a - $b;
+        }
+        if ($mode === SORT_STRING) {
+            if ($flag_case) {
+                return strcasecmp($a, $b);
+            }
+            return strcmp($a, $b);
+        }
+        if ($mode === SORT_NATURAL) {
+            if ($flag_case) {
+                return strnatcasecmp($a, $b);
+            }
+            return strnatcmp($a, $b);
+        }
+
+        // for SORT_REGULAR
+        return $a == $b ? 0 : ($a > $b ? 1 : -1);
+    }
+
+    /**
      * 値の型を取得する（gettype + get_class）
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
