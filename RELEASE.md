@@ -8,7 +8,19 @@
 
 ## x.y.z
 
-- no todo
+- Utility が増えてきたから然るべき場所へ移動する
+
+## 1.1.7
+
+- [feature][Utility] process を追加
+- [feature][Utility] get_uploaded_files を追加
+- [change][Vars] var_html の表示形式を変更
+- [feature][Classobj] get_object_properties を追加
+- [feature][Arrays] array_mix を追加
+- [feature][Arrays] array_kmap を追加
+- [feature][Arrays] array_get のクロージャ対応
+- [feature][Arrays] array_sprintf の $format 省略（vsprintf）に対応
+- [feature][Arrays] array_each の callback に第3引数（0からの連番）を追加
 
 ## 1.1.6
 
