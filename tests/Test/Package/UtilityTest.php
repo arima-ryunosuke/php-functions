@@ -53,6 +53,57 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(1, $cache('test', function () { return 1; }, __FUNCTION__, true));
     }
 
+    function test_process()
+    {
+        $process = process;
+        $file = sys_get_temp_dir() . '/rf-process.php';
+        $stdout = null;
+        $stderr = null;
+
+        file_put_contents($file, '<?php
+            fwrite(STDOUT, stream_get_contents(STDIN));
+            fwrite(STDERR, "STDERR!");
+            exit(123);
+        ');
+        $return = $process(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+        $this->assertSame(123, $return);
+        $this->assertSame('STDIN!', $stdout);
+        $this->assertSame('STDERR!', $stderr);
+
+        file_put_contents($file, '<?php
+            $out = str_repeat("o", 100);
+            $err = str_repeat("e", 100);
+            for ($i = 0; $i < 1000; $i++) {
+                fwrite(STDOUT, $out);
+                fwrite(STDERR, $err);
+            }
+        ');
+        $return = $process(PHP_BINARY, $file, "STDIN!", $stdout, $stderr);
+        $this->assertSame(0, $return);
+        $this->assertSame(str_repeat("o", 100 * 1000), $stdout);
+        $this->assertSame(str_repeat("e", 100 * 1000), $stderr);
+
+        $return = $process(PHP_BINARY, ['-r' => "syntax error"], '', $stdout, $stderr);
+        $this->assertSame(254, $return);
+        $this->assertContains('Parse error', "$stdout $stderr");
+
+        $pingopt = DIRECTORY_SEPARATOR === '\\' ? '-n' : '-c';
+        $return = $process('ping', ["127.0.0.2", $pingopt => 1], '', $stdout, $stderr);
+        $this->assertSame(0, $return);
+        $this->assertContains('127.0.0.2', $stdout);
+        $this->assertSame('', $stderr);
+
+        $return = $process('ping', "unknownhost", '', $stdout, $stderr);
+        $this->assertNotSame(0, $return);
+        $this->assertContains('unknownhost', "$stdout $stderr");
+
+        $process(PHP_BINARY, ['-r' => "echo getcwd();"], '', $stdout, $stderr, __DIR__);
+        $this->assertSame(__DIR__, $stdout);
+
+        $process(PHP_BINARY, ['-r' => "echo getenv('HOGE');"], '', $stdout, $stderr, null, ['HOGE' => 'hoge']);
+        $this->assertSame('hoge', $stdout);
+    }
+
     function test_arguments()
     {
         $arguments = arguments;

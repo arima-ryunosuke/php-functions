@@ -67,6 +67,100 @@ class Utility
     }
 
     /**
+     * proc_open ～ proc_close の一連の処理を行う
+     *
+     * 標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。
+     *
+     * Example:
+     * ```php
+     * // サンプル実行用ファイルを用意
+     * $phpfile = sys_get_temp_dir() . '/rf-sample.php';
+     * file_put_contents($phpfile, "<?php
+     *     fwrite(STDOUT, fgets(STDIN));
+     *     fwrite(STDERR, 'err');
+     *     exit((int) ini_get('max_file_uploads'));
+     * ");
+     * // 引数と標準入出力エラーを使った単純な例
+     * $rc = process(PHP_BINARY, [
+     *     '-d' => 'max_file_uploads=123',
+     *     $phpfile,
+     * ], 'out', $stdout, $stderr);
+     * assertSame($rc, 123); // -d で与えた max_file_uploads で exit してるので 123
+     * assertSame($stdout, 'out'); // 標準出力に標準入力を書き込んでいるので "out" が格納される
+     * assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "err" が格納される
+     * ```
+     *
+     * @param string $command 実行コマンド。escapeshellcmd される
+     * @param array|string $args コマンドライン引数。文字列はそのまま結合される。配列は escapeshellarg された上でキーと結合される
+     * @param string $stdin 標準入力
+     * @param string $stdout 標準出力（参照渡しで格納される）
+     * @param string $stderr 標準エラー（参照渡しで格納される）
+     * @param string $cwd 作業ディレクトリ
+     * @param array $env 環境変数
+     * @return int リターンコード
+     */
+    public static function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
+    {
+        $ecommand = escapeshellcmd($command);
+
+        if (is_array($args)) {
+            $args = call_user_func(array_sprintf, $args, function ($v, $k) {
+                $ev = escapeshellarg($v);
+                return is_int($k) ? $ev : "$k $ev";
+            }, ' ');
+        }
+
+        $proc = proc_open("$ecommand $args", [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ], $pipes, $cwd, $env);
+
+        if ($proc === false) {
+            // どうしたら失敗するのかわからない
+            throw new \RuntimeException("$command start failed."); // @codeCoverageIgnore
+        }
+
+        fwrite($pipes[0], $stdin);
+        fclose($pipes[0]);
+
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $stdout = $stderr = '';
+        while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
+            $read = [$pipes[1], $pipes[2]];
+            $write = $except = null;
+            if (stream_select($read, $write, $except, 1) === false) {
+                // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                // @codeCoverageIgnoreStart
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+                proc_close($proc);
+                throw new \RuntimeException('stream_select failed.');
+                // @codeCoverageIgnoreEnd
+            }
+            foreach ($read as $fp) {
+                if ($fp === $pipes[1]) {
+                    $stdout .= fread($fp, 1024);
+                }
+                elseif ($fp === $pipes[2]) {
+                    $stderr .= fread($fp, 1024);
+                }
+            }
+        }
+
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $rc = proc_close($proc);
+        if ($rc === -1) {
+            // どうしたら失敗するのかわからない
+            throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
+        }
+        return $rc;
+    }
+
+    /**
      * コマンドライン引数をパースして引数とオプションを返す
      *
      * 少しリッチな {@link http://php.net/manual/function.getopt.php getopt} として使える（shell 由来のオプション構文(a:b::)はどうも馴染みにくい）。
