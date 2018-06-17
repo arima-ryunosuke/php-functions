@@ -49,11 +49,12 @@
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L297" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            	</div>
+                    	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
 
-	<div class="description"><p>構文関連のユーティリティ</p></div>
+	<div class="description"><p>構文関連のユーティリティ</p>
+</div>
 
 	<h3>Construction</h3>
                 
@@ -77,7 +78,7 @@
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L10-L27" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::returns()" tabindex="-1" class="structure-title ">
                         returns						<small>($v)</small>
 					</h4>
@@ -86,14 +87,17 @@
 <p>clone などでそのまま返す関数が欲しいことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">$object = new \stdClass();
-assertSame(returns($object), $object);</code></pre></div>
+assertSame(returns($object), $object);
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$v</td>
-				<td class="desc"><p>return する値</p></td>
+				<td class="desc"><p>return する値</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -102,7 +106,8 @@ assertSame(returns($object), $object);</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc"><p>$v を返す</p></td>
+			<td class="desc"><p>$v を返す</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -125,7 +130,7 @@ assertSame(returns($object), $object);</code></pre></div>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L29-L102" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::optional()" tabindex="-1" class="structure-title ">
                         optional						<small>($object, $expected = null)</small>
 					</h4>
@@ -156,19 +161,23 @@ assertSame($getobject()['hoge'], null);
 assertSame(iterator_to_array(optional($getobject())), []);
 
 // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
-assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code></pre></div>
+assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">object<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$object</td>
-				<td class="desc"><p>オブジェクト</p></td>
+				<td class="desc"><p>オブジェクト</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$expected = null</td>
-				<td class="desc"><p>期待するクラス名。指定した場合は is_a される</p></td>
+				<td class="desc"><p>期待するクラス名。指定した場合は is_a される</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -177,7 +186,8 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc"><p>$object がオブジェクトならそのまま返し、違うなら NullObject を返す</p></td>
+			<td class="desc"><p>$object がオブジェクトならそのまま返し、違うなら NullObject を返す</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -200,7 +210,7 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L104-L124" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
                         throws						<small>($ex)</small>
 					</h4>
@@ -213,14 +223,17 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);</code
 }
 catch (\Exception $ex) {
     assertSame($ex-&gt;getMessage(), 'throws');
-}</code></pre></div>
+}
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a></td>
 				<td class="rest">$ex</td>
-				<td class="desc"><p>投げる例外</p></td>
+				<td class="desc"><p>投げる例外</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -252,7 +265,7 @@ catch (\Exception $ex) {
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L126-L153" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throw_if()" tabindex="-1" class="structure-title ">
                         throw_if						<small>($flag, $ex, ...$ex_args)</small>
 					</h4>
@@ -265,24 +278,29 @@ throw_if(false, new \Exception());
 // 投げる
 try{throw_if(true, new \Exception());}catch(\Exception $ex){}
 // クラス指定で投げる
-try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}</code></pre></div>
+try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">bool<span class="type-separator"></span><wbr>mixed</td>
 				<td class="rest">$flag</td>
-				<td class="desc"><p>true 相当値を与えると例外を投げる</p></td>
+				<td class="desc"><p>true 相当値を与えると例外を投げる</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>string</td>
 				<td class="rest">$ex</td>
-				<td class="desc"><p>投げる例外。クラス名の場合は中で new する</p></td>
+				<td class="desc"><p>投げる例外。クラス名の場合は中で new する</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$ex_args</td>
-				<td class="desc"><p>$ex にクラス名を与えたときの引数（可変引数）</p></td>
+				<td class="desc"><p>$ex にクラス名を与えたときの引数（可変引数）</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -314,7 +332,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}</
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L155-L193" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::ifelse()" tabindex="-1" class="structure-title ">
                         ifelse						<small>($actual, $expected, $then, $else = null)</small>
 					</h4>
@@ -332,29 +350,35 @@ assertSame(ifelse($heavyfunc(1), false, 'default'), 1);
 // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
 assertSame(ifelse($heavyfunc(null), false, 'default'), null);
 // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
-assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre></div>
+assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$actual</td>
-				<td class="desc"><p>調べる値（左辺値）</p></td>
+				<td class="desc"><p>調べる値（左辺値）</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$expected</td>
-				<td class="desc"><p>比較する値（右辺値）</p></td>
+				<td class="desc"><p>比較する値（右辺値）</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$then</td>
-				<td class="desc"><p>真の場合の値</p></td>
+				<td class="desc"><p>真の場合の値</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">mixed</td>
 				<td class="rest">$else = null</td>
-				<td class="desc"><p>偽の場合の値。省略時は $actual</p></td>
+				<td class="desc"><p>偽の場合の値。省略時は $actual</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -363,7 +387,8 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre>
 		<tbody>
 		<tr>
 			<td class="type">mixed</td>
-			<td class="desc"><p>$then or $else</p></td>
+			<td class="desc"><p>$then or $else</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -386,7 +411,7 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');</code></pre>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L195-L218" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch						<small>($try, $catch = null, ...$variadic)</small>
 					</h4>
@@ -399,24 +424,29 @@ $try = function($a, $b, $c){return [$a, $b, $c];};
 assertSame(try_catch($try, null, 1, 2, 3), [1, 2, 3]);
 // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
 $try = function(){throw new \Exception('tried');};
-assertSame(try_catch($try)-&gt;getMessage(), 'tried');</code></pre></div>
+assertSame(try_catch($try)-&gt;getMessage(), 'tried');
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$try</td>
-				<td class="desc"><p>try ブロッククロージャ</p></td>
+				<td class="desc"><p>try ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$catch = null</td>
-				<td class="desc"><p>catch ブロッククロージャ</p></td>
+				<td class="desc"><p>catch ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc"><p>$try に渡る引数</p></td>
+				<td class="desc"><p>$try に渡る引数</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -425,7 +455,8 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</td>
-			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p></td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -448,7 +479,7 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');</code></pre></div>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L220-L247" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally						<small>($try, $finally = null, ...$variadic)</small>
 					</h4>
@@ -465,24 +496,29 @@ assertSame($finally_count, 1); // 呼ばれている
 // 例外は投げっぱなすが、 $finally は実行される
 $try = function(){throw new \Exception('tried');};
 try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
-assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
+assertSame($finally_count, 2); // 呼ばれている
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$try</td>
-				<td class="desc"><p>try ブロッククロージャ</p></td>
+				<td class="desc"><p>try ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$finally = null</td>
-				<td class="desc"><p>finally ブロッククロージャ</p></td>
+				<td class="desc"><p>finally ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc"><p>$try に渡る引数</p></td>
+				<td class="desc"><p>$try に渡る引数</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -491,7 +527,8 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</td>
-			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p></td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -514,7 +551,7 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L249-L296" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally						<small>($try, $catch = null, $finally = null, ...$variadic)</small>
 					</h4>
@@ -531,29 +568,35 @@ assertSame($finally_count, 1); // 呼ばれている
 // 例外を投げるが、 $catch で握りつぶす
 $try = function(){throw new \Exception('tried');};
 assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)-&gt;getMessage(), 'tried');
-assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
+assertSame($finally_count, 2); // 呼ばれている
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$try</td>
-				<td class="desc"><p>try ブロッククロージャ</p></td>
+				<td class="desc"><p>try ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$catch = null</td>
-				<td class="desc"><p>catch ブロッククロージャ</p></td>
+				<td class="desc"><p>catch ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$finally = null</td>
-				<td class="desc"><p>finally ブロッククロージャ</p></td>
+				<td class="desc"><p>finally ブロッククロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc"><p>$try に渡る引数</p></td>
+				<td class="desc"><p>$try に渡る引数</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -562,7 +605,8 @@ assertSame($finally_count, 2); // 呼ばれている</code></pre></div>
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</td>
-			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p></td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>

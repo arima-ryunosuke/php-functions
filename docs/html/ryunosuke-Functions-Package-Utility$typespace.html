@@ -48,12 +48,13 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L439" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            	</div>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L558" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                    	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
 
-	<div class="description"><p>汎用的なユーティリティ</p></div>
+	<div class="description"><p>汎用的なユーティリティ</p>
+</div>
 
 	<h3>Construction</h3>
                 
@@ -76,50 +77,27 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L10-L67" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
-					<h4 id="ryunosuke\Functions\Package\Utility::cache()" tabindex="-1" class="structure-title ">
-                        cache						<small>($key, $provider, $namespace = null, $use_internal = true)</small>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L10-L33" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    							<span class="display-none" data-fqsen="ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()">			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/tests/Test/Package/UtilityTest.php#L10-L196" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+            </span>
+                        					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::get_uploaded_files()" tabindex="-1" class="structure-title ">
+                        get_uploaded_files						<small>($files = null)</small>
 					</h4>
 					<div class="inner-item">
-						<div class="description"><p>シンプルにキャッシュする</p>
-<p>この関数は get/set を兼ねる。<br />
-キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
-<p>内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。<br />
-内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。</p>
-<p>$provider に null を与えるとキャッシュの削除となる。</p>
-<p>Example:</p>
-<pre><code class="language-php">$provider = function(){return rand();};
-// 乱数を返す処理だが、キャッシュされるので同じ値になる
-$rand1 = cache('rand', $provider);
-$rand2 = cache('rand', $provider);
-assertSame($rand1, $rand2);
-// $provider に null を与えると削除される
-cache('rand', null);
-$rand3 = cache('rand', $provider);
-assertNotSame($rand1, $rand3);</code></pre></div>
+						<div class="description"><p>$_FILES の構造を組み替えて $_POST などと同じにする</p>
+<p>$_FILES の配列構造はバグとしか思えないのでそれを是正する関数。<br />
+第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。</p>
+<p>サンプルを書くと長くなるので例は<tag_source data-fqsen='ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()' data-description='テストファイル'>テストファイル</tag_source>を参照。</p>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">string</td>
-				<td class="rest">$key</td>
-				<td class="desc"><p>キャッシュのキー</p></td>
-			</tr>
-        			<tr>
-				<td class="type">callable</td>
-				<td class="rest">$provider</td>
-				<td class="desc"><p>キャッシュがない場合にコールされる callable</p></td>
-			</tr>
-        			<tr>
-				<td class="type">string</td>
-				<td class="rest">$namespace = null</td>
-				<td class="desc"><p>名前空間</p></td>
-			</tr>
-        			<tr>
-				<td class="type">bool</td>
-				<td class="rest">$use_internal = true</td>
-				<td class="desc"><p>内部キャッシュオブジェクトを使うか</p></td>
+				<td class="type">array</td>
+				<td class="rest">$files = null</td>
+				<td class="desc"><p>$_FILES の同じ構造の配列。省略時は $_FILES</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -127,8 +105,9 @@ assertNotSame($rand1, $rand3);</code></pre></div>
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type">mixed</td>
-			<td class="desc"><p>キャッシュ</p></td>
+			<td class="type">array</td>
+			<td class="desc"><p>$_FILES を $_POST などと同じ構造にした配列</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -150,8 +129,190 @@ assertNotSame($rand1, $rand3);</code></pre></div>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L69-L207" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L35-L92" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::cache()" tabindex="-1" class="structure-title ">
+                        cache						<small>($key, $provider, $namespace = null, $use_internal = true)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>シンプルにキャッシュする</p>
+<p>この関数は get/set を兼ねる。<br />
+キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
+<p>内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。<br />
+内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。</p>
+<p>$provider に null を与えるとキャッシュの削除となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$provider = function(){return rand();};
+// 乱数を返す処理だが、キャッシュされるので同じ値になる
+$rand1 = cache('rand', $provider);
+$rand2 = cache('rand', $provider);
+assertSame($rand1, $rand2);
+// $provider に null を与えると削除される
+cache('rand', null);
+$rand3 = cache('rand', $provider);
+assertNotSame($rand1, $rand3);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$key</td>
+				<td class="desc"><p>キャッシュのキー</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$provider</td>
+				<td class="desc"><p>キャッシュがない場合にコールされる callable</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$namespace = null</td>
+				<td class="desc"><p>名前空間</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$use_internal = true</td>
+				<td class="desc"><p>内部キャッシュオブジェクトを使うか</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>キャッシュ</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L94-L186" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
+                        process						<small>($command, $args = [], $stdin = &#039;&#039;, &amp;$stdout = &#039;&#039;, &amp;$stderr = &#039;&#039;, $cwd = null, $env = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>proc_open ～ proc_close の一連の処理を行う</p>
+<p>標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// サンプル実行用ファイルを用意
+$phpfile = sys_get_temp_dir() . '/rf-sample.php';
+file_put_contents($phpfile, "&lt;?php
+    fwrite(STDOUT, fgets(STDIN));
+    fwrite(STDERR, 'err');
+    exit((int) ini_get('max_file_uploads'));
+");
+// 引数と標準入出力エラーを使った単純な例
+$rc = process(PHP_BINARY, [
+    '-d' =&gt; 'max_file_uploads=123',
+    $phpfile,
+], 'out', $stdout, $stderr);
+assertSame($rc, 123); // -d で与えた max_file_uploads で exit してるので 123
+assertSame($stdout, 'out'); // 標準出力に標準入力を書き込んでいるので "out" が格納される
+assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "err" が格納される
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$command</td>
+				<td class="desc"><p>実行コマンド。escapeshellcmd される</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>string</td>
+				<td class="rest">$args = []</td>
+				<td class="desc"><p>コマンドライン引数。文字列はそのまま結合される。配列は escapeshellarg された上でキーと結合される</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$stdin = &#039;&#039;</td>
+				<td class="desc"><p>標準入力</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">&amp;$stdout = &#039;&#039;</td>
+				<td class="desc"><p>標準出力（参照渡しで格納される）</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">&amp;$stderr = &#039;&#039;</td>
+				<td class="desc"><p>標準エラー（参照渡しで格納される）</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$cwd = null</td>
+				<td class="desc"><p>作業ディレクトリ</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$env = null</td>
+				<td class="desc"><p>環境変数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">int</td>
+			<td class="desc"><p>リターンコード</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L188-L326" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
                         arguments						<small>($rule, $argv = null)</small>
 					</h4>
@@ -163,16 +324,16 @@ assertNotSame($rand1, $rand3);</code></pre></div>
 <p>$rule に従って <code>--noval filename --opt optval</code> のような文字列・配列をパースする。<br />
 $rule 配列の仕様は下記。</p>
 <ul>
-<li>キーは「オプション名」を指定する。ただし・・・
-<ul>
+<li>キーは「オプション名」を指定する。ただし・・・<ul>
 <li>数値キーは「引数」を意味する</li>
 <li>スペースの後に「ショート名」を与えられる</li>
-</ul></li>
-<li>値は「デフォルト値」を指定する。ただし・・・
-<ul>
+</ul>
+</li>
+<li>値は「デフォルト値」を指定する。ただし・・・<ul>
 <li><code>[]</code> は「複数値オプション」を意味する（配列にしない限り同オプションの多重指定は許されない）</li>
 <li><code>null</code> は「値なしオプション」を意味する（スイッチングオプション）</li>
-</ul></li>
+</ul>
+</li>
 </ul>
 <p>上記の仕様でパースして「引数は数値連番、オプションはオプション名をキーとした配列」を返す。<br />
 なお、いわゆる「引数」はどこに来ても良い（前オプション、後オプションの区別がない）。</p>
@@ -205,19 +366,23 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
     'opts'   =&gt; ['o1', 'o2', 'o3'], // ロング、ショート混在でも OK
     'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
     'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
-]);</code></pre></div>
+]);
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$rule</td>
-				<td class="desc"><p>オプションルール</p></td>
+				<td class="desc"><p>オプションルール</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">array<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$argv = null</td>
-				<td class="desc"><p>パースするコマンドライン引数。未指定時は $argv が使用される</p></td>
+				<td class="desc"><p>パースするコマンドライン引数。未指定時は $argv が使用される</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -226,7 +391,8 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 		<tbody>
 		<tr>
 			<td class="type">array</td>
-			<td class="desc"><p>コマンドライン引数＋オプション</p></td>
+			<td class="desc"><p>コマンドライン引数＋オプション</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -248,8 +414,8 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L209-L268" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L328-L387" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error						<small>($message, $destination = null)</small>
 					</h4>
@@ -259,19 +425,22 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 <p>第2引数 $destination で出力対象を指定する。省略すると error_log 設定に従う。<br />
 文字列を与えるとファイル名とみなし、ファイルに追記される。<br />
 ファイルを開くが、<strong>ファイルは閉じない</strong>。閉じ処理は php の終了処理に身を任せる。<br />
-したがって閉じる必要がある場合はファイルポインタを渡す必要がある。</p></div>
+したがって閉じる必要がある場合はファイルポインタを渡す必要がある。</p>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>mixed</td>
 				<td class="rest">$message</td>
-				<td class="desc"><p>出力メッセージ</p></td>
+				<td class="desc"><p>出力メッセージ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">resource<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>mixed</td>
 				<td class="rest">$destination = null</td>
-				<td class="desc"><p>出力先</p></td>
+				<td class="desc"><p>出力先</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -280,7 +449,8 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 		<tbody>
 		<tr>
 			<td class="type">int</td>
-			<td class="desc"><p>書き込んだバイト数</p></td>
+			<td class="desc"><p>書き込んだバイト数</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -302,8 +472,8 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L270-L297" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L389-L416" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
                         timer						<small>($callable, $count = 1)</small>
 					</h4>
@@ -312,19 +482,23 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 <p>第1引数 $callable を $count 回回してその処理時間を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 0.01 秒を 10 回回すので 0.1 秒は超える
-assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));</code></pre></div>
+assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">callable</td>
 				<td class="rest">$callable</td>
-				<td class="desc"><p>処理クロージャ</p></td>
+				<td class="desc"><p>処理クロージャ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$count = 1</td>
-				<td class="desc"><p>ループ回数</p></td>
+				<td class="desc"><p>ループ回数</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -333,7 +507,8 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));</code></pre><
 		<tbody>
 		<tr>
 			<td class="type">float</td>
-			<td class="desc"><p>処理時間</p></td>
+			<td class="desc"><p>処理時間</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -355,8 +530,8 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));</code></pre><
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L299-L438" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L418-L557" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>
 					</h4>
@@ -370,29 +545,35 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));</code></pre><
 benchmark([
     'intval',
     'intcast' =&gt; function($v){return (int)$v;},
-], ['12345'], 10);</code></pre></div>
+], ['12345'], 10);
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">array<span class="type-separator"></span><wbr>callable</td>
 				<td class="rest">$suite</td>
-				<td class="desc"><p>ベンチ対象処理</p></td>
+				<td class="desc"><p>ベンチ対象処理</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">array</td>
 				<td class="rest">$args = []</td>
-				<td class="desc"><p>各ケースに与えられる引数</p></td>
+				<td class="desc"><p>各ケースに与えられる引数</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">int</td>
 				<td class="rest">$millisec = 1000</td>
-				<td class="desc"><p>呼び出しミリ秒</p></td>
+				<td class="desc"><p>呼び出しミリ秒</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">bool</td>
 				<td class="rest">$output = true</td>
-				<td class="desc"><p>true だと標準出力に出力される</p></td>
+				<td class="desc"><p>true だと標準出力に出力される</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -401,7 +582,8 @@ benchmark([
 		<tbody>
 		<tr>
 			<td class="type">array</td>
-			<td class="desc"><p>ベンチ結果の配列</p></td>
+			<td class="desc"><p>ベンチ結果の配列</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>

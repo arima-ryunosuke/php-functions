@@ -48,12 +48,13 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            	</div>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L277" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                    	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
 
-	<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p></div>
+	<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p>
+</div>
 
 	<h3>Construction</h3>
                 
@@ -77,7 +78,7 @@
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::stdclass()" tabindex="-1" class="structure-title ">
                         stdclass						<small>($fields = [])</small>
 					</h4>
@@ -92,14 +93,17 @@ $fields = ['a' =&gt; 'A', 'b' =&gt; 'B'];
 assertEquals(stdclass($fields), (object) $fields);
 // ただしこういうことはキャストでは出来ない
 assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
-assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする</code></pre></div>
+assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
 				<td class="rest">$fields = []</td>
-				<td class="desc"><p>フィールド配列</p></td>
+				<td class="desc"><p>フィールド配列</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -108,7 +112,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type"><a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></td>
-			<td class="desc"><p>生成した stdClass インスタンス</p></td>
+			<td class="desc"><p>生成した stdClass インスタンス</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -131,7 +136,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L40-L90" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
                         detect_namespace						<small>($location)</small>
 					</h4>
@@ -140,14 +145,16 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 <p>指定パスに名前空間を持つような php ファイルが有るならその名前空間を返す。<br />
 指定パスに名前空間を持つような php ファイルが無いなら親をたどる。<br />
 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。</p>
-<p>言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。</p></div>
+<p>言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。</p>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$location</td>
-				<td class="desc"><p>配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す</p></td>
+				<td class="desc"><p>配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -156,7 +163,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc"><p>名前空間</p></td>
+			<td class="desc"><p>名前空間</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -179,7 +187,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L92-L122" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader						<small>($startdir = null)</small>
 					</h4>
@@ -187,14 +195,17 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<div class="description"><p>composer のクラスローダを返す</p>
 <p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());</code></pre></div>
+<pre><code class="language-php">assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$startdir = null</td>
-				<td class="desc"><p>高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用</p></td>
+				<td class="desc"><p>高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -203,7 +214,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type"><a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></td>
-			<td class="desc"><p>クラスローダ</p></td>
+			<td class="desc"><p>クラスローダ</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -226,21 +238,24 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L124-L144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace						<small>($class)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>クラスの名前空間部分を取得する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');</code></pre></div>
+<pre><code class="language-php">assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>object</td>
 				<td class="rest">$class</td>
-				<td class="desc"><p>対象クラス・オブジェクト</p></td>
+				<td class="desc"><p>対象クラス・オブジェクト</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -249,7 +264,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc"><p>クラスの名前空間</p></td>
+			<td class="desc"><p>クラスの名前空間</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -272,21 +288,24 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L146-L165" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten						<small>($class)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>クラスの名前空間部分を除いた短い名前を取得する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');</code></pre></div>
+<pre><code class="language-php">assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
+</code></pre>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>object</td>
 				<td class="rest">$class</td>
-				<td class="desc"><p>対象クラス・オブジェクト</p></td>
+				<td class="desc"><p>対象クラス・オブジェクト</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -295,7 +314,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc"><p>クラスの短い名前</p></td>
+			<td class="desc"><p>クラスの短い名前</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -318,7 +338,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L167-L228" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-            					</div>
+                                    					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace						<small>($class, $register, $dirname = null)</small>
 					</h4>
@@ -333,24 +353,28 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 <p>classA &lt;- classAA &lt;- classB &lt;- classC</p>
 <p>つまり、classA を継承した classAA を定義してそれを classA とみなすことが可能になる。<br />
 ただし、内部的には class_alias を使用して実現しているので厳密には異なるクラスとなる。</p>
-<p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p></div>
+<p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p>
+</div>
                         	<table class="table">
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$class</td>
-				<td class="desc"><p>対象クラス名</p></td>
+				<td class="desc"><p>対象クラス名</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
 				<td class="rest">$register</td>
-				<td class="desc"><p>置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ</p></td>
+				<td class="desc"><p>置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ</p>
+</td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$dirname = null</td>
-				<td class="desc"><p>一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う</p></td>
+				<td class="desc"><p>一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う</p>
+</td>
 			</tr>
         		</tbody>
 	</table>
@@ -360,6 +384,71 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 		<tr>
 			<td class="type">void</td>
 			<td class="desc"></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L230-L276" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
+                        get_object_properties						<small>($object)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
+<p>get_object_vars + no public プロパティを返すイメージ。</p>
+<p>Example:</p>
+<pre><code class="language-php">$object = new \Exception('something', 42);
+$object-&gt;oreore = 'oreore';
+
+// get_object_vars はそのスコープから見えないプロパティを取得できない
+// var_dump(get_object_vars($object));
+
+// array キャストは全て得られるが null 文字を含むので扱いにくい
+// var_dump((array) $object);
+
+// この関数を使えば不可視プロパティも取得できる
+assertArraySubset([
+    'message' =&gt; 'something',
+    'code'    =&gt; 42,
+    'oreore'  =&gt; 'oreore',
+], get_object_properties($object));
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">object</td>
+				<td class="rest">$object</td>
+				<td class="desc"><p>オブジェクト</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>全プロパティ</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>

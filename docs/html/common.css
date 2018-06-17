@@ -424,13 +424,13 @@ td.rest {
 .glyphicon-public::before {
     font-size: 6px;
     content: "\e135";
-    color: #337ab7;
+    color: #0a8004;
 }
 
 .glyphicon-magic::before {
     font-size: 6px;
     content: "\e165";
-    color: #337ab7;
+    color: #5f94f3;
 }
 
 .label-icon {

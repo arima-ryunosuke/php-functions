@@ -476,6 +476,61 @@ if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') |
         return $array;
     }
 }
+if (!isset($excluded_functions['array_mix']) && (!function_exists('array_mix') || (!false && (new \ReflectionFunction('array_mix'))->isInternal()))) {
+    /**
+     * 配列を交互に追加する
+     *
+     * 引数の配列を横断的に追加して返す。
+     * 数値キーは振り直される。文字キーはそのまま追加される（同じキーは後方上書き）。
+     *
+     * 配列の長さが異なる場合、短い方に対しては何もしない。そのまま追加される。
+     *
+     * Example:
+     * ```php
+     * // 奇数配列と偶数配列をミックスして自然数配列を生成
+     * assertSame(array_mix([1, 3, 5], [2, 4, 6]), [1, 2, 3, 4, 5, 6]);
+     * // 長さが異なる場合はそのまま追加される（短い方の足りない分は無視される）
+     * assertSame(array_mix([1], [2, 3, 4]), [1, 2, 3, 4]);
+     * assertSame(array_mix([1, 3, 4], [2]), [1, 2, 3, 4]);
+     * // 可変引数なので3配列以上も可
+     * assertSame(array_mix([1], [2, 4], [3, 5, 6]), [1, 2, 3, 4, 5, 6]);
+     * assertSame(array_mix([1, 4, 6], [2, 5], [3]), [1, 2, 3, 4, 5, 6]);
+     * // 文字キーは維持される
+     * assertSame(array_mix(['a' => 'A', 1, 3], ['b' => 'B', 2]), ['a' => 'A', 'b' => 'B', 1, 2, 3]);
+     * ```
+     *
+     * @param array $variadic 対象配列（可変引数）
+     * @return array 引数配列が交互に追加された配列
+     */
+    function array_mix(...$variadic)
+    {
+        assert(count(array_filter($variadic, function ($v) { return !is_array($v); })) === 0);
+
+        if (!$variadic) {
+            return [];
+        }
+
+        $keyses = array_map('array_keys', $variadic);
+        $limit = max(array_map('count', $keyses));
+
+        $result = [];
+        for ($i = 0; $i < $limit; $i++) {
+            foreach ($keyses as $n => $keys) {
+                if (isset($keys[$i])) {
+                    $key = $keys[$i];
+                    $val = $variadic[$n][$key];
+                    if (is_int($key)) {
+                        $result[] = $val;
+                    }
+                    else {
+                        $result[$key] = $val;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+}
 if (!isset($excluded_functions['array_implode']) && (!function_exists('array_implode') || (!false && (new \ReflectionFunction('array_implode'))->isInternal()))) {
     /**
      * 配列の各要素の間に要素を差し込む
@@ -527,6 +582,7 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
      *
      * $format は書式文字列（$v, $k）。
      * callable を与えると sprintf ではなくコールバック処理になる（$v, $k）。
+     * 省略（null）するとキーを format 文字列、値を引数として **vsprintf** する。
      *
      * Example:
      * ```php
@@ -538,6 +594,11 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
      * // クロージャを与えるとコールバック動作になる
      * $closure = function($v, $k){return "$k=" . strtoupper($v);};
      * assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
+     * // 省略すると vsprintf になる
+     * assertSame(array_sprintf([
+     *     'str:%s,int:%d' => ['sss', '3.14'],
+     *     'single:%s'     => 'str',
+     * ], null, '|'), 'str:sss,int:3|single:str');
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -545,10 +606,13 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
      * @param string $glue 結合文字列。未指定時は implode しない
      * @return array|string sprintf された配列
      */
-    function array_sprintf($array, $format, $glue = null)
+    function array_sprintf($array, $format = null, $glue = null)
     {
         if (is_callable($format)) {
             $callback = call_user_func(func_user_func_array, $format);
+        }
+        elseif ($format === null) {
+            $callback = function ($v, $k) { return vsprintf($k, is_array($v) ? $v : [$v]); };
         }
         else {
             $callback = function ($v, $k) use ($format) { return sprintf($format, $v, $k); };
@@ -692,7 +756,11 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
      *
      * $key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。
      * その場合、$default が活きるのは「全て無かった場合」となる。
+     *
      * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
+     *
+     * 同様に、$key にクロージャを与えると、その返り値が true 相当のものを返す。
+     * その際、 $default が配列なら一致するものを配列で返し、配列でないなら単値で返す。
      *
      * Example:
      * ```php
@@ -706,10 +774,14 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
      * assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 => 'a']);
      * // 配列デフォルト（null ではなく [] を返す）
      * assertSame(array_get(['a', 'b', 'c'], [9]), []);
+     * // クロージャ指定＆単値（コールバックが true を返す最初の要素）
+     * assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}), 'b');
+     * // クロージャ指定＆配列（コールバックが true を返すもの）
+     * assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []), [1 => 'b', 2 => 'c']);
      * ```
      *
      * @param array $array 配列
-     * @param string|int|array $key 取得したいキー
+     * @param string|int|array $key 取得したいキー。配列を与えると全て返す。クロージャの場合は true 相当を返す
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
@@ -728,6 +800,22 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
                 if (func_num_args() === 2) {
                     $default = [];
                 }
+                return $default;
+            }
+            return $result;
+        }
+
+        if ($key instanceof \Closure) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                if ($key($v, $k)) {
+                    if (func_num_args() === 2) {
+                        return $v;
+                    }
+                    $result[$k] = $v;
+                }
+            }
+            if (!$result) {
                 return $default;
             }
             return $result;
@@ -831,8 +919,10 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
      * assertSame($array, ['piyo' => 'PIYO']);
      * ```
      *
+     * @todo array_get と同じように $default に応じて返り値を変える（互換性が壊れるのでメジャー待ち）
+     *
      * @param array $array 配列
-     * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を返す
+     * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を伏せる
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
@@ -1356,6 +1446,48 @@ if (!isset($excluded_functions['array_maps']) && (!function_exists('array_maps')
         return $result;
     }
 }
+if (!isset($excluded_functions['array_kmap']) && (!function_exists('array_kmap') || (!false && (new \ReflectionFunction('array_kmap'))->isInternal()))) {
+    /**
+     * キーも渡ってくる array_map
+     *
+     * `array_map($callback, $array, array_keys($array))` とほとんど変わりはない。
+     * 違いは下記。
+     *
+     * - 引数の順番が異なる（$array が先）
+     * - キーが死なない（array_map は複数配列を与えるとキーが死ぬ）
+     * - 配列だけでなく Traversable も受け入れる
+     * - callback の第3引数に 0 からの連番が渡ってくる
+     *
+     * Example:
+     * ```php
+     * // キー・値をくっつけるシンプルな例
+     * assertSame(array_kmap([
+     *     'k1' => 'v1',
+     *     'k2' => 'v2',
+     *     'k3' => 'v3',
+     * ], function($v, $k){return "$k:$v";}), [
+     *     'k1' => 'k1:v1',
+     *     'k2' => 'k2:v2',
+     *     'k3' => 'k3:v3',
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable $callback 評価クロージャ
+     * @return array $callback を通した新しい配列
+     */
+    function array_kmap($array, $callback)
+    {
+        $callback = call_user_func(func_user_func_array, $callback);
+
+        $n = 0;
+        $result = [];
+        foreach ($array as $k => $v) {
+            $result[$k] = $callback($v, $k, $n++);
+        }
+        return $result;
+    }
+}
 if (!isset($excluded_functions['array_nmap']) && (!function_exists('array_nmap') || (!false && (new \ReflectionFunction('array_nmap'))->isInternal()))) {
     /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
@@ -1473,12 +1605,14 @@ if (!isset($excluded_functions['array_each']) && (!function_exists('array_each')
     /**
      * array_reduce の参照版（のようなもの）
      *
-     * 配列をループで回し、その途中経過、値、キーをコールバック引数で渡して最終的な結果を返り値として返す。
+     * 配列をループで回し、その途中経過、値、キー、連番をコールバック引数で渡して最終的な結果を返り値として返す。
      * array_reduce と少し似てるが、下記の点が異なる。
      *
      * - いわゆる $carry は返り値で表すのではなく、参照引数で表す
-     * - 値だけでなくキーも渡ってくる
+     * - 値だけでなくキー、連番も渡ってくる
      * - 巨大配列の場合でも速度劣化が少ない（array_reduce に巨大配列を渡すと実用にならないレベルで遅くなる）
+     *
+     * $callback の引数は `($value, $key, $n)` （$n はキーとは関係がない 0 ～ 要素数-1 の通し連番）。
      *
      * 返り値ではなく参照引数なので return する必要はない（ワンライナーが書きやすくなる）。
      * 返り値が空くのでループ制御に用いる。
@@ -1539,8 +1673,9 @@ if (!isset($excluded_functions['array_each']) && (!function_exists('array_each')
             }
         }
 
+        $n = 0;
         foreach ($array as $k => $v) {
-            $return = $callback($default, $v, $k);
+            $return = $callback($default, $v, $k, $n++);
             if ($return === false) {
                 break;
             }
@@ -2651,6 +2786,55 @@ if (!isset($excluded_functions['class_replace']) && (!function_exists('class_rep
         }
 
         class_alias($newclass, $class);
+    }
+}
+if (!isset($excluded_functions['get_object_properties']) && (!function_exists('get_object_properties') || (!false && (new \ReflectionFunction('get_object_properties'))->isInternal()))) {
+    /**
+     * オブジェクトのプロパティを可視・不可視を問わず取得する
+     *
+     * get_object_vars + no public プロパティを返すイメージ。
+     *
+     * Example:
+     * ```php
+     * $object = new \Exception('something', 42);
+     * $object->oreore = 'oreore';
+     *
+     * // get_object_vars はそのスコープから見えないプロパティを取得できない
+     * // var_dump(get_object_vars($object));
+     *
+     * // array キャストは全て得られるが null 文字を含むので扱いにくい
+     * // var_dump((array) $object);
+     *
+     * // この関数を使えば不可視プロパティも取得できる
+     * assertArraySubset([
+     *     'message' => 'something',
+     *     'code'    => 42,
+     *     'oreore'  => 'oreore',
+     * ], get_object_properties($object));
+     * ```
+     *
+     * @param object $object オブジェクト
+     * @return array 全プロパティ
+     */
+    function get_object_properties($object)
+    {
+        static $refs = [];
+        $class = get_class($object);
+        if (!isset($refs[$class])) {
+            $props = (new \ReflectionClass($class))->getProperties();
+            $refs[$class] = call_user_func(array_each, $props, function (&$carry, \ReflectionProperty $rp) {
+                if (!$rp->isStatic()) {
+                    $rp->setAccessible(true);
+                    $carry[$rp->getName()] = $rp;
+                }
+            }, []);
+        }
+
+        // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
+        $vars = call_user_func(array_map_method, $refs[$class], 'getValue', [$object]);
+        $vars += get_object_vars($object);
+
+        return $vars;
     }
 }
 if (!isset($excluded_functions['file_list']) && (!function_exists('file_list') || (!false && (new \ReflectionFunction('file_list'))->isInternal()))) {
@@ -5254,6 +5438,32 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
         }
     }
 }
+if (!isset($excluded_functions['get_uploaded_files']) && (!function_exists('get_uploaded_files') || (!false && (new \ReflectionFunction('get_uploaded_files'))->isInternal()))) {
+    /**
+     * $_FILES の構造を組み替えて $_POST などと同じにする
+     *
+     * $_FILES の配列構造はバグとしか思えないのでそれを是正する関数。
+     * 第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。
+     *
+     * サンプルを書くと長くなるので例は{@source \ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files() テストファイル}を参照。
+     *
+     * @param array $files $_FILES の同じ構造の配列。省略時は $_FILES
+     * @return array $_FILES を $_POST などと同じ構造にした配列
+     */
+    function get_uploaded_files($files = null)
+    {
+        $result = [];
+        foreach (($files ?: $_FILES) as $name => $file) {
+            if (is_array($file['name'])) {
+                $file = call_user_func(get_uploaded_files, call_user_func(array_each, $file['name'], function (&$carry, $dummy, $subkey) use ($file) {
+                    $carry[$subkey] = call_user_func(array_lookup, $file, $subkey);
+                }));
+            }
+            $result[$name] = $file;
+        }
+        return $result;
+    }
+}
 if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (!false && (new \ReflectionFunction('cache'))->isInternal()))) {
     /**
      * シンプルにキャッシュする
@@ -5312,6 +5522,101 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (!fals
             $cache[$namespace][$key] = $provider();
         }
         return $cache[$namespace][$key];
+    }
+}
+if (!isset($excluded_functions['process']) && (!function_exists('process') || (!false && (new \ReflectionFunction('process'))->isInternal()))) {
+    /**
+     * proc_open ～ proc_close の一連の処理を行う
+     *
+     * 標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。
+     *
+     * Example:
+     * ```php
+     * // サンプル実行用ファイルを用意
+     * $phpfile = sys_get_temp_dir() . '/rf-sample.php';
+     * file_put_contents($phpfile, "<?php
+     *     fwrite(STDOUT, fgets(STDIN));
+     *     fwrite(STDERR, 'err');
+     *     exit((int) ini_get('max_file_uploads'));
+     * ");
+     * // 引数と標準入出力エラーを使った単純な例
+     * $rc = process(PHP_BINARY, [
+     *     '-d' => 'max_file_uploads=123',
+     *     $phpfile,
+     * ], 'out', $stdout, $stderr);
+     * assertSame($rc, 123); // -d で与えた max_file_uploads で exit してるので 123
+     * assertSame($stdout, 'out'); // 標準出力に標準入力を書き込んでいるので "out" が格納される
+     * assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "err" が格納される
+     * ```
+     *
+     * @param string $command 実行コマンド。escapeshellcmd される
+     * @param array|string $args コマンドライン引数。文字列はそのまま結合される。配列は escapeshellarg された上でキーと結合される
+     * @param string $stdin 標準入力
+     * @param string $stdout 標準出力（参照渡しで格納される）
+     * @param string $stderr 標準エラー（参照渡しで格納される）
+     * @param string $cwd 作業ディレクトリ
+     * @param array $env 環境変数
+     * @return int リターンコード
+     */
+    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
+    {
+        $ecommand = escapeshellcmd($command);
+
+        if (is_array($args)) {
+            $args = call_user_func(array_sprintf, $args, function ($v, $k) {
+                $ev = escapeshellarg($v);
+                return is_int($k) ? $ev : "$k $ev";
+            }, ' ');
+        }
+
+        $proc = proc_open("$ecommand $args", [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ], $pipes, $cwd, $env);
+
+        if ($proc === false) {
+            // どうしたら失敗するのかわからない
+            throw new \RuntimeException("$command start failed."); // @codeCoverageIgnore
+        }
+
+        fwrite($pipes[0], $stdin);
+        fclose($pipes[0]);
+
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $stdout = $stderr = '';
+        while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
+            $read = [$pipes[1], $pipes[2]];
+            $write = $except = null;
+            if (stream_select($read, $write, $except, 1) === false) {
+                // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                // @codeCoverageIgnoreStart
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+                proc_close($proc);
+                throw new \RuntimeException('stream_select failed.');
+                // @codeCoverageIgnoreEnd
+            }
+            foreach ($read as $fp) {
+                if ($fp === $pipes[1]) {
+                    $stdout .= fread($fp, 1024);
+                }
+                elseif ($fp === $pipes[2]) {
+                    $stderr .= fread($fp, 1024);
+                }
+            }
+        }
+
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $rc = proc_close($proc);
+        if ($rc === -1) {
+            // どうしたら失敗するのかわからない
+            throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
+        }
+        return $rc;
     }
 }
 if (!isset($excluded_functions['arguments']) && (!function_exists('arguments') || (!false && (new \ReflectionFunction('arguments'))->isInternal()))) {
@@ -6334,25 +6639,8 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
             }
             // オブジェクトは単にプロパティを __set_state する文字列を出力する
             elseif (is_object($value)) {
-                // クラスごとに \ReflectionProperty をキャッシュしておく
-                static $refs = [];
-                $class = get_class($value);
-                if (!isset($refs[$class])) {
-                    $props = (new \ReflectionClass($value))->getProperties();
-                    $refs[$class] = call_user_func(array_each, $props, function (&$carry, \ReflectionProperty $rp) {
-                        if (!$rp->isStatic()) {
-                            $rp->setAccessible(true);
-                            $carry[$rp->getName()] = $rp;
-                        }
-                    }, []);
-                }
-
-                // 単純に配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
-                $vars = call_user_func(array_map_method, $refs[$class], 'getValue', [$value]);
-                $vars += get_object_vars($value);
-
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export($vars, $nest, $parents) . ')';
+                return get_class($value) . '::__set_state(' . $export(call_user_func(get_object_properties, $value), $nest, $parents) . ')';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -6374,7 +6662,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
 }
 if (!isset($excluded_functions['var_html']) && (!function_exists('var_html') || (!false && (new \ReflectionFunction('var_html'))->isInternal()))) {
     /**
-     * var_export2 を html コンテキストに特化させたもの
+     * var_export2 を html コンテキストに特化させたようなもの
      *
      * 下記のような出力になる。
      * - `<pre class='var_html'> ～ </pre>` で囲まれる
@@ -6387,21 +6675,62 @@ if (!isset($excluded_functions['var_html']) && (!function_exists('var_html') || 
      */
     function var_html($value)
     {
-        $result = call_user_func(var_export2, $value, true);
-        $result = highlight_string("<?php " . $result, true);
-        $result = preg_replace('#&lt;\\?php(\s|&nbsp;)#', '', $result, 1);
-        $result = "<pre class='var_html'>$result</pre>";
+        $var_export = function ($value) {
+            $result = var_export($value, true);
+            $result = highlight_string("<?php " . $result, true);
+            $result = preg_replace('#&lt;\\?php(\s|&nbsp;)#u', '', $result, 1);
+            $result = preg_replace('#<br />#u', "\n", $result);
+            $result = preg_replace('#>\n<#u', '><', $result);
+            return $result;
+        };
+
+        $export = function ($value, $parents) use (&$export, $var_export) {
+            foreach ($parents as $parent) {
+                if ($parent === $value) {
+                    return '*RECURSION*';
+                }
+            }
+            if (is_array($value)) {
+                $count = count($value);
+                if (!$count) {
+                    return '[empty]';
+                }
+
+                $maxlen = max(array_map('strlen', array_keys($value)));
+                $kvl = '';
+                $parents[] = $value;
+                foreach ($value as $k => $v) {
+                    $align = str_repeat(' ', $maxlen - strlen($k));
+                    $kvl .= $var_export($k) . $align . ' => ' . $export($v, $parents) . "\n";
+                }
+                $var = "<var style='text-decoration:underline'>$count elements</var>";
+                $summary = "<summary style='cursor:pointer;color:#0a6ebd'>[$var]</summary>";
+                return "<details style='display:inline;vertical-align:text-top'>$summary$kvl</details>";
+            }
+            elseif (is_object($value)) {
+                $parents[] = $value;
+                return get_class($value) . '::' . $export(call_user_func(get_object_properties, $value), $parents);
+            }
+            elseif (is_null($value)) {
+                return 'null';
+            }
+            elseif (is_resource($value)) {
+                return ((string) $value) . '(' . get_resource_type($value) . ')';
+            }
+            else {
+                return $var_export($value);
+            }
+        };
 
         // text/html を強制する（でないと見やすいどころか見づらくなる）
         // @codeCoverageIgnoreStart
         if (!headers_sent()) {
             header_remove('Content-Type');
-            ob_end_flush();
             header('Content-Type: text/html');
         }
         // @codeCoverageIgnoreEnd
 
-        echo $result;
+        echo "<pre class='var_html'>{$export($value, [])}</pre>";
     }
 }
 if (!isset($excluded_functions['hashvar']) && (!function_exists('hashvar') || (!false && (new \ReflectionFunction('hashvar'))->isInternal()))) {

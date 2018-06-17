@@ -155,4 +155,15 @@ $(function () {
         $a.text($this.data('description'));
         $this.before($a).hide();
     });
+    // source tag
+    $('tag_source').each(function () {
+        var $this = $(this);
+        var $a = $('<a/>');
+        var fqsen = $this.data('fqsen');
+        var href = $this.closest('.structure-item').find('[data-fqsen="' + $.escape(fqsen) + '"]>.source-link').attr('href');
+        $a.attr('href', href);
+        $a.attr('target', '_blank');
+        $a.text($this.data('description'));
+        $this.before($a).hide();
+    });
 });
