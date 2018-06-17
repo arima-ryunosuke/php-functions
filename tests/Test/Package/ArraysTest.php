@@ -714,6 +714,21 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['P-A', 'P-B', 'P-C'], $array_maps($objs, ['getName' => ['p-', true]]));
     }
 
+    function test_array_kmap()
+    {
+        $array_kmap = array_kmap;
+        $array = [
+            'k1' => 'v1',
+            'k2' => 'v2',
+            'k3' => 'v3',
+        ];
+        $this->assertEquals([
+            'k1' => '0:k1-v1',
+            'k2' => '1:k2-v2',
+            'k3' => '2:k3-v3',
+        ], $array_kmap($array, function ($v, $k, $n) { return "$n:$k-$v"; }));
+    }
+
     function test_array_nmap()
     {
         $array_nmap = array_nmap;

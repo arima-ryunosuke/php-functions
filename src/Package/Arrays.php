@@ -1362,6 +1362,47 @@ class Arrays
     }
 
     /**
+     * キーも渡ってくる array_map
+     *
+     * `array_map($callback, $array, array_keys($array))` とほとんど変わりはない。
+     * 違いは下記。
+     *
+     * - 引数の順番が異なる（$array が先）
+     * - キーが死なない（array_map は複数配列を与えるとキーが死ぬ）
+     * - 配列だけでなく Traversable も受け入れる
+     * - callback の第3引数に 0 からの連番が渡ってくる
+     *
+     * Example:
+     * ```php
+     * // キー・値をくっつけるシンプルな例
+     * assertSame(array_kmap([
+     *     'k1' => 'v1',
+     *     'k2' => 'v2',
+     *     'k3' => 'v3',
+     * ], function($v, $k){return "$k:$v";}), [
+     *     'k1' => 'k1:v1',
+     *     'k2' => 'k2:v2',
+     *     'k3' => 'k3:v3',
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable $callback 評価クロージャ
+     * @return array $callback を通した新しい配列
+     */
+    public static function array_kmap($array, $callback)
+    {
+        $callback = call_user_func(func_user_func_array, $callback);
+
+        $n = 0;
+        $result = [];
+        foreach ($array as $k => $v) {
+            $result[$k] = $callback($v, $k, $n++);
+        }
+        return $result;
+    }
+
+    /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
      *
      * 引数 $n に配列を与えると [キー番目 => 値番目] とみなしてキー・値も渡される（Example 参照）。
