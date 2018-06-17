@@ -516,6 +516,7 @@ class Arrays
      *
      * $format は書式文字列（$v, $k）。
      * callable を与えると sprintf ではなくコールバック処理になる（$v, $k）。
+     * 省略（null）するとキーを format 文字列、値を引数として **vsprintf** する。
      *
      * Example:
      * ```php
@@ -527,6 +528,11 @@ class Arrays
      * // クロージャを与えるとコールバック動作になる
      * $closure = function($v, $k){return "$k=" . strtoupper($v);};
      * assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
+     * // 省略すると vsprintf になる
+     * assertSame(array_sprintf([
+     *     'str:%s,int:%d' => ['sss', '3.14'],
+     *     'single:%s'     => 'str',
+     * ], null, '|'), 'str:sss,int:3|single:str');
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -534,10 +540,13 @@ class Arrays
      * @param string $glue 結合文字列。未指定時は implode しない
      * @return array|string sprintf された配列
      */
-    public static function array_sprintf($array, $format, $glue = null)
+    public static function array_sprintf($array, $format = null, $glue = null)
     {
         if (is_callable($format)) {
             $callback = call_user_func(func_user_func_array, $format);
+        }
+        elseif ($format === null) {
+            $callback = function ($v, $k) { return vsprintf($k, is_array($v) ? $v : [$v]); };
         }
         else {
             $callback = function ($v, $k) use ($format) { return sprintf($format, $v, $k); };

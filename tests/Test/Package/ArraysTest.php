@@ -234,6 +234,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         $this->assertEquals(['kv-aA', 'kv-bB', 'kv-cC'], $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }));
         $this->assertEquals('kv-aA,kv-bB,kv-cC', $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }, ','));
+
+        $this->assertEquals($array_sprintf([
+            'str:%s,int:%d' => ['sss', '3.14'],
+            'single:%s'     => 'str',
+        ], null, '|'), 'str:sss,int:3|single:str');
     }
 
     function test_array_strpad()
