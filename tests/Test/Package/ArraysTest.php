@@ -755,7 +755,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             4 => 16,
             5 => 25,
         ]);
-        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k) {
+        $receiver = [];
+        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k, $n) use (&$receiver) {
+            $receiver[] = $n;
             if ($k === 3) {
                 return false;
             }
@@ -765,6 +767,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             2 => 4,
             3 => 9,
         ]);
+        $this->assertEquals([0, 1, 2, 3], $receiver);
 
         // こういう使い方（オブジェクトの配列からメソッド由来の連想配列を作成）を想定しているのでテスト
         $ex_a = new \Exception('a');
