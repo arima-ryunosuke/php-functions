@@ -310,6 +310,43 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // 配列を与えたときの順番は指定したものを優先
         $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], $array_get(['a', 'b', 'c'], [2, 1, 0]));
+
+        $array = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'first',
+            'second',
+            'third',
+            99     => 99,
+            100    => 100,
+            101    => 101,
+        ];
+
+        // キーが数値でないものを抽出
+        $extract = $array_get($array, function ($v, $k) { return !is_int($k); }, []);
+        $this->assertEquals([
+            'key1' => 'value1',
+            'key2' => 'value2',
+        ], $extract);
+
+        // キーが数値のものを抽出
+        $extract = $array_get($array, function ($v, $k) { return is_int($k); }, []);
+        $this->assertEquals([
+            0   => 'first',
+            1   => 'second',
+            2   => 'third',
+            99  => 99,
+            100 => 100,
+            101 => 101,
+        ], $extract);
+
+        // 単値モード
+        $extract = $array_get($array, function ($v, $k) { return is_int($k); });
+        $this->assertEquals('first', $extract);
+
+        // 値がオブジェクトのものを抽出（そんなものはない）
+        $extract = $array_get($array, function ($v, $k) { return is_object($v); });
+        $this->assertEquals(null, $extract);
     }
 
     function test_array_set()

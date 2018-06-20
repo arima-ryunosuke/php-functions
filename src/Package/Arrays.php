@@ -677,7 +677,11 @@ class Arrays
      *
      * $key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。
      * その場合、$default が活きるのは「全て無かった場合」となる。
+     *
      * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
+     *
+     * 同様に、$key にクロージャを与えると、その返り値が true 相当のものを返す。
+     * その際、 $default が配列なら一致するものを配列で返し、配列でないなら単値で返す。
      *
      * Example:
      * ```php
@@ -691,10 +695,14 @@ class Arrays
      * assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 => 'a']);
      * // 配列デフォルト（null ではなく [] を返す）
      * assertSame(array_get(['a', 'b', 'c'], [9]), []);
+     * // クロージャ指定＆単値（コールバックが true を返す最初の要素）
+     * assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}), 'b');
+     * // クロージャ指定＆配列（コールバックが true を返すもの）
+     * assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []), [1 => 'b', 2 => 'c']);
      * ```
      *
      * @param array $array 配列
-     * @param string|int|array $key 取得したいキー
+     * @param string|int|array $key 取得したいキー。配列を与えると全て返す。クロージャの場合は true 相当を返す
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
@@ -713,6 +721,22 @@ class Arrays
                 if (func_num_args() === 2) {
                     $default = [];
                 }
+                return $default;
+            }
+            return $result;
+        }
+
+        if ($key instanceof \Closure) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                if ($key($v, $k)) {
+                    if (func_num_args() === 2) {
+                        return $v;
+                    }
+                    $result[$k] = $v;
+                }
+            }
+            if (!$result) {
                 return $default;
             }
             return $result;
@@ -814,8 +838,10 @@ class Arrays
      * assertSame($array, ['piyo' => 'PIYO']);
      * ```
      *
+     * @todo array_get と同じように $default に応じて返り値を変える（互換性が壊れるのでメジャー待ち）
+     *
      * @param array $array 配列
-     * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を返す
+     * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を伏せる
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
