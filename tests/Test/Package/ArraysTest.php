@@ -212,6 +212,21 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a', 'b', 'c', 'd', 'e'], $array_add(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
     }
 
+    function test_array_mix()
+    {
+        $array_mix = array_mix;
+        $this->assertEquals([], $array_mix());
+        $this->assertEquals([], $array_mix([], []));
+        $this->assertEquals([null], $array_mix([], [], [null]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6], $array_mix([1, 3, 5], [2, 4, 6]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], $array_mix([1, 3, 5], [2, 4, 6, 7]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], $array_mix([1, 3, 5, 7], [2, 4, 6]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6], $array_mix([1], [2, 4], [3, 5, 6]));
+        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], $array_mix(['a' => 'A', 'c' => 'C'], ['b' => 'b']));
+        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], $array_mix(['a' => 'A'], ['b' => 'b', 'c' => 'C']));
+        $this->assertEquals(['a' => '!', 'X', 'Y', 'Z'], $array_mix(['a' => 'A', 'X', 'Z'], ['a' => '!', 'Y']));
+    }
+
     function test_array_implode()
     {
         $array_implode = array_implode;
