@@ -10,6 +10,7 @@ return [
     'frontpage'  => 'ryunosuke\\Functions\\Package\\',
     'menusize'   => 35,
     'source-map' => [
-        '.*/' => 'https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/',
+        '.*/tests/' => 'https://github.com/arima-ryunosuke/php-functions/blob/master/tests/',
+        '.*/'       => 'https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/',
     ],
 ];
