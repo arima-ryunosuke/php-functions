@@ -638,25 +638,8 @@ class Vars
             }
             // オブジェクトは単にプロパティを __set_state する文字列を出力する
             elseif (is_object($value)) {
-                // クラスごとに \ReflectionProperty をキャッシュしておく
-                static $refs = [];
-                $class = get_class($value);
-                if (!isset($refs[$class])) {
-                    $props = (new \ReflectionClass($value))->getProperties();
-                    $refs[$class] = call_user_func(array_each, $props, function (&$carry, \ReflectionProperty $rp) {
-                        if (!$rp->isStatic()) {
-                            $rp->setAccessible(true);
-                            $carry[$rp->getName()] = $rp;
-                        }
-                    }, []);
-                }
-
-                // 単純に配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
-                $vars = call_user_func(array_map_method, $refs[$class], 'getValue', [$value]);
-                $vars += get_object_vars($value);
-
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export($vars, $nest, $parents) . ')';
+                return get_class($value) . '::__set_state(' . $export(call_user_func(get_object_properties, $value), $nest, $parents) . ')';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -677,7 +660,7 @@ class Vars
     }
 
     /**
-     * var_export2 を html コンテキストに特化させたもの
+     * var_export2 を html コンテキストに特化させたようなもの
      *
      * 下記のような出力になる。
      * - `<pre class='var_html'> ～ </pre>` で囲まれる
@@ -690,21 +673,62 @@ class Vars
      */
     public static function var_html($value)
     {
-        $result = call_user_func(var_export2, $value, true);
-        $result = highlight_string("<?php " . $result, true);
-        $result = preg_replace('#&lt;\\?php(\s|&nbsp;)#', '', $result, 1);
-        $result = "<pre class='var_html'>$result</pre>";
+        $var_export = function ($value) {
+            $result = var_export($value, true);
+            $result = highlight_string("<?php " . $result, true);
+            $result = preg_replace('#&lt;\\?php(\s|&nbsp;)#u', '', $result, 1);
+            $result = preg_replace('#<br />#u', "\n", $result);
+            $result = preg_replace('#>\n<#u', '><', $result);
+            return $result;
+        };
+
+        $export = function ($value, $parents) use (&$export, $var_export) {
+            foreach ($parents as $parent) {
+                if ($parent === $value) {
+                    return '*RECURSION*';
+                }
+            }
+            if (is_array($value)) {
+                $count = count($value);
+                if (!$count) {
+                    return '[empty]';
+                }
+
+                $maxlen = max(array_map('strlen', array_keys($value)));
+                $kvl = '';
+                $parents[] = $value;
+                foreach ($value as $k => $v) {
+                    $align = str_repeat(' ', $maxlen - strlen($k));
+                    $kvl .= $var_export($k) . $align . ' => ' . $export($v, $parents) . "\n";
+                }
+                $var = "<var style='text-decoration:underline'>$count elements</var>";
+                $summary = "<summary style='cursor:pointer;color:#0a6ebd'>[$var]</summary>";
+                return "<details style='display:inline;vertical-align:text-top'>$summary$kvl</details>";
+            }
+            elseif (is_object($value)) {
+                $parents[] = $value;
+                return get_class($value) . '::' . $export(call_user_func(get_object_properties, $value), $parents);
+            }
+            elseif (is_null($value)) {
+                return 'null';
+            }
+            elseif (is_resource($value)) {
+                return ((string) $value) . '(' . get_resource_type($value) . ')';
+            }
+            else {
+                return $var_export($value);
+            }
+        };
 
         // text/html を強制する（でないと見やすいどころか見づらくなる）
         // @codeCoverageIgnoreStart
         if (!headers_sent()) {
             header_remove('Content-Type');
-            ob_end_flush();
             header('Content-Type: text/html');
         }
         // @codeCoverageIgnoreEnd
 
-        echo $result;
+        echo "<pre class='var_html'>{$export($value, [])}</pre>";
     }
 
     /**

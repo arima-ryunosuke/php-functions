@@ -486,6 +486,7 @@ VAR
             'int'         => 123,
             'string'      => 'ABC',
             'object'      => new \DateTime(),
+            'resource'    => STDOUT,
         ];
         $this->expectOutputRegex('#<pre class=\'var_html\'>#');
         $var_html($value);
