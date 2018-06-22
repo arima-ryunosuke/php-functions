@@ -8,6 +8,31 @@ namespace ryunosuke\Functions\Package;
 class Utility
 {
     /**
+     * $_FILES の構造を組み替えて $_POST などと同じにする
+     *
+     * $_FILES の配列構造はバグとしか思えないのでそれを是正する関数。
+     * 第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。
+     *
+     * サンプルを書くと長くなるので例は{@source \ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files() テストファイル}を参照。
+     *
+     * @param array $files $_FILES の同じ構造の配列。省略時は $_FILES
+     * @return array $_FILES を $_POST などと同じ構造にした配列
+     */
+    public static function get_uploaded_files($files = null)
+    {
+        $result = [];
+        foreach (($files ?: $_FILES) as $name => $file) {
+            if (is_array($file['name'])) {
+                $file = call_user_func(get_uploaded_files, call_user_func(array_each, $file['name'], function (&$carry, $dummy, $subkey) use ($file) {
+                    $carry[$subkey] = call_user_func(array_lookup, $file, $subkey);
+                }, []));
+            }
+            $result[$name] = $file;
+        }
+        return $result;
+    }
+
+    /**
      * シンプルにキャッシュする
      *
      * この関数は get/set を兼ねる。

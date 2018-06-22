@@ -7,6 +7,194 @@ use ryunosuke\Functions\Package\Funchand;
 
 class UtilityTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_get_uploaded_files()
+    {
+        $get_uploaded_files = get_uploaded_files;
+        $actual = $get_uploaded_files([
+            // <input type="file" name="file1">
+            'file1'   => [
+                'name'     => '/home/file1',
+                'type'     => 'text/plain',
+                'tmp_name' => '/tmp/file1',
+                'error'    => UPLOAD_ERR_NO_FILE,
+                'size'     => 1,
+            ],
+            // <input type="file" name="file2[]">
+            'file2'   => [
+                'name'     => ['/home/file2'],
+                'type'     => ['text/plain'],
+                'tmp_name' => ['/tmp/file2'],
+                'error'    => [UPLOAD_ERR_NO_FILE],
+                'size'     => [2],
+            ],
+            // <input type="file" name="file2[]"> <input type="file" name="file2[]">
+            'file2-2' => [
+                'name'     => ['/home/file2-1', '/home/file2-2'],
+                'type'     => ['text/plain', 'text/plain'],
+                'tmp_name' => ['/tmp/file2-1', '/tmp/file2-2'],
+                'error'    => [UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_FILE],
+                'size'     => [21, 22],
+            ],
+            // <input type="file" name="file3[0][sub]">
+            'file3'   => [
+                'name'     => [
+                    ['sub' => '/home/file3'],
+                ],
+                'type'     => [
+                    ['sub' => 'text/plain'],
+                ],
+                'tmp_name' => [
+                    ['sub' => '/tmp/file3'],
+                ],
+                'error'    => [
+                    ['sub' => UPLOAD_ERR_NO_FILE],
+                ],
+                'size'     => [
+                    ['sub' => 3],
+                ],
+            ],
+            // <input type="file" name="file4[0][sub1]"> <input type="file" name="file4[0][sub2]">
+            'file3-2' => [
+                'name'     => [
+                    [
+                        'sub1' => '/home/file3-1',
+                        'sub2' => '/home/file3-2',
+                    ],
+                ],
+                'type'     => [
+                    [
+                        'sub1' => 'text/plain',
+                        'sub2' => 'text/plain',
+                    ],
+                ],
+                'tmp_name' => [
+                    [
+                        'sub1' => '/tmp/file3-1',
+                        'sub2' => '/tmp/file3-2',
+                    ],
+                ],
+                'error'    => [
+                    [
+                        'sub1' => UPLOAD_ERR_NO_FILE,
+                        'sub2' => UPLOAD_ERR_NO_FILE,
+                    ],
+                ],
+                'size'     => [
+                    [
+                        'sub1' => 31,
+                        'sub2' => 32,
+                    ],
+                ],
+            ],
+            // <input type="file" name="file4[0][sub]"> <input type="file" name="file4[1][sub]">
+            'file4-2' => [
+                'name'     => [
+                    ['sub' => '/home/file4-1'],
+                    ['sub' => '/home/file4-2'],
+                ],
+                'type'     => [
+                    ['sub' => 'text/plain'],
+                    ['sub' => 'text/plain'],
+                ],
+                'tmp_name' => [
+                    ['sub' => '/tmp/file4-1'],
+                    ['sub' => '/tmp/file4-2'],
+                ],
+                'error'    => [
+                    ['sub' => UPLOAD_ERR_NO_FILE],
+                    ['sub' => UPLOAD_ERR_NO_FILE],
+                ],
+                'size'     => [
+                    ['sub' => 41],
+                    ['sub' => 42],
+                ],
+            ],
+        ]);
+        $this->assertSame([
+            'file1'   => [
+                'name'     => '/home/file1',
+                'type'     => 'text/plain',
+                'tmp_name' => '/tmp/file1',
+                'error'    => UPLOAD_ERR_NO_FILE,
+                'size'     => 1,
+            ],
+            'file2'   => [
+                [
+                    'name'     => '/home/file2',
+                    'type'     => 'text/plain',
+                    'tmp_name' => '/tmp/file2',
+                    'error'    => UPLOAD_ERR_NO_FILE,
+                    'size'     => 2,
+                ],
+            ],
+            'file2-2' => [
+                [
+                    'name'     => '/home/file2-1',
+                    'type'     => 'text/plain',
+                    'tmp_name' => '/tmp/file2-1',
+                    'error'    => UPLOAD_ERR_NO_FILE,
+                    'size'     => 21,
+                ],
+                [
+                    'name'     => '/home/file2-2',
+                    'type'     => 'text/plain',
+                    'tmp_name' => '/tmp/file2-2',
+                    'error'    => UPLOAD_ERR_NO_FILE,
+                    'size'     => 22,
+                ],
+            ],
+            'file3'   => [
+                [
+                    'sub' => [
+                        'name'     => '/home/file3',
+                        'type'     => 'text/plain',
+                        'tmp_name' => '/tmp/file3',
+                        'error'    => UPLOAD_ERR_NO_FILE,
+                        'size'     => 3,
+                    ],
+                ],
+            ],
+            'file3-2' => [
+                [
+                    'sub1' => [
+                        'name'     => '/home/file3-1',
+                        'type'     => 'text/plain',
+                        'tmp_name' => '/tmp/file3-1',
+                        'error'    => UPLOAD_ERR_NO_FILE,
+                        'size'     => 31,
+                    ],
+                    'sub2' => [
+                        'name'     => '/home/file3-2',
+                        'type'     => 'text/plain',
+                        'tmp_name' => '/tmp/file3-2',
+                        'error'    => UPLOAD_ERR_NO_FILE,
+                        'size'     => 32,
+                    ],
+                ],
+            ],
+            'file4-2' => [
+                [
+                    'sub' => [
+                        'name'     => '/home/file4-1',
+                        'type'     => 'text/plain',
+                        'tmp_name' => '/tmp/file4-1',
+                        'error'    => UPLOAD_ERR_NO_FILE,
+                        'size'     => 41,
+                    ],
+                ],
+                [
+                    'sub' => [
+                        'name'     => '/home/file4-2',
+                        'type'     => 'text/plain',
+                        'tmp_name' => '/tmp/file4-2',
+                        'error'    => UPLOAD_ERR_NO_FILE,
+                        'size'     => 42,
+                    ],
+                ],
+            ],
+        ], $actual);
+    }
+
     function test_cache()
     {
         $cache = cache;
