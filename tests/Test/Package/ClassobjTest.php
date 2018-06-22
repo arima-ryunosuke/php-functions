@@ -93,4 +93,18 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
             'this is C',
         ], (new \ryunosuke\Test\package\Classobj\C())->f());
     }
+
+    function test_get_object_properties()
+    {
+        $get_object_properties = get_object_properties;
+        $concrete = new \Concrete('name');
+        $concrete->value = 'value';
+        /** @noinspection PhpUndefinedFieldInspection */
+        $concrete->oreore = 'oreore';
+        $this->assertEquals([
+            'value'  => 'value',
+            'name'   => 'name',
+            'oreore' => 'oreore',
+        ], $get_object_properties($concrete));
+    }
 }

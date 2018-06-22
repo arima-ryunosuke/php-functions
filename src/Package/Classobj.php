@@ -226,4 +226,52 @@ class Classobj
 
         class_alias($newclass, $class);
     }
+
+    /**
+     * オブジェクトのプロパティを可視・不可視を問わず取得する
+     *
+     * get_object_vars + no public プロパティを返すイメージ。
+     *
+     * Example:
+     * ```php
+     * $object = new \Exception('something', 42);
+     * $object->oreore = 'oreore';
+     *
+     * // get_object_vars はそのスコープから見えないプロパティを取得できない
+     * // var_dump(get_object_vars($object));
+     *
+     * // array キャストは全て得られるが null 文字を含むので扱いにくい
+     * // var_dump((array) $object);
+     *
+     * // この関数を使えば不可視プロパティも取得できる
+     * assertArraySubset([
+     *     'message' => 'something',
+     *     'code'    => 42,
+     *     'oreore'  => 'oreore',
+     * ], get_object_properties($object));
+     * ```
+     *
+     * @param object $object オブジェクト
+     * @return array 全プロパティ
+     */
+    public static function get_object_properties($object)
+    {
+        static $refs = [];
+        $class = get_class($object);
+        if (!isset($refs[$class])) {
+            $props = (new \ReflectionClass($class))->getProperties();
+            $refs[$class] = call_user_func(array_each, $props, function (&$carry, \ReflectionProperty $rp) {
+                if (!$rp->isStatic()) {
+                    $rp->setAccessible(true);
+                    $carry[$rp->getName()] = $rp;
+                }
+            }, []);
+        }
+
+        // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
+        $vars = call_user_func(array_map_method, $refs[$class], 'getValue', [$object]);
+        $vars += get_object_vars($object);
+
+        return $vars;
+    }
 }
