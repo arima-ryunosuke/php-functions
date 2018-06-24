@@ -29,7 +29,6 @@ const array_set = ['ryunosuke\\Functions\\Package\\Arrays', 'array_set'];
 const array_unset = ['ryunosuke\\Functions\\Package\\Arrays', 'array_unset'];
 const array_dive = ['ryunosuke\\Functions\\Package\\Arrays', 'array_dive'];
 const array_keys_exist = ['ryunosuke\\Functions\\Package\\Arrays', 'array_keys_exist'];
-const array_exists = ['ryunosuke\\Functions\\Package\\Arrays', 'array_exists'];
 const array_find = ['ryunosuke\\Functions\\Package\\Arrays', 'array_find'];
 const array_grep_key = ['ryunosuke\\Functions\\Package\\Arrays', 'array_grep_key'];
 const array_map_key = ['ryunosuke\\Functions\\Package\\Arrays', 'array_map_key'];
