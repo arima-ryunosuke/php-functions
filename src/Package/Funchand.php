@@ -23,7 +23,7 @@ class Funchand
         $__rfunc_delegate_marker = true;
 
         if ($arity === null) {
-            $arity = call_user_func(parameter_length, $callable, true, true);
+            $arity = (parameter_length)($callable, true, true);
         }
 
         if (is_infinite($arity)) {
@@ -59,7 +59,7 @@ class Funchand
                     return $invoker($callable, func_get_args());
                 };
             default:
-                $argstring = call_user_func(array_rmap, range(1, $arity), strcat, '$_');
+                $argstring = (array_rmap)(range(1, $arity), strcat, '$_');
                 return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
@@ -82,9 +82,9 @@ class Funchand
      */
     public static function nbind($callable, $n, ...$variadic)
     {
-        return call_user_func(delegate, function ($callable, $args) use ($variadic, $n) {
-            return call_user_func_array($callable, call_user_func(array_insert, $args, $variadic, $n));
-        }, $callable, call_user_func(parameter_length, $callable, true) - count($variadic));
+        return (delegate)(function ($callable, $args) use ($variadic, $n) {
+            return call_user_func_array($callable, (array_insert)($args, $variadic, $n));
+        }, $callable, (parameter_length)($callable, true) - count($variadic));
     }
 
     /**
@@ -102,7 +102,7 @@ class Funchand
      */
     public static function lbind($callable, ...$variadic)
     {
-        return call_user_func_array(nbind, call_user_func(array_insert, func_get_args(), 0, 1));
+        return call_user_func_array(nbind, (array_insert)(func_get_args(), 0, 1));
     }
 
     /**
@@ -120,7 +120,7 @@ class Funchand
      */
     public static function rbind($callable, ...$variadic)
     {
-        return call_user_func_array(nbind, call_user_func(array_insert, func_get_args(), null, 1));
+        return call_user_func_array(nbind, (array_insert)(func_get_args(), null, 1));
     }
 
     /**
@@ -180,11 +180,11 @@ class Funchand
         }
 
         $first = array_shift($callables);
-        return call_user_func(delegate, function ($first, $args) use ($callables, $arrayalbe) {
+        return (delegate)(function ($first, $args) use ($callables, $arrayalbe) {
             $result = call_user_func_array($first, $args);
             foreach ($callables as $callable) {
                 // 「配列モードでただの配列」でないなら配列化
-                if (!($arrayalbe && is_array($result) && !call_user_func(is_hasharray, $result))) {
+                if (!($arrayalbe && is_array($result) && !(is_hasharray)($result))) {
                     $result = [$result];
                 }
                 $result = call_user_func_array($callable, $result);
@@ -233,7 +233,7 @@ class Funchand
      */
     public static function not_func($callable)
     {
-        return call_user_func(delegate, function ($callable, $args) {
+        return (delegate)(function ($callable, $args) {
             return !call_user_func_array($callable, $args);
         }, $callable);
     }
@@ -257,7 +257,7 @@ class Funchand
     public static function eval_func($expression, ...$variadic)
     {
         $eargs = $variadic;
-        return call_user_func(delegate, function ($expression, $args) use ($eargs) {
+        return (delegate)(function ($expression, $args) use ($eargs) {
             return call_user_func(function () {
                 extract(func_get_arg(1));
                 return eval("return " . func_get_arg(0) . ";");
@@ -319,7 +319,7 @@ class Funchand
             return $callable;
         }
 
-        $ref = call_user_func(reflect_callable, $callable);
+        $ref = (reflect_callable)($callable);
         if ($ref instanceof \ReflectionMethod) {
             // for タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
             if (is_object($callable)) {
@@ -473,7 +473,7 @@ class Funchand
         // クロージャの $call_name には一意性がないのでキャッシュできない（spl_object_hash でもいいが、かなり重複するので完全ではない）
         if ($callable instanceof \Closure) {
             /** @var \ReflectionFunctionAbstract $ref */
-            $ref = call_user_func(reflect_callable, $callable);
+            $ref = (reflect_callable)($callable);
             if ($thought_variadic && $ref->isVariadic()) {
                 return INF;
             }
@@ -488,9 +488,9 @@ class Funchand
         // $call_name 取得
         is_callable($callable, false, $call_name);
 
-        $cache = call_user_func(cache, $call_name, function () use ($callable) {
+        $cache = (cache)($call_name, function () use ($callable) {
             /** @var \ReflectionFunctionAbstract $ref */
-            $ref = call_user_func(reflect_callable, $callable);
+            $ref = (reflect_callable)($callable);
             return [
                 '00' => $ref->getNumberOfParameters(),
                 '01' => $ref->isVariadic() ? INF : $ref->getNumberOfParameters(),
@@ -542,15 +542,15 @@ class Funchand
         // クロージャはユーザ定義しかありえないので調べる必要がない
         if ($callback instanceof \Closure) {
             // が、組み込みをバイパスする delegate はクロージャなのでそれだけは除外
-            $uses = call_user_func(reflect_callable, $callback)->getStaticVariables();
+            $uses = (reflect_callable)($callback)->getStaticVariables();
             if (!isset($uses['__rfunc_delegate_marker'])) {
                 return $callback;
             }
         }
 
         // 上記以外は「引数ぴったりで削ぎ落としてコールするクロージャ」を返す
-        $plength = call_user_func(parameter_length, $callback, true, true);
-        return call_user_func(delegate, function ($callback, $args) use ($plength) {
+        $plength = (parameter_length)($callback, true, true);
+        return (delegate)(function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
                 return call_user_func_array($callback, $args);
             }
@@ -586,7 +586,7 @@ class Funchand
         // callname の取得と非静的のチェック
         is_callable($original, true, $calllname);
         $calllname = ltrim($calllname, '\\');
-        $ref = call_user_func(reflect_callable, $original);
+        $ref = (reflect_callable)($original);
         if ($ref instanceof \ReflectionMethod && !$ref->isStatic()) {
             throw new \InvalidArgumentException("$calllname is non-static method.");
         }
@@ -596,7 +596,7 @@ class Funchand
         }
 
         // キャッシュ指定有りなら読み込むだけで eval しない
-        $cachedir = call_user_func(ifelse, $cachedir, true, sys_get_temp_dir());
+        $cachedir = (ifelse)($cachedir, true, sys_get_temp_dir());
         $cachefile = $cachedir ? $cachedir . '/' . rawurlencode($calllname . '-' . $alias) . '.php' : null;
         if ($cachefile && file_exists($cachefile)) {
             require $cachefile;

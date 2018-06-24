@@ -81,7 +81,7 @@ class Strings
         }
 
         // trim するなら preg_split だと無駄にややこしくなるのでベタにやる
-        $trim = ($trimchars === true) ? 'trim' : call_user_func(rbind, 'trim', $trimchars);
+        $trim = ($trimchars === true) ? 'trim' : (rbind)('trim', $trimchars);
         $parts = explode($delimiter, $string);
         $parts = array_map($trim, $parts);
         $parts = array_filter($parts, 'strlen');
@@ -310,10 +310,10 @@ class Strings
     {
         $fp = fopen('php://memory', 'rw+');
         try {
-            if (is_array($array) && call_user_func(array_depth, $array) === 1) {
+            if (is_array($array) && (array_depth)($array) === 1) {
                 $array = [$array];
             }
-            return call_user_func(call_safely, function ($fp, $array, $delimiter, $enclosure, $escape) {
+            return (call_safely)(function ($fp, $array, $delimiter, $enclosure, $escape) {
                 foreach ($array as $line) {
                     fputcsv($fp, $line, $delimiter, $enclosure, $escape);
                 }
@@ -493,11 +493,11 @@ class Strings
      */
     public static function starts_with($string, $with, $case_insensitivity = false)
     {
-        assert('is_string($string)');
-        assert('is_string($with)');
-        assert('strlen($with)');
+        assert(is_string($string));
+        assert(is_string($with));
+        assert(strlen($with));
 
-        return call_user_func(str_equals, substr($string, 0, strlen($with)), $with, $case_insensitivity);
+        return (str_equals)(substr($string, 0, strlen($with)), $with, $case_insensitivity);
     }
 
     /**
@@ -517,11 +517,11 @@ class Strings
      */
     public static function ends_with($string, $with, $case_insensitivity = false)
     {
-        assert('is_string($string)');
-        assert('is_string($with)');
-        assert('strlen($with)');
+        assert(is_string($string));
+        assert(is_string($with));
+        assert(strlen($with));
 
-        return call_user_func(str_equals, substr($string, -strlen($with)), $with, $case_insensitivity);
+        return (str_equals)(substr($string, -strlen($with)), $with, $case_insensitivity);
     }
 
     /**
@@ -538,7 +538,7 @@ class Strings
      */
     public static function camel_case($string, $delimiter = '_')
     {
-        return lcfirst(call_user_func(pascal_case, $string, $delimiter));
+        return lcfirst((pascal_case)($string, $delimiter));
     }
 
     /**
@@ -589,7 +589,7 @@ class Strings
      */
     public static function chain_case($string, $delimiter = '-')
     {
-        return call_user_func(snake_case, $string, $delimiter);
+        return (snake_case)($string, $delimiter);
     }
 
     /**
@@ -821,6 +821,6 @@ class Strings
      */
     public static function render_file($template_file, $array)
     {
-        return call_user_func(render_string, file_get_contents($template_file), $array);
+        return (render_string)(file_get_contents($template_file), $array);
     }
 }

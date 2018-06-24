@@ -77,7 +77,7 @@ class Classobj
 
         // 指定パスの兄弟ファイルを調べた後、親ディレクトリを辿っていく
         $basenames = [];
-        return call_user_func(dirname_r, $location, function ($directory) use ($detectNS, &$basenames) {
+        return (dirname_r)($location, function ($directory) use ($detectNS, &$basenames) {
             foreach (array_filter(glob("$directory/*.php"), 'is_file') as $file) {
                 $namespace = $detectNS($file);
                 if ($namespace !== null) {
@@ -86,7 +86,7 @@ class Classobj
                 }
             }
             $basenames[] = pathinfo($directory, PATHINFO_FILENAME);
-        }) ?: call_user_func(throws, new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
+        }) ?: (throws)(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 
     /**
@@ -104,7 +104,7 @@ class Classobj
      */
     public static function class_loader($startdir = null)
     {
-        $file = call_user_func(cache, 'path', function () use ($startdir) {
+        $file = (cache)('path', function () use ($startdir) {
             $dir = $startdir ?: __DIR__;
             while ($dir !== ($pdir = dirname($dir))) {
                 $dir = $pdir;
@@ -203,7 +203,7 @@ class Classobj
         if (func_num_args() === 2 || !file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
-            call_user_func(file_set_contents, $fname, $content);
+            (file_set_contents)($fname, $content);
         }
         require_once $fname;
 
@@ -260,7 +260,7 @@ class Classobj
         $class = get_class($object);
         if (!isset($refs[$class])) {
             $props = (new \ReflectionClass($class))->getProperties();
-            $refs[$class] = call_user_func(array_each, $props, function (&$carry, \ReflectionProperty $rp) {
+            $refs[$class] = (array_each)($props, function (&$carry, \ReflectionProperty $rp) {
                 if (!$rp->isStatic()) {
                     $rp->setAccessible(true);
                     $carry[$rp->getName()] = $rp;
@@ -269,7 +269,7 @@ class Classobj
         }
 
         // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
-        $vars = call_user_func(array_map_method, $refs[$class], 'getValue', [$object]);
+        $vars = (array_map_method)($refs[$class], 'getValue', [$object]);
         $vars += get_object_vars($object);
 
         return $vars;

@@ -23,8 +23,8 @@ class Utility
         $result = [];
         foreach (($files ?: $_FILES) as $name => $file) {
             if (is_array($file['name'])) {
-                $file = call_user_func(get_uploaded_files, call_user_func(array_each, $file['name'], function (&$carry, $dummy, $subkey) use ($file) {
-                    $carry[$subkey] = call_user_func(array_lookup, $file, $subkey);
+                $file = (get_uploaded_files)((array_each)($file['name'], function (&$carry, $dummy, $subkey) use ($file) {
+                    $carry[$subkey] = (array_lookup)($file, $subkey);
                 }, []));
             }
             $result[$name] = $file;
@@ -129,7 +129,7 @@ class Utility
         $ecommand = escapeshellcmd($command);
 
         if (is_array($args)) {
-            $args = call_user_func(array_sprintf, $args, function ($v, $k) {
+            $args = (array_sprintf)($args, function ($v, $k) {
                 $ev = escapeshellarg($v);
                 return is_int($k) ? $ev : "$k $ev";
             }, ' ');
@@ -344,7 +344,7 @@ class Utility
         static $persistences = [];
 
         $time = date('d-M-Y H:i:s e');
-        $content = call_user_func(stringify, $message);
+        $content = (stringify)($message);
         $location = '';
         if (!($message instanceof \Exception || $message instanceof \Throwable)) {
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
@@ -441,7 +441,7 @@ class Utility
     public static function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     {
         $benchset = [];
-        foreach (call_user_func(arrayize, $suite) as $name => $caller) {
+        foreach ((arrayize)($suite) as $name => $caller) {
             if (!is_callable($caller, false, $callname)) {
                 throw new \InvalidArgumentException('caller is not callable.');
             }
@@ -459,7 +459,7 @@ class Utility
                 throw new \InvalidArgumentException('duplicated benchname.');
             }
 
-            $benchset[$name] = call_user_func(closurize, $caller);
+            $benchset[$name] = (closurize)($caller);
         }
 
         if (!$benchset) {
@@ -476,7 +476,7 @@ class Utility
         };
 
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-        $assertions = call_user_func(call_safely, function ($benchset, $args) use ($copy) {
+        $assertions = (call_safely)(function ($benchset, $args) use ($copy) {
             $result = [];
             foreach ($benchset as $name => $caller) {
                 $result[$name] = $caller(...$copy($args));
@@ -489,8 +489,8 @@ class Utility
         foreach ($assertions as $name1 => $return1) {
             foreach ($assertions as $name2 => $return2) {
                 if ($return1 !== null && $return2 !== null && $return1 !== $return2) {
-                    $returns1 = call_user_func(stringify, $return1);
-                    $returns2 = call_user_func(stringify, $return2);
+                    $returns1 = (stringify)($return1);
+                    $returns2 = (stringify)($return2);
                     trigger_error("Results of $name1 and $name2 are different. ($returns1, $returns2)");
                 }
             }
@@ -536,7 +536,7 @@ Running %count$s cases (between %millsec$s ms):
 %summary$s
 
 RESULT;
-            echo call_user_func(kvsprintf, $template, [
+            echo (kvsprintf)($template, [
                 'count'     => count($benchset),
                 'millsec'   => number_format($millisec),
                 'header'    => sprintf($defformat, 'name', 'called', '1 call(ms)', 'ratio'),

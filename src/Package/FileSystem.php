@@ -104,7 +104,7 @@ class FileSystem
                 $result[$basedir] = [];
             }
             if ($item->isDir()) {
-                $result[$basedir] += call_user_func(file_tree, $item->getPathname(), $filter_condition);
+                $result[$basedir] += (file_tree)($item->getPathname(), $filter_condition);
             }
             else {
                 if ($filter_condition === null || $filter_condition($item->getPathname())) {
@@ -176,7 +176,7 @@ class FileSystem
         }
 
         if (!is_dir($dirname = dirname($filename))) {
-            if (!@call_user_func(mkdir_p, $dirname, $umask)) {
+            if (!@(mkdir_p)($dirname, $umask)) {
                 throw new \RuntimeException("failed to mkdir($dirname)");
             }
         }
@@ -235,7 +235,7 @@ class FileSystem
         if ($dirname === $path) {
             return false;
         }
-        return call_user_func(dirname_r, $dirname, $callback);
+        return (dirname_r)($dirname, $callback);
     }
 
     /**
@@ -259,7 +259,7 @@ class FileSystem
      */
     public static function fnmatch_and($patterns, $string, $flags = 0)
     {
-        $patterns = call_user_func(is_iterable, $patterns) ? $patterns : [$patterns];
+        $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
         if (empty($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
@@ -293,7 +293,7 @@ class FileSystem
      */
     public static function fnmatch_or($patterns, $string, $flags = 0)
     {
-        $patterns = call_user_func(is_iterable, $patterns) ? $patterns : [$patterns];
+        $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
         if (empty($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
@@ -361,11 +361,11 @@ class FileSystem
 
         $path = implode($DS, $paths);
 
-        if (!call_user_func(path_is_absolute, $path)) {
+        if (!(path_is_absolute)($path)) {
             $path = getcwd() . $DS . $path;
         }
 
-        return call_user_func(path_normalize, $path);
+        return (path_normalize)($path);
     }
 
     /**
@@ -455,24 +455,24 @@ class FileSystem
         // ディレクトリでないなら copy へ移譲
         if (!is_dir($src)) {
             if ($dirmode) {
-                call_user_func(mkdir_p, $dst);
+                (mkdir_p)($dst);
                 return copy($src, $dst . basename($src));
             }
             else {
-                call_user_func(mkdir_p, dirname($dst));
+                (mkdir_p)(dirname($dst));
                 return copy($src, $dst);
             }
         }
 
         if ($dirmode) {
-            return call_user_func(cp_rf, $src, $dst . basename($src));
+            return (cp_rf)($src, $dst . basename($src));
         }
 
-        call_user_func(mkdir_p, $dst);
+        (mkdir_p)($dst);
 
         foreach (glob("$src/*") as $file) {
             if (is_dir($file)) {
-                call_user_func(cp_rf, $file, "$dst/" . basename($file));
+                (cp_rf)($file, "$dst/" . basename($file));
             }
             else {
                 copy($file, "$dst/" . basename($file));

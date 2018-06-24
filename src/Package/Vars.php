@@ -24,7 +24,7 @@ class Vars
             case 'boolean':
                 return $var ? 'true' : 'false';
             case 'array':
-                return call_user_func(var_export2, $var, true);
+                return (var_export2)($var, true);
             case 'object':
                 if (method_exists($var, '__toString')) {
                     return (string) $var;
@@ -177,7 +177,7 @@ class Vars
      */
     public static function arrayval($var, $recursive = true)
     {
-        if (!$recursive || call_user_func(is_primitive, $var)) {
+        if (!$recursive || (is_primitive)($var)) {
             return (array) $var;
         }
 
@@ -185,8 +185,8 @@ class Vars
 
         $result = [];
         foreach ($var as $k => $v) {
-            if (!call_user_func(is_primitive, $v)) {
-                $v = call_user_func(arrayval, $v, true);
+            if (!(is_primitive)($v)) {
+                $v = (arrayval)($v, true);
             }
             $result[$k] = $v;
         }
@@ -294,7 +294,7 @@ class Vars
     {
         $core = function ($var, $parents) use (&$core) {
             // 複合型でないなら間違いなく false
-            if (call_user_func(is_primitive, $var)) {
+            if ((is_primitive)($var)) {
                 return false;
             }
 
@@ -484,11 +484,11 @@ class Vars
      */
     public static function var_apply($var, $callback, ...$args)
     {
-        $iterable = call_user_func(is_iterable, $var);
+        $iterable = (is_iterable)($var);
         if ($iterable) {
             $result = [];
             foreach ($var as $k => $v) {
-                $result[$k] = call_user_func(var_apply, $v, $callback, ...$args);
+                $result[$k] = (var_apply)($v, $callback, ...$args);
             }
             return $result;
         }
@@ -526,7 +526,7 @@ class Vars
      */
     public static function var_applys($var, $callback, ...$args)
     {
-        $iterable = call_user_func(is_iterable, $var);
+        $iterable = (is_iterable)($var);
         if (!$iterable) {
             $var = [$var];
         }
@@ -612,7 +612,7 @@ class Vars
                 // ただの配列
                 if ($value === array_values($value)) {
                     // スカラー値のみで構成されているならシンプルな再帰
-                    if (call_user_func(array_all, $value, is_primitive)) {
+                    if ((array_all)($value, is_primitive)) {
                         $vals = array_map($export, $value);
                         return '[' . implode(', ', $vals) . ']';
                     }
@@ -626,7 +626,7 @@ class Vars
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $values = call_user_func(array_map_key, $value, $export);
+                $values = (array_map_key)($value, $export);
                 $maxlen = max(array_map('strlen', array_keys($values)));
                 $kvl = '';
                 $parents[] = $value;
@@ -639,7 +639,7 @@ class Vars
             // オブジェクトは単にプロパティを __set_state する文字列を出力する
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export(call_user_func(get_object_properties, $value), $nest, $parents) . ')';
+                return get_class($value) . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -707,7 +707,7 @@ class Vars
             }
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . '::' . $export(call_user_func(get_object_properties, $value), $parents);
+                return get_class($value) . '::' . $export((get_object_properties)($value), $parents);
             }
             elseif (is_null($value)) {
                 return 'null';
@@ -753,9 +753,9 @@ class Vars
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $file = $trace['file'];
         $line = $trace['line'];
-        $function = call_user_func(function_shorten, $trace['function']);
+        $function = (function_shorten)($trace['function']);
 
-        $cache = call_user_func(cache, $file . '#' . $line, function () use ($file, $line, $function) {
+        $cache = (cache)($file . '#' . $line, function () use ($file, $line, $function) {
             // 呼び出し元の1行を取得
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             $target = $lines[$line - 1];
@@ -786,7 +786,7 @@ class Vars
                 // 1文字単位の文字列の場合
                 else {
                     // 自身の呼び出しが終わった
-                    if ($starting && $token === ')') {
+                    if ($starting && $token === ')' && $caller) {
                         $callers[] = $caller;
                         $caller = [];
                         $starting = false;

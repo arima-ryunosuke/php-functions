@@ -84,7 +84,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = call_user_func(first_keyvalue, $array);
+        list($k, $v) = (first_keyvalue)($array);
         return $k;
     }
 
@@ -109,7 +109,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = call_user_func(first_keyvalue, $array);
+        list($k, $v) = (first_keyvalue)($array);
         return $v;
     }
 
@@ -157,7 +157,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = call_user_func(last_keyvalue, $array);
+        list($k, $v) = (last_keyvalue)($array);
         return $k;
     }
 
@@ -182,7 +182,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = call_user_func(last_keyvalue, $array);
+        list($k, $v) = (last_keyvalue)($array);
         return $v;
     }
 
@@ -203,9 +203,17 @@ class Arrays
      */
     public static function last_keyvalue($array, $default = null)
     {
+        if (empty($array)) {
+            return $default;
+        }
+        if (is_array($array)) {
+            $v = end($array);
+            $k = key($array);
+            return [$k, $v];
+        }
         /** @noinspection PhpStatementHasEmptyBodyInspection */
         foreach ($array as $k => $v) {
-            // duumy
+            // dummy
         }
         // $k がセットされてるなら「ループが最低でも1度回った（≠空）」とみなせる
         if (isset($k)) {
@@ -423,7 +431,7 @@ class Arrays
         if ($comparator === null || is_int($comparator)) {
             $sort_flg = $comparator;
             $comparator = function ($av, $bv, $ak, $bk) use ($sort_flg) {
-                return call_user_func(varcmp, $av, $bv, $sort_flg);
+                return (varcmp)($av, $bv, $sort_flg);
             };
         }
 
@@ -545,7 +553,7 @@ class Arrays
     {
         // 第1引数が回せない場合は引数を入れ替えて可変引数パターン
         if (!is_array($array) && !$array instanceof \Traversable) {
-            return call_user_func(array_implode, array_slice(func_get_args(), 1), $array);
+            return (array_implode)(array_slice(func_get_args(), 1), $array);
         }
 
         $result = [];
@@ -597,7 +605,7 @@ class Arrays
     public static function array_sprintf($array, $format = null, $glue = null)
     {
         if (is_callable($format)) {
-            $callback = call_user_func(func_user_func_array, $format);
+            $callback = (func_user_func_array)($format);
         }
         elseif ($format === null) {
             $callback = function ($v, $k) { return vsprintf($k, is_array($v) ? $v : [$v]); };
@@ -725,10 +733,10 @@ class Arrays
         $nodefault = func_num_args() === 1;
         return function (array $array) use ($key, $default, $nodefault) {
             if ($nodefault) {
-                return call_user_func(array_get, $array, $key);
+                return (array_get)($array, $key);
             }
             else {
-                return call_user_func(array_get, $array, $key, $default);
+                return (array_get)($array, $key, $default);
             }
         };
     }
@@ -856,7 +864,7 @@ class Arrays
         if ($key === null) {
             $array[] = $value;
             if ($require_return === true) {
-                $key = call_user_func(last_key, $array);
+                $key = (last_key)($array);
             }
         }
         else {
@@ -1019,11 +1027,11 @@ class Arrays
         foreach ($keys as $k => $key) {
             if (is_array($key)) {
                 // まずそのキーをチェックして
-                if (!call_user_func(array_keys_exist, $k, $array)) {
+                if (!(array_keys_exist)($k, $array)) {
                     return false;
                 }
                 // あるなら再帰する
-                if (!call_user_func(array_keys_exist, $key, $array[$k])) {
+                if (!(array_keys_exist)($key, $array[$k])) {
                     return false;
                 }
             }
@@ -1037,34 +1045,6 @@ class Arrays
             }
         }
         return true;
-    }
-
-    /**
-     * array_search のクロージャ版のようなもの
-     *
-     * コールバックが true 相当を返す最初のキーを返す。
-     * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
-     *
-     * Example:
-     * ```php
-     * assertSame(array_exists(['a', 'b', '9'], 'ctype_digit'), 2);
-     * assertSame(array_exists(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
-     * ```
-     *
-     * @deprecated array_exists という名前で真偽値を返さないのは直感に反する。 キーが欲しい用途には array_find を使う
-     *
-     * @param array|\Traversable $array 調べる配列
-     * @param callable $callback 評価コールバック
-     * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
-     */
-    public static function array_exists($array, $callback)
-    {
-        foreach ($array as $k => $v) {
-            if ($callback($v)) {
-                return $k;
-            }
-        }
-        return false;
     }
 
     /**
@@ -1093,7 +1073,7 @@ class Arrays
      */
     public static function array_find($array, $callback, $is_key = true)
     {
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
 
         foreach ($array as $k => $v) {
             $result = $callback($v, $k);
@@ -1176,7 +1156,7 @@ class Arrays
      */
     public static function array_filter_not($array, $callback)
     {
-        return array_filter($array, call_user_func(not_func, $callback));
+        return array_filter($array, (not_func)($callback));
     }
 
     /**
@@ -1223,7 +1203,7 @@ class Arrays
      */
     public static function array_filter_eval($array, $expression)
     {
-        return call_user_func(array_filter_key, $array, call_user_func(eval_func, $expression, 'k', 'v'));
+        return (array_filter_key)($array, (eval_func)($expression, 'k', 'v'));
     }
 
     /**
@@ -1271,7 +1251,7 @@ class Arrays
             $column = array_flip($column);
         }
 
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
 
         $result = [];
         foreach ($array as $k => $v) {
@@ -1313,7 +1293,7 @@ class Arrays
      */
     public static function array_map_filter($array, $callback, $strict = false)
     {
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
         $result = [];
         foreach ($array as $k => $v) {
             $vv = $callback($v, $k);
@@ -1401,7 +1381,7 @@ class Arrays
                 $callback = key($callback);
             }
             else {
-                $callback = call_user_func(func_user_func_array, $callback);
+                $callback = (func_user_func_array)($callback);
             }
             foreach ($result as $k => $v) {
                 if (isset($margs)) {
@@ -1446,7 +1426,7 @@ class Arrays
      */
     public static function array_kmap($array, $callback)
     {
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
 
         $n = 0;
         $result = [];
@@ -1491,7 +1471,7 @@ class Arrays
             if (empty($n)) {
                 throw new \InvalidArgumentException('array $n is empty.');
             }
-            list($kn, $vn) = call_user_func(first_keyvalue, $n);
+            list($kn, $vn) = (first_keyvalue)($n);
 
             // array_insert は負数も受け入れられるが、それを考慮しだすともう収拾がつかない
             if ($kn < 0 || $vn < 0) {
@@ -1500,16 +1480,16 @@ class Arrays
 
             // どちらが大きいかで順番がズレるので分岐しなければならない
             if ($kn <= $vn) {
-                $args = call_user_func(array_insert, $args, null, $kn);
-                $args = call_user_func(array_insert, $args, null, ++$vn);// ↑で挿入してるので+1
+                $args = (array_insert)($args, null, $kn);
+                $args = (array_insert)($args, null, ++$vn);// ↑で挿入してるので+1
             }
             else {
-                $args = call_user_func(array_insert, $args, null, $vn);
-                $args = call_user_func(array_insert, $args, null, ++$kn);// ↑で挿入してるので+1
+                $args = (array_insert)($args, null, $vn);
+                $args = (array_insert)($args, null, ++$kn);// ↑で挿入してるので+1
             }
         }
         else {
-            $args = call_user_func(array_insert, $args, null, $n);
+            $args = (array_insert)($args, null, $n);
         }
 
         $result = [];
@@ -1544,7 +1524,7 @@ class Arrays
      */
     public static function array_lmap($array, $callback, ...$variadic)
     {
-        return call_user_func_array(array_nmap, call_user_func(array_insert, func_get_args(), 0, 2));
+        return call_user_func_array(array_nmap, (array_insert)(func_get_args(), 0, 2));
     }
 
     /**
@@ -1563,7 +1543,7 @@ class Arrays
      */
     public static function array_rmap($array, $callback, ...$variadic)
     {
-        return call_user_func_array(array_nmap, call_user_func(array_insert, func_get_args(), func_num_args() - 2, 2));
+        return call_user_func_array(array_nmap, (array_insert)(func_get_args(), func_num_args() - 2, 2));
     }
 
     /**
@@ -1630,7 +1610,7 @@ class Arrays
     {
         if (func_num_args() === 2) {
             /** @var \ReflectionFunction $ref */
-            $ref = call_user_func(reflect_callable, $callback);
+            $ref = (reflect_callable)($callback);
             $params = $ref->getParameters();
             if ($params[0]->isDefaultValueAvailable()) {
                 $default = $params[0]->getDefaultValue();
@@ -1736,7 +1716,7 @@ class Arrays
     {
         $result = array_fill_keys(array_keys($rules), []);
         foreach ($rules as $name => $rule) {
-            $rule = call_user_func(func_user_func_array, $rule);
+            $rule = (func_user_func_array)($rule);
             foreach ($array as $k => $v) {
                 if ($rule($v, $k)) {
                     $result[$name][$k] = $v;
@@ -1776,7 +1756,7 @@ class Arrays
         if (is_array($callback) && !is_callable($callback)) {
             $result = array_fill_keys(array_keys($callback), 0);
             foreach ($callback as $name => $rule) {
-                $rule = call_user_func(func_user_func_array, $rule);
+                $rule = (func_user_func_array)($rule);
                 foreach ($array as $k => $v) {
                     if ($rule($v, $k)) {
                         $result[$name]++;
@@ -1786,7 +1766,7 @@ class Arrays
             return $result;
         }
 
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
         $result = 0;
         foreach ($array as $k => $v) {
             if ($callback($v, $k)) {
@@ -1827,7 +1807,7 @@ class Arrays
      */
     public static function array_group($array, $callback = null, $preserve_keys = false)
     {
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
 
         $result = [];
         foreach ($array as $k => $v) {
@@ -1874,7 +1854,7 @@ class Arrays
             return $default;
         }
 
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
 
         foreach ($array as $k => $v) {
             if (!$callback($v, $k)) {
@@ -1907,7 +1887,7 @@ class Arrays
             return $default;
         }
 
-        $callback = call_user_func(func_user_func_array, $callback);
+        $callback = (func_user_func_array)($callback);
 
         foreach ($array as $k => $v) {
             if ($callback($v, $k)) {
@@ -1955,7 +1935,7 @@ class Arrays
             return $array;
         }
 
-        if (!is_array($orders) || !call_user_func(is_hasharray, $orders)) {
+        if (!is_array($orders) || !(is_hasharray)($orders)) {
             $orders = [$orders];
         }
 
@@ -2024,14 +2004,7 @@ class Arrays
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    if (method_exists($ref, 'hasReturnType') && $ref->hasReturnType()) {
-                        // getReturnType があるならそれに基づく
-                        $type = (string) $ref->getReturnType();
-                    }
-                    else {
-                        // ないなら返り値の型から推測
-                        $type = gettype(reset($arg));
-                    }
+                    $type = $ref->hasReturnType() ? (string) $ref->getReturnType() : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
@@ -2045,14 +2018,14 @@ class Arrays
         // array_multisort はキーを保持しないので、ソートされる配列にキー配列を加えて後で combine する
         if ($preserve_keys) {
             $keys = array_keys($array);
-            $args[] =& $array;
-            $args[] =& $keys;
+            $args[] = &$array;
+            $args[] = &$keys;
             call_user_func_array('array_multisort', $args);
             return array_combine($keys, $array);
         }
         // キーを保持しないなら単純呼び出しで OK
         else {
-            $args[] =& $array;
+            $args[] = &$array;
             call_user_func_array('array_multisort', $args);
             return $array;
         }
@@ -2218,7 +2191,7 @@ class Arrays
         }
         // null なら最初の要素のキー・null
         if ($template === null) {
-            $template = array_fill_keys(array_keys(call_user_func(first_value, $array)), null);
+            $template = array_fill_keys(array_keys((first_value)($array)), null);
         }
 
         $result = [];

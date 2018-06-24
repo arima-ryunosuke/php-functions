@@ -23,7 +23,7 @@ class Math
      */
     public static function minimum(...$variadic)
     {
-        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
         return min($args);
     }
 
@@ -43,7 +43,7 @@ class Math
      */
     public static function maximum(...$variadic)
     {
-        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
         return max($args);
     }
 
@@ -65,7 +65,7 @@ class Math
      */
     public static function mode(...$variadic)
     {
-        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
         $vals = array_map(function ($v) {
             if (is_object($v)) {
                 // ここに特別扱いのオブジェクトを列挙していく
@@ -73,7 +73,7 @@ class Math
                     return $v->getTimestamp();
                 }
                 // それ以外は stringify へ移譲（__toString もここに含まれている）
-                return call_user_func(stringify, $v);
+                return (stringify)($v);
             }
             return (string) $v;
         }, $args);
@@ -102,8 +102,8 @@ class Math
      */
     public static function mean(...$variadic)
     {
-        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
-        $args = array_filter($args, 'is_numeric') or call_user_func(throws, new \LengthException("argument's must be contain munber."));
+        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or (throws)(new \LengthException("argument's must be contain munber."));
         return array_sum($args) / count($args);
     }
 
@@ -129,7 +129,7 @@ class Math
      */
     public static function median(...$variadic)
     {
-        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
+        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
         $count = count($args);
         $center = (int) ($count / 2);
         sort($args);
@@ -178,8 +178,8 @@ class Math
      */
     public static function sum(...$variadic)
     {
-        $args = call_user_func(array_flatten, $variadic) or call_user_func(throws, new \LengthException("argument's length is 0."));
-        $args = array_filter($args, 'is_numeric') or call_user_func(throws, new \LengthException("argument's must be contain munber."));
+        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or (throws)(new \LengthException("argument's must be contain munber."));
         return array_sum($args);
     }
 
