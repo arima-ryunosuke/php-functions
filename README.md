@@ -60,17 +60,13 @@ php 5.6 未満だと関数の use が出来ないのでグローバルのほう�
 
 ### export
 
-下記のようにすると指定ディレクトリへ指定名前空間でファイル自体が吐き出されます。
+下記のようにすると指定名前空間でファイル自体が吐き出されます。
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
 // 任意の名前空間へ出力
-\ryunosuke\Functions\Transporter::exportFunction('namespace');
-// 任意の名前空間へクラスとして出力
-\ryunosuke\Functions\Transporter::exportFunction('namespace', true, '/dir/to/export');
-// phar として出力
-\ryunosuke\Functions\Transporter::exportPhar('namespace', '/path/to/phar');
+file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace'));
 ```
 
 あとはプロジェクト固有の include.php などで吐き出したファイルを読み込めば OK です。
@@ -78,12 +74,6 @@ require __DIR__ . '/vendor/autoload.php';
 逆に言えば既存の処理しか使わないなら任意名前空間に吐き出すメリットはあまりありません。
 
 名前空間エクスポートを使うと後述のキャッシュはほぼ無効になります（リクエスト中はキャッシュされるがリクエストをまたいだキャッシュは無効になる）。
-
-クラスとして出力すると完全に別個のクラスとして動作します（実質的にはコピーして名前空間を変更しているようなものです）。
-依存を増やしたくないときに有用です。
-
-phar として出力した場合は `require '/path/to/phar';` だけで動作します。
-名前空間が変えられる上、 phar に閉じ込められるので依存を増やすこともなく、持ち回しが可能になります。この方法がおすすめです。
 
 ### constant
 
