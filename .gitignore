@@ -1,10 +1,6 @@
 /composer.lock
 /vendor
 /tests/coverage
-/tests/namespace/*
-!/tests/namespace/.gitkeep
-/tests/klass/*
-!/tests/klass/.gitkeep
 /tests/examples/*
 !/tests/examples/.gitkeep
 /tests/temporary/*
