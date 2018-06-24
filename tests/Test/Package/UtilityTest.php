@@ -2,9 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\FileSystem;
-use ryunosuke\Functions\Package\Funchand;
-
 class UtilityTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_get_uploaded_files()
@@ -404,13 +401,13 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertContains('PHP Log:  message2', $contents);
         $this->assertContains(__FILE__, $contents);
 
-        $t = FileSystem::tmpname();
+        $t = (tmpname)();
         $error('message3', $t);
         $contents = file_get_contents($t);
         $this->assertContains('PHP Log:  message3', $contents);
         $this->assertContains(__FILE__, $contents);
 
-        $persistences = Funchand::reflect_callable($error)->getStaticVariables()['persistences'];
+        $persistences = (reflect_callable)($error)->getStaticVariables()['persistences'];
         $this->assertCount(1, $persistences);
         $this->assertArrayHasKey($t, $persistences);
         $this->assertInternalType('resource', $persistences[$t]);
@@ -435,7 +432,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $benchmark = benchmark;
         $return = '';
         $t = microtime(true);
-        $output = Funchand::ob_capture(function () use (&$return, $benchmark) {
+        $output = (ob_capture)(function () use (&$return, $benchmark) {
             $return = $benchmark([
                 [new \Concrete('hoge'), 'getName'],
                 function () { return 'hoge'; },

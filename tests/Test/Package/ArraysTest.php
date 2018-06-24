@@ -2,9 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\Arrays;
-use ryunosuke\Functions\Package\Funchand;
-
 class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_arrayize()
@@ -48,6 +45,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([0, 'a'], $first_keyvalue(['a', 'b', 'c'], 'def'));
         $this->assertEquals('def', $first_keyvalue([], 'def'));
         $this->assertEquals(null, $first_keyvalue([]));
+
+        $this->assertEquals([0, 1], $first_keyvalue(new \ArrayObject([1, 2, 3])));
+        $this->assertEquals(null, $first_keyvalue(new \ArrayObject([])));
     }
 
     function test_last_key()
@@ -75,6 +75,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([2, 'c'], $last_keyvalue(['a', 'b', 'c'], 'def'));
         $this->assertEquals('def', $last_keyvalue([], 'def'));
         $this->assertEquals(null, $last_keyvalue([]));
+
+        $this->assertEquals([2, 3], $last_keyvalue(new \ArrayObject([1, 2, 3])));
+        $this->assertEquals(null, $last_keyvalue(new \ArrayObject([])));
     }
 
     function test_prev_key()
@@ -201,7 +204,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // 上記は挙動のテストであってソートのテストを行っていないのでテスト
         $array = array_combine(range('a', 'z'), range('a', 'z'));
-        $this->assertSame($array, $kvsort(Arrays::array_shuffle($array), function ($a, $b) { return strcmp($a, $b); }));
+        $this->assertSame($array, $kvsort((array_shuffle)($array), function ($a, $b) { return strcmp($a, $b); }));
     }
 
     function test_array_add()
@@ -564,15 +567,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($array_keys_exist(['nx' => ['y']], $array));
     }
 
-    function test_array_exists()
-    {
-        $array_exists = array_exists;
-        $this->assertEquals(2, $array_exists(['a', 'b', '9'], 'ctype_digit'));
-        $this->assertEquals('b', $array_exists(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }));
-        $this->assertSame(0, $array_exists(['9', 'b', 'c'], 'ctype_digit'));
-        $this->assertSame(false, $array_exists(['a', 'b', 'c'], function ($v) { }));
-    }
-
     function test_array_find()
     {
         $array_find = array_find;
@@ -706,15 +700,15 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a', null, 123], $array_map_method([$o1, null, 123], 'getName', [], null));
 
         // $ignore=false でおかしなことすると warning が発生する
-        $this->assertException(new \PHPUnit_Framework_Error_Warning('', 0, '', 0), $array_map_method, [$o1, null, 123], 'getName');
+        $this->assertException(new \PHPUnit\Framework\Error\Warning('', 0, '', 0), $array_map_method, [$o1, null, 123], 'getName');
     }
 
     function test_array_maps()
     {
         $array_maps = array_maps;
-        $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], 'strtoupper', Funchand::lbind(strcat, '_')));
+        $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')));
         // これでも同じ
-        $composite = Funchand::composite(false, 'strtoupper', Funchand::lbind(strcat, '_'));
+        $composite = (composite)(false, 'strtoupper', (lbind)(strcat, '_'));
         $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], $composite));
 
         $this->assertEquals(['a' => 'Aaa', 'b' => 'Bbb'], $array_maps(['a' => 'A', 'b' => 'B'], strcat, strcat));
@@ -897,8 +891,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // flag をカウント
-        $this->assertEquals(1, $array_count($array, Arrays::array_of('flag')));
-        $this->assertEquals(2, $array_count($array, Funchand::not_func(Arrays::array_of('flag'))));
+        $this->assertEquals(1, $array_count($array, (array_of)('flag')));
+        $this->assertEquals(2, $array_count($array, (not_func)((array_of)('flag'))));
 
         // group: 'B' をカウント。ただし、数値キーの場合のみ
         $this->assertEquals(1, $array_count($array, function ($v, $k) {
@@ -910,7 +904,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'A' => 1,
             'B' => 2,
         ], $array_count($array, [
-            'A' => Funchand::composite(Arrays::array_of('group'), Funchand::lbind(str_equals, 'A')),
+            'A' => (composite)((array_of)('group'), (lbind)(str_equals, 'A')),
             'B' => function ($v) { return $v['group'] === 'B'; },
         ]));
     }
@@ -940,8 +934,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             3    => $row3,
         ];
 
-        $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], $array_group($array, Arrays::array_of('group')));
-        $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], $array_group($array, Arrays::array_of('group'), true));
+        $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], $array_group($array, (array_of)('group')));
+        $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], $array_group($array, (array_of)('group'), true));
 
         $this->assertEquals([
             'A' => [
@@ -963,7 +957,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                     'flag'  => true,
                 ],
             ],
-        ], $array_group([$row1, $row2, $row3], Arrays::array_of(['group', 'id'])));
+        ], $array_group([$row1, $row2, $row3], (array_of)(['group', 'id'])));
     }
 
     function test_array_all()
@@ -1270,8 +1264,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
 
         $actual = $array_order($data, [
-            'string' => Funchand::return_arg(0),
-            ''       => Funchand::return_arg(0),
+            'string' => (return_arg)(0),
+            ''       => (return_arg)(0),
         ], true);
         $this->assertSame([
             0 => ['string' => 'aa', 'integer' => 7],
@@ -1315,9 +1309,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_order_closure3()
     {
         $array_order = array_order;
-        if (version_compare(PHP_VERSION, '7.0.0') < 0) {
-            return;
-        }
         $data = [
             '33',
             '111',

@@ -2,28 +2,25 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\Arrays;
-use ryunosuke\Functions\Package\Math;
-
 class MathTest extends \ryunosuke\Test\AbstractTestCase
 {
     static function provideData()
     {
         return [
-            'int_evn'      => Arrays::array_shuffle([-3, -2, -1, 0, 1, 1, 1, 2, 3, 4]),
-            'int_odd'      => Arrays::array_shuffle([-3, -2, -1, 0, 1, 1, 2, 3, 4]),
-            'float_evn'    => Arrays::array_shuffle([-1.1, 0, 1.1, 1.1, 1.1, 2.2]),
-            'float_odd'    => Arrays::array_shuffle([-1.1, 0, 1.1, 1.1, 2.2]),
-            'string_evn'   => Arrays::array_shuffle(['a', 'm', 'm', 'm', 'z']),
-            'string_odd'   => Arrays::array_shuffle(['a', 'm', 'm', 'z']),
-            'datetime_evn' => Arrays::array_shuffle([
+            'int_evn'      => (array_shuffle)([-3, -2, -1, 0, 1, 1, 1, 2, 3, 4]),
+            'int_odd'      => (array_shuffle)([-3, -2, -1, 0, 1, 1, 2, 3, 4]),
+            'float_evn'    => (array_shuffle)([-1.1, 0, 1.1, 1.1, 1.1, 2.2]),
+            'float_odd'    => (array_shuffle)([-1.1, 0, 1.1, 1.1, 2.2]),
+            'string_evn'   => (array_shuffle)(['a', 'm', 'm', 'm', 'z']),
+            'string_odd'   => (array_shuffle)(['a', 'm', 'm', 'z']),
+            'datetime_evn' => (array_shuffle)([
                 new \DateTime('1999/12/24 12:34:56'),
                 new \DateTime('2000/12/24 12:34:56'),
                 new \DateTime('2000/12/24 12:34:56'),
                 new \DateTime('2000/12/24 12:34:56'),
                 new \DateTime('2001/12/24 12:34:56'),
             ]),
-            'datetime_odd' => Arrays::array_shuffle([
+            'datetime_odd' => (array_shuffle)([
                 new \DateTime('1999/12/24 12:34:56'),
                 new \DateTime('2000/12/24 12:34:56'),
                 new \DateTime('2000/12/24 12:34:56'),
@@ -135,7 +132,7 @@ class MathTest extends \ryunosuke\Test\AbstractTestCase
         foreach (range(0, 1000) as $n) {
             $result[$n] = $random_at(1, 2, 3, 4, 5, 6, 7, 8, 9);
         }
-        $this->assertRange(4.85, 5.15, Math::mean($result));
+        $this->assertRange(4.85, 5.15, (mean)($result));
 
         // 1つでも OK
         $this->assertEquals(9, $random_at(9));
@@ -164,7 +161,7 @@ class MathTest extends \ryunosuke\Test\AbstractTestCase
         foreach (range(0, 1000) as $n) {
             $result[$n] = $probability(10) ? 10 : 0;
         }
-        $this->assertRange(0.85, 1.15, Math::mean($result));
+        $this->assertRange(0.85, 1.15, (mean)($result));
 
         // 0% なら全部 false になるはず
         $result = [];

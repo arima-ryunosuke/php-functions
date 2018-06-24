@@ -92,22 +92,25 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
      */
     function test_exportAll()
     {
+        if (getenv('TEST_TARGET') === 'namespace') {
+            return;
+        }
+
         $dir = sys_get_temp_dir() . '/rft';
-        call_user_func(rm_rf, $dir);
-        call_user_func(mkdir_p, $dir . '/global');
-        call_user_func(mkdir_p, $dir . '/namespace');
+        (rm_rf)($dir);
+        (mkdir_p)($dir);
 
         // この時点では noexists
-        $this->assertFileNotExists("$dir/global/constant.php");
-        $this->assertFileNotExists("$dir/namespace/constant.php");
-        $this->assertFileNotExists("$dir/constant.php");
+        $this->assertFileNotExists("$dir/global.php");
+        $this->assertFileNotExists("$dir/namespace.php");
+        $this->assertFileNotExists("$dir/package.php");
 
         Transporter::exportAll($dir);
 
         // 配置されてるはず
-        $this->assertFileExists("$dir/global/constant.php");
-        $this->assertFileExists("$dir/namespace/constant.php");
-        $this->assertFileExists("$dir/constant.php");
+        $this->assertFileExists("$dir/global.php");
+        $this->assertFileExists("$dir/namespace.php");
+        $this->assertFileExists("$dir/package.php");
     }
 
     /**
@@ -116,9 +119,13 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
      */
     function test_exportNamespace()
     {
+        if (getenv('TEST_TARGET') === 'namespace') {
+            return;
+        }
+
         $dir = sys_get_temp_dir() . '/rfe';
-        call_user_func(rm_rf, $dir);
-        call_user_func(mkdir_p, $dir);
+        (rm_rf)($dir);
+        (mkdir_p)($dir);
 
         $contents = Transporter::exportNamespace('test\hoge');
 

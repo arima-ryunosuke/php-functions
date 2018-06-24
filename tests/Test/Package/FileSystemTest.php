@@ -2,21 +2,19 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\FileSystem;
-
 class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_file_list()
     {
         $file_list = file_list;
         $base = sys_get_temp_dir() . '/tree';
-        FileSystem::rm_rf($base);
-        FileSystem::file_set_contents($base . '/a/a1.txt', '');
-        FileSystem::file_set_contents($base . '/a/a2.txt', '');
-        FileSystem::file_set_contents($base . '/a//b/ab1.txt', '');
-        FileSystem::file_set_contents($base . '/a//b/ab2.log', 'xxx');
-        FileSystem::file_set_contents($base . '/a//b/c/abc1.log', 'xxxxx');
-        FileSystem::file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
+        (rm_rf)($base);
+        (file_set_contents)($base . '/a/a1.txt', '');
+        (file_set_contents)($base . '/a/a2.txt', '');
+        (file_set_contents)($base . '/a//b/ab1.txt', '');
+        (file_set_contents)($base . '/a//b/ab2.log', 'xxx');
+        (file_set_contents)($base . '/a//b/c/abc1.log', 'xxxxx');
+        (file_set_contents)($base . '/a//b/c/abc2.log', 'xxxxxxx');
 
         $this->assertFalse($file_list('/notfound'));
 
@@ -32,7 +30,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
 
         // 拡張子でフィルタ
-        $tree = $file_list($base, function ($fname) { return FileSystem::file_extension($fname) === 'txt'; });
+        $tree = $file_list($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
         $this->assertSame([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
@@ -52,14 +50,14 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
     {
         $file_tree = file_tree;
         $base = sys_get_temp_dir() . '/tree';
-        FileSystem::rm_rf($base);
-        FileSystem::file_set_contents($base . '/a/a1.txt', '');
-        FileSystem::file_set_contents($base . '/a/a2.txt', '');
-        FileSystem::file_set_contents($base . '/a//b/ab1.txt', '');
-        FileSystem::file_set_contents($base . '/a//b/ab2.log', 'xxx');
-        FileSystem::file_set_contents($base . '/a//b/c/abc1.log', 'xxxxx');
-        FileSystem::file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
-        FileSystem::file_set_contents($base . '/x.ext', '');
+        (rm_rf)($base);
+        (file_set_contents)($base . '/a/a1.txt', '');
+        (file_set_contents)($base . '/a/a2.txt', '');
+        (file_set_contents)($base . '/a//b/ab1.txt', '');
+        (file_set_contents)($base . '/a//b/ab2.log', 'xxx');
+        (file_set_contents)($base . '/a//b/c/abc1.log', 'xxxxx');
+        (file_set_contents)($base . '/a//b/c/abc2.log', 'xxxxxxx');
+        (file_set_contents)($base . '/x.ext', '');
 
         $this->assertFalse($file_tree('/notfound'));
 
@@ -84,7 +82,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
 
         // 拡張子でフィルタ
-        $tree = $file_tree($base, function ($fname) { return FileSystem::file_extension($fname) === 'txt'; });
+        $tree = $file_tree($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
         $this->assertSame([
             'tree' => [
                 'a' => [
@@ -142,7 +140,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
     {
         $file_set_contents = file_set_contents;
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
-        FileSystem::rm_rf($dir);
+        (rm_rf)($dir);
 
         $file_set_contents("$dir/hoge.txt", 'hoge');
         $this->assertStringEqualsFile("$dir/hoge.txt", 'hoge');
@@ -250,7 +248,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
     {
         $mkdir_p = mkdir_p;
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
-        FileSystem::rm_rf($dir);
+        (rm_rf)($dir);
         $this->assertTrue($mkdir_p($dir));
         $this->assertFileExists($dir);
         $this->assertFalse($mkdir_p($dir));
@@ -262,13 +260,13 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $tmpdir = sys_get_temp_dir() . '/cp_rf';
 
         $src = "$tmpdir/src";
-        FileSystem::rm_rf($src);
-        FileSystem::file_set_contents("$src/a/b/c.txt", 'aaa');
-        FileSystem::file_set_contents("$src/a/b/c1/d1.txt", '');
-        FileSystem::file_set_contents("$src/a/b/c2/d2.txt", '');
+        (rm_rf)($src);
+        (file_set_contents)("$src/a/b/c.txt", 'aaa');
+        (file_set_contents)("$src/a/b/c1/d1.txt", '');
+        (file_set_contents)("$src/a/b/c2/d2.txt", '');
 
         $dst = "$tmpdir/dst";
-        FileSystem::mkdir_p($dst);
+        (mkdir_p)($dst);
 
         // ただのファイル（"/" なし）
         $cp_rf("$src/a/b/c.txt", "$dst/x.txt");
@@ -279,14 +277,14 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertStringEqualsFile("$dst/c.txt", 'aaa');
 
         // "/" なし（dst 自身にコピー）
-        FileSystem::rm_rf($dst);
-        FileSystem::file_set_contents("$dst/xxx.txt", '');
+        (rm_rf)($dst);
+        (file_set_contents)("$dst/xxx.txt", '');
         $cp_rf("$src/", $dst);
         // 置換のような動作は行わないので元あったものは保持されているはず
         $this->assertFileExists("$dst/xxx.txt");
         // ツリーを確認（コピーされているはず）
-        $srctree = FileSystem::file_tree($src);
-        $dsttree = FileSystem::file_tree($dst);
+        $srctree = (file_tree)($src);
+        $dsttree = (file_tree)($dst);
         $this->assertEquals(['xxx.txt', 'a'], array_keys($dsttree['dst']));
         $this->assertEquals(array_keys($srctree['src']['a']), array_keys($dsttree['dst']['a']));
         $this->assertEquals(array_keys($srctree['src']['a']['b']), array_keys($dsttree['dst']['a']['b']));
@@ -294,14 +292,14 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(array_keys($srctree['src']['a']['b']['c2']), array_keys($dsttree['dst']['a']['b']['c2']));
 
         // "/" あり（dst の中にコピー）
-        FileSystem::rm_rf($dst);
-        FileSystem::file_set_contents("$dst/xxx.txt", '');
+        (rm_rf)($dst);
+        (file_set_contents)("$dst/xxx.txt", '');
         $cp_rf("$src/", "$dst/");
         // 置換のような動作は行わないので元あったものは保持されているはず
         $this->assertFileExists("$dst/xxx.txt");
         // ツリーを確認（コピーされているはず）
-        $srctree = FileSystem::file_tree($src);
-        $dsttree = FileSystem::file_tree($dst);
+        $srctree = (file_tree)($src);
+        $dsttree = (file_tree)($dst);
         $this->assertEquals(array_keys($srctree['src']), array_keys($dsttree['dst']['src']));
         $this->assertEquals(array_keys($srctree['src']['a']), array_keys($dsttree['dst']['src']['a']));
         $this->assertEquals(array_keys($srctree['src']['a']['b']), array_keys($dsttree['dst']['src']['a']['b']));
@@ -316,13 +314,13 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $dir2 = dirname($dir);
         $dir1 = dirname($dir2);
 
-        FileSystem::file_set_contents("$dir/a.txt", '');
+        (file_set_contents)("$dir/a.txt", '');
         $rm_rf($dir2);
         $this->assertFileNotExists($dir2); // 自身は消える
         $this->assertFileExists(dirname($dir2)); // 親は残る
         $this->assertFalse($rm_rf($dir)); // 存在しないと false を返す
 
-        FileSystem::file_set_contents("$dir/a.txt", '');
+        (file_set_contents)("$dir/a.txt", '');
         $rm_rf($dir1, false);
         $this->assertFileExists($dir1); // 自身は残る
         $this->assertFileNotExists($dir2); // 子は消える
@@ -330,18 +328,17 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_tmpname()
     {
-        // @todo closurize すると getStaticVariables が腐る？
-
         $wd = sys_get_temp_dir() . '/tmpname';
-        FileSystem::mkdir_p(sys_get_temp_dir() . '/tmpname');
-        FileSystem::rm_rf(sys_get_temp_dir() . '/tmpname', false);
+        (mkdir_p)(sys_get_temp_dir() . '/tmpname');
+        (rm_rf)(sys_get_temp_dir() . '/tmpname', false);
 
         $list = [
-            FileSystem::tmpname(null, $wd),
-            FileSystem::tmpname(null, $wd),
-            FileSystem::tmpname(null, $wd),
+            (tmpname)(null, $wd),
+            (tmpname)(null, $wd),
+            (tmpname)(null, $wd),
         ];
-        $files = (new \ReflectionMethod('\ryunosuke\\Functions\\Package\\FileSystem::tmpname'))->getStaticVariables()['files'];
+        /** @noinspection PhpUndefinedMethodInspection */
+        $files = ((reflect_callable)(tmpname))->getStaticVariables()['files'];
         $this->assertArraySubset($list, $files);
 
         // こういうこともできるっぽいが多分黒魔術（カバレッジもされないし…）まぁコケてはくれるので許容する

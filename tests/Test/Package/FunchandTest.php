@@ -2,9 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\FileSystem;
-use ryunosuke\Functions\Package\Funchand;
-
 class FunchandTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_nbind()
@@ -30,14 +27,14 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $func1 = $nbind($func2, 1, 'b');// 引数を1個要求するクロージャ
         $func0 = $nbind($func1, 0, 'a');// 引数を0個要求するクロージャ
 
-        $this->assertEquals(0, Funchand::parameter_length($func0));
-        $this->assertEquals(1, Funchand::parameter_length($func1));
-        $this->assertEquals(2, Funchand::parameter_length($func2));
-        $this->assertEquals(3, Funchand::parameter_length($func3));
-        $this->assertEquals(4, Funchand::parameter_length($func4));
-        $this->assertEquals(5, Funchand::parameter_length($func5));
-        $this->assertEquals(6, Funchand::parameter_length($func6));
-        $this->assertEquals(7, Funchand::parameter_length($func7));
+        $this->assertEquals(0, (parameter_length)($func0));
+        $this->assertEquals(1, (parameter_length)($func1));
+        $this->assertEquals(2, (parameter_length)($func2));
+        $this->assertEquals(3, (parameter_length)($func3));
+        $this->assertEquals(4, (parameter_length)($func4));
+        $this->assertEquals(5, (parameter_length)($func5));
+        $this->assertEquals(6, (parameter_length)($func6));
+        $this->assertEquals(7, (parameter_length)($func7));
 
         $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f', 'g'], $func0());
         $this->assertEquals(['A', 'b', 'c', 'd', 'e', 'f', 'g'], $func1('A'));
@@ -130,7 +127,7 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($not_strlen('hoge'));
         $this->assertTrue($not_strlen(''));
 
-        $this->assertEquals(1, Funchand::parameter_length($not_func('strlen')));
+        $this->assertEquals(1, (parameter_length)($not_func('strlen')));
     }
 
     function test_eval_func()
@@ -139,9 +136,9 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(4, call_user_func($eval_func('4')));
         $this->assertEquals(7, call_user_func($eval_func('$a + $b', 'a', 'b'), 3, 4));
 
-        $this->assertEquals(0, Funchand::parameter_length($eval_func('$v')));
-        $this->assertEquals(1, Funchand::parameter_length($eval_func('$v', 'a')));
-        $this->assertEquals(2, Funchand::parameter_length($eval_func('$v', 'a', 'b')));
+        $this->assertEquals(0, (parameter_length)($eval_func('$v')));
+        $this->assertEquals(1, (parameter_length)($eval_func('$v', 'a')));
+        $this->assertEquals(2, (parameter_length)($eval_func('$v', 'a', 'b')));
     }
 
     function test_reflect_callable()
@@ -427,8 +424,8 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
 
             // キャッシュ
             $cachedir = sys_get_temp_dir() . '/rf-fa';
-            FileSystem::mkdir_p($cachedir);
-            FileSystem::rm_rf($cachedir, false);
+            (mkdir_p)($cachedir);
+            (rm_rf)($cachedir, false);
             file_put_contents("$cachedir/trim-trim000.php", '<?php function trim000(){return "000";}');
             $function_alias('trim', 'trim000', $cachedir);
             $function_alias('trim', 'trim998', $cachedir);

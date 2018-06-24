@@ -2,8 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\FileSystem;
-
 class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_return()
@@ -217,7 +215,7 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
     {
         $try_catch_finally = try_catch_finally;
         $workingdir = sys_get_temp_dir() . '/rf-working';
-        FileSystem::rm_rf($workingdir);
+        (rm_rf)($workingdir);
 
         $try_catch_finally(function () use ($workingdir) {
             // try 句でディレクトリを作る
@@ -226,7 +224,7 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
             // catch 句ではなにもしない
         }, function () use ($workingdir) {
             // finally 句でディレクトリを消す
-            FileSystem::rm_rf($workingdir);
+            (rm_rf)($workingdir);
         });
         // finally が仕事をしてディレクトリが消えているはず
         $this->assertFalse(file_exists($workingdir));
@@ -241,7 +239,7 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
                 throw $ex;
             }, function () use ($workingdir) {
                 // finally 句でディレクトリを消す
-                FileSystem::rm_rf($workingdir);
+                (rm_rf)($workingdir);
             });
         }
         catch (\Exception $ex) {

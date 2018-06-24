@@ -9,11 +9,11 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
      */
     function test_all()
     {
-        if (getenv('TEST_TARGET') !== false && getenv('TEST_TARGET') !== 'package') {
+        if (getenv('TEST_TARGET') !== 'package') {
             return;
         }
 
-        require_once __DIR__ . '/../../include/global/function.php';
+        @require_once __DIR__ . '/../../include/global.php';
         defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
         defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 

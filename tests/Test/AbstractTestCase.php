@@ -2,9 +2,10 @@
 
 namespace ryunosuke\Test;
 
+use PHPUnit\Framework\TestCase;
 use ryunosuke\Functions\Package\Funchand;
 
-class AbstractTestCase extends \PHPUnit_Framework_TestCase
+class AbstractTestCase extends TestCase
 {
     /**
      * 例外が投げられたかアサーション

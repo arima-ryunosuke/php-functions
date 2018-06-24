@@ -2,9 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use ryunosuke\Functions\Package\Classobj;
-use ryunosuke\Functions\Package\Vars;
-
 class VarsTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_stringify()
@@ -59,9 +56,6 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('is not numeric', $numberify, 'aaa');
         $this->assertException('is not numeric', $numberify, 'a.a');
         $this->assertException('is not numeric', $numberify, '1.2.3', true);
-        if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
-            $this->assertException('could not be converted to string', $numberify, new \stdClass());
-        }
     }
 
     function test_numval()
@@ -94,13 +88,13 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
             ['array'],
         ]);
 
-        $inner = Classobj::stdclass([
+        $inner = (stdclass)([
             'inner-scalar2',
-            Classobj::stdclass([
+            (stdclass)([
                 'lastleaf',
             ]),
         ]);
-        $stdclass = Classobj::stdclass([
+        $stdclass = (stdclass)([
             'key'   => 'inner-scalar1',
             'inner' => $inner
         ]);
@@ -295,9 +289,9 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(0, $varcmp($a, $x));
 
         // object
-        $a = Classobj::stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
-        $b = Classobj::stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 0]);
-        $x = Classobj::stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
+        $a = (stdclass)(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
+        $b = (stdclass)(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 0]);
+        $x = (stdclass)(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
         $this->assertGreaterThan(0, $varcmp($a, $b));
         $this->assertLessThan(0, $varcmp($b, $a));
         $this->assertEquals(0, $varcmp($a, $x));
@@ -497,45 +491,29 @@ VAR
         $hoge = 1;
         $fuga = 2;
         $piyo = 3;
-        $this->assertEquals(compact('hoge'), Vars::hashvar($hoge));
-        $this->assertEquals(compact('piyo', 'fuga'), Vars::hashvar($piyo, $fuga));
+        $this->assertEquals(compact('hoge'), (hashvar)($hoge));
+        $this->assertEquals(compact('piyo', 'fuga'), (hashvar)($piyo, $fuga));
 
         // 同一行で2回呼んでも引数の数が異なれば区別できる
-        $this->assertEquals([compact('hoge'), compact('piyo', 'fuga')], [Vars::hashvar($hoge), Vars::hashvar($piyo, $fuga)]);
+        $this->assertEquals([compact('hoge'), compact('piyo', 'fuga')], [(hashvar)($hoge), (hashvar)($piyo, $fuga)]);
 
         // 引数の数が同じでも行が異なれば区別できる
         $this->assertEquals([compact('hoge'), compact('fuga')], [
-            Vars::hashvar($hoge),
-            Vars::hashvar($fuga),
+            (hashvar)($hoge),
+            (hashvar)($fuga),
         ]);
 
         // 即値は使用できない
         $this->assertException(new \UnexpectedValueException('variable'), function () {
             $hoge = 1;
-            Vars::hashvar($hoge, 1);
+            (hashvar)($hoge, 1);
         });
 
         // 同一行に同じ引数2つだと区別出来ない
         $this->assertException(new \UnexpectedValueException('ambiguous'), function () {
             $hoge = 1;
             $fuga = 2;
-            [Vars::hashvar($hoge), Vars::hashvar($fuga)];
+            [(hashvar)($hoge), (hashvar)($fuga)];
         });
-    }
-
-    function test_hashvar_global()
-    {
-        if (function_exists('hashvar')) {
-            $hoge = 1;
-            $fuga = 2;
-            $piyo = 3;
-            $this->assertEquals(compact('hoge'), hashvar($hoge));
-            $this->assertEquals(compact('piyo', 'fuga'), hashvar($piyo, $fuga));
-        }
-        else {
-            function hashvar()
-            {
-            }
-        }
     }
 }
