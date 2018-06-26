@@ -11,10 +11,9 @@ class Transporter
      */
     public static function importAsGlobal(array $excluded_functions = [])
     {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $excluded_functions = array_flip($excluded_functions);
-        call_user_func(function ($excluded_functions) {
-            require_once __DIR__ . '/../include/global.php';
-        }, $excluded_functions);
+        require_once __DIR__ . '/../include/global.php';
     }
 
     /**
@@ -24,10 +23,9 @@ class Transporter
      */
     public static function importAsNamespace(array $excluded_functions = [])
     {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $excluded_functions = array_flip($excluded_functions);
-        call_user_func(function ($excluded_functions) {
-            require_once __DIR__ . '/../include/namespace.php';
-        }, $excluded_functions);
+        require_once __DIR__ . '/../include/namespace.php';
     }
 
     /**

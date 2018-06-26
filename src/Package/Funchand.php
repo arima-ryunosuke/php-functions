@@ -83,7 +83,7 @@ class Funchand
     public static function nbind($callable, $n, ...$variadic)
     {
         return (delegate)(function ($callable, $args) use ($variadic, $n) {
-            return call_user_func_array($callable, (array_insert)($args, $variadic, $n));
+            return $callable(...(array_insert)($args, $variadic, $n));
         }, $callable, (parameter_length)($callable, true) - count($variadic));
     }
 
@@ -102,7 +102,7 @@ class Funchand
      */
     public static function lbind($callable, ...$variadic)
     {
-        return call_user_func_array(nbind, (array_insert)(func_get_args(), 0, 1));
+        return (nbind)(...(array_insert)(func_get_args(), 0, 1));
     }
 
     /**
@@ -120,7 +120,7 @@ class Funchand
      */
     public static function rbind($callable, ...$variadic)
     {
-        return call_user_func_array(nbind, (array_insert)(func_get_args(), null, 1));
+        return (nbind)(...(array_insert)(func_get_args(), null, 1));
     }
 
     /**
@@ -181,13 +181,13 @@ class Funchand
 
         $first = array_shift($callables);
         return (delegate)(function ($first, $args) use ($callables, $arrayalbe) {
-            $result = call_user_func_array($first, $args);
+            $result = $first(...$args);
             foreach ($callables as $callable) {
                 // 「配列モードでただの配列」でないなら配列化
                 if (!($arrayalbe && is_array($result) && !(is_hasharray)($result))) {
                     $result = [$result];
                 }
-                $result = call_user_func_array($callable, $result);
+                $result = $callable(...$result);
             }
             return $result;
         }, $first);
@@ -234,7 +234,7 @@ class Funchand
     public static function not_func($callable)
     {
         return (delegate)(function ($callable, $args) {
-            return !call_user_func_array($callable, $args);
+            return !$callable(...$args);
         }, $callable);
     }
 
@@ -258,10 +258,10 @@ class Funchand
     {
         $eargs = $variadic;
         return (delegate)(function ($expression, $args) use ($eargs) {
-            return call_user_func(function () {
+            return (function () {
                 extract(func_get_arg(1));
                 return eval("return " . func_get_arg(0) . ";");
-            }, $expression, array_combine($eargs, $args));
+            })($expression, array_combine($eargs, $args));
         }, $expression, count($eargs));
     }
 
@@ -359,7 +359,7 @@ class Funchand
         });
 
         try {
-            return call_user_func_array($callback, $variadic);
+            return $callback(...$variadic);
         }
         finally {
             restore_error_handler();
@@ -382,7 +382,7 @@ class Funchand
     {
         ob_start();
         try {
-            call_user_func_array($callback, $variadic);
+            $callback(...$variadic);
             return ob_get_contents();
         }
         finally {
@@ -552,9 +552,9 @@ class Funchand
         $plength = (parameter_length)($callback, true, true);
         return (delegate)(function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
-                return call_user_func_array($callback, $args);
+                return $callback(...$args);
             }
-            return call_user_func_array($callback, array_slice($args, 0, $plength));
+            return $callback(...array_slice($args, 0, $plength));
         }, $callback, $plength);
     }
 

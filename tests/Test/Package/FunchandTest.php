@@ -133,8 +133,8 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
     function test_eval_func()
     {
         $eval_func = eval_func;
-        $this->assertEquals(4, call_user_func($eval_func('4')));
-        $this->assertEquals(7, call_user_func($eval_func('$a + $b', 'a', 'b'), 3, 4));
+        $this->assertEquals(4, $eval_func('4')());
+        $this->assertEquals(7, $eval_func('$a + $b', 'a', 'b')(3, 4));
 
         $this->assertEquals(0, (parameter_length)($eval_func('$v')));
         $this->assertEquals(1, (parameter_length)($eval_func('$v', 'a')));
@@ -179,25 +179,25 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
     {
         $closurize = closurize;
         // タイプ 0: クロージャ
-        $this->assertEquals('aaa', call_user_func($closurize(function ($v) { return $v; }), 'aaa'));
+        $this->assertEquals('aaa', $closurize(function ($v) { return $v; })('aaa'));
 
         // タイプ 1: 単純なコールバック
-        $this->assertEquals(3, call_user_func($closurize('strlen'), 'aaa'));
+        $this->assertEquals(3, $closurize('strlen')('aaa'));
 
         // タイプ 2: 静的クラスメソッドのコール
-        $this->assertEquals('Concrete::staticMethod', call_user_func($closurize(['Concrete', 'staticMethod'])));
+        $this->assertEquals('Concrete::staticMethod', $closurize(['Concrete', 'staticMethod'])());
 
         // タイプ 3: オブジェクトメソッドのコール
-        $this->assertEquals('Concrete::instanceMethod', call_user_func($closurize([new \Concrete(''), 'instanceMethod'])));
+        $this->assertEquals('Concrete::instanceMethod', $closurize([new \Concrete(''), 'instanceMethod'])());
 
         // タイプ 4: 静的クラスメソッドのコール (PHP 5.2.3 以降)
-        $this->assertEquals('Concrete::staticMethod', call_user_func($closurize('Concrete::staticMethod')));
+        $this->assertEquals('Concrete::staticMethod', $closurize('Concrete::staticMethod')());
 
         // タイプ 5: 相対指定による静的クラスメソッドのコール (PHP 5.3.0 以降)
-        $this->assertEquals('AbstractConcrete::staticMethod', call_user_func($closurize(['Concrete', 'parent::staticMethod'])));
+        $this->assertEquals('AbstractConcrete::staticMethod', $closurize(['Concrete', 'parent::staticMethod'])());
 
         // タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
-        $this->assertEquals('Concrete::__invoke', call_user_func($closurize(new \Concrete('hoge'))));
+        $this->assertEquals('Concrete::__invoke', $closurize(new \Concrete('hoge'))());
     }
 
     function test_call_safely()
@@ -272,8 +272,8 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(1, (new \ReflectionFunction('count'))->invokeArgs([$object]));
         $this->assertEquals(0, (new \ReflectionMethod($object, 'count'))->invokeArgs($object, []));
 
-        $this->assertEquals(1, call_user_func(function () use ($object) { return count($object); }));
-        $this->assertEquals(0, call_user_func(function () use ($object) { return $object->count(); }));
+        $this->assertEquals(1, (function () use ($object) { return count($object); })());
+        $this->assertEquals(0, (function () use ($object) { return $object->count(); })());
 
         $this->assertException('backtrace', $by_builtin, '', '');
     }

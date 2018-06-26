@@ -854,10 +854,10 @@ class Arrays
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return call_user_func_array(array_set, [&$array[$k], $value, $key, $require_return]);
+                return (array_set)(...[&$array[$k], $value, $key, $require_return]);
             }
             else {
-                return call_user_func_array(array_set, [&$array, $value, $k, $require_return]);
+                return (array_set)(...[&$array, $value, $k, $require_return]);
             }
         }
 
@@ -1339,7 +1339,7 @@ class Arrays
             if ($ignore === null && !is_callable([$object, $method])) {
                 return $object;
             }
-            return call_user_func_array([$object, $method], $args);
+            return ([$object, $method])(...$args);
         }, $array);
     }
 
@@ -1385,7 +1385,7 @@ class Arrays
             }
             foreach ($result as $k => $v) {
                 if (isset($margs)) {
-                    $result[$k] = call_user_func_array([$v, $callback], $margs);
+                    $result[$k] = ([$v, $callback])(...$margs);
                 }
                 else {
                     $result[$k] = $callback($v, $k);
@@ -1503,7 +1503,7 @@ class Arrays
             else {
                 $args[$n] = $v;
             }
-            $result[$k] = call_user_func_array($callback, $args);
+            $result[$k] = $callback(...$args);
         }
         return $result;
     }
@@ -1524,7 +1524,7 @@ class Arrays
      */
     public static function array_lmap($array, $callback, ...$variadic)
     {
-        return call_user_func_array(array_nmap, (array_insert)(func_get_args(), 0, 2));
+        return (array_nmap)(...(array_insert)(func_get_args(), 0, 2));
     }
 
     /**
@@ -1543,7 +1543,7 @@ class Arrays
      */
     public static function array_rmap($array, $callback, ...$variadic)
     {
-        return call_user_func_array(array_nmap, (array_insert)(func_get_args(), func_num_args() - 2, 2));
+        return (array_nmap)(...(array_insert)(func_get_args(), func_num_args() - 2, 2));
     }
 
     /**
@@ -2020,13 +2020,13 @@ class Arrays
             $keys = array_keys($array);
             $args[] = &$array;
             $args[] = &$keys;
-            call_user_func_array('array_multisort', $args);
+            array_multisort(...$args);
             return array_combine($keys, $array);
         }
         // キーを保持しないなら単純呼び出しで OK
         else {
             $args[] = &$array;
-            call_user_func_array('array_multisort', $args);
+            array_multisort(...$args);
             return $array;
         }
     }
@@ -2076,8 +2076,8 @@ class Arrays
     public static function array_shrink_key(array $array, ...$variadic)
     {
         $args = func_get_args();
-        array_unshift($args, call_user_func_array('array_replace', $args));
-        return call_user_func_array('array_intersect_key', $args);
+        array_unshift($args, array_replace(...$args));
+        return array_intersect_key(...$args);
     }
 
     /**

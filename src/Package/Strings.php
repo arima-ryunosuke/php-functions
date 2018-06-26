@@ -792,7 +792,7 @@ class Strings
         }
 
         try {
-            return call_user_func(function () {
+            return (function () {
                 // extract は数値キーを展開してくれないので自前ループで展開
                 foreach (func_get_arg(1) as $k => $v) {
                     $$k = $v;
@@ -803,7 +803,7 @@ class Strings
                 extract(func_get_arg(1));
                 // そして eval. ↑は要するに数値キーのみを展開している
                 return eval(func_get_arg(0));
-            }, $evalcode, $vars);
+            })($evalcode, $vars);
         }
         catch (\ParseError $ex) {
             throw new \RuntimeException('failed to eval code.' . $evalcode, 0, $ex);

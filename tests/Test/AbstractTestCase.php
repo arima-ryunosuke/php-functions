@@ -18,13 +18,7 @@ class AbstractTestCase extends TestCase
         if (is_string($e)) {
             if (class_exists($e)) {
                 $ref = new \ReflectionClass($e);
-                // 5.6 未満では内部クラスを newInstanceWithoutConstructor できない
-                if ($ref->isInternal()) {
-                    $e = $ref->newInstance();
-                }
-                else {
-                    $e = $ref->newInstanceWithoutConstructor();
-                }
+                $e = $ref->newInstanceWithoutConstructor();
             }
             else {
                 $e = new \Exception($e);
@@ -32,7 +26,7 @@ class AbstractTestCase extends TestCase
         }
 
         try {
-            call_user_func_array($callback, array_slice(func_get_args(), 2));
+            $callback(...array_slice(func_get_args(), 2));
         }
         catch (\Exception $ex) {
             // 型は常に判定

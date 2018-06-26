@@ -196,11 +196,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(array_reverse(array_keys($array)), array_keys($kvsort($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })));
 
         // 配列じゃなくても Traversable ならソート可能
-        $this->assertSame([1 => 1, 0 => 2, 2 => 3], $kvsort(call_user_func(function () {
+        $this->assertSame([1 => 1, 0 => 2, 2 => 3], $kvsort((function () {
             yield 2;
             yield 1;
             yield 3;
-        })));
+        })()));
 
         // 上記は挙動のテストであってソートのテストを行っていないのでテスト
         $array = array_combine(range('a', 'z'), range('a', 'z'));
@@ -314,10 +314,10 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $hoge_of = $array_of('hoge', 'HOGE');
         $this->assertEquals('HOGE', $hoge_of(['fuga' => 'FUGA']));
 
-        $this->assertEquals([0 => 'a', 2 => 'c'], call_user_func($array_of([0, 2]), ['a', 'b', 'c']));
-        $this->assertEquals([0 => 'a'], call_user_func($array_of([0, 9]), ['a', 'b', 'c']));
-        $this->assertEquals([], call_user_func($array_of([9]), ['a', 'b', 'c']));
-        $this->assertEquals(null, call_user_func($array_of([9], null), ['a', 'b', 'c']));
+        $this->assertEquals([0 => 'a', 2 => 'c'], $array_of([0, 2])(['a', 'b', 'c']));
+        $this->assertEquals([0 => 'a'], $array_of([0, 9])(['a', 'b', 'c']));
+        $this->assertEquals([], $array_of([9])(['a', 'b', 'c']));
+        $this->assertEquals(null, $array_of([9], null)(['a', 'b', 'c']));
     }
 
     function test_array_get()
@@ -698,9 +698,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // $ignore=null するとそのまま返す
         $this->assertEquals(['a', null, 123], $array_map_method([$o1, null, 123], 'getName', [], null));
-
-        // $ignore=false でおかしなことすると warning が発生する
-        $this->assertException(new \PHPUnit\Framework\Error\Warning('', 0, '', 0), $array_map_method, [$o1, null, 123], 'getName');
     }
 
     function test_array_maps()

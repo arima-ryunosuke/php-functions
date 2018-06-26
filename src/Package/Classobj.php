@@ -198,7 +198,7 @@ class Classobj
         }
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
-        $classfile = call_user_func(class_loader)->findFile($class);
+        $classfile = (class_loader)()->findFile($class);
         $fname = rtrim(($dirname ?: sys_get_temp_dir()), '/\\') . '/' . str_replace('\\', '/', $class) . '.php';
         if (func_num_args() === 2 || !file_exists($fname)) {
             $content = file_get_contents($classfile);

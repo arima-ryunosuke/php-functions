@@ -37,7 +37,7 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         // __call
         $this->assertSame('hoge', $optional($o)->hoge());
         // __invoke
-        $this->assertSame('Concrete::__invoke', call_user_func($optional($o)));
+        $this->assertSame('Concrete::__invoke', $optional($o)());
         // __toString
         $this->assertSame('hoge', (string) $optional($o));
         // offsetExists
@@ -60,7 +60,7 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         // __call
         $this->assertSame(null, $optional($o)->hoge());
         // __invoke
-        $this->assertSame(null, call_user_func($optional($o)));
+        $this->assertSame(null, $optional($o)());
         // __toString
         $this->assertSame('', (string) $optional($o));
         // offsetExists
