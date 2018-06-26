@@ -593,6 +593,156 @@ class Strings
     }
 
     /**
+     * parse_uri の逆
+     *
+     * URI のパーツを与えると URI として構築する。
+     * パーツは不完全でも良い。例えば scheme を省略すると "://" すら付かない URI が生成される。
+     *
+     * "query" パートだけは配列が許容される。その場合クエリ文字列に変換される。
+     *
+     * Example:
+     * ```php
+     * // 完全指定
+     * assertSame(build_uri([
+     *     'scheme'   => 'http',
+     *     'user'     => 'user',
+     *     'pass'     => 'pass',
+     *     'host'     => 'localhost',
+     *     'port'     => '80',
+     *     'path'     => '/path/to/file',
+     *     'query'    => ['id' => 1],
+     *     'fragment' => 'hash',
+     * ]), 'http://user:pass@localhost:80/path/to/file?id=1#hash');
+     * // 一部だけ指定
+     * assertSame(build_uri([
+     *     'scheme'   => 'http',
+     *     'host'     => 'localhost',
+     *     'path'     => '/path/to/file',
+     *     'fragment' => 'hash',
+     * ]), 'http://localhost/path/to/file#hash');
+     * ```
+     *
+     * @param array $parts URI の各パーツ配列
+     * @return string URI 文字列
+     */
+    public static function build_uri($parts)
+    {
+        $parts += [
+            'scheme'   => '',
+            'user'     => '',
+            'pass'     => '',
+            'host'     => '',
+            'port'     => '',
+            'path'     => '',
+            'query'    => '',
+            'fragment' => '',
+        ];
+        $parts['host'] = filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? "[{$parts['host']}]" : $parts['host'];
+        $parts['path'] = ltrim($parts['path'], '/');
+        $parts['query'] = is_array($parts['query']) ? http_build_query($parts['query'], '', '&') : $parts['query'];
+
+        $uri = '';
+        $uri .= (concat)($parts['scheme'], '://');
+        $uri .= (concat)($parts['user'] . (concat)(':', $parts['pass']), '@');
+        $uri .= (concat)($parts['host']);
+        $uri .= (concat)(':', $parts['port']);
+        $uri .= (concat)('/', $parts['path']);
+        $uri .= (concat)('?', $parts['query']);
+        $uri .= (concat)('#', $parts['fragment']);
+        return $uri;
+    }
+
+    /**
+     * parse_url の仕様を少しいじったもの
+     *
+     * parse_url とは下記が異なる。
+     *
+     * - "単一文字列" はホスト名とみなされる（parse_url はパスとみなされる）
+     * - パートがなくてもキー自体は生成される（そしてその値は $default で指定したもの）
+     * - query は配列で返す（parse_str される）
+     * - パート値をスカラー値で返すことはできない（必ず8要素の配列を返す）
+     *
+     * Example:
+     * ```php
+     * // 完全指定
+     * assertEquals(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'), [
+     *     'scheme'   => 'http',
+     *     'user'     => 'user',
+     *     'pass'     => 'pass',
+     *     'host'     => 'localhost',
+     *     'port'     => '80',
+     *     'path'     => '/path/to/file',
+     *     'query'    => ['id' => 1],
+     *     'fragment' => 'hash',
+     * ]);
+     * // デフォルト値つき
+     * assertEquals(parse_uri('localhost/path/to/file', [
+     *     'scheme'   => 'http', // scheme のデフォルト値
+     *     'user'     => 'user', // user のデフォルト値
+     *     'port'     => '8080', // port のデフォルト値
+     *     'host'     => 'hoge', // host のデフォルト値
+     * ]), [
+     *     'scheme'   => 'http',      // scheme はないのでデフォルト値が使われている
+     *     'user'     => 'user',      // user はないのでデフォルト値が使われている
+     *     'pass'     => '',
+     *     'host'     => 'localhost', // host はあるのでデフォルト値が使われていない
+     *     'port'     => '8080',      // port はないのでデフォルト値が使われている
+     *     'path'     => '/path/to/file',
+     *     'query'    => [],
+     *     'fragment' => '',
+     * ]);
+     * ```
+     *
+     * @param string $uri パースする URI
+     * @param array|string $default $uri に足りないパーツがあった場合のデフォルト値。文字列を与えた場合はそのパース結果がデフォルト値になる
+     * @return array URI の各パーツ配列
+     */
+    public static function parse_uri($uri, $default = [])
+    {
+        $regex = "
+            (?:(?<scheme>[a-z][-+.0-9a-z]*)://)?
+            (?:
+              (?: (?<user>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=])*)?
+              (?::(?<pass>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=])*))?@)?
+            )?
+            (?<host>((?:\\[[0-9a-f:]+\\]) | (?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=]))*)
+            (?::(?<port>\d{0,5}))?
+            (?<path>(?:/(?: [-.~\\w!$&'()*+,;=:@] | %[0-9a-f]{2} )* )*)?
+            (?:\\?(?<query>   (?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=/:?@])*))?
+            (?:\\#(?<fragment>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=/:?@])*))?
+        ";
+
+        $default_default = [
+            'scheme'   => '',
+            'user'     => '',
+            'pass'     => '',
+            'host'     => '',
+            'port'     => '',
+            'path'     => '',
+            'query'    => '',
+            'fragment' => '',
+        ];
+
+        // 配列以外はパースしてそれをデフォルトとする
+        if (!is_array($default)) {
+            $default = (preg_capture)("#^$regex\$#ix", (string) $default, $default_default);
+        }
+
+        // パース。先頭の // はスキーム省略とみなすので除去する
+        $uri = (preg_splice)('#^//#', '', $uri);
+        $parts = (preg_capture)("#^$regex\$#ix", $uri, $default + $default_default);
+
+        // 諸々調整（IPv6、パス / の正規化、クエリ配列化）
+        $parts['host'] = (preg_splice)('#^\\[(.+)\\]$#', '$1', $parts['host']);
+        $parts['path'] = (concat)('/', ltrim($parts['path'], '/'));
+        if (is_string($parts['query'])) {
+            parse_str($parts['query'], $parts['query']);
+        }
+
+        return $parts;
+    }
+
+    /**
      * 安全な乱数文字列を生成する
      *
      * @param int $length 生成文字列長

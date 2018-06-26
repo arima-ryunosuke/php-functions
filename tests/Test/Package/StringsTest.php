@@ -347,6 +347,201 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('a-b-c-', $chain_case('-ABC-'));
     }
 
+    function provideUri()
+    {
+        $gen = function ($scheme = '', $user = '', $pass = '', $host = '', $port = '', $path = '', $query = [], $fragment = '') {
+            return compact('scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment');
+        };
+        return [
+            'full'          => [
+                'uri'   => 'scheme://user:pass@host:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('scheme', 'user', 'pass', 'host', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no schema'     => [
+                'uri'   => 'user:pass@host:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', 'user', 'pass', 'host', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no user'       => [
+                'uri'   => ':pass@host:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', '', 'pass', 'host', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no pass'       => [
+                'uri'   => 'user@host:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', 'user', '', 'host', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no auth'       => [
+                'uri'   => 'host:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', '', '', 'host', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no host'       => [
+                'uri'   => ':12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', '', '', '', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no port'       => [
+                'uri'   => 'host/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', '', '', 'host', '', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no origin'     => [
+                'uri'   => '/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('', '', '', '', '', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no path'       => [
+                'uri'   => '?op1=1&op2=2#hash',
+                'parts' => $gen('', '', '', '', '', '', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'no query'      => [
+                'uri'   => '#hash',
+                'parts' => $gen('', '', '', '', '', '', [], 'hash'),
+            ],
+            'no query hash' => [
+                'uri'   => '/path/to/hoge#hash',
+                'parts' => $gen('', '', '', '', '', '/path/to/hoge', [], 'hash'),
+            ],
+            'no all'        => [
+                'uri'   => '',
+                'parts' => $gen(),
+            ],
+            'ipv4'          => [
+                'uri'   => 'scheme://user:pass@127.0.0.1:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('scheme', 'user', 'pass', '127.0.0.1', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'ipv6'          => [
+                'uri'   => 'scheme://user:pass@[2001:db8::1234:0:0:9abc]:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('scheme', 'user', 'pass', '2001:db8::1234:0:0:9abc', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
+            'multibyte'     => [
+                'uri'   => 'scheme://local.host/path/to/hoge?aaa=' . rawurlencode('あああ'),
+                'parts' => $gen('scheme', '', '', 'local.host', '', '/path/to/hoge', ['aaa' => 'あああ'], ''),
+            ],
+        ];
+    }
+
+    function test_build_uri()
+    {
+        $build_uri = build_uri;
+        foreach ($this->provideUri() as $title => $data) {
+            $this->assertEquals($data['uri'], $build_uri($data['parts']), $title);
+        }
+    }
+
+    function test_parse_uri()
+    {
+        $parse_uri = parse_uri;
+        foreach ($this->provideUri() as $title => $data) {
+            $this->assertEquals($data['parts'], $parse_uri($data['uri']), $title);
+        }
+
+        // default array
+        $this->assertEquals([
+            'scheme'   => 'defscheme',
+            'user'     => 'defuser',
+            'pass'     => 'defpass',
+            'host'     => 'defhost',
+            'port'     => '12345',
+            'path'     => '/defpath',
+            'query'    => ['defquery' => ''],
+            'fragment' => 'deffragment',
+        ], $parse_uri('', [
+            'scheme'   => 'defscheme',
+            'user'     => 'defuser',
+            'pass'     => 'defpass',
+            'host'     => 'defhost',
+            'port'     => '12345',
+            'path'     => 'defpath',
+            'query'    => 'defquery',
+            'fragment' => 'deffragment',
+        ]));
+
+        // default string
+        $this->assertEquals([
+            'scheme'   => 'defscheme',
+            'user'     => 'defuser',
+            'pass'     => 'defpass',
+            'host'     => 'defhost',
+            'port'     => '12345',
+            'path'     => '/defpath',
+            'query'    => ['defquery' => ''],
+            'fragment' => 'deffragment',
+        ], $parse_uri('', 'defscheme://defuser:defpass@defhost:12345/defpath?defquery#deffragment'));
+    }
+
+    function test_parse_uri_special()
+    {
+        $parse_uri = parse_uri;
+
+        // double slash
+        $this->assertEquals([
+            'scheme'   => '',
+            'user'     => 'user',
+            'pass'     => 'pass',
+            'host'     => 'host',
+            'port'     => '',
+            'path'     => '/path/to/hoge',
+            'query'    => ['op1' => 1, 'op2' => 2],
+            'fragment' => 'hash',
+        ], $parse_uri('//user:pass@host/path/to/hoge?op1=1&op2=2#hash'));
+
+        // tripple slash
+        $this->assertEquals([
+            'scheme'   => '',
+            'user'     => '',
+            'pass'     => '',
+            'host'     => '',
+            'port'     => '',
+            'path'     => '/path/to/hoge',
+            'query'    => ['op1' => 1, 'op2' => 2],
+            'fragment' => 'hash',
+        ], $parse_uri('///path/to/hoge?op1=1&op2=2#hash'));
+
+        // no port value
+        $this->assertEquals([
+            'scheme'   => 'scheme',
+            'user'     => 'user',
+            'pass'     => 'pass',
+            'host'     => 'host',
+            'port'     => '',
+            'path'     => '/path/to/hoge',
+            'query'    => ['op1' => 1, 'op2' => 2],
+            'fragment' => 'hash',
+        ], $parse_uri('scheme://user:pass@host:/path/to/hoge?op1=1&op2=2#hash'));
+
+        // no path value
+        $this->assertEquals([
+            'scheme'   => 'scheme',
+            'user'     => 'user',
+            'pass'     => 'pass',
+            'host'     => 'host',
+            'port'     => '',
+            'path'     => '',
+            'query'    => ['op1' => 1, 'op2' => 2],
+            'fragment' => 'hash',
+        ], $parse_uri('scheme://user:pass@host?op1=1&op2=2#hash'));
+
+        // no query value
+        $this->assertEquals([
+            'scheme'   => 'scheme',
+            'user'     => 'user',
+            'pass'     => 'pass',
+            'host'     => 'host',
+            'port'     => '',
+            'path'     => '/path/to/hoge',
+            'query'    => [],
+            'fragment' => 'hash',
+        ], $parse_uri('scheme://user:pass@host/path/to/hoge?#hash'));
+
+        // no fragment value
+        $this->assertEquals([
+            'scheme'   => 'scheme',
+            'user'     => 'user',
+            'pass'     => 'pass',
+            'host'     => 'host',
+            'port'     => '',
+            'path'     => '/path/to/hoge',
+            'query'    => [],
+            'fragment' => '',
+        ], $parse_uri('scheme://user:pass@host/path/to/hoge?#'));
+    }
+
     function test_random_string()
     {
         $random_string = random_string;
