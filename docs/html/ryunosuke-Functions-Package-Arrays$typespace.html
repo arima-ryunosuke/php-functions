@@ -48,7 +48,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L2485" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L2522" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
@@ -3364,10 +3364,10 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2057-L2081" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2057-L2085" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" tabindex="-1" class="structure-title ">
-                        array_shrink_key						<small>($array, ...$variadic)</small>
+                        array_shrink_key						<small>(...$variadic)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>値の優先順位を逆にした array_intersect_key</p>
@@ -3385,15 +3385,9 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array</td>
-				<td class="rest">$array</td>
-				<td class="desc"><p>対象配列</p>
-</td>
-			</tr>
-        			<tr>
-				<td class="type">array</td>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a>[]</td>
 				<td class="rest">...$variadic</td>
-				<td class="desc"><p>比較する配列</p>
+				<td class="desc"><p>共通項を取る配列（可変引数）</p>
 </td>
 			</tr>
         		</tbody>
@@ -3426,7 +3420,68 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2083-L2129" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2087-L2118" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_pickup()" tabindex="-1" class="structure-title ">
+                        array_pickup						<small>($array, $keys)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>キーを指定してそれだけの配列にする</p>
+<p><code>array_intersect_key($array, array_flip($keys))</code> とほぼ同義。<br />
+違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。</p>
+<p>Example:</p>
+<pre><code class="language-php">// a と c を取り出す
+assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['a', 'c']), ['a' =&gt; 'A', 'c' =&gt; 'C']);
+// 順番は $keys 基準になる
+assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="rest">$array</td>
+				<td class="desc"><p>対象配列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$keys</td>
+				<td class="desc"><p>取り出すキー（可変引数）</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>新しい配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2120-L2166" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lookup()" tabindex="-1" class="structure-title ">
                         array_lookup						<small>($array, $column_key = null, $index_key = null)</small>
@@ -3495,7 +3550,7 @@ assertSame(array_lookup($array), $array);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2131-L2166" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2168-L2203" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_columns()" tabindex="-1" class="structure-title ">
                         array_columns						<small>($array, $column_keys = null, $index_key = null)</small>
@@ -3563,7 +3618,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2168-L2207" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2205-L2244" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" tabindex="-1" class="structure-title ">
                         array_uncolumns						<small>($array, $template = null)</small>
@@ -3624,7 +3679,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2209-L2331" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2246-L2368" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_convert()" tabindex="-1" class="structure-title ">
                         array_convert						<small>($array, $callback, $apply_array = false)</small>
@@ -3726,7 +3781,7 @@ assertSame(array_convert($array, $callback, true), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2333-L2408" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2370-L2445" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_flatten()" tabindex="-1" class="structure-title ">
                         array_flatten						<small>($array, $delimiter = null)</small>
@@ -3815,7 +3870,7 @@ assertSame(array_flatten($array, '.'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2410-L2484" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2447-L2521" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
                         array_nest						<small>($array, $delimiter = &#039;.&#039;)</small>

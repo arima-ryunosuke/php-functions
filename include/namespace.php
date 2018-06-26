@@ -916,10 +916,10 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('ryunosuke\\Fu
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return call_user_func_array(array_set, [&$array[$k], $value, $key, $require_return]);
+                return (array_set)(...[&$array[$k], $value, $key, $require_return]);
             }
             else {
-                return call_user_func_array(array_set, [&$array, $value, $k, $require_return]);
+                return (array_set)(...[&$array, $value, $k, $require_return]);
             }
         }
 
@@ -1437,7 +1437,7 @@ if (!isset($excluded_functions['array_map_method']) && (!function_exists('ryunos
             if ($ignore === null && !is_callable([$object, $method])) {
                 return $object;
             }
-            return call_user_func_array([$object, $method], $args);
+            return ([$object, $method])(...$args);
         }, $array);
     }
 }
@@ -1486,7 +1486,7 @@ if (!isset($excluded_functions['array_maps']) && (!function_exists('ryunosuke\\F
             }
             foreach ($result as $k => $v) {
                 if (isset($margs)) {
-                    $result[$k] = call_user_func_array([$v, $callback], $margs);
+                    $result[$k] = ([$v, $callback])(...$margs);
                 }
                 else {
                     $result[$k] = $callback($v, $k);
@@ -1610,7 +1610,7 @@ if (!isset($excluded_functions['array_nmap']) && (!function_exists('ryunosuke\\F
             else {
                 $args[$n] = $v;
             }
-            $result[$k] = call_user_func_array($callback, $args);
+            $result[$k] = $callback(...$args);
         }
         return $result;
     }
@@ -1634,7 +1634,7 @@ if (!isset($excluded_functions['array_lmap']) && (!function_exists('ryunosuke\\F
      */
     function array_lmap($array, $callback, ...$variadic)
     {
-        return call_user_func_array(array_nmap, (array_insert)(func_get_args(), 0, 2));
+        return (array_nmap)(...(array_insert)(func_get_args(), 0, 2));
     }
 }
 
@@ -1656,7 +1656,7 @@ if (!isset($excluded_functions['array_rmap']) && (!function_exists('ryunosuke\\F
      */
     function array_rmap($array, $callback, ...$variadic)
     {
-        return call_user_func_array(array_nmap, (array_insert)(func_get_args(), func_num_args() - 2, 2));
+        return (array_nmap)(...(array_insert)(func_get_args(), func_num_args() - 2, 2));
     }
 }
 
@@ -2160,13 +2160,13 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('ryunosuke\\
             $keys = array_keys($array);
             $args[] = &$array;
             $args[] = &$keys;
-            call_user_func_array('array_multisort', $args);
+            array_multisort(...$args);
             return array_combine($keys, $array);
         }
         // キーを保持しないなら単純呼び出しで OK
         else {
             $args[] = &$array;
-            call_user_func_array('array_multisort', $args);
+            array_multisort(...$args);
             return $array;
         }
     }
@@ -2215,15 +2215,55 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('ryunos
      * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
      * ```
      *
-     * @param array $array 対象配列
-     * @param array $variadic 比較する配列
+     * @param array|\Traversable[] $variadic 共通項を取る配列（可変引数）
      * @return array 新しい配列
      */
-    function array_shrink_key(array $array, ...$variadic)
+    function array_shrink_key(...$variadic)
     {
-        $args = func_get_args();
-        array_unshift($args, call_user_func_array('array_replace', $args));
-        return call_user_func_array('array_intersect_key', $args);
+        $result = [];
+        foreach ($variadic as $n => $array) {
+            if (!is_array($array)) {
+                $variadic[$n] = (arrayval)($array, false);
+            }
+            $result = array_replace($result, $variadic[$n]);
+        }
+        return array_intersect_key($result, ...$variadic);
+    }
+}
+
+const array_pickup = 'ryunosuke\\Functions\\array_pickup';
+if (!isset($excluded_functions['array_pickup']) && (!function_exists('ryunosuke\\Functions\\array_pickup') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\array_pickup'))->isInternal()))) {
+    /**
+     * キーを指定してそれだけの配列にする
+     *
+     * `array_intersect_key($array, array_flip($keys))` とほぼ同義。
+     * 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。
+     *
+     * Example:
+     * ```php
+     * // a と c を取り出す
+     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']), ['a' => 'A', 'c' => 'C']);
+     * // 順番は $keys 基準になる
+     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param array $keys 取り出すキー（可変引数）
+     * @return array 新しい配列
+     */
+    function array_pickup($array, $keys)
+    {
+        if (!is_array($array)) {
+            $array = (arrayval)($array, false);
+        }
+
+        $result = [];
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $array)) {
+                $result[$key] = $array[$key];
+            }
+        }
+        return $result;
     }
 }
 
@@ -2856,7 +2896,7 @@ if (!isset($excluded_functions['class_replace']) && (!function_exists('ryunosuke
         }
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
-        $classfile = call_user_func(class_loader)->findFile($class);
+        $classfile = (class_loader)()->findFile($class);
         $fname = rtrim(($dirname ?: sys_get_temp_dir()), '/\\') . '/' . str_replace('\\', '/', $class) . '.php';
         if (func_num_args() === 2 || !file_exists($fname)) {
             $content = file_get_contents($classfile);
@@ -3615,7 +3655,7 @@ if (!isset($excluded_functions['nbind']) && (!function_exists('ryunosuke\\Functi
     function nbind($callable, $n, ...$variadic)
     {
         return (delegate)(function ($callable, $args) use ($variadic, $n) {
-            return call_user_func_array($callable, (array_insert)($args, $variadic, $n));
+            return $callable(...(array_insert)($args, $variadic, $n));
         }, $callable, (parameter_length)($callable, true) - count($variadic));
     }
 }
@@ -3637,7 +3677,7 @@ if (!isset($excluded_functions['lbind']) && (!function_exists('ryunosuke\\Functi
      */
     function lbind($callable, ...$variadic)
     {
-        return call_user_func_array(nbind, (array_insert)(func_get_args(), 0, 1));
+        return (nbind)(...(array_insert)(func_get_args(), 0, 1));
     }
 }
 
@@ -3658,7 +3698,7 @@ if (!isset($excluded_functions['rbind']) && (!function_exists('ryunosuke\\Functi
      */
     function rbind($callable, ...$variadic)
     {
-        return call_user_func_array(nbind, (array_insert)(func_get_args(), null, 1));
+        return (nbind)(...(array_insert)(func_get_args(), null, 1));
     }
 }
 
@@ -3722,13 +3762,13 @@ if (!isset($excluded_functions['composite']) && (!function_exists('ryunosuke\\Fu
 
         $first = array_shift($callables);
         return (delegate)(function ($first, $args) use ($callables, $arrayalbe) {
-            $result = call_user_func_array($first, $args);
+            $result = $first(...$args);
             foreach ($callables as $callable) {
                 // 「配列モードでただの配列」でないなら配列化
                 if (!($arrayalbe && is_array($result) && !(is_hasharray)($result))) {
                     $result = [$result];
                 }
-                $result = call_user_func_array($callable, $result);
+                $result = $callable(...$result);
             }
             return $result;
         }, $first);
@@ -3781,7 +3821,7 @@ if (!isset($excluded_functions['not_func']) && (!function_exists('ryunosuke\\Fun
     function not_func($callable)
     {
         return (delegate)(function ($callable, $args) {
-            return !call_user_func_array($callable, $args);
+            return !$callable(...$args);
         }, $callable);
     }
 }
@@ -3808,10 +3848,10 @@ if (!isset($excluded_functions['eval_func']) && (!function_exists('ryunosuke\\Fu
     {
         $eargs = $variadic;
         return (delegate)(function ($expression, $args) use ($eargs) {
-            return call_user_func(function () {
+            return (function () {
                 extract(func_get_arg(1));
                 return eval("return " . func_get_arg(0) . ";");
-            }, $expression, array_combine($eargs, $args));
+            })($expression, array_combine($eargs, $args));
         }, $expression, count($eargs));
     }
 }
@@ -3918,7 +3958,7 @@ if (!isset($excluded_functions['call_safely']) && (!function_exists('ryunosuke\\
         });
 
         try {
-            return call_user_func_array($callback, $variadic);
+            return $callback(...$variadic);
         }
         finally {
             restore_error_handler();
@@ -3944,7 +3984,7 @@ if (!isset($excluded_functions['ob_capture']) && (!function_exists('ryunosuke\\F
     {
         ob_start();
         try {
-            call_user_func_array($callback, $variadic);
+            $callback(...$variadic);
             return ob_get_contents();
         }
         finally {
@@ -4126,9 +4166,9 @@ if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('ry
         $plength = (parameter_length)($callback, true, true);
         return (delegate)(function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
-                return call_user_func_array($callback, $args);
+                return $callback(...$args);
             }
-            return call_user_func_array($callback, array_slice($args, 0, $plength));
+            return $callback(...array_slice($args, 0, $plength));
         }, $callback, $plength);
     }
 }
@@ -5116,6 +5156,162 @@ if (!isset($excluded_functions['chain_case']) && (!function_exists('ryunosuke\\F
     }
 }
 
+const build_uri = 'ryunosuke\\Functions\\build_uri';
+if (!isset($excluded_functions['build_uri']) && (!function_exists('ryunosuke\\Functions\\build_uri') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\build_uri'))->isInternal()))) {
+    /**
+     * parse_uri の逆
+     *
+     * URI のパーツを与えると URI として構築する。
+     * パーツは不完全でも良い。例えば scheme を省略すると "://" すら付かない URI が生成される。
+     *
+     * "query" パートだけは配列が許容される。その場合クエリ文字列に変換される。
+     *
+     * Example:
+     * ```php
+     * // 完全指定
+     * assertSame(build_uri([
+     *     'scheme'   => 'http',
+     *     'user'     => 'user',
+     *     'pass'     => 'pass',
+     *     'host'     => 'localhost',
+     *     'port'     => '80',
+     *     'path'     => '/path/to/file',
+     *     'query'    => ['id' => 1],
+     *     'fragment' => 'hash',
+     * ]), 'http://user:pass@localhost:80/path/to/file?id=1#hash');
+     * // 一部だけ指定
+     * assertSame(build_uri([
+     *     'scheme'   => 'http',
+     *     'host'     => 'localhost',
+     *     'path'     => '/path/to/file',
+     *     'fragment' => 'hash',
+     * ]), 'http://localhost/path/to/file#hash');
+     * ```
+     *
+     * @param array $parts URI の各パーツ配列
+     * @return string URI 文字列
+     */
+    function build_uri($parts)
+    {
+        $parts += [
+            'scheme'   => '',
+            'user'     => '',
+            'pass'     => '',
+            'host'     => '',
+            'port'     => '',
+            'path'     => '',
+            'query'    => '',
+            'fragment' => '',
+        ];
+        $parts['host'] = filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? "[{$parts['host']}]" : $parts['host'];
+        $parts['path'] = ltrim($parts['path'], '/');
+        $parts['query'] = is_array($parts['query']) ? http_build_query($parts['query'], '', '&') : $parts['query'];
+
+        $uri = '';
+        $uri .= (concat)($parts['scheme'], '://');
+        $uri .= (concat)($parts['user'] . (concat)(':', $parts['pass']), '@');
+        $uri .= (concat)($parts['host']);
+        $uri .= (concat)(':', $parts['port']);
+        $uri .= (concat)('/', $parts['path']);
+        $uri .= (concat)('?', $parts['query']);
+        $uri .= (concat)('#', $parts['fragment']);
+        return $uri;
+    }
+}
+
+const parse_uri = 'ryunosuke\\Functions\\parse_uri';
+if (!isset($excluded_functions['parse_uri']) && (!function_exists('ryunosuke\\Functions\\parse_uri') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\parse_uri'))->isInternal()))) {
+    /**
+     * parse_url の仕様を少しいじったもの
+     *
+     * parse_url とは下記が異なる。
+     *
+     * - "単一文字列" はホスト名とみなされる（parse_url はパスとみなされる）
+     * - パートがなくてもキー自体は生成される（そしてその値は $default で指定したもの）
+     * - query は配列で返す（parse_str される）
+     * - パート値をスカラー値で返すことはできない（必ず8要素の配列を返す）
+     *
+     * Example:
+     * ```php
+     * // 完全指定
+     * assertEquals(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'), [
+     *     'scheme'   => 'http',
+     *     'user'     => 'user',
+     *     'pass'     => 'pass',
+     *     'host'     => 'localhost',
+     *     'port'     => '80',
+     *     'path'     => '/path/to/file',
+     *     'query'    => ['id' => 1],
+     *     'fragment' => 'hash',
+     * ]);
+     * // デフォルト値つき
+     * assertEquals(parse_uri('localhost/path/to/file', [
+     *     'scheme'   => 'http', // scheme のデフォルト値
+     *     'user'     => 'user', // user のデフォルト値
+     *     'port'     => '8080', // port のデフォルト値
+     *     'host'     => 'hoge', // host のデフォルト値
+     * ]), [
+     *     'scheme'   => 'http',      // scheme はないのでデフォルト値が使われている
+     *     'user'     => 'user',      // user はないのでデフォルト値が使われている
+     *     'pass'     => '',
+     *     'host'     => 'localhost', // host はあるのでデフォルト値が使われていない
+     *     'port'     => '8080',      // port はないのでデフォルト値が使われている
+     *     'path'     => '/path/to/file',
+     *     'query'    => [],
+     *     'fragment' => '',
+     * ]);
+     * ```
+     *
+     * @param string $uri パースする URI
+     * @param array|string $default $uri に足りないパーツがあった場合のデフォルト値。文字列を与えた場合はそのパース結果がデフォルト値になる
+     * @return array URI の各パーツ配列
+     */
+    function parse_uri($uri, $default = [])
+    {
+        $regex = "
+            (?:(?<scheme>[a-z][-+.0-9a-z]*)://)?
+            (?:
+              (?: (?<user>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=])*)?
+              (?::(?<pass>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=])*))?@)?
+            )?
+            (?<host>((?:\\[[0-9a-f:]+\\]) | (?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=]))*)
+            (?::(?<port>\d{0,5}))?
+            (?<path>(?:/(?: [-.~\\w!$&'()*+,;=:@] | %[0-9a-f]{2} )* )*)?
+            (?:\\?(?<query>   (?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=/:?@])*))?
+            (?:\\#(?<fragment>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=/:?@])*))?
+        ";
+
+        $default_default = [
+            'scheme'   => '',
+            'user'     => '',
+            'pass'     => '',
+            'host'     => '',
+            'port'     => '',
+            'path'     => '',
+            'query'    => '',
+            'fragment' => '',
+        ];
+
+        // 配列以外はパースしてそれをデフォルトとする
+        if (!is_array($default)) {
+            $default = (preg_capture)("#^$regex\$#ix", (string) $default, $default_default);
+        }
+
+        // パース。先頭の // はスキーム省略とみなすので除去する
+        $uri = (preg_splice)('#^//#', '', $uri);
+        $parts = (preg_capture)("#^$regex\$#ix", $uri, $default + $default_default);
+
+        // 諸々調整（IPv6、パス / の正規化、クエリ配列化）
+        $parts['host'] = (preg_splice)('#^\\[(.+)\\]$#', '$1', $parts['host']);
+        $parts['path'] = (concat)('/', ltrim($parts['path'], '/'));
+        if (is_string($parts['query'])) {
+            parse_str($parts['query'], $parts['query']);
+        }
+
+        return $parts;
+    }
+}
+
 const random_string = 'ryunosuke\\Functions\\random_string';
 if (!isset($excluded_functions['random_string']) && (!function_exists('ryunosuke\\Functions\\random_string') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\random_string'))->isInternal()))) {
     /**
@@ -5330,7 +5526,7 @@ if (!isset($excluded_functions['render_string']) && (!function_exists('ryunosuke
         }
 
         try {
-            return call_user_func(function () {
+            return (function () {
                 // extract は数値キーを展開してくれないので自前ループで展開
                 foreach (func_get_arg(1) as $k => $v) {
                     $$k = $v;
@@ -5341,7 +5537,7 @@ if (!isset($excluded_functions['render_string']) && (!function_exists('ryunosuke
                 extract(func_get_arg(1));
                 // そして eval. ↑は要するに数値キーのみを展開している
                 return eval(func_get_arg(0));
-            }, $evalcode, $vars);
+            })($evalcode, $vars);
         }
         catch (\ParseError $ex) {
             throw new \RuntimeException('failed to eval code.' . $evalcode, 0, $ex);
@@ -5625,7 +5821,7 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('ryuno
     /**
      * try ～ catch ～ finally 構文の関数版
      *
-     * php < 5.5 にはないし、例外機構構文が冗長なことがまれによくあるはず。
+     * 例外機構構文が冗長なことがまれによくあるはず。
      *
      * Example:
      * ```php
@@ -6151,20 +6347,12 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('ryunosuke\\Fu
             throw new \InvalidArgumentException('benchset is empty.');
         }
 
-        // 5.6 で ... 呼び出しで zval が書き換わる不具合？があったのでループで引数配列を生成（異なる zval を返す）
-        $copy = function ($array) {
-            $result = [];
-            foreach ($array as $k => $v) {
-                $result[$k] = $v;
-            }
-            return $result;
-        };
-
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-        $assertions = (call_safely)(function ($benchset, $args) use ($copy) {
+        $assertions = (call_safely)(function ($benchset, $args) {
             $result = [];
+            $args2 = $args;
             foreach ($benchset as $name => $caller) {
-                $result[$name] = $caller(...$copy($args));
+                $result[$name] = $caller(...$args2);
             }
             return $result;
         }, $benchset, $args);
@@ -6185,9 +6373,9 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('ryunosuke\\Fu
         $counts = [];
         foreach ($benchset as $name => $caller) {
             $end = microtime(true) + $millisec / 1000;
-            $avg = $copy($args);
+            $args2 = $args;
             for ($n = 0; microtime(true) <= $end; $n++) {
-                $caller(...$avg);
+                $caller(...$args2);
             }
             $counts[$name] = $n;
         }
@@ -6230,7 +6418,7 @@ RESULT;
                     return vsprintf($defformat, [
                             $data['name'],
                             number_format($data['called']),
-                            number_format($data['mills'] * 1000, 6),
+                            number_format($data['mills'], 6),
                             number_format($data['ratio'], 3),
                         ]
                     );
@@ -6423,20 +6611,105 @@ if (!isset($excluded_functions['arrayval']) && (!function_exists('ryunosuke\\Fun
      */
     function arrayval($var, $recursive = true)
     {
-        if (!$recursive || (is_primitive)($var)) {
+        // return json_decode(json_encode($var), true);
+
+        // 無駄なループを回したくないので非再帰で配列の場合はそのまま返す
+        if (!$recursive && is_array($var)) {
+            return $var;
+        }
+
+        if ((is_primitive)($var)) {
             return (array) $var;
         }
 
-        // return json_decode(json_encode($var), true);
-
         $result = [];
         foreach ($var as $k => $v) {
-            if (!(is_primitive)($v)) {
-                $v = (arrayval)($v, true);
+            if ($recursive && !(is_primitive)($v)) {
+                $v = (arrayval)($v, $recursive);
             }
             $result[$k] = $v;
         }
         return $result;
+    }
+}
+
+const si_prefix = 'ryunosuke\\Functions\\si_prefix';
+if (!isset($excluded_functions['si_prefix']) && (!function_exists('ryunosuke\\Functions\\si_prefix') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\si_prefix'))->isInternal()))) {
+    /**
+     * 数値に SI 接頭辞を付与する
+     *
+     * 値は 1 <= $var < 1000 の範囲内に収められる。
+     * ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。
+     *
+     * Example:
+     * ```php
+     * // シンプルに k をつける
+     * assertSame(si_prefix(12345), '12.345 k');
+     * // シンプルに m をつける
+     * assertSame(si_prefix(0.012345), '12.345 m');
+     * // 書式フォーマットを指定できる
+     * assertSame(si_prefix(12345, '%d%s'), '12k');
+     * assertSame(si_prefix(0.012345, '%d%s'), '12m');
+     * // ファイルサイズを byte で表示する
+     * assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+     * // フォーマットに null を与えると sprintf せずに配列で返す
+     * assertSame(si_prefix(12345, null), [12.345, 'k']);
+     * ```
+     *
+     * @param mixed $var 丸める値
+     * @param string $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
+     * @return string|array SI 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
+     */
+    function si_prefix($var, $format = '%.3f %s')
+    {
+        $units = [
+            -24 => 'y', // ヨクト
+            -21 => 'z', // ゼプト
+            -18 => 'a', // アト
+            -15 => 'f', // フェムト
+            -12 => 'p', // ピコ
+            -9  => 'n', // ナノ
+            -6  => 'µ', // マイクロ
+            -3  => 'm', // ミリ
+            0   => '',  //
+            3   => 'k', // キロ
+            6   => 'M', // メガ
+            9   => 'G', // ギガ
+            12  => 'T', // テラ
+            15  => 'P', // ペタ
+            18  => 'E', // エクサ
+            21  => 'Z', // ゼタ
+            24  => 'Y', // ヨタ
+        ];
+
+        $result = function ($format, $var, $unit) {
+            if ($format === null) {
+                return [$var, $unit];
+            }
+            return sprintf($format, $var, $unit);
+        };
+
+        if ($var == 0) {
+            return $result($format, $var, '');
+        }
+
+        $original = $var;
+        $var = abs($var);
+        $n = 0;
+        while (!(1 <= $var && $var < 1000)) {
+            if ($var < 1) {
+                $n--;
+                $var *= 1000;
+            }
+            else {
+                $n++;
+                $var /= 1000;
+            }
+        }
+        if (!isset($units[$n * 3])) {
+            throw new \InvalidArgumentException("$original is too large or small.");
+        }
+        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n * 3]);
     }
 }
 

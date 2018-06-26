@@ -48,7 +48,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L826" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L976" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Strings</span></h2>
@@ -1146,7 +1146,166 @@ assertFalse(ends_with('abcdef', 'xyz'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L595-L621" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L595-L653" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::build_uri()" tabindex="-1" class="structure-title ">
+                        build_uri						<small>($parts)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>parse_uri の逆</p>
+<p>URI のパーツを与えると URI として構築する。<br />
+パーツは不完全でも良い。例えば scheme を省略すると "://" すら付かない URI が生成される。</p>
+<p>"query" パートだけは配列が許容される。その場合クエリ文字列に変換される。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 完全指定
+assertSame(build_uri([
+    'scheme'   =&gt; 'http',
+    'user'     =&gt; 'user',
+    'pass'     =&gt; 'pass',
+    'host'     =&gt; 'localhost',
+    'port'     =&gt; '80',
+    'path'     =&gt; '/path/to/file',
+    'query'    =&gt; ['id' =&gt; 1],
+    'fragment' =&gt; 'hash',
+]), 'http://user:pass@localhost:80/path/to/file?id=1#hash');
+// 一部だけ指定
+assertSame(build_uri([
+    'scheme'   =&gt; 'http',
+    'host'     =&gt; 'localhost',
+    'path'     =&gt; '/path/to/file',
+    'fragment' =&gt; 'hash',
+]), 'http://localhost/path/to/file#hash');
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$parts</td>
+				<td class="desc"><p>URI の各パーツ配列</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc"><p>URI 文字列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L655-L743" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::parse_uri()" tabindex="-1" class="structure-title ">
+                        parse_uri						<small>($uri, $default = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>parse_url の仕様を少しいじったもの</p>
+<p>parse_url とは下記が異なる。</p>
+<ul>
+<li>"単一文字列" はホスト名とみなされる（parse_url はパスとみなされる）</li>
+<li>パートがなくてもキー自体は生成される（そしてその値は $default で指定したもの）</li>
+<li>query は配列で返す（parse_str される）</li>
+<li>パート値をスカラー値で返すことはできない（必ず8要素の配列を返す）</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// 完全指定
+assertEquals(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'), [
+    'scheme'   =&gt; 'http',
+    'user'     =&gt; 'user',
+    'pass'     =&gt; 'pass',
+    'host'     =&gt; 'localhost',
+    'port'     =&gt; '80',
+    'path'     =&gt; '/path/to/file',
+    'query'    =&gt; ['id' =&gt; 1],
+    'fragment' =&gt; 'hash',
+]);
+// デフォルト値つき
+assertEquals(parse_uri('localhost/path/to/file', [
+    'scheme'   =&gt; 'http', // scheme のデフォルト値
+    'user'     =&gt; 'user', // user のデフォルト値
+    'port'     =&gt; '8080', // port のデフォルト値
+    'host'     =&gt; 'hoge', // host のデフォルト値
+]), [
+    'scheme'   =&gt; 'http',      // scheme はないのでデフォルト値が使われている
+    'user'     =&gt; 'user',      // user はないのでデフォルト値が使われている
+    'pass'     =&gt; '',
+    'host'     =&gt; 'localhost', // host はあるのでデフォルト値が使われていない
+    'port'     =&gt; '8080',      // port はないのでデフォルト値が使われている
+    'path'     =&gt; '/path/to/file',
+    'query'    =&gt; [],
+    'fragment' =&gt; '',
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$uri</td>
+				<td class="desc"><p>パースする URI</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>string</td>
+				<td class="rest">$default = []</td>
+				<td class="desc"><p>$uri に足りないパーツがあった場合のデフォルト値。文字列を与えた場合はそのパース結果がデフォルト値になる</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>URI の各パーツ配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L745-L771" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::random_string()" tabindex="-1" class="structure-title ">
                         random_string						<small>($length = 8, $charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;)</small>
@@ -1199,7 +1358,7 @@ assertFalse(ends_with('abcdef', 'xyz'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L623-L657" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L773-L807" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::kvsprintf()" tabindex="-1" class="structure-title ">
                         kvsprintf						<small>($format, $array)</small>
@@ -1256,7 +1415,7 @@ assertFalse(ends_with('abcdef', 'xyz'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L659-L696" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L809-L846" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_capture()" tabindex="-1" class="structure-title ">
                         preg_capture						<small>($pattern, $subject, $default)</small>
@@ -1329,7 +1488,7 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L698-L739" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L848-L889" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_splice()" tabindex="-1" class="structure-title ">
                         preg_splice						<small>($pattern, $replacement, $subject, &amp;$matches = [])</small>
@@ -1411,7 +1570,7 @@ assertSame($m, ['abc']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L741-L811" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L891-L961" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_string()" tabindex="-1" class="structure-title ">
                         render_string						<small>($template, $array)</small>
@@ -1487,7 +1646,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L813-L825" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L963-L975" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_file()" tabindex="-1" class="structure-title ">
                         render_file						<small>($template_file, $array)</small>
