@@ -10,6 +10,16 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.1
+
+- [feature][Arrays] array_pickup を追加
+- [feature][Strings] parse_uri を追加
+- [feature][Strings] build_uri を追加
+- [feature][Vars] si_prefix を追加
+- [fixbug][Arrays] array_shrink_key のオブジェクト対応
+- [fixbug][Utility] benchmark の平均時間が1000倍されていた不具合を修正
+- [fixbug][Vars] arrayval が recursive で挙動が違う不具合を修正
+
 ## 1.2.0
 
 - [*change] php 7.0 未満を切り捨て
