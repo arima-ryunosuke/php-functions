@@ -537,7 +537,7 @@ RESULT;
                     return vsprintf($defformat, [
                             $data['name'],
                             number_format($data['called']),
-                            number_format($data['mills'] * 1000, 6),
+                            number_format($data['mills'], 6),
                             number_format($data['ratio'], 3),
                         ]
                     );

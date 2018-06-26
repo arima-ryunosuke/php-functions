@@ -457,6 +457,10 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         @$benchmark(['md5', 'sha1'], ['hoge'], 10, false);
         $this->assertContains('Results of sha1 and md5 are different', error_get_last()['message']);
 
+        // usleep(15000) の平均実行時間は 15ms のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
+        $output = $benchmark(['usleep'], [15000], 300, false);
+        $this->assertLessThan(15 + 5, $output[0]['mills']);
+
         // 参照渡しも呼べる
         $benchmark(['reset', 'end'], [['hoge']], 10, false);
         // エラーが出なければいいので assert はナシ
