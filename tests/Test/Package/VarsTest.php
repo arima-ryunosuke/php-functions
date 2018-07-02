@@ -115,6 +115,51 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         ], $arrayval($stdclass, false));
     }
 
+    function test_si_prefix()
+    {
+        $si_prefix = si_prefix;
+        $units = [
+            -24 => 'y', // ヨクト
+            -21 => 'z', // ゼプト
+            -18 => 'a', // アト
+            -15 => 'f', // フェムト
+            -12 => 'p', // ピコ
+            -9  => 'n', // ナノ
+            -6  => 'µ', // マイクロ
+            -3  => 'm', // ミリ
+            0   => ' ',  //
+            3   => 'k', // キロ
+            6   => 'M', // メガ
+            9   => 'G', // ギガ
+            12  => 'T', // テラ
+            15  => 'P', // ペタ
+            18  => 'E', // エクサ
+            21  => 'Z', // ゼタ
+            24  => 'Y', // ヨタ
+        ];
+        foreach ($units as $exp => $unit) {
+            $plus = $si_prefix(pow(10, $exp));
+            $this->assertContains('1.000', $plus, "10^$exp");
+            $this->assertStringEndsWith($unit, $plus, "10^$exp");
+
+            $minus = $si_prefix(-pow(10, $exp));
+            $this->assertContains('-1.000', $minus, "10^$exp");
+            $this->assertStringEndsWith($unit, $minus, "10^$exp");
+        }
+
+        $this->assertEquals('0.000 ', $si_prefix("0.0"));
+        $this->assertEquals('0.000 ', $si_prefix("0"));
+        $this->assertEquals('0.000 ', $si_prefix(0));
+        $this->assertEquals('0.000 ', $si_prefix(0.0));
+        $this->assertEquals('999.000 ', $si_prefix(999));
+        $this->assertEquals('1.000 k', $si_prefix(1000));
+        $this->assertEquals('1.001 k', $si_prefix(1001));
+        $this->assertEquals([0, ''], $si_prefix(0, null));
+        $this->assertEquals([12.345, 'k'], $si_prefix(12345, null));
+
+        $this->assertException('too large or small', $si_prefix, pow(10, 30));
+    }
+
     function test_is_empty()
     {
         $is_empty = is_empty;

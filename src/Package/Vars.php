@@ -194,6 +194,83 @@ class Vars
     }
 
     /**
+     * 数値に SI 接頭辞を付与する
+     *
+     * 値は 1 <= $var < 1000 の範囲内に収められる。
+     * ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。
+     *
+     * Example:
+     * ```php
+     * // シンプルに k をつける
+     * assertSame(si_prefix(12345), '12.345 k');
+     * // シンプルに m をつける
+     * assertSame(si_prefix(0.012345), '12.345 m');
+     * // 書式フォーマットを指定できる
+     * assertSame(si_prefix(12345, '%d%s'), '12k');
+     * assertSame(si_prefix(0.012345, '%d%s'), '12m');
+     * // ファイルサイズを byte で表示する
+     * assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+     * // フォーマットに null を与えると sprintf せずに配列で返す
+     * assertSame(si_prefix(12345, null), [12.345, 'k']);
+     * ```
+     *
+     * @param mixed $var 丸める値
+     * @param string $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
+     * @return string|array SI 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
+     */
+    public static function si_prefix($var, $format = '%.3f %s')
+    {
+        $units = [
+            -24 => 'y', // ヨクト
+            -21 => 'z', // ゼプト
+            -18 => 'a', // アト
+            -15 => 'f', // フェムト
+            -12 => 'p', // ピコ
+            -9  => 'n', // ナノ
+            -6  => 'µ', // マイクロ
+            -3  => 'm', // ミリ
+            0   => '',  //
+            3   => 'k', // キロ
+            6   => 'M', // メガ
+            9   => 'G', // ギガ
+            12  => 'T', // テラ
+            15  => 'P', // ペタ
+            18  => 'E', // エクサ
+            21  => 'Z', // ゼタ
+            24  => 'Y', // ヨタ
+        ];
+
+        $result = function ($format, $var, $unit) {
+            if ($format === null) {
+                return [$var, $unit];
+            }
+            return sprintf($format, $var, $unit);
+        };
+
+        if ($var == 0) {
+            return $result($format, $var, '');
+        }
+
+        $original = $var;
+        $var = abs($var);
+        $n = 0;
+        while (!(1 <= $var && $var < 1000)) {
+            if ($var < 1) {
+                $n--;
+                $var *= 1000;
+            }
+            else {
+                $n++;
+                $var /= 1000;
+            }
+        }
+        if (!isset($units[$n * 3])) {
+            throw new \InvalidArgumentException("$original is too large or small.");
+        }
+        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n * 3]);
+    }
+
+    /**
      * 値が空か検査する
      *
      * `empty` とほぼ同じ。ただし
