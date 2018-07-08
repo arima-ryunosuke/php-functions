@@ -2069,15 +2069,19 @@ class Arrays
      * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
      * ```
      *
-     * @param array $array 対象配列
-     * @param array $variadic 比較する配列
+     * @param array|\Traversable[] $variadic 共通項を取る配列（可変引数）
      * @return array 新しい配列
      */
-    public static function array_shrink_key(array $array, ...$variadic)
+    public static function array_shrink_key(...$variadic)
     {
-        $args = func_get_args();
-        array_unshift($args, array_replace(...$args));
-        return array_intersect_key(...$args);
+        $result = [];
+        foreach ($variadic as $n => $array) {
+            if (!is_array($array)) {
+                $variadic[$n] = (arrayval)($array, false);
+            }
+            $result = array_replace($result, $variadic[$n]);
+        }
+        return array_intersect_key($result, ...$variadic);
     }
 
     /**

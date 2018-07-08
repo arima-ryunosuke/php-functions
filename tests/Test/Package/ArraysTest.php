@@ -1389,6 +1389,13 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], array_intersect_key($array, $array1, $array2, $array3));
         // array_shrink_key は右方優先
         $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], $array_shrink_key($array, $array1, $array2, $array3));
+
+        // オブジェクトも渡せる
+        $object = (stdclass)($array);
+        $object1 = (stdclass)($array1);
+        $object2 = (stdclass)($array2);
+        $object3 = (stdclass)($array3);
+        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], $array_shrink_key($object, $object1, $object2, $object3));
     }
 
     function test_array_lookup()
