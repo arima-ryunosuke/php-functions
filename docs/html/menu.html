@@ -26,7 +26,7 @@
                 return this.dataset.src + '?' + cachekey;
             });
 
-            $(document).on('click', 'a[href]:not(.cachekey)', function () {
+            $(document).on('click', 'a[href]:not([target="_blank"]):not(.cachekey)', function () {
                 this.classList.add('cachekey');
                 this.href = this.href.replace('.html', '.html?' + cachekey);
             });
@@ -37,6 +37,7 @@
 <h1>
 	Namespace
 	<input type="search" id="search" class="form-control" autocomplete="off" placeholder="search">
+	<a href="fqsens.html" class="all-fqsen" target="main">all</a>
 </h1>
 <div class="main-wrapper">
     	<ul class="namespaces">
@@ -65,7 +66,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Arrays" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays" class="" target="main">Arrays</a>
+							<a id="ryunosuke\Functions\Package\Arrays" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays" class="bold " target="main">Arrays</a>
 							<small class="ellipsis-text">配列関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -530,7 +531,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                     					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Classobj" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj" class="" target="main">Classobj</a>
+							<a id="ryunosuke\Functions\Package\Classobj" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj" class="bold " target="main">Classobj</a>
 							<small class="ellipsis-text">クラス・オブジェクト関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -595,7 +596,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\FileSystem" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem" class="" target="main">FileSystem</a>
+							<a id="ryunosuke\Functions\Package\FileSystem" href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem" class="bold " target="main">FileSystem</a>
 							<small class="ellipsis-text">ファイルシステム関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -716,7 +717,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Funchand" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand" class="" target="main">Funchand</a>
+							<a id="ryunosuke\Functions\Package\Funchand" href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand" class="bold " target="main">Funchand</a>
 							<small class="ellipsis-text">callable 関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -861,7 +862,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Math" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math" class="" target="main">Math</a>
+							<a id="ryunosuke\Functions\Package\Math" href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math" class="bold " target="main">Math</a>
 							<small class="ellipsis-text">数学関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -942,7 +943,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Strings" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings" class="" target="main">Strings</a>
+							<a id="ryunosuke\Functions\Package\Strings" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings" class="bold " target="main">Strings</a>
 							<small class="ellipsis-text">文字列関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -1143,7 +1144,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                 					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Syntax" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax" class="" target="main">Syntax</a>
+							<a id="ryunosuke\Functions\Package\Syntax" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax" class="bold " target="main">Syntax</a>
 							<small class="ellipsis-text">構文関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -1216,7 +1217,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                     					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Utility" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility" class="" target="main">Utility</a>
+							<a id="ryunosuke\Functions\Package\Utility" href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility" class="bold " target="main">Utility</a>
 							<small class="ellipsis-text">汎用的なユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
@@ -1281,7 +1282,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
-							<a id="ryunosuke\Functions\Package\Vars" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars" class="" target="main">Vars</a>
+							<a id="ryunosuke\Functions\Package\Vars" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars" class="bold " target="main">Vars</a>
 							<small class="ellipsis-text">変数関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->

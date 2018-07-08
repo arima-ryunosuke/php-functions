@@ -233,9 +233,13 @@ ul > li {
     font-weight: normal;
     font-size: 14px;
     display: inline;
-    width: calc(100% - 9.1em);
+    width: calc(100% - 11.1em);
     height: 100%;
     padding: 2px;
+}
+
+h1 a, h1 a:hover, h1 a:focus {
+    color: #ff9c9c;
 }
 
 .typeahead.dropdown-menu {
@@ -316,6 +320,8 @@ ul > li {
 
 .description code {
     font-size: 12px;
+    overflow-x: auto;
+    white-space: pre;
 }
 
 .using li {

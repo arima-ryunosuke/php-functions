@@ -68,6 +68,10 @@ var $window = $(window);
 
 hljs.initHighlightingOnLoad();
 
+// frame switching
+$('.frame-switch a:eq(0)').attr('href', '../' + window.location.hash);
+$('.frame-switch a:eq(1)').attr('href', window.location.href);
+
 if (window.name === 'main') {
     $.open(window.location.hash.substring(1));
     $window.on('hashchange', function () {
