@@ -177,16 +177,21 @@ class Vars
      */
     public static function arrayval($var, $recursive = true)
     {
-        if (!$recursive || (is_primitive)($var)) {
+        // return json_decode(json_encode($var), true);
+
+        // 無駄なループを回したくないので非再帰で配列の場合はそのまま返す
+        if (!$recursive && is_array($var)) {
+            return $var;
+        }
+
+        if ((is_primitive)($var)) {
             return (array) $var;
         }
 
-        // return json_decode(json_encode($var), true);
-
         $result = [];
         foreach ($var as $k => $v) {
-            if (!(is_primitive)($v)) {
-                $v = (arrayval)($v, true);
+            if ($recursive && !(is_primitive)($v)) {
+                $v = (arrayval)($v, $recursive);
             }
             $result[$k] = $v;
         }

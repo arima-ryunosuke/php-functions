@@ -88,6 +88,22 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
             ['array'],
         ]);
 
+        $ao = new \ArrayObject([1, 2, 3]);
+        $this->assertSame([
+            'k'  => 'v',
+            'ao' => [1, 2, 3],
+        ], $arrayval([
+            'k'  => 'v',
+            'ao' => $ao,
+        ]));
+        $this->assertSame([
+            'k'  => 'v',
+            'ao' => $ao,
+        ], $arrayval([
+            'k'  => 'v',
+            'ao' => $ao,
+        ], false));
+
         $inner = (stdclass)([
             'inner-scalar2',
             (stdclass)([
