@@ -1398,6 +1398,19 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], $array_shrink_key($object, $object1, $object2, $object3));
     }
 
+    function test_array_pickup()
+    {
+        $array_pickup = array_pickup;
+        $this->assertSame(['a' => 'A'], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['a']));
+        $this->assertSame(['b' => ['b' => 'B']], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['b']));
+
+        $this->assertSame(['a' => 'A', 'c' => 'C'], $array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']));
+        $this->assertSame(['c' => 'C', 'a' => 'A'], $array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']));
+
+        $this->assertSame(['a' => 'A', 'c' => 'C'], $array_pickup((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
+        $this->assertSame(['c' => 'C', 'a' => 'A'], $array_pickup((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
+    }
+
     function test_array_lookup()
     {
         $array_lookup = array_lookup;

@@ -2085,6 +2085,39 @@ class Arrays
     }
 
     /**
+     * キーを指定してそれだけの配列にする
+     *
+     * `array_intersect_key($array, array_flip($keys))` とほぼ同義。
+     * 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。
+     *
+     * Example:
+     * ```php
+     * // a と c を取り出す
+     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']), ['a' => 'A', 'c' => 'C']);
+     * // 順番は $keys 基準になる
+     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param array $keys 取り出すキー（可変引数）
+     * @return array 新しい配列
+     */
+    public static function array_pickup($array, $keys)
+    {
+        if (!is_array($array)) {
+            $array = (arrayval)($array, false);
+        }
+
+        $result = [];
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $array)) {
+                $result[$key] = $array[$key];
+            }
+        }
+        return $result;
+    }
+
+    /**
      * キー保存可能な array_column
      *
      * array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。
