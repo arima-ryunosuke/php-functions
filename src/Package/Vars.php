@@ -403,6 +403,39 @@ class Vars
     }
 
     /**
+     * 変数が文字列化できるか調べる
+     *
+     * 「配列」「__toString を持たないオブジェクト」が false になる。
+     * （厳密に言えば配列は "Array" になるので文字列化できるといえるがここでは考えない）。
+     *
+     * Example:
+     * ```php
+     * // こいつらは true
+     * assertTrue(is_stringable(null));
+     * assertTrue(is_stringable(true));
+     * assertTrue(is_stringable(3.14));
+     * assertTrue(is_stringable(STDOUT));
+     * assertTrue(is_stringable(new \Exception()));
+     * // こいつらは false
+     * assertFalse(is_stringable(new \ArrayObject()));
+     * assertFalse(is_stringable([1, 2, 3]));
+     * ```
+     *
+     * @param mixed $var 調べる値
+     * @return bool 文字列化できるなら true
+     */
+    public static function is_stringable($var)
+    {
+        if (is_array($var)) {
+            return false;
+        }
+        if (is_object($var) && !method_exists($var, '__toString')) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * 変数が foreach で回せるか調べる
      *
      * オブジェクトの場合は \Traversable のみ。

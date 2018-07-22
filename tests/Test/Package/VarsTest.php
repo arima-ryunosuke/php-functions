@@ -256,6 +256,21 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($is_recursive($rnestobject));
     }
 
+    function test_is_stringable()
+    {
+        $is_stringable = is_stringable;
+        $this->assertTrue($is_stringable(null));
+        $this->assertTrue($is_stringable(false));
+        $this->assertTrue($is_stringable(true));
+        $this->assertTrue($is_stringable(123));
+        $this->assertTrue($is_stringable(123.456));
+        $this->assertTrue($is_stringable('hoge'));
+        $this->assertTrue($is_stringable(STDIN));
+        $this->assertFalse($is_stringable(['array']));
+        $this->assertFalse($is_stringable(new \stdClass()));
+        $this->assertTrue($is_stringable(new \Concrete('hoge')));
+    }
+
     function test_is_iterable()
     {
         $is_iterable = is_iterable;
