@@ -778,11 +778,14 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 	<div class="description"><p>キーを指定してそれだけの配列にする</p>
 <p><code>array_intersect_key($array, array_flip($keys))</code> とほぼ同義。<br />
 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。</p>
+<p>$keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// a と c を取り出す
 assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['a', 'c']), ['a' =&gt; 'A', 'c' =&gt; 'C']);
 // 順番は $keys 基準になる
 assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
+// 連想配列を渡すと読み替えて返す
+assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; 'C', 'aX' =&gt; 'A']);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()"> ryunosuke\Functions\Package\Arrays::array_lookup()</a></h2>
@@ -954,6 +957,40 @@ catch (\Exception $e) {
 }
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_difference()"> ryunosuke\Functions\Package\Arrays::array_difference()</a></h2>
+	<div class="description"><p>配列の差分を取り配列で返す</p>
+<p>返り値の配列は構造化されたデータではない。<br />
+主に文字列化して出力することを想定している。</p>
+<p>ユースケースとしては「スキーマデータ」「各環境の設定ファイル」などの差分。</p>
+<ul>
+<li>'+' はキーが追加されたことを表す</li>
+<li>'-' はキーが削除されたことを表す</li>
+<li>両方が含まれている場合、値の変更を表す</li>
+</ul>
+<p>数値キーはキーの比較は行われない。値の差分のみ返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// common は 中身に差分がある。 1 に key1 はあるが、 2 にはない。2 に key2 はあるが、 1 にはない。
+assertSame(array_difference([
+    'common' =&gt; [
+        'sub' =&gt; [
+            'x' =&gt; 'val',
+        ]
+    ],
+    'key1'   =&gt; 'hoge',
+], [
+    'common' =&gt; [
+        'sub' =&gt; [
+            'x' =&gt; 'VAL',
+        ]
+    ],
+    'key2'   =&gt; 'fuga',
+]), [
+    'common.sub.x' =&gt; ['-' =&gt; 'val', '+' =&gt; 'VAL'],
+    'key1'         =&gt; ['-' =&gt; 'hoge'],
+    'key2'         =&gt; ['+' =&gt; 'fuga'],
+]);
+</code></pre>
+</div>
             	<h2>class<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj"> ryunosuke\Functions\Package\Classobj</a></h2>
 	<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p>
 </div>
@@ -1009,6 +1046,23 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 <p>つまり、classA を継承した classAA を定義してそれを classA とみなすことが可能になる。<br />
 ただし、内部的には class_alias を使用して実現しているので厳密には異なるクラスとなる。</p>
 <p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::object_dive()"> ryunosuke\Functions\Package\Classobj::object_dive()</a></h2>
+	<div class="description"><p>パス形式でプロパティ値を取得</p>
+<p>存在しない場合は $default を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$class = stdclass([
+    'a' =&gt; stdclass([
+        'b' =&gt; stdclass([
+            'c' =&gt; 'vvv'
+        ])
+    ])
+]);
+assertSame(object_dive($class, 'a.b.c'), 'vvv');
+assertSame(object_dive($class, 'a.b.x', 9), 9);
+// 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
+assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
+</code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::get_object_properties()"> ryunosuke\Functions\Package\Classobj::get_object_properties()</a></h2>
 	<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
@@ -1323,6 +1377,13 @@ catch (\Exception $ex) {
 	<div class="description"><p>ob_start ～ ob_get_clean のブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(ob_capture(function(){echo 123;}), '123');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::is_bindable_closure()"> ryunosuke\Functions\Package\Funchand::is_bindable_closure()</a></h2>
+	<div class="description"><p>$this を bind 可能なクロージャか調べる</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(is_bindable_closure(function(){}));
+assertFalse(is_bindable_closure(static function(){}));
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::by_builtin()"> ryunosuke\Functions\Package\Funchand::by_builtin()</a></h2>
@@ -2034,6 +2095,27 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 ]);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::backtrace()"> ryunosuke\Functions\Package\Utility::backtrace()</a></h2>
+	<div class="description"><p>特定条件までのバックトレースを取得する</p>
+<p>第2引数 $options を満たすトレース以降を返す。<br />
+$options は ['$trace の key' =&gt; "条件"] を渡す。<br />
+条件は文字列かクロージャで、文字列の場合は緩い一致、クロージャの場合は true を返した場合にそれ以降を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">function f001 () {return backtrace(0, ['function' =&gt; 'f002', 'limit' =&gt; 2]);}
+function f002 () {return f001();}
+function f003 () {return f002();}
+$traces = f003();
+// limit 指定してるので2個
+assertCount(2, $traces);
+// 「function が f002 以降」を返す
+assertArraySubset([
+    'function' =&gt; 'f002'
+], $traces[0]);
+assertArraySubset([
+    'function' =&gt; 'f003'
+], $traces[1]);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::error()"> ryunosuke\Functions\Package\Utility::error()</a></h2>
 	<div class="description"><p>エラー出力する</p>
 <p>第1引数 $message はそれらしく文字列化されて出力される。基本的にはあらゆる型を与えて良い。</p>
@@ -2191,6 +2273,30 @@ assertTrue(is_recursive($array));
 $object = new \stdClass();
 $object-&gt;recursive = $object;
 assertTrue(is_recursive($object));
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_stringable()"> ryunosuke\Functions\Package\Vars::is_stringable()</a></h2>
+	<div class="description"><p>変数が文字列化できるか調べる</p>
+<p>「配列」「__toString を持たないオブジェクト」が false になる。<br />
+（厳密に言えば配列は "Array" になるので文字列化できるといえるがここでは考えない）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// こいつらは true
+assertTrue(is_stringable(null));
+assertTrue(is_stringable(true));
+assertTrue(is_stringable(3.14));
+assertTrue(is_stringable(STDOUT));
+assertTrue(is_stringable(new \Exception()));
+// こいつらは false
+assertFalse(is_stringable(new \ArrayObject()));
+assertFalse(is_stringable([1, 2, 3]));
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_arrayable()"> ryunosuke\Functions\Package\Vars::is_arrayable()</a></h2>
+	<div class="description"><p>変数が配列アクセス可能か調べる</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(is_arrayable([]));
+assertTrue(is_arrayable(new \ArrayObject()));
+assertFalse(is_arrayable(new \stdClass()));
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()"> ryunosuke\Functions\Package\Vars::is_iterable()</a></h2>

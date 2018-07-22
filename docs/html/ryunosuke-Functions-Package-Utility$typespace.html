@@ -53,7 +53,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L550" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L609" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
@@ -419,7 +419,78 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L328-L387" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L328-L385" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::backtrace()" tabindex="-1" class="structure-title ">
+                        backtrace						<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>特定条件までのバックトレースを取得する</p>
+<p>第2引数 $options を満たすトレース以降を返す。<br />
+$options は ['$trace の key' =&gt; "条件"] を渡す。<br />
+条件は文字列かクロージャで、文字列の場合は緩い一致、クロージャの場合は true を返した場合にそれ以降を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">function f001 () {return backtrace(0, ['function' =&gt; 'f002', 'limit' =&gt; 2]);}
+function f002 () {return f001();}
+function f003 () {return f002();}
+$traces = f003();
+// limit 指定してるので2個
+assertCount(2, $traces);
+// 「function が f002 以降」を返す
+assertArraySubset([
+    'function' =&gt; 'f002'
+], $traces[0]);
+assertArraySubset([
+    'function' =&gt; 'f003'
+], $traces[1]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$flags = DEBUG_BACKTRACE_PROVIDE_OBJECT</td>
+				<td class="desc"><p>debug_backtrace の引数</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$options = []</td>
+				<td class="desc"><p>フィルタ条件</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>バックトレース</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L387-L446" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error						<small>($message, $destination = null)</small>
@@ -477,7 +548,7 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L389-L416" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L448-L475" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
                         timer						<small>($callable, $count = 1)</small>
@@ -535,7 +606,7 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L418-L549" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L477-L608" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>

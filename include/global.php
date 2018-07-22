@@ -839,8 +839,8 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
         if (is_array($key)) {
             $result = [];
             foreach ($key as $k) {
-                // 深遠な事情で少しでも高速化したかったので isset || array_key_exists にしてある
-                if (isset($array[$k]) || array_key_exists($k, $array)) {
+                // 深遠な事情で少しでも高速化したかったので isset || array_keys_exist にしてある
+                if (isset($array[$k]) || (array_keys_exist)($k, $array)) {
                     $result[$k] = $array[$k];
                 }
             }
@@ -870,7 +870,7 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
             return $result;
         }
 
-        if (array_key_exists($key, $array)) {
+        if ((array_keys_exist)($key, $array)) {
             return $array[$key];
         }
         return $default;
@@ -984,7 +984,7 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
         if (is_array($key)) {
             $result = [];
             foreach ($key as $rk => $ak) {
-                if (array_key_exists($ak, $array)) {
+                if ((array_keys_exist)($ak, $array)) {
                     $result[$rk] = $array[$ak];
                     unset($array[$ak]);
                 }
@@ -1009,7 +1009,7 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
             return $result;
         }
 
-        if (array_key_exists($key, $array)) {
+        if ((array_keys_exist)($key, $array)) {
             $result = $array[$key];
             unset($array[$key]);
             return $result;
@@ -1050,7 +1050,10 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive')
     {
         $keys = is_array($path) ? $path : explode($delimiter, $path);
         foreach ($keys as $key) {
-            if (!array_key_exists($key, $array)) {
+            if (!(is_arrayable)($array)) {
+                return $default;
+            }
+            if (!(array_keys_exist)($key, $array)) {
                 return $default;
             }
             $array = $array[$key];
@@ -1105,7 +1108,7 @@ if (!isset($excluded_functions['array_keys_exist']) && (!function_exists('array_
                 }
             }
             elseif ($is_arrayaccess) {
-                if (!isset($array[$key])) {
+                if (!$array->offsetExists($key)) {
                     return false;
                 }
             }
@@ -1480,6 +1483,7 @@ if (!isset($excluded_functions['array_maps']) && (!function_exists('array_maps')
                 $callback = key($callback);
             }
             else {
+                $margs = null;
                 $callback = (func_user_func_array)($callback);
             }
             foreach ($result as $k => $v) {
@@ -2237,12 +2241,16 @@ if (!isset($excluded_functions['array_pickup']) && (!function_exists('array_pick
      * `array_intersect_key($array, array_flip($keys))` とほぼ同義。
      * 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。
      *
+     * $keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。
+     *
      * Example:
      * ```php
      * // a と c を取り出す
      * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']), ['a' => 'A', 'c' => 'C']);
      * // 順番は $keys 基準になる
      * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * // 連想配列を渡すと読み替えて返す
+     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2256,9 +2264,16 @@ if (!isset($excluded_functions['array_pickup']) && (!function_exists('array_pick
         }
 
         $result = [];
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $array)) {
-                $result[$key] = $array[$key];
+        foreach ($keys as $k => $key) {
+            if (is_int($k)) {
+                if (array_key_exists($key, $array)) {
+                    $result[$key] = $array[$key];
+                }
+            }
+            else {
+                if (array_key_exists($k, $array)) {
+                    $result[$key] = $array[$k];
+                }
             }
         }
         return $result;
@@ -2686,6 +2701,115 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('array_nest')
     }
 }
 
+const array_difference = 'array_difference';
+if (!isset($excluded_functions['array_difference']) && (!function_exists('array_difference') || (!false && (new \ReflectionFunction('array_difference'))->isInternal()))) {
+    /**
+     * 配列の差分を取り配列で返す
+     *
+     * 返り値の配列は構造化されたデータではない。
+     * 主に文字列化して出力することを想定している。
+     *
+     * ユースケースとしては「スキーマデータ」「各環境の設定ファイル」などの差分。
+     *
+     * - '+' はキーが追加されたことを表す
+     * - '-' はキーが削除されたことを表す
+     * - 両方が含まれている場合、値の変更を表す
+     *
+     * 数値キーはキーの比較は行われない。値の差分のみ返す。
+     *
+     * Example:
+     * ```php
+     * // common は 中身に差分がある。 1 に key1 はあるが、 2 にはない。2 に key2 はあるが、 1 にはない。
+     * assertSame(array_difference([
+     *     'common' => [
+     *         'sub' => [
+     *             'x' => 'val',
+     *         ]
+     *     ],
+     *     'key1'   => 'hoge',
+     * ], [
+     *     'common' => [
+     *         'sub' => [
+     *             'x' => 'VAL',
+     *         ]
+     *     ],
+     *     'key2'   => 'fuga',
+     * ]), [
+     *     'common.sub.x' => ['-' => 'val', '+' => 'VAL'],
+     *     'key1'         => ['-' => 'hoge'],
+     *     'key2'         => ['+' => 'fuga'],
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $array1 対象配列1
+     * @param array|\Traversable $array2 対象配列2
+     * @param string $delimiter 差分配列のキー区切り文字
+     * @return array 差分を表す配列
+     */
+    function array_difference($array1, $array2, $delimiter = '.')
+    {
+        $rule = [
+            'list' => static function ($v, $k) { return is_int($k); },
+            'hash' => static function ($v, $k) { return !is_int($k); },
+        ];
+        $prefixer = static function ($key, $k) use ($delimiter) {
+            return $key === '' ? $k : $key . $delimiter . $k;
+        };
+
+        return call_user_func($f = static function ($array1, $array2, $key = '') use (&$f, $rule, $prefixer) {
+            $result = [];
+
+            $array1 = (array_assort)($array1, $rule);
+            $array2 = (array_assort)($array2, $rule);
+
+            foreach (array_diff($array1['list'], $array2['list']) as $k => $v1) {
+                $prefix = $prefixer($key, $k);
+                $result[$prefix] = ['-' => $v1];
+            }
+            foreach (array_diff($array2['list'], $array1['list']) as $k => $v2) {
+                $prefix = $prefixer($key, $k);
+                $result[$prefix] = ['+' => $v2];
+            }
+            foreach ($array1['hash'] + $array2['hash'] as $k => $dummy) {
+                $exists1 = array_key_exists($k, $array1['hash']);
+                $exists2 = array_key_exists($k, $array2['hash']);
+
+                $v1 = $exists1 ? $array1['hash'][$k] : null;
+                $v2 = $exists2 ? $array2['hash'][$k] : null;
+
+                $is_array1 = is_array($v1);
+                $is_array2 = is_array($v2);
+
+                $prefix = $prefixer($key, $k);
+                if ($exists1 && $exists2) {
+                    if ($is_array1 && $is_array2) {
+                        $result += $f($v1, $v2, $prefix);
+                    }
+                    elseif ($is_array1) {
+                        $result += $f($v1, [], $prefix);
+                        $result[$prefix] = ['+' => $v2];
+                    }
+                    elseif ($is_array2) {
+                        $result[$prefix] = ['-' => $v1];
+                        $result += $f([], $v2, $prefix);
+                    }
+                    elseif ($v1 !== $v2) {
+                        $result[$prefix] = ['-' => $v1, '+' => $v2];
+                    }
+                }
+                elseif ($exists1) {
+                    $result[$prefix] = ['-' => $v1];
+                }
+                elseif ($exists2) {
+                    $result[$prefix] = ['+' => $v2];
+                }
+            }
+
+            return $result;
+        }, $array1, $array2);
+    }
+}
+
 const stdclass = 'stdclass';
 if (!isset($excluded_functions['stdclass']) && (!function_exists('stdclass') || (!false && (new \ReflectionFunction('stdclass'))->isInternal()))) {
     /**
@@ -2921,6 +3045,47 @@ if (!isset($excluded_functions['class_replace']) && (!function_exists('class_rep
         }
 
         class_alias($newclass, $class);
+    }
+}
+
+const object_dive = 'object_dive';
+if (!isset($excluded_functions['object_dive']) && (!function_exists('object_dive') || (!false && (new \ReflectionFunction('object_dive'))->isInternal()))) {
+    /**
+     * パス形式でプロパティ値を取得
+     *
+     * 存在しない場合は $default を返す。
+     *
+     * Example:
+     * ```php
+     * $class = stdclass([
+     *     'a' => stdclass([
+     *         'b' => stdclass([
+     *             'c' => 'vvv'
+     *         ])
+     *     ])
+     * ]);
+     * assertSame(object_dive($class, 'a.b.c'), 'vvv');
+     * assertSame(object_dive($class, 'a.b.x', 9), 9);
+     * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
+     * assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
+     * ```
+     *
+     * @param object $object 調べるオブジェクト
+     * @param string|array $path パス文字列。配列も与えられる
+     * @param mixed $default 無かった場合のデフォルト値
+     * @param string $delimiter パスの区切り文字。大抵は '.' か '/'
+     * @return mixed パスが示すプロパティ値
+     */
+    function object_dive($object, $path, $default = null, $delimiter = '.')
+    {
+        $keys = is_array($path) ? $path : explode($delimiter, $path);
+        foreach ($keys as $key) {
+            if (!isset($object->$key)) {
+                return $default;
+            }
+            $object = $object->$key;
+        }
+        return $object;
     }
 }
 
@@ -3988,6 +4153,26 @@ if (!isset($excluded_functions['ob_capture']) && (!function_exists('ob_capture')
         finally {
             ob_end_clean();
         }
+    }
+}
+
+const is_bindable_closure = 'is_bindable_closure';
+if (!isset($excluded_functions['is_bindable_closure']) && (!function_exists('is_bindable_closure') || (!false && (new \ReflectionFunction('is_bindable_closure'))->isInternal()))) {
+    /**
+     * $this を bind 可能なクロージャか調べる
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_bindable_closure(function(){}));
+     * assertFalse(is_bindable_closure(static function(){}));
+     * ```
+     *
+     * @param \Closure $closure 調べるクロージャ
+     * @return bool $this を bind 可能なクロージャなら true
+     */
+    function is_bindable_closure(\Closure $closure)
+    {
+        return !!@$closure->bindTo(new \stdClass());
     }
 }
 
@@ -6196,6 +6381,68 @@ if (!isset($excluded_functions['arguments']) && (!function_exists('arguments') |
     }
 }
 
+const backtrace = 'backtrace';
+if (!isset($excluded_functions['backtrace']) && (!function_exists('backtrace') || (!false && (new \ReflectionFunction('backtrace'))->isInternal()))) {
+    /**
+     * 特定条件までのバックトレースを取得する
+     *
+     * 第2引数 $options を満たすトレース以降を返す。
+     * $options は ['$trace の key' => "条件"] を渡す。
+     * 条件は文字列かクロージャで、文字列の場合は緩い一致、クロージャの場合は true を返した場合にそれ以降を返す。
+     *
+     * Example:
+     * ```php
+     * function f001 () {return backtrace(0, ['function' => 'f002', 'limit' => 2]);}
+     * function f002 () {return f001();}
+     * function f003 () {return f002();}
+     * $traces = f003();
+     * // limit 指定してるので2個
+     * assertCount(2, $traces);
+     * // 「function が f002 以降」を返す
+     * assertArraySubset([
+     *     'function' => 'f002'
+     * ], $traces[0]);
+     * assertArraySubset([
+     *     'function' => 'f003'
+     * ], $traces[1]);
+     * ```
+     *
+     * @param int $flags debug_backtrace の引数
+     * @param array $options フィルタ条件
+     * @return array バックトレース
+     */
+    function backtrace($flags = \DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = [])
+    {
+        $result = [];
+        $traces = debug_backtrace($flags);
+        foreach ($traces as $n => $trace) {
+            foreach ($options as $key => $val) {
+                if (!isset($trace[$key])) {
+                    continue;
+                }
+
+                if ($val instanceof \Closure) {
+                    $break = $val($trace[$key]);
+                }
+                else {
+                    $break = $trace[$key] == $val;
+                }
+                if ($break) {
+                    $result = array_slice($traces, $n);
+                    break 2;
+                }
+            }
+        }
+
+        // limit は特別扱いで千切り指定
+        if (isset($options['limit'])) {
+            $result = array_slice($result, 0, $options['limit']);
+        }
+
+        return $result;
+    }
+}
+
 const error = 'error';
 if (!isset($excluded_functions['error']) && (!function_exists('error') || (!false && (new \ReflectionFunction('error'))->isInternal()))) {
     /**
@@ -6844,6 +7091,63 @@ if (!isset($excluded_functions['is_recursive']) && (!function_exists('is_recursi
             return false;
         };
         return $core($var, []);
+    }
+}
+
+const is_stringable = 'is_stringable';
+if (!isset($excluded_functions['is_stringable']) && (!function_exists('is_stringable') || (!false && (new \ReflectionFunction('is_stringable'))->isInternal()))) {
+    /**
+     * 変数が文字列化できるか調べる
+     *
+     * 「配列」「__toString を持たないオブジェクト」が false になる。
+     * （厳密に言えば配列は "Array" になるので文字列化できるといえるがここでは考えない）。
+     *
+     * Example:
+     * ```php
+     * // こいつらは true
+     * assertTrue(is_stringable(null));
+     * assertTrue(is_stringable(true));
+     * assertTrue(is_stringable(3.14));
+     * assertTrue(is_stringable(STDOUT));
+     * assertTrue(is_stringable(new \Exception()));
+     * // こいつらは false
+     * assertFalse(is_stringable(new \ArrayObject()));
+     * assertFalse(is_stringable([1, 2, 3]));
+     * ```
+     *
+     * @param mixed $var 調べる値
+     * @return bool 文字列化できるなら true
+     */
+    function is_stringable($var)
+    {
+        if (is_array($var)) {
+            return false;
+        }
+        if (is_object($var) && !method_exists($var, '__toString')) {
+            return false;
+        }
+        return true;
+    }
+}
+
+const is_arrayable = 'is_arrayable';
+if (!isset($excluded_functions['is_arrayable']) && (!function_exists('is_arrayable') || (!false && (new \ReflectionFunction('is_arrayable'))->isInternal()))) {
+    /**
+     * 変数が配列アクセス可能か調べる
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_arrayable([]));
+     * assertTrue(is_arrayable(new \ArrayObject()));
+     * assertFalse(is_arrayable(new \stdClass()));
+     * ```
+     *
+     * @param array $var 調べる値
+     * @return bool 配列アクセス可能なら true
+     */
+    function is_arrayable($var)
+    {
+        return is_array($var) || $var instanceof \ArrayAccess;
     }
 }
 
