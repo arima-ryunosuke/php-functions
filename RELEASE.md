@@ -10,6 +10,20 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.2
+
+- [feature][Utility] backtrace を追加
+- [feature][Vars] is_stringable を追加
+- [feature][Vars] is_arrayable を追加
+- [feature][Classobj] object_dive を追加
+- [feature][Funchand] is_bindable_closure を追加
+- [feature][Arrays] array_pickup のキー読み替え対応
+- [feature][Arrays] array_difference を追加
+- [fixbug][Arrays] array_keys_exist で値が null だと false を返す不具合を修正
+- [fixbug][Arrays] array_dive で配列以外が来ると notice が出る不具合を修正
+- [fixbug][Arrays] 一部の関数が ArrayAccess で動作しない不具合を修正
+- [fixbug][Arrays] array_maps でメソッドの後の普通のコールバックが誤作動する不具合を修正
+
 ## 1.2.1
 
 - [feature][Arrays] array_pickup を追加
