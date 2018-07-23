@@ -94,6 +94,21 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
         ], (new \ryunosuke\Test\package\Classobj\C())->f());
     }
 
+    function test_object_dive()
+    {
+        $object_dive = object_dive;
+        $class = (stdclass)([
+            'a' => (stdclass)([
+                'b' => (stdclass)([
+                    'c' => 'abc',
+                ])
+            ])
+        ]);
+        $this->assertEquals('abc', $object_dive($class, 'a.b.c'));
+        $this->assertEquals('none', $object_dive($class, 'a.b.c.x', 'none'));
+        $this->assertEquals('none', $object_dive($class, 'a.b.X', 'none'));
+    }
+
     function test_get_object_properties()
     {
         $get_object_properties = get_object_properties;

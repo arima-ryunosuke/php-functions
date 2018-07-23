@@ -228,6 +228,44 @@ class Classobj
     }
 
     /**
+     * パス形式でプロパティ値を取得
+     *
+     * 存在しない場合は $default を返す。
+     *
+     * Example:
+     * ```php
+     * $class = stdclass([
+     *     'a' => stdclass([
+     *         'b' => stdclass([
+     *             'c' => 'vvv'
+     *         ])
+     *     ])
+     * ]);
+     * assertSame(object_dive($class, 'a.b.c'), 'vvv');
+     * assertSame(object_dive($class, 'a.b.x', 9), 9);
+     * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
+     * assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
+     * ```
+     *
+     * @param object $object 調べるオブジェクト
+     * @param string|array $path パス文字列。配列も与えられる
+     * @param mixed $default 無かった場合のデフォルト値
+     * @param string $delimiter パスの区切り文字。大抵は '.' か '/'
+     * @return mixed パスが示すプロパティ値
+     */
+    public static function object_dive($object, $path, $default = null, $delimiter = '.')
+    {
+        $keys = is_array($path) ? $path : explode($delimiter, $path);
+        foreach ($keys as $key) {
+            if (!isset($object->$key)) {
+                return $default;
+            }
+            $object = $object->$key;
+        }
+        return $object;
+    }
+
+    /**
      * オブジェクトのプロパティを可視・不可視を問わず取得する
      *
      * get_object_vars + no public プロパティを返すイメージ。
