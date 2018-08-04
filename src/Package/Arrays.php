@@ -2090,12 +2090,16 @@ class Arrays
      * `array_intersect_key($array, array_flip($keys))` とほぼ同義。
      * 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。
      *
+     * $keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。
+     *
      * Example:
      * ```php
      * // a と c を取り出す
      * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']), ['a' => 'A', 'c' => 'C']);
      * // 順番は $keys 基準になる
      * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * // 連想配列を渡すと読み替えて返す
+     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2109,9 +2113,16 @@ class Arrays
         }
 
         $result = [];
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $array)) {
-                $result[$key] = $array[$key];
+        foreach ($keys as $k => $key) {
+            if (is_int($k)) {
+                if (array_key_exists($key, $array)) {
+                    $result[$key] = $array[$key];
+                }
+            }
+            else {
+                if (array_key_exists($k, $array)) {
+                    $result[$key] = $array[$k];
+                }
             }
         }
         return $result;

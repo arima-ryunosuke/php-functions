@@ -1409,6 +1409,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         $this->assertSame(['a' => 'A', 'c' => 'C'], $array_pickup((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
         $this->assertSame(['c' => 'C', 'a' => 'A'], $array_pickup((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
+
+        $this->assertSame(['AAA' => 'A'], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']));
+        $this->assertSame(['BBB' => ['b' => 'B']], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']));
     }
 
     function test_array_lookup()
