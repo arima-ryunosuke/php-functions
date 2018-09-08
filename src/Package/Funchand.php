@@ -391,6 +391,23 @@ class Funchand
     }
 
     /**
+     * $this を bind 可能なクロージャか調べる
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_bindable_closure(function(){}));
+     * assertFalse(is_bindable_closure(static function(){}));
+     * ```
+     *
+     * @param \Closure $closure 調べるクロージャ
+     * @return bool $this を bind 可能なクロージャなら true
+     */
+    public static function is_bindable_closure(\Closure $closure)
+    {
+        return !!@$closure->bindTo(new \stdClass());
+    }
+
+    /**
      * Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す
      *
      * Countable#count, Serializable#serialize のように「インターフェースのメソッド名」と「ネイティブ関数名」が一致している必要がある。

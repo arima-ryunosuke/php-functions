@@ -248,6 +248,38 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals($current, ob_get_level());
     }
 
+    function test_is_bindable_closure()
+    {
+        function _global_nostatic_closure() { return function () { return get_class($this); }; }
+
+        function _global_static_closure() { return static function () { return get_class($this); }; }
+
+        $class = new class
+        {
+            public function _nostatic_nostatic_closure() { return function () { return get_class($this); }; }
+
+            public function _nostatic_static_closure() { return static function () { return get_class($this); }; }
+
+            public static function _static_nostatic_closure() { return function () { return get_class($this); }; }
+
+            public static function _static_static_closure() { return static function () { return get_class($this); }; }
+        };
+
+        $is_bindable_closure = is_bindable_closure;
+        $this->assertTrue($is_bindable_closure(_global_nostatic_closure()));
+        $this->assertFalse($is_bindable_closure(_global_static_closure()));
+        $this->assertTrue($is_bindable_closure($class->_nostatic_nostatic_closure()));
+        $this->assertFalse($is_bindable_closure($class->_nostatic_static_closure()));
+        $this->assertTrue($is_bindable_closure($class->_static_nostatic_closure()));
+        $this->assertFalse($is_bindable_closure($class->_static_static_closure()));
+
+        // true のやつらは実際に bind してみる
+        $dummy = new \stdClass();
+        $this->assertEquals('stdClass', \Closure::bind(_global_nostatic_closure(), $dummy)());
+        $this->assertEquals('stdClass', \Closure::bind($class->_nostatic_nostatic_closure(), $dummy)());
+        $this->assertEquals('stdClass', \Closure::bind($class->_static_nostatic_closure(), $dummy)());
+    }
+
     function test_by_builtin()
     {
         $by_builtin = by_builtin;
