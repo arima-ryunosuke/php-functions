@@ -984,7 +984,10 @@ class Arrays
     {
         $keys = is_array($path) ? $path : explode($delimiter, $path);
         foreach ($keys as $key) {
-            if (!array_key_exists($key, $array)) {
+            if (!(is_arrayable)($array)) {
+                return $default;
+            }
+            if (!(array_keys_exist)($key, $array)) {
                 return $default;
             }
             $array = $array[$key];

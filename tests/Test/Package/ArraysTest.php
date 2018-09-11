@@ -498,9 +498,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_dive()
     {
         $array_dive = array_dive;
-        $this->assertEquals('vvv', $array_dive(['a' => ['b' => ['c' => 'vvv']]], 'a.b.c'));
-        $this->assertEquals(9, $array_dive(['a' => ['b' => ['c' => 'vvv']]], 'a.b.x', 9));
-        $this->assertEquals('vvv', $array_dive(['a' => ['b' => ['c' => 'vvv']]], ['a', 'b', 'c']));
+        $array = ['a' => ['b' => ['c' => 'vvv']]];
+        $this->assertEquals('vvv', $array_dive($array, 'a.b.c'));
+        $this->assertEquals(9, $array_dive($array, 'a.b.x', 9));
+        $this->assertEquals('vvv', $array_dive($array, ['a', 'b', 'c']));
+        $this->assertNull($array_dive($array, 'a.b.c.x'));
     }
 
     function test_array_keys_exist()
