@@ -1036,7 +1036,7 @@ class Arrays
                 }
             }
             elseif ($is_arrayaccess) {
-                if (!isset($array[$key])) {
+                if (!$array->offsetExists($key)) {
                     return false;
                 }
             }

@@ -559,8 +559,10 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $array));
 
         // \ArrayAccess
-        $array = new \ArrayObject([], \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS);
+        $array = new \Arrayable([]);
         $array['x'] = ['y' => 'z'];
+        $array['null'] = null;
+        $this->assertTrue($array_keys_exist('null', $array));
         $this->assertTrue($array_keys_exist(['x' => ['y']], $array));
         $this->assertTrue($array_keys_exist(['x' => ['y']], $array));
         $this->assertFalse($array_keys_exist(['nx'], $array));
