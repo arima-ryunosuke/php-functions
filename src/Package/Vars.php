@@ -436,6 +436,24 @@ class Vars
     }
 
     /**
+     * 変数が配列アクセス可能か調べる
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_arrayable([]));
+     * assertTrue(is_arrayable(new \ArrayObject()));
+     * assertFalse(is_arrayable(new \stdClass()));
+     * ```
+     *
+     * @param array $var 調べる値
+     * @return bool 配列アクセス可能なら true
+     */
+    public static function is_arrayable($var)
+    {
+        return is_array($var) || $var instanceof \ArrayAccess;
+    }
+
+    /**
      * 変数が foreach で回せるか調べる
      *
      * オブジェクトの場合は \Traversable のみ。

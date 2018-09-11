@@ -271,6 +271,16 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($is_stringable(new \Concrete('hoge')));
     }
 
+    function test_is_arrayable()
+    {
+        $is_arrayable = is_arrayable;
+        $this->assertTrue($is_arrayable([]));
+        $this->assertTrue($is_arrayable(new \ArrayObject()));
+
+        $this->assertFalse($is_arrayable(1));
+        $this->assertFalse($is_arrayable(new \stdClass()));
+    }
+
     function test_is_iterable()
     {
         $is_iterable = is_iterable;
