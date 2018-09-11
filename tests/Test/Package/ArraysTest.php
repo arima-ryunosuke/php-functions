@@ -334,6 +334,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         // 配列を与えたときの順番は指定したものを優先
         $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], $array_get(['a', 'b', 'c'], [2, 1, 0]));
 
+        // Arrayable でも動作する
+        $ao = new \Arrayable(['a', 'b', 'c']);
+        $this->assertEquals('b', $array_get($ao, 1));
+        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], $array_get($ao, [2, 1, 0]));
+
         $array = [
             'key1' => 'value1',
             'key2' => 'value2',
@@ -426,6 +431,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
         $this->assertSame([1 => 'A', 0 => 'B'], $array_unset($array, [1 => 'a', 0 => 'b']));
 
+        // Arrayable でも動作する
+        $ao = new \Arrayable(['a', 'b', 'c']);
+        $this->assertEquals('b', $array_unset($ao, 1));
+        $this->assertEquals([0 => 'c', 2 => 'a'], $array_unset($ao, [2, 1, 0]));
+
         $array = [
             'key1' => 'value1',
             'key2' => 'value2',
@@ -503,6 +513,12 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(9, $array_dive($array, 'a.b.x', 9));
         $this->assertEquals('vvv', $array_dive($array, ['a', 'b', 'c']));
         $this->assertNull($array_dive($array, 'a.b.c.x'));
+
+        // Arrayable でも動作する
+        $ao = new \Arrayable(['a' => ['b' => ['c' => 'vvv']]]);
+        $this->assertEquals('vvv', $array_dive($ao, 'a.b.c'));
+        $this->assertEquals(9, $array_dive($ao, 'a.b.x', 9));
+        $this->assertEquals('vvv', $array_dive($ao, ['a', 'b', 'c']));
     }
 
     function test_array_keys_exist()

@@ -782,8 +782,8 @@ class Arrays
         if (is_array($key)) {
             $result = [];
             foreach ($key as $k) {
-                // 深遠な事情で少しでも高速化したかったので isset || array_key_exists にしてある
-                if (isset($array[$k]) || array_key_exists($k, $array)) {
+                // 深遠な事情で少しでも高速化したかったので isset || array_keys_exist にしてある
+                if (isset($array[$k]) || (array_keys_exist)($k, $array)) {
                     $result[$k] = $array[$k];
                 }
             }
@@ -813,7 +813,7 @@ class Arrays
             return $result;
         }
 
-        if (array_key_exists($key, $array)) {
+        if ((array_keys_exist)($key, $array)) {
             return $array[$key];
         }
         return $default;
@@ -921,7 +921,7 @@ class Arrays
         if (is_array($key)) {
             $result = [];
             foreach ($key as $rk => $ak) {
-                if (array_key_exists($ak, $array)) {
+                if ((array_keys_exist)($ak, $array)) {
                     $result[$rk] = $array[$ak];
                     unset($array[$ak]);
                 }
@@ -946,7 +946,7 @@ class Arrays
             return $result;
         }
 
-        if (array_key_exists($key, $array)) {
+        if ((array_keys_exist)($key, $array)) {
             $result = $array[$key];
             unset($array[$key]);
             return $result;
