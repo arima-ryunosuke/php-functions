@@ -386,6 +386,60 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('requires value', $arguments, ['req' => 'hoge'], 'arg1 arg2 --req');
     }
 
+    function test_backtrace()
+    {
+        $mock = new class()
+        {
+            function m1($options) { return (backtrace)(0, $options); }
+
+            function m2($options) { return $this->m1($options); }
+
+            function m3($options) { return $this->m2($options); }
+        };
+
+        $traces = $mock->m3([
+            'function' => 'm2',
+            'limit'    => 2,
+        ]);
+        $this->assertCount(2, $traces);
+        $this->assertArraySubset([
+            'file'     => __FILE__,
+            'function' => 'm2',
+            'class'    => get_class($mock),
+        ], $traces[0]);
+        $this->assertArraySubset([
+            'file'     => __FILE__,
+            'function' => 'm3',
+            'class'    => get_class($mock),
+        ], $traces[1]);
+
+        $traces = $mock->m3([
+            'class' => function ($v) { return (str_contains)($v, 'class@anonymous'); },
+            'limit' => 3,
+        ]);
+        $this->assertCount(3, $traces);
+        $this->assertArraySubset([
+            'file'     => __FILE__,
+            'function' => 'm1',
+            'class'    => get_class($mock),
+        ], $traces[0]);
+        $this->assertArraySubset([
+            'file'     => __FILE__,
+            'function' => 'm2',
+            'class'    => get_class($mock),
+        ], $traces[1]);
+        $this->assertArraySubset([
+            'file'     => __FILE__,
+            'function' => 'm3',
+            'class'    => get_class($mock),
+        ], $traces[2]);
+
+        $traces = $mock->m3([
+            'class' => 'not found',
+        ]);
+        $this->assertCount(0, $traces);
+    }
+
     function test_error()
     {
         $error = error;

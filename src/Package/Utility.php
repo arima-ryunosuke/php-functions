@@ -326,6 +326,65 @@ class Utility
     }
 
     /**
+     * 特定条件までのバックトレースを取得する
+     *
+     * 第2引数 $options を満たすトレース以降を返す。
+     * $options は ['$trace の key' => "条件"] を渡す。
+     * 条件は文字列かクロージャで、文字列の場合は緩い一致、クロージャの場合は true を返した場合にそれ以降を返す。
+     *
+     * Example:
+     * ```php
+     * function f001 () {return backtrace(0, ['function' => 'f002', 'limit' => 2]);}
+     * function f002 () {return f001();}
+     * function f003 () {return f002();}
+     * $traces = f003();
+     * // limit 指定してるので2個
+     * assertCount(2, $traces);
+     * // 「function が f002 以降」を返す
+     * assertArraySubset([
+     *     'function' => 'f002'
+     * ], $traces[0]);
+     * assertArraySubset([
+     *     'function' => 'f003'
+     * ], $traces[1]);
+     * ```
+     *
+     * @param int $flags debug_backtrace の引数
+     * @param array $options フィルタ条件
+     * @return array バックトレース
+     */
+    public static function backtrace($flags = \DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = [])
+    {
+        $result = [];
+        $traces = debug_backtrace($flags);
+        foreach ($traces as $n => $trace) {
+            foreach ($options as $key => $val) {
+                if (!isset($trace[$key])) {
+                    continue;
+                }
+
+                if ($val instanceof \Closure) {
+                    $break = $val($trace[$key]);
+                }
+                else {
+                    $break = $trace[$key] == $val;
+                }
+                if ($break) {
+                    $result = array_slice($traces, $n);
+                    break 2;
+                }
+            }
+        }
+
+        // limit は特別扱いで千切り指定
+        if (isset($options['limit'])) {
+            $result = array_slice($result, 0, $options['limit']);
+        }
+
+        return $result;
+    }
+
+    /**
      * エラー出力する
      *
      * 第1引数 $message はそれらしく文字列化されて出力される。基本的にはあらゆる型を与えて良い。
