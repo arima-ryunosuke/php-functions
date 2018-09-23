@@ -1384,6 +1384,7 @@ class Arrays
                 $callback = key($callback);
             }
             else {
+                $margs = null;
                 $callback = (func_user_func_array)($callback);
             }
             foreach ($result as $k => $v) {
