@@ -1792,4 +1792,166 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'k1.k2' => 'v2',
         ]);
     }
+
+    function test_array_difference()
+    {
+        $array_difference = array_difference;
+        $a1 = [
+            'common'      => [
+                'key' => 'nodiff',
+            ],
+            'diff'        => [
+                'common'         => [
+                    'key' => 'nodiff',
+                ],
+                'only1'          => 'hoge',
+                'array1scalar2'  => [123, 456],
+                'scalar1array2'  => 456789,
+                'scalar1scalar2' => 'hoge',
+                'array1array2'   => [123, 456],
+                'hash1hash2'     => ['a' => 'A', 'b' => 'B'],
+            ],
+            'mix'         => [
+                'first' => 'first',
+                1,
+                2,
+                3,
+                'last'  => 'last',
+            ],
+            'diff1array'  => [
+                'hoge' => 'HOGE',
+            ],
+            'diff1scalar' => 'hoge',
+        ];
+        $a2 = [
+            'common'      => [
+                'key' => 'nodiff',
+            ],
+            'diff'        => [
+                'common'         => [
+                    'key' => 'nodiff',
+                ],
+                'only2'          => 'fuga',
+                'array1scalar2'  => 123456,
+                'scalar1array2'  => [456, 789],
+                'scalar1scalar2' => 'fuga',
+                'array1array2'   => [456, 789],
+                'hash1hash2'     => ['b' => 'xB', 'c' => 'C'],
+            ],
+            'mix'         => [
+                'first' => 'FIRST',
+                2,
+                3,
+                4,
+                'last'  => 'LAST',
+            ],
+            'diff2array'  => [
+                'fuga' => 'FUGA',
+            ],
+            'diff2scalar' => 'fuga',
+        ];
+
+        //(var_export2)($array_difference($a1, $a2));
+        $this->assertSame([
+            // common は共通しているので結果に出ない
+            // 'common' => [],
+            // diff.only1 は 1 にしかないので '-' のみ
+            'diff.only1'           => [
+                '-' => 'hoge',
+            ],
+
+            // diff.array1scalar2 は 1 が配列で 2 がスカラーなので '-' が2つ出現する
+            'diff.array1scalar2.0' => [
+                '-' => 123,
+            ],
+            'diff.array1scalar2.1' => [
+                '-' => 456,
+            ],
+
+            // diff.array1scalar2 は 1 が配列で 2 がスカラーなので '+' が1つ出現する
+            'diff.array1scalar2'   => [
+                '+' => 123456,
+            ],
+
+            // diff.scalar1array2 は 1 がスカラーで 2 が配列なので '-' が1つ出現する
+            'diff.scalar1array2'   => [
+                '-' => 456789,
+            ],
+
+            // diff.scalar1array2 は 1 がスカラーで 2 が配列なので '+' が2つ出現する
+            'diff.scalar1array2.0' => [
+                '+' => 456,
+            ],
+            'diff.scalar1array2.1' => [
+                '+' => 789,
+            ],
+
+            // diff.scalar1scalar2 は 1 がスカラーで 2 がスカラーなので '+' '-' が出現する
+            'diff.scalar1scalar2'  => [
+                '-' => 'hoge',
+                '+' => 'fuga',
+            ],
+
+            // diff.array1array2 は共にただの配列なので '+' '-' がそれぞれ出現する（456 はキーが異なるが出現しない）
+            'diff.array1array2.0'  => [
+                '-' => 123,
+            ],
+            'diff.array1array2.1'  => [
+                '+' => 789,
+            ],
+
+            // diff.array1array2 は共に連想配列なので '+' '-' がそれぞれ出現する（b は値が異なるので '+' '-'）
+            'diff.hash1hash2.a'    => [
+                '-' => 'A',
+            ],
+            'diff.hash1hash2.b'    => [
+                '-' => 'B',
+                '+' => 'xB',
+            ],
+            'diff.hash1hash2.c'    => [
+                '+' => 'C',
+            ],
+
+            // diff.only2 は 2 にしかないので '+' のみ
+            'diff.only2'           => [
+                '+' => 'fuga',
+            ],
+
+            // 数値キーと文字キーの混在
+            'mix.0'                => [
+                '-' => 1,
+            ],
+            'mix.2'                => [
+                '+' => 4,
+            ],
+            'mix.first'            => [
+                '-' => 'first',
+                '+' => 'FIRST',
+            ],
+            'mix.last'             => [
+                '-' => 'last',
+                '+' => 'LAST',
+            ],
+
+            // diff1array は 1 にしかないので '-' のみ
+            'diff1array'           => [
+                '-' => ['hoge' => 'HOGE'],
+            ],
+
+            // diff1scalar は 1 にしかないので '-' のみ
+            'diff1scalar'          => [
+                '-' => 'hoge',
+            ],
+
+            // diff2array は 2 にしかないので '+' のみ
+            'diff2array'           => [
+                '+' => ['fuga' => 'FUGA'],
+            ],
+
+            // diff2scalar は 2 にしかないので '+' のみ
+            'diff2scalar'          => [
+                '+' => 'fuga',
+            ],
+        ], $array_difference($a1, $a2));
+    }
 }

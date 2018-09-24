@@ -2519,4 +2519,110 @@ class Arrays
         }
         return $result;
     }
+
+    /**
+     * 配列の差分を取り配列で返す
+     *
+     * 返り値の配列は構造化されたデータではない。
+     * 主に文字列化して出力することを想定している。
+     *
+     * ユースケースとしては「スキーマデータ」「各環境の設定ファイル」などの差分。
+     *
+     * - '+' はキーが追加されたことを表す
+     * - '-' はキーが削除されたことを表す
+     * - 両方が含まれている場合、値の変更を表す
+     *
+     * 数値キーはキーの比較は行われない。値の差分のみ返す。
+     *
+     * Example:
+     * ```php
+     * // common は 中身に差分がある。 1 に key1 はあるが、 2 にはない。2 に key2 はあるが、 1 にはない。
+     * assertSame(array_difference([
+     *     'common' => [
+     *         'sub' => [
+     *             'x' => 'val',
+     *         ]
+     *     ],
+     *     'key1'   => 'hoge',
+     * ], [
+     *     'common' => [
+     *         'sub' => [
+     *             'x' => 'VAL',
+     *         ]
+     *     ],
+     *     'key2'   => 'fuga',
+     * ]), [
+     *     'common.sub.x' => ['-' => 'val', '+' => 'VAL'],
+     *     'key1'         => ['-' => 'hoge'],
+     *     'key2'         => ['+' => 'fuga'],
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $array1 対象配列1
+     * @param array|\Traversable $array2 対象配列2
+     * @param string $delimiter 差分配列のキー区切り文字
+     * @return array 差分を表す配列
+     */
+    public static function array_difference($array1, $array2, $delimiter = '.')
+    {
+        $rule = [
+            'list' => static function ($v, $k) { return is_int($k); },
+            'hash' => static function ($v, $k) { return !is_int($k); },
+        ];
+        $prefixer = static function ($key, $k) use ($delimiter) {
+            return $key === '' ? $k : $key . $delimiter . $k;
+        };
+
+        return call_user_func($f = static function ($array1, $array2, $key = '') use (&$f, $rule, $prefixer) {
+            $result = [];
+
+            $array1 = (array_assort)($array1, $rule);
+            $array2 = (array_assort)($array2, $rule);
+
+            foreach (array_diff($array1['list'], $array2['list']) as $k => $v1) {
+                $prefix = $prefixer($key, $k);
+                $result[$prefix] = ['-' => $v1];
+            }
+            foreach (array_diff($array2['list'], $array1['list']) as $k => $v2) {
+                $prefix = $prefixer($key, $k);
+                $result[$prefix] = ['+' => $v2];
+            }
+            foreach ($array1['hash'] + $array2['hash'] as $k => $dummy) {
+                $exists1 = array_key_exists($k, $array1['hash']);
+                $exists2 = array_key_exists($k, $array2['hash']);
+
+                $v1 = $exists1 ? $array1['hash'][$k] : null;
+                $v2 = $exists2 ? $array2['hash'][$k] : null;
+
+                $is_array1 = is_array($v1);
+                $is_array2 = is_array($v2);
+
+                $prefix = $prefixer($key, $k);
+                if ($exists1 && $exists2) {
+                    if ($is_array1 && $is_array2) {
+                        $result += $f($v1, $v2, $prefix);
+                    }
+                    elseif ($is_array1) {
+                        $result += $f($v1, [], $prefix);
+                        $result[$prefix] = ['+' => $v2];
+                    }
+                    elseif ($is_array2) {
+                        $result[$prefix] = ['-' => $v1];
+                        $result += $f([], $v2, $prefix);
+                    }
+                    elseif ($v1 !== $v2) {
+                        $result[$prefix] = ['-' => $v1, '+' => $v2];
+                    }
+                }
+                elseif ($exists1) {
+                    $result[$prefix] = ['-' => $v1];
+                }
+                elseif ($exists2) {
+                    $result[$prefix] = ['+' => $v2];
+                }
+            }
+
+            return $result;
+        }, $array1, $array2);
+    }
 }
