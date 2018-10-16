@@ -3968,6 +3968,94 @@ if (!isset($excluded_functions['return_arg']) && (!function_exists('ryunosuke\\F
     }
 }
 
+const ope_func = 'ryunosuke\\Functions\\ope_func';
+if (!isset($excluded_functions['ope_func']) && (!function_exists('ryunosuke\\Functions\\ope_func') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\ope_func'))->isInternal()))) {
+    /**
+     * 演算子のクロージャを返す
+     *
+     * 関数ベースなので `??` のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。
+     *
+     * Example:
+     * ```php
+     * $not = ope_func('!');    // 否定演算子クロージャ
+     * assertSame(false, $not(true));
+     *
+     * $minus1 = ope_func('-', 1); // 負数演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
+     * $minus2 = ope_func('-', 2); // 減算演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
+     * assertSame(-2, $minus1(2));
+     * assertSame(3 - 2, $minus2(3, 2));
+     *
+     * $cond2 = ope_func('?:', 2); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
+     * $cond3 = ope_func('?:', 3); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
+     * assertSame('OK' ?: 'NG', $cond2('OK', 'NG'));
+     * assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
+     * ```
+     *
+     * @param string $operator 演算子
+     * @param int $n 何項演算子か明示する引数
+     * @return \Closure 演算子のクロージャ
+     */
+    function ope_func($operator, $n = null)
+    {
+        static $operators = null;
+        $operators = $operators ?: [
+            1 => [
+                ''   => function ($v1) { return $v1; }, // こんな演算子はないが、「if ($value) {}」として使えることがある
+                '!'  => function ($v1) { return !$v1; },
+                '+'  => function ($v1) { return +$v1; },
+                '-'  => function ($v1) { return -$v1; },
+                '~'  => function ($v1) { return ~$v1; },
+                '++' => function ($v1) { return ++$v1; },
+                '--' => function ($v1) { return --$v1; },
+            ],
+            2 => [
+                '?:'         => function ($v1, $v2) { return $v1 ?: $v2; },
+                '??'         => function ($v1, $v2) { return $v1 ?? $v2; },
+                '=='         => function ($v1, $v2) { return $v1 == $v2; },
+                '==='        => function ($v1, $v2) { return $v1 === $v2; },
+                '!='         => function ($v1, $v2) { return $v1 != $v2; },
+                '<>'         => function ($v1, $v2) { return $v1 <> $v2; },
+                '!=='        => function ($v1, $v2) { return $v1 !== $v2; },
+                '<'          => function ($v1, $v2) { return $v1 < $v2; },
+                '<='         => function ($v1, $v2) { return $v1 <= $v2; },
+                '>'          => function ($v1, $v2) { return $v1 > $v2; },
+                '>='         => function ($v1, $v2) { return $v1 >= $v2; },
+                '<=>'        => function ($v1, $v2) { return $v1 <=> $v2; },
+                '.'          => function ($v1, $v2) { return $v1 . $v2; },
+                '+'          => function ($v1, $v2) { return $v1 + $v2; },
+                '-'          => function ($v1, $v2) { return $v1 - $v2; },
+                '*'          => function ($v1, $v2) { return $v1 * $v2; },
+                '/'          => function ($v1, $v2) { return $v1 / $v2; },
+                '%'          => function ($v1, $v2) { return $v1 % $v2; },
+                '**'         => function ($v1, $v2) { return $v1 ** $v2; },
+                '^'          => function ($v1, $v2) { return $v1 ^ $v2; },
+                '&'          => function ($v1, $v2) { return $v1 & $v2; },
+                '|'          => function ($v1, $v2) { return $v1 | $v2; },
+                '<<'         => function ($v1, $v2) { return $v1 << $v2; },
+                '>>'         => function ($v1, $v2) { return $v1 >> $v2; },
+                '&&'         => function ($v1, $v2) { return $v1 && $v2; },
+                '||'         => function ($v1, $v2) { return $v1 || $v2; },
+                'or'         => function ($v1, $v2) { return $v1 or $v2; },
+                'and'        => function ($v1, $v2) { return $v1 and $v2; },
+                'xor'        => function ($v1, $v2) { return $v1 xor $v2; },
+                'instanceof' => function ($v1, $v2) { return $v1 instanceof $v2; },
+            ],
+            3 => [
+                '?:' => function ($v1, $v2, $v3) { return $v1 ? $v2 : $v3; },
+            ],
+        ];
+
+        $operator = trim($operator);
+        foreach ($operators as $kou => $ops) {
+            if (($n === null || $n == $kou) && isset($ops[$operator])) {
+                return $ops[$operator];
+            }
+        }
+
+        throw new \InvalidArgumentException("$operator is not defined Operator.");
+    }
+}
+
 const not_func = 'ryunosuke\\Functions\\not_func';
 if (!isset($excluded_functions['not_func']) && (!function_exists('ryunosuke\\Functions\\not_func') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\not_func'))->isInternal()))) {
     /**
@@ -5212,25 +5300,35 @@ if (!isset($excluded_functions['starts_with']) && (!function_exists('ryunosuke\\
     /**
      * 指定文字列で始まるか調べる
      *
+     * $with に配列を渡すといずれかで始まるときに true を返す。
+     *
      * Example:
      * ```php
      * assertTrue(starts_with('abcdef', 'abc'));
      * assertTrue(starts_with('abcdef', 'ABC', true));
      * assertFalse(starts_with('abcdef', 'xyz'));
+     * assertTrue(starts_with('abcdef', ['a', 'b', 'c']));
+     * assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
      * ```
      *
      * @param string $string 探される文字列
-     * @param string $with 探す文字列
+     * @param string|array $with 探す文字列
      * @param bool $case_insensitivity 大文字小文字を区別するか
      * @return bool 指定文字列で始まるなら true を返す
      */
     function starts_with($string, $with, $case_insensitivity = false)
     {
         assert(is_string($string));
-        assert(is_string($with));
-        assert(strlen($with));
 
-        return (str_equals)(substr($string, 0, strlen($with)), $with, $case_insensitivity);
+        foreach ((array) $with as $w) {
+            assert(is_string($w));
+            assert(strlen($w));
+
+            if ((str_equals)(substr($string, 0, strlen($w)), $w, $case_insensitivity)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -5239,11 +5337,15 @@ if (!isset($excluded_functions['ends_with']) && (!function_exists('ryunosuke\\Fu
     /**
      * 指定文字列で終わるか調べる
      *
+     * $with に配列を渡すといずれかで終わるときに true を返す。
+     *
      * Example:
      * ```php
      * assertTrue(ends_with('abcdef', 'def'));
      * assertTrue(ends_with('abcdef', 'DEF', true));
      * assertFalse(ends_with('abcdef', 'xyz'));
+     * assertTrue(ends_with('abcdef', ['d', 'e', 'f']));
+     * assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
      * ```
      *
      * @param string $string 探される文字列
@@ -5254,10 +5356,16 @@ if (!isset($excluded_functions['ends_with']) && (!function_exists('ryunosuke\\Fu
     function ends_with($string, $with, $case_insensitivity = false)
     {
         assert(is_string($string));
-        assert(is_string($with));
-        assert(strlen($with));
 
-        return (str_equals)(substr($string, -strlen($with)), $with, $case_insensitivity);
+        foreach ((array) $with as $w) {
+            assert(is_string($w));
+            assert(strlen($w));
+
+            if ((str_equals)(substr($string, -strlen($w)), $w, $case_insensitivity)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -5841,6 +5949,191 @@ if (!isset($excluded_functions['optional']) && (!function_exists('ryunosuke\\Fun
     }
 }
 
+const chain = 'ryunosuke\\Functions\\chain';
+if (!isset($excluded_functions['chain']) && (!function_exists('ryunosuke\\Functions\\chain') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\chain'))->isInternal()))) {
+    /**
+     * 関数をメソッドチェーンできるオブジェクトを返す
+     *
+     * ChainObject という関数をチェーンできるオブジェクトを返す。
+     * ChainObject は大抵のグローバル関数がアノテーションされており、コード補完することが出来る（利便性のためであり、IDE がエラーなどを出しても呼び出し自体は可能）。
+     * 呼び出しは「第1引数に現在の値が適用」されて実行される（下記の func1 コールで任意の位置に適用されることもできる）。
+     *
+     * 下記の特殊ルールにより、特殊な呼び出し方ができる。
+     *
+     * - array_XXX, str_XXX は省略して XXX で呼び出せる
+     *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない
+     * - funcE で eval される文字列のクロージャを呼べる
+     *   - 変数名は `$v` 固定だが、 `$v` が無いときに限り 最左に自動付与される
+     * - funcP で配列指定オペレータのクロージャを呼べる
+     *   - 複数指定した場合は順次呼ばれる。つまり map はともかく filter 用途では使えない
+     * - func1 で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる
+     *   - func2, func3 等も呼び出し可能
+     * - 引数が1つの呼び出しは () を省略できる
+     *
+     * この特殊ルールは普通に使う分にはそこまで気にしなくて良い。
+     * map や filter を駆使しようとすると必要になるが、イテレーション目的ではなく文字列のチェインなどが目的であればほぼ使うことはない。
+     *
+     * 特殊なメソッドとして下記がある。
+     *
+     * - apply($callback, ...$cbargs): 任意のコールバックを現在の値に適用する
+     *
+     * 上記を含むメソッド呼び出しはすべて自分自身を返すので、最終結果を得たい場合は `invoke` を実行する必要がある。
+     * ただし、 IteratorAggregate が実装されているので、配列の場合に限り foreach で直接回すことができる。
+     * さらに、 __toString も実装されているので、文字列的値の場合に限り自動で文字列化される。
+     *
+     * 用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。
+     * ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。
+     *
+     * Example:
+     * ```php
+     * # 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
+     * $n1_9 = range(1, 9);
+     * // 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
+     * assertSame(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v <= 5; }))), 30);
+     * // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
+     * assertSame(chain($n1_9)->filter(function ($v) { return $v <= 5; })->map(function ($v) { return $v * 2; })->sum()(), 30);
+     * // funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
+     * assertSame(chain($n1_9)->filterP(['<=' => 5])->mapP(['*' => 2])->sum()(), 30);
+     * // funcE を介したもの。かなり直感的だが eval なので少し不安
+     * assertSame(chain($n1_9)->filterE('<= 5')->mapE('* 2')->sum()(), 30);
+     *
+     * # "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
+     * $string = 'hello   world';
+     * // 素の php で処理したもの。もはやなにがなんだか分からない
+     * assertSame(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filter(explode(' ', $string))))))), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+     * // chain だとかなりそれっぽくできる。 explode/implode の第1引数は区切り文字なので func1 構文を使用している。また、 rot13 以降は引数がないので () を省略している
+     * assertSame(chain($string)->explode1(' ')->filter()->map('ucfirst')->implode1('/')->rot13->md5->strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+     *
+     *  # よくある DB レコードをあれこれするシチュエーション
+     * $co = chain([
+     *     ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
+     *     ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
+     *     ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
+     *     ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
+     * ]);
+     * // e.g. 男性の平均給料
+     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
+     * // e.g. 女性の平均年齢
+     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
+     * // e.g. 30歳以上の平均給料
+     * assertSame((clone $co)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
+     * // e.g. 20～30歳の平均給料
+     * assertSame((clone $co)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
+     * // e.g. 男性の最小年齢
+     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
+     * // e.g. 女性の最大給料
+     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     * ```
+     *
+     * @param mixed $source 元データ
+     * @return \ChainObject
+     */
+    function chain($source)
+    {
+        return new class($source) implements \IteratorAggregate
+        {
+            private $data;
+
+            public function __construct($source)
+            {
+                $this->data = $source;
+            }
+
+            public function __invoke()
+            {
+                return $this->data;
+            }
+
+            public function __get($name)
+            {
+                return $this->_apply($name, []);
+            }
+
+            public function __call($name, $arguments)
+            {
+                return $this->_apply($name, $arguments);
+            }
+
+            public function __toString()
+            {
+                return (string) $this->data;
+            }
+
+            public function getIterator()
+            {
+                foreach ($this->data as $k => $v) {
+                    yield $k => $v;
+                }
+            }
+
+            public function apply($callback, ...$args)
+            {
+                $this->data = $callback($this->data, ...$args);
+                return $this;
+            }
+
+            private function _apply($name, $arguments)
+            {
+                // 特別扱い1: map は非常によく呼ぶので引数を補正する
+                if ($name === 'map') {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    return $this->array_map1(...$arguments);
+                }
+
+                // 実際の呼び出し1: 存在する関数はそのまま移譲する（defined や namespace は定数コール用）
+                if (false
+                    || function_exists($fname = $name)
+                    || function_exists($fname = "array_$name")
+                    || function_exists($fname = "str_$name")
+                    || (defined($cname = $name) && is_callable($fname = constant($cname)))
+                    || (defined($cname = "array_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                ) {
+                    /** @noinspection PhpUndefinedVariableInspection */
+                    $this->data = $fname($this->data, ...$arguments);
+                    return $this;
+                }
+                // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
+                if (preg_match('#(.+?)(\d+)$#', $name, $match)) {
+                    $this->data = $match[1](...(array_insert)($arguments, [$this->data], $match[2]));
+                    return $this;
+                }
+
+                // 接尾呼び出し1: E で終わる呼び出しは文字列を eval した callback とする
+                if (preg_match('#(.+?)E$#', $name, $match)) {
+                    $expr = array_pop($arguments);
+                    $expr = strpos($expr, '$_') === false ? '$_ ' . $expr : $expr;
+                    $arguments[] = (eval_func)($expr, '_');
+                    return $this->{$match[1]}(...$arguments);
+                }
+                // 接尾呼び出し2: P で終わる呼び出しは演算子を callback とする
+                if (preg_match('#(.+?)P$#', $name, $match)) {
+                    $ops = array_reverse((array) array_pop($arguments));
+                    $arguments[] = function ($v) use ($ops) {
+                        foreach ($ops as $ope => $rand) {
+                            if (is_int($ope)) {
+                                $ope = $rand;
+                                $rand = [];
+                            }
+                            if (!is_array($rand)) {
+                                $rand = [$rand];
+                            }
+                            $v = (ope_func)($ope, count($rand) + 1)($v, ...$rand);
+                        }
+                        return $v;
+                    };
+                    return $this->{$match[1]}(...$arguments);
+                }
+
+                throw new \BadFunctionCallException("$name is not defined.");
+            }
+        };
+    }
+}
+
 const throws = 'ryunosuke\\Functions\\throws';
 if (!isset($excluded_functions['throws']) && (!function_exists('ryunosuke\\Functions\\throws') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\throws'))->isInternal()))) {
     /**
@@ -6383,6 +6676,111 @@ if (!isset($excluded_functions['arguments']) && (!function_exists('ryunosuke\\Fu
     }
 }
 
+const stacktrace = 'ryunosuke\\Functions\\stacktrace';
+if (!isset($excluded_functions['stacktrace']) && (!function_exists('ryunosuke\\Functions\\stacktrace') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\stacktrace'))->isInternal()))) {
+    /**
+     * スタックトレースを文字列で返す
+     *
+     * `(new \Exception())->getTraceAsString()` と実質的な役割は同じ。
+     * ただし、 getTraceAsString は引数が Array になったりクラス名しか取れなかったり微妙に使い勝手が悪いのでもうちょっと情報量を増やしたもの。
+     *
+     * 第1引数 $traces はトレース的配列を受け取る（`(new \Exception())->getTrace()` とか）。
+     * 未指定時は debug_backtrace() で採取する。
+     *
+     * 第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。
+     * 今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。
+     *
+     * @param array $traces debug_backtrace 的な配列
+     * @param int|string|array $option オプション
+     * @return string トレース文字列
+     */
+    function stacktrace($traces = null, $option = ['format' => '%s:%s %s', 'limit' => 16])
+    {
+        if (is_int($option)) {
+            $limit = $option;
+            $format = '%s:%s %s';
+        }
+        elseif (is_string($option)) {
+            $limit = 16;
+            $format = $option;
+        }
+        else {
+            $limit = $option['limit'] ?? 16;
+            $format = $option['format'] ?? '%s:%s %s';
+        }
+
+        $stringify = function ($value) use ($limit) {
+            // 再帰用クロージャ
+            $export = function ($value, $nest = 0, $parents = []) use (&$export, $limit) {
+                // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+                foreach ($parents as $parent) {
+                    if ($parent === $value) {
+                        return var_export('*RECURSION*', true);
+                    }
+                }
+                // 配列は連想判定したり再帰したり色々
+                if (is_array($value)) {
+                    $parents[] = $value;
+                    $flat = $value === array_values($value);
+                    $kvl = [];
+                    foreach ($value as $k => $v) {
+                        if (count($kvl) >= $limit) {
+                            $kvl[] = sprintf('...(more %d length)', count($value) - $limit);
+                            break;
+                        }
+                        $kvl[] = ($flat ? '' : $k . ':') . $export($v, $nest + 1, $parents);
+                    }
+                    return ($flat ? '[' : '{') . implode(', ', $kvl) . ($flat ? ']' : '}');
+                }
+                // オブジェクトは単にプロパティを __set_state する文字列を出力する
+                elseif (is_object($value)) {
+                    $parents[] = $value;
+                    return get_class($value) . $export((get_object_properties)($value), $nest, $parents);
+                }
+                // 文字列は改行削除
+                elseif (is_string($value)) {
+                    $value = str_replace(["\r\n", "\r", "\n"], '\n', $value);
+                    if (($strlen = strlen($value)) > $limit) {
+                        $value = substr($value, 0, $limit) . sprintf('...(more %d length)', $strlen - $limit);
+                    }
+                    return $value;
+                }
+                // それ以外は stringify
+                else {
+                    return (stringify)($value);
+                }
+            };
+
+            return $export($value);
+        };
+
+        $traces = $traces ?? array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
+        $result = [];
+        foreach ($traces as $i => $trace) {
+            // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）
+            if (!isset($trace['file'])) {
+                continue;
+            }
+
+            $file = $trace['file'];
+            $line = $trace['line'];
+            if (strpos($trace['file'], "eval()'d code") !== false && ($traces[$i + 1]['function'] ?? '') === 'eval') {
+                $file = $traces[$i + 1]['file'];
+                $line = $traces[$i + 1]['line'] . "." . $trace['line'];
+            }
+
+            $callee = $trace['function'];
+            if (isset($trace['type'])) {
+                $callee = $trace['class'] . $trace['type'] . $callee;
+            }
+            $callee .= '(' . implode(', ', array_map($stringify, $trace['args'] ?? [])) . ')';
+
+            $result[] = sprintf($format, $file, $line, $callee);
+        }
+        return implode("\n", $result);
+    }
+}
+
 const backtrace = 'ryunosuke\\Functions\\backtrace';
 if (!isset($excluded_functions['backtrace']) && (!function_exists('ryunosuke\\Functions\\backtrace') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\backtrace'))->isInternal()))) {
     /**
@@ -6885,8 +7283,10 @@ if (!isset($excluded_functions['si_prefix']) && (!function_exists('ryunosuke\\Fu
     /**
      * 数値に SI 接頭辞を付与する
      *
-     * 値は 1 <= $var < 1000 の範囲内に収められる。
+     * 値は 1 <= $var < 1000(1024) の範囲内に収められる。
      * ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。
+     *
+     * 歴史的な経緯により $unit と $format は入れ替えて指定することができる（型で分岐する）。
      *
      * Example:
      * ```php
@@ -6899,35 +7299,47 @@ if (!isset($excluded_functions['si_prefix']) && (!function_exists('ryunosuke\\Fu
      * assertSame(si_prefix(0.012345, '%d%s'), '12m');
      * // ファイルサイズを byte で表示する
      * assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+     * // ファイルサイズを byte で表示する（1024）
+     * assertSame(si_prefix(10240, '%.3f %sbyte', 1024), '10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
      * assertSame(si_prefix(12345, null), [12.345, 'k']);
      * ```
      *
      * @param mixed $var 丸める値
+     * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
      * @param string $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
-     * @return string|array SI 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
+     * @return string|array 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
      */
-    function si_prefix($var, $format = '%.3f %s')
+    function si_prefix($var, $unit = 1000, $format = '%.3f %s')
     {
-        $units = [
-            -24 => 'y', // ヨクト
-            -21 => 'z', // ゼプト
-            -18 => 'a', // アト
-            -15 => 'f', // フェムト
-            -12 => 'p', // ピコ
-            -9  => 'n', // ナノ
-            -6  => 'µ', // マイクロ
-            -3  => 'm', // ミリ
-            0   => '',  //
-            3   => 'k', // キロ
-            6   => 'M', // メガ
-            9   => 'G', // ギガ
-            12  => 'T', // テラ
-            15  => 'P', // ペタ
-            18  => 'E', // エクサ
-            21  => 'Z', // ゼタ
-            24  => 'Y', // ヨタ
+        static $units = [
+            -8 => 'y', // ヨクト
+            -7 => 'z', // ゼプト
+            -6 => 'a', // アト
+            -5 => 'f', // フェムト
+            -4 => 'p', // ピコ
+            -3 => 'n', // ナノ
+            -2 => 'µ', // マイクロ
+            -1 => 'm', // ミリ
+            0  => '',  //
+            1  => 'k', // キロ
+            2  => 'M', // メガ
+            3  => 'G', // ギガ
+            4  => 'T', // テラ
+            5  => 'P', // ペタ
+            6  => 'E', // エクサ
+            7  => 'Z', // ゼタ
+            8  => 'Y', // ヨタ
         ];
+
+        // 引数体系を変えたので後方互換性のため型を見て入れ替える
+        if (is_string($unit) || is_null($unit)) {
+            $t = $format;
+            $format = $unit;
+            $unit = intval($t) ?: 1000;
+        }
+
+        assert($unit > 0);
 
         $result = function ($format, $var, $unit) {
             if ($format === null) {
@@ -6943,20 +7355,77 @@ if (!isset($excluded_functions['si_prefix']) && (!function_exists('ryunosuke\\Fu
         $original = $var;
         $var = abs($var);
         $n = 0;
-        while (!(1 <= $var && $var < 1000)) {
+        while (!(1 <= $var && $var < $unit)) {
             if ($var < 1) {
                 $n--;
-                $var *= 1000;
+                $var *= $unit;
             }
             else {
                 $n++;
-                $var /= 1000;
+                $var /= $unit;
             }
         }
-        if (!isset($units[$n * 3])) {
-            throw new \InvalidArgumentException("$original is too large or small.");
+        if (!isset($units[$n])) {
+            throw new \InvalidArgumentException("$original is too large or small ($n).");
         }
-        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n * 3]);
+        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n]);
+    }
+}
+
+const si_unprefix = 'ryunosuke\\Functions\\si_unprefix';
+if (!isset($excluded_functions['si_unprefix']) && (!function_exists('ryunosuke\\Functions\\si_unprefix') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\si_unprefix'))->isInternal()))) {
+    /**
+     * SI 接頭辞が付与された文字列を数値化する
+     *
+     * 典型的な用途は ini_get で得られた値を数値化したいとき。
+     * ただし、 init は 1m のように小文字で指定することもあるので大文字化する必要はある。
+     *
+     * Example:
+     * ```php
+     * // 1k = 1000
+     * assertSame(si_unprefix('1k'), 1000);
+     * // 1k = 1024
+     * assertSame(si_unprefix('1k', 1024), 1024);
+     * // m はメガではなくミリ
+     * assertSame(si_unprefix('1m'), 0.001);
+     * // M がメガ
+     * assertSame(si_unprefix('1M'), 1000000);
+     * // K だけは特別扱いで大文字小文字のどちらでもキロになる
+     * assertSame(si_unprefix('1K'), 1000);
+     * ```
+     *
+     * @param mixed $var 数値化する値
+     * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
+     * @return int|float SI 接頭辞を取り払った実際の数値
+     */
+    function si_unprefix($var, $unit = 1000)
+    {
+        static $units = [
+            'y' => -8, // ヨクト
+            'z' => -7, // ゼプト
+            'a' => -6, // アト
+            'f' => -5, // フェムト
+            'p' => -4, // ピコ
+            'n' => -3, // ナノ
+            'µ' => -2, // マイクロ
+            'm' => -1, // ミリ
+            ''  => 0, //
+            'k' => 1, // キロ
+            'K' => 1, // キロ（特別扱い）
+            'M' => 2, // メガ
+            'G' => 3, // ギガ
+            'T' => 4, // テラ
+            'P' => 5, // ペタ
+            'E' => 6, // エクサ
+            'Z' => 7, // ゼタ
+            'Y' => 8, // ヨタ
+        ];
+
+        assert($unit > 0);
+
+        $var = trim($var);
+        preg_match('#[' . implode('', array_keys($units)) . ']$#u', $var, $m);
+        return (numval)($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
     }
 }
 

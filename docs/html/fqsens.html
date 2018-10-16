@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
@@ -1329,6 +1330,24 @@ $arg1 = return_arg(1);
 assertSame($arg1('dummy', 'hoge'), 'hoge');
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ope_func()"> ryunosuke\Functions\Package\Funchand::ope_func()</a></h2>
+	<div class="description"><p>演算子のクロージャを返す</p>
+<p>関数ベースなので <code>??</code> のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$not = ope_func('!');    // 否定演算子クロージャ
+assertSame(false, $not(true));
+
+$minus1 = ope_func('-', 1); // 負数演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
+$minus2 = ope_func('-', 2); // 減算演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
+assertSame(-2, $minus1(2));
+assertSame(3 - 2, $minus2(3, 2));
+
+$cond2 = ope_func('?:', 2); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
+$cond3 = ope_func('?:', 3); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
+assertSame('OK' ?: 'NG', $cond2('OK', 'NG'));
+assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::not_func()"> ryunosuke\Functions\Package\Funchand::not_func()</a></h2>
 	<div class="description"><p>返り値の真偽値を逆転した新しいクロージャを返す</p>
 <p>Example:</p>
@@ -1688,18 +1707,24 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()"> ryunosuke\Functions\Package\Strings::starts_with()</a></h2>
 	<div class="description"><p>指定文字列で始まるか調べる</p>
+<p>$with に配列を渡すといずれかで始まるときに true を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(starts_with('abcdef', 'abc'));
 assertTrue(starts_with('abcdef', 'ABC', true));
 assertFalse(starts_with('abcdef', 'xyz'));
+assertTrue(starts_with('abcdef', ['a', 'b', 'c']));
+assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ends_with()"> ryunosuke\Functions\Package\Strings::ends_with()</a></h2>
 	<div class="description"><p>指定文字列で終わるか調べる</p>
+<p>$with に配列を渡すといずれかで終わるときに true を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(ends_with('abcdef', 'def'));
 assertTrue(ends_with('abcdef', 'DEF', true));
 assertFalse(ends_with('abcdef', 'xyz'));
+assertTrue(ends_with('abcdef', ['d', 'e', 'f']));
+assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::camel_case()"> ryunosuke\Functions\Package\Strings::camel_case()</a></h2>
@@ -1908,6 +1933,82 @@ assertSame(iterator_to_array(optional($getobject())), []);
 assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::chain()"> ryunosuke\Functions\Package\Syntax::chain()</a></h2>
+	<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
+<p>ChainObject という関数をチェーンできるオブジェクトを返す。<br />
+ChainObject は大抵のグローバル関数がアノテーションされており、コード補完することが出来る（利便性のためであり、IDE がエラーなどを出しても呼び出し自体は可能）。<br />
+呼び出しは「第1引数に現在の値が適用」されて実行される（下記の func1 コールで任意の位置に適用されることもできる）。</p>
+<p>下記の特殊ルールにより、特殊な呼び出し方ができる。</p>
+<ul>
+<li>array_XXX, str_XXX は省略して XXX で呼び出せる<ul>
+<li>省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない</li>
+</ul>
+</li>
+<li>funcE で eval される文字列のクロージャを呼べる<ul>
+<li>変数名は <code>$v</code> 固定だが、 <code>$v</code> が無いときに限り 最左に自動付与される</li>
+</ul>
+</li>
+<li>funcP で配列指定オペレータのクロージャを呼べる<ul>
+<li>複数指定した場合は順次呼ばれる。つまり map はともかく filter 用途では使えない</li>
+</ul>
+</li>
+<li>func1 で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる<ul>
+<li>func2, func3 等も呼び出し可能</li>
+</ul>
+</li>
+<li>引数が1つの呼び出しは () を省略できる</li>
+</ul>
+<p>この特殊ルールは普通に使う分にはそこまで気にしなくて良い。<br />
+map や filter を駆使しようとすると必要になるが、イテレーション目的ではなく文字列のチェインなどが目的であればほぼ使うことはない。</p>
+<p>特殊なメソッドとして下記がある。</p>
+<ul>
+<li>apply($callback, ...$cbargs): 任意のコールバックを現在の値に適用する</li>
+</ul>
+<p>上記を含むメソッド呼び出しはすべて自分自身を返すので、最終結果を得たい場合は <code>invoke</code> を実行する必要がある。<br />
+ただし、 IteratorAggregate が実装されているので、配列の場合に限り foreach で直接回すことができる。<br />
+さらに、 __toString も実装されているので、文字列的値の場合に限り自動で文字列化される。</p>
+<p>用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。<br />
+ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。</p>
+<p>Example:</p>
+<pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
+$n1_9 = range(1, 9);
+// 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
+assertSame(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v &lt;= 5; }))), 30);
+// chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
+assertSame(chain($n1_9)-&gt;filter(function ($v) { return $v &lt;= 5; })-&gt;map(function ($v) { return $v * 2; })-&gt;sum()(), 30);
+// funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
+assertSame(chain($n1_9)-&gt;filterP(['&lt;=' =&gt; 5])-&gt;mapP(['*' =&gt; 2])-&gt;sum()(), 30);
+// funcE を介したもの。かなり直感的だが eval なので少し不安
+assertSame(chain($n1_9)-&gt;filterE('&lt;= 5')-&gt;mapE('* 2')-&gt;sum()(), 30);
+
+# "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
+$string = 'hello   world';
+// 素の php で処理したもの。もはやなにがなんだか分からない
+assertSame(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filter(explode(' ', $string))))))), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+// chain だとかなりそれっぽくできる。 explode/implode の第1引数は区切り文字なので func1 構文を使用している。また、 rot13 以降は引数がないので () を省略している
+assertSame(chain($string)-&gt;explode1(' ')-&gt;filter()-&gt;map('ucfirst')-&gt;implode1('/')-&gt;rot13-&gt;md5-&gt;strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+
+ # よくある DB レコードをあれこれするシチュエーション
+$co = chain([
+    ['id' =&gt; 1, 'name' =&gt; 'hoge', 'sex' =&gt; 'F', 'age' =&gt; 17, 'salary' =&gt; 230000],
+    ['id' =&gt; 3, 'name' =&gt; 'fuga', 'sex' =&gt; 'M', 'age' =&gt; 43, 'salary' =&gt; 480000],
+    ['id' =&gt; 7, 'name' =&gt; 'piyo', 'sex' =&gt; 'M', 'age' =&gt; 21, 'salary' =&gt; 270000],
+    ['id' =&gt; 9, 'name' =&gt; 'hage', 'sex' =&gt; 'F', 'age' =&gt; 30, 'salary' =&gt; 320000],
+]);
+// e.g. 男性の平均給料
+assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()(), 375000);
+// e.g. 女性の平均年齢
+assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()(), 23.5);
+// e.g. 30歳以上の平均給料
+assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()(), 400000);
+// e.g. 20～30歳の平均給料
+assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()(), 295000);
+// e.g. 男性の最小年齢
+assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()(), 21);
+// e.g. 女性の最大給料
+assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throws()"> ryunosuke\Functions\Package\Syntax::throws()</a></h2>
 	<div class="description"><p>throw の関数版</p>
 <p>hoge() or throw などしたいことがまれによくあるはず。</p>
@@ -2095,6 +2196,15 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 ]);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::stacktrace()"> ryunosuke\Functions\Package\Utility::stacktrace()</a></h2>
+	<div class="description"><p>スタックトレースを文字列で返す</p>
+<p><code>(new \Exception())-&gt;getTraceAsString()</code> と実質的な役割は同じ。<br />
+ただし、 getTraceAsString は引数が Array になったりクラス名しか取れなかったり微妙に使い勝手が悪いのでもうちょっと情報量を増やしたもの。</p>
+<p>第1引数 $traces はトレース的配列を受け取る（<code>(new \Exception())-&gt;getTrace()</code> とか）。<br />
+未指定時は debug_backtrace() で採取する。</p>
+<p>第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。<br />
+今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。</p>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::backtrace()"> ryunosuke\Functions\Package\Utility::backtrace()</a></h2>
 	<div class="description"><p>特定条件までのバックトレースを取得する</p>
 <p>第2引数 $options を満たすトレース以降を返す。<br />
@@ -2206,8 +2316,9 @@ assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので�
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_prefix()"> ryunosuke\Functions\Package\Vars::si_prefix()</a></h2>
 	<div class="description"><p>数値に SI 接頭辞を付与する</p>
-<p>値は 1 &lt;= $var &lt; 1000 の範囲内に収められる。<br />
+<p>値は 1 &lt;= $var &lt; 1000(1024) の範囲内に収められる。<br />
 ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。</p>
+<p>歴史的な経緯により $unit と $format は入れ替えて指定することができる（型で分岐する）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルに k をつける
 assertSame(si_prefix(12345), '12.345 k');
@@ -2218,8 +2329,27 @@ assertSame(si_prefix(12345, '%d%s'), '12k');
 assertSame(si_prefix(0.012345, '%d%s'), '12m');
 // ファイルサイズを byte で表示する
 assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+// ファイルサイズを byte で表示する（1024）
+assertSame(si_prefix(10240, '%.3f %sbyte', 1024), '10.000 kbyte');
 // フォーマットに null を与えると sprintf せずに配列で返す
 assertSame(si_prefix(12345, null), [12.345, 'k']);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_unprefix()"> ryunosuke\Functions\Package\Vars::si_unprefix()</a></h2>
+	<div class="description"><p>SI 接頭辞が付与された文字列を数値化する</p>
+<p>典型的な用途は ini_get で得られた値を数値化したいとき。<br />
+ただし、 init は 1m のように小文字で指定することもあるので大文字化する必要はある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 1k = 1000
+assertSame(si_unprefix('1k'), 1000);
+// 1k = 1024
+assertSame(si_unprefix('1k', 1024), 1024);
+// m はメガではなくミリ
+assertSame(si_unprefix('1m'), 0.001);
+// M がメガ
+assertSame(si_unprefix('1M'), 1000000);
+// K だけは特別扱いで大文字小文字のどちらでもキロになる
+assertSame(si_unprefix('1K'), 1000);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_empty()"> ryunosuke\Functions\Package\Vars::is_empty()</a></h2>

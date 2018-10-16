@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
@@ -53,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L291" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L473" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -214,7 +215,126 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L98-L118" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L98-L278" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Syntax::chain()" tabindex="-1" class="structure-title ">
+                        chain						<small>($source)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
+<p>ChainObject という関数をチェーンできるオブジェクトを返す。<br />
+ChainObject は大抵のグローバル関数がアノテーションされており、コード補完することが出来る（利便性のためであり、IDE がエラーなどを出しても呼び出し自体は可能）。<br />
+呼び出しは「第1引数に現在の値が適用」されて実行される（下記の func1 コールで任意の位置に適用されることもできる）。</p>
+<p>下記の特殊ルールにより、特殊な呼び出し方ができる。</p>
+<ul>
+<li>array_XXX, str_XXX は省略して XXX で呼び出せる<ul>
+<li>省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない</li>
+</ul>
+</li>
+<li>funcE で eval される文字列のクロージャを呼べる<ul>
+<li>変数名は <code>$v</code> 固定だが、 <code>$v</code> が無いときに限り 最左に自動付与される</li>
+</ul>
+</li>
+<li>funcP で配列指定オペレータのクロージャを呼べる<ul>
+<li>複数指定した場合は順次呼ばれる。つまり map はともかく filter 用途では使えない</li>
+</ul>
+</li>
+<li>func1 で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる<ul>
+<li>func2, func3 等も呼び出し可能</li>
+</ul>
+</li>
+<li>引数が1つの呼び出しは () を省略できる</li>
+</ul>
+<p>この特殊ルールは普通に使う分にはそこまで気にしなくて良い。<br />
+map や filter を駆使しようとすると必要になるが、イテレーション目的ではなく文字列のチェインなどが目的であればほぼ使うことはない。</p>
+<p>特殊なメソッドとして下記がある。</p>
+<ul>
+<li>apply($callback, ...$cbargs): 任意のコールバックを現在の値に適用する</li>
+</ul>
+<p>上記を含むメソッド呼び出しはすべて自分自身を返すので、最終結果を得たい場合は <code>invoke</code> を実行する必要がある。<br />
+ただし、 IteratorAggregate が実装されているので、配列の場合に限り foreach で直接回すことができる。<br />
+さらに、 __toString も実装されているので、文字列的値の場合に限り自動で文字列化される。</p>
+<p>用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。<br />
+ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。</p>
+<p>Example:</p>
+<pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
+$n1_9 = range(1, 9);
+// 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
+assertSame(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v &lt;= 5; }))), 30);
+// chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
+assertSame(chain($n1_9)-&gt;filter(function ($v) { return $v &lt;= 5; })-&gt;map(function ($v) { return $v * 2; })-&gt;sum()(), 30);
+// funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
+assertSame(chain($n1_9)-&gt;filterP(['&lt;=' =&gt; 5])-&gt;mapP(['*' =&gt; 2])-&gt;sum()(), 30);
+// funcE を介したもの。かなり直感的だが eval なので少し不安
+assertSame(chain($n1_9)-&gt;filterE('&lt;= 5')-&gt;mapE('* 2')-&gt;sum()(), 30);
+
+# "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
+$string = 'hello   world';
+// 素の php で処理したもの。もはやなにがなんだか分からない
+assertSame(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filter(explode(' ', $string))))))), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+// chain だとかなりそれっぽくできる。 explode/implode の第1引数は区切り文字なので func1 構文を使用している。また、 rot13 以降は引数がないので () を省略している
+assertSame(chain($string)-&gt;explode1(' ')-&gt;filter()-&gt;map('ucfirst')-&gt;implode1('/')-&gt;rot13-&gt;md5-&gt;strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+
+ # よくある DB レコードをあれこれするシチュエーション
+$co = chain([
+    ['id' =&gt; 1, 'name' =&gt; 'hoge', 'sex' =&gt; 'F', 'age' =&gt; 17, 'salary' =&gt; 230000],
+    ['id' =&gt; 3, 'name' =&gt; 'fuga', 'sex' =&gt; 'M', 'age' =&gt; 43, 'salary' =&gt; 480000],
+    ['id' =&gt; 7, 'name' =&gt; 'piyo', 'sex' =&gt; 'M', 'age' =&gt; 21, 'salary' =&gt; 270000],
+    ['id' =&gt; 9, 'name' =&gt; 'hage', 'sex' =&gt; 'F', 'age' =&gt; 30, 'salary' =&gt; 320000],
+]);
+// e.g. 男性の平均給料
+assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()(), 375000);
+// e.g. 女性の平均年齢
+assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()(), 23.5);
+// e.g. 30歳以上の平均給料
+assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()(), 400000);
+// e.g. 20～30歳の平均給料
+assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()(), 295000);
+// e.g. 男性の最小年齢
+assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()(), 21);
+// e.g. 女性の最大給料
+assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$source</td>
+				<td class="desc"><p>元データ</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></td>
+			<td class="desc"></td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L280-L300" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
                         throws						<small>($ex)</small>
@@ -269,7 +389,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L120-L147" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L302-L329" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throw_if()" tabindex="-1" class="structure-title ">
                         throw_if						<small>($flag, $ex, ...$ex_args)</small>
@@ -336,7 +456,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L149-L187" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L331-L369" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::ifelse()" tabindex="-1" class="structure-title ">
                         ifelse						<small>($actual, $expected, $then, $else = null)</small>
@@ -415,7 +535,7 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L189-L212" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L371-L394" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch						<small>($try, $catch = null, ...$variadic)</small>
@@ -483,7 +603,7 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L214-L241" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L396-L423" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally						<small>($try, $finally = null, ...$variadic)</small>
@@ -555,7 +675,7 @@ assertSame($finally_count, 2); // 呼ばれている
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L243-L290" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L425-L472" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally						<small>($try, $catch = null, $finally = null, ...$variadic)</small>
