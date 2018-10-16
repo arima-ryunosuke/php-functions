@@ -10,6 +10,15 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.3
+
+- [feature][Strings] starts_with/ends_with の配列対応
+- [feature][Utility] stacktrace を追加
+- [feature][Vars] si_prefix の単位指定対応
+- [feature][Vars] si_unprefix を追加
+- [feature][Funchand] ope_func を追加
+- [feature][Syntax] chain を追加
+
 ## 1.2.2
 
 - [feature][Utility] backtrace を追加
