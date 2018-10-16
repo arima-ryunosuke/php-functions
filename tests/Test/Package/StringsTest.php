@@ -292,6 +292,11 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($starts_with('abcdef', 'ABC', true));
         $this->assertFalse($starts_with('abcdef', 'xbc', true));
 
+        $this->assertTrue($starts_with('abcdef', ['a', 'X']));
+        $this->assertTrue($starts_with('abcdef', ['abc', 'XXX']));
+        $this->assertFalse($starts_with('abcdef', ['XXX']));
+        $this->assertFalse($starts_with('abcdef', []));
+
         $this->assertFalse($starts_with('', 's'));
     }
 
@@ -305,6 +310,11 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertTrue($ends_with('abcdef', 'def', true));
         $this->assertTrue($ends_with('abcdef', 'DEF', true));
         $this->assertFalse($ends_with('abcdef', 'xef', true));
+
+        $this->assertTrue($ends_with('abcdef', ['f', 'X']));
+        $this->assertTrue($ends_with('abcdef', ['def', 'XXX']));
+        $this->assertFalse($ends_with('abcdef', ['XXX']));
+        $this->assertFalse($ends_with('abcdef', []));
 
         $this->assertFalse($ends_with('', 's'));
     }

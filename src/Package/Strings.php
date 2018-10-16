@@ -479,35 +479,49 @@ class Strings
     /**
      * 指定文字列で始まるか調べる
      *
+     * $with に配列を渡すといずれかで始まるときに true を返す。
+     *
      * Example:
      * ```php
      * assertTrue(starts_with('abcdef', 'abc'));
      * assertTrue(starts_with('abcdef', 'ABC', true));
      * assertFalse(starts_with('abcdef', 'xyz'));
+     * assertTrue(starts_with('abcdef', ['a', 'b', 'c']));
+     * assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
      * ```
      *
      * @param string $string 探される文字列
-     * @param string $with 探す文字列
+     * @param string|array $with 探す文字列
      * @param bool $case_insensitivity 大文字小文字を区別するか
      * @return bool 指定文字列で始まるなら true を返す
      */
     public static function starts_with($string, $with, $case_insensitivity = false)
     {
         assert(is_string($string));
-        assert(is_string($with));
-        assert(strlen($with));
 
-        return (str_equals)(substr($string, 0, strlen($with)), $with, $case_insensitivity);
+        foreach ((array) $with as $w) {
+            assert(is_string($w));
+            assert(strlen($w));
+
+            if ((str_equals)(substr($string, 0, strlen($w)), $w, $case_insensitivity)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * 指定文字列で終わるか調べる
+     *
+     * $with に配列を渡すといずれかで終わるときに true を返す。
      *
      * Example:
      * ```php
      * assertTrue(ends_with('abcdef', 'def'));
      * assertTrue(ends_with('abcdef', 'DEF', true));
      * assertFalse(ends_with('abcdef', 'xyz'));
+     * assertTrue(ends_with('abcdef', ['d', 'e', 'f']));
+     * assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
      * ```
      *
      * @param string $string 探される文字列
@@ -518,10 +532,16 @@ class Strings
     public static function ends_with($string, $with, $case_insensitivity = false)
     {
         assert(is_string($string));
-        assert(is_string($with));
-        assert(strlen($with));
 
-        return (str_equals)(substr($string, -strlen($with)), $with, $case_insensitivity);
+        foreach ((array) $with as $w) {
+            assert(is_string($w));
+            assert(strlen($w));
+
+            if ((str_equals)(substr($string, -strlen($w)), $w, $case_insensitivity)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
