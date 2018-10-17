@@ -386,6 +386,85 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('requires value', $arguments, ['req' => 'hoge'], 'arg1 arg2 --req');
     }
 
+    function test_stacktrace()
+    {
+        function test_stacktrace_in()
+        {
+            return (stacktrace)();
+        }
+
+        function test_stacktrace()
+        {
+            $c = function () {
+                return eval('return \ryunosuke\\Test\\Package\\test_stacktrace_in();');
+            };
+            return $c();
+        }
+
+        $mock = new class()
+        {
+            static function sm() { return test_stacktrace(); }
+
+            function im() { return $this::sm(); }
+        };
+
+        $traces = explode("\n", $mock->im());
+        $this->assertContains('test_stacktrace_in', $traces[0]);
+        $this->assertContains('eval', $traces[1]);
+        $this->assertContains('{closure}', $traces[2]);
+        $this->assertContains('test_stacktrace', $traces[3]);
+        $this->assertContains('::sm', $traces[4]);
+        $this->assertContains('->im', $traces[5]);
+
+        $traces = (stacktrace)([
+            [
+                'file'     => 'hoge',
+                'line'     => 1,
+                'function' => 'func',
+                'args'     => [
+                    123456789,
+                    'stringarg',
+                    'long string long string long string',
+                    new \Concrete('fields'),
+                    ['a', 'b', 'c'],
+                    ['a' => 'A', 'b' => 'B', 'c' => 'C'],
+                    ['n' => ['e' => ['s' => ['t' => 'X']]]],
+                    ['la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la'],
+                ],
+            ]
+        ]);
+        $this->assertContains('123456789', $traces);
+        $this->assertContains('stringarg', $traces);
+        $this->assertContains('long string long...(more 19 length)', $traces);
+        $this->assertContains('Concrete{value:null, name:fields}', $traces);
+        $this->assertContains('[a, b, c]', $traces);
+        $this->assertContains('{a:A, b:B, c:C}', $traces);
+        $this->assertContains('{n:{e:{s:{t:X}}}}', $traces);
+        $this->assertContains('[la, la, la, la, la, la, la, la, la, la, la, la, la, la, la, la, ...(more 1 length)]', $traces);
+
+        $traces = (stacktrace)([
+            [
+                'file'     => 'hoge',
+                'line'     => 1,
+                'function' => 'func',
+            ]
+        ], '%s');
+        $this->assertEquals('hoge', $traces);
+
+        $traces = (stacktrace)([
+            [
+                'file'     => 'hoge',
+                'line'     => 1,
+                'function' => 'func',
+                'args'     => [
+                    'abc',
+                    ['a', 'b', 'c'],
+                ],
+            ]
+        ], 2);
+        $this->assertEquals('hoge:1 func(ab...(more 1 length), [a, b, ...(more 1 length)])', $traces);
+    }
+
     function test_backtrace()
     {
         $mock = new class()

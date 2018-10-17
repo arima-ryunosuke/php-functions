@@ -326,6 +326,108 @@ class Utility
     }
 
     /**
+     * スタックトレースを文字列で返す
+     *
+     * `(new \Exception())->getTraceAsString()` と実質的な役割は同じ。
+     * ただし、 getTraceAsString は引数が Array になったりクラス名しか取れなかったり微妙に使い勝手が悪いのでもうちょっと情報量を増やしたもの。
+     *
+     * 第1引数 $traces はトレース的配列を受け取る（`(new \Exception())->getTrace()` とか）。
+     * 未指定時は debug_backtrace() で採取する。
+     *
+     * 第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。
+     * 今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。
+     *
+     * @param array $traces debug_backtrace 的な配列
+     * @param int|string|array $option オプション
+     * @return string トレース文字列
+     */
+    public static function stacktrace($traces = null, $option = ['format' => '%s:%s %s', 'limit' => 16])
+    {
+        if (is_int($option)) {
+            $limit = $option;
+            $format = '%s:%s %s';
+        }
+        elseif (is_string($option)) {
+            $limit = 16;
+            $format = $option;
+        }
+        else {
+            $limit = $option['limit'] ?? 16;
+            $format = $option['format'] ?? '%s:%s %s';
+        }
+
+        $stringify = function ($value) use ($limit) {
+            // 再帰用クロージャ
+            $export = function ($value, $nest = 0, $parents = []) use (&$export, $limit) {
+                // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+                foreach ($parents as $parent) {
+                    if ($parent === $value) {
+                        return var_export('*RECURSION*', true);
+                    }
+                }
+                // 配列は連想判定したり再帰したり色々
+                if (is_array($value)) {
+                    $parents[] = $value;
+                    $flat = $value === array_values($value);
+                    $kvl = [];
+                    foreach ($value as $k => $v) {
+                        if (count($kvl) >= $limit) {
+                            $kvl[] = sprintf('...(more %d length)', count($value) - $limit);
+                            break;
+                        }
+                        $kvl[] = ($flat ? '' : $k . ':') . $export($v, $nest + 1, $parents);
+                    }
+                    return ($flat ? '[' : '{') . implode(', ', $kvl) . ($flat ? ']' : '}');
+                }
+                // オブジェクトは単にプロパティを __set_state する文字列を出力する
+                elseif (is_object($value)) {
+                    $parents[] = $value;
+                    return get_class($value) . $export((get_object_properties)($value), $nest, $parents);
+                }
+                // 文字列は改行削除
+                elseif (is_string($value)) {
+                    $value = str_replace(["\r\n", "\r", "\n"], '\n', $value);
+                    if (($strlen = strlen($value)) > $limit) {
+                        $value = substr($value, 0, $limit) . sprintf('...(more %d length)', $strlen - $limit);
+                    }
+                    return $value;
+                }
+                // それ以外は stringify
+                else {
+                    return (stringify)($value);
+                }
+            };
+
+            return $export($value);
+        };
+
+        $traces = $traces ?? array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
+        $result = [];
+        foreach ($traces as $i => $trace) {
+            // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）
+            if (!isset($trace['file'])) {
+                continue;
+            }
+
+            $file = $trace['file'];
+            $line = $trace['line'];
+            if (strpos($trace['file'], "eval()'d code") !== false && ($traces[$i + 1]['function'] ?? '') === 'eval') {
+                $file = $traces[$i + 1]['file'];
+                $line = $traces[$i + 1]['line'] . "." . $trace['line'];
+            }
+
+            $callee = $trace['function'];
+            if (isset($trace['type'])) {
+                $callee = $trace['class'] . $trace['type'] . $callee;
+            }
+            $callee .= '(' . implode(', ', array_map($stringify, $trace['args'] ?? [])) . ')';
+
+            $result[] = sprintf($format, $file, $line, $callee);
+        }
+        return implode("\n", $result);
+    }
+
+    /**
      * 特定条件までのバックトレースを取得する
      *
      * 第2引数 $options を満たすトレース以降を返す。
