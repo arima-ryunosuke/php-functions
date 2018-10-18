@@ -201,8 +201,10 @@ class Vars
     /**
      * 数値に SI 接頭辞を付与する
      *
-     * 値は 1 <= $var < 1000 の範囲内に収められる。
+     * 値は 1 <= $var < 1000(1024) の範囲内に収められる。
      * ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。
+     *
+     * 歴史的な経緯により $unit と $format は入れ替えて指定することができる（型で分岐する）。
      *
      * Example:
      * ```php
@@ -215,35 +217,47 @@ class Vars
      * assertSame(si_prefix(0.012345, '%d%s'), '12m');
      * // ファイルサイズを byte で表示する
      * assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+     * // ファイルサイズを byte で表示する（1024）
+     * assertSame(si_prefix(10240, '%.3f %sbyte', 1024), '10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
      * assertSame(si_prefix(12345, null), [12.345, 'k']);
      * ```
      *
      * @param mixed $var 丸める値
+     * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
      * @param string $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
-     * @return string|array SI 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
+     * @return string|array 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
      */
-    public static function si_prefix($var, $format = '%.3f %s')
+    public static function si_prefix($var, $unit = 1000, $format = '%.3f %s')
     {
-        $units = [
-            -24 => 'y', // ヨクト
-            -21 => 'z', // ゼプト
-            -18 => 'a', // アト
-            -15 => 'f', // フェムト
-            -12 => 'p', // ピコ
-            -9  => 'n', // ナノ
-            -6  => 'µ', // マイクロ
-            -3  => 'm', // ミリ
-            0   => '',  //
-            3   => 'k', // キロ
-            6   => 'M', // メガ
-            9   => 'G', // ギガ
-            12  => 'T', // テラ
-            15  => 'P', // ペタ
-            18  => 'E', // エクサ
-            21  => 'Z', // ゼタ
-            24  => 'Y', // ヨタ
+        static $units = [
+            -8 => 'y', // ヨクト
+            -7 => 'z', // ゼプト
+            -6 => 'a', // アト
+            -5 => 'f', // フェムト
+            -4 => 'p', // ピコ
+            -3 => 'n', // ナノ
+            -2 => 'µ', // マイクロ
+            -1 => 'm', // ミリ
+            0  => '',  //
+            1  => 'k', // キロ
+            2  => 'M', // メガ
+            3  => 'G', // ギガ
+            4  => 'T', // テラ
+            5  => 'P', // ペタ
+            6  => 'E', // エクサ
+            7  => 'Z', // ゼタ
+            8  => 'Y', // ヨタ
         ];
+
+        // 引数体系を変えたので後方互換性のため型を見て入れ替える
+        if (is_string($unit) || is_null($unit)) {
+            $t = $format;
+            $format = $unit;
+            $unit = intval($t) ?: 1000;
+        }
+
+        assert($unit > 0);
 
         $result = function ($format, $var, $unit) {
             if ($format === null) {
@@ -259,20 +273,20 @@ class Vars
         $original = $var;
         $var = abs($var);
         $n = 0;
-        while (!(1 <= $var && $var < 1000)) {
+        while (!(1 <= $var && $var < $unit)) {
             if ($var < 1) {
                 $n--;
-                $var *= 1000;
+                $var *= $unit;
             }
             else {
                 $n++;
-                $var /= 1000;
+                $var /= $unit;
             }
         }
-        if (!isset($units[$n * 3])) {
-            throw new \InvalidArgumentException("$original is too large or small.");
+        if (!isset($units[$n])) {
+            throw new \InvalidArgumentException("$original is too large or small ($n).");
         }
-        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n * 3]);
+        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n]);
     }
 
     /**
