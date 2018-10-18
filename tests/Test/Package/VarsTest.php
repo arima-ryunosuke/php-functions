@@ -195,6 +195,47 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([1.001, 'k'], $si_prefix("1001", null));
     }
 
+    function test_si_unprefix()
+    {
+        $si_unprefix = si_unprefix;
+        $units = [
+            -8 => 'y', // ヨクト
+            -7 => 'z', // ゼプト
+            -6 => 'a', // アト
+            -5 => 'f', // フェムト
+            -4 => 'p', // ピコ
+            -3 => 'n', // ナノ
+            -2 => 'µ', // マイクロ
+            -1 => 'm', // ミリ
+            0  => ' ', //
+            1  => 'k', // キロ
+            2  => 'M', // メガ
+            3  => 'G', // ギガ
+            4  => 'T', // テラ
+            5  => 'P', // ペタ
+            6  => 'E', // エクサ
+            7  => 'Z', // ゼタ
+            8  => 'Y', // ヨタ
+        ];
+        foreach ($units as $exp => $unit) {
+            $this->assertEquals(+pow(1000, $exp), $si_unprefix("1$unit"), "+pow(1000, $exp)");
+            $this->assertEquals(-pow(1000, $exp), $si_unprefix("-1$unit"), "-pow(1000, $exp)");
+
+            $this->assertEquals(+pow(2, $exp * 10), $si_unprefix("1$unit", 1024), "+pow(2, $exp * 10)");
+            $this->assertEquals(-pow(2, $exp * 10), $si_unprefix("-1$unit", 1024), "-pow(2, $exp * 10)");
+        }
+
+        $this->assertEquals(0, $si_unprefix("0.0"));
+        $this->assertEquals(0, $si_unprefix("0"));
+        $this->assertEquals(0, $si_unprefix(0));
+        $this->assertEquals(0, $si_unprefix(0.0));
+        $this->assertEquals(999, $si_unprefix('999'));
+        $this->assertEquals(1000, $si_unprefix('1k'));
+        $this->assertEquals(1023, $si_unprefix('1023', 1024));
+        $this->assertEquals(1024, $si_unprefix('1k', 1024));
+        $this->assertEquals(1024, $si_unprefix('1K', 1024));
+    }
+
     function test_is_empty()
     {
         $is_empty = is_empty;

@@ -290,6 +290,60 @@ class Vars
     }
 
     /**
+     * SI 接頭辞が付与された文字列を数値化する
+     *
+     * 典型的な用途は ini_get で得られた値を数値化したいとき。
+     * ただし、 init は 1m のように小文字で指定することもあるので大文字化する必要はある。
+     *
+     * Example:
+     * ```php
+     * // 1k = 1000
+     * assertSame(si_unprefix('1k'), 1000);
+     * // 1k = 1024
+     * assertSame(si_unprefix('1k', 1024), 1024);
+     * // m はメガではなくミリ
+     * assertSame(si_unprefix('1m'), 0.001);
+     * // M がメガ
+     * assertSame(si_unprefix('1M'), 1000000);
+     * // K だけは特別扱いで大文字小文字のどちらでもキロになる
+     * assertSame(si_unprefix('1K'), 1000);
+     * ```
+     *
+     * @param mixed $var 数値化する値
+     * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
+     * @return int|float SI 接頭辞を取り払った実際の数値
+     */
+    public static function si_unprefix($var, $unit = 1000)
+    {
+        static $units = [
+            'y' => -8, // ヨクト
+            'z' => -7, // ゼプト
+            'a' => -6, // アト
+            'f' => -5, // フェムト
+            'p' => -4, // ピコ
+            'n' => -3, // ナノ
+            'µ' => -2, // マイクロ
+            'm' => -1, // ミリ
+            ''  => 0, //
+            'k' => 1, // キロ
+            'K' => 1, // キロ（特別扱い）
+            'M' => 2, // メガ
+            'G' => 3, // ギガ
+            'T' => 4, // テラ
+            'P' => 5, // ペタ
+            'E' => 6, // エクサ
+            'Z' => 7, // ゼタ
+            'Y' => 8, // ヨタ
+        ];
+
+        assert($unit > 0);
+
+        $var = trim($var);
+        preg_match('#[' . implode('', array_keys($units)) . ']$#u', $var, $m);
+        return (numval)($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
+    }
+
+    /**
      * 値が空か検査する
      *
      * `empty` とほぼ同じ。ただし
