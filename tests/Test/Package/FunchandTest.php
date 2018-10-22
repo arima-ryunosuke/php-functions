@@ -120,6 +120,86 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(2, $return1(1, 2, 3));
     }
 
+    function test_ope_func()
+    {
+        $ope_func = ope_func;
+        $operators = [
+            1 => [
+                ''   => [[true], [false]],
+                '!'  => [[true], [false]],
+                '+'  => [[-1], [1]],
+                '-'  => [[1]],
+                '~'  => [[-1], [1]],
+                '++' => [], // 直値の++はできないので個別にテストする
+                '--' => [], // 直値の--はできないので個別にテストする
+            ],
+            2 => [
+                '?:'         => [[true, 'OK'], [false, 'NG']],
+                '??'         => [[true, 'OK'], [false, 'OK'], [null, 'NG']],
+                '=='         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+                '==='        => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+                '!='         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+                '<>'         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+                '!=='        => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+                '<'          => [[1, 1], [1, 2], [2, 1]],
+                '<='         => [[1, 1], [1, 2], [2, 1]],
+                '>'          => [[1, 1], [1, 2], [2, 1]],
+                '>='         => [[1, 1], [1, 2], [2, 1]],
+                '<=>'        => [[1, 1], [1, 2], [2, 1], ['aaa', 'bbb']],
+                '.'          => [['aaa', 'bbb']],
+                '+'          => [[-1, 1]],
+                '-'          => [[-1, 1]],
+                '*'          => [[-1, 1]],
+                '/'          => [[-1, 1]],
+                '%'          => [[-1, 1]],
+                '**'         => [[-1, 1]],
+                '^'          => [[-1, 1]],
+                '&'          => [[-1, 1]],
+                '|'          => [[-1, 1]],
+                '<<'         => [[-1, 1]],
+                '>>'         => [[-1, 1]],
+                '&&'         => [[false, false], [true, false], [false, true], [true, true]],
+                '||'         => [[false, false], [true, false], [false, true], [true, true]],
+                'or'         => [[false, false], [true, false], [false, true], [true, true]],
+                'and'        => [[false, false], [true, false], [false, true], [true, true]],
+                'xor'        => [[false, false], [true, false], [false, true], [true, true]],
+                'instanceof' => [], // 文字列化できないので個別にテストする
+            ],
+            3 => [
+                '?:' => [[true, 'OK', 'NG'], [false, 'NG', 'OK']],
+            ],
+        ];
+        $ve = function ($v) { return var_export($v, true); };
+        foreach ($operators as $n => $ops) {
+            foreach ($ops as $o => $argss) {
+                foreach ($argss as $args) {
+                    $expression = null;
+                    if ($n == 1) {
+                        $expression = "return $o{$ve($args[0])};";
+                    }
+                    elseif ($n == 2) {
+                        $expression = "return {$ve($args[0])} $o {$ve($args[1])};";
+                    }
+                    elseif ($n == 3) {
+                        // 3項演算子は定型的に eval 出来ないが1つしかないので直書きする
+                        $expression = "return {$ve($args[0])} ? {$ve($args[1])} : {$ve($args[2])};";
+                    }
+                    $this->assertSame(eval($expression), $ope_func($o, $n)(...$args), "$expression is failed.");
+                }
+            }
+        }
+
+        // 一部 eval ではテスト出来ないので個別でテスト
+        $this->assertSame(2, $ope_func('++', 1)(1));
+        $this->assertSame(0, $ope_func('--', 1)(1));
+        $this->assertTrue($ope_func('instanceof', 2)(new \stdClass(), \stdClass::class));
+        $this->assertFalse($ope_func('instanceof', 2)(new \stdClass(), \Exception::class));
+
+        // 例外系
+        $this->assertException('is not defined', ope_func, 'hogera', 999);
+        $this->assertException('is not defined', ope_func, '+', 3);
+    }
+
     function test_not_func()
     {
         $not_func = not_func;

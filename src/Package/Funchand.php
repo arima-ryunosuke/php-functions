@@ -219,6 +219,91 @@ class Funchand
     }
 
     /**
+     * 演算子のクロージャを返す
+     *
+     * 関数ベースなので `??` のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。
+     *
+     * Example:
+     * ```php
+     * $not = ope_func('!');    // 否定演算子クロージャ
+     * assertSame(false, $not(true));
+     *
+     * $minus1 = ope_func('-', 1); // 負数演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
+     * $minus2 = ope_func('-', 2); // 減算演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
+     * assertSame(-2, $minus1(2));
+     * assertSame(3 - 2, $minus2(3, 2));
+     *
+     * $cond2 = ope_func('?:', 2); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
+     * $cond3 = ope_func('?:', 3); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
+     * assertSame('OK' ?: 'NG', $cond2('OK', 'NG'));
+     * assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
+     * ```
+     *
+     * @param string $operator 演算子
+     * @param int $n 何項演算子か明示する引数
+     * @return \Closure 演算子のクロージャ
+     */
+    public static function ope_func($operator, $n = null)
+    {
+        static $operators = null;
+        $operators = $operators ?: [
+            1 => [
+                ''   => function ($v1) { return $v1; }, // こんな演算子はないが、「if ($value) {}」として使えることがある
+                '!'  => function ($v1) { return !$v1; },
+                '+'  => function ($v1) { return +$v1; },
+                '-'  => function ($v1) { return -$v1; },
+                '~'  => function ($v1) { return ~$v1; },
+                '++' => function ($v1) { return ++$v1; },
+                '--' => function ($v1) { return --$v1; },
+            ],
+            2 => [
+                '?:'         => function ($v1, $v2) { return $v1 ?: $v2; },
+                '??'         => function ($v1, $v2) { return $v1 ?? $v2; },
+                '=='         => function ($v1, $v2) { return $v1 == $v2; },
+                '==='        => function ($v1, $v2) { return $v1 === $v2; },
+                '!='         => function ($v1, $v2) { return $v1 != $v2; },
+                '<>'         => function ($v1, $v2) { return $v1 <> $v2; },
+                '!=='        => function ($v1, $v2) { return $v1 !== $v2; },
+                '<'          => function ($v1, $v2) { return $v1 < $v2; },
+                '<='         => function ($v1, $v2) { return $v1 <= $v2; },
+                '>'          => function ($v1, $v2) { return $v1 > $v2; },
+                '>='         => function ($v1, $v2) { return $v1 >= $v2; },
+                '<=>'        => function ($v1, $v2) { return $v1 <=> $v2; },
+                '.'          => function ($v1, $v2) { return $v1 . $v2; },
+                '+'          => function ($v1, $v2) { return $v1 + $v2; },
+                '-'          => function ($v1, $v2) { return $v1 - $v2; },
+                '*'          => function ($v1, $v2) { return $v1 * $v2; },
+                '/'          => function ($v1, $v2) { return $v1 / $v2; },
+                '%'          => function ($v1, $v2) { return $v1 % $v2; },
+                '**'         => function ($v1, $v2) { return $v1 ** $v2; },
+                '^'          => function ($v1, $v2) { return $v1 ^ $v2; },
+                '&'          => function ($v1, $v2) { return $v1 & $v2; },
+                '|'          => function ($v1, $v2) { return $v1 | $v2; },
+                '<<'         => function ($v1, $v2) { return $v1 << $v2; },
+                '>>'         => function ($v1, $v2) { return $v1 >> $v2; },
+                '&&'         => function ($v1, $v2) { return $v1 && $v2; },
+                '||'         => function ($v1, $v2) { return $v1 || $v2; },
+                'or'         => function ($v1, $v2) { return $v1 or $v2; },
+                'and'        => function ($v1, $v2) { return $v1 and $v2; },
+                'xor'        => function ($v1, $v2) { return $v1 xor $v2; },
+                'instanceof' => function ($v1, $v2) { return $v1 instanceof $v2; },
+            ],
+            3 => [
+                '?:' => function ($v1, $v2, $v3) { return $v1 ? $v2 : $v3; },
+            ],
+        ];
+
+        $operator = trim($operator);
+        foreach ($operators as $kou => $ops) {
+            if (($n === null || $n == $kou) && isset($ops[$operator])) {
+                return $ops[$operator];
+            }
+        }
+
+        throw new \InvalidArgumentException("$operator is not defined Operator.");
+    }
+
+    /**
      * 返り値の真偽値を逆転した新しいクロージャを返す
      *
      * Example:
