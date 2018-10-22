@@ -33,8 +33,12 @@
   "scripts": {
     "build": [
       "@composer export",
+      "@composer stub",
       "@composer test",
       "@composer document"
+    ],
+    "stub": [
+      "php bin/stub.php"
     ],
     "export": [
       "ryunosuke\\Functions\\Transporter::exportAll"
