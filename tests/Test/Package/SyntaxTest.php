@@ -75,6 +75,72 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertNull($optional(new \ArrayObject([1]), 'stdClass')->count());
     }
 
+    function test_chain()
+    {
+        /** @var \ChainObject $co */
+        $chain = chain;
+
+        // funcO
+        $co = $chain([1, 2, 3, 4, 5]);
+        $this->assertEquals([-1, -2, -3, -4, -5], (clone $co)->mapP(['-'])());
+        $this->assertEquals([0, 5, 5, 5, 5], (clone $co)->mapP(['-' => 1])->mapP(['?:' => [5, 0]])());
+        $this->assertEquals([2 => 8, 9, 10], (clone $co)->filterP(['>=' => 3])->mapP(['+' => 5])());
+
+        // funcE
+        $co = $chain([1, 2, 3, 4, 5]);
+        $this->assertEquals([2 => 6, 8, 10], (clone $co)->mapE('*2')->filterE('>5')());
+        $this->assertEquals('1,4,9,16,25', (clone $co)->mapE('$_ * $_')->vsprintf1('%d,%d,%d,%d,%d')());
+
+        // apply
+        $co = $chain('a12345z');
+        $this->assertEquals('12,345.000', $co->apply('ltrim', 'a')->apply('rtrim', 'z')->apply('number_format', 3)());
+        $this->assertEquals('12,345.000', (string) $co);
+
+        // iterator
+        $co = $chain(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], iterator_to_array($co));
+
+        // string
+        $co = $chain('hello');
+        $this->assertEquals('H,e,l,l,o', $co->ucfirst->str_split->implode1(',')());
+        $this->assertEquals('H,e,l,l,o', (string) $co);
+
+        // exception
+        $this->assertException('is not defined', [$chain(null), 'undefined_function']);
+
+        // use case
+        $co = $chain([
+            ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
+            ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
+            ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
+            ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
+        ]);
+
+        // e.g. 男性の平均給料
+        $this->assertEquals(375000, (clone $co)->whereP('sex', ['===' => 'M'])->column('salary')->mean()());
+
+        // e.g. 女性の平均年齢
+        $this->assertEquals(23.5, (clone $co)->whereE('sex', '=== "F"')->column('age')->mean()());
+
+        // e.g. 30歳以上の平均給料
+        $this->assertEquals(400000, (clone $co)->whereP('age', ['>=' => 30])->column('salary')->mean()());
+
+        // e.g. 20～30歳の平均給料
+        $this->assertEquals(295000, (clone $co)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()());
+
+        // e.g. 男性の最小年齢
+        $this->assertEquals(21, (clone $co)->whereP('sex', ['===' => 'M'])->column('age')->min()());
+
+        // e.g. 女性の最大給料
+        $this->assertEquals(320000, (clone $co)->whereE('sex', '=== "F"')->column('salary')->max()());
+
+        // e.g. 30歳以上の id => name
+        $this->assertEquals([
+            3 => 'fuga',
+            9 => 'hage',
+        ], (clone $co)->whereP('age', ['>=' => 30])->column('name', 'id')());
+    }
+
     function test_throws()
     {
         $throws = throws;
