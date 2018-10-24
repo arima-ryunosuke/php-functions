@@ -496,7 +496,7 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 $options は ['$trace の key' =&gt; "条件"] を渡す。<br />
 条件は文字列かクロージャで、文字列の場合は緩い一致、クロージャの場合は true を返した場合にそれ以降を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">function f001 () {return backtrace(0, ['function' =&gt; 'f002', 'limit' =&gt; 2]);}
+<pre><code class="language-php">function f001 () {return backtrace(0, ['function' =&gt; __NAMESPACE__ . '\\f002', 'limit' =&gt; 2]);}
 function f002 () {return f001();}
 function f003 () {return f002();}
 $traces = f003();
@@ -504,10 +504,10 @@ $traces = f003();
 assertCount(2, $traces);
 // 「function が f002 以降」を返す
 assertArraySubset([
-    'function' =&gt; 'f002'
+    'function' =&gt; __NAMESPACE__ . '\\f002'
 ], $traces[0]);
 assertArraySubset([
-    'function' =&gt; 'f003'
+    'function' =&gt; __NAMESPACE__ . '\\f003'
 ], $traces[1]);
 </code></pre>
 </div>

@@ -571,6 +571,112 @@ if (!isset($excluded_functions['array_mix']) && (!function_exists('ryunosuke\\Fu
     }
 }
 
+const array_zip = 'ryunosuke\\Functions\\array_zip';
+if (!isset($excluded_functions['array_zip']) && (!function_exists('ryunosuke\\Functions\\array_zip') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\array_zip'))->isInternal()))) {
+    /**
+     * 配列の各要素値で順番に配列を作る
+     *
+     * `array_map(null, ...$arrays)` とほぼ同義。ただし
+     *
+     * - 文字キーは保存される（数値キーは再割り振りされる）
+     * - 一つだけ配列を与えても構造は壊れない（array_map(null) は壊れる）
+     *
+     * Example:
+     * ```php
+     * // 普通の zip
+     * $this->assertEquals(array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+     * // キーが維持される
+     * $this->assertEquals(array_zip(['a' => 1, 2, 3], ['hoge', 'b' => 'fuga', 'piyo']), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
+     * ```
+     *
+     * @param array $arrays 対象配列（可変引数）
+     * @return array 各要素値の配列
+     */
+    function array_zip(...$arrays)
+    {
+        $count = count($arrays);
+        if ($count === 0) {
+            throw new \InvalidArgumentException('$arrays is empty.');
+        }
+
+        // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
+        foreach ($arrays as $a) {
+            if ((is_hasharray)($a)) {
+                $keyses = array_map('array_keys', $arrays);
+                $limit = max(array_map('count', $keyses));
+
+                $result = [];
+                for ($i = 0; $i < $limit; $i++) {
+                    $e = [];
+                    foreach ($arrays as $n => $array) {
+                        if (!isset($keyses[$n][$i])) {
+                            $e[] = null;
+                            continue;
+                        }
+                        $key = $keyses[$n][$i];
+                        if (is_int($key)) {
+                            $e[] = $array[$key];
+                        }
+                        else {
+                            $e[$key] = $array[$key];
+                        }
+                    }
+                    $result[] = $e;
+                }
+                return $result;
+            }
+        }
+
+        // array_map(null) は1つだけ与えると構造がぶっ壊れる
+        if ($count === 1) {
+            return array_map(function ($v) { return [$v]; }, $arrays[0]);
+        }
+        return array_map(null, ...$arrays);
+    }
+}
+
+const array_cross = 'ryunosuke\\Functions\\array_cross';
+if (!isset($excluded_functions['array_cross']) && (!function_exists('ryunosuke\\Functions\\array_cross') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\array_cross'))->isInternal()))) {
+    /**
+     * 配列の直積を返す
+     *
+     * 文字キーは保存されるが数値キーは再割り振りされる。
+     * ただし、文字キーが重複すると例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // 普通の直積
+     * $this->assertSame(array_cross([1, 2], [3, 4]), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+     * // キーが維持される
+     * $this->assertSame(array_cross(['a' => 1, 2], ['b' => 3, 4]), [['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
+     * ```
+     *
+     * @param array $arrays 対象配列（可変引数）
+     * @return array 各配列値の直積
+     */
+    function array_cross(...$arrays)
+    {
+        if (!$arrays) {
+            return [];
+        }
+
+        $result = [[]];
+        foreach ($arrays as $array) {
+            $tmp = [];
+            foreach ($result as $x) {
+                foreach ($array as $k => $v) {
+                    if (is_string($k) && array_key_exists($k, $x)) {
+                        throw new \InvalidArgumentException("duplicated key '$k'.");
+                    }
+                    $tmp[] = array_merge($x, [$k => $v]);
+                }
+            }
+            $result = $tmp;
+        }
+        return $result;
+    }
+}
+
 const array_implode = 'ryunosuke\\Functions\\array_implode';
 if (!isset($excluded_functions['array_implode']) && (!function_exists('ryunosuke\\Functions\\array_implode') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\array_implode'))->isInternal()))) {
     /**
@@ -2235,6 +2341,36 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('ryunos
     }
 }
 
+const array_fill_callback = 'ryunosuke\\Functions\\array_fill_callback';
+if (!isset($excluded_functions['array_fill_callback']) && (!function_exists('ryunosuke\\Functions\\array_fill_callback') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\array_fill_callback'))->isInternal()))) {
+    /**
+     * array_fill_keys のコールバック版のようなもの
+     *
+     * 指定したキー配列をそれらのマップしたもので配列を生成する。
+     * `array_combine($keys, array_map($callback, $keys))` とほぼ等価。
+     *
+     * Example:
+     * ```php
+     * // [a, b, c] から [a => A, b => B, c => C] を作る
+     * assertSame(array_fill_callback(['a', 'b', 'c'], 'strtoupper'), ['a' => 'A', 'b' => 'B', 'c' => 'C']);
+     * // [a, b, c] からその sha1 配列を作って大文字化する
+     * assertSame(array_fill_callback(['a', 'b', 'c'], function ($v){ return strtoupper(sha1($v)); }), [
+     *     'a' => '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
+     *     'b' => 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
+     *     'c' => '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $keys キーとなる配列
+     * @param callable $callback 要素のコールバック（引数でキーが渡ってくる）
+     * @return array 新しい配列
+     */
+    function array_fill_callback($keys, $callback)
+    {
+        return array_combine($keys, array_map((func_user_func_array)($callback), $keys));
+    }
+}
+
 const array_pickup = 'ryunosuke\\Functions\\array_pickup';
 if (!isset($excluded_functions['array_pickup']) && (!function_exists('ryunosuke\\Functions\\array_pickup') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\array_pickup'))->isInternal()))) {
     /**
@@ -3330,6 +3466,69 @@ if (!isset($excluded_functions['file_set_contents']) && (!function_exists('ryuno
     }
 }
 
+const file_rewrite_contents = 'ryunosuke\\Functions\\file_rewrite_contents';
+if (!isset($excluded_functions['file_rewrite_contents']) && (!function_exists('ryunosuke\\Functions\\file_rewrite_contents') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\file_rewrite_contents'))->isInternal()))) {
+    /**
+     * ファイルを読み込んで内容をコールバックに渡して書き込む
+     *
+     * Example:
+     * ```php
+     * // 適当にファイルを用意
+     * $testpath = sys_get_temp_dir() . '/rewrite.txt';
+     * file_put_contents($testpath, 'hoge');
+     * // 前後に 'pre-', '-fix' を付与する
+     * file_rewrite_contents($testpath, function($contents, $fp){ return "pre-$contents-fix"; });
+     * assertStringEqualsFile($testpath, 'pre-hoge-fix');
+     * ```
+     *
+     * @param string $filename 読み書きするファイル名
+     * @param callable $callback 書き込む内容。引数で $contents, $fp が渡ってくる
+     * @param int $operation ロック定数（LOCL_SH, LOCK_EX, LOCK_NB）
+     * @return int 書き込まれたバイト数
+     */
+    function file_rewrite_contents($filename, $callback, $operation = 0)
+    {
+        try {
+            // 開いて
+            $fp = fopen($filename, 'c+b') ?: (throws)(new \UnexpectedValueException('failed to fopen.'));
+            if ($operation) {
+                flock($fp, $operation) ?: (throws)(new \UnexpectedValueException('failed to flock.'));
+            }
+
+            // 読み込んで
+            rewind($fp) ?: (throws)(new \UnexpectedValueException('failed to rewind.'));
+            $contents = false !== ($t = stream_get_contents($fp)) ? $t : (throws)(new \UnexpectedValueException('failed to stream_get_contents.'));
+
+            // 変更して
+            rewind($fp) ?: (throws)(new \UnexpectedValueException('failed to rewind.'));
+            ftruncate($fp, 0) ?: (throws)(new \UnexpectedValueException('failed to ftruncate.'));
+            $contents = $callback($contents, $fp);
+
+            // 書き込んで
+            $return = ($r = fwrite($fp, $contents)) !== false ? $r : (throws)(new \UnexpectedValueException('failed to fwrite.'));
+            fflush($fp) ?: (throws)(new \UnexpectedValueException('failed to fflush.'));
+
+            // 閉じて
+            if ($operation) {
+                flock($fp, LOCK_UN) ?: (throws)(new \UnexpectedValueException('failed to flock.'));
+            }
+            fclose($fp) ?: (throws)(new \UnexpectedValueException('failed to fclose.'));
+
+            // 返す
+            return $return;
+        }
+        catch (\Exception $ex) {
+            if (isset($fp)) {
+                if ($operation) {
+                    flock($fp, LOCK_UN);
+                }
+                fclose($fp);
+            }
+            throw $ex;
+        }
+    }
+}
+
 const mkdir_p = 'ryunosuke\\Functions\\mkdir_p';
 if (!isset($excluded_functions['mkdir_p']) && (!function_exists('ryunosuke\\Functions\\mkdir_p') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\mkdir_p'))->isInternal()))) {
     /**
@@ -4099,13 +4298,13 @@ if (!isset($excluded_functions['eval_func']) && (!function_exists('ryunosuke\\Fu
      */
     function eval_func($expression, ...$variadic)
     {
-        $eargs = $variadic;
-        return (delegate)(function ($expression, $args) use ($eargs) {
-            return (function () {
-                extract(func_get_arg(1));
-                return eval("return " . func_get_arg(0) . ";");
-            })($expression, array_combine($eargs, $args));
-        }, $expression, count($eargs));
+        static $cache = [];
+        $args = (array_sprintf)($variadic, '$%s', ',');
+        $declare = "return function($args) { return $expression; };";
+        if (!isset($cache[$declare])) {
+            $cache[$declare] = eval($declare);
+        }
+        return $cache[$declare];
     }
 }
 
@@ -5016,7 +5215,7 @@ if (!isset($excluded_functions['str_equals']) && (!function_exists('ryunosuke\\F
      *
      * @param string $str1 文字列1
      * @param string $str2 文字列2
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 同じ文字列なら true
      */
     function str_equals($str1, $str2, $case_insensitivity = false)
@@ -5057,7 +5256,7 @@ if (!isset($excluded_functions['str_contains']) && (!function_exists('ryunosuke\
      *
      * @param string $haystack 対象文字列
      * @param string|array $needle 調べる文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @param bool $and_flag すべて含む場合に true を返すか
      * @return bool $needle を含むなら true
      */
@@ -5084,6 +5283,84 @@ if (!isset($excluded_functions['str_contains']) && (!function_exists('ryunosuke\
             }
         }
         return !!$and_flag;
+    }
+}
+
+const str_chop = 'ryunosuke\\Functions\\str_chop';
+if (!isset($excluded_functions['str_chop']) && (!function_exists('ryunosuke\\Functions\\str_chop') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\str_chop'))->isInternal()))) {
+    /**
+     * 先頭・末尾の指定文字列を削ぎ落とす
+     *
+     * Example:
+     * ```php
+     * // 文字列からパス文字列と拡張子を削ぎ落とす
+     * $PATH = '/path/to/something';
+     * assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $prefix 削ぎ落とす先頭文字列
+     * @param string $suffix 削ぎ落とす末尾文字列
+     * @param bool $case_insensitivity 大文字小文字を無視するか
+     * @return string 削ぎ落とした文字列
+     */
+    function str_chop($string, $prefix = null, $suffix = null, $case_insensitivity = false)
+    {
+        $pattern = [];
+        if (strlen($prefix)) {
+            $pattern[] = '(\A' . preg_quote($prefix, '#') . ')';
+        }
+        if (strlen($suffix)) {
+            $pattern[] = '(' . preg_quote($suffix, '#') . '\z)';
+        }
+        $flag = 'u' . ($case_insensitivity ? 'i' : '');
+        return preg_replace('#' . implode('|', $pattern) . '#' . $flag, '', $string);
+    }
+}
+
+const str_lchop = 'ryunosuke\\Functions\\str_lchop';
+if (!isset($excluded_functions['str_lchop']) && (!function_exists('ryunosuke\\Functions\\str_lchop') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\str_lchop'))->isInternal()))) {
+    /**
+     * 先頭の指定文字列を削ぎ落とす
+     *
+     * Example:
+     * ```php
+     * // 文字列からパス文字列を削ぎ落とす
+     * $PATH = '/path/to/something';
+     * assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $prefix 削ぎ落とす先頭文字列
+     * @param bool $case_insensitivity 大文字小文字を無視するか
+     * @return string 削ぎ落とした文字列
+     */
+    function str_lchop($string, $prefix, $case_insensitivity = false)
+    {
+        return (str_chop)($string, $prefix, null, $case_insensitivity);
+    }
+}
+
+const str_rchop = 'ryunosuke\\Functions\\str_rchop';
+if (!isset($excluded_functions['str_rchop']) && (!function_exists('ryunosuke\\Functions\\str_rchop') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\str_rchop'))->isInternal()))) {
+    /**
+     * 末尾の指定文字列を削ぎ落とす
+     *
+     * Example:
+     * ```php
+     * // 文字列から .php を削ぎ落とす
+     * $PATH = '/path/to/something';
+     * assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $suffix 削ぎ落とす末尾文字列
+     * @param bool $case_insensitivity 大文字小文字を無視するか
+     * @return string 削ぎ落とした文字列
+     */
+    function str_rchop($string, $suffix = null, $case_insensitivity = false)
+    {
+        return (str_chop)($string, null, $suffix, $case_insensitivity);
     }
 }
 
@@ -5170,7 +5447,7 @@ if (!isset($excluded_functions['str_subreplace']) && (!function_exists('ryunosuk
      * @param string $subject 対象文字列
      * @param string $search 検索文字列
      * @param array|string $replaces 置換文字列配列（単一指定は配列化される）
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 置換された文字列
      */
     function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
@@ -5313,7 +5590,7 @@ if (!isset($excluded_functions['starts_with']) && (!function_exists('ryunosuke\\
      *
      * @param string $string 探される文字列
      * @param string|array $with 探す文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 指定文字列で始まるなら true を返す
      */
     function starts_with($string, $with, $case_insensitivity = false)
@@ -5350,7 +5627,7 @@ if (!isset($excluded_functions['ends_with']) && (!function_exists('ryunosuke\\Fu
      *
      * @param string $string 探される文字列
      * @param string $with 探す文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 対象文字列で終わるなら true
      */
     function ends_with($string, $with, $case_insensitivity = false)
@@ -6792,7 +7069,7 @@ if (!isset($excluded_functions['backtrace']) && (!function_exists('ryunosuke\\Fu
      *
      * Example:
      * ```php
-     * function f001 () {return backtrace(0, ['function' => 'f002', 'limit' => 2]);}
+     * function f001 () {return backtrace(0, ['function' => __NAMESPACE__ . '\\f002', 'limit' => 2]);}
      * function f002 () {return f001();}
      * function f003 () {return f002();}
      * $traces = f003();
@@ -6800,10 +7077,10 @@ if (!isset($excluded_functions['backtrace']) && (!function_exists('ryunosuke\\Fu
      * assertCount(2, $traces);
      * // 「function が f002 以降」を返す
      * assertArraySubset([
-     *     'function' => 'f002'
+     *     'function' => __NAMESPACE__ . '\\f002'
      * ], $traces[0]);
      * assertArraySubset([
-     *     'function' => 'f003'
+     *     'function' => __NAMESPACE__ . '\\f003'
      * ], $traces[1]);
      * ```
      *
@@ -7437,9 +7714,12 @@ if (!isset($excluded_functions['is_empty']) && (!function_exists('ryunosuke\\Fun
      * `empty` とほぼ同じ。ただし
      *
      * - string: "0"
-     * - あらゆる object
+     * - countable でない object
+     * - countable である object で count() > 0
      *
      * は false 判定する。
+     * ただし countable は互換性のため $countable_object で指定する（デフォルト false）。
+     * 次のバージョンアップでこの引数はデフォルト true になるか削除される。
      *
      * なお、関数の仕様上、未定義変数を true 判定することはできない。
      * 未定義変数をチェックしたい状況は大抵の場合コードが悪いが `$array['key1']['key2']` を調べたいことはある。
@@ -7460,12 +7740,17 @@ if (!isset($excluded_functions['is_empty']) && (!function_exists('ryunosuke\\Fun
      * ```
      *
      * @param mixed $var 判定する値
+     * @param bool $countable_object 判定する値
      * @return bool 空なら true
      */
-    function is_empty($var)
+    function is_empty($var, $countable_object = false)
     {
-        // empty で空でない判定ならそれで良い
-        if (!empty($var)) {
+        // object は is_countable 次第
+        if (is_object($var)) {
+            // for compatible
+            if ($countable_object && (is_countable)($var)) {
+                return !count($var);
+            }
             return false;
         }
 
@@ -7474,12 +7759,8 @@ if (!isset($excluded_functions['is_empty']) && (!function_exists('ryunosuke\\Fun
             return false;
         }
 
-        // object は false
-        if (is_object($var)) {
-            return false;
-        }
-
-        return true;
+        // 上記以外は empty に任せる
+        return empty($var);
     }
 }
 
