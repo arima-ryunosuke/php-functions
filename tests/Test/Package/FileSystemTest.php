@@ -136,6 +136,49 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('ext', $file_extension('.ext'));
     }
 
+    function test_file_rewrite_contents()
+    {
+        $file_rewrite_contents = file_rewrite_contents;
+        $testpath = sys_get_temp_dir() . '/rewrite/test.txt';
+        (file_set_contents)($testpath, 'dummy');
+
+        // standard
+        $bytes = $file_rewrite_contents($testpath, function ($contents, $fp) {
+            $this->assertEquals('dummy', $contents);
+            $this->assertInternalType('resource', $fp);
+            return 'rewrite!';
+        });
+        $this->assertEquals(8, $bytes);
+        $this->assertStringEqualsFile($testpath, 'rewrite!');
+
+        // 0 bytes
+        $bytes = $file_rewrite_contents($testpath, function ($contents) { return ''; });
+        $this->assertEquals(0, $bytes);
+        $this->assertStringEqualsFile($testpath, '');
+
+        // no exists
+        $bytes = $file_rewrite_contents(dirname($testpath) . '/test2.txt', function ($contents) {
+            return 'test2!';
+        }, LOCK_EX);
+        $this->assertEquals(6, $bytes);
+        $this->assertStringEqualsFile(dirname($testpath) . '/test2.txt', 'test2!');
+
+        // lock
+        $bytes = $file_rewrite_contents($testpath, function ($contents) { return 'locked!'; }, LOCK_EX);
+        $this->assertEquals(7, $bytes);
+        $this->assertStringEqualsFile($testpath, 'locked!');
+
+        // open failed
+        @$this->assertException('failed to fopen', $file_rewrite_contents, dirname($testpath), function () { });
+
+        // lock failed
+        $fp = fopen($testpath, 'r');
+        flock($fp, LOCK_EX);
+        @$this->assertException('failed to flock', $file_rewrite_contents, $testpath, function () { }, LOCK_EX | LOCK_NB);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+    }
+
     function test_file_set_contents()
     {
         $file_set_contents = file_set_contents;
