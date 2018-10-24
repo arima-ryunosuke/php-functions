@@ -10,6 +10,18 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.4
+
+- [refactor][All] php7.2 でテストがコケていたので修正
+- [feature][FileSystem] file_rewrite_contents を追加
+- [feature][Strings] str_chop を追加
+- [feature][Arrays] array_zip を追加
+- [feature][Arrays] array_cross を追加
+- [feature][Arrays] array_fill_callback を追加
+- [fixbug][Funchand] eval_func が激遅だった不具合を修正
+- [change][Vars] is_empry の仕様を変更
+  - countable object で count() > 0 なら false を返せるようになった（当面はフラグで互換性維持）
+
 ## 1.2.3
 
 - [feature][Strings] starts_with/ends_with の配列対応
