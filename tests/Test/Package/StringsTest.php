@@ -168,6 +168,25 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse($str_contains(new \Concrete('abcdef'), new \Concrete('XX'), true));
     }
 
+    function test_str_chop()
+    {
+        $str_chop = str_chop;
+        $this->assertEquals("MMMzzz", $str_chop('aaaMMMzzz', 'aaa'));
+        $this->assertEquals("aaaMMM", $str_chop('aaaMMMzzz', null, 'zzz'));
+        $this->assertEquals("MMM", $str_chop('aaaMMMzzz', 'aaa', 'zzz'));
+        $this->assertEquals("aaaMMMzzz", $str_chop('aaaMMMzzz', 'aaaa', 'zzzz'));
+        $this->assertEquals(" aaaMMMzzz ", $str_chop(' aaaMMMzzz ', 'aaa', 'zzz'));
+        $this->assertEquals("aaaMMMzzz", $str_chop('aaaMMMzzz', 'AAA', 'ZZZ'));
+        $this->assertEquals("MMM", $str_chop('aaaMMMzzz', 'AAA', 'ZZZ', true));
+        $this->assertEquals("\naaazzz", $str_chop("\naaazzz", 'aaa'));
+        $this->assertEquals("aaazzz\n", $str_chop("aaazzz\n", null, 'zzz'));
+        $this->assertEquals("aaazzz", $str_chop("\naaazzz\n", "\n", "\n"));
+        $this->assertEquals('#^.\\$', $str_chop('[#^.\\$]', "[", "]"));
+
+        $this->assertEquals("MMMzzz", (str_lchop)('aaaMMMzzz', 'aaa'));
+        $this->assertEquals("aaaMMM", (str_rchop)('aaaMMMzzz', 'zzz'));
+    }
+
     function test_str_putcsv()
     {
         $str_putcsv = str_putcsv;

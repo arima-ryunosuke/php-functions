@@ -278,6 +278,75 @@ class Strings
     }
 
     /**
+     * 先頭・末尾の指定文字列を削ぎ落とす
+     *
+     * Example:
+     * ```php
+     * // 文字列からパス文字列と拡張子を削ぎ落とす
+     * $PATH = '/path/to/something';
+     * assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $prefix 削ぎ落とす先頭文字列
+     * @param string $suffix 削ぎ落とす末尾文字列
+     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @return string 削ぎ落とした文字列
+     */
+    public static function str_chop($string, $prefix = null, $suffix = null, $case_insensitivity = false)
+    {
+        $pattern = [];
+        if (strlen($prefix)) {
+            $pattern[] = '(\A' . preg_quote($prefix, '#') . ')';
+        }
+        if (strlen($suffix)) {
+            $pattern[] = '(' . preg_quote($suffix, '#') . '\z)';
+        }
+        $flag = 'u' . ($case_insensitivity ? 'i' : '');
+        return preg_replace('#' . implode('|', $pattern) . '#' . $flag, '', $string);
+    }
+
+    /**
+     * 先頭の指定文字列を削ぎ落とす
+     *
+     * Example:
+     * ```php
+     * // 文字列からパス文字列を削ぎ落とす
+     * $PATH = '/path/to/something';
+     * assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $prefix 削ぎ落とす先頭文字列
+     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @return string 削ぎ落とした文字列
+     */
+    public static function str_lchop($string, $prefix, $case_insensitivity = false)
+    {
+        return (str_chop)($string, $prefix, null, $case_insensitivity);
+    }
+
+    /**
+     * 末尾の指定文字列を削ぎ落とす
+     *
+     * Example:
+     * ```php
+     * // 文字列から .php を削ぎ落とす
+     * $PATH = '/path/to/something';
+     * assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $suffix 削ぎ落とす末尾文字列
+     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @return string 削ぎ落とした文字列
+     */
+    public static function str_rchop($string, $suffix = null, $case_insensitivity = false)
+    {
+        return (str_chop)($string, null, $suffix, $case_insensitivity);
+    }
+
+    /**
      * fputcsv の文字列版（str_getcsv の put 版）
      *
      * エラーは例外に変換される。
