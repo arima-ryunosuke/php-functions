@@ -436,7 +436,7 @@ class Utility
      *
      * Example:
      * ```php
-     * function f001 () {return backtrace(0, ['function' => 'f002', 'limit' => 2]);}
+     * function f001 () {return backtrace(0, ['function' => __NAMESPACE__ . '\\f002', 'limit' => 2]);}
      * function f002 () {return f001();}
      * function f003 () {return f002();}
      * $traces = f003();
@@ -444,10 +444,10 @@ class Utility
      * assertCount(2, $traces);
      * // 「function が f002 以降」を返す
      * assertArraySubset([
-     *     'function' => 'f002'
+     *     'function' => __NAMESPACE__ . '\\f002'
      * ], $traces[0]);
      * assertArraySubset([
-     *     'function' => 'f003'
+     *     'function' => __NAMESPACE__ . '\\f003'
      * ], $traces[1]);
      * ```
      *

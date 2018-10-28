@@ -18,7 +18,7 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
         $stdclass = (object) $fields;
         $this->assertInstanceOf('stdClass', $stdclass);
         // $this->assertEquals([], get_object_vars($stdclass)); php7 から OK になっている？
-        $this->assertFalse(property_exists($stdclass, '0'));
+        // $this->assertFalse(property_exists($stdclass, '0')); php7.2 から OK になっている？
     }
 
     function test_detect_namespace()

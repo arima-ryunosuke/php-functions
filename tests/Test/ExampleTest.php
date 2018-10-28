@@ -25,7 +25,7 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
             }
 
             $exfile = __DIR__ . '/../examples/' . basename($file);
-            file_put_contents($exfile, "<?php\n" . implode("\n", $contents));
+            file_put_contents($exfile, "<?php\nnamespace Example;\n" . implode("\n", $contents));
             ob_start();
             include $exfile;
             ob_end_clean();
