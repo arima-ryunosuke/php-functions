@@ -349,9 +349,12 @@ class Vars
      * `empty` とほぼ同じ。ただし
      *
      * - string: "0"
-     * - あらゆる object
+     * - countable でない object
+     * - countable である object で count() > 0
      *
      * は false 判定する。
+     * ただし countable は互換性のため $countable_object で指定する（デフォルト false）。
+     * 次のバージョンアップでこの引数はデフォルト true になるか削除される。
      *
      * なお、関数の仕様上、未定義変数を true 判定することはできない。
      * 未定義変数をチェックしたい状況は大抵の場合コードが悪いが `$array['key1']['key2']` を調べたいことはある。
@@ -372,12 +375,17 @@ class Vars
      * ```
      *
      * @param mixed $var 判定する値
+     * @param bool $countable_object 判定する値
      * @return bool 空なら true
      */
-    public static function is_empty($var)
+    public static function is_empty($var, $countable_object = false)
     {
-        // empty で空でない判定ならそれで良い
-        if (!empty($var)) {
+        // object は is_countable 次第
+        if (is_object($var)) {
+            // for compatible
+            if ($countable_object && (is_countable)($var)) {
+                return !count($var);
+            }
             return false;
         }
 
@@ -386,12 +394,8 @@ class Vars
             return false;
         }
 
-        // object は false
-        if (is_object($var)) {
-            return false;
-        }
-
-        return true;
+        // 上記以外は empty に任せる
+        return empty($var);
     }
 
     /**
