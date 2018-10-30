@@ -530,6 +530,67 @@ class Arrays
     }
 
     /**
+     * 配列の各要素値で順番に配列を作る
+     *
+     * `array_map(null, ...$arrays)` とほぼ同義。ただし
+     *
+     * - 文字キーは保存される（数値キーは再割り振りされる）
+     * - 一つだけ配列を与えても構造は壊れない（array_map(null) は壊れる）
+     *
+     * Example:
+     * ```php
+     * // 普通の zip
+     * $this->assertEquals(array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+     * // キーが維持される
+     * $this->assertEquals(array_zip(['a' => 1, 2, 3], ['hoge', 'b' => 'fuga', 'piyo']), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
+     * ```
+     *
+     * @param array $arrays 対象配列（可変引数）
+     * @return array 各要素値の配列
+     */
+    public static function array_zip(...$arrays)
+    {
+        $count = count($arrays);
+        if ($count === 0) {
+            throw new \InvalidArgumentException('$arrays is empty.');
+        }
+
+        // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
+        foreach ($arrays as $a) {
+            if ((is_hasharray)($a)) {
+                $keyses = array_map('array_keys', $arrays);
+                $limit = max(array_map('count', $keyses));
+
+                $result = [];
+                for ($i = 0; $i < $limit; $i++) {
+                    $e = [];
+                    foreach ($arrays as $n => $array) {
+                        if (!isset($keyses[$n][$i])) {
+                            $e[] = null;
+                            continue;
+                        }
+                        $key = $keyses[$n][$i];
+                        if (is_int($key)) {
+                            $e[] = $array[$key];
+                        }
+                        else {
+                            $e[$key] = $array[$key];
+                        }
+                    }
+                    $result[] = $e;
+                }
+                return $result;
+            }
+        }
+
+        // array_map(null) は1つだけ与えると構造がぶっ壊れる
+        if ($count === 1) {
+            return array_map(function ($v) { return [$v]; }, $arrays[0]);
+        }
+        return array_map(null, ...$arrays);
+    }
+
+    /**
      * 配列の各要素の間に要素を差し込む
      *
      * 歴史的な理由はないが、引数をどちらの順番でも受けつけることが可能。

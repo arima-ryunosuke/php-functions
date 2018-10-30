@@ -230,6 +230,44 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['a' => '!', 'X', 'Y', 'Z'], $array_mix(['a' => 'A', 'X', 'Z'], ['a' => '!', 'Y']));
     }
 
+    function test_array_zip()
+    {
+        $array_zip = array_zip;
+        $this->assertEquals([[1], [2], [3]], $array_zip([1, 2, 3]));
+        $this->assertEquals([[[1]], [[2]], [[3]]], $array_zip([[1], [2], [3]]));
+        $this->assertEquals([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']], $array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']));
+        $this->assertEquals([
+            [
+                'a' => 1,
+                0   => 'hoge',
+                1   => 'foo',
+            ],
+            [
+                0   => 2,
+                'b' => 'fuga',
+                1   => 'bar',
+            ],
+            [
+                0   => 3,
+                1   => 'piyo',
+                'c' => 'baz',
+            ],
+            [
+                0   => null,
+                1   => null,
+                'n' => 'null',
+            ],
+        ],
+            $array_zip(
+                ['a' => 1, 2, 3],
+                ['hoge', 'b' => 'fuga', 'piyo'],
+                ['foo', 'bar', 'c' => 'baz', 'n' => 'null']
+            )
+        );
+
+        $this->assertException('$arrays is empty', $array_zip);
+    }
+
     function test_array_implode()
     {
         $array_implode = array_implode;
