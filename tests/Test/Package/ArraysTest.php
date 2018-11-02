@@ -268,6 +268,25 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('$arrays is empty', $array_zip);
     }
 
+    function test_array_cross()
+    {
+        $array_cross = array_cross;
+        $this->assertSame([], $array_cross());
+        $this->assertSame([], $array_cross([]));
+        $this->assertSame([], $array_cross([], []));
+
+        $this->assertSame([[1], [2]], $array_cross([1, 2]));
+        $this->assertSame([[1, 3], [1, 4], [2, 3], [2, 4]], $array_cross([1, 2], [3, 4]));
+        $this->assertSame([[1, 3, 5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6]], $array_cross([1, 2], [3, 4], [5, 6]));
+
+        $this->assertSame([['a' => 'A'], ['b' => 'B']], $array_cross(['a' => 'A', 'b' => 'B']));
+        $this->assertSame([['a' => 'A', 'c' => 'C'], ['a' => 'A', 'd' => 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'd' => 'D']], $array_cross(['a' => 'A', 'b' => 'B'], ['c' => 'C', 'd' => 'D']));
+
+        $this->assertSame([['A', 'c' => 'C'], ['A', 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'D']], $array_cross(['A', 'b' => 'B'], ['c' => 'C', 'D']));
+
+        $this->assertException('duplicated key', $array_cross, ['a' => 'A', 'B'], ['C', 'a' => 'D']);
+    }
+
     function test_array_implode()
     {
         $array_implode = array_implode;
