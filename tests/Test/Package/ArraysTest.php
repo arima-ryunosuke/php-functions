@@ -1475,6 +1475,12 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], $array_shrink_key($object, $object1, $object2, $object3));
     }
 
+    function test_array_fill_callback()
+    {
+        $array_fill_callback = array_fill_callback;
+        $this->assertSame(array_combine($keys = ['a', 'b', 'c'], array_map('strtoupper', $keys)), $array_fill_callback(['a', 'b', 'c'], 'strtoupper'));
+    }
+
     function test_array_pickup()
     {
         $array_pickup = array_pickup;
