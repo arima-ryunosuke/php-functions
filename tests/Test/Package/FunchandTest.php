@@ -216,6 +216,13 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(4, $eval_func('4')());
         $this->assertEquals(7, $eval_func('$a + $b', 'a', 'b')(3, 4));
 
+        $a1 = $eval_func('$a', 'a');
+        $a2 = $eval_func('$a', 'a');
+        $x = $eval_func('$x', 'x');
+        $this->assertSame($a1, $a2);
+        $this->assertNotSame($a1, $x);
+        $this->assertNotSame($a2, $x);
+
         $this->assertEquals(0, (parameter_length)($eval_func('$v')));
         $this->assertEquals(1, (parameter_length)($eval_func('$v', 'a')));
         $this->assertEquals(2, (parameter_length)($eval_func('$v', 'a', 'b')));

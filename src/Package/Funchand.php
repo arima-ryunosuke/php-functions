@@ -341,13 +341,13 @@ class Funchand
      */
     public static function eval_func($expression, ...$variadic)
     {
-        $eargs = $variadic;
-        return (delegate)(function ($expression, $args) use ($eargs) {
-            return (function () {
-                extract(func_get_arg(1));
-                return eval("return " . func_get_arg(0) . ";");
-            })($expression, array_combine($eargs, $args));
-        }, $expression, count($eargs));
+        static $cache = [];
+        $args = (array_sprintf)($variadic, '$%s', ',');
+        $declare = "return function($args) { return $expression; };";
+        if (!isset($cache[$declare])) {
+            $cache[$declare] = eval($declare);
+        }
+        return $cache[$declare];
     }
 
     /**
