@@ -210,7 +210,7 @@ class Strings
      *
      * @param string $str1 文字列1
      * @param string $str2 文字列2
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 同じ文字列なら true
      */
     public static function str_equals($str1, $str2, $case_insensitivity = false)
@@ -248,7 +248,7 @@ class Strings
      *
      * @param string $haystack 対象文字列
      * @param string|array $needle 調べる文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @param bool $and_flag すべて含む場合に true を返すか
      * @return bool $needle を含むなら true
      */
@@ -290,7 +290,7 @@ class Strings
      * @param string $string 対象文字列
      * @param string $prefix 削ぎ落とす先頭文字列
      * @param string $suffix 削ぎ落とす末尾文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
     public static function str_chop($string, $prefix = null, $suffix = null, $case_insensitivity = false)
@@ -318,7 +318,7 @@ class Strings
      *
      * @param string $string 対象文字列
      * @param string $prefix 削ぎ落とす先頭文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
     public static function str_lchop($string, $prefix, $case_insensitivity = false)
@@ -338,7 +338,7 @@ class Strings
      *
      * @param string $string 対象文字列
      * @param string $suffix 削ぎ落とす末尾文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
     public static function str_rchop($string, $suffix = null, $case_insensitivity = false)
@@ -424,7 +424,7 @@ class Strings
      * @param string $subject 対象文字列
      * @param string $search 検索文字列
      * @param array|string $replaces 置換文字列配列（単一指定は配列化される）
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 置換された文字列
      */
     public static function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
@@ -561,7 +561,7 @@ class Strings
      *
      * @param string $string 探される文字列
      * @param string|array $with 探す文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 指定文字列で始まるなら true を返す
      */
     public static function starts_with($string, $with, $case_insensitivity = false)
@@ -595,7 +595,7 @@ class Strings
      *
      * @param string $string 探される文字列
      * @param string $with 探す文字列
-     * @param bool $case_insensitivity 大文字小文字を区別するか
+     * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 対象文字列で終わるなら true
      */
     public static function ends_with($string, $with, $case_insensitivity = false)
