@@ -667,6 +667,24 @@ VAR
         $var_html($value);
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_console_log()
+    {
+        $this->expectOutputRegex('#aaa#');
+        (console_log)('aaa');
+        echo 'aaa';
+        ob_end_flush();
+    }
+
+    function test_console_log_ex()
+    {
+        $this->expectExceptionMessage('header is already sent');
+        (console_log)('aaa');
+    }
+
     function test_hashvar()
     {
         $hoge = 1;
