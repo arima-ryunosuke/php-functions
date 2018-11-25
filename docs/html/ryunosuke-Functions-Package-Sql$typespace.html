@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not([target="_blank"]):not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + cachekey);
+            });
+        })();
+	</script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Sql)</small>
+	</span>
+	<span class="pull-right">
+		<small class="frame-switch">
+		<a target="_parent">frame</a> | <a target="_parent">noframe</a>
+		</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Sql.php#L5-L485" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                    	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Sql</span></h2>
+
+	<div class="description"><p>Sql 関連のユーティリティ</p>
+</div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Sql.php#L11-L16" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Sql::KEYWORDS" tabindex="-1" class="structure-title">
+						<small>array</small>
+                        KEYWORDS						<var> = [&#039;ACCESSIBLE&#039;, &#039;ACTION&#039;, &#039;ADD&#039;, &#039;AFTER&#039;, &#039;AGAINST&#039;, &#039;AGGREGATE&#039;, &#039;ALGORITHM&#039;, &#039;ALL&#039;, &#039;ALTER&#039;, &#039;ALTER TABLE&#039;, &#039;ANALYSE&#039;, &#039;ANALYZE&#039;, &#039;AND&#039;, &#039;AS&#039;, &#039;ASC&#039;, &#039;AUTOCOMMIT&#039;, &#039;AUTO_INCREMENT&#039;, &#039;BACKUP&#039;, &#039;BEGIN&#039;, &#039;BETWEEN&#039;, &#039;BINLOG&#039;, &#039;BOTH&#039;, &#039;CASCADE&#039;, &#039;CASE&#039;, &#039;CHANGE&#039;, &#039;CHANGED&#039;, &#039;CHARACTER SET&#039;, &#039;CHARSET&#039;, &#039;CHECK&#039;, &#039;CHECKSUM&#039;, &#039;COLLATE&#039;, &#039;COLLATION&#039;, &#039;COLUMN&#039;, &#039;COLUMNS&#039;, &#039;COMMENT&#039;, &#039;COMMIT&#039;, &#039;COMMITTED&#039;, &#039;COMPRESSED&#039;, &#039;CONCURRENT&#039;, &#039;CONSTRAINT&#039;, &#039;CONTAINS&#039;, &#039;CONVERT&#039;, &#039;CREATE&#039;, &#039;CROSS&#039;, &#039;CURRENT_TIMESTAMP&#039;, &#039;DATABASE&#039;, &#039;DATABASES&#039;, &#039;DAY&#039;, &#039;DAY_HOUR&#039;, &#039;DAY_MINUTE&#039;, &#039;DAY_SECOND&#039;, &#039;DEFAULT&#039;, &#039;DEFINER&#039;, &#039;DELAYED&#039;, &#039;DELETE&#039;, &#039;DELETE FROM&#039;, &#039;DESC&#039;, &#039;DESCRIBE&#039;, &#039;DETERMINISTIC&#039;, &#039;DISTINCT&#039;, &#039;DISTINCTROW&#039;, &#039;DIV&#039;, &#039;DO&#039;, &#039;DROP&#039;, &#039;DUMPFILE&#039;, &#039;DUPLICATE&#039;, &#039;DYNAMIC&#039;, &#039;ELSE&#039;, &#039;ENCLOSED&#039;, &#039;END&#039;, &#039;ENGINE&#039;, &#039;ENGINES&#039;, &#039;ENGINE_TYPE&#039;, &#039;ESCAPE&#039;, &#039;ESCAPED&#039;, &#039;EVENTS&#039;, &#039;EXCEPT&#039;, &#039;EXECUTE&#039;, &#039;EXISTS&#039;, &#039;EXPLAIN&#039;, &#039;EXTENDED&#039;, &#039;FAST&#039;, &#039;FIELDS&#039;, &#039;FILE&#039;, &#039;FIRST&#039;, &#039;FIXED&#039;, &#039;FLUSH&#039;, &#039;FOR&#039;, &#039;FORCE&#039;, &#039;FOREIGN&#039;, &#039;FROM&#039;, &#039;FULL&#039;, &#039;FULLTEXT&#039;, &#039;FUNCTION&#039;, &#039;GLOBAL&#039;, &#039;GRANT&#039;, &#039;GRANTS&#039;, &#039;GROUP BY&#039;, &#039;GROUP_CONCAT&#039;, &#039;HAVING&#039;, &#039;HEAP&#039;, &#039;HIGH_PRIORITY&#039;, &#039;HOSTS&#039;, &#039;HOUR&#039;, &#039;HOUR_MINUTE&#039;, &#039;HOUR_SECOND&#039;, &#039;IDENTIFIED&#039;, &#039;IF&#039;, &#039;IFNULL&#039;, &#039;IGNORE&#039;, &#039;IN&#039;, &#039;INDEX&#039;, &#039;INDEXES&#039;, &#039;INFILE&#039;, &#039;INNER&#039;, &#039;INSERT&#039;, &#039;INSERT_ID&#039;, &#039;INSERT_METHOD&#039;, &#039;INTERSECT&#039;, &#039;INTERVAL&#039;, &#039;INTO&#039;, &#039;INVOKER&#039;, &#039;IS&#039;, &#039;ISOLATION&#039;, &#039;JOIN&#039;, &#039;KEY&#039;, &#039;KEYS&#039;, &#039;KILL&#039;, &#039;LAST_INSERT_ID&#039;, &#039;LEADING&#039;, &#039;LEFT&#039;, &#039;LEVEL&#039;, &#039;LIKE&#039;, &#039;LIMIT&#039;, &#039;LINEAR&#039;, &#039;LINES&#039;, &#039;LOAD&#039;, &#039;LOCAL&#039;, &#039;LOCK&#039;, &#039;LOCKS&#039;, &#039;LOGS&#039;, &#039;LOW_PRIORITY&#039;, &#039;MARIA&#039;, &#039;MASTER&#039;, &#039;MASTER_CONNECT_RETRY&#039;, &#039;MASTER_HOST&#039;, &#039;MASTER_LOG_FILE&#039;, &#039;MATCH&#039;, &#039;MAX_CONNECTIONS_PER_HOUR&#039;, &#039;MAX_QUERIES_PER_HOUR&#039;, &#039;MAX_ROWS&#039;, &#039;MAX_UPDATES_PER_HOUR&#039;, &#039;MAX_USER_CONNECTIONS&#039;, &#039;MEDIUM&#039;, &#039;MERGE&#039;, &#039;MINUTE&#039;, &#039;MINUTE_SECOND&#039;, &#039;MIN_ROWS&#039;, &#039;MODE&#039;, &#039;MODIFY&#039;, &#039;MONTH&#039;, &#039;MRG_MYISAM&#039;, &#039;MYISAM&#039;, &#039;NAMES&#039;, &#039;NATURAL&#039;, &#039;NOT&#039;, &#039;NOW()&#039;, &#039;NULL&#039;, &#039;OFFSET&#039;, &#039;ON&#039;, &#039;ON DELETE&#039;, &#039;ON UPDATE&#039;, &#039;OPEN&#039;, &#039;OPTIMIZE&#039;, &#039;OPTION&#039;, &#039;OPTIONALLY&#039;, &#039;OR&#039;, &#039;ORDER BY&#039;, &#039;OUTER&#039;, &#039;OUTFILE&#039;, &#039;PACK_KEYS&#039;, &#039;PAGE&#039;, &#039;PARTIAL&#039;, &#039;PARTITION&#039;, &#039;PARTITIONS&#039;, &#039;PASSWORD&#039;, &#039;PRIMARY&#039;, &#039;PRIVILEGES&#039;, &#039;PROCEDURE&#039;, &#039;PROCESS&#039;, &#039;PROCESSLIST&#039;, &#039;PURGE&#039;, &#039;QUICK&#039;, &#039;RAID0&#039;, &#039;RAID_CHUNKS&#039;, &#039;RAID_CHUNKSIZE&#039;, &#039;RAID_TYPE&#039;, &#039;RANGE&#039;, &#039;READ&#039;, &#039;READ_ONLY&#039;, &#039;READ_WRITE&#039;, &#039;REFERENCES&#039;, &#039;REGEXP&#039;, &#039;RELOAD&#039;, &#039;RENAME&#039;, &#039;REPAIR&#039;, &#039;REPEATABLE&#039;, &#039;REPLACE&#039;, &#039;REPLICATION&#039;, &#039;RESET&#039;, &#039;RESTORE&#039;, &#039;RESTRICT&#039;, &#039;RETURN&#039;, &#039;RETURNS&#039;, &#039;REVOKE&#039;, &#039;RIGHT&#039;, &#039;RLIKE&#039;, &#039;ROLLBACK&#039;, &#039;ROW&#039;, &#039;ROWS&#039;, &#039;ROW_FORMAT&#039;, &#039;SECOND&#039;, &#039;SECURITY&#039;, &#039;SELECT&#039;, &#039;SEPARATOR&#039;, &#039;SERIALIZABLE&#039;, &#039;SESSION&#039;, &#039;SET&#039;, &#039;SHARE&#039;, &#039;SHOW&#039;, &#039;SHUTDOWN&#039;, &#039;SLAVE&#039;, &#039;SONAME&#039;, &#039;SOUNDS&#039;, &#039;SQL&#039;, &#039;SQL_AUTO_IS_NULL&#039;, &#039;SQL_BIG_RESULT&#039;, &#039;SQL_BIG_SELECTS&#039;, &#039;SQL_BIG_TABLES&#039;, &#039;SQL_BUFFER_RESULT&#039;, &#039;SQL_CACHE&#039;, &#039;SQL_CALC_FOUND_ROWS&#039;, &#039;SQL_LOG_BIN&#039;, &#039;SQL_LOG_OFF&#039;, &#039;SQL_LOG_UPDATE&#039;, &#039;SQL_LOW_PRIORITY_UPDATES&#039;, &#039;SQL_MAX_JOIN_SIZE&#039;, &#039;SQL_NO_CACHE&#039;, &#039;SQL_QUOTE_SHOW_CREATE&#039;, &#039;SQL_SAFE_UPDATES&#039;, &#039;SQL_SELECT_LIMIT&#039;, &#039;SQL_SLAVE_SKIP_COUNTER&#039;, &#039;SQL_SMALL_RESULT&#039;, &#039;SQL_WARNINGS&#039;, &#039;START&#039;, &#039;STARTING&#039;, &#039;STATUS&#039;, &#039;STOP&#039;, &#039;STORAGE&#039;, &#039;STRAIGHT_JOIN&#039;, &#039;STRING&#039;, &#039;STRIPED&#039;, &#039;SUPER&#039;, &#039;TABLE&#039;, &#039;TABLES&#039;, &#039;TEMPORARY&#039;, &#039;TERMINATED&#039;, &#039;THEN&#039;, &#039;TO&#039;, &#039;TRAILING&#039;, &#039;TRANSACTIONAL&#039;, &#039;TRUE&#039;, &#039;TRUNCATE&#039;, &#039;TYPE&#039;, &#039;TYPES&#039;, &#039;UNCOMMITTED&#039;, &#039;UNION&#039;, &#039;UNION ALL&#039;, &#039;UNIQUE&#039;, &#039;UNLOCK&#039;, &#039;UNSIGNED&#039;, &#039;UPDATE&#039;, &#039;USAGE&#039;, &#039;USE&#039;, &#039;USING&#039;, &#039;VALUES&#039;, &#039;VARIABLES&#039;, &#039;VIEW&#039;, &#039;WHEN&#039;, &#039;WHERE&#039;, &#039;WITH&#039;, &#039;WORK&#039;, &#039;WRITE&#039;, &#039;XOR&#039;, &#039;YEAR_MONTH&#039;, &#039;ABS&#039;, &#039;ACOS&#039;, &#039;ADDDATE&#039;, &#039;ADDTIME&#039;, &#039;AES_DECRYPT&#039;, &#039;AES_ENCRYPT&#039;, &#039;AREA&#039;, &#039;ASBINARY&#039;, &#039;ASCII&#039;, &#039;ASIN&#039;, &#039;ASTEXT&#039;, &#039;ATAN&#039;, &#039;ATAN2&#039;, &#039;AVG&#039;, &#039;BDMPOLYFROMTEXT&#039;, &#039;BDMPOLYFROMWKB&#039;, &#039;BDPOLYFROMTEXT&#039;, &#039;BDPOLYFROMWKB&#039;, &#039;BENCHMARK&#039;, &#039;BIN&#039;, &#039;BIT_AND&#039;, &#039;BIT_COUNT&#039;, &#039;BIT_LENGTH&#039;, &#039;BIT_OR&#039;, &#039;BIT_XOR&#039;, &#039;BOUNDARY&#039;, &#039;BUFFER&#039;, &#039;CAST&#039;, &#039;CEIL&#039;, &#039;CEILING&#039;, &#039;CENTROID&#039;, &#039;CHAR&#039;, &#039;CHARACTER_LENGTH&#039;, &#039;CHARSET&#039;, &#039;CHAR_LENGTH&#039;, &#039;COALESCE&#039;, &#039;COERCIBILITY&#039;, &#039;COLLATION&#039;, &#039;COMPRESS&#039;, &#039;CONCAT&#039;, &#039;CONCAT_WS&#039;, &#039;CONNECTION_ID&#039;, &#039;CONTAINS&#039;, &#039;CONV&#039;, &#039;CONVERT&#039;, &#039;CONVERT_TZ&#039;, &#039;CONVEXHULL&#039;, &#039;COS&#039;, &#039;COT&#039;, &#039;COUNT&#039;, &#039;CRC32&#039;, &#039;CROSSES&#039;, &#039;CURDATE&#039;, &#039;CURRENT_DATE&#039;, &#039;CURRENT_TIME&#039;, &#039;CURRENT_TIMESTAMP&#039;, &#039;CURRENT_USER&#039;, &#039;CURTIME&#039;, &#039;DATABASE&#039;, &#039;DATE&#039;, &#039;DATEDIFF&#039;, &#039;DATE_ADD&#039;, &#039;DATE_DIFF&#039;, &#039;DATE_FORMAT&#039;, &#039;DATE_SUB&#039;, &#039;DAY&#039;, &#039;DAYNAME&#039;, &#039;DAYOFMONTH&#039;, &#039;DAYOFWEEK&#039;, &#039;DAYOFYEAR&#039;, &#039;DECODE&#039;, &#039;DEFAULT&#039;, &#039;DEGREES&#039;, &#039;DES_DECRYPT&#039;, &#039;DES_ENCRYPT&#039;, &#039;DIFFERENCE&#039;, &#039;DIMENSION&#039;, &#039;DISJOINT&#039;, &#039;DISTANCE&#039;, &#039;ELT&#039;, &#039;ENCODE&#039;, &#039;ENCRYPT&#039;, &#039;ENDPOINT&#039;, &#039;ENVELOPE&#039;, &#039;EQUALS&#039;, &#039;EXP&#039;, &#039;EXPORT_SET&#039;, &#039;EXTERIORRING&#039;, &#039;EXTRACT&#039;, &#039;EXTRACTVALUE&#039;, &#039;FIELD&#039;, &#039;FIND_IN_SET&#039;, &#039;FLOOR&#039;, &#039;FORMAT&#039;, &#039;FOUND_ROWS&#039;, &#039;FROM_DAYS&#039;, &#039;FROM_UNIXTIME&#039;, &#039;GEOMCOLLFROMTEXT&#039;, &#039;GEOMCOLLFROMWKB&#039;, &#039;GEOMETRYCOLLECTION&#039;, &#039;GEOMETRYCOLLECTIONFROMTEXT&#039;, &#039;GEOMETRYCOLLECTIONFROMWKB&#039;, &#039;GEOMETRYFROMTEXT&#039;, &#039;GEOMETRYFROMWKB&#039;, &#039;GEOMETRYN&#039;, &#039;GEOMETRYTYPE&#039;, &#039;GEOMFROMTEXT&#039;, &#039;GEOMFROMWKB&#039;, &#039;GET_FORMAT&#039;, &#039;GET_LOCK&#039;, &#039;GLENGTH&#039;, &#039;GREATEST&#039;, &#039;GROUP_CONCAT&#039;, &#039;GROUP_UNIQUE_USERS&#039;, &#039;HEX&#039;, &#039;HOUR&#039;, &#039;IF&#039;, &#039;IFNULL&#039;, &#039;INET_ATON&#039;, &#039;INET_NTOA&#039;, &#039;INSERT&#039;, &#039;INSTR&#039;, &#039;INTERIORRINGN&#039;, &#039;INTERSECTION&#039;, &#039;INTERSECTS&#039;, &#039;INTERVAL&#039;, &#039;ISCLOSED&#039;, &#039;ISEMPTY&#039;, &#039;ISNULL&#039;, &#039;ISRING&#039;, &#039;ISSIMPLE&#039;, &#039;IS_FREE_LOCK&#039;, &#039;IS_USED_LOCK&#039;, &#039;LAST_DAY&#039;, &#039;LAST_INSERT_ID&#039;, &#039;LCASE&#039;, &#039;LEAST&#039;, &#039;LEFT&#039;, &#039;LENGTH&#039;, &#039;LINEFROMTEXT&#039;, &#039;LINEFROMWKB&#039;, &#039;LINESTRING&#039;, &#039;LINESTRINGFROMTEXT&#039;, &#039;LINESTRINGFROMWKB&#039;, &#039;LN&#039;, &#039;LOAD_FILE&#039;, &#039;LOCALTIME&#039;, &#039;LOCALTIMESTAMP&#039;, &#039;LOCATE&#039;, &#039;LOG&#039;, &#039;LOG10&#039;, &#039;LOG2&#039;, &#039;LOWER&#039;, &#039;LPAD&#039;, &#039;LTRIM&#039;, &#039;MAKEDATE&#039;, &#039;MAKETIME&#039;, &#039;MAKE_SET&#039;, &#039;MASTER_POS_WAIT&#039;, &#039;MAX&#039;, &#039;MBRCONTAINS&#039;, &#039;MBRDISJOINT&#039;, &#039;MBREQUAL&#039;, &#039;MBRINTERSECTS&#039;, &#039;MBROVERLAPS&#039;, &#039;MBRTOUCHES&#039;, &#039;MBRWITHIN&#039;, &#039;MD5&#039;, &#039;MICROSECOND&#039;, &#039;MID&#039;, &#039;MIN&#039;, &#039;MINUTE&#039;, &#039;MLINEFROMTEXT&#039;, &#039;MLINEFROMWKB&#039;, &#039;MOD&#039;, &#039;MONTH&#039;, &#039;MONTHNAME&#039;, &#039;MPOINTFROMTEXT&#039;, &#039;MPOINTFROMWKB&#039;, &#039;MPOLYFROMTEXT&#039;, &#039;MPOLYFROMWKB&#039;, &#039;MULTILINESTRING&#039;, &#039;MULTILINESTRINGFROMTEXT&#039;, &#039;MULTILINESTRINGFROMWKB&#039;, &#039;MULTIPOINT&#039;, &#039;MULTIPOINTFROMTEXT&#039;, &#039;MULTIPOINTFROMWKB&#039;, &#039;MULTIPOLYGON&#039;, &#039;MULTIPOLYGONFROMTEXT&#039;, &#039;MULTIPOLYGONFROMWKB&#039;, &#039;NAME_CONST&#039;, &#039;NULLIF&#039;, &#039;NUMGEOMETRIES&#039;, &#039;NUMINTERIORRINGS&#039;, &#039;NUMPOINTS&#039;, &#039;OCT&#039;, &#039;OCTET_LENGTH&#039;, &#039;OLD_PASSWORD&#039;, &#039;ORD&#039;, &#039;OVERLAPS&#039;, &#039;PASSWORD&#039;, &#039;PERIOD_ADD&#039;, &#039;PERIOD_DIFF&#039;, &#039;PI&#039;, &#039;POINT&#039;, &#039;POINTFROMTEXT&#039;, &#039;POINTFROMWKB&#039;, &#039;POINTN&#039;, &#039;POINTONSURFACE&#039;, &#039;POLYFROMTEXT&#039;, &#039;POLYFROMWKB&#039;, &#039;POLYGON&#039;, &#039;POLYGONFROMTEXT&#039;, &#039;POLYGONFROMWKB&#039;, &#039;POSITION&#039;, &#039;POW&#039;, &#039;POWER&#039;, &#039;QUARTER&#039;, &#039;QUOTE&#039;, &#039;RADIANS&#039;, &#039;RAND&#039;, &#039;RELATED&#039;, &#039;RELEASE_LOCK&#039;, &#039;REPEAT&#039;, &#039;REPLACE&#039;, &#039;REVERSE&#039;, &#039;RIGHT&#039;, &#039;ROUND&#039;, &#039;ROW_COUNT&#039;, &#039;RPAD&#039;, &#039;RTRIM&#039;, &#039;SCHEMA&#039;, &#039;SECOND&#039;, &#039;SEC_TO_TIME&#039;, &#039;SESSION_USER&#039;, &#039;SHA&#039;, &#039;SHA1&#039;, &#039;SIGN&#039;, &#039;SIN&#039;, &#039;SLEEP&#039;, &#039;SOUNDEX&#039;, &#039;SPACE&#039;, &#039;SQRT&#039;, &#039;SRID&#039;, &#039;STARTPOINT&#039;, &#039;STD&#039;, &#039;STDDEV&#039;, &#039;STDDEV_POP&#039;, &#039;STDDEV_SAMP&#039;, &#039;STRCMP&#039;, &#039;STR_TO_DATE&#039;, &#039;SUBDATE&#039;, &#039;SUBSTR&#039;, &#039;SUBSTRING&#039;, &#039;SUBSTRING_INDEX&#039;, &#039;SUBTIME&#039;, &#039;SUM&#039;, &#039;SYMDIFFERENCE&#039;, &#039;SYSDATE&#039;, &#039;SYSTEM_USER&#039;, &#039;TAN&#039;, &#039;TIME&#039;, &#039;TIMEDIFF&#039;, &#039;TIMESTAMP&#039;, &#039;TIMESTAMPADD&#039;, &#039;TIMESTAMPDIFF&#039;, &#039;TIME_FORMAT&#039;, &#039;TIME_TO_SEC&#039;, &#039;TOUCHES&#039;, &#039;TO_DAYS&#039;, &#039;TRIM&#039;, &#039;TRUNCATE&#039;, &#039;UCASE&#039;, &#039;UNCOMPRESS&#039;, &#039;UNCOMPRESSED_LENGTH&#039;, &#039;UNHEX&#039;, &#039;UNIQUE_USERS&#039;, &#039;UNIX_TIMESTAMP&#039;, &#039;UPDATEXML&#039;, &#039;UPPER&#039;, &#039;USER&#039;, &#039;UTC_DATE&#039;, &#039;UTC_TIME&#039;, &#039;UTC_TIMESTAMP&#039;, &#039;UUID&#039;, &#039;VARIANCE&#039;, &#039;VAR_POP&#039;, &#039;VAR_SAMP&#039;, &#039;VERSION&#039;, &#039;WEEK&#039;, &#039;WEEKDAY&#039;, &#039;WEEKOFYEAR&#039;, &#039;WITHIN&#039;, &#039;X&#039;, &#039;Y&#039;, &#039;YEAR&#039;, &#039;YEARWEEK&#039;]</var>
+					</h4>
+					<div class="inner-item">
+						<div class="description"></div>
+
+                                                					</div>
+				</li>
+            		</ul>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Sql.php#L19-L53" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Sql::sql_quote()" tabindex="-1" class="structure-title ">
+                        sql_quote						<small>($value)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ものすごく雑に値をクオートする</p>
+<p>非常に荒くアドホックに実装しているのでこの関数で得られた値で<strong>実際に実行してはならない</strong>。<br />
+あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
+<ul>
+<li>null は NULL になる</li>
+<li>数字はそのまま数字になる</li>
+<li>bool は 0 or 1 になる</li>
+<li>それ以外は addslashes される</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(sql_quote(null), 'NULL');
+assertSame(sql_quote(123), 123);
+assertSame(sql_quote(true), 1);
+assertSame(sql_quote("hoge"), "'hoge'");
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$value</td>
+				<td class="desc"><p>クオートする値</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>クオートされた値</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Sql.php#L55-L85" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Sql::sql_bind()" tabindex="-1" class="structure-title ">
+                        sql_bind						<small>($sql, $values)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ものすごく雑に SQL に値を埋め込む</p>
+<p>非常に荒くアドホックに実装しているのでこの関数で得られた SQL を<strong>実際に実行してはならない</strong>。<br />
+あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
+<p>プレースホルダは ? か :alnum で混在していても良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(sql_bind('select ?', 1), "select 1");
+assertSame(sql_bind('select :hoge', ['hoge' =&gt; 'hoge']), "select 'hoge'");
+assertSame(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']), "select 1, 'hoge'");
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$sql</td>
+				<td class="desc"><p>値を埋め込む SQL</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>mixed</td>
+				<td class="rest">$values</td>
+				<td class="desc"><p>埋め込む値</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>値が埋め込まれた SQL</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Sql.php#L87-L484" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Sql::sql_format()" tabindex="-1" class="structure-title ">
+                        sql_format						<small>($sql, $options = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>ものすごく雑に SQL を整形する</p>
+<p>非常に荒くアドホックに実装しているのでこの関数で得られた SQL を<strong>実際に実行してはならない</strong>。<br />
+あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
+<p>JOIN 句は FROM 句とみなさず、別句として処理する。<br />
+AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &amp;&amp; は改行されない（OR と || も同様）。</p>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$sql</td>
+				<td class="desc"><p>整形する SQL</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$options = []</td>
+				<td class="desc"><p>整形オプション</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc"><p>整形された SQL</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

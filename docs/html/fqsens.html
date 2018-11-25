@@ -380,6 +380,31 @@ assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
 assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_put()"> ryunosuke\Functions\Package\Arrays::array_put()</a></h2>
+	<div class="description"><p>キー指定の配列値設定</p>
+<p>array_set とほとんど同じ。<br />
+第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。<br />
+また、<strong>int を与えても同様の動作</strong>となる。<br />
+第3引数に配列を指定すると潜って設定する。</p>
+<p>array_set における $require_return は廃止している。<br />
+これはもともと end や last_key が遅かったのでオプショナルにしていたが、もう改善しているし、7.3 から array_key_last があるので、呼び元で適宜使えば良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'B'];
+// 第3引数 int
+assertSame(array_put($array, 'Z', 999), 1);
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z']);
+// 第3引数省略（最後に連番キーで設定）
+assertSame(array_put($array, 'Z'), 2);
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z']);
+// 第3引数でキーを指定
+assertSame(array_put($array, 'Z', 'z'), 'z');
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z']);
+assertSame(array_put($array, 'Z', 'z'), 'z');
+// 第3引数で配列を指定
+assertSame(array_put($array, 'Z', ['x', 'y', 'z']), 'z');
+assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_unset()"> ryunosuke\Functions\Package\Arrays::array_unset()</a></h2>
 	<div class="description"><p>伏せると同時にその値を返す</p>
 <p>$key に配列を与えると全て伏せて配列で返す。<br />
@@ -670,6 +695,8 @@ assertSame(
 	<div class="description"><p>配列の次元数を返す</p>
 <p>フラット配列は 1 と定義する。<br />
 つまり、配列を与える限りは 0 以下を返すことはない。</p>
+<p>第2引数 $max_depth を与えるとその階層になった時点で走査を打ち切る。<br />
+「1階層のみか？」などを調べるときは指定したほうが高速に動作する。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(array_depth([]), 1);
 assertSame(array_depth(['hoge']), 1);
@@ -1087,6 +1114,37 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 <p>つまり、classA を継承した classAA を定義してそれを classA とみなすことが可能になる。<br />
 ただし、内部的には class_alias を使用して実現しているので厳密には異なるクラスとなる。</p>
 <p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Y1 extends X1 だとしてクラス定義でオーバーライドする
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
+    // アンスコがついたクラスが定義されるのでそれを継承して定義する
+    class X1d extends \ryunosuke\Test\Package\Classobj\X1_
+    {
+        function method(){return 'this is X1d';}
+        function newmethod(){return 'this is newmethod';}
+    }
+    // このように匿名クラスを返しても良い。ただし、混在せずにどちらか一方にすること
+    return new class() extends \ryunosuke\Test\Package\Classobj\X1_
+    {
+        function method(){return 'this is X1d';}
+        function newmethod(){return 'this is newmethod';}
+    };
+});
+// X1 を継承している Y1 にまで影響が出ている（X1 を完全に置換できたということ）
+assertSame((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;method(), 'this is X1d');
+assertSame((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;newmethod(), 'this is newmethod');
+
+// Y2 extends X2 だとしてクロージャ配列でオーバーライドする
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
+    return [
+        'method'    =&gt; function(){return 'this is X2d';},
+        'newmethod' =&gt; function(){return 'this is newmethod';},
+    ];
+});
+// X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
+assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2d');
+assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
+</code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::object_dive()"> ryunosuke\Functions\Package\Classobj::object_dive()</a></h2>
 	<div class="description"><p>パス形式でプロパティ値を取得</p>
@@ -1432,6 +1490,15 @@ assertInstanceof(\Closure::class, $sprintf);
 assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::callable_code()"> ryunosuke\Functions\Package\Funchand::callable_code()</a></h2>
+	<div class="description"><p>callable のコードブロックを返す</p>
+<p>返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。</p>
+<p>Example:</p>
+<pre><code class="language-php">list($meta, $body) = callable_code(function(...$args){return true;});
+assertSame($meta, 'function(...$args)');
+assertSame($body, '{return true;}');
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::call_safely()"> ryunosuke\Functions\Package\Funchand::call_safely()</a></h2>
 	<div class="description"><p>エラーを例外に変換するブロックでコールバックを実行する</p>
 <p>Example:</p>
@@ -1498,6 +1565,32 @@ assertSame(parameter_length('trim', true), 1);
 <pre><code class="language-php">// strlen に2つの引数を渡してもエラーにならない
 $strlen = func_user_func_array('strlen');
 assertSame($strlen('abc', null), 3);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_method()"> ryunosuke\Functions\Package\Funchand::func_method()</a></h2>
+	<div class="description"><p>指定メソッドを呼び出すクロージャを返す</p>
+<p>この関数を呼ぶとメソッドのクロージャを返す。<br />
+そのクロージャにオブジェクトを与えて呼び出すとそれはメソッド呼び出しとなる。</p>
+<p>オプションでデフォルト引数を設定できる（Example を参照）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 与えられた引数を結合して返すメソッド hoge を持つクラス
+$object = new class()
+{
+    function hoge(...$args) { return implode(',', $args); }
+};
+// hoge を呼び出すクロージャ
+$hoge = func_method('hoge');
+// ↑を使用して $object の hoge を呼び出す
+assertSame($hoge($object, 1, 2, 3), '1,2,3');
+
+// デフォルト値付きで hoge を呼び出すクロージャ
+$hoge789 = func_method('hoge', 7, 8, 9);
+// ↑を使用して $object の hoge を呼び出す（引数指定してるので結果は同じ）
+assertSame($hoge789($object, 1, 2, 3), '1,2,3');
+// 同上（一部デフォルト値）
+assertSame($hoge789($object, 1, 2), '1,2,9');
+// 同上（全部デフォルト値）
+assertSame($hoge789($object), '7,8,9');
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_alias()"> ryunosuke\Functions\Package\Funchand::function_alias()</a></h2>
@@ -1613,6 +1706,86 @@ if (probability(50)) {
     echo "hello";
 }
 </code></pre>
+</div>
+            	<h2>class<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network"> ryunosuke\Functions\Package\Network</a></h2>
+	<div class="description"><p>ネットワーク関連のユーティリティ</p>
+</div>
+                	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()"> ryunosuke\Functions\Package\Network::http_requests()</a></h2>
+	<div class="description"><p>http リクエストを並列で投げる</p>
+<p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
+$urls の要素は単一の文字列か curl のオプションである必要がある。</p>
+<p>返り値は $urls のキーを保持したまま、レスポンスが返ってきた順に格納して配列で返す。<br />
+構造は下記のサンプルを参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">$responses = http_requests([
+    // このように [キー =&gt; CURL オプション] 形式が正しい使い方
+    'fuga' =&gt; [
+        CURLOPT_URL     =&gt; 'http://unknown-host',
+        CURLOPT_TIMEOUT =&gt; 5,
+    ],
+    // ただし、このように [キー =&gt; URL] 形式でもいい（オプションはデフォルトが使用される）
+    'hoge' =&gt; 'http://127.0.0.1',
+]);
+[
+    // キーが維持されるので hoge キー
+    'hoge' =&gt; [
+        // 0 番目の要素は body 文字列
+        'response body',
+        // 1 番目の要素は header 配列
+        [
+            // ・・・・・
+            'Content-Type' =&gt; 'text/plain',
+            // ・・・・・
+        ],
+        // 2 番目の要素は curl のメタ配列
+        [
+            // ・・・・・
+        ],
+    ],
+    // curl のエラーが出た場合は int になる（CURLE_*** の値）
+    'fuga' =&gt; 6,
+];
+</code></pre>
+</div>
+            	<h2>class<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql"> ryunosuke\Functions\Package\Sql</a></h2>
+	<div class="description"><p>Sql 関連のユーティリティ</p>
+</div>
+        	<h2>classconstant<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::KEYWORDS"> ryunosuke\Functions\Package\Sql::KEYWORDS</a></h2>
+	<div class="description"></div>
+            	<h2>method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_quote()"> ryunosuke\Functions\Package\Sql::sql_quote()</a></h2>
+	<div class="description"><p>ものすごく雑に値をクオートする</p>
+<p>非常に荒くアドホックに実装しているのでこの関数で得られた値で<strong>実際に実行してはならない</strong>。<br />
+あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
+<ul>
+<li>null は NULL になる</li>
+<li>数字はそのまま数字になる</li>
+<li>bool は 0 or 1 になる</li>
+<li>それ以外は addslashes される</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(sql_quote(null), 'NULL');
+assertSame(sql_quote(123), 123);
+assertSame(sql_quote(true), 1);
+assertSame(sql_quote("hoge"), "'hoge'");
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_bind()"> ryunosuke\Functions\Package\Sql::sql_bind()</a></h2>
+	<div class="description"><p>ものすごく雑に SQL に値を埋め込む</p>
+<p>非常に荒くアドホックに実装しているのでこの関数で得られた SQL を<strong>実際に実行してはならない</strong>。<br />
+あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
+<p>プレースホルダは ? か :alnum で混在していても良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(sql_bind('select ?', 1), "select 1");
+assertSame(sql_bind('select :hoge', ['hoge' =&gt; 'hoge']), "select 'hoge'");
+assertSame(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']), "select 1, 'hoge'");
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_format()"> ryunosuke\Functions\Package\Sql::sql_format()</a></h2>
+	<div class="description"><p>ものすごく雑に SQL を整形する</p>
+<p>非常に荒くアドホックに実装しているのでこの関数で得られた SQL を<strong>実際に実行してはならない</strong>。<br />
+あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
+<p>JOIN 句は FROM 句とみなさず、別句として処理する。<br />
+AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &amp;&amp; は改行されない（OR と || も同様）。</p>
 </div>
             	<h2>class<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings"> ryunosuke\Functions\Package\Strings</a></h2>
 	<div class="description"><p>文字列関連のユーティリティ</p>
@@ -1938,6 +2111,26 @@ assertSame(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123')
 assertSame($m, ['abc']);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_replaces()"> ryunosuke\Functions\Package\Strings::preg_replaces()</a></h2>
+	<div class="description"><p>パターン番号を指定して preg_replace する</p>
+<p>パターン番号を指定してそれのみを置換する。<br />
+名前付きキャプチャを使用している場合はキーに文字列も使える。<br />
+値にクロージャを渡した場合はコールバックされて置換される。</p>
+<p>$replacements に単一文字列を渡した場合、 <code>[1 =&gt; $replacements]</code> と等しくなる（第1キャプチャを置換）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// a と z に囲まれた数字を XXX に置換する
+assertSame(preg_replaces('#a(\d+)z#', [1 =&gt; 'XXX'], 'a123z'), 'aXXXz');
+// 名前付きキャプチャも指定できる
+assertSame(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; 'XXX'], 'a123z'), 'aXXXz');
+// クロージャを渡すと元文字列を引数としてコールバックされる
+assertSame(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; function($src){return $src * 2;}], 'a123z'), 'a246z');
+// 複合的なサンプル（a タグの href と target 属性を書き換える）
+assertSame(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;target&gt;.*)"&gt;#', [
+    'href'   =&gt; function($href){return strtoupper($href);},
+    'target' =&gt; function($target){return strtoupper($target);},
+], '&lt;a href="hoge" target="fuga"&gt;inner text&lt;/a&gt;'), '&lt;a href="HOGE" target="FUGA"&gt;inner text&lt;/a&gt;');
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()"> ryunosuke\Functions\Package\Strings::render_string()</a></h2>
 	<div class="description"><p>"hoge {$hoge}" 形式のレンダリング</p>
 <p>文字列を eval して "hoge {$hoge}" 形式の文字列に変数を埋め込む。<br />
@@ -1970,7 +2163,35 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
             	<h2>class<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax"> ryunosuke\Functions\Package\Syntax</a></h2>
 	<div class="description"><p>構文関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()"> ryunosuke\Functions\Package\Syntax::returns()</a></h2>
+        	<h2>classconstant<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::TOKEN_NAME"> ryunosuke\Functions\Package\Syntax::TOKEN_NAME</a></h2>
+	<div class="description"></div>
+            	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::parse_php()"> ryunosuke\Functions\Package\Syntax::parse_php()</a></h2>
+	<div class="description"><p>php のコード断片をパースする</p>
+<p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
+つまり必ず <code>[TOKENID, TOKEN, LINE]</code> で返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$phpcode = 'namespace Hogera;
+class Example
+{
+    // something
+}';
+
+// namespace ～ ; を取得
+$part = parse_php($phpcode, [
+    'begin' =&gt; T_NAMESPACE,
+    'end'   =&gt; ';',
+]);
+assertSame(implode('', array_column($part, 1)), 'namespace Hogera;');
+
+// class ～ { を取得
+$part = parse_php($phpcode, [
+    'begin' =&gt; T_CLASS,
+    'end'   =&gt; '{',
+]);
+assertSame(implode('', array_column($part, 1)), "class Example\n{");
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()"> ryunosuke\Functions\Package\Syntax::returns()</a></h2>
 	<div class="description"><p>引数をそのまま返す</p>
 <p>clone などでそのまま返す関数が欲しいことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -2652,6 +2873,11 @@ assertSame(var_export2(compact('rarray', 'robject'), true), "[
 <li>Content-Type が強制的に text/html になる</li>
 </ul>
 <p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::console_log()"> ryunosuke\Functions\Package\Vars::console_log()</a></h2>
+	<div class="description"><p>js の console に値を吐き出す</p>
+<p>script タグではなく X-ChromeLogger-Data を使用する。<br />
+したがってヘッダ送信前に呼ぶ必要がある。</p>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::hashvar()"> ryunosuke\Functions\Package\Vars::hashvar()</a></h2>
 	<div class="description"><p>変数指定をできるようにした compact</p>

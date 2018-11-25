@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
+	<link rel="stylesheet" type="text/css" data-href="common.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/3.1.1/bootstrap3-typeahead.min.js"></script>
+	<script data-src="common.js"></script>
+
+	<script>
+        (function () {
+            var cachekey;
+            try {
+                cachekey = window.parent.CACHEKEY;
+            }
+            catch (e) {
+                cachekey = 'nocache';
+            }
+            $('link[data-href]').attr('href', function () {
+                return this.dataset.href + '?' + cachekey;
+            });
+            $('script[data-src]').attr('src', function () {
+                return this.dataset.src + '?' + cachekey;
+            });
+
+            $(document).on('click', 'a[href]:not([target="_blank"]):not(.cachekey)', function () {
+                this.classList.add('cachekey');
+                this.href = this.href.replace('.html', '.html?' + cachekey);
+            });
+        })();
+	</script>
+    </head>
+<body>
+<a id="anchor" href="./" style="display: none"></a>
+<h1 class="ellipsis">
+	<span class="pull-left">
+	Structure
+	<small class="ellipsis-text">(ryunosuke\Functions\Package\Network)</small>
+	</span>
+	<span class="pull-right">
+		<small class="frame-switch">
+		<a target="_parent">frame</a> | <a target="_parent">noframe</a>
+		</small>
+	</span>
+</h1>
+<div class="main-wrapper">
+	<div class="attribute">
+		<span class="label label-danger"></span>
+		<span class="label label-warning"></span>
+		<span class="label label-info"></span>
+		<span class="label label-info"></span>
+		<span class="label label-deprecated"></span>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L134" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                    	</div>
+
+	<h2>class <span class="category-name">ryunosuke\Functions\Package\Network</span></h2>
+
+	<div class="description"><p>ネットワーク関連のユーティリティ</p>
+</div>
+
+	<h3>Construction</h3>
+                
+	<h3>Hierarchy</h3>
+	<div class="hierarchy"></div>
+
+	<h3>Constants</h3>
+    
+	<h3>Properties</h3>
+    
+	<h3>Methods</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L133" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Network::http_requests()" tabindex="-1" class="structure-title ">
+                        http_requests						<small>($urls)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>http リクエストを並列で投げる</p>
+<p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
+$urls の要素は単一の文字列か curl のオプションである必要がある。</p>
+<p>返り値は $urls のキーを保持したまま、レスポンスが返ってきた順に格納して配列で返す。<br />
+構造は下記のサンプルを参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">$responses = http_requests([
+    // このように [キー =&gt; CURL オプション] 形式が正しい使い方
+    'fuga' =&gt; [
+        CURLOPT_URL     =&gt; 'http://unknown-host',
+        CURLOPT_TIMEOUT =&gt; 5,
+    ],
+    // ただし、このように [キー =&gt; URL] 形式でもいい（オプションはデフォルトが使用される）
+    'hoge' =&gt; 'http://127.0.0.1',
+]);
+[
+    // キーが維持されるので hoge キー
+    'hoge' =&gt; [
+        // 0 番目の要素は body 文字列
+        'response body',
+        // 1 番目の要素は header 配列
+        [
+            // ・・・・・
+            'Content-Type' =&gt; 'text/plain',
+            // ・・・・・
+        ],
+        // 2 番目の要素は curl のメタ配列
+        [
+            // ・・・・・
+        ],
+    ],
+    // curl のエラーが出た場合は int になる（CURLE_*** の値）
+    'fuga' =&gt; 6,
+];
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$urls</td>
+				<td class="desc"><p>実行する curl オプション</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>レスポンス配列。取得した順番でキーを保持しつつ追加される</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            		</ul>
+    
+	<div class="attribute">
+		<span class="label label-default"></span>
+		<span class="label label-default"></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</body>
+</html>

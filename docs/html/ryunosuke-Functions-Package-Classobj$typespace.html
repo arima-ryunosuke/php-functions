@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L315" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L378" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -343,7 +343,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L167-L228" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L167-L291" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace						<small>($class, $register, $dirname = null)</small>
@@ -360,6 +360,37 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 <p>つまり、classA を継承した classAA を定義してそれを classA とみなすことが可能になる。<br />
 ただし、内部的には class_alias を使用して実現しているので厳密には異なるクラスとなる。</p>
 <p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Y1 extends X1 だとしてクラス定義でオーバーライドする
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
+    // アンスコがついたクラスが定義されるのでそれを継承して定義する
+    class X1d extends \ryunosuke\Test\Package\Classobj\X1_
+    {
+        function method(){return 'this is X1d';}
+        function newmethod(){return 'this is newmethod';}
+    }
+    // このように匿名クラスを返しても良い。ただし、混在せずにどちらか一方にすること
+    return new class() extends \ryunosuke\Test\Package\Classobj\X1_
+    {
+        function method(){return 'this is X1d';}
+        function newmethod(){return 'this is newmethod';}
+    };
+});
+// X1 を継承している Y1 にまで影響が出ている（X1 を完全に置換できたということ）
+assertSame((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;method(), 'this is X1d');
+assertSame((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;newmethod(), 'this is newmethod');
+
+// Y2 extends X2 だとしてクロージャ配列でオーバーライドする
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
+    return [
+        'method'    =&gt; function(){return 'this is X2d';},
+        'newmethod' =&gt; function(){return 'this is newmethod';},
+    ];
+});
+// X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
+assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2d');
+assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
+</code></pre>
 </div>
                         	<table class="table">
 		<caption>Parameters</caption>
@@ -373,7 +404,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
         			<tr>
 				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
 				<td class="rest">$register</td>
-				<td class="desc"><p>置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ</p>
+				<td class="desc"><p>置換クラスを定義 or 返すクロージャ or 定義メソッド配列。「返せる」のは php7.0 以降のみ</p>
 </td>
 			</tr>
         			<tr>
@@ -411,7 +442,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L230-L266" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L293-L329" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
                         object_dive						<small>($object, $path, $default = null, $delimiter = &#039;.&#039;)</small>
@@ -490,7 +521,7 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L268-L314" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L331-L377" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
                         get_object_properties						<small>($object)</small>

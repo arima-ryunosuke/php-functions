@@ -33,7 +33,7 @@ $.fn.titleattr = function () {
     return this.each(function () {
         var $this = $(this);
         var content = $this.find('.ellipsis-text');
-        $this.attr('title', content.length ? content.text() : $this.text());
+        $this.attr('title', content.text() || $this.text());
     });
 };
 // replace first comment node

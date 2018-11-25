@@ -149,9 +149,11 @@
  * @method   \ChainObject  cross4(...$arrays)
  * @method   \ChainObject  cross5(...$arrays)
  * @property \ChainObject $array_depth
- * @method   \ChainObject  array_depth()
+ * @method   \ChainObject  array_depth($max_depth = null)
+ * @method   \ChainObject  array_depth1($array)
  * @property \ChainObject $depth
- * @method   \ChainObject  depth()
+ * @method   \ChainObject  depth($max_depth = null)
+ * @method   \ChainObject  depth1($array)
  * @method   \ChainObject  array_diff(...$arrays)
  * @method   \ChainObject  array_diff1($arr1, ...$arrays)
  * @method   \ChainObject  array_diff2($arr1, ...$arrays)
@@ -1224,6 +1226,8 @@
  * @method   \ChainObject  call_user_func6($function_name, ...$parameters)
  * @method   \ChainObject  call_user_func_array($parameters)
  * @method   \ChainObject  call_user_func_array1($function_name)
+ * @property \ChainObject $callable_code
+ * @method   \ChainObject  callable_code()
  * @property \ChainObject $camel_case
  * @method   \ChainObject  camel_case($delimiter = '_')
  * @method   \ChainObject  camel_case1($string)
@@ -1300,6 +1304,12 @@
  * @method   \ChainObject  concat3(...$variadic)
  * @method   \ChainObject  concat4(...$variadic)
  * @method   \ChainObject  concat5(...$variadic)
+ * @method   \ChainObject  console_log(...$values)
+ * @method   \ChainObject  console_log1(...$values)
+ * @method   \ChainObject  console_log2(...$values)
+ * @method   \ChainObject  console_log3(...$values)
+ * @method   \ChainObject  console_log4(...$values)
+ * @method   \ChainObject  console_log5(...$values)
  * @property \ChainObject $constant
  * @method   \ChainObject  constant()
  * @method   \ChainObject  convert_cyr_string($from, $to)
@@ -1643,6 +1653,14 @@
  * @method   \ChainObject  ftruncate1($fp)
  * @property \ChainObject $func_get_arg
  * @method   \ChainObject  func_get_arg()
+ * @property \ChainObject $func_method
+ * @method   \ChainObject  func_method(...$defaultargs)
+ * @method   \ChainObject  func_method1($methodname, ...$defaultargs)
+ * @method   \ChainObject  func_method2($methodname, ...$defaultargs)
+ * @method   \ChainObject  func_method3($methodname, ...$defaultargs)
+ * @method   \ChainObject  func_method4($methodname, ...$defaultargs)
+ * @method   \ChainObject  func_method5($methodname, ...$defaultargs)
+ * @method   \ChainObject  func_method6($methodname, ...$defaultargs)
  * @property \ChainObject $func_user_func_array
  * @method   \ChainObject  func_user_func_array()
  * @method   \ChainObject  func_user_func_arrayP()
@@ -1823,6 +1841,8 @@
  * @method   \ChainObject  http_build_query1($formdata, $arg_separator = null, $enc_type = null)
  * @method   \ChainObject  http_build_query2($formdata, $prefix = null, $enc_type = null)
  * @method   \ChainObject  http_build_query3($formdata, $prefix = null, $arg_separator = null)
+ * @property \ChainObject $http_requests
+ * @method   \ChainObject  http_requests()
  * @method   \ChainObject  http_response_code()
  * @method   \ChainObject  hypot($num2)
  * @method   \ChainObject  hypot1($num1)
@@ -2394,6 +2414,9 @@
  * @method   \ChainObject  parse_ini_string($process_sections = null, $scanner_mode = null)
  * @method   \ChainObject  parse_ini_string1($ini_string, $scanner_mode = null)
  * @method   \ChainObject  parse_ini_string2($ini_string, $process_sections = null)
+ * @property \ChainObject $parse_php
+ * @method   \ChainObject  parse_php($option = [])
+ * @method   \ChainObject  parse_php1($phpcode)
  * @property \ChainObject $parse_uri
  * @method   \ChainObject  parse_uri($default = [])
  * @method   \ChainObject  parse_uri1($uri)
@@ -2667,6 +2690,13 @@
  * @method   \ChainObject  sprintf4($format, ...$args)
  * @method   \ChainObject  sprintf5($format, ...$args)
  * @method   \ChainObject  sprintf6($format, ...$args)
+ * @method   \ChainObject  sql_bind($values)
+ * @method   \ChainObject  sql_bind1($sql)
+ * @property \ChainObject $sql_format
+ * @method   \ChainObject  sql_format($options = [])
+ * @method   \ChainObject  sql_format1($sql)
+ * @property \ChainObject $sql_quote
+ * @method   \ChainObject  sql_quote()
  * @property \ChainObject $sqrt
  * @method   \ChainObject  sqrt()
  * @method   \ChainObject  srand($mode = null)
