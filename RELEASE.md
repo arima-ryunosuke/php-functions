@@ -10,6 +10,24 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.5
+
+- [feature][Arrays] array_put を追加
+- [feature][Arrays] array_zip の iterable 対応
+- [feature][Arrays] array_depth の最大指定
+- [feature][Strings] preg_replaces を追加
+- [feature][Syntax] parse_php を追加
+- [feature][Vars] console_log を追加
+- [feature][Funchand] callable_code を追加
+- [feature][Funchand] func_method を追加
+- [feature][Classobj] class_replace の配列対応
+- [feature][Network] http_requests を追加
+- [feature][Sql] sql_quote を追加
+- [feature][Sql] sql_bind を追加
+- [feature][Sql] sql_format を追加
+- [change][FileCache] クリアするファイル種別を指定
+- [change][All] 定数も出力するように変更
+
 ## 1.2.4
 
 - [refactor][All] php7.2 でテストがコケていたので修正
