@@ -930,6 +930,22 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(2, $array_depth(['X', 'y' => ['Y']]));
         $this->assertEquals(2, $array_depth(['x' => ['X'], 'Y']));
         $this->assertEquals(3, $array_depth(['x' => ['X'], 'y' => ['Y'], 'z' => ['z' => ['Z']]]));
+
+        // $max_depth 指定
+        $this->assertEquals(1, $array_depth([[[[['X']]]]], 1));
+        $this->assertEquals(2, $array_depth([[[[['X']]]]], 2));
+        $this->assertEquals(3, $array_depth([[[[['X']]]]], 3));
+        $this->assertEquals(4, $array_depth([[[[['X']]]]], 4));
+        $this->assertEquals(5, $array_depth([[[[['X']]]]], 5));
+        $this->assertEquals(5, $array_depth([[[[['X']]]]], 6));
+        $this->assertEquals(3, $array_depth([
+            ['X'],
+            [['X']],
+            [[['X']]],
+            [[[['X']]]],
+            [[[[['X']]]]],
+            [[[[[['X']]]]]],
+        ], 3));
     }
 
     function test_array_insert()
