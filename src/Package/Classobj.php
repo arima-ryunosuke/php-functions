@@ -184,8 +184,41 @@ class Classobj
      *
      * 実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。
      *
+     * Example:
+     * ```php
+     * // Y1 extends X1 だとしてクラス定義でオーバーライドする
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
+     *     // アンスコがついたクラスが定義されるのでそれを継承して定義する
+     *     class X1d extends \ryunosuke\Test\Package\Classobj\X1_
+     *     {
+     *         function method(){return 'this is X1d';}
+     *         function newmethod(){return 'this is newmethod';}
+     *     }
+     *     // このように匿名クラスを返しても良い。ただし、混在せずにどちらか一方にすること
+     *     return new class() extends \ryunosuke\Test\Package\Classobj\X1_
+     *     {
+     *         function method(){return 'this is X1d';}
+     *         function newmethod(){return 'this is newmethod';}
+     *     };
+     * });
+     * // X1 を継承している Y1 にまで影響が出ている（X1 を完全に置換できたということ）
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y1())->method(), 'this is X1d');
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y1())->newmethod(), 'this is newmethod');
+     *
+     * // Y2 extends X2 だとしてクロージャ配列でオーバーライドする
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
+     *     return [
+     *         'method'    => function(){return 'this is X2d';},
+     *         'newmethod' => function(){return 'this is newmethod';},
+     *     ];
+     * });
+     * // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->method(), 'this is X2d');
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod(), 'this is newmethod');
+     * ```
+     *
      * @param string $class 対象クラス名
-     * @param \Closure $register 置換クラスを定義 or 返すクロージャ。「返せる」のは php7.0 以降のみ
+     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列。「返せる」のは php7.0 以降のみ
      * @param string $dirname 一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う
      */
     public static function class_replace($class, $register, $dirname = null)
@@ -214,7 +247,7 @@ class Classobj
         if ($newclass === null) {
             $classes = array_diff(get_declared_classes(), $classess);
             if (count($classes) !== 1) {
-                throw new \DomainException('declared multi classes.');
+                throw new \DomainException('declared multi classes.' . implode(',', $classes));
             }
             $newclass = reset($classes);
         }
@@ -222,6 +255,36 @@ class Classobj
         if (is_object($newclass)) {
             /** @noinspection PhpUnusedLocalVariableInspection */
             $newclass = get_class($newclass);
+        }
+        // 配列はメソッド定義のクロージャ配列とする
+        if (is_array($newclass)) {
+            $content = file_get_contents($fname);
+            $origspace = (parse_php)($content, [
+                'begin' => T_NAMESPACE,
+                'end'   => ';',
+            ]);
+            array_shift($origspace);
+            array_pop($origspace);
+
+            $origclass = (parse_php)($content, [
+                'begin'  => T_CLASS,
+                'end'    => T_STRING,
+                'offset' => count($origspace),
+            ]);
+            array_shift($origclass);
+
+            $origspace = trim(implode('', array_column($origspace, 1)));
+            $origclass = trim(implode('', array_column($origclass, 1)));
+
+            $methods = '';
+            foreach ($newclass as $name => $func) {
+                $codes = (callable_code)($func);
+                $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $codes[0]);
+                $methods .= "public $mname {$codes[1]}";
+            }
+
+            $newclass = "\\$origspace\\{$origclass}_";
+            eval("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
         }
 
         class_alias($newclass, $class);

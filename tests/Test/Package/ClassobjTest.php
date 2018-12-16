@@ -82,16 +82,38 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
             return new \B();
         });
 
+        $class_replace('\\ryunosuke\\Test\\package\\Classobj\\C', function () {
+            return [
+                'newMethod' => function () {
+                    return 'this is ' . (new \ReflectionClass($this))->getShortName();
+                },
+                'f'         => function () {
+                    return parent::f();
+                },
+            ];
+        });
+
         $this->assertEquals([
             'this is exA',
             'this is exB',
         ], (new \ryunosuke\Test\package\Classobj\B())->f());
 
+        $classC = new \ryunosuke\Test\package\Classobj\C();
         $this->assertEquals([
             'this is exA',
             'this is exB',
             'this is C',
-        ], (new \ryunosuke\Test\package\Classobj\C())->f());
+        ], $classC->f());
+        $this->assertEquals('this is C__', $classC->newMethod());
+
+        $classD = new \ryunosuke\Test\package\Classobj\D();
+        $this->assertEquals([
+            'this is exA',
+            'this is exB',
+            'this is C',
+            'this is D',
+        ], $classD->f());
+        $this->assertEquals('this is D', $classD->newMethod());
     }
 
     function test_object_dive()
