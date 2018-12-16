@@ -57,13 +57,18 @@ class Transporter
         $PREFIX = "Don't touch this code. This is auto generated.";
 
         $ve = function ($v) { return var_export($v, true); };
-        $contents = [];
+        $consts = $contents = [];
 
         foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
             $refclass = new \ReflectionClass(__NAMESPACE__ . "\\Package\\" . basename($fn, '.php'));
-            $methods = $refclass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC);
+
+            foreach ($refclass->getConstants() as $cname => $cvalue) {
+                $cvalue = $ve($cvalue);
+                $consts[] = "const $cname = $cvalue;";
+            }
+
             $lines = file($refclass->getFileName());
-            foreach ($methods as $method) {
+            foreach ($refclass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC) as $method) {
                 $doccomment = $method->getDocComment();
                 $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
                 $mname = $method->getName();
@@ -86,6 +91,6 @@ class Transporter
             }
         }
 
-        return "<?php\n\n# $PREFIX\n\n" . ($namespace ? "namespace $namespace;\n\n" : "") . implode("\n", $contents);
+        return "<?php\n\n# $PREFIX\n\n" . ($namespace ? "namespace $namespace;\n\n" : "") . "# constants\n" . implode("\n", $consts) . "\n\n# functions\n" . implode("\n", $contents);
     }
 }
