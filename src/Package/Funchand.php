@@ -418,6 +418,45 @@ class Funchand
     }
 
     /**
+     * callable のコードブロックを返す
+     *
+     * 返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。
+     *
+     * Example:
+     * ```php
+     * list($meta, $body) = callable_code(function(...$args){return true;});
+     * assertSame($meta, 'function(...$args)');
+     * assertSame($body, '{return true;}');
+     * ```
+     *
+     * @param callable $callable コードを取得する callable
+     * @return array ['定義部分', '{処理コード}']
+     */
+    public static function callable_code($callable)
+    {
+        /** @var \ReflectionFunctionAbstract $ref */
+        $ref = (reflect_callable)($callable);
+        $contents = file($ref->getFileName());
+        $start = $ref->getStartLine();
+        $end = $ref->getEndLine();
+        $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
+
+        $meta = (parse_php)("<?php $codeblock", [
+            'begin' => T_FUNCTION,
+            'end'   => '{',
+        ]);
+        array_pop($meta);
+
+        $body = (parse_php)("<?php $codeblock", [
+            'begin'  => '{',
+            'end'    => '}',
+            'offset' => count($meta),
+        ]);
+
+        return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
+    }
+
+    /**
      * エラーを例外に変換するブロックでコールバックを実行する
      *
      * Example:

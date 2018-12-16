@@ -287,6 +287,50 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('Concrete::__invoke', $closurize(new \Concrete('hoge'))());
     }
 
+    function test_callable_code()
+    {
+        function hoge_callable_code()
+        {
+            return true;
+        }
+
+        $callable_code = callable_code;
+        $code = $callable_code(__NAMESPACE__ . "\\hoge_callable_code");
+        $this->assertEquals([
+            'function hoge_callable_code()',
+            '{
+            return true;
+        }',
+        ], $code);
+
+        $code = $callable_code([$this, 'createResult']);
+        $this->assertEquals([
+            'function createResult()',
+            '{
+        return new TestResult;
+    }',
+        ], $code);
+
+        $usevar = null;
+        $code = $callable_code(function ($arg1 = "{\n}") use ($usevar): \Closure {
+            if (true) {
+                return function () use ($usevar) {
+
+                };
+            }
+        });
+        $this->assertEquals([
+            'function ($arg1 = "{\n}") use ($usevar): \Closure',
+            '{
+            if (true) {
+                return function () use ($usevar) {
+
+                };
+            }
+        }',
+        ], $code);
+    }
+
     function test_call_safely()
     {
         $call_safely = call_safely;
