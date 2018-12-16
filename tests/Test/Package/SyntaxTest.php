@@ -4,6 +4,46 @@ namespace ryunosuke\Test\Package;
 
 class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_parse_php()
+    {
+        $parse_php = parse_php;
+        $code = 'a(123);';
+        $tokens = $parse_php($code, 2);
+        $this->assertEquals([
+            [T_OPEN_TAG, '<?php ', 1, 'T_OPEN_TAG'],
+            [T_STRING, 'a', 1, 'T_STRING'],
+            [null, '(', 0],
+            [T_LNUMBER, '123', 1, 'T_LNUMBER'],
+            [null, ')', 0],
+            [null, ';', 0],
+        ], $tokens);
+
+        $code = 'function(...$args)use($usevar){if(false)return function(){};}';
+        $tokens = $parse_php($code, [
+            'begin' => T_FUNCTION,
+            'end'   => '{',
+        ]);
+        $this->assertEquals('function(...$args)use($usevar){', implode('', array_column($tokens, 1)));
+        $tokens = $parse_php($code, [
+            'begin'  => '{',
+            'end'    => '}',
+            'offset' => count($tokens),
+        ]);
+        $this->assertEquals('{if(false)return function(){};}', implode('', array_column($tokens, 1)));
+
+        $code = 'namespace hoge\\fuga\\piyo;class C {function m(){if(false)return function(){};}}';
+        $tokens = $parse_php($code, [
+            'begin' => T_NAMESPACE,
+            'end'   => ';',
+        ]);
+        $this->assertEquals('namespace hoge\fuga\piyo;', implode('', array_column($tokens, 1)));
+        $tokens = $parse_php($code, [
+            'begin' => T_CLASS,
+            'end'   => '}',
+        ]);
+        $this->assertEquals('class C {function m(){if(false)return function(){};}}', implode('', array_column($tokens, 1)));
+    }
+
     function test_return()
     {
         $returns = returns;

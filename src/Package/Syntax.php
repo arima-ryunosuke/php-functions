@@ -7,6 +7,121 @@ namespace ryunosuke\Functions\Package;
  */
 class Syntax
 {
+    const TOKEN_NAME = 2;
+
+    /**
+     * php のコード断片をパースする
+     *
+     * 結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。
+     * つまり必ず `[TOKENID, TOKEN, LINE]` で返す。
+     *
+     * Example:
+     * ```php
+     * $phpcode = 'namespace Hogera;
+     * class Example
+     * {
+     *     // something
+     * }';
+     *
+     * // namespace ～ ; を取得
+     * $part = parse_php($phpcode, [
+     *     'begin' => T_NAMESPACE,
+     *     'end'   => ';',
+     * ]);
+     * assertSame(implode('', array_column($part, 1)), 'namespace Hogera;');
+     *
+     * // class ～ { を取得
+     * $part = parse_php($phpcode, [
+     *     'begin' => T_CLASS,
+     *     'end'   => '{',
+     * ]);
+     * assertSame(implode('', array_column($part, 1)), "class Example\n{");
+     * ```
+     *
+     * @param string $phpcode パースする php コード
+     * @param array|int $option パースオプション
+     * @return array トークン配列
+     */
+    public static function parse_php($phpcode, $option = [])
+    {
+        if (is_int($option)) {
+            $option = ['flags' => $option];
+        }
+
+        $default = [
+            'begin'      => [],   // 開始トークン
+            'end'        => [],   // 終了トークン
+            'offset'     => 0,    // 開始トークン位置
+            'flags'      => 0,    // token_get_all の $flags. TOKEN_PARSE を与えると ParseError が出ることがあるのでデフォルト 0
+            'cache'      => true, // キャッシュするか否か
+            'nest_token' => [
+                ')' => '(',
+                '}' => '{',
+                ']' => '[',
+            ],
+        ];
+        $option += $default;
+
+        static $cache = [];
+        if (!$option['cache'] || !isset($cache[$phpcode])) {
+            // token_get_all の結果は微妙に扱いづらいので少し調整する（string/array だったり、名前変換の必要があったり）
+            $cache[$phpcode] = array_map(function ($token) use ($option) {
+                if (is_array($token)) {
+                    // for debug
+                    if ($option['flags'] & TOKEN_NAME) {
+                        $token[] = token_name($token[0]);
+                    }
+                    return $token;
+                }
+                else {
+                    // string -> [TOKEN, CHAR, LINE]
+                    return [null, $token, 0];
+                }
+            }, token_get_all("<?php $phpcode", $option['flags']));
+        }
+        $tokens = $cache[$phpcode];
+
+        $begin_tokens = (array) $option['begin'];
+        $end_tokens = (array) $option['end'];
+        $nest_tokens = $option['nest_token'];
+
+        $result = [];
+        $starting = !$begin_tokens;
+        $nesting = 0;
+        for ($i = $option['offset'], $l = count($tokens); $i < $l; $i++) {
+            $token = $tokens[$i];
+
+            foreach ($begin_tokens as $t) {
+                if ($t === $token[0] || $t === $token[1]) {
+                    $starting = true;
+                    break;
+                }
+            }
+            if (!$starting) {
+                continue;
+            }
+
+            $result[] = $token;
+
+            foreach ($end_tokens as $t) {
+                if (isset($nest_tokens[$t])) {
+                    $nest_token = $nest_tokens[$t];
+                    if ($token[0] === $nest_token || $token[1] === $nest_token) {
+                        $nesting++;
+                    }
+                }
+                if ($t === $token[0] || $t === $token[1]) {
+                    $nesting--;
+                    if ($nesting <= 0) {
+                        break 2;
+                    }
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
     /**
      * 引数をそのまま返す
      *
