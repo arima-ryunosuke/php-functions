@@ -9,6 +9,10 @@
         </testsuite>
     </testsuites>
 
+    <php>
+        <!--><const name="TESTWEBSERVER" value="http://localhost"/><-->
+    </php>
+
     <filter>
         <whitelist>
             <directory suffix=".php">../src</directory>
