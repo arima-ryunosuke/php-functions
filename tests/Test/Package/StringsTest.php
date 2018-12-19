@@ -680,6 +680,31 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals($m, ['abc']);
     }
 
+    public function test_preg_replaces()
+    {
+        $preg_replaces = preg_replaces;
+        // simple
+        $this->assertEquals('aaa99999zzz, aaa99999zzz', $preg_replaces('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz'));
+        $this->assertEquals('aaa99,999zzz', $preg_replaces('#aaa(\d\d\d),(\d\d\d)zzz#', [1 => 99, 2 => 999], 'aaa123,456zzz'));
+
+        // named
+        $this->assertEquals('aaa99999zzz, aaa99999zzz', $preg_replaces('#aaa(?<digit>\d\d\d)zzz#', ['digit' => 99999], 'aaa123zzz, aaa456zzz'));
+
+        // multibyte
+        $this->assertEquals('あxい|うxえxお', $preg_replaces('#い(x)う#u', '|', 'あxいxうxえxお'));
+
+        // limit, count
+        $count = 0;
+        $this->assertEquals('aaa99999zzz, aaa456zzz', $preg_replaces('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz', 1, $count));
+        $this->assertEquals(1, $count);
+        $this->assertEquals('aaa99999zzz, aaa99999zzz', $preg_replaces('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz', 9, $count));
+        $this->assertEquals(2, $count);
+
+        // misc
+        $this->assertEquals('aaa99999zzz', $preg_replaces('#aaa(\d\d\d)zzz#', 99999, 'aaa123zzz'));
+        $this->assertEquals('aaa246zzz', $preg_replaces('#aaa(\d\d\d)zzz#', function ($v) { return $v * 2; }, 'aaa123zzz'));
+    }
+
     public function test_render_string()
     {
         $render_string = render_string;

@@ -978,6 +978,71 @@ class Strings
     }
 
     /**
+     * パターン番号を指定して preg_replace する
+     *
+     * パターン番号を指定してそれのみを置換する。
+     * 名前付きキャプチャを使用している場合はキーに文字列も使える。
+     * 値にクロージャを渡した場合はコールバックされて置換される。
+     *
+     * $replacements に単一文字列を渡した場合、 `[1 => $replacements]` と等しくなる（第1キャプチャを置換）。
+     *
+     * Example:
+     * ```php
+     * // a と z に囲まれた数字を XXX に置換する
+     * assertSame(preg_replaces('#a(\d+)z#', [1 => 'XXX'], 'a123z'), 'aXXXz');
+     * // 名前付きキャプチャも指定できる
+     * assertSame(preg_replaces('#a(?<digit>\d+)z#', ['digit' => 'XXX'], 'a123z'), 'aXXXz');
+     * // クロージャを渡すと元文字列を引数としてコールバックされる
+     * assertSame(preg_replaces('#a(?<digit>\d+)z#', ['digit' => function($src){return $src * 2;}], 'a123z'), 'a246z');
+     * // 複合的なサンプル（a タグの href と target 属性を書き換える）
+     * assertSame(preg_replaces('#<a\s+href="(?<href>.*)"\s+target="(?<target>.*)">#', [
+     *     'href'   => function($href){return strtoupper($href);},
+     *     'target' => function($target){return strtoupper($target);},
+     * ], '<a href="hoge" target="fuga">inner text</a>'), '<a href="HOGE" target="FUGA">inner text</a>');
+     * ```
+     *
+     * @param string $pattern 正規表現
+     * @param array|string $replacements 置換文字列
+     * @param string $subject 対象文字列
+     * @param int $limit 置換回数
+     * @param null $count 置換回数格納変数
+     * @return string 置換された文字列
+     */
+    public static function preg_replaces($pattern, $replacements, $subject, $limit = -1, &$count = null)
+    {
+        $offset = 0;
+        $count = 0;
+        if (!(is_arrayable)($replacements)) {
+            $replacements = [1 => $replacements];
+        }
+
+        preg_match_all($pattern, $subject, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            if ($limit-- === 0) {
+                break;
+            }
+            $count++;
+
+            foreach ($match as $index => $m) {
+                if ($m[1] >= 0 && $index !== 0 && isset($replacements[$index])) {
+                    $src = $m[0];
+                    $dst = $replacements[$index];
+                    if ($dst instanceof \Closure) {
+                        $dst = $dst($src);
+                    }
+
+                    $srclen = strlen($src);
+                    $dstlen = strlen($dst);
+
+                    $subject = substr_replace($subject, $dst, $offset + $m[1], $srclen);
+                    $offset += $dstlen - $srclen;
+                }
+            }
+        }
+        return $subject;
+    }
+
+    /**
      * "hoge {$hoge}" 形式のレンダリング
      *
      * 文字列を eval して "hoge {$hoge}" 形式の文字列に変数を埋め込む。
