@@ -9,6 +9,8 @@ use Psr\SimpleCache\CacheInterface;
  */
 class FileCache implements CacheInterface
 {
+    const CACHE_EXT = '.php-cache';
+
     /** @var string キャッシュディレクトリ */
     private $cachedir;
 
@@ -31,7 +33,7 @@ class FileCache implements CacheInterface
         if ($this->cachedir !== null) {
             // 変更されているもののみ保存
             foreach ($this->changed as $namespace => $dummy) {
-                $filepath = $this->cachedir . '/' . rawurlencode($namespace);
+                $filepath = $this->cachedir . '/' . rawurlencode($namespace) . self::CACHE_EXT;
                 $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
 
                 $temppath = tempnam(sys_get_temp_dir(), 'cache');
@@ -60,7 +62,7 @@ class FileCache implements CacheInterface
         // 名前空間自体がないなら作る or 読む
         if (!isset($this->cache[$namespace])) {
             $nsarray = [];
-            $cachpath = $this->cachedir . '/' . rawurldecode($namespace);
+            $cachpath = $this->cachedir . '/' . rawurldecode($namespace) . self::CACHE_EXT;
             if (file_exists($cachpath)) {
                 $nsarray = require $cachpath;
             }
@@ -92,7 +94,7 @@ class FileCache implements CacheInterface
 
         // ファイルも消す
         if ($this->cachedir !== null) {
-            foreach (glob($this->cachedir . '/*') as $file) {
+            foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
                 unlink($file);
             }
         }
