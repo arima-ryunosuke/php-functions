@@ -507,6 +507,31 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen', '-'));
     }
 
+    function test_func_method()
+    {
+        $func_method = func_method;
+        $object = new class()
+        {
+            function hoge(...$args) { return implode(',', $args); }
+        };
+
+        $hoge = $func_method('hoge');
+        $this->assertEquals('x,y,z', $hoge($object, 'x', 'y', 'z'));
+
+        $hoge = $func_method('hoge', 'X', 'Y', 'Z');
+        $this->assertEquals('X,Y,Z', $hoge($object));
+        $this->assertEquals('x,Y,Z', $hoge($object, 'x'));
+        $this->assertEquals('x,y,z', $hoge($object, 'x', 'y', 'z'));
+
+        // array_maps とか array_map_method とかの模倣
+        $exs = [
+            new \Exception('hoge'),
+            new \Exception('fuga'),
+            new \Exception('piyo'),
+        ];
+        $this->assertEquals(['hoge', 'fuga', 'piyo'], array_map($func_method('getMessage'), $exs));
+    }
+
     function test_function_alias()
     {
         $function_alias = function_alias;

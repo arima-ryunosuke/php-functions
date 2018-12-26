@@ -700,6 +700,47 @@ class Funchand
     }
 
     /**
+     * 指定メソッドを呼び出すクロージャを返す
+     *
+     * この関数を呼ぶとメソッドのクロージャを返す。
+     * そのクロージャにオブジェクトを与えて呼び出すとそれはメソッド呼び出しとなる。
+     *
+     * オプションでデフォルト引数を設定できる（Example を参照）。
+     *
+     * Example:
+     * ```php
+     * // 与えられた引数を結合して返すメソッド hoge を持つクラス
+     * $object = new class()
+     * {
+     *     function hoge(...$args) { return implode(',', $args); }
+     * };
+     * // hoge を呼び出すクロージャ
+     * $hoge = func_method('hoge');
+     * // ↑を使用して $object の hoge を呼び出す
+     * assertSame($hoge($object, 1, 2, 3), '1,2,3');
+     *
+     * // デフォルト値付きで hoge を呼び出すクロージャ
+     * $hoge789 = func_method('hoge', 7, 8, 9);
+     * // ↑を使用して $object の hoge を呼び出す（引数指定してるので結果は同じ）
+     * assertSame($hoge789($object, 1, 2, 3), '1,2,3');
+     * // 同上（一部デフォルト値）
+     * assertSame($hoge789($object, 1, 2), '1,2,9');
+     * // 同上（全部デフォルト値）
+     * assertSame($hoge789($object), '7,8,9');
+     * ```
+     *
+     * @param string $methodname メソッド名
+     * @param array $defaultargs メソッドのデフォルト引数
+     * @return \Closure メソッドを呼び出すクロージャ
+     */
+    public static function func_method($methodname, ...$defaultargs)
+    {
+        return function ($object, ...$args) use ($methodname, $defaultargs) {
+            return ([$object, $methodname])(...$args + $defaultargs);
+        };
+    }
+
+    /**
      * 関数のエイリアスを作成する
      *
      * 単に移譲するだけではなく、参照渡し・参照返しも模倣される。
