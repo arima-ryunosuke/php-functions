@@ -465,6 +465,37 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         });
     }
 
+    function test_array_put()
+    {
+        $array_put = array_put;
+        // single
+        $array = ['a' => 'A', 'B'];
+        $this->assertEquals(1, $array_put($array, 'Z'));
+        $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
+        $this->assertEquals(2, $array_put($array, 'Z', 123));
+        $this->assertEquals(['a' => 'A', 'B', 'Z', 'Z'], $array);
+        $this->assertEquals('z', $array_put($array, 'Z', 'z'));
+        $this->assertEquals(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z'], $array);
+        $this->assertEquals('a', $array_put($array, 'X', 'a'));
+        $this->assertEquals(['a' => 'X', 'B', 'Z', 'Z', 'z' => 'Z'], $array);
+
+        // array
+        $array = ['a' => 'A', 'b' => ['B']];
+        $this->assertEquals('x', $array_put($array, 'X', ['x']));
+        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X'], $array);
+        $this->assertEquals('z', $array_put($array, 'X', ['y', 'z']));
+        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']], $array);
+        $this->assertEquals('b', $array_put($array, 'W', ['b']));
+        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']], $array);
+        $this->assertEquals(0, $array_put($array, 'Y2', ['y', null]));
+        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']], $array);
+        $this->assertException('is not array', function () {
+            $array_put = array_put;
+            $array = ['a' => ['b' => 's']];
+            $array_put($array, 'X', ['a', 'b', 'c']);
+        });
+    }
+
     function test_array_unset()
     {
         $array_unset = array_unset;

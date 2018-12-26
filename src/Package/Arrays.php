@@ -974,6 +974,67 @@ class Arrays
     }
 
     /**
+     * キー指定の配列値設定
+     *
+     * array_set とほとんど同じ。
+     * 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。
+     * また、**int を与えても同様の動作**となる。
+     * 第3引数に配列を指定すると潜って設定する。
+     *
+     * array_set における $require_return は廃止している。
+     * これはもともと end や last_key が遅かったのでオプショナルにしていたが、もう改善しているし、7.3 から array_key_last があるので、呼び元で適宜使えば良い。
+     *
+     * Example:
+     * ```php
+     * $array = ['a' => 'A', 'B'];
+     * // 第3引数 int
+     * assertSame(array_put($array, 'Z', 999), 1);
+     * assertSame($array, ['a' => 'A', 'B', 'Z']);
+     * // 第3引数省略（最後に連番キーで設定）
+     * assertSame(array_put($array, 'Z'), 2);
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'Z']);
+     * // 第3引数でキーを指定
+     * assertSame(array_put($array, 'Z', 'z'), 'z');
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z']);
+     * assertSame(array_put($array, 'Z', 'z'), 'z');
+     * // 第3引数で配列を指定
+     * assertSame(array_put($array, 'Z', ['x', 'y', 'z']), 'z');
+     * assertSame($array, ['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
+     * ```
+     *
+     * @param array $array 配列
+     * @param mixed $value 設定する値
+     * @param array|string|int|null $key 設定するキー
+     * @return string|int 設定したキー
+     */
+    public static function array_put(&$array, $value, $key = null)
+    {
+        if (is_array($key)) {
+            $k = array_shift($key);
+            if ($key) {
+                if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
+                    throw new \InvalidArgumentException('$array[$k] is not array.');
+                }
+                return (array_put)(...[&$array[$k], $value, $key]);
+            }
+            else {
+                return (array_put)(...[&$array, $value, $k]);
+            }
+        }
+
+        if ($key === null || is_int($key)) {
+            $array[] = $value;
+            // compatible array_key_last under 7.3
+            end($array);
+            $key = key($array);
+        }
+        else {
+            $array[$key] = $value;
+        }
+        return $key;
+    }
+
+    /**
      * 伏せると同時にその値を返す
      *
      * $key に配列を与えると全て伏せて配列で返す。
