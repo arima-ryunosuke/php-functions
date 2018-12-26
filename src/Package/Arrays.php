@@ -558,24 +558,15 @@ class Arrays
         // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
         foreach ($arrays as $a) {
             if ((is_hasharray)($a)) {
-                $keyses = array_map('array_keys', $arrays);
-                $limit = max(array_map('count', $keyses));
+                $limit = max(array_map('count', $arrays));
+                $yielders = array_map(function ($array) { yield from $array; }, $arrays);
 
                 $result = [];
                 for ($i = 0; $i < $limit; $i++) {
                     $e = [];
-                    foreach ($arrays as $n => $array) {
-                        if (!isset($keyses[$n][$i])) {
-                            $e[] = null;
-                            continue;
-                        }
-                        $key = $keyses[$n][$i];
-                        if (is_int($key)) {
-                            $e[] = $array[$key];
-                        }
-                        else {
-                            $e[$key] = $array[$key];
-                        }
+                    foreach ($yielders as $yielder) {
+                        (array_put)($e, $yielder->current(), $yielder->key());
+                        $yielder->next();
                     }
                     $result[] = $e;
                 }
@@ -588,6 +579,23 @@ class Arrays
             return array_map(function ($v) { return [$v]; }, $arrays[0]);
         }
         return array_map(null, ...$arrays);
+
+        /* MultipleIterator を使った実装。かなり遅かったので採用しなかったが、一応コメントとして残す
+        $mi = new \MultipleIterator(\MultipleIterator::MIT_NEED_ANY | \MultipleIterator::MIT_KEYS_NUMERIC);
+        foreach ($arrays as $array) {
+            $mi->attachIterator((function ($array) { yield from $array; })($array));
+        }
+
+        $result = [];
+        foreach ($mi as $k => $v) {
+            $e = [];
+            for ($i = 0; $i < $count; $i++) {
+                (array_put)($e, $v[$i], $k[$i]);
+            }
+            $result[] = $e;
+        }
+        return $result;
+        */
     }
 
     /**
