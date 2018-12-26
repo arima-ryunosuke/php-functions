@@ -6,28 +6,26 @@ class SqlTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_sql_quote()
     {
-        $sql_quote = sql_quote;
-        $this->assertEquals('NULL', $sql_quote(null));
-        $this->assertEquals('0', $sql_quote(false));
-        $this->assertEquals('1', $sql_quote(true));
-        $this->assertEquals('123', $sql_quote(123));
-        $this->assertEquals('1.23', $sql_quote(1.23));
-        $this->assertEquals('123', $sql_quote('123'));
-        $this->assertEquals('1.23', $sql_quote('1.23'));
-        $this->assertEquals("'hoge'", $sql_quote('hoge'));
-        $this->assertEquals("'ho\'ge'", $sql_quote("ho'ge"));
-        $this->assertEquals("'ho\\\"ge'", $sql_quote('ho"ge'));
+        $this->assertEquals('NULL', (sql_quote)(null));
+        $this->assertEquals('0', (sql_quote)(false));
+        $this->assertEquals('1', (sql_quote)(true));
+        $this->assertEquals('123', (sql_quote)(123));
+        $this->assertEquals('1.23', (sql_quote)(1.23));
+        $this->assertEquals('123', (sql_quote)('123'));
+        $this->assertEquals('1.23', (sql_quote)('1.23'));
+        $this->assertEquals("'hoge'", (sql_quote)('hoge'));
+        $this->assertEquals("'ho\'ge'", (sql_quote)("ho'ge"));
+        $this->assertEquals("'ho\\\"ge'", (sql_quote)('ho"ge'));
     }
 
     function test_sql_bind()
     {
-        $sql_bind = sql_bind;
-        $this->assertEquals('select 1', $sql_bind('select ?', 1));
-        $this->assertEquals('select 1, 2', $sql_bind('select ?, ?', [1, 2]));
-        $this->assertEquals('select 1', $sql_bind('select :name', ['name' => 1]));
-        $this->assertEquals('select ":name"', $sql_bind('select ":name"', ['xxx' => 1]));
-        $this->assertEquals('select 1, 3, 2, 4', $sql_bind('select ?, :hoge, ?, :fuga', [1, 2, 'hoge' => 3, 'fuga' => 4]));
-        $this->assertEquals("select 'a', 'c', 'b', 'd'", $sql_bind('select ?, :hoge, ?, :fuga', ['a', 'b', 'hoge' => 'c', 'fuga' => 'd']));
+        $this->assertEquals('select 1', (sql_bind)('select ?', 1));
+        $this->assertEquals('select 1, 2', (sql_bind)('select ?, ?', [1, 2]));
+        $this->assertEquals('select 1', (sql_bind)('select :name', ['name' => 1]));
+        $this->assertEquals('select ":name"', (sql_bind)('select ":name"', ['xxx' => 1]));
+        $this->assertEquals('select 1, 3, 2, 4', (sql_bind)('select ?, :hoge, ?, :fuga', [1, 2, 'hoge' => 3, 'fuga' => 4]));
+        $this->assertEquals("select 'a', 'c', 'b', 'd'", (sql_bind)('select ?, :hoge, ?, :fuga', ['a', 'b', 'hoge' => 'c', 'fuga' => 'd']));
     }
 
     function test_sql_format_create()

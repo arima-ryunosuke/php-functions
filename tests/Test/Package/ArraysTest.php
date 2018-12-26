@@ -6,182 +6,169 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_arrayize()
     {
-        $arrayize = arrayize;
-        $this->assertEquals([1, 2, 3], $arrayize(1, 2, 3));
-        $this->assertEquals([1, 2, 3], $arrayize([1], 2, 3));
+        $this->assertEquals([1, 2, 3], (arrayize)(1, 2, 3));
+        $this->assertEquals([1, 2, 3], (arrayize)([1], 2, 3));
     }
 
     function test_is_hasharray()
     {
-        $is_hasharray = is_hasharray;
-        $this->assertFalse($is_hasharray([]));
-        $this->assertFalse($is_hasharray([1]));
-        $this->assertFalse($is_hasharray([0 => 1]));
-        $this->assertTrue($is_hasharray([1 => 1]));
+        $this->assertFalse((is_hasharray)([]));
+        $this->assertFalse((is_hasharray)([1]));
+        $this->assertFalse((is_hasharray)([0 => 1]));
+        $this->assertTrue((is_hasharray)([1 => 1]));
     }
 
     function test_first_key()
     {
-        $first_key = first_key;
-        $this->assertEquals(0, $first_key(['a', 'b', 'c']));
-        $this->assertEquals(0, $first_key(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', $first_key([], 'def'));
-        $this->assertEquals(null, $first_key([]));
+        $this->assertEquals(0, (first_key)(['a', 'b', 'c']));
+        $this->assertEquals(0, (first_key)(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', (first_key)([], 'def'));
+        $this->assertEquals(null, (first_key)([]));
     }
 
     function test_first_value()
     {
-        $first_value = first_value;
-        $this->assertEquals('a', $first_value(['a', 'b', 'c']));
-        $this->assertEquals('a', $first_value(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', $first_value([], 'def'));
-        $this->assertEquals(null, $first_value([]));
+        $this->assertEquals('a', (first_value)(['a', 'b', 'c']));
+        $this->assertEquals('a', (first_value)(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', (first_value)([], 'def'));
+        $this->assertEquals(null, (first_value)([]));
     }
 
     function test_first_keyvalue()
     {
-        $first_keyvalue = first_keyvalue;
-        $this->assertEquals([0, 'a'], $first_keyvalue(['a', 'b', 'c']));
-        $this->assertEquals([0, 'a'], $first_keyvalue(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', $first_keyvalue([], 'def'));
-        $this->assertEquals(null, $first_keyvalue([]));
+        $this->assertEquals([0, 'a'], (first_keyvalue)(['a', 'b', 'c']));
+        $this->assertEquals([0, 'a'], (first_keyvalue)(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', (first_keyvalue)([], 'def'));
+        $this->assertEquals(null, (first_keyvalue)([]));
 
-        $this->assertEquals([0, 1], $first_keyvalue(new \ArrayObject([1, 2, 3])));
-        $this->assertEquals(null, $first_keyvalue(new \ArrayObject([])));
+        $this->assertEquals([0, 1], (first_keyvalue)(new \ArrayObject([1, 2, 3])));
+        $this->assertEquals(null, (first_keyvalue)(new \ArrayObject([])));
     }
 
     function test_last_key()
     {
-        $last_key = last_key;
-        $this->assertEquals(2, $last_key(['a', 'b', 'c']));
-        $this->assertEquals(2, $last_key(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', $last_key([], 'def'));
-        $this->assertEquals(null, $last_key([]));
+        $this->assertEquals(2, (last_key)(['a', 'b', 'c']));
+        $this->assertEquals(2, (last_key)(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', (last_key)([], 'def'));
+        $this->assertEquals(null, (last_key)([]));
     }
 
     function test_last_value()
     {
-        $last_value = last_value;
-        $this->assertEquals('c', $last_value(['a', 'b', 'c']));
-        $this->assertEquals('c', $last_value(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', $last_value([], 'def'));
-        $this->assertEquals(null, $last_value([]));
+        $this->assertEquals('c', (last_value)(['a', 'b', 'c']));
+        $this->assertEquals('c', (last_value)(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', (last_value)([], 'def'));
+        $this->assertEquals(null, (last_value)([]));
     }
 
     function test_last_keyvalue()
     {
-        $last_keyvalue = last_keyvalue;
-        $this->assertEquals([2, 'c'], $last_keyvalue(['a', 'b', 'c']));
-        $this->assertEquals([2, 'c'], $last_keyvalue(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', $last_keyvalue([], 'def'));
-        $this->assertEquals(null, $last_keyvalue([]));
+        $this->assertEquals([2, 'c'], (last_keyvalue)(['a', 'b', 'c']));
+        $this->assertEquals([2, 'c'], (last_keyvalue)(['a', 'b', 'c'], 'def'));
+        $this->assertEquals('def', (last_keyvalue)([], 'def'));
+        $this->assertEquals(null, (last_keyvalue)([]));
 
-        $this->assertEquals([2, 3], $last_keyvalue(new \ArrayObject([1, 2, 3])));
-        $this->assertEquals(null, $last_keyvalue(new \ArrayObject([])));
+        $this->assertEquals([2, 3], (last_keyvalue)(new \ArrayObject([1, 2, 3])));
+        $this->assertEquals(null, (last_keyvalue)(new \ArrayObject([])));
     }
 
     function test_prev_key()
     {
-        $prev_key = prev_key;
         // 数値キーのみ
         $array = ['a', 'b', 'c'];
-        $this->assertSame(0, $prev_key($array, 1));
-        $this->assertSame(null, $prev_key($array, 0));
-        $this->assertSame(false, $prev_key($array, 'xxx'));
+        $this->assertSame(0, (prev_key)($array, 1));
+        $this->assertSame(null, (prev_key)($array, 0));
+        $this->assertSame(false, (prev_key)($array, 'xxx'));
         // 文字キーのみ
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame('a', $prev_key($array, 'b'));
-        $this->assertSame(null, $prev_key($array, 'a'));
-        $this->assertSame(false, $prev_key($array, 'xxx'));
+        $this->assertSame('a', (prev_key)($array, 'b'));
+        $this->assertSame(null, (prev_key)($array, 'a'));
+        $this->assertSame(false, (prev_key)($array, 'xxx'));
         // 混在キー
         $array = ['a', 'b' => 'B', 'c'];
-        $this->assertSame(0, $prev_key($array, 'b'));
-        $this->assertSame(null, $prev_key($array, 0));
-        $this->assertSame(false, $prev_key($array, 'xxx'));
+        $this->assertSame(0, (prev_key)($array, 'b'));
+        $this->assertSame(null, (prev_key)($array, 0));
+        $this->assertSame(false, (prev_key)($array, 'xxx'));
         // 負数キー
         $array = [-4 => 'a', -3 => 'b', -2 => 'c'];
-        $this->assertSame(-4, $prev_key($array, -3));
-        $this->assertSame(null, $prev_key($array, -4));
-        $this->assertSame(false, $prev_key($array, 'xxx'));
+        $this->assertSame(-4, (prev_key)($array, -3));
+        $this->assertSame(null, (prev_key)($array, -4));
+        $this->assertSame(false, (prev_key)($array, 'xxx'));
         // めっちゃバラバラキー
         $array = [-4 => 1, 3 => 2, 1 => 3, 2 => 4, -3 => 5, 'x' => 6];
-        $this->assertSame(1, $prev_key($array, 2));
-        $this->assertSame(null, $prev_key($array, -4));
-        $this->assertSame(false, $prev_key($array, 'xxx'));
+        $this->assertSame(1, (prev_key)($array, 2));
+        $this->assertSame(null, (prev_key)($array, -4));
+        $this->assertSame(false, (prev_key)($array, 'xxx'));
     }
 
     function test_next_key()
     {
-        $next_key = next_key;
         // 数値キーのみ
         $array = ['a', 'b', 'c'];
-        $this->assertSame(3, $next_key($array));
-        $this->assertSame(2, $next_key($array, 1));
-        $this->assertSame(null, $next_key($array, 2));
-        $this->assertSame(false, $next_key($array, 'xxx'));
+        $this->assertSame(3, (next_key)($array));
+        $this->assertSame(2, (next_key)($array, 1));
+        $this->assertSame(null, (next_key)($array, 2));
+        $this->assertSame(false, (next_key)($array, 'xxx'));
         // 文字キーのみ
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame(0, $next_key($array));
-        $this->assertSame('b', $next_key($array, 'a'));
-        $this->assertSame(null, $next_key($array, 'c'));
-        $this->assertSame(false, $next_key($array, 'xxx'));
+        $this->assertSame(0, (next_key)($array));
+        $this->assertSame('b', (next_key)($array, 'a'));
+        $this->assertSame(null, (next_key)($array, 'c'));
+        $this->assertSame(false, (next_key)($array, 'xxx'));
         // 混在キー
         $array = ['a', 'b' => 'B', 'c'];
-        $this->assertSame(2, $next_key($array));
-        $this->assertSame(1, $next_key($array, 'b'));
-        $this->assertSame(null, $next_key($array, 1));
-        $this->assertSame(false, $next_key($array, 'xxx'));
+        $this->assertSame(2, (next_key)($array));
+        $this->assertSame(1, (next_key)($array, 'b'));
+        $this->assertSame(null, (next_key)($array, 1));
+        $this->assertSame(false, (next_key)($array, 'xxx'));
         // 負数キー
         $array = [-4 => 'a', -3 => 'b', -2 => 'c'];
-        $this->assertSame(0, $next_key($array));
-        $this->assertSame(-2, $next_key($array, -3));
-        $this->assertSame(null, $next_key($array, -2));
-        $this->assertSame(false, $next_key($array, 'xxx'));
+        $this->assertSame(0, (next_key)($array));
+        $this->assertSame(-2, (next_key)($array, -3));
+        $this->assertSame(null, (next_key)($array, -2));
+        $this->assertSame(false, (next_key)($array, 'xxx'));
         // めっちゃバラバラキー
         $array = [-4 => 1, 3 => 2, 1 => 3, 2 => 4, -3 => 5, 'x' => 6];
-        $this->assertSame(4, $next_key($array));
-        $this->assertSame(-3, $next_key($array, 2));
-        $this->assertSame(null, $next_key($array, 'x'));
-        $this->assertSame(false, $next_key($array, 'xxx'));
+        $this->assertSame(4, (next_key)($array));
+        $this->assertSame(-3, (next_key)($array, 2));
+        $this->assertSame(null, (next_key)($array, 'x'));
+        $this->assertSame(false, (next_key)($array, 'xxx'));
     }
 
     function test_in_array_and()
     {
-        $in_array_and = in_array_and;
-        $this->assertFalse($in_array_and([], []));
-        $this->assertFalse($in_array_and(['a'], []));
+        $this->assertFalse((in_array_and)([], []));
+        $this->assertFalse((in_array_and)(['a'], []));
 
-        $this->assertTrue($in_array_and(['a'], ['a', 'b', 'c']));
-        $this->assertTrue($in_array_and(['a', 'b'], ['a', 'b', 'c']));
-        $this->assertTrue($in_array_and(['a', 'b', 'c'], ['a', 'b', 'c']));
-        $this->assertFalse($in_array_and(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
-        $this->assertFalse($in_array_and(['z'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_and)(['a'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_and)(['a', 'b'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_and)(['a', 'b', 'c'], ['a', 'b', 'c']));
+        $this->assertFalse((in_array_and)(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
+        $this->assertFalse((in_array_and)(['z'], ['a', 'b', 'c']));
 
-        $this->assertTrue($in_array_and(['1', 2], [1, 2, 3], false));
-        $this->assertFalse($in_array_and(['1', 2], [1, 2, 3], true));
-        $this->assertFalse($in_array_and(['1', '2'], [1, 2, 3], true));
+        $this->assertTrue((in_array_and)(['1', 2], [1, 2, 3], false));
+        $this->assertFalse((in_array_and)(['1', 2], [1, 2, 3], true));
+        $this->assertFalse((in_array_and)(['1', '2'], [1, 2, 3], true));
     }
 
     function test_in_array_or()
     {
-        $in_array_or = in_array_or;
-        $this->assertFalse($in_array_or([], []));
-        $this->assertFalse($in_array_or(['a'], []));
+        $this->assertFalse((in_array_or)([], []));
+        $this->assertFalse((in_array_or)(['a'], []));
 
-        $this->assertTrue($in_array_or(['a'], ['a', 'b', 'c']));
-        $this->assertTrue($in_array_or(['a', 'b'], ['a', 'b', 'c']));
-        $this->assertTrue($in_array_or(['a', 'b', 'c'], ['a', 'b', 'c']));
-        $this->assertTrue($in_array_or(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
-        $this->assertFalse($in_array_or(['z'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_or)(['a'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_or)(['a', 'b'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_or)(['a', 'b', 'c'], ['a', 'b', 'c']));
+        $this->assertTrue((in_array_or)(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
+        $this->assertFalse((in_array_or)(['z'], ['a', 'b', 'c']));
 
-        $this->assertTrue($in_array_or(['1', 2], [1, 2, 3], false));
-        $this->assertTrue($in_array_or(['1', 2], [1, 2, 3], true));
-        $this->assertFalse($in_array_or(['1', '2'], [1, 2, 3], true));
+        $this->assertTrue((in_array_or)(['1', 2], [1, 2, 3], false));
+        $this->assertTrue((in_array_or)(['1', 2], [1, 2, 3], true));
+        $this->assertFalse((in_array_or)(['1', '2'], [1, 2, 3], true));
     }
 
     function test_kvsort()
     {
-        $kvsort = kvsort;
         $array = array_fill_keys(range('a', 'z'), 9);
 
         // asort は安定ソートではない
@@ -190,13 +177,13 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertNotSame($array, $native);
 
         // kvsort は安定ソートである
-        $this->assertSame($array, $kvsort($array));
+        $this->assertSame($array, (kvsort)($array));
 
         // キーでソートできる
-        $this->assertSame(array_reverse(array_keys($array)), array_keys($kvsort($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })));
+        $this->assertSame(array_reverse(array_keys($array)), array_keys((kvsort)($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })));
 
         // 配列じゃなくても Traversable ならソート可能
-        $this->assertSame([1 => 1, 0 => 2, 2 => 3], $kvsort((function () {
+        $this->assertSame([1 => 1, 0 => 2, 2 => 3], (kvsort)((function () {
             yield 2;
             yield 1;
             yield 3;
@@ -204,38 +191,35 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // 上記は挙動のテストであってソートのテストを行っていないのでテスト
         $array = array_combine(range('a', 'z'), range('a', 'z'));
-        $this->assertSame($array, $kvsort((array_shuffle)($array), function ($a, $b) { return strcmp($a, $b); }));
+        $this->assertSame($array, (kvsort)((array_shuffle)($array), function ($a, $b) { return strcmp($a, $b); }));
     }
 
     function test_array_add()
     {
-        $array_add = array_add;
-        $this->assertEquals(['a', 'b', 'c'], $array_add(['a', 'b', 'c'], ['d']));
-        $this->assertEquals(['a', 'b', 'c', 'd'], $array_add(['a', 'b', 'c'], [3 => 'd']));
-        $this->assertEquals(['a', 'b', 'c', 'd', 'e'], $array_add(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
+        $this->assertEquals(['a', 'b', 'c'], (array_add)(['a', 'b', 'c'], ['d']));
+        $this->assertEquals(['a', 'b', 'c', 'd'], (array_add)(['a', 'b', 'c'], [3 => 'd']));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e'], (array_add)(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
     }
 
     function test_array_mix()
     {
-        $array_mix = array_mix;
-        $this->assertEquals([], $array_mix());
-        $this->assertEquals([], $array_mix([], []));
-        $this->assertEquals([null], $array_mix([], [], [null]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6], $array_mix([1, 3, 5], [2, 4, 6]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], $array_mix([1, 3, 5], [2, 4, 6, 7]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], $array_mix([1, 3, 5, 7], [2, 4, 6]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6], $array_mix([1], [2, 4], [3, 5, 6]));
-        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], $array_mix(['a' => 'A', 'c' => 'C'], ['b' => 'b']));
-        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], $array_mix(['a' => 'A'], ['b' => 'b', 'c' => 'C']));
-        $this->assertEquals(['a' => '!', 'X', 'Y', 'Z'], $array_mix(['a' => 'A', 'X', 'Z'], ['a' => '!', 'Y']));
+        $this->assertEquals([], (array_mix)());
+        $this->assertEquals([], (array_mix)([], []));
+        $this->assertEquals([null], (array_mix)([], [], [null]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6], (array_mix)([1, 3, 5], [2, 4, 6]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], (array_mix)([1, 3, 5], [2, 4, 6, 7]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], (array_mix)([1, 3, 5, 7], [2, 4, 6]));
+        $this->assertEquals([1, 2, 3, 4, 5, 6], (array_mix)([1], [2, 4], [3, 5, 6]));
+        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], (array_mix)(['a' => 'A', 'c' => 'C'], ['b' => 'b']));
+        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], (array_mix)(['a' => 'A'], ['b' => 'b', 'c' => 'C']));
+        $this->assertEquals(['a' => '!', 'X', 'Y', 'Z'], (array_mix)(['a' => 'A', 'X', 'Z'], ['a' => '!', 'Y']));
     }
 
     function test_array_zip()
     {
-        $array_zip = array_zip;
-        $this->assertEquals([[1], [2], [3]], $array_zip([1, 2, 3]));
-        $this->assertEquals([[[1]], [[2]], [[3]]], $array_zip([[1], [2], [3]]));
-        $this->assertEquals([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']], $array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']));
+        $this->assertEquals([[1], [2], [3]], (array_zip)([1, 2, 3]));
+        $this->assertEquals([[[1]], [[2]], [[3]]], (array_zip)([[1], [2], [3]]));
+        $this->assertEquals([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']], (array_zip)([1, 2, 3], ['hoge', 'fuga', 'piyo']));
         $this->assertEquals([
             [
                 'a' => 1,
@@ -258,59 +242,56 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 'n' => 'null',
             ],
         ],
-            $array_zip(
+            (array_zip)(
                 ['a' => 1, 2, 3],
                 ['hoge', 'b' => 'fuga', 'piyo'],
                 ['foo', 'bar', 'c' => 'baz', 'n' => 'null']
             )
         );
 
-        $this->assertException('$arrays is empty', $array_zip);
+        $this->assertException('$arrays is empty', array_zip);
     }
 
     function test_array_cross()
     {
-        $array_cross = array_cross;
-        $this->assertSame([], $array_cross());
-        $this->assertSame([], $array_cross([]));
-        $this->assertSame([], $array_cross([], []));
+        $this->assertSame([], (array_cross)());
+        $this->assertSame([], (array_cross)([]));
+        $this->assertSame([], (array_cross)([], []));
 
-        $this->assertSame([[1], [2]], $array_cross([1, 2]));
-        $this->assertSame([[1, 3], [1, 4], [2, 3], [2, 4]], $array_cross([1, 2], [3, 4]));
-        $this->assertSame([[1, 3, 5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6]], $array_cross([1, 2], [3, 4], [5, 6]));
+        $this->assertSame([[1], [2]], (array_cross)([1, 2]));
+        $this->assertSame([[1, 3], [1, 4], [2, 3], [2, 4]], (array_cross)([1, 2], [3, 4]));
+        $this->assertSame([[1, 3, 5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6]], (array_cross)([1, 2], [3, 4], [5, 6]));
 
-        $this->assertSame([['a' => 'A'], ['b' => 'B']], $array_cross(['a' => 'A', 'b' => 'B']));
-        $this->assertSame([['a' => 'A', 'c' => 'C'], ['a' => 'A', 'd' => 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'd' => 'D']], $array_cross(['a' => 'A', 'b' => 'B'], ['c' => 'C', 'd' => 'D']));
+        $this->assertSame([['a' => 'A'], ['b' => 'B']], (array_cross)(['a' => 'A', 'b' => 'B']));
+        $this->assertSame([['a' => 'A', 'c' => 'C'], ['a' => 'A', 'd' => 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'd' => 'D']], (array_cross)(['a' => 'A', 'b' => 'B'], ['c' => 'C', 'd' => 'D']));
 
-        $this->assertSame([['A', 'c' => 'C'], ['A', 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'D']], $array_cross(['A', 'b' => 'B'], ['c' => 'C', 'D']));
+        $this->assertSame([['A', 'c' => 'C'], ['A', 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'D']], (array_cross)(['A', 'b' => 'B'], ['c' => 'C', 'D']));
 
-        $this->assertException('duplicated key', $array_cross, ['a' => 'A', 'B'], ['C', 'a' => 'D']);
+        $this->assertException('duplicated key', array_cross, ['a' => 'A', 'B'], ['C', 'a' => 'D']);
     }
 
     function test_array_implode()
     {
-        $array_implode = array_implode;
-        $this->assertEquals(['a', ',', 'b', ',', 'c'], $array_implode(['a', 'b', 'c'], ','));
-        $this->assertEquals(['a', ',', 'b', ',', 'c'], $array_implode(',', 'a', 'b', 'c'));
-        $this->assertEquals(['a' => 'A', ',', 'b' => 'B', ',', 'c' => 'C'], $array_implode(['a' => 'A', 'b' => 'B', 'c' => 'C'], ','));
-        $this->assertEquals(['a', ',', 'b', ',', 'c'], $array_implode([1 => 'a', 0 => 'b', 2 => 'c'], ','));
+        $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)(['a', 'b', 'c'], ','));
+        $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)(',', 'a', 'b', 'c'));
+        $this->assertEquals(['a' => 'A', ',', 'b' => 'B', ',', 'c' => 'C'], (array_implode)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ','));
+        $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)([1 => 'a', 0 => 'b', 2 => 'c'], ','));
     }
 
     function test_array_sprintf()
     {
-        $array_sprintf = array_sprintf;
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
 
-        $this->assertEquals(['A:a', 'B:b', 'C:c'], $array_sprintf($array, '%s:%s'));
-        $this->assertEquals('A:a,B:b,C:c', $array_sprintf($array, '%s:%s', ','));
+        $this->assertEquals(['A:a', 'B:b', 'C:c'], (array_sprintf)($array, '%s:%s'));
+        $this->assertEquals('A:a,B:b,C:c', (array_sprintf)($array, '%s:%s', ','));
 
-        $this->assertEquals(['v-A', 'v-B', 'v-C'], $array_sprintf($array, function ($v) { return "v-$v"; }));
-        $this->assertEquals('v-A,v-B,v-C', $array_sprintf($array, function ($v) { return "v-$v"; }, ','));
+        $this->assertEquals(['v-A', 'v-B', 'v-C'], (array_sprintf)($array, function ($v) { return "v-$v"; }));
+        $this->assertEquals('v-A,v-B,v-C', (array_sprintf)($array, function ($v) { return "v-$v"; }, ','));
 
-        $this->assertEquals(['kv-aA', 'kv-bB', 'kv-cC'], $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }));
-        $this->assertEquals('kv-aA,kv-bB,kv-cC', $array_sprintf($array, function ($v, $k) { return "kv-$k$v"; }, ','));
+        $this->assertEquals(['kv-aA', 'kv-bB', 'kv-cC'], (array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }));
+        $this->assertEquals('kv-aA,kv-bB,kv-cC', (array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }, ','));
 
-        $this->assertEquals($array_sprintf([
+        $this->assertEquals((array_sprintf)([
             'str:%s,int:%d' => ['sss', '3.14'],
             'single:%s'     => 'str',
         ], null, '|'), 'str:sss,int:3|single:str');
@@ -318,83 +299,79 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_strpad()
     {
-        $array_strpad = array_strpad;
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
 
         // prefix key
-        $this->assertEquals(['Ka' => 'A', 'Kb' => 'B', 'Kc' => 'C'], $array_strpad($array, 'K'));
+        $this->assertEquals(['Ka' => 'A', 'Kb' => 'B', 'Kc' => 'C'], (array_strpad)($array, 'K'));
         // prefix val
-        $this->assertEquals(['a' => 'VA', 'b' => 'VB', 'c' => 'VC'], $array_strpad($array, '', 'V'));
+        $this->assertEquals(['a' => 'VA', 'b' => 'VB', 'c' => 'VC'], (array_strpad)($array, '', 'V'));
         // prefix key-val
-        $this->assertEquals(['Ka' => 'VA', 'Kb' => 'VB', 'Kc' => 'VC'], $array_strpad($array, 'K', 'V'));
+        $this->assertEquals(['Ka' => 'VA', 'Kb' => 'VB', 'Kc' => 'VC'], (array_strpad)($array, 'K', 'V'));
 
         // suffix key
-        $this->assertEquals(['aK' => 'A', 'bK' => 'B', 'cK' => 'C'], $array_strpad($array, ['K']));
+        $this->assertEquals(['aK' => 'A', 'bK' => 'B', 'cK' => 'C'], (array_strpad)($array, ['K']));
         // suffix val
-        $this->assertEquals(['a' => 'AV', 'b' => 'BV', 'c' => 'CV'], $array_strpad($array, '', ['V']));
+        $this->assertEquals(['a' => 'AV', 'b' => 'BV', 'c' => 'CV'], (array_strpad)($array, '', ['V']));
         // suffix key-val
-        $this->assertEquals(['aK' => 'AV', 'bK' => 'BV', 'cK' => 'CV'], $array_strpad($array, ['K'], ['V']));
+        $this->assertEquals(['aK' => 'AV', 'bK' => 'BV', 'cK' => 'CV'], (array_strpad)($array, ['K'], ['V']));
 
         // prefix suffix key
-        $this->assertEquals(['KaK' => 'A', 'KbK' => 'B', 'KcK' => 'C'], $array_strpad($array, ['K', 'K']));
+        $this->assertEquals(['KaK' => 'A', 'KbK' => 'B', 'KcK' => 'C'], (array_strpad)($array, ['K', 'K']));
         // prefix suffix val
-        $this->assertEquals(['a' => 'VAV', 'b' => 'VBV', 'c' => 'VCV'], $array_strpad($array, '', ['V', 'V']));
+        $this->assertEquals(['a' => 'VAV', 'b' => 'VBV', 'c' => 'VCV'], (array_strpad)($array, '', ['V', 'V']));
         // prefix suffix key-val
-        $this->assertEquals(['KaK' => 'VAV', 'KbK' => 'VBV', 'KcK' => 'VCV'], $array_strpad($array, ['K', 'K'], ['V', 'V']));
+        $this->assertEquals(['KaK' => 'VAV', 'KbK' => 'VBV', 'KcK' => 'VCV'], (array_strpad)($array, ['K', 'K'], ['V', 'V']));
         // prefix key, suffix val
-        $this->assertEquals(['Ka' => 'AV', 'Kb' => 'BV', 'Kc' => 'CV'], $array_strpad($array, 'K', ['V']));
+        $this->assertEquals(['Ka' => 'AV', 'Kb' => 'BV', 'Kc' => 'CV'], (array_strpad)($array, 'K', ['V']));
     }
 
     function test_array_pos()
     {
-        $array_pos = array_pos;
         // 1 番目の要素を返す
-        $this->assertEquals('y', $array_pos(['x', 'y', 'z'], 1, false));
+        $this->assertEquals('y', (array_pos)(['x', 'y', 'z'], 1, false));
         // 負数は後ろから返す
-        $this->assertEquals('z', $array_pos(['x', 'y', 'z'], -1, false));
+        $this->assertEquals('z', (array_pos)(['x', 'y', 'z'], -1, false));
 
         // 上記の is_key:true 版（キーを返す）
-        $this->assertEquals(1, $array_pos(['x', 'y', 'z'], 1, true));
-        $this->assertEquals(2, $array_pos(['x', 'y', 'z'], -1, true));
+        $this->assertEquals(1, (array_pos)(['x', 'y', 'z'], 1, true));
+        $this->assertEquals(2, (array_pos)(['x', 'y', 'z'], -1, true));
 
         // 範囲外は例外が飛ぶ
-        $this->assertException('OutOfBoundsException', $array_pos, ['x', 'y', 'z'], 9, true);
+        $this->assertException('OutOfBoundsException', array_pos, ['x', 'y', 'z'], 9, true);
     }
 
     function test_array_of()
     {
-        $array_of = array_of;
-        $hoge_of = $array_of('hoge');
+        $hoge_of = (array_of)('hoge');
         $this->assertEquals('HOGE', $hoge_of(['hoge' => 'HOGE']));
         $this->assertEquals(null, $hoge_of(['fuga' => 'FUGA']));
 
-        $hoge_of = $array_of('hoge', 'HOGE');
+        $hoge_of = (array_of)('hoge', 'HOGE');
         $this->assertEquals('HOGE', $hoge_of(['fuga' => 'FUGA']));
 
-        $this->assertEquals([0 => 'a', 2 => 'c'], $array_of([0, 2])(['a', 'b', 'c']));
-        $this->assertEquals([0 => 'a'], $array_of([0, 9])(['a', 'b', 'c']));
-        $this->assertEquals([], $array_of([9])(['a', 'b', 'c']));
-        $this->assertEquals(null, $array_of([9], null)(['a', 'b', 'c']));
+        $this->assertEquals([0 => 'a', 2 => 'c'], (array_of)([0, 2])(['a', 'b', 'c']));
+        $this->assertEquals([0 => 'a'], (array_of)([0, 9])(['a', 'b', 'c']));
+        $this->assertEquals([], (array_of)([9])(['a', 'b', 'c']));
+        $this->assertEquals(null, (array_of)([9], null)(['a', 'b', 'c']));
     }
 
     function test_array_get()
     {
-        $array_get = array_get;
-        $this->assertEquals('b', $array_get(['a', 'b', 'c'], 1));
-        $this->assertEquals(999, $array_get(['a', 'b', 'c'], 9, 999));
+        $this->assertEquals('b', (array_get)(['a', 'b', 'c'], 1));
+        $this->assertEquals(999, (array_get)(['a', 'b', 'c'], 9, 999));
 
-        $this->assertEquals([0 => 'a', 2 => 'c'], $array_get(['a', 'b', 'c'], [0, 2]));
-        $this->assertEquals([0 => 'a'], $array_get(['a', 'b', 'c'], [0, 9]));
-        $this->assertEquals([], $array_get(['a', 'b', 'c'], [9]));
-        $this->assertEquals(null, $array_get(['a', 'b', 'c'], [9], null));
+        $this->assertEquals([0 => 'a', 2 => 'c'], (array_get)(['a', 'b', 'c'], [0, 2]));
+        $this->assertEquals([0 => 'a'], (array_get)(['a', 'b', 'c'], [0, 9]));
+        $this->assertEquals([], (array_get)(['a', 'b', 'c'], [9]));
+        $this->assertEquals(null, (array_get)(['a', 'b', 'c'], [9], null));
 
         // 配列を与えたときの順番は指定したものを優先
-        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], $array_get(['a', 'b', 'c'], [2, 1, 0]));
+        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], (array_get)(['a', 'b', 'c'], [2, 1, 0]));
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a', 'b', 'c']);
-        $this->assertEquals('b', $array_get($ao, 1));
-        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], $array_get($ao, [2, 1, 0]));
+        $this->assertEquals('b', (array_get)($ao, 1));
+        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], (array_get)($ao, [2, 1, 0]));
 
         $array = [
             'key1' => 'value1',
@@ -408,14 +385,14 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // キーが数値でないものを抽出
-        $extract = $array_get($array, function ($v, $k) { return !is_int($k); }, []);
+        $extract = (array_get)($array, function ($v, $k) { return !is_int($k); }, []);
         $this->assertEquals([
             'key1' => 'value1',
             'key2' => 'value2',
         ], $extract);
 
         // キーが数値のものを抽出
-        $extract = $array_get($array, function ($v, $k) { return is_int($k); }, []);
+        $extract = (array_get)($array, function ($v, $k) { return is_int($k); }, []);
         $this->assertEquals([
             0   => 'first',
             1   => 'second',
@@ -426,103 +403,98 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $extract);
 
         // 単値モード
-        $extract = $array_get($array, function ($v, $k) { return is_int($k); });
+        $extract = (array_get)($array, function ($v, $k) { return is_int($k); });
         $this->assertEquals('first', $extract);
 
         // 値がオブジェクトのものを抽出（そんなものはない）
-        $extract = $array_get($array, function ($v, $k) { return is_object($v); });
+        $extract = (array_get)($array, function ($v, $k) { return is_object($v); });
         $this->assertEquals(null, $extract);
     }
 
     function test_array_set()
     {
-        $array_set = array_set;
         // single
         $array = ['a' => 'A', 'B'];
-        $this->assertEquals(1, $array_set($array, 'Z'));
+        $this->assertEquals(1, (array_set)($array, 'Z'));
         $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
-        $this->assertEquals('z', $array_set($array, 'Z', 'z'));
+        $this->assertEquals('z', (array_set)($array, 'Z', 'z'));
         $this->assertEquals(['a' => 'A', 'B', 'Z', 'z' => 'Z'], $array);
-        $this->assertEquals('a', $array_set($array, 'X', 'a'));
+        $this->assertEquals('a', (array_set)($array, 'X', 'a'));
         $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z'], $array);
-        $this->assertEquals(null, $array_set($array, 'Z', null, false));
+        $this->assertEquals(null, (array_set)($array, 'Z', null, false));
         $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z', 'Z'], $array);
 
         // array
         $array = ['a' => 'A', 'b' => ['B']];
-        $this->assertEquals('x', $array_set($array, 'X', ['x']));
+        $this->assertEquals('x', (array_set)($array, 'X', ['x']));
         $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X'], $array);
-        $this->assertEquals('z', $array_set($array, 'X', ['y', 'z']));
+        $this->assertEquals('z', (array_set)($array, 'X', ['y', 'z']));
         $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals('b', $array_set($array, 'W', ['b']));
+        $this->assertEquals('b', (array_set)($array, 'W', ['b']));
         $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals(0, $array_set($array, 'Y2', ['y', null]));
+        $this->assertEquals(0, (array_set)($array, 'Y2', ['y', null]));
         $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']], $array);
         $this->assertException('is not array', function () {
-            $array_set = array_set;
             $array = ['a' => ['b' => 's']];
-            $array_set($array, 'X', ['a', 'b', 'c']);
+            (array_set)($array, 'X', ['a', 'b', 'c']);
         });
     }
 
     function test_array_put()
     {
-        $array_put = array_put;
         // single
         $array = ['a' => 'A', 'B'];
-        $this->assertEquals(1, $array_put($array, 'Z'));
+        $this->assertEquals(1, (array_put)($array, 'Z'));
         $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
-        $this->assertEquals(2, $array_put($array, 'Z', 123));
+        $this->assertEquals(2, (array_put)($array, 'Z', 123));
         $this->assertEquals(['a' => 'A', 'B', 'Z', 'Z'], $array);
-        $this->assertEquals('z', $array_put($array, 'Z', 'z'));
+        $this->assertEquals('z', (array_put)($array, 'Z', 'z'));
         $this->assertEquals(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z'], $array);
-        $this->assertEquals('a', $array_put($array, 'X', 'a'));
+        $this->assertEquals('a', (array_put)($array, 'X', 'a'));
         $this->assertEquals(['a' => 'X', 'B', 'Z', 'Z', 'z' => 'Z'], $array);
 
         // array
         $array = ['a' => 'A', 'b' => ['B']];
-        $this->assertEquals('x', $array_put($array, 'X', ['x']));
+        $this->assertEquals('x', (array_put)($array, 'X', ['x']));
         $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X'], $array);
-        $this->assertEquals('z', $array_put($array, 'X', ['y', 'z']));
+        $this->assertEquals('z', (array_put)($array, 'X', ['y', 'z']));
         $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals('b', $array_put($array, 'W', ['b']));
+        $this->assertEquals('b', (array_put)($array, 'W', ['b']));
         $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals(0, $array_put($array, 'Y2', ['y', null]));
+        $this->assertEquals(0, (array_put)($array, 'Y2', ['y', null]));
         $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']], $array);
         $this->assertException('is not array', function () {
-            $array_put = array_put;
             $array = ['a' => ['b' => 's']];
-            $array_put($array, 'X', ['a', 'b', 'c']);
+            (array_put)($array, 'X', ['a', 'b', 'c']);
         });
     }
 
     function test_array_unset()
     {
-        $array_unset = array_unset;
         // single
         $array = ['a' => 'A', 'b' => 'B'];
-        $this->assertEquals('A', $array_unset($array, 'a'));
+        $this->assertEquals('A', (array_unset)($array, 'a'));
         $this->assertEquals(['b' => 'B'], $array);
-        $this->assertEquals('X', $array_unset($array, 'x', 'X'));
+        $this->assertEquals('X', (array_unset)($array, 'x', 'X'));
         $this->assertEquals(['b' => 'B'], $array);
 
         // array
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertEquals('X', $array_unset($array, ['x'], 'X'));
-        $this->assertEquals(['X'], $array_unset($array, ['x'], ['X']));
-        $this->assertEquals(['A', 'B'], $array_unset($array, ['a', 'b', 'x']));
+        $this->assertEquals('X', (array_unset)($array, ['x'], 'X'));
+        $this->assertEquals(['X'], (array_unset)($array, ['x'], ['X']));
+        $this->assertEquals(['A', 'B'], (array_unset)($array, ['a', 'b', 'x']));
         $this->assertEquals(['c' => 'C'], $array);
 
         // array with key
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame(['B', 'A'], $array_unset($array, ['b', 'a']));
+        $this->assertSame(['B', 'A'], (array_unset)($array, ['b', 'a']));
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame([1 => 'A', 0 => 'B'], $array_unset($array, [1 => 'a', 0 => 'b']));
+        $this->assertSame([1 => 'A', 0 => 'B'], (array_unset)($array, [1 => 'a', 0 => 'b']));
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a', 'b', 'c']);
-        $this->assertEquals('b', $array_unset($ao, 1));
-        $this->assertEquals([0 => 'c', 2 => 'a'], $array_unset($ao, [2, 1, 0]));
+        $this->assertEquals('b', (array_unset)($ao, 1));
+        $this->assertEquals([0 => 'c', 2 => 'a'], (array_unset)($ao, [2, 1, 0]));
 
         $array = [
             'key1' => 'value1',
@@ -536,7 +508,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // まずキーが数値でないものを抽出
-        $extract = $array_unset($array, function ($v, $k) { return !is_int($k); });
+        $extract = (array_unset)($array, function ($v, $k) { return !is_int($k); });
         $this->assertEquals([
             'key1' => 'value1',
             'key2' => 'value2',
@@ -551,7 +523,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $array);
 
         // さらに値が100以上のものを抽出
-        $extract = $array_unset($array, function ($v, $k) { return $v >= 100; });
+        $extract = (array_unset)($array, function ($v, $k) { return $v >= 100; });
         $this->assertEquals([
             100 => 100,
             101 => 101,
@@ -564,7 +536,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $array);
 
         // さらに値が "second" のものを抽出
-        $extract = $array_unset($array, function ($v, $k) { return $v === 'second'; });
+        $extract = (array_unset)($array, function ($v, $k) { return $v === 'second'; });
         $this->assertEquals([
             1 => 'second',
         ], $extract);
@@ -575,7 +547,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $array);
 
         // さらに値がオブジェクトのものを抽出（そんなものはない）
-        $extract = $array_unset($array, function ($v, $k) { return is_object($v); });
+        $extract = (array_unset)($array, function ($v, $k) { return is_object($v); });
         $this->assertEquals(null, $extract);
         $this->assertEquals([
             'first',
@@ -584,7 +556,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $array);
 
         // さらにキー数値のものを抽出（全て）
-        $extract = $array_unset($array, function ($v, $k) { return is_int($k); });
+        $extract = (array_unset)($array, function ($v, $k) { return is_int($k); });
         $this->assertEquals([
             'first',
             2  => 'third',
@@ -595,23 +567,21 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_dive()
     {
-        $array_dive = array_dive;
         $array = ['a' => ['b' => ['c' => 'vvv']]];
-        $this->assertEquals('vvv', $array_dive($array, 'a.b.c'));
-        $this->assertEquals(9, $array_dive($array, 'a.b.x', 9));
-        $this->assertEquals('vvv', $array_dive($array, ['a', 'b', 'c']));
-        $this->assertNull($array_dive($array, 'a.b.c.x'));
+        $this->assertEquals('vvv', (array_dive)($array, 'a.b.c'));
+        $this->assertEquals(9, (array_dive)($array, 'a.b.x', 9));
+        $this->assertEquals('vvv', (array_dive)($array, ['a', 'b', 'c']));
+        $this->assertNull((array_dive)($array, 'a.b.c.x'));
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a' => ['b' => ['c' => 'vvv']]]);
-        $this->assertEquals('vvv', $array_dive($ao, 'a.b.c'));
-        $this->assertEquals(9, $array_dive($ao, 'a.b.x', 9));
-        $this->assertEquals('vvv', $array_dive($ao, ['a', 'b', 'c']));
+        $this->assertEquals('vvv', (array_dive)($ao, 'a.b.c'));
+        $this->assertEquals(9, (array_dive)($ao, 'a.b.x', 9));
+        $this->assertEquals('vvv', (array_dive)($ao, ['a', 'b', 'c']));
     }
 
     function test_array_keys_exist()
     {
-        $array_keys_exist = array_keys_exist;
         $array = [
             'a' => 'A',
             'b' => 'B',
@@ -626,21 +596,21 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             ]
         ];
         // すべて含む
-        $this->assertTrue($array_keys_exist(['a', 'b', 'c'], $array));
+        $this->assertTrue((array_keys_exist)(['a', 'b', 'c'], $array));
         // 単一文字指定で含む
-        $this->assertTrue($array_keys_exist('a', $array));
+        $this->assertTrue((array_keys_exist)('a', $array));
         // 1つ含まない
-        $this->assertFalse($array_keys_exist(['a', 'b', 'n'], $array));
+        $this->assertFalse((array_keys_exist)(['a', 'b', 'n'], $array));
         // 単一文字指定で含まない
-        $this->assertFalse($array_keys_exist('X', $array));
+        $this->assertFalse((array_keys_exist)('X', $array));
         // 空は例外
-        $this->assertException('empty', $array_keys_exist, [], $array);
+        $this->assertException('empty', array_keys_exist, [], $array);
 
         // ネスト調査
-        $this->assertTrue($array_keys_exist([
+        $this->assertTrue((array_keys_exist)([
             'x' => ['x1', 'x2', 'y'],
         ], $array));
-        $this->assertTrue($array_keys_exist([
+        $this->assertTrue((array_keys_exist)([
             'x' => [
                 'x1',
                 'x2',
@@ -650,10 +620,10 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 ],
             ]
         ], $array));
-        $this->assertFalse($array_keys_exist([
+        $this->assertFalse((array_keys_exist)([
             'nx' => ['x1', 'x2', 'y'],
         ], $array));
-        $this->assertFalse($array_keys_exist([
+        $this->assertFalse((array_keys_exist)([
             'x' => [
                 'x1',
                 'x2',
@@ -668,72 +638,65 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $array = new \Arrayable([]);
         $array['x'] = ['y' => 'z'];
         $array['null'] = null;
-        $this->assertTrue($array_keys_exist('null', $array));
-        $this->assertTrue($array_keys_exist(['x' => ['y']], $array));
-        $this->assertTrue($array_keys_exist(['x' => ['y']], $array));
-        $this->assertFalse($array_keys_exist(['nx'], $array));
-        $this->assertFalse($array_keys_exist(['nx' => ['y']], $array));
+        $this->assertTrue((array_keys_exist)('null', $array));
+        $this->assertTrue((array_keys_exist)(['x' => ['y']], $array));
+        $this->assertTrue((array_keys_exist)(['x' => ['y']], $array));
+        $this->assertFalse((array_keys_exist)(['nx'], $array));
+        $this->assertFalse((array_keys_exist)(['nx' => ['y']], $array));
     }
 
     function test_array_find()
     {
-        $array_find = array_find;
-        $this->assertEquals(2, $array_find(['a', 'b', '9'], 'ctype_digit'));
-        $this->assertEquals('b', $array_find(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }));
-        $this->assertSame(0, $array_find(['9', 'b', 'c'], 'ctype_digit'));
-        $this->assertSame(false, $array_find(['a', 'b', 'c'], function ($v) { }));
+        $this->assertEquals(2, (array_find)(['a', 'b', '9'], 'ctype_digit'));
+        $this->assertEquals('b', (array_find)(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }));
+        $this->assertSame(0, (array_find)(['9', 'b', 'c'], 'ctype_digit'));
+        $this->assertSame(false, (array_find)(['a', 'b', 'c'], function ($v) { }));
 
-        $this->assertEquals('A', $array_find(['a', 'b', '9'], function ($v) {
+        $this->assertEquals('A', (array_find)(['a', 'b', '9'], function ($v) {
             return ctype_digit($v) ? false : strtoupper($v);
         }, false));
-        $this->assertEquals('B', $array_find(['9', 'b', 'c'], function ($v) {
+        $this->assertEquals('B', (array_find)(['9', 'b', 'c'], function ($v) {
             return ctype_digit($v) ? false : strtoupper($v);
         }, false));
-        $this->assertEquals(5, $array_find([1, 2, 3, 4, -5, -6], function ($v) {
+        $this->assertEquals(5, (array_find)([1, 2, 3, 4, -5, -6], function ($v) {
             return $v < 0 ? abs($v) : false;
         }, false));
     }
 
     function test_array_grep_key()
     {
-        $array_grep_key = array_grep_key;
-        $this->assertEquals(['a', 'b', 'c'], $array_grep_key(['a', 'b', 'c'], '#\d#'));
-        $this->assertEquals(['hoge' => 'HOGE'], $array_grep_key(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#'));
-        $this->assertEquals(['fuga' => 'FUGA'], $array_grep_key(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#', true));
+        $this->assertEquals(['a', 'b', 'c'], (array_grep_key)(['a', 'b', 'c'], '#\d#'));
+        $this->assertEquals(['hoge' => 'HOGE'], (array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#'));
+        $this->assertEquals(['fuga' => 'FUGA'], (array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#', true));
     }
 
     function test_array_map_key()
     {
-        $array_map_key = array_map_key;
-        $this->assertEquals(['A' => 'A', 'B' => 'B'], $array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'));
-        $this->assertEquals(['A' => 'A'], $array_map_key(['a' => 'A', 'b' => 'B'], function ($k) { return $k === 'b' ? null : strtoupper($k); }));
+        $this->assertEquals(['A' => 'A', 'B' => 'B'], (array_map_key)(['a' => 'A', 'b' => 'B'], 'strtoupper'));
+        $this->assertEquals(['A' => 'A'], (array_map_key)(['a' => 'A', 'b' => 'B'], function ($k) { return $k === 'b' ? null : strtoupper($k); }));
     }
 
     function test_array_filter_not()
     {
-        $array_filter_not = array_filter_not;
-        $this->assertEquals([1 => ''], $array_filter_not(['a', '', 'c'], 'strlen'));
+        $this->assertEquals([1 => ''], (array_filter_not)(['a', '', 'c'], 'strlen'));
     }
 
     function test_array_filter_key()
     {
-        $array_filter_key = array_filter_key;
-        $this->assertEquals([1 => 'b'], $array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }));
-        $this->assertEquals([1 => 'b'], $array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }));
-        $this->assertEquals(['a', 2 => 'c'], $array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }));
+        $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }));
+        $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }));
+        $this->assertEquals(['a', 2 => 'c'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }));
     }
 
     function test_array_filter_eval()
     {
-        $array_filter_eval = array_filter_eval;
-        $this->assertEquals([1 => 'b'], $array_filter_eval(['a', 'b', 'c'], '$k === 1'));
-        $this->assertEquals([1 => 'b'], $array_filter_eval(['a', 'b', 'c'], '$v === "b"'));
-        $this->assertEquals(['a', 2 => 'c'], $array_filter_eval(['a', 'b', 'c'], '$v !== "b"'));
+        $this->assertEquals([1 => 'b'], (array_filter_eval)(['a', 'b', 'c'], '$k === 1'));
+        $this->assertEquals([1 => 'b'], (array_filter_eval)(['a', 'b', 'c'], '$v === "b"'));
+        $this->assertEquals(['a', 2 => 'c'], (array_filter_eval)(['a', 'b', 'c'], '$v !== "b"'));
     }
 
     function test_array_where()
     {
-        $array_where = array_where;
         $array = [
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
@@ -741,96 +704,92 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // 省略すればそのまま
-        $this->assertEquals($array, $array_where($array));
+        $this->assertEquals($array, (array_where)($array));
 
         // flag 値で true フィルタ
         $this->assertEquals([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
-        ], $array_where($array, 'flag'));
+        ], (array_where)($array, 'flag'));
 
         // name 値でクロージャフィルタ（'o' を含む）
         $this->assertEquals([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], $array_where($array, 'name', function ($name) {
+        ], (array_where)($array, 'name', function ($name) {
             return strpos($name, 'o') !== false;
         }));
 
         // id, name 値でクロージャフィルタ（id === 3 && 'o' を含む）
         $this->assertEquals([
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], $array_where($array, ['id', 'name'], function ($id_name) {
+        ], (array_where)($array, ['id', 'name'], function ($id_name) {
             return $id_name['id'] === 3 && strpos($id_name['name'], 'o') !== false;
         }));
 
         // キーでクロージャフィルタ（key === 2）
         $this->assertEquals([
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], $array_where($array, null, function ($name, $key) {
+        ], (array_where)($array, null, function ($name, $key) {
             return $key === 2;
         }));
     }
 
     function test_array_map_filter()
     {
-        $array_map_filter = array_map_filter;
         // strict:false なので 0 が除外される
-        $this->assertEquals([-2, -1, '3' => 1, 2], $array_map_filter([1, 2, 3, 4, 5], function ($v) {
+        $this->assertEquals([-2, -1, '3' => 1, 2], (array_map_filter)([1, 2, 3, 4, 5], function ($v) {
             return $v - 3;
         }, false));
 
         // strict:true なので全て返ってくる
-        $this->assertEquals([-2, -1, 0, 1, 2], $array_map_filter([1, 2, 3, 4, 5], function ($v) {
+        $this->assertEquals([-2, -1, 0, 1, 2], (array_map_filter)([1, 2, 3, 4, 5], function ($v) {
             return $v - 3;
         }, true));
 
         // strict:true は null がフィルタされる
-        $this->assertEquals([-2, -1, '3' => 1, 2], $array_map_filter([1, 2, 3, 4, 5], function ($v) {
+        $this->assertEquals([-2, -1, '3' => 1, 2], (array_map_filter)([1, 2, 3, 4, 5], function ($v) {
             return $v === 3 ? null : $v - 3;
         }, true));
     }
 
     function test_array_map_method()
     {
-        $array_map_method = array_map_method;
         $o1 = new \Concrete('a');
         $o2 = new \Concrete('b');
         $o3 = new \Concrete('c');
 
         // きちんと呼ばれるし引数も渡る
-        $this->assertEquals(['a', 'b', 'c'], $array_map_method([$o1, $o2, $o3], 'getName'));
-        $this->assertEquals(['_A', '_B', '_C'], $array_map_method([$o1, $o2, $o3], 'getName', ['_', true]));
+        $this->assertEquals(['a', 'b', 'c'], (array_map_method)([$o1, $o2, $o3], 'getName'));
+        $this->assertEquals(['_A', '_B', '_C'], (array_map_method)([$o1, $o2, $o3], 'getName', ['_', true]));
 
         // $ignore=true すると filter される
-        $this->assertEquals(['a'], $array_map_method([$o1, null, 123], 'getName', [], true));
+        $this->assertEquals(['a'], (array_map_method)([$o1, null, 123], 'getName', [], true));
 
         // $ignore=null するとそのまま返す
-        $this->assertEquals(['a', null, 123], $array_map_method([$o1, null, 123], 'getName', [], null));
+        $this->assertEquals(['a', null, 123], (array_map_method)([$o1, null, 123], 'getName', [], null));
     }
 
     function test_array_maps()
     {
-        $array_maps = array_maps;
-        $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')));
+        $this->assertEquals(['_A', '_B', '_C'], (array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')));
         // これでも同じ
         $composite = (composite)(false, 'strtoupper', (lbind)(strcat, '_'));
-        $this->assertEquals(['_A', '_B', '_C'], $array_maps(['a', 'b', 'c'], $composite));
+        $this->assertEquals(['_A', '_B', '_C'], (array_maps)(['a', 'b', 'c'], $composite));
 
-        $this->assertEquals(['a' => 'Aaa', 'b' => 'Bbb'], $array_maps(['a' => 'A', 'b' => 'B'], strcat, strcat));
+        $this->assertEquals(['a' => 'Aaa', 'b' => 'Bbb'], (array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat));
 
         // メソッドモード
         $ex = new \Exception('msg1', 1, new \Exception('msg2', 2, new \Exception('msg3', 3)));
-        $this->assertEquals(['msg1', 'msg1', 'msg1'], $array_maps([$ex, $ex, $ex], '@getMessage'));
-        $this->assertEquals([2, 2, 2], $array_maps([$ex, $ex, $ex], '@getPrevious', '@getCode'));
-        $this->assertEquals([3, 3, 3], $array_maps([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'));
+        $this->assertEquals(['msg1', 'msg1', 'msg1'], (array_maps)([$ex, $ex, $ex], '@getMessage'));
+        $this->assertEquals([2, 2, 2], (array_maps)([$ex, $ex, $ex], '@getPrevious', '@getCode'));
+        $this->assertEquals([3, 3, 3], (array_maps)([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'));
 
         $objs = [new \Concrete('a'), new \Concrete('b'), new \Concrete('c')];
-        $this->assertEquals(['P-A', 'P-B', 'P-C'], $array_maps($objs, ['getName' => ['p-', true]]));
+        $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
     }
 
     function test_array_kmap()
     {
-        $array_kmap = array_kmap;
         $array = [
             'k1' => 'v1',
             'k2' => 'v2',
@@ -840,49 +799,45 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'k1' => '0:k1-v1',
             'k2' => '1:k2-v2',
             'k3' => '2:k3-v3',
-        ], $array_kmap($array, function ($v, $k, $n) { return "$n:$k-$v"; }));
+        ], (array_kmap)($array, function ($v, $k, $n) { return "$n:$k-$v"; }));
     }
 
     function test_array_nmap()
     {
-        $array_nmap = array_nmap;
         // それぞれ N 番目に適用される
-        $this->assertEquals(['1a--z', '2a--z'], $array_nmap([1, 2], strcat, 0, 'a-', '-z'));
-        $this->assertEquals(['a-1-z', 'a-2-z'], $array_nmap([1, 2], strcat, 1, 'a-', '-z'));
-        $this->assertEquals(['a--z1', 'a--z2'], $array_nmap([1, 2], strcat, 2, 'a-', '-z'));
+        $this->assertEquals(['1a--z', '2a--z'], (array_nmap)([1, 2], strcat, 0, 'a-', '-z'));
+        $this->assertEquals(['a-1-z', 'a-2-z'], (array_nmap)([1, 2], strcat, 1, 'a-', '-z'));
+        $this->assertEquals(['a--z1', 'a--z2'], (array_nmap)([1, 2], strcat, 2, 'a-', '-z'));
 
         /// $n に配列を渡すとキー・値の両方が渡ってくる
         // キーを1番目、値を2番目に渡す
-        $this->assertEquals(['k' => ' a k b v c '], $array_nmap(['k' => 'v'], strcat, [1 => 2], ' a ', ' b ', ' c '));
+        $this->assertEquals(['k' => ' a k b v c '], (array_nmap)(['k' => 'v'], strcat, [1 => 2], ' a ', ' b ', ' c '));
         // キーを2番目、値を1番目に渡す
-        $this->assertEquals(['k' => ' a v b k c '], $array_nmap(['k' => 'v'], strcat, [2 => 1], ' a ', ' b ', ' c '));
+        $this->assertEquals(['k' => ' a v b k c '], (array_nmap)(['k' => 'v'], strcat, [2 => 1], ' a ', ' b ', ' c '));
         // キーを1番目、値を1番目に渡す（キーが優先される）
-        $this->assertEquals(['k' => ' a kv b  c '], $array_nmap(['k' => 'v'], strcat, [1 => 1], ' a ', ' b ', ' c '));
+        $this->assertEquals(['k' => ' a kv b  c '], (array_nmap)(['k' => 'v'], strcat, [1 => 1], ' a ', ' b ', ' c '));
 
-        $this->assertException('empty', $array_nmap, [], strcat, []);
-        $this->assertException('positive', $array_nmap, [], strcat, [1 => -1]);
-        $this->assertException('positive', $array_nmap, [], strcat, [-1 => 1]);
+        $this->assertException('empty', array_nmap, [], strcat, []);
+        $this->assertException('positive', array_nmap, [], strcat, [1 => -1]);
+        $this->assertException('positive', array_nmap, [], strcat, [-1 => 1]);
     }
 
     function test_array_lmap()
     {
-        $array_lmap = array_lmap;
         // 最左に適用される
-        $this->assertEquals(['1a--z', '2a--z'], $array_lmap([1, 2], strcat, 'a-', '-z'));
+        $this->assertEquals(['1a--z', '2a--z'], (array_lmap)([1, 2], strcat, 'a-', '-z'));
     }
 
     function test_array_rmap()
     {
-        $array_rmap = array_rmap;
         // 最右に適用される
-        $this->assertEquals(['a--z1', 'a--z2'], $array_rmap([1, 2], strcat, 'a-', '-z'));
+        $this->assertEquals(['a--z1', 'a--z2'], (array_rmap)([1, 2], strcat, 'a-', '-z'));
     }
 
     function test_array_each()
     {
-        $array_each = array_each;
-        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''), '12345');
-        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []), [
+        $this->assertSame((array_each)([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''), '12345');
+        $this->assertSame((array_each)([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []), [
             1 => 1,
             2 => 4,
             3 => 9,
@@ -890,7 +845,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             5 => 25,
         ]);
         $receiver = [];
-        $this->assertSame($array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k, $n) use (&$receiver) {
+        $this->assertSame((array_each)([1, 2, 3, 4, 5], function (&$carry, $v, $k, $n) use (&$receiver) {
             $receiver[] = $n;
             if ($k === 3) {
                 return false;
@@ -907,38 +862,37 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $ex_a = new \Exception('a');
         $ex_b = new \Exception('b');
         $ex_c = new \Exception('c');
-        $this->assertSame(['a' => $ex_a, 'b' => $ex_b, 'c' => $ex_c], $array_each([$ex_a, $ex_b, $ex_c], function (&$carry, \Exception $ex) {
+        $this->assertSame(['a' => $ex_a, 'b' => $ex_b, 'c' => $ex_c], (array_each)([$ex_a, $ex_b, $ex_c], function (&$carry, \Exception $ex) {
             $carry[$ex->getMessage()] = $ex;
         }));
 
         // 推奨しないが見た目が気に入っている使い方
-        $this->assertSame('start123', $array_each([1, 2, 3], function (&$carry = 'start', $v) { $carry .= $v; }));
-        $this->assertSame('start', $array_each([], function (&$carry = 'start', $v) { $carry .= $v; }));
-        $this->assertSame(null, $array_each([], function (&$carry, $v) { $carry .= $v; }));
+        $this->assertSame('start123', (array_each)([1, 2, 3], function (&$carry = 'start', $v) { $carry .= $v; }));
+        $this->assertSame('start', (array_each)([], function (&$carry = 'start', $v) { $carry .= $v; }));
+        $this->assertSame(null, (array_each)([], function (&$carry, $v) { $carry .= $v; }));
     }
 
     function test_array_depth()
     {
-        $array_depth = array_depth;
         // シンプル
-        $this->assertEquals(1, $array_depth([]));
-        $this->assertEquals(1, $array_depth(['X']));
-        $this->assertEquals(2, $array_depth([['X']]));
-        $this->assertEquals(3, $array_depth([[['X']]]));
+        $this->assertEquals(1, (array_depth)([]));
+        $this->assertEquals(1, (array_depth)(['X']));
+        $this->assertEquals(2, (array_depth)([['X']]));
+        $this->assertEquals(3, (array_depth)([[['X']]]));
 
         // 最大が得られるか？
-        $this->assertEquals(2, $array_depth(['X', 'y' => ['Y']]));
-        $this->assertEquals(2, $array_depth(['x' => ['X'], 'Y']));
-        $this->assertEquals(3, $array_depth(['x' => ['X'], 'y' => ['Y'], 'z' => ['z' => ['Z']]]));
+        $this->assertEquals(2, (array_depth)(['X', 'y' => ['Y']]));
+        $this->assertEquals(2, (array_depth)(['x' => ['X'], 'Y']));
+        $this->assertEquals(3, (array_depth)(['x' => ['X'], 'y' => ['Y'], 'z' => ['z' => ['Z']]]));
 
         // $max_depth 指定
-        $this->assertEquals(1, $array_depth([[[[['X']]]]], 1));
-        $this->assertEquals(2, $array_depth([[[[['X']]]]], 2));
-        $this->assertEquals(3, $array_depth([[[[['X']]]]], 3));
-        $this->assertEquals(4, $array_depth([[[[['X']]]]], 4));
-        $this->assertEquals(5, $array_depth([[[[['X']]]]], 5));
-        $this->assertEquals(5, $array_depth([[[[['X']]]]], 6));
-        $this->assertEquals(3, $array_depth([
+        $this->assertEquals(1, (array_depth)([[[[['X']]]]], 1));
+        $this->assertEquals(2, (array_depth)([[[[['X']]]]], 2));
+        $this->assertEquals(3, (array_depth)([[[[['X']]]]], 3));
+        $this->assertEquals(4, (array_depth)([[[[['X']]]]], 4));
+        $this->assertEquals(5, (array_depth)([[[[['X']]]]], 5));
+        $this->assertEquals(5, (array_depth)([[[[['X']]]]], 6));
+        $this->assertEquals(3, (array_depth)([
             ['X'],
             [['X']],
             [[['X']]],
@@ -950,33 +904,31 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_insert()
     {
-        $array_insert = array_insert;
         // 第3引数を省略すると最後に挿入される
-        $this->assertEquals([1, 2, 3, 'x'], $array_insert([1, 2, 3], 'x'));
+        $this->assertEquals([1, 2, 3, 'x'], (array_insert)([1, 2, 3], 'x'));
 
         // 第3引数を指定するとその位置に挿入される
-        $this->assertEquals([1, 'x', 2, 3], $array_insert([1, 2, 3], 'x', 1));
+        $this->assertEquals([1, 'x', 2, 3], (array_insert)([1, 2, 3], 'x', 1));
 
         // 配列を指定するとその位置にマージされる
-        $this->assertEquals([1, 'x1', 'x2', 2, 3], $array_insert([1, 2, 3], ['x1', 'x2'], 1));
+        $this->assertEquals([1, 'x1', 'x2', 2, 3], (array_insert)([1, 2, 3], ['x1', 'x2'], 1));
 
         // 負数を指定すると後ろから数えて挿入される
-        $this->assertEquals([1, 2, 'x1', 'x2', 3], $array_insert([1, 2, 3], ['x1', 'x2'], -1));
+        $this->assertEquals([1, 2, 'x1', 'x2', 3], (array_insert)([1, 2, 3], ['x1', 'x2'], -1));
 
         // 連想配列もOK
-        $this->assertEquals(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z'], $array_insert(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1));
+        $this->assertEquals(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z'], (array_insert)(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1));
     }
 
     function test_array_assort()
     {
-        $array_assort = array_assort;
         // 普通に使う
         $this->assertEquals([
             'none'  => [],
             'char1' => [0 => 'a'],
             'char2' => [1 => 'bb'],
             'char3' => [2 => 'ccc'],
-        ], $array_assort(['a', 'bb', 'ccc'], [
+        ], (array_assort)(['a', 'bb', 'ccc'], [
             'none'  => function ($v) { return strlen($v) === 0; },
             'char1' => function ($v) { return strlen($v) === 1; },
             'char2' => function ($v) { return strlen($v) === 2; },
@@ -987,7 +939,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([
             'rule1' => ['a', 'bb', 'ccc'],
             'rule2' => ['a', 'bb', 'ccc'],
-        ], $array_assort(['a', 'bb', 'ccc'], [
+        ], (array_assort)(['a', 'bb', 'ccc'], [
             'rule1' => function () { return true; },
             'rule2' => function () { return true; },
         ]));
@@ -995,12 +947,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_count()
     {
-        $array_count = array_count;
         $array = ['a', 'b', 'c'];
 
         // 普通に使う分には count(array_filter()) と同じ
         $eq_b = function ($v) { return $v === 'b'; };
-        $this->assertEquals(count(array_filter($array, $eq_b)), $array_count($array, $eq_b));
+        $this->assertEquals(count(array_filter($array, $eq_b)), (array_count)($array, $eq_b));
 
         $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
         $row2 = ['id' => 2, 'group' => 'B', 'flag' => true];
@@ -1012,11 +963,11 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // flag をカウント
-        $this->assertEquals(1, $array_count($array, (array_of)('flag')));
-        $this->assertEquals(2, $array_count($array, (not_func)((array_of)('flag'))));
+        $this->assertEquals(1, (array_count)($array, (array_of)('flag')));
+        $this->assertEquals(2, (array_count)($array, (not_func)((array_of)('flag'))));
 
         // group: 'B' をカウント。ただし、数値キーの場合のみ
-        $this->assertEquals(1, $array_count($array, function ($v, $k) {
+        $this->assertEquals(1, (array_count)($array, function ($v, $k) {
             return is_int($k) && $v['group'] === 'B';
         }));
 
@@ -1024,7 +975,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([
             'A' => 1,
             'B' => 2,
-        ], $array_count($array, [
+        ], (array_count)($array, [
             'A' => (composite)((array_of)('group'), (lbind)(str_equals, 'A')),
             'B' => function ($v) { return $v['group'] === 'B'; },
         ]));
@@ -1032,19 +983,18 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_group()
     {
-        $array_group = array_group;
         $this->assertEquals([
             1 => [1],
             2 => [2],
             3 => [3],
             4 => [4],
             5 => [5],
-        ], $array_group([1, 2, 3, 4, 5]));
+        ], (array_group)([1, 2, 3, 4, 5]));
 
         $this->assertEquals([
             0 => [2, 4],
             1 => [1, 3, 5],
-        ], $array_group([1, 2, 3, 4, 5], function ($v) { return $v % 2; }));
+        ], (array_group)([1, 2, 3, 4, 5], function ($v) { return $v % 2; }));
 
         $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
         $row2 = ['id' => 2, 'group' => 'B', 'flag' => true];
@@ -1055,8 +1005,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             3    => $row3,
         ];
 
-        $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], $array_group($array, (array_of)('group')));
-        $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], $array_group($array, (array_of)('group'), true));
+        $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], (array_group)($array, (array_of)('group')));
+        $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], (array_group)($array, (array_of)('group'), true));
 
         $this->assertEquals([
             'A' => [
@@ -1078,64 +1028,60 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                     'flag'  => true,
                 ],
             ],
-        ], $array_group([$row1, $row2, $row3], (array_of)(['group', 'id'])));
+        ], (array_group)([$row1, $row2, $row3], (array_of)(['group', 'id'])));
     }
 
     function test_array_all()
     {
-        $array_all = array_all;
         $array = [
             0 => ['id' => 1, 'name' => '', 'flag' => false],
             1 => ['id' => 2, 'name' => '', 'flag' => true],
             2 => ['id' => 3, 'name' => '', 'flag' => false],
         ];
 
-        $this->assertTrue($array_all([], null));
-        $this->assertFalse($array_all([], null, false));
+        $this->assertTrue((array_all)([], null));
+        $this->assertFalse((array_all)([], null, false));
 
-        $this->assertTrue($array_all([true, true]));
-        $this->assertFalse($array_all([true, false]));
-        $this->assertFalse($array_all([false, false]));
+        $this->assertTrue((array_all)([true, true]));
+        $this->assertFalse((array_all)([true, false]));
+        $this->assertFalse((array_all)([false, false]));
 
-        $this->assertTrue($array_all($array, function ($v) { return $v['id']; }));
-        $this->assertFalse($array_all($array, function ($v) { return $v['flag']; }));
-        $this->assertFalse($array_all($array, function ($v) { return $v['name']; }));
-        $this->assertFalse($array_all($array, function ($v, $k) { return $k && $v['flag']; }));
+        $this->assertTrue((array_all)($array, function ($v) { return $v['id']; }));
+        $this->assertFalse((array_all)($array, function ($v) { return $v['flag']; }));
+        $this->assertFalse((array_all)($array, function ($v) { return $v['name']; }));
+        $this->assertFalse((array_all)($array, function ($v, $k) { return $k && $v['flag']; }));
     }
 
     function test_array_any()
     {
-        $array_any = array_any;
         $array = [
             0 => ['id' => 1, 'name' => '', 'flag' => false],
             1 => ['id' => 2, 'name' => '', 'flag' => true],
             2 => ['id' => 3, 'name' => '', 'flag' => false],
         ];
 
-        $this->assertFalse($array_any([], null));
-        $this->assertTrue($array_any([], null, true));
+        $this->assertFalse((array_any)([], null));
+        $this->assertTrue((array_any)([], null, true));
 
-        $this->assertTrue($array_any([true, true]));
-        $this->assertTrue($array_any([true, false]));
-        $this->assertFalse($array_any([false, false]));
+        $this->assertTrue((array_any)([true, true]));
+        $this->assertTrue((array_any)([true, false]));
+        $this->assertFalse((array_any)([false, false]));
 
-        $this->assertTrue($array_any($array, function ($v) { return $v['id']; }));
-        $this->assertTrue($array_any($array, function ($v) { return $v['flag']; }));
-        $this->assertFalse($array_any($array, function ($v) { return $v['name']; }));
-        $this->assertTrue($array_any($array, function ($v, $k) { return $k && $v['flag']; }));
+        $this->assertTrue((array_any)($array, function ($v) { return $v['id']; }));
+        $this->assertTrue((array_any)($array, function ($v) { return $v['flag']; }));
+        $this->assertFalse((array_any)($array, function ($v) { return $v['name']; }));
+        $this->assertTrue((array_any)($array, function ($v, $k) { return $k && $v['flag']; }));
     }
 
     function test_array_order()
     {
-        $array_order = array_order;
-        $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9], $array_order([2, 4, 5, 1, 8, 6, 9, 3, 7], true));
-        $this->assertEquals(['g', 'f', 'e', 'd', 'c', 'b', 'a'], $array_order(['b', 'd', 'g', 'a', 'f', 'e', 'c'], false));
-        $this->assertEquals(['a', 'a', 'b', 'b', 'c', 'c', 'z'], $array_order(['b', 'c', 'z', 'b', 'a', 'c', 'a'], ['a', 'b', 'c']));
+        $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9], (array_order)([2, 4, 5, 1, 8, 6, 9, 3, 7], true));
+        $this->assertEquals(['g', 'f', 'e', 'd', 'c', 'b', 'a'], (array_order)(['b', 'd', 'g', 'a', 'f', 'e', 'c'], false));
+        $this->assertEquals(['a', 'a', 'b', 'b', 'c', 'c', 'z'], (array_order)(['b', 'c', 'z', 'b', 'a', 'c', 'a'], ['a', 'b', 'c']));
     }
 
     function test_array_order_list()
     {
-        $array_order = array_order;
         $data = [
             0 => '111',
             1 => '1',
@@ -1146,7 +1092,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             6 => '1',
         ];
 
-        $actual = $array_order($data, true, true);
+        $actual = (array_order)($data, true, true);
         $this->assertSame([
             2 => '011',
             1 => '1',
@@ -1157,7 +1103,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             3 => '111',
         ], $actual);
 
-        $actual = $array_order($data, -SORT_NATURAL, true);
+        $actual = (array_order)($data, -SORT_NATURAL, true);
         $this->assertSame([
             0 => '111',
             3 => '111',
@@ -1171,7 +1117,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_hash()
     {
-        $array_order = array_order;
         $data = [
             'a' => '111',
             'b' => '1',
@@ -1182,7 +1127,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'g' => '1',
         ];
 
-        $actual = $array_order($data, true, true);
+        $actual = (array_order)($data, true, true);
         $this->assertSame([
             'c' => '011',
             'b' => '1',
@@ -1193,7 +1138,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'd' => '111',
         ], $actual);
 
-        $actual = $array_order($data, -SORT_NATURAL, true);
+        $actual = (array_order)($data, -SORT_NATURAL, true);
         $this->assertSame([
             'a' => '111',
             'd' => '111',
@@ -1207,7 +1152,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_bool()
     {
-        $array_order = array_order;
         $data = [
             0 => ['string' => 'aa', 'integer' => 7],
             1 => ['string' => 'cc', 'integer' => 1],
@@ -1219,7 +1163,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // 文字降順・数値昇順
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string'  => false,
             'integer' => true,
         ], true);
@@ -1234,7 +1178,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
 
         // 文字昇順・数値降順
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string'  => true,
             'integer' => false,
         ], true);
@@ -1249,7 +1193,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
 
         // 数値降順・文字昇順
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'integer' => false,
             'string'  => true,
         ], true);
@@ -1264,7 +1208,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
 
         // 数値昇順・文字降順
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'integer' => true,
             'string'  => false,
         ], true);
@@ -1281,7 +1225,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_int()
     {
-        $array_order = array_order;
         $data = [
             0 => ['string' => '111', 'integer' => '7a'],
             1 => ['string' => '1', 'integer' => '1g'],
@@ -1293,7 +1236,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ];
 
         // 文字自然降順・数値昇順
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string'  => SORT_NATURAL,
             'integer' => SORT_NUMERIC,
         ], true);
@@ -1308,7 +1251,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
 
         // 文字自然昇順・数値降順
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string'  => -SORT_NATURAL,
             'integer' => -SORT_NUMERIC,
         ], true);
@@ -1325,7 +1268,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_array()
     {
-        $array_order = array_order;
         $data = [
             0 => ['string' => 'aa', 'integer' => 7],
             1 => ['string' => 'cc', 'integer' => 1],
@@ -1336,7 +1278,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
         ];
 
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string'  => ['bb', 'aa', 'dd', 'cc'],
             'integer' => [2, 6, 7],
         ], true);
@@ -1353,7 +1295,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_closure1()
     {
-        $array_order = array_order;
         $data = [
             0 => ['string' => 'aa', 'integer' => 7],
             1 => ['string' => 'cc', 'integer' => 1],
@@ -1364,7 +1305,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
         ];
 
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'integer' => function ($v) {
                 // 6は0とみなす
                 return $v === 6 ? 0 : $v;
@@ -1384,7 +1325,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             0 => ['string' => 'aa', 'integer' => 7],
         ], $actual);
 
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string' => (return_arg)(0),
             ''       => (return_arg)(0),
         ], true);
@@ -1401,7 +1342,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_closure2()
     {
-        $array_order = array_order;
         $data = [
             0 => ['string' => 'aa', 'array' => [7, 3]],
             1 => ['string' => 'cc', 'array' => [1, 5]],
@@ -1412,7 +1352,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             6 => ['string' => 'cc', 'array' => [2, 2]],
         ];
 
-        $actual = $array_order($data, [
+        $actual = (array_order)($data, [
             'string' => function ($a, $b) { return strcmp($a, $b); },
             'array'  => function ($a, $b) { return array_sum($b) - array_sum($a); },
         ], true);
@@ -1429,7 +1369,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_closure3()
     {
-        $array_order = array_order;
         $data = [
             '33',
             '111',
@@ -1441,7 +1380,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // returnType が int なら数値的にソートされる
         $cb = eval('return function ($v): int { return $v; };');
-        $actual = $array_order($data, $cb);
+        $actual = (array_order)($data, $cb);
         $this->assertSame([
             '11',
             '22',
@@ -1453,7 +1392,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // returnType が string なら文字的にソートされる
         $cb = eval('return function ($v): string { return $v; };');
-        $actual = $array_order($data, $cb);
+        $actual = (array_order)($data, $cb);
         $this->assertSame([
             '11',
             '111',
@@ -1466,22 +1405,20 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_order_ex()
     {
-        $array_order = array_order;
-        $this->assertEquals([], $array_order([], [[]]));
-        $this->assertEquals([1], $array_order([1], [[]]));
+        $this->assertEquals([], (array_order)([], [[]]));
+        $this->assertEquals([1], (array_order)([1], [[]]));
 
-        $this->assertException(new \InvalidArgumentException('x is undefined'), $array_order, [['a' => 1], ['a' => 2]], ['x' => true]);
+        $this->assertException(new \InvalidArgumentException('x is undefined'), array_order, [['a' => 1], ['a' => 2]], ['x' => true]);
 
-        $this->assertException(new \DomainException('$order is invalid'), $array_order, [['a' => 1], ['a' => 2]], ['a' => new \stdClass()]);
+        $this->assertException(new \DomainException('$order is invalid'), array_order, [['a' => 1], ['a' => 2]], ['a' => new \stdClass()]);
     }
 
     function test_array_order_misc()
     {
-        $array_order = array_order;
         // 1000 rows, 26 cols, 5 order is in 1 seconds
         $data = array_fill(0, 999, array_fill_keys(range('a', 'z'), 1));
         $t = microtime(true);
-        $array_order($data, [
+        (array_order)($data, [
             'a' => true,
             'b' => false,
             'c' => [1, 2, 3],
@@ -1494,16 +1431,14 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_shuffle()
     {
-        $array_shuffle = array_shuffle;
         srand(123);
         mt_srand(123);
-        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], $array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']));
-        $this->assertNotSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], $array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']));
+        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']));
+        $this->assertNotSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']));
     }
 
     function test_array_shrink_key()
     {
-        $array_shrink_key = array_shrink_key;
         $array = [0 => 'first', 'a' => 'A', 'b' => 'B', 'c' => 'C', 'x' => 'X', 'y' => 'Y', 'z' => 'Z', 99 => 'end'];
         $array1 = [0 => 'first2', 'b' => 'B1', 'a' => 'A1', 'c' => 'C1'];
         $array2 = [1 => 'second', 'b' => 'B2', 'a' => 'A2', 'c' => 'C2', 'x' => 'X2'];
@@ -1512,41 +1447,38 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         // array_intersect_key は左方優先だが・・・
         $this->assertSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], array_intersect_key($array, $array1, $array2, $array3));
         // array_shrink_key は右方優先
-        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], $array_shrink_key($array, $array1, $array2, $array3));
+        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], (array_shrink_key)($array, $array1, $array2, $array3));
 
         // オブジェクトも渡せる
         $object = (stdclass)($array);
         $object1 = (stdclass)($array1);
         $object2 = (stdclass)($array2);
         $object3 = (stdclass)($array3);
-        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], $array_shrink_key($object, $object1, $object2, $object3));
+        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], (array_shrink_key)($object, $object1, $object2, $object3));
     }
 
     function test_array_fill_callback()
     {
-        $array_fill_callback = array_fill_callback;
-        $this->assertSame(array_combine($keys = ['a', 'b', 'c'], array_map('strtoupper', $keys)), $array_fill_callback(['a', 'b', 'c'], 'strtoupper'));
+        $this->assertSame(array_combine($keys = ['a', 'b', 'c'], array_map('strtoupper', $keys)), (array_fill_callback)(['a', 'b', 'c'], 'strtoupper'));
     }
 
     function test_array_pickup()
     {
-        $array_pickup = array_pickup;
-        $this->assertSame(['a' => 'A'], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['a']));
-        $this->assertSame(['b' => ['b' => 'B']], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['b']));
+        $this->assertSame(['a' => 'A'], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a']));
+        $this->assertSame(['b' => ['b' => 'B']], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b']));
 
-        $this->assertSame(['a' => 'A', 'c' => 'C'], $array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']));
-        $this->assertSame(['c' => 'C', 'a' => 'A'], $array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']));
+        $this->assertSame(['a' => 'A', 'c' => 'C'], (array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']));
+        $this->assertSame(['c' => 'C', 'a' => 'A'], (array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']));
 
-        $this->assertSame(['a' => 'A', 'c' => 'C'], $array_pickup((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
-        $this->assertSame(['c' => 'C', 'a' => 'A'], $array_pickup((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
+        $this->assertSame(['a' => 'A', 'c' => 'C'], (array_pickup)((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
+        $this->assertSame(['c' => 'C', 'a' => 'A'], (array_pickup)((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
 
-        $this->assertSame(['AAA' => 'A'], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']));
-        $this->assertSame(['BBB' => ['b' => 'B']], $array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']));
+        $this->assertSame(['AAA' => 'A'], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']));
+        $this->assertSame(['BBB' => ['b' => 'B']], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']));
     }
 
     function test_array_lookup()
     {
-        $array_lookup = array_lookup;
         $arrays = [
             11 => ['id' => 1, 'name' => 'name1'],
             12 => ['id' => 2, 'name' => 'name2'],
@@ -1556,17 +1488,16 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $objects = array_map(stdclass, $arrays);
 
         // 第3引数を与えれば array_column と全く同じ
-        $this->assertSame(array_column($arrays, 'name', 'id'), $array_lookup($arrays, 'name', 'id'));
+        $this->assertSame(array_column($arrays, 'name', 'id'), (array_lookup)($arrays, 'name', 'id'));
         // 与えなければキーが保存される array_column のような動作になる
-        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], $array_lookup($arrays, 'name'));
-        $this->assertSame(array_combine(array_keys($arrays), array_column($arrays, null)), $array_lookup($arrays, null));
+        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], (array_lookup)($arrays, 'name'));
+        $this->assertSame(array_combine(array_keys($arrays), array_column($arrays, null)), (array_lookup)($arrays, null));
         // オブジェクトもOK
-        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], $array_lookup($objects, 'name'));
+        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], (array_lookup)($objects, 'name'));
     }
 
     function test_array_columns()
     {
-        $array_columns = array_columns;
         $array = [
             ['id' => 1, 'name' => 'A'],
             ['id' => 2, 'name' => 'B'],
@@ -1576,24 +1507,23 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([
             'id'   => [1, 2, 3],
             'name' => ['A', 'B', 'C'],
-        ], $array_columns($array));
+        ], (array_columns)($array));
 
         $this->assertEquals([
             'name' => [1 => 'A', 2 => 'B', 3 => 'C'],
-        ], $array_columns($array, 'name', 'id'));
+        ], (array_columns)($array, 'name', 'id'));
 
-        $this->assertException('InvalidArgumentException', $array_columns, []);
+        $this->assertException('InvalidArgumentException', array_columns, []);
     }
 
     function test_array_uncolumns()
     {
-        $array_uncolumns = array_uncolumns;
         // 普通の配列
         $this->assertEquals([
             ['id' => 1, 'name' => 'A'],
             ['id' => 2, 'name' => 'B'],
             ['id' => 3, 'name' => 'C'],
-        ], $array_uncolumns([
+        ], (array_uncolumns)([
             'id'   => [1, 2, 3],
             'name' => ['A', 'B', 'C'],
         ]));
@@ -1603,7 +1533,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'x' => ['id' => 1, 'name' => 'A'],
             'y' => ['id' => 2, 'name' => 'B'],
             'z' => ['id' => 3, 'name' => 'C'],
-        ], $array_uncolumns([
+        ], (array_uncolumns)([
             'id'   => ['x' => 1, 'y' => 2, 'z' => 3],
             'name' => ['x' => 'A', 'y' => 'B', 'z' => 'C'],
         ]));
@@ -1615,7 +1545,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'z'  => ['id' => 3],
             'y'  => ['name' => 'B'],
             'az' => ['name' => 'C'],
-        ], $array_uncolumns([
+        ], (array_uncolumns)([
             'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
             'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
         ]));
@@ -1625,7 +1555,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'x'  => ['id' => 1, 'name' => 'A'],
             'ya' => ['id' => 2, 'name' => null],
             'z'  => ['id' => 3, 'name' => null],
-        ], $array_uncolumns([
+        ], (array_uncolumns)([
             'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
             'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
         ], null));
@@ -1635,7 +1565,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'x'   => ['id' => 1, 'name' => 'A'],
             'y'   => ['id' => null, 'name' => 'B'],
             'zzz' => ['id' => 999, 'name' => 999],
-        ], $array_uncolumns([
+        ], (array_uncolumns)([
             'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
             'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
         ], ['x' => null, 'y' => null, 'zzz' => 999]));
@@ -1643,7 +1573,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_convert()
     {
-        $array_convert = array_convert;
         $array = [
             'k1' => 'v1',
             'k2' => [
@@ -1665,7 +1594,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                     '_k222' => 'prefix-v222',
                 ],
             ],
-        ], $array_convert($array, function ($k, &$v) {
+        ], (array_convert)($array, function ($k, &$v) {
             if (!is_array($v)) {
                 $v = "prefix-$v";
             }
@@ -1680,7 +1609,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                     'k221' => 'v221',
                 ],
             ],
-        ], $array_convert($array, function ($k, $v) {
+        ], (array_convert)($array, function ($k, $v) {
             return in_array($k, ['k21', 'k222']) ? false : null;
         }));
 
@@ -1690,7 +1619,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'k2' => [
                 'k22' => [],
             ],
-        ], $array_convert($array, function ($k, $v) {
+        ], (array_convert)($array, function ($k, $v) {
             return in_array($k, ['k21', 'k221', 'k222']) ? false : null;
         }));
 
@@ -1700,7 +1629,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'k2' => [
                 'k21' => 'v21',
             ],
-        ], $array_convert($array, function ($k, $v) {
+        ], (array_convert)($array, function ($k, $v) {
             return in_array($k, ['k22']) ? false : null;
         }, true));
 
@@ -1716,7 +1645,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                     'new2' => 'new2val',
                 ],
             ],
-        ], $array_convert($array, function ($k, &$v) {
+        ], (array_convert)($array, function ($k, &$v) {
             if ($k === 'k22') {
                 $v = array_merge($v, ['new1' => 'new1val', 'new2' => 'new2val']);
             }
@@ -1732,7 +1661,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                     'k222' => 'prefix-v222',
                 ],
             ],
-        ], $array_convert($array, function ($k, &$v) {
+        ], (array_convert)($array, function ($k, &$v) {
             $v = "prefix-$v";
             return null;
         }));
@@ -1740,7 +1669,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_convert_seq()
     {
-        $array_convert = array_convert;
         $array = [
             'k1' => 'v1',
             'k2' => [
@@ -1758,7 +1686,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             ],
             9    => 'v2',
             10   => 'v1',
-        ], $array_convert($array, function ($k) {
+        ], (array_convert)($array, function ($k) {
             if ($k === 'k1') {
                 return true;
             }
@@ -1772,7 +1700,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 'k22' => [1 => 'v222', 2 => 'v221',],
             ],
             9    => 'v2',
-        ], $array_convert($array, function ($k, $v) {
+        ], (array_convert)($array, function ($k, $v) {
             if ($v === 'v221') {
                 return true;
             }
@@ -1798,14 +1726,13 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 2 => 31,
             ],
             3 => 3,
-        ], $array_convert($array, function ($k, $v) {
+        ], (array_convert)($array, function ($k, $v) {
             return true;
         }, true));
     }
 
     function test_array_convert_array()
     {
-        $array_convert = array_convert;
         $array = [
             'k1' => 'v1',
             'k2' => [
@@ -1821,7 +1748,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 2,
                 3,
             ],
-        ], $array_convert($array, function ($k, $v) {
+        ], (array_convert)($array, function ($k, $v) {
             if ($k === 'k22') {
                 return [1, 2, 3];
             }
@@ -1830,7 +1757,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_convert_arg()
     {
-        $array_convert = array_convert;
         $array = [
             'k1' => 'v1',
             'k2' => [
@@ -1841,7 +1767,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 ],
             ],
         ];
-        $array_convert($array, function ($k, $v, $history) {
+        (array_convert)($array, function ($k, $v, $history) {
             static $n = 0;
             $expected = [
                 [],
@@ -1855,7 +1781,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_flatten()
     {
-        $array_flatten = array_flatten;
         $o = new \stdClass();
         $array = [
             'k1' => 'v1',
@@ -1876,7 +1801,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             2,
             3,
             $o,
-        ], $array_flatten($array));
+        ], (array_flatten)($array));
 
         // 区切り文字指定
         $this->assertSame([
@@ -1887,15 +1812,14 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'k2.k23.1' => 2,
             'k2.k23.2' => 3,
             'o'        => $o,
-        ], $array_flatten($array, '.'));
+        ], (array_flatten)($array, '.'));
     }
 
     function test_array_nest()
     {
-        $array_nest = array_nest;
         $this->assertEquals([
             'k1' => 'v2'
-        ], $array_nest([
+        ], (array_nest)([
                 'k1.k2' => 'v1',
                 'k1'    => 'v2',
             ])
@@ -1905,7 +1829,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 0    => 'v1',
                 'k2' => 'v2',
             ]
-        ], $array_nest([
+        ], (array_nest)([
                 'k1'    => ['v1'],
                 'k1.k2' => 'v2',
             ])
@@ -1915,12 +1839,12 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 0    => 'v1',
                 'k2' => 'v2',
             ]
-        ], $array_nest([
+        ], (array_nest)([
                 'k1.0'  => 'v1',
                 'k1.k2' => 'v2',
             ])
         );
-        $this->assertException('already exists', $array_nest, [
+        $this->assertException('already exists', (array_nest), [
             'k1'    => 'v1',
             'k1.k2' => 'v2',
         ]);
@@ -1928,7 +1852,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_array_difference()
     {
-        $array_difference = array_difference;
         $a1 = [
             'common'      => [
                 'key' => 'nodiff',
@@ -1984,7 +1907,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'diff2scalar' => 'fuga',
         ];
 
-        //(var_export2)($array_difference($a1, $a2));
+        //(var_export2)((array_difference)($a1, $a2));
         $this->assertSame([
             // common は共通しているので結果に出ない
             // 'common' => [],
@@ -2085,6 +2008,6 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
             'diff2scalar'          => [
                 '+' => 'fuga',
             ],
-        ], $array_difference($a1, $a2));
+        ], (array_difference)($a1, $a2));
     }
 }

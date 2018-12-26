@@ -6,7 +6,6 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_file_list()
     {
-        $file_list = file_list;
         $base = sys_get_temp_dir() . '/tree';
         (rm_rf)($base);
         (file_set_contents)($base . '/a/a1.txt', '');
@@ -16,10 +15,10 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         (file_set_contents)($base . '/a//b/c/abc1.log', 'xxxxx');
         (file_set_contents)($base . '/a//b/c/abc2.log', 'xxxxxxx');
 
-        $this->assertFalse($file_list('/notfound'));
+        $this->assertFalse((file_list)('/notfound'));
 
         // 単純列挙
-        $tree = $file_list($base);
+        $tree = (file_list)($base);
         $this->assertSame([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
@@ -30,7 +29,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
 
         // 拡張子でフィルタ
-        $tree = $file_list($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
+        $tree = (file_list)($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
         $this->assertSame([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
@@ -38,7 +37,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
 
         // ファイルサイズでフィルタ
-        $tree = $file_list($base, function ($fname) { return filesize($fname) > 0; });
+        $tree = (file_list)($base, function ($fname) { return filesize($fname) > 0; });
         $this->assertSame([
             realpath($base . '/a/b/ab2.log'),
             realpath($base . '/a/b/c/abc1.log'),
@@ -48,7 +47,6 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_file_tree()
     {
-        $file_tree = file_tree;
         $base = sys_get_temp_dir() . '/tree';
         (rm_rf)($base);
         (file_set_contents)($base . '/a/a1.txt', '');
@@ -59,10 +57,10 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         (file_set_contents)($base . '/a//b/c/abc2.log', 'xxxxxxx');
         (file_set_contents)($base . '/x.ext', '');
 
-        $this->assertFalse($file_tree('/notfound'));
+        $this->assertFalse((file_tree)('/notfound'));
 
         // 単純列挙
-        $tree = $file_tree($base);
+        $tree = (file_tree)($base);
         $this->assertSame([
             'tree' => [
                 'x.ext' => realpath($base . '/x.ext'),
@@ -82,7 +80,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
 
         // 拡張子でフィルタ
-        $tree = $file_tree($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
+        $tree = (file_tree)($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
         $this->assertSame([
             'tree' => [
                 'a' => [
@@ -96,7 +94,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
 
         // ファイルサイズでフィルタ
-        $tree = $file_tree($base, function ($fname) { return filesize($fname) > 0; });
+        $tree = (file_tree)($base, function ($fname) { return filesize($fname) > 0; });
         $this->assertSame([
             'tree' => [
                 'a' => [
@@ -114,36 +112,34 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_file_extension()
     {
-        $file_extension = file_extension;
         $DS = DIRECTORY_SEPARATOR;
-        $this->assertEquals("filename.new", $file_extension("filename.old", 'new'));
-        $this->assertEquals("path{$DS}filename.new", $file_extension("path{$DS}filename.old", 'new'));
-        $this->assertEquals("{$DS}fullpath{$DS}filename.new", $file_extension("{$DS}fullpath{$DS}filename.old", 'new'));
-        $this->assertEquals("filename.new", $file_extension("filename", 'new'));
-        $this->assertEquals("filename.old.new", $file_extension("filename.old.", 'new'));
-        $this->assertEquals("filename.old1.new", $file_extension("filename.old1.old2", 'new'));
+        $this->assertEquals("filename.new", (file_extension)("filename.old", 'new'));
+        $this->assertEquals("path{$DS}filename.new", (file_extension)("path{$DS}filename.old", 'new'));
+        $this->assertEquals("{$DS}fullpath{$DS}filename.new", (file_extension)("{$DS}fullpath{$DS}filename.old", 'new'));
+        $this->assertEquals("filename.new", (file_extension)("filename", 'new'));
+        $this->assertEquals("filename.old.new", (file_extension)("filename.old.", 'new'));
+        $this->assertEquals("filename.old1.new", (file_extension)("filename.old1.old2", 'new'));
 
-        $this->assertEquals('filename.new', $file_extension('filename.old', '.new'));
-        $this->assertEquals('filename.new', $file_extension('filename.old', 'new'));
-        $this->assertEquals('filename', $file_extension('filename.old', ''));
-        $this->assertEquals('filename.', $file_extension('filename.old', '.'));
-        $this->assertEquals('filename.', $file_extension('filename.old', '...'));
+        $this->assertEquals('filename.new', (file_extension)('filename.old', '.new'));
+        $this->assertEquals('filename.new', (file_extension)('filename.old', 'new'));
+        $this->assertEquals('filename', (file_extension)('filename.old', ''));
+        $this->assertEquals('filename.', (file_extension)('filename.old', '.'));
+        $this->assertEquals('filename.', (file_extension)('filename.old', '...'));
 
-        $this->assertEquals('ext', $file_extension('filename.suf.ext'));
-        $this->assertEquals('ext', $file_extension('filename.ext'));
-        $this->assertEquals('', $file_extension('filename.'));
-        $this->assertEquals(null, $file_extension('filename'));
-        $this->assertEquals('ext', $file_extension('.ext'));
+        $this->assertEquals('ext', (file_extension)('filename.suf.ext'));
+        $this->assertEquals('ext', (file_extension)('filename.ext'));
+        $this->assertEquals('', (file_extension)('filename.'));
+        $this->assertEquals(null, (file_extension)('filename'));
+        $this->assertEquals('ext', (file_extension)('.ext'));
     }
 
     function test_file_rewrite_contents()
     {
-        $file_rewrite_contents = file_rewrite_contents;
         $testpath = sys_get_temp_dir() . '/rewrite/test.txt';
         (file_set_contents)($testpath, 'dummy');
 
         // standard
-        $bytes = $file_rewrite_contents($testpath, function ($contents, $fp) {
+        $bytes = (file_rewrite_contents)($testpath, function ($contents, $fp) {
             $this->assertEquals('dummy', $contents);
             $this->assertInternalType('resource', $fp);
             return 'rewrite!';
@@ -152,59 +148,57 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertStringEqualsFile($testpath, 'rewrite!');
 
         // 0 bytes
-        $bytes = $file_rewrite_contents($testpath, function ($contents) { return ''; });
+        $bytes = (file_rewrite_contents)($testpath, function ($contents) { return ''; });
         $this->assertEquals(0, $bytes);
         $this->assertStringEqualsFile($testpath, '');
 
         // no exists
-        $bytes = $file_rewrite_contents(dirname($testpath) . '/test2.txt', function ($contents) {
+        $bytes = (file_rewrite_contents)(dirname($testpath) . '/test2.txt', function ($contents) {
             return 'test2!';
         }, LOCK_EX);
         $this->assertEquals(6, $bytes);
         $this->assertStringEqualsFile(dirname($testpath) . '/test2.txt', 'test2!');
 
         // lock
-        $bytes = $file_rewrite_contents($testpath, function ($contents) { return 'locked!'; }, LOCK_EX);
+        $bytes = (file_rewrite_contents)($testpath, function ($contents) { return 'locked!'; }, LOCK_EX);
         $this->assertEquals(7, $bytes);
         $this->assertStringEqualsFile($testpath, 'locked!');
 
         // open failed
-        @$this->assertException('failed to fopen', $file_rewrite_contents, dirname($testpath), function () { });
+        @$this->assertException('failed to fopen', file_rewrite_contents, dirname($testpath), function () { });
 
         // lock failed
         $fp = fopen($testpath, 'r');
         flock($fp, LOCK_EX);
-        @$this->assertException('failed to flock', $file_rewrite_contents, $testpath, function () { }, LOCK_EX | LOCK_NB);
+        @$this->assertException('failed to flock', file_rewrite_contents, $testpath, function () { }, LOCK_EX | LOCK_NB);
         flock($fp, LOCK_UN);
         fclose($fp);
     }
 
     function test_file_set_contents()
     {
-        $file_set_contents = file_set_contents;
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
         (rm_rf)($dir);
 
-        $file_set_contents("$dir/hoge.txt", 'hoge');
+        (file_set_contents)("$dir/hoge.txt", 'hoge');
         $this->assertStringEqualsFile("$dir/hoge.txt", 'hoge');
 
-        $this->assertException('failed to mkdir', $file_set_contents, '/dev/null/::::::/a', '');
+        $this->assertException('failed to mkdir', file_set_contents, '/dev/null/::::::/a', '');
     }
 
     function test_dirname_r()
     {
-        $dirname_r = dirname_r;
         // composer.json が見つかるまで親を辿って見つかったらそのパスを返す
-        $this->assertEquals(realpath(__DIR__ . '/../../../composer.json'), $dirname_r(__DIR__, function ($path) {
+        $this->assertEquals(realpath(__DIR__ . '/../../../composer.json'), (dirname_r)(__DIR__, function ($path) {
             return realpath("$path/composer.json");
         }));
         // 見つからない場合は false を返す
-        $this->assertEquals(false, $dirname_r(__DIR__, function ($path) {
+        $this->assertEquals(false, (dirname_r)(__DIR__, function ($path) {
             return realpath("$path/notfound.ext");
         }));
         // 使い方の毛色は違うが、このようにすると各構成要素が得られる
         $paths = [];
-        $this->assertEquals(false, $dirname_r('/root/path/to/something', function ($path) use (&$paths) {
+        $this->assertEquals(false, (dirname_r)('/root/path/to/something', function ($path) use (&$paths) {
             $paths[] = $path;
         }));
         $this->assertEquals([
@@ -218,88 +212,81 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_fnmatch_and()
     {
-        $fnmatch_and = fnmatch_and;
-        $this->assertTrue($fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'));
-        $this->assertFalse($fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
+        $this->assertTrue((fnmatch_and)(['*aaa*', '*bbb*'], 'aaaXbbbX'));
+        $this->assertFalse((fnmatch_and)(['*aaa*', '*bbb*'], 'aaaX'));
 
-        $this->assertException('empty', $fnmatch_and, [], '');
+        $this->assertException('empty', fnmatch_and, [], '');
     }
 
     function test_fnmatch_or()
     {
-        $fnmatch_or = fnmatch_or;
-        $this->assertTrue($fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'));
-        $this->assertFalse($fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
+        $this->assertTrue((fnmatch_or)(['*aaa*', '*bbb*'], 'aaaX'));
+        $this->assertFalse((fnmatch_or)(['*aaa*', '*bbb*'], 'cccX'));
 
-        $this->assertException('empty', $fnmatch_or, [], '');
+        $this->assertException('empty', fnmatch_or, [], '');
     }
 
     function test_path_is_absolute()
     {
-        $path_is_absolute = path_is_absolute;
-        $this->assertFalse($path_is_absolute('a/b/c'));
-        $this->assertTrue($path_is_absolute('/a/b/c'));
+        $this->assertFalse((path_is_absolute)('a/b/c'));
+        $this->assertTrue((path_is_absolute)('/a/b/c'));
         $DS = DIRECTORY_SEPARATOR;
         if ($DS === '\\') {
-            $this->assertTrue($path_is_absolute("C:"));
-            $this->assertTrue($path_is_absolute("C:\\path"));
-            $this->assertTrue($path_is_absolute("\\a\\/b\\c"));
-            $this->assertFalse($path_is_absolute('a\\b\\c'));
+            $this->assertTrue((path_is_absolute)("C:"));
+            $this->assertTrue((path_is_absolute)("C:\\path"));
+            $this->assertTrue((path_is_absolute)("\\a\\/b\\c"));
+            $this->assertFalse((path_is_absolute)('a\\b\\c'));
         }
     }
 
     function test_path_resolve()
     {
-        $path_resolve = path_resolve;
         $DS = DIRECTORY_SEPARATOR;
-        $this->assertEquals(getcwd() . "{$DS}a{$DS}b{$DS}c", $path_resolve('a/b/c'));
-        $this->assertEquals("{$DS}a{$DS}b{$DS}c", $path_resolve('/a/b/c'));
-        $this->assertEquals("{$DS}root{$DS}a{$DS}b{$DS}c", $path_resolve('/root', 'a/b/c'));
-        $this->assertEquals("{$DS}a{$DS}b{$DS}c", $path_resolve('/root', '../a/b/c'));
-        $this->assertEquals(getcwd() . "{$DS}root{$DS}a{$DS}b{$DS}c", $path_resolve('root', 'a/b/c'));
+        $this->assertEquals(getcwd() . "{$DS}a{$DS}b{$DS}c", (path_resolve)('a/b/c'));
+        $this->assertEquals("{$DS}a{$DS}b{$DS}c", (path_resolve)('/a/b/c'));
+        $this->assertEquals("{$DS}root{$DS}a{$DS}b{$DS}c", (path_resolve)('/root', 'a/b/c'));
+        $this->assertEquals("{$DS}a{$DS}b{$DS}c", (path_resolve)('/root', '../a/b/c'));
+        $this->assertEquals(getcwd() . "{$DS}root{$DS}a{$DS}b{$DS}c", (path_resolve)('root', 'a/b/c'));
         if ($DS === '\\') {
-            $this->assertEquals('C:\\a\\b\\c', $path_resolve('C:\\a\\b\\c'));
+            $this->assertEquals('C:\\a\\b\\c', (path_resolve)('C:\\a\\b\\c'));
         }
     }
 
     function test_path_normalize()
     {
-        $path_normalize = path_normalize;
         $DS = DIRECTORY_SEPARATOR;
         // 単純な相対
-        $this->assertEquals("{$DS}a{$DS}b{$DS}d{$DS}e", $path_normalize('/a/b/c/../d/./e'));
+        $this->assertEquals("{$DS}a{$DS}b{$DS}d{$DS}e", (path_normalize)('/a/b/c/../d/./e'));
         // 相対パス
-        $this->assertEquals("a{$DS}d{$DS}e", $path_normalize('a/b/c/../../d/./e'));
+        $this->assertEquals("a{$DS}d{$DS}e", (path_normalize)('a/b/c/../../d/./e'));
         // 連続ドット
-        $this->assertEquals("{$DS}a.b{$DS}c..d", $path_normalize('/a.b/c..d'));
+        $this->assertEquals("{$DS}a.b{$DS}c..d", (path_normalize)('/a.b/c..d'));
         // 連続区切り
-        $this->assertEquals("{$DS}a{$DS}b", $path_normalize('//a//b//'));
+        $this->assertEquals("{$DS}a{$DS}b", (path_normalize)('//a//b//'));
         // Windows
         if ($DS === '\\') {
             // \\ 区切り
-            $this->assertEquals('C:\\a\\b\\d', $path_normalize('C:\\//a\\/b/\\c/../\\d'));
+            $this->assertEquals('C:\\a\\b\\d', (path_normalize)('C:\\//a\\/b/\\c/../\\d'));
             // 連続区切り
-            $this->assertEquals("{$DS}a{$DS}b", $path_normalize('\\/a/\\\\/\\b'));
+            $this->assertEquals("{$DS}a{$DS}b", (path_normalize)('\\/a/\\\\/\\b'));
         }
         // いきなり親をたどると例外
-        $this->assertException('is invalid', $path_normalize, '../');
+        $this->assertException('is invalid', path_normalize, '../');
         // 辿りすぎも例外
-        $this->assertException('is invalid', $path_normalize, 'a/b/c/../../../..');
+        $this->assertException('is invalid', path_normalize, 'a/b/c/../../../..');
     }
 
     function test_mkdir_p()
     {
-        $mkdir_p = mkdir_p;
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
         (rm_rf)($dir);
-        $this->assertTrue($mkdir_p($dir));
+        $this->assertTrue((mkdir_p)($dir));
         $this->assertFileExists($dir);
-        $this->assertFalse($mkdir_p($dir));
+        $this->assertFalse((mkdir_p)($dir));
     }
 
     function test_cp_rf()
     {
-        $cp_rf = cp_rf;
         $tmpdir = sys_get_temp_dir() . '/cp_rf';
 
         $src = "$tmpdir/src";
@@ -312,17 +299,17 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         (mkdir_p)($dst);
 
         // ただのファイル（"/" なし）
-        $cp_rf("$src/a/b/c.txt", "$dst/x.txt");
+        (cp_rf)("$src/a/b/c.txt", "$dst/x.txt");
         $this->assertStringEqualsFile("$dst/x.txt", 'aaa');
 
         // ただのファイル（"/" あり）
-        $cp_rf("$src/a/b/c.txt", "$dst/");
+        (cp_rf)("$src/a/b/c.txt", "$dst/");
         $this->assertStringEqualsFile("$dst/c.txt", 'aaa');
 
         // "/" なし（dst 自身にコピー）
         (rm_rf)($dst);
         (file_set_contents)("$dst/xxx.txt", '');
-        $cp_rf("$src/", $dst);
+        (cp_rf)("$src/", $dst);
         // 置換のような動作は行わないので元あったものは保持されているはず
         $this->assertFileExists("$dst/xxx.txt");
         // ツリーを確認（コピーされているはず）
@@ -337,7 +324,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         // "/" あり（dst の中にコピー）
         (rm_rf)($dst);
         (file_set_contents)("$dst/xxx.txt", '');
-        $cp_rf("$src/", "$dst/");
+        (cp_rf)("$src/", "$dst/");
         // 置換のような動作は行わないので元あったものは保持されているはず
         $this->assertFileExists("$dst/xxx.txt");
         // ツリーを確認（コピーされているはず）
@@ -352,19 +339,18 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_rm_rf()
     {
-        $rm_rf = rm_rf;
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3';
         $dir2 = dirname($dir);
         $dir1 = dirname($dir2);
 
         (file_set_contents)("$dir/a.txt", '');
-        $rm_rf($dir2);
+        (rm_rf)($dir2);
         $this->assertFileNotExists($dir2); // 自身は消える
         $this->assertFileExists(dirname($dir2)); // 親は残る
-        $this->assertFalse($rm_rf($dir)); // 存在しないと false を返す
+        $this->assertFalse((rm_rf)($dir)); // 存在しないと false を返す
 
         (file_set_contents)("$dir/a.txt", '');
-        $rm_rf($dir1, false);
+        (rm_rf)($dir1, false);
         $this->assertFileExists($dir1); // 自身は残る
         $this->assertFileNotExists($dir2); // 子は消える
     }

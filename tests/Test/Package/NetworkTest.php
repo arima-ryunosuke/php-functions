@@ -11,9 +11,8 @@ class NetworkTest extends \ryunosuke\Test\AbstractTestCase
         }
         $server = TESTWEBSERVER;
 
-        $http_requests = http_requests;
         $time = microtime(true);
-        $responses = $http_requests([
+        $responses = (http_requests)([
             'w1' => "$server/sleep.php?wait=1",
             'w2' => "$server/sleep.php?wait=2",
             'to' => [

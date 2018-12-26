@@ -6,9 +6,8 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 {
     function test_parse_php()
     {
-        $parse_php = parse_php;
         $code = 'a(123);';
-        $tokens = $parse_php($code, 2);
+        $tokens = (parse_php)($code, 2);
         $this->assertEquals([
             [T_OPEN_TAG, '<?php ', 1, 'T_OPEN_TAG'],
             [T_STRING, 'a', 1, 'T_STRING'],
@@ -19,12 +18,12 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         ], $tokens);
 
         $code = 'function(...$args)use($usevar){if(false)return function(){};}';
-        $tokens = $parse_php($code, [
+        $tokens = (parse_php)($code, [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
         $this->assertEquals('function(...$args)use($usevar){', implode('', array_column($tokens, 1)));
-        $tokens = $parse_php($code, [
+        $tokens = (parse_php)($code, [
             'begin'  => '{',
             'end'    => '}',
             'offset' => count($tokens),
@@ -32,12 +31,12 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('{if(false)return function(){};}', implode('', array_column($tokens, 1)));
 
         $code = 'namespace hoge\\fuga\\piyo;class C {function m(){if(false)return function(){};}}';
-        $tokens = $parse_php($code, [
+        $tokens = (parse_php)($code, [
             'begin' => T_NAMESPACE,
             'end'   => ';',
         ]);
         $this->assertEquals('namespace hoge\fuga\piyo;', implode('', array_column($tokens, 1)));
-        $tokens = $parse_php($code, [
+        $tokens = (parse_php)($code, [
             'begin' => T_CLASS,
             'end'   => '}',
         ]);
@@ -46,110 +45,107 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_return()
     {
-        $returns = returns;
         $o = new \stdClass();
         $o->hoge = 123;
-        $this->assertSame($o, $returns($o));
+        $this->assertSame($o, (returns)($o));
 
         // ユースケースとしては例えば clone してチェーンしたいことがある
         // 下記は出来ない
         /*
         (clone $o)->hoge;
         */
-        $this->assertEquals(123, $returns(clone $o)->hoge);
+        $this->assertEquals(123, (returns)(clone $o)->hoge);
     }
 
     function test_optional()
     {
-        $optional = optional;
         $o = new \Concrete('hoge');
         $o->hoge = 'hoge';
         $o->value = 'hoge';
 
         // method
-        $this->assertSame('hoge', $optional($o)->getName());
+        $this->assertSame('hoge', (optional)($o)->getName());
         // property
-        $this->assertSame('hoge', $optional($o)->value);
+        $this->assertSame('hoge', (optional)($o)->value);
         // __isset
-        $this->assertSame(true, isset($optional($o)->hoge));
+        $this->assertSame(true, isset((optional)($o)->hoge));
         // __get
-        $this->assertSame('hoge', $optional($o)->hoge);
+        $this->assertSame('hoge', (optional)($o)->hoge);
         // __call
-        $this->assertSame('hoge', $optional($o)->hoge());
+        $this->assertSame('hoge', (optional)($o)->hoge());
         // __invoke
-        $this->assertSame('Concrete::__invoke', $optional($o)());
+        $this->assertSame('Concrete::__invoke', (optional)($o)());
         // __toString
-        $this->assertSame('hoge', (string) $optional($o));
+        $this->assertSame('hoge', (string) (optional)($o));
         // offsetExists
-        $this->assertSame(false, empty($optional($o)['hoge']));
+        $this->assertSame(false, empty((optional)($o)['hoge']));
         // offsetGet
-        $this->assertSame('hoge', $optional($o)['hoge']);
+        $this->assertSame('hoge', (optional)($o)['hoge']);
         // iterator
-        $this->assertNotEmpty(iterator_to_array($optional($o)));
+        $this->assertNotEmpty(iterator_to_array((optional)($o)));
 
         $o = null;
 
         // method
-        $this->assertSame(null, $optional($o)->getName());
+        $this->assertSame(null, (optional)($o)->getName());
         // property
-        $this->assertSame(null, $optional($o)->value);
+        $this->assertSame(null, (optional)($o)->value);
         // __isset
-        $this->assertSame(false, isset($optional($o)->hoge));
+        $this->assertSame(false, isset((optional)($o)->hoge));
         // __get
-        $this->assertSame(null, $optional($o)->hoge);
+        $this->assertSame(null, (optional)($o)->hoge);
         // __call
-        $this->assertSame(null, $optional($o)->hoge());
+        $this->assertSame(null, (optional)($o)->hoge());
         // __invoke
-        $this->assertSame(null, $optional($o)());
+        $this->assertSame(null, (optional)($o)());
         // __toString
-        $this->assertSame('', (string) $optional($o));
+        $this->assertSame('', (string) (optional)($o));
         // offsetExists
-        $this->assertSame(true, empty($optional($o)['hoge']));
+        $this->assertSame(true, empty((optional)($o)['hoge']));
         // offsetGet
-        $this->assertSame(null, $optional($o)['hoge']);
+        $this->assertSame(null, (optional)($o)['hoge']);
         // iterator
-        $this->assertEmpty(iterator_to_array($optional($o)));
+        $this->assertEmpty(iterator_to_array((optional)($o)));
 
         // 型指定
-        $this->assertEquals(1, $optional(new \ArrayObject([1]))->count());
-        $this->assertNull($optional(new \ArrayObject([1]), 'stdClass')->count());
+        $this->assertEquals(1, (optional)(new \ArrayObject([1]))->count());
+        $this->assertNull((optional)(new \ArrayObject([1]), 'stdClass')->count());
     }
 
     function test_chain()
     {
         /** @var \ChainObject $co */
-        $chain = chain;
 
         // funcO
-        $co = $chain([1, 2, 3, 4, 5]);
+        $co = (chain)([1, 2, 3, 4, 5]);
         $this->assertEquals([-1, -2, -3, -4, -5], (clone $co)->mapP(['-'])());
         $this->assertEquals([0, 5, 5, 5, 5], (clone $co)->mapP(['-' => 1])->mapP(['?:' => [5, 0]])());
         $this->assertEquals([2 => 8, 9, 10], (clone $co)->filterP(['>=' => 3])->mapP(['+' => 5])());
 
         // funcE
-        $co = $chain([1, 2, 3, 4, 5]);
+        $co = (chain)([1, 2, 3, 4, 5]);
         $this->assertEquals([2 => 6, 8, 10], (clone $co)->mapE('*2')->filterE('>5')());
         $this->assertEquals('1,4,9,16,25', (clone $co)->mapE('$_ * $_')->vsprintf1('%d,%d,%d,%d,%d')());
 
         // apply
-        $co = $chain('a12345z');
+        $co = (chain)('a12345z');
         $this->assertEquals('12,345.000', $co->apply('ltrim', 'a')->apply('rtrim', 'z')->apply('number_format', 3)());
         $this->assertEquals('12,345.000', (string) $co);
 
         // iterator
-        $co = $chain(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        $co = (chain)(['a' => 'A', 'b' => 'B', 'c' => 'C']);
         $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], iterator_to_array($co));
 
         // string
-        $co = $chain('hello');
+        $co = (chain)('hello');
         $this->assertEquals('H,e,l,l,o', $co->ucfirst->str_split->implode1(',')());
         $this->assertEquals('H,e,l,l,o', (string) $co);
 
         // exception
-        $this->assertException('is not defined', [$chain(null), 'undefined_function']);
+        $this->assertException('is not defined', [(chain)(null), 'undefined_function']);
 
         // use case
-        $co = $chain([
+        $co = (chain)([
             ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
             ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
             ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
@@ -183,28 +179,25 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_throws()
     {
-        $throws = throws;
         // ユースケースとしては例えば or throw がしたいことがある
         // 下記は出来ない
         /*
         @mkdir(__DIR__) or throw new \Exception('mkdir fail');
         */
-        $this->assertException(new \Exception('mkdir fail'), function () use ($throws) {
-            @mkdir(__DIR__) or $throws(new \Exception('mkdir fail'));
+        $this->assertException(new \Exception('mkdir fail'), function () {
+            @mkdir(__DIR__) or (throws)(new \Exception('mkdir fail'));
         });
     }
 
     function test_throw_if()
     {
-        $throw_if = throw_if;
-        $throw_if(false, new \Exception('message', 123));
-        $this->assertException(new \Exception('message', 123), $throw_if, true, new \Exception('message', 123));
-        $this->assertException(new \Exception('message', 123), $throw_if, true, \Exception::class, 'message', 123);
+        (throw_if)(false, new \Exception('message', 123));
+        $this->assertException(new \Exception('message', 123), throw_if, true, new \Exception('message', 123));
+        $this->assertException(new \Exception('message', 123), throw_if, true, \Exception::class, 'message', 123);
     }
 
     function test_ifelse()
     {
-        $ifelse = ifelse;
         // ユースケースとしては例えば null と 0/false を区別したいことがある
         // 下記は出来ない
         /*
@@ -218,23 +211,22 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 
         // 上で挙げたユースケース
         $minute = 13;
-        $this->assertEquals(13, $ifelse($minute, false, 59));
+        $this->assertEquals(13, (ifelse)($minute, false, 59));
         $minute = false;
-        $this->assertEquals(59, $ifelse($minute, false, 59));
+        $this->assertEquals(59, (ifelse)($minute, false, 59));
 
         // 'hoge' === 'hoge' なので 'OK' を返す
-        $this->assertEquals('OK', $ifelse('hoge', 'hoge', 'OK', 'NG'));
+        $this->assertEquals('OK', (ifelse)('hoge', 'hoge', 'OK', 'NG'));
         // 'hoge' !== 'fuga' なので 'NG' を返す
-        $this->assertEquals('NG', $ifelse('hoge', 'fuga', 'OK', 'NG'));
+        $this->assertEquals('NG', (ifelse)('hoge', 'fuga', 'OK', 'NG'));
         // 第4引数を省略すると第1引数を表す
-        $this->assertEquals('hoge', $ifelse('hoge', 'fuga', 'OK'));
+        $this->assertEquals('hoge', (ifelse)('hoge', 'fuga', 'OK'));
         // callable を与えるとその結果で判定する
-        $this->assertEquals('OK', $ifelse('hoge', 'is_string', 'OK'));
+        $this->assertEquals('OK', (ifelse)('hoge', 'is_string', 'OK'));
     }
 
     function test_try_catch()
     {
-        $try_catch = try_catch;
         $try = function () {
             throw new \RuntimeException();
         };
@@ -250,8 +242,8 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         }
         */
 
-        $this->assertException(new \Exception('hoge'), function () use ($try, $try_catch) {
-            $try_catch($try, function ($ex) { throw new \Exception('hoge', 0, $ex); });
+        $this->assertException(new \Exception('hoge'), function () use ($try) {
+            (try_catch)($try, function ($ex) { throw new \Exception('hoge', 0, $ex); });
         });
 
         // あるいは throw しないで単純に返り値として欲しいことがある
@@ -265,12 +257,11 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         }
         */
 
-        $this->assertInstanceOf('\RuntimeException', $try_catch($try));
+        $this->assertInstanceOf('\RuntimeException', (try_catch)($try));
     }
 
     function test_try_finally()
     {
-        $try_finally = try_finally;
         $try1 = function ($v) {
             return strtoupper($v);
         };
@@ -304,12 +295,12 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         */
 
         // 引数は渡るし返り値は正しいし $finally も呼ばれている
-        $this->assertEquals('HOGE', $try_finally($try1, $finally, 'hoge'));
+        $this->assertEquals('HOGE', (try_finally)($try1, $finally, 'hoge'));
         $this->assertEquals(1, $finally_count);
 
         // 例外が投げられるが $finally は呼ばれている
         try {
-            $try_finally($try2, $finally);
+            (try_finally)($try2, $finally);
         }
         catch (\Exception $ex) {
             // 握りつぶし
@@ -319,11 +310,10 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_try_catch_finally()
     {
-        $try_catch_finally = try_catch_finally;
         $workingdir = sys_get_temp_dir() . '/rf-working';
         (rm_rf)($workingdir);
 
-        $try_catch_finally(function () use ($workingdir) {
+        (try_catch_finally)(function () use ($workingdir) {
             // try 句でディレクトリを作る
             mkdir($workingdir, 0777, true);
         }, function () {
@@ -336,7 +326,7 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertFalse(file_exists($workingdir));
 
         try {
-            $try_catch_finally(function () use ($workingdir) {
+            (try_catch_finally)(function () use ($workingdir) {
                 // try 句でディレクトリを作って例外を投げる
                 mkdir($workingdir, 0777, true);
                 throw new \Exception();
