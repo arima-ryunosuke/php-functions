@@ -10,6 +10,17 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.6
+
+- [feature][Arrays] arrays を追加
+- [feature][Arrays] array_where で連想配列を渡すと個別でANDできるようになった
+- [change][Arrays] array_difference にただの配列を渡すと Warning が出る不具合を修正
+- [feature][Strings] quoteexplode の複数分割文字対応
+- [feature][Network] getipaddress を追加
+- [feature][Network] incidr を追加
+- [fixbug][Syntax] chain で内部関数が呼べなかった不具合を修正
+- [fixbug][Utility] arguments のエスケープ対応
+
 ## 1.2.5
 
 - [feature][Arrays] array_put を追加
