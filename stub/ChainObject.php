@@ -1137,6 +1137,8 @@
  * @method   \ChainObject  arrayize3(...$variadic)
  * @method   \ChainObject  arrayize4(...$variadic)
  * @method   \ChainObject  arrayize5(...$variadic)
+ * @property \ChainObject $arrays
+ * @method   \ChainObject  arrays()
  * @property \ChainObject $arrayval
  * @method   \ChainObject  arrayval($recursive = true)
  * @method   \ChainObject  arrayval1($var)
@@ -1717,6 +1719,7 @@
  * @method   \ChainObject  gethostbyname()
  * @property \ChainObject $gethostbynamel
  * @method   \ChainObject  gethostbynamel()
+ * @method   \ChainObject  getipaddress()
  * @property \ChainObject $getprotobyname
  * @method   \ChainObject  getprotobyname()
  * @property \ChainObject $getprotobynumber
@@ -1870,6 +1873,8 @@
  * @method   \ChainObject  in_array_or($haystack, $strict = false)
  * @method   \ChainObject  in_array_or1($needle, $strict = false)
  * @method   \ChainObject  in_array_or2($needle, $haystack)
+ * @method   \ChainObject  incidr($cidr)
+ * @method   \ChainObject  incidr1($ipaddr)
  * @property \ChainObject $inet_ntop
  * @method   \ChainObject  inet_ntop()
  * @property \ChainObject $inet_pton

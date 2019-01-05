@@ -602,6 +602,7 @@ const KEYWORDS = array (
 const TOKEN_NAME = 2;
 
 # functions
+const arrays = ['ryunosuke\\Functions\\Package\\Arrays', 'arrays'];
 const arrayize = ['ryunosuke\\Functions\\Package\\Arrays', 'arrayize'];
 const is_hasharray = ['ryunosuke\\Functions\\Package\\Arrays', 'is_hasharray'];
 const first_key = ['ryunosuke\\Functions\\Package\\Arrays', 'first_key'];
@@ -717,6 +718,8 @@ const average = ['ryunosuke\\Functions\\Package\\Math', 'average'];
 const sum = ['ryunosuke\\Functions\\Package\\Math', 'sum'];
 const random_at = ['ryunosuke\\Functions\\Package\\Math', 'random_at'];
 const probability = ['ryunosuke\\Functions\\Package\\Math', 'probability'];
+const getipaddress = ['ryunosuke\\Functions\\Package\\Network', 'getipaddress'];
+const incidr = ['ryunosuke\\Functions\\Package\\Network', 'incidr'];
 const http_requests = ['ryunosuke\\Functions\\Package\\Network', 'http_requests'];
 const sql_quote = ['ryunosuke\\Functions\\Package\\Sql', 'sql_quote'];
 const sql_bind = ['ryunosuke\\Functions\\Package\\Sql', 'sql_bind'];

@@ -600,6 +600,40 @@ const KEYWORDS = array (
 const TOKEN_NAME = 2;
 
 # functions
+const arrays = 'arrays';
+if (!isset($excluded_functions['arrays']) && (!function_exists('arrays') || (!false && (new \ReflectionFunction('arrays'))->isInternal()))) {
+    /**
+     * 配列をシーケンシャルに走査するジェネレータを返す
+     *
+     * 「シーケンシャルに」とは要するに数値連番が得られるように走査するということ。
+     * 0ベースの連番を作ってインクリメントしながら foreach するのと全く変わらない。
+     *
+     * キーは連番、値は [$key, $value] で返す。
+     * つまり、 Example のように foreach の list 構文を使えば「連番、キー、値」でループを回すことが可能になる。
+     * 「foreach で回したいんだけど連番も欲しい」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+     * $nkv = [];
+     * foreach (arrays($array) as $n => list($k, $v)) { // php7.1 以降なら list ではなく [] でも行ける
+     *     $nkv[] = "$n,$k,$v";
+     * }
+     * assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @return \Generator [$seq => [$key, $value]] を返すジェネレータ
+     */
+    function arrays($array)
+    {
+        $n = 0;
+        foreach ($array as $k => $v) {
+            yield $n++ => [$k, $v];
+        }
+    }
+}
+
 const arrayize = 'arrayize';
 if (!isset($excluded_functions['arrayize']) && (!function_exists('arrayize') || (!false && (new \ReflectionFunction('arrayize'))->isInternal()))) {
     /**
@@ -2084,7 +2118,8 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
      * $callback は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。
      * つまり $column も $callback も省略した場合、実質的に array_filter と同じ動作になる。
      *
-     * $column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。
+     * $column は配列を受け入れる。配列を渡した場合その値の共通項がコールバックに渡る。
+     * 連想配列の場合は「キーのカラム == 値」で filter する（それぞれで AND。厳密かどうかは $callback で指定。説明が難しいので Example を参照）。
      *
      * $callback が要求するならキーも渡ってくる。
      *
@@ -2106,6 +2141,13 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
      * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
+     * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
+     * assertSame(array_where($array, [
+     *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
+     *     'name' => function($name){return strpos($name, 'o') !== false;}, // name に o を含む
+     * ]), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2117,7 +2159,28 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
     {
         $is_array = is_array($column);
         if ($is_array) {
-            $column = array_flip($column);
+            if ((is_hasharray)($column)) {
+                if ($callback !== null && !is_bool($callback)) {
+                    throw new \InvalidArgumentException('if hash array $column, $callback must be bool.');
+                }
+                $callbacks = array_map(function ($c) use ($callback) {
+                    if ($c instanceof \Closure) {
+                        return $c;
+                    }
+                    return $callback ? function ($v) use ($c) { return $v === $c; } : function ($v) use ($c) { return $v == $c; };
+                }, $column);
+                $callback = function ($vv, $k) use ($callbacks) {
+                    foreach ($callbacks as $c => $callback) {
+                        if (!$callback($vv[$c], $k)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+            }
+            else {
+                $column = array_flip($column);
+            }
         }
 
         $callback = (func_user_func_array)($callback);
@@ -3573,56 +3636,52 @@ if (!isset($excluded_functions['array_difference']) && (!function_exists('array_
             'list' => static function ($v, $k) { return is_int($k); },
             'hash' => static function ($v, $k) { return !is_int($k); },
         ];
-        $prefixer = static function ($key, $k) use ($delimiter) {
-            return $key === '' ? $k : $key . $delimiter . $k;
-        };
 
-        return call_user_func($f = static function ($array1, $array2, $key = '') use (&$f, $rule, $prefixer) {
+        $udiff = static function ($a, $b) { return $a <=> $b; };
+
+        return call_user_func($f = static function ($array1, $array2, $key = null) use (&$f, $rule, $udiff, $delimiter) {
             $result = [];
 
             $array1 = (array_assort)($array1, $rule);
             $array2 = (array_assort)($array2, $rule);
 
-            foreach (array_diff($array1['list'], $array2['list']) as $k => $v1) {
-                $prefix = $prefixer($key, $k);
-                $result[$prefix] = ['-' => $v1];
-            }
-            foreach (array_diff($array2['list'], $array1['list']) as $k => $v2) {
-                $prefix = $prefixer($key, $k);
-                $result[$prefix] = ['+' => $v2];
-            }
-            foreach ($array1['hash'] + $array2['hash'] as $k => $dummy) {
-                $exists1 = array_key_exists($k, $array1['hash']);
-                $exists2 = array_key_exists($k, $array2['hash']);
+            $list1 = array_values(array_udiff($array1['list'], $array2['list'], $udiff));
+            $list2 = array_values(array_udiff($array2['list'], $array1['list'], $udiff));
+            for ($k = 0, $l = max(count($list1), count($list2)); $k < $l; $k++) {
+                $exists1 = array_key_exists($k, $list1);
+                $exists2 = array_key_exists($k, $list2);
 
-                $v1 = $exists1 ? $array1['hash'][$k] : null;
-                $v2 = $exists2 ? $array2['hash'][$k] : null;
+                $v1 = $exists1 ? $list1[$k] : null;
+                $v2 = $exists2 ? $list2[$k] : null;
 
-                $is_array1 = is_array($v1);
-                $is_array2 = is_array($v2);
-
-                $prefix = $prefixer($key, $k);
-                if ($exists1 && $exists2) {
-                    if ($is_array1 && $is_array2) {
-                        $result += $f($v1, $v2, $prefix);
-                    }
-                    elseif ($is_array1) {
-                        $result += $f($v1, [], $prefix);
-                        $result[$prefix] = ['+' => $v2];
-                    }
-                    elseif ($is_array2) {
-                        $result[$prefix] = ['-' => $v1];
-                        $result += $f([], $v2, $prefix);
-                    }
-                    elseif ($v1 !== $v2) {
-                        $result[$prefix] = ['-' => $v1, '+' => $v2];
-                    }
+                $prefix = $key === null ? count($result) : $key;
+                if ($exists1) {
+                    $result[$prefix]['-'][] = $v1;
                 }
-                elseif ($exists1) {
-                    $result[$prefix] = ['-' => $v1];
+                if ($exists2) {
+                    $result[$prefix]['+'][] = $v2;
                 }
-                elseif ($exists2) {
-                    $result[$prefix] = ['+' => $v2];
+            }
+
+            $hash1 = array_udiff_assoc($array1['hash'], $array2['hash'], $udiff);
+            $hash2 = array_udiff_assoc($array2['hash'], $array1['hash'], $udiff);
+            foreach (array_keys($hash1 + $hash2) as $k) {
+                $exists1 = array_key_exists($k, $hash1);
+                $exists2 = array_key_exists($k, $hash2);
+
+                $v1 = $exists1 ? $hash1[$k] : null;
+                $v2 = $exists2 ? $hash2[$k] : null;
+
+                $prefix = $key === null ? $k : $key . $delimiter . $k;
+                if (is_array($v1) && is_array($v2)) {
+                    $result += $f($v1, $v2, $prefix);
+                    continue;
+                }
+                if ($exists1) {
+                    $result[$prefix]['-'] = $v1;
+                }
+                if ($exists2) {
+                    $result[$prefix]['+'] = $v2;
                 }
             }
 
@@ -5827,6 +5886,90 @@ if (!isset($excluded_functions['probability']) && (!function_exists('probability
     }
 }
 
+const getipaddress = 'getipaddress';
+if (!isset($excluded_functions['getipaddress']) && (!function_exists('getipaddress') || (!false && (new \ReflectionFunction('getipaddress'))->isInternal()))) {
+    /**
+     * 接続元となる IP を返す
+     *
+     * 要するに自分の IP を返す。
+     *
+     * Example:
+     * ```php
+     * // 何らかの IP アドレスが返ってくる
+     * assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', getipaddress());
+     * // 自分への接続元は自分なので 127.0.0.1 を返す
+     * assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
+     * ```
+     *
+     * @param string $target 接続先。基本的に指定することはない
+     * @return string IP アドレス
+     */
+    function getipaddress($target = '128.0.0.0')
+    {
+        $socket = stream_socket_client("udp://$target:7", $errno, $errstr);
+        if ($socket === false) {
+            throw new \InvalidArgumentException($errstr, $errno);
+        }
+        $sname = stream_socket_get_name($socket, false);
+        $ipaddr = parse_url($sname, PHP_URL_HOST);
+
+        fclose($socket);
+
+        return $ipaddr;
+    }
+}
+
+const incidr = 'incidr';
+if (!isset($excluded_functions['incidr']) && (!function_exists('incidr') || (!false && (new \ReflectionFunction('incidr'))->isInternal()))) {
+    /**
+     * ipv4 の cidr チェック
+     *
+     * $ipaddr が $cidr のレンジ内なら true を返す。
+     * $cidr は複数与えることができ、どれかに合致したら true を返す。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * // 範囲内なので true
+     * assertTrue(incidr('192.168.1.1', '192.168.1.0/24'));
+     * // 範囲外なので false
+     * assertFalse(incidr('192.168.1.1', '192.168.2.0/24'));
+     * // 1つでも範囲内なら true
+     * assertTrue(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']));
+     * // 全部範囲外なら false
+     * assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
+     * ```
+     *
+     * @param string $ipaddr 調べられる IP アドレス
+     * @param string|array $cidr 調べる cidr アドレス
+     * @return bool $ipaddr が $cidr 内なら true
+     */
+    function incidr($ipaddr, $cidr)
+    {
+        if (!filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("ipaddr '$ipaddr' is invalid.");
+        }
+        $iplong = ip2long($ipaddr);
+
+        foreach ((arrayize)($cidr) as $cidr) {
+            list($subnet, $length) = explode('/', $cidr, 2) + [1 => '32'];
+
+            if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                throw new \InvalidArgumentException("subnet addr '$subnet' is invalid.");
+            }
+            if (!(ctype_digit($length) && (0 <= $length && $length <= 32))) {
+                throw new \InvalidArgumentException("subnet mask '$length' is invalid.");
+            }
+
+            if (substr_compare(sprintf('%032b', $iplong), sprintf('%032b', ip2long($subnet)), 0, $length) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 const http_requests = 'http_requests';
 if (!isset($excluded_functions['http_requests']) && (!function_exists('http_requests') || (!false && (new \ReflectionFunction('http_requests'))->isInternal()))) {
     /**
@@ -6592,7 +6735,7 @@ if (!isset($excluded_functions['quoteexplode']) && (!function_exists('quoteexplo
      * ]);
      * ```
      *
-     * @param string $delimiter 分割文字列
+     * @param string|array $delimiter 分割文字列
      * @param string $string 対象文字列
      * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
      * @param string $escape エスケープ文字
@@ -6605,7 +6748,7 @@ if (!isset($excluded_functions['quoteexplode']) && (!function_exists('quoteexplo
             $enclosures = array_combine($chars, $chars);
         }
 
-        $delimiterlen = strlen($delimiter);
+        $delimiters = (arrayize)($delimiter);
         $starts = implode('', array_keys($enclosures));
         $ends = implode('', $enclosures);
         $enclosing = [];
@@ -6625,9 +6768,15 @@ if (!isset($excluded_functions['quoteexplode']) && (!function_exists('quoteexplo
                 $enclosing[] = $string[$i];
                 continue;
             }
-            if (empty($enclosing) && substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
-                $result[] = substr($string, $current, $i - $current);
-                $current = $i + $delimiterlen;
+            if (empty($enclosing)) {
+                foreach ($delimiters as $delimiter) {
+                    $delimiterlen = strlen($delimiter);
+                    if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
+                        $result[] = substr($string, $current, $i - $current);
+                        $current = $i + $delimiterlen;
+                        break;
+                    }
+                }
             }
         }
         $result[] = substr($string, $current, $i);
@@ -7969,15 +8118,8 @@ if (!isset($excluded_functions['chain']) && (!function_exists('chain') || (!fals
                 return $this;
             }
 
-            private function _apply($name, $arguments)
+            private function _resolve($name)
             {
-                // 特別扱い1: map は非常によく呼ぶので引数を補正する
-                if ($name === 'map') {
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    return $this->array_map1(...$arguments);
-                }
-
-                // 実際の呼び出し1: 存在する関数はそのまま移譲する（defined や namespace は定数コール用）
                 if (false
                     || function_exists($fname = $name)
                     || function_exists($fname = "array_$name")
@@ -7990,12 +8132,26 @@ if (!isset($excluded_functions['chain']) && (!function_exists('chain') || (!fals
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */
+                    return $fname;
+                }
+            }
+
+            private function _apply($name, $arguments)
+            {
+                // 特別扱い1: map は非常によく呼ぶので引数を補正する
+                if ($name === 'map') {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    return $this->array_map1(...$arguments);
+                }
+
+                // 実際の呼び出し1: 存在する関数はそのまま移譲する
+                if ($fname = $this->_resolve($name)) {
                     $this->data = $fname($this->data, ...$arguments);
                     return $this;
                 }
                 // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
-                if (preg_match('#(.+?)(\d+)$#', $name, $match)) {
-                    $this->data = $match[1](...(array_insert)($arguments, [$this->data], $match[2]));
+                if (preg_match('#(.+?)(\d+)$#', $name, $match) && $fname = $this->_resolve($match[1])) {
+                    $this->data = $fname(...(array_insert)($arguments, [$this->data], $match[2]));
                     return $this;
                 }
 
@@ -8496,7 +8652,9 @@ if (!isset($excluded_functions['arguments']) && (!function_exists('arguments') |
             $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
         }
         if (is_string($argv)) {
-            $argv = preg_split('#\s+#', $argv, -1, PREG_SPLIT_NO_EMPTY);
+            $argv = (quoteexplode)([" ", "\t"], $argv);
+            $argv = array_filter($argv, 'strlen');
+            $argv = array_map(function ($v) { return trim(str_replace('\\"', '"', $v), '"'); }, $argv);
         }
         $argv = array_values($argv);
 

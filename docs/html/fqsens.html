@@ -55,7 +55,23 @@
                 	<h2>class<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays"> ryunosuke\Functions\Package\Arrays</a></h2>
 	<div class="description"><p>配列関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrayize()"> ryunosuke\Functions\Package\Arrays::arrayize()</a></h2>
+                	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrays()"> ryunosuke\Functions\Package\Arrays::arrays()</a></h2>
+	<div class="description"><p>配列をシーケンシャルに走査するジェネレータを返す</p>
+<p>「シーケンシャルに」とは要するに数値連番が得られるように走査するということ。<br />
+0ベースの連番を作ってインクリメントしながら foreach するのと全く変わらない。</p>
+<p>キーは連番、値は [$key, $value] で返す。<br />
+つまり、 Example のように foreach の list 構文を使えば「連番、キー、値」でループを回すことが可能になる。<br />
+「foreach で回したいんだけど連番も欲しい」という状況はまれによくあるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+$nkv = [];
+foreach (arrays($array) as $n =&gt; list($k, $v)) { // php7.1 以降なら list ではなく [] でも行ける
+    $nkv[] = "$n,$k,$v";
+}
+assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrayize()"> ryunosuke\Functions\Package\Arrays::arrayize()</a></h2>
 	<div class="description"><p>引数の配列を生成する。</p>
 <p>配列以外を渡すと配列化されて追加される。<br />
 連想配列は未対応。あくまで普通の配列化のみ。<br />
@@ -528,7 +544,8 @@ assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&g
 <p>$column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。<br />
 $callback は絞り込み条件を渡す。null を与えると true 相当の値でフィルタする。<br />
 つまり $column も $callback も省略した場合、実質的に array_filter と同じ動作になる。</p>
-<p>$column は配列を受け入れる。配列を渡した場合その共通項がコールバックに渡る。</p>
+<p>$column は配列を受け入れる。配列を渡した場合その値の共通項がコールバックに渡る。<br />
+連想配列の場合は「キーのカラム == 値」で filter する（それぞれで AND。厳密かどうかは $callback で指定。説明が難しいので Example を参照）。</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = [
@@ -547,6 +564,13 @@ assertSame(array_where($array, null, $equal_2), [2 =&gt; ['id' =&gt; 3, 'name' =
 // $column に配列を渡すと共通項が渡ってくる
 $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
 assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true]]);
+// $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
+assertSame(array_where($array, ['name' =&gt; 'piyo', 'flag' =&gt; false]), [2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false]]);
+// $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
+assertSame(array_where($array, [
+    'id'   =&gt; function($id){return $id &gt;= 3;},                       // id が 3 以上
+    'name' =&gt; function($name){return strpos($name, 'o') !== false;}, // name に o を含む
+]), [2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false]]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_filter()"> ryunosuke\Functions\Package\Arrays::array_map_filter()</a></h2>
@@ -1710,7 +1734,33 @@ if (probability(50)) {
             	<h2>class<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network"> ryunosuke\Functions\Package\Network</a></h2>
 	<div class="description"><p>ネットワーク関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()"> ryunosuke\Functions\Package\Network::http_requests()</a></h2>
+                	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::getipaddress()"> ryunosuke\Functions\Package\Network::getipaddress()</a></h2>
+	<div class="description"><p>接続元となる IP を返す</p>
+<p>要するに自分の IP を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 何らかの IP アドレスが返ってくる
+assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', getipaddress());
+// 自分への接続元は自分なので 127.0.0.1 を返す
+assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::incidr()"> ryunosuke\Functions\Package\Network::incidr()</a></h2>
+	<div class="description"><p>ipv4 の cidr チェック</p>
+<p>$ipaddr が $cidr のレンジ内なら true を返す。<br />
+$cidr は複数与えることができ、どれかに合致したら true を返す。</p>
+<p>ipv6 は今のところ未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 範囲内なので true
+assertTrue(incidr('192.168.1.1', '192.168.1.0/24'));
+// 範囲外なので false
+assertFalse(incidr('192.168.1.1', '192.168.2.0/24'));
+// 1つでも範囲内なら true
+assertTrue(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']));
+// 全部範囲外なら false
+assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()"> ryunosuke\Functions\Package\Network::http_requests()</a></h2>
 	<div class="description"><p>http リクエストを並列で投げる</p>
 <p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
 $urls の要素は単一の文字列か curl のオプションである必要がある。</p>
