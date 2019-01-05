@@ -4,6 +4,11 @@ namespace ryunosuke\Test\Package;
 
 class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_arrays()
+    {
+        $this->assertEquals([['a', 'A'], ['b', 'B'], ['c', 'C']], iterator_to_array((arrays)(['a' => 'A', 'b' => 'B', 'c' => 'C'])));
+    }
+
     function test_arrayize()
     {
         $this->assertEquals([1, 2, 3], (arrayize)(1, 2, 3));
