@@ -21,11 +21,12 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
             preg_match_all('#```php(.*?)```.*?function (.+?)\\(#us', file_get_contents($file), $matches, PREG_SET_ORDER);
             $contents = [];
             foreach ($matches as $match) {
-                $contents[] = '//' . $match[2] . preg_replace('#^     \* ?#um', '', $match[1]);
+                $contents[] = '// ' . $match[2];
+                $contents[] = "(function () {" . rtrim(preg_replace('#^     \* ?#um', '', $match[1])) . "\n})();\n";
             }
 
             $exfile = __DIR__ . '/../examples/' . basename($file);
-            file_put_contents($exfile, "<?php\nnamespace Example;\n" . implode("\n", $contents));
+            file_put_contents($exfile, "<?php\nnamespace Example;\n\n" . implode("\n", $contents));
             ob_start();
             include $exfile;
             ob_end_clean();
