@@ -249,7 +249,9 @@ class Utility
             $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
         }
         if (is_string($argv)) {
-            $argv = preg_split('#\s+#', $argv, -1, PREG_SPLIT_NO_EMPTY);
+            $argv = (quoteexplode)([" ", "\t"], $argv);
+            $argv = array_filter($argv, 'strlen');
+            $argv = array_map(function ($v) { return trim(str_replace('\\"', '"', $v), '"'); }, $argv);
         }
         $argv = array_values($argv);
 

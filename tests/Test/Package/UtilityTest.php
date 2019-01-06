@@ -364,6 +364,15 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
             'opt2 b' => [],
         ], '-a O11 -a O12 -b O21 arg1 arg2'));
 
+        // クオーティング
+        $this->assertSame([
+            'opt' => 'A B',
+            'arg1 arg2',
+            'a"b'
+        ], (arguments)([
+            'opt' => '',
+        ], '--opt "A B" "arg1 arg2" "a\\"b"'));
+
         // ルール不正
         $this->assertException('duplicated option name', arguments, ['opt1' => null, 'opt1 o' => null]);
         $this->assertException('duplicated short option', arguments, ['opt1 o' => null, 'opt2 o' => null]);
