@@ -141,6 +141,10 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('H,e,l,l,o', $co->ucfirst->str_split->implode1(',')());
         $this->assertEquals('H,e,l,l,o', (string) $co);
 
+        // internal
+        $co = (chain)('1,2,3,4,5');
+        $this->assertEquals([6, 8, 10], $co->multiexplode1(',')->filter_notP(['<' => 3])->mapsE('*2')->values()());
+
         // exception
         $this->assertException('is not defined', [(chain)(null), 'undefined_function']);
 

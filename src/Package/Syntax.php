@@ -331,15 +331,8 @@ class Syntax
                 return $this;
             }
 
-            private function _apply($name, $arguments)
+            private function _resolve($name)
             {
-                // 特別扱い1: map は非常によく呼ぶので引数を補正する
-                if ($name === 'map') {
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    return $this->array_map1(...$arguments);
-                }
-
-                // 実際の呼び出し1: 存在する関数はそのまま移譲する（defined や namespace は定数コール用）
                 if (false
                     || function_exists($fname = $name)
                     || function_exists($fname = "array_$name")
@@ -352,12 +345,26 @@ class Syntax
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */
+                    return $fname;
+                }
+            }
+
+            private function _apply($name, $arguments)
+            {
+                // 特別扱い1: map は非常によく呼ぶので引数を補正する
+                if ($name === 'map') {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    return $this->array_map1(...$arguments);
+                }
+
+                // 実際の呼び出し1: 存在する関数はそのまま移譲する
+                if ($fname = $this->_resolve($name)) {
                     $this->data = $fname($this->data, ...$arguments);
                     return $this;
                 }
                 // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
-                if (preg_match('#(.+?)(\d+)$#', $name, $match)) {
-                    $this->data = $match[1](...(array_insert)($arguments, [$this->data], $match[2]));
+                if (preg_match('#(.+?)(\d+)$#', $name, $match) && $fname = $this->_resolve($match[1])) {
+                    $this->data = $fname(...(array_insert)($arguments, [$this->data], $match[2]));
                     return $this;
                 }
 
