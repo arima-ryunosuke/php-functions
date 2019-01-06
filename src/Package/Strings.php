@@ -154,7 +154,7 @@ class Strings
      * ]);
      * ```
      *
-     * @param string $delimiter 分割文字列
+     * @param string|array $delimiter 分割文字列
      * @param string $string 対象文字列
      * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
      * @param string $escape エスケープ文字
@@ -167,7 +167,7 @@ class Strings
             $enclosures = array_combine($chars, $chars);
         }
 
-        $delimiterlen = strlen($delimiter);
+        $delimiters = (arrayize)($delimiter);
         $starts = implode('', array_keys($enclosures));
         $ends = implode('', $enclosures);
         $enclosing = [];
@@ -187,9 +187,15 @@ class Strings
                 $enclosing[] = $string[$i];
                 continue;
             }
-            if (empty($enclosing) && substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
-                $result[] = substr($string, $current, $i - $current);
-                $current = $i + $delimiterlen;
+            if (empty($enclosing)) {
+                foreach ($delimiters as $delimiter) {
+                    $delimiterlen = strlen($delimiter);
+                    if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
+                        $result[] = substr($string, $current, $i - $current);
+                        $current = $i + $delimiterlen;
+                        break;
+                    }
+                }
             }
         }
         $result[] = substr($string, $current, $i);

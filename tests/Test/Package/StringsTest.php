@@ -73,6 +73,13 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
             "'e,f'"
         ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'));
 
+        $this->assertEquals([
+            'a',
+            'b',
+            'c',
+            "'d e\tf'"
+        ], (quoteexplode)([" ", "\t"], "a b\tc 'd e\tf'"));
+
         assertEquals((quoteexplode)(',', 'a,b,{e,f}', ['{' => '}']), [
             'a',
             'b',
