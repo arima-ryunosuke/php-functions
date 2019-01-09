@@ -737,6 +737,24 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         ], (array_where)($array, null, function ($name, $key) {
             return $key === 2;
         }));
+
+        // 連想配列
+        $this->assertEquals([
+            1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+        ], (array_where)($array, ['flag' => 1], false));
+        $this->assertEquals([
+            1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+        ], (array_where)($array, ['flag' => true], true));
+        $this->assertEquals([
+            0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+        ], (array_where)($array, ['name' => 'hoge', 'flag' => false]));
+        $this->assertEquals([], (array_where)($array, ['flag' => 1], true));
+        $this->assertEquals([
+            0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+        ], (array_where)($array, ['name' => function ($name) { return $name === 'hoge'; }, 'flag' => function ($flag) { return !$flag; }]));
+
+        // 例外
+        $this->assertException('must be bool', array_where, $array, ['flag' => 1], function () { });
     }
 
     function test_array_map_filter()
