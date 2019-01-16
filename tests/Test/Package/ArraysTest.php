@@ -1876,10 +1876,10 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_difference()
     {
         $a1 = [
-            'common'      => [
+            'common'        => [
                 'key' => 'nodiff',
             ],
-            'diff'        => [
+            'diff'          => [
                 'common'         => [
                     'key' => 'nodiff',
                 ],
@@ -1890,23 +1890,32 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 'array1array2'   => [123, 456],
                 'hash1hash2'     => ['a' => 'A', 'b' => 'B'],
             ],
-            'mix'         => [
+            'mix'           => [
                 'first' => 'first',
                 1,
                 2,
                 3,
                 'last'  => 'last',
             ],
-            'diff1array'  => [
+            'diff1array'    => [
                 'hoge' => 'HOGE',
             ],
-            'diff1scalar' => 'hoge',
+            'diff1scalar'   => 'hoge',
+            'array'         => [[1, 2, 3, 4]],
+            'tags'          => [
+                ['name' => 'tag1', 'value' => 'val1'],
+                ['name' => 'tag2', 'value' => 'val2'],
+                ['name' => 'tag3', 'value' => 'val3'],
+                ['name' => 'tag4', 'value' => 'val4'],
+            ],
+            'array1scalar2' => [[1, 2, 3]],
+            'array2scalar1' => [123],
         ];
         $a2 = [
-            'common'      => [
+            'common'        => [
                 'key' => 'nodiff',
             ],
-            'diff'        => [
+            'diff'          => [
                 'common'         => [
                     'key' => 'nodiff',
                 ],
@@ -1917,119 +1926,161 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
                 'array1array2'   => [456, 789],
                 'hash1hash2'     => ['b' => 'xB', 'c' => 'C'],
             ],
-            'mix'         => [
+            'mix'           => [
                 'first' => 'FIRST',
                 2,
                 3,
                 4,
                 'last'  => 'LAST',
             ],
-            'diff2array'  => [
+            'diff2array'    => [
                 'fuga' => 'FUGA',
             ],
-            'diff2scalar' => 'fuga',
+            'diff2scalar'   => 'fuga',
+            'array'         => [[3, 4, 5, 6]],
+            'tags'          => [
+                ['name' => 'tag2', 'value' => 'val2'],
+                ['name' => 'tag3', 'value' => 'X'],
+                ['name' => 'tag9', 'value' => 'val9'],
+            ],
+            'array1scalar2' => [123],
+            'array2scalar1' => [[1, 2, 3]],
         ];
 
         //(var_export2)((array_difference)($a1, $a2));
-        $this->assertSame([
+        $this->assertEquals([
             // common は共通しているので結果に出ない
             // 'common' => [],
             // diff.only1 は 1 にしかないので '-' のみ
-            'diff.only1'           => [
+            'diff.only1'          => [
                 '-' => 'hoge',
             ],
 
-            // diff.array1scalar2 は 1 が配列で 2 がスカラーなので '-' が2つ出現する
-            'diff.array1scalar2.0' => [
-                '-' => 123,
-            ],
-            'diff.array1scalar2.1' => [
-                '-' => 456,
-            ],
-
-            // diff.array1scalar2 は 1 が配列で 2 がスカラーなので '+' が1つ出現する
-            'diff.array1scalar2'   => [
+            // diff.array1scalar2 は 1 が配列で 2 がスカラーなので '-' が配列、 '+' が1つ出現する
+            'diff.array1scalar2'  => [
+                '-' => [123, 456],
                 '+' => 123456,
             ],
 
-            // diff.scalar1array2 は 1 がスカラーで 2 が配列なので '-' が1つ出現する
-            'diff.scalar1array2'   => [
+            // diff.scalar1array2 は 1 がスカラーで 2 が配列なので '-' が1つ '+' が配列で出現する
+            'diff.scalar1array2'  => [
                 '-' => 456789,
-            ],
-
-            // diff.scalar1array2 は 1 がスカラーで 2 が配列なので '+' が2つ出現する
-            'diff.scalar1array2.0' => [
-                '+' => 456,
-            ],
-            'diff.scalar1array2.1' => [
-                '+' => 789,
+                '+' => [456, 789],
             ],
 
             // diff.scalar1scalar2 は 1 がスカラーで 2 がスカラーなので '+' '-' が出現する
-            'diff.scalar1scalar2'  => [
+            'diff.scalar1scalar2' => [
                 '-' => 'hoge',
                 '+' => 'fuga',
             ],
 
             // diff.array1array2 は共にただの配列なので '+' '-' がそれぞれ出現する（456 はキーが異なるが出現しない）
-            'diff.array1array2.0'  => [
-                '-' => 123,
-            ],
-            'diff.array1array2.1'  => [
-                '+' => 789,
+            'diff.array1array2'   => [
+                '-' => [123],
+                '+' => [789],
             ],
 
             // diff.array1array2 は共に連想配列なので '+' '-' がそれぞれ出現する（b は値が異なるので '+' '-'）
-            'diff.hash1hash2.a'    => [
+            'diff.hash1hash2.a'   => [
                 '-' => 'A',
             ],
-            'diff.hash1hash2.b'    => [
+            'diff.hash1hash2.b'   => [
                 '-' => 'B',
                 '+' => 'xB',
             ],
-            'diff.hash1hash2.c'    => [
+            'diff.hash1hash2.c'   => [
                 '+' => 'C',
             ],
 
             // diff.only2 は 2 にしかないので '+' のみ
-            'diff.only2'           => [
+            'diff.only2'          => [
                 '+' => 'fuga',
             ],
 
             // 数値キーと文字キーの混在
-            'mix.0'                => [
-                '-' => 1,
+            'mix'                 => [
+                '-' => [1],
+                '+' => [4],
             ],
-            'mix.2'                => [
-                '+' => 4,
-            ],
-            'mix.first'            => [
+            'mix.first'           => [
                 '-' => 'first',
                 '+' => 'FIRST',
             ],
-            'mix.last'             => [
+            'mix.last'            => [
                 '-' => 'last',
                 '+' => 'LAST',
             ],
 
             // diff1array は 1 にしかないので '-' のみ
-            'diff1array'           => [
+            'diff1array'          => [
                 '-' => ['hoge' => 'HOGE'],
             ],
 
             // diff1scalar は 1 にしかないので '-' のみ
-            'diff1scalar'          => [
+            'diff1scalar'         => [
                 '-' => 'hoge',
             ],
 
             // diff2array は 2 にしかないので '+' のみ
-            'diff2array'           => [
+            'diff2array'          => [
                 '+' => ['fuga' => 'FUGA'],
             ],
 
             // diff2scalar は 2 にしかないので '+' のみ
-            'diff2scalar'          => [
+            'diff2scalar'         => [
                 '+' => 'fuga',
+            ],
+
+            // 素の配列の配列
+            'array'               => [
+                '-' => [
+                    [1, 2, 3, 4],
+                ],
+                '+' => [
+                    [3, 4, 5, 6],
+                ],
+            ],
+
+            // 連想配列の配列
+            'tags'                => [
+                '-' => [
+                    [
+                        'name'  => 'tag1',
+                        'value' => 'val1',
+                    ],
+                    [
+                        'name'  => 'tag3',
+                        'value' => 'val3',
+                    ],
+                    [
+                        'name'  => 'tag4',
+                        'value' => 'val4',
+                    ],
+                ],
+                '+' => [
+                    [
+                        'name'  => 'tag3',
+                        'value' => 'X',
+                    ],
+                    [
+                        'name'  => 'tag9',
+                        'value' => 'val9',
+                    ],
+                ],
+            ],
+
+            // 素の配列とスカラーの混在
+            'array1scalar2'       => [
+                '-' => [
+                    [1, 2, 3],
+                ],
+                '+' => [123],
+            ],
+            'array2scalar1'       => [
+                '-' => [123],
+                '+' => [
+                    [1, 2, 3],
+                ],
             ],
         ], (array_difference)($a1, $a2));
     }

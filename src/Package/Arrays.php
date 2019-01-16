@@ -2855,56 +2855,52 @@ class Arrays
             'list' => static function ($v, $k) { return is_int($k); },
             'hash' => static function ($v, $k) { return !is_int($k); },
         ];
-        $prefixer = static function ($key, $k) use ($delimiter) {
-            return $key === '' ? $k : $key . $delimiter . $k;
-        };
 
-        return call_user_func($f = static function ($array1, $array2, $key = '') use (&$f, $rule, $prefixer) {
+        $udiff = static function ($a, $b) { return $a <=> $b; };
+
+        return call_user_func($f = static function ($array1, $array2, $key = null) use (&$f, $rule, $udiff, $delimiter) {
             $result = [];
 
             $array1 = (array_assort)($array1, $rule);
             $array2 = (array_assort)($array2, $rule);
 
-            foreach (array_diff($array1['list'], $array2['list']) as $k => $v1) {
-                $prefix = $prefixer($key, $k);
-                $result[$prefix] = ['-' => $v1];
-            }
-            foreach (array_diff($array2['list'], $array1['list']) as $k => $v2) {
-                $prefix = $prefixer($key, $k);
-                $result[$prefix] = ['+' => $v2];
-            }
-            foreach ($array1['hash'] + $array2['hash'] as $k => $dummy) {
-                $exists1 = array_key_exists($k, $array1['hash']);
-                $exists2 = array_key_exists($k, $array2['hash']);
+            $list1 = array_values(array_udiff($array1['list'], $array2['list'], $udiff));
+            $list2 = array_values(array_udiff($array2['list'], $array1['list'], $udiff));
+            for ($k = 0, $l = max(count($list1), count($list2)); $k < $l; $k++) {
+                $exists1 = array_key_exists($k, $list1);
+                $exists2 = array_key_exists($k, $list2);
 
-                $v1 = $exists1 ? $array1['hash'][$k] : null;
-                $v2 = $exists2 ? $array2['hash'][$k] : null;
+                $v1 = $exists1 ? $list1[$k] : null;
+                $v2 = $exists2 ? $list2[$k] : null;
 
-                $is_array1 = is_array($v1);
-                $is_array2 = is_array($v2);
-
-                $prefix = $prefixer($key, $k);
-                if ($exists1 && $exists2) {
-                    if ($is_array1 && $is_array2) {
-                        $result += $f($v1, $v2, $prefix);
-                    }
-                    elseif ($is_array1) {
-                        $result += $f($v1, [], $prefix);
-                        $result[$prefix] = ['+' => $v2];
-                    }
-                    elseif ($is_array2) {
-                        $result[$prefix] = ['-' => $v1];
-                        $result += $f([], $v2, $prefix);
-                    }
-                    elseif ($v1 !== $v2) {
-                        $result[$prefix] = ['-' => $v1, '+' => $v2];
-                    }
+                $prefix = $key === null ? count($result) : $key;
+                if ($exists1) {
+                    $result[$prefix]['-'][] = $v1;
                 }
-                elseif ($exists1) {
-                    $result[$prefix] = ['-' => $v1];
+                if ($exists2) {
+                    $result[$prefix]['+'][] = $v2;
                 }
-                elseif ($exists2) {
-                    $result[$prefix] = ['+' => $v2];
+            }
+
+            $hash1 = array_udiff_assoc($array1['hash'], $array2['hash'], $udiff);
+            $hash2 = array_udiff_assoc($array2['hash'], $array1['hash'], $udiff);
+            foreach (array_keys($hash1 + $hash2) as $k) {
+                $exists1 = array_key_exists($k, $hash1);
+                $exists2 = array_key_exists($k, $hash2);
+
+                $v1 = $exists1 ? $hash1[$k] : null;
+                $v2 = $exists2 ? $hash2[$k] : null;
+
+                $prefix = $key === null ? $k : $key . $delimiter . $k;
+                if (is_array($v1) && is_array($v2)) {
+                    $result += $f($v1, $v2, $prefix);
+                    continue;
+                }
+                if ($exists1) {
+                    $result[$prefix]['-'] = $v1;
+                }
+                if ($exists2) {
+                    $result[$prefix]['+'] = $v2;
                 }
             }
 
