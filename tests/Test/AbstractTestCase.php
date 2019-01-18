@@ -25,23 +25,25 @@ class AbstractTestCase extends TestCase
             }
         }
 
+        $args = array_slice(func_get_args(), 2);
+        $message = json_encode($args, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         try {
-            $callback(...array_slice(func_get_args(), 2));
+            $callback(...$args);
         }
         catch (\Exception $ex) {
             // 型は常に判定
-            self::assertInstanceOf(get_class($e), $ex);
+            self::assertInstanceOf(get_class($e), $ex, $message);
             // コードは指定されていたときのみ
             if ($e->getCode() > 0) {
-                self::assertEquals($e->getCode(), $ex->getCode());
+                self::assertEquals($e->getCode(), $ex->getCode(), $message);
             }
             // メッセージも指定されていたときのみ
             if (strlen($e->getMessage()) > 0) {
-                self::assertContains($e->getMessage(), $ex->getMessage());
+                self::assertContains($e->getMessage(), $ex->getMessage(), $message);
             }
             return;
         }
-        self::fail(get_class($e) . ' is not thrown.');
+        self::fail(get_class($e) . ' is not thrown.' . $message);
     }
 
     /**
