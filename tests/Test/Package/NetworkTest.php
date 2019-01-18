@@ -4,6 +4,13 @@ namespace ryunosuke\Test\Package;
 
 class NetworkTest extends \ryunosuke\Test\AbstractTestCase
 {
+    function test_getipaddress()
+    {
+        $this->assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', (getipaddress)());
+
+        @$this->assertException('php_network_getaddresses', getipaddress, '256.256.256.256');
+    }
+
     function test_http_requests()
     {
         if (!defined('TESTWEBSERVER')) {

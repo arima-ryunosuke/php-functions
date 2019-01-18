@@ -8,6 +8,36 @@ namespace ryunosuke\Functions\Package;
 class Network
 {
     /**
+     * 接続元となる IP を返す
+     *
+     * 要するに自分の IP を返す。
+     *
+     * Example:
+     * ```php
+     * // 何らかの IP アドレスが返ってくる
+     * assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', getipaddress());
+     * // 自分への接続元は自分なので 127.0.0.1 を返す
+     * assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
+     * ```
+     *
+     * @param string $target 接続先。基本的に指定することはない
+     * @return string IP アドレス
+     */
+    public static function getipaddress($target = '128.0.0.0')
+    {
+        $socket = stream_socket_client("udp://$target:7", $errno, $errstr);
+        if ($socket === false) {
+            throw new \InvalidArgumentException($errstr, $errno);
+        }
+        $sname = stream_socket_get_name($socket, false);
+        $ipaddr = parse_url($sname, PHP_URL_HOST);
+
+        fclose($socket);
+
+        return $ipaddr;
+    }
+
+    /**
      * http リクエストを並列で投げる
      *
      * $urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。
