@@ -38,6 +38,54 @@ class Network
     }
 
     /**
+     * ipv4 の cidr チェック
+     *
+     * $ipaddr が $cidr のレンジ内なら true を返す。
+     * $cidr は複数与えることができ、どれかに合致したら true を返す。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * // 範囲内なので true
+     * assertTrue(incidr('192.168.1.1', '192.168.1.0/24'));
+     * // 範囲外なので false
+     * assertFalse(incidr('192.168.1.1', '192.168.2.0/24'));
+     * // 1つでも範囲内なら true
+     * assertTrue(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']));
+     * // 全部範囲外なら false
+     * assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
+     * ```
+     *
+     * @param string $ipaddr 調べられる IP アドレス
+     * @param string|array $cidr 調べる cidr アドレス
+     * @return bool $ipaddr が $cidr 内なら true
+     */
+    public static function incidr($ipaddr, $cidr)
+    {
+        if (!filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("ipaddr '$ipaddr' is invalid.");
+        }
+        $iplong = ip2long($ipaddr);
+
+        foreach ((arrayize)($cidr) as $cidr) {
+            list($subnet, $length) = explode('/', $cidr, 2) + [1 => '32'];
+
+            if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                throw new \InvalidArgumentException("subnet addr '$subnet' is invalid.");
+            }
+            if (!(ctype_digit($length) && (0 <= $length && $length <= 32))) {
+                throw new \InvalidArgumentException("subnet mask '$length' is invalid.");
+            }
+
+            if (substr_compare(sprintf('%032b', $iplong), sprintf('%032b', ip2long($subnet)), 0, $length) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * http リクエストを並列で投げる
      *
      * $urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。
