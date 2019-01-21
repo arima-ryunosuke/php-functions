@@ -10,6 +10,23 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.7
+
+- [feature][Strings] markdown_table を追加
+- [feature][Strings] htmltag を追加
+- [feature][Strings] str_guess を追加
+- [feature][Strings] damerau_levenshtein を追加
+- [feature][Strings] ini_import/ini_export を追加
+- [feature][Strings] csv_import/csv_export を追加
+- [feature][Strings] json_import/json_export を追加
+- [feature][Funchand] namedcallize を追加
+- [fixbug][Sql] sql_format で特殊構文で改行がなされない不具合を修正
+- [fixbug][Strings] multiexplode で複数デリミタ＋負数を与えると文字列が変わってしまう不具合を修正
+- [change][Vars] var_export2 の文字列表現をダブルクオートに変更
+  - php としては壊れていない
+- [change][Funchand] ope_func の仕様変更
+  - 引数が減った。減る方向なので互換性は壊れていない
+
 ## 1.2.6
 
 - [feature][Arrays] arrays を追加
