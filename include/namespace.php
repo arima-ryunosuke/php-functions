@@ -599,6 +599,7 @@ const KEYWORDS = array (
   590 => 'YEAR',
   591 => 'YEARWEEK',
 );
+const JSON_MAX_DEPTH = -1;
 const TOKEN_NAME = 2;
 
 # functions
@@ -4986,79 +4987,60 @@ if (!isset($excluded_functions['ope_func']) && (!function_exists('ryunosuke\\Fun
      * $not = ope_func('!');    // 否定演算子クロージャ
      * assertSame(false, $not(true));
      *
-     * $minus1 = ope_func('-', 1); // 負数演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
-     * $minus2 = ope_func('-', 2); // 減算演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
-     * assertSame(-2, $minus1(2));
-     * assertSame(3 - 2, $minus2(3, 2));
+     * $minus = ope_func('-'); // マイナス演算子クロージャ
+     * assertSame(-2, $minus(2));       // 引数1つで呼ぶと1項演算子
+     * assertSame(3 - 2, $minus(3, 2)); // 引数2つで呼ぶと2項演算子
      *
-     * $cond2 = ope_func('?:', 2); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
-     * $cond3 = ope_func('?:', 3); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
-     * assertSame('OK' ?: 'NG', $cond2('OK', 'NG'));
-     * assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
+     * $cond = ope_func('?:'); // 条件演算子クロージャ
+     * assertSame('OK' ?: 'NG', $cond('OK', 'NG'));               // 引数2つで呼ぶと2項演算子
+     * assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼ぶと3項演算子
      * ```
      *
      * @param string $operator 演算子
-     * @param int $n 何項演算子か明示する引数
      * @return \Closure 演算子のクロージャ
      */
-    function ope_func($operator, $n = null)
+    function ope_func($operator)
     {
         static $operators = null;
         $operators = $operators ?: [
-            1 => [
-                ''   => function ($v1) { return $v1; }, // こんな演算子はないが、「if ($value) {}」として使えることがある
-                '!'  => function ($v1) { return !$v1; },
-                '+'  => function ($v1) { return +$v1; },
-                '-'  => function ($v1) { return -$v1; },
-                '~'  => function ($v1) { return ~$v1; },
-                '++' => function ($v1) { return ++$v1; },
-                '--' => function ($v1) { return --$v1; },
-            ],
-            2 => [
-                '?:'         => function ($v1, $v2) { return $v1 ?: $v2; },
-                '??'         => function ($v1, $v2) { return $v1 ?? $v2; },
-                '=='         => function ($v1, $v2) { return $v1 == $v2; },
-                '==='        => function ($v1, $v2) { return $v1 === $v2; },
-                '!='         => function ($v1, $v2) { return $v1 != $v2; },
-                '<>'         => function ($v1, $v2) { return $v1 <> $v2; },
-                '!=='        => function ($v1, $v2) { return $v1 !== $v2; },
-                '<'          => function ($v1, $v2) { return $v1 < $v2; },
-                '<='         => function ($v1, $v2) { return $v1 <= $v2; },
-                '>'          => function ($v1, $v2) { return $v1 > $v2; },
-                '>='         => function ($v1, $v2) { return $v1 >= $v2; },
-                '<=>'        => function ($v1, $v2) { return $v1 <=> $v2; },
-                '.'          => function ($v1, $v2) { return $v1 . $v2; },
-                '+'          => function ($v1, $v2) { return $v1 + $v2; },
-                '-'          => function ($v1, $v2) { return $v1 - $v2; },
-                '*'          => function ($v1, $v2) { return $v1 * $v2; },
-                '/'          => function ($v1, $v2) { return $v1 / $v2; },
-                '%'          => function ($v1, $v2) { return $v1 % $v2; },
-                '**'         => function ($v1, $v2) { return $v1 ** $v2; },
-                '^'          => function ($v1, $v2) { return $v1 ^ $v2; },
-                '&'          => function ($v1, $v2) { return $v1 & $v2; },
-                '|'          => function ($v1, $v2) { return $v1 | $v2; },
-                '<<'         => function ($v1, $v2) { return $v1 << $v2; },
-                '>>'         => function ($v1, $v2) { return $v1 >> $v2; },
-                '&&'         => function ($v1, $v2) { return $v1 && $v2; },
-                '||'         => function ($v1, $v2) { return $v1 || $v2; },
-                'or'         => function ($v1, $v2) { return $v1 or $v2; },
-                'and'        => function ($v1, $v2) { return $v1 and $v2; },
-                'xor'        => function ($v1, $v2) { return $v1 xor $v2; },
-                'instanceof' => function ($v1, $v2) { return $v1 instanceof $v2; },
-            ],
-            3 => [
-                '?:' => function ($v1, $v2, $v3) { return $v1 ? $v2 : $v3; },
-            ],
+            ''           => static function ($v1) { return $v1; }, // こんな演算子はないが、「if ($value) {}」として使えることがある
+            '!'          => static function ($v1) { return !$v1; },
+            '+'          => static function ($v1, $v2 = null) { return func_num_args() === 1 ? (+$v1) : ($v1 + $v2); },
+            '-'          => static function ($v1, $v2 = null) { return func_num_args() === 1 ? (-$v1) : ($v1 - $v2); },
+            '~'          => static function ($v1) { return ~$v1; },
+            '++'         => static function (&$v1) { return ++$v1; },
+            '--'         => static function (&$v1) { return --$v1; },
+            '?:'         => static function ($v1, $v2, $v3 = null) { return func_num_args() === 2 ? ($v1 ?: $v2) : ($v1 ? $v2 : $v3); },
+            '??'         => static function ($v1, $v2) { return $v1 ?? $v2; },
+            '=='         => static function ($v1, $v2) { return $v1 == $v2; },
+            '==='        => static function ($v1, $v2) { return $v1 === $v2; },
+            '!='         => static function ($v1, $v2) { return $v1 != $v2; },
+            '<>'         => static function ($v1, $v2) { return $v1 <> $v2; },
+            '!=='        => static function ($v1, $v2) { return $v1 !== $v2; },
+            '<'          => static function ($v1, $v2) { return $v1 < $v2; },
+            '<='         => static function ($v1, $v2) { return $v1 <= $v2; },
+            '>'          => static function ($v1, $v2) { return $v1 > $v2; },
+            '>='         => static function ($v1, $v2) { return $v1 >= $v2; },
+            '<=>'        => static function ($v1, $v2) { return $v1 <=> $v2; },
+            '.'          => static function ($v1, $v2) { return $v1 . $v2; },
+            '*'          => static function ($v1, $v2) { return $v1 * $v2; },
+            '/'          => static function ($v1, $v2) { return $v1 / $v2; },
+            '%'          => static function ($v1, $v2) { return $v1 % $v2; },
+            '**'         => static function ($v1, $v2) { return $v1 ** $v2; },
+            '^'          => static function ($v1, $v2) { return $v1 ^ $v2; },
+            '&'          => static function ($v1, $v2) { return $v1 & $v2; },
+            '|'          => static function ($v1, $v2) { return $v1 | $v2; },
+            '<<'         => static function ($v1, $v2) { return $v1 << $v2; },
+            '>>'         => static function ($v1, $v2) { return $v1 >> $v2; },
+            '&&'         => static function ($v1, $v2) { return $v1 && $v2; },
+            '||'         => static function ($v1, $v2) { return $v1 || $v2; },
+            'or'         => static function ($v1, $v2) { return $v1 or $v2; },
+            'and'        => static function ($v1, $v2) { return $v1 and $v2; },
+            'xor'        => static function ($v1, $v2) { return $v1 xor $v2; },
+            'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
         ];
 
-        $operator = trim($operator);
-        foreach ($operators as $kou => $ops) {
-            if (($n === null || $n == $kou) && isset($ops[$operator])) {
-                return $ops[$operator];
-            }
-        }
-
-        throw new \InvalidArgumentException("$operator is not defined Operator.");
+        return $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));
     }
 }
 
@@ -5372,6 +5354,150 @@ if (!isset($excluded_functions['by_builtin']) && (!function_exists('ryunosuke\\F
             $last = $trace;
         }
         throw new \RuntimeException('failed to search backtrace.');
+    }
+}
+
+const namedcallize = 'ryunosuke\\Functions\\namedcallize';
+if (!isset($excluded_functions['namedcallize']) && (!function_exists('ryunosuke\\Functions\\namedcallize') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\namedcallize'))->isInternal()))) {
+    /**
+     * callable を名前付き引数で呼べるようにしたクロージャを返す
+     *
+     * callable のデフォルト引数は適用されるが、それ以外にも $default でデフォルト値を与えることができる（部分適用のようなものだと思えば良い）。
+     * 最終的な優先順位は下記。上に行くほど優先。
+     *
+     * 1. 呼び出し時の引数
+     * 2. この関数の $default 引数
+     * 3. callable のデフォルト引数
+     *
+     * 引数は n 番目でも引数名でもどちらでも良い。
+     * n 番目の場合は引数名に依存しないが、順番に依存してしまう。
+     * 引数名の場合は順番に依存しないが、引数名に依存してしまう。
+     *
+     * 可変引数の場合は 1 と 2 がマージされる。
+     * 必須引数が渡されていない or 定義されていない引数が渡された場合は例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // ベースとなる関数（引数をそのまま連想配列で返す）
+     * $f = function ($x, $a = 1, $b = 2, ...$other){return get_defined_vars();};
+     *
+     * // x に 'X', a に 9 を与えて名前付きで呼べるクロージャ
+     * $f1 = namedcallize($f, [
+     *     'x' => 'X',
+     *     'a' => 9,
+     * ]);
+     * // 引数無しで呼ぶと↑で与えた引数が使用される（b は渡されていないのでデフォルト引数の 2 が使用される）
+     * assertSame($f1(), [
+     *     'x'     => 'X',
+     *     'a'     => 9,
+     *     'b'     => 2,
+     *     'other' => [],
+     * ]);
+     * // 引数付きで呼ぶとそれが優先される
+     * assertSame($f1([
+     *     'x'     => 'XXX',
+     *     'a'     => 99,
+     *     'b'     => 999,
+     *     'other' => [1, 2, 3],
+     * ]), [
+     *     'x'     => 'XXX',
+     *     'a'     => 99,
+     *     'b'     => 999,
+     *     'other' => [1, 2, 3],
+     * ]);
+     * // 引数名ではなく、 n 番目指定でも同じ
+     * assertSame($f1([
+     *     'x' => 'XXX',
+     *     1   => 99,
+     *     2   => 999,
+     *     3   => [1, 2, 3],
+     * ]), [
+     *     'x'     => 'XXX',
+     *     'a'     => 99,
+     *     'b'     => 999,
+     *     'other' => [1, 2, 3],
+     * ]);
+     *
+     * // x に 'X', other に [1, 2, 3] を与えて名前付きで呼べるクロージャ
+     * $f2 = namedcallize($f, [
+     *     'x'     => 'X',
+     *     'other' => [1, 2, 3],
+     * ]);
+     * // other は可変引数なのでマージされる
+     * assertSame($f2(['other' => [4, 5, 6]]), [
+     *     'x'     => 'X',
+     *     'a'     => 1,
+     *     'b'     => 2,
+     *     'other' => [1, 2, 3, 4, 5, 6],
+     * ]);
+     * ```
+     *
+     * @param callable $callable
+     * @param array $defaults デフォルト引数
+     * @return \Closure 名前付き引数で呼べるようにしたクロージャ
+     */
+    function namedcallize($callable, $defaults = [])
+    {
+        // @formatter:off
+        static $dummy_arg;
+        $dummy_arg = $dummy_arg ?? new class{};
+        $dummy_class = get_class($dummy_arg);
+        // @formatter:on
+
+        /** @var \ReflectionParameter[] $refparams */
+        $refparams = (reflect_callable)($callable)->getParameters();
+
+        $defargs = [];
+        $argnames = [];
+        $variadicname = null;
+        foreach ($refparams as $n => $param) {
+            $pname = $param->getName();
+
+            $argnames[$n] = $pname;
+
+            // 可変引数は貯めておく
+            if ($param->isVariadic()) {
+                $variadicname = $pname;
+            }
+
+            // ユーザ指定は最優先
+            if (array_key_exists($pname, $defaults)) {
+                $defargs[$pname] = $defaults[$pname];
+            }
+            elseif (array_key_exists($n, $defaults)) {
+                $defargs[$pname] = $defaults[$n];
+            }
+            // デフォルト引数があるならそれを
+            elseif ($param->isDefaultValueAvailable()) {
+                $defargs[$pname] = $param->getDefaultValue();
+            }
+            // それ以外なら「指定されていない」ことを表すダミー引数を入れておく（あとでチェックに使う）
+            else {
+                $defargs[$pname] = $param->isVariadic() ? [] : $dummy_arg;
+            }
+        }
+
+        return function ($params = []) use ($callable, $defargs, $argnames, $variadicname, $dummy_class) {
+            $params = (array_map_key)($params, function ($k) use ($argnames) { return is_int($k) ? $argnames[$k] : $k; });
+            $params = array_replace($defargs, $params);
+
+            // 勝手に突っ込んだ $dummy_class がいるのはおかしい。指定されていないと思われる
+            if ($dummyargs = array_filter($params, function ($v) use ($dummy_class) { return $v instanceof $dummy_class; })) {
+                throw new \InvalidArgumentException('missing required arguments(' . implode(', ', array_keys($dummyargs)) . ').');
+            }
+            // diff って余りが出るのはおかしい。余計なものがあると思われる
+            if ($diffargs = array_diff_key($params, $defargs)) {
+                throw new \InvalidArgumentException('specified undefined arguments(' . implode(', ', array_keys($diffargs)) . ').');
+            }
+
+            // 可変引数はマージする
+            if ($variadicname) {
+                $params = array_merge($params, $defargs[$variadicname], $params[$variadicname]);
+                unset($params[$variadicname]);
+            }
+
+            return $callable(...array_values($params));
+        };
     }
 }
 
@@ -6450,7 +6576,9 @@ if (!isset($excluded_functions['sql_format']) && (!function_exists('ryunosuke\\F
                         $result[] = $MARK_BR . $virttoken . $MARK_SP;
                         break;
                     case "ON":
-                        if ($subcontext === 'SET') {
+                        // ON は ON でも mysql の ON DUPLICATED かもしれない（pgsql の ON CONFLICT も似たようなコンテキスト）
+                        $name = $seek($index, +1);
+                        if (in_array(strtoupper($name), ['DUPLICATE', 'CONFLICT'], true)) {
                             $result[] = $MARK_BR;
                             $subcontext = '';
                         }
@@ -6675,7 +6803,7 @@ if (!isset($excluded_functions['multiexplode']) && (!function_exists('ryunosuke\
      * $delimiter には配列が使える。いわゆる「複数文字列での分割」の動作になる。
      *
      * $limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。
-     * 素の explode の負数 $limit の動作が微妙に気に入らない（implode 正数と対称性がない）ので再実装。
+     * 端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。
      *
      * Example:
      * ```php
@@ -6684,7 +6812,7 @@ if (!isset($excluded_functions['multiexplode']) && (!function_exists('ryunosuke\
      * // 負数を与えると前詰め
      * assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
      * // もちろん上記2つは共存できる
-     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b,c', 'd']);
+     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
      * ```
      *
      * @param string|array $delimiter 分割文字列。配列可
@@ -6694,21 +6822,17 @@ if (!isset($excluded_functions['multiexplode']) && (!function_exists('ryunosuke\
      */
     function multiexplode($delimiter, $string, $limit = \PHP_INT_MAX)
     {
-        if (is_array($delimiter)) {
-            $representative = reset($delimiter);
-            $string = str_replace($delimiter, $representative, $string);
-            $delimiter = $representative;
-        }
-
+        $limit = (int) $limit;
         if ($limit < 0) {
-            $parts = explode($delimiter, $string);
-            $sub = array_splice($parts, 0, $limit + 1);
-            if ($sub) {
-                array_unshift($parts, implode($delimiter, $sub));
-            }
-            return $parts;
+            // 下手に php で小細工するよりこうやって富豪的にやるのが一番速かった
+            return array_reverse(array_map('strrev', (multiexplode)($delimiter, strrev($string), -$limit)));
         }
-        return explode($delimiter, $string, $limit);
+        // explode において 0 は 1 と等しい
+        if ($limit === 0) {
+            $limit = 1;
+        }
+        $delimiter = array_map(function ($v) { return preg_quote($v, '#'); }, (arrayize)($delimiter));
+        return preg_split('#' . implode('|', $delimiter) . '#', $string, $limit);
     }
 }
 
@@ -7313,6 +7437,168 @@ if (!isset($excluded_functions['chain_case']) && (!function_exists('ryunosuke\\F
     }
 }
 
+const htmltag = 'ryunosuke\\Functions\\htmltag';
+if (!isset($excluded_functions['htmltag']) && (!function_exists('ryunosuke\\Functions\\htmltag') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\htmltag'))->isInternal()))) {
+    /**
+     * css セレクタから html 文字列を生成する
+     *
+     * `tag#id.class[attr=value]` のような css セレクタから `<tag id="id" class="class" attr="value"></tag>` のような html 文字列を返す。
+     * 配列を与えるとキーがセレクタ、値がコンテント文字列になる。
+     * さらに値が配列だと再帰して生成する。
+     *
+     * 値や属性は適切に htmlspecialchars される。
+     *
+     * Example:
+     * ```php
+     * // 単純文字列はただのタグを生成する
+     * assertSame(
+     *     htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'),
+     *     '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
+     * );
+     * // ペア配列を与えるとコンテント文字列になる
+     * assertSame(
+     *     htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' => "this is text's content"]),
+     *     '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden>this is text&#039;s content</a>'
+     * );
+     * // ネストした配列を与えると再帰される
+     * assertSame(
+     *     htmltag([
+     *         'div#wrapper' => [
+     *             'b.class1' => [
+     *                 '<plain>',
+     *             ],
+     *             'b.class2' => [
+     *                 '<plain1>',
+     *                 's' => '<strike>',
+     *                 '<plain2>',
+     *             ],
+     *         ],
+     *     ]),
+     *     '<div id="wrapper"><b class="class1">&lt;plain&gt;</b><b class="class2">&lt;plain1&gt;<s>&lt;strike&gt;</s>&lt;plain2&gt;</b></div>'
+     * );
+     * ```
+     *
+     * @param string|array $selector
+     * @return string html 文字列
+     */
+    function htmltag($selector)
+    {
+        if (!(is_iterable)($selector)) {
+            $selector = [$selector => ''];
+        }
+
+        $html = static function ($string) {
+            return htmlspecialchars($string, ENT_QUOTES);
+        };
+
+        $build = static function ($selector, $content, $escape) use ($html) {
+            $tag = '';
+            $id = '';
+            $classes = [];
+            $attrs = [];
+
+            $context = null;
+            $escaping = null;
+            $chars = preg_split('##u', $selector, -1, PREG_SPLIT_NO_EMPTY);
+            for ($i = 0, $l = count($chars); $i < $l; $i++) {
+                $char = $chars[$i];
+                if ($char === '"' || $char === "'") {
+                    $escaping = $escaping === $char ? null : $char;
+                }
+
+                if (!$escaping && $char === '#') {
+                    if (strlen($id)) {
+                        throw new \InvalidArgumentException('#id is multiple.');
+                    }
+                    $context = $char;
+                    continue;
+                }
+                if (!$escaping && $char === '.') {
+                    $context = $char;
+                    $classes[] = '';
+                    continue;
+                }
+                if (!$escaping && $char === '[') {
+                    $context = $char;
+                    $attrs[] = '';
+                    continue;
+                }
+                if (!$escaping && $char === ']') {
+                    $context = null;
+                    continue;
+                }
+
+                if ($char === '\\') {
+                    $char = $chars[++$i];
+                }
+
+                if ($context === null) {
+                    $tag .= $char;
+                    continue;
+                }
+                if ($context === '#') {
+                    $id .= $char;
+                    continue;
+                }
+                if ($context === '.') {
+                    $classes[count($classes) - 1] .= $char;
+                    continue;
+                }
+                if ($context === '[') {
+                    $attrs[count($attrs) - 1] .= $char;
+                    continue;
+                }
+            }
+
+            if (!strlen($tag)) {
+                throw new \InvalidArgumentException('tagname is empty.');
+            }
+
+            $attrkv = [];
+            if (strlen($id)) {
+                $attrkv['id'] = $id;
+            }
+            if ($classes) {
+                $attrkv['class'] = implode(' ', $classes);
+            }
+            foreach ($attrs as $attr) {
+                list($k, $v) = explode('=', $attr, 2) + [1 => null];
+                if (array_key_exists($k, $attrkv)) {
+                    throw new \InvalidArgumentException("[$k] is dumplicated.");
+                }
+                $attrkv[$k] = $v;
+            }
+            $attrs = [];
+            foreach ($attrkv as $k => $v) {
+                $attrs[] = $v === null
+                    ? $html($k)
+                    : sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
+            }
+
+            preg_match('#(\s*)(.+)(\s*)#u', $tag, $m);
+            list(, $prefix, $tag, $suffix) = $m;
+            $tag_attr = $html($tag) . (concat)(' ', implode(' ', $attrs));
+            $content = ($escape ? $html($content) : $content);
+
+            return "$prefix<$tag_attr>$content</$tag>$suffix";
+        };
+
+        $result = '';
+        foreach ($selector as $key => $value) {
+            if (is_int($key)) {
+                $result .= $html($value);
+            }
+            elseif ((is_iterable)($value)) {
+                $result .= $build($key, (htmltag)($value), false);
+            }
+            else {
+                $result .= $build($key, $value, true);
+            }
+        }
+        return $result;
+    }
+}
+
 const build_uri = 'ryunosuke\\Functions\\build_uri';
 if (!isset($excluded_functions['build_uri']) && (!function_exists('ryunosuke\\Functions\\build_uri') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\build_uri'))->isInternal()))) {
     /**
@@ -7466,6 +7752,417 @@ if (!isset($excluded_functions['parse_uri']) && (!function_exists('ryunosuke\\Fu
         }
 
         return $parts;
+    }
+}
+
+const ini_export = 'ryunosuke\\Functions\\ini_export';
+if (!isset($excluded_functions['ini_export']) && (!function_exists('ryunosuke\\Functions\\ini_export') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\ini_export'))->isInternal()))) {
+    /**
+     * 連想配列を INI 的文字列に変換する
+     *
+     * Example:
+     * ```php
+     * assertEquals(ini_export(['a' => 1, 'b' => 'B', 'c' => PHP_SAPI]), 'a = 1
+     * b = "B"
+     * c = "cli"
+     * ');
+     * ```
+     *
+     * @param array $iniarray ini 化する配列
+     * @param array $options オプション配列
+     * @return string ini 文字列
+     */
+    function ini_export($iniarray, $options = [])
+    {
+        $options += [
+            'process_sections' => false,
+            'alignment'        => true,
+        ];
+
+        $generate = function ($array, $key = null) use (&$generate, $options) {
+            $ishasharray = is_array($array) && (is_hasharray)($array);
+            return (array_sprintf)($array, function ($v, $k) use ($generate, $key, $ishasharray) {
+                if ((is_iterable)($v)) {
+                    return $generate($v, $k);
+                }
+
+                if ($key === null) {
+                    return $k . ' = ' . (var_export2)($v, true);
+                }
+                return ($ishasharray ? "{$key}[$k]" : "{$key}[]") . ' = ' . (var_export2)($v, true);
+            }, "\n");
+        };
+
+        if ($options['process_sections']) {
+            return (array_sprintf)($iniarray, function ($v, $k) use ($generate) {
+                return "[$k]\n{$generate($v)}\n";
+            }, "\n");
+        }
+
+        return $generate($iniarray) . "\n";
+    }
+}
+
+const ini_import = 'ryunosuke\\Functions\\ini_import';
+if (!isset($excluded_functions['ini_import']) && (!function_exists('ryunosuke\\Functions\\ini_import') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\ini_import'))->isInternal()))) {
+    /**
+     * INI 的文字列を連想配列に変換する
+     *
+     * Example:
+     * ```php
+     * assertEquals(ini_import("
+     * a = 1
+     * b = 'B'
+     * c = PHP_VERSION
+     * "), ['a' => 1, 'b' => 'B', 'c' => PHP_VERSION]);
+     * ```
+     *
+     * @param string $inistring ini 文字列
+     * @param array $options オプション配列
+     * @return array 配列
+     */
+    function ini_import($inistring, $options = [])
+    {
+        $options += [
+            'process_sections' => false,
+            'scanner_mode'     => INI_SCANNER_TYPED,
+        ];
+
+        return parse_ini_string($inistring, $options['process_sections'], $options['scanner_mode']);
+    }
+}
+
+const csv_export = 'ryunosuke\\Functions\\csv_export';
+if (!isset($excluded_functions['csv_export']) && (!function_exists('ryunosuke\\Functions\\csv_export') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\csv_export'))->isInternal()))) {
+    /**
+     * 連想配列の配列を CSV 的文字列に変換する
+     *
+     * CSV ヘッダ行は全連想配列のキーの共通項となる。
+     * 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。
+     * ただし、オプションで headers が与えられた場合はそれを使用する。
+     * この headers オプションはヘッダ文字列変換も兼ねる（[key => header] で「key を header で吐き出し」となる）。
+     *
+     * メモリ効率は意識しない（どうせ元々配列を保持してるので意識しても無駄）。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * $csvarrays = [
+     *     ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'],             // 普通の行
+     *     ['c' => 'C2', 'a' => 'A2', 'b' => 'B2'],             // 順番が入れ替わっている行
+     *     ['c' => 'C3', 'a' => 'A3', 'b' => 'B3', 'x' => 'X'], // 余計な要素が入っている行
+     * ];
+     * assertEquals(csv_export($csvarrays), "a,b,c
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ");
+     *
+     * // ヘッダを指定できる
+     * assertEquals(csv_export($csvarrays, [
+     *     'headers' => ['a' => 'A', 'c' => 'C'], // a と c だけを出力＋ヘッダ文字変更
+     * ]), "A,C
+     * A1,C1
+     * A2,C2
+     * A3,C3
+     * ");
+     * ```
+     *
+     * @param array $csvarrays 連想配列の配列
+     * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
+     * @return array CSV 的文字列
+     */
+    function csv_export($csvarrays, $options = [])
+    {
+        $options += [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape'    => '\\',
+            'encoding'  => mb_internal_encoding(),
+            'headers'   => [],
+        ];
+
+        $fp = fopen('php://temp', 'rw+');
+        try {
+            return (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers) {
+                $mb_internal_encoding = mb_internal_encoding();
+                if (!$headers) {
+                    foreach ($csvarrays as $array) {
+                        $headers = $headers ? array_intersect_key($headers, $array) : $array;
+                    }
+                    $headers = array_keys($headers);
+                }
+                if (!(is_hasharray)($headers)) {
+                    $headers = array_combine($headers, $headers);
+                }
+                if ($encoding !== $mb_internal_encoding) {
+                    mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                }
+                fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
+                $default = array_fill_keys(array_keys($headers), '');
+
+                foreach ($csvarrays as $array) {
+                    $row = array_intersect_key(array_replace($default, $array), $default);
+                    if ($encoding !== $mb_internal_encoding) {
+                        mb_convert_variables($encoding, $mb_internal_encoding, $row);
+                    }
+                    fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                }
+                rewind($fp);
+                return stream_get_contents($fp);
+            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+        }
+        finally {
+            fclose($fp);
+        }
+    }
+}
+
+const csv_import = 'ryunosuke\\Functions\\csv_import';
+if (!isset($excluded_functions['csv_import']) && (!function_exists('ryunosuke\\Functions\\csv_import') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\csv_import'))->isInternal()))) {
+    /**
+     * CSV 的文字列を連想配列の配列に変換する
+     *
+     * 1行目をヘッダ文字列とみなしてそれをキーとした連想配列の配列を返す。
+     * ただし、オプションで headers が与えられた場合はそれを使用する。
+     * この headers オプションはヘッダフィルタも兼ねる（[n => header] で「n 番目フィールドを header で取り込み」となる）。
+     *
+     * メモリ効率は意識しない（どうせ配列を返すので意識しても無駄）。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * assertEquals(csv_import("
+     * a,b,c
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * "), [
+     *     ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'],
+     *     ['a' => 'A2', 'b' => 'B2', 'c' => 'C2'],
+     *     ['a' => 'A3', 'b' => 'B3', 'c' => 'C3'],
+     * ]);
+     *
+     * // ヘッダを指定できる
+     * assertEquals(csv_import("
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ", [
+     *     'headers' => [0 => 'a', 2 => 'c'], // 1がないので1番目のフィールドを読み飛ばしつつ、0, 2 は "a", "c" として取り込む
+     * ]), [
+     *     ['a' => 'A1', 'c' => 'C1'],
+     *     ['a' => 'A2', 'c' => 'C2'],
+     *     ['a' => 'A3', 'c' => 'C3'],
+     * ]);
+     * ```
+     *
+     * @param string|resource $csvstring CSV 的文字列。ファイルポインタでも良いが終了後に必ず閉じられる
+     * @param array $options オプション配列。fgetcsv の第3引数以降もここで指定する
+     * @return array 連想配列の配列
+     */
+    function csv_import($csvstring, $options = [])
+    {
+        $options += [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape'    => '\\',
+            'encoding'  => mb_internal_encoding(),
+            'headers'   => [],
+        ];
+
+        if (is_resource($csvstring)) {
+            $fp = $csvstring;
+        }
+        else {
+            $fp = fopen('php://temp', 'r+b');
+            fwrite($fp, $csvstring);
+            rewind($fp);
+        }
+
+        try {
+            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers) {
+                $mb_internal_encoding = mb_internal_encoding();
+                $result = [];
+                while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
+                    if ($row === [null]) {
+                        continue;
+                    }
+                    if ($mb_internal_encoding !== $encoding) {
+                        mb_convert_variables($mb_internal_encoding, $encoding, $row);
+                    }
+                    if (!$headers) {
+                        $headers = $row;
+                        continue;
+                    }
+                    $result[] = array_combine($headers, array_intersect_key($row, $headers));
+                }
+                return $result;
+            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+        }
+        finally {
+            fclose($fp);
+        }
+    }
+}
+
+const json_export = 'ryunosuke\\Functions\\json_export';
+if (!isset($excluded_functions['json_export']) && (!function_exists('ryunosuke\\Functions\\json_export') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\json_export'))->isInternal()))) {
+    /**
+     * json_encode のプロキシ関数
+     *
+     * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
+     *
+     * Example:
+     * ```php
+     * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
+     * assertEquals(json_export(['a' => 'A', 'b' => 'B'], [
+     *    JSON_PRETTY_PRINT => false,
+     * ]), '{"a":"A","b":"B"}');
+     * ```
+     *
+     * @param mixed $value encode する値
+     * @param array $options JSON_*** をキーにした連想配列。 値が false は指定されていないとみなされる
+     * @return string JSON 文字列
+     */
+    function json_export($value, $options = [])
+    {
+        $options += [
+            JSON_UNESCAPED_UNICODE      => true, // エスケープなしで特にデメリットはない
+            JSON_PRESERVE_ZERO_FRACTION => true, // 勝手に変換はできるだけ避けたい
+        ];
+        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $option = array_sum(array_keys(array_filter($options)));
+
+        // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
+        if (json_last_error()) {
+            json_encode(null);
+        }
+
+        $result = json_encode($value, $option, $depth);
+
+        // エラーが出ていたら例外に変換
+        if (json_last_error()) {
+            throw new \ErrorException(json_last_error_msg(), json_last_error());
+        }
+
+        return $result;
+    }
+}
+
+const json_import = 'ryunosuke\\Functions\\json_import';
+if (!isset($excluded_functions['json_import']) && (!function_exists('ryunosuke\\Functions\\json_import') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\json_import'))->isInternal()))) {
+    /**
+     * json_decode のプロキシ関数
+     *
+     * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
+     *
+     * Example:
+     * ```php
+     * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
+     * assertEquals(json_import('{"a":"A","b":"B"}', [
+     *    JSON_OBJECT_AS_ARRAY => true,
+     * ]), ['a' => 'A', 'b' => 'B']);
+     * ```
+     *
+     * @param string $value JSON 文字列
+     * @param array $options JSON_*** をキーにした連想配列。 値が false は指定されていないとみなされる
+     * @return mixed decode された値
+     */
+    function json_import($value, $options = [])
+    {
+        $options += [
+            JSON_OBJECT_AS_ARRAY => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+        ];
+        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $option = array_sum(array_keys(array_filter($options)));
+
+        // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
+        if (json_last_error()) {
+            json_encode(null);
+        }
+
+        // The second option is JSON_OBJECT_AS_ARRAY that has the same effect as setting assoc to TRUE
+        // とあるが、 null を指定しないと効いてくれないっぽい
+        $result = json_decode($value, null, $depth, $option);
+
+        // エラーが出ていたら例外に変換
+        if (json_last_error()) {
+            throw new \ErrorException(json_last_error_msg(), json_last_error());
+        }
+
+        return $result;
+    }
+}
+
+const markdown_table = 'ryunosuke\\Functions\\markdown_table';
+if (!isset($excluded_functions['markdown_table']) && (!function_exists('ryunosuke\\Functions\\markdown_table') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\markdown_table'))->isInternal()))) {
+    /**
+     * 連想配列の配列を markdown テーブル文字列にする
+     *
+     * 見出しはキーの和集合で生成され、改行は `<br>` に置換される。
+     * 要素が全て数値の場合は右寄せになる。
+     *
+     * Example:
+     * ```php
+     * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
+     * assertEquals("\n" . markdown_table([
+     *    ['a' => 'a1', 'b' => 'b1'],
+     *    ['b' => 'b2', 'c' => '2'],
+     *    ['a' => 'a3', 'c' => '3'],
+     * ]), "
+     * | a   | b   |   c |
+     * | --- | --- | --: |
+     * | a1  | b1  |     |
+     * |     | b2  |   2 |
+     * | a3  |     |   3 |
+     * ");
+     * ```
+     *
+     * @param array $array 連想配列の配列
+     * @return string markdown テーブル文字列
+     */
+    function markdown_table($array)
+    {
+        if (!is_array($array) || (is_empty)($array)) {
+            throw new \InvalidArgumentException('$array must be array of hasharray.');
+        }
+
+        $defaults = [];
+        $numerics = [];
+        $lengths = [];
+        foreach ($array as $n => $fields) {
+            assert(is_array($fields), '$array must be array of hasharray.');
+            foreach ($fields as $k => $v) {
+                $v = str_replace(["\r\n", "\r", "\n"], '<br>', $v);
+                $array[$n][$k] = $v;
+                $defaults[$k] = '';
+                $numerics[$k] = ($numerics[$k] ?? true) && is_numeric($v);
+                $lengths[$k] = max($lengths[$k] ?? 3, strlen($k), strlen($v)); // 3 は markdown の最低見出し長
+            }
+        }
+
+        $linebuilder = function ($array, $padstr) use ($numerics, $lengths) {
+            $line = [];
+            foreach ($array as $k => $v) {
+                $pad = str_pad($v, strlen($v) - mb_strwidth($v) + $lengths[$k], $padstr, $numerics[$k] ? STR_PAD_LEFT : STR_PAD_RIGHT);
+                if ($padstr === '-' && $numerics[$k]) {
+                    $pad[strlen($pad) - 1] = ':';
+                }
+                $line[] = $pad;
+            }
+            return '| ' . implode(' | ', $line) . ' |';
+        };
+
+        $result = [];
+
+        $result[] = $linebuilder(array_combine($keys = array_keys($defaults), $keys), ' ');
+        $result[] = $linebuilder($defaults, '-');
+        foreach ($array as $fields) {
+            $result[] = $linebuilder(array_replace($defaults, $fields), ' ');
+        }
+
+        return implode("\n", $result) . "\n";
     }
 }
 
@@ -7692,6 +8389,143 @@ if (!isset($excluded_functions['preg_replaces']) && (!function_exists('ryunosuke
             }
         }
         return $subject;
+    }
+}
+
+const damerau_levenshtein = 'ryunosuke\\Functions\\damerau_levenshtein';
+if (!isset($excluded_functions['damerau_levenshtein']) && (!function_exists('ryunosuke\\Functions\\damerau_levenshtein') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\damerau_levenshtein'))->isInternal()))) {
+    /**
+     * Damerau–Levenshtein 距離を返す
+     *
+     * 簡単に言えば「転置（入れ替え）を考慮したレーベンシュタイン」である。
+     * 例えば "destroy" と "destory" は 「1挿入1削除=2」であるが、Damerau 版だと「1転置=1」となる。
+     *
+     * また、マルチバイト（UTF-8 のみ）にも対応している。
+     *
+     * Example:
+     * ```php
+     * // destroy と destory は普通にレーベンシュタイン距離を取ると 2 になるが・・・
+     * assertSame(levenshtein("destroy", "destory"), 2);
+     * // damerau_levenshtein だと1である
+     * assertSame(damerau_levenshtein("destroy", "destory"), 1);
+     * // UTF-8 でも大丈夫
+     * assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
+     * ```
+     *
+     * @param string $s1 対象文字列1
+     * @param string $s2 対象文字列2
+     * @param int $cost_ins 挿入のコスト
+     * @param int $cost_rep 置換のコスト
+     * @param int $cost_del 削除のコスト
+     * @param int $cost_swp 転置のコスト
+     * @return int Damerau–Levenshtein 距離
+     */
+    function damerau_levenshtein($s1, $s2, $cost_ins = 1, $cost_rep = 1, $cost_del = 1, $cost_swp = 1)
+    {
+        $s1 = is_array($s1) ? $s1 : preg_split('//u', $s1, -1, PREG_SPLIT_NO_EMPTY);
+        $s2 = is_array($s2) ? $s2 : preg_split('//u', $s2, -1, PREG_SPLIT_NO_EMPTY);
+        $l1 = count($s1);
+        $l2 = count($s2);
+        if (!$l1) {
+            return $l2 * $cost_ins;
+        }
+        if (!$l2) {
+            return $l1 * $cost_del;
+        }
+        $p1 = array_fill(0, $l2 + 1, 0);
+        $p2 = array_fill(0, $l2 + 1, 0);
+        for ($i2 = 0; $i2 <= $l2; $i2++) {
+            $p1[$i2] = $i2 * $cost_ins;
+        }
+        for ($i1 = 0; $i1 < $l1; $i1++) {
+            $p2[0] = $p1[0] + $cost_del;
+            for ($i2 = 0; $i2 < $l2; $i2++) {
+                $c0 = $p1[$i2];
+                if ($s1[$i1] !== $s2[$i2]) {
+                    if (
+                        $cost_swp && (
+                            ($s1[$i1] === ($s2[$i2 - 1] ?? '') && ($s1[$i1 - 1] ?? '') === $s2[$i2]) ||
+                            ($s1[$i1] === ($s2[$i2 + 1] ?? '') && ($s1[$i1 + 1] ?? '') === $s2[$i2])
+                        )
+                    ) {
+                        $c0 += $cost_swp / 2;
+                    }
+                    else {
+                        $c0 += $cost_rep;
+                    }
+                }
+                $c1 = $p1[$i2 + 1] + $cost_del;
+                if ($c1 < $c0) {
+                    $c0 = $c1;
+                }
+                $c2 = $p2[$i2] + $cost_ins;
+                if ($c2 < $c0) {
+                    $c0 = $c2;
+                }
+                $p2[$i2 + 1] = $c0;
+            }
+            $tmp = $p1;
+            $p1 = $p2;
+            $p2 = $tmp;
+        }
+        return (int) $p1[$l2];
+    }
+}
+
+const str_guess = 'ryunosuke\\Functions\\str_guess';
+if (!isset($excluded_functions['str_guess']) && (!function_exists('ryunosuke\\Functions\\str_guess') || (!false && (new \ReflectionFunction('ryunosuke\\Functions\\str_guess'))->isInternal()))) {
+    /**
+     * $string に最も近い文字列を返す
+     *
+     * レーベンシュタイン比の最も小さい要素を返す。
+     *
+     * この関数の結果（内部実装）は互換性を考慮しない。
+     * 例えば現在は damerau_levenshtein で実装されているが、 similar_text になる可能性もある。
+     *
+     * Example:
+     * ```php
+     * // 「あいうえお」と最も距離の近い文字列は「あいゆえに」である
+     * assertSame(str_guess("あいうえお", [
+     *     'かきくけこ', // マッチ度 0%（1文字もかすらない）
+     *     'ぎぼあいこ', // マッチ度 0%（"あい"はあるが位置が異なる）
+     *     'かとうあい', // マッチ度 20%（"う"の位置が等しい）
+     *     'あいしてる', // マッチ度 40&（"あい"がマッチ）
+     *     'あいゆえに', // マッチ度 60&（"あい", "え"がマッチ）
+     * ]), 'あいゆえに');
+     * ```
+     *
+     * @param string $string 調べる文字列
+     * @param array $candidates 候補文字列配列
+     * @param int $percent マッチ度（％）を受ける変数
+     * @return string 最も近い文字列
+     */
+    function str_guess($string, $candidates, &$percent = null)
+    {
+        $candidates = array_filter((arrayval)($candidates, false), 'strlen');
+        if (!$candidates) {
+            throw new \InvalidArgumentException('$candidates is empty.');
+        }
+
+        $sarray = preg_split('//u', $string, -1, PREG_SPLIT_NO_EMPTY);
+        $closest = null;
+        $shortest = PHP_INT_MAX;
+        foreach ($candidates as $candidate) {
+            $carray = preg_split('//u', $candidate, -1, PREG_SPLIT_NO_EMPTY);
+            $delta = (damerau_levenshtein)($sarray, $carray) / max(count($sarray), count($carray));
+
+            if ($delta < $shortest) {
+                $closest = $candidate;
+                $shortest = $delta;
+            }
+
+            if ($delta === 0) {
+                break;
+            }
+        }
+
+        $percent = intval(100 - $shortest * 100);
+
+        return $closest;
     }
 }
 
@@ -8176,7 +9010,7 @@ if (!isset($excluded_functions['chain']) && (!function_exists('ryunosuke\\Functi
                             if (!is_array($rand)) {
                                 $rand = [$rand];
                             }
-                            $v = (ope_func)($ope, count($rand) + 1)($v, ...$rand);
+                            $v = (ope_func)($ope)($v, ...$rand);
                         }
                         return $v;
                     };
@@ -9097,35 +9931,15 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('ryunosuke\\Fu
 
         // 出力するなら出力
         if ($output) {
-            $nlength = max(5, max(array_map('strlen', array_keys($benchset))));
-            $slength = 9;
-            $olength = 12;
-            $rlength = 6;
-            $defformat = "| %-{$nlength}s | %{$slength}s | %{$olength}s | %{$rlength}s |";
-            $sepformat = "| %'-{$nlength}s | %'-{$slength}s:| %'-{$olength}s:| %'-{$rlength}s:|";
-
-            $template = <<<'RESULT'
-Running %count$s cases (between %millsec$s ms):
-%header$s
-%separator$s
-%summary$s
-
-RESULT;
-            echo (kvsprintf)($template, [
-                'count'     => count($benchset),
-                'millsec'   => number_format($millisec),
-                'header'    => sprintf($defformat, 'name', 'called', '1 call(ms)', 'ratio'),
-                'separator' => sprintf($sepformat, '', '', '', ''),
-                'summary'   => implode("\n", array_map(function ($data) use ($defformat) {
-                    return vsprintf($defformat, [
-                            $data['name'],
-                            number_format($data['called']),
-                            number_format($data['mills'], 6),
-                            number_format($data['ratio'], 3),
-                        ]
-                    );
-                }, $result)),
-            ]);
+            printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
+            echo (markdown_table)(array_map(function ($v) {
+                return [
+                    'name'       => $v['name'],
+                    'called'     => number_format($v['called'], 0),
+                    '1 call(ms)' => number_format($v['mills'], 6),
+                    'ratio'      => number_format($v['ratio'], 3),
+                ];
+            }, $result));
         }
 
         return $result;
@@ -9925,6 +10739,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
      * - 配列は 5.4 以降のショートシンタックス（[]）で出力
      * - インデントは 4 固定
      * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
+     * - 文字列はダブルクオート
      * - null は null（小文字）
      * - 再帰構造を渡しても警告がでない（さらに NULL ではなく `'*RECURSION*'` という文字列になる）
      * - 配列の再帰構造の出力が異なる（Example参照）
@@ -9932,14 +10747,14 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
      * Example:
      * ```php
      * // 単純なエクスポート
-     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), "[
-     *     'array' => [1, 2, 3],
-     *     'hash'  => [
-     *         'a' => 'A',
-     *         'b' => 'B',
-     *         'c' => 'C',
+     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), '[
+     *     "array" => [1, 2, 3],
+     *     "hash"  => [
+     *         "a" => "A",
+     *         "b" => "B",
+     *         "c" => "C",
      *     ],
-     * ]");
+     * ]');
      * // 再帰構造を含むエクスポート（標準の var_export は形式が異なる。 var_export すれば分かる）
      * $rarray = [];
      * $rarray['a']['b']['c'] = &$rarray;
@@ -9947,22 +10762,22 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
      * $robject->a = new \stdClass();
      * $robject->a->b = new \stdClass();
      * $robject->a->b->c = $robject;
-     * assertSame(var_export2(compact('rarray', 'robject'), true), "[
-     *     'rarray'  => [
-     *         'a' => [
-     *             'b' => [
-     *                 'c' => '*RECURSION*',
+     * assertSame(var_export2(compact('rarray', 'robject'), true), '[
+     *     "rarray"  => [
+     *         "a" => [
+     *             "b" => [
+     *                 "c" => "*RECURSION*",
      *             ],
      *         ],
      *     ],
-     *     'robject' => stdClass::__set_state([
-     *         'a' => stdClass::__set_state([
-     *             'b' => stdClass::__set_state([
-     *                 'c' => '*RECURSION*',
+     *     "robject" => stdClass::__set_state([
+     *         "a" => stdClass::__set_state([
+     *             "b" => stdClass::__set_state([
+     *                 "c" => "*RECURSION*",
      *             ]),
      *         ]),
      *     ]),
-     * ]");
+     * ]');
      * ```
      *
      * @param mixed $value 出力する値
@@ -9979,7 +10794,7 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
-                    return var_export('*RECURSION*', true);
+                    return $export('*RECURSION*');
                 }
             }
             // 配列は連想判定したり再帰したり色々
@@ -10023,6 +10838,10 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('ryunosuke\\
             elseif (is_object($value)) {
                 $parents[] = $value;
                 return get_class($value) . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
+            }
+            // 文字列はダブルクオート
+            elseif (is_string($value)) {
+                return '"' . addcslashes($value, "\"\0\\") . '"';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {

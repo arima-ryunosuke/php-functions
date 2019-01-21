@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L1065" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L1070" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Vars</span></h2>
@@ -1173,7 +1173,7 @@ assertSame(var_applys('a', $upper), 'A');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L742-L865" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L742-L870" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_export2()" tabindex="-1" class="structure-title ">
                         var_export2						<small>($value, $return = false)</small>
@@ -1185,20 +1185,21 @@ assertSame(var_applys('a', $upper), 'A');
 <li>配列は 5.4 以降のショートシンタックス（[]）で出力</li>
 <li>インデントは 4 固定</li>
 <li>ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり</li>
+<li>文字列はダブルクオート</li>
 <li>null は null（小文字）</li>
 <li>再帰構造を渡しても警告がでない（さらに NULL ではなく <code>'*RECURSION*'</code> という文字列になる）</li>
 <li>配列の再帰構造の出力が異なる（Example参照）</li>
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// 単純なエクスポート
-assertSame(var_export2(['array' =&gt; [1, 2, 3], 'hash' =&gt; ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']], true), "[
-    'array' =&gt; [1, 2, 3],
-    'hash'  =&gt; [
-        'a' =&gt; 'A',
-        'b' =&gt; 'B',
-        'c' =&gt; 'C',
+assertSame(var_export2(['array' =&gt; [1, 2, 3], 'hash' =&gt; ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']], true), '[
+    "array" =&gt; [1, 2, 3],
+    "hash"  =&gt; [
+        "a" =&gt; "A",
+        "b" =&gt; "B",
+        "c" =&gt; "C",
     ],
-]");
+]');
 // 再帰構造を含むエクスポート（標準の var_export は形式が異なる。 var_export すれば分かる）
 $rarray = [];
 $rarray['a']['b']['c'] = &amp;$rarray;
@@ -1206,22 +1207,22 @@ $robject = new \stdClass();
 $robject-&gt;a = new \stdClass();
 $robject-&gt;a-&gt;b = new \stdClass();
 $robject-&gt;a-&gt;b-&gt;c = $robject;
-assertSame(var_export2(compact('rarray', 'robject'), true), "[
-    'rarray'  =&gt; [
-        'a' =&gt; [
-            'b' =&gt; [
-                'c' =&gt; '*RECURSION*',
+assertSame(var_export2(compact('rarray', 'robject'), true), '[
+    "rarray"  =&gt; [
+        "a" =&gt; [
+            "b" =&gt; [
+                "c" =&gt; "*RECURSION*",
             ],
         ],
     ],
-    'robject' =&gt; stdClass::__set_state([
-        'a' =&gt; stdClass::__set_state([
-            'b' =&gt; stdClass::__set_state([
-                'c' =&gt; '*RECURSION*',
+    "robject" =&gt; stdClass::__set_state([
+        "a" =&gt; stdClass::__set_state([
+            "b" =&gt; stdClass::__set_state([
+                "c" =&gt; "*RECURSION*",
             ]),
         ]),
     ]),
-]");
+]');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1269,7 +1270,7 @@ assertSame(var_export2(compact('rarray', 'robject'), true), "[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L867-L937" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L872-L942" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_html()" tabindex="-1" class="structure-title ">
                         var_html						<small>($value)</small>
@@ -1322,7 +1323,7 @@ assertSame(var_export2(compact('rarray', 'robject'), true), "[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L939-L977" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L944-L982" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::console_log()" tabindex="-1" class="structure-title ">
                         console_log						<small>(...$values)</small>
@@ -1381,7 +1382,7 @@ assertSame(var_export2(compact('rarray', 'robject'), true), "[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L979-L1064" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L984-L1069" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::hashvar()" tabindex="-1" class="structure-title ">
                         hashvar						<small>(...$vars)</small>

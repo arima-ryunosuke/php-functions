@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L832" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L954" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Funchand</span></h2>
@@ -453,10 +453,10 @@ assertSame($arg1('dummy', 'hoge'), 'hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L221-L304" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L221-L285" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::ope_func()" tabindex="-1" class="structure-title ">
-                        ope_func						<small>($operator, $n = null)</small>
+                        ope_func						<small>($operator)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>演算子のクロージャを返す</p>
@@ -465,15 +465,13 @@ assertSame($arg1('dummy', 'hoge'), 'hoge');
 <pre><code class="language-php">$not = ope_func('!');    // 否定演算子クロージャ
 assertSame(false, $not(true));
 
-$minus1 = ope_func('-', 1); // 負数演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
-$minus2 = ope_func('-', 2); // 減算演算子クロージャ（"-" 演算子は1項2項があるので明示する必要がある）
-assertSame(-2, $minus1(2));
-assertSame(3 - 2, $minus2(3, 2));
+$minus = ope_func('-'); // マイナス演算子クロージャ
+assertSame(-2, $minus(2));       // 引数1つで呼ぶと1項演算子
+assertSame(3 - 2, $minus(3, 2)); // 引数2つで呼ぶと2項演算子
 
-$cond2 = ope_func('?:', 2); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
-$cond3 = ope_func('?:', 3); // 条件演算子クロージャ（"?:" 演算子は2項3項があるので明示する必要がある）
-assertSame('OK' ?: 'NG', $cond2('OK', 'NG'));
-assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
+$cond = ope_func('?:'); // 条件演算子クロージャ
+assertSame('OK' ?: 'NG', $cond('OK', 'NG'));               // 引数2つで呼ぶと2項演算子
+assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼ぶと3項演算子
 </code></pre>
 </div>
                         	<table class="table">
@@ -483,12 +481,6 @@ assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
 				<td class="type">string</td>
 				<td class="rest">$operator</td>
 				<td class="desc"><p>演算子</p>
-</td>
-			</tr>
-        			<tr>
-				<td class="type">int</td>
-				<td class="rest">$n = null</td>
-				<td class="desc"><p>何項演算子か明示する引数</p>
 </td>
 			</tr>
         		</tbody>
@@ -521,7 +513,7 @@ assertSame(false ? 'OK' : 'NG', $cond3(false, 'OK', 'NG'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L306-L324" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L287-L305" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::not_func()" tabindex="-1" class="structure-title ">
                         not_func						<small>($callable)</small>
@@ -573,7 +565,7 @@ assertTrue($not_strlen(''));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L326-L351" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L307-L332" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::eval_func()" tabindex="-1" class="structure-title ">
                         eval_func						<small>($expression, ...$variadic)</small>
@@ -632,7 +624,7 @@ assertSame($evalfunc(1, 2, 3), 6);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L353-L384" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L334-L365" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::reflect_callable()" tabindex="-1" class="structure-title ">
                         reflect_callable						<small>($callable)</small>
@@ -683,7 +675,7 @@ assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L386-L418" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L367-L399" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::closurize()" tabindex="-1" class="structure-title ">
                         closurize						<small>($callable)</small>
@@ -736,7 +728,7 @@ assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L420-L457" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L401-L438" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::callable_code()" tabindex="-1" class="structure-title ">
                         callable_code						<small>($callable)</small>
@@ -789,7 +781,7 @@ assertSame($body, '{return true;}');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L459-L491" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L440-L472" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::call_safely()" tabindex="-1" class="structure-title ">
                         call_safely						<small>($callback, ...$variadic)</small>
@@ -850,7 +842,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L493-L515" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L474-L496" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::ob_capture()" tabindex="-1" class="structure-title ">
                         ob_capture						<small>($callback, ...$variadic)</small>
@@ -906,7 +898,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L517-L532" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L498-L513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::is_bindable_closure()" tabindex="-1" class="structure-title ">
                         is_bindable_closure						<small>($closure)</small>
@@ -957,7 +949,7 @@ assertFalse(is_bindable_closure(static function(){}));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L534-L590" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L515-L571" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::by_builtin()" tabindex="-1" class="structure-title ">
                         by_builtin						<small>($class, $function)</small>
@@ -1022,7 +1014,125 @@ assertSame($counter-&gt;count(), 0);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L592-L643" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L573-L712" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::namedcallize()" tabindex="-1" class="structure-title ">
+                        namedcallize						<small>($callable, $defaults = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>callable を名前付き引数で呼べるようにしたクロージャを返す</p>
+<p>callable のデフォルト引数は適用されるが、それ以外にも $default でデフォルト値を与えることができる（部分適用のようなものだと思えば良い）。<br />
+最終的な優先順位は下記。上に行くほど優先。</p>
+<ol>
+<li>呼び出し時の引数</li>
+<li>この関数の $default 引数</li>
+<li>callable のデフォルト引数</li>
+</ol>
+<p>引数は n 番目でも引数名でもどちらでも良い。<br />
+n 番目の場合は引数名に依存しないが、順番に依存してしまう。<br />
+引数名の場合は順番に依存しないが、引数名に依存してしまう。</p>
+<p>可変引数の場合は 1 と 2 がマージされる。<br />
+必須引数が渡されていない or 定義されていない引数が渡された場合は例外を投げる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// ベースとなる関数（引数をそのまま連想配列で返す）
+$f = function ($x, $a = 1, $b = 2, ...$other){return get_defined_vars();};
+
+// x に 'X', a に 9 を与えて名前付きで呼べるクロージャ
+$f1 = namedcallize($f, [
+    'x' =&gt; 'X',
+    'a' =&gt; 9,
+]);
+// 引数無しで呼ぶと↑で与えた引数が使用される（b は渡されていないのでデフォルト引数の 2 が使用される）
+assertSame($f1(), [
+    'x'     =&gt; 'X',
+    'a'     =&gt; 9,
+    'b'     =&gt; 2,
+    'other' =&gt; [],
+]);
+// 引数付きで呼ぶとそれが優先される
+assertSame($f1([
+    'x'     =&gt; 'XXX',
+    'a'     =&gt; 99,
+    'b'     =&gt; 999,
+    'other' =&gt; [1, 2, 3],
+]), [
+    'x'     =&gt; 'XXX',
+    'a'     =&gt; 99,
+    'b'     =&gt; 999,
+    'other' =&gt; [1, 2, 3],
+]);
+// 引数名ではなく、 n 番目指定でも同じ
+assertSame($f1([
+    'x' =&gt; 'XXX',
+    1   =&gt; 99,
+    2   =&gt; 999,
+    3   =&gt; [1, 2, 3],
+]), [
+    'x'     =&gt; 'XXX',
+    'a'     =&gt; 99,
+    'b'     =&gt; 999,
+    'other' =&gt; [1, 2, 3],
+]);
+
+// x に 'X', other に [1, 2, 3] を与えて名前付きで呼べるクロージャ
+$f2 = namedcallize($f, [
+    'x'     =&gt; 'X',
+    'other' =&gt; [1, 2, 3],
+]);
+// other は可変引数なのでマージされる
+assertSame($f2(['other' =&gt; [4, 5, 6]]), [
+    'x'     =&gt; 'X',
+    'a'     =&gt; 1,
+    'b'     =&gt; 2,
+    'other' =&gt; [1, 2, 3, 4, 5, 6],
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc"></td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$defaults = []</td>
+				<td class="desc"><p>デフォルト引数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc"><p>名前付き引数で呼べるようにしたクロージャ</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L714-L765" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::parameter_length()" tabindex="-1" class="structure-title ">
                         parameter_length						<small>($callable, $require_only = false, $thought_variadic = false)</small>
@@ -1090,7 +1200,7 @@ assertSame(parameter_length('trim', true), 1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L645-L655" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L767-L777" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_shorten()" tabindex="-1" class="structure-title ">
                         function_shorten						<small>($function)</small>
@@ -1137,7 +1247,7 @@ assertSame(parameter_length('trim', true), 1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L657-L700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L779-L822" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" tabindex="-1" class="structure-title ">
                         func_user_func_array						<small>($callback)</small>
@@ -1193,7 +1303,7 @@ assertSame($strlen('abc', null), 3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L702-L741" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L824-L863" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_method()" tabindex="-1" class="structure-title ">
                         func_method						<small>($methodname, ...$defaultargs)</small>
@@ -1269,7 +1379,7 @@ assertSame($hoge789($object), '7,8,9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L743-L831" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L865-L953" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_alias()" tabindex="-1" class="structure-title ">
                         function_alias						<small>($original, $alias, $cachedir = false)</small>

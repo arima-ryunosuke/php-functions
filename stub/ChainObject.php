@@ -232,19 +232,19 @@
  * @method   \ChainObject  diff_ukeyE($arr2, $callback_key_comp_func)
  * @method   \ChainObject  diff_ukeyE1($arr1, $callback_key_comp_func)
  * @method   \ChainObject  diff_ukeyE2($arr1, $arr2)
- * @method   \ChainObject  array_difference($array2, $delimiter = '.')
- * @method   \ChainObject  array_difference1($array1, $delimiter = '.')
+ * @method   \ChainObject  array_difference($array2, $delimiter = ".")
+ * @method   \ChainObject  array_difference1($array1, $delimiter = ".")
  * @method   \ChainObject  array_difference2($array1, $array2)
- * @method   \ChainObject  difference($array2, $delimiter = '.')
- * @method   \ChainObject  difference1($array1, $delimiter = '.')
+ * @method   \ChainObject  difference($array2, $delimiter = ".")
+ * @method   \ChainObject  difference1($array1, $delimiter = ".")
  * @method   \ChainObject  difference2($array1, $array2)
- * @method   \ChainObject  array_dive($path, $default = null, $delimiter = '.')
- * @method   \ChainObject  array_dive1($array, $default = null, $delimiter = '.')
- * @method   \ChainObject  array_dive2($array, $path, $delimiter = '.')
+ * @method   \ChainObject  array_dive($path, $default = null, $delimiter = ".")
+ * @method   \ChainObject  array_dive1($array, $default = null, $delimiter = ".")
+ * @method   \ChainObject  array_dive2($array, $path, $delimiter = ".")
  * @method   \ChainObject  array_dive3($array, $path, $default = null)
- * @method   \ChainObject  dive($path, $default = null, $delimiter = '.')
- * @method   \ChainObject  dive1($array, $default = null, $delimiter = '.')
- * @method   \ChainObject  dive2($array, $path, $delimiter = '.')
+ * @method   \ChainObject  dive($path, $default = null, $delimiter = ".")
+ * @method   \ChainObject  dive1($array, $default = null, $delimiter = ".")
+ * @method   \ChainObject  dive2($array, $path, $delimiter = ".")
  * @method   \ChainObject  dive3($array, $path, $default = null)
  * @method   \ChainObject  array_each($callback, $default = null)
  * @method   \ChainObject  array_each1($array, $default = null)
@@ -731,10 +731,10 @@
  * @method   \ChainObject  mix4(...$variadic)
  * @method   \ChainObject  mix5(...$variadic)
  * @property \ChainObject $array_nest
- * @method   \ChainObject  array_nest($delimiter = '.')
+ * @method   \ChainObject  array_nest($delimiter = ".")
  * @method   \ChainObject  array_nest1($array)
  * @property \ChainObject $nest
- * @method   \ChainObject  nest($delimiter = '.')
+ * @method   \ChainObject  nest($delimiter = ".")
  * @method   \ChainObject  nest1($array)
  * @method   \ChainObject  array_nmap($callback, $n, ...$variadic)
  * @method   \ChainObject  array_nmap1($array, $n, ...$variadic)
@@ -955,11 +955,11 @@
  * @method   \ChainObject  array_sprintf($format = null, $glue = null)
  * @method   \ChainObject  array_sprintf1($array, $glue = null)
  * @method   \ChainObject  array_sprintf2($array, $format = null)
- * @method   \ChainObject  array_strpad($key_prefix, $val_prefix = '')
- * @method   \ChainObject  array_strpad1($array, $val_prefix = '')
+ * @method   \ChainObject  array_strpad($key_prefix, $val_prefix = "")
+ * @method   \ChainObject  array_strpad1($array, $val_prefix = "")
  * @method   \ChainObject  array_strpad2($array, $key_prefix)
- * @method   \ChainObject  strpad($key_prefix, $val_prefix = '')
- * @method   \ChainObject  strpad1($array, $val_prefix = '')
+ * @method   \ChainObject  strpad($key_prefix, $val_prefix = "")
+ * @method   \ChainObject  strpad1($array, $val_prefix = "")
  * @method   \ChainObject  strpad2($array, $key_prefix)
  * @property \ChainObject $array_sum
  * @method   \ChainObject  array_sum()
@@ -1231,14 +1231,14 @@
  * @property \ChainObject $callable_code
  * @method   \ChainObject  callable_code()
  * @property \ChainObject $camel_case
- * @method   \ChainObject  camel_case($delimiter = '_')
+ * @method   \ChainObject  camel_case($delimiter = "_")
  * @method   \ChainObject  camel_case1($string)
  * @property \ChainObject $ceil
  * @method   \ChainObject  ceil()
  * @property \ChainObject $chain
  * @method   \ChainObject  chain()
  * @property \ChainObject $chain_case
- * @method   \ChainObject  chain_case($delimiter = '-')
+ * @method   \ChainObject  chain_case($delimiter = "-")
  * @method   \ChainObject  chain_case1($string)
  * @property \ChainObject $chdir
  * @method   \ChainObject  chdir()
@@ -1343,8 +1343,20 @@
  * @property \ChainObject $crypt
  * @method   \ChainObject  crypt($salt = null)
  * @method   \ChainObject  crypt1($str)
+ * @property \ChainObject $csv_export
+ * @method   \ChainObject  csv_export($options = [])
+ * @method   \ChainObject  csv_export1($csvarrays)
+ * @property \ChainObject $csv_import
+ * @method   \ChainObject  csv_import($options = [])
+ * @method   \ChainObject  csv_import1($csvstring)
  * @property \ChainObject $current
  * @method   \ChainObject  current()
+ * @method   \ChainObject  damerau_levenshtein($s2, $cost_ins = 1, $cost_rep = 1, $cost_del = 1, $cost_swp = 1)
+ * @method   \ChainObject  damerau_levenshtein1($s1, $cost_ins = 1, $cost_rep = 1, $cost_del = 1, $cost_swp = 1)
+ * @method   \ChainObject  damerau_levenshtein2($s1, $s2, $cost_rep = 1, $cost_del = 1, $cost_swp = 1)
+ * @method   \ChainObject  damerau_levenshtein3($s1, $s2, $cost_ins = 1, $cost_del = 1, $cost_swp = 1)
+ * @method   \ChainObject  damerau_levenshtein4($s1, $s2, $cost_ins = 1, $cost_rep = 1, $cost_swp = 1)
+ * @method   \ChainObject  damerau_levenshtein5($s1, $s2, $cost_ins = 1, $cost_rep = 1, $cost_del = 1)
  * @property \ChainObject $date
  * @method   \ChainObject  date($timestamp = null)
  * @method   \ChainObject  date1($format)
@@ -1536,7 +1548,7 @@
  * @property \ChainObject $file_exists
  * @method   \ChainObject  file_exists()
  * @property \ChainObject $file_extension
- * @method   \ChainObject  file_extension($extension = '')
+ * @method   \ChainObject  file_extension($extension = "")
  * @method   \ChainObject  file_extension1($filename)
  * @property \ChainObject $file_get_contents
  * @method   \ChainObject  file_get_contents($flags = null, $context = null, $offset = null, $maxlen = null)
@@ -1839,6 +1851,8 @@
  * @property \ChainObject $htmlspecialchars_decode
  * @method   \ChainObject  htmlspecialchars_decode($quote_style = null)
  * @method   \ChainObject  htmlspecialchars_decode1($string)
+ * @property \ChainObject $htmltag
+ * @method   \ChainObject  htmltag()
  * @property \ChainObject $http_build_query
  * @method   \ChainObject  http_build_query($prefix = null, $arg_separator = null, $enc_type = null)
  * @method   \ChainObject  http_build_query1($formdata, $arg_separator = null, $enc_type = null)
@@ -1881,10 +1895,16 @@
  * @method   \ChainObject  inet_pton()
  * @method   \ChainObject  ini_alter($newvalue)
  * @method   \ChainObject  ini_alter1($varname)
+ * @property \ChainObject $ini_export
+ * @method   \ChainObject  ini_export($options = [])
+ * @method   \ChainObject  ini_export1($iniarray)
  * @property \ChainObject $ini_get
  * @method   \ChainObject  ini_get()
  * @method   \ChainObject  ini_get_all($details = null)
  * @method   \ChainObject  ini_get_all1($extension = null)
+ * @property \ChainObject $ini_import
+ * @method   \ChainObject  ini_import($options = [])
+ * @method   \ChainObject  ini_import1($inistring)
  * @property \ChainObject $ini_restore
  * @method   \ChainObject  ini_restore()
  * @method   \ChainObject  ini_set($newvalue)
@@ -1981,6 +2001,12 @@
  * @method   \ChainObject  is_writeable()
  * @method   \ChainObject  join($pieces)
  * @method   \ChainObject  join1($glue)
+ * @property \ChainObject $json_export
+ * @method   \ChainObject  json_export($options = [])
+ * @method   \ChainObject  json_export1($value)
+ * @property \ChainObject $json_import
+ * @method   \ChainObject  json_import($options = [])
+ * @method   \ChainObject  json_import1($value)
  * @property \ChainObject $key
  * @method   \ChainObject  key()
  * @method   \ChainObject  key_exists($search)
@@ -2043,6 +2069,8 @@
  * @method   \ChainObject  mail2($to, $subject, $additional_headers = null, $additional_parameters = null)
  * @method   \ChainObject  mail3($to, $subject, $message, $additional_parameters = null)
  * @method   \ChainObject  mail4($to, $subject, $message, $additional_headers = null)
+ * @property \ChainObject $markdown_table
+ * @method   \ChainObject  markdown_table()
  * @property \ChainObject $max
  * @method   \ChainObject  max(...$args)
  * @method   \ChainObject  max1(...$args)
@@ -2322,6 +2350,9 @@
  * @method   \ChainObject  multiexplode($string, $limit = 9223372036854775807)
  * @method   \ChainObject  multiexplode1($delimiter, $limit = 9223372036854775807)
  * @method   \ChainObject  multiexplode2($delimiter, $string)
+ * @property \ChainObject $namedcallize
+ * @method   \ChainObject  namedcallize($defaults = [])
+ * @method   \ChainObject  namedcallize1($callable)
  * @method   \ChainObject  nbind($n, ...$variadic)
  * @method   \ChainObject  nbind1($callable, ...$variadic)
  * @method   \ChainObject  nbind2($callable, $n, ...$variadic)
@@ -2378,15 +2409,14 @@
  * @method   \ChainObject  ob_start($chunk_size = null, $flags = null)
  * @method   \ChainObject  ob_start1($user_function = null, $flags = null)
  * @method   \ChainObject  ob_start2($user_function = null, $chunk_size = null)
- * @method   \ChainObject  object_dive($path, $default = null, $delimiter = '.')
- * @method   \ChainObject  object_dive1($object, $default = null, $delimiter = '.')
- * @method   \ChainObject  object_dive2($object, $path, $delimiter = '.')
+ * @method   \ChainObject  object_dive($path, $default = null, $delimiter = ".")
+ * @method   \ChainObject  object_dive1($object, $default = null, $delimiter = ".")
+ * @method   \ChainObject  object_dive2($object, $path, $delimiter = ".")
  * @method   \ChainObject  object_dive3($object, $path, $default = null)
  * @property \ChainObject $octdec
  * @method   \ChainObject  octdec()
  * @property \ChainObject $ope_func
- * @method   \ChainObject  ope_func($n = null)
- * @method   \ChainObject  ope_func1($operator)
+ * @method   \ChainObject  ope_func()
  * @property \ChainObject $opendir
  * @method   \ChainObject  opendir($context = null)
  * @method   \ChainObject  opendir1($path)
@@ -2429,7 +2459,7 @@
  * @method   \ChainObject  parse_url($component = null)
  * @method   \ChainObject  parse_url1($url)
  * @property \ChainObject $pascal_case
- * @method   \ChainObject  pascal_case($delimiter = '_')
+ * @method   \ChainObject  pascal_case($delimiter = "_")
  * @method   \ChainObject  pascal_case1($string)
  * @property \ChainObject $password_get_info
  * @method   \ChainObject  password_get_info()
@@ -2514,10 +2544,10 @@
  * @method   \ChainObject  quoted_printable_decode()
  * @property \ChainObject $quoted_printable_encode
  * @method   \ChainObject  quoted_printable_encode()
- * @method   \ChainObject  quoteexplode($string, $enclosures = '\'"', $escape = '\\')
- * @method   \ChainObject  quoteexplode1($delimiter, $enclosures = '\'"', $escape = '\\')
- * @method   \ChainObject  quoteexplode2($delimiter, $string, $escape = '\\')
- * @method   \ChainObject  quoteexplode3($delimiter, $string, $enclosures = '\'"')
+ * @method   \ChainObject  quoteexplode($string, $enclosures = "'\"", $escape = "\\")
+ * @method   \ChainObject  quoteexplode1($delimiter, $enclosures = "'\"", $escape = "\\")
+ * @method   \ChainObject  quoteexplode2($delimiter, $string, $escape = "\\")
+ * @method   \ChainObject  quoteexplode3($delimiter, $string, $enclosures = "'\"")
  * @property \ChainObject $quotemeta
  * @method   \ChainObject  quotemeta()
  * @property \ChainObject $rad2deg
@@ -2534,7 +2564,7 @@
  * @method   \ChainObject  random_bytes()
  * @method   \ChainObject  random_int($max)
  * @method   \ChainObject  random_int1($min)
- * @method   \ChainObject  random_string($charlist = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+ * @method   \ChainObject  random_string($charlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
  * @method   \ChainObject  random_string1($length = 8)
  * @method   \ChainObject  range($high, $step = null)
  * @method   \ChainObject  range1($low, $step = null)
@@ -2657,8 +2687,8 @@
  * @method   \ChainObject  show_source($return = null)
  * @method   \ChainObject  show_source1($file_name)
  * @property \ChainObject $si_prefix
- * @method   \ChainObject  si_prefix($unit = 1000, $format = '%.3f %s')
- * @method   \ChainObject  si_prefix1($var, $format = '%.3f %s')
+ * @method   \ChainObject  si_prefix($unit = 1000, $format = "%.3f %s")
+ * @method   \ChainObject  si_prefix1($var, $format = "%.3f %s")
  * @method   \ChainObject  si_prefix2($var, $unit = 1000)
  * @property \ChainObject $si_unprefix
  * @method   \ChainObject  si_unprefix($unit = 1000)
@@ -2673,7 +2703,7 @@
  * @property \ChainObject $sleep
  * @method   \ChainObject  sleep()
  * @property \ChainObject $snake_case
- * @method   \ChainObject  snake_case($delimiter = '_')
+ * @method   \ChainObject  snake_case($delimiter = "_")
  * @method   \ChainObject  snake_case1($string)
  * @property \ChainObject $socket_get_status
  * @method   \ChainObject  socket_get_status()
@@ -2706,7 +2736,7 @@
  * @method   \ChainObject  sqrt()
  * @method   \ChainObject  srand($mode = null)
  * @method   \ChainObject  srand1($seed = null)
- * @method   \ChainObject  stacktrace($option = ['format' => '%s:%s %s', 'limit' => 16])
+ * @method   \ChainObject  stacktrace($option = ["format" => "%s:%s %s", "limit" => 16])
  * @method   \ChainObject  stacktrace1($traces = null)
  * @method   \ChainObject  starts_with($with, $case_insensitivity = false)
  * @method   \ChainObject  starts_with1($string, $case_insensitivity = false)
@@ -2758,15 +2788,15 @@
  * @method   \ChainObject  pad2($input, $pad_length, $pad_type = null)
  * @method   \ChainObject  pad3($input, $pad_length, $pad_string = null)
  * @property \ChainObject $str_putcsv
- * @method   \ChainObject  str_putcsv($delimiter = ',', $enclosure = '"', $escape = '\\')
- * @method   \ChainObject  str_putcsv1($array, $enclosure = '"', $escape = '\\')
- * @method   \ChainObject  str_putcsv2($array, $delimiter = ',', $escape = '\\')
- * @method   \ChainObject  str_putcsv3($array, $delimiter = ',', $enclosure = '"')
+ * @method   \ChainObject  str_putcsv($delimiter = ",", $enclosure = "\"", $escape = "\\")
+ * @method   \ChainObject  str_putcsv1($array, $enclosure = "\"", $escape = "\\")
+ * @method   \ChainObject  str_putcsv2($array, $delimiter = ",", $escape = "\\")
+ * @method   \ChainObject  str_putcsv3($array, $delimiter = ",", $enclosure = "\"")
  * @property \ChainObject $putcsv
- * @method   \ChainObject  putcsv($delimiter = ',', $enclosure = '"', $escape = '\\')
- * @method   \ChainObject  putcsv1($array, $enclosure = '"', $escape = '\\')
- * @method   \ChainObject  putcsv2($array, $delimiter = ',', $escape = '\\')
- * @method   \ChainObject  putcsv3($array, $delimiter = ',', $enclosure = '"')
+ * @method   \ChainObject  putcsv($delimiter = ",", $enclosure = "\"", $escape = "\\")
+ * @method   \ChainObject  putcsv1($array, $enclosure = "\"", $escape = "\\")
+ * @method   \ChainObject  putcsv2($array, $delimiter = ",", $escape = "\\")
+ * @method   \ChainObject  putcsv3($array, $delimiter = ",", $enclosure = "\"")
  * @property \ChainObject $str_rchop
  * @method   \ChainObject  str_rchop($suffix = null, $case_insensitivity = false)
  * @method   \ChainObject  str_rchop1($string, $case_insensitivity = false)
@@ -3057,7 +3087,7 @@
  * @method   \ChainObject  timezone_transitions_get1($object, $timestamp_end = null)
  * @method   \ChainObject  timezone_transitions_get2($object, $timestamp_begin = null)
  * @method   \ChainObject  tmpname($dir = null)
- * @method   \ChainObject  tmpname1($prefix = 'rft')
+ * @method   \ChainObject  tmpname1($prefix = "rft")
  * @property \ChainObject $touch
  * @method   \ChainObject  touch($time = null, $atime = null)
  * @method   \ChainObject  touch1($filename, $atime = null)
