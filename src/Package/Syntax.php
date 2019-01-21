@@ -387,7 +387,7 @@ class Syntax
                             if (!is_array($rand)) {
                                 $rand = [$rand];
                             }
-                            $v = (ope_func)($ope, count($rand) + 1)($v, ...$rand);
+                            $v = (ope_func)($ope)($v, ...$rand);
                         }
                         return $v;
                     };
