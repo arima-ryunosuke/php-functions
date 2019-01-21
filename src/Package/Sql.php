@@ -358,7 +358,9 @@ class Sql
                         $result[] = $MARK_BR . $virttoken . $MARK_SP;
                         break;
                     case "ON":
-                        if ($subcontext === 'SET') {
+                        // ON は ON でも mysql の ON DUPLICATED かもしれない（pgsql の ON CONFLICT も似たようなコンテキスト）
+                        $name = $seek($index, +1);
+                        if (in_array(strtoupper($name), ['DUPLICATE', 'CONFLICT'], true)) {
                             $result[] = $MARK_BR;
                             $subcontext = '';
                         }

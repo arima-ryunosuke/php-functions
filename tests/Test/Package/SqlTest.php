@@ -344,6 +344,30 @@ WHERE
 ', 'DELETE t1, t2 FROM t1 INNER JOIN t2 INNER JOIN t3 WHERE t1.id=t2.id AND t2.id=t3.id');
     }
 
+    function test_sql_format_modify()
+    {
+        // delete multi
+        $this->assertFormatSql('
+INSERT INTO
+  test(id, name)
+SELECT
+  100,
+  "aaa" 
+FROM
+  dual 
+WHERE
+  (
+    NOT EXISTS(SELECT * FROM test WHERE id = 100)
+  )
+ON DUPLICATE KEY UPDATE
+  id = VALUES(id),
+  name = VALUES(name)
+', 'INSERT INTO test(id, name)
+SELECT 100,"aaa" FROM dual WHERE (NOT EXISTS(SELECT * FROM test WHERE id = 100))
+ON DUPLICATE KEY UPDATE id = VALUES(id),name = VALUES(name)
+');
+    }
+
     function test_sql_format_comment()
     {
         $this->assertFormatSql("
