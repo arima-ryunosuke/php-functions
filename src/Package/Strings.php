@@ -838,6 +838,174 @@ class Strings
     }
 
     /**
+     * 連想配列の配列を CSV 的文字列に変換する
+     *
+     * CSV ヘッダ行は全連想配列のキーの共通項となる。
+     * 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。
+     * ただし、オプションで headers が与えられた場合はそれを使用する。
+     * この headers オプションはヘッダ文字列変換も兼ねる（[key => header] で「key を header で吐き出し」となる）。
+     *
+     * メモリ効率は意識しない（どうせ元々配列を保持してるので意識しても無駄）。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * $csvarrays = [
+     *     ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'],             // 普通の行
+     *     ['c' => 'C2', 'a' => 'A2', 'b' => 'B2'],             // 順番が入れ替わっている行
+     *     ['c' => 'C3', 'a' => 'A3', 'b' => 'B3', 'x' => 'X'], // 余計な要素が入っている行
+     * ];
+     * assertEquals(csv_export($csvarrays), "a,b,c
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ");
+     *
+     * // ヘッダを指定できる
+     * assertEquals(csv_export($csvarrays, [
+     *     'headers' => ['a' => 'A', 'c' => 'C'], // a と c だけを出力＋ヘッダ文字変更
+     * ]), "A,C
+     * A1,C1
+     * A2,C2
+     * A3,C3
+     * ");
+     * ```
+     *
+     * @param array $csvarrays 連想配列の配列
+     * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
+     * @return array CSV 的文字列
+     */
+    public static function csv_export($csvarrays, $options = [])
+    {
+        $options += [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape'    => '\\',
+            'encoding'  => mb_internal_encoding(),
+            'headers'   => [],
+        ];
+
+        $fp = fopen('php://temp', 'rw+');
+        try {
+            return (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers) {
+                $mb_internal_encoding = mb_internal_encoding();
+                if (!$headers) {
+                    foreach ($csvarrays as $array) {
+                        $headers = $headers ? array_intersect_key($headers, $array) : $array;
+                    }
+                    $headers = array_keys($headers);
+                }
+                if (!(is_hasharray)($headers)) {
+                    $headers = array_combine($headers, $headers);
+                }
+                if ($encoding !== $mb_internal_encoding) {
+                    mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                }
+                fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
+                $default = array_fill_keys(array_keys($headers), '');
+
+                foreach ($csvarrays as $array) {
+                    $row = array_intersect_key(array_replace($default, $array), $default);
+                    if ($encoding !== $mb_internal_encoding) {
+                        mb_convert_variables($encoding, $mb_internal_encoding, $row);
+                    }
+                    fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                }
+                rewind($fp);
+                return stream_get_contents($fp);
+            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+        }
+        finally {
+            fclose($fp);
+        }
+    }
+
+    /**
+     * CSV 的文字列を連想配列の配列に変換する
+     *
+     * 1行目をヘッダ文字列とみなしてそれをキーとした連想配列の配列を返す。
+     * ただし、オプションで headers が与えられた場合はそれを使用する。
+     * この headers オプションはヘッダフィルタも兼ねる（[n => header] で「n 番目フィールドを header で取り込み」となる）。
+     *
+     * メモリ効率は意識しない（どうせ配列を返すので意識しても無駄）。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * assertEquals(csv_import("
+     * a,b,c
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * "), [
+     *     ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'],
+     *     ['a' => 'A2', 'b' => 'B2', 'c' => 'C2'],
+     *     ['a' => 'A3', 'b' => 'B3', 'c' => 'C3'],
+     * ]);
+     *
+     * // ヘッダを指定できる
+     * assertEquals(csv_import("
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ", [
+     *     'headers' => [0 => 'a', 2 => 'c'], // 1がないので1番目のフィールドを読み飛ばしつつ、0, 2 は "a", "c" として取り込む
+     * ]), [
+     *     ['a' => 'A1', 'c' => 'C1'],
+     *     ['a' => 'A2', 'c' => 'C2'],
+     *     ['a' => 'A3', 'c' => 'C3'],
+     * ]);
+     * ```
+     *
+     * @param string|resource $csvstring CSV 的文字列。ファイルポインタでも良いが終了後に必ず閉じられる
+     * @param array $options オプション配列。fgetcsv の第3引数以降もここで指定する
+     * @return array 連想配列の配列
+     */
+    public static function csv_import($csvstring, $options = [])
+    {
+        $options += [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape'    => '\\',
+            'encoding'  => mb_internal_encoding(),
+            'headers'   => [],
+        ];
+
+        if (is_resource($csvstring)) {
+            $fp = $csvstring;
+        }
+        else {
+            $fp = fopen('php://temp', 'r+b');
+            fwrite($fp, $csvstring);
+            rewind($fp);
+        }
+
+        try {
+            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers) {
+                $mb_internal_encoding = mb_internal_encoding();
+                $result = [];
+                while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
+                    if ($row === [null]) {
+                        continue;
+                    }
+                    if ($mb_internal_encoding !== $encoding) {
+                        mb_convert_variables($mb_internal_encoding, $encoding, $row);
+                    }
+                    if (!$headers) {
+                        $headers = $row;
+                        continue;
+                    }
+                    $result[] = array_combine($headers, array_intersect_key($row, $headers));
+                }
+                return $result;
+            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+        }
+        finally {
+            fclose($fp);
+        }
+    }
+
+    /**
      * 安全な乱数文字列を生成する
      *
      * @param int $length 生成文字列長

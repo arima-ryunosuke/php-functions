@@ -557,6 +557,125 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         ], (parse_uri)('scheme://user:pass@host/path/to/hoge?#'));
     }
 
+    function test_csv_encoding()
+    {
+        $DATADIR = __DIR__ . '/Strings';
+
+        $utf8array = [
+            ['Ａ' => 'あ', 'Ｂ' => 'い', 'Ｃ' => 'う', 'Ｄ' => 'え', 'Ｅ' => 'お'],
+            ['Ａ' => 'か', 'Ｂ' => 'き', 'Ｃ' => 'く', 'Ｄ' => 'け', 'Ｅ' => 'こ'],
+        ];
+        $sjisstring = require "$DATADIR/sjisstring.php";
+        $sjisstring12345 = require "$DATADIR/sjisstring12345.php";
+        $sjisstringnohead = require "$DATADIR/sjisstringnohead.php";
+
+        $this->assertEquals($sjisstring, (csv_export)($utf8array, ['encoding' => 'SJIS']));
+        $this->assertEquals($utf8array, (csv_import)($sjisstring, ['encoding' => 'SJIS']));
+
+        $this->assertEquals($sjisstring12345, (csv_export)($utf8array, [
+            'encoding' => 'SJIS',
+            'headers'  => [
+                'Ａ' => '１',
+                'Ｂ' => '２',
+                'Ｃ' => '３',
+                'Ｄ' => '４',
+                'Ｅ' => '５',
+            ],
+        ]));
+        $this->assertEquals($utf8array, (csv_import)($sjisstringnohead, [
+            'encoding' => 'SJIS',
+            'headers'  => [
+                'Ａ',
+                'Ｂ',
+                'Ｃ',
+                'Ｄ',
+                'Ｅ',
+            ],
+        ]));
+    }
+
+    function test_csv_export()
+    {
+        $csvarrays = [
+            // スタンダード
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            // 順番が入れ替わっている
+            ['c' => 'c2', 'b' => 'b2', 'a' => 'a2'],
+            // 余計な項目がある
+            ['c' => 'c3', 'b' => 'b3', 'a' => 'a3', 'x' => 'X'],
+        ];
+
+        $this->assertEquals("a,b,c
+a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+", (csv_export)($csvarrays));
+
+        // headers 指定
+        $this->assertEquals("A,C
+a1,c1
+a2,c2
+a3,c3
+", (csv_export)($csvarrays, ['headers' => ['a' => 'A', 'c' => 'C']]));
+
+        // fputcsv 引数
+        $csvarrays[0]['c'] = " c\n";
+        $this->assertEquals("a b c
+a1 b1 ' c
+'
+a2 b2 c2
+a3 b3 c3
+", (csv_export)($csvarrays, ['delimiter' => ' ', 'enclosure' => "'"]));
+    }
+
+    function test_csv_import()
+    {
+        $this->assertEquals([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
+            ['a' => 'a3', 'b' => 'b3', 'c' => 'c3'],
+        ], (csv_import)('a,b,c
+a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+'));
+
+        // 空行とクオート
+        $this->assertEquals([
+            ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
+        ], (csv_import)('a,b,c
+"a1,x",b1,c1
+
+a3,b3,"c3
+x"
+'));
+
+        // ファイルポインタ
+        file_put_contents(sys_get_temp_dir() . '/test.csv', 'a,b,c
+"a1,x",b1,c1
+
+a3,b3,"c3
+x"
+');
+        $this->assertEquals([
+            ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
+        ], (csv_import)(fopen(sys_get_temp_dir() . '/test.csv', 'r')));
+
+        // headers 指定
+        $this->assertEquals([
+            ['A' => 'a1', 'C' => 'c1'],
+            ['A' => 'a2', 'C' => 'c2'],
+        ], (csv_import)('
+a1,b1,c1
+a2,b2,c2
+', ['headers' => ['A', 2 => 'C']]));
+
+        // 要素数が合わないと例外
+        $this->assertException('array_combine', csv_import, "a,b,c\nhoge");
+    }
+
     function test_random_string()
     {
         $actual = (random_string)(256, 'abc');
