@@ -416,6 +416,65 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('backtrace', by_builtin, '', '');
     }
 
+    function test_namedcallize()
+    {
+        $f1 = function ($x, $a = 1) { return get_defined_vars(); };
+        $f2 = function ($x, ...$args) { return get_defined_vars(); };
+
+        // 単純呼び出し
+        $this->assertEquals([
+            'x' => 0,
+            'a' => 1,
+        ], (namedcallize)($f1)(['x' => 0]));
+        $this->assertEquals([
+            'x' => 0,
+            'a' => 9,
+        ], (namedcallize)($f1)(['x' => 0, 'a' => 9]));
+
+        // デフォルト
+        $this->assertEquals([
+            'x' => 0,
+            'a' => 1,
+        ], (namedcallize)($f1, [
+            'x' => 0,
+        ])());
+        $this->assertEquals([
+            'x' => 9,
+            'a' => 8,
+        ], (namedcallize)($f1, [
+            'x' => 0,
+            'a' => 8,
+        ])(['x' => 9, 'a' => 8]));
+        $this->assertEquals([
+            'x' => 9,
+            'a' => 8,
+        ], (namedcallize)($f1, [
+            'x' => 0,
+            1   => 8,
+        ])(['x' => 9,]));
+        $this->assertEquals([
+            'x' => 9,
+            'a' => 8,
+        ], (namedcallize)($f1, [
+            'x' => 0,
+        ])(['x' => 9, 1 => 8]));
+
+        // 可変引数
+        $this->assertEquals([
+            'x'    => 0,
+            'args' => [1, 2],
+        ], (namedcallize)($f2)(['x' => 0, 'args' => [1, 2]]));
+        $this->assertEquals([
+            'x'    => 0,
+            'args' => [1, 2],
+        ], (namedcallize)($f2)(['x' => 0, 1 => [1, 2]]));
+
+        // 例外系
+        $fx = (namedcallize)($f1);
+        $this->assertException('required arguments', $fx, []);
+        $this->assertException('undefined arguments', $fx, ['x' => null, 'unknown' => null]);
+    }
+
     function test_parameter_length()
     {
         // タイプ 0: クロージャ
