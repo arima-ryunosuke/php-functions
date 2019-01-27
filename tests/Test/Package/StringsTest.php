@@ -676,6 +676,42 @@ a2,b2,c2
         $this->assertException('array_combine', csv_import, "a,b,c\nhoge");
     }
 
+    function test_json_export()
+    {
+        // エラー情報を突っ込んでおく
+        json_decode('aaa');
+
+        // デフォルトオプション
+        $this->assertEquals('[123.0,"あ"]', (json_export)([123.0, 'あ']));
+
+        // オプション指定（上書き）
+        $this->assertEquals("[\n    123,\n    \"\u3042\"\n]", (json_export)([123.0, 'あ'], [
+            JSON_UNESCAPED_UNICODE      => false,
+            JSON_PRESERVE_ZERO_FRACTION => false,
+            JSON_PRETTY_PRINT           => true,
+        ]));
+
+        // depth
+        $this->assertException('Maximum stack depth exceeded', json_export, [[[[[[]]]]]], [JSON_MAX_DEPTH => 3]);
+    }
+
+    function test_json_import()
+    {
+        // エラー情報を突っ込んでおく
+        json_decode('aaa');
+
+        // デフォルトオプション
+        $this->assertEquals([123.0, "あ"], (json_import)('[123.0,"あ"]'));
+
+        // オプション指定（上書き）
+        $this->assertEquals((object) ['a' => 123.0, 'b' => "あ"], (json_import)('{"a":123.0,"b":"あ"}', [
+            JSON_OBJECT_AS_ARRAY => false,
+        ]));
+
+        // depth
+        $this->assertException('Maximum stack depth exceeded', json_import, '[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3]);
+    }
+
     function test_random_string()
     {
         $actual = (random_string)(256, 'abc');

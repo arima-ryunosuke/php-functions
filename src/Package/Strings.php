@@ -7,6 +7,9 @@ namespace ryunosuke\Functions\Package;
  */
 class Strings
 {
+    /** json_*** 関数で $depth 引数を表す定数 */
+    const JSON_MAX_DEPTH = -1;
+
     /**
      * 文字列結合の関数版
      *
@@ -1003,6 +1006,89 @@ class Strings
         finally {
             fclose($fp);
         }
+    }
+
+    /**
+     * json_encode のプロキシ関数
+     *
+     * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
+     *
+     * Example:
+     * ```php
+     * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
+     * assertEquals(json_export(['a' => 'A', 'b' => 'B'], [
+     *    JSON_PRETTY_PRINT => false,
+     * ]), '{"a":"A","b":"B"}');
+     * ```
+     *
+     * @param mixed $value encode する値
+     * @param array $options JSON_*** をキーにした連想配列。 値が false は指定されていないとみなされる
+     * @return string JSON 文字列
+     */
+    public static function json_export($value, $options = [])
+    {
+        $options += [
+            JSON_UNESCAPED_UNICODE      => true, // エスケープなしで特にデメリットはない
+            JSON_PRESERVE_ZERO_FRACTION => true, // 勝手に変換はできるだけ避けたい
+        ];
+        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $option = array_sum(array_keys(array_filter($options)));
+
+        // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
+        if (json_last_error()) {
+            json_encode(null);
+        }
+
+        $result = json_encode($value, $option, $depth);
+
+        // エラーが出ていたら例外に変換
+        if (json_last_error()) {
+            throw new \ErrorException(json_last_error_msg(), json_last_error());
+        }
+
+        return $result;
+    }
+
+    /**
+     * json_decode のプロキシ関数
+     *
+     * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
+     *
+     * Example:
+     * ```php
+     * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
+     * assertEquals(json_import('{"a":"A","b":"B"}', [
+     *    JSON_OBJECT_AS_ARRAY => true,
+     * ]), ['a' => 'A', 'b' => 'B']);
+     * ```
+     *
+     * @param string $value JSON 文字列
+     * @param array $options JSON_*** をキーにした連想配列。 値が false は指定されていないとみなされる
+     * @return mixed decode された値
+     */
+    public static function json_import($value, $options = [])
+    {
+        $options += [
+            JSON_OBJECT_AS_ARRAY => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+        ];
+        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $option = array_sum(array_keys(array_filter($options)));
+
+        // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
+        if (json_last_error()) {
+            json_encode(null);
+        }
+
+        // The second option is JSON_OBJECT_AS_ARRAY that has the same effect as setting assoc to TRUE
+        // とあるが、 null を指定しないと効いてくれないっぽい
+        $result = json_decode($value, null, $depth, $option);
+
+        // エラーが出ていたら例外に変換
+        if (json_last_error()) {
+            throw new \ErrorException(json_last_error_msg(), json_last_error());
+        }
+
+        return $result;
     }
 
     /**
