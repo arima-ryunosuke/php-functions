@@ -98,7 +98,7 @@ class Strings
      * $delimiter には配列が使える。いわゆる「複数文字列での分割」の動作になる。
      *
      * $limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。
-     * 素の explode の負数 $limit の動作が微妙に気に入らない（implode 正数と対称性がない）ので再実装。
+     * 端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。
      *
      * Example:
      * ```php
@@ -107,7 +107,7 @@ class Strings
      * // 負数を与えると前詰め
      * assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
      * // もちろん上記2つは共存できる
-     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b,c', 'd']);
+     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
      * ```
      *
      * @param string|array $delimiter 分割文字列。配列可
@@ -117,21 +117,17 @@ class Strings
      */
     public static function multiexplode($delimiter, $string, $limit = \PHP_INT_MAX)
     {
-        if (is_array($delimiter)) {
-            $representative = reset($delimiter);
-            $string = str_replace($delimiter, $representative, $string);
-            $delimiter = $representative;
-        }
-
+        $limit = (int) $limit;
         if ($limit < 0) {
-            $parts = explode($delimiter, $string);
-            $sub = array_splice($parts, 0, $limit + 1);
-            if ($sub) {
-                array_unshift($parts, implode($delimiter, $sub));
-            }
-            return $parts;
+            // 下手に php で小細工するよりこうやって富豪的にやるのが一番速かった
+            return array_reverse(array_map('strrev', (multiexplode)($delimiter, strrev($string), -$limit)));
         }
-        return explode($delimiter, $string, $limit);
+        // explode において 0 は 1 と等しい
+        if ($limit === 0) {
+            $limit = 1;
+        }
+        $delimiter = array_map(function ($v) { return preg_quote($v, '#'); }, (arrayize)($delimiter));
+        return preg_split('#' . implode('|', $delimiter) . '#', $string, $limit);
     }
 
     /**
