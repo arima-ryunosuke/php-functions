@@ -59,12 +59,6 @@ class NetworkTest extends \ryunosuke\Test\AbstractTestCase
         // トータルで最大である2秒程度（これがキモ。他はおまけに過ぎない）
         $this->assertRange(1.8, 2.2, $time);
 
-        $this->assertEquals($responses['w1'][1][0], 'HTTP/1.1 200 OK');
-        $this->assertRange(0.8, 1.2, $responses['w1'][2]['total_time']);
-
-        $this->assertEquals($responses['w2'][1][0], 'HTTP/1.1 200 OK');
-        $this->assertRange(1.8, 2.2, $responses['w2'][2]['total_time']);
-
         $this->assertEquals($responses['to'], CURLE_OPERATION_TIMEOUTED);
     }
 }
