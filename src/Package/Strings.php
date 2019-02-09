@@ -1447,6 +1447,60 @@ class Strings
     }
 
     /**
+     * $string に最も近い文字列を返す
+     *
+     * レーベンシュタイン比の最も小さい要素を返す。
+     *
+     * この関数の結果（内部実装）は互換性を考慮しない。
+     * 例えば現在は damerau_levenshtein で実装されているが、 similar_text になる可能性もある。
+     *
+     * Example:
+     * ```php
+     * // 「あいうえお」と最も距離の近い文字列は「あいゆえに」である
+     * assertSame(str_guess("あいうえお", [
+     *     'かきくけこ', // マッチ度 0%（1文字もかすらない）
+     *     'ぎぼあいこ', // マッチ度 0%（"あい"はあるが位置が異なる）
+     *     'かとうあい', // マッチ度 20%（"う"の位置が等しい）
+     *     'あいしてる', // マッチ度 40&（"あい"がマッチ）
+     *     'あいゆえに', // マッチ度 60&（"あい", "え"がマッチ）
+     * ]), 'あいゆえに');
+     * ```
+     *
+     * @param string $string 調べる文字列
+     * @param array $candidates 候補文字列配列
+     * @param int $percent マッチ度（％）を受ける変数
+     * @return string 最も近い文字列
+     */
+    public static function str_guess($string, $candidates, &$percent = null)
+    {
+        $candidates = array_filter((arrayval)($candidates, false), 'strlen');
+        if (!$candidates) {
+            throw new \InvalidArgumentException('$candidates is empty.');
+        }
+
+        $sarray = preg_split('//u', $string, -1, PREG_SPLIT_NO_EMPTY);
+        $closest = null;
+        $shortest = PHP_INT_MAX;
+        foreach ($candidates as $candidate) {
+            $carray = preg_split('//u', $candidate, -1, PREG_SPLIT_NO_EMPTY);
+            $delta = (damerau_levenshtein)($sarray, $carray) / max(count($sarray), count($carray));
+
+            if ($delta < $shortest) {
+                $closest = $candidate;
+                $shortest = $delta;
+            }
+
+            if ($delta === 0) {
+                break;
+            }
+        }
+
+        $percent = intval(100 - $shortest * 100);
+
+        return $closest;
+    }
+
+    /**
      * "hoge {$hoge}" 形式のレンダリング
      *
      * 文字列を eval して "hoge {$hoge}" 形式の文字列に変数を埋め込む。

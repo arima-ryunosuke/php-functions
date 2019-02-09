@@ -979,6 +979,37 @@ a2,b2,c2
         $this->assertSame(3, (damerau_levenshtein)("あいうえお", "xあういえおx"));
     }
 
+    public function test_str_guess()
+    {
+        $percent = 0;
+        $this->assertEquals("12345", (str_guess)("12345", [
+            "12345",
+        ], $percent));
+        $this->assertEquals(100, $percent);
+
+        $this->assertSame("1234", (str_guess)("12345", [
+            "1",
+            "12",
+            "123",
+            "1234",
+        ], $percent));
+        $this->assertEquals(80, $percent);
+
+        $this->assertSame("x12345x", (str_guess)("12345", [
+            "x12345x",
+            "xx12345xx",
+        ], $percent));
+        $this->assertEquals(71, $percent);
+
+        $this->assertSame("x12345x", (str_guess)("notfound", [
+            "x12345x",
+            "xx12345xx",
+        ], $percent));
+        $this->assertEquals(0, $percent);
+
+        $this->assertException('is empty', str_guess, '', []);
+    }
+
     public function test_render_string()
     {
         // single
