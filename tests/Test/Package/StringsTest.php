@@ -946,6 +946,39 @@ a2,b2,c2
         $this->assertEquals('aaa246zzz', (preg_replaces)('#aaa(\d\d\d)zzz#', function ($v) { return $v * 2; }, 'aaa123zzz'));
     }
 
+    public function test_damerau_levenshtein()
+    {
+        $this->assertSame(0, (damerau_levenshtein)("12345", "12345"));
+        $this->assertSame(3, (damerau_levenshtein)("", "xzy"));
+        $this->assertSame(3, (damerau_levenshtein)("xzy", ""));
+        $this->assertSame(0, (damerau_levenshtein)("", ""));
+        $this->assertSame(1, (damerau_levenshtein)("1", "2"));
+        $this->assertSame(1, (damerau_levenshtein)("12", "21"));
+        $this->assertSame(2, (damerau_levenshtein)("2121", "11", 2, 1, 1));
+        $this->assertSame(10, (damerau_levenshtein)("2121", "11", 2, 1, 5));
+        $this->assertSame(2, (damerau_levenshtein)("11", "2121", 1, 1, 1));
+        $this->assertSame(10, (damerau_levenshtein)("11", "2121", 5, 1, 1));
+        $this->assertSame(3, (damerau_levenshtein)("111", "121", 2, 3, 2));
+        $this->assertSame(4, (damerau_levenshtein)("111", "121", 2, 9, 2));
+        $this->assertSame(2, (damerau_levenshtein)("13458", "12345"));
+        $this->assertSame(2, (damerau_levenshtein)("1345", "1234"));
+        $this->assertSame(1, (damerau_levenshtein)("debugg", "debug"));
+        $this->assertSame(1, (damerau_levenshtein)("ddebug", "debug"));
+        $this->assertSame(2, (damerau_levenshtein)("debbbug", "debug"));
+        $this->assertSame(1, (damerau_levenshtein)("debugging", "debuging"));
+        $this->assertSame(2, (damerau_levenshtein)("a", "bc"));
+        $this->assertSame(2, (damerau_levenshtein)("xa", "xbc"));
+        $this->assertSame(2, (damerau_levenshtein)("xax", "xbcx"));
+        $this->assertSame(2, (damerau_levenshtein)("ax", "bcx"));
+
+        $this->assertSame(1, (damerau_levenshtein)("abc", "bac"));
+        $this->assertSame(2, (damerau_levenshtein)("bare", "bear"));
+        $this->assertSame(2, (damerau_levenshtein)("12", "21", 1, 1, 1, 0));
+        $this->assertSame(2, (damerau_levenshtein)("destroy", "destory", 1, 1, 1, 2));
+
+        $this->assertSame(3, (damerau_levenshtein)("あいうえお", "xあういえおx"));
+    }
+
     public function test_render_string()
     {
         // single
