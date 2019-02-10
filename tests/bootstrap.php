@@ -3,7 +3,6 @@
 namespace ryunosuke\Test;
 
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 require __DIR__ . '/classes.php';
 
 \ryunosuke\Functions\Cacher::initialize(new \ryunosuke\Functions\FileCache(__DIR__ . '/temporary'));
