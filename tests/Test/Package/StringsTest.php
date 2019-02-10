@@ -374,6 +374,59 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('a-b-c-', (chain_case)('-ABC-'));
     }
 
+    function test_htmltag()
+    {
+        $this->assertEquals(
+            '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>',
+            (htmltag)('a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]')
+        );
+        $this->assertEquals(
+            '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>',
+            (htmltag)(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>'])
+        );
+        $this->assertEquals(
+            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;bold&gt;</b></a>',
+            (htmltag)([
+                'a.c1#hoge.c2[href="http://hoge"]' => [
+                    'b' => '<bold>',
+                ],
+            ])
+        );
+        $this->assertEquals(
+            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;plain1&gt;<t>&lt;thin&gt;</t>&lt;plain2&gt;</b></a>',
+            (htmltag)([
+                'a.c1#hoge.c2[href="http://hoge"]' => [
+                    'b' => [
+                        '<plain1>',
+                        't' => '<thin>',
+                        '<plain2>',
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(
+            '
+<div id="hoge">
+  <b>plain1</b>
+  <b>plain2</b>
+</div>
+<span>plain</span>',
+            (htmltag)([
+                "\ndiv\n#hoge" => [
+                    "\n  b"   => 'plain1',
+                    "\n  b\n" => 'plain2',
+                ],
+                "span"         => 'plain',
+            ])
+        );
+
+        $this->assertException('tagname is empty', htmltag, '#id.class');
+        $this->assertException('#id is multiple', htmltag, 'a#id#id');
+        $this->assertException('[a] is dumplicated', htmltag, 'a[a=1][a=2]');
+        $this->assertException('[id] is dumplicated', htmltag, 'a#id[id=id]');
+    }
+
     function provideUri()
     {
         $gen = function ($scheme = '', $user = '', $pass = '', $host = '', $port = '', $path = '', $query = [], $fragment = '') {

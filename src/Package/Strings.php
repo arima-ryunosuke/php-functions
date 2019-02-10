@@ -687,6 +687,165 @@ class Strings
     }
 
     /**
+     * css セレクタから html 文字列を生成する
+     *
+     * `tag#id.class[attr=value]` のような css セレクタから `<tag id="id" class="class" attr="value"></tag>` のような html 文字列を返す。
+     * 配列を与えるとキーがセレクタ、値がコンテント文字列になる。
+     * さらに値が配列だと再帰して生成する。
+     *
+     * 値や属性は適切に htmlspecialchars される。
+     *
+     * Example:
+     * ```php
+     * // 単純文字列はただのタグを生成する
+     * assertSame(
+     *     htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'),
+     *     '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
+     * );
+     * // ペア配列を与えるとコンテント文字列になる
+     * assertSame(
+     *     htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' => "this is text's content"]),
+     *     '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden>this is text&#039;s content</a>'
+     * );
+     * // ネストした配列を与えると再帰される
+     * assertSame(
+     *     htmltag([
+     *         'div#wrapper' => [
+     *             'b.class1' => [
+     *                 '<plain>',
+     *             ],
+     *             'b.class2' => [
+     *                 '<plain1>',
+     *                 's' => '<strike>',
+     *                 '<plain2>',
+     *             ],
+     *         ],
+     *     ]),
+     *     '<div id="wrapper"><b class="class1">&lt;plain&gt;</b><b class="class2">&lt;plain1&gt;<s>&lt;strike&gt;</s>&lt;plain2&gt;</b></div>'
+     * );
+     * ```
+     *
+     * @param string|array $selector
+     * @return string html 文字列
+     */
+    public static function htmltag($selector)
+    {
+        if (!(is_iterable)($selector)) {
+            $selector = [$selector => ''];
+        }
+
+        $html = static function ($string) {
+            return htmlspecialchars($string, ENT_QUOTES);
+        };
+
+        $build = static function ($selector, $content, $escape) use ($html) {
+            $tag = '';
+            $id = '';
+            $classes = [];
+            $attrs = [];
+
+            $context = null;
+            $escaping = null;
+            $chars = preg_split('##u', $selector, -1, PREG_SPLIT_NO_EMPTY);
+            for ($i = 0, $l = count($chars); $i < $l; $i++) {
+                $char = $chars[$i];
+                if ($char === '"' || $char === "'") {
+                    $escaping = $escaping === $char ? null : $char;
+                }
+
+                if (!$escaping && $char === '#') {
+                    if (strlen($id)) {
+                        throw new \InvalidArgumentException('#id is multiple.');
+                    }
+                    $context = $char;
+                    continue;
+                }
+                if (!$escaping && $char === '.') {
+                    $context = $char;
+                    $classes[] = '';
+                    continue;
+                }
+                if (!$escaping && $char === '[') {
+                    $context = $char;
+                    $attrs[] = '';
+                    continue;
+                }
+                if (!$escaping && $char === ']') {
+                    $context = null;
+                    continue;
+                }
+
+                if ($char === '\\') {
+                    $char = $chars[++$i];
+                }
+
+                if ($context === null) {
+                    $tag .= $char;
+                    continue;
+                }
+                if ($context === '#') {
+                    $id .= $char;
+                    continue;
+                }
+                if ($context === '.') {
+                    $classes[count($classes) - 1] .= $char;
+                    continue;
+                }
+                if ($context === '[') {
+                    $attrs[count($attrs) - 1] .= $char;
+                    continue;
+                }
+            }
+
+            if (!strlen($tag)) {
+                throw new \InvalidArgumentException('tagname is empty.');
+            }
+
+            $attrkv = [];
+            if (strlen($id)) {
+                $attrkv['id'] = $id;
+            }
+            if ($classes) {
+                $attrkv['class'] = implode(' ', $classes);
+            }
+            foreach ($attrs as $attr) {
+                list($k, $v) = explode('=', $attr, 2) + [1 => null];
+                if (array_key_exists($k, $attrkv)) {
+                    throw new \InvalidArgumentException("[$k] is dumplicated.");
+                }
+                $attrkv[$k] = $v;
+            }
+            $attrs = [];
+            foreach ($attrkv as $k => $v) {
+                $attrs[] = $v === null
+                    ? $html($k)
+                    : sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
+            }
+
+            preg_match('#(\s*)(.+)(\s*)#u', $tag, $m);
+            list(, $prefix, $tag, $suffix) = $m;
+            $tag_attr = $html($tag) . (concat)(' ', implode(' ', $attrs));
+            $content = ($escape ? $html($content) : $content);
+
+            return "$prefix<$tag_attr>$content</$tag>$suffix";
+        };
+
+        $result = '';
+        foreach ($selector as $key => $value) {
+            if (is_int($key)) {
+                $result .= $html($value);
+            }
+            elseif ((is_iterable)($value)) {
+                $result .= $build($key, (htmltag)($value), false);
+            }
+            else {
+                $result .= $build($key, $value, true);
+            }
+        }
+        return $result;
+    }
+
+    /**
      * parse_uri の逆
      *
      * URI のパーツを与えると URI として構築する。
