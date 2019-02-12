@@ -870,6 +870,37 @@ a2,b2,c2
         $this->assertException('Maximum stack depth exceeded', json_import, '[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3]);
     }
 
+    function test_markdown_table()
+    {
+        $this->assertEquals("
+| a   |
+| --- |
+| xx  |
+", "\n" . (markdown_table)([['a' => 'xx']]));
+
+        $this->assertEquals("
+|   a |
+| --: |
+|  99 |
+", "\n" . (markdown_table)([['a' => '99']]));
+
+        $this->assertEquals("
+| a   | b      |
+| --- | ------ |
+| aa  |        |
+|     | b<br>b |
+", "\n" . (markdown_table)([['a' => 'aa'], ['b' => "b\nb"]]));
+
+        $this->assertEquals("
+| a   | b   |
+| --- | --- |
+| あ  |     |
+|     | い  |
+", "\n" . (markdown_table)([['a' => 'あ'], ['b' => 'い']]));
+
+        $this->assertException('must be array of hasharray', markdown_table, '');
+    }
+
     function test_random_string()
     {
         $actual = (random_string)(256, 'abc');

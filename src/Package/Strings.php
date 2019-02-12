@@ -1318,6 +1318,74 @@ class Strings
     }
 
     /**
+     * 連想配列の配列を markdown テーブル文字列にする
+     *
+     * 見出しはキーの和集合で生成され、改行は `<br>` に置換される。
+     * 要素が全て数値の場合は右寄せになる。
+     *
+     * Example:
+     * ```php
+     * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
+     * assertEquals("\n" . markdown_table([
+     *    ['a' => 'a1', 'b' => 'b1'],
+     *    ['b' => 'b2', 'c' => '2'],
+     *    ['a' => 'a3', 'c' => '3'],
+     * ]), "
+     * | a   | b   |   c |
+     * | --- | --- | --: |
+     * | a1  | b1  |     |
+     * |     | b2  |   2 |
+     * | a3  |     |   3 |
+     * ");
+     * ```
+     *
+     * @param array $array 連想配列の配列
+     * @return string markdown テーブル文字列
+     */
+    public static function markdown_table($array)
+    {
+        if (!is_array($array) || (is_empty)($array)) {
+            throw new \InvalidArgumentException('$array must be array of hasharray.');
+        }
+
+        $defaults = [];
+        $numerics = [];
+        $lengths = [];
+        foreach ($array as $n => $fields) {
+            assert(is_array($fields), '$array must be array of hasharray.');
+            foreach ($fields as $k => $v) {
+                $v = str_replace(["\r\n", "\r", "\n"], '<br>', $v);
+                $array[$n][$k] = $v;
+                $defaults[$k] = '';
+                $numerics[$k] = ($numerics[$k] ?? true) && is_numeric($v);
+                $lengths[$k] = max($lengths[$k] ?? 3, strlen($k), strlen($v)); // 3 は markdown の最低見出し長
+            }
+        }
+
+        $linebuilder = function ($array, $padstr) use ($numerics, $lengths) {
+            $line = [];
+            foreach ($array as $k => $v) {
+                $pad = str_pad($v, strlen($v) - mb_strwidth($v) + $lengths[$k], $padstr, $numerics[$k] ? STR_PAD_LEFT : STR_PAD_RIGHT);
+                if ($padstr === '-' && $numerics[$k]) {
+                    $pad[strlen($pad) - 1] = ':';
+                }
+                $line[] = $pad;
+            }
+            return '| ' . implode(' | ', $line) . ' |';
+        };
+
+        $result = [];
+
+        $result[] = $linebuilder(array_combine($keys = array_keys($defaults), $keys), ' ');
+        $result[] = $linebuilder($defaults, '-');
+        foreach ($array as $fields) {
+            $result[] = $linebuilder(array_replace($defaults, $fields), ' ');
+        }
+
+        return implode("\n", $result) . "\n";
+    }
+
+    /**
      * 安全な乱数文字列を生成する
      *
      * @param int $length 生成文字列長

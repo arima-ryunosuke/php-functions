@@ -677,35 +677,15 @@ class Utility
 
         // 出力するなら出力
         if ($output) {
-            $nlength = max(5, max(array_map('strlen', array_keys($benchset))));
-            $slength = 9;
-            $olength = 12;
-            $rlength = 6;
-            $defformat = "| %-{$nlength}s | %{$slength}s | %{$olength}s | %{$rlength}s |";
-            $sepformat = "| %'-{$nlength}s | %'-{$slength}s:| %'-{$olength}s:| %'-{$rlength}s:|";
-
-            $template = <<<'RESULT'
-Running %count$s cases (between %millsec$s ms):
-%header$s
-%separator$s
-%summary$s
-
-RESULT;
-            echo (kvsprintf)($template, [
-                'count'     => count($benchset),
-                'millsec'   => number_format($millisec),
-                'header'    => sprintf($defformat, 'name', 'called', '1 call(ms)', 'ratio'),
-                'separator' => sprintf($sepformat, '', '', '', ''),
-                'summary'   => implode("\n", array_map(function ($data) use ($defformat) {
-                    return vsprintf($defformat, [
-                            $data['name'],
-                            number_format($data['called']),
-                            number_format($data['mills'], 6),
-                            number_format($data['ratio'], 3),
-                        ]
-                    );
-                }, $result)),
-            ]);
+            printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
+            echo (markdown_table)(array_map(function ($v) {
+                return [
+                    'name'       => $v['name'],
+                    'called'     => number_format($v['called'], 0),
+                    '1 call(ms)' => number_format($v['mills'], 6),
+                    'ratio'      => number_format($v['ratio'], 3),
+                ];
+            }, $result));
         }
 
         return $result;
