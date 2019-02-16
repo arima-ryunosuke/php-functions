@@ -557,6 +557,103 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         ], (parse_uri)('scheme://user:pass@host/path/to/hoge?#'));
     }
 
+    function test_ini_export()
+    {
+        $iniarray = [
+            'simple'    => [
+                'a'     => 'A',
+                'b'     => 'B',
+                'quote' => "\"\0\\'",
+            ],
+            'array'     => [
+                'x' => ['A', 'B', 'C'],
+            ],
+            'hasharray' => [
+                'y' => [
+                    'a' => 'A',
+                    'b' => 'B',
+                ],
+            ],
+        ];
+
+        $this->assertEquals('simple[a] = "A"
+simple[b] = "B"
+simple[quote] = "\"\000\\\\\'"
+x[] = "A"
+x[] = "B"
+x[] = "C"
+y[a] = "A"
+y[b] = "B"
+', (ini_export)($iniarray, ['process_sections' => false]));
+
+        $this->assertEquals('[simple]
+a = "A"
+b = "B"
+quote = "\"\000\\\\\'"
+
+[array]
+x[] = "A"
+x[] = "B"
+x[] = "C"
+
+[hasharray]
+y[a] = "A"
+y[b] = "B"
+', (ini_export)($iniarray, ['process_sections' => true]));
+    }
+
+    function test_ini_import()
+    {
+        $this->assertEquals([
+            'a'     => 'A',
+            'b'     => 'B',
+            'quote' => '"\000\\\'',
+            'x'     => ['A', 'B', 'C'],
+            'y'     => [
+                'a' => 'A',
+                'b' => 'B',
+            ],
+        ], (ini_import)('a = "A"
+b = "B"
+quote = "\"\000\\\\\'"
+x[] = "A"
+x[] = "B"
+x[] = "C"
+y[a] = "A"
+y[b] = "B"
+', ['process_sections' => false]));
+
+        $this->assertEquals([
+            'simple'    => [
+                'a'     => 'A',
+                'b'     => 'B',
+                'quote' => '"\000\\\'',
+            ],
+            'array'     => [
+                'x' => ['A', 'B', 'C'],
+            ],
+            'hasharray' => [
+                'y' => [
+                    'a' => 'A',
+                    'b' => 'B',
+                ],
+            ],
+        ], (ini_import)('[simple]
+a = "A"
+b = "B"
+quote = "\"\000\\\\\'"
+
+[array]
+x[] = "A"
+x[] = "B"
+x[] = "C"
+
+[hasharray]
+y[a] = "A"
+y[b] = "B"
+', ['process_sections' => true]));
+    }
+
     function test_csv_encoding()
     {
         $DATADIR = __DIR__ . '/Strings';

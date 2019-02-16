@@ -841,6 +841,77 @@ class Strings
     }
 
     /**
+     * 連想配列を INI 的文字列に変換する
+     *
+     * Example:
+     * ```php
+     * assertEquals(ini_export(['a' => 1, 'b' => 'B', 'c' => PHP_SAPI]), 'a = 1
+     * b = "B"
+     * c = "cli"
+     * ');
+     * ```
+     *
+     * @param array $iniarray ini 化する配列
+     * @param array $options オプション配列
+     * @return string ini 文字列
+     */
+    public static function ini_export($iniarray, $options = [])
+    {
+        $options += [
+            'process_sections' => false,
+            'alignment'        => true,
+        ];
+
+        $generate = function ($array, $key = null) use (&$generate, $options) {
+            $ishasharray = is_array($array) && (is_hasharray)($array);
+            return (array_sprintf)($array, function ($v, $k) use ($generate, $key, $ishasharray) {
+                if ((is_iterable)($v)) {
+                    return $generate($v, $k);
+                }
+
+                if ($key === null) {
+                    return $k . ' = ' . (var_export2)($v, true);
+                }
+                return ($ishasharray ? "{$key}[$k]" : "{$key}[]") . ' = ' . (var_export2)($v, true);
+            }, "\n");
+        };
+
+        if ($options['process_sections']) {
+            return (array_sprintf)($iniarray, function ($v, $k) use ($generate) {
+                return "[$k]\n{$generate($v)}\n";
+            }, "\n");
+        }
+
+        return $generate($iniarray) . "\n";
+    }
+
+    /**
+     * INI 的文字列を連想配列に変換する
+     *
+     * Example:
+     * ```php
+     * assertEquals(ini_import("
+     * a = 1
+     * b = 'B'
+     * c = PHP_VERSION
+     * "), ['a' => 1, 'b' => 'B', 'c' => PHP_VERSION]);
+     * ```
+     *
+     * @param string $inistring ini 文字列
+     * @param array $options オプション配列
+     * @return array 配列
+     */
+    public static function ini_import($inistring, $options = [])
+    {
+        $options += [
+            'process_sections' => false,
+            'scanner_mode'     => INI_SCANNER_TYPED,
+        ];
+
+        return parse_ini_string($inistring, $options['process_sections'], $options['scanner_mode']);
+    }
+
+    /**
      * 連想配列の配列を CSV 的文字列に変換する
      *
      * CSV ヘッダ行は全連想配列のキーの共通項となる。
