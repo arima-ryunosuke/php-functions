@@ -747,6 +747,7 @@ class Vars
      * - 配列は 5.4 以降のショートシンタックス（[]）で出力
      * - インデントは 4 固定
      * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
+     * - 文字列はダブルクオート
      * - null は null（小文字）
      * - 再帰構造を渡しても警告がでない（さらに NULL ではなく `'*RECURSION*'` という文字列になる）
      * - 配列の再帰構造の出力が異なる（Example参照）
@@ -754,14 +755,14 @@ class Vars
      * Example:
      * ```php
      * // 単純なエクスポート
-     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), "[
-     *     'array' => [1, 2, 3],
-     *     'hash'  => [
-     *         'a' => 'A',
-     *         'b' => 'B',
-     *         'c' => 'C',
+     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), '[
+     *     "array" => [1, 2, 3],
+     *     "hash"  => [
+     *         "a" => "A",
+     *         "b" => "B",
+     *         "c" => "C",
      *     ],
-     * ]");
+     * ]');
      * // 再帰構造を含むエクスポート（標準の var_export は形式が異なる。 var_export すれば分かる）
      * $rarray = [];
      * $rarray['a']['b']['c'] = &$rarray;
@@ -769,22 +770,22 @@ class Vars
      * $robject->a = new \stdClass();
      * $robject->a->b = new \stdClass();
      * $robject->a->b->c = $robject;
-     * assertSame(var_export2(compact('rarray', 'robject'), true), "[
-     *     'rarray'  => [
-     *         'a' => [
-     *             'b' => [
-     *                 'c' => '*RECURSION*',
+     * assertSame(var_export2(compact('rarray', 'robject'), true), '[
+     *     "rarray"  => [
+     *         "a" => [
+     *             "b" => [
+     *                 "c" => "*RECURSION*",
      *             ],
      *         ],
      *     ],
-     *     'robject' => stdClass::__set_state([
-     *         'a' => stdClass::__set_state([
-     *             'b' => stdClass::__set_state([
-     *                 'c' => '*RECURSION*',
+     *     "robject" => stdClass::__set_state([
+     *         "a" => stdClass::__set_state([
+     *             "b" => stdClass::__set_state([
+     *                 "c" => "*RECURSION*",
      *             ]),
      *         ]),
      *     ]),
-     * ]");
+     * ]');
      * ```
      *
      * @param mixed $value 出力する値
@@ -801,7 +802,7 @@ class Vars
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
-                    return var_export('*RECURSION*', true);
+                    return $export('*RECURSION*');
                 }
             }
             // 配列は連想判定したり再帰したり色々
@@ -845,6 +846,10 @@ class Vars
             elseif (is_object($value)) {
                 $parents[] = $value;
                 return get_class($value) . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
+            }
+            // 文字列はダブルクオート
+            elseif (is_string($value)) {
+                return '"' . addcslashes($value, "\"\0\\") . '"';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {

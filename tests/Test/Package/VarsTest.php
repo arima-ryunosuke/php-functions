@@ -13,7 +13,7 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('123.456', (stringify)(123.456));
         $this->assertEquals('hoge', (stringify)('hoge'));
         $this->assertEquals('Resource id #1', (stringify)(STDIN));
-        $this->assertEquals('[\'array\']', (stringify)(['array']));
+        $this->assertEquals('["array"]', (stringify)(['array']));
         $this->assertEquals('stdClass', (stringify)(new \stdClass()));
         $this->assertEquals('hoge', (stringify)(new \Concrete('hoge')));
         $this->assertEquals('C:11:"ArrayObject":36:{x:i:0;a:1:{i:0;s:4:"hoge";};m:a:0:{}}', (stringify)(new \ArrayObject(['hoge'])));
@@ -540,14 +540,14 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
 
         $this->assertSame(<<<'EXPECTED'
 [
-    '\'' . "\0" . '\'' => 123,
-    'key'              => 456,
-    'null'             => null,
-    'nulls'            => [null],
+    "'\000\"" => 123,
+    "key"     => 456,
+    "null"    => null,
+    "nulls"   => [null],
 ]
 EXPECTED
             , (var_export2)([
-                "'\0'"  => 123,
+                "'\0\"" => 123,
                 'key'   => 456,
                 'null'  => null,
                 'nulls' => [null],
@@ -563,8 +563,8 @@ EXPECTED
 
         $this->assertEquals(<<<'VAR'
 Concrete::__set_state([
-    'value' => null,
-    'name'  => 'hoge',
+    "value" => null,
+    "name"  => "hoge",
 ])
 VAR
             , (var_export2)($concrete, true));
@@ -572,9 +572,9 @@ VAR
         $concrete->external = 'aaa';
         $this->assertEquals(<<<'VAR'
 Concrete::__set_state([
-    'value'    => null,
-    'name'     => 'hoge',
-    'external' => 'aaa',
+    "value"    => null,
+    "name"     => "hoge",
+    "external" => "aaa",
 ])
 VAR
             , (var_export2)($concrete, true));
@@ -586,9 +586,9 @@ VAR
         $rarray['parent']['child']['grand'] = &$rarray;
         $this->assertEquals(<<<'VAR'
 [
-    'parent' => [
-        'child' => [
-            'grand' => '*RECURSION*',
+    "parent" => [
+        "child" => [
+            "grand" => "*RECURSION*",
         ],
     ],
 ]
@@ -601,9 +601,9 @@ VAR
         $robject->parent->child->grand = $robject;
         $this->assertEquals(<<<'VAR'
 stdClass::__set_state([
-    'parent' => stdClass::__set_state([
-        'child' => stdClass::__set_state([
-            'grand' => '*RECURSION*',
+    "parent" => stdClass::__set_state([
+        "child" => stdClass::__set_state([
+            "grand" => "*RECURSION*",
         ]),
     ]),
 ])
