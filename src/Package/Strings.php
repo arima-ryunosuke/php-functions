@@ -1305,9 +1305,7 @@ class Strings
             json_encode(null);
         }
 
-        // The second option is JSON_OBJECT_AS_ARRAY that has the same effect as setting assoc to TRUE
-        // とあるが、 null を指定しないと効いてくれないっぽい
-        $result = json_decode($value, null, $depth, $option);
+        $result = json_decode($value, $options[JSON_OBJECT_AS_ARRAY], $depth, $option);
 
         // エラーが出ていたら例外に変換
         if (json_last_error()) {
