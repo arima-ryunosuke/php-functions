@@ -10,6 +10,10 @@
 
 - no todo
 
+## 1.0.8
+
+- [feature][FileCache] umask 次第では自分以外読めないファイルが出来上がるので chmod を設定
+
 ## 1.0.7
 
 - [feature][strings] preg_capture 追加
