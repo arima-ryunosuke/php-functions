@@ -29,6 +29,7 @@ class FileCache implements CacheInterface
     {
         // キャッシュディレクトリなしならインメモリ（リクエストをまたがない）
         if ($this->cachedir !== null) {
+            @mkdir($this->cachedir, 0777, true);
             // 変更されているもののみ保存
             foreach ($this->changed as $namespace => $dummy) {
                 $filepath = $this->cachedir . '/' . rawurlencode($namespace);
@@ -36,6 +37,7 @@ class FileCache implements CacheInterface
 
                 $temppath = tempnam(sys_get_temp_dir(), 'cache');
                 if (file_put_contents($temppath, $content) !== false) {
+                    @chmod($temppath, 0644);
                     if (!@rename($temppath, $filepath)) {
                         @unlink($temppath);
                     }
