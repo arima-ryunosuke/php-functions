@@ -7,6 +7,7 @@ namespace ryunosuke\Functions\Package;
  */
 class Syntax
 {
+    /** parse_php 関数でトークン名変換をするか */
     const TOKEN_NAME = 2;
 
     /**

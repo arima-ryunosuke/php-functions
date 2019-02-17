@@ -127,7 +127,20 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         (rm_rf)($dir);
         (mkdir_p)($dir);
 
+        // 内部テストのためにちょっと小細工する
+        file_put_contents(__DIR__ . '/../../src/Package/Dummy.php', <<<DUMMY
+<?php
+namespace ryunosuke\Functions\Package;
+class DUMMY
+{
+    const simple_array = [1, 2, 3];
+}
+DUMMY
+        );
+
         $contents = Transporter::exportNamespace('test\hoge');
+
+        unlink(__DIR__ . '/../../src/Package/Dummy.php');
 
         $this->assertContains('namespace test\hoge;', $contents);
         $this->assertContains('const arrayize = ', $contents);

@@ -90,9 +90,12 @@ class Transporter
         foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
             $refclass = new \ReflectionClass(__NAMESPACE__ . "\\Package\\" . basename($fn, '.php'));
 
-            foreach ($refclass->getConstants() as $cname => $cvalue) {
-                $cvalue = $ve($cvalue);
-                $consts[] = "const $cname = $cvalue;";
+            $classconsts = method_exists($refclass, 'getReflectionConstants') ? $refclass->getReflectionConstants() : $refclass->getConstants();
+            foreach ($classconsts as $cname => $cvalue) {
+                $doccomment = $cvalue instanceof \ReflectionClassConstant ? $cvalue->getDocComment() : '';
+                $cname = $cvalue instanceof \ReflectionClassConstant ? $cvalue->getName() : $cname;
+                $cvalue = $ve($cvalue instanceof \ReflectionClassConstant ? $cvalue->getValue() : $cvalue);
+                $consts[] = "$doccomment\nconst $cname = $cvalue;";
             }
 
             $lines = file($refclass->getFileName());
