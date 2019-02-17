@@ -10,6 +10,13 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.8
+
+- [feature][Transporter] 定数の doccomment 出力に対応
+- [refactor][Transporter] 出力表現を変更
+- [refactor][Vars] var_export2 の内部処理を変更
+- [fixbug][Strings] json_import が 7.0 に対応していなかったので修正
+
 ## 1.2.7
 
 - [feature][Strings] markdown_table を追加
