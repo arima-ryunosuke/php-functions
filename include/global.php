@@ -3,606 +3,610 @@
 # Don't touch this code. This is auto generated.
 
 # constants
-const KEYWORDS = array (
-  0 => 'ACCESSIBLE',
-  1 => 'ACTION',
-  2 => 'ADD',
-  3 => 'AFTER',
-  4 => 'AGAINST',
-  5 => 'AGGREGATE',
-  6 => 'ALGORITHM',
-  7 => 'ALL',
-  8 => 'ALTER',
-  9 => 'ALTER TABLE',
-  10 => 'ANALYSE',
-  11 => 'ANALYZE',
-  12 => 'AND',
-  13 => 'AS',
-  14 => 'ASC',
-  15 => 'AUTOCOMMIT',
-  16 => 'AUTO_INCREMENT',
-  17 => 'BACKUP',
-  18 => 'BEGIN',
-  19 => 'BETWEEN',
-  20 => 'BINLOG',
-  21 => 'BOTH',
-  22 => 'CASCADE',
-  23 => 'CASE',
-  24 => 'CHANGE',
-  25 => 'CHANGED',
-  26 => 'CHARACTER SET',
-  27 => 'CHARSET',
-  28 => 'CHECK',
-  29 => 'CHECKSUM',
-  30 => 'COLLATE',
-  31 => 'COLLATION',
-  32 => 'COLUMN',
-  33 => 'COLUMNS',
-  34 => 'COMMENT',
-  35 => 'COMMIT',
-  36 => 'COMMITTED',
-  37 => 'COMPRESSED',
-  38 => 'CONCURRENT',
-  39 => 'CONSTRAINT',
-  40 => 'CONTAINS',
-  41 => 'CONVERT',
-  42 => 'CREATE',
-  43 => 'CROSS',
-  44 => 'CURRENT_TIMESTAMP',
-  45 => 'DATABASE',
-  46 => 'DATABASES',
-  47 => 'DAY',
-  48 => 'DAY_HOUR',
-  49 => 'DAY_MINUTE',
-  50 => 'DAY_SECOND',
-  51 => 'DEFAULT',
-  52 => 'DEFINER',
-  53 => 'DELAYED',
-  54 => 'DELETE',
-  55 => 'DELETE FROM',
-  56 => 'DESC',
-  57 => 'DESCRIBE',
-  58 => 'DETERMINISTIC',
-  59 => 'DISTINCT',
-  60 => 'DISTINCTROW',
-  61 => 'DIV',
-  62 => 'DO',
-  63 => 'DROP',
-  64 => 'DUMPFILE',
-  65 => 'DUPLICATE',
-  66 => 'DYNAMIC',
-  67 => 'ELSE',
-  68 => 'ENCLOSED',
-  69 => 'END',
-  70 => 'ENGINE',
-  71 => 'ENGINES',
-  72 => 'ENGINE_TYPE',
-  73 => 'ESCAPE',
-  74 => 'ESCAPED',
-  75 => 'EVENTS',
-  76 => 'EXCEPT',
-  77 => 'EXECUTE',
-  78 => 'EXISTS',
-  79 => 'EXPLAIN',
-  80 => 'EXTENDED',
-  81 => 'FAST',
-  82 => 'FIELDS',
-  83 => 'FILE',
-  84 => 'FIRST',
-  85 => 'FIXED',
-  86 => 'FLUSH',
-  87 => 'FOR',
-  88 => 'FORCE',
-  89 => 'FOREIGN',
-  90 => 'FROM',
-  91 => 'FULL',
-  92 => 'FULLTEXT',
-  93 => 'FUNCTION',
-  94 => 'GLOBAL',
-  95 => 'GRANT',
-  96 => 'GRANTS',
-  97 => 'GROUP BY',
-  98 => 'GROUP_CONCAT',
-  99 => 'HAVING',
-  100 => 'HEAP',
-  101 => 'HIGH_PRIORITY',
-  102 => 'HOSTS',
-  103 => 'HOUR',
-  104 => 'HOUR_MINUTE',
-  105 => 'HOUR_SECOND',
-  106 => 'IDENTIFIED',
-  107 => 'IF',
-  108 => 'IFNULL',
-  109 => 'IGNORE',
-  110 => 'IN',
-  111 => 'INDEX',
-  112 => 'INDEXES',
-  113 => 'INFILE',
-  114 => 'INNER',
-  115 => 'INSERT',
-  116 => 'INSERT_ID',
-  117 => 'INSERT_METHOD',
-  118 => 'INTERSECT',
-  119 => 'INTERVAL',
-  120 => 'INTO',
-  121 => 'INVOKER',
-  122 => 'IS',
-  123 => 'ISOLATION',
-  124 => 'JOIN',
-  125 => 'KEY',
-  126 => 'KEYS',
-  127 => 'KILL',
-  128 => 'LAST_INSERT_ID',
-  129 => 'LEADING',
-  130 => 'LEFT',
-  131 => 'LEVEL',
-  132 => 'LIKE',
-  133 => 'LIMIT',
-  134 => 'LINEAR',
-  135 => 'LINES',
-  136 => 'LOAD',
-  137 => 'LOCAL',
-  138 => 'LOCK',
-  139 => 'LOCKS',
-  140 => 'LOGS',
-  141 => 'LOW_PRIORITY',
-  142 => 'MARIA',
-  143 => 'MASTER',
-  144 => 'MASTER_CONNECT_RETRY',
-  145 => 'MASTER_HOST',
-  146 => 'MASTER_LOG_FILE',
-  147 => 'MATCH',
-  148 => 'MAX_CONNECTIONS_PER_HOUR',
-  149 => 'MAX_QUERIES_PER_HOUR',
-  150 => 'MAX_ROWS',
-  151 => 'MAX_UPDATES_PER_HOUR',
-  152 => 'MAX_USER_CONNECTIONS',
-  153 => 'MEDIUM',
-  154 => 'MERGE',
-  155 => 'MINUTE',
-  156 => 'MINUTE_SECOND',
-  157 => 'MIN_ROWS',
-  158 => 'MODE',
-  159 => 'MODIFY',
-  160 => 'MONTH',
-  161 => 'MRG_MYISAM',
-  162 => 'MYISAM',
-  163 => 'NAMES',
-  164 => 'NATURAL',
-  165 => 'NOT',
-  166 => 'NOW()',
-  167 => 'NULL',
-  168 => 'OFFSET',
-  169 => 'ON',
-  170 => 'ON DELETE',
-  171 => 'ON UPDATE',
-  172 => 'OPEN',
-  173 => 'OPTIMIZE',
-  174 => 'OPTION',
-  175 => 'OPTIONALLY',
-  176 => 'OR',
-  177 => 'ORDER BY',
-  178 => 'OUTER',
-  179 => 'OUTFILE',
-  180 => 'PACK_KEYS',
-  181 => 'PAGE',
-  182 => 'PARTIAL',
-  183 => 'PARTITION',
-  184 => 'PARTITIONS',
-  185 => 'PASSWORD',
-  186 => 'PRIMARY',
-  187 => 'PRIVILEGES',
-  188 => 'PROCEDURE',
-  189 => 'PROCESS',
-  190 => 'PROCESSLIST',
-  191 => 'PURGE',
-  192 => 'QUICK',
-  193 => 'RAID0',
-  194 => 'RAID_CHUNKS',
-  195 => 'RAID_CHUNKSIZE',
-  196 => 'RAID_TYPE',
-  197 => 'RANGE',
-  198 => 'READ',
-  199 => 'READ_ONLY',
-  200 => 'READ_WRITE',
-  201 => 'REFERENCES',
-  202 => 'REGEXP',
-  203 => 'RELOAD',
-  204 => 'RENAME',
-  205 => 'REPAIR',
-  206 => 'REPEATABLE',
-  207 => 'REPLACE',
-  208 => 'REPLICATION',
-  209 => 'RESET',
-  210 => 'RESTORE',
-  211 => 'RESTRICT',
-  212 => 'RETURN',
-  213 => 'RETURNS',
-  214 => 'REVOKE',
-  215 => 'RIGHT',
-  216 => 'RLIKE',
-  217 => 'ROLLBACK',
-  218 => 'ROW',
-  219 => 'ROWS',
-  220 => 'ROW_FORMAT',
-  221 => 'SECOND',
-  222 => 'SECURITY',
-  223 => 'SELECT',
-  224 => 'SEPARATOR',
-  225 => 'SERIALIZABLE',
-  226 => 'SESSION',
-  227 => 'SET',
-  228 => 'SHARE',
-  229 => 'SHOW',
-  230 => 'SHUTDOWN',
-  231 => 'SLAVE',
-  232 => 'SONAME',
-  233 => 'SOUNDS',
-  234 => 'SQL',
-  235 => 'SQL_AUTO_IS_NULL',
-  236 => 'SQL_BIG_RESULT',
-  237 => 'SQL_BIG_SELECTS',
-  238 => 'SQL_BIG_TABLES',
-  239 => 'SQL_BUFFER_RESULT',
-  240 => 'SQL_CACHE',
-  241 => 'SQL_CALC_FOUND_ROWS',
-  242 => 'SQL_LOG_BIN',
-  243 => 'SQL_LOG_OFF',
-  244 => 'SQL_LOG_UPDATE',
-  245 => 'SQL_LOW_PRIORITY_UPDATES',
-  246 => 'SQL_MAX_JOIN_SIZE',
-  247 => 'SQL_NO_CACHE',
-  248 => 'SQL_QUOTE_SHOW_CREATE',
-  249 => 'SQL_SAFE_UPDATES',
-  250 => 'SQL_SELECT_LIMIT',
-  251 => 'SQL_SLAVE_SKIP_COUNTER',
-  252 => 'SQL_SMALL_RESULT',
-  253 => 'SQL_WARNINGS',
-  254 => 'START',
-  255 => 'STARTING',
-  256 => 'STATUS',
-  257 => 'STOP',
-  258 => 'STORAGE',
-  259 => 'STRAIGHT_JOIN',
-  260 => 'STRING',
-  261 => 'STRIPED',
-  262 => 'SUPER',
-  263 => 'TABLE',
-  264 => 'TABLES',
-  265 => 'TEMPORARY',
-  266 => 'TERMINATED',
-  267 => 'THEN',
-  268 => 'TO',
-  269 => 'TRAILING',
-  270 => 'TRANSACTIONAL',
-  271 => 'TRUE',
-  272 => 'TRUNCATE',
-  273 => 'TYPE',
-  274 => 'TYPES',
-  275 => 'UNCOMMITTED',
-  276 => 'UNION',
-  277 => 'UNION ALL',
-  278 => 'UNIQUE',
-  279 => 'UNLOCK',
-  280 => 'UNSIGNED',
-  281 => 'UPDATE',
-  282 => 'USAGE',
-  283 => 'USE',
-  284 => 'USING',
-  285 => 'VALUES',
-  286 => 'VARIABLES',
-  287 => 'VIEW',
-  288 => 'WHEN',
-  289 => 'WHERE',
-  290 => 'WITH',
-  291 => 'WORK',
-  292 => 'WRITE',
-  293 => 'XOR',
-  294 => 'YEAR_MONTH',
-  295 => 'ABS',
-  296 => 'ACOS',
-  297 => 'ADDDATE',
-  298 => 'ADDTIME',
-  299 => 'AES_DECRYPT',
-  300 => 'AES_ENCRYPT',
-  301 => 'AREA',
-  302 => 'ASBINARY',
-  303 => 'ASCII',
-  304 => 'ASIN',
-  305 => 'ASTEXT',
-  306 => 'ATAN',
-  307 => 'ATAN2',
-  308 => 'AVG',
-  309 => 'BDMPOLYFROMTEXT',
-  310 => 'BDMPOLYFROMWKB',
-  311 => 'BDPOLYFROMTEXT',
-  312 => 'BDPOLYFROMWKB',
-  313 => 'BENCHMARK',
-  314 => 'BIN',
-  315 => 'BIT_AND',
-  316 => 'BIT_COUNT',
-  317 => 'BIT_LENGTH',
-  318 => 'BIT_OR',
-  319 => 'BIT_XOR',
-  320 => 'BOUNDARY',
-  321 => 'BUFFER',
-  322 => 'CAST',
-  323 => 'CEIL',
-  324 => 'CEILING',
-  325 => 'CENTROID',
-  326 => 'CHAR',
-  327 => 'CHARACTER_LENGTH',
-  328 => 'CHARSET',
-  329 => 'CHAR_LENGTH',
-  330 => 'COALESCE',
-  331 => 'COERCIBILITY',
-  332 => 'COLLATION',
-  333 => 'COMPRESS',
-  334 => 'CONCAT',
-  335 => 'CONCAT_WS',
-  336 => 'CONNECTION_ID',
-  337 => 'CONTAINS',
-  338 => 'CONV',
-  339 => 'CONVERT',
-  340 => 'CONVERT_TZ',
-  341 => 'CONVEXHULL',
-  342 => 'COS',
-  343 => 'COT',
-  344 => 'COUNT',
-  345 => 'CRC32',
-  346 => 'CROSSES',
-  347 => 'CURDATE',
-  348 => 'CURRENT_DATE',
-  349 => 'CURRENT_TIME',
-  350 => 'CURRENT_TIMESTAMP',
-  351 => 'CURRENT_USER',
-  352 => 'CURTIME',
-  353 => 'DATABASE',
-  354 => 'DATE',
-  355 => 'DATEDIFF',
-  356 => 'DATE_ADD',
-  357 => 'DATE_DIFF',
-  358 => 'DATE_FORMAT',
-  359 => 'DATE_SUB',
-  360 => 'DAY',
-  361 => 'DAYNAME',
-  362 => 'DAYOFMONTH',
-  363 => 'DAYOFWEEK',
-  364 => 'DAYOFYEAR',
-  365 => 'DECODE',
-  366 => 'DEFAULT',
-  367 => 'DEGREES',
-  368 => 'DES_DECRYPT',
-  369 => 'DES_ENCRYPT',
-  370 => 'DIFFERENCE',
-  371 => 'DIMENSION',
-  372 => 'DISJOINT',
-  373 => 'DISTANCE',
-  374 => 'ELT',
-  375 => 'ENCODE',
-  376 => 'ENCRYPT',
-  377 => 'ENDPOINT',
-  378 => 'ENVELOPE',
-  379 => 'EQUALS',
-  380 => 'EXP',
-  381 => 'EXPORT_SET',
-  382 => 'EXTERIORRING',
-  383 => 'EXTRACT',
-  384 => 'EXTRACTVALUE',
-  385 => 'FIELD',
-  386 => 'FIND_IN_SET',
-  387 => 'FLOOR',
-  388 => 'FORMAT',
-  389 => 'FOUND_ROWS',
-  390 => 'FROM_DAYS',
-  391 => 'FROM_UNIXTIME',
-  392 => 'GEOMCOLLFROMTEXT',
-  393 => 'GEOMCOLLFROMWKB',
-  394 => 'GEOMETRYCOLLECTION',
-  395 => 'GEOMETRYCOLLECTIONFROMTEXT',
-  396 => 'GEOMETRYCOLLECTIONFROMWKB',
-  397 => 'GEOMETRYFROMTEXT',
-  398 => 'GEOMETRYFROMWKB',
-  399 => 'GEOMETRYN',
-  400 => 'GEOMETRYTYPE',
-  401 => 'GEOMFROMTEXT',
-  402 => 'GEOMFROMWKB',
-  403 => 'GET_FORMAT',
-  404 => 'GET_LOCK',
-  405 => 'GLENGTH',
-  406 => 'GREATEST',
-  407 => 'GROUP_CONCAT',
-  408 => 'GROUP_UNIQUE_USERS',
-  409 => 'HEX',
-  410 => 'HOUR',
-  411 => 'IF',
-  412 => 'IFNULL',
-  413 => 'INET_ATON',
-  414 => 'INET_NTOA',
-  415 => 'INSERT',
-  416 => 'INSTR',
-  417 => 'INTERIORRINGN',
-  418 => 'INTERSECTION',
-  419 => 'INTERSECTS',
-  420 => 'INTERVAL',
-  421 => 'ISCLOSED',
-  422 => 'ISEMPTY',
-  423 => 'ISNULL',
-  424 => 'ISRING',
-  425 => 'ISSIMPLE',
-  426 => 'IS_FREE_LOCK',
-  427 => 'IS_USED_LOCK',
-  428 => 'LAST_DAY',
-  429 => 'LAST_INSERT_ID',
-  430 => 'LCASE',
-  431 => 'LEAST',
-  432 => 'LEFT',
-  433 => 'LENGTH',
-  434 => 'LINEFROMTEXT',
-  435 => 'LINEFROMWKB',
-  436 => 'LINESTRING',
-  437 => 'LINESTRINGFROMTEXT',
-  438 => 'LINESTRINGFROMWKB',
-  439 => 'LN',
-  440 => 'LOAD_FILE',
-  441 => 'LOCALTIME',
-  442 => 'LOCALTIMESTAMP',
-  443 => 'LOCATE',
-  444 => 'LOG',
-  445 => 'LOG10',
-  446 => 'LOG2',
-  447 => 'LOWER',
-  448 => 'LPAD',
-  449 => 'LTRIM',
-  450 => 'MAKEDATE',
-  451 => 'MAKETIME',
-  452 => 'MAKE_SET',
-  453 => 'MASTER_POS_WAIT',
-  454 => 'MAX',
-  455 => 'MBRCONTAINS',
-  456 => 'MBRDISJOINT',
-  457 => 'MBREQUAL',
-  458 => 'MBRINTERSECTS',
-  459 => 'MBROVERLAPS',
-  460 => 'MBRTOUCHES',
-  461 => 'MBRWITHIN',
-  462 => 'MD5',
-  463 => 'MICROSECOND',
-  464 => 'MID',
-  465 => 'MIN',
-  466 => 'MINUTE',
-  467 => 'MLINEFROMTEXT',
-  468 => 'MLINEFROMWKB',
-  469 => 'MOD',
-  470 => 'MONTH',
-  471 => 'MONTHNAME',
-  472 => 'MPOINTFROMTEXT',
-  473 => 'MPOINTFROMWKB',
-  474 => 'MPOLYFROMTEXT',
-  475 => 'MPOLYFROMWKB',
-  476 => 'MULTILINESTRING',
-  477 => 'MULTILINESTRINGFROMTEXT',
-  478 => 'MULTILINESTRINGFROMWKB',
-  479 => 'MULTIPOINT',
-  480 => 'MULTIPOINTFROMTEXT',
-  481 => 'MULTIPOINTFROMWKB',
-  482 => 'MULTIPOLYGON',
-  483 => 'MULTIPOLYGONFROMTEXT',
-  484 => 'MULTIPOLYGONFROMWKB',
-  485 => 'NAME_CONST',
-  486 => 'NULLIF',
-  487 => 'NUMGEOMETRIES',
-  488 => 'NUMINTERIORRINGS',
-  489 => 'NUMPOINTS',
-  490 => 'OCT',
-  491 => 'OCTET_LENGTH',
-  492 => 'OLD_PASSWORD',
-  493 => 'ORD',
-  494 => 'OVERLAPS',
-  495 => 'PASSWORD',
-  496 => 'PERIOD_ADD',
-  497 => 'PERIOD_DIFF',
-  498 => 'PI',
-  499 => 'POINT',
-  500 => 'POINTFROMTEXT',
-  501 => 'POINTFROMWKB',
-  502 => 'POINTN',
-  503 => 'POINTONSURFACE',
-  504 => 'POLYFROMTEXT',
-  505 => 'POLYFROMWKB',
-  506 => 'POLYGON',
-  507 => 'POLYGONFROMTEXT',
-  508 => 'POLYGONFROMWKB',
-  509 => 'POSITION',
-  510 => 'POW',
-  511 => 'POWER',
-  512 => 'QUARTER',
-  513 => 'QUOTE',
-  514 => 'RADIANS',
-  515 => 'RAND',
-  516 => 'RELATED',
-  517 => 'RELEASE_LOCK',
-  518 => 'REPEAT',
-  519 => 'REPLACE',
-  520 => 'REVERSE',
-  521 => 'RIGHT',
-  522 => 'ROUND',
-  523 => 'ROW_COUNT',
-  524 => 'RPAD',
-  525 => 'RTRIM',
-  526 => 'SCHEMA',
-  527 => 'SECOND',
-  528 => 'SEC_TO_TIME',
-  529 => 'SESSION_USER',
-  530 => 'SHA',
-  531 => 'SHA1',
-  532 => 'SIGN',
-  533 => 'SIN',
-  534 => 'SLEEP',
-  535 => 'SOUNDEX',
-  536 => 'SPACE',
-  537 => 'SQRT',
-  538 => 'SRID',
-  539 => 'STARTPOINT',
-  540 => 'STD',
-  541 => 'STDDEV',
-  542 => 'STDDEV_POP',
-  543 => 'STDDEV_SAMP',
-  544 => 'STRCMP',
-  545 => 'STR_TO_DATE',
-  546 => 'SUBDATE',
-  547 => 'SUBSTR',
-  548 => 'SUBSTRING',
-  549 => 'SUBSTRING_INDEX',
-  550 => 'SUBTIME',
-  551 => 'SUM',
-  552 => 'SYMDIFFERENCE',
-  553 => 'SYSDATE',
-  554 => 'SYSTEM_USER',
-  555 => 'TAN',
-  556 => 'TIME',
-  557 => 'TIMEDIFF',
-  558 => 'TIMESTAMP',
-  559 => 'TIMESTAMPADD',
-  560 => 'TIMESTAMPDIFF',
-  561 => 'TIME_FORMAT',
-  562 => 'TIME_TO_SEC',
-  563 => 'TOUCHES',
-  564 => 'TO_DAYS',
-  565 => 'TRIM',
-  566 => 'TRUNCATE',
-  567 => 'UCASE',
-  568 => 'UNCOMPRESS',
-  569 => 'UNCOMPRESSED_LENGTH',
-  570 => 'UNHEX',
-  571 => 'UNIQUE_USERS',
-  572 => 'UNIX_TIMESTAMP',
-  573 => 'UPDATEXML',
-  574 => 'UPPER',
-  575 => 'USER',
-  576 => 'UTC_DATE',
-  577 => 'UTC_TIME',
-  578 => 'UTC_TIMESTAMP',
-  579 => 'UUID',
-  580 => 'VARIANCE',
-  581 => 'VAR_POP',
-  582 => 'VAR_SAMP',
-  583 => 'VERSION',
-  584 => 'WEEK',
-  585 => 'WEEKDAY',
-  586 => 'WEEKOFYEAR',
-  587 => 'WITHIN',
-  588 => 'X',
-  589 => 'Y',
-  590 => 'YEAR',
-  591 => 'YEARWEEK',
-);
+/** SQL キーワード（全 RDBMS ごちゃまぜ） */
+const KEYWORDS = [
+    ""  => "",
+    0   => "ACCESSIBLE",
+    1   => "ACTION",
+    2   => "ADD",
+    3   => "AFTER",
+    4   => "AGAINST",
+    5   => "AGGREGATE",
+    6   => "ALGORITHM",
+    7   => "ALL",
+    8   => "ALTER",
+    9   => "ALTER TABLE",
+    10  => "ANALYSE",
+    11  => "ANALYZE",
+    12  => "AND",
+    13  => "AS",
+    14  => "ASC",
+    15  => "AUTOCOMMIT",
+    16  => "AUTO_INCREMENT",
+    17  => "BACKUP",
+    18  => "BEGIN",
+    19  => "BETWEEN",
+    20  => "BINLOG",
+    21  => "BOTH",
+    22  => "CASCADE",
+    23  => "CASE",
+    24  => "CHANGE",
+    25  => "CHANGED",
+    26  => "CHARACTER SET",
+    27  => "CHARSET",
+    28  => "CHECK",
+    29  => "CHECKSUM",
+    30  => "COLLATE",
+    31  => "COLLATION",
+    32  => "COLUMN",
+    33  => "COLUMNS",
+    34  => "COMMENT",
+    35  => "COMMIT",
+    36  => "COMMITTED",
+    37  => "COMPRESSED",
+    38  => "CONCURRENT",
+    39  => "CONSTRAINT",
+    40  => "CONTAINS",
+    41  => "CONVERT",
+    42  => "CREATE",
+    43  => "CROSS",
+    44  => "CURRENT_TIMESTAMP",
+    45  => "DATABASE",
+    46  => "DATABASES",
+    47  => "DAY",
+    48  => "DAY_HOUR",
+    49  => "DAY_MINUTE",
+    50  => "DAY_SECOND",
+    51  => "DEFAULT",
+    52  => "DEFINER",
+    53  => "DELAYED",
+    54  => "DELETE",
+    55  => "DELETE FROM",
+    56  => "DESC",
+    57  => "DESCRIBE",
+    58  => "DETERMINISTIC",
+    59  => "DISTINCT",
+    60  => "DISTINCTROW",
+    61  => "DIV",
+    62  => "DO",
+    63  => "DROP",
+    64  => "DUMPFILE",
+    65  => "DUPLICATE",
+    66  => "DYNAMIC",
+    67  => "ELSE",
+    68  => "ENCLOSED",
+    69  => "END",
+    70  => "ENGINE",
+    71  => "ENGINES",
+    72  => "ENGINE_TYPE",
+    73  => "ESCAPE",
+    74  => "ESCAPED",
+    75  => "EVENTS",
+    76  => "EXCEPT",
+    77  => "EXECUTE",
+    78  => "EXISTS",
+    79  => "EXPLAIN",
+    80  => "EXTENDED",
+    81  => "FAST",
+    82  => "FIELDS",
+    83  => "FILE",
+    84  => "FIRST",
+    85  => "FIXED",
+    86  => "FLUSH",
+    87  => "FOR",
+    88  => "FORCE",
+    89  => "FOREIGN",
+    90  => "FROM",
+    91  => "FULL",
+    92  => "FULLTEXT",
+    93  => "FUNCTION",
+    94  => "GLOBAL",
+    95  => "GRANT",
+    96  => "GRANTS",
+    97  => "GROUP BY",
+    98  => "GROUP_CONCAT",
+    99  => "HAVING",
+    100 => "HEAP",
+    101 => "HIGH_PRIORITY",
+    102 => "HOSTS",
+    103 => "HOUR",
+    104 => "HOUR_MINUTE",
+    105 => "HOUR_SECOND",
+    106 => "IDENTIFIED",
+    107 => "IF",
+    108 => "IFNULL",
+    109 => "IGNORE",
+    110 => "IN",
+    111 => "INDEX",
+    112 => "INDEXES",
+    113 => "INFILE",
+    114 => "INNER",
+    115 => "INSERT",
+    116 => "INSERT_ID",
+    117 => "INSERT_METHOD",
+    118 => "INTERSECT",
+    119 => "INTERVAL",
+    120 => "INTO",
+    121 => "INVOKER",
+    122 => "IS",
+    123 => "ISOLATION",
+    124 => "JOIN",
+    125 => "KEY",
+    126 => "KEYS",
+    127 => "KILL",
+    128 => "LAST_INSERT_ID",
+    129 => "LEADING",
+    130 => "LEFT",
+    131 => "LEVEL",
+    132 => "LIKE",
+    133 => "LIMIT",
+    134 => "LINEAR",
+    135 => "LINES",
+    136 => "LOAD",
+    137 => "LOCAL",
+    138 => "LOCK",
+    139 => "LOCKS",
+    140 => "LOGS",
+    141 => "LOW_PRIORITY",
+    142 => "MARIA",
+    143 => "MASTER",
+    144 => "MASTER_CONNECT_RETRY",
+    145 => "MASTER_HOST",
+    146 => "MASTER_LOG_FILE",
+    147 => "MATCH",
+    148 => "MAX_CONNECTIONS_PER_HOUR",
+    149 => "MAX_QUERIES_PER_HOUR",
+    150 => "MAX_ROWS",
+    151 => "MAX_UPDATES_PER_HOUR",
+    152 => "MAX_USER_CONNECTIONS",
+    153 => "MEDIUM",
+    154 => "MERGE",
+    155 => "MINUTE",
+    156 => "MINUTE_SECOND",
+    157 => "MIN_ROWS",
+    158 => "MODE",
+    159 => "MODIFY",
+    160 => "MONTH",
+    161 => "MRG_MYISAM",
+    162 => "MYISAM",
+    163 => "NAMES",
+    164 => "NATURAL",
+    165 => "NOT",
+    166 => "NOW()",
+    167 => "NULL",
+    168 => "OFFSET",
+    169 => "ON",
+    170 => "ON DELETE",
+    171 => "ON UPDATE",
+    172 => "OPEN",
+    173 => "OPTIMIZE",
+    174 => "OPTION",
+    175 => "OPTIONALLY",
+    176 => "OR",
+    177 => "ORDER BY",
+    178 => "OUTER",
+    179 => "OUTFILE",
+    180 => "PACK_KEYS",
+    181 => "PAGE",
+    182 => "PARTIAL",
+    183 => "PARTITION",
+    184 => "PARTITIONS",
+    185 => "PASSWORD",
+    186 => "PRIMARY",
+    187 => "PRIVILEGES",
+    188 => "PROCEDURE",
+    189 => "PROCESS",
+    190 => "PROCESSLIST",
+    191 => "PURGE",
+    192 => "QUICK",
+    193 => "RAID0",
+    194 => "RAID_CHUNKS",
+    195 => "RAID_CHUNKSIZE",
+    196 => "RAID_TYPE",
+    197 => "RANGE",
+    198 => "READ",
+    199 => "READ_ONLY",
+    200 => "READ_WRITE",
+    201 => "REFERENCES",
+    202 => "REGEXP",
+    203 => "RELOAD",
+    204 => "RENAME",
+    205 => "REPAIR",
+    206 => "REPEATABLE",
+    207 => "REPLACE",
+    208 => "REPLICATION",
+    209 => "RESET",
+    210 => "RESTORE",
+    211 => "RESTRICT",
+    212 => "RETURN",
+    213 => "RETURNS",
+    214 => "REVOKE",
+    215 => "RIGHT",
+    216 => "RLIKE",
+    217 => "ROLLBACK",
+    218 => "ROW",
+    219 => "ROWS",
+    220 => "ROW_FORMAT",
+    221 => "SECOND",
+    222 => "SECURITY",
+    223 => "SELECT",
+    224 => "SEPARATOR",
+    225 => "SERIALIZABLE",
+    226 => "SESSION",
+    227 => "SET",
+    228 => "SHARE",
+    229 => "SHOW",
+    230 => "SHUTDOWN",
+    231 => "SLAVE",
+    232 => "SONAME",
+    233 => "SOUNDS",
+    234 => "SQL",
+    235 => "SQL_AUTO_IS_NULL",
+    236 => "SQL_BIG_RESULT",
+    237 => "SQL_BIG_SELECTS",
+    238 => "SQL_BIG_TABLES",
+    239 => "SQL_BUFFER_RESULT",
+    240 => "SQL_CACHE",
+    241 => "SQL_CALC_FOUND_ROWS",
+    242 => "SQL_LOG_BIN",
+    243 => "SQL_LOG_OFF",
+    244 => "SQL_LOG_UPDATE",
+    245 => "SQL_LOW_PRIORITY_UPDATES",
+    246 => "SQL_MAX_JOIN_SIZE",
+    247 => "SQL_NO_CACHE",
+    248 => "SQL_QUOTE_SHOW_CREATE",
+    249 => "SQL_SAFE_UPDATES",
+    250 => "SQL_SELECT_LIMIT",
+    251 => "SQL_SLAVE_SKIP_COUNTER",
+    252 => "SQL_SMALL_RESULT",
+    253 => "SQL_WARNINGS",
+    254 => "START",
+    255 => "STARTING",
+    256 => "STATUS",
+    257 => "STOP",
+    258 => "STORAGE",
+    259 => "STRAIGHT_JOIN",
+    260 => "STRING",
+    261 => "STRIPED",
+    262 => "SUPER",
+    263 => "TABLE",
+    264 => "TABLES",
+    265 => "TEMPORARY",
+    266 => "TERMINATED",
+    267 => "THEN",
+    268 => "TO",
+    269 => "TRAILING",
+    270 => "TRANSACTIONAL",
+    271 => "TRUE",
+    272 => "TRUNCATE",
+    273 => "TYPE",
+    274 => "TYPES",
+    275 => "UNCOMMITTED",
+    276 => "UNION",
+    277 => "UNION ALL",
+    278 => "UNIQUE",
+    279 => "UNLOCK",
+    280 => "UNSIGNED",
+    281 => "UPDATE",
+    282 => "USAGE",
+    283 => "USE",
+    284 => "USING",
+    285 => "VALUES",
+    286 => "VARIABLES",
+    287 => "VIEW",
+    288 => "WHEN",
+    289 => "WHERE",
+    290 => "WITH",
+    291 => "WORK",
+    292 => "WRITE",
+    293 => "XOR",
+    294 => "YEAR_MONTH",
+    295 => "ABS",
+    296 => "ACOS",
+    297 => "ADDDATE",
+    298 => "ADDTIME",
+    299 => "AES_DECRYPT",
+    300 => "AES_ENCRYPT",
+    301 => "AREA",
+    302 => "ASBINARY",
+    303 => "ASCII",
+    304 => "ASIN",
+    305 => "ASTEXT",
+    306 => "ATAN",
+    307 => "ATAN2",
+    308 => "AVG",
+    309 => "BDMPOLYFROMTEXT",
+    310 => "BDMPOLYFROMWKB",
+    311 => "BDPOLYFROMTEXT",
+    312 => "BDPOLYFROMWKB",
+    313 => "BENCHMARK",
+    314 => "BIN",
+    315 => "BIT_AND",
+    316 => "BIT_COUNT",
+    317 => "BIT_LENGTH",
+    318 => "BIT_OR",
+    319 => "BIT_XOR",
+    320 => "BOUNDARY",
+    321 => "BUFFER",
+    322 => "CAST",
+    323 => "CEIL",
+    324 => "CEILING",
+    325 => "CENTROID",
+    326 => "CHAR",
+    327 => "CHARACTER_LENGTH",
+    328 => "CHARSET",
+    329 => "CHAR_LENGTH",
+    330 => "COALESCE",
+    331 => "COERCIBILITY",
+    332 => "COLLATION",
+    333 => "COMPRESS",
+    334 => "CONCAT",
+    335 => "CONCAT_WS",
+    336 => "CONNECTION_ID",
+    337 => "CONTAINS",
+    338 => "CONV",
+    339 => "CONVERT",
+    340 => "CONVERT_TZ",
+    341 => "CONVEXHULL",
+    342 => "COS",
+    343 => "COT",
+    344 => "COUNT",
+    345 => "CRC32",
+    346 => "CROSSES",
+    347 => "CURDATE",
+    348 => "CURRENT_DATE",
+    349 => "CURRENT_TIME",
+    350 => "CURRENT_TIMESTAMP",
+    351 => "CURRENT_USER",
+    352 => "CURTIME",
+    353 => "DATABASE",
+    354 => "DATE",
+    355 => "DATEDIFF",
+    356 => "DATE_ADD",
+    357 => "DATE_DIFF",
+    358 => "DATE_FORMAT",
+    359 => "DATE_SUB",
+    360 => "DAY",
+    361 => "DAYNAME",
+    362 => "DAYOFMONTH",
+    363 => "DAYOFWEEK",
+    364 => "DAYOFYEAR",
+    365 => "DECODE",
+    366 => "DEFAULT",
+    367 => "DEGREES",
+    368 => "DES_DECRYPT",
+    369 => "DES_ENCRYPT",
+    370 => "DIFFERENCE",
+    371 => "DIMENSION",
+    372 => "DISJOINT",
+    373 => "DISTANCE",
+    374 => "ELT",
+    375 => "ENCODE",
+    376 => "ENCRYPT",
+    377 => "ENDPOINT",
+    378 => "ENVELOPE",
+    379 => "EQUALS",
+    380 => "EXP",
+    381 => "EXPORT_SET",
+    382 => "EXTERIORRING",
+    383 => "EXTRACT",
+    384 => "EXTRACTVALUE",
+    385 => "FIELD",
+    386 => "FIND_IN_SET",
+    387 => "FLOOR",
+    388 => "FORMAT",
+    389 => "FOUND_ROWS",
+    390 => "FROM_DAYS",
+    391 => "FROM_UNIXTIME",
+    392 => "GEOMCOLLFROMTEXT",
+    393 => "GEOMCOLLFROMWKB",
+    394 => "GEOMETRYCOLLECTION",
+    395 => "GEOMETRYCOLLECTIONFROMTEXT",
+    396 => "GEOMETRYCOLLECTIONFROMWKB",
+    397 => "GEOMETRYFROMTEXT",
+    398 => "GEOMETRYFROMWKB",
+    399 => "GEOMETRYN",
+    400 => "GEOMETRYTYPE",
+    401 => "GEOMFROMTEXT",
+    402 => "GEOMFROMWKB",
+    403 => "GET_FORMAT",
+    404 => "GET_LOCK",
+    405 => "GLENGTH",
+    406 => "GREATEST",
+    407 => "GROUP_CONCAT",
+    408 => "GROUP_UNIQUE_USERS",
+    409 => "HEX",
+    410 => "HOUR",
+    411 => "IF",
+    412 => "IFNULL",
+    413 => "INET_ATON",
+    414 => "INET_NTOA",
+    415 => "INSERT",
+    416 => "INSTR",
+    417 => "INTERIORRINGN",
+    418 => "INTERSECTION",
+    419 => "INTERSECTS",
+    420 => "INTERVAL",
+    421 => "ISCLOSED",
+    422 => "ISEMPTY",
+    423 => "ISNULL",
+    424 => "ISRING",
+    425 => "ISSIMPLE",
+    426 => "IS_FREE_LOCK",
+    427 => "IS_USED_LOCK",
+    428 => "LAST_DAY",
+    429 => "LAST_INSERT_ID",
+    430 => "LCASE",
+    431 => "LEAST",
+    432 => "LEFT",
+    433 => "LENGTH",
+    434 => "LINEFROMTEXT",
+    435 => "LINEFROMWKB",
+    436 => "LINESTRING",
+    437 => "LINESTRINGFROMTEXT",
+    438 => "LINESTRINGFROMWKB",
+    439 => "LN",
+    440 => "LOAD_FILE",
+    441 => "LOCALTIME",
+    442 => "LOCALTIMESTAMP",
+    443 => "LOCATE",
+    444 => "LOG",
+    445 => "LOG10",
+    446 => "LOG2",
+    447 => "LOWER",
+    448 => "LPAD",
+    449 => "LTRIM",
+    450 => "MAKEDATE",
+    451 => "MAKETIME",
+    452 => "MAKE_SET",
+    453 => "MASTER_POS_WAIT",
+    454 => "MAX",
+    455 => "MBRCONTAINS",
+    456 => "MBRDISJOINT",
+    457 => "MBREQUAL",
+    458 => "MBRINTERSECTS",
+    459 => "MBROVERLAPS",
+    460 => "MBRTOUCHES",
+    461 => "MBRWITHIN",
+    462 => "MD5",
+    463 => "MICROSECOND",
+    464 => "MID",
+    465 => "MIN",
+    466 => "MINUTE",
+    467 => "MLINEFROMTEXT",
+    468 => "MLINEFROMWKB",
+    469 => "MOD",
+    470 => "MONTH",
+    471 => "MONTHNAME",
+    472 => "MPOINTFROMTEXT",
+    473 => "MPOINTFROMWKB",
+    474 => "MPOLYFROMTEXT",
+    475 => "MPOLYFROMWKB",
+    476 => "MULTILINESTRING",
+    477 => "MULTILINESTRINGFROMTEXT",
+    478 => "MULTILINESTRINGFROMWKB",
+    479 => "MULTIPOINT",
+    480 => "MULTIPOINTFROMTEXT",
+    481 => "MULTIPOINTFROMWKB",
+    482 => "MULTIPOLYGON",
+    483 => "MULTIPOLYGONFROMTEXT",
+    484 => "MULTIPOLYGONFROMWKB",
+    485 => "NAME_CONST",
+    486 => "NULLIF",
+    487 => "NUMGEOMETRIES",
+    488 => "NUMINTERIORRINGS",
+    489 => "NUMPOINTS",
+    490 => "OCT",
+    491 => "OCTET_LENGTH",
+    492 => "OLD_PASSWORD",
+    493 => "ORD",
+    494 => "OVERLAPS",
+    495 => "PASSWORD",
+    496 => "PERIOD_ADD",
+    497 => "PERIOD_DIFF",
+    498 => "PI",
+    499 => "POINT",
+    500 => "POINTFROMTEXT",
+    501 => "POINTFROMWKB",
+    502 => "POINTN",
+    503 => "POINTONSURFACE",
+    504 => "POLYFROMTEXT",
+    505 => "POLYFROMWKB",
+    506 => "POLYGON",
+    507 => "POLYGONFROMTEXT",
+    508 => "POLYGONFROMWKB",
+    509 => "POSITION",
+    510 => "POW",
+    511 => "POWER",
+    512 => "QUARTER",
+    513 => "QUOTE",
+    514 => "RADIANS",
+    515 => "RAND",
+    516 => "RELATED",
+    517 => "RELEASE_LOCK",
+    518 => "REPEAT",
+    519 => "REPLACE",
+    520 => "REVERSE",
+    521 => "RIGHT",
+    522 => "ROUND",
+    523 => "ROW_COUNT",
+    524 => "RPAD",
+    525 => "RTRIM",
+    526 => "SCHEMA",
+    527 => "SECOND",
+    528 => "SEC_TO_TIME",
+    529 => "SESSION_USER",
+    530 => "SHA",
+    531 => "SHA1",
+    532 => "SIGN",
+    533 => "SIN",
+    534 => "SLEEP",
+    535 => "SOUNDEX",
+    536 => "SPACE",
+    537 => "SQRT",
+    538 => "SRID",
+    539 => "STARTPOINT",
+    540 => "STD",
+    541 => "STDDEV",
+    542 => "STDDEV_POP",
+    543 => "STDDEV_SAMP",
+    544 => "STRCMP",
+    545 => "STR_TO_DATE",
+    546 => "SUBDATE",
+    547 => "SUBSTR",
+    548 => "SUBSTRING",
+    549 => "SUBSTRING_INDEX",
+    550 => "SUBTIME",
+    551 => "SUM",
+    552 => "SYMDIFFERENCE",
+    553 => "SYSDATE",
+    554 => "SYSTEM_USER",
+    555 => "TAN",
+    556 => "TIME",
+    557 => "TIMEDIFF",
+    558 => "TIMESTAMP",
+    559 => "TIMESTAMPADD",
+    560 => "TIMESTAMPDIFF",
+    561 => "TIME_FORMAT",
+    562 => "TIME_TO_SEC",
+    563 => "TOUCHES",
+    564 => "TO_DAYS",
+    565 => "TRIM",
+    566 => "TRUNCATE",
+    567 => "UCASE",
+    568 => "UNCOMPRESS",
+    569 => "UNCOMPRESSED_LENGTH",
+    570 => "UNHEX",
+    571 => "UNIQUE_USERS",
+    572 => "UNIX_TIMESTAMP",
+    573 => "UPDATEXML",
+    574 => "UPPER",
+    575 => "USER",
+    576 => "UTC_DATE",
+    577 => "UTC_TIME",
+    578 => "UTC_TIMESTAMP",
+    579 => "UUID",
+    580 => "VARIANCE",
+    581 => "VAR_POP",
+    582 => "VAR_SAMP",
+    583 => "VERSION",
+    584 => "WEEK",
+    585 => "WEEKDAY",
+    586 => "WEEKOFYEAR",
+    587 => "WITHIN",
+    588 => "X",
+    589 => "Y",
+    590 => "YEAR",
+    591 => "YEARWEEK",
+];
+/** json_*** 関数で $depth 引数を表す定数 */
 const JSON_MAX_DEPTH = -1;
+/** parse_php 関数でトークン名変換をするか */
 const TOKEN_NAME = 2;
 
 # functions
-const arrays = 'arrays';
-if (!isset($excluded_functions['arrays']) && (!function_exists('arrays') || (!false && (new \ReflectionFunction('arrays'))->isInternal()))) {
+const arrays = "arrays";
+if (!isset($excluded_functions["arrays"]) && (!function_exists("arrays") || (!false && (new \ReflectionFunction("arrays"))->isInternal()))) {
     /**
      * 配列をシーケンシャルに走査するジェネレータを返す
      *
@@ -635,8 +639,8 @@ if (!isset($excluded_functions['arrays']) && (!function_exists('arrays') || (!fa
     }
 }
 
-const arrayize = 'arrayize';
-if (!isset($excluded_functions['arrayize']) && (!function_exists('arrayize') || (!false && (new \ReflectionFunction('arrayize'))->isInternal()))) {
+const arrayize = "arrayize";
+if (!isset($excluded_functions["arrayize"]) && (!function_exists("arrayize") || (!false && (new \ReflectionFunction("arrayize"))->isInternal()))) {
     /**
      * 引数の配列を生成する。
      *
@@ -668,8 +672,8 @@ if (!isset($excluded_functions['arrayize']) && (!function_exists('arrayize') || 
     }
 }
 
-const is_hasharray = 'is_hasharray';
-if (!isset($excluded_functions['is_hasharray']) && (!function_exists('is_hasharray') || (!false && (new \ReflectionFunction('is_hasharray'))->isInternal()))) {
+const is_hasharray = "is_hasharray";
+if (!isset($excluded_functions["is_hasharray"]) && (!function_exists("is_hasharray") || (!false && (new \ReflectionFunction("is_hasharray"))->isInternal()))) {
     /**
      * 配列が連想配列か調べる
      *
@@ -697,8 +701,8 @@ if (!isset($excluded_functions['is_hasharray']) && (!function_exists('is_hasharr
     }
 }
 
-const first_key = 'first_key';
-if (!isset($excluded_functions['first_key']) && (!function_exists('first_key') || (!false && (new \ReflectionFunction('first_key'))->isInternal()))) {
+const first_key = "first_key";
+if (!isset($excluded_functions["first_key"]) && (!function_exists("first_key") || (!false && (new \ReflectionFunction("first_key"))->isInternal()))) {
     /**
      * 配列の最初のキーを返す
      *
@@ -725,8 +729,8 @@ if (!isset($excluded_functions['first_key']) && (!function_exists('first_key') |
     }
 }
 
-const first_value = 'first_value';
-if (!isset($excluded_functions['first_value']) && (!function_exists('first_value') || (!false && (new \ReflectionFunction('first_value'))->isInternal()))) {
+const first_value = "first_value";
+if (!isset($excluded_functions["first_value"]) && (!function_exists("first_value") || (!false && (new \ReflectionFunction("first_value"))->isInternal()))) {
     /**
      * 配列の最初の値を返す
      *
@@ -753,8 +757,8 @@ if (!isset($excluded_functions['first_value']) && (!function_exists('first_value
     }
 }
 
-const first_keyvalue = 'first_keyvalue';
-if (!isset($excluded_functions['first_keyvalue']) && (!function_exists('first_keyvalue') || (!false && (new \ReflectionFunction('first_keyvalue'))->isInternal()))) {
+const first_keyvalue = "first_keyvalue";
+if (!isset($excluded_functions["first_keyvalue"]) && (!function_exists("first_keyvalue") || (!false && (new \ReflectionFunction("first_keyvalue"))->isInternal()))) {
     /**
      * 配列の最初のキー/値ペアをタプルで返す
      *
@@ -779,8 +783,8 @@ if (!isset($excluded_functions['first_keyvalue']) && (!function_exists('first_ke
     }
 }
 
-const last_key = 'last_key';
-if (!isset($excluded_functions['last_key']) && (!function_exists('last_key') || (!false && (new \ReflectionFunction('last_key'))->isInternal()))) {
+const last_key = "last_key";
+if (!isset($excluded_functions["last_key"]) && (!function_exists("last_key") || (!false && (new \ReflectionFunction("last_key"))->isInternal()))) {
     /**
      * 配列の最後のキーを返す
      *
@@ -807,8 +811,8 @@ if (!isset($excluded_functions['last_key']) && (!function_exists('last_key') || 
     }
 }
 
-const last_value = 'last_value';
-if (!isset($excluded_functions['last_value']) && (!function_exists('last_value') || (!false && (new \ReflectionFunction('last_value'))->isInternal()))) {
+const last_value = "last_value";
+if (!isset($excluded_functions["last_value"]) && (!function_exists("last_value") || (!false && (new \ReflectionFunction("last_value"))->isInternal()))) {
     /**
      * 配列の最後の値を返す
      *
@@ -835,8 +839,8 @@ if (!isset($excluded_functions['last_value']) && (!function_exists('last_value')
     }
 }
 
-const last_keyvalue = 'last_keyvalue';
-if (!isset($excluded_functions['last_keyvalue']) && (!function_exists('last_keyvalue') || (!false && (new \ReflectionFunction('last_keyvalue'))->isInternal()))) {
+const last_keyvalue = "last_keyvalue";
+if (!isset($excluded_functions["last_keyvalue"]) && (!function_exists("last_keyvalue") || (!false && (new \ReflectionFunction("last_keyvalue"))->isInternal()))) {
     /**
      * 配列の最後のキー/値ペアをタプルで返す
      *
@@ -875,8 +879,8 @@ if (!isset($excluded_functions['last_keyvalue']) && (!function_exists('last_keyv
     }
 }
 
-const prev_key = 'prev_key';
-if (!isset($excluded_functions['prev_key']) && (!function_exists('prev_key') || (!false && (new \ReflectionFunction('prev_key'))->isInternal()))) {
+const prev_key = "prev_key";
+if (!isset($excluded_functions["prev_key"]) && (!function_exists("prev_key") || (!false && (new \ReflectionFunction("prev_key"))->isInternal()))) {
     /**
      * 配列の指定キーの前のキーを返す
      *
@@ -912,8 +916,8 @@ if (!isset($excluded_functions['prev_key']) && (!function_exists('prev_key') || 
     }
 }
 
-const next_key = 'next_key';
-if (!isset($excluded_functions['next_key']) && (!function_exists('next_key') || (!false && (new \ReflectionFunction('next_key'))->isInternal()))) {
+const next_key = "next_key";
+if (!isset($excluded_functions["next_key"]) && (!function_exists("next_key") || (!false && (new \ReflectionFunction("next_key"))->isInternal()))) {
     /**
      * 配列の指定キーの次のキーを返す
      *
@@ -967,8 +971,8 @@ if (!isset($excluded_functions['next_key']) && (!function_exists('next_key') || 
     }
 }
 
-const in_array_and = 'in_array_and';
-if (!isset($excluded_functions['in_array_and']) && (!function_exists('in_array_and') || (!false && (new \ReflectionFunction('in_array_and'))->isInternal()))) {
+const in_array_and = "in_array_and";
+if (!isset($excluded_functions["in_array_and"]) && (!function_exists("in_array_and") || (!false && (new \ReflectionFunction("in_array_and"))->isInternal()))) {
     /**
      * in_array の複数版（AND）
      *
@@ -1005,8 +1009,8 @@ if (!isset($excluded_functions['in_array_and']) && (!function_exists('in_array_a
     }
 }
 
-const in_array_or = 'in_array_or';
-if (!isset($excluded_functions['in_array_or']) && (!function_exists('in_array_or') || (!false && (new \ReflectionFunction('in_array_or'))->isInternal()))) {
+const in_array_or = "in_array_or";
+if (!isset($excluded_functions["in_array_or"]) && (!function_exists("in_array_or") || (!false && (new \ReflectionFunction("in_array_or"))->isInternal()))) {
     /**
      * in_array の複数版（OR）
      *
@@ -1043,8 +1047,8 @@ if (!isset($excluded_functions['in_array_or']) && (!function_exists('in_array_or
     }
 }
 
-const kvsort = 'kvsort';
-if (!isset($excluded_functions['kvsort']) && (!function_exists('kvsort') || (!false && (new \ReflectionFunction('kvsort'))->isInternal()))) {
+const kvsort = "kvsort";
+if (!isset($excluded_functions["kvsort"]) && (!function_exists("kvsort") || (!false && (new \ReflectionFunction("kvsort"))->isInternal()))) {
     /**
      * 比較関数にキーも渡ってくる安定ソート
      *
@@ -1119,8 +1123,8 @@ if (!isset($excluded_functions['kvsort']) && (!function_exists('kvsort') || (!fa
     }
 }
 
-const array_add = 'array_add';
-if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') || (!false && (new \ReflectionFunction('array_add'))->isInternal()))) {
+const array_add = "array_add";
+if (!isset($excluded_functions["array_add"]) && (!function_exists("array_add") || (!false && (new \ReflectionFunction("array_add"))->isInternal()))) {
     /**
      * 配列の+演算子の関数版
      *
@@ -1145,8 +1149,8 @@ if (!isset($excluded_functions['array_add']) && (!function_exists('array_add') |
     }
 }
 
-const array_mix = 'array_mix';
-if (!isset($excluded_functions['array_mix']) && (!function_exists('array_mix') || (!false && (new \ReflectionFunction('array_mix'))->isInternal()))) {
+const array_mix = "array_mix";
+if (!isset($excluded_functions["array_mix"]) && (!function_exists("array_mix") || (!false && (new \ReflectionFunction("array_mix"))->isInternal()))) {
     /**
      * 配列を交互に追加する
      *
@@ -1202,8 +1206,8 @@ if (!isset($excluded_functions['array_mix']) && (!function_exists('array_mix') |
     }
 }
 
-const array_zip = 'array_zip';
-if (!isset($excluded_functions['array_zip']) && (!function_exists('array_zip') || (!false && (new \ReflectionFunction('array_zip'))->isInternal()))) {
+const array_zip = "array_zip";
+if (!isset($excluded_functions["array_zip"]) && (!function_exists("array_zip") || (!false && (new \ReflectionFunction("array_zip"))->isInternal()))) {
     /**
      * 配列の各要素値で順番に配列を作る
      *
@@ -1274,8 +1278,8 @@ if (!isset($excluded_functions['array_zip']) && (!function_exists('array_zip') |
     }
 }
 
-const array_cross = 'array_cross';
-if (!isset($excluded_functions['array_cross']) && (!function_exists('array_cross') || (!false && (new \ReflectionFunction('array_cross'))->isInternal()))) {
+const array_cross = "array_cross";
+if (!isset($excluded_functions["array_cross"]) && (!function_exists("array_cross") || (!false && (new \ReflectionFunction("array_cross"))->isInternal()))) {
     /**
      * 配列の直積を返す
      *
@@ -1316,8 +1320,8 @@ if (!isset($excluded_functions['array_cross']) && (!function_exists('array_cross
     }
 }
 
-const array_implode = 'array_implode';
-if (!isset($excluded_functions['array_implode']) && (!function_exists('array_implode') || (!false && (new \ReflectionFunction('array_implode'))->isInternal()))) {
+const array_implode = "array_implode";
+if (!isset($excluded_functions["array_implode"]) && (!function_exists("array_implode") || (!false && (new \ReflectionFunction("array_implode"))->isInternal()))) {
     /**
      * 配列の各要素の間に要素を差し込む
      *
@@ -1360,8 +1364,8 @@ if (!isset($excluded_functions['array_implode']) && (!function_exists('array_imp
     }
 }
 
-const array_sprintf = 'array_sprintf';
-if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_sprintf') || (!false && (new \ReflectionFunction('array_sprintf'))->isInternal()))) {
+const array_sprintf = "array_sprintf";
+if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("array_sprintf") || (!false && (new \ReflectionFunction("array_sprintf"))->isInternal()))) {
     /**
      * キーと値で sprintf する
      *
@@ -1419,8 +1423,8 @@ if (!isset($excluded_functions['array_sprintf']) && (!function_exists('array_spr
     }
 }
 
-const array_strpad = 'array_strpad';
-if (!isset($excluded_functions['array_strpad']) && (!function_exists('array_strpad') || (!false && (new \ReflectionFunction('array_strpad'))->isInternal()))) {
+const array_strpad = "array_strpad";
+if (!isset($excluded_functions["array_strpad"]) && (!function_exists("array_strpad") || (!false && (new \ReflectionFunction("array_strpad"))->isInternal()))) {
     /**
      * 配列のキー・要素に文字列を付加する
      *
@@ -1463,8 +1467,8 @@ if (!isset($excluded_functions['array_strpad']) && (!function_exists('array_strp
     }
 }
 
-const array_pos = 'array_pos';
-if (!isset($excluded_functions['array_pos']) && (!function_exists('array_pos') || (!false && (new \ReflectionFunction('array_pos'))->isInternal()))) {
+const array_pos = "array_pos";
+if (!isset($excluded_functions["array_pos"]) && (!function_exists("array_pos") || (!false && (new \ReflectionFunction("array_pos"))->isInternal()))) {
     /**
      * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
      *
@@ -1508,8 +1512,8 @@ if (!isset($excluded_functions['array_pos']) && (!function_exists('array_pos') |
     }
 }
 
-const array_of = 'array_of';
-if (!isset($excluded_functions['array_of']) && (!function_exists('array_of') || (!false && (new \ReflectionFunction('array_of'))->isInternal()))) {
+const array_of = "array_of";
+if (!isset($excluded_functions["array_of"]) && (!function_exists("array_of") || (!false && (new \ReflectionFunction("array_of"))->isInternal()))) {
     /**
      * 配列を与えると指定キーの値を返すクロージャを返す
      *
@@ -1543,8 +1547,8 @@ if (!isset($excluded_functions['array_of']) && (!function_exists('array_of') || 
     }
 }
 
-const array_get = 'array_get';
-if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') || (!false && (new \ReflectionFunction('array_get'))->isInternal()))) {
+const array_get = "array_get";
+if (!isset($excluded_functions["array_get"]) && (!function_exists("array_get") || (!false && (new \ReflectionFunction("array_get"))->isInternal()))) {
     /**
      * デフォルト値付きの配列値取得
      *
@@ -1624,8 +1628,8 @@ if (!isset($excluded_functions['array_get']) && (!function_exists('array_get') |
     }
 }
 
-const array_set = 'array_set';
-if (!isset($excluded_functions['array_set']) && (!function_exists('array_set') || (!false && (new \ReflectionFunction('array_set'))->isInternal()))) {
+const array_set = "array_set";
+if (!isset($excluded_functions["array_set"]) && (!function_exists("array_set") || (!false && (new \ReflectionFunction("array_set"))->isInternal()))) {
     /**
      * キー指定の配列値設定
      *
@@ -1681,8 +1685,8 @@ if (!isset($excluded_functions['array_set']) && (!function_exists('array_set') |
     }
 }
 
-const array_put = 'array_put';
-if (!isset($excluded_functions['array_put']) && (!function_exists('array_put') || (!false && (new \ReflectionFunction('array_put'))->isInternal()))) {
+const array_put = "array_put";
+if (!isset($excluded_functions["array_put"]) && (!function_exists("array_put") || (!false && (new \ReflectionFunction("array_put"))->isInternal()))) {
     /**
      * キー指定の配列値設定
      *
@@ -1745,8 +1749,8 @@ if (!isset($excluded_functions['array_put']) && (!function_exists('array_put') |
     }
 }
 
-const array_unset = 'array_unset';
-if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset') || (!false && (new \ReflectionFunction('array_unset'))->isInternal()))) {
+const array_unset = "array_unset";
+if (!isset($excluded_functions["array_unset"]) && (!function_exists("array_unset") || (!false && (new \ReflectionFunction("array_unset"))->isInternal()))) {
     /**
      * 伏せると同時にその値を返す
      *
@@ -1829,8 +1833,8 @@ if (!isset($excluded_functions['array_unset']) && (!function_exists('array_unset
     }
 }
 
-const array_dive = 'array_dive';
-if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive') || (!false && (new \ReflectionFunction('array_dive'))->isInternal()))) {
+const array_dive = "array_dive";
+if (!isset($excluded_functions["array_dive"]) && (!function_exists("array_dive") || (!false && (new \ReflectionFunction("array_dive"))->isInternal()))) {
     /**
      * パス形式で配列値を取得
      *
@@ -1873,8 +1877,8 @@ if (!isset($excluded_functions['array_dive']) && (!function_exists('array_dive')
     }
 }
 
-const array_keys_exist = 'array_keys_exist';
-if (!isset($excluded_functions['array_keys_exist']) && (!function_exists('array_keys_exist') || (!false && (new \ReflectionFunction('array_keys_exist'))->isInternal()))) {
+const array_keys_exist = "array_keys_exist";
+if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("array_keys_exist") || (!false && (new \ReflectionFunction("array_keys_exist"))->isInternal()))) {
     /**
      * array_key_exists の複数版
      *
@@ -1931,8 +1935,8 @@ if (!isset($excluded_functions['array_keys_exist']) && (!function_exists('array_
     }
 }
 
-const array_find = 'array_find';
-if (!isset($excluded_functions['array_find']) && (!function_exists('array_find') || (!false && (new \ReflectionFunction('array_find'))->isInternal()))) {
+const array_find = "array_find";
+if (!isset($excluded_functions["array_find"]) && (!function_exists("array_find") || (!false && (new \ReflectionFunction("array_find"))->isInternal()))) {
     /**
      * array_search のクロージャ版のようなもの
      *
@@ -1974,8 +1978,8 @@ if (!isset($excluded_functions['array_find']) && (!function_exists('array_find')
     }
 }
 
-const array_grep_key = 'array_grep_key';
-if (!isset($excluded_functions['array_grep_key']) && (!function_exists('array_grep_key') || (!false && (new \ReflectionFunction('array_grep_key'))->isInternal()))) {
+const array_grep_key = "array_grep_key";
+if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("array_grep_key") || (!false && (new \ReflectionFunction("array_grep_key"))->isInternal()))) {
     /**
      * キーを正規表現でフィルタする
      *
@@ -2003,8 +2007,8 @@ if (!isset($excluded_functions['array_grep_key']) && (!function_exists('array_gr
     }
 }
 
-const array_map_key = 'array_map_key';
-if (!isset($excluded_functions['array_map_key']) && (!function_exists('array_map_key') || (!false && (new \ReflectionFunction('array_map_key'))->isInternal()))) {
+const array_map_key = "array_map_key";
+if (!isset($excluded_functions["array_map_key"]) && (!function_exists("array_map_key") || (!false && (new \ReflectionFunction("array_map_key"))->isInternal()))) {
     /**
      * キーをマップして変換する
      *
@@ -2033,8 +2037,8 @@ if (!isset($excluded_functions['array_map_key']) && (!function_exists('array_map
     }
 }
 
-const array_filter_not = 'array_filter_not';
-if (!isset($excluded_functions['array_filter_not']) && (!function_exists('array_filter_not') || (!false && (new \ReflectionFunction('array_filter_not'))->isInternal()))) {
+const array_filter_not = "array_filter_not";
+if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("array_filter_not") || (!false && (new \ReflectionFunction("array_filter_not"))->isInternal()))) {
     /**
      * array_filter の否定版
      *
@@ -2055,8 +2059,8 @@ if (!isset($excluded_functions['array_filter_not']) && (!function_exists('array_
     }
 }
 
-const array_filter_key = 'array_filter_key';
-if (!isset($excluded_functions['array_filter_key']) && (!function_exists('array_filter_key') || (!false && (new \ReflectionFunction('array_filter_key'))->isInternal()))) {
+const array_filter_key = "array_filter_key";
+if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("array_filter_key") || (!false && (new \ReflectionFunction("array_filter_key"))->isInternal()))) {
     /**
      * キーを主軸とした array_filter
      *
@@ -2085,8 +2089,8 @@ if (!isset($excluded_functions['array_filter_key']) && (!function_exists('array_
     }
 }
 
-const array_filter_eval = 'array_filter_eval';
-if (!isset($excluded_functions['array_filter_eval']) && (!function_exists('array_filter_eval') || (!false && (new \ReflectionFunction('array_filter_eval'))->isInternal()))) {
+const array_filter_eval = "array_filter_eval";
+if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("array_filter_eval") || (!false && (new \ReflectionFunction("array_filter_eval"))->isInternal()))) {
     /**
      * eval で評価して array_filter する
      *
@@ -2108,8 +2112,8 @@ if (!isset($excluded_functions['array_filter_eval']) && (!function_exists('array
     }
 }
 
-const array_where = 'array_where';
-if (!isset($excluded_functions['array_where']) && (!function_exists('array_where') || (!false && (new \ReflectionFunction('array_where'))->isInternal()))) {
+const array_where = "array_where";
+if (!isset($excluded_functions["array_where"]) && (!function_exists("array_where") || (!false && (new \ReflectionFunction("array_where"))->isInternal()))) {
     /**
      * 指定キーの要素で array_filter する
      *
@@ -2206,8 +2210,8 @@ if (!isset($excluded_functions['array_where']) && (!function_exists('array_where
     }
 }
 
-const array_map_filter = 'array_map_filter';
-if (!isset($excluded_functions['array_map_filter']) && (!function_exists('array_map_filter') || (!false && (new \ReflectionFunction('array_map_filter'))->isInternal()))) {
+const array_map_filter = "array_map_filter";
+if (!isset($excluded_functions["array_map_filter"]) && (!function_exists("array_map_filter") || (!false && (new \ReflectionFunction("array_map_filter"))->isInternal()))) {
     /**
      * array_map + array_filter する
      *
@@ -2241,8 +2245,8 @@ if (!isset($excluded_functions['array_map_filter']) && (!function_exists('array_
     }
 }
 
-const array_map_method = 'array_map_method';
-if (!isset($excluded_functions['array_map_method']) && (!function_exists('array_map_method') || (!false && (new \ReflectionFunction('array_map_method'))->isInternal()))) {
+const array_map_method = "array_map_method";
+if (!isset($excluded_functions["array_map_method"]) && (!function_exists("array_map_method") || (!false && (new \ReflectionFunction("array_map_method"))->isInternal()))) {
     /**
      * メソッドを指定できるようにした array_map
      *
@@ -2283,8 +2287,8 @@ if (!isset($excluded_functions['array_map_method']) && (!function_exists('array_
     }
 }
 
-const array_maps = 'array_maps';
-if (!isset($excluded_functions['array_maps']) && (!function_exists('array_maps') || (!false && (new \ReflectionFunction('array_maps'))->isInternal()))) {
+const array_maps = "array_maps";
+if (!isset($excluded_functions["array_maps"]) && (!function_exists("array_maps") || (!false && (new \ReflectionFunction("array_maps"))->isInternal()))) {
     /**
      * 複数コールバックを指定できる array_map
      *
@@ -2339,8 +2343,8 @@ if (!isset($excluded_functions['array_maps']) && (!function_exists('array_maps')
     }
 }
 
-const array_kmap = 'array_kmap';
-if (!isset($excluded_functions['array_kmap']) && (!function_exists('array_kmap') || (!false && (new \ReflectionFunction('array_kmap'))->isInternal()))) {
+const array_kmap = "array_kmap";
+if (!isset($excluded_functions["array_kmap"]) && (!function_exists("array_kmap") || (!false && (new \ReflectionFunction("array_kmap"))->isInternal()))) {
     /**
      * キーも渡ってくる array_map
      *
@@ -2383,8 +2387,8 @@ if (!isset($excluded_functions['array_kmap']) && (!function_exists('array_kmap')
     }
 }
 
-const array_nmap = 'array_nmap';
-if (!isset($excluded_functions['array_nmap']) && (!function_exists('array_nmap') || (!false && (new \ReflectionFunction('array_nmap'))->isInternal()))) {
+const array_nmap = "array_nmap";
+if (!isset($excluded_functions["array_nmap"]) && (!function_exists("array_nmap") || (!false && (new \ReflectionFunction("array_nmap"))->isInternal()))) {
     /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
      *
@@ -2458,8 +2462,8 @@ if (!isset($excluded_functions['array_nmap']) && (!function_exists('array_nmap')
     }
 }
 
-const array_lmap = 'array_lmap';
-if (!isset($excluded_functions['array_lmap']) && (!function_exists('array_lmap') || (!false && (new \ReflectionFunction('array_lmap'))->isInternal()))) {
+const array_lmap = "array_lmap";
+if (!isset($excluded_functions["array_lmap"]) && (!function_exists("array_lmap") || (!false && (new \ReflectionFunction("array_lmap"))->isInternal()))) {
     /**
      * 要素値を $callback の最左に適用して array_map する
      *
@@ -2480,8 +2484,8 @@ if (!isset($excluded_functions['array_lmap']) && (!function_exists('array_lmap')
     }
 }
 
-const array_rmap = 'array_rmap';
-if (!isset($excluded_functions['array_rmap']) && (!function_exists('array_rmap') || (!false && (new \ReflectionFunction('array_rmap'))->isInternal()))) {
+const array_rmap = "array_rmap";
+if (!isset($excluded_functions["array_rmap"]) && (!function_exists("array_rmap") || (!false && (new \ReflectionFunction("array_rmap"))->isInternal()))) {
     /**
      * 要素値を $callback の最右に適用して array_map する
      *
@@ -2502,8 +2506,8 @@ if (!isset($excluded_functions['array_rmap']) && (!function_exists('array_rmap')
     }
 }
 
-const array_each = 'array_each';
-if (!isset($excluded_functions['array_each']) && (!function_exists('array_each') || (!false && (new \ReflectionFunction('array_each'))->isInternal()))) {
+const array_each = "array_each";
+if (!isset($excluded_functions["array_each"]) && (!function_exists("array_each") || (!false && (new \ReflectionFunction("array_each"))->isInternal()))) {
     /**
      * array_reduce の参照版（のようなもの）
      *
@@ -2586,8 +2590,8 @@ if (!isset($excluded_functions['array_each']) && (!function_exists('array_each')
     }
 }
 
-const array_depth = 'array_depth';
-if (!isset($excluded_functions['array_depth']) && (!function_exists('array_depth') || (!false && (new \ReflectionFunction('array_depth'))->isInternal()))) {
+const array_depth = "array_depth";
+if (!isset($excluded_functions["array_depth"]) && (!function_exists("array_depth") || (!false && (new \ReflectionFunction("array_depth"))->isInternal()))) {
     /**
      * 配列の次元数を返す
      *
@@ -2634,8 +2638,8 @@ if (!isset($excluded_functions['array_depth']) && (!function_exists('array_depth
     }
 }
 
-const array_insert = 'array_insert';
-if (!isset($excluded_functions['array_insert']) && (!function_exists('array_insert') || (!false && (new \ReflectionFunction('array_insert'))->isInternal()))) {
+const array_insert = "array_insert";
+if (!isset($excluded_functions["array_insert"]) && (!function_exists("array_insert") || (!false && (new \ReflectionFunction("array_insert"))->isInternal()))) {
     /**
      * 配列・連想配列を問わず任意の位置に値を挿入する
      *
@@ -2669,8 +2673,8 @@ if (!isset($excluded_functions['array_insert']) && (!function_exists('array_inse
     }
 }
 
-const array_assort = 'array_assort';
-if (!isset($excluded_functions['array_assort']) && (!function_exists('array_assort') || (!false && (new \ReflectionFunction('array_assort'))->isInternal()))) {
+const array_assort = "array_assort";
+if (!isset($excluded_functions["array_assort"]) && (!function_exists("array_assort") || (!false && (new \ReflectionFunction("array_assort"))->isInternal()))) {
     /**
      * 配列をコールバックに従って分類する
      *
@@ -2709,8 +2713,8 @@ if (!isset($excluded_functions['array_assort']) && (!function_exists('array_asso
     }
 }
 
-const array_count = 'array_count';
-if (!isset($excluded_functions['array_count']) && (!function_exists('array_count') || (!false && (new \ReflectionFunction('array_count'))->isInternal()))) {
+const array_count = "array_count";
+if (!isset($excluded_functions["array_count"]) && (!function_exists("array_count") || (!false && (new \ReflectionFunction("array_count"))->isInternal()))) {
     /**
      * 配列をコールバックに従ってカウントする
      *
@@ -2762,8 +2766,8 @@ if (!isset($excluded_functions['array_count']) && (!function_exists('array_count
     }
 }
 
-const array_group = 'array_group';
-if (!isset($excluded_functions['array_group']) && (!function_exists('array_group') || (!false && (new \ReflectionFunction('array_group'))->isInternal()))) {
+const array_group = "array_group";
+if (!isset($excluded_functions["array_group"]) && (!function_exists("array_group") || (!false && (new \ReflectionFunction("array_group"))->isInternal()))) {
     /**
      * 配列をコールバックの返り値でグループ化する
      *
@@ -2820,8 +2824,8 @@ if (!isset($excluded_functions['array_group']) && (!function_exists('array_group
     }
 }
 
-const array_all = 'array_all';
-if (!isset($excluded_functions['array_all']) && (!function_exists('array_all') || (!false && (new \ReflectionFunction('array_all'))->isInternal()))) {
+const array_all = "array_all";
+if (!isset($excluded_functions["array_all"]) && (!function_exists("array_all") || (!false && (new \ReflectionFunction("array_all"))->isInternal()))) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
      *
@@ -2856,8 +2860,8 @@ if (!isset($excluded_functions['array_all']) && (!function_exists('array_all') |
     }
 }
 
-const array_any = 'array_any';
-if (!isset($excluded_functions['array_any']) && (!function_exists('array_any') || (!false && (new \ReflectionFunction('array_any'))->isInternal()))) {
+const array_any = "array_any";
+if (!isset($excluded_functions["array_any"]) && (!function_exists("array_any") || (!false && (new \ReflectionFunction("array_any"))->isInternal()))) {
     /**
      * 全要素が false になるなら false を返す（1つでも true なら true を返す）
      *
@@ -2892,8 +2896,8 @@ if (!isset($excluded_functions['array_any']) && (!function_exists('array_any') |
     }
 }
 
-const array_order = 'array_order';
-if (!isset($excluded_functions['array_order']) && (!function_exists('array_order') || (!false && (new \ReflectionFunction('array_order'))->isInternal()))) {
+const array_order = "array_order";
+if (!isset($excluded_functions["array_order"]) && (!function_exists("array_order") || (!false && (new \ReflectionFunction("array_order"))->isInternal()))) {
     /**
      * 配列を $orders に従って並べ替える
      *
@@ -3029,8 +3033,8 @@ if (!isset($excluded_functions['array_order']) && (!function_exists('array_order
     }
 }
 
-const array_shuffle = 'array_shuffle';
-if (!isset($excluded_functions['array_shuffle']) && (!function_exists('array_shuffle') || (!false && (new \ReflectionFunction('array_shuffle'))->isInternal()))) {
+const array_shuffle = "array_shuffle";
+if (!isset($excluded_functions["array_shuffle"]) && (!function_exists("array_shuffle") || (!false && (new \ReflectionFunction("array_shuffle"))->isInternal()))) {
     /**
      * shuffle のキーが保存される＋参照渡しではない版
      *
@@ -3055,8 +3059,8 @@ if (!isset($excluded_functions['array_shuffle']) && (!function_exists('array_shu
     }
 }
 
-const array_shrink_key = 'array_shrink_key';
-if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('array_shrink_key') || (!false && (new \ReflectionFunction('array_shrink_key'))->isInternal()))) {
+const array_shrink_key = "array_shrink_key";
+if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("array_shrink_key") || (!false && (new \ReflectionFunction("array_shrink_key"))->isInternal()))) {
     /**
      * 値の優先順位を逆にした array_intersect_key
      *
@@ -3088,8 +3092,8 @@ if (!isset($excluded_functions['array_shrink_key']) && (!function_exists('array_
     }
 }
 
-const array_fill_callback = 'array_fill_callback';
-if (!isset($excluded_functions['array_fill_callback']) && (!function_exists('array_fill_callback') || (!false && (new \ReflectionFunction('array_fill_callback'))->isInternal()))) {
+const array_fill_callback = "array_fill_callback";
+if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("array_fill_callback") || (!false && (new \ReflectionFunction("array_fill_callback"))->isInternal()))) {
     /**
      * array_fill_keys のコールバック版のようなもの
      *
@@ -3118,8 +3122,8 @@ if (!isset($excluded_functions['array_fill_callback']) && (!function_exists('arr
     }
 }
 
-const array_pickup = 'array_pickup';
-if (!isset($excluded_functions['array_pickup']) && (!function_exists('array_pickup') || (!false && (new \ReflectionFunction('array_pickup'))->isInternal()))) {
+const array_pickup = "array_pickup";
+if (!isset($excluded_functions["array_pickup"]) && (!function_exists("array_pickup") || (!false && (new \ReflectionFunction("array_pickup"))->isInternal()))) {
     /**
      * キーを指定してそれだけの配列にする
      *
@@ -3165,8 +3169,8 @@ if (!isset($excluded_functions['array_pickup']) && (!function_exists('array_pick
     }
 }
 
-const array_lookup = 'array_lookup';
-if (!isset($excluded_functions['array_lookup']) && (!function_exists('array_lookup') || (!false && (new \ReflectionFunction('array_lookup'))->isInternal()))) {
+const array_lookup = "array_lookup";
+if (!isset($excluded_functions["array_lookup"]) && (!function_exists("array_lookup") || (!false && (new \ReflectionFunction("array_lookup"))->isInternal()))) {
     /**
      * キー保存可能な array_column
      *
@@ -3216,8 +3220,8 @@ if (!isset($excluded_functions['array_lookup']) && (!function_exists('array_look
     }
 }
 
-const array_columns = 'array_columns';
-if (!isset($excluded_functions['array_columns']) && (!function_exists('array_columns') || (!false && (new \ReflectionFunction('array_columns'))->isInternal()))) {
+const array_columns = "array_columns";
+if (!isset($excluded_functions["array_columns"]) && (!function_exists("array_columns") || (!false && (new \ReflectionFunction("array_columns"))->isInternal()))) {
     /**
      * 全要素に対して array_column する
      *
@@ -3256,8 +3260,8 @@ if (!isset($excluded_functions['array_columns']) && (!function_exists('array_col
     }
 }
 
-const array_uncolumns = 'array_uncolumns';
-if (!isset($excluded_functions['array_uncolumns']) && (!function_exists('array_uncolumns') || (!false && (new \ReflectionFunction('array_uncolumns'))->isInternal()))) {
+const array_uncolumns = "array_uncolumns";
+if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("array_uncolumns") || (!false && (new \ReflectionFunction("array_uncolumns"))->isInternal()))) {
     /**
      * array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する
      *
@@ -3300,8 +3304,8 @@ if (!isset($excluded_functions['array_uncolumns']) && (!function_exists('array_u
     }
 }
 
-const array_convert = 'array_convert';
-if (!isset($excluded_functions['array_convert']) && (!function_exists('array_convert') || (!false && (new \ReflectionFunction('array_convert'))->isInternal()))) {
+const array_convert = "array_convert";
+if (!isset($excluded_functions["array_convert"]) && (!function_exists("array_convert") || (!false && (new \ReflectionFunction("array_convert"))->isInternal()))) {
     /**
      * 配列の各要素に再帰的にコールバックを適用して変換する
      *
@@ -3427,8 +3431,8 @@ if (!isset($excluded_functions['array_convert']) && (!function_exists('array_con
     }
 }
 
-const array_flatten = 'array_flatten';
-if (!isset($excluded_functions['array_flatten']) && (!function_exists('array_flatten') || (!false && (new \ReflectionFunction('array_flatten'))->isInternal()))) {
+const array_flatten = "array_flatten";
+if (!isset($excluded_functions["array_flatten"]) && (!function_exists("array_flatten") || (!false && (new \ReflectionFunction("array_flatten"))->isInternal()))) {
     /**
      * 多階層配列をフラットに展開する
      *
@@ -3507,8 +3511,8 @@ if (!isset($excluded_functions['array_flatten']) && (!function_exists('array_fla
     }
 }
 
-const array_nest = 'array_nest';
-if (!isset($excluded_functions['array_nest']) && (!function_exists('array_nest') || (!false && (new \ReflectionFunction('array_nest'))->isInternal()))) {
+const array_nest = "array_nest";
+if (!isset($excluded_functions["array_nest"]) && (!function_exists("array_nest") || (!false && (new \ReflectionFunction("array_nest"))->isInternal()))) {
     /**
      * シンプルな [キー => 値] な配列から階層配列を生成する
      *
@@ -3586,8 +3590,8 @@ if (!isset($excluded_functions['array_nest']) && (!function_exists('array_nest')
     }
 }
 
-const array_difference = 'array_difference';
-if (!isset($excluded_functions['array_difference']) && (!function_exists('array_difference') || (!false && (new \ReflectionFunction('array_difference'))->isInternal()))) {
+const array_difference = "array_difference";
+if (!isset($excluded_functions["array_difference"]) && (!function_exists("array_difference") || (!false && (new \ReflectionFunction("array_difference"))->isInternal()))) {
     /**
      * 配列の差分を取り配列で返す
      *
@@ -3691,8 +3695,8 @@ if (!isset($excluded_functions['array_difference']) && (!function_exists('array_
     }
 }
 
-const stdclass = 'stdclass';
-if (!isset($excluded_functions['stdclass']) && (!function_exists('stdclass') || (!false && (new \ReflectionFunction('stdclass'))->isInternal()))) {
+const stdclass = "stdclass";
+if (!isset($excluded_functions["stdclass"]) && (!function_exists("stdclass") || (!false && (new \ReflectionFunction("stdclass"))->isInternal()))) {
     /**
      * 初期フィールド値を与えて stdClass を生成する
      *
@@ -3724,8 +3728,8 @@ if (!isset($excluded_functions['stdclass']) && (!function_exists('stdclass') || 
     }
 }
 
-const detect_namespace = 'detect_namespace';
-if (!isset($excluded_functions['detect_namespace']) && (!function_exists('detect_namespace') || (!false && (new \ReflectionFunction('detect_namespace'))->isInternal()))) {
+const detect_namespace = "detect_namespace";
+if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect_namespace") || (!false && (new \ReflectionFunction("detect_namespace"))->isInternal()))) {
     /**
      * ディレクトリ構造から名前空間を推測して返す
      *
@@ -3779,8 +3783,8 @@ if (!isset($excluded_functions['detect_namespace']) && (!function_exists('detect
     }
 }
 
-const class_loader = 'class_loader';
-if (!isset($excluded_functions['class_loader']) && (!function_exists('class_loader') || (!false && (new \ReflectionFunction('class_loader'))->isInternal()))) {
+const class_loader = "class_loader";
+if (!isset($excluded_functions["class_loader"]) && (!function_exists("class_loader") || (!false && (new \ReflectionFunction("class_loader"))->isInternal()))) {
     /**
      * composer のクラスローダを返す
      *
@@ -3814,8 +3818,8 @@ if (!isset($excluded_functions['class_loader']) && (!function_exists('class_load
     }
 }
 
-const class_namespace = 'class_namespace';
-if (!isset($excluded_functions['class_namespace']) && (!function_exists('class_namespace') || (!false && (new \ReflectionFunction('class_namespace'))->isInternal()))) {
+const class_namespace = "class_namespace";
+if (!isset($excluded_functions["class_namespace"]) && (!function_exists("class_namespace") || (!false && (new \ReflectionFunction("class_namespace"))->isInternal()))) {
     /**
      * クラスの名前空間部分を取得する
      *
@@ -3839,8 +3843,8 @@ if (!isset($excluded_functions['class_namespace']) && (!function_exists('class_n
     }
 }
 
-const class_shorten = 'class_shorten';
-if (!isset($excluded_functions['class_shorten']) && (!function_exists('class_shorten') || (!false && (new \ReflectionFunction('class_shorten'))->isInternal()))) {
+const class_shorten = "class_shorten";
+if (!isset($excluded_functions["class_shorten"]) && (!function_exists("class_shorten") || (!false && (new \ReflectionFunction("class_shorten"))->isInternal()))) {
     /**
      * クラスの名前空間部分を除いた短い名前を取得する
      *
@@ -3863,8 +3867,8 @@ if (!isset($excluded_functions['class_shorten']) && (!function_exists('class_sho
     }
 }
 
-const class_replace = 'class_replace';
-if (!isset($excluded_functions['class_replace']) && (!function_exists('class_replace') || (!false && (new \ReflectionFunction('class_replace'))->isInternal()))) {
+const class_replace = "class_replace";
+if (!isset($excluded_functions["class_replace"]) && (!function_exists("class_replace") || (!false && (new \ReflectionFunction("class_replace"))->isInternal()))) {
     /**
      * 既存（未読み込みに限る）クラスを強制的に置換する
      *
@@ -3992,8 +3996,8 @@ if (!isset($excluded_functions['class_replace']) && (!function_exists('class_rep
     }
 }
 
-const object_dive = 'object_dive';
-if (!isset($excluded_functions['object_dive']) && (!function_exists('object_dive') || (!false && (new \ReflectionFunction('object_dive'))->isInternal()))) {
+const object_dive = "object_dive";
+if (!isset($excluded_functions["object_dive"]) && (!function_exists("object_dive") || (!false && (new \ReflectionFunction("object_dive"))->isInternal()))) {
     /**
      * パス形式でプロパティ値を取得
      *
@@ -4033,8 +4037,8 @@ if (!isset($excluded_functions['object_dive']) && (!function_exists('object_dive
     }
 }
 
-const get_object_properties = 'get_object_properties';
-if (!isset($excluded_functions['get_object_properties']) && (!function_exists('get_object_properties') || (!false && (new \ReflectionFunction('get_object_properties'))->isInternal()))) {
+const get_object_properties = "get_object_properties";
+if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("get_object_properties") || (!false && (new \ReflectionFunction("get_object_properties"))->isInternal()))) {
     /**
      * オブジェクトのプロパティを可視・不可視を問わず取得する
      *
@@ -4084,8 +4088,8 @@ if (!isset($excluded_functions['get_object_properties']) && (!function_exists('g
     }
 }
 
-const file_list = 'file_list';
-if (!isset($excluded_functions['file_list']) && (!function_exists('file_list') || (!false && (new \ReflectionFunction('file_list'))->isInternal()))) {
+const file_list = "file_list";
+if (!isset($excluded_functions["file_list"]) && (!function_exists("file_list") || (!false && (new \ReflectionFunction("file_list"))->isInternal()))) {
     /**
      * ファイル一覧を配列で返す
      *
@@ -4132,8 +4136,8 @@ if (!isset($excluded_functions['file_list']) && (!function_exists('file_list') |
     }
 }
 
-const file_tree = 'file_tree';
-if (!isset($excluded_functions['file_tree']) && (!function_exists('file_tree') || (!false && (new \ReflectionFunction('file_tree'))->isInternal()))) {
+const file_tree = "file_tree";
+if (!isset($excluded_functions["file_tree"]) && (!function_exists("file_tree") || (!false && (new \ReflectionFunction("file_tree"))->isInternal()))) {
     /**
      * ディレクトリ階層をツリー構造で返す
      *
@@ -4202,8 +4206,8 @@ if (!isset($excluded_functions['file_tree']) && (!function_exists('file_tree') |
     }
 }
 
-const file_extension = 'file_extension';
-if (!isset($excluded_functions['file_extension']) && (!function_exists('file_extension') || (!false && (new \ReflectionFunction('file_extension'))->isInternal()))) {
+const file_extension = "file_extension";
+if (!isset($excluded_functions["file_extension"]) && (!function_exists("file_extension") || (!false && (new \ReflectionFunction("file_extension"))->isInternal()))) {
     /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
      *
@@ -4241,8 +4245,8 @@ if (!isset($excluded_functions['file_extension']) && (!function_exists('file_ext
     }
 }
 
-const file_set_contents = 'file_set_contents';
-if (!isset($excluded_functions['file_set_contents']) && (!function_exists('file_set_contents') || (!false && (new \ReflectionFunction('file_set_contents'))->isInternal()))) {
+const file_set_contents = "file_set_contents";
+if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("file_set_contents") || (!false && (new \ReflectionFunction("file_set_contents"))->isInternal()))) {
     /**
      * ディレクトリも掘る file_put_contents
      *
@@ -4272,8 +4276,8 @@ if (!isset($excluded_functions['file_set_contents']) && (!function_exists('file_
     }
 }
 
-const file_rewrite_contents = 'file_rewrite_contents';
-if (!isset($excluded_functions['file_rewrite_contents']) && (!function_exists('file_rewrite_contents') || (!false && (new \ReflectionFunction('file_rewrite_contents'))->isInternal()))) {
+const file_rewrite_contents = "file_rewrite_contents";
+if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("file_rewrite_contents") || (!false && (new \ReflectionFunction("file_rewrite_contents"))->isInternal()))) {
     /**
      * ファイルを読み込んで内容をコールバックに渡して書き込む
      *
@@ -4335,8 +4339,8 @@ if (!isset($excluded_functions['file_rewrite_contents']) && (!function_exists('f
     }
 }
 
-const mkdir_p = 'mkdir_p';
-if (!isset($excluded_functions['mkdir_p']) && (!function_exists('mkdir_p') || (!false && (new \ReflectionFunction('mkdir_p'))->isInternal()))) {
+const mkdir_p = "mkdir_p";
+if (!isset($excluded_functions["mkdir_p"]) && (!function_exists("mkdir_p") || (!false && (new \ReflectionFunction("mkdir_p"))->isInternal()))) {
     /**
      * ディレクトリを再帰的に掘る
      *
@@ -4360,8 +4364,8 @@ if (!isset($excluded_functions['mkdir_p']) && (!function_exists('mkdir_p') || (!
     }
 }
 
-const dirname_r = 'dirname_r';
-if (!isset($excluded_functions['dirname_r']) && (!function_exists('dirname_r') || (!false && (new \ReflectionFunction('dirname_r'))->isInternal()))) {
+const dirname_r = "dirname_r";
+if (!isset($excluded_functions["dirname_r"]) && (!function_exists("dirname_r") || (!false && (new \ReflectionFunction("dirname_r"))->isInternal()))) {
     /**
      * コールバックが true 相当を返すまで親ディレクトリを辿り続ける
      *
@@ -4396,8 +4400,8 @@ if (!isset($excluded_functions['dirname_r']) && (!function_exists('dirname_r') |
     }
 }
 
-const fnmatch_and = 'fnmatch_and';
-if (!isset($excluded_functions['fnmatch_and']) && (!function_exists('fnmatch_and') || (!false && (new \ReflectionFunction('fnmatch_and'))->isInternal()))) {
+const fnmatch_and = "fnmatch_and";
+if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("fnmatch_and") || (!false && (new \ReflectionFunction("fnmatch_and"))->isInternal()))) {
     /**
      * fnmatch の AND 版
      *
@@ -4433,8 +4437,8 @@ if (!isset($excluded_functions['fnmatch_and']) && (!function_exists('fnmatch_and
     }
 }
 
-const fnmatch_or = 'fnmatch_or';
-if (!isset($excluded_functions['fnmatch_or']) && (!function_exists('fnmatch_or') || (!false && (new \ReflectionFunction('fnmatch_or'))->isInternal()))) {
+const fnmatch_or = "fnmatch_or";
+if (!isset($excluded_functions["fnmatch_or"]) && (!function_exists("fnmatch_or") || (!false && (new \ReflectionFunction("fnmatch_or"))->isInternal()))) {
     /**
      * fnmatch の OR 版
      *
@@ -4470,8 +4474,8 @@ if (!isset($excluded_functions['fnmatch_or']) && (!function_exists('fnmatch_or')
     }
 }
 
-const path_is_absolute = 'path_is_absolute';
-if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('path_is_absolute') || (!false && (new \ReflectionFunction('path_is_absolute'))->isInternal()))) {
+const path_is_absolute = "path_is_absolute";
+if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("path_is_absolute") || (!false && (new \ReflectionFunction("path_is_absolute"))->isInternal()))) {
     /**
      * パスが絶対パスか判定する
      *
@@ -4505,8 +4509,8 @@ if (!isset($excluded_functions['path_is_absolute']) && (!function_exists('path_i
     }
 }
 
-const path_resolve = 'path_resolve';
-if (!isset($excluded_functions['path_resolve']) && (!function_exists('path_resolve') || (!false && (new \ReflectionFunction('path_resolve'))->isInternal()))) {
+const path_resolve = "path_resolve";
+if (!isset($excluded_functions["path_resolve"]) && (!function_exists("path_resolve") || (!false && (new \ReflectionFunction("path_resolve"))->isInternal()))) {
     /**
      * パスを絶対パスに変換して正規化する
      *
@@ -4538,8 +4542,8 @@ if (!isset($excluded_functions['path_resolve']) && (!function_exists('path_resol
     }
 }
 
-const path_normalize = 'path_normalize';
-if (!isset($excluded_functions['path_normalize']) && (!function_exists('path_normalize') || (!false && (new \ReflectionFunction('path_normalize'))->isInternal()))) {
+const path_normalize = "path_normalize";
+if (!isset($excluded_functions["path_normalize"]) && (!function_exists("path_normalize") || (!false && (new \ReflectionFunction("path_normalize"))->isInternal()))) {
     /**
      * パスを正規化する
      *
@@ -4585,8 +4589,8 @@ if (!isset($excluded_functions['path_normalize']) && (!function_exists('path_nor
     }
 }
 
-const cp_rf = 'cp_rf';
-if (!isset($excluded_functions['cp_rf']) && (!function_exists('cp_rf') || (!false && (new \ReflectionFunction('cp_rf'))->isInternal()))) {
+const cp_rf = "cp_rf";
+if (!isset($excluded_functions["cp_rf"]) && (!function_exists("cp_rf") || (!false && (new \ReflectionFunction("cp_rf"))->isInternal()))) {
     /**
      * ディレクトリのコピー
      *
@@ -4657,8 +4661,8 @@ if (!isset($excluded_functions['cp_rf']) && (!function_exists('cp_rf') || (!fals
     }
 }
 
-const rm_rf = 'rm_rf';
-if (!isset($excluded_functions['rm_rf']) && (!function_exists('rm_rf') || (!false && (new \ReflectionFunction('rm_rf'))->isInternal()))) {
+const rm_rf = "rm_rf";
+if (!isset($excluded_functions["rm_rf"]) && (!function_exists("rm_rf") || (!false && (new \ReflectionFunction("rm_rf"))->isInternal()))) {
     /**
      * 中身があっても消せる rmdir
      *
@@ -4697,8 +4701,8 @@ if (!isset($excluded_functions['rm_rf']) && (!function_exists('rm_rf') || (!fals
     }
 }
 
-const tmpname = 'tmpname';
-if (!isset($excluded_functions['tmpname']) && (!function_exists('tmpname') || (!false && (new \ReflectionFunction('tmpname'))->isInternal()))) {
+const tmpname = "tmpname";
+if (!isset($excluded_functions["tmpname"]) && (!function_exists("tmpname") || (!false && (new \ReflectionFunction("tmpname"))->isInternal()))) {
     /**
      * 終了時に削除される一時ファイル名を生成する
      *
@@ -4744,8 +4748,8 @@ if (!isset($excluded_functions['tmpname']) && (!function_exists('tmpname') || (!
     }
 }
 
-const delegate = 'delegate';
-if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || (!false && (new \ReflectionFunction('delegate'))->isInternal()))) {
+const delegate = "delegate";
+if (!isset($excluded_functions["delegate"]) && (!function_exists("delegate") || (!false && (new \ReflectionFunction("delegate"))->isInternal()))) {
     /**
      * 指定 callable を指定クロージャで実行するクロージャを返す
      *
@@ -4806,8 +4810,8 @@ if (!isset($excluded_functions['delegate']) && (!function_exists('delegate') || 
     }
 }
 
-const nbind = 'nbind';
-if (!isset($excluded_functions['nbind']) && (!function_exists('nbind') || (!false && (new \ReflectionFunction('nbind'))->isInternal()))) {
+const nbind = "nbind";
+if (!isset($excluded_functions["nbind"]) && (!function_exists("nbind") || (!false && (new \ReflectionFunction("nbind"))->isInternal()))) {
     /**
      * $callable の指定位置に引数を束縛したクロージャを返す
      *
@@ -4830,8 +4834,8 @@ if (!isset($excluded_functions['nbind']) && (!function_exists('nbind') || (!fals
     }
 }
 
-const lbind = 'lbind';
-if (!isset($excluded_functions['lbind']) && (!function_exists('lbind') || (!false && (new \ReflectionFunction('lbind'))->isInternal()))) {
+const lbind = "lbind";
+if (!isset($excluded_functions["lbind"]) && (!function_exists("lbind") || (!false && (new \ReflectionFunction("lbind"))->isInternal()))) {
     /**
      * $callable の最左に引数を束縛した callable を返す
      *
@@ -4851,8 +4855,8 @@ if (!isset($excluded_functions['lbind']) && (!function_exists('lbind') || (!fals
     }
 }
 
-const rbind = 'rbind';
-if (!isset($excluded_functions['rbind']) && (!function_exists('rbind') || (!false && (new \ReflectionFunction('rbind'))->isInternal()))) {
+const rbind = "rbind";
+if (!isset($excluded_functions["rbind"]) && (!function_exists("rbind") || (!false && (new \ReflectionFunction("rbind"))->isInternal()))) {
     /**
      * $callable の最右に引数を束縛した callable を返す
      *
@@ -4872,8 +4876,8 @@ if (!isset($excluded_functions['rbind']) && (!function_exists('rbind') || (!fals
     }
 }
 
-const composite = 'composite';
-if (!isset($excluded_functions['composite']) && (!function_exists('composite') || (!false && (new \ReflectionFunction('composite'))->isInternal()))) {
+const composite = "composite";
+if (!isset($excluded_functions["composite"]) && (!function_exists("composite") || (!false && (new \ReflectionFunction("composite"))->isInternal()))) {
     /**
      * 合成関数を返す
      *
@@ -4945,8 +4949,8 @@ if (!isset($excluded_functions['composite']) && (!function_exists('composite') |
     }
 }
 
-const return_arg = 'return_arg';
-if (!isset($excluded_functions['return_arg']) && (!function_exists('return_arg') || (!false && (new \ReflectionFunction('return_arg'))->isInternal()))) {
+const return_arg = "return_arg";
+if (!isset($excluded_functions["return_arg"]) && (!function_exists("return_arg") || (!false && (new \ReflectionFunction("return_arg"))->isInternal()))) {
     /**
      * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
      *
@@ -4973,8 +4977,8 @@ if (!isset($excluded_functions['return_arg']) && (!function_exists('return_arg')
     }
 }
 
-const ope_func = 'ope_func';
-if (!isset($excluded_functions['ope_func']) && (!function_exists('ope_func') || (!false && (new \ReflectionFunction('ope_func'))->isInternal()))) {
+const ope_func = "ope_func";
+if (!isset($excluded_functions["ope_func"]) && (!function_exists("ope_func") || (!false && (new \ReflectionFunction("ope_func"))->isInternal()))) {
     /**
      * 演算子のクロージャを返す
      *
@@ -5042,8 +5046,8 @@ if (!isset($excluded_functions['ope_func']) && (!function_exists('ope_func') || 
     }
 }
 
-const not_func = 'not_func';
-if (!isset($excluded_functions['not_func']) && (!function_exists('not_func') || (!false && (new \ReflectionFunction('not_func'))->isInternal()))) {
+const not_func = "not_func";
+if (!isset($excluded_functions["not_func"]) && (!function_exists("not_func") || (!false && (new \ReflectionFunction("not_func"))->isInternal()))) {
     /**
      * 返り値の真偽値を逆転した新しいクロージャを返す
      *
@@ -5065,8 +5069,8 @@ if (!isset($excluded_functions['not_func']) && (!function_exists('not_func') || 
     }
 }
 
-const eval_func = 'eval_func';
-if (!isset($excluded_functions['eval_func']) && (!function_exists('eval_func') || (!false && (new \ReflectionFunction('eval_func'))->isInternal()))) {
+const eval_func = "eval_func";
+if (!isset($excluded_functions["eval_func"]) && (!function_exists("eval_func") || (!false && (new \ReflectionFunction("eval_func"))->isInternal()))) {
     /**
      * 指定コードで eval するクロージャを返す
      *
@@ -5095,8 +5099,8 @@ if (!isset($excluded_functions['eval_func']) && (!function_exists('eval_func') |
     }
 }
 
-const reflect_callable = 'reflect_callable';
-if (!isset($excluded_functions['reflect_callable']) && (!function_exists('reflect_callable') || (!false && (new \ReflectionFunction('reflect_callable'))->isInternal()))) {
+const reflect_callable = "reflect_callable";
+if (!isset($excluded_functions["reflect_callable"]) && (!function_exists("reflect_callable") || (!false && (new \ReflectionFunction("reflect_callable"))->isInternal()))) {
     /**
      * callable から ReflectionFunctionAbstract を生成する
      *
@@ -5131,8 +5135,8 @@ if (!isset($excluded_functions['reflect_callable']) && (!function_exists('reflec
     }
 }
 
-const closurize = 'closurize';
-if (!isset($excluded_functions['closurize']) && (!function_exists('closurize') || (!false && (new \ReflectionFunction('closurize'))->isInternal()))) {
+const closurize = "closurize";
+if (!isset($excluded_functions["closurize"]) && (!function_exists("closurize") || (!false && (new \ReflectionFunction("closurize"))->isInternal()))) {
     /**
      * callable を Closure に変換する
      *
@@ -5168,8 +5172,8 @@ if (!isset($excluded_functions['closurize']) && (!function_exists('closurize') |
     }
 }
 
-const callable_code = 'callable_code';
-if (!isset($excluded_functions['callable_code']) && (!function_exists('callable_code') || (!false && (new \ReflectionFunction('callable_code'))->isInternal()))) {
+const callable_code = "callable_code";
+if (!isset($excluded_functions["callable_code"]) && (!function_exists("callable_code") || (!false && (new \ReflectionFunction("callable_code"))->isInternal()))) {
     /**
      * callable のコードブロックを返す
      *
@@ -5210,8 +5214,8 @@ if (!isset($excluded_functions['callable_code']) && (!function_exists('callable_
     }
 }
 
-const call_safely = 'call_safely';
-if (!isset($excluded_functions['call_safely']) && (!function_exists('call_safely') || (!false && (new \ReflectionFunction('call_safely'))->isInternal()))) {
+const call_safely = "call_safely";
+if (!isset($excluded_functions["call_safely"]) && (!function_exists("call_safely") || (!false && (new \ReflectionFunction("call_safely"))->isInternal()))) {
     /**
      * エラーを例外に変換するブロックでコールバックを実行する
      *
@@ -5247,8 +5251,8 @@ if (!isset($excluded_functions['call_safely']) && (!function_exists('call_safely
     }
 }
 
-const ob_capture = 'ob_capture';
-if (!isset($excluded_functions['ob_capture']) && (!function_exists('ob_capture') || (!false && (new \ReflectionFunction('ob_capture'))->isInternal()))) {
+const ob_capture = "ob_capture";
+if (!isset($excluded_functions["ob_capture"]) && (!function_exists("ob_capture") || (!false && (new \ReflectionFunction("ob_capture"))->isInternal()))) {
     /**
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
      *
@@ -5274,8 +5278,8 @@ if (!isset($excluded_functions['ob_capture']) && (!function_exists('ob_capture')
     }
 }
 
-const is_bindable_closure = 'is_bindable_closure';
-if (!isset($excluded_functions['is_bindable_closure']) && (!function_exists('is_bindable_closure') || (!false && (new \ReflectionFunction('is_bindable_closure'))->isInternal()))) {
+const is_bindable_closure = "is_bindable_closure";
+if (!isset($excluded_functions["is_bindable_closure"]) && (!function_exists("is_bindable_closure") || (!false && (new \ReflectionFunction("is_bindable_closure"))->isInternal()))) {
     /**
      * $this を bind 可能なクロージャか調べる
      *
@@ -5294,8 +5298,8 @@ if (!isset($excluded_functions['is_bindable_closure']) && (!function_exists('is_
     }
 }
 
-const by_builtin = 'by_builtin';
-if (!isset($excluded_functions['by_builtin']) && (!function_exists('by_builtin') || (!false && (new \ReflectionFunction('by_builtin'))->isInternal()))) {
+const by_builtin = "by_builtin";
+if (!isset($excluded_functions["by_builtin"]) && (!function_exists("by_builtin") || (!false && (new \ReflectionFunction("by_builtin"))->isInternal()))) {
     /**
      * Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す
      *
@@ -5355,8 +5359,8 @@ if (!isset($excluded_functions['by_builtin']) && (!function_exists('by_builtin')
     }
 }
 
-const namedcallize = 'namedcallize';
-if (!isset($excluded_functions['namedcallize']) && (!function_exists('namedcallize') || (!false && (new \ReflectionFunction('namedcallize'))->isInternal()))) {
+const namedcallize = "namedcallize";
+if (!isset($excluded_functions["namedcallize"]) && (!function_exists("namedcallize") || (!false && (new \ReflectionFunction("namedcallize"))->isInternal()))) {
     /**
      * callable を名前付き引数で呼べるようにしたクロージャを返す
      *
@@ -5499,8 +5503,8 @@ if (!isset($excluded_functions['namedcallize']) && (!function_exists('namedcalli
     }
 }
 
-const parameter_length = 'parameter_length';
-if (!isset($excluded_functions['parameter_length']) && (!function_exists('parameter_length') || (!false && (new \ReflectionFunction('parameter_length'))->isInternal()))) {
+const parameter_length = "parameter_length";
+if (!isset($excluded_functions["parameter_length"]) && (!function_exists("parameter_length") || (!false && (new \ReflectionFunction("parameter_length"))->isInternal()))) {
     /**
      * callable の引数の数を返す
      *
@@ -5555,8 +5559,8 @@ if (!isset($excluded_functions['parameter_length']) && (!function_exists('parame
     }
 }
 
-const function_shorten = 'function_shorten';
-if (!isset($excluded_functions['function_shorten']) && (!function_exists('function_shorten') || (!false && (new \ReflectionFunction('function_shorten'))->isInternal()))) {
+const function_shorten = "function_shorten";
+if (!isset($excluded_functions["function_shorten"]) && (!function_exists("function_shorten") || (!false && (new \ReflectionFunction("function_shorten"))->isInternal()))) {
     /**
      * 関数の名前空間部分を除いた短い名前を取得する
      *
@@ -5570,8 +5574,8 @@ if (!isset($excluded_functions['function_shorten']) && (!function_exists('functi
     }
 }
 
-const func_user_func_array = 'func_user_func_array';
-if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('func_user_func_array') || (!false && (new \ReflectionFunction('func_user_func_array'))->isInternal()))) {
+const func_user_func_array = "func_user_func_array";
+if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("func_user_func_array") || (!false && (new \ReflectionFunction("func_user_func_array"))->isInternal()))) {
     /**
      * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
      *
@@ -5618,8 +5622,8 @@ if (!isset($excluded_functions['func_user_func_array']) && (!function_exists('fu
     }
 }
 
-const func_method = 'func_method';
-if (!isset($excluded_functions['func_method']) && (!function_exists('func_method') || (!false && (new \ReflectionFunction('func_method'))->isInternal()))) {
+const func_method = "func_method";
+if (!isset($excluded_functions["func_method"]) && (!function_exists("func_method") || (!false && (new \ReflectionFunction("func_method"))->isInternal()))) {
     /**
      * 指定メソッドを呼び出すクロージャを返す
      *
@@ -5662,8 +5666,8 @@ if (!isset($excluded_functions['func_method']) && (!function_exists('func_method
     }
 }
 
-const function_alias = 'function_alias';
-if (!isset($excluded_functions['function_alias']) && (!function_exists('function_alias') || (!false && (new \ReflectionFunction('function_alias'))->isInternal()))) {
+const function_alias = "function_alias";
+if (!isset($excluded_functions["function_alias"]) && (!function_exists("function_alias") || (!false && (new \ReflectionFunction("function_alias"))->isInternal()))) {
     /**
      * 関数のエイリアスを作成する
      *
@@ -5755,8 +5759,8 @@ CODE;
     }
 }
 
-const minimum = 'minimum';
-if (!isset($excluded_functions['minimum']) && (!function_exists('minimum') || (!false && (new \ReflectionFunction('minimum'))->isInternal()))) {
+const minimum = "minimum";
+if (!isset($excluded_functions["minimum"]) && (!function_exists("minimum") || (!false && (new \ReflectionFunction("minimum"))->isInternal()))) {
     /**
      * 引数の最小値を返す
      *
@@ -5778,8 +5782,8 @@ if (!isset($excluded_functions['minimum']) && (!function_exists('minimum') || (!
     }
 }
 
-const maximum = 'maximum';
-if (!isset($excluded_functions['maximum']) && (!function_exists('maximum') || (!false && (new \ReflectionFunction('maximum'))->isInternal()))) {
+const maximum = "maximum";
+if (!isset($excluded_functions["maximum"]) && (!function_exists("maximum") || (!false && (new \ReflectionFunction("maximum"))->isInternal()))) {
     /**
      * 引数の最大値を返す
      *
@@ -5801,8 +5805,8 @@ if (!isset($excluded_functions['maximum']) && (!function_exists('maximum') || (!
     }
 }
 
-const mode = 'mode';
-if (!isset($excluded_functions['mode']) && (!function_exists('mode') || (!false && (new \ReflectionFunction('mode'))->isInternal()))) {
+const mode = "mode";
+if (!isset($excluded_functions["mode"]) && (!function_exists("mode") || (!false && (new \ReflectionFunction("mode"))->isInternal()))) {
     /**
      * 引数の最頻値を返す
      *
@@ -5841,8 +5845,8 @@ if (!isset($excluded_functions['mode']) && (!function_exists('mode') || (!false 
     }
 }
 
-const mean = 'mean';
-if (!isset($excluded_functions['mean']) && (!function_exists('mean') || (!false && (new \ReflectionFunction('mean'))->isInternal()))) {
+const mean = "mean";
+if (!isset($excluded_functions["mean"]) && (!function_exists("mean") || (!false && (new \ReflectionFunction("mean"))->isInternal()))) {
     /**
      * 引数の相加平均値を返す
      *
@@ -5867,8 +5871,8 @@ if (!isset($excluded_functions['mean']) && (!function_exists('mean') || (!false 
     }
 }
 
-const median = 'median';
-if (!isset($excluded_functions['median']) && (!function_exists('median') || (!false && (new \ReflectionFunction('median'))->isInternal()))) {
+const median = "median";
+if (!isset($excluded_functions["median"]) && (!function_exists("median") || (!false && (new \ReflectionFunction("median"))->isInternal()))) {
     /**
      * 引数の中央値を返す
      *
@@ -5906,8 +5910,8 @@ if (!isset($excluded_functions['median']) && (!function_exists('median') || (!fa
     }
 }
 
-const average = 'average';
-if (!isset($excluded_functions['average']) && (!function_exists('average') || (!false && (new \ReflectionFunction('average'))->isInternal()))) {
+const average = "average";
+if (!isset($excluded_functions["average"]) && (!function_exists("average") || (!false && (new \ReflectionFunction("average"))->isInternal()))) {
     /**
      * 引数の意味平均値を返す
      *
@@ -5927,8 +5931,8 @@ if (!isset($excluded_functions['average']) && (!function_exists('average') || (!
     }
 }
 
-const sum = 'sum';
-if (!isset($excluded_functions['sum']) && (!function_exists('sum') || (!false && (new \ReflectionFunction('sum'))->isInternal()))) {
+const sum = "sum";
+if (!isset($excluded_functions["sum"]) && (!function_exists("sum") || (!false && (new \ReflectionFunction("sum"))->isInternal()))) {
     /**
      * 引数の合計値を返す
      *
@@ -5952,8 +5956,8 @@ if (!isset($excluded_functions['sum']) && (!function_exists('sum') || (!false &&
     }
 }
 
-const random_at = 'random_at';
-if (!isset($excluded_functions['random_at']) && (!function_exists('random_at') || (!false && (new \ReflectionFunction('random_at'))->isInternal()))) {
+const random_at = "random_at";
+if (!isset($excluded_functions["random_at"]) && (!function_exists("random_at") || (!false && (new \ReflectionFunction("random_at"))->isInternal()))) {
     /**
      * 引数をランダムで返す
      *
@@ -5974,8 +5978,8 @@ if (!isset($excluded_functions['random_at']) && (!function_exists('random_at') |
     }
 }
 
-const probability = 'probability';
-if (!isset($excluded_functions['probability']) && (!function_exists('probability') || (!false && (new \ReflectionFunction('probability'))->isInternal()))) {
+const probability = "probability";
+if (!isset($excluded_functions["probability"]) && (!function_exists("probability") || (!false && (new \ReflectionFunction("probability"))->isInternal()))) {
     /**
      * 一定確率で true を返す
      *
@@ -6012,8 +6016,8 @@ if (!isset($excluded_functions['probability']) && (!function_exists('probability
     }
 }
 
-const getipaddress = 'getipaddress';
-if (!isset($excluded_functions['getipaddress']) && (!function_exists('getipaddress') || (!false && (new \ReflectionFunction('getipaddress'))->isInternal()))) {
+const getipaddress = "getipaddress";
+if (!isset($excluded_functions["getipaddress"]) && (!function_exists("getipaddress") || (!false && (new \ReflectionFunction("getipaddress"))->isInternal()))) {
     /**
      * 接続元となる IP を返す
      *
@@ -6045,8 +6049,8 @@ if (!isset($excluded_functions['getipaddress']) && (!function_exists('getipaddre
     }
 }
 
-const incidr = 'incidr';
-if (!isset($excluded_functions['incidr']) && (!function_exists('incidr') || (!false && (new \ReflectionFunction('incidr'))->isInternal()))) {
+const incidr = "incidr";
+if (!isset($excluded_functions["incidr"]) && (!function_exists("incidr") || (!false && (new \ReflectionFunction("incidr"))->isInternal()))) {
     /**
      * ipv4 の cidr チェック
      *
@@ -6096,8 +6100,8 @@ if (!isset($excluded_functions['incidr']) && (!function_exists('incidr') || (!fa
     }
 }
 
-const http_requests = 'http_requests';
-if (!isset($excluded_functions['http_requests']) && (!function_exists('http_requests') || (!false && (new \ReflectionFunction('http_requests'))->isInternal()))) {
+const http_requests = "http_requests";
+if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requests") || (!false && (new \ReflectionFunction("http_requests"))->isInternal()))) {
     /**
      * http リクエストを並列で投げる
      *
@@ -6224,8 +6228,8 @@ if (!isset($excluded_functions['http_requests']) && (!function_exists('http_requ
     }
 }
 
-const sql_quote = 'sql_quote';
-if (!isset($excluded_functions['sql_quote']) && (!function_exists('sql_quote') || (!false && (new \ReflectionFunction('sql_quote'))->isInternal()))) {
+const sql_quote = "sql_quote";
+if (!isset($excluded_functions["sql_quote"]) && (!function_exists("sql_quote") || (!false && (new \ReflectionFunction("sql_quote"))->isInternal()))) {
     /**
      * ものすごく雑に値をクオートする
      *
@@ -6263,8 +6267,8 @@ if (!isset($excluded_functions['sql_quote']) && (!function_exists('sql_quote') |
     }
 }
 
-const sql_bind = 'sql_bind';
-if (!isset($excluded_functions['sql_bind']) && (!function_exists('sql_bind') || (!false && (new \ReflectionFunction('sql_bind'))->isInternal()))) {
+const sql_bind = "sql_bind";
+if (!isset($excluded_functions["sql_bind"]) && (!function_exists("sql_bind") || (!false && (new \ReflectionFunction("sql_bind"))->isInternal()))) {
     /**
      * ものすごく雑に SQL に値を埋め込む
      *
@@ -6298,8 +6302,8 @@ if (!isset($excluded_functions['sql_bind']) && (!function_exists('sql_bind') || 
     }
 }
 
-const sql_format = 'sql_format';
-if (!isset($excluded_functions['sql_format']) && (!function_exists('sql_format') || (!false && (new \ReflectionFunction('sql_format'))->isInternal()))) {
+const sql_format = "sql_format";
+if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format") || (!false && (new \ReflectionFunction("sql_format"))->isInternal()))) {
     /**
      * ものすごく雑に SQL を整形する
      *
@@ -6702,8 +6706,8 @@ if (!isset($excluded_functions['sql_format']) && (!function_exists('sql_format')
     }
 }
 
-const strcat = 'strcat';
-if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (!false && (new \ReflectionFunction('strcat'))->isInternal()))) {
+const strcat = "strcat";
+if (!isset($excluded_functions["strcat"]) && (!function_exists("strcat") || (!false && (new \ReflectionFunction("strcat"))->isInternal()))) {
     /**
      * 文字列結合の関数版
      *
@@ -6721,8 +6725,8 @@ if (!isset($excluded_functions['strcat']) && (!function_exists('strcat') || (!fa
     }
 }
 
-const concat = 'concat';
-if (!isset($excluded_functions['concat']) && (!function_exists('concat') || (!false && (new \ReflectionFunction('concat'))->isInternal()))) {
+const concat = "concat";
+if (!isset($excluded_functions["concat"]) && (!function_exists("concat") || (!false && (new \ReflectionFunction("concat"))->isInternal()))) {
     /**
      * strcat の空文字回避版
      *
@@ -6753,8 +6757,8 @@ if (!isset($excluded_functions['concat']) && (!function_exists('concat') || (!fa
     }
 }
 
-const split_noempty = 'split_noempty';
-if (!isset($excluded_functions['split_noempty']) && (!function_exists('split_noempty') || (!false && (new \ReflectionFunction('split_noempty'))->isInternal()))) {
+const split_noempty = "split_noempty";
+if (!isset($excluded_functions["split_noempty"]) && (!function_exists("split_noempty") || (!false && (new \ReflectionFunction("split_noempty"))->isInternal()))) {
     /**
      * 空文字を除外する文字列分割
      *
@@ -6793,8 +6797,8 @@ if (!isset($excluded_functions['split_noempty']) && (!function_exists('split_noe
     }
 }
 
-const multiexplode = 'multiexplode';
-if (!isset($excluded_functions['multiexplode']) && (!function_exists('multiexplode') || (!false && (new \ReflectionFunction('multiexplode'))->isInternal()))) {
+const multiexplode = "multiexplode";
+if (!isset($excluded_functions["multiexplode"]) && (!function_exists("multiexplode") || (!false && (new \ReflectionFunction("multiexplode"))->isInternal()))) {
     /**
      * explode の配列対応と $limit の挙動を変えたもの
      *
@@ -6834,8 +6838,8 @@ if (!isset($excluded_functions['multiexplode']) && (!function_exists('multiexplo
     }
 }
 
-const quoteexplode = 'quoteexplode';
-if (!isset($excluded_functions['quoteexplode']) && (!function_exists('quoteexplode') || (!false && (new \ReflectionFunction('quoteexplode'))->isInternal()))) {
+const quoteexplode = "quoteexplode";
+if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplode") || (!false && (new \ReflectionFunction("quoteexplode"))->isInternal()))) {
     /**
      * エスケープやクオートに対応した explode
      *
@@ -6908,8 +6912,8 @@ if (!isset($excluded_functions['quoteexplode']) && (!function_exists('quoteexplo
     }
 }
 
-const str_equals = 'str_equals';
-if (!isset($excluded_functions['str_equals']) && (!function_exists('str_equals') || (!false && (new \ReflectionFunction('str_equals'))->isInternal()))) {
+const str_equals = "str_equals";
+if (!isset($excluded_functions["str_equals"]) && (!function_exists("str_equals") || (!false && (new \ReflectionFunction("str_equals"))->isInternal()))) {
     /**
      * 文字列比較の関数版
      *
@@ -6950,8 +6954,8 @@ if (!isset($excluded_functions['str_equals']) && (!function_exists('str_equals')
     }
 }
 
-const str_contains = 'str_contains';
-if (!isset($excluded_functions['str_contains']) && (!function_exists('str_contains') || (!false && (new \ReflectionFunction('str_contains'))->isInternal()))) {
+const str_contains = "str_contains";
+if (!isset($excluded_functions["str_contains"]) && (!function_exists("str_contains") || (!false && (new \ReflectionFunction("str_contains"))->isInternal()))) {
     /**
      * 指定文字列を含むか返す
      *
@@ -6995,8 +6999,8 @@ if (!isset($excluded_functions['str_contains']) && (!function_exists('str_contai
     }
 }
 
-const str_chop = 'str_chop';
-if (!isset($excluded_functions['str_chop']) && (!function_exists('str_chop') || (!false && (new \ReflectionFunction('str_chop'))->isInternal()))) {
+const str_chop = "str_chop";
+if (!isset($excluded_functions["str_chop"]) && (!function_exists("str_chop") || (!false && (new \ReflectionFunction("str_chop"))->isInternal()))) {
     /**
      * 先頭・末尾の指定文字列を削ぎ落とす
      *
@@ -7027,8 +7031,8 @@ if (!isset($excluded_functions['str_chop']) && (!function_exists('str_chop') || 
     }
 }
 
-const str_lchop = 'str_lchop';
-if (!isset($excluded_functions['str_lchop']) && (!function_exists('str_lchop') || (!false && (new \ReflectionFunction('str_lchop'))->isInternal()))) {
+const str_lchop = "str_lchop";
+if (!isset($excluded_functions["str_lchop"]) && (!function_exists("str_lchop") || (!false && (new \ReflectionFunction("str_lchop"))->isInternal()))) {
     /**
      * 先頭の指定文字列を削ぎ落とす
      *
@@ -7050,8 +7054,8 @@ if (!isset($excluded_functions['str_lchop']) && (!function_exists('str_lchop') |
     }
 }
 
-const str_rchop = 'str_rchop';
-if (!isset($excluded_functions['str_rchop']) && (!function_exists('str_rchop') || (!false && (new \ReflectionFunction('str_rchop'))->isInternal()))) {
+const str_rchop = "str_rchop";
+if (!isset($excluded_functions["str_rchop"]) && (!function_exists("str_rchop") || (!false && (new \ReflectionFunction("str_rchop"))->isInternal()))) {
     /**
      * 末尾の指定文字列を削ぎ落とす
      *
@@ -7073,8 +7077,8 @@ if (!isset($excluded_functions['str_rchop']) && (!function_exists('str_rchop') |
     }
 }
 
-const str_putcsv = 'str_putcsv';
-if (!isset($excluded_functions['str_putcsv']) && (!function_exists('str_putcsv') || (!false && (new \ReflectionFunction('str_putcsv'))->isInternal()))) {
+const str_putcsv = "str_putcsv";
+if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("str_putcsv") || (!false && (new \ReflectionFunction("str_putcsv"))->isInternal()))) {
     /**
      * fputcsv の文字列版（str_getcsv の put 版）
      *
@@ -7125,8 +7129,8 @@ if (!isset($excluded_functions['str_putcsv']) && (!function_exists('str_putcsv')
     }
 }
 
-const str_subreplace = 'str_subreplace';
-if (!isset($excluded_functions['str_subreplace']) && (!function_exists('str_subreplace') || (!false && (new \ReflectionFunction('str_subreplace'))->isInternal()))) {
+const str_subreplace = "str_subreplace";
+if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("str_subreplace") || (!false && (new \ReflectionFunction("str_subreplace"))->isInternal()))) {
     /**
      * 指定文字列を置換する
      *
@@ -7204,8 +7208,8 @@ if (!isset($excluded_functions['str_subreplace']) && (!function_exists('str_subr
     }
 }
 
-const str_between = 'str_between';
-if (!isset($excluded_functions['str_between']) && (!function_exists('str_between') || (!false && (new \ReflectionFunction('str_between'))->isInternal()))) {
+const str_between = "str_between";
+if (!isset($excluded_functions["str_between"]) && (!function_exists("str_between") || (!false && (new \ReflectionFunction("str_between"))->isInternal()))) {
     /**
      * 指定文字で囲まれた文字列を取得する
      *
@@ -7281,8 +7285,8 @@ if (!isset($excluded_functions['str_between']) && (!function_exists('str_between
     }
 }
 
-const starts_with = 'starts_with';
-if (!isset($excluded_functions['starts_with']) && (!function_exists('starts_with') || (!false && (new \ReflectionFunction('starts_with'))->isInternal()))) {
+const starts_with = "starts_with";
+if (!isset($excluded_functions["starts_with"]) && (!function_exists("starts_with") || (!false && (new \ReflectionFunction("starts_with"))->isInternal()))) {
     /**
      * 指定文字列で始まるか調べる
      *
@@ -7318,8 +7322,8 @@ if (!isset($excluded_functions['starts_with']) && (!function_exists('starts_with
     }
 }
 
-const ends_with = 'ends_with';
-if (!isset($excluded_functions['ends_with']) && (!function_exists('ends_with') || (!false && (new \ReflectionFunction('ends_with'))->isInternal()))) {
+const ends_with = "ends_with";
+if (!isset($excluded_functions["ends_with"]) && (!function_exists("ends_with") || (!false && (new \ReflectionFunction("ends_with"))->isInternal()))) {
     /**
      * 指定文字列で終わるか調べる
      *
@@ -7355,8 +7359,8 @@ if (!isset($excluded_functions['ends_with']) && (!function_exists('ends_with') |
     }
 }
 
-const camel_case = 'camel_case';
-if (!isset($excluded_functions['camel_case']) && (!function_exists('camel_case') || (!false && (new \ReflectionFunction('camel_case'))->isInternal()))) {
+const camel_case = "camel_case";
+if (!isset($excluded_functions["camel_case"]) && (!function_exists("camel_case") || (!false && (new \ReflectionFunction("camel_case"))->isInternal()))) {
     /**
      * camelCase に変換する
      *
@@ -7375,8 +7379,8 @@ if (!isset($excluded_functions['camel_case']) && (!function_exists('camel_case')
     }
 }
 
-const pascal_case = 'pascal_case';
-if (!isset($excluded_functions['pascal_case']) && (!function_exists('pascal_case') || (!false && (new \ReflectionFunction('pascal_case'))->isInternal()))) {
+const pascal_case = "pascal_case";
+if (!isset($excluded_functions["pascal_case"]) && (!function_exists("pascal_case") || (!false && (new \ReflectionFunction("pascal_case"))->isInternal()))) {
     /**
      * PascalCase に変換する
      *
@@ -7395,8 +7399,8 @@ if (!isset($excluded_functions['pascal_case']) && (!function_exists('pascal_case
     }
 }
 
-const snake_case = 'snake_case';
-if (!isset($excluded_functions['snake_case']) && (!function_exists('snake_case') || (!false && (new \ReflectionFunction('snake_case'))->isInternal()))) {
+const snake_case = "snake_case";
+if (!isset($excluded_functions["snake_case"]) && (!function_exists("snake_case") || (!false && (new \ReflectionFunction("snake_case"))->isInternal()))) {
     /**
      * snake_case に変換する
      *
@@ -7415,8 +7419,8 @@ if (!isset($excluded_functions['snake_case']) && (!function_exists('snake_case')
     }
 }
 
-const chain_case = 'chain_case';
-if (!isset($excluded_functions['chain_case']) && (!function_exists('chain_case') || (!false && (new \ReflectionFunction('chain_case'))->isInternal()))) {
+const chain_case = "chain_case";
+if (!isset($excluded_functions["chain_case"]) && (!function_exists("chain_case") || (!false && (new \ReflectionFunction("chain_case"))->isInternal()))) {
     /**
      * chain-case に変換する
      *
@@ -7435,8 +7439,8 @@ if (!isset($excluded_functions['chain_case']) && (!function_exists('chain_case')
     }
 }
 
-const htmltag = 'htmltag';
-if (!isset($excluded_functions['htmltag']) && (!function_exists('htmltag') || (!false && (new \ReflectionFunction('htmltag'))->isInternal()))) {
+const htmltag = "htmltag";
+if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!false && (new \ReflectionFunction("htmltag"))->isInternal()))) {
     /**
      * css セレクタから html 文字列を生成する
      *
@@ -7597,8 +7601,8 @@ if (!isset($excluded_functions['htmltag']) && (!function_exists('htmltag') || (!
     }
 }
 
-const build_uri = 'build_uri';
-if (!isset($excluded_functions['build_uri']) && (!function_exists('build_uri') || (!false && (new \ReflectionFunction('build_uri'))->isInternal()))) {
+const build_uri = "build_uri";
+if (!isset($excluded_functions["build_uri"]) && (!function_exists("build_uri") || (!false && (new \ReflectionFunction("build_uri"))->isInternal()))) {
     /**
      * parse_uri の逆
      *
@@ -7660,8 +7664,8 @@ if (!isset($excluded_functions['build_uri']) && (!function_exists('build_uri') |
     }
 }
 
-const parse_uri = 'parse_uri';
-if (!isset($excluded_functions['parse_uri']) && (!function_exists('parse_uri') || (!false && (new \ReflectionFunction('parse_uri'))->isInternal()))) {
+const parse_uri = "parse_uri";
+if (!isset($excluded_functions["parse_uri"]) && (!function_exists("parse_uri") || (!false && (new \ReflectionFunction("parse_uri"))->isInternal()))) {
     /**
      * parse_url の仕様を少しいじったもの
      *
@@ -7753,8 +7757,8 @@ if (!isset($excluded_functions['parse_uri']) && (!function_exists('parse_uri') |
     }
 }
 
-const ini_export = 'ini_export';
-if (!isset($excluded_functions['ini_export']) && (!function_exists('ini_export') || (!false && (new \ReflectionFunction('ini_export'))->isInternal()))) {
+const ini_export = "ini_export";
+if (!isset($excluded_functions["ini_export"]) && (!function_exists("ini_export") || (!false && (new \ReflectionFunction("ini_export"))->isInternal()))) {
     /**
      * 連想配列を INI 的文字列に変換する
      *
@@ -7801,8 +7805,8 @@ if (!isset($excluded_functions['ini_export']) && (!function_exists('ini_export')
     }
 }
 
-const ini_import = 'ini_import';
-if (!isset($excluded_functions['ini_import']) && (!function_exists('ini_import') || (!false && (new \ReflectionFunction('ini_import'))->isInternal()))) {
+const ini_import = "ini_import";
+if (!isset($excluded_functions["ini_import"]) && (!function_exists("ini_import") || (!false && (new \ReflectionFunction("ini_import"))->isInternal()))) {
     /**
      * INI 的文字列を連想配列に変換する
      *
@@ -7830,8 +7834,8 @@ if (!isset($excluded_functions['ini_import']) && (!function_exists('ini_import')
     }
 }
 
-const csv_export = 'csv_export';
-if (!isset($excluded_functions['csv_export']) && (!function_exists('csv_export') || (!false && (new \ReflectionFunction('csv_export'))->isInternal()))) {
+const csv_export = "csv_export";
+if (!isset($excluded_functions["csv_export"]) && (!function_exists("csv_export") || (!false && (new \ReflectionFunction("csv_export"))->isInternal()))) {
     /**
      * 連想配列の配列を CSV 的文字列に変換する
      *
@@ -7916,8 +7920,8 @@ if (!isset($excluded_functions['csv_export']) && (!function_exists('csv_export')
     }
 }
 
-const csv_import = 'csv_import';
-if (!isset($excluded_functions['csv_import']) && (!function_exists('csv_import') || (!false && (new \ReflectionFunction('csv_import'))->isInternal()))) {
+const csv_import = "csv_import";
+if (!isset($excluded_functions["csv_import"]) && (!function_exists("csv_import") || (!false && (new \ReflectionFunction("csv_import"))->isInternal()))) {
     /**
      * CSV 的文字列を連想配列の配列に変換する
      *
@@ -8004,8 +8008,8 @@ if (!isset($excluded_functions['csv_import']) && (!function_exists('csv_import')
     }
 }
 
-const json_export = 'json_export';
-if (!isset($excluded_functions['json_export']) && (!function_exists('json_export') || (!false && (new \ReflectionFunction('json_export'))->isInternal()))) {
+const json_export = "json_export";
+if (!isset($excluded_functions["json_export"]) && (!function_exists("json_export") || (!false && (new \ReflectionFunction("json_export"))->isInternal()))) {
     /**
      * json_encode のプロキシ関数
      *
@@ -8048,8 +8052,8 @@ if (!isset($excluded_functions['json_export']) && (!function_exists('json_export
     }
 }
 
-const json_import = 'json_import';
-if (!isset($excluded_functions['json_import']) && (!function_exists('json_import') || (!false && (new \ReflectionFunction('json_import'))->isInternal()))) {
+const json_import = "json_import";
+if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import") || (!false && (new \ReflectionFunction("json_import"))->isInternal()))) {
     /**
      * json_decode のプロキシ関数
      *
@@ -8080,9 +8084,7 @@ if (!isset($excluded_functions['json_import']) && (!function_exists('json_import
             json_encode(null);
         }
 
-        // The second option is JSON_OBJECT_AS_ARRAY that has the same effect as setting assoc to TRUE
-        // とあるが、 null を指定しないと効いてくれないっぽい
-        $result = json_decode($value, null, $depth, $option);
+        $result = json_decode($value, $options[JSON_OBJECT_AS_ARRAY], $depth, $option);
 
         // エラーが出ていたら例外に変換
         if (json_last_error()) {
@@ -8093,8 +8095,8 @@ if (!isset($excluded_functions['json_import']) && (!function_exists('json_import
     }
 }
 
-const markdown_table = 'markdown_table';
-if (!isset($excluded_functions['markdown_table']) && (!function_exists('markdown_table') || (!false && (new \ReflectionFunction('markdown_table'))->isInternal()))) {
+const markdown_table = "markdown_table";
+if (!isset($excluded_functions["markdown_table"]) && (!function_exists("markdown_table") || (!false && (new \ReflectionFunction("markdown_table"))->isInternal()))) {
     /**
      * 連想配列の配列を markdown テーブル文字列にする
      *
@@ -8164,8 +8166,8 @@ if (!isset($excluded_functions['markdown_table']) && (!function_exists('markdown
     }
 }
 
-const random_string = 'random_string';
-if (!isset($excluded_functions['random_string']) && (!function_exists('random_string') || (!false && (new \ReflectionFunction('random_string'))->isInternal()))) {
+const random_string = "random_string";
+if (!isset($excluded_functions["random_string"]) && (!function_exists("random_string") || (!false && (new \ReflectionFunction("random_string"))->isInternal()))) {
     /**
      * 安全な乱数文字列を生成する
      *
@@ -8195,8 +8197,8 @@ if (!isset($excluded_functions['random_string']) && (!function_exists('random_st
     }
 }
 
-const kvsprintf = 'kvsprintf';
-if (!isset($excluded_functions['kvsprintf']) && (!function_exists('kvsprintf') || (!false && (new \ReflectionFunction('kvsprintf'))->isInternal()))) {
+const kvsprintf = "kvsprintf";
+if (!isset($excluded_functions["kvsprintf"]) && (!function_exists("kvsprintf") || (!false && (new \ReflectionFunction("kvsprintf"))->isInternal()))) {
     /**
      * 連想配列を指定できるようにした vsprintf
      *
@@ -8234,8 +8236,8 @@ if (!isset($excluded_functions['kvsprintf']) && (!function_exists('kvsprintf') |
     }
 }
 
-const preg_capture = 'preg_capture';
-if (!isset($excluded_functions['preg_capture']) && (!function_exists('preg_capture') || (!false && (new \ReflectionFunction('preg_capture'))->isInternal()))) {
+const preg_capture = "preg_capture";
+if (!isset($excluded_functions["preg_capture"]) && (!function_exists("preg_capture") || (!false && (new \ReflectionFunction("preg_capture"))->isInternal()))) {
     /**
      * キャプチャを主軸においた preg_match
      *
@@ -8276,8 +8278,8 @@ if (!isset($excluded_functions['preg_capture']) && (!function_exists('preg_captu
     }
 }
 
-const preg_splice = 'preg_splice';
-if (!isset($excluded_functions['preg_splice']) && (!function_exists('preg_splice') || (!false && (new \ReflectionFunction('preg_splice'))->isInternal()))) {
+const preg_splice = "preg_splice";
+if (!isset($excluded_functions["preg_splice"]) && (!function_exists("preg_splice") || (!false && (new \ReflectionFunction("preg_splice"))->isInternal()))) {
     /**
      * キャプチャも行える preg_replace
      *
@@ -8322,8 +8324,8 @@ if (!isset($excluded_functions['preg_splice']) && (!function_exists('preg_splice
     }
 }
 
-const preg_replaces = 'preg_replaces';
-if (!isset($excluded_functions['preg_replaces']) && (!function_exists('preg_replaces') || (!false && (new \ReflectionFunction('preg_replaces'))->isInternal()))) {
+const preg_replaces = "preg_replaces";
+if (!isset($excluded_functions["preg_replaces"]) && (!function_exists("preg_replaces") || (!false && (new \ReflectionFunction("preg_replaces"))->isInternal()))) {
     /**
      * パターン番号を指定して preg_replace する
      *
@@ -8390,8 +8392,8 @@ if (!isset($excluded_functions['preg_replaces']) && (!function_exists('preg_repl
     }
 }
 
-const damerau_levenshtein = 'damerau_levenshtein';
-if (!isset($excluded_functions['damerau_levenshtein']) && (!function_exists('damerau_levenshtein') || (!false && (new \ReflectionFunction('damerau_levenshtein'))->isInternal()))) {
+const damerau_levenshtein = "damerau_levenshtein";
+if (!isset($excluded_functions["damerau_levenshtein"]) && (!function_exists("damerau_levenshtein") || (!false && (new \ReflectionFunction("damerau_levenshtein"))->isInternal()))) {
     /**
      * Damerau–Levenshtein 距離を返す
      *
@@ -8470,8 +8472,8 @@ if (!isset($excluded_functions['damerau_levenshtein']) && (!function_exists('dam
     }
 }
 
-const str_guess = 'str_guess';
-if (!isset($excluded_functions['str_guess']) && (!function_exists('str_guess') || (!false && (new \ReflectionFunction('str_guess'))->isInternal()))) {
+const str_guess = "str_guess";
+if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") || (!false && (new \ReflectionFunction("str_guess"))->isInternal()))) {
     /**
      * $string に最も近い文字列を返す
      *
@@ -8527,8 +8529,8 @@ if (!isset($excluded_functions['str_guess']) && (!function_exists('str_guess') |
     }
 }
 
-const render_string = 'render_string';
-if (!isset($excluded_functions['render_string']) && (!function_exists('render_string') || (!false && (new \ReflectionFunction('render_string'))->isInternal()))) {
+const render_string = "render_string";
+if (!isset($excluded_functions["render_string"]) && (!function_exists("render_string") || (!false && (new \ReflectionFunction("render_string"))->isInternal()))) {
     /**
      * "hoge {$hoge}" 形式のレンダリング
      *
@@ -8602,8 +8604,8 @@ if (!isset($excluded_functions['render_string']) && (!function_exists('render_st
     }
 }
 
-const render_file = 'render_file';
-if (!isset($excluded_functions['render_file']) && (!function_exists('render_file') || (!false && (new \ReflectionFunction('render_file'))->isInternal()))) {
+const render_file = "render_file";
+if (!isset($excluded_functions["render_file"]) && (!function_exists("render_file") || (!false && (new \ReflectionFunction("render_file"))->isInternal()))) {
     /**
      * "hoge {$hoge}" 形式のレンダリングのファイル版
      *
@@ -8619,8 +8621,8 @@ if (!isset($excluded_functions['render_file']) && (!function_exists('render_file
     }
 }
 
-const parse_php = 'parse_php';
-if (!isset($excluded_functions['parse_php']) && (!function_exists('parse_php') || (!false && (new \ReflectionFunction('parse_php'))->isInternal()))) {
+const parse_php = "parse_php";
+if (!isset($excluded_functions["parse_php"]) && (!function_exists("parse_php") || (!false && (new \ReflectionFunction("parse_php"))->isInternal()))) {
     /**
      * php のコード断片をパースする
      *
@@ -8735,8 +8737,8 @@ if (!isset($excluded_functions['parse_php']) && (!function_exists('parse_php') |
     }
 }
 
-const returns = 'returns';
-if (!isset($excluded_functions['returns']) && (!function_exists('returns') || (!false && (new \ReflectionFunction('returns'))->isInternal()))) {
+const returns = "returns";
+if (!isset($excluded_functions["returns"]) && (!function_exists("returns") || (!false && (new \ReflectionFunction("returns"))->isInternal()))) {
     /**
      * 引数をそのまま返す
      *
@@ -8757,8 +8759,8 @@ if (!isset($excluded_functions['returns']) && (!function_exists('returns') || (!
     }
 }
 
-const optional = 'optional';
-if (!isset($excluded_functions['optional']) && (!function_exists('optional') || (!false && (new \ReflectionFunction('optional'))->isInternal()))) {
+const optional = "optional";
+if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || (!false && (new \ReflectionFunction("optional"))->isInternal()))) {
     /**
      * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
      *
@@ -8829,8 +8831,8 @@ if (!isset($excluded_functions['optional']) && (!function_exists('optional') || 
     }
 }
 
-const chain = 'chain';
-if (!isset($excluded_functions['chain']) && (!function_exists('chain') || (!false && (new \ReflectionFunction('chain'))->isInternal()))) {
+const chain = "chain";
+if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!false && (new \ReflectionFunction("chain"))->isInternal()))) {
     /**
      * 関数をメソッドチェーンできるオブジェクトを返す
      *
@@ -9021,8 +9023,8 @@ if (!isset($excluded_functions['chain']) && (!function_exists('chain') || (!fals
     }
 }
 
-const throws = 'throws';
-if (!isset($excluded_functions['throws']) && (!function_exists('throws') || (!false && (new \ReflectionFunction('throws'))->isInternal()))) {
+const throws = "throws";
+if (!isset($excluded_functions["throws"]) && (!function_exists("throws") || (!false && (new \ReflectionFunction("throws"))->isInternal()))) {
     /**
      * throw の関数版
      *
@@ -9046,8 +9048,8 @@ if (!isset($excluded_functions['throws']) && (!function_exists('throws') || (!fa
     }
 }
 
-const throw_if = 'throw_if';
-if (!isset($excluded_functions['throw_if']) && (!function_exists('throw_if') || (!false && (new \ReflectionFunction('throw_if'))->isInternal()))) {
+const throw_if = "throw_if";
+if (!isset($excluded_functions["throw_if"]) && (!function_exists("throw_if") || (!false && (new \ReflectionFunction("throw_if"))->isInternal()))) {
     /**
      * 条件付き throw
      *
@@ -9078,8 +9080,8 @@ if (!isset($excluded_functions['throw_if']) && (!function_exists('throw_if') || 
     }
 }
 
-const ifelse = 'ifelse';
-if (!isset($excluded_functions['ifelse']) && (!function_exists('ifelse') || (!false && (new \ReflectionFunction('ifelse'))->isInternal()))) {
+const ifelse = "ifelse";
+if (!isset($excluded_functions["ifelse"]) && (!function_exists("ifelse") || (!false && (new \ReflectionFunction("ifelse"))->isInternal()))) {
     /**
      * if ～ else 構文の関数版
      *
@@ -9121,8 +9123,8 @@ if (!isset($excluded_functions['ifelse']) && (!function_exists('ifelse') || (!fa
     }
 }
 
-const try_catch = 'try_catch';
-if (!isset($excluded_functions['try_catch']) && (!function_exists('try_catch') || (!false && (new \ReflectionFunction('try_catch'))->isInternal()))) {
+const try_catch = "try_catch";
+if (!isset($excluded_functions["try_catch"]) && (!function_exists("try_catch") || (!false && (new \ReflectionFunction("try_catch"))->isInternal()))) {
     /**
      * try ～ catch 構文の関数版
      *
@@ -9149,8 +9151,8 @@ if (!isset($excluded_functions['try_catch']) && (!function_exists('try_catch') |
     }
 }
 
-const try_finally = 'try_finally';
-if (!isset($excluded_functions['try_finally']) && (!function_exists('try_finally') || (!false && (new \ReflectionFunction('try_finally'))->isInternal()))) {
+const try_finally = "try_finally";
+if (!isset($excluded_functions["try_finally"]) && (!function_exists("try_finally") || (!false && (new \ReflectionFunction("try_finally"))->isInternal()))) {
     /**
      * try ～ finally 構文の関数版
      *
@@ -9181,8 +9183,8 @@ if (!isset($excluded_functions['try_finally']) && (!function_exists('try_finally
     }
 }
 
-const try_catch_finally = 'try_catch_finally';
-if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_catch_finally') || (!false && (new \ReflectionFunction('try_catch_finally'))->isInternal()))) {
+const try_catch_finally = "try_catch_finally";
+if (!isset($excluded_functions["try_catch_finally"]) && (!function_exists("try_catch_finally") || (!false && (new \ReflectionFunction("try_catch_finally"))->isInternal()))) {
     /**
      * try ～ catch ～ finally 構文の関数版
      *
@@ -9233,8 +9235,8 @@ if (!isset($excluded_functions['try_catch_finally']) && (!function_exists('try_c
     }
 }
 
-const get_uploaded_files = 'get_uploaded_files';
-if (!isset($excluded_functions['get_uploaded_files']) && (!function_exists('get_uploaded_files') || (!false && (new \ReflectionFunction('get_uploaded_files'))->isInternal()))) {
+const get_uploaded_files = "get_uploaded_files";
+if (!isset($excluded_functions["get_uploaded_files"]) && (!function_exists("get_uploaded_files") || (!false && (new \ReflectionFunction("get_uploaded_files"))->isInternal()))) {
     /**
      * $_FILES の構造を組み替えて $_POST などと同じにする
      *
@@ -9261,8 +9263,8 @@ if (!isset($excluded_functions['get_uploaded_files']) && (!function_exists('get_
     }
 }
 
-const cache = 'cache';
-if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (!false && (new \ReflectionFunction('cache'))->isInternal()))) {
+const cache = "cache";
+if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!false && (new \ReflectionFunction("cache"))->isInternal()))) {
     /**
      * シンプルにキャッシュする
      *
@@ -9323,8 +9325,8 @@ if (!isset($excluded_functions['cache']) && (!function_exists('cache') || (!fals
     }
 }
 
-const process = 'process';
-if (!isset($excluded_functions['process']) && (!function_exists('process') || (!false && (new \ReflectionFunction('process'))->isInternal()))) {
+const process = "process";
+if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!false && (new \ReflectionFunction("process"))->isInternal()))) {
     /**
      * proc_open ～ proc_close の一連の処理を行う
      *
@@ -9420,8 +9422,8 @@ if (!isset($excluded_functions['process']) && (!function_exists('process') || (!
     }
 }
 
-const arguments = 'arguments';
-if (!isset($excluded_functions['arguments']) && (!function_exists('arguments') || (!false && (new \ReflectionFunction('arguments'))->isInternal()))) {
+const arguments = "arguments";
+if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") || (!false && (new \ReflectionFunction("arguments"))->isInternal()))) {
     /**
      * コマンドライン引数をパースして引数とオプションを返す
      *
@@ -9565,8 +9567,8 @@ if (!isset($excluded_functions['arguments']) && (!function_exists('arguments') |
     }
 }
 
-const stacktrace = 'stacktrace';
-if (!isset($excluded_functions['stacktrace']) && (!function_exists('stacktrace') || (!false && (new \ReflectionFunction('stacktrace'))->isInternal()))) {
+const stacktrace = "stacktrace";
+if (!isset($excluded_functions["stacktrace"]) && (!function_exists("stacktrace") || (!false && (new \ReflectionFunction("stacktrace"))->isInternal()))) {
     /**
      * スタックトレースを文字列で返す
      *
@@ -9670,8 +9672,8 @@ if (!isset($excluded_functions['stacktrace']) && (!function_exists('stacktrace')
     }
 }
 
-const backtrace = 'backtrace';
-if (!isset($excluded_functions['backtrace']) && (!function_exists('backtrace') || (!false && (new \ReflectionFunction('backtrace'))->isInternal()))) {
+const backtrace = "backtrace";
+if (!isset($excluded_functions["backtrace"]) && (!function_exists("backtrace") || (!false && (new \ReflectionFunction("backtrace"))->isInternal()))) {
     /**
      * 特定条件までのバックトレースを取得する
      *
@@ -9732,8 +9734,8 @@ if (!isset($excluded_functions['backtrace']) && (!function_exists('backtrace') |
     }
 }
 
-const error = 'error';
-if (!isset($excluded_functions['error']) && (!function_exists('error') || (!false && (new \ReflectionFunction('error'))->isInternal()))) {
+const error = "error";
+if (!isset($excluded_functions["error"]) && (!function_exists("error") || (!false && (new \ReflectionFunction("error"))->isInternal()))) {
     /**
      * エラー出力する
      *
@@ -9796,8 +9798,8 @@ if (!isset($excluded_functions['error']) && (!function_exists('error') || (!fals
     }
 }
 
-const timer = 'timer';
-if (!isset($excluded_functions['timer']) && (!function_exists('timer') || (!false && (new \ReflectionFunction('timer'))->isInternal()))) {
+const timer = "timer";
+if (!isset($excluded_functions["timer"]) && (!function_exists("timer") || (!false && (new \ReflectionFunction("timer"))->isInternal()))) {
     /**
      * 処理時間を計測する
      *
@@ -9828,8 +9830,8 @@ if (!isset($excluded_functions['timer']) && (!function_exists('timer') || (!fals
     }
 }
 
-const benchmark = 'benchmark';
-if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') || (!false && (new \ReflectionFunction('benchmark'))->isInternal()))) {
+const benchmark = "benchmark";
+if (!isset($excluded_functions["benchmark"]) && (!function_exists("benchmark") || (!false && (new \ReflectionFunction("benchmark"))->isInternal()))) {
     /**
      * 簡易ベンチマークを取る
      *
@@ -9944,8 +9946,8 @@ if (!isset($excluded_functions['benchmark']) && (!function_exists('benchmark') |
     }
 }
 
-const stringify = 'stringify';
-if (!isset($excluded_functions['stringify']) && (!function_exists('stringify') || (!false && (new \ReflectionFunction('stringify'))->isInternal()))) {
+const stringify = "stringify";
+if (!isset($excluded_functions["stringify"]) && (!function_exists("stringify") || (!false && (new \ReflectionFunction("stringify"))->isInternal()))) {
     /**
      * 値を何とかして文字列化する
      *
@@ -9982,8 +9984,8 @@ if (!isset($excluded_functions['stringify']) && (!function_exists('stringify') |
     }
 }
 
-const numberify = 'numberify';
-if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') || (!false && (new \ReflectionFunction('numberify'))->isInternal()))) {
+const numberify = "numberify";
+if (!isset($excluded_functions["numberify"]) && (!function_exists("numberify") || (!false && (new \ReflectionFunction("numberify"))->isInternal()))) {
     /**
      * 値を何とかして数値化する
      *
@@ -10060,8 +10062,8 @@ if (!isset($excluded_functions['numberify']) && (!function_exists('numberify') |
     }
 }
 
-const numval = 'numval';
-if (!isset($excluded_functions['numval']) && (!function_exists('numval') || (!false && (new \ReflectionFunction('numval'))->isInternal()))) {
+const numval = "numval";
+if (!isset($excluded_functions["numval"]) && (!function_exists("numval") || (!false && (new \ReflectionFunction("numval"))->isInternal()))) {
     /**
      * 値を数値化する
      *
@@ -10095,8 +10097,8 @@ if (!isset($excluded_functions['numval']) && (!function_exists('numval') || (!fa
     }
 }
 
-const arrayval = 'arrayval';
-if (!isset($excluded_functions['arrayval']) && (!function_exists('arrayval') || (!false && (new \ReflectionFunction('arrayval'))->isInternal()))) {
+const arrayval = "arrayval";
+if (!isset($excluded_functions["arrayval"]) && (!function_exists("arrayval") || (!false && (new \ReflectionFunction("arrayval"))->isInternal()))) {
     /**
      * array キャストの関数版
      *
@@ -10147,8 +10149,8 @@ if (!isset($excluded_functions['arrayval']) && (!function_exists('arrayval') || 
     }
 }
 
-const si_prefix = 'si_prefix';
-if (!isset($excluded_functions['si_prefix']) && (!function_exists('si_prefix') || (!false && (new \ReflectionFunction('si_prefix'))->isInternal()))) {
+const si_prefix = "si_prefix";
+if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") || (!false && (new \ReflectionFunction("si_prefix"))->isInternal()))) {
     /**
      * 数値に SI 接頭辞を付与する
      *
@@ -10241,8 +10243,8 @@ if (!isset($excluded_functions['si_prefix']) && (!function_exists('si_prefix') |
     }
 }
 
-const si_unprefix = 'si_unprefix';
-if (!isset($excluded_functions['si_unprefix']) && (!function_exists('si_unprefix') || (!false && (new \ReflectionFunction('si_unprefix'))->isInternal()))) {
+const si_unprefix = "si_unprefix";
+if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("si_unprefix") || (!false && (new \ReflectionFunction("si_unprefix"))->isInternal()))) {
     /**
      * SI 接頭辞が付与された文字列を数値化する
      *
@@ -10298,8 +10300,8 @@ if (!isset($excluded_functions['si_unprefix']) && (!function_exists('si_unprefix
     }
 }
 
-const is_empty = 'is_empty';
-if (!isset($excluded_functions['is_empty']) && (!function_exists('is_empty') || (!false && (new \ReflectionFunction('is_empty'))->isInternal()))) {
+const is_empty = "is_empty";
+if (!isset($excluded_functions["is_empty"]) && (!function_exists("is_empty") || (!false && (new \ReflectionFunction("is_empty"))->isInternal()))) {
     /**
      * 値が空か検査する
      *
@@ -10356,8 +10358,8 @@ if (!isset($excluded_functions['is_empty']) && (!function_exists('is_empty') || 
     }
 }
 
-const is_primitive = 'is_primitive';
-if (!isset($excluded_functions['is_primitive']) && (!function_exists('is_primitive') || (!false && (new \ReflectionFunction('is_primitive'))->isInternal()))) {
+const is_primitive = "is_primitive";
+if (!isset($excluded_functions["is_primitive"]) && (!function_exists("is_primitive") || (!false && (new \ReflectionFunction("is_primitive"))->isInternal()))) {
     /**
      * 値が複合型でないか検査する
      *
@@ -10387,8 +10389,8 @@ if (!isset($excluded_functions['is_primitive']) && (!function_exists('is_primiti
     }
 }
 
-const is_recursive = 'is_recursive';
-if (!isset($excluded_functions['is_recursive']) && (!function_exists('is_recursive') || (!false && (new \ReflectionFunction('is_recursive'))->isInternal()))) {
+const is_recursive = "is_recursive";
+if (!isset($excluded_functions["is_recursive"]) && (!function_exists("is_recursive") || (!false && (new \ReflectionFunction("is_recursive"))->isInternal()))) {
     /**
      * 変数が再帰参照を含むか調べる
      *
@@ -10438,8 +10440,8 @@ if (!isset($excluded_functions['is_recursive']) && (!function_exists('is_recursi
     }
 }
 
-const is_stringable = 'is_stringable';
-if (!isset($excluded_functions['is_stringable']) && (!function_exists('is_stringable') || (!false && (new \ReflectionFunction('is_stringable'))->isInternal()))) {
+const is_stringable = "is_stringable";
+if (!isset($excluded_functions["is_stringable"]) && (!function_exists("is_stringable") || (!false && (new \ReflectionFunction("is_stringable"))->isInternal()))) {
     /**
      * 変数が文字列化できるか調べる
      *
@@ -10474,8 +10476,8 @@ if (!isset($excluded_functions['is_stringable']) && (!function_exists('is_string
     }
 }
 
-const is_arrayable = 'is_arrayable';
-if (!isset($excluded_functions['is_arrayable']) && (!function_exists('is_arrayable') || (!false && (new \ReflectionFunction('is_arrayable'))->isInternal()))) {
+const is_arrayable = "is_arrayable";
+if (!isset($excluded_functions["is_arrayable"]) && (!function_exists("is_arrayable") || (!false && (new \ReflectionFunction("is_arrayable"))->isInternal()))) {
     /**
      * 変数が配列アクセス可能か調べる
      *
@@ -10495,8 +10497,8 @@ if (!isset($excluded_functions['is_arrayable']) && (!function_exists('is_arrayab
     }
 }
 
-const is_iterable = 'is_iterable';
-if (!isset($excluded_functions['is_iterable']) && (!function_exists('is_iterable') || (!true && (new \ReflectionFunction('is_iterable'))->isInternal()))) {
+const is_iterable = "is_iterable";
+if (!isset($excluded_functions["is_iterable"]) && (!function_exists("is_iterable") || (!true && (new \ReflectionFunction("is_iterable"))->isInternal()))) {
     /**
      * 変数が foreach で回せるか調べる
      *
@@ -10522,8 +10524,8 @@ if (!isset($excluded_functions['is_iterable']) && (!function_exists('is_iterable
     }
 }
 
-const is_countable = 'is_countable';
-if (!isset($excluded_functions['is_countable']) && (!function_exists('is_countable') || (!true && (new \ReflectionFunction('is_countable'))->isInternal()))) {
+const is_countable = "is_countable";
+if (!isset($excluded_functions["is_countable"]) && (!function_exists("is_countable") || (!true && (new \ReflectionFunction("is_countable"))->isInternal()))) {
     /**
      * 変数が count でカウントできるか調べる
      *
@@ -10547,8 +10549,8 @@ if (!isset($excluded_functions['is_countable']) && (!function_exists('is_countab
     }
 }
 
-const varcmp = 'varcmp';
-if (!isset($excluded_functions['varcmp']) && (!function_exists('varcmp') || (!false && (new \ReflectionFunction('varcmp'))->isInternal()))) {
+const varcmp = "varcmp";
+if (!isset($excluded_functions["varcmp"]) && (!function_exists("varcmp") || (!false && (new \ReflectionFunction("varcmp"))->isInternal()))) {
     /**
      * php7 の `<=>` の関数版
      *
@@ -10612,8 +10614,8 @@ if (!isset($excluded_functions['varcmp']) && (!function_exists('varcmp') || (!fa
     }
 }
 
-const var_type = 'var_type';
-if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || (!false && (new \ReflectionFunction('var_type'))->isInternal()))) {
+const var_type = "var_type";
+if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || (!false && (new \ReflectionFunction("var_type"))->isInternal()))) {
     /**
      * 値の型を取得する（gettype + get_class）
      *
@@ -10644,8 +10646,8 @@ if (!isset($excluded_functions['var_type']) && (!function_exists('var_type') || 
     }
 }
 
-const var_apply = 'var_apply';
-if (!isset($excluded_functions['var_apply']) && (!function_exists('var_apply') || (!false && (new \ReflectionFunction('var_apply'))->isInternal()))) {
+const var_apply = "var_apply";
+if (!isset($excluded_functions["var_apply"]) && (!function_exists("var_apply") || (!false && (new \ReflectionFunction("var_apply"))->isInternal()))) {
     /**
      * 値にコールバックを適用する
      *
@@ -10686,8 +10688,8 @@ if (!isset($excluded_functions['var_apply']) && (!function_exists('var_apply') |
     }
 }
 
-const var_applys = 'var_applys';
-if (!isset($excluded_functions['var_applys']) && (!function_exists('var_applys') || (!false && (new \ReflectionFunction('var_applys'))->isInternal()))) {
+const var_applys = "var_applys";
+if (!isset($excluded_functions["var_applys"]) && (!function_exists("var_applys") || (!false && (new \ReflectionFunction("var_applys"))->isInternal()))) {
     /**
      * 配列にコールバックを適用する
      *
@@ -10727,8 +10729,8 @@ if (!isset($excluded_functions['var_applys']) && (!function_exists('var_applys')
     }
 }
 
-const var_export2 = 'var_export2';
-if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2') || (!false && (new \ReflectionFunction('var_export2'))->isInternal()))) {
+const var_export2 = "var_export2";
+if (!isset($excluded_functions["var_export2"]) && (!function_exists("var_export2") || (!false && (new \ReflectionFunction("var_export2"))->isInternal()))) {
     /**
      * 組み込みの var_export をいい感じにしたもの
      *
@@ -10797,38 +10799,27 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
             }
             // 配列は連想判定したり再帰したり色々
             if (is_array($value)) {
-                // 空配列は固定文字列
-                if (!$value) {
-                    return '[]';
-                }
-
                 $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
                 $spacer2 = str_repeat(' ', $nest * $INDENT);
 
-                // ただの配列
-                if ($value === array_values($value)) {
-                    // スカラー値のみで構成されているならシンプルな再帰
-                    if ((array_all)($value, is_primitive)) {
-                        $vals = array_map($export, $value);
-                        return '[' . implode(', ', $vals) . ']';
-                    }
-                    // スカラー値以外が含まれているならキーを含めない
-                    $kvl = '';
-                    $parents[] = $value;
-                    foreach ($value as $k => $v) {
-                        $kvl .= $spacer1 . $export($v, $nest + 1, $parents) . ",\n";
-                    }
-                    return "[\n{$kvl}{$spacer2}]";
+                $hashed = (is_hasharray)($value);
+
+                // スカラー値のみで構成されているならシンプルな再帰
+                if (!$hashed && (array_all)($value, is_primitive)) {
+                    return '[' . implode(', ', array_map($export, $value)) . ']';
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $values = (array_map_key)($value, $export);
-                $maxlen = max(array_map('strlen', array_keys($values)));
+                if ($hashed) {
+                    $keys = array_map($export, array_combine($keys = array_keys($value), $keys));
+                    $maxlen = max(array_map('strlen', $keys));
+                }
                 $kvl = '';
                 $parents[] = $value;
-                foreach ($values as $k => $v) {
-                    $align = str_repeat(' ', $maxlen - strlen($k));
-                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($v, $nest + 1, $parents) . ",\n";
+                foreach ($value as $k => $v) {
+                    /** @noinspection PhpUndefinedVariableInspection */
+                    $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
+                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -10860,8 +10851,8 @@ if (!isset($excluded_functions['var_export2']) && (!function_exists('var_export2
     }
 }
 
-const var_html = 'var_html';
-if (!isset($excluded_functions['var_html']) && (!function_exists('var_html') || (!false && (new \ReflectionFunction('var_html'))->isInternal()))) {
+const var_html = "var_html";
+if (!isset($excluded_functions["var_html"]) && (!function_exists("var_html") || (!false && (new \ReflectionFunction("var_html"))->isInternal()))) {
     /**
      * var_export2 を html コンテキストに特化させたようなもの
      *
@@ -10935,8 +10926,8 @@ if (!isset($excluded_functions['var_html']) && (!function_exists('var_html') || 
     }
 }
 
-const console_log = 'console_log';
-if (!isset($excluded_functions['console_log']) && (!function_exists('console_log') || (!false && (new \ReflectionFunction('console_log'))->isInternal()))) {
+const console_log = "console_log";
+if (!isset($excluded_functions["console_log"]) && (!function_exists("console_log") || (!false && (new \ReflectionFunction("console_log"))->isInternal()))) {
     /**
      * js の console に値を吐き出す
      *
@@ -10978,8 +10969,8 @@ if (!isset($excluded_functions['console_log']) && (!function_exists('console_log
     }
 }
 
-const hashvar = 'hashvar';
-if (!isset($excluded_functions['hashvar']) && (!function_exists('hashvar') || (!false && (new \ReflectionFunction('hashvar'))->isInternal()))) {
+const hashvar = "hashvar";
+if (!isset($excluded_functions["hashvar"]) && (!function_exists("hashvar") || (!false && (new \ReflectionFunction("hashvar"))->isInternal()))) {
     /**
      * 変数指定をできるようにした compact
      *
