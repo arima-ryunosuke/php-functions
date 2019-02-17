@@ -807,38 +807,27 @@ class Vars
             }
             // 配列は連想判定したり再帰したり色々
             if (is_array($value)) {
-                // 空配列は固定文字列
-                if (!$value) {
-                    return '[]';
-                }
-
                 $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
                 $spacer2 = str_repeat(' ', $nest * $INDENT);
 
-                // ただの配列
-                if ($value === array_values($value)) {
-                    // スカラー値のみで構成されているならシンプルな再帰
-                    if ((array_all)($value, is_primitive)) {
-                        $vals = array_map($export, $value);
-                        return '[' . implode(', ', $vals) . ']';
-                    }
-                    // スカラー値以外が含まれているならキーを含めない
-                    $kvl = '';
-                    $parents[] = $value;
-                    foreach ($value as $k => $v) {
-                        $kvl .= $spacer1 . $export($v, $nest + 1, $parents) . ",\n";
-                    }
-                    return "[\n{$kvl}{$spacer2}]";
+                $hashed = (is_hasharray)($value);
+
+                // スカラー値のみで構成されているならシンプルな再帰
+                if (!$hashed && (array_all)($value, is_primitive)) {
+                    return '[' . implode(', ', array_map($export, $value)) . ']';
                 }
 
                 // 連想配列はキーを含めて桁あわせ
-                $values = (array_map_key)($value, $export);
-                $maxlen = max(array_map('strlen', array_keys($values)));
+                if ($hashed) {
+                    $keys = array_map($export, array_combine($keys = array_keys($value), $keys));
+                    $maxlen = max(array_map('strlen', $keys));
+                }
                 $kvl = '';
                 $parents[] = $value;
-                foreach ($values as $k => $v) {
-                    $align = str_repeat(' ', $maxlen - strlen($k));
-                    $kvl .= $spacer1 . $k . $align . ' => ' . $export($v, $nest + 1, $parents) . ",\n";
+                foreach ($value as $k => $v) {
+                    /** @noinspection PhpUndefinedVariableInspection */
+                    $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
+                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
