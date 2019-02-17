@@ -56,7 +56,35 @@ class Transporter
     {
         $PREFIX = "Don't touch this code. This is auto generated.";
 
-        $ve = function ($v) { return var_export($v, true); };
+        // このコンテキストで var_export2 は使えないのでインライン展開する
+        $ve = function ($value, $nest = 0) use (&$ve) {
+            if (is_array($value)) {
+                $spacer1 = str_repeat(' ', ($nest + 1) * 4);
+                $spacer2 = str_repeat(' ', $nest * 4);
+
+                $hashed = $value !== array_values($value);
+
+                if (!$hashed) {
+                    $primitive_only = (array_filter($value, function ($v) { return is_scalar($v) || is_null($v) || is_resource($v); }));
+                    if ($primitive_only === $value) {
+                        return '[' . implode(', ', array_map($ve, $value)) . ']';
+                    }
+                }
+
+                if ($hashed) {
+                    $keys = array_map($ve, array_combine($keys = array_keys($value), $keys));
+                    $maxlen = max(array_map('strlen', $keys));
+                }
+                $kvl = '';
+                foreach ($value as $k => $v) {
+                    /** @noinspection PhpUndefinedVariableInspection */
+                    $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
+                    $kvl .= $spacer1 . $keystr . $ve($v, $nest + 1) . ",\n";
+                }
+                return "[\n{$kvl}{$spacer2}]";
+            }
+            return is_string($value) ? '"' . addcslashes($value, "\"\0\\") . '"' : (is_null($value) ? 'null' : var_export($value, true));
+        };
         $consts = $contents = [];
 
         foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
