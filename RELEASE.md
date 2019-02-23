@@ -10,6 +10,22 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.9
+
+- [feature][Strings] str_ellipsis を追加
+- [feature][Strings] str_array を追加
+- [feature][Strings] mb_substr_replace を追加
+- [feature][Strings] markdown_list を追加
+- [feature][Strings] namespace_split を追加
+- [feature][Arrays] array_pos_key を追加
+- [feature][Arrays] array_map_recursive を追加
+- [feature][Syntax] switchs を追加
+- [feature][Utility] date_interval を追加
+- [feature][Utility] arguments でオプション的文字列を引数として扱えるオプションを追加
+- [fixbug][Utility] stacktrace で引数が取れていなかった&&文字列がおかしかった不具合を修正
+- [feature][Network] http_requests でデフォルトオプションを指定できるように修正
+- [feature][Transporter] exportNamespace で関数指定を実装
+
 ## 1.2.8
 
 - [feature][Transporter] 定数の doccomment 出力に対応
