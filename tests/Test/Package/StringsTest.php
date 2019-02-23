@@ -901,6 +901,51 @@ a2,b2,c2
         $this->assertException('must be array of hasharray', markdown_table, '');
     }
 
+    function test_markdown_list()
+    {
+        $this->assertEquals("
+- A
+- B
+- C: 
+    - 1
+    - 2
+    - 3
+", "\n" . (markdown_list)(['A', 'B', 'C' => [1, 2, 3]]));
+
+        $this->assertEquals("
+- a: A
+- b: B
+- ls: 
+    - 1
+    - 2
+    - 3
+", "\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => [1, 2, 3]]));
+
+        $this->assertEquals("
+- a: A
+- b: B
+- ls: LS
+    - 1
+    - 2
+    - 3
+", "\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]]));
+
+        $this->assertEquals("
+* a = A
+* b = B
+* ls = LS
+	1. 1
+	2. 2
+	3. 3
+", "\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]], [
+                'indent'    => "\t",
+                'separator' => ' = ',
+                'liststyle' => '*',
+                'ordered'   => true,
+            ])
+        );
+    }
+
     function test_random_string()
     {
         $actual = (random_string)(256, 'abc');

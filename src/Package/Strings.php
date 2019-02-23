@@ -1384,6 +1384,67 @@ class Strings
     }
 
     /**
+     * 連想配列の配列を markdown リスト文字列にする
+     *
+     *
+     *
+     * Example:
+     * ```php
+     * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
+     * assertEquals("\n" . markdown_table([
+     *    ['a' => 'a1', 'b' => 'b1'],
+     *    ['b' => 'b2', 'c' => '2'],
+     *    ['a' => 'a3', 'c' => '3'],
+     * ]), "
+     * | a   | b   |   c |
+     * | --- | --- | --: |
+     * | a1  | b1  |     |
+     * |     | b2  |   2 |
+     * | a3  |     |   3 |
+     * ");
+     * ```
+     *
+     * @param array $array 配列
+     * @param array $option オプション配列
+     * @return string markdown リスト文字列
+     */
+    public static function markdown_list($array, $option = [])
+    {
+        $option += [
+            'indent'    => '    ',
+            'separator' => ': ',
+            'liststyle' => '-',
+            'ordered'   => false,
+        ];
+
+        $f = function ($array, $nest) use (&$f, $option) {
+            $spacer = str_repeat($option['indent'], $nest);
+            $result = [];
+            foreach ((arrays)($array) as $n => list($k, $v)) {
+                if ((is_iterable)($v)) {
+                    if (!is_int($k)) {
+                        $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];
+                    }
+                    $result = array_merge($result, $f($v, $nest + 1));
+                }
+                else {
+                    if (!is_int($k)) {
+                        $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'] . $v;
+                    }
+                    elseif (!$option['ordered']) {
+                        $result[] = $spacer . $option['liststyle'] . ' ' . $v;
+                    }
+                    else {
+                        $result[] = $spacer . ($n + 1) . '. ' . $v;
+                    }
+                }
+            }
+            return $result;
+        };
+        return implode("\n", $f($array, 0)) . "\n";
+    }
+
+    /**
      * 安全な乱数文字列を生成する
      *
      * @param int $length 生成文字列長
