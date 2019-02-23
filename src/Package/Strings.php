@@ -1462,23 +1462,34 @@ class Strings
     }
 
     /**
-     * 連想配列の配列を markdown リスト文字列にする
-     *
-     *
+     * 配列を markdown リスト文字列にする
      *
      * Example:
      * ```php
      * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
-     * assertEquals("\n" . markdown_table([
-     *    ['a' => 'a1', 'b' => 'b1'],
-     *    ['b' => 'b2', 'c' => '2'],
-     *    ['a' => 'a3', 'c' => '3'],
-     * ]), "
-     * | a   | b   |   c |
-     * | --- | --- | --: |
-     * | a1  | b1  |     |
-     * |     | b2  |   2 |
-     * | a3  |     |   3 |
+     * assertEquals("\n" . markdown_list([
+     *     'dict'        => [
+     *         'Key1' => 'Value1',
+     *         'Key2' => 'Value2',
+     *     ],
+     *     'list'        => ['Item1', 'Item2', 'Item3'],
+     *     'dict & list' => [
+     *         'Key' => 'Value',
+     *         ['Item1', 'Item2', 'Item3'],
+     *     ],
+     * ], ['separator' => ':']), "
+     * - dict:
+     *     - Key1:Value1
+     *     - Key2:Value2
+     * - list:
+     *     - Item1
+     *     - Item2
+     *     - Item3
+     * - dict & list:
+     *     - Key:Value
+     *         - Item1
+     *         - Item2
+     *         - Item3
      * ");
      * ```
      *

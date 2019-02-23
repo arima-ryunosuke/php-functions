@@ -1512,6 +1512,42 @@ if (!isset($excluded_functions["array_pos"]) && (!function_exists("array_pos") |
     }
 }
 
+const array_pos_key = "array_pos_key";
+if (!isset($excluded_functions["array_pos_key"]) && (!function_exists("array_pos_key") || (!false && (new \ReflectionFunction("array_pos_key"))->isInternal()))) {
+    /**
+     * 配列の指定キーの位置を返す
+     *
+     * Example:
+     * ```php
+     * assertSame(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'), 2);
+     * assertSame(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1), -1);
+     * ```
+     *
+     * @param array $array 対象配列
+     * @param string|int $key 取得する位置
+     * @param mixed $default 見つからなかったときのデフォルト値。指定しないと例外
+     * @return mixed 指定キーの位置
+     */
+    function array_pos_key($array, $key, $default = null)
+    {
+        // very slow
+        // return array_flip(array_keys($array))[$key];
+
+        $n = 0;
+        foreach ($array as $k => $v) {
+            if ($k === $key) {
+                return $n;
+            }
+            $n++;
+        }
+
+        if (func_num_args() === 2) {
+            throw new \OutOfBoundsException("$key is not found.");
+        }
+        return $default;
+    }
+}
+
 const array_of = "array_of";
 if (!isset($excluded_functions["array_of"]) && (!function_exists("array_of") || (!false && (new \ReflectionFunction("array_of"))->isInternal()))) {
     /**
@@ -2004,6 +2040,74 @@ if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("array_gr
             }
         }
         return $result;
+    }
+}
+
+const array_map_recursive = "array_map_recursive";
+if (!isset($excluded_functions["array_map_recursive"]) && (!function_exists("array_map_recursive") || (!false && (new \ReflectionFunction("array_map_recursive"))->isInternal()))) {
+    /**
+     * array_map の再帰版
+     *
+     * 下記の点で少し array_map とは挙動が異なる。
+     *
+     * - 配列だけでなく iterable も対象になる（引数で指定可能。デフォルト true）
+     *     - つまりオブジェクト構造は維持されず、結果はすべて配列になる
+     * - 値だけでなくキーも渡ってくる
+     *
+     * Example:
+     * ```php
+     * // array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
+     * assertSame(array_map_recursive([
+     *     'k' => 'v',
+     *     'c' => new \ArrayObject([
+     *         'k1' => 'v1',
+     *         'k2' => 'v2',
+     *     ]),
+     * ], 'strtoupper'), [
+     *     'k' => 'V',
+     *     'c' => [
+     *         'k1' => 'V1',
+     *         'k2' => 'V2',
+     *     ],
+     * ]);
+     *
+     * // ただし、その挙動は引数で変更可能
+     * assertSame(array_map_recursive([
+     *     'k' => 'v',
+     *     'c' => new \ArrayObject([
+     *         'k1' => 'v1',
+     *         'k2' => 'v2',
+     *     ]),
+     * ], 'gettype', false), [
+     *     'k' => 'string',
+     *     'c' => 'object',
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable $callback 評価クロージャ
+     * @param bool $iterable is_iterable で判定するか
+     * @return array map された新しい配列
+     */
+    function array_map_recursive($array, $callback, $iterable = true)
+    {
+        $callback = (func_user_func_array)($callback);
+
+        // ↑の変換を再帰ごとにやるのは現実的ではないのでクロージャに閉じ込めて再帰する
+        $main = static function ($array) use (&$main, $callback, $iterable) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                if (($iterable && (is_iterable)($v)) || (!$iterable && is_array($v))) {
+                    $result[$k] = $main($v);
+                }
+                else {
+                    $result[$k] = $callback($v, $k);
+                }
+            }
+            return $result;
+        };
+
+        return $main($array);
     }
 }
 
@@ -4728,21 +4832,23 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("tmpname") || (!
 
         // 生成したファイルを覚えておいて最後に消す
         static $files = [];
-        $files[] = $tempfile;
-        // ただし、 shutdown_function にあまり大量に追加したくないので初回のみ登録する（$files は参照で渡す）
-        if (count($files) === 1) {
-            register_shutdown_function(function () use (&$files) {
-                // @codeCoverageIgnoreStart
-                foreach ($files as $file) {
-                    // 明示的に消されたかもしれないので file_exists してから消す
-                    if (file_exists($file)) {
-                        // レースコンディションのため @ を付ける
-                        @unlink($file);
-                    }
+        $files[$tempfile] = new class($tempfile)
+        {
+            private $tempfile;
+
+            public function __construct($tempfile) { $this->tempfile = $tempfile; }
+
+            public function __destruct() { return $this(); }
+
+            public function __invoke()
+            {
+                // 明示的に消されたかもしれないので file_exists してから消す
+                if (file_exists($this->tempfile)) {
+                    // レースコンディションのため @ を付ける
+                    @unlink($this->tempfile);
                 }
-                // @codeCoverageIgnoreEnd
-            });
-        }
+            }
+        };
 
         return $tempfile;
     }
@@ -6144,9 +6250,10 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
      * ```
      *
      * @param array $urls 実行する curl オプション
+     * @param array $default_options 全 $urls に適用されるデフォルトオプション
      * @return array レスポンス配列。取得した順番でキーを保持しつつ追加される
      */
-    function http_requests($urls)
+    function http_requests($urls, $default_options = [])
     {
         // 固定オプション（必ずこの値が使用される）
         $default1 = [
@@ -6156,7 +6263,7 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
         ];
 
         // 可変オプション（指定がない場合のみ使用される）
-        $default2 = [
+        $default_options += [
             CURLOPT_FOLLOWLOCATION => true, // リダイレクトをたどる
             CURLOPT_MAXREDIRS      => 16,   // リダイレクトをたどる回数
         ];
@@ -6172,7 +6279,7 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
             }
 
             $ch = curl_init();
-            curl_setopt_array($ch, $default1 + $opt + $default2);
+            curl_setopt_array($ch, $default1 + $opt + $default_options);
             curl_multi_add_handle($mh, $ch);
 
             // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
@@ -6203,16 +6310,7 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
                 else {
                     $info = curl_getinfo($handle);
                     $response = curl_multi_getcontent($handle);
-                    $headers = [];
-                    foreach (preg_split('#\R#', substr($response, 0, $info['header_size']), -1, PREG_SPLIT_NO_EMPTY) as $header) {
-                        $parts = explode(':', $header, 2);
-                        if (isset($parts[1])) {
-                            $headers[trim($parts[0])] = trim($parts[1]);
-                        }
-                        else {
-                            $headers[] = trim($parts[0]);
-                        }
-                    }
+                    $headers = (str_array)(substr($response, 0, $info['header_size']), ':', true);
                     $body = substr($response, $info['header_size']);
                     $responses[$resultmap["$handle"]] = [$body, $headers, $info];
                 }
@@ -7285,6 +7383,56 @@ if (!isset($excluded_functions["str_between"]) && (!function_exists("str_between
     }
 }
 
+const str_ellipsis = "str_ellipsis";
+if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("str_ellipsis") || (!false && (new \ReflectionFunction("str_ellipsis"))->isInternal()))) {
+    /**
+     * 文字列を指定幅に丸める
+     *
+     * mb_strimwidth と機能的には同じだが、省略文字の差し込み位置を $pos で指定できる。
+     * $pos は負数が指定できる。負数の場合後ろから数えられる。
+     * 省略した場合は真ん中となる。
+     *
+     * Example:
+     * ```php
+     * // 8文字に丸める（$pos 省略なので真ん中が省略される）
+     * assertSame(str_ellipsis('1234567890', 8, '...'), '12...890');
+     * // 8文字に丸める（$pos=1 なので1文字目から省略される）
+     * assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
+     * // 8文字に丸める（$pos=-1 なので後ろから1文字目から省略される）
+     * assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param int $width 丸める幅
+     * @param string $trimmarker 省略文字列
+     * @param int|null $pos 省略記号の差し込み位置
+     * @return string 丸められた文字列
+     */
+    function str_ellipsis($string, $width, $trimmarker = '...', $pos = null)
+    {
+        $string = (string) $string;
+
+        $strlen = mb_strlen($string);
+        if ($strlen <= $width) {
+            return $string;
+        }
+
+        $markerlen = mb_strlen($trimmarker);
+        if ($markerlen >= $width) {
+            return $trimmarker;
+        }
+
+        $length = $width - $markerlen;
+        $pos = $pos ?? $length / 2;
+        if ($pos < 0) {
+            $pos += $length;
+        }
+        $pos = max(0, min($pos, $length));
+
+        return (mb_substr_replace)($string, $trimmarker, $pos, $strlen - $length);
+    }
+}
+
 const starts_with = "starts_with";
 if (!isset($excluded_functions["starts_with"]) && (!function_exists("starts_with") || (!false && (new \ReflectionFunction("starts_with"))->isInternal()))) {
     /**
@@ -7436,6 +7584,40 @@ if (!isset($excluded_functions["chain_case"]) && (!function_exists("chain_case")
     function chain_case($string, $delimiter = '-')
     {
         return (snake_case)($string, $delimiter);
+    }
+}
+
+const namespace_split = "namespace_split";
+if (!isset($excluded_functions["namespace_split"]) && (!function_exists("namespace_split") || (!false && (new \ReflectionFunction("namespace_split"))->isInternal()))) {
+    /**
+     * 文字列を名前空間とローカル名に区切ってタプルで返す
+     *
+     * class_namespace/class_shorten や function_shorten とほぼ同じだが下記の違いがある。
+     *
+     * - あくまで文字列として処理する
+     *     - 例えば class_namespace は get_class されるが、この関数は（いうなれば） strval される
+     * - \\ を trim しないし、特別扱いもしない
+     *     - `ns\\hoge` と `\\ns\\hoge` で返り値が微妙に異なる
+     *     - `ns\\` のような場合は名前空間だけを返す
+     *
+     * Example:
+     * ```php
+     * assertSame(namespace_split('ns\\hoge'), ['ns', 'hoge']);
+     * assertSame(namespace_split('hoge'), ['', 'hoge']);
+     * assertSame(namespace_split('ns\\'), ['ns', '']);
+     * assertSame(namespace_split('\\hoge'), ['', 'hoge']);
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @return array [namespace, localname]
+     */
+    function namespace_split($string)
+    {
+        $pos = strrpos($string, '\\');
+        if ($pos === false) {
+            return ['', $string];
+        }
+        return [substr($string, 0, $pos), substr($string, $pos + 1)];
     }
 }
 
@@ -8166,6 +8348,81 @@ if (!isset($excluded_functions["markdown_table"]) && (!function_exists("markdown
     }
 }
 
+const markdown_list = "markdown_list";
+if (!isset($excluded_functions["markdown_list"]) && (!function_exists("markdown_list") || (!false && (new \ReflectionFunction("markdown_list"))->isInternal()))) {
+    /**
+     * 配列を markdown リスト文字列にする
+     *
+     * Example:
+     * ```php
+     * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
+     * assertEquals("\n" . markdown_list([
+     *     'dict'        => [
+     *         'Key1' => 'Value1',
+     *         'Key2' => 'Value2',
+     *     ],
+     *     'list'        => ['Item1', 'Item2', 'Item3'],
+     *     'dict & list' => [
+     *         'Key' => 'Value',
+     *         ['Item1', 'Item2', 'Item3'],
+     *     ],
+     * ], ['separator' => ':']), "
+     * - dict:
+     *     - Key1:Value1
+     *     - Key2:Value2
+     * - list:
+     *     - Item1
+     *     - Item2
+     *     - Item3
+     * - dict & list:
+     *     - Key:Value
+     *         - Item1
+     *         - Item2
+     *         - Item3
+     * ");
+     * ```
+     *
+     * @param array $array 配列
+     * @param array $option オプション配列
+     * @return string markdown リスト文字列
+     */
+    function markdown_list($array, $option = [])
+    {
+        $option += [
+            'indent'    => '    ',
+            'separator' => ': ',
+            'liststyle' => '-',
+            'ordered'   => false,
+        ];
+
+        $f = function ($array, $nest) use (&$f, $option) {
+            $spacer = str_repeat($option['indent'], $nest);
+            $result = [];
+            foreach ((arrays)($array) as $n => list($k, $v)) {
+                if ((is_iterable)($v)) {
+                    if (!is_int($k)) {
+                        $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];
+                    }
+                    $result = array_merge($result, $f($v, $nest + 1));
+                }
+                else {
+                    if (!is_int($k)) {
+                        $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'] . $v;
+                    }
+                    elseif (!$option['ordered']) {
+                        $result[] = $spacer . $option['liststyle'] . ' ' . $v;
+                    }
+                    else {
+                        $result[] = $spacer . ($n + 1) . '. ' . $v;
+                    }
+                }
+            }
+            return $result;
+        };
+        return implode("\n", $f($array, 0)) . "\n";
+    }
+}
+
 const random_string = "random_string";
 if (!isset($excluded_functions["random_string"]) && (!function_exists("random_string") || (!false && (new \ReflectionFunction("random_string"))->isInternal()))) {
     /**
@@ -8526,6 +8783,125 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") |
         $percent = intval(100 - $shortest * 100);
 
         return $closest;
+    }
+}
+
+const str_array = "str_array";
+if (!isset($excluded_functions["str_array"]) && (!function_exists("str_array") || (!false && (new \ReflectionFunction("str_array"))->isInternal()))) {
+    /**
+     * 文字列を区切り文字で区切って配列に変換する
+     *
+     * 典型的には http ヘッダとか sar の結果とかを配列にする。
+     *
+     * Example:
+     * ```php
+     * // http response header  を ":" 区切りで連想配列にする
+     * assertSame(str_array("
+     * HTTP/1.1 200 OK
+     * Content-Type: text/html; charset=utf-8
+     * Connection: Keep-Alive
+     * ", ':', true), [
+     *     'HTTP/1.1 200 OK',
+     *     'Content-Type' => 'text/html; charset=utf-8',
+     *     'Connection'   => 'Keep-Alive',
+     * ]);
+     *
+     * // sar の結果を " " 区切りで連想配列の配列にする
+     * assertSame(str_array("
+     * 13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
+     * 13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
+     * 13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
+     * ", ' ', false), [
+     *     1 => [
+     *         '13:00:01' => '13:10:01',
+     *         'CPU'      => 'all',
+     *         '%user'    => '0.99',
+     *         '%nice'    => '0.10',
+     *         '%system'  => '0.71',
+     *         '%iowait'  => '0.00',
+     *         '%steal'   => '0.00',
+     *         '%idle'    => '98.19',
+     *     ],
+     *     2 => [
+     *         '13:00:01' => '13:20:01',
+     *         'CPU'      => 'all',
+     *         '%user'    => '0.60',
+     *         '%nice'    => '0.10',
+     *         '%system'  => '0.56',
+     *         '%iowait'  => '0.00',
+     *         '%steal'   => '0.00',
+     *         '%idle'    => '98.74',
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string|array $string 対象文字列。配列を与えても動作する
+     * @param string $delimiter 区切り文字
+     * @param bool $hashmode 連想配列モードか
+     * @return array 配列
+     */
+    function str_array($string, $delimiter, $hashmode)
+    {
+        $array = $string;
+        if ((is_stringable)($string)) {
+            $array = preg_split('#\R#u', $string, -1, PREG_SPLIT_NO_EMPTY);
+        }
+        $delimiter = preg_quote($delimiter, '#');
+
+        $result = [];
+        if ($hashmode) {
+            foreach ($array as $n => $line) {
+                $parts = preg_split("#$delimiter#u", $line, 2, PREG_SPLIT_NO_EMPTY);
+                $key = isset($parts[1]) ? array_shift($parts) : $n;
+                $result[trim($key)] = trim($parts[0]);
+            }
+        }
+        else {
+            foreach ($array as $n => $line) {
+                $parts = preg_split("#$delimiter#u", $line, -1, PREG_SPLIT_NO_EMPTY);
+                if (!isset($keys)) {
+                    $keys = $parts;
+                    continue;
+                }
+                $result[$n] = count($keys) === count($parts) ? array_combine($keys, $parts) : null;
+            }
+        }
+        return $result;
+    }
+}
+
+const mb_substr_replace = "mb_substr_replace";
+if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("mb_substr_replace") || (!false && (new \ReflectionFunction("mb_substr_replace"))->isInternal()))) {
+    /**
+     * マルチバイト対応 substr_replace
+     *
+     * 本家は配列を与えたりできるが、ややこしいし使う気がしないので未対応。
+     *
+     * Example:
+     * ```php
+     * // 数値キーが参照できる
+     * assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param string $replacement 置換文字列
+     * @param int $start 開始位置
+     * @param int $length 置換長
+     * @return string 置換した文字列
+     */
+    function mb_substr_replace($string, $replacement, $start, $length = null)
+    {
+        $string = (string) $string;
+
+        $strlen = mb_strlen($string);
+        if ($start < 0) {
+            $start += $strlen;
+        }
+        if ($length < 0) {
+            $length += $strlen - $start;
+        }
+
+        return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, null);
     }
 }
 
@@ -9123,6 +9499,49 @@ if (!isset($excluded_functions["ifelse"]) && (!function_exists("ifelse") || (!fa
     }
 }
 
+const switchs = "switchs";
+if (!isset($excluded_functions["switchs"]) && (!function_exists("switchs") || (!false && (new \ReflectionFunction("switchs"))->isInternal()))) {
+    /**
+     * switch 構文の関数版
+     *
+     * case にクロージャを与えると実行して返す。
+     * つまり、クロージャを返すことは出来ないので注意。
+     *
+     * $default を与えないとマッチしなかったときに例外を投げる。
+     *
+     * Example:
+     * ```php
+     * $cases = [
+     *     1 => 'value is 1',
+     *     2 => function(){return 'value is 2';},
+     * ];
+     * assertSame(switchs(1, $cases), 'value is 1');
+     * assertSame(switchs(2, $cases), 'value is 2');
+     * assertSame(switchs(3, $cases, 'undefined'), 'undefined');
+     * ```
+     *
+     * @param mixed $value 調べる値
+     * @param array $cases case 配列
+     * @param null $default マッチしなかったときのデフォルト値。指定しないと例外
+     * @return mixed
+     */
+    function switchs($value, $cases, $default = null)
+    {
+        if (!array_key_exists($value, $cases)) {
+            if (func_num_args() === 2) {
+                throw new \OutOfBoundsException("value $value is not defined in " . json_encode(array_keys($cases)));
+            }
+            return $default;
+        }
+
+        $case = $cases[$value];
+        if ($case instanceof \Closure) {
+            return $case($value);
+        }
+        return $case;
+    }
+}
+
 const try_catch = "try_catch";
 if (!isset($excluded_functions["try_catch"]) && (!function_exists("try_catch") || (!false && (new \ReflectionFunction("try_catch"))->isInternal()))) {
     /**
@@ -9232,6 +9651,212 @@ if (!isset($excluded_functions["try_catch_finally"]) && (!function_exists("try_c
                 $finally();
             }
         }
+    }
+}
+
+const date_interval = "date_interval";
+if (!isset($excluded_functions["date_interval"]) && (!function_exists("date_interval") || (!false && (new \ReflectionFunction("date_interval"))->isInternal()))) {
+    /**
+     * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
+     *
+     * 例えば `60 * 60 * 24 * 900 + 12345.678` （約900日12345秒）は・・・
+     *
+     * - 2 年（約900日なので）
+     * - 5 ヶ月（約(900 - 365 * 2 = 170)日なので）
+     * - 18 日（約(170 - 30.416 * 5 = 18)日なので）
+     * - 3 時間（約12345秒なので）
+     * - 25 分（約(12345 - 3600 * 3 = 1545)秒なので）
+     * - 45 秒（約(1545 - 60 * 25 = 45)秒なので）
+     * - 678 ミリ秒（.678 部分そのまま）
+     *
+     * となる（年はうるう年未考慮で365日、月は30.41666666日で換算）。
+     *
+     * $format を与えると DateInterval::format して文字列で返す。与えないと DateInterval をそのまま返す。
+     * $format はクロージャを与えることができる。クロージャを与えた場合、各要素を引数としてコールバックされる。
+     * $format は配列で与えることができる。配列で与えた場合、 0 になる要素は省かれる。
+     * セパレータを与えたり、pre/suffix を与えたりできるが、難解なので省略する。
+     *
+     * $limit_type で換算のリミットを指定できる。例えば 'y' を指定すると「2年5ヶ月」となるが、 'm' を指定すると「29ヶ月」となる。
+     * 数値を与えるとその範囲でオートスケールする。例えば 3 を指定すると値が大きいとき `ymd` の表示になり、年が 0 になると `mdh` の表示に切り替わるようになる。
+     *
+     * Example:
+     * ```php
+     * // 書式文字列指定（%vはミリ秒）
+     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'), '02/05/18 03:25:45.678');
+     *
+     * // 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
+     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}), '678,45,25,3,18,5,2,0');
+     *
+     * // リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
+     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'), '00/29/18 03:25:45.678');
+     *
+     * // 書式に配列を与えてリミットに数値を与えるとその範囲でオートスケールする
+     * $format = [
+     *     'y' => '%y年',
+     *     'm' => '%mヶ月',
+     *     'd' => '%d日',
+     *     ' ',
+     *     'h' => '%h時間',
+     *     'i' => '%i分',
+     *     's' => '%s秒',
+     * ];
+     * // 数が大きいので年・月・日の3要素のみ
+     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3), '2年5ヶ月18日');
+     * // 数がそこそこだと日・時間・分の3要素に切り替わる
+     * assertSame(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3), '20日 3時間25分');
+     * // どんなに数が小さくても3要素以下にはならない
+     * assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
+     *
+     * // 書式指定なし（DateInterval を返す）
+     * assertInstanceOf(\DateInterval::class, date_interval(123.456));
+     * ```
+     *
+     * @param int|float $sec タイムスタンプ
+     * @param string|array $format 時刻フォーマット
+     * @param string|int $limit_type どこまで換算するか（[c|y|m|d|h|i|s]）
+     * @return string|\DateInterval 時間差文字列 or DateInterval オブジェクト
+     */
+    function date_interval($sec, $format = null, $limit_type = 'y')
+    {
+        $ymdhisv = ['c', 'y', 'm', 'd', 'h', 'i', 's', 'v'];
+        $map = ['c' => 7, 'y' => 6, 'm' => 5, 'd' => 4, 'h' => 3, 'i' => 2, 's' => 1];
+        if (ctype_digit("$limit_type")) {
+            $limit = $map['c'];
+            $limit_type = (int) $limit_type;
+            if (!is_array($format) && !is_null($format)) {
+                throw new \UnexpectedValueException('$format must be array if $limit_type is digit.');
+            }
+        }
+        else {
+            $limit = $map[$limit_type] ?? (throws)(new \InvalidArgumentException("limit_type:$limit_type is undefined."));
+        }
+
+        // 各単位を導出
+        $mills = $sec * 1000;
+        $seconds = $sec;
+        $minutes = $seconds / 60;
+        $hours = $minutes / 60;
+        $days = $hours / 24;
+        $months = $days / (365 / 12);
+        $years = $days / 365;
+        $centurys = $years / 100;
+
+        // $limit に従って値を切り捨てて DateInterval を作成
+        /** @noinspection PhpUndefinedFieldInspection */
+        {
+            $interval = new \DateInterval('PT1S');
+            $interval->c = $limit < $map['c'] ? 0 : $centurys % 1000;
+            $interval->y = $limit < $map['y'] ? 0 : ($limit === $map['y'] ? $years : $years % 100);
+            $interval->m = $limit < $map['m'] ? 0 : ($limit === $map['m'] ? $months : $months % 12);
+            $interval->d = $limit < $map['d'] ? 0 : ($limit === $map['d'] ? $days : intval(($days * 100000000) % (365 / 12 * 100000000) / 100000000));
+            $interval->h = $limit < $map['h'] ? 0 : ($limit === $map['h'] ? $hours : $hours % 24);
+            $interval->i = $limit < $map['i'] ? 0 : ($limit === $map['i'] ? $minutes : $minutes % 60);
+            $interval->s = $limit < $map['s'] ? 0 : ($limit === $map['s'] ? $seconds : $seconds % 60);
+            $interval->v = $mills % 1000;
+        }
+
+        // null は DateInterval をそのまま返す
+        if ($format === null) {
+            return $interval;
+        }
+
+        // クロージャはコールバックする
+        if ($format instanceof \Closure) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            return $format($interval->v, $interval->s, $interval->i, $interval->h, $interval->d, $interval->m, $interval->y, $interval->c);
+        }
+
+        // 配列はいろいろとフィルタする
+        if (is_array($format)) {
+            // 数値ならその範囲でオートスケール
+            if (is_int($limit_type)) {
+                // 配列を回して値があるやつ + $limit_type の範囲とする
+                foreach ($ymdhisv as $n => $key) {
+                    // 最低 $limit_type は保持するために isset する
+                    if ($interval->$key > 0 || !isset($ymdhisv[$n + $limit_type + 1])) {
+                        $pos = [];
+                        for ($i = 0; $i < $limit_type; $i++) {
+                            if (isset($ymdhisv[$n + $i])) {
+                                if (($p = (array_pos_key)($format, $ymdhisv[$n + $i], -1)) >= 0) {
+                                    $pos[] = $p;
+                                }
+                            }
+                        }
+                        if (!$pos) {
+                            throw new \UnexpectedValueException('$format is empty.');
+                        }
+                        // 順不同なので min/max から slice しなければならない
+                        $min = min($pos);
+                        $max = max($pos);
+                        $format = array_slice($format, $min, $max - $min + 1);
+                        break;
+                    }
+                }
+            }
+
+            // 来ている $format を正規化（日時文字列は配列にするかつ値がないならフィルタ）
+            $tmp = [];
+            foreach ($format as $key => $fmt) {
+                if (isset($interval->$key)) {
+                    if (!is_int($limit_type) && $interval->$key === 0) {
+                        $tmp[] = ['', '', ''];
+                        continue;
+                    }
+                    $fmt = (arrayize)($fmt);
+                    $fmt = (switchs)(count($fmt), [
+                        1 => static function () use ($fmt) { return ['', $fmt[0], '']; },
+                        2 => static function () use ($fmt) { return ['', $fmt[0], $fmt[1]]; },
+                        3 => static function () use ($fmt) { return array_values($fmt); },
+                    ]);
+                }
+                $tmp[] = $fmt;
+            }
+            // さらに前後の値がないならフィルタ
+            $tmp2 = [];
+            foreach ($tmp as $n => $fmt) {
+                $prevempty = true;
+                for ($i = $n - 1; $i >= 0; $i--) {
+                    if (!is_array($tmp[$i])) {
+                        break;
+                    }
+                    if (strlen($tmp[$i][1])) {
+                        $prevempty = false;
+                        break;
+                    }
+                }
+                $nextempty = true;
+                for ($i = $n + 1, $l = count($tmp); $i < $l; $i++) {
+                    if (!is_array($tmp[$i])) {
+                        break;
+                    }
+                    if (strlen($tmp[$i][1])) {
+                        $nextempty = false;
+                        break;
+                    }
+                }
+
+                if (is_array($fmt)) {
+                    if ($prevempty) {
+                        $fmt[0] = '';
+                    }
+                    if ($nextempty) {
+                        $fmt[2] = '';
+                    }
+                }
+                elseif ($prevempty || $nextempty) {
+                    $fmt = '';
+                }
+                $tmp2 = array_merge($tmp2, (arrayize)($fmt));
+            }
+            $format = implode('', $tmp2);
+        }
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        {
+            $format = preg_replace('#(^|[^%])%c#u', '${1}' . $interval->c, $format);
+            $format = preg_replace('#(^|[^%])%v#u', '${1}' . $interval->v, $format);
+        }
+        return $interval->format($format);
     }
 }
 
@@ -9440,6 +10065,8 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
      * - 値は「デフォルト値」を指定する。ただし・・・
      *     - `[]` は「複数値オプション」を意味する（配列にしない限り同オプションの多重指定は許されない）
      *     - `null` は「値なしオプション」を意味する（スイッチングオプション）
+     * - 空文字キーは解釈自体のオプションを与える
+     *     - 今のところ throw のみの実装。配列ではなく bool を与えられる
      *
      * 上記の仕様でパースして「引数は数値連番、オプションはオプション名をキーとした配列」を返す。
      * なお、いわゆる「引数」はどこに来ても良い（前オプション、後オプションの区別がない）。
@@ -9476,6 +10103,17 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
      *     'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
      *     'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
      * ]);
+     *
+     * // 空文字で解釈自体のオプションを与える
+     * $rule = [
+     *     ''  => false, // 定義されていないオプションが来ても例外を投げずに引数として処理する
+     * ];
+     * assertSame(arguments($rule, '--long A -short B'), [
+     *     '--long', // 明らかにオプション指定に見えるが、 long というオプションは定義されていないので引数として解釈される
+     *     'A',      // 同上。long のオプション値に見えるが、ただの引数
+     *     '-short', // 同上。short というオプションは定義されていない
+     *     'B',      // 同上。short のオプション値に見えるが、ただの引数
+     * ]);
      * ```
      *
      * @param array $rule オプションルール
@@ -9484,13 +10122,20 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
      */
     function arguments($rule, $argv = null)
     {
+        $opt = (array_unset)($rule, '', []);
+        if (is_bool($opt)) {
+            $opt = ['thrown' => $opt];
+        }
+        $opt += [
+            'thrown' => true,
+        ];
+
         if ($argv === null) {
             $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
         }
         if (is_string($argv)) {
             $argv = (quoteexplode)([" ", "\t"], $argv);
             $argv = array_filter($argv, 'strlen');
-            $argv = array_map(function ($v) { return trim(str_replace('\\"', '"', $v), '"'); }, $argv);
         }
         $argv = array_values($argv);
 
@@ -9502,7 +10147,7 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
                 $argsdefaults[$name] = $default;
                 continue;
             }
-            list($longname, $shortname) = preg_split('#\s+#', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
+            list($longname, $shortname) = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
             if ($shortname !== null) {
                 if (array_key_exists($shortname, $shortmap)) {
                     throw new \InvalidArgumentException("duplicated short option name '$shortname'");
@@ -9522,9 +10167,17 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
             if (strlen($token) >= 2 && $token[0] === '-') {
                 if ($token[1] === '-') {
                     $optname = substr($token, 2);
+                    if (!$opt['thrown'] && !array_key_exists($optname, $optsdefaults)) {
+                        $result[$n++] = $token;
+                        continue;
+                    }
                 }
                 else {
                     $shortname = substr($token, 1);
+                    if (!$opt['thrown'] && !isset($shortmap[$shortname])) {
+                        $result[$n++] = $token;
+                        continue;
+                    }
                     if (strlen($shortname) > 1) {
                         array_unshift($argv, '-' . substr($shortname, 1));
                         $shortname = substr($shortname, 0, 1);
@@ -9563,6 +10216,11 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
             }
         }
 
+        array_walk_recursive($result, function (&$v) {
+            if (is_string($v)) {
+                $v = trim(str_replace('\\"', '"', $v), '"');
+            }
+        });
         return $result + $argsdefaults;
     }
 }
@@ -9634,7 +10292,7 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("stacktrace")
                     if (($strlen = strlen($value)) > $limit) {
                         $value = substr($value, 0, $limit) . sprintf('...(more %d length)', $strlen - $limit);
                     }
-                    return $value;
+                    return '"' . addcslashes($value, "\"\0\\") . '"';
                 }
                 // それ以外は stringify
                 else {
@@ -9645,7 +10303,7 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("stacktrace")
             return $export($value);
         };
 
-        $traces = $traces ?? array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
+        $traces = $traces ?? array_slice(debug_backtrace(), 1);
         $result = [];
         foreach ($traces as $i => $trace) {
             // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）

@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L212" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L204" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Network</span></h2>
@@ -203,10 +203,10 @@ assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L88-L211" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L88-L203" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_requests()" tabindex="-1" class="structure-title ">
-                        http_requests						<small>($urls)</small>
+                        http_requests						<small>($urls, $default_options = [])</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>http リクエストを並列で投げる</p>
@@ -252,6 +252,12 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 				<td class="type">array</td>
 				<td class="rest">$urls</td>
 				<td class="desc"><p>実行する curl オプション</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$default_options = []</td>
+				<td class="desc"><p>全 $urls に適用されるデフォルトオプション</p>
 </td>
 			</tr>
         		</tbody>

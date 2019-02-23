@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L693" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L929" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
@@ -83,8 +83,114 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L10-L33" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-                                    							<span class="display-none" data-fqsen="ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()">			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/tests/Test/Package/UtilityTest.php#L7-L192" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L10-L211" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::date_interval()" tabindex="-1" class="structure-title ">
+                        date_interval						<small>($sec, $format = null, $limit_type = &#039;y&#039;)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
+<p>例えば <code>60 * 60 * 24 * 900 + 12345.678</code> （約900日12345秒）は・・・</p>
+<ul>
+<li>2 年（約900日なので）</li>
+<li>5 ヶ月（約(900 - 365 * 2 = 170)日なので）</li>
+<li>18 日（約(170 - 30.416 * 5 = 18)日なので）</li>
+<li>3 時間（約12345秒なので）</li>
+<li>25 分（約(12345 - 3600 * 3 = 1545)秒なので）</li>
+<li>45 秒（約(1545 - 60 * 25 = 45)秒なので）</li>
+<li>678 ミリ秒（.678 部分そのまま）</li>
+</ul>
+<p>となる（年はうるう年未考慮で365日、月は30.41666666日で換算）。</p>
+<p>$format を与えると DateInterval::format して文字列で返す。与えないと DateInterval をそのまま返す。<br />
+$format はクロージャを与えることができる。クロージャを与えた場合、各要素を引数としてコールバックされる。<br />
+$format は配列で与えることができる。配列で与えた場合、 0 になる要素は省かれる。<br />
+セパレータを与えたり、pre/suffix を与えたりできるが、難解なので省略する。</p>
+<p>$limit_type で換算のリミットを指定できる。例えば 'y' を指定すると「2年5ヶ月」となるが、 'm' を指定すると「29ヶ月」となる。<br />
+数値を与えるとその範囲でオートスケールする。例えば 3 を指定すると値が大きいとき <code>ymd</code> の表示になり、年が 0 になると <code>mdh</code> の表示に切り替わるようになる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 書式文字列指定（%vはミリ秒）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'), '02/05/18 03:25:45.678');
+
+// 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}), '678,45,25,3,18,5,2,0');
+
+// リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'), '00/29/18 03:25:45.678');
+
+// 書式に配列を与えてリミットに数値を与えるとその範囲でオートスケールする
+$format = [
+    'y' =&gt; '%y年',
+    'm' =&gt; '%mヶ月',
+    'd' =&gt; '%d日',
+    ' ',
+    'h' =&gt; '%h時間',
+    'i' =&gt; '%i分',
+    's' =&gt; '%s秒',
+];
+// 数が大きいので年・月・日の3要素のみ
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3), '2年5ヶ月18日');
+// 数がそこそこだと日・時間・分の3要素に切り替わる
+assertSame(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3), '20日 3時間25分');
+// どんなに数が小さくても3要素以下にはならない
+assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
+
+// 書式指定なし（DateInterval を返す）
+assertInstanceOf(\DateInterval::class, date_interval(123.456));
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">int<span class="type-separator"></span><wbr>float</td>
+				<td class="rest">$sec</td>
+				<td class="desc"><p>タイムスタンプ</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$format = null</td>
+				<td class="desc"><p>時刻フォーマット</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int</td>
+				<td class="rest">$limit_type = &#039;y&#039;</td>
+				<td class="desc"><p>どこまで換算するか（[c|y|m|d|h|i|s]）</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.dateinterval.php" class="fqsen" target="_blank">\DateInterval</a></td>
+			<td class="desc"><p>時間差文字列 or DateInterval オブジェクト</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L213-L236" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    							<span class="display-none" data-fqsen="ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()">			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/tests/Test/Package/UtilityTest.php#L102-L287" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             </span>
                         					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::get_uploaded_files()" tabindex="-1" class="structure-title ">
@@ -135,7 +241,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L35-L92" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L238-L295" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::cache()" tabindex="-1" class="structure-title ">
                         cache						<small>($key, $provider, $namespace = null, $use_internal = true)</small>
@@ -216,7 +322,7 @@ assertNotSame($rand1, $rand3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L94-L186" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L297-L389" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
                         process						<small>($command, $args = [], $stdin = &#039;&#039;, &amp;$stdout = &#039;&#039;, &amp;$stderr = &#039;&#039;, $cwd = null, $env = null)</small>
@@ -317,7 +423,7 @@ assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "er
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L188-L328" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L391-L564" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
                         arguments						<small>($rule, $argv = null)</small>
@@ -338,6 +444,10 @@ $rule 配列の仕様は下記。</p>
 <li>値は「デフォルト値」を指定する。ただし・・・<ul>
 <li><code>[]</code> は「複数値オプション」を意味する（配列にしない限り同オプションの多重指定は許されない）</li>
 <li><code>null</code> は「値なしオプション」を意味する（スイッチングオプション）</li>
+</ul>
+</li>
+<li>空文字キーは解釈自体のオプションを与える<ul>
+<li>今のところ throw のみの実装。配列ではなく bool を与えられる</li>
 </ul>
 </li>
 </ul>
@@ -372,6 +482,17 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
     'opts'   =&gt; ['o1', 'o2', 'o3'], // ロング、ショート混在でも OK
     'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
     'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
+]);
+
+// 空文字で解釈自体のオプションを与える
+$rule = [
+    ''  =&gt; false, // 定義されていないオプションが来ても例外を投げずに引数として処理する
+];
+assertSame(arguments($rule, '--long A -short B'), [
+    '--long', // 明らかにオプション指定に見えるが、 long というオプションは定義されていないので引数として解釈される
+    'A',      // 同上。long のオプション値に見えるが、ただの引数
+    '-short', // 同上。short というオプションは定義されていない
+    'B',      // 同上。short のオプション値に見えるが、ただの引数
 ]);
 </code></pre>
 </div>
@@ -420,7 +541,7 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L330-L430" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L566-L666" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::stacktrace()" tabindex="-1" class="structure-title ">
                         stacktrace						<small>($traces = null, $option = [
@@ -485,7 +606,7 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L432-L489" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L668-L725" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::backtrace()" tabindex="-1" class="structure-title ">
                         backtrace						<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = [])</small>
@@ -556,7 +677,7 @@ assertArraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L491-L550" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L727-L786" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error						<small>($message, $destination = null)</small>
@@ -614,7 +735,7 @@ assertArraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L552-L579" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L788-L815" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
                         timer						<small>($callable, $count = 1)</small>
@@ -672,7 +793,7 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L581-L692" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L817-L928" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>

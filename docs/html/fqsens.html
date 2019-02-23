@@ -342,6 +342,13 @@ assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1), 'B');
 assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true), 'b');
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos_key()"> ryunosuke\Functions\Package\Arrays::array_pos_key()</a></h2>
+	<div class="description"><p>配列の指定キーの位置を返す</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'c'), 2);
+assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1), -1);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_of()"> ryunosuke\Functions\Package\Arrays::array_of()</a></h2>
 	<div class="description"><p>配列を与えると指定キーの値を返すクロージャを返す</p>
 <p>存在しない場合は $default を返す。</p>
@@ -504,6 +511,45 @@ assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
 <p>Example:</p>
 <pre><code class="language-php">assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#'), ['a' =&gt; 'A', 'aa' =&gt; 'AA']);
 assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', true), ['b' =&gt; 'B']);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_recursive()"> ryunosuke\Functions\Package\Arrays::array_map_recursive()</a></h2>
+	<div class="description"><p>array_map の再帰版</p>
+<p>下記の点で少し array_map とは挙動が異なる。</p>
+<ul>
+<li>配列だけでなく iterable も対象になる（引数で指定可能。デフォルト true）<ul>
+<li>つまりオブジェクト構造は維持されず、結果はすべて配列になる</li>
+</ul>
+</li>
+<li>値だけでなくキーも渡ってくる</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
+assertSame(array_map_recursive([
+    'k' =&gt; 'v',
+    'c' =&gt; new \ArrayObject([
+        'k1' =&gt; 'v1',
+        'k2' =&gt; 'v2',
+    ]),
+], 'strtoupper'), [
+    'k' =&gt; 'V',
+    'c' =&gt; [
+        'k1' =&gt; 'V1',
+        'k2' =&gt; 'V2',
+    ],
+]);
+
+// ただし、その挙動は引数で変更可能
+assertSame(array_map_recursive([
+    'k' =&gt; 'v',
+    'c' =&gt; new \ArrayObject([
+        'k1' =&gt; 'v1',
+        'k2' =&gt; 'v2',
+    ]),
+], 'gettype', false), [
+    'k' =&gt; 'string',
+    'c' =&gt; 'object',
+]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_key()"> ryunosuke\Functions\Package\Arrays::array_map_key()</a></h2>
@@ -2074,6 +2120,20 @@ assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}
 assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_ellipsis()"> ryunosuke\Functions\Package\Strings::str_ellipsis()</a></h2>
+	<div class="description"><p>文字列を指定幅に丸める</p>
+<p>mb_strimwidth と機能的には同じだが、省略文字の差し込み位置を $pos で指定できる。<br />
+$pos は負数が指定できる。負数の場合後ろから数えられる。<br />
+省略した場合は真ん中となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 8文字に丸める（$pos 省略なので真ん中が省略される）
+assertSame(str_ellipsis('1234567890', 8, '...'), '12...890');
+// 8文字に丸める（$pos=1 なので1文字目から省略される）
+assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
+// 8文字に丸める（$pos=-1 なので後ろから1文字目から省略される）
+assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()"> ryunosuke\Functions\Package\Strings::starts_with()</a></h2>
 	<div class="description"><p>指定文字列で始まるか調べる</p>
 <p>$with に配列を渡すといずれかで始まるときに true を返す。</p>
@@ -2118,6 +2178,27 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 	<div class="description"><p>chain-case に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::namespace_split()"> ryunosuke\Functions\Package\Strings::namespace_split()</a></h2>
+	<div class="description"><p>文字列を名前空間とローカル名に区切ってタプルで返す</p>
+<p>class_namespace/class_shorten や function_shorten とほぼ同じだが下記の違いがある。</p>
+<ul>
+<li>あくまで文字列として処理する<ul>
+<li>例えば class_namespace は get_class されるが、この関数は（いうなれば） strval される</li>
+</ul>
+</li>
+<li>\ を trim しないし、特別扱いもしない<ul>
+<li><code>ns\\hoge</code> と <code>\\ns\\hoge</code> で返り値が微妙に異なる</li>
+<li><code>ns\\</code> のような場合は名前空間だけを返す</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(namespace_split('ns\\hoge'), ['ns', 'hoge']);
+assertSame(namespace_split('hoge'), ['', 'hoge']);
+assertSame(namespace_split('ns\\'), ['ns', '']);
+assertSame(namespace_split('\\hoge'), ['', 'hoge']);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::htmltag()"> ryunosuke\Functions\Package\Strings::htmltag()</a></h2>
@@ -2341,6 +2422,36 @@ assertEquals("\n" . markdown_table([
 ");
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_list()"> ryunosuke\Functions\Package\Strings::markdown_list()</a></h2>
+	<div class="description"><p>配列を markdown リスト文字列にする</p>
+<p>Example:</p>
+<pre><code class="language-php">// 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
+assertEquals("\n" . markdown_list([
+    'dict'        =&gt; [
+        'Key1' =&gt; 'Value1',
+        'Key2' =&gt; 'Value2',
+    ],
+    'list'        =&gt; ['Item1', 'Item2', 'Item3'],
+    'dict &amp; list' =&gt; [
+        'Key' =&gt; 'Value',
+        ['Item1', 'Item2', 'Item3'],
+    ],
+], ['separator' =&gt; ':']), "
+- dict:
+    - Key1:Value1
+    - Key2:Value2
+- list:
+    - Item1
+    - Item2
+    - Item3
+- dict &amp; list:
+    - Key:Value
+        - Item1
+        - Item2
+        - Item3
+");
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::random_string()"> ryunosuke\Functions\Package\Strings::random_string()</a></h2>
 	<div class="description"><p>安全な乱数文字列を生成する</p>
 </div>
@@ -2436,6 +2547,58 @@ assertSame(str_guess("あいうえお", [
     'あいしてる', // マッチ度 40&amp;（"あい"がマッチ）
     'あいゆえに', // マッチ度 60&amp;（"あい", "え"がマッチ）
 ]), 'あいゆえに');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_array()"> ryunosuke\Functions\Package\Strings::str_array()</a></h2>
+	<div class="description"><p>文字列を区切り文字で区切って配列に変換する</p>
+<p>典型的には http ヘッダとか sar の結果とかを配列にする。</p>
+<p>Example:</p>
+<pre><code class="language-php">// http response header  を ":" 区切りで連想配列にする
+assertSame(str_array("
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Connection: Keep-Alive
+", ':', true), [
+    'HTTP/1.1 200 OK',
+    'Content-Type' =&gt; 'text/html; charset=utf-8',
+    'Connection'   =&gt; 'Keep-Alive',
+]);
+
+// sar の結果を " " 区切りで連想配列の配列にする
+assertSame(str_array("
+13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
+13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
+13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
+", ' ', false), [
+    1 =&gt; [
+        '13:00:01' =&gt; '13:10:01',
+        'CPU'      =&gt; 'all',
+        '%user'    =&gt; '0.99',
+        '%nice'    =&gt; '0.10',
+        '%system'  =&gt; '0.71',
+        '%iowait'  =&gt; '0.00',
+        '%steal'   =&gt; '0.00',
+        '%idle'    =&gt; '98.19',
+    ],
+    2 =&gt; [
+        '13:00:01' =&gt; '13:20:01',
+        'CPU'      =&gt; 'all',
+        '%user'    =&gt; '0.60',
+        '%nice'    =&gt; '0.10',
+        '%system'  =&gt; '0.56',
+        '%iowait'  =&gt; '0.00',
+        '%steal'   =&gt; '0.00',
+        '%idle'    =&gt; '98.74',
+    ],
+]);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_substr_replace()"> ryunosuke\Functions\Package\Strings::mb_substr_replace()</a></h2>
+	<div class="description"><p>マルチバイト対応 substr_replace</p>
+<p>本家は配列を与えたりできるが、ややこしいし使う気がしないので未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 数値キーが参照できる
+assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()"> ryunosuke\Functions\Package\Strings::render_string()</a></h2>
@@ -2654,6 +2817,21 @@ assertSame(ifelse($heavyfunc(null), false, 'default'), null);
 assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::switchs()"> ryunosuke\Functions\Package\Syntax::switchs()</a></h2>
+	<div class="description"><p>switch 構文の関数版</p>
+<p>case にクロージャを与えると実行して返す。<br />
+つまり、クロージャを返すことは出来ないので注意。</p>
+<p>$default を与えないとマッチしなかったときに例外を投げる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$cases = [
+    1 =&gt; 'value is 1',
+    2 =&gt; function(){return 'value is 2';},
+];
+assertSame(switchs(1, $cases), 'value is 1');
+assertSame(switchs(2, $cases), 'value is 2');
+assertSame(switchs(3, $cases, 'undefined'), 'undefined');
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch()"> ryunosuke\Functions\Package\Syntax::try_catch()</a></h2>
 	<div class="description"><p>try ～ catch 構文の関数版</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
@@ -2701,7 +2879,57 @@ assertSame($finally_count, 2); // 呼ばれている
             	<h2>class<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility"> ryunosuke\Functions\Package\Utility</a></h2>
 	<div class="description"><p>汎用的なユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()"> ryunosuke\Functions\Package\Utility::get_uploaded_files()</a></h2>
+                	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::date_interval()"> ryunosuke\Functions\Package\Utility::date_interval()</a></h2>
+	<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
+<p>例えば <code>60 * 60 * 24 * 900 + 12345.678</code> （約900日12345秒）は・・・</p>
+<ul>
+<li>2 年（約900日なので）</li>
+<li>5 ヶ月（約(900 - 365 * 2 = 170)日なので）</li>
+<li>18 日（約(170 - 30.416 * 5 = 18)日なので）</li>
+<li>3 時間（約12345秒なので）</li>
+<li>25 分（約(12345 - 3600 * 3 = 1545)秒なので）</li>
+<li>45 秒（約(1545 - 60 * 25 = 45)秒なので）</li>
+<li>678 ミリ秒（.678 部分そのまま）</li>
+</ul>
+<p>となる（年はうるう年未考慮で365日、月は30.41666666日で換算）。</p>
+<p>$format を与えると DateInterval::format して文字列で返す。与えないと DateInterval をそのまま返す。<br />
+$format はクロージャを与えることができる。クロージャを与えた場合、各要素を引数としてコールバックされる。<br />
+$format は配列で与えることができる。配列で与えた場合、 0 になる要素は省かれる。<br />
+セパレータを与えたり、pre/suffix を与えたりできるが、難解なので省略する。</p>
+<p>$limit_type で換算のリミットを指定できる。例えば 'y' を指定すると「2年5ヶ月」となるが、 'm' を指定すると「29ヶ月」となる。<br />
+数値を与えるとその範囲でオートスケールする。例えば 3 を指定すると値が大きいとき <code>ymd</code> の表示になり、年が 0 になると <code>mdh</code> の表示に切り替わるようになる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 書式文字列指定（%vはミリ秒）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'), '02/05/18 03:25:45.678');
+
+// 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}), '678,45,25,3,18,5,2,0');
+
+// リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'), '00/29/18 03:25:45.678');
+
+// 書式に配列を与えてリミットに数値を与えるとその範囲でオートスケールする
+$format = [
+    'y' =&gt; '%y年',
+    'm' =&gt; '%mヶ月',
+    'd' =&gt; '%d日',
+    ' ',
+    'h' =&gt; '%h時間',
+    'i' =&gt; '%i分',
+    's' =&gt; '%s秒',
+];
+// 数が大きいので年・月・日の3要素のみ
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3), '2年5ヶ月18日');
+// 数がそこそこだと日・時間・分の3要素に切り替わる
+assertSame(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3), '20日 3時間25分');
+// どんなに数が小さくても3要素以下にはならない
+assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
+
+// 書式指定なし（DateInterval を返す）
+assertInstanceOf(\DateInterval::class, date_interval(123.456));
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()"> ryunosuke\Functions\Package\Utility::get_uploaded_files()</a></h2>
 	<div class="description"><p>$_FILES の構造を組み替えて $_POST などと同じにする</p>
 <p>$_FILES の配列構造はバグとしか思えないのでそれを是正する関数。<br />
 第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。</p>
@@ -2765,6 +2993,10 @@ $rule 配列の仕様は下記。</p>
 <li><code>null</code> は「値なしオプション」を意味する（スイッチングオプション）</li>
 </ul>
 </li>
+<li>空文字キーは解釈自体のオプションを与える<ul>
+<li>今のところ throw のみの実装。配列ではなく bool を与えられる</li>
+</ul>
+</li>
 </ul>
 <p>上記の仕様でパースして「引数は数値連番、オプションはオプション名をキーとした配列」を返す。<br />
 なお、いわゆる「引数」はどこに来ても良い（前オプション、後オプションの区別がない）。</p>
@@ -2797,6 +3029,17 @@ assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
     'opts'   =&gt; ['o1', 'o2', 'o3'], // ロング、ショート混在でも OK
     'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
     'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
+]);
+
+// 空文字で解釈自体のオプションを与える
+$rule = [
+    ''  =&gt; false, // 定義されていないオプションが来ても例外を投げずに引数として処理する
+];
+assertSame(arguments($rule, '--long A -short B'), [
+    '--long', // 明らかにオプション指定に見えるが、 long というオプションは定義されていないので引数として解釈される
+    'A',      // 同上。long のオプション値に見えるが、ただの引数
+    '-short', // 同上。short というオプションは定義されていない
+    'B',      // 同上。short のオプション値に見えるが、ただの引数
 ]);
 </code></pre>
 </div>
