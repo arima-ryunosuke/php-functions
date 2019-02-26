@@ -186,16 +186,7 @@ class Network
                 else {
                     $info = curl_getinfo($handle);
                     $response = curl_multi_getcontent($handle);
-                    $headers = [];
-                    foreach (preg_split('#\R#', substr($response, 0, $info['header_size']), -1, PREG_SPLIT_NO_EMPTY) as $header) {
-                        $parts = explode(':', $header, 2);
-                        if (isset($parts[1])) {
-                            $headers[trim($parts[0])] = trim($parts[1]);
-                        }
-                        else {
-                            $headers[] = trim($parts[0]);
-                        }
-                    }
+                    $headers = (str_array)(substr($response, 0, $info['header_size']), ':', true);
                     $body = substr($response, $info['header_size']);
                     $responses[$resultmap["$handle"]] = [$body, $headers, $info];
                 }

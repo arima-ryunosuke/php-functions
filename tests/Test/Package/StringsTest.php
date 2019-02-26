@@ -1139,6 +1139,64 @@ a2,b2,c2
         $this->assertException('is empty', str_guess, '', []);
     }
 
+    public function test_str_array()
+    {
+        // http header
+        $string = <<<TEXT
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Connection: Keep-Alive
+TEXT;
+        $this->assertEquals([
+            'HTTP/1.1 200 OK',
+            'Content-Type' => 'text/html; charset=utf-8',
+            'Connection'   => 'Keep-Alive',
+        ], (str_array)($string, ':', true));
+
+        // sar
+        $string = <<<TEXT
+13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
+13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
+13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
+TEXT;
+        $this->assertEquals([
+            1 => [
+                '13:00:01' => '13:10:01',
+                'CPU'      => 'all',
+                '%user'    => '0.99',
+                '%nice'    => '0.10',
+                '%system'  => '0.71',
+                '%iowait'  => '0.00',
+                '%steal'   => '0.00',
+                '%idle'    => '98.19',
+            ],
+            2 => [
+                '13:00:01' => '13:20:01',
+                'CPU'      => 'all',
+                '%user'    => '0.60',
+                '%nice'    => '0.10',
+                '%system'  => '0.56',
+                '%iowait'  => '0.00',
+                '%steal'   => '0.00',
+                '%idle'    => '98.74',
+            ],
+        ], (str_array)($string, ' ', false));
+
+        // misc
+        $this->assertEquals([
+            'a' => 'A',
+            'b' => 'B',
+            2   => '',
+            3   => 'c',
+        ], (str_array)("a=A\n\nb=B\n \nc", '=', true));
+        $this->assertEquals([
+            1 => ['a' => '1', 'b' => '2', 'c' => '3'],
+            2 => ['a' => '4', 'b' => '5', 'c' => '6'],
+            3 => null,
+            4 => ['a' => '7', 'b' => '8', 'c' => '9'],
+        ], (str_array)("a+b+c\n1+2+3\n\n4+5+6\n \n7+8+9", '+', false));
+    }
+
     public function test_render_string()
     {
         // single
