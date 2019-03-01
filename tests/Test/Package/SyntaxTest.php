@@ -229,6 +229,18 @@ class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('OK', (ifelse)('hoge', 'is_string', 'OK'));
     }
 
+    function test_switchs()
+    {
+        $cases = [
+            1 => 'value is 1',
+            2 => function () { return 'value is 2'; },
+        ];
+        $this->assertEquals('value is 1', (switchs)(1, $cases, 'undefined'));
+        $this->assertEquals('value is 2', (switchs)(2, $cases, 'undefined'));
+        $this->assertEquals('undefined', (switchs)(3, $cases, 'undefined'));
+        $this->assertException('is not defined in', switchs, 9, $cases);
+    }
+
     function test_try_catch()
     {
         $try = function () {
