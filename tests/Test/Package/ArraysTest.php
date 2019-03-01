@@ -345,6 +345,13 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('OutOfBoundsException', array_pos, ['x', 'y', 'z'], 9, true);
     }
 
+    function test_array_pos_key()
+    {
+        $this->assertEquals((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'), 2);
+        $this->assertEquals((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1), -1);
+        $this->assertException('OutOfBoundsException', array_pos_key, ['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x');
+    }
+
     function test_array_of()
     {
         $hoge_of = (array_of)('hoge');

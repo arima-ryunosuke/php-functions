@@ -849,6 +849,39 @@ class Arrays
     }
 
     /**
+     * 配列の指定キーの位置を返す
+     *
+     * Example:
+     * ```php
+     * assertSame(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'), 2);
+     * assertSame(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1), -1);
+     * ```
+     *
+     * @param array $array 対象配列
+     * @param string|int $key 取得する位置
+     * @param mixed $default 見つからなかったときのデフォルト値。指定しないと例外
+     * @return mixed 指定キーの位置
+     */
+    public static function array_pos_key($array, $key, $default = null)
+    {
+        // very slow
+        // return array_flip(array_keys($array))[$key];
+
+        $n = 0;
+        foreach ($array as $k => $v) {
+            if ($k === $key) {
+                return $n;
+            }
+            $n++;
+        }
+
+        if (func_num_args() === 2) {
+            throw new \OutOfBoundsException("$key is not found.");
+        }
+        return $default;
+    }
+
+    /**
      * 配列を与えると指定キーの値を返すクロージャを返す
      *
      * 存在しない場合は $default を返す。
