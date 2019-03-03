@@ -551,6 +551,53 @@ class Strings
     }
 
     /**
+     * 文字列を指定幅に丸める
+     *
+     * mb_strimwidth と機能的には同じだが、省略文字の差し込み位置を $pos で指定できる。
+     * $pos は負数が指定できる。負数の場合後ろから数えられる。
+     * 省略した場合は真ん中となる。
+     *
+     * Example:
+     * ```php
+     * // 8文字に丸める（$pos 省略なので真ん中が省略される）
+     * assertSame(str_ellipsis('1234567890', 8, '...'), '12...890');
+     * // 8文字に丸める（$pos=1 なので1文字目から省略される）
+     * assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
+     * // 8文字に丸める（$pos=-1 なので後ろから1文字目から省略される）
+     * assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param int $width 丸める幅
+     * @param string $trimmarker 省略文字列
+     * @param int|null $pos 省略記号の差し込み位置
+     * @return string 丸められた文字列
+     */
+    public static function str_ellipsis($string, $width, $trimmarker = '...', $pos = null)
+    {
+        $string = (string) $string;
+
+        $strlen = mb_strlen($string);
+        if ($strlen <= $width) {
+            return $string;
+        }
+
+        $markerlen = mb_strlen($trimmarker);
+        if ($markerlen >= $width) {
+            return $trimmarker;
+        }
+
+        $length = $width - $markerlen;
+        $pos = $pos ?? $length / 2;
+        if ($pos < 0) {
+            $pos += $length;
+        }
+        $pos = max(0, min($pos, $length));
+
+        return (mb_substr_replace)($string, $trimmarker, $pos, $strlen - $length);
+    }
+
+    /**
      * 指定文字列で始まるか調べる
      *
      * $with に配列を渡すといずれかで始まるときに true を返す。

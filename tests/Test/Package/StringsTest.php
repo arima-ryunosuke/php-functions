@@ -306,6 +306,42 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame('nest1{nest2{nest3}}', (str_between)('{nest1{nest2{nest3}}}', '{', '}'));
     }
 
+    function test_str_ellipsis()
+    {
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', 0));
+        $this->assertSame('1...7890', (str_ellipsis)('1234567890', 8, '...', 1));
+        $this->assertSame('12...890', (str_ellipsis)('1234567890', 8, '...', 2));
+        $this->assertSame('123...90', (str_ellipsis)('1234567890', 8, '...', 3));
+        $this->assertSame('1234...0', (str_ellipsis)('1234567890', 8, '...', 4));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 5));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 6));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 7));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 8));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 9));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 10));
+        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 11));
+        $this->assertSame('1234...0', (str_ellipsis)('1234567890', 8, '...', -1));
+        $this->assertSame('123...90', (str_ellipsis)('1234567890', 8, '...', -2));
+        $this->assertSame('12...890', (str_ellipsis)('1234567890', 8, '...', -3));
+        $this->assertSame('1...7890', (str_ellipsis)('1234567890', 8, '...', -4));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -5));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -6));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -7));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -8));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -9));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -10));
+        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -11));
+
+        $this->assertSame('12...890', (str_ellipsis)('1234567890', 8, '...', null));
+        $this->assertSame('12...90', (str_ellipsis)('1234567890', 7, '...', null));
+
+        $this->assertSame('１２・・・８９０', (str_ellipsis)('１２３４５６７８９０', 8, '・・・', null));
+        $this->assertSame('１２・・・９０', (str_ellipsis)('１２３４５６７８９０', 7, '・・・', null));
+
+        $this->assertSame('...', (str_ellipsis)('1234567890', 1, '...', null));
+        $this->assertSame('1234567890', (str_ellipsis)('1234567890', 1000, '...', null));
+    }
+
     function test_starts_with()
     {
         $this->assertTrue((starts_with)('abcdef', 'abc'));
