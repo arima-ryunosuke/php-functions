@@ -234,6 +234,8 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('Zxxxx', (str_subreplace)($string, 'x', [-5 => 'Z']));
         // case insensitivity
         $this->assertEquals('i1xxxx', (str_subreplace)($string, 'X', ['i1'], true));
+        // multibyte
+        $this->assertEquals('ああかああ', (str_subreplace)('あああああ', 'あ', [2 => 'か']));
         // no number
         $this->assertException("key must be integer", str_subreplace, $string, 'x', ['s' => '']);
         // out od range
@@ -1137,6 +1139,31 @@ a2,b2,c2
         $this->assertEquals(0, $percent);
 
         $this->assertException('is empty', str_guess, '', []);
+    }
+
+    function test_mb_substr_replace()
+    {
+        // 素の挙動は substr_replace と全く変わらない
+        $params = [
+            ['0123456789', 'X', 2, null],
+            ['0123456789', 'X', 2, 0],
+            ['0123456789', 'X', 2, 6],
+            ['0123456789', 'X', 2, -2],
+            ['0123456789', 'X', -8, 6],
+            ['0123456789', 'X', -8, -2],
+            ['0123456789', 'X', -8, 999],
+            ['0123456789', 'X', -999, 999],
+        ];
+        foreach ($params as $param) {
+            $this->assertEquals(substr_replace(...$param), (mb_substr_replace)(...$param), implode(', ', $param));
+        }
+
+        // もちろんマルチバイトでも動作する
+        $this->assertEquals('０１X２３４５６７８９', (mb_substr_replace)('０１２３４５６７８９', 'X', 2, null));
+        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', 2, 6));
+        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', 2, -2));
+        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', -8, 6));
+        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', -8, -2));
     }
 
     public function test_str_array()
