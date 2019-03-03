@@ -392,7 +392,7 @@ class Utility
                     if (($strlen = strlen($value)) > $limit) {
                         $value = substr($value, 0, $limit) . sprintf('...(more %d length)', $strlen - $limit);
                     }
-                    return $value;
+                    return '"' . addcslashes($value, "\"\0\\") . '"';
                 }
                 // それ以外は stringify
                 else {
@@ -403,7 +403,7 @@ class Utility
             return $export($value);
         };
 
-        $traces = $traces ?? array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
+        $traces = $traces ?? array_slice(debug_backtrace(), 1);
         $result = [];
         foreach ($traces as $i => $trace) {
             // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）

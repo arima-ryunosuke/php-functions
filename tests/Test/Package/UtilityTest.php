@@ -440,11 +440,11 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertContains('123456789', $traces);
         $this->assertContains('stringarg', $traces);
         $this->assertContains('long string long...(more 19 length)', $traces);
-        $this->assertContains('Concrete{value:null, name:fields}', $traces);
-        $this->assertContains('[a, b, c]', $traces);
-        $this->assertContains('{a:A, b:B, c:C}', $traces);
-        $this->assertContains('{n:{e:{s:{t:X}}}}', $traces);
-        $this->assertContains('[la, la, la, la, la, la, la, la, la, la, la, la, la, la, la, la, ...(more 1 length)]', $traces);
+        $this->assertContains('Concrete{value:null, name:"fields"}', $traces);
+        $this->assertContains('["a", "b", "c"]', $traces);
+        $this->assertContains('{a:"A", b:"B", c:"C"}', $traces);
+        $this->assertContains('{n:{e:{s:{t:"X"}}}}', $traces);
+        $this->assertContains('["la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", ...(more 1 length)', $traces);
 
         $traces = (stacktrace)([
             [
@@ -466,7 +466,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
                 ],
             ]
         ], 2);
-        $this->assertEquals('hoge:1 func(ab...(more 1 length), [a, b, ...(more 1 length)])', $traces);
+        $this->assertEquals('hoge:1 func("ab...(more 1 length)", ["a", "b", ...(more 1 length)])', $traces);
     }
 
     function test_backtrace()
