@@ -201,6 +201,8 @@ class Utility
      * - 値は「デフォルト値」を指定する。ただし・・・
      *     - `[]` は「複数値オプション」を意味する（配列にしない限り同オプションの多重指定は許されない）
      *     - `null` は「値なしオプション」を意味する（スイッチングオプション）
+     * - 空文字キーは解釈自体のオプションを与える
+     *     - 今のところ throw のみの実装。配列ではなく bool を与えられる
      *
      * 上記の仕様でパースして「引数は数値連番、オプションはオプション名をキーとした配列」を返す。
      * なお、いわゆる「引数」はどこに来ても良い（前オプション、後オプションの区別がない）。
@@ -237,6 +239,17 @@ class Utility
      *     'arg1', // 一見 -ln のオプション値に見えるが、 noval は値なしなので引数として得られる
      *     'arg2', // 前オプション、後オプションの区別はないのでどこに居ようと引数として得られる
      * ]);
+     *
+     * // 空文字で解釈自体のオプションを与える
+     * $rule = [
+     *     ''  => false, // 定義されていないオプションが来ても例外を投げずに引数として処理する
+     * ];
+     * assertSame(arguments($rule, '--long A -short B'), [
+     *     '--long', // 明らかにオプション指定に見えるが、 long というオプションは定義されていないので引数として解釈される
+     *     'A',      // 同上。long のオプション値に見えるが、ただの引数
+     *     '-short', // 同上。short というオプションは定義されていない
+     *     'B',      // 同上。short のオプション値に見えるが、ただの引数
+     * ]);
      * ```
      *
      * @param array $rule オプションルール
@@ -245,13 +258,20 @@ class Utility
      */
     public static function arguments($rule, $argv = null)
     {
+        $opt = (array_unset)($rule, '', []);
+        if (is_bool($opt)) {
+            $opt = ['thrown' => $opt];
+        }
+        $opt += [
+            'thrown' => true,
+        ];
+
         if ($argv === null) {
             $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
         }
         if (is_string($argv)) {
             $argv = (quoteexplode)([" ", "\t"], $argv);
             $argv = array_filter($argv, 'strlen');
-            $argv = array_map(function ($v) { return trim(str_replace('\\"', '"', $v), '"'); }, $argv);
         }
         $argv = array_values($argv);
 
@@ -263,7 +283,7 @@ class Utility
                 $argsdefaults[$name] = $default;
                 continue;
             }
-            list($longname, $shortname) = preg_split('#\s+#', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
+            list($longname, $shortname) = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
             if ($shortname !== null) {
                 if (array_key_exists($shortname, $shortmap)) {
                     throw new \InvalidArgumentException("duplicated short option name '$shortname'");
@@ -283,9 +303,17 @@ class Utility
             if (strlen($token) >= 2 && $token[0] === '-') {
                 if ($token[1] === '-') {
                     $optname = substr($token, 2);
+                    if (!$opt['thrown'] && !array_key_exists($optname, $optsdefaults)) {
+                        $result[$n++] = $token;
+                        continue;
+                    }
                 }
                 else {
                     $shortname = substr($token, 1);
+                    if (!$opt['thrown'] && !isset($shortmap[$shortname])) {
+                        $result[$n++] = $token;
+                        continue;
+                    }
                     if (strlen($shortname) > 1) {
                         array_unshift($argv, '-' . substr($shortname, 1));
                         $shortname = substr($shortname, 0, 1);
@@ -324,6 +352,11 @@ class Utility
             }
         }
 
+        array_walk_recursive($result, function (&$v) {
+            if (is_string($v)) {
+                $v = trim(str_replace('\\"', '"', $v), '"');
+            }
+        });
         return $result + $argsdefaults;
     }
 

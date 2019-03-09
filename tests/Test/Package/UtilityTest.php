@@ -373,14 +373,26 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
             'opt' => '',
         ], '--opt "A B" "arg1 arg2" "a\\"b"'));
 
-        // ルール不正
-        $this->assertException('duplicated option name', arguments, ['opt1' => null, 'opt1 o' => null]);
-        $this->assertException('duplicated short option', arguments, ['opt1 o' => null, 'opt2 o' => null]);
+        // 知らんオプションが与えられた・・・が、 thrown が false である
+        $this->assertSame([
+            'opt1' => 'A',
+            'opt2' => 'B',
+            '--long',
+            '-short',
+        ], (arguments)([
+            ''       => false,
+            'opt1'   => '',
+            'opt2 o' => '',
+        ], '--opt1 A --long -o B -short'));
 
         // 知らんオプションが与えられた
         $this->assertException('undefined option name', arguments, [], 'arg1 arg2 --hoge');
         $this->assertException('undefined short option', arguments, [], 'arg1 arg2 -h');
         $this->assertException('undefined short option', arguments, ['o1 a' => null, 'o2 b' => null], 'arg1 arg2 -abc');
+
+        // ルール不正
+        $this->assertException('duplicated option name', arguments, ['opt1' => null, 'opt1 o' => null]);
+        $this->assertException('duplicated short option', arguments, ['opt1 o' => null, 'opt2 o' => null]);
 
         // 複数指定された
         $this->assertException('specified already', arguments, ['noreq n' => null], '--noreq arg1 arg2 -n');
