@@ -1350,6 +1350,71 @@ class Arrays
     }
 
     /**
+     * array_map の再帰版
+     *
+     * 下記の点で少し array_map とは挙動が異なる。
+     *
+     * - 配列だけでなく iterable も対象になる（引数で指定可能。デフォルト true）
+     *     - つまりオブジェクト構造は維持されず、結果はすべて配列になる
+     * - 値だけでなくキーも渡ってくる
+     *
+     * Example:
+     * ```php
+     * // array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
+     * assertSame(array_map_recursive([
+     *     'k' => 'v',
+     *     'c' => new \ArrayObject([
+     *         'k1' => 'v1',
+     *         'k2' => 'v2',
+     *     ]),
+     * ], 'strtoupper'), [
+     *     'k' => 'V',
+     *     'c' => [
+     *         'k1' => 'V1',
+     *         'k2' => 'V2',
+     *     ],
+     * ]);
+     *
+     * // ただし、その挙動は引数で変更可能
+     * assertSame(array_map_recursive([
+     *     'k' => 'v',
+     *     'c' => new \ArrayObject([
+     *         'k1' => 'v1',
+     *         'k2' => 'v2',
+     *     ]),
+     * ], 'gettype', false), [
+     *     'k' => 'string',
+     *     'c' => 'object',
+     * ]);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param callable $callback 評価クロージャ
+     * @param bool $iterable is_iterable で判定するか
+     * @return array map された新しい配列
+     */
+    public static function array_map_recursive($array, $callback, $iterable = true)
+    {
+        $callback = (func_user_func_array)($callback);
+
+        // ↑の変換を再帰ごとにやるのは現実的ではないのでクロージャに閉じ込めて再帰する
+        $main = static function ($array) use (&$main, $callback, $iterable) {
+            $result = [];
+            foreach ($array as $k => $v) {
+                if (($iterable && (is_iterable)($v)) || (!$iterable && is_array($v))) {
+                    $result[$k] = $main($v);
+                }
+                else {
+                    $result[$k] = $callback($v, $k);
+                }
+            }
+            return $result;
+        };
+
+        return $main($array);
+    }
+
+    /**
      * キーをマップして変換する
      *
      * $callback が null を返すとその要素は取り除かれる。

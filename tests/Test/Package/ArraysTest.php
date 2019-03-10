@@ -682,6 +682,34 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(['fuga' => 'FUGA'], (array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#', true));
     }
 
+    function test_array_map_recursive()
+    {
+        $this->assertSame((array_map_recursive)([
+            'k' => 'v',
+            'c' => new \ArrayObject([
+                'k1' => 'v1',
+                'k2' => 'v2',
+            ]),
+        ], 'strtoupper'), [
+            'k' => 'V',
+            'c' => [
+                'k1' => 'V1',
+                'k2' => 'V2',
+            ],
+        ]);
+
+        $this->assertSame((array_map_recursive)([
+            'k' => 'v',
+            'c' => new \ArrayObject([
+                'k1' => 'v1',
+                'k2' => 'v2',
+            ]),
+        ], 'gettype', false), [
+            'k' => 'string',
+            'c' => 'object',
+        ]);
+    }
+
     function test_array_map_key()
     {
         $this->assertEquals(['A' => 'A', 'B' => 'B'], (array_map_key)(['a' => 'A', 'b' => 'B'], 'strtoupper'));
