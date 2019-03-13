@@ -368,11 +368,12 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ];
         /** @noinspection PhpUndefinedMethodInspection */
         $files = ((reflect_callable)(tmpname))->getStaticVariables()['files'];
-        $this->assertArraySubset($list, $files);
+        $this->assertEquals($list, array_keys($files));
 
-        // こういうこともできるっぽいが多分黒魔術（カバレッジもされないし…）まぁコケてはくれるので許容する
-        register_shutdown_function(function ($wd) {
-            $this->assertEquals([], glob("$wd/*"));
-        }, $wd);
+        foreach ($files as $name => $file) {
+            $this->assertFileExists($name);
+            $file();
+            $this->assertFileNotExists($name);
+        }
     }
 }

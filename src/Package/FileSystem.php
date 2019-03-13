@@ -603,21 +603,23 @@ class FileSystem
 
         // 生成したファイルを覚えておいて最後に消す
         static $files = [];
-        $files[] = $tempfile;
-        // ただし、 shutdown_function にあまり大量に追加したくないので初回のみ登録する（$files は参照で渡す）
-        if (count($files) === 1) {
-            register_shutdown_function(function () use (&$files) {
-                // @codeCoverageIgnoreStart
-                foreach ($files as $file) {
-                    // 明示的に消されたかもしれないので file_exists してから消す
-                    if (file_exists($file)) {
-                        // レースコンディションのため @ を付ける
-                        @unlink($file);
-                    }
+        $files[$tempfile] = new class($tempfile)
+        {
+            private $tempfile;
+
+            public function __construct($tempfile) { $this->tempfile = $tempfile; }
+
+            public function __destruct() { return $this(); }
+
+            public function __invoke()
+            {
+                // 明示的に消されたかもしれないので file_exists してから消す
+                if (file_exists($this->tempfile)) {
+                    // レースコンディションのため @ を付ける
+                    @unlink($this->tempfile);
                 }
-                // @codeCoverageIgnoreEnd
-            });
-        }
+            }
+        };
 
         return $tempfile;
     }
