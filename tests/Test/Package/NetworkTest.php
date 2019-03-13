@@ -47,19 +47,19 @@ class NetworkTest extends \ryunosuke\Test\AbstractTestCase
 
         $time = microtime(true);
         $responses = (http_requests)([
-            'w1' => "$server/sleep.php?wait=1",
-            'w2' => "$server/sleep.php?wait=2",
+            'w3' => "$server/sleep.php?wait=3",
+            'w4' => "$server/sleep.php?wait=4",
             'to' => [
                 CURLOPT_URL     => "$server/sleep.php?wait=10",
-                CURLOPT_TIMEOUT => 2,
+                CURLOPT_TIMEOUT => 3,
             ],
         ], [
             CURLOPT_TIMEOUT => 10,
         ]);
         $time = microtime(true) - $time;
 
-        // トータルで最大である2秒程度（これがキモ。他はおまけに過ぎない）
-        $this->assertRange(1.8, 2.2, $time);
+        // 普通に投げると(3+4+3)秒かかるがそんなにかかっていないはず
+        $this->assertLessThan(7, $time);
 
         $this->assertEquals($responses['to'], CURLE_OPERATION_TIMEOUTED);
     }
