@@ -412,6 +412,16 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals('a-b-c-', (chain_case)('-ABC-'));
     }
 
+    function test_namespace_split()
+    {
+        $this->assertEquals(['ns', 'hoge'], (namespace_split)('ns\\hoge'));
+        $this->assertEquals(['\\ns', 'hoge'], (namespace_split)('\\ns\\hoge'));
+        $this->assertEquals(['\\ns', ''], (namespace_split)('\\ns\\'));
+        $this->assertEquals(['', 'hoge'], (namespace_split)('hoge'));
+        $this->assertEquals(['', 'hoge'], (namespace_split)('\\hoge'));
+        $this->assertEquals(['aaa', 'bbb'], (namespace_split)(new \Concrete('aaa\bbb')));
+    }
+
     function test_htmltag()
     {
         $this->assertEquals(
