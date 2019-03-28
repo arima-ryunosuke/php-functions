@@ -53,6 +53,8 @@ class NetworkTest extends \ryunosuke\Test\AbstractTestCase
                 CURLOPT_URL     => "$server/sleep.php?wait=10",
                 CURLOPT_TIMEOUT => 2,
             ],
+        ], [
+            CURLOPT_TIMEOUT => 10,
         ]);
         $time = microtime(true) - $time;
 

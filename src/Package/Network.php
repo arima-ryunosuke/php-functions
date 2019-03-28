@@ -127,9 +127,10 @@ class Network
      * ```
      *
      * @param array $urls 実行する curl オプション
+     * @param array $default_options 全 $urls に適用されるデフォルトオプション
      * @return array レスポンス配列。取得した順番でキーを保持しつつ追加される
      */
-    public static function http_requests($urls)
+    public static function http_requests($urls, $default_options = [])
     {
         // 固定オプション（必ずこの値が使用される）
         $default1 = [
@@ -139,7 +140,7 @@ class Network
         ];
 
         // 可変オプション（指定がない場合のみ使用される）
-        $default2 = [
+        $default_options += [
             CURLOPT_FOLLOWLOCATION => true, // リダイレクトをたどる
             CURLOPT_MAXREDIRS      => 16,   // リダイレクトをたどる回数
         ];
@@ -155,7 +156,7 @@ class Network
             }
 
             $ch = curl_init();
-            curl_setopt_array($ch, $default1 + $opt + $default2);
+            curl_setopt_array($ch, $default1 + $opt + $default_options);
             curl_multi_add_handle($mh, $ch);
 
             // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
