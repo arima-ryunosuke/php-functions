@@ -52,9 +52,32 @@ class Transporter
         file_put_contents("$dir/package.php", self::exportNamespace(__NAMESPACE__ . '\\Package', true));
     }
 
-    public static function exportNamespace($namespace, $classmode = false)
+    public static function exportNamespace($namespace, $classmode = false, $funcname = null)
     {
         $PREFIX = "Don't touch this code. This is auto generated.";
+
+        if ($funcname !== null) {
+            $depends = self::detectDependent();
+
+            $main = function ($funcname, &$result) use (&$main, $depends) {
+                foreach ($depends[$funcname]['constant'] ?? [] as $const) {
+                    $result['constant'][$const] = true;
+                }
+
+                $result['function'][$funcname] = true;
+                foreach ($depends[$funcname]['function'] ?? [] as $func) {
+                    if (!isset($result['function'][$func])) {
+                        $main($func, $result);
+                    }
+                }
+            };
+
+            $result = array_fill_keys(['constant', 'function'], []);
+            foreach ((array) $funcname as $name) {
+                $main($name, $result);
+            }
+            $funcname = $result;
+        }
 
         // このコンテキストで var_export2 は使えないのでインライン展開する
         $ve = function ($value, $nest = 0) use (&$ve) {
@@ -85,8 +108,8 @@ class Transporter
             }
             return is_string($value) ? '"' . addcslashes($value, "\"\0\\") . '"' : (is_null($value) ? 'null' : var_export($value, true));
         };
-        $consts = $contents = [];
 
+        $consts = $contents = [];
         foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
             $refclass = new \ReflectionClass(__NAMESPACE__ . "\\Package\\" . basename($fn, '.php'));
 
@@ -95,26 +118,34 @@ class Transporter
                 $doccomment = $cvalue instanceof \ReflectionClassConstant ? $cvalue->getDocComment() : '';
                 $cname = $cvalue instanceof \ReflectionClassConstant ? $cvalue->getName() : $cname;
                 $cvalue = $ve($cvalue instanceof \ReflectionClassConstant ? $cvalue->getValue() : $cvalue);
+                if ($funcname !== null && !isset($funcname['constant'][$cname])) {
+                    continue;
+                }
                 $consts[] = "$doccomment\nconst $cname = $cvalue;";
             }
 
             $lines = file($refclass->getFileName());
             foreach ($refclass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC) as $method) {
-                $doccomment = $method->getDocComment();
-                $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
                 $mname = $method->getName();
 
-                $sl = $method->getStartLine();
-                $el = $method->getEndLine();
-                $block = implode('', array_slice($lines, $sl - 1, $el - $sl + 1));
-                $block = preg_replace('#public static #', '', $block, 1);
-                $code = "    $doccomment\n$block";
+                if ($funcname !== null && !isset($funcname['function'][$mname])) {
+                    continue;
+                }
 
                 if ($classmode) {
                     $id = '[' . $ve($refclass->name) . ', ' . $ve($mname) . ']';
                     $contents[] = "const $mname = $id;";
                 }
                 else {
+                    $doccomment = $method->getDocComment();
+                    $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
+
+                    $sl = $method->getStartLine();
+                    $el = $method->getEndLine();
+                    $block = implode('', array_slice($lines, $sl - 1, $el - $sl + 1));
+                    $block = preg_replace('#public static #', '', $block, 1);
+                    $code = "    $doccomment\n$block";
+
                     $id = $ve(ltrim("$namespace\\$mname", '\\'));
                     $contents[] = "const $mname = $id;";
                     $contents[] = "if (!isset(\$excluded_functions[{$ve($mname)}]) && (!function_exists($id) || (!$polyfill && (new \\ReflectionFunction($id))->isInternal()))) {\n$code}\n";
@@ -123,5 +154,40 @@ class Transporter
         }
 
         return "<?php\n\n# $PREFIX\n\n" . ($namespace ? "namespace $namespace;\n\n" : "") . "# constants\n" . implode("\n", $consts) . "\n\n# functions\n" . implode("\n", $contents);
+    }
+
+    public static function detectDependent()
+    {
+        $consts = $methods = [];
+        foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
+            $refclass = new \ReflectionClass(__NAMESPACE__ . "\\Package\\" . basename($fn, '.php'));
+            $consts += $refclass->getConstants();
+            foreach ($refclass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC) as $method) {
+                $methods[$method->getName()] = $method;
+            }
+        }
+
+        $depends = array_fill_keys(array_keys($methods), [
+            'constant' => [],
+            'function' => [],
+        ]);
+        foreach ($methods as $name => $method) {
+            $sl = $method->getStartLine();
+            $el = $method->getEndLine();
+            $codeblock = implode('', array_slice(file($method->getFileName()), $sl, $el - $sl));
+
+            $tokens = token_get_all("<?php $codeblock");
+            foreach ($tokens as $token) {
+                if ($token[0] === T_STRING) {
+                    if (isset($consts[$token[1]])) {
+                        $depends[$name]['constant'][$token[1]] = true;
+                    }
+                    if (isset($methods[$token[1]])) {
+                        $depends[$name]['function'][$token[1]] = true;
+                    }
+                }
+            }
+        }
+        return array_map(function ($v) { return array_map('array_keys', $v); }, $depends);
     }
 }

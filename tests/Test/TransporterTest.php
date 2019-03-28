@@ -123,10 +123,6 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
             return;
         }
 
-        $dir = sys_get_temp_dir() . '/rfe';
-        (rm_rf)($dir);
-        (mkdir_p)($dir);
-
         // 内部テストのためにちょっと小細工する
         file_put_contents(__DIR__ . '/../../src/Package/Dummy.php', <<<DUMMY
 <?php
@@ -145,5 +141,24 @@ DUMMY
         $this->assertContains('namespace test\hoge;', $contents);
         $this->assertContains('const arrayize = ', $contents);
         $this->assertContains('function arrayize', $contents);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_exportNamespace_func()
+    {
+        if (getenv('TEST_TARGET') === 'namespace') {
+            return;
+        }
+
+        $contents = Transporter::exportNamespace('test\hoge', false, [
+            'callable_code',
+        ]);
+
+        $this->assertContains('callable_code', $contents);    // 自分自身が含まれている
+        $this->assertContains('const TOKEN_NAME', $contents); // 依存している定数が含まれている
+        $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
     }
 }
