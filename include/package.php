@@ -5,7 +5,7 @@
 namespace ryunosuke\Functions\Package;
 
 # constants
-/** SQL キーワード（全 RDBMS ごちゃまぜ） */
+
 const KEYWORDS = [
     ""  => "",
     0   => "ACCESSIBLE",
@@ -601,9 +601,9 @@ const KEYWORDS = [
     590 => "YEAR",
     591 => "YEARWEEK",
 ];
-/** json_*** 関数で $depth 引数を表す定数 */
+
 const JSON_MAX_DEPTH = -1;
-/** parse_php 関数でトークン名変換をするか */
+
 const TOKEN_NAME = 2;
 
 # functions
@@ -682,6 +682,7 @@ const object_dive = ["ryunosuke\\Functions\\Package\\Classobj", "object_dive"];
 const get_object_properties = ["ryunosuke\\Functions\\Package\\Classobj", "get_object_properties"];
 const file_list = ["ryunosuke\\Functions\\Package\\FileSystem", "file_list"];
 const file_tree = ["ryunosuke\\Functions\\Package\\FileSystem", "file_tree"];
+const file_suffix = ["ryunosuke\\Functions\\Package\\FileSystem", "file_suffix"];
 const file_extension = ["ryunosuke\\Functions\\Package\\FileSystem", "file_extension"];
 const file_set_contents = ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_contents"];
 const file_rewrite_contents = ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"];
@@ -695,6 +696,7 @@ const path_normalize = ["ryunosuke\\Functions\\Package\\FileSystem", "path_norma
 const cp_rf = ["ryunosuke\\Functions\\Package\\FileSystem", "cp_rf"];
 const rm_rf = ["ryunosuke\\Functions\\Package\\FileSystem", "rm_rf"];
 const tmpname = ["ryunosuke\\Functions\\Package\\FileSystem", "tmpname"];
+const memory_path = ["ryunosuke\\Functions\\Package\\FileSystem", "memory_path"];
 const delegate = ["ryunosuke\\Functions\\Package\\Funchand", "delegate"];
 const nbind = ["ryunosuke\\Functions\\Package\\Funchand", "nbind"];
 const lbind = ["ryunosuke\\Functions\\Package\\Funchand", "lbind"];
@@ -744,6 +746,7 @@ const str_lchop = ["ryunosuke\\Functions\\Package\\Strings", "str_lchop"];
 const str_rchop = ["ryunosuke\\Functions\\Package\\Strings", "str_rchop"];
 const str_putcsv = ["ryunosuke\\Functions\\Package\\Strings", "str_putcsv"];
 const str_subreplace = ["ryunosuke\\Functions\\Package\\Strings", "str_subreplace"];
+const str_submap = ["ryunosuke\\Functions\\Package\\Strings", "str_submap"];
 const str_between = ["ryunosuke\\Functions\\Package\\Strings", "str_between"];
 const str_ellipsis = ["ryunosuke\\Functions\\Package\\Strings", "str_ellipsis"];
 const starts_with = ["ryunosuke\\Functions\\Package\\Strings", "starts_with"];
@@ -775,6 +778,8 @@ const str_array = ["ryunosuke\\Functions\\Package\\Strings", "str_array"];
 const mb_substr_replace = ["ryunosuke\\Functions\\Package\\Strings", "mb_substr_replace"];
 const render_string = ["ryunosuke\\Functions\\Package\\Strings", "render_string"];
 const render_file = ["ryunosuke\\Functions\\Package\\Strings", "render_file"];
+const ob_include = ["ryunosuke\\Functions\\Package\\Strings", "ob_include"];
+const include_string = ["ryunosuke\\Functions\\Package\\Strings", "include_string"];
 const parse_php = ["ryunosuke\\Functions\\Package\\Syntax", "parse_php"];
 const returns = ["ryunosuke\\Functions\\Package\\Syntax", "returns"];
 const optional = ["ryunosuke\\Functions\\Package\\Syntax", "optional"];

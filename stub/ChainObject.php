@@ -1603,6 +1603,8 @@
  * @method   \ChainObject  file_set_contents($data, $umask = 2)
  * @method   \ChainObject  file_set_contents1($filename, $umask = 2)
  * @method   \ChainObject  file_set_contents2($filename, $data)
+ * @method   \ChainObject  file_suffix($suffix)
+ * @method   \ChainObject  file_suffix1($filename)
  * @property \ChainObject $file_tree
  * @method   \ChainObject  file_tree($filter_condition = null)
  * @method   \ChainObject  file_tree1($dirname)
@@ -1918,6 +1920,9 @@
  * @method   \ChainObject  in_array_or2($needle, $haystack)
  * @method   \ChainObject  incidr($cidr)
  * @method   \ChainObject  incidr1($ipaddr)
+ * @property \ChainObject $include_string
+ * @method   \ChainObject  include_string($array = [])
+ * @method   \ChainObject  include_string1($template)
  * @property \ChainObject $inet_ntop
  * @method   \ChainObject  inet_ntop()
  * @property \ChainObject $inet_pton
@@ -2325,6 +2330,8 @@
  * @method   \ChainObject  median5(...$variadic)
  * @method   \ChainObject  memory_get_peak_usage()
  * @method   \ChainObject  memory_get_usage()
+ * @property \ChainObject $memory_path
+ * @method   \ChainObject  memory_path()
  * @property \ChainObject $metaphone
  * @method   \ChainObject  metaphone($phones = null)
  * @method   \ChainObject  metaphone1($text)
@@ -2444,6 +2451,9 @@
  * @method   \ChainObject  ob_captureE6($callback, ...$variadic)
  * @method   \ChainObject  ob_get_status()
  * @method   \ChainObject  ob_implicit_flush()
+ * @property \ChainObject $ob_include
+ * @method   \ChainObject  ob_include($array = [])
+ * @method   \ChainObject  ob_include1($include_file)
  * @method   \ChainObject  ob_start($chunk_size = null, $flags = null)
  * @method   \ChainObject  ob_start1($user_function = null, $flags = null)
  * @method   \ChainObject  ob_start2($user_function = null, $chunk_size = null)
@@ -2875,6 +2885,12 @@
  * @property \ChainObject $split
  * @method   \ChainObject  split($split_length = null)
  * @method   \ChainObject  split1($str)
+ * @method   \ChainObject  str_submap($replaces, $case_insensitivity = false)
+ * @method   \ChainObject  str_submap1($subject, $case_insensitivity = false)
+ * @method   \ChainObject  str_submap2($subject, $replaces)
+ * @method   \ChainObject  submap($replaces, $case_insensitivity = false)
+ * @method   \ChainObject  submap1($subject, $case_insensitivity = false)
+ * @method   \ChainObject  submap2($subject, $replaces)
  * @method   \ChainObject  str_subreplace($search, $replaces, $case_insensitivity = false)
  * @method   \ChainObject  str_subreplace1($subject, $replaces, $case_insensitivity = false)
  * @method   \ChainObject  str_subreplace2($subject, $search, $case_insensitivity = false)

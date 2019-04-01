@@ -5,7 +5,7 @@
 namespace ryunosuke\Functions;
 
 # constants
-/** SQL キーワード（全 RDBMS ごちゃまぜ） */
+
 const KEYWORDS = [
     ""  => "",
     0   => "ACCESSIBLE",
@@ -601,9 +601,9 @@ const KEYWORDS = [
     590 => "YEAR",
     591 => "YEARWEEK",
 ];
-/** json_*** 関数で $depth 引数を表す定数 */
+
 const JSON_MAX_DEPTH = -1;
-/** parse_php 関数でトークン名変換をするか */
+
 const TOKEN_NAME = 2;
 
 # functions
@@ -1059,7 +1059,7 @@ if (!isset($excluded_functions["kvsort"]) && (!function_exists("ryunosuke\\Funct
      * さらに安定ソートであり、同値だとしても元の並び順は維持される。
      *
      * $comparator は省略できる。省略した場合、型に基づいてよしなにソートする。
-     * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）
+     * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）。
      *
      * ただし、標準のソート関数とは異なり、参照渡しではなくソートして返り値で返す。
      * また、いわゆる asort であり、キー・値は常に維持される。
@@ -1221,9 +1221,15 @@ if (!isset($excluded_functions["array_zip"]) && (!function_exists("ryunosuke\\Fu
      * Example:
      * ```php
      * // 普通の zip
-     * $this->assertEquals(array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+     * assertEquals(array_zip(
+     *     [1, 2, 3],
+     *     ['hoge', 'fuga', 'piyo']
+     * ), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
      * // キーが維持される
-     * $this->assertEquals(array_zip(['a' => 1, 2, 3], ['hoge', 'b' => 'fuga', 'piyo']), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
+     * assertEquals(array_zip(
+     *     ['a' => 1, 2, 3],
+     *     ['hoge', 'b' => 'fuga', 'piyo']
+     * ), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
      * ```
      *
      * @param array $arrays 対象配列（可変引数）
@@ -1291,9 +1297,15 @@ if (!isset($excluded_functions["array_cross"]) && (!function_exists("ryunosuke\\
      * Example:
      * ```php
      * // 普通の直積
-     * $this->assertSame(array_cross([1, 2], [3, 4]), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+     * assertSame(array_cross(
+     *     [1, 2],
+     *     [3, 4]
+     * ), [[1, 3], [1, 4], [2, 3], [2, 4]]);
      * // キーが維持される
-     * $this->assertSame(array_cross(['a' => 1, 2], ['b' => 3, 4]), [['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
+     * assertSame(array_cross(
+     *     ['a' => 1, 2],
+     *     ['b' => 3, 4]
+     * ), [['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
      * ```
      *
      * @param array $arrays 対象配列（可変引数）
@@ -2242,23 +2254,35 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ];
      * // 'flag' が true 相当のものだけ返す
-     * assertSame(array_where($array, 'flag'), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, 'flag'), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     * ]);
      * // 'name' に 'h' を含むものだけ返す
      * $contain_h = function($name){return strpos($name, 'h') !== false;};
-     * assertSame(array_where($array, 'name', $contain_h), [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
+     * assertSame(array_where($array, 'name', $contain_h), [
+     *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+     * ]);
      * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
      * $equal_2 = function($row, $key){return $key === 2;};
-     * assertSame(array_where($array, null, $equal_2), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * assertSame(array_where($array, null, $equal_2), [
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     * ]);
      * // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
-     * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
      * assertSame(array_where($array, [
      *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
      *     'name' => function($name){return strpos($name, 'o') !== false;}, // name に o を含む
-     * ]), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * ]), [
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2362,7 +2386,9 @@ if (!isset($excluded_functions["array_map_method"]) && (!function_exists("ryunos
      *
      * Example:
      * ```php
-     * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
+     * $exa = new \Exception('a');
+     * $exb = new \Exception('b');
+     * $std = new \stdClass();
      * // getMessage で map される
      * assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
@@ -2412,7 +2438,8 @@ if (!isset($excluded_functions["array_maps"]) && (!function_exists("ryunosuke\\F
      * assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
      * assertSame(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}), ['a' => 'a:A', 'b' => 'b:B']);
-     * // `@method` でメソッドコールになる
+     * // メソッドコールもできる（引数不要なら `@method` でも同じ）
+     * assertSame(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' => []]), ['a', 'b']);
      * assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
      * ```
      *
@@ -2794,10 +2821,20 @@ if (!isset($excluded_functions["array_assort"]) && (!function_exists("ryunosuke\
      * ```php
      * // lt2(2より小さい)で分類
      * $lt2 = function($v){return $v < 2;};
-     * assertSame(array_assort([1, 2, 3], ['lt2' => $lt2]), ['lt2' => [1]]);
+     * assertSame(array_assort([1, 2, 3], [
+     *     'lt2' => $lt2,
+     * ]), [
+     *     'lt2' => [1],
+     * ]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
      * $lt3 = function($v){return $v < 3;};
-     * assertSame(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']), ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
+     * assertSame(array_assort(['1', '2', '3'], [
+     *     'lt3' => $lt3,
+     *     'ctd' => 'ctype_digit',
+     * ]), [
+     *     'lt3' => ['1', '2'],
+     *     'ctd' => ['1', '2', '3'],
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2826,6 +2863,7 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\
      *
      * コールバックが true 相当を返した要素をカウントして返す。
      * 普通に使う分には `count(array_filter($array, $callback))` とほとんど同じだが、下記の点が微妙に異なる。
+     *
      * - $callback が要求するならキーも渡ってくる
      * - $callback には配列が渡せる。配列を渡した場合は件数を配列で返す（Example 参照）
      *
@@ -2838,7 +2876,10 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\
      * assertSame(array_count($array, [
      *     'a' => function($s){return strpos($s, 'a') !== false;},
      *     'o' => function($s){return strpos($s, 'o') !== false;},
-     * ]), ['a' => 1, 'o' => 2]);
+     * ]), [
+     *     'a' => 1,
+     *     'o' => 2,
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2877,12 +2918,18 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("ryunosuke\\
     /**
      * 配列をコールバックの返り値でグループ化する
      *
-     * コールバックが配列を返すと入れ子としてグループする。
+     * コールバックを省略すると値そのもので評価する。
+     * コールバックが配列を返すと入れ子としてグループ化する。
      *
      * Example:
      * ```php
-     * assertSame(array_group([1, 1, 1]), [1 => [1, 1, 1]]);
-     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 => [1, 3], 0 => [2]]);
+     * assertSame(array_group([1, 1, 1]), [
+     *     1 => [1, 1, 1],
+     * ]);
+     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [
+     *     1 => [1, 3],
+     *     0 => [2],
+     * ]);
      * // group -> id で入れ子グループにする
      * $row1 = ['id' => 1, 'group' => 'hoge'];
      * $row2 = ['id' => 2, 'group' => 'fuga'];
@@ -3017,7 +3064,7 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\
      *     'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
      *     'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
      *     'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
-     *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+     *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型に依存
      *     'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
      * ];
      * ```
@@ -3208,10 +3255,15 @@ if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("ryu
      *
      * Example:
      * ```php
+     * $abc = ['a', 'b', 'c'];
      * // [a, b, c] から [a => A, b => B, c => C] を作る
-     * assertSame(array_fill_callback(['a', 'b', 'c'], 'strtoupper'), ['a' => 'A', 'b' => 'B', 'c' => 'C']);
+     * assertSame(array_fill_callback($abc, 'strtoupper'), [
+     *     'a' => 'A',
+     *     'b' => 'B',
+     *     'c' => 'C',
+     * ]);
      * // [a, b, c] からその sha1 配列を作って大文字化する
-     * assertSame(array_fill_callback(['a', 'b', 'c'], function ($v){ return strtoupper(sha1($v)); }), [
+     * assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }), [
      *     'a' => '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
      *     'b' => 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
      *     'c' => '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -3240,12 +3292,13 @@ if (!isset($excluded_functions["array_pickup"]) && (!function_exists("ryunosuke\
      *
      * Example:
      * ```php
+     * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // a と c を取り出す
-     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']), ['a' => 'A', 'c' => 'C']);
+     * assertSame(array_pickup($array, ['a', 'c']), ['a' => 'A', 'c' => 'C']);
      * // 順番は $keys 基準になる
-     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * assertSame(array_pickup($array, ['c', 'a']), ['c' => 'C', 'a' => 'A']);
      * // 連想配列を渡すと読み替えて返す
-     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
+     * assertSame(array_pickup($array, ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -3284,13 +3337,20 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\
      *
      * Example:
      * ```php
-     * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
+     * $array = [
+     *     11 => ['id' => 1, 'name' => 'name1'],
+     *     12 => ['id' => 2, 'name' => 'name2'],
+     *     13 => ['id' => 3, 'name' => 'name3'],
+     * ];
      * // 第3引数を渡せば array_column と全く同じ
      * assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
      * assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
      * // 省略すればキーが保存される
-     * assertSame(array_lookup($array, 'name'), [11 => 'name1', 12 => 'name2', 13 => 'name3']);
-     * assertSame(array_lookup($array), $array);
+     * assertSame(array_lookup($array, 'name'), [
+     *     11 => 'name1',
+     *     12 => 'name2',
+     *     13 => 'name3',
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -3376,7 +3436,10 @@ if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("ryunosu
      *
      * Example:
      * ```php
-     * assertSame(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]), [
+     * assertSame(array_uncolumns([
+     *     'id'   => [1, 2],
+     *     'name' => ['A', 'B'],
+     * ]), [
      *     ['id' => 1, 'name' => 'A'],
      *     ['id' => 2, 'name' => 'B'],
      * ]);
@@ -3419,6 +3482,7 @@ if (!isset($excluded_functions["array_convert"]) && (!function_exists("ryunosuke
      *
      * 引数は (キー, 値, 今まで処理したキー配列) で渡ってくる。
      * 返り値は新しいキーを返す。
+     *
      * - 文字列や数値を返すとそれがキーとして使われる
      * - null を返すと元のキーがそのまま使われる
      * - true を返すと数値連番が振られる
@@ -4170,7 +4234,7 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("r
      * ```
      *
      * @param object $object オブジェクト
-     * @return array 全プロパティ
+     * @return array 全プロパティの配列
      */
     function get_object_properties($object)
     {
@@ -4312,12 +4376,50 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("ryunosuke\\Fu
     }
 }
 
+const file_suffix = "ryunosuke\\Functions\\file_suffix";
+if (!isset($excluded_functions["file_suffix"]) && (!function_exists("ryunosuke\\Functions\\file_suffix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_suffix"))->isInternal()))) {
+    /**
+     * ファイル名にサフィックスを付与する
+     *
+     * pathinfoに非準拠。例えば「filename.hoge.fuga」のような形式は「filename」が変換対象になる。
+     *
+     * Example:
+     * ```php
+     * assertSame(file_suffix('filename.ext', '-min'), 'filename-min.ext');
+     * assertSame(file_suffix('filename.ext1.ext2', '-min'), 'filename-min.ext1.ext2');
+     * ```
+     *
+     * @param string $filename パス・ファイル名
+     * @param string $suffix 付与するサフィックス
+     * @return string サフィックスが付与されたパス名
+     */
+    function file_suffix($filename, $suffix)
+    {
+        $pathinfo = pathinfo($filename);
+        $dirname = $pathinfo['dirname'];
+
+        $exts = [];
+        while (isset($pathinfo['extension'])) {
+            $exts[] = '.' . $pathinfo['extension'];
+            $pathinfo = pathinfo($pathinfo['filename']);
+        }
+
+        $basename = $pathinfo['filename'] . $suffix . implode('', array_reverse($exts));
+
+        if ($dirname === '.') {
+            return $basename;
+        }
+
+        return $dirname . DIRECTORY_SEPARATOR . $basename;
+    }
+}
+
 const file_extension = "ryunosuke\\Functions\\file_extension";
 if (!isset($excluded_functions["file_extension"]) && (!function_exists("ryunosuke\\Functions\\file_extension") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_extension"))->isInternal()))) {
     /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
      *
-     * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
+     * pathinfo に準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
      *
      * Example:
      * ```php
@@ -4813,6 +4915,7 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("ryunosuke\\Func
      * 終了時に削除される一時ファイル名を生成する
      *
      * tempnam とほぼ同じで違いは下記。
+     *
      * - 引数が逆
      * - 終了時に削除される
      * - 失敗時に false を返すのではなく例外を投げる
@@ -4853,6 +4956,366 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("ryunosuke\\Func
         };
 
         return $tempfile;
+    }
+}
+
+const memory_path = "ryunosuke\\Functions\\memory_path";
+if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\Functions\\memory_path") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\memory_path"))->isInternal()))) {
+    /**
+     * ファイルのように扱えるメモリ上のパスを返す
+     *
+     * 劣化 vfsStream のようなもの。
+     * stream wrapper を用いて実装しており、そのプロトコルは初回呼び出し時に1度だけ登録される。
+     * プロトコル名は決め打ちだが、 php.ini に "rfunc.memory_stream" というキーで文字列を指定するとそれが使用される。
+     *
+     * ファイル操作はある程度できるが、ディレクトリ操作は未対応（そこまでしたいなら vfsStream とか /dev/shm とかを使えば良い）。
+     *
+     * Example:
+     * ```php
+     * // ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
+     * $memory_path = memory_path('filename.txt');
+     * // 呼んだだけでは何もしないので存在しない
+     * assertSame(file_exists($memory_path), false);
+     * // file_put_contents が使える
+     * assertSame(file_put_contents($memory_path, 'Hello, World'), 12);
+     * // file_get_contents が使える
+     * assertSame(file_get_contents($memory_path), 'Hello, World');
+     * // 上記の操作で実体が存在している
+     * assertSame(file_exists($memory_path), true);
+     * // unlink が使える
+     * assertSame(unlink($memory_path), true);
+     * // unlink したので存在しない
+     * assertSame(file_exists($memory_path), false);
+     * ```
+     *
+     * @param string $path パス名（実質的に一意なファイル名）
+     * @return string メモリ上のパス
+     */
+    function memory_path($path)
+    {
+        static $STREAM_NAME, $registered = false;
+        if (!$registered) {
+            $STREAM_NAME = $STREAM_NAME ?: get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000';
+            if (in_array($STREAM_NAME, stream_get_wrappers())) {
+                throw new \DomainException("$STREAM_NAME is registered already.");
+            }
+
+            $registered = true;
+            stream_wrapper_register($STREAM_NAME, get_class(new class()
+            {
+                private static $entries = [];
+
+                private $entry;
+                private $id;
+                private $position;
+                private $readable;
+                private $writable;
+                private $appendable;
+
+                public $context;
+
+                private static function create()
+                {
+                    // @todo time 系は一応用意しているだけでほとんど未実装（read/write のたびに更新する？）
+                    $now = time();
+                    return (object) [
+                        'permission' => 0777 & ~umask(),
+                        'owner'      => function_exists('posix_getuid') ? posix_getuid() : 0,
+                        'group'      => function_exists('posix_getgid') ? posix_getgid() : 0,
+                        'atime'      => $now,
+                        'mtime'      => $now,
+                        'ctime'      => $now,
+                        'content'    => '',
+                    ];
+                }
+
+                private static function stat($id)
+                {
+                    $that = self::$entries[$id];
+                    return [
+                        'dev'     => 0,
+                        'ino'     => 0,
+                        'mode'    => $that->permission,
+                        'nlink'   => 0,
+                        'uid'     => $that->owner,
+                        'gid'     => $that->group,
+                        'rdev'    => 0,
+                        'size'    => strlen($that->content),
+                        'atime'   => $that->atime,
+                        'mtime'   => $that->mtime,
+                        'ctime'   => $that->ctime,
+                        'blksize' => -1,
+                        'blocks'  => -1,
+                    ];
+                }
+
+                public function __call($name, $arguments)
+                {
+                    // 対応して無くても標準では警告止まりなので例外に変える
+                    throw new \DomainException("$name is not supported.");
+                }
+
+                public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
+                {
+                    assert(is_int($options));
+                    assert(!strlen($opened_path));
+                    $this->id = parse_url($path, PHP_URL_HOST);
+
+                    // t フラグはクソなので実装しない（デフォルトで b フラグとする）
+                    if (strpos($mode, 'r') !== false) {
+                        // 普通の fopen でファイルが存在しないとエラーになるので模倣する
+                        if (!isset(self::$entries[$this->id])) {
+                            throw new \InvalidArgumentException("'$path' is not exist.");
+                        }
+                        $this->position = 0;
+                        $this->readable = true;
+                        $this->writable = strpos($mode, '+') !== false;
+                        $this->appendable = false;
+                    }
+                    elseif (strpos($mode, 'w') !== false) {
+                        // ファイルポインタをファイルの先頭に置き、ファイルサイズをゼロにします。
+                        // ファイルが存在しない場合には、作成を試みます。
+                        self::$entries[$this->id] = self::create();
+                        $this->position = 0;
+                        $this->readable = strpos($mode, '+') !== false;
+                        $this->writable = true;
+                        $this->appendable = false;
+                    }
+                    elseif (strpos($mode, 'a') !== false) {
+                        // ファイルポインタをファイルの終端に置きます。
+                        // ファイルが存在しない場合には、作成を試みます。
+                        if (!isset(self::$entries[$this->id])) {
+                            self::$entries[$this->id] = self::create();
+                        }
+                        $this->position = 0;
+                        $this->readable = strpos($mode, '+') !== false;
+                        $this->writable = true;
+                        $this->appendable = true;
+                    }
+                    elseif (strpos($mode, 'x') !== false) {
+                        // ファイルポインタをファイルの先頭に置きます。
+                        // ファイルが既に存在する場合には fopen() は失敗し、 E_WARNING レベルのエラーを発行します。
+                        // ファイルが存在しない場合には新規作成を試みます。
+                        if (isset(self::$entries[$this->id])) {
+                            throw new \InvalidArgumentException("'$path' is exist already.");
+                        }
+                        self::$entries[$this->id] = self::create();
+                        $this->position = 0;
+                        $this->readable = strpos($mode, '+') !== false;
+                        $this->writable = true;
+                        $this->appendable = false;
+                    }
+                    elseif (strpos($mode, 'c') !== false) {
+                        // ファイルが存在しない場合には新規作成を試みます。
+                        // ファイルが既に存在する場合でもそれを ('w' のように) 切り詰めたりせず、 また ('x' のように) 関数のコールが失敗することもありません。
+                        // ファイルポインタをファイルの先頭に置きます。
+                        if (!isset(self::$entries[$this->id])) {
+                            self::$entries[$this->id] = self::create();
+                        }
+                        $this->position = 0;
+                        $this->readable = strpos($mode, '+') !== false;
+                        $this->writable = true;
+                        $this->appendable = false;
+                    }
+
+                    $this->entry = self::$entries[$this->id];
+
+                    return true;
+                }
+
+                public function stream_close()
+                {
+                }
+
+                public function stream_lock(int $operation): bool
+                {
+                    assert(is_int($operation));
+                    // メモリアクセスは競合しないので常に true を返す
+                    return true;
+                }
+
+                public function stream_flush(): bool
+                {
+                    // バッファしないので常に true を返す
+                    return true;
+                }
+
+                public function stream_eof(): bool
+                {
+                    return $this->position >= strlen($this->entry->content);
+                }
+
+                public function stream_read(int $count): string
+                {
+                    if (!$this->readable) {
+                        return '';
+                    }
+                    $result = substr($this->entry->content, $this->position, $count);
+                    $this->position += strlen($result);
+                    return $result;
+                }
+
+                public function stream_write(string $data): int
+                {
+                    if (!$this->writable) {
+                        return 0;
+                    }
+                    $datalen = strlen($data);
+                    $posision = $this->position;
+                    // このモードは、fseek() では何の効果もありません。書き込みは、常に追記となります。
+                    if ($this->appendable) {
+                        $posision = strlen($this->entry->content);
+                    }
+                    // 一般的に、ファイルの終端より先の位置に移動することも許されています。
+                    // そこにデータを書き込んだ場合、ファイルの終端からシーク位置までの範囲を読み込むと 値 0 が埋められたバイトを返します。
+                    $current = str_pad($this->entry->content, $posision, "\0", STR_PAD_RIGHT);
+                    $this->entry->content = substr_replace($current, $data, $posision, $datalen);
+                    $this->position += $datalen;
+                    return $datalen;
+                }
+
+                public function stream_truncate(int $new_size): bool
+                {
+                    if (!$this->writable) {
+                        return false;
+                    }
+                    $current = substr($this->entry->content, 0, $new_size);
+                    $this->entry->content = str_pad($current, $new_size, "\0", STR_PAD_RIGHT);
+                    return true;
+                }
+
+                public function stream_tell(): int
+                {
+                    return $this->position;
+                }
+
+                public function stream_seek(int $offset, int $whence = SEEK_SET): bool
+                {
+                    $strlen = strlen($this->entry->content);
+                    switch ($whence) {
+                        case SEEK_SET:
+                            if ($offset < 0) {
+                                return false;
+                            }
+                            $this->position = $offset;
+                            break;
+
+                        // stream_tell を定義していると SEEK_CUR が呼ばれない？（計算されて SEEK_SET に移譲されているような気がする）
+                        // @codeCoverageIgnoreStart
+                        case SEEK_CUR:
+                            $this->position += $offset;
+                            break;
+                        // @codeCoverageIgnoreEnd
+
+                        case SEEK_END:
+                            $this->position = $strlen + $offset;
+                            break;
+                    }
+                    // ファイルの終端から数えた位置に移動するには、負の値を offset に渡して whence を SEEK_END に設定しなければなりません。
+                    if ($this->position < 0) {
+                        $this->position = $strlen + $this->position;
+                        if ($this->position < 0) {
+                            $this->position = 0;
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                public function stream_stat()
+                {
+                    return self::stat($this->id);
+                }
+
+                public function stream_metadata($path, $option, $var)
+                {
+                    $id = parse_url($path, PHP_URL_HOST);
+                    switch ($option) {
+                        case STREAM_META_TOUCH:
+                            if (!isset(self::$entries[$id])) {
+                                self::$entries[$id] = self::create();
+                            }
+                            $mtime = $var[0] ?? time();
+                            $atime = $var[1] ?? $mtime;
+                            self::$entries[$id]->mtime = $mtime;
+                            self::$entries[$id]->atime = $atime;
+                            break;
+
+                        case STREAM_META_ACCESS:
+                            if (!isset(self::$entries[$id])) {
+                                return false;
+                            }
+                            self::$entries[$id]->permission = $var;
+                            self::$entries[$id]->ctime = time();
+                            break;
+
+                        /** @noinspection PhpMissingBreakStatementInspection */
+                        case STREAM_META_OWNER_NAME:
+                            $var = function_exists('posix_getpwnam') ? posix_getpwnam($var)['uid'] : 0;
+                        case STREAM_META_OWNER:
+                            if (!isset(self::$entries[$id])) {
+                                return false;
+                            }
+                            self::$entries[$id]->owner = $var;
+                            self::$entries[$id]->ctime = time();
+                            break;
+
+                        /** @noinspection PhpMissingBreakStatementInspection */
+                        case STREAM_META_GROUP_NAME:
+                            $var = function_exists('posix_getgrnam') ? posix_getgrnam($var)['gid'] : 0;
+                        case STREAM_META_GROUP:
+                            if (!isset(self::$entries[$id])) {
+                                return false;
+                            }
+                            self::$entries[$id]->group = $var;
+                            self::$entries[$id]->ctime = time();
+                            break;
+                    }
+                    // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
+                    clearstatcache(true, $path);
+                    return true;
+                }
+
+                public function url_stat(string $path, int $flags)
+                {
+                    assert(is_int($flags));
+                    $id = parse_url($path, PHP_URL_HOST);
+                    if (!isset(self::$entries[$id])) {
+                        return false;
+                    }
+                    return self::stat($id);
+                }
+
+                public function rename(string $path_from, string $path_to): bool
+                {
+                    // rename は同じプロトコルじゃないと使えない制約があるのでプロトコルは見ないで OK
+                    $id_from = parse_url($path_from, PHP_URL_HOST);
+                    if (!isset(self::$entries[$id_from])) {
+                        return false;
+                    }
+                    $id_to = parse_url($path_to, PHP_URL_HOST);
+                    self::$entries[$id_to] = self::$entries[$id_from];
+                    unset(self::$entries[$id_from]);
+                    // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
+                    clearstatcache(true, $path_from);
+                    return true;
+                }
+
+                public function unlink(string $path): bool
+                {
+                    $id = parse_url($path, PHP_URL_HOST);
+                    if (!isset(self::$entries[$id])) {
+                        return false;
+                    }
+                    unset(self::$entries[$id]);
+                    // もしファイルを作成した場合、 たとえファイルを削除したとしても TRUE を返します。しかし、unlink() はキャッシュを自動的にクリアします。
+                    clearstatcache(true, $path);
+                    return true;
+                }
+            }));
+        }
+
+        return "$STREAM_NAME://$path";
     }
 }
 
@@ -5366,7 +5829,15 @@ if (!isset($excluded_functions["ob_capture"]) && (!function_exists("ryunosuke\\F
      *
      * Example:
      * ```php
+     * // コールバック内のテキストが得られる
      * assertSame(ob_capture(function(){echo 123;}), '123');
+     * // こういう事もできる
+     * assertSame(ob_capture(function () {
+     * ?>
+     * bare string1
+     * bare string2
+     * <?php
+     * }), "bare string1\nbare string2\n");
      * ```
      *
      * @param callable $callback 実行するコールバック
@@ -7236,7 +7707,7 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
      *
      * $subject 内の $search を $replaces に置換する。
      * str_replace とは「N 番目のみ置換できる」点で異なる。
-     * つまり、$subject='hoge', $replace=[2 => 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。
+     * つまり、$search='hoge', $replace=[2 => 'fuga'] とすると「2 番目の 'hoge' が 'fuga' に置換される」という動作になる（0 ベース）。
      *
      * $replace に 非配列を与えた場合は配列化される。
      * つまり `$replaces = 'hoge'` は `$replaces = [0 => 'hoge']` と同じ（最初のマッチを置換する）。
@@ -7246,6 +7717,7 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
      * また、置換後の文字列は置換対象にはならない。
      *
      * N 番目の検索文字列が見つからない場合は例外を投げる。
+     * ただし、文字自体が見つからない場合は投げない。
      *
      * Example:
      * ```php
@@ -7275,17 +7747,21 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
         }
 
         // 負数対応のために逆数計算（ついでに整数チェック）
-        $subcount = substr_count($subject, $search);
+        $subcount = $case_insensitivity ? substr_count(strtolower($subject), strtolower($search)) : substr_count($subject, $search);
+        if ($subcount === 0) {
+            return $subject;
+        }
         $mapping = [];
         foreach ($replaces as $n => $replace) {
+            $origN = $n;
             if (!is_int($n)) {
                 throw new \InvalidArgumentException('$replaces key must be integer.');
             }
             if ($n < 0) {
                 $n += $subcount;
             }
-            if ($n < 0) {
-                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
+            if (!(0 <= $n && $n < $subcount)) {
+                throw new \InvalidArgumentException("notfound search string '$search' of {$origN}th.");
             }
             $mapping[$n] = $replace;
         }
@@ -7293,9 +7769,6 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
         $offset = 0;
         for ($n = 0; $n <= $maxseq; $n++) {
             $pos = $case_insensitivity ? stripos($subject, $search, $offset) : strpos($subject, $search, $offset);
-            if ($pos === false) {
-                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
-            }
             if (isset($mapping[$n])) {
                 $subject = substr_replace($subject, $mapping[$n], $pos, strlen($search));
                 $offset = $pos + strlen($mapping[$n]);
@@ -7305,6 +7778,111 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
             }
         }
         return $subject;
+    }
+}
+
+const str_submap = "ryunosuke\\Functions\\str_submap";
+if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\Functions\\str_submap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_submap"))->isInternal()))) {
+    /**
+     * 指定文字列を置換する
+     *
+     * $subject を $replaces に従って置換する。
+     * 具体的には「$replaces を 複数指定できる str_subreplace」に近い。
+     *
+     * strtr とは「N 番目のみ置換できる」点で異なる。
+     * つまり、$replaces=['hoge' => [2 => 'fuga']] とすると「2 番目の 'hoge' が 'fuga' に置換される」という動作になる（0 ベース）。
+     *
+     * $replaces の要素に非配列を与えた場合は配列化される。
+     * つまり `$replaces = ['hoge' => 'fuga']` は `$replaces = ['hoge' => ['fuga']]` と同じ（最初のマッチを置換する）。
+     *
+     * $replace に空配列を与えると何もしない。
+     * 負数キーは後ろから数える動作となる。
+     * また、置換後の文字列は置換対象にはならない。
+     *
+     * N 番目の検索文字列が見つからない場合は例外を投げる。
+     * ただし、文字自体が見つからない場合は投げない。
+     *
+     * Example:
+     * ```php
+     * // "hello, world" の l と o を置換
+     * assertSame(str_submap('hello, world', [
+     *     // l は0番目と2番目のみを置換（1番目は何も行われない）
+     *     'l' => [
+     *         0 => 'L1',
+     *         2 => 'L3',
+     *     ],
+     *     // o は後ろから数えて1番目を置換
+     *     'o' => [
+     *         -1 => 'O',
+     *     ],
+     * ]), 'heL1lo, wOrL3d');
+     * ```
+     *
+     * @param string $subject 対象文字列
+     * @param array $replaces 読み換え配列
+     * @param bool $case_insensitivity 大文字小文字を無視するか
+     * @return string 置換された文字列
+     */
+    function str_submap($subject, $replaces, $case_insensitivity = false)
+    {
+        assert((is_iterable)($replaces));
+
+        $isubject = $subject;
+        if ($case_insensitivity) {
+            $isubject = strtolower($isubject);
+        }
+
+        // 負数対応のために逆数計算（ついでに整数チェック）
+        $mapping = [];
+        foreach ($replaces as $from => $map) {
+            $ifrom = $from;
+            if ($case_insensitivity) {
+                $ifrom = strtolower($ifrom);
+            }
+            $subcount = substr_count($isubject, $ifrom);
+            if ($subcount === 0) {
+                continue;
+            }
+            $mapping[$ifrom] = [];
+            $map = (is_iterable)($map) ? $map : [$map];
+            foreach ($map as $n => $to) {
+                $origN = $n;
+                if (!is_int($n)) {
+                    throw new \InvalidArgumentException('$replaces key must be integer.');
+                }
+                if ($n < 0) {
+                    $n += $subcount;
+                }
+                if (!(0 <= $n && $n < $subcount)) {
+                    throw new \InvalidArgumentException("notfound search string '$from' of {$origN}th.");
+                }
+                $mapping[$ifrom][$n] = $to;
+            }
+        }
+
+        // 空はそのまま返す
+        if ((is_empty)($mapping)) {
+            return $subject;
+        }
+
+        // いろいろ試した感じ正規表現が最もシンプルかつ高速だった
+
+        $repkeys = array_keys($mapping);
+        $counter = array_fill_keys($repkeys, 0);
+        $patterns = array_map(function ($k) { return preg_quote($k, '#'); }, $repkeys);
+
+        $i_flag = $case_insensitivity ? 'i' : '';
+        return preg_replace_callback("#" . implode('|', $patterns) . "#u$i_flag", function ($matches) use (&$counter, $mapping, $case_insensitivity) {
+            $imatch = $matches[0];
+            if ($case_insensitivity) {
+                $imatch = strtolower($imatch);
+            }
+            $index = $counter[$imatch]++;
+            if (array_key_exists($index, $mapping[$imatch])) {
+                return $mapping[$imatch][$index];
+            }
+            return $matches[0];
+        }, $subject);
     }
 }
 
@@ -8028,7 +8606,11 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
      * ただし、オプションで headers が与えられた場合はそれを使用する。
      * この headers オプションはヘッダ文字列変換も兼ねる（[key => header] で「key を header で吐き出し」となる）。
      *
-     * メモリ効率は意識しない（どうせ元々配列を保持してるので意識しても無駄）。
+     * callback オプションが渡された場合は「あらゆる処理の最初」にコールされる。
+     * つまりヘッダの読み換えや文字エンコーディングの変換が行われる前の状態でコールされる。
+     * また、 false を返すとその要素はスルーされる。
+     *
+     * output オプションにリソースを渡すとそこに対して書き込みが行われる（fclose はされない）。
      *
      * Example:
      * ```php
@@ -8056,7 +8638,7 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
      *
      * @param array $csvarrays 連想配列の配列
      * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
-     * @return array CSV 的文字列
+     * @return array|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
      */
     function csv_export($csvarrays, $options = [])
     {
@@ -8066,11 +8648,21 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
             'headers'   => [],
+            'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+            'output'    => null,
         ];
 
-        $fp = fopen('php://temp', 'rw+');
+        $output = $options['output'];
+
+        if ($output) {
+            $fp = $options['output'];
+        }
+        else {
+            $fp = fopen('php://temp', 'rw+');
+        }
         try {
-            return (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers) {
+            $size = (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $callback) {
+                $size = 0;
                 $mb_internal_encoding = mb_internal_encoding();
                 if (!$headers) {
                     foreach ($csvarrays as $array) {
@@ -8084,22 +8676,33 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
                 if ($encoding !== $mb_internal_encoding) {
                     mb_convert_variables($encoding, $mb_internal_encoding, $headers);
                 }
-                fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
+                $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
                 $default = array_fill_keys(array_keys($headers), '');
 
-                foreach ($csvarrays as $array) {
+                foreach ($csvarrays as $n => $array) {
+                    if ($callback) {
+                        if ($callback($array, $n) === false) {
+                            continue;
+                        }
+                    }
                     $row = array_intersect_key(array_replace($default, $array), $default);
                     if ($encoding !== $mb_internal_encoding) {
                         mb_convert_variables($encoding, $mb_internal_encoding, $row);
                     }
-                    fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                    $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
                 }
-                rewind($fp);
-                return stream_get_contents($fp);
-            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+                return $size;
+            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['callback']);
+            if ($output) {
+                return $size;
+            }
+            rewind($fp);
+            return stream_get_contents($fp);
         }
         finally {
-            fclose($fp);
+            if (!$output) {
+                fclose($fp);
+            }
         }
     }
 }
@@ -8112,6 +8715,11 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
      * 1行目をヘッダ文字列とみなしてそれをキーとした連想配列の配列を返す。
      * ただし、オプションで headers が与えられた場合はそれを使用する。
      * この headers オプションはヘッダフィルタも兼ねる（[n => header] で「n 番目フィールドを header で取り込み」となる）。
+     * 入力にヘッダがありかつ headers に連想配列が渡された場合はフィルタ兼読み換えとなる（Example を参照）。
+     *
+     * callback オプションが渡された場合は「あらゆる処理の最後」にコールされる。
+     * つまりヘッダの読み換えや文字エンコーディングの変換が行われた後の状態でコールされる。
+     * また、 false を返すとその要素はスルーされる。
      *
      * メモリ効率は意識しない（どうせ配列を返すので意識しても無駄）。
      *
@@ -8141,6 +8749,20 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
      *     ['a' => 'A2', 'c' => 'C2'],
      *     ['a' => 'A3', 'c' => 'C3'],
      * ]);
+     *
+     * // ヘッダありで連想配列で指定するとキーの読み換えとなる（指定しなければ読み飛ばしも行える）
+     * assertEquals(csv_import("
+     * a,b,c
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ", [
+     *     'headers' => ['a' => 'hoge', 'c' => 'piyo'], // a は hoge, c は piyo で読み込む。 b は指定がないので飛ばされる
+     * ]), [
+     *     ['hoge' => 'A1', 'piyo' => 'C1'],
+     *     ['hoge' => 'A2', 'piyo' => 'C2'],
+     *     ['hoge' => 'A3', 'piyo' => 'C3'],
+     * ]);
      * ```
      *
      * @param string|resource $csvstring CSV 的文字列。ファイルポインタでも良いが終了後に必ず閉じられる
@@ -8155,7 +8777,15 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
             'headers'   => [],
+            'headermap' => null,
+            'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
         ];
+
+        // 文字キーを含む場合はヘッダーありの読み換えとなる
+        if (is_array($options['headers']) && count(array_filter(array_keys($options['headers']), 'is_string')) > 0) {
+            $options['headermap'] = $options['headers'];
+            $options['headers'] = null;
+        }
 
         if (is_resource($csvstring)) {
             $fp = $csvstring;
@@ -8167,9 +8797,10 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
         }
 
         try {
-            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers) {
+            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $callback) {
                 $mb_internal_encoding = mb_internal_encoding();
                 $result = [];
+                $n = -1;
                 while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
                     if ($row === [null]) {
                         continue;
@@ -8181,10 +8812,21 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
                         $headers = $row;
                         continue;
                     }
-                    $result[] = array_combine($headers, array_intersect_key($row, $headers));
+
+                    $n++;
+                    $row = array_combine($headers, array_intersect_key($row, $headers));
+                    if ($headermap) {
+                        $row = (array_pickup)($row, $headermap);
+                    }
+                    if ($callback) {
+                        if ($callback($row, $n) === false) {
+                            continue;
+                        }
+                    }
+                    $result[] = $row;
                 }
                 return $result;
-            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['callback']);
         }
         finally {
             fclose($fp);
@@ -8545,7 +9187,7 @@ if (!isset($excluded_functions["preg_splice"]) && (!function_exists("ryunosuke\\
      * 「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。
      *
      * $replacement に callable を渡すと preg_replace_callback がコールされる。
-     * callable と入っても単純文字列 callble （"strtoupper" など）は callable とはみなされない。
+     * callable とはいっても単純文字列 callble （"strtoupper" など）は callable とはみなされない。
      * 配列形式の callable や クロージャのみ preg_replace_callback になる。
      *
      * Example:
@@ -8881,7 +9523,7 @@ if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("ryuno
      *
      * Example:
      * ```php
-     * // 数値キーが参照できる
+     * // 2文字目から5文字を「あいうえお」に置換する
      * assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
      * ```
      *
@@ -8996,6 +9638,64 @@ if (!isset($excluded_functions["render_file"]) && (!function_exists("ryunosuke\\
     function render_file($template_file, $array)
     {
         return (render_string)(file_get_contents($template_file), $array);
+    }
+}
+
+const ob_include = "ryunosuke\\Functions\\ob_include";
+if (!isset($excluded_functions["ob_include"]) && (!function_exists("ryunosuke\\Functions\\ob_include") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ob_include"))->isInternal()))) {
+    /**
+     * 変数を extract して include する
+     *
+     * Example:
+     * ```php
+     * // このようなテンプレートファイルを用意すると
+     * file_put_contents(sys_get_temp_dir() . '/template.php', '
+     * This is plain text.
+     * This is <?= $var ?>.
+     * This is <?php echo strtoupper($var) ?>.
+     * ');
+     * // このようにレンダリングできる
+     * assertSame(ob_include(sys_get_temp_dir() . '/template.php', ['var' => 'hoge']), '
+     * This is plain text.
+     * This is hoge.
+     * This is HOGE.
+     * ');
+     * ```
+     *
+     * @param string $include_file include するファイル名
+     * @param array $array extract される連想変数
+     * @return string レンダリングされた文字列
+     */
+    function ob_include($include_file, $array = [])
+    {
+        return (static function () {
+            ob_start();
+            extract(func_get_arg(1));
+            include func_get_arg(0);
+            return ob_get_clean();
+        })($include_file, $array);
+    }
+}
+
+const include_string = "ryunosuke\\Functions\\include_string";
+if (!isset($excluded_functions["include_string"]) && (!function_exists("ryunosuke\\Functions\\include_string") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\include_string"))->isInternal()))) {
+    /**
+     * 変数を extract して include する（文字列指定）
+     *
+     * @see ob_include()
+     *
+     * @param string $template テンプレート文字列
+     * @param array $array extract される連想変数
+     * @return string レンダリングされた文字列
+     */
+    function include_string($template, $array = [])
+    {
+        // opcache が効かない気がする
+        $path = (memory_path)(__FUNCTION__);
+        file_put_contents($path, $template);
+        $result = (ob_include)($path, $array);
+        unlink($path);
+        return $result;
     }
 }
 
@@ -9223,7 +9923,7 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
      * - array_XXX, str_XXX は省略して XXX で呼び出せる
      *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない
      * - funcE で eval される文字列のクロージャを呼べる
-     *   - 変数名は `$v` 固定だが、 `$v` が無いときに限り 最左に自動付与される
+     *   - 変数名は `$_` 固定だが、 `$_` が無いときに限り 最左に自動付与される
      * - funcP で配列指定オペレータのクロージャを呼べる
      *   - 複数指定した場合は順次呼ばれる。つまり map はともかく filter 用途では使えない
      * - func1 で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる
@@ -10909,7 +11609,7 @@ if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("ryunosuke\\
      * SI 接頭辞が付与された文字列を数値化する
      *
      * 典型的な用途は ini_get で得られた値を数値化したいとき。
-     * ただし、 init は 1m のように小文字で指定することもあるので大文字化する必要はある。
+     * ただし、 ini は 1m のように小文字で指定することもあるので大文字化する必要はある。
      *
      * Example:
      * ```php
@@ -11163,7 +11863,7 @@ if (!isset($excluded_functions["is_iterable"]) && (!function_exists("ryunosuke\\
      * 変数が foreach で回せるか調べる
      *
      * オブジェクトの場合は \Traversable のみ。
-     * 要するに {@link http://php.net/manual/ja/function.is-iterable.php is_iterable} の polyfill。
+     * 要するに {@link http://php.net/manual/function.is-iterable.php is_iterable} の polyfill。
      *
      * Example:
      * ```php
@@ -11188,6 +11888,8 @@ const is_countable = "ryunosuke\\Functions\\is_countable";
 if (!isset($excluded_functions["is_countable"]) && (!function_exists("ryunosuke\\Functions\\is_countable") || (!true && (new \ReflectionFunction("ryunosuke\\Functions\\is_countable"))->isInternal()))) {
     /**
      * 変数が count でカウントできるか調べる
+     *
+     * 要するに {@link http://php.net/manual/function.is-countable.php is_countable} の polyfill。
      *
      * Example:
      * ```php

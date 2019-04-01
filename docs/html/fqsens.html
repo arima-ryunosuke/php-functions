@@ -200,7 +200,7 @@ assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
 「値で比較して同値だったらキーも見たい」という状況はまれによくあるはず。<br />
 さらに安定ソートであり、同値だとしても元の並び順は維持される。</p>
 <p>$comparator は省略できる。省略した場合、型に基づいてよしなにソートする。<br />
-（が、比較のたびに型チェックが入るので指定したほうが高速に動く）</p>
+（が、比較のたびに型チェックが入るので指定したほうが高速に動く）。</p>
 <p>ただし、標準のソート関数とは異なり、参照渡しではなくソートして返り値で返す。<br />
 また、いわゆる asort であり、キー・値は常に維持される。</p>
 <p>Example:</p>
@@ -268,9 +268,15 @@ assertSame(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]), ['a' =&gt; 'A',
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// 普通の zip
-$this-&gt;assertEquals(array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+assertEquals(array_zip(
+    [1, 2, 3],
+    ['hoge', 'fuga', 'piyo']
+), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
 // キーが維持される
-$this-&gt;assertEquals(array_zip(['a' =&gt; 1, 2, 3], ['hoge', 'b' =&gt; 'fuga', 'piyo']), [['a' =&gt; 1, 'hoge'], [2, 'b' =&gt; 'fuga'], [3, 'piyo']]);
+assertEquals(array_zip(
+    ['a' =&gt; 1, 2, 3],
+    ['hoge', 'b' =&gt; 'fuga', 'piyo']
+), [['a' =&gt; 1, 'hoge'], [2, 'b' =&gt; 'fuga'], [3, 'piyo']]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_cross()"> ryunosuke\Functions\Package\Arrays::array_cross()</a></h2>
@@ -279,9 +285,15 @@ $this-&gt;assertEquals(array_zip(['a' =&gt; 1, 2, 3], ['hoge', 'b' =&gt; 'fuga',
 ただし、文字キーが重複すると例外を投げる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 普通の直積
-$this-&gt;assertSame(array_cross([1, 2], [3, 4]), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+assertSame(array_cross(
+    [1, 2],
+    [3, 4]
+), [[1, 3], [1, 4], [2, 3], [2, 4]]);
 // キーが維持される
-$this-&gt;assertSame(array_cross(['a' =&gt; 1, 2], ['b' =&gt; 3, 4]), [['a' =&gt; 1, 'b' =&gt; 3], ['a' =&gt; 1, 4], [2, 'b' =&gt; 3], [2, 4]]);
+assertSame(array_cross(
+    ['a' =&gt; 1, 2],
+    ['b' =&gt; 3, 4]
+), [['a' =&gt; 1, 'b' =&gt; 3], ['a' =&gt; 1, 4], [2, 'b' =&gt; 3], [2, 4]]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_implode()"> ryunosuke\Functions\Package\Arrays::array_implode()</a></h2>
@@ -600,23 +612,35 @@ $callback は絞り込み条件を渡す。null を与えると true 相当の�
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ];
 // 'flag' が true 相当のものだけ返す
-assertSame(array_where($array, 'flag'), [1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true]]);
+assertSame(array_where($array, 'flag'), [
+    1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
+]);
 // 'name' に 'h' を含むものだけ返す
 $contain_h = function($name){return strpos($name, 'h') !== false;};
-assertSame(array_where($array, 'name', $contain_h), [0 =&gt; ['id' =&gt; 1, 'name' =&gt; 'hoge', 'flag' =&gt; false]]);
+assertSame(array_where($array, 'name', $contain_h), [
+    0 =&gt; ['id' =&gt; 1, 'name' =&gt; 'hoge', 'flag' =&gt; false],
+]);
 // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
 $equal_2 = function($row, $key){return $key === 2;};
-assertSame(array_where($array, null, $equal_2), [2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false]]);
+assertSame(array_where($array, null, $equal_2), [
+    2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
+]);
 // $column に配列を渡すと共通項が渡ってくる
 $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true]]);
+assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [
+    1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
+]);
 // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
-assertSame(array_where($array, ['name' =&gt; 'piyo', 'flag' =&gt; false]), [2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false]]);
+assertSame(array_where($array, ['name' =&gt; 'piyo', 'flag' =&gt; false]), [
+    2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
+]);
 // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
 assertSame(array_where($array, [
     'id'   =&gt; function($id){return $id &gt;= 3;},                       // id が 3 以上
     'name' =&gt; function($name){return strpos($name, 'o') !== false;}, // name に o を含む
-]), [2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false]]);
+]), [
+    2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
+]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_filter()"> ryunosuke\Functions\Package\Arrays::array_map_filter()</a></h2>
@@ -635,7 +659,9 @@ assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
 スルーする場合は $ignore=true とする。スルーした場合 map ではなく filter される（結果配列に含まれない）。<br />
 $ignore=null とすると 何もせずそのまま要素を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">$exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
+<pre><code class="language-php">$exa = new \Exception('a');
+$exb = new \Exception('b');
+$std = new \stdClass();
 // getMessage で map される
 assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
 // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
@@ -657,7 +683,8 @@ assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), [
 assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
 // キーも渡ってくる
 assertSame(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}), ['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
-// `@method` でメソッドコールになる
+// メソッドコールもできる（引数不要なら `@method` でも同じ）
+assertSame(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' =&gt; []]), ['a', 'b']);
 assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
 </code></pre>
 </div>
@@ -794,10 +821,20 @@ assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =
 <p>Example:</p>
 <pre><code class="language-php">// lt2(2より小さい)で分類
 $lt2 = function($v){return $v &lt; 2;};
-assertSame(array_assort([1, 2, 3], ['lt2' =&gt; $lt2]), ['lt2' =&gt; [1]]);
+assertSame(array_assort([1, 2, 3], [
+    'lt2' =&gt; $lt2,
+]), [
+    'lt2' =&gt; [1],
+]);
 // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
 $lt3 = function($v){return $v &lt; 3;};
-assertSame(array_assort(['1', '2', '3'], ['lt3' =&gt; $lt3, 'ctd' =&gt; 'ctype_digit']), ['lt3' =&gt; ['1', '2'], 'ctd' =&gt; ['1', '2', '3']]);
+assertSame(array_assort(['1', '2', '3'], [
+    'lt3' =&gt; $lt3,
+    'ctd' =&gt; 'ctype_digit',
+]), [
+    'lt3' =&gt; ['1', '2'],
+    'ctd' =&gt; ['1', '2', '3'],
+]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()"> ryunosuke\Functions\Package\Arrays::array_count()</a></h2>
@@ -816,15 +853,24 @@ assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}),
 assertSame(array_count($array, [
     'a' =&gt; function($s){return strpos($s, 'a') !== false;},
     'o' =&gt; function($s){return strpos($s, 'o') !== false;},
-]), ['a' =&gt; 1, 'o' =&gt; 2]);
+]), [
+    'a' =&gt; 1,
+    'o' =&gt; 2,
+]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_group()"> ryunosuke\Functions\Package\Arrays::array_group()</a></h2>
 	<div class="description"><p>配列をコールバックの返り値でグループ化する</p>
-<p>コールバックが配列を返すと入れ子としてグループする。</p>
+<p>コールバックを省略すると値そのもので評価する。<br />
+コールバックが配列を返すと入れ子としてグループ化する。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_group([1, 1, 1]), [1 =&gt; [1, 1, 1]]);
-assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 =&gt; [1, 3], 0 =&gt; [2]]);
+<pre><code class="language-php">assertSame(array_group([1, 1, 1]), [
+    1 =&gt; [1, 1, 1],
+]);
+assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [
+    1 =&gt; [1, 3],
+    0 =&gt; [2],
+]);
 // group -&gt; id で入れ子グループにする
 $row1 = ['id' =&gt; 1, 'group' =&gt; 'hoge'];
 $row2 = ['id' =&gt; 2, 'group' =&gt; 'fuga'];
@@ -867,7 +913,7 @@ assertFalse(array_any([false, false]));
     'col1' =&gt; true,                               // true: 昇順, false: 降順。照合は型に依存
     'col2' =&gt; SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
     'col3' =&gt; ['sort', 'this', 'order'],          // 指定した配列順で昇順
-    'col4' =&gt; function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+    'col4' =&gt; function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型に依存
     'col5' =&gt; function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
 ];
 </code></pre>
@@ -902,10 +948,15 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 <p>指定したキー配列をそれらのマップしたもので配列を生成する。<br />
 <code>array_combine($keys, array_map($callback, $keys))</code> とほぼ等価。</p>
 <p>Example:</p>
-<pre><code class="language-php">// [a, b, c] から [a =&gt; A, b =&gt; B, c =&gt; C] を作る
-assertSame(array_fill_callback(['a', 'b', 'c'], 'strtoupper'), ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']);
+<pre><code class="language-php">$abc = ['a', 'b', 'c'];
+// [a, b, c] から [a =&gt; A, b =&gt; B, c =&gt; C] を作る
+assertSame(array_fill_callback($abc, 'strtoupper'), [
+    'a' =&gt; 'A',
+    'b' =&gt; 'B',
+    'c' =&gt; 'C',
+]);
 // [a, b, c] からその sha1 配列を作って大文字化する
-assertSame(array_fill_callback(['a', 'b', 'c'], function ($v){ return strtoupper(sha1($v)); }), [
+assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }), [
     'a' =&gt; '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
     'b' =&gt; 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
     'c' =&gt; '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -918,25 +969,33 @@ assertSame(array_fill_callback(['a', 'b', 'c'], function ($v){ return strtoupper
 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。</p>
 <p>$keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。</p>
 <p>Example:</p>
-<pre><code class="language-php">// a と c を取り出す
-assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['a', 'c']), ['a' =&gt; 'A', 'c' =&gt; 'C']);
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// a と c を取り出す
+assertSame(array_pickup($array, ['a', 'c']), ['a' =&gt; 'A', 'c' =&gt; 'C']);
 // 順番は $keys 基準になる
-assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
+assertSame(array_pickup($array, ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
 // 連想配列を渡すと読み替えて返す
-assertSame(array_pickup(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; 'C', 'aX' =&gt; 'A']);
+assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; 'C', 'aX' =&gt; 'A']);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()"> ryunosuke\Functions\Package\Arrays::array_lookup()</a></h2>
 	<div class="description"><p>キー保存可能な array_column</p>
 <p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">$array = [11 =&gt; ['id' =&gt; 1, 'name' =&gt; 'name1'], 12 =&gt; ['id' =&gt; 2, 'name' =&gt; 'name2'], 13 =&gt; ['id' =&gt; 3, 'name' =&gt; 'name3']];
+<pre><code class="language-php">$array = [
+    11 =&gt; ['id' =&gt; 1, 'name' =&gt; 'name1'],
+    12 =&gt; ['id' =&gt; 2, 'name' =&gt; 'name2'],
+    13 =&gt; ['id' =&gt; 3, 'name' =&gt; 'name3'],
+];
 // 第3引数を渡せば array_column と全く同じ
 assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
 assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
 // 省略すればキーが保存される
-assertSame(array_lookup($array, 'name'), [11 =&gt; 'name1', 12 =&gt; 'name2', 13 =&gt; 'name3']);
-assertSame(array_lookup($array), $array);
+assertSame(array_lookup($array, 'name'), [
+    11 =&gt; 'name1',
+    12 =&gt; 'name2',
+    13 =&gt; 'name3',
+]);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_columns()"> ryunosuke\Functions\Package\Arrays::array_columns()</a></h2>
@@ -956,7 +1015,10 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 <p>$template を指定すると「それに含まれる配列かつ値がデフォルト」になる（要するに $default みたいなもの）。<br />
 キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_uncolumns(['id' =&gt; [1, 2], 'name' =&gt; ['A', 'B']]), [
+<pre><code class="language-php">assertSame(array_uncolumns([
+    'id'   =&gt; [1, 2],
+    'name' =&gt; ['A', 'B'],
+]), [
     ['id' =&gt; 1, 'name' =&gt; 'A'],
     ['id' =&gt; 2, 'name' =&gt; 'B'],
 ]);
@@ -1299,9 +1361,17 @@ assertEquals(file_tree($tmp), [
 ]);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_suffix()"> ryunosuke\Functions\Package\FileSystem::file_suffix()</a></h2>
+	<div class="description"><p>ファイル名にサフィックスを付与する</p>
+<p>pathinfoに非準拠。例えば「filename.hoge.fuga」のような形式は「filename」が変換対象になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(file_suffix('filename.ext', '-min'), 'filename-min.ext');
+assertSame(file_suffix('filename.ext1.ext2', '-min'), 'filename-min.ext1.ext2');
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_extension()"> ryunosuke\Functions\Package\FileSystem::file_extension()</a></h2>
 	<div class="description"><p>ファイルの拡張子を変更する。引数を省略すると拡張子を返す</p>
-<p>pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。</p>
+<p>pathinfo に準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(file_extension('filename.ext'), 'ext');
 assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
@@ -1442,6 +1512,29 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
 <li>失敗時に false を返すのではなく例外を投げる</li>
 </ul>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::memory_path()"> ryunosuke\Functions\Package\FileSystem::memory_path()</a></h2>
+	<div class="description"><p>ファイルのように扱えるメモリ上のパスを返す</p>
+<p>劣化 vfsStream のようなもの。<br />
+stream wrapper を用いて実装しており、そのプロトコルは初回呼び出し時に1度だけ登録される。<br />
+プロトコル名は決め打ちだが、 php.ini に "rfunc.memory_stream" というキーで文字列を指定するとそれが使用される。</p>
+<p>ファイル操作はある程度できるが、ディレクトリ操作は未対応（そこまでしたいなら vfsStream とか /dev/shm とかを使えば良い）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
+$memory_path = memory_path('filename.txt');
+// 呼んだだけでは何もしないので存在しない
+assertSame(file_exists($memory_path), false);
+// file_put_contents が使える
+assertSame(file_put_contents($memory_path, 'Hello, World'), 12);
+// file_get_contents が使える
+assertSame(file_get_contents($memory_path), 'Hello, World');
+// 上記の操作で実体が存在している
+assertSame(file_exists($memory_path), true);
+// unlink が使える
+assertSame(unlink($memory_path), true);
+// unlink したので存在しない
+assertSame(file_exists($memory_path), false);
+</code></pre>
+</div>
             	<h2>class<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand"> ryunosuke\Functions\Package\Funchand</a></h2>
 	<div class="description"><p>callable 関連のユーティリティ</p>
 </div>
@@ -1581,7 +1674,15 @@ catch (\Exception $ex) {
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ob_capture()"> ryunosuke\Functions\Package\Funchand::ob_capture()</a></h2>
 	<div class="description"><p>ob_start ～ ob_get_clean のブロックでコールバックを実行する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(ob_capture(function(){echo 123;}), '123');
+<pre><code class="language-php">// コールバック内のテキストが得られる
+assertSame(ob_capture(function(){echo 123;}), '123');
+// こういう事もできる
+assertSame(ob_capture(function () {
+?&gt;
+bare string1
+bare string2
+&lt;?php
+}), "bare string1\nbare string2\n");
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::is_bindable_closure()"> ryunosuke\Functions\Package\Funchand::is_bindable_closure()</a></h2>
@@ -2086,13 +2187,14 @@ assertSame(str_putcsv((function() {
 	<div class="description"><p>指定文字列を置換する</p>
 <p>$subject 内の $search を $replaces に置換する。<br />
 str_replace とは「N 番目のみ置換できる」点で異なる。<br />
-つまり、$subject='hoge', $replace=[2 =&gt; 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。</p>
+つまり、$search='hoge', $replace=[2 =&gt; 'fuga'] とすると「2 番目の 'hoge' が 'fuga' に置換される」という動作になる（0 ベース）。</p>
 <p>$replace に 非配列を与えた場合は配列化される。<br />
 つまり <code>$replaces = 'hoge'</code> は <code>$replaces = [0 =&gt; 'hoge']</code> と同じ（最初のマッチを置換する）。</p>
 <p>$replace に空配列を与えると何もしない。<br />
 負数キーは後ろから数える動作となる。<br />
 また、置換後の文字列は置換対象にはならない。</p>
-<p>N 番目の検索文字列が見つからない場合は例外を投げる。</p>
+<p>N 番目の検索文字列が見つからない場合は例外を投げる。<br />
+ただし、文字自体が見つからない場合は投げない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 1番目（0ベースなので2番目）の x を X に置換
 assertSame(str_subreplace('xxx', 'x', [1 =&gt; 'X']), 'xXx');
@@ -2100,6 +2202,34 @@ assertSame(str_subreplace('xxx', 'x', [1 =&gt; 'X']), 'xXx');
 assertSame(str_subreplace('!xxx!', 'x', [0 =&gt; 'Xa', -1 =&gt; 'Xz']), '!XaxXz!');
 // 置換結果は置換対象にならない
 assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_submap()"> ryunosuke\Functions\Package\Strings::str_submap()</a></h2>
+	<div class="description"><p>指定文字列を置換する</p>
+<p>$subject を $replaces に従って置換する。<br />
+具体的には「$replaces を 複数指定できる str_subreplace」に近い。</p>
+<p>strtr とは「N 番目のみ置換できる」点で異なる。<br />
+つまり、$replaces=['hoge' =&gt; [2 =&gt; 'fuga']] とすると「2 番目の 'hoge' が 'fuga' に置換される」という動作になる（0 ベース）。</p>
+<p>$replaces の要素に非配列を与えた場合は配列化される。<br />
+つまり <code>$replaces = ['hoge' =&gt; 'fuga']</code> は <code>$replaces = ['hoge' =&gt; ['fuga']]</code> と同じ（最初のマッチを置換する）。</p>
+<p>$replace に空配列を与えると何もしない。<br />
+負数キーは後ろから数える動作となる。<br />
+また、置換後の文字列は置換対象にはならない。</p>
+<p>N 番目の検索文字列が見つからない場合は例外を投げる。<br />
+ただし、文字自体が見つからない場合は投げない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// "hello, world" の l と o を置換
+assertSame(str_submap('hello, world', [
+    // l は0番目と2番目のみを置換（1番目は何も行われない）
+    'l' =&gt; [
+        0 =&gt; 'L1',
+        2 =&gt; 'L3',
+    ],
+    // o は後ろから数えて1番目を置換
+    'o' =&gt; [
+        -1 =&gt; 'O',
+    ],
+]), 'heL1lo, wOrL3d');
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_between()"> ryunosuke\Functions\Package\Strings::str_between()</a></h2>
@@ -2326,7 +2456,10 @@ c = PHP_VERSION
 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。<br />
 ただし、オプションで headers が与えられた場合はそれを使用する。<br />
 この headers オプションはヘッダ文字列変換も兼ねる（[key =&gt; header] で「key を header で吐き出し」となる）。</p>
-<p>メモリ効率は意識しない（どうせ元々配列を保持してるので意識しても無駄）。</p>
+<p>callback オプションが渡された場合は「あらゆる処理の最初」にコールされる。<br />
+つまりヘッダの読み換えや文字エンコーディングの変換が行われる前の状態でコールされる。<br />
+また、 false を返すとその要素はスルーされる。</p>
+<p>output オプションにリソースを渡すとそこに対して書き込みが行われる（fclose はされない）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな実行例
 $csvarrays = [
@@ -2354,7 +2487,11 @@ A3,C3
 	<div class="description"><p>CSV 的文字列を連想配列の配列に変換する</p>
 <p>1行目をヘッダ文字列とみなしてそれをキーとした連想配列の配列を返す。<br />
 ただし、オプションで headers が与えられた場合はそれを使用する。<br />
-この headers オプションはヘッダフィルタも兼ねる（[n =&gt; header] で「n 番目フィールドを header で取り込み」となる）。</p>
+この headers オプションはヘッダフィルタも兼ねる（[n =&gt; header] で「n 番目フィールドを header で取り込み」となる）。<br />
+入力にヘッダがありかつ headers に連想配列が渡された場合はフィルタ兼読み換えとなる（Example を参照）。</p>
+<p>callback オプションが渡された場合は「あらゆる処理の最後」にコールされる。<br />
+つまりヘッダの読み換えや文字エンコーディングの変換が行われた後の状態でコールされる。<br />
+また、 false を返すとその要素はスルーされる。</p>
 <p>メモリ効率は意識しない（どうせ配列を返すので意識しても無駄）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな実行例
@@ -2380,6 +2517,20 @@ A3,B3,C3
     ['a' =&gt; 'A1', 'c' =&gt; 'C1'],
     ['a' =&gt; 'A2', 'c' =&gt; 'C2'],
     ['a' =&gt; 'A3', 'c' =&gt; 'C3'],
+]);
+
+// ヘッダありで連想配列で指定するとキーの読み換えとなる（指定しなければ読み飛ばしも行える）
+assertEquals(csv_import("
+a,b,c
+A1,B1,C1
+A2,B2,C2
+A3,B3,C3
+", [
+    'headers' =&gt; ['a' =&gt; 'hoge', 'c' =&gt; 'piyo'], // a は hoge, c は piyo で読み込む。 b は指定がないので飛ばされる
+]), [
+    ['hoge' =&gt; 'A1', 'piyo' =&gt; 'C1'],
+    ['hoge' =&gt; 'A2', 'piyo' =&gt; 'C2'],
+    ['hoge' =&gt; 'A3', 'piyo' =&gt; 'C3'],
 ]);
 </code></pre>
 </div>
@@ -2483,7 +2634,7 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
 	<div class="description"><p>キャプチャも行える preg_replace</p>
 <p>「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。</p>
 <p>$replacement に callable を渡すと preg_replace_callback がコールされる。<br />
-callable と入っても単純文字列 callble （"strtoupper" など）は callable とはみなされない。<br />
+callable とはいっても単純文字列 callble （"strtoupper" など）は callable とはみなされない。<br />
 配列形式の callable や クロージャのみ preg_replace_callback になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 数字を除去しつつその除去された数字を得る
@@ -2597,7 +2748,7 @@ assertSame(str_array("
 	<div class="description"><p>マルチバイト対応 substr_replace</p>
 <p>本家は配列を与えたりできるが、ややこしいし使う気がしないので未対応。</p>
 <p>Example:</p>
-<pre><code class="language-php">// 数値キーが参照できる
+<pre><code class="language-php">// 2文字目から5文字を「あいうえお」に置換する
 assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
 </code></pre>
 </div>
@@ -2629,6 +2780,26 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_file()"> ryunosuke\Functions\Package\Strings::render_file()</a></h2>
 	<div class="description"><p>"hoge {$hoge}" 形式のレンダリングのファイル版</p>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ob_include()"> ryunosuke\Functions\Package\Strings::ob_include()</a></h2>
+	<div class="description"><p>変数を extract して include する</p>
+<p>Example:</p>
+<pre><code class="language-php">// このようなテンプレートファイルを用意すると
+file_put_contents(sys_get_temp_dir() . '/template.php', '
+This is plain text.
+This is &lt;?= $var ?&gt;.
+This is &lt;?php echo strtoupper($var) ?&gt;.
+');
+// このようにレンダリングできる
+assertSame(ob_include(sys_get_temp_dir() . '/template.php', ['var' =&gt; 'hoge']), '
+This is plain text.
+This is hoge.
+This is HOGE.
+');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::include_string()"> ryunosuke\Functions\Package\Strings::include_string()</a></h2>
+	<div class="description"><p>変数を extract して include する（文字列指定）</p>
 </div>
             	<h2>class<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax"> ryunosuke\Functions\Package\Syntax</a></h2>
 	<div class="description"><p>構文関連のユーティリティ</p>
@@ -2712,7 +2883,7 @@ ChainObject は大抵のグローバル関数がアノテーションされて�
 </ul>
 </li>
 <li>funcE で eval される文字列のクロージャを呼べる<ul>
-<li>変数名は <code>$v</code> 固定だが、 <code>$v</code> が無いときに限り 最左に自動付与される</li>
+<li>変数名は <code>$_</code> 固定だが、 <code>$_</code> が無いときに限り 最左に自動付与される</li>
 </ul>
 </li>
 <li>funcP で配列指定オペレータのクロージャを呼べる<ul>
@@ -3185,7 +3356,7 @@ assertSame(si_prefix(12345, null), [12.345, 'k']);
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_unprefix()"> ryunosuke\Functions\Package\Vars::si_unprefix()</a></h2>
 	<div class="description"><p>SI 接頭辞が付与された文字列を数値化する</p>
 <p>典型的な用途は ini_get で得られた値を数値化したいとき。<br />
-ただし、 init は 1m のように小文字で指定することもあるので大文字化する必要はある。</p>
+ただし、 ini は 1m のように小文字で指定することもあるので大文字化する必要はある。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 1k = 1000
 assertSame(si_unprefix('1k'), 1000);
@@ -3282,7 +3453,7 @@ assertFalse(is_arrayable(new \stdClass()));
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()"> ryunosuke\Functions\Package\Vars::is_iterable()</a></h2>
 	<div class="description"><p>変数が foreach で回せるか調べる</p>
 <p>オブジェクトの場合は \Traversable のみ。<br />
-要するに <tag_link data-kind='uri' data-type='http://php.net/manual/ja/function.is-iterable.php' data-description='is_iterable'>is_iterable</tag_link> の polyfill。</p>
+要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-iterable.php' data-description='is_iterable'>is_iterable</tag_link> の polyfill。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(is_iterable([1, 2, 3]));
 assertTrue(is_iterable((function () { yield 1; })()));
@@ -3292,6 +3463,7 @@ assertFalse(is_iterable(new \stdClass()));
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()"> ryunosuke\Functions\Package\Vars::is_countable()</a></h2>
 	<div class="description"><p>変数が count でカウントできるか調べる</p>
+<p>要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-countable.php' data-description='is_countable'>is_countable</tag_link> の polyfill。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(is_countable([1, 2, 3]));
 assertTrue(is_countable(new \ArrayObject()));
