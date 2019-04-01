@@ -10,6 +10,20 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.2.10
+
+- [feature][FileSystem] file_suffix を追加
+- [feature][FileSystem] memory_path を追加
+- [feature][Strings] ob_include/include_string を追加
+- [feature][Strings] csv 関係の修正
+  - 入出力両方でコールバックを指定できるように修正
+  - csv_export で出力リソースを指定できるように修正
+  - csv_import でヘッダ読み換えができるように修正
+- [feature][Strings] str_submap を追加
+- [fixbug][Strings] str_subreplace を修正
+  - $case_insensitivity の時に負数を指定すると例外が飛ぶ不具合を修正
+  - 見つからない場合にも例外が飛んでいた不具合を修正
+
 ## 1.2.9
 
 - [feature][Strings] str_ellipsis を追加
