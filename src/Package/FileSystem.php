@@ -120,6 +120,41 @@ class FileSystem
     }
 
     /**
+     * ファイル名にサフィックスを付与する
+     *
+     * pathinfoに非準拠。例えば「filename.hoge.fuga」のような形式は「filename」が変換対象になる。
+     *
+     * Example:
+     * ```php
+     * assertSame(file_suffix('filename.ext', '-min'), 'filename-min.ext');
+     * assertSame(file_suffix('filename.ext1.ext2', '-min'), 'filename-min.ext1.ext2');
+     * ```
+     *
+     * @param string $filename パス・ファイル名
+     * @param string $suffix 付与するサフィックス
+     * @return string サフィックスが付与されたパス名
+     */
+    public static function file_suffix($filename, $suffix)
+    {
+        $pathinfo = pathinfo($filename);
+        $dirname = $pathinfo['dirname'];
+
+        $exts = [];
+        while (isset($pathinfo['extension'])) {
+            $exts[] = '.' . $pathinfo['extension'];
+            $pathinfo = pathinfo($pathinfo['filename']);
+        }
+
+        $basename = $pathinfo['filename'] . $suffix . implode('', array_reverse($exts));
+
+        if ($dirname === '.') {
+            return $basename;
+        }
+
+        return $dirname . DIRECTORY_SEPARATOR . $basename;
+    }
+
+    /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
      *
      * pathinfo に準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。

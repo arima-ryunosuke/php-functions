@@ -110,6 +110,18 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         ], $tree);
     }
 
+    function test_file_suffix()
+    {
+        $DS = DIRECTORY_SEPARATOR;
+        $this->assertEquals("filename-suffix.ext", (file_suffix)("filename.ext", '-suffix'));
+        $this->assertEquals("path{$DS}filename-suffix.ext", (file_suffix)("path{$DS}filename.ext", '-suffix'));
+        $this->assertEquals("path{$DS}filename-suffix", (file_suffix)("path{$DS}filename", '-suffix'));
+        $this->assertEquals("filename.suffix.ext1.ext2", (file_suffix)("filename.ext1.ext2", '.suffix'));
+        $this->assertEquals("filename..", (file_suffix)("filename.", '.'));
+        $this->assertEquals("filename-suf.", (file_suffix)("filename.", '-suf'));
+        $this->assertEquals("filename.ext", (file_suffix)("filename.ext", ''));
+    }
+
     function test_file_extension()
     {
         $DS = DIRECTORY_SEPARATOR;
