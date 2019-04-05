@@ -1,4 +1,5 @@
 <?php
+declare(ticks=1);
 
 namespace ryunosuke\Test\Package;
 
@@ -387,5 +388,179 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
             $file();
             $this->assertFileNotExists($name);
         }
+    }
+
+    function test_memory_path()
+    {
+        $hoge = (memory_path)('hoge');
+        $fuga = (memory_path)('fuga');
+        $piyo = (memory_path)('piyo');
+
+        // f 系の一連の流れ
+        $f = fopen($hoge, 'w+');
+        $this->assertEquals(true, flock($f, LOCK_EX));
+        $this->assertEquals(5, fwrite($f, 'Hello'));
+        $this->assertEquals(6, fwrite($f, 'World!'));
+        $this->assertEquals(0, fseek($f, 3, SEEK_SET));
+        $this->assertEquals(3, ftell($f));
+        $this->assertEquals(false, feof($f));
+        $this->assertEquals('loW', fread($f, 3));
+        $this->assertEquals('orld!', fread($f, 1024));
+        $this->assertEquals(0, fseek($f, 100, SEEK_SET));
+        $this->assertEquals(1, fwrite($f, 'x'));
+        $this->assertEquals(true, feof($f));
+        $this->assertEquals(true, fflush($f));
+        $this->assertEquals(true, ftruncate($f, 1024));
+        $this->assertEquals(true, flock($f, LOCK_UN));
+        $this->assertEquals(true, fclose($f));
+        $this->assertEquals(1024, filesize($hoge));
+
+        // file_get/put_contents
+        $this->assertEquals(6, file_put_contents($hoge, 'hogera'));
+        $this->assertEquals('hogera', file_get_contents($hoge));
+        $this->assertEquals(6, file_put_contents($hoge, 'fugawa', FILE_APPEND));
+        $this->assertEquals('hogerafugawa', file_get_contents($hoge));
+
+        // file 系関数
+        $this->assertEquals(true, is_readable($hoge));
+        $this->assertEquals(true, is_writable($hoge));
+        $this->assertEquals(false, file_exists($fuga));
+        $this->assertEquals(true, touch($fuga, 1234567890));
+        $this->assertEquals(true, file_exists($fuga));
+        $this->assertEquals(true, touch($fuga, 1234567890));
+        $this->assertEquals(true, chown($fuga, 'user'));
+        $this->assertEquals(1234567890, filemtime($fuga));
+        $this->assertEquals(true, unlink($fuga));
+        $this->assertEquals(false, unlink((memory_path)('piyo')));
+        $this->assertEquals(false, file_exists($piyo));
+
+        $this->assertEquals(false, rename($piyo, $fuga));
+        $this->assertEquals(true, rename($hoge, $piyo));
+        $this->assertEquals(false, file_exists($hoge));
+        $this->assertEquals(true, file_exists($piyo));
+
+        $this->assertException('is not supported', 'mkdir', $hoge);
+    }
+
+    function test_memory_path_open()
+    {
+        $test = function ($expectedFile, $actualFile, $mode) {
+            $expected = fopen($expectedFile, $mode);
+            $actual = fopen($actualFile, $mode);
+
+            $this->assertEquals(ftell($expected), ftell($actual));
+            $this->assertEquals(filesize($expectedFile), filesize($actualFile));
+
+            $this->assertEquals(fwrite($expected, '12345'), fwrite($actual, '12345'));
+            rewind($expected);
+            rewind($actual);
+            $this->assertEquals(fgets($expected), fgets($actual));
+            $this->assertEquals(ftruncate($expected, '12345'), ftruncate($actual, '12345'));
+        };
+
+        foreach (['r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'] as $mode) {
+            @unlink($expectedFile = sys_get_temp_dir() . "/tmp$mode.txt");
+            @unlink($actualFile = (memory_path)("/tmp$mode.txt"));
+            if ($mode[0] !== 'x') {
+                file_put_contents($expectedFile, 'abcde');
+                file_put_contents($actualFile, 'abcde');
+            }
+            $test($expectedFile, $actualFile, $mode);
+        }
+
+        $path = (memory_path)(__FUNCTION__);
+        fopen($path, 'a');
+        $this->assertTrue(file_exists($path));
+        unlink($path);
+        fopen($path, 'c');
+        $this->assertTrue(file_exists($path));
+        unlink($path);
+        $this->assertException('is not exist', 'fopen', $path, 'r');
+        touch($path);
+        $this->assertException('is exist already', 'fopen', $path, 'x');
+    }
+
+    function test_memory_path_seek()
+    {
+        $test = function ($expectedFile, $actualFile) {
+            $expected = fopen($expectedFile, 'w+');
+            $actual = fopen($actualFile, 'w+');
+            $this->assertEquals(fwrite($expected, '0123456789'), fwrite($actual, '0123456789'));
+
+            $this->assertEquals(fseek($expected, 1, SEEK_SET), fseek($actual, 1, SEEK_SET));
+            $this->assertEquals(fseek($expected, -1, SEEK_SET), fseek($actual, -1, SEEK_SET));
+            $this->assertEquals(ftell($expected), ftell($actual));
+
+            $this->assertEquals(fseek($expected, 1, SEEK_CUR), fseek($actual, 1, SEEK_CUR));
+            $this->assertEquals(fseek($expected, -1, SEEK_CUR), fseek($actual, -1, SEEK_CUR));
+            $this->assertEquals(fseek($expected, -111, SEEK_CUR), fseek($actual, -111, SEEK_CUR));
+            $this->assertEquals(ftell($expected), ftell($actual));
+
+            $this->assertEquals(fseek($expected, 1, SEEK_END), fseek($actual, 1, SEEK_END));
+            $this->assertEquals(fseek($expected, -1, SEEK_END), fseek($actual, -1, SEEK_END));
+            $this->assertEquals(fseek($expected, -111, SEEK_END), fseek($actual, -111, SEEK_END));
+            $this->assertEquals(ftell($expected), ftell($actual));
+
+            $this->assertEquals(fseek($expected, 100, SEEK_SET), fseek($actual, 100, SEEK_SET));
+            $this->assertEquals(fwrite($expected, 'x'), fwrite($actual, 'x'));
+            $this->assertEquals(rewind($expected), rewind($actual));
+            $this->assertEquals(fread($expected, 1000), fread($actual, 1000));
+        };
+        $test(sys_get_temp_dir() . '/tmp.txt', (memory_path)('tmp.txt'));
+    }
+
+    function test_memory_path_perm()
+    {
+        $path = (memory_path)('path');
+
+        $this->assertEquals(false, chmod($path, 0777));
+        $this->assertEquals(false, chown($path, 48));
+        $this->assertEquals(false, chgrp($path, 48));
+
+        umask(0077);
+        $this->assertEquals(true, touch($path));
+        if (DIRECTORY_SEPARATOR === '/') {
+            $this->assertEquals(0700, fileperms($path));
+            $this->assertEquals(true, chmod($path, 0777));
+            $this->assertEquals(0777, fileperms($path));
+        }
+
+        $this->assertEquals(true, chown($path, 48));
+        $this->assertEquals(48, fileowner($path));
+        $this->assertEquals(true, chown($path, 'mysql'));
+        $this->assertEquals(27, fileowner($path));
+
+        $this->assertEquals(true, chgrp($path, 48));
+        $this->assertEquals(48, filegroup($path));
+        $this->assertEquals(true, chgrp($path, 'mysql'));
+        $this->assertEquals(27, filegroup($path));
+
+        $this->assertEquals(true, chmod($path, 0700));
+        if (DIRECTORY_SEPARATOR === '/') {
+            $this->assertEquals(false, is_readable($path));
+            $this->assertEquals(false, is_writable($path));
+        }
+    }
+
+    function test_memory_path_leak()
+    {
+        $path = (memory_path)('path');
+        $usage = memory_get_usage(true);
+
+        file_put_contents($path, str_repeat('x', 4 * 1024 * 1024));
+        $this->assertGreaterThan(4 * 1024 * 1024, memory_get_usage(true) - $usage);
+
+        unlink($path);
+        $this->assertLessThan(100, memory_get_usage(true) - $usage);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_memory_path_already()
+    {
+        stream_wrapper_register('MemoryStreamV010000', 'stdClass');
+        $this->assertException('is registered already', memory_path, 'hoge');
     }
 }
