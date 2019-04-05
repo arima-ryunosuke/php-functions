@@ -1328,4 +1328,29 @@ zero is index 0.
 579 is expression.
 ", $actual);
     }
+
+    public function test_ob_include()
+    {
+        $actual = (ob_include)(__DIR__ . '/Strings/template.php', [
+            'variable' => 'variable',
+        ]);
+        $this->assertEquals("This is plain text.
+This is variable.
+This is VARIABLE.
+", $actual);
+    }
+
+    public function test_include_string()
+    {
+        $actual = (include_string)('This is plain text.
+This is <?= $variable ?>.
+This is <?php echo strtoupper($variable) ?>.
+', [
+            'variable' => 'variable',
+        ]);
+        $this->assertEquals("This is plain text.
+This is variable.
+This is VARIABLE.
+", $actual);
+    }
 }
