@@ -122,7 +122,7 @@ class FileSystem
     /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
      *
-     * pathinfoに準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
+     * pathinfo に準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。
      *
      * Example:
      * ```php
@@ -582,6 +582,7 @@ class FileSystem
      * 終了時に削除される一時ファイル名を生成する
      *
      * tempnam とほぼ同じで違いは下記。
+     *
      * - 引数が逆
      * - 終了時に削除される
      * - 失敗時に false を返すのではなく例外を投げる

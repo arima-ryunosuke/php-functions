@@ -353,7 +353,7 @@ class Classobj
      * ```
      *
      * @param object $object オブジェクト
-     * @return array 全プロパティ
+     * @return array 全プロパティの配列
      */
     public static function get_object_properties($object)
     {

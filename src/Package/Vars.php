@@ -293,7 +293,7 @@ class Vars
      * SI 接頭辞が付与された文字列を数値化する
      *
      * 典型的な用途は ini_get で得られた値を数値化したいとき。
-     * ただし、 init は 1m のように小文字で指定することもあるので大文字化する必要はある。
+     * ただし、 ini は 1m のように小文字で指定することもあるので大文字化する必要はある。
      *
      * Example:
      * ```php
@@ -529,7 +529,7 @@ class Vars
      * 変数が foreach で回せるか調べる
      *
      * オブジェクトの場合は \Traversable のみ。
-     * 要するに {@link http://php.net/manual/ja/function.is-iterable.php is_iterable} の polyfill。
+     * 要するに {@link http://php.net/manual/function.is-iterable.php is_iterable} の polyfill。
      *
      * Example:
      * ```php
@@ -551,6 +551,8 @@ class Vars
 
     /**
      * 変数が count でカウントできるか調べる
+     *
+     * 要するに {@link http://php.net/manual/function.is-countable.php is_countable} の polyfill。
      *
      * Example:
      * ```php

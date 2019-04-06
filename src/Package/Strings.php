@@ -405,7 +405,7 @@ class Strings
      *
      * $subject 内の $search を $replaces に置換する。
      * str_replace とは「N 番目のみ置換できる」点で異なる。
-     * つまり、$subject='hoge', $replace=[2 => 'fuga'] とすると「3 番目の 'hoge' が hoge に置換される」という動作になる（0 ベース）。
+     * つまり、$search='hoge', $replace=[2 => 'fuga'] とすると「2 番目の 'hoge' が 'fuga' に置換される」という動作になる（0 ベース）。
      *
      * $replace に 非配列を与えた場合は配列化される。
      * つまり `$replaces = 'hoge'` は `$replaces = [0 => 'hoge']` と同じ（最初のマッチを置換する）。
@@ -1642,7 +1642,7 @@ class Strings
      * 「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。
      *
      * $replacement に callable を渡すと preg_replace_callback がコールされる。
-     * callable と入っても単純文字列 callble （"strtoupper" など）は callable とはみなされない。
+     * callable とはいっても単純文字列 callble （"strtoupper" など）は callable とはみなされない。
      * 配列形式の callable や クロージャのみ preg_replace_callback になる。
      *
      * Example:
@@ -1963,7 +1963,7 @@ class Strings
      *
      * Example:
      * ```php
-     * // 数値キーが参照できる
+     * // 2文字目から5文字を「あいうえお」に置換する
      * assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
      * ```
      *

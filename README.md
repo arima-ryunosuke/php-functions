@@ -75,6 +75,18 @@ file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::expo
 
 名前空間エクスポートを使うと後述のキャッシュはほぼ無効になります（リクエスト中はキャッシュされるがリクエストをまたいだキャッシュは無効になる）。
 
+下記のようにすると指定した関数と依存関係にある関数のみが吐き出されます。
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+
+// 'funcA', 'funcB' だけを出力
+file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', false, ['funcA', 'funcB']));
+```
+
+`funcA` や `funcB` が例えば `funcC` に依存していれば `funcC` も吐き出されます。
+用途はちょろっとしたコード片のコピペ用です（全体は要らんけど特定のやつだけ吐き出したい用途が個人的にあった）。
+
 ### constant
 
 少し変わった仕様として、関数名と同名の定数も定義されます。

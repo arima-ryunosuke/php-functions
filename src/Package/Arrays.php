@@ -418,7 +418,7 @@ class Arrays
      * さらに安定ソートであり、同値だとしても元の並び順は維持される。
      *
      * $comparator は省略できる。省略した場合、型に基づいてよしなにソートする。
-     * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）
+     * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）。
      *
      * ただし、標準のソート関数とは異なり、参照渡しではなくソートして返り値で返す。
      * また、いわゆる asort であり、キー・値は常に維持される。
@@ -571,9 +571,15 @@ class Arrays
      * Example:
      * ```php
      * // 普通の zip
-     * $this->assertEquals(array_zip([1, 2, 3], ['hoge', 'fuga', 'piyo']), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+     * assertEquals(array_zip(
+     *     [1, 2, 3],
+     *     ['hoge', 'fuga', 'piyo']
+     * ), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
      * // キーが維持される
-     * $this->assertEquals(array_zip(['a' => 1, 2, 3], ['hoge', 'b' => 'fuga', 'piyo']), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
+     * assertEquals(array_zip(
+     *     ['a' => 1, 2, 3],
+     *     ['hoge', 'b' => 'fuga', 'piyo']
+     * ), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
      * ```
      *
      * @param array $arrays 対象配列（可変引数）
@@ -638,9 +644,15 @@ class Arrays
      * Example:
      * ```php
      * // 普通の直積
-     * $this->assertSame(array_cross([1, 2], [3, 4]), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+     * assertSame(array_cross(
+     *     [1, 2],
+     *     [3, 4]
+     * ), [[1, 3], [1, 4], [2, 3], [2, 4]]);
      * // キーが維持される
-     * $this->assertSame(array_cross(['a' => 1, 2], ['b' => 3, 4]), [['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
+     * assertSame(array_cross(
+     *     ['a' => 1, 2],
+     *     ['b' => 3, 4]
+     * ), [['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
      * ```
      *
      * @param array $arrays 対象配列（可変引数）
@@ -1529,23 +1541,35 @@ class Arrays
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ];
      * // 'flag' が true 相当のものだけ返す
-     * assertSame(array_where($array, 'flag'), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, 'flag'), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     * ]);
      * // 'name' に 'h' を含むものだけ返す
      * $contain_h = function($name){return strpos($name, 'h') !== false;};
-     * assertSame(array_where($array, 'name', $contain_h), [0 => ['id' => 1, 'name' => 'hoge', 'flag' => false]]);
+     * assertSame(array_where($array, 'name', $contain_h), [
+     *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+     * ]);
      * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
      * $equal_2 = function($row, $key){return $key === 2;};
-     * assertSame(array_where($array, null, $equal_2), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * assertSame(array_where($array, null, $equal_2), [
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [1 => ['id' => 2, 'name' => 'fuga', 'flag' => true]]);
+     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     * ]);
      * // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
-     * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
      * assertSame(array_where($array, [
      *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
      *     'name' => function($name){return strpos($name, 'o') !== false;}, // name に o を含む
-     * ]), [2 => ['id' => 3, 'name' => 'piyo', 'flag' => false]]);
+     * ]), [
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -1643,7 +1667,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * $exa = new \Exception('a'); $exb = new \Exception('b'); $std = new \stdClass();
+     * $exa = new \Exception('a');
+     * $exb = new \Exception('b');
+     * $std = new \stdClass();
      * // getMessage で map される
      * assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
@@ -1690,7 +1716,8 @@ class Arrays
      * assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
      * assertSame(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}), ['a' => 'a:A', 'b' => 'b:B']);
-     * // `@method` でメソッドコールになる
+     * // メソッドコールもできる（引数不要なら `@method` でも同じ）
+     * assertSame(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' => []]), ['a', 'b']);
      * assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
      * ```
      *
@@ -2048,10 +2075,20 @@ class Arrays
      * ```php
      * // lt2(2より小さい)で分類
      * $lt2 = function($v){return $v < 2;};
-     * assertSame(array_assort([1, 2, 3], ['lt2' => $lt2]), ['lt2' => [1]]);
+     * assertSame(array_assort([1, 2, 3], [
+     *     'lt2' => $lt2,
+     * ]), [
+     *     'lt2' => [1],
+     * ]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
      * $lt3 = function($v){return $v < 3;};
-     * assertSame(array_assort(['1', '2', '3'], ['lt3' => $lt3, 'ctd' => 'ctype_digit']), ['lt3' => ['1', '2'], 'ctd' => ['1', '2', '3']]);
+     * assertSame(array_assort(['1', '2', '3'], [
+     *     'lt3' => $lt3,
+     *     'ctd' => 'ctype_digit',
+     * ]), [
+     *     'lt3' => ['1', '2'],
+     *     'ctd' => ['1', '2', '3'],
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2077,6 +2114,7 @@ class Arrays
      *
      * コールバックが true 相当を返した要素をカウントして返す。
      * 普通に使う分には `count(array_filter($array, $callback))` とほとんど同じだが、下記の点が微妙に異なる。
+     *
      * - $callback が要求するならキーも渡ってくる
      * - $callback には配列が渡せる。配列を渡した場合は件数を配列で返す（Example 参照）
      *
@@ -2089,7 +2127,10 @@ class Arrays
      * assertSame(array_count($array, [
      *     'a' => function($s){return strpos($s, 'a') !== false;},
      *     'o' => function($s){return strpos($s, 'o') !== false;},
-     * ]), ['a' => 1, 'o' => 2]);
+     * ]), [
+     *     'a' => 1,
+     *     'o' => 2,
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2125,12 +2166,18 @@ class Arrays
     /**
      * 配列をコールバックの返り値でグループ化する
      *
-     * コールバックが配列を返すと入れ子としてグループする。
+     * コールバックを省略すると値そのもので評価する。
+     * コールバックが配列を返すと入れ子としてグループ化する。
      *
      * Example:
      * ```php
-     * assertSame(array_group([1, 1, 1]), [1 => [1, 1, 1]]);
-     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [1 => [1, 3], 0 => [2]]);
+     * assertSame(array_group([1, 1, 1]), [
+     *     1 => [1, 1, 1],
+     * ]);
+     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [
+     *     1 => [1, 3],
+     *     0 => [2],
+     * ]);
      * // group -> id で入れ子グループにする
      * $row1 = ['id' => 1, 'group' => 'hoge'];
      * $row2 = ['id' => 2, 'group' => 'fuga'];
@@ -2256,7 +2303,7 @@ class Arrays
      *     'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
      *     'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
      *     'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
-     *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型(php7 は returnType)に依存
+     *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型に依存
      *     'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
      * ];
      * ```
@@ -2438,10 +2485,15 @@ class Arrays
      *
      * Example:
      * ```php
+     * $abc = ['a', 'b', 'c'];
      * // [a, b, c] から [a => A, b => B, c => C] を作る
-     * assertSame(array_fill_callback(['a', 'b', 'c'], 'strtoupper'), ['a' => 'A', 'b' => 'B', 'c' => 'C']);
+     * assertSame(array_fill_callback($abc, 'strtoupper'), [
+     *     'a' => 'A',
+     *     'b' => 'B',
+     *     'c' => 'C',
+     * ]);
      * // [a, b, c] からその sha1 配列を作って大文字化する
-     * assertSame(array_fill_callback(['a', 'b', 'c'], function ($v){ return strtoupper(sha1($v)); }), [
+     * assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }), [
      *     'a' => '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
      *     'b' => 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
      *     'c' => '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -2467,12 +2519,13 @@ class Arrays
      *
      * Example:
      * ```php
+     * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // a と c を取り出す
-     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']), ['a' => 'A', 'c' => 'C']);
+     * assertSame(array_pickup($array, ['a', 'c']), ['a' => 'A', 'c' => 'C']);
      * // 順番は $keys 基準になる
-     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * assertSame(array_pickup($array, ['c', 'a']), ['c' => 'C', 'a' => 'A']);
      * // 連想配列を渡すと読み替えて返す
-     * assertSame(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
+     * assertSame(array_pickup($array, ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2508,13 +2561,20 @@ class Arrays
      *
      * Example:
      * ```php
-     * $array = [11 => ['id' => 1, 'name' => 'name1'], 12 => ['id' => 2, 'name' => 'name2'], 13 => ['id' => 3, 'name' => 'name3']];
+     * $array = [
+     *     11 => ['id' => 1, 'name' => 'name1'],
+     *     12 => ['id' => 2, 'name' => 'name2'],
+     *     13 => ['id' => 3, 'name' => 'name3'],
+     * ];
      * // 第3引数を渡せば array_column と全く同じ
      * assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
      * assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
      * // 省略すればキーが保存される
-     * assertSame(array_lookup($array, 'name'), [11 => 'name1', 12 => 'name2', 13 => 'name3']);
-     * assertSame(array_lookup($array), $array);
+     * assertSame(array_lookup($array, 'name'), [
+     *     11 => 'name1',
+     *     12 => 'name2',
+     *     13 => 'name3',
+     * ]);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -2594,7 +2654,10 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_uncolumns(['id' => [1, 2], 'name' => ['A', 'B']]), [
+     * assertSame(array_uncolumns([
+     *     'id'   => [1, 2],
+     *     'name' => ['A', 'B'],
+     * ]), [
      *     ['id' => 1, 'name' => 'A'],
      *     ['id' => 2, 'name' => 'B'],
      * ]);
@@ -2634,6 +2697,7 @@ class Arrays
      *
      * 引数は (キー, 値, 今まで処理したキー配列) で渡ってくる。
      * 返り値は新しいキーを返す。
+     *
      * - 文字列や数値を返すとそれがキーとして使われる
      * - null を返すと元のキーがそのまま使われる
      * - true を返すと数値連番が振られる

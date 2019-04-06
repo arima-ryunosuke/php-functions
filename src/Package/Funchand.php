@@ -476,7 +476,15 @@ class Funchand
      *
      * Example:
      * ```php
+     * // コールバック内のテキストが得られる
      * assertSame(ob_capture(function(){echo 123;}), '123');
+     * // こういう事もできる
+     * assertSame(ob_capture(function () {
+     * ?>
+     * bare string1
+     * bare string2
+     * <?php
+     * }), "bare string1\nbare string2\n");
      * ```
      *
      * @param callable $callback 実行するコールバック
