@@ -246,6 +246,57 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException("'x' of -6th.", str_subreplace, $string, 'x', [-6 => 'nodef']);
     }
 
+    function test_str_submap()
+    {
+        $string = 'hello, world';
+
+        // empty
+        $this->assertEquals('hello, world', (str_submap)($string, []));
+        // only 1
+        $this->assertEquals('helLo, world', (str_submap)($string, [
+            'l' => [
+                1 => 'L',
+            ],
+        ]));
+        // multiple
+        $this->assertEquals('helLo1, wo2rld', (str_submap)($string, [
+            'l' => [
+                1 => 'L',
+            ],
+            'o' => [
+                'o1',
+                'o2',
+            ],
+        ]));
+        // overlap
+        $this->assertEquals('world, WORLD', (str_submap)($string, [
+            'hello' => 'world',
+            'world' => 'WORLD',
+        ]));
+        // negative
+        $this->assertEquals('helLo, wOrld', (str_submap)($string, [
+            'l' => [
+                -2 => 'L',
+            ],
+            'o' => [
+                -1 => 'O',
+            ],
+        ]));
+        // notfound
+        $this->assertEquals('hello, world', (str_submap)($string, ['xxx' => 'XXX']));
+        // case insensitivity
+        $this->assertEquals('H, world', (str_submap)($string, [
+            'HELLO' => 'H',
+        ], true));
+        // multibyte
+        $this->assertEquals('へろーわ棒るど', (str_submap)('へろーわーるど', ['ー' => [1 => '棒']]));
+        // no number
+        $this->assertException("key must be integer", str_submap, $string, ['w' => ['' => '']]);
+        // out od range
+        $this->assertException("'l' of 3th.", str_submap, $string, ['l' => [3 => 'nodef']]);
+        $this->assertException("'l' of -4th.", str_submap, $string, ['l' => [-4 => 'nodef']]);
+    }
+
     function test_str_between()
     {
         ////////// 0123456789A1234567891B23456789C123456789D
