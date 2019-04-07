@@ -232,16 +232,18 @@ class StringsTest extends \ryunosuke\Test\AbstractTestCase
         // negative
         $this->assertEquals('xxxxZ', (str_subreplace)($string, 'x', [-1 => 'Z']));
         $this->assertEquals('Zxxxx', (str_subreplace)($string, 'x', [-5 => 'Z']));
+        // notfound
+        $this->assertEquals('xxxxx', (str_subreplace)($string, 'z', ['Z']));
         // case insensitivity
         $this->assertEquals('i1xxxx', (str_subreplace)($string, 'X', ['i1'], true));
+        $this->assertEquals('xxxxi5', (str_subreplace)($string, 'X', [-1 => 'i5'], true));
         // multibyte
         $this->assertEquals('ああかああ', (str_subreplace)('あああああ', 'あ', [2 => 'か']));
         // no number
         $this->assertException("key must be integer", str_subreplace, $string, 'x', ['s' => '']);
         // out od range
         $this->assertException("'x' of 5th.", str_subreplace, $string, 'x', [5 => 'nodef']);
-        $this->assertException("'x' of -1th.", str_subreplace, $string, 'x', [-6 => 'nodef']);
-        $this->assertException("'n' of 0th.", str_subreplace, $string, 'n', ['']);
+        $this->assertException("'x' of -6th.", str_subreplace, $string, 'x', [-6 => 'nodef']);
     }
 
     function test_str_between()

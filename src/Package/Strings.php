@@ -415,6 +415,7 @@ class Strings
      * また、置換後の文字列は置換対象にはならない。
      *
      * N 番目の検索文字列が見つからない場合は例外を投げる。
+     * ただし、文字自体が見つからない場合は投げない。
      *
      * Example:
      * ```php
@@ -444,17 +445,21 @@ class Strings
         }
 
         // 負数対応のために逆数計算（ついでに整数チェック）
-        $subcount = substr_count($subject, $search);
+        $subcount = $case_insensitivity ? substr_count(strtolower($subject), strtolower($search)) : substr_count($subject, $search);
+        if ($subcount === 0) {
+            return $subject;
+        }
         $mapping = [];
         foreach ($replaces as $n => $replace) {
+            $origN = $n;
             if (!is_int($n)) {
                 throw new \InvalidArgumentException('$replaces key must be integer.');
             }
             if ($n < 0) {
                 $n += $subcount;
             }
-            if ($n < 0) {
-                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
+            if (!(0 <= $n && $n < $subcount)) {
+                throw new \InvalidArgumentException("notfound search string '$search' of {$origN}th.");
             }
             $mapping[$n] = $replace;
         }
@@ -462,9 +467,6 @@ class Strings
         $offset = 0;
         for ($n = 0; $n <= $maxseq; $n++) {
             $pos = $case_insensitivity ? stripos($subject, $search, $offset) : strpos($subject, $search, $offset);
-            if ($pos === false) {
-                throw new \InvalidArgumentException("notfound search string '$search' of {$n}th.");
-            }
             if (isset($mapping[$n])) {
                 $subject = substr_replace($subject, $mapping[$n], $pos, strlen($search));
                 $offset = $pos + strlen($mapping[$n]);
