@@ -1256,7 +1256,11 @@ class Strings
      * ただし、オプションで headers が与えられた場合はそれを使用する。
      * この headers オプションはヘッダ文字列変換も兼ねる（[key => header] で「key を header で吐き出し」となる）。
      *
-     * メモリ効率は意識しない（どうせ元々配列を保持してるので意識しても無駄）。
+     * callback オプションが渡された場合は「あらゆる処理の最初」にコールされる。
+     * つまりヘッダの読み換えや文字エンコーディングの変換が行われる前の状態でコールされる。
+     * また、 false を返すとその要素はスルーされる。
+     *
+     * output オプションにリソースを渡すとそこに対して書き込みが行われる（fclose はされない）。
      *
      * Example:
      * ```php
@@ -1284,7 +1288,7 @@ class Strings
      *
      * @param array $csvarrays 連想配列の配列
      * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
-     * @return array CSV 的文字列
+     * @return array|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
      */
     public static function csv_export($csvarrays, $options = [])
     {
@@ -1294,11 +1298,21 @@ class Strings
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
             'headers'   => [],
+            'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+            'output'    => null,
         ];
 
-        $fp = fopen('php://temp', 'rw+');
+        $output = $options['output'];
+
+        if ($output) {
+            $fp = $options['output'];
+        }
+        else {
+            $fp = fopen('php://temp', 'rw+');
+        }
         try {
-            return (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers) {
+            $size = (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $callback) {
+                $size = 0;
                 $mb_internal_encoding = mb_internal_encoding();
                 if (!$headers) {
                     foreach ($csvarrays as $array) {
@@ -1312,22 +1326,33 @@ class Strings
                 if ($encoding !== $mb_internal_encoding) {
                     mb_convert_variables($encoding, $mb_internal_encoding, $headers);
                 }
-                fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
+                $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
                 $default = array_fill_keys(array_keys($headers), '');
 
-                foreach ($csvarrays as $array) {
+                foreach ($csvarrays as $n => $array) {
+                    if ($callback) {
+                        if ($callback($array, $n) === false) {
+                            continue;
+                        }
+                    }
                     $row = array_intersect_key(array_replace($default, $array), $default);
                     if ($encoding !== $mb_internal_encoding) {
                         mb_convert_variables($encoding, $mb_internal_encoding, $row);
                     }
-                    fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                    $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
                 }
-                rewind($fp);
-                return stream_get_contents($fp);
-            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+                return $size;
+            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['callback']);
+            if ($output) {
+                return $size;
+            }
+            rewind($fp);
+            return stream_get_contents($fp);
         }
         finally {
-            fclose($fp);
+            if (!$output) {
+                fclose($fp);
+            }
         }
     }
 
@@ -1337,6 +1362,11 @@ class Strings
      * 1行目をヘッダ文字列とみなしてそれをキーとした連想配列の配列を返す。
      * ただし、オプションで headers が与えられた場合はそれを使用する。
      * この headers オプションはヘッダフィルタも兼ねる（[n => header] で「n 番目フィールドを header で取り込み」となる）。
+     * 入力にヘッダがありかつ headers に連想配列が渡された場合はフィルタ兼読み換えとなる（Example を参照）。
+     *
+     * callback オプションが渡された場合は「あらゆる処理の最後」にコールされる。
+     * つまりヘッダの読み換えや文字エンコーディングの変換が行われた後の状態でコールされる。
+     * また、 false を返すとその要素はスルーされる。
      *
      * メモリ効率は意識しない（どうせ配列を返すので意識しても無駄）。
      *
@@ -1366,6 +1396,20 @@ class Strings
      *     ['a' => 'A2', 'c' => 'C2'],
      *     ['a' => 'A3', 'c' => 'C3'],
      * ]);
+     *
+     * // ヘッダありで連想配列で指定するとキーの読み換えとなる（指定しなければ読み飛ばしも行える）
+     * assertEquals(csv_import("
+     * a,b,c
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ", [
+     *     'headers' => ['a' => 'hoge', 'c' => 'piyo'], // a は hoge, c は piyo で読み込む。 b は指定がないので飛ばされる
+     * ]), [
+     *     ['hoge' => 'A1', 'piyo' => 'C1'],
+     *     ['hoge' => 'A2', 'piyo' => 'C2'],
+     *     ['hoge' => 'A3', 'piyo' => 'C3'],
+     * ]);
      * ```
      *
      * @param string|resource $csvstring CSV 的文字列。ファイルポインタでも良いが終了後に必ず閉じられる
@@ -1380,7 +1424,15 @@ class Strings
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
             'headers'   => [],
+            'headermap' => null,
+            'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
         ];
+
+        // 文字キーを含む場合はヘッダーありの読み換えとなる
+        if (is_array($options['headers']) && count(array_filter(array_keys($options['headers']), 'is_string')) > 0) {
+            $options['headermap'] = $options['headers'];
+            $options['headers'] = null;
+        }
 
         if (is_resource($csvstring)) {
             $fp = $csvstring;
@@ -1392,9 +1444,10 @@ class Strings
         }
 
         try {
-            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers) {
+            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $callback) {
                 $mb_internal_encoding = mb_internal_encoding();
                 $result = [];
+                $n = -1;
                 while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
                     if ($row === [null]) {
                         continue;
@@ -1406,10 +1459,21 @@ class Strings
                         $headers = $row;
                         continue;
                     }
-                    $result[] = array_combine($headers, array_intersect_key($row, $headers));
+
+                    $n++;
+                    $row = array_combine($headers, array_intersect_key($row, $headers));
+                    if ($headermap) {
+                        $row = (array_pickup)($row, $headermap);
+                    }
+                    if ($callback) {
+                        if ($callback($row, $n) === false) {
+                            continue;
+                        }
+                    }
+                    $result[] = $row;
                 }
                 return $result;
-            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers']);
+            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['callback']);
         }
         finally {
             fclose($fp);

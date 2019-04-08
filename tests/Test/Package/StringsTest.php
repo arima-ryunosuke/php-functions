@@ -877,6 +877,27 @@ a2,c2
 a3,c3
 ", (csv_export)($csvarrays, ['headers' => ['a' => 'A', 'c' => 'C']]));
 
+        // callback 指定
+        $this->assertEquals("a,b,c
+a1,B1,c1
+a3,B3,c3
+", (csv_export)($csvarrays, [
+            'callback' => function (&$row, $n) {
+                $row['b'] = strtoupper($row['b']);
+                return $n !== 1;
+            }
+        ]));
+
+        // output 指定
+        $receiver = fopen('php://memory', 'r+b');
+        $this->assertEquals(33, (csv_export)($csvarrays, ['output' => $receiver]));
+        rewind($receiver);
+        $this->assertEquals("a,b,c
+a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+", stream_get_contents($receiver));
+
         // fputcsv 引数
         $csvarrays[0]['c'] = " c\n";
         $this->assertEquals("a b c
@@ -922,7 +943,7 @@ x"
             ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
         ], (csv_import)(fopen(sys_get_temp_dir() . '/test.csv', 'r')));
 
-        // headers 指定
+        // headers 指定（数値）
         $this->assertEquals([
             ['A' => 'a1', 'C' => 'c1'],
             ['A' => 'a2', 'C' => 'c2'],
@@ -930,6 +951,31 @@ x"
 a1,b1,c1
 a2,b2,c2
 ', ['headers' => ['A', 2 => 'C']]));
+
+        // headers 指定（キーマップ）
+        $this->assertEquals([
+            ['xA' => 'a1', 'xC' => 'c1'],
+            ['xA' => 'a2', 'xC' => 'c2'],
+        ], (csv_import)('
+A,B,C
+a1,b1,c1
+a2,b2,c2
+', ['headers' => ['C' => 'xC', 'A' => 'xA', 'unknown' => 'x']]));
+
+        // コールバック指定
+        $this->assertEquals([
+            ['a' => 'a1', 'b' => 'B1', 'c' => 'c1'],
+            ['a' => 'a3', 'b' => 'B3', 'c' => 'c3'],
+        ], (csv_import)('a,b,c
+a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+', [
+            'callback' => function (&$row, $n) {
+                $row['b'] = strtoupper($row['b']);
+                return $n !== 1;
+            }
+        ]));
 
         // 要素数が合わないと例外
         $this->assertException('array_combine', csv_import, "a,b,c\nhoge");
