@@ -204,8 +204,6 @@ class Vars
      * 値は 1 <= $var < 1000(1024) の範囲内に収められる。
      * ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。
      *
-     * 歴史的な経緯により $unit と $format は入れ替えて指定することができる（型で分岐する）。
-     *
      * Example:
      * ```php
      * // シンプルに k をつける
@@ -213,14 +211,14 @@ class Vars
      * // シンプルに m をつける
      * assertSame(si_prefix(0.012345), '12.345 m');
      * // 書式フォーマットを指定できる
-     * assertSame(si_prefix(12345, '%d%s'), '12k');
-     * assertSame(si_prefix(0.012345, '%d%s'), '12m');
+     * assertSame(si_prefix(12345, 1000, '%d%s'), '12k');
+     * assertSame(si_prefix(0.012345, 1000, '%d%s'), '12m');
      * // ファイルサイズを byte で表示する
-     * assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+     * assertSame(si_prefix(12345, 1000, '%d %sbyte'), '12 kbyte');
      * // ファイルサイズを byte で表示する（1024）
-     * assertSame(si_prefix(10240, '%.3f %sbyte', 1024), '10.000 kbyte');
+     * assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
-     * assertSame(si_prefix(12345, null), [12.345, 'k']);
+     * assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
      * ```
      *
      * @param mixed $var 丸める値
@@ -249,13 +247,6 @@ class Vars
             7  => 'Z', // ゼタ
             8  => 'Y', // ヨタ
         ];
-
-        // 引数体系を変えたので後方互換性のため型を見て入れ替える
-        if (is_string($unit) || is_null($unit)) {
-            $t = $format;
-            $format = $unit;
-            $unit = intval($t) ?: 1000;
-        }
 
         assert($unit > 0);
 

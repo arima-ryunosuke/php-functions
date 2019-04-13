@@ -182,13 +182,6 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('too large or small', si_prefix, pow(10, 30));
     }
 
-    function test_si_prefix_regression()
-    {
-        $this->assertEquals('1.001 k', (si_prefix)("1001"));
-        $this->assertEquals('X1.001 kX', (si_prefix)("1001", 'X%.3f %sX'));
-        $this->assertEquals([1.001, 'k'], (si_prefix)("1001", null));
-    }
-
     function test_si_unprefix()
     {
         $units = [
