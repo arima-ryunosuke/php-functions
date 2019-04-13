@@ -502,6 +502,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['B', 'A'], (array_unset)($array, ['b', 'a']));
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
         $this->assertSame([1 => 'A', 0 => 'B'], (array_unset)($array, [1 => 'a', 0 => 'b']));
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertSame([], (array_unset)($array, ['XXX']));
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a', 'b', 'c']);

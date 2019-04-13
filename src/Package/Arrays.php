@@ -1124,6 +1124,8 @@ class Arrays
      * $key に配列を与えると全て伏せて配列で返す。
      * その場合、$default が活きるのは「全て無かった場合」となる。
      *
+     * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
+     *
      * 配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
      * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
      *
@@ -1154,8 +1156,6 @@ class Arrays
      * assertSame($array, ['piyo' => 'PIYO']);
      * ```
      *
-     * @todo array_get と同じように $default に応じて返り値を変える（互換性が壊れるのでメジャー待ち）
-     *
      * @param array $array 配列
      * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を伏せる
      * @param mixed $default 無かった場合のデフォルト値
@@ -1172,6 +1172,10 @@ class Arrays
                 }
             }
             if (!$result) {
+                // 明示的に与えられていないなら [] を使用する
+                if (func_num_args() === 2) {
+                    $default = [];
+                }
                 return $default;
             }
             return $result;
