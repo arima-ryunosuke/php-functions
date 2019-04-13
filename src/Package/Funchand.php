@@ -367,8 +367,6 @@ class Funchand
     /**
      * callable を Closure に変換する
      *
-     * php7.1 の fromCallable みたいなもの。
-     *
      * Example:
      * ```php
      * $sprintf = closurize('sprintf');
@@ -381,21 +379,7 @@ class Funchand
      */
     public static function closurize($callable)
     {
-        if ($callable instanceof \Closure) {
-            return $callable;
-        }
-
-        $ref = (reflect_callable)($callable);
-        if ($ref instanceof \ReflectionMethod) {
-            // for タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
-            if (is_object($callable)) {
-                return $ref->getClosure($callable);
-            }
-            if (is_array($callable)) {
-                return $ref->getClosure($callable[0]);
-            }
-        }
-        return $ref->getClosure();
+        return \Closure::fromCallable($callable);
     }
 
     /**
