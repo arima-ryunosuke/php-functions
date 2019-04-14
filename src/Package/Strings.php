@@ -435,12 +435,10 @@ class Strings
      */
     public static function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
     {
-        if (!is_array($replaces)) {
-            $replaces = [$replaces];
-        }
+        $replaces = (is_iterable)($replaces) ? $replaces : [$replaces];
 
         // 空はそのまま返す
-        if (empty($replaces)) {
+        if ((is_empty)($replaces)) {
             return $subject;
         }
 

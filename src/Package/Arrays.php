@@ -111,7 +111,7 @@ class Arrays
      */
     public static function first_key($array, $default = null)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -136,7 +136,7 @@ class Arrays
      */
     public static function first_value($array, $default = null)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -184,7 +184,7 @@ class Arrays
      */
     public static function last_key($array, $default = null)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -209,7 +209,7 @@ class Arrays
      */
     public static function last_value($array, $default = null)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -234,7 +234,7 @@ class Arrays
      */
     public static function last_keyvalue($array, $default = null)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
         if (is_array($array)) {
@@ -362,8 +362,8 @@ class Arrays
      */
     public static function in_array_and($needle, $haystack, $strict = false)
     {
-        $needle = is_array($needle) ? $needle : [$needle];
-        if (empty($needle)) {
+        $needle = (is_iterable)($needle) ? $needle : [$needle];
+        if ((is_empty)($needle)) {
             return false;
         }
 
@@ -397,8 +397,8 @@ class Arrays
      */
     public static function in_array_or($needle, $haystack, $strict = false)
     {
-        $needle = is_array($needle) ? $needle : [$needle];
-        if (empty($needle)) {
+        $needle = (is_iterable)($needle) ? $needle : [$needle];
+        if ((is_empty)($needle)) {
             return false;
         }
 
@@ -1269,8 +1269,8 @@ class Arrays
      */
     public static function array_keys_exist($keys, $array)
     {
-        $keys = (array) $keys;
-        if (empty($keys)) {
+        $keys = (is_iterable)($keys) ? $keys : [$keys];
+        if ((is_empty)($keys)) {
             throw new \InvalidArgumentException('$keys is empty.');
         }
 
@@ -2247,7 +2247,7 @@ class Arrays
      */
     public static function array_all($array, $callback = null, $default = true)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
 
@@ -2280,7 +2280,7 @@ class Arrays
      */
     public static function array_any($array, $callback = null, $default = false)
     {
-        if (empty($array)) {
+        if ((is_empty)($array)) {
             return $default;
         }
 
