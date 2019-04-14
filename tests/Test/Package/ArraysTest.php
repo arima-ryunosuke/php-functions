@@ -75,6 +75,7 @@ class ArraysTest extends AbstractTestCase
 
         $this->assertEquals([2, 3], (last_keyvalue)(new \ArrayObject([1, 2, 3])));
         $this->assertEquals(null, (last_keyvalue)(new \ArrayObject([])));
+        $this->assertEquals(null, (last_keyvalue)(new \stdClass()));
     }
 
     function test_prev_key()

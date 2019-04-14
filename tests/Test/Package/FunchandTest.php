@@ -284,7 +284,7 @@ class FunchandTest extends AbstractTestCase
 
         $code = (callable_code)([$this, 'createResult']);
         $this->assertEquals([
-            'function createResult()',
+            'function createResult(): TestResult',
             '{
         return new TestResult;
     }',

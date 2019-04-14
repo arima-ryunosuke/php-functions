@@ -154,7 +154,7 @@ class FileSystemTest extends AbstractTestCase
         // standard
         $bytes = (file_rewrite_contents)($testpath, function ($contents, $fp) {
             $this->assertEquals('dummy', $contents);
-            $this->assertInternalType('resource', $fp);
+            $this->assertIsResource($fp);
             return 'rewrite!';
         });
         $this->assertEquals(8, $bytes);

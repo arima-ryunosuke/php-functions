@@ -596,12 +596,12 @@ class UtilityTest extends AbstractTestCase
             'limit'    => 2,
         ]);
         $this->assertCount(2, $traces);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ], $traces[0]);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
@@ -612,17 +612,17 @@ class UtilityTest extends AbstractTestCase
             'limit' => 3,
         ]);
         $this->assertCount(3, $traces);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm1',
             'class'    => get_class($mock),
         ], $traces[0]);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ], $traces[1]);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
@@ -656,7 +656,7 @@ class UtilityTest extends AbstractTestCase
         $persistences = (reflect_callable)((error))->getStaticVariables()['persistences'];
         $this->assertCount(1, $persistences);
         $this->assertArrayHasKey($t, $persistences);
-        $this->assertInternalType('resource', $persistences[$t]);
+        $this->assertIsResource($persistences[$t]);
 
         $this->assertException('must be resource or string', error, 'int', 1);
     }
@@ -689,9 +689,9 @@ class UtilityTest extends AbstractTestCase
         $this->assertLessThan(0.4, $t);
 
         // それらしい結果が返ってきている
-        $this->assertInternalType('string', $return[0]['name']);
-        $this->assertInternalType('integer', $return[0]['called']);
-        $this->assertInternalType('numeric', $return[0]['ratio']);
+        $this->assertIsString($return[0]['name']);
+        $this->assertIsInt($return[0]['called']);
+        $this->assertIsNumeric($return[0]['ratio']);
 
         // それらしい名前が振られている
         $this->assertContains('Concrete::getName', $output);
@@ -703,7 +703,7 @@ class UtilityTest extends AbstractTestCase
 
         // usleep(15000) の平均実行時間は 15ms のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
         $output = (benchmark)(['usleep'], [15000], 300, false);
-        $this->assertLessThan(15 + 5, $output[0]['mills']);
+        $this->assertLessThan(15 + 7, $output[0]['mills']);
 
         // 参照渡しも呼べる
         (benchmark)(['reset', 'end'], [['hoge']], 10, false);
