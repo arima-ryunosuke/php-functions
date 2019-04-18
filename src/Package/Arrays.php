@@ -2534,17 +2534,15 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param array $keys 取り出すキー（可変引数）
+     * @param array $keys 取り出すキー
      * @return array 新しい配列
      */
     public static function array_pickup($array, $keys)
     {
-        if (!is_array($array)) {
-            $array = (arrayval)($array, false);
-        }
+        $array = (arrayval)($array, false);
 
         $result = [];
-        foreach ($keys as $k => $key) {
+        foreach ((arrayval)($keys, false) as $k => $key) {
             if (is_int($k)) {
                 if (array_key_exists($key, $array)) {
                     $result[$key] = $array[$key];
