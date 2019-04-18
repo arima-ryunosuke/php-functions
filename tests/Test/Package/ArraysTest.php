@@ -1545,6 +1545,21 @@ class ArraysTest extends AbstractTestCase
         $this->assertSame(['BBB' => ['b' => 'B']], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']));
     }
 
+    function test_array_remove()
+    {
+        $this->assertSame(['a' => 'A', 'c' => 'C'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'b'));
+        $this->assertSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x'));
+
+        $this->assertSame(['a' => 'A'], (array_remove)(['a' => 'A', 'b' => ['b' => 'B']], ['b']));
+        $this->assertSame(['b' => ['b' => 'B']], (array_remove)(['a' => 'A', 'b' => ['b' => 'B']], ['a']));
+
+        $this->assertSame(['b' => 'B'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']));
+        $this->assertSame(['b' => 'B'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']));
+
+        $this->assertEquals(new \ArrayObject(['b' => 'B']), (array_remove)(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
+        $this->assertEquals(new \ArrayObject(['b' => 'B']), (array_remove)(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
+    }
+
     function test_array_lookup()
     {
         $arrays = [
