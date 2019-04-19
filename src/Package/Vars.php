@@ -844,7 +844,7 @@ class Vars
         if ($return) {
             return $result;
         }
-        echo $result;
+        echo $result, "\n";
     }
 
     /**
