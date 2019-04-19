@@ -10,6 +10,17 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.1
+
+- [feature][Arrays] array_pickup の $keys が配列しか受け付けていなかったのを修正
+- [feature][Arrays] array_remove を追加
+- [feature][Syntax] evaluate を追加
+- [feature][Funchand] function_parameter を追加
+- [feature][Classobj] class_extends を追加
+- [feature][Classobj] const_exists を追加
+- [fixbug][Classobj] class_replace でロックが掛かっていなかったので修正
+- [refactor][Classobj] class_loader の内部実装を変更
+
 ## 1.3.0
 
 - [*change] 対応バージョンを php 7.1 に格上げ
