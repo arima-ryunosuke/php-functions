@@ -595,11 +595,11 @@ class Arrays
         // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
         foreach ($arrays as $a) {
             if ((is_hasharray)($a)) {
-                $limit = max(array_map('count', $arrays));
+                /** @var \Generator[] $yielders */
                 $yielders = array_map(function ($array) { yield from $array; }, $arrays);
 
                 $result = [];
-                for ($i = 0; $i < $limit; $i++) {
+                for ($i = 0, $limit = max(array_map('count', $arrays)); $i < $limit; $i++) {
                     $e = [];
                     foreach ($yielders as $yielder) {
                         (array_put)($e, $yielder->current(), $yielder->key());

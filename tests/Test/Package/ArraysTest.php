@@ -934,8 +934,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         }));
 
         // 推奨しないが見た目が気に入っている使い方
-        $this->assertSame('start123', (array_each)([1, 2, 3], function (&$carry = 'start', $v) { $carry .= $v; }));
-        $this->assertSame('start', (array_each)([], function (&$carry = 'start', $v) { $carry .= $v; }));
+        $this->assertSame('start123', (array_each)([1, 2, 3], function (&$carry = 'start', $v = null) { $carry .= $v; }));
+        $this->assertSame('start', (array_each)([], function (&$carry = 'start', $v = null) { $carry .= $v; }));
         $this->assertSame(null, (array_each)([], function (&$carry, $v) { $carry .= $v; }));
     }
 

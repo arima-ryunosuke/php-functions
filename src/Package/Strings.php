@@ -1132,6 +1132,7 @@ class Strings
      */
     public static function parse_uri($uri, $default = [])
     {
+        /** @noinspection RequiredAttributes */
         $regex = "
             (?:(?<scheme>[a-z][-+.0-9a-z]*)://)?
             (?:
