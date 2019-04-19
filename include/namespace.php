@@ -5,7 +5,7 @@
 namespace ryunosuke\Functions;
 
 # constants
-
+/** SQL キーワード（全 RDBMS ごちゃまぜ） */
 const KEYWORDS = [
     ""  => "",
     0   => "ACCESSIBLE",
@@ -602,9 +602,12 @@ const KEYWORDS = [
     591 => "YEARWEEK",
 ];
 
+/** json_*** 関数で $depth 引数を表す定数 */
 const JSON_MAX_DEPTH = -1;
 
+/** parse_php 関数でトークン名変換をするか */
 const TOKEN_NAME = 2;
+
 
 # functions
 const arrays = "ryunosuke\\Functions\\arrays";
@@ -629,7 +632,7 @@ if (!isset($excluded_functions["arrays"]) && (!function_exists("ryunosuke\\Funct
      * assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @return \Generator [$seq => [$key, $value]] を返すジェネレータ
      */
     function arrays($array)
@@ -716,17 +719,17 @@ if (!isset($excluded_functions["first_key"]) && (!function_exists("ryunosuke\\Fu
      * assertSame(first_key([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最初のキー
      */
     function first_key($array, $default = null)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (first_keyvalue)($array);
+        list($k, $v) = first_keyvalue($array);
         return $k;
     }
 }
@@ -744,17 +747,17 @@ if (!isset($excluded_functions["first_value"]) && (!function_exists("ryunosuke\\
      * assertSame(first_value([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最初の値
      */
     function first_value($array, $default = null)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (first_keyvalue)($array);
+        list($k, $v) = first_keyvalue($array);
         return $v;
     }
 }
@@ -772,7 +775,7 @@ if (!isset($excluded_functions["first_keyvalue"]) && (!function_exists("ryunosuk
      * assertSame(first_keyvalue([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return array [最初のキー, 最初の値]
      */
@@ -798,17 +801,17 @@ if (!isset($excluded_functions["last_key"]) && (!function_exists("ryunosuke\\Fun
      * assertSame(last_key([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最後のキー
      */
     function last_key($array, $default = null)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (last_keyvalue)($array);
+        list($k, $v) = last_keyvalue($array);
         return $k;
     }
 }
@@ -826,17 +829,17 @@ if (!isset($excluded_functions["last_value"]) && (!function_exists("ryunosuke\\F
      * assertSame(last_value([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最後の値
      */
     function last_value($array, $default = null)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (last_keyvalue)($array);
+        list($k, $v) = last_keyvalue($array);
         return $v;
     }
 }
@@ -854,13 +857,13 @@ if (!isset($excluded_functions["last_keyvalue"]) && (!function_exists("ryunosuke
      * assertSame(last_keyvalue([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return array [最後のキー, 最後の値]
      */
     function last_keyvalue($array, $default = null)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
         if (is_array($array)) {
@@ -997,8 +1000,8 @@ if (!isset($excluded_functions["in_array_and"]) && (!function_exists("ryunosuke\
      */
     function in_array_and($needle, $haystack, $strict = false)
     {
-        $needle = is_array($needle) ? $needle : [$needle];
-        if (empty($needle)) {
+        $needle = is_iterable($needle) ? $needle : [$needle];
+        if (is_empty($needle)) {
             return false;
         }
 
@@ -1035,8 +1038,8 @@ if (!isset($excluded_functions["in_array_or"]) && (!function_exists("ryunosuke\\
      */
     function in_array_or($needle, $haystack, $strict = false)
     {
-        $needle = is_array($needle) ? $needle : [$needle];
-        if (empty($needle)) {
+        $needle = is_iterable($needle) ? $needle : [$needle];
+        if (is_empty($needle)) {
             return false;
         }
 
@@ -1094,7 +1097,7 @@ if (!isset($excluded_functions["kvsort"]) && (!function_exists("ryunosuke\\Funct
      * ]);
      * ```
      *
-     * @param array|\Traversable|string $array 対象配列
+     * @param iterable|string $array 対象配列
      * @param callable|int $comparator 比較関数。SORT_XXX も使える
      * @return array ソートされた配列
      */
@@ -1103,7 +1106,7 @@ if (!isset($excluded_functions["kvsort"]) && (!function_exists("ryunosuke\\Funct
         if ($comparator === null || is_int($comparator)) {
             $sort_flg = $comparator;
             $comparator = function ($av, $bv, $ak, $bk) use ($sort_flg) {
-                return (varcmp)($av, $bv, $sort_flg);
+                return varcmp($av, $bv, $sort_flg);
             };
         }
 
@@ -1244,15 +1247,15 @@ if (!isset($excluded_functions["array_zip"]) && (!function_exists("ryunosuke\\Fu
 
         // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
         foreach ($arrays as $a) {
-            if ((is_hasharray)($a)) {
-                $limit = max(array_map('count', $arrays));
+            if (is_hasharray($a)) {
+                /** @var \Generator[] $yielders */
                 $yielders = array_map(function ($array) { yield from $array; }, $arrays);
 
                 $result = [];
-                for ($i = 0; $i < $limit; $i++) {
+                for ($i = 0, $limit = max(array_map('count', $arrays)); $i < $limit; $i++) {
                     $e = [];
                     foreach ($yielders as $yielder) {
-                        (array_put)($e, $yielder->current(), $yielder->key());
+                        array_put($e, $yielder->current(), $yielder->key());
                         $yielder->next();
                     }
                     $result[] = $e;
@@ -1352,7 +1355,7 @@ if (!isset($excluded_functions["array_implode"]) && (!function_exists("ryunosuke
      * assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
      * ```
      *
-     * @param array|\Traversable|string $array 対象配列
+     * @param iterable|string $array 対象配列
      * @param string $glue 差し込む要素
      * @return array 差し込まれた配列
      */
@@ -1360,7 +1363,7 @@ if (!isset($excluded_functions["array_implode"]) && (!function_exists("ryunosuke
     {
         // 第1引数が回せない場合は引数を入れ替えて可変引数パターン
         if (!is_array($array) && !$array instanceof \Traversable) {
-            return (array_implode)(array_slice(func_get_args(), 1), $array);
+            return array_implode(array_slice(func_get_args(), 1), $array);
         }
 
         $result = [];
@@ -1407,7 +1410,7 @@ if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("ryunosuke
      * ], null, '|'), 'str:sss,int:3|single:str');
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|callable $format 書式文字列あるいはクロージャ
      * @param string $glue 結合文字列。未指定時は implode しない
      * @return array|string sprintf された配列
@@ -1415,7 +1418,7 @@ if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("ryunosuke
     function array_sprintf($array, $format = null, $glue = null)
     {
         if (is_callable($format)) {
-            $callback = (func_user_func_array)($format);
+            $callback = func_user_func_array($format);
         }
         elseif ($format === null) {
             $callback = function ($v, $k) { return vsprintf($k, is_array($v) ? $v : [$v]); };
@@ -1455,7 +1458,7 @@ if (!isset($excluded_functions["array_strpad"]) && (!function_exists("ryunosuke\
      * assertSame(array_strpad($array, '', ['-suffix']), ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|array $key_prefix キー側の付加文字列
      * @param string|array $val_prefix 値側の付加文字列
      * @return array 文字列付与された配列
@@ -1588,10 +1591,10 @@ if (!isset($excluded_functions["array_of"]) && (!function_exists("ryunosuke\\Fun
         $nodefault = func_num_args() === 1;
         return function (array $array) use ($key, $default, $nodefault) {
             if ($nodefault) {
-                return (array_get)($array, $key);
+                return array_get($array, $key);
             }
             else {
-                return (array_get)($array, $key, $default);
+                return array_get($array, $key, $default);
             }
         };
     }
@@ -1641,7 +1644,7 @@ if (!isset($excluded_functions["array_get"]) && (!function_exists("ryunosuke\\Fu
             $result = [];
             foreach ($key as $k) {
                 // 深遠な事情で少しでも高速化したかったので isset || array_keys_exist にしてある
-                if (isset($array[$k]) || (array_keys_exist)($k, $array)) {
+                if (isset($array[$k]) || array_keys_exist($k, $array)) {
                     $result[$k] = $array[$k];
                 }
             }
@@ -1671,7 +1674,7 @@ if (!isset($excluded_functions["array_get"]) && (!function_exists("ryunosuke\\Fu
             return $result;
         }
 
-        if ((array_keys_exist)($key, $array)) {
+        if (array_keys_exist($key, $array)) {
             return $array[$key];
         }
         return $default;
@@ -1715,17 +1718,17 @@ if (!isset($excluded_functions["array_set"]) && (!function_exists("ryunosuke\\Fu
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return (array_set)(...[&$array[$k], $value, $key, $require_return]);
+                return array_set(...[&$array[$k], $value, $key, $require_return]);
             }
             else {
-                return (array_set)(...[&$array, $value, $k, $require_return]);
+                return array_set(...[&$array, $value, $k, $require_return]);
             }
         }
 
         if ($key === null) {
             $array[] = $value;
             if ($require_return === true) {
-                $key = (last_key)($array);
+                $key = last_key($array);
             }
         }
         else {
@@ -1779,10 +1782,10 @@ if (!isset($excluded_functions["array_put"]) && (!function_exists("ryunosuke\\Fu
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return (array_put)(...[&$array[$k], $value, $key]);
+                return array_put(...[&$array[$k], $value, $key]);
             }
             else {
-                return (array_put)(...[&$array, $value, $k]);
+                return array_put(...[&$array, $value, $k]);
             }
         }
 
@@ -1806,6 +1809,8 @@ if (!isset($excluded_functions["array_unset"]) && (!function_exists("ryunosuke\\
      *
      * $key に配列を与えると全て伏せて配列で返す。
      * その場合、$default が活きるのは「全て無かった場合」となる。
+     *
+     * さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。
      *
      * 配列を与えた場合の返り値は与えた配列の順番・キーが活きる。
      * これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。
@@ -1837,8 +1842,6 @@ if (!isset($excluded_functions["array_unset"]) && (!function_exists("ryunosuke\\
      * assertSame($array, ['piyo' => 'PIYO']);
      * ```
      *
-     * @todo array_get と同じように $default に応じて返り値を変える（互換性が壊れるのでメジャー待ち）
-     *
      * @param array $array 配列
      * @param string|int|array|callable $key 伏せたいキー。配列を与えると全て伏せる。クロージャの場合は true 相当を伏せる
      * @param mixed $default 無かった場合のデフォルト値
@@ -1849,12 +1852,16 @@ if (!isset($excluded_functions["array_unset"]) && (!function_exists("ryunosuke\\
         if (is_array($key)) {
             $result = [];
             foreach ($key as $rk => $ak) {
-                if ((array_keys_exist)($ak, $array)) {
+                if (array_keys_exist($ak, $array)) {
                     $result[$rk] = $array[$ak];
                     unset($array[$ak]);
                 }
             }
             if (!$result) {
+                // 明示的に与えられていないなら [] を使用する
+                if (func_num_args() === 2) {
+                    $default = [];
+                }
                 return $default;
             }
             return $result;
@@ -1874,7 +1881,7 @@ if (!isset($excluded_functions["array_unset"]) && (!function_exists("ryunosuke\\
             return $result;
         }
 
-        if ((array_keys_exist)($key, $array)) {
+        if (array_keys_exist($key, $array)) {
             $result = $array[$key];
             unset($array[$key]);
             return $result;
@@ -1915,10 +1922,10 @@ if (!isset($excluded_functions["array_dive"]) && (!function_exists("ryunosuke\\F
     {
         $keys = is_array($path) ? $path : explode($delimiter, $path);
         foreach ($keys as $key) {
-            if (!(is_arrayable)($array)) {
+            if (!is_arrayable($array)) {
                 return $default;
             }
-            if (!(array_keys_exist)($key, $array)) {
+            if (!array_keys_exist($key, $array)) {
                 return $default;
             }
             $array = $array[$key];
@@ -1954,8 +1961,8 @@ if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("ryunos
      */
     function array_keys_exist($keys, $array)
     {
-        $keys = (array) $keys;
-        if (empty($keys)) {
+        $keys = is_iterable($keys) ? $keys : [$keys];
+        if (is_empty($keys)) {
             throw new \InvalidArgumentException('$keys is empty.');
         }
 
@@ -1964,11 +1971,11 @@ if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("ryunos
         foreach ($keys as $k => $key) {
             if (is_array($key)) {
                 // まずそのキーをチェックして
-                if (!(array_keys_exist)($k, $array)) {
+                if (!array_keys_exist($k, $array)) {
                     return false;
                 }
                 // あるなら再帰する
-                if (!(array_keys_exist)($key, $array[$k])) {
+                if (!array_keys_exist($key, $array[$k])) {
                     return false;
                 }
             }
@@ -2006,14 +2013,14 @@ if (!isset($excluded_functions["array_find"]) && (!function_exists("ryunosuke\\F
      * assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
      * ```
      *
-     * @param array|\Traversable $array 調べる配列
+     * @param iterable $array 調べる配列
      * @param callable $callback 評価コールバック
      * @param bool $is_key キーを返すか否か
      * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
      */
     function array_find($array, $callback, $is_key = true)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         foreach ($array as $k => $v) {
             $result = $callback($v, $k);
@@ -2039,7 +2046,7 @@ if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("ryunosuk
      * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true), ['b' => 'B']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $regex 正規表現
      * @param bool $not true にすると「マッチしない」でフィルタする
      * @return array 正規表現でフィルタされた配列
@@ -2098,20 +2105,20 @@ if (!isset($excluded_functions["array_map_recursive"]) && (!function_exists("ryu
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param bool $iterable is_iterable で判定するか
      * @return array map された新しい配列
      */
     function array_map_recursive($array, $callback, $iterable = true)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         // ↑の変換を再帰ごとにやるのは現実的ではないのでクロージャに閉じ込めて再帰する
         $main = static function ($array) use (&$main, $callback, $iterable) {
             $result = [];
             foreach ($array as $k => $v) {
-                if (($iterable && (is_iterable)($v)) || (!$iterable && is_array($v))) {
+                if (($iterable && is_iterable($v)) || (!$iterable && is_array($v))) {
                     $result[$k] = $main($v);
                 }
                 else {
@@ -2138,7 +2145,7 @@ if (!isset($excluded_functions["array_map_key"]) && (!function_exists("ryunosuke
      * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], function(){}), []);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @return array キーが変換された新しい配列
      */
@@ -2167,13 +2174,13 @@ if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("ryunos
      * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価 callable
      * @return array $callback が false を返した新しい配列
      */
     function array_filter_not($array, $callback)
     {
-        return array_filter($array, (not_func)($callback));
+        return array_filter(arrayval($array, false), not_func($callback));
     }
 }
 
@@ -2191,7 +2198,7 @@ if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("ryunos
      * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 => 'a', 2 => 'c']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @return array $callback が true を返した新しい配列
      */
@@ -2220,13 +2227,13 @@ if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("ryuno
      * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $expression eval コード
      * @return array $expression が true を返した新しい配列
      */
     function array_filter_eval($array, $expression)
     {
-        return (array_filter_key)($array, (eval_func)($expression, 'k', 'v'));
+        return array_filter_key($array, eval_func($expression, 'k', 'v'));
     }
 }
 
@@ -2285,7 +2292,7 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|array|null $column キー名
      * @param callable $callback 評価クロージャ
      * @return array $where が真を返した新しい配列
@@ -2294,7 +2301,7 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
     {
         $is_array = is_array($column);
         if ($is_array) {
-            if ((is_hasharray)($column)) {
+            if (is_hasharray($column)) {
                 if ($callback !== null && !is_bool($callback)) {
                     throw new \InvalidArgumentException('if hash array $column, $callback must be bool.');
                 }
@@ -2318,7 +2325,7 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
             }
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         $result = [];
         foreach ($array as $k => $v) {
@@ -2356,14 +2363,14 @@ if (!isset($excluded_functions["array_map_filter"]) && (!function_exists("ryunos
      * assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param bool $strict 厳密比較フラグ。 true だと null のみが偽とみなされる
      * @return array $callback が真を返した新しい配列
      */
     function array_map_filter($array, $callback, $strict = false)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
         $result = [];
         foreach ($array as $k => $v) {
             $vv = $callback($v, $k);
@@ -2397,7 +2404,7 @@ if (!isset($excluded_functions["array_map_method"]) && (!function_exists("ryunos
      * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $method メソッド
      * @param array $args メソッドに渡る引数
      * @param bool|null $ignore メソッドが存在しない場合にスルーするか。null を渡すと要素そのものを返す
@@ -2406,7 +2413,7 @@ if (!isset($excluded_functions["array_map_method"]) && (!function_exists("ryunos
     function array_map_method($array, $method, $args = [], $ignore = false)
     {
         if ($ignore === true) {
-            $array = array_filter($array, function ($object) use ($method) {
+            $array = array_filter(arrayval($array, false), function ($object) use ($method) {
                 return is_callable([$object, $method]);
             });
         }
@@ -2415,7 +2422,7 @@ if (!isset($excluded_functions["array_map_method"]) && (!function_exists("ryunos
                 return $object;
             }
             return ([$object, $method])(...$args);
-        }, $array);
+        }, arrayval($array, false));
     }
 }
 
@@ -2443,13 +2450,13 @@ if (!isset($excluded_functions["array_maps"]) && (!function_exists("ryunosuke\\F
      * assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable[] $callbacks 評価クロージャ配列
      * @return array 評価クロージャを通した新しい配列
      */
     function array_maps($array, ...$callbacks)
     {
-        $result = $array;
+        $result = arrayval($array, false);
         foreach ($callbacks as $callback) {
             if (is_string($callback) && $callback[0] === '@') {
                 $margs = [];
@@ -2461,7 +2468,7 @@ if (!isset($excluded_functions["array_maps"]) && (!function_exists("ryunosuke\\F
             }
             else {
                 $margs = null;
-                $callback = (func_user_func_array)($callback);
+                $callback = func_user_func_array($callback);
             }
             foreach ($result as $k => $v) {
                 if (isset($margs)) {
@@ -2503,13 +2510,13 @@ if (!isset($excluded_functions["array_kmap"]) && (!function_exists("ryunosuke\\F
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @return array $callback を通した新しい配列
      */
     function array_kmap($array, $callback)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         $n = 0;
         $result = [];
@@ -2538,7 +2545,7 @@ if (!isset($excluded_functions["array_nmap"]) && (!function_exists("ryunosuke\\F
      * assertSame(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'), ['k' => 'a k b v c']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param int|array $n 要素値を入れる引数番目。配列を渡すとキー・値の両方を指定でき、両方が渡ってくる
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
@@ -2557,7 +2564,7 @@ if (!isset($excluded_functions["array_nmap"]) && (!function_exists("ryunosuke\\F
             if (empty($n)) {
                 throw new \InvalidArgumentException('array $n is empty.');
             }
-            list($kn, $vn) = (first_keyvalue)($n);
+            list($kn, $vn) = first_keyvalue($n);
 
             // array_insert は負数も受け入れられるが、それを考慮しだすともう収拾がつかない
             if ($kn < 0 || $vn < 0) {
@@ -2566,16 +2573,16 @@ if (!isset($excluded_functions["array_nmap"]) && (!function_exists("ryunosuke\\F
 
             // どちらが大きいかで順番がズレるので分岐しなければならない
             if ($kn <= $vn) {
-                $args = (array_insert)($args, null, $kn);
-                $args = (array_insert)($args, null, ++$vn);// ↑で挿入してるので+1
+                $args = array_insert($args, null, $kn);
+                $args = array_insert($args, null, ++$vn);// ↑で挿入してるので+1
             }
             else {
-                $args = (array_insert)($args, null, $vn);
-                $args = (array_insert)($args, null, ++$kn);// ↑で挿入してるので+1
+                $args = array_insert($args, null, $vn);
+                $args = array_insert($args, null, ++$kn);// ↑で挿入してるので+1
             }
         }
         else {
-            $args = (array_insert)($args, null, $n);
+            $args = array_insert($args, null, $n);
         }
 
         $result = [];
@@ -2606,14 +2613,14 @@ if (!isset($excluded_functions["array_lmap"]) && (!function_exists("ryunosuke\\F
      * assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
     function array_lmap($array, $callback, ...$variadic)
     {
-        return (array_nmap)(...(array_insert)(func_get_args(), 0, 2));
+        return array_nmap(...array_insert(func_get_args(), 0, 2));
     }
 }
 
@@ -2628,14 +2635,14 @@ if (!isset($excluded_functions["array_rmap"]) && (!function_exists("ryunosuke\\F
      * assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
     function array_rmap($array, $callback, ...$variadic)
     {
-        return (array_nmap)(...(array_insert)(func_get_args(), func_num_args() - 2, 2));
+        return array_nmap(...array_insert(func_get_args(), func_num_args() - 2, 2));
     }
 }
 
@@ -2696,7 +2703,7 @@ if (!isset($excluded_functions["array_each"]) && (!function_exists("ryunosuke\\F
      * );
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ。(&$carry, $key, $value) を受ける
      * @param mixed $default ループの最初や空の場合に適用される値
      * @return mixed each した結果
@@ -2705,7 +2712,7 @@ if (!isset($excluded_functions["array_each"]) && (!function_exists("ryunosuke\\F
     {
         if (func_num_args() === 2) {
             /** @var \ReflectionFunction $ref */
-            $ref = (reflect_callable)($callback);
+            $ref = reflect_callable($callback);
             $params = $ref->getParameters();
             if ($params[0]->isDefaultValueAvailable()) {
                 $default = $params[0]->getDefaultValue();
@@ -2837,7 +2844,7 @@ if (!isset($excluded_functions["array_assort"]) && (!function_exists("ryunosuke\
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable[] $rules 分類ルール。[key => callable] 形式
      * @return array 分類された新しい配列
      */
@@ -2845,7 +2852,7 @@ if (!isset($excluded_functions["array_assort"]) && (!function_exists("ryunosuke\
     {
         $result = array_fill_keys(array_keys($rules), []);
         foreach ($rules as $name => $rule) {
-            $rule = (func_user_func_array)($rule);
+            $rule = func_user_func_array($rule);
             foreach ($array as $k => $v) {
                 if ($rule($v, $k)) {
                     $result[$name][$k] = $v;
@@ -2882,7 +2889,7 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback カウントルール。配列も渡せる
      * @return int|array 条件一致した件数
      */
@@ -2892,7 +2899,7 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\
         if (is_array($callback) && !is_callable($callback)) {
             $result = array_fill_keys(array_keys($callback), 0);
             foreach ($callback as $name => $rule) {
-                $rule = (func_user_func_array)($rule);
+                $rule = func_user_func_array($rule);
                 foreach ($array as $k => $v) {
                     if ($rule($v, $k)) {
                         $result[$name]++;
@@ -2902,7 +2909,7 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\
             return $result;
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
         $result = 0;
         foreach ($array as $k => $v) {
             if ($callback($v, $k)) {
@@ -2945,14 +2952,14 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("ryunosuke\\
      * ]);
      * ```
      *
-     * @param array|\Traversable 対象配列
+     * @param iterable 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
      */
     function array_group($array, $callback = null, $preserve_keys = false)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         $result = [];
         foreach ($array as $k => $v) {
@@ -2991,18 +2998,18 @@ if (!isset($excluded_functions["array_all"]) && (!function_exists("ryunosuke\\Fu
      * assertFalse(array_all([false, false]));
      * ```
      *
-     * @param array|\Traversable 対象配列
+     * @param iterable 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が true なら true
      */
     function array_all($array, $callback = null, $default = true)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         foreach ($array as $k => $v) {
             if (!$callback($v, $k)) {
@@ -3027,18 +3034,18 @@ if (!isset($excluded_functions["array_any"]) && (!function_exists("ryunosuke\\Fu
      * assertFalse(array_any([false, false]));
      * ```
      *
-     * @param array|\Traversable 対象配列
+     * @param iterable 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が false なら false
      */
     function array_any($array, $callback = null, $default = false)
     {
-        if (empty($array)) {
+        if (is_empty($array)) {
             return $default;
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = func_user_func_array($callback);
 
         foreach ($array as $k => $v) {
             if ($callback($v, $k)) {
@@ -3089,7 +3096,7 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\
             return $array;
         }
 
-        if (!is_array($orders) || !(is_hasharray)($orders)) {
+        if (!is_array($orders) || !is_hasharray($orders)) {
             $orders = [$orders];
         }
 
@@ -3229,7 +3236,7 @@ if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("ryunos
      * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
      * ```
      *
-     * @param array|\Traversable[] $variadic 共通項を取る配列（可変引数）
+     * @param iterable[] $variadic 共通項を取る配列（可変引数）
      * @return array 新しい配列
      */
     function array_shrink_key(...$variadic)
@@ -3237,7 +3244,7 @@ if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("ryunos
         $result = [];
         foreach ($variadic as $n => $array) {
             if (!is_array($array)) {
-                $variadic[$n] = (arrayval)($array, false);
+                $variadic[$n] = arrayval($array, false);
             }
             $result = array_replace($result, $variadic[$n]);
         }
@@ -3270,13 +3277,14 @@ if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("ryu
      * ]);
      * ```
      *
-     * @param array|\Traversable $keys キーとなる配列
+     * @param iterable $keys キーとなる配列
      * @param callable $callback 要素のコールバック（引数でキーが渡ってくる）
      * @return array 新しい配列
      */
     function array_fill_callback($keys, $callback)
     {
-        return array_combine($keys, array_map((func_user_func_array)($callback), $keys));
+        $keys = arrayval($keys, false);
+        return array_combine($keys, array_map(func_user_func_array($callback), $keys));
     }
 }
 
@@ -3301,14 +3309,14 @@ if (!isset($excluded_functions["array_pickup"]) && (!function_exists("ryunosuke\
      * assertSame(array_pickup($array, ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param array $keys 取り出すキー（可変引数）
      * @return array 新しい配列
      */
     function array_pickup($array, $keys)
     {
         if (!is_array($array)) {
-            $array = (arrayval)($array, false);
+            $array = arrayval($array, false);
         }
 
         $result = [];
@@ -3353,7 +3361,7 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|null $column_key 値となるキー
      * @param string|null $index_key キーとなるキー
      * @return array 新しい配列
@@ -3361,7 +3369,7 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\
     function array_lookup($array, $column_key = null, $index_key = null)
     {
         if (func_num_args() === 3) {
-            return array_column($array, $column_key, $index_key);
+            return array_column(arrayval($array, false), $column_key, $index_key);
         }
 
         // null 対応できないし、php7 からオブジェクトに対応してるらしいので止め。ベタにやる
@@ -3457,7 +3465,7 @@ if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("ryunosu
         }
         // null なら最初の要素のキー・null
         if ($template === null) {
-            $template = array_fill_keys(array_keys((first_value)($array)), null);
+            $template = array_fill_keys(array_keys(first_value($array)), null);
         }
 
         $result = [];
@@ -3645,7 +3653,7 @@ if (!isset($excluded_functions["array_flatten"]) && (!function_exists("ryunosuke
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
      * @return array フラット化された配列
      */
@@ -3735,7 +3743,7 @@ if (!isset($excluded_functions["array_nest"]) && (!function_exists("ryunosuke\\F
      * }
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $delimiter キーの区切り文字
      * @return array 階層化された配列
      */
@@ -3800,8 +3808,8 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("ryunos
      * ]);
      * ```
      *
-     * @param array|\Traversable $array1 対象配列1
-     * @param array|\Traversable $array2 対象配列2
+     * @param iterable $array1 対象配列1
+     * @param iterable $array2 対象配列2
      * @param string $delimiter 差分配列のキー区切り文字
      * @return array 差分を表す配列
      */
@@ -3817,8 +3825,8 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("ryunos
         return call_user_func($f = static function ($array1, $array2, $key = null) use (&$f, $rule, $udiff, $delimiter) {
             $result = [];
 
-            $array1 = (array_assort)($array1, $rule);
-            $array2 = (array_assort)($array2, $rule);
+            $array1 = array_assort($array1, $rule);
+            $array2 = array_assort($array2, $rule);
 
             $list1 = array_values(array_udiff($array1['list'], $array2['list'], $udiff));
             $list2 = array_values(array_udiff($array2['list'], $array1['list'], $udiff));
@@ -3885,10 +3893,10 @@ if (!isset($excluded_functions["stdclass"]) && (!function_exists("ryunosuke\\Fun
      * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
      * ```
      *
-     * @param array|\Traversable $fields フィールド配列
+     * @param iterable $fields フィールド配列
      * @return \stdClass 生成した stdClass インスタンス
      */
-    function stdclass($fields = [])
+    function stdclass(iterable $fields = [])
     {
         $stdclass = new \stdClass();
         foreach ($fields as $key => $value) {
@@ -3940,7 +3948,7 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("ryunos
 
         // 指定パスの兄弟ファイルを調べた後、親ディレクトリを辿っていく
         $basenames = [];
-        return (dirname_r)($location, function ($directory) use ($detectNS, &$basenames) {
+        return dirname_r($location, function ($directory) use ($detectNS, &$basenames) {
             foreach (array_filter(glob("$directory/*.php"), 'is_file') as $file) {
                 $namespace = $detectNS($file);
                 if ($namespace !== null) {
@@ -3949,7 +3957,7 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("ryunos
                 }
             }
             $basenames[] = pathinfo($directory, PATHINFO_FILENAME);
-        }) ?: (throws)(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
+        }) ?: throws(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 }
 
@@ -3970,7 +3978,7 @@ if (!isset($excluded_functions["class_loader"]) && (!function_exists("ryunosuke\
      */
     function class_loader($startdir = null)
     {
-        $file = (cache)('path', function () use ($startdir) {
+        $file = cache('path', function () use ($startdir) {
             $dir = $startdir ?: __DIR__;
             while ($dir !== ($pdir = dirname($dir))) {
                 $dir = $pdir;
@@ -4093,10 +4101,9 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
      * ```
      *
      * @param string $class 対象クラス名
-     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列。「返せる」のは php7.0 以降のみ
-     * @param string $dirname 一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う
+     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
      */
-    function class_replace($class, $register, $dirname = null)
+    function class_replace($class, $register)
     {
         $class = ltrim($class, '\\');
 
@@ -4106,12 +4113,12 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
         }
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
-        $classfile = (class_loader)()->findFile($class);
-        $fname = rtrim(($dirname ?: sys_get_temp_dir()), '/\\') . '/' . str_replace('\\', '/', $class) . '.php';
+        $classfile = class_loader()->findFile($class);
+        $fname = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
         if (func_num_args() === 2 || !file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
-            (file_set_contents)($fname, $content);
+            file_set_contents($fname, $content);
         }
         require_once $fname;
 
@@ -4134,14 +4141,14 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
         // 配列はメソッド定義のクロージャ配列とする
         if (is_array($newclass)) {
             $content = file_get_contents($fname);
-            $origspace = (parse_php)($content, [
+            $origspace = parse_php($content, [
                 'begin' => T_NAMESPACE,
                 'end'   => ';',
             ]);
             array_shift($origspace);
             array_pop($origspace);
 
-            $origclass = (parse_php)($content, [
+            $origclass = parse_php($content, [
                 'begin'  => T_CLASS,
                 'end'    => T_STRING,
                 'offset' => count($origspace),
@@ -4153,8 +4160,8 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
 
             $methods = '';
             foreach ($newclass as $name => $func) {
-                $codes = (callable_code)($func);
-                $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $codes[0]);
+                $codes = callable_code($func);
+                $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $codes[0]);
                 $methods .= "public $mname {$codes[1]}";
             }
 
@@ -4242,7 +4249,7 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("r
         $class = get_class($object);
         if (!isset($refs[$class])) {
             $props = (new \ReflectionClass($class))->getProperties();
-            $refs[$class] = (array_each)($props, function (&$carry, \ReflectionProperty $rp) {
+            $refs[$class] = array_each($props, function (&$carry, \ReflectionProperty $rp) {
                 if (!$rp->isStatic()) {
                     $rp->setAccessible(true);
                     $carry[$rp->getName()] = $rp;
@@ -4251,7 +4258,7 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("r
         }
 
         // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
-        $vars = (array_map_method)($refs[$class], 'getValue', [$object]);
+        $vars = array_map_method($refs[$class], 'getValue', [$object]);
         $vars += get_object_vars($object);
 
         return $vars;
@@ -4360,7 +4367,7 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("ryunosuke\\Fu
                 $result[$basedir] = [];
             }
             if ($item->isDir()) {
-                $result[$basedir] += (file_tree)($item->getPathname(), $filter_condition);
+                $result[$basedir] += file_tree($item->getPathname(), $filter_condition);
             }
             else {
                 if ($filter_condition === null || $filter_condition($item->getPathname())) {
@@ -4476,7 +4483,7 @@ if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("ryuno
         }
 
         if (!is_dir($dirname = dirname($filename))) {
-            if (!@(mkdir_p)($dirname, $umask)) {
+            if (!@mkdir_p($dirname, $umask)) {
                 throw new \RuntimeException("failed to mkdir($dirname)");
             }
         }
@@ -4508,29 +4515,29 @@ if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("r
     {
         try {
             // 開いて
-            $fp = fopen($filename, 'c+b') ?: (throws)(new \UnexpectedValueException('failed to fopen.'));
+            $fp = fopen($filename, 'c+b') ?: throws(new \UnexpectedValueException('failed to fopen.'));
             if ($operation) {
-                flock($fp, $operation) ?: (throws)(new \UnexpectedValueException('failed to flock.'));
+                flock($fp, $operation) ?: throws(new \UnexpectedValueException('failed to flock.'));
             }
 
             // 読み込んで
-            rewind($fp) ?: (throws)(new \UnexpectedValueException('failed to rewind.'));
-            $contents = false !== ($t = stream_get_contents($fp)) ? $t : (throws)(new \UnexpectedValueException('failed to stream_get_contents.'));
+            rewind($fp) ?: throws(new \UnexpectedValueException('failed to rewind.'));
+            $contents = false !== ($t = stream_get_contents($fp)) ? $t : throws(new \UnexpectedValueException('failed to stream_get_contents.'));
 
             // 変更して
-            rewind($fp) ?: (throws)(new \UnexpectedValueException('failed to rewind.'));
-            ftruncate($fp, 0) ?: (throws)(new \UnexpectedValueException('failed to ftruncate.'));
+            rewind($fp) ?: throws(new \UnexpectedValueException('failed to rewind.'));
+            ftruncate($fp, 0) ?: throws(new \UnexpectedValueException('failed to ftruncate.'));
             $contents = $callback($contents, $fp);
 
             // 書き込んで
-            $return = ($r = fwrite($fp, $contents)) !== false ? $r : (throws)(new \UnexpectedValueException('failed to fwrite.'));
-            fflush($fp) ?: (throws)(new \UnexpectedValueException('failed to fflush.'));
+            $return = ($r = fwrite($fp, $contents)) !== false ? $r : throws(new \UnexpectedValueException('failed to fwrite.'));
+            fflush($fp) ?: throws(new \UnexpectedValueException('failed to fflush.'));
 
             // 閉じて
             if ($operation) {
-                flock($fp, LOCK_UN) ?: (throws)(new \UnexpectedValueException('failed to flock.'));
+                flock($fp, LOCK_UN) ?: throws(new \UnexpectedValueException('failed to flock.'));
             }
-            fclose($fp) ?: (throws)(new \UnexpectedValueException('failed to fclose.'));
+            fclose($fp) ?: throws(new \UnexpectedValueException('failed to fclose.'));
 
             // 返す
             return $return;
@@ -4604,7 +4611,7 @@ if (!isset($excluded_functions["dirname_r"]) && (!function_exists("ryunosuke\\Fu
         if ($dirname === $path) {
             return false;
         }
-        return (dirname_r)($dirname, $callback);
+        return dirname_r($dirname, $callback);
     }
 }
 
@@ -4631,8 +4638,8 @@ if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("ryunosuke\\
      */
     function fnmatch_and($patterns, $string, $flags = 0)
     {
-        $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
-        if (empty($patterns)) {
+        $patterns = is_iterable($patterns) ? $patterns : [$patterns];
+        if (is_empty($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
 
@@ -4668,8 +4675,8 @@ if (!isset($excluded_functions["fnmatch_or"]) && (!function_exists("ryunosuke\\F
      */
     function fnmatch_or($patterns, $string, $flags = 0)
     {
-        $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
-        if (empty($patterns)) {
+        $patterns = is_iterable($patterns) ? $patterns : [$patterns];
+        if (is_empty($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
 
@@ -4742,11 +4749,11 @@ if (!isset($excluded_functions["path_resolve"]) && (!function_exists("ryunosuke\
 
         $path = implode($DS, $paths);
 
-        if (!(path_is_absolute)($path)) {
+        if (!path_is_absolute($path)) {
             $path = getcwd() . $DS . $path;
         }
 
-        return (path_normalize)($path);
+        return path_normalize($path);
     }
 }
 
@@ -4842,24 +4849,24 @@ if (!isset($excluded_functions["cp_rf"]) && (!function_exists("ryunosuke\\Functi
         // ディレクトリでないなら copy へ移譲
         if (!is_dir($src)) {
             if ($dirmode) {
-                (mkdir_p)($dst);
+                mkdir_p($dst);
                 return copy($src, $dst . basename($src));
             }
             else {
-                (mkdir_p)(dirname($dst));
+                mkdir_p(dirname($dst));
                 return copy($src, $dst);
             }
         }
 
         if ($dirmode) {
-            return (cp_rf)($src, $dst . basename($src));
+            return cp_rf($src, $dst . basename($src));
         }
 
-        (mkdir_p)($dst);
+        mkdir_p($dst);
 
         foreach (glob("$src/*") as $file) {
             if (is_dir($file)) {
-                (cp_rf)($file, "$dst/" . basename($file));
+                cp_rf($file, "$dst/" . basename($file));
             }
             else {
                 copy($file, "$dst/" . basename($file));
@@ -4927,7 +4934,7 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("ryunosuke\\Func
     function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
-        $dir = $dir ?: sys_get_temp_dir();
+        $dir = $dir ?: cachedir();
         $tempfile = tempnam($dir, $prefix);
 
         // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？
@@ -5337,7 +5344,7 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Fun
         $__rfunc_delegate_marker = true;
 
         if ($arity === null) {
-            $arity = (parameter_length)($callable, true, true);
+            $arity = parameter_length($callable, true, true);
         }
 
         if (is_infinite($arity)) {
@@ -5373,7 +5380,7 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Fun
                     return $invoker($callable, func_get_args());
                 };
             default:
-                $argstring = (array_rmap)(range(1, $arity), strcat, '$_');
+                $argstring = array_rmap(range(1, $arity), strcat, '$_');
                 return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
@@ -5399,9 +5406,9 @@ if (!isset($excluded_functions["nbind"]) && (!function_exists("ryunosuke\\Functi
      */
     function nbind($callable, $n, ...$variadic)
     {
-        return (delegate)(function ($callable, $args) use ($variadic, $n) {
-            return $callable(...(array_insert)($args, $variadic, $n));
-        }, $callable, (parameter_length)($callable, true) - count($variadic));
+        return delegate(function ($callable, $args) use ($variadic, $n) {
+            return $callable(...array_insert($args, $variadic, $n));
+        }, $callable, parameter_length($callable, true) - count($variadic));
     }
 }
 
@@ -5422,7 +5429,7 @@ if (!isset($excluded_functions["lbind"]) && (!function_exists("ryunosuke\\Functi
      */
     function lbind($callable, ...$variadic)
     {
-        return (nbind)(...(array_insert)(func_get_args(), 0, 1));
+        return nbind(...array_insert(func_get_args(), 0, 1));
     }
 }
 
@@ -5443,7 +5450,7 @@ if (!isset($excluded_functions["rbind"]) && (!function_exists("ryunosuke\\Functi
      */
     function rbind($callable, ...$variadic)
     {
-        return (nbind)(...(array_insert)(func_get_args(), null, 1));
+        return nbind(...array_insert(func_get_args(), null, 1));
     }
 }
 
@@ -5506,11 +5513,11 @@ if (!isset($excluded_functions["composite"]) && (!function_exists("ryunosuke\\Fu
         }
 
         $first = array_shift($callables);
-        return (delegate)(function ($first, $args) use ($callables, $arrayalbe) {
+        return delegate(function ($first, $args) use ($callables, $arrayalbe) {
             $result = $first(...$args);
             foreach ($callables as $callable) {
                 // 「配列モードでただの配列」でないなら配列化
-                if (!($arrayalbe && is_array($result) && !(is_hasharray)($result))) {
+                if (!($arrayalbe && is_array($result) && !is_hasharray($result))) {
                     $result = [$result];
                 }
                 $result = $callable(...$result);
@@ -5613,7 +5620,7 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Fun
             'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
         ];
 
-        return $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));
+        return $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
     }
 }
 
@@ -5634,7 +5641,7 @@ if (!isset($excluded_functions["not_func"]) && (!function_exists("ryunosuke\\Fun
      */
     function not_func($callable)
     {
-        return (delegate)(function ($callable, $args) {
+        return delegate(function ($callable, $args) {
             return !$callable(...$args);
         }, $callable);
     }
@@ -5661,7 +5668,7 @@ if (!isset($excluded_functions["eval_func"]) && (!function_exists("ryunosuke\\Fu
     function eval_func($expression, ...$variadic)
     {
         static $cache = [];
-        $args = (array_sprintf)($variadic, '$%s', ',');
+        $args = array_sprintf($variadic, '$%s', ',');
         $declare = "return function($args) { return $expression; };";
         if (!isset($cache[$declare])) {
             $cache[$declare] = eval($declare);
@@ -5711,8 +5718,6 @@ if (!isset($excluded_functions["closurize"]) && (!function_exists("ryunosuke\\Fu
     /**
      * callable を Closure に変換する
      *
-     * php7.1 の fromCallable みたいなもの。
-     *
      * Example:
      * ```php
      * $sprintf = closurize('sprintf');
@@ -5725,21 +5730,7 @@ if (!isset($excluded_functions["closurize"]) && (!function_exists("ryunosuke\\Fu
      */
     function closurize($callable)
     {
-        if ($callable instanceof \Closure) {
-            return $callable;
-        }
-
-        $ref = (reflect_callable)($callable);
-        if ($ref instanceof \ReflectionMethod) {
-            // for タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
-            if (is_object($callable)) {
-                return $ref->getClosure($callable);
-            }
-            if (is_array($callable)) {
-                return $ref->getClosure($callable[0]);
-            }
-        }
-        return $ref->getClosure();
+        return \Closure::fromCallable($callable);
     }
 }
 
@@ -5763,19 +5754,19 @@ if (!isset($excluded_functions["callable_code"]) && (!function_exists("ryunosuke
     function callable_code($callable)
     {
         /** @var \ReflectionFunctionAbstract $ref */
-        $ref = (reflect_callable)($callable);
+        $ref = reflect_callable($callable);
         $contents = file($ref->getFileName());
         $start = $ref->getStartLine();
         $end = $ref->getEndLine();
         $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
 
-        $meta = (parse_php)("<?php $codeblock", [
+        $meta = parse_php("<?php $codeblock", [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
         array_pop($meta);
 
-        $body = (parse_php)("<?php $codeblock", [
+        $body = parse_php("<?php $codeblock", [
             'begin'  => '{',
             'end'    => '}',
             'offset' => count($meta),
@@ -6026,7 +6017,7 @@ if (!isset($excluded_functions["namedcallize"]) && (!function_exists("ryunosuke\
         // @formatter:on
 
         /** @var \ReflectionParameter[] $refparams */
-        $refparams = (reflect_callable)($callable)->getParameters();
+        $refparams = reflect_callable($callable)->getParameters();
 
         $defargs = [];
         $argnames = [];
@@ -6059,7 +6050,7 @@ if (!isset($excluded_functions["namedcallize"]) && (!function_exists("ryunosuke\
         }
 
         return function ($params = []) use ($callable, $defargs, $argnames, $variadicname, $dummy_class) {
-            $params = (array_map_key)($params, function ($k) use ($argnames) { return is_int($k) ? $argnames[$k] : $k; });
+            $params = array_map_key($params, function ($k) use ($argnames) { return is_int($k) ? $argnames[$k] : $k; });
             $params = array_replace($defargs, $params);
 
             // 勝手に突っ込んだ $dummy_class がいるのはおかしい。指定されていないと思われる
@@ -6109,7 +6100,7 @@ if (!isset($excluded_functions["parameter_length"]) && (!function_exists("ryunos
         // クロージャの $call_name には一意性がないのでキャッシュできない（spl_object_hash でもいいが、かなり重複するので完全ではない）
         if ($callable instanceof \Closure) {
             /** @var \ReflectionFunctionAbstract $ref */
-            $ref = (reflect_callable)($callable);
+            $ref = reflect_callable($callable);
             if ($thought_variadic && $ref->isVariadic()) {
                 return INF;
             }
@@ -6124,9 +6115,9 @@ if (!isset($excluded_functions["parameter_length"]) && (!function_exists("ryunos
         // $call_name 取得
         is_callable($callable, false, $call_name);
 
-        $cache = (cache)($call_name, function () use ($callable) {
+        $cache = cache($call_name, function () use ($callable) {
             /** @var \ReflectionFunctionAbstract $ref */
-            $ref = (reflect_callable)($callable);
+            $ref = reflect_callable($callable);
             return [
                 '00' => $ref->getNumberOfParameters(),
                 '01' => $ref->isVariadic() ? INF : $ref->getNumberOfParameters(),
@@ -6184,15 +6175,15 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("ry
         // クロージャはユーザ定義しかありえないので調べる必要がない
         if ($callback instanceof \Closure) {
             // が、組み込みをバイパスする delegate はクロージャなのでそれだけは除外
-            $uses = (reflect_callable)($callback)->getStaticVariables();
+            $uses = reflect_callable($callback)->getStaticVariables();
             if (!isset($uses['__rfunc_delegate_marker'])) {
                 return $callback;
             }
         }
 
         // 上記以外は「引数ぴったりで削ぎ落としてコールするクロージャ」を返す
-        $plength = (parameter_length)($callback, true, true);
-        return (delegate)(function ($callback, $args) use ($plength) {
+        $plength = parameter_length($callback, true, true);
+        return delegate(function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
                 return $callback(...$args);
             }
@@ -6264,9 +6255,8 @@ if (!isset($excluded_functions["function_alias"]) && (!function_exists("ryunosuk
      *
      * @param callable $original 元となる関数
      * @param string $alias 関数のエイリアス名
-     * @param string|bool $cachedir キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す
      */
-    function function_alias($original, $alias, $cachedir = false)
+    function function_alias($original, $alias)
     {
         // クロージャとか __invoke とかは無理なので例外を投げる
         if (is_object($original)) {
@@ -6275,7 +6265,7 @@ if (!isset($excluded_functions["function_alias"]) && (!function_exists("ryunosuk
         // callname の取得と非静的のチェック
         is_callable($original, true, $calllname);
         $calllname = ltrim($calllname, '\\');
-        $ref = (reflect_callable)($original);
+        $ref = reflect_callable($original);
         if ($ref instanceof \ReflectionMethod && !$ref->isStatic()) {
             throw new \InvalidArgumentException("$calllname is non-static method.");
         }
@@ -6285,9 +6275,8 @@ if (!isset($excluded_functions["function_alias"]) && (!function_exists("ryunosuk
         }
 
         // キャッシュ指定有りなら読み込むだけで eval しない
-        $cachedir = (ifelse)($cachedir, true, sys_get_temp_dir());
-        $cachefile = $cachedir ? $cachedir . '/' . rawurlencode($calllname . '-' . $alias) . '.php' : null;
-        if ($cachefile && file_exists($cachefile)) {
+        $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
+        if (file_exists($cachefile)) {
             require $cachefile;
             return;
         }
@@ -6332,9 +6321,7 @@ namespace $namespace {
 CODE;
 
         eval($code);
-        if ($cachefile) {
-            file_put_contents($cachefile, "<?php\n" . $code);
-        }
+        file_put_contents($cachefile, "<?php\n" . $code);
     }
 }
 
@@ -6356,7 +6343,7 @@ if (!isset($excluded_functions["minimum"]) && (!function_exists("ryunosuke\\Func
      */
     function minimum(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
         return min($args);
     }
 }
@@ -6379,7 +6366,7 @@ if (!isset($excluded_functions["maximum"]) && (!function_exists("ryunosuke\\Func
      */
     function maximum(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
         return max($args);
     }
 }
@@ -6404,7 +6391,7 @@ if (!isset($excluded_functions["mode"]) && (!function_exists("ryunosuke\\Functio
      */
     function mode(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
         $vals = array_map(function ($v) {
             if (is_object($v)) {
                 // ここに特別扱いのオブジェクトを列挙していく
@@ -6412,7 +6399,7 @@ if (!isset($excluded_functions["mode"]) && (!function_exists("ryunosuke\\Functio
                     return $v->getTimestamp();
                 }
                 // それ以外は stringify へ移譲（__toString もここに含まれている）
-                return (stringify)($v);
+                return stringify($v);
             }
             return (string) $v;
         }, $args);
@@ -6444,8 +6431,8 @@ if (!isset($excluded_functions["mean"]) && (!function_exists("ryunosuke\\Functio
      */
     function mean(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
-        $args = array_filter($args, 'is_numeric') or (throws)(new \LengthException("argument's must be contain munber."));
+        $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or throws(new \LengthException("argument's must be contain munber."));
         return array_sum($args) / count($args);
     }
 }
@@ -6474,7 +6461,7 @@ if (!isset($excluded_functions["median"]) && (!function_exists("ryunosuke\\Funct
      */
     function median(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
         $count = count($args);
         $center = (int) ($count / 2);
         sort($args);
@@ -6529,8 +6516,8 @@ if (!isset($excluded_functions["sum"]) && (!function_exists("ryunosuke\\Function
      */
     function sum(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
-        $args = array_filter($args, 'is_numeric') or (throws)(new \LengthException("argument's must be contain munber."));
+        $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or throws(new \LengthException("argument's must be contain munber."));
         return array_sum($args);
     }
 }
@@ -6661,7 +6648,7 @@ if (!isset($excluded_functions["incidr"]) && (!function_exists("ryunosuke\\Funct
         }
         $iplong = ip2long($ipaddr);
 
-        foreach ((arrayize)($cidr) as $cidr) {
+        foreach (arrayize($cidr) as $cidr) {
             list($subnet, $length) = explode('/', $cidr, 2) + [1 => '32'];
 
             if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -6783,7 +6770,7 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("ryunosuke
                 else {
                     $info = curl_getinfo($handle);
                     $response = curl_multi_getcontent($handle);
-                    $headers = (str_array)(substr($response, 0, $info['header_size']), ':', true);
+                    $headers = str_array(substr($response, 0, $info['header_size']), ':', true);
                     $body = substr($response, $info['header_size']);
                     $responses[$resultmap["$handle"]] = [$body, $headers, $info];
                 }
@@ -6861,14 +6848,14 @@ if (!isset($excluded_functions["sql_bind"]) && (!function_exists("ryunosuke\\Fun
      */
     function sql_bind($sql, $values)
     {
-        $values = (arrayize)($values);
+        $values = arrayize($values);
         $n = 0;
         return preg_replace_callback('#(\?)|(:([a-z_][a-z_0-9]*))#ui', function ($m) use ($values, &$n) {
             $name = $m[1] === '?' ? $n++ : $m[3];
             if (!array_key_exists($name, $values)) {
                 return $m[0];
             }
-            return (sql_quote)($values[$name]);
+            return sql_quote($values[$name]);
         }, $sql);
     }
 }
@@ -6930,7 +6917,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
                     'NUMBER'  => function ($token) { return "<span style='color:#0000BB;'>" . htmlspecialchars($token) . "</span>"; },
                 ],
             ];
-            $rule = $rules[$options['highlight']] ?? (throws)(new \InvalidArgumentException('highlight must be "cli" or "html".'));
+            $rule = $rules[$options['highlight']] ?? throws(new \InvalidArgumentException('highlight must be "cli" or "html".'));
             $options['highlight'] = function ($token, $ttype) use ($keywords, $rule) {
                 switch (true) {
                     case isset($keywords[strtoupper($token)]):
@@ -7075,6 +7062,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
                         $result[] = $MARK_BR . $virttoken . $MARK_SP;
                         $subcontext = $uppertoken;
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "BETWEEN":
                         $subcontext = $uppertoken;
                         goto _DEFAULT;
@@ -7093,6 +7081,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
                             $result[] = $MARK_BR;
                         }
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "AND":
                         // BETWEEN A AND B と論理演算子の AND が競合するので分岐後にフォールスルー
                         if ($subcontext === 'BETWEEN') {
@@ -7122,6 +7111,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
                         $context = $uppertoken;
                         break;
                     case "LEFT":
+                        /** @noinspection PhpMissingBreakStatementInspection */
                     case "RIGHT":
                         // 例えば LEFT や RIGHT は関数呼び出しの場合もあるので分岐後にフォールスルー
                         if ($seek($index, +1) === '(') {
@@ -7249,7 +7239,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
         };
 
         $result = $interpret();
-        $result = (preg_replaces)("#" . implode('|', [
+        $result = preg_replaces("#" . implode('|', [
                 // 改行文字＋インデント文字をインデントとみなす（改行＋連続スペースもついでに）
                 "(?<indent>$MARK_BR(($MARK_NT|$MARK_SP)+))",
                 // 連続改行は1つに集約
@@ -7359,7 +7349,7 @@ if (!isset($excluded_functions["split_noempty"]) && (!function_exists("ryunosuke
         }
 
         // trim するなら preg_split だと無駄にややこしくなるのでベタにやる
-        $trim = ($trimchars === true) ? 'trim' : (rbind)('trim', $trimchars);
+        $trim = ($trimchars === true) ? 'trim' : rbind('trim', $trimchars);
         $parts = explode($delimiter, $string);
         $parts = array_map($trim, $parts);
         $parts = array_filter($parts, 'strlen');
@@ -7398,13 +7388,13 @@ if (!isset($excluded_functions["multiexplode"]) && (!function_exists("ryunosuke\
         $limit = (int) $limit;
         if ($limit < 0) {
             // 下手に php で小細工するよりこうやって富豪的にやるのが一番速かった
-            return array_reverse(array_map('strrev', (multiexplode)($delimiter, strrev($string), -$limit)));
+            return array_reverse(array_map('strrev', multiexplode($delimiter, strrev($string), -$limit)));
         }
         // explode において 0 は 1 と等しい
         if ($limit === 0) {
             $limit = 1;
         }
-        $delimiter = array_map(function ($v) { return preg_quote($v, '#'); }, (arrayize)($delimiter));
+        $delimiter = array_map(function ($v) { return preg_quote($v, '#'); }, arrayize($delimiter));
         return preg_split('#' . implode('|', $delimiter) . '#', $string, $limit);
     }
 }
@@ -7447,7 +7437,7 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("ryunosuke\
             $enclosures = array_combine($chars, $chars);
         }
 
-        $delimiters = (arrayize)($delimiter);
+        $delimiters = arrayize($delimiter);
         $starts = implode('', array_keys($enclosures));
         $ends = implode('', $enclosures);
         $enclosing = [];
@@ -7621,7 +7611,7 @@ if (!isset($excluded_functions["str_lchop"]) && (!function_exists("ryunosuke\\Fu
      */
     function str_lchop($string, $prefix, $case_insensitivity = false)
     {
-        return (str_chop)($string, $prefix, null, $case_insensitivity);
+        return str_chop($string, $prefix, null, $case_insensitivity);
     }
 }
 
@@ -7644,7 +7634,7 @@ if (!isset($excluded_functions["str_rchop"]) && (!function_exists("ryunosuke\\Fu
      */
     function str_rchop($string, $suffix = null, $case_insensitivity = false)
     {
-        return (str_chop)($string, null, $suffix, $case_insensitivity);
+        return str_chop($string, null, $suffix, $case_insensitivity);
     }
 }
 
@@ -7673,7 +7663,7 @@ if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("ryunosuke\\F
      * })()), "a,b,c\nd,e,f");
      * ```
      *
-     * @param array|\Traversable $array 値の配列 or 値の配列の配列
+     * @param iterable $array 値の配列 or 値の配列の配列
      * @param string $delimiter フィールド区切り文字
      * @param string $enclosure フィールドを囲む文字
      * @param string $escape エスケープ文字
@@ -7683,10 +7673,10 @@ if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("ryunosuke\\F
     {
         $fp = fopen('php://memory', 'rw+');
         try {
-            if (is_array($array) && (array_depth)($array) === 1) {
+            if (is_array($array) && array_depth($array) === 1) {
                 $array = [$array];
             }
-            return (call_safely)(function ($fp, $array, $delimiter, $enclosure, $escape) {
+            return call_safely(function ($fp, $array, $delimiter, $enclosure, $escape) {
                 foreach ($array as $line) {
                     fputcsv($fp, $line, $delimiter, $enclosure, $escape);
                 }
@@ -7737,12 +7727,10 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
      */
     function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
     {
-        if (!is_array($replaces)) {
-            $replaces = [$replaces];
-        }
+        $replaces = is_iterable($replaces) ? $replaces : [$replaces];
 
         // 空はそのまま返す
-        if (empty($replaces)) {
+        if (is_empty($replaces)) {
             return $subject;
         }
 
@@ -7825,7 +7813,7 @@ if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\F
      */
     function str_submap($subject, $replaces, $case_insensitivity = false)
     {
-        assert((is_iterable)($replaces));
+        assert(is_iterable($replaces));
 
         $isubject = $subject;
         if ($case_insensitivity) {
@@ -7844,7 +7832,7 @@ if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\F
                 continue;
             }
             $mapping[$ifrom] = [];
-            $map = (is_iterable)($map) ? $map : [$map];
+            $map = is_iterable($map) ? $map : [$map];
             foreach ($map as $n => $to) {
                 $origN = $n;
                 if (!is_int($n)) {
@@ -7861,7 +7849,7 @@ if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\F
         }
 
         // 空はそのまま返す
-        if ((is_empty)($mapping)) {
+        if (is_empty($mapping)) {
             return $subject;
         }
 
@@ -8009,7 +7997,7 @@ if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("ryunosuke\
         }
         $pos = max(0, min($pos, $length));
 
-        return (mb_substr_replace)($string, $trimmarker, $pos, $strlen - $length);
+        return mb_substr_replace($string, $trimmarker, $pos, $strlen - $length);
     }
 }
 
@@ -8042,7 +8030,7 @@ if (!isset($excluded_functions["starts_with"]) && (!function_exists("ryunosuke\\
             assert(is_string($w));
             assert(strlen($w));
 
-            if ((str_equals)(substr($string, 0, strlen($w)), $w, $case_insensitivity)) {
+            if (str_equals(substr($string, 0, strlen($w)), $w, $case_insensitivity)) {
                 return true;
             }
         }
@@ -8079,7 +8067,7 @@ if (!isset($excluded_functions["ends_with"]) && (!function_exists("ryunosuke\\Fu
             assert(is_string($w));
             assert(strlen($w));
 
-            if ((str_equals)(substr($string, -strlen($w)), $w, $case_insensitivity)) {
+            if (str_equals(substr($string, -strlen($w)), $w, $case_insensitivity)) {
                 return true;
             }
         }
@@ -8103,7 +8091,7 @@ if (!isset($excluded_functions["camel_case"]) && (!function_exists("ryunosuke\\F
      */
     function camel_case($string, $delimiter = '_')
     {
-        return lcfirst((pascal_case)($string, $delimiter));
+        return lcfirst(pascal_case($string, $delimiter));
     }
 }
 
@@ -8163,7 +8151,7 @@ if (!isset($excluded_functions["chain_case"]) && (!function_exists("ryunosuke\\F
      */
     function chain_case($string, $delimiter = '-')
     {
-        return (snake_case)($string, $delimiter);
+        return snake_case($string, $delimiter);
     }
 }
 
@@ -8247,7 +8235,7 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("ryunosuke\\Func
      */
     function htmltag($selector)
     {
-        if (!(is_iterable)($selector)) {
+        if (!is_iterable($selector)) {
             $selector = [$selector => ''];
         }
 
@@ -8341,7 +8329,7 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("ryunosuke\\Func
 
             preg_match('#(\s*)(.+)(\s*)#u', $tag, $m);
             list(, $prefix, $tag, $suffix) = $m;
-            $tag_attr = $html($tag) . (concat)(' ', implode(' ', $attrs));
+            $tag_attr = $html($tag) . concat(' ', implode(' ', $attrs));
             $content = ($escape ? $html($content) : $content);
 
             return "$prefix<$tag_attr>$content</$tag>$suffix";
@@ -8352,8 +8340,8 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("ryunosuke\\Func
             if (is_int($key)) {
                 $result .= $html($value);
             }
-            elseif ((is_iterable)($value)) {
-                $result .= $build($key, (htmltag)($value), false);
+            elseif (is_iterable($value)) {
+                $result .= $build($key, htmltag($value), false);
             }
             else {
                 $result .= $build($key, $value, true);
@@ -8415,13 +8403,13 @@ if (!isset($excluded_functions["build_uri"]) && (!function_exists("ryunosuke\\Fu
         $parts['query'] = is_array($parts['query']) ? http_build_query($parts['query'], '', '&') : $parts['query'];
 
         $uri = '';
-        $uri .= (concat)($parts['scheme'], '://');
-        $uri .= (concat)($parts['user'] . (concat)(':', $parts['pass']), '@');
-        $uri .= (concat)($parts['host']);
-        $uri .= (concat)(':', $parts['port']);
-        $uri .= (concat)('/', $parts['path']);
-        $uri .= (concat)('?', $parts['query']);
-        $uri .= (concat)('#', $parts['fragment']);
+        $uri .= concat($parts['scheme'], '://');
+        $uri .= concat($parts['user'] . concat(':', $parts['pass']), '@');
+        $uri .= concat($parts['host']);
+        $uri .= concat(':', $parts['port']);
+        $uri .= concat('/', $parts['path']);
+        $uri .= concat('?', $parts['query']);
+        $uri .= concat('#', $parts['fragment']);
         return $uri;
     }
 }
@@ -8475,6 +8463,7 @@ if (!isset($excluded_functions["parse_uri"]) && (!function_exists("ryunosuke\\Fu
      */
     function parse_uri($uri, $default = [])
     {
+        /** @noinspection RequiredAttributes */
         $regex = "
             (?:(?<scheme>[a-z][-+.0-9a-z]*)://)?
             (?:
@@ -8501,16 +8490,16 @@ if (!isset($excluded_functions["parse_uri"]) && (!function_exists("ryunosuke\\Fu
 
         // 配列以外はパースしてそれをデフォルトとする
         if (!is_array($default)) {
-            $default = (preg_capture)("#^$regex\$#ix", (string) $default, $default_default);
+            $default = preg_capture("#^$regex\$#ix", (string) $default, $default_default);
         }
 
         // パース。先頭の // はスキーム省略とみなすので除去する
-        $uri = (preg_splice)('#^//#', '', $uri);
-        $parts = (preg_capture)("#^$regex\$#ix", $uri, $default + $default_default);
+        $uri = preg_splice('#^//#', '', $uri);
+        $parts = preg_capture("#^$regex\$#ix", $uri, $default + $default_default);
 
         // 諸々調整（IPv6、パス / の正規化、クエリ配列化）
-        $parts['host'] = (preg_splice)('#^\\[(.+)\\]$#', '$1', $parts['host']);
-        $parts['path'] = (concat)('/', ltrim($parts['path'], '/'));
+        $parts['host'] = preg_splice('#^\\[(.+)\\]$#', '$1', $parts['host']);
+        $parts['path'] = concat('/', ltrim($parts['path'], '/'));
         if (is_string($parts['query'])) {
             parse_str($parts['query'], $parts['query']);
         }
@@ -8544,21 +8533,21 @@ if (!isset($excluded_functions["ini_export"]) && (!function_exists("ryunosuke\\F
         ];
 
         $generate = function ($array, $key = null) use (&$generate, $options) {
-            $ishasharray = is_array($array) && (is_hasharray)($array);
-            return (array_sprintf)($array, function ($v, $k) use ($generate, $key, $ishasharray) {
-                if ((is_iterable)($v)) {
+            $ishasharray = is_array($array) && is_hasharray($array);
+            return array_sprintf($array, function ($v, $k) use ($generate, $key, $ishasharray) {
+                if (is_iterable($v)) {
                     return $generate($v, $k);
                 }
 
                 if ($key === null) {
-                    return $k . ' = ' . (var_export2)($v, true);
+                    return $k . ' = ' . var_export2($v, true);
                 }
-                return ($ishasharray ? "{$key}[$k]" : "{$key}[]") . ' = ' . (var_export2)($v, true);
+                return ($ishasharray ? "{$key}[$k]" : "{$key}[]") . ' = ' . var_export2($v, true);
             }, "\n");
         };
 
         if ($options['process_sections']) {
-            return (array_sprintf)($iniarray, function ($v, $k) use ($generate) {
+            return array_sprintf($iniarray, function ($v, $k) use ($generate) {
                 return "[$k]\n{$generate($v)}\n";
             }, "\n");
         }
@@ -8661,7 +8650,7 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
             $fp = fopen('php://temp', 'rw+');
         }
         try {
-            $size = (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $callback) {
+            $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $callback) {
                 $size = 0;
                 $mb_internal_encoding = mb_internal_encoding();
                 if (!$headers) {
@@ -8670,7 +8659,7 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
                     }
                     $headers = array_keys($headers);
                 }
-                if (!(is_hasharray)($headers)) {
+                if (!is_hasharray($headers)) {
                     $headers = array_combine($headers, $headers);
                 }
                 if ($encoding !== $mb_internal_encoding) {
@@ -8797,7 +8786,7 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
         }
 
         try {
-            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $callback) {
+            return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $callback) {
                 $mb_internal_encoding = mb_internal_encoding();
                 $result = [];
                 $n = -1;
@@ -8816,7 +8805,7 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
                     $n++;
                     $row = array_combine($headers, array_intersect_key($row, $headers));
                     if ($headermap) {
-                        $row = (array_pickup)($row, $headermap);
+                        $row = array_pickup($row, $headermap);
                     }
                     if ($callback) {
                         if ($callback($row, $n) === false) {
@@ -8859,7 +8848,7 @@ if (!isset($excluded_functions["json_export"]) && (!function_exists("ryunosuke\\
             JSON_UNESCAPED_UNICODE      => true, // エスケープなしで特にデメリットはない
             JSON_PRESERVE_ZERO_FRACTION => true, // 勝手に変換はできるだけ避けたい
         ];
-        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $depth = array_unset($options, JSON_MAX_DEPTH, 512);
         $option = array_sum(array_keys(array_filter($options)));
 
         // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
@@ -8902,7 +8891,7 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
         $options += [
             JSON_OBJECT_AS_ARRAY => true, // 個人的嗜好だが連想配列のほうが扱いやすい
         ];
-        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $depth = array_unset($options, JSON_MAX_DEPTH, 512);
         $option = array_sum(array_keys(array_filter($options)));
 
         // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
@@ -8950,7 +8939,7 @@ if (!isset($excluded_functions["markdown_table"]) && (!function_exists("ryunosuk
      */
     function markdown_table($array)
     {
-        if (!is_array($array) || (is_empty)($array)) {
+        if (!is_array($array) || is_empty($array)) {
             throw new \InvalidArgumentException('$array must be array of hasharray.');
         }
 
@@ -9042,8 +9031,8 @@ if (!isset($excluded_functions["markdown_list"]) && (!function_exists("ryunosuke
         $f = function ($array, $nest) use (&$f, $option) {
             $spacer = str_repeat($option['indent'], $nest);
             $result = [];
-            foreach ((arrays)($array) as $n => list($k, $v)) {
-                if ((is_iterable)($v)) {
+            foreach (arrays($array) as $n => list($k, $v)) {
+                if (is_iterable($v)) {
                     if (!is_int($k)) {
                         $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];
                     }
@@ -9262,7 +9251,7 @@ if (!isset($excluded_functions["preg_replaces"]) && (!function_exists("ryunosuke
     {
         $offset = 0;
         $count = 0;
-        if (!(is_arrayable)($replacements)) {
+        if (!is_arrayable($replacements)) {
             $replacements = [1 => $replacements];
         }
 
@@ -9402,7 +9391,7 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("ryunosuke\\Fu
      */
     function str_guess($string, $candidates, &$percent = null)
     {
-        $candidates = array_filter((arrayval)($candidates, false), 'strlen');
+        $candidates = array_filter(arrayval($candidates, false), 'strlen');
         if (!$candidates) {
             throw new \InvalidArgumentException('$candidates is empty.');
         }
@@ -9412,7 +9401,7 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("ryunosuke\\Fu
         $shortest = PHP_INT_MAX;
         foreach ($candidates as $candidate) {
             $carray = preg_split('//u', $candidate, -1, PREG_SPLIT_NO_EMPTY);
-            $delta = (damerau_levenshtein)($sarray, $carray) / max(count($sarray), count($carray));
+            $delta = damerau_levenshtein($sarray, $carray) / max(count($sarray), count($carray));
 
             if ($delta < $shortest) {
                 $closest = $candidate;
@@ -9487,7 +9476,7 @@ if (!isset($excluded_functions["str_array"]) && (!function_exists("ryunosuke\\Fu
     function str_array($string, $delimiter, $hashmode)
     {
         $array = $string;
-        if ((is_stringable)($string)) {
+        if (is_stringable($string)) {
             $array = preg_split('#\R#u', $string, -1, PREG_SPLIT_NO_EMPTY);
         }
         $delimiter = preg_quote($delimiter, '#');
@@ -9637,7 +9626,7 @@ if (!isset($excluded_functions["render_file"]) && (!function_exists("ryunosuke\\
      */
     function render_file($template_file, $array)
     {
-        return (render_string)(file_get_contents($template_file), $array);
+        return render_string(file_get_contents($template_file), $array);
     }
 }
 
@@ -9691,9 +9680,9 @@ if (!isset($excluded_functions["include_string"]) && (!function_exists("ryunosuk
     function include_string($template, $array = [])
     {
         // opcache が効かない気がする
-        $path = (memory_path)(__FUNCTION__);
+        $path = memory_path(__FUNCTION__);
         file_put_contents($path, $template);
-        $result = (ob_include)($path, $array);
+        $result = ob_include($path, $array);
         unlink($path);
         return $result;
     }
@@ -10065,7 +10054,7 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
                 }
                 // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
                 if (preg_match('#(.+?)(\d+)$#', $name, $match) && $fname = $this->_resolve($match[1])) {
-                    $this->data = $fname(...(array_insert)($arguments, [$this->data], $match[2]));
+                    $this->data = $fname(...array_insert($arguments, [$this->data], $match[2]));
                     return $this;
                 }
 
@@ -10073,7 +10062,7 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
                 if (preg_match('#(.+?)E$#', $name, $match)) {
                     $expr = array_pop($arguments);
                     $expr = strpos($expr, '$_') === false ? '$_ ' . $expr : $expr;
-                    $arguments[] = (eval_func)($expr, '_');
+                    $arguments[] = eval_func($expr, '_');
                     return $this->{$match[1]}(...$arguments);
                 }
                 // 接尾呼び出し2: P で終わる呼び出しは演算子を callback とする
@@ -10088,7 +10077,7 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
                             if (!is_array($rand)) {
                                 $rand = [$rand];
                             }
-                            $v = (ope_func)($ope)($v, ...$rand);
+                            $v = ope_func($ope)($v, ...$rand);
                         }
                         return $v;
                     };
@@ -10268,7 +10257,7 @@ if (!isset($excluded_functions["try_catch"]) && (!function_exists("ryunosuke\\Fu
      */
     function try_catch($try, $catch = null, ...$variadic)
     {
-        return (try_catch_finally)($try, $catch, null, ...$variadic);
+        return try_catch_finally($try, $catch, null, ...$variadic);
     }
 }
 
@@ -10300,7 +10289,7 @@ if (!isset($excluded_functions["try_finally"]) && (!function_exists("ryunosuke\\
      */
     function try_finally($try, $finally = null, ...$variadic)
     {
-        return (try_catch_finally)($try, throws, $finally, ...$variadic);
+        return try_catch_finally($try, throws, $finally, ...$variadic);
     }
 }
 
@@ -10430,7 +10419,7 @@ if (!isset($excluded_functions["date_interval"]) && (!function_exists("ryunosuke
             }
         }
         else {
-            $limit = $map[$limit_type] ?? (throws)(new \InvalidArgumentException("limit_type:$limit_type is undefined."));
+            $limit = $map[$limit_type] ?? throws(new \InvalidArgumentException("limit_type:$limit_type is undefined."));
         }
 
         // 各単位を導出
@@ -10479,7 +10468,7 @@ if (!isset($excluded_functions["date_interval"]) && (!function_exists("ryunosuke
                         $pos = [];
                         for ($i = 0; $i < $limit_type; $i++) {
                             if (isset($ymdhisv[$n + $i])) {
-                                if (($p = (array_pos_key)($format, $ymdhisv[$n + $i], -1)) >= 0) {
+                                if (($p = array_pos_key($format, $ymdhisv[$n + $i], -1)) >= 0) {
                                     $pos[] = $p;
                                 }
                             }
@@ -10504,8 +10493,8 @@ if (!isset($excluded_functions["date_interval"]) && (!function_exists("ryunosuke
                         $tmp[] = ['', '', ''];
                         continue;
                     }
-                    $fmt = (arrayize)($fmt);
-                    $fmt = (switchs)(count($fmt), [
+                    $fmt = arrayize($fmt);
+                    $fmt = switchs(count($fmt), [
                         1 => static function () use ($fmt) { return ['', $fmt[0], '']; },
                         2 => static function () use ($fmt) { return ['', $fmt[0], $fmt[1]]; },
                         3 => static function () use ($fmt) { return array_values($fmt); },
@@ -10548,7 +10537,7 @@ if (!isset($excluded_functions["date_interval"]) && (!function_exists("ryunosuke
                 elseif ($prevempty || $nextempty) {
                     $fmt = '';
                 }
-                $tmp2 = array_merge($tmp2, (arrayize)($fmt));
+                $tmp2 = array_merge($tmp2, arrayize($fmt));
             }
             $format = implode('', $tmp2);
         }
@@ -10580,12 +10569,36 @@ if (!isset($excluded_functions["get_uploaded_files"]) && (!function_exists("ryun
         $result = [];
         foreach (($files ?: $_FILES) as $name => $file) {
             if (is_array($file['name'])) {
-                $file = (get_uploaded_files)((array_each)($file['name'], function (&$carry, $dummy, $subkey) use ($file) {
-                    $carry[$subkey] = (array_lookup)($file, $subkey);
+                $file = get_uploaded_files(array_each($file['name'], function (&$carry, $dummy, $subkey) use ($file) {
+                    $carry[$subkey] = array_lookup($file, $subkey);
                 }, []));
             }
             $result[$name] = $file;
         }
+        return $result;
+    }
+}
+
+const cachedir = "ryunosuke\\Functions\\cachedir";
+if (!isset($excluded_functions["cachedir"]) && (!function_exists("ryunosuke\\Functions\\cachedir") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\cachedir"))->isInternal()))) {
+    /**
+     * 本ライブラリで使用するキャッシュディレクトリを設定する
+     *
+     * @param string|null $dirname キャッシュディレクトリ。省略時は返すのみ
+     * @return string 設定前のキャッシュディレクトリ
+     */
+    function cachedir($dirname = null)
+    {
+        static $cachedir;
+        if ($dirname === null) {
+            return $cachedir = $cachedir ?? sys_get_temp_dir();
+        }
+
+        if (!file_exists($dirname)) {
+            @mkdir($dirname, 0777 & (~umask()), true);
+        }
+        $result = $cachedir;
+        $cachedir = realpath($dirname);
         return $result;
     }
 }
@@ -10595,11 +10608,8 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functi
     /**
      * シンプルにキャッシュする
      *
-     * この関数は get/set を兼ねる。
+     * この関数は get/set/delete を兼ねる。
      * キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。
-     *
-     * 内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。
-     * 内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。
      *
      * $provider に null を与えるとキャッシュの削除となる。
      *
@@ -10619,36 +10629,118 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functi
      * @param string $key キャッシュのキー
      * @param callable $provider キャッシュがない場合にコールされる callable
      * @param string $namespace 名前空間
-     * @param bool $use_internal 内部キャッシュオブジェクトを使うか
      * @return mixed キャッシュ
      */
-    function cache($key, $provider, $namespace = null, $use_internal = true)
+    function cache($key, $provider, $namespace = null)
     {
-        if ($namespace === null) {
-            $namespace = __FILE__;
+        static $cacheobject;
+        $cacheobject = $cacheobject ?? new class(cachedir())
+            {
+                const CACHE_EXT = '.php-cache';
+
+                /** @var string キャッシュディレクトリ */
+                private $cachedir;
+
+                /** @var array 内部キャッシュ */
+                private $cache;
+
+                /** @var array 変更感知配列 */
+                private $changed;
+
+                public function __construct($cachedir)
+                {
+                    $this->cachedir = $cachedir;
+                    $this->cache = [];
+                    $this->changed = [];
+                }
+
+                public function __destruct()
+                {
+                    // 変更されているもののみ保存
+                    foreach ($this->changed as $namespace => $dummy) {
+                        $filepath = $this->cachedir . '/' . rawurlencode($namespace) . self::CACHE_EXT;
+                        $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
+
+                        $temppath = tempnam(sys_get_temp_dir(), 'cache');
+                        if (file_put_contents($temppath, $content) !== false) {
+                            @chmod($temppath, 0644);
+                            if (!@rename($temppath, $filepath)) {
+                                @unlink($temppath);
+                            }
+                        }
+                    }
+                }
+
+                public function has($namespace, $key)
+                {
+                    // ファイルから読み込む必要があるので get しておく
+                    $this->get($namespace, $key);
+                    return array_key_exists($key, $this->cache[$namespace]);
+                }
+
+                public function get($namespace, $key)
+                {
+                    // 名前空間自体がないなら作る or 読む
+                    if (!isset($this->cache[$namespace])) {
+                        $nsarray = [];
+                        $cachpath = $this->cachedir . '/' . rawurldecode($namespace) . self::CACHE_EXT;
+                        if (file_exists($cachpath)) {
+                            $nsarray = require $cachpath;
+                        }
+                        $this->cache[$namespace] = $nsarray;
+                    }
+
+                    return $this->cache[$namespace][$key] ?? null;
+                }
+
+                public function set($namespace, $key, $value)
+                {
+                    // 新しい値が来たら変更フラグを立てる
+                    if (!isset($this->cache[$namespace]) || !array_key_exists($key, $this->cache[$namespace]) || $this->cache[$namespace][$key] !== $value) {
+                        $this->changed[$namespace] = true;
+                    }
+
+                    $this->cache[$namespace][$key] = $value;
+                }
+
+                public function delete($namespace, $key)
+                {
+                    $this->changed[$namespace] = true;
+                    unset($this->cache[$namespace][$key]);
+                }
+
+                public function clear()
+                {
+                    // インメモリ情報をクリアして・・・
+                    $this->cache = [];
+                    $this->changed = [];
+
+                    // ファイルも消す
+                    if ($this->cachedir !== null) {
+                        foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
+                            unlink($file);
+                        }
+                    }
+                }
+            };
+
+        // flush (for test)
+        if ($key === null) {
+            $cacheobject = null;
+            return;
         }
 
-        // 内部オブジェクトが使えるなら使う
-        if ($use_internal && class_exists(\ryunosuke\Functions\Cacher::class)) {
-            if ($provider === null) {
-                return \ryunosuke\Functions\Cacher::delete($namespace, $key);
-            }
-            return \ryunosuke\Functions\Cacher::put($namespace, $key, $provider);
-        }
+        $namespace = $namespace ?? __FILE__;
 
-        static $cache = [];
+        $exist = $cacheobject->has($namespace, $key);
         if ($provider === null) {
-            $return = isset($cache[$namespace][$key]);
-            unset($cache[$namespace][$key]);
-            return $return;
+            $cacheobject->delete($namespace, $key);
+            return $exist;
         }
-        if (!isset($cache[$namespace])) {
-            $cache[$namespace] = [];
+        if (!$exist) {
+            $cacheobject->set($namespace, $key, $provider());
         }
-        if (!array_key_exists($key, $cache[$namespace])) {
-            $cache[$namespace][$key] = $provider();
-        }
-        return $cache[$namespace][$key];
+        return $cacheobject->get($namespace, $key);
     }
 }
 
@@ -10692,7 +10784,7 @@ if (!isset($excluded_functions["process"]) && (!function_exists("ryunosuke\\Func
         $ecommand = escapeshellcmd($command);
 
         if (is_array($args)) {
-            $args = (array_sprintf)($args, function ($v, $k) {
+            $args = array_sprintf($args, function ($v, $k) {
                 $ev = escapeshellarg($v);
                 return is_int($k) ? $ev : "$k $ev";
             }, ' ');
@@ -10824,7 +10916,7 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("ryunosuke\\Fu
      */
     function arguments($rule, $argv = null)
     {
-        $opt = (array_unset)($rule, '', []);
+        $opt = array_unset($rule, '', []);
         if (is_bool($opt)) {
             $opt = ['thrown' => $opt];
         }
@@ -10836,7 +10928,7 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("ryunosuke\\Fu
             $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
         }
         if (is_string($argv)) {
-            $argv = (quoteexplode)([" ", "\t"], $argv);
+            $argv = quoteexplode([" ", "\t"], $argv);
             $argv = array_filter($argv, 'strlen');
         }
         $argv = array_values($argv);
@@ -10986,7 +11078,7 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
                 // オブジェクトは単にプロパティを __set_state する文字列を出力する
                 elseif (is_object($value)) {
                     $parents[] = $value;
-                    return get_class($value) . $export((get_object_properties)($value), $nest, $parents);
+                    return get_class($value) . $export(get_object_properties($value), $nest, $parents);
                 }
                 // 文字列は改行削除
                 elseif (is_string($value)) {
@@ -10998,7 +11090,7 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
                 }
                 // それ以外は stringify
                 else {
-                    return (stringify)($value);
+                    return stringify($value);
                 }
             };
 
@@ -11115,7 +11207,7 @@ if (!isset($excluded_functions["error"]) && (!function_exists("ryunosuke\\Functi
         static $persistences = [];
 
         $time = date('d-M-Y H:i:s e');
-        $content = (stringify)($message);
+        $content = stringify($message);
         $location = '';
         if (!($message instanceof \Exception || $message instanceof \Throwable)) {
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
@@ -11218,7 +11310,7 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
     function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     {
         $benchset = [];
-        foreach ((arrayize)($suite) as $name => $caller) {
+        foreach (arrayize($suite) as $name => $caller) {
             if (!is_callable($caller, false, $callname)) {
                 throw new \InvalidArgumentException('caller is not callable.');
             }
@@ -11236,7 +11328,7 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
                 throw new \InvalidArgumentException('duplicated benchname.');
             }
 
-            $benchset[$name] = (closurize)($caller);
+            $benchset[$name] = closurize($caller);
         }
 
         if (!$benchset) {
@@ -11244,7 +11336,7 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
         }
 
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-        $assertions = (call_safely)(function ($benchset, $args) {
+        $assertions = call_safely(function ($benchset, $args) {
             $result = [];
             $args2 = $args;
             foreach ($benchset as $name => $caller) {
@@ -11258,8 +11350,8 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
         foreach ($assertions as $name1 => $return1) {
             foreach ($assertions as $name2 => $return2) {
                 if ($return1 !== null && $return2 !== null && $return1 !== $return2) {
-                    $returns1 = (stringify)($return1);
-                    $returns2 = (stringify)($return2);
+                    $returns1 = stringify($return1);
+                    $returns2 = stringify($return2);
                     trigger_error("Results of $name1 and $name2 are different. ($returns1, $returns2)");
                 }
             }
@@ -11292,7 +11384,7 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
         // 出力するなら出力
         if ($output) {
             printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
-            echo (markdown_table)(array_map(function ($v) {
+            echo markdown_table(array_map(function ($v) {
                 return [
                     'name'       => $v['name'],
                     'called'     => number_format($v['called'], 0),
@@ -11325,7 +11417,7 @@ if (!isset($excluded_functions["stringify"]) && (!function_exists("ryunosuke\\Fu
             case 'boolean':
                 return $var ? 'true' : 'false';
             case 'array':
-                return (var_export2)($var, true);
+                return var_export2($var, true);
             case 'object':
                 if (method_exists($var, '__toString')) {
                     return (string) $var;
@@ -11494,14 +11586,14 @@ if (!isset($excluded_functions["arrayval"]) && (!function_exists("ryunosuke\\Fun
             return $var;
         }
 
-        if ((is_primitive)($var)) {
+        if (is_primitive($var)) {
             return (array) $var;
         }
 
         $result = [];
         foreach ($var as $k => $v) {
-            if ($recursive && !(is_primitive)($v)) {
-                $v = (arrayval)($v, $recursive);
+            if ($recursive && !is_primitive($v)) {
+                $v = arrayval($v, $recursive);
             }
             $result[$k] = $v;
         }
@@ -11517,8 +11609,6 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("ryunosuke\\Fu
      * 値は 1 <= $var < 1000(1024) の範囲内に収められる。
      * ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。
      *
-     * 歴史的な経緯により $unit と $format は入れ替えて指定することができる（型で分岐する）。
-     *
      * Example:
      * ```php
      * // シンプルに k をつける
@@ -11526,14 +11616,14 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("ryunosuke\\Fu
      * // シンプルに m をつける
      * assertSame(si_prefix(0.012345), '12.345 m');
      * // 書式フォーマットを指定できる
-     * assertSame(si_prefix(12345, '%d%s'), '12k');
-     * assertSame(si_prefix(0.012345, '%d%s'), '12m');
+     * assertSame(si_prefix(12345, 1000, '%d%s'), '12k');
+     * assertSame(si_prefix(0.012345, 1000, '%d%s'), '12m');
      * // ファイルサイズを byte で表示する
-     * assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+     * assertSame(si_prefix(12345, 1000, '%d %sbyte'), '12 kbyte');
      * // ファイルサイズを byte で表示する（1024）
-     * assertSame(si_prefix(10240, '%.3f %sbyte', 1024), '10.000 kbyte');
+     * assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
-     * assertSame(si_prefix(12345, null), [12.345, 'k']);
+     * assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
      * ```
      *
      * @param mixed $var 丸める値
@@ -11562,13 +11652,6 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("ryunosuke\\Fu
             7  => 'Z', // ゼタ
             8  => 'Y', // ヨタ
         ];
-
-        // 引数体系を変えたので後方互換性のため型を見て入れ替える
-        if (is_string($unit) || is_null($unit)) {
-            $t = $format;
-            $format = $unit;
-            $unit = intval($t) ?: 1000;
-        }
 
         assert($unit > 0);
 
@@ -11656,7 +11739,7 @@ if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("ryunosuke\\
 
         $var = trim($var);
         preg_match('#[' . implode('', array_keys($units)) . ']$#u', $var, $m);
-        return (numval)($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
+        return numval($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
     }
 }
 
@@ -11672,8 +11755,6 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("ryunosuke\\Fun
      * - countable である object で count() > 0
      *
      * は false 判定する。
-     * ただし countable は互換性のため $countable_object で指定する（デフォルト false）。
-     * 次のバージョンアップでこの引数はデフォルト true になるか削除される。
      *
      * なお、関数の仕様上、未定義変数を true 判定することはできない。
      * 未定義変数をチェックしたい状況は大抵の場合コードが悪いが `$array['key1']['key2']` を調べたいことはある。
@@ -11694,15 +11775,13 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("ryunosuke\\Fun
      * ```
      *
      * @param mixed $var 判定する値
-     * @param bool $countable_object 判定する値
      * @return bool 空なら true
      */
-    function is_empty($var, $countable_object = false)
+    function is_empty($var)
     {
         // object は is_countable 次第
         if (is_object($var)) {
-            // for compatible
-            if ($countable_object && (is_countable)($var)) {
+            if (is_countable($var)) {
                 return !count($var);
             }
             return false;
@@ -11773,7 +11852,7 @@ if (!isset($excluded_functions["is_recursive"]) && (!function_exists("ryunosuke\
     {
         $core = function ($var, $parents) use (&$core) {
             // 複合型でないなら間違いなく false
-            if ((is_primitive)($var)) {
+            if (is_primitive($var)) {
                 return false;
             }
 
@@ -12037,11 +12116,11 @@ if (!isset($excluded_functions["var_apply"]) && (!function_exists("ryunosuke\\Fu
      */
     function var_apply($var, $callback, ...$args)
     {
-        $iterable = (is_iterable)($var);
+        $iterable = is_iterable($var);
         if ($iterable) {
             $result = [];
             foreach ($var as $k => $v) {
-                $result[$k] = (var_apply)($v, $callback, ...$args);
+                $result[$k] = var_apply($v, $callback, ...$args);
             }
             return $result;
         }
@@ -12082,7 +12161,7 @@ if (!isset($excluded_functions["var_applys"]) && (!function_exists("ryunosuke\\F
      */
     function var_applys($var, $callback, ...$args)
     {
-        $iterable = (is_iterable)($var);
+        $iterable = is_iterable($var);
         if (!$iterable) {
             $var = [$var];
         }
@@ -12164,10 +12243,10 @@ if (!isset($excluded_functions["var_export2"]) && (!function_exists("ryunosuke\\
                 $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
                 $spacer2 = str_repeat(' ', $nest * $INDENT);
 
-                $hashed = (is_hasharray)($value);
+                $hashed = is_hasharray($value);
 
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (!$hashed && (array_all)($value, is_primitive)) {
+                if (!$hashed && array_all($value, is_primitive)) {
                     return '[' . implode(', ', array_map($export, $value)) . ']';
                 }
 
@@ -12188,7 +12267,7 @@ if (!isset($excluded_functions["var_export2"]) && (!function_exists("ryunosuke\\
             // オブジェクトは単にプロパティを __set_state する文字列を出力する
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
+                return get_class($value) . '::__set_state(' . $export(get_object_properties($value), $nest, $parents) . ')';
             }
             // 文字列はダブルクオート
             elseif (is_string($value)) {
@@ -12209,7 +12288,7 @@ if (!isset($excluded_functions["var_export2"]) && (!function_exists("ryunosuke\\
         if ($return) {
             return $result;
         }
-        echo $result;
+        echo $result, "\n";
     }
 }
 
@@ -12263,7 +12342,7 @@ if (!isset($excluded_functions["var_html"]) && (!function_exists("ryunosuke\\Fun
             }
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . '::' . $export((get_object_properties)($value), $parents);
+                return get_class($value) . '::' . $export(get_object_properties($value), $parents);
             }
             elseif (is_null($value)) {
                 return 'null';
@@ -12355,9 +12434,9 @@ if (!isset($excluded_functions["hashvar"]) && (!function_exists("ryunosuke\\Func
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $file = $trace['file'];
         $line = $trace['line'];
-        $function = (function_shorten)($trace['function']);
+        $function = function_shorten($trace['function']);
 
-        $cache = (cache)($file . '#' . $line, function () use ($file, $line, $function) {
+        $cache = cache($file . '#' . $line, function () use ($file, $line, $function) {
             // 呼び出し元の1行を取得
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             $target = $lines[$line - 1];

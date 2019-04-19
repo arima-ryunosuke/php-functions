@@ -444,6 +444,7 @@ assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' 
 	<div class="description"><p>伏せると同時にその値を返す</p>
 <p>$key に配列を与えると全て伏せて配列で返す。<br />
 その場合、$default が活きるのは「全て無かった場合」となる。</p>
+<p>さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。</p>
 <p>配列を与えた場合の返り値は与えた配列の順番・キーが活きる。<br />
 これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。</p>
 <p>同様に、$key にクロージャを与えると、その返り値が true 相当のものを伏せて配列で返す。<br />
@@ -1644,7 +1645,6 @@ assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::closurize()"> ryunosuke\Functions\Package\Funchand::closurize()</a></h2>
 	<div class="description"><p>callable を Closure に変換する</p>
-<p>php7.1 の fromCallable みたいなもの。</p>
 <p>Example:</p>
 <pre><code class="language-php">$sprintf = closurize('sprintf');
 assertInstanceof(\Closure::class, $sprintf);
@@ -3106,12 +3106,13 @@ assertInstanceOf(\DateInterval::class, date_interval(123.456));
 第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。</p>
 <p>サンプルを書くと長くなるので例は<tag_source data-fqsen='ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()' data-description='テストファイル'>テストファイル</tag_source>を参照。</p>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()"> ryunosuke\Functions\Package\Utility::cachedir()</a></h2>
+	<div class="description"><p>本ライブラリで使用するキャッシュディレクトリを設定する</p>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cache()"> ryunosuke\Functions\Package\Utility::cache()</a></h2>
 	<div class="description"><p>シンプルにキャッシュする</p>
-<p>この関数は get/set を兼ねる。<br />
+<p>この関数は get/set/delete を兼ねる。<br />
 キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
-<p>内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。<br />
-内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。</p>
 <p>$provider に null を与えるとキャッシュの削除となる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$provider = function(){return rand();};
@@ -3336,21 +3337,20 @@ assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので�
 	<div class="description"><p>数値に SI 接頭辞を付与する</p>
 <p>値は 1 &lt;= $var &lt; 1000(1024) の範囲内に収められる。<br />
 ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。</p>
-<p>歴史的な経緯により $unit と $format は入れ替えて指定することができる（型で分岐する）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルに k をつける
 assertSame(si_prefix(12345), '12.345 k');
 // シンプルに m をつける
 assertSame(si_prefix(0.012345), '12.345 m');
 // 書式フォーマットを指定できる
-assertSame(si_prefix(12345, '%d%s'), '12k');
-assertSame(si_prefix(0.012345, '%d%s'), '12m');
+assertSame(si_prefix(12345, 1000, '%d%s'), '12k');
+assertSame(si_prefix(0.012345, 1000, '%d%s'), '12m');
 // ファイルサイズを byte で表示する
-assertSame(si_prefix(12345, '%d %sbyte'), '12 kbyte');
+assertSame(si_prefix(12345, 1000, '%d %sbyte'), '12 kbyte');
 // ファイルサイズを byte で表示する（1024）
-assertSame(si_prefix(10240, '%.3f %sbyte', 1024), '10.000 kbyte');
+assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
 // フォーマットに null を与えると sprintf せずに配列で返す
-assertSame(si_prefix(12345, null), [12.345, 'k']);
+assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_unprefix()"> ryunosuke\Functions\Package\Vars::si_unprefix()</a></h2>
@@ -3378,9 +3378,7 @@ assertSame(si_unprefix('1K'), 1000);
 <li>countable でない object</li>
 <li>countable である object で count() &gt; 0</li>
 </ul>
-<p>は false 判定する。<br />
-ただし countable は互換性のため $countable_object で指定する（デフォルト false）。<br />
-次のバージョンアップでこの引数はデフォルト true になるか削除される。</p>
+<p>は false 判定する。</p>
 <p>なお、関数の仕様上、未定義変数を true 判定することはできない。<br />
 未定義変数をチェックしたい状況は大抵の場合コードが悪いが <code>$array['key1']['key2']</code> を調べたいことはある。<br />
 そういう時には使えない（?? する必要がある）。</p>
