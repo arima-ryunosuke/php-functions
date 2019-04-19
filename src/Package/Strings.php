@@ -374,7 +374,7 @@ class Strings
      * })()), "a,b,c\nd,e,f");
      * ```
      *
-     * @param array|\Traversable $array 値の配列 or 値の配列の配列
+     * @param iterable $array 値の配列 or 値の配列の配列
      * @param string $delimiter フィールド区切り文字
      * @param string $enclosure フィールドを囲む文字
      * @param string $escape エスケープ文字

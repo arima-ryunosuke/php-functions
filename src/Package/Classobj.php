@@ -25,10 +25,10 @@ class Classobj
      * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
      * ```
      *
-     * @param array|\Traversable $fields フィールド配列
+     * @param iterable $fields フィールド配列
      * @return \stdClass 生成した stdClass インスタンス
      */
-    public static function stdclass($fields = [])
+    public static function stdclass(iterable $fields = [])
     {
         $stdclass = new \stdClass();
         foreach ($fields as $key => $value) {

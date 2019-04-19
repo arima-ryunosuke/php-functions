@@ -721,6 +721,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_filter_not()
     {
         $this->assertEquals([1 => ''], (array_filter_not)(['a', '', 'c'], 'strlen'));
+        $this->assertEquals([1 => ''], (array_filter_not)(new \ArrayObject(['a', '', 'c']), 'strlen'));
     }
 
     function test_array_filter_key()
@@ -827,6 +828,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // $ignore=null するとそのまま返す
         $this->assertEquals(['a', null, 123], (array_map_method)([$o1, null, 123], 'getName', [], null));
+
+        // iterable
+        $this->assertEquals(['a', null, 123], (array_map_method)(new \ArrayObject([$o1, null, 123]), 'getName', [], null));
     }
 
     function test_array_maps()
@@ -845,6 +849,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([3, 3, 3], (array_maps)([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'));
 
         $objs = [new \Concrete('a'), new \Concrete('b'), new \Concrete('c')];
+        $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
+
+        $objs = new \ArrayObject([new \Concrete('a'), new \Concrete('b'), new \Concrete('c')]);
         $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
     }
 

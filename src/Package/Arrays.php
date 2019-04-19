@@ -27,7 +27,7 @@ class Arrays
      * assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @return \Generator [$seq => [$key, $value]] を返すジェネレータ
      */
     public static function arrays($array)
@@ -105,7 +105,7 @@ class Arrays
      * assertSame(first_key([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最初のキー
      */
@@ -130,7 +130,7 @@ class Arrays
      * assertSame(first_value([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最初の値
      */
@@ -155,7 +155,7 @@ class Arrays
      * assertSame(first_keyvalue([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return array [最初のキー, 最初の値]
      */
@@ -178,7 +178,7 @@ class Arrays
      * assertSame(last_key([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最後のキー
      */
@@ -203,7 +203,7 @@ class Arrays
      * assertSame(last_value([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 最後の値
      */
@@ -228,7 +228,7 @@ class Arrays
      * assertSame(last_keyvalue([], 999), 999);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param mixed $default 無かった場合のデフォルト値
      * @return array [最後のキー, 最後の値]
      */
@@ -453,7 +453,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable|string $array 対象配列
+     * @param iterable|string $array 対象配列
      * @param callable|int $comparator 比較関数。SORT_XXX も使える
      * @return array ソートされた配列
      */
@@ -696,7 +696,7 @@ class Arrays
      * assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
      * ```
      *
-     * @param array|\Traversable|string $array 対象配列
+     * @param iterable|string $array 対象配列
      * @param string $glue 差し込む要素
      * @return array 差し込まれた配列
      */
@@ -748,7 +748,7 @@ class Arrays
      * ], null, '|'), 'str:sss,int:3|single:str');
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|callable $format 書式文字列あるいはクロージャ
      * @param string $glue 結合文字列。未指定時は implode しない
      * @return array|string sprintf された配列
@@ -793,7 +793,7 @@ class Arrays
      * assertSame(array_strpad($array, '', ['-suffix']), ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|array $key_prefix キー側の付加文字列
      * @param string|array $val_prefix 値側の付加文字列
      * @return array 文字列付与された配列
@@ -1318,7 +1318,7 @@ class Arrays
      * assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
      * ```
      *
-     * @param array|\Traversable $array 調べる配列
+     * @param iterable $array 調べる配列
      * @param callable $callback 評価コールバック
      * @param bool $is_key キーを返すか否か
      * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
@@ -1348,7 +1348,7 @@ class Arrays
      * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true), ['b' => 'B']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $regex 正規表現
      * @param bool $not true にすると「マッチしない」でフィルタする
      * @return array 正規表現でフィルタされた配列
@@ -1404,7 +1404,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param bool $iterable is_iterable で判定するか
      * @return array map された新しい配列
@@ -1441,7 +1441,7 @@ class Arrays
      * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], function(){}), []);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @return array キーが変換された新しい配列
      */
@@ -1467,13 +1467,13 @@ class Arrays
      * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価 callable
      * @return array $callback が false を返した新しい配列
      */
     public static function array_filter_not($array, $callback)
     {
-        return array_filter($array, (not_func)($callback));
+        return array_filter((arrayval)($array, false), (not_func)($callback));
     }
 
     /**
@@ -1488,7 +1488,7 @@ class Arrays
      * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 => 'a', 2 => 'c']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @return array $callback が true を返した新しい配列
      */
@@ -1514,7 +1514,7 @@ class Arrays
      * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $expression eval コード
      * @return array $expression が true を返した新しい配列
      */
@@ -1576,7 +1576,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|array|null $column キー名
      * @param callable $callback 評価クロージャ
      * @return array $where が真を返した新しい配列
@@ -1644,7 +1644,7 @@ class Arrays
      * assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param bool $strict 厳密比較フラグ。 true だと null のみが偽とみなされる
      * @return array $callback が真を返した新しい配列
@@ -1682,7 +1682,7 @@ class Arrays
      * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $method メソッド
      * @param array $args メソッドに渡る引数
      * @param bool|null $ignore メソッドが存在しない場合にスルーするか。null を渡すと要素そのものを返す
@@ -1691,7 +1691,7 @@ class Arrays
     public static function array_map_method($array, $method, $args = [], $ignore = false)
     {
         if ($ignore === true) {
-            $array = array_filter($array, function ($object) use ($method) {
+            $array = array_filter((arrayval)($array, false), function ($object) use ($method) {
                 return is_callable([$object, $method]);
             });
         }
@@ -1700,7 +1700,7 @@ class Arrays
                 return $object;
             }
             return ([$object, $method])(...$args);
-        }, $array);
+        }, (arrayval)($array, false));
     }
 
     /**
@@ -1725,13 +1725,13 @@ class Arrays
      * assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable[] $callbacks 評価クロージャ配列
      * @return array 評価クロージャを通した新しい配列
      */
     public static function array_maps($array, ...$callbacks)
     {
-        $result = $array;
+        $result = (arrayval)($array, false);
         foreach ($callbacks as $callback) {
             if (is_string($callback) && $callback[0] === '@') {
                 $margs = [];
@@ -1782,7 +1782,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @return array $callback を通した新しい配列
      */
@@ -1814,7 +1814,7 @@ class Arrays
      * assertSame(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'), ['k' => 'a k b v c']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param int|array $n 要素値を入れる引数番目。配列を渡すとキー・値の両方を指定でき、両方が渡ってくる
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
@@ -1879,7 +1879,7 @@ class Arrays
      * assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
@@ -1898,7 +1898,7 @@ class Arrays
      * assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
@@ -1963,7 +1963,7 @@ class Arrays
      * );
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ。(&$carry, $key, $value) を受ける
      * @param mixed $default ループの最初や空の場合に適用される値
      * @return mixed each した結果
@@ -2095,7 +2095,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable[] $rules 分類ルール。[key => callable] 形式
      * @return array 分類された新しい配列
      */
@@ -2137,7 +2137,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback カウントルール。配列も渡せる
      * @return int|array 条件一致した件数
      */
@@ -2197,7 +2197,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable 対象配列
+     * @param iterable 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
@@ -2240,7 +2240,7 @@ class Arrays
      * assertFalse(array_all([false, false]));
      * ```
      *
-     * @param array|\Traversable 対象配列
+     * @param iterable 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が true なら true
@@ -2273,7 +2273,7 @@ class Arrays
      * assertFalse(array_any([false, false]));
      * ```
      *
-     * @param array|\Traversable 対象配列
+     * @param iterable 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が false なら false
@@ -2466,7 +2466,7 @@ class Arrays
      * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
      * ```
      *
-     * @param array|\Traversable[] $variadic 共通項を取る配列（可変引数）
+     * @param iterable[] $variadic 共通項を取る配列（可変引数）
      * @return array 新しい配列
      */
     public static function array_shrink_key(...$variadic)
@@ -2504,12 +2504,13 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $keys キーとなる配列
+     * @param iterable $keys キーとなる配列
      * @param callable $callback 要素のコールバック（引数でキーが渡ってくる）
      * @return array 新しい配列
      */
     public static function array_fill_callback($keys, $callback)
     {
+        $keys = (arrayval)($keys, false);
         return array_combine($keys, array_map((func_user_func_array)($callback), $keys));
     }
 
@@ -2532,7 +2533,7 @@ class Arrays
      * assertSame(array_pickup($array, ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param array $keys 取り出すキー（可変引数）
      * @return array 新しい配列
      */
@@ -2581,7 +2582,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|null $column_key 値となるキー
      * @param string|null $index_key キーとなるキー
      * @return array 新しい配列
@@ -2589,7 +2590,7 @@ class Arrays
     public static function array_lookup($array, $column_key = null, $index_key = null)
     {
         if (func_num_args() === 3) {
-            return array_column($array, $column_key, $index_key);
+            return array_column((arrayval)($array, false), $column_key, $index_key);
         }
 
         // null 対応できないし、php7 からオブジェクトに対応してるらしいので止め。ベタにやる
@@ -2861,7 +2862,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
      * @return array フラット化された配列
      */
@@ -2948,7 +2949,7 @@ class Arrays
      * }
      * ```
      *
-     * @param array|\Traversable $array 対象配列
+     * @param iterable $array 対象配列
      * @param string $delimiter キーの区切り文字
      * @return array 階層化された配列
      */
@@ -3010,8 +3011,8 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array|\Traversable $array1 対象配列1
-     * @param array|\Traversable $array2 対象配列2
+     * @param iterable $array1 対象配列1
+     * @param iterable $array2 対象配列2
      * @param string $delimiter 差分配列のキー区切り文字
      * @return array 差分を表す配列
      */
