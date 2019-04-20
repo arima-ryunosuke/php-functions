@@ -367,10 +367,8 @@ class Utility
                     $this->changed = [];
 
                     // ファイルも消す
-                    if ($this->cachedir !== null) {
-                        foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
-                            unlink($file);
-                        }
+                    foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
+                        unlink($file);
                     }
                 }
             };
@@ -744,7 +742,7 @@ class Utility
         foreach ($traces as $i => $trace) {
             // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）
             if (!isset($trace['file'])) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             $file = $trace['file'];

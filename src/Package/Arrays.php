@@ -21,7 +21,7 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * $nkv = [];
-     * foreach (arrays($array) as $n => list($k, $v)) { // php7.1 以降なら list ではなく [] でも行ける
+     * foreach (arrays($array) as $n => [$k, $v]) {
      *     $nkv[] = "$n,$k,$v";
      * }
      * assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
