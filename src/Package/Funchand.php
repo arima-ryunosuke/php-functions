@@ -892,51 +892,79 @@ class Funchand
 
         // キャッシュ指定有りなら読み込むだけで eval しない
         $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
-        if (file_exists($cachefile)) {
-            require $cachefile;
-            return;
-        }
+        if (!file_exists($cachefile)) {
+            $parts = explode('\\', ltrim($alias, '\\'));
+            $reference = $ref->returnsReference() ? '&' : '';
+            $funcname = $reference . array_pop($parts);
+            $namespace = implode('\\', $parts);
 
-        // 仮引数と実引数の構築
-        $params = [];
-        $args = [];
-        foreach ($ref->getParameters() as $param) {
-            $default = '';
-            if ($param->isOptional()) {
+            $params = (function_parameter)($ref);
+            $prms = implode(', ', array_values($params));
+            $args = implode(', ', array_keys($params));
+            if ($ref->isInternal()) {
+                $args = "array_slice([$args] + func_get_args(), 0, func_num_args())";
+            }
+            else {
+                $args = "[$args]";
+            }
+
+            $code = <<<CODE
+namespace $namespace {
+    function $funcname($prms) {
+        \$return = $reference \\$calllname(...$args);
+        return \$return;
+    }
+}
+CODE;
+            file_put_contents($cachefile, "<?php\n" . $code);
+        }
+        require_once $cachefile;
+    }
+
+    /**
+     * 関数/メソッドの引数定義を取得する
+     *
+     * ほぼ内部向けで外から呼ぶことはあまり想定していない。
+     *
+     * @param \ReflectionFunctionAbstract|callable $eitherReffuncOrCallable 関数/メソッドリフレクション or callable
+     * @return array [引数名 => 引数宣言] の配列
+     */
+    public static function function_parameter($eitherReffuncOrCallable)
+    {
+        $reffunc = $eitherReffuncOrCallable instanceof \ReflectionFunctionAbstract
+            ? $eitherReffuncOrCallable
+            : (reflect_callable)($eitherReffuncOrCallable);
+
+        $result = [];
+        foreach ($reffunc->getParameters() as $parameter) {
+            $declare = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+
+            if ($parameter->isVariadic()) {
+                $declare = '...' . $declare;
+            }
+            elseif ($parameter->isOptional()) {
                 // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
-                if ($param->isDefaultValueAvailable()) {
-                    $defval = var_export($param->getDefaultValue(), true);
+                if ($parameter->isDefaultValueAvailable()) {
+                    // 修飾なしでデフォルト定数が使われているとその名前空間で解決してしまうので場合分けが必要
+                    if ($parameter->isDefaultValueConstant() && strpos($parameter->getDefaultValueConstantName(), '\\') === false) {
+                        $defval = $parameter->getDefaultValueConstantName();
+                    }
+                    else {
+                        $defval = (var_export2)($parameter->getDefaultValue(), true);
+                    }
                 }
                 // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
                 // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
                 else {
                     $defval = 'null';
                 }
-                $default = ' = ' . $defval;
+                $declare .= ' = ' . $defval;
             }
-            $varname = ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
-            $params[] = $varname . $default;
-            $args[] = $varname;
+
+            $name = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+            $result[$name] = $declare;
         }
 
-        $parts = explode('\\', ltrim($alias, '\\'));
-        $reference = $ref->returnsReference() ? '&' : '';
-        $funcname = $reference . array_pop($parts);
-        $namespace = implode('\\', $parts);
-
-        $params = implode(', ', $params);
-        $args = implode(', ', $args);
-
-        $code = <<<CODE
-namespace $namespace {
-    function $funcname($params) {
-        \$return = $reference \\$calllname(...array_slice([$args] + func_get_args(), 0, func_num_args()));
-        return \$return;
-    }
-}
-CODE;
-
-        eval($code);
-        file_put_contents($cachefile, "<?php\n" . $code);
+        return $result;
     }
 }

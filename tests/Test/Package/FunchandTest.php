@@ -646,4 +646,44 @@ class FunchandTest extends AbstractTestCase
         $this->assertException('non-static method', function_alias, [new \Concrete('u'), 'getName'], 'xx');
         $this->assertException('already declared', function_alias, 'implode', 'implode');
     }
+
+    function test_function_parameter()
+    {
+        // reflection
+        $params = (function_parameter)((reflect_callable)(function ($a, &$b, $c = 123, &$d = 456, ...$x) { }));
+        $this->assertSame([
+            '$a'  => '$a',
+            '&$b' => '&$b',
+            '$c'  => '$c = 123',
+            '&$d' => '&$d = 456',
+            '$x'  => '...$x',
+        ], $params);
+
+        // callable
+        $params = (function_parameter)(function ($a, &$b, $c = 123, &$d = 456, ...$x) { });
+        $this->assertSame([
+            '$a'  => '$a',
+            '&$b' => '&$b',
+            '$c'  => '$c = 123',
+            '&$d' => '&$d = 456',
+            '$x'  => '...$x',
+        ], $params);
+
+        // ns\const
+        $params = (function_parameter)(function ($a = PHP_SAPI) { });
+        $this->assertSame([
+            '$a' => '$a = "cli"'
+        ], $params);
+        $params = (function_parameter)(function ($a = \PHP_SAPI) { });
+        $this->assertSame([
+            '$a' => '$a = PHP_SAPI'
+        ], $params);
+
+        // internal
+        $params = (function_parameter)('trim');
+        $this->assertSame([
+            '$str'            => '$str',
+            '$character_mask' => '$character_mask = null'
+        ], $params);
+    }
 }
