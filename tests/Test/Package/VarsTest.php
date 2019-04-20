@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class VarsTest extends \ryunosuke\Test\AbstractTestCase
+class VarsTest extends AbstractTestCase
 {
     function test_stringify()
     {

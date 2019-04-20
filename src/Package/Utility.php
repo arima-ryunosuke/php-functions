@@ -236,13 +236,31 @@ class Utility
     }
 
     /**
+     * 本ライブラリで使用するキャッシュディレクトリを設定する
+     *
+     * @param string|null $dirname キャッシュディレクトリ。省略時は返すのみ
+     * @return string 設定前のキャッシュディレクトリ
+     */
+    public static function cachedir($dirname = null)
+    {
+        static $cachedir;
+        if ($dirname === null) {
+            return $cachedir = $cachedir ?? sys_get_temp_dir();
+        }
+
+        if (!file_exists($dirname)) {
+            @mkdir($dirname, 0777 & (~umask()), true);
+        }
+        $result = $cachedir;
+        $cachedir = realpath($dirname);
+        return $result;
+    }
+
+    /**
      * シンプルにキャッシュする
      *
-     * この関数は get/set を兼ねる。
+     * この関数は get/set/delete を兼ねる。
      * キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。
-     *
-     * 内部キャッシュオブジェクトがあるならそれを使う。その場合リクエストを跨いでキャッシュされる。
-     * 内部キャッシュオブジェクトがないあるいは $use_internal=false なら素の static 変数でキャッシュする。
      *
      * $provider に null を与えるとキャッシュの削除となる。
      *
@@ -262,36 +280,118 @@ class Utility
      * @param string $key キャッシュのキー
      * @param callable $provider キャッシュがない場合にコールされる callable
      * @param string $namespace 名前空間
-     * @param bool $use_internal 内部キャッシュオブジェクトを使うか
      * @return mixed キャッシュ
      */
-    public static function cache($key, $provider, $namespace = null, $use_internal = true)
+    public static function cache($key, $provider, $namespace = null)
     {
-        if ($namespace === null) {
-            $namespace = __FILE__;
+        static $cacheobject;
+        $cacheobject = $cacheobject ?? new class((cachedir)())
+            {
+                const CACHE_EXT = '.php-cache';
+
+                /** @var string キャッシュディレクトリ */
+                private $cachedir;
+
+                /** @var array 内部キャッシュ */
+                private $cache;
+
+                /** @var array 変更感知配列 */
+                private $changed;
+
+                public function __construct($cachedir)
+                {
+                    $this->cachedir = $cachedir;
+                    $this->cache = [];
+                    $this->changed = [];
+                }
+
+                public function __destruct()
+                {
+                    // 変更されているもののみ保存
+                    foreach ($this->changed as $namespace => $dummy) {
+                        $filepath = $this->cachedir . '/' . rawurlencode($namespace) . self::CACHE_EXT;
+                        $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
+
+                        $temppath = tempnam(sys_get_temp_dir(), 'cache');
+                        if (file_put_contents($temppath, $content) !== false) {
+                            @chmod($temppath, 0644);
+                            if (!@rename($temppath, $filepath)) {
+                                @unlink($temppath);
+                            }
+                        }
+                    }
+                }
+
+                public function has($namespace, $key)
+                {
+                    // ファイルから読み込む必要があるので get しておく
+                    $this->get($namespace, $key);
+                    return array_key_exists($key, $this->cache[$namespace]);
+                }
+
+                public function get($namespace, $key)
+                {
+                    // 名前空間自体がないなら作る or 読む
+                    if (!isset($this->cache[$namespace])) {
+                        $nsarray = [];
+                        $cachpath = $this->cachedir . '/' . rawurldecode($namespace) . self::CACHE_EXT;
+                        if (file_exists($cachpath)) {
+                            $nsarray = require $cachpath;
+                        }
+                        $this->cache[$namespace] = $nsarray;
+                    }
+
+                    return $this->cache[$namespace][$key] ?? null;
+                }
+
+                public function set($namespace, $key, $value)
+                {
+                    // 新しい値が来たら変更フラグを立てる
+                    if (!isset($this->cache[$namespace]) || !array_key_exists($key, $this->cache[$namespace]) || $this->cache[$namespace][$key] !== $value) {
+                        $this->changed[$namespace] = true;
+                    }
+
+                    $this->cache[$namespace][$key] = $value;
+                }
+
+                public function delete($namespace, $key)
+                {
+                    $this->changed[$namespace] = true;
+                    unset($this->cache[$namespace][$key]);
+                }
+
+                public function clear()
+                {
+                    // インメモリ情報をクリアして・・・
+                    $this->cache = [];
+                    $this->changed = [];
+
+                    // ファイルも消す
+                    if ($this->cachedir !== null) {
+                        foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
+                            unlink($file);
+                        }
+                    }
+                }
+            };
+
+        // flush (for test)
+        if ($key === null) {
+            $cacheobject = null;
+            return;
         }
 
-        // 内部オブジェクトが使えるなら使う
-        if ($use_internal && class_exists(\ryunosuke\Functions\Cacher::class)) {
-            if ($provider === null) {
-                return \ryunosuke\Functions\Cacher::delete($namespace, $key);
-            }
-            return \ryunosuke\Functions\Cacher::put($namespace, $key, $provider);
-        }
+        $namespace = $namespace ?? __FILE__;
 
-        static $cache = [];
+        $exist = $cacheobject->has($namespace, $key);
         if ($provider === null) {
-            $return = isset($cache[$namespace][$key]);
-            unset($cache[$namespace][$key]);
-            return $return;
+            $cacheobject->delete($namespace, $key);
+            return $exist;
         }
-        if (!isset($cache[$namespace])) {
-            $cache[$namespace] = [];
+        if (!$exist) {
+            $cacheobject->set($namespace, $key, $provider());
         }
-        if (!array_key_exists($key, $cache[$namespace])) {
-            $cache[$namespace][$key] = $provider();
-        }
-        return $cache[$namespace][$key];
+        return $cacheobject->get($namespace, $key);
     }
 
     /**

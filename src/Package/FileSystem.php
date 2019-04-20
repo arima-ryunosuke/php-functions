@@ -629,7 +629,7 @@ class FileSystem
     public static function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
-        $dir = $dir ?: sys_get_temp_dir();
+        $dir = $dir ?: (cachedir)();
         $tempfile = tempnam($dir, $prefix);
 
         // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？

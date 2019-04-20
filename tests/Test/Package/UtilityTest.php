@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class UtilityTest extends \ryunosuke\Test\AbstractTestCase
+class UtilityTest extends AbstractTestCase
 {
     function test_date_interval()
     {
@@ -286,6 +286,15 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
     }
 
+    function test_cachedir()
+    {
+        $tmpdir = sys_get_temp_dir() . '/test';
+        (rm_rf)($tmpdir);
+        $this->assertEquals((path_normalize)(self::TMPDIR . getenv('TEST_TARGET')), (cachedir)($tmpdir));
+        $this->assertEquals((path_normalize)($tmpdir), (cachedir)());
+        $this->assertEquals((path_normalize)($tmpdir), (cachedir)(sys_get_temp_dir()));
+    }
+
     function test_cache()
     {
         $provider = function () {
@@ -306,28 +315,23 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(1, (cache)('test', function () { return 1; }, __FUNCTION__, false));
     }
 
-    function test_cache_internal()
+    function test_cache_object()
     {
-        if (DIRECTORY_SEPARATOR !== '\\') {
-            return;
-        }
+        (cache)(null, null);
+        $value = sha1(uniqid(mt_rand(), true));
 
-        $provider = function () {
-            return sha1(uniqid(mt_rand(), true));
-        };
+        $tmpdir = self::TMPDIR . '/cache_object';
+        (rm_rf)($tmpdir);
+        (cachedir)($tmpdir);
+        (cache)('key', function () use ($value) { return $value; }, 'hoge');
+        (cache)(null, null);
+        $this->assertFileExists("$tmpdir/hoge.php-cache");
+        $this->assertEquals($value, (cache)('key', function () { return 'dummy'; }, 'hoge'));
 
-        // 何度呼んでもキャッシュされるので一致する
-        $current = (cache)('test', $provider, null, true);
-        $this->assertEquals($current, (cache)('test', $provider, null, true));
-        $this->assertEquals($current, (cache)('test', $provider, null, true));
-        $this->assertEquals($current, (cache)('test', $provider, null, true));
-
-        // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
-        $this->assertNotEquals($current, (cache)('test', $provider, __FUNCTION__, true));
-
-        // null を与えると削除される
-        $this->assertTrue((cache)('test', null, __FUNCTION__, true));
-        $this->assertEquals(1, (cache)('test', function () { return 1; }, __FUNCTION__, true));
+        (cache)('key', function () use ($value) { return $value; }, 'fuga');
+        /** @noinspection PhpUndefinedMethodInspection */
+        (reflect_callable)(cache)->getStaticVariables()['cacheobject']->clear();
+        $this->assertFileNotExists("$tmpdir/hoge.php-cache");
     }
 
     function test_process()

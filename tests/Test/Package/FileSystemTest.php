@@ -3,7 +3,7 @@ declare(ticks=1);
 
 namespace ryunosuke\Test\Package;
 
-class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
+class FileSystemTest extends AbstractTestCase
 {
     function test_file_list()
     {

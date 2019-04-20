@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class ArraysTest extends \ryunosuke\Test\AbstractTestCase
+class ArraysTest extends AbstractTestCase
 {
     function test_arrays()
     {

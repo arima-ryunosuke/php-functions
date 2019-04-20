@@ -96,7 +96,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
             return;
         }
 
-        $dir = sys_get_temp_dir() . '/rft';
+        $dir = (cachedir)() . '/' . __FUNCTION__;
         (rm_rf)($dir);
         (mkdir_p)($dir);
 

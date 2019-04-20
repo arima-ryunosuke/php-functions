@@ -871,9 +871,8 @@ class Funchand
      *
      * @param callable $original 元となる関数
      * @param string $alias 関数のエイリアス名
-     * @param string|bool $cachedir キャッシュパス。未指定/falseだとキャッシュされない。true だと一時ディレクトリに書き出す
      */
-    public static function function_alias($original, $alias, $cachedir = false)
+    public static function function_alias($original, $alias)
     {
         // クロージャとか __invoke とかは無理なので例外を投げる
         if (is_object($original)) {
@@ -892,9 +891,8 @@ class Funchand
         }
 
         // キャッシュ指定有りなら読み込むだけで eval しない
-        $cachedir = (ifelse)($cachedir, true, sys_get_temp_dir());
-        $cachefile = $cachedir ? $cachedir . '/' . rawurlencode($calllname . '-' . $alias) . '.php' : null;
-        if ($cachefile && file_exists($cachefile)) {
+        $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
+        if (file_exists($cachefile)) {
             require $cachefile;
             return;
         }
@@ -939,8 +937,6 @@ namespace $namespace {
 CODE;
 
         eval($code);
-        if ($cachefile) {
-            file_put_contents($cachefile, "<?php\n" . $code);
-        }
+        file_put_contents($cachefile, "<?php\n" . $code);
     }
 }

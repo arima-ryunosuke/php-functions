@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
+class ClassobjTest extends AbstractTestCase
 {
     function test_stdclass()
     {

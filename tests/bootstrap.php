@@ -3,9 +3,6 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/classes.php';
 
-\ryunosuke\Functions\Cacher::initialize(new \ryunosuke\Functions\FileCache(__DIR__ . '/temporary'));
-\ryunosuke\Functions\Cacher::clear();
-
 // Windows 用にダミーで apache(48)/mysql(27) を固定で返す
 if (!function_exists('posix_getuid')) {
     function posix_getuid() { return 48; }
