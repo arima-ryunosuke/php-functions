@@ -112,6 +112,86 @@ class ClassobjTest extends AbstractTestCase
         $this->assertEquals('this is D', $classD->newMethod());
     }
 
+    function test_class_extends()
+    {
+        (rm_rf)(self::TMPDIR . getenv('TEST_TARGET'), false);
+        require_once __DIR__ . '/Classobj/extends.php';
+        $original = new \ryunosuke\Test\Package\Classobj\ClassExtends();
+        /** @var \ryunosuke\Test\Package\Classobj\ClassExtends $object */
+        $object = (class_extends)($original, [
+            'hoge'       => function ($arg) {
+                /** @noinspection PhpUndefinedMethodInspection */
+                return [
+                    'this'   => $this,
+                    'method' => $this->privateMethod(),
+                    'arg'    => $arg,
+                ];
+            },
+            'staticHoge' => static function ($arg) {
+                /** @noinspection PhpUndefinedMethodInspection */
+                return [
+                    'self'   => get_called_class(),
+                    'method' => self::staticMethod(),
+                    'arg'    => $arg,
+                ];
+            },
+        ], [
+            'fuga' => 'dummy',
+        ]);
+
+        $this->assertEquals('dummy', $object->fuga);
+        $object->fuga = 'dummy2';
+        $this->assertEquals('dummy2', $object->fuga);
+        $object->piyo = 'dummy3';
+        /** @noinspection PhpUndefinedFieldInspection */
+        {
+            $this->assertEquals('dummy3', $object->piyo);
+            $this->assertEquals('dummy3', $original->piyo);
+            $original->piyo = 'dummy4';
+            $this->assertEquals('dummy4', $object->piyo);
+            $this->assertEquals('dummy4', $original->piyo);
+        }
+
+        $object->setFields('a', 'b', 'c', 'd');
+        $result = $object->hoge(9);
+        $this->assertInstanceOf(\ryunosuke\Test\Package\Classobj\ClassExtends::class, $result['this']);
+        $this->assertEquals('private:a', $result['method']);
+        $this->assertEquals(9, $result['arg']);
+
+        $object->setFields('A1', 'B', 'C', 'D');
+        $this->assertEquals('public:A1', $original->publicMethod());
+        $original->setFields('A2', 'B', 'C', 'D');
+        $this->assertEquals('public:A2', $object->publicMethod());
+
+        $object::$staticfield = 'foo';
+        $this->assertEquals('static:foo', $object::staticMethod());
+        /** @noinspection PhpUndefinedMethodInspection */
+        $this->assertEquals([
+            'self'   => 'ryunosuke\Test\Package\Classobj\ClassExtends',
+            'method' => 'static:foo',
+            'arg'    => 123,
+        ], $object::staticHoge(123));
+
+        $original::$staticfield = 'bar';
+        $this->assertEquals('static:bar', $object::staticMethod());
+        /** @noinspection PhpUndefinedMethodInspection */
+        $this->assertEquals([
+            'self'   => 'ryunosuke\Test\Package\Classobj\ClassExtends',
+            'method' => 'static:bar',
+            'arg'    => 123,
+        ], $object::staticHoge(123));
+
+        // internal
+        $e = (class_extends)(new \Exception('message', 123), [
+            'codemessage' => function () {
+                /** @noinspection PhpUndefinedFieldInspection */
+                return $this->code . ':' . $this->message;
+            },
+        ]);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $this->assertEquals('123:message', $e->codemessage());
+    }
+
     function test_object_dive()
     {
         $class = (stdclass)([

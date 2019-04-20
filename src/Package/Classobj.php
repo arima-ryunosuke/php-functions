@@ -287,6 +287,155 @@ class Classobj
     }
 
     /**
+     * インスタンスを動的に拡張する
+     *
+     * インスタンスに特異メソッド・特異フィールドのようなものを生やす。
+     * ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。
+     * そのクラスの __set/__get が禁止されている場合に使えるかもしれない程度。
+     *
+     * クロージャ配列を渡すと特異メソッドになる。
+     * そのクロージャの $this は元オブジェクトで bind される。
+     * ただし、static closure を渡した場合はそれは static メソッドとして扱われる。
+     *
+     * 内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。
+     * 当然ながら final クラスの拡張もできない。
+     *
+     * Example:
+     * ```php
+     * // Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
+     * $object = new \Exception('hoge', 123);
+     * $newobject = class_extends($object, [
+     *     'codemessage' => function() {
+     *         // bind されるので protected フィールドが使える
+     *         return $this->code . ':' . $this->message;
+     *     },
+     * ]);
+     * assertSame($newobject->codemessage(), '123:hoge');
+     * ```
+     *
+     * @param string $object 対象オブジェクト
+     * @param \Closure[] $methods 注入するメソッド
+     * @param array $fields 注入するフィールド
+     * @return object $object を拡張した object
+     */
+    public static function class_extends($object, $methods, $fields = [])
+    {
+        static $template_source, $template_reflection;
+        if (!isset($template_source)) {
+            // コード補完やフォーマッタを効かせたいので文字列 eval ではなく直に new する（1回だけだし）
+            // @codeCoverageIgnoreStart
+            $template_reflection = new \ReflectionClass(
+                new class()
+                {
+                    private static $__originalClass;
+                    private        $__original;
+                    private        $__fields;
+                    private        $__methods;
+                    private static $__staticMethods = [];
+
+                    public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
+                    {
+                        if ($refclass === null) {
+                            return;
+                        }
+                        self::$__originalClass = get_class($original);
+
+                        $this->__original = $original;
+                        $this->__fields = $fields;
+
+                        foreach ($methods as $name => $method) {
+                            $method = \Closure::fromCallable($method);
+                            $bmethod = @$method->bindTo($this->__original, $refclass->isInternal() ? $this : $this->__original);
+                            // 内部クラスは $this バインドできないので original じゃなく自身にする
+                            if ($bmethod) {
+                                $this->__methods[$name] = $bmethod;
+                            }
+                            else {
+                                self::$__staticMethods[$name] = $method->bindTo(null, self::$__originalClass);
+                            }
+                        }
+                    }
+
+                    public function __get($name)
+                    {
+                        if (array_key_exists($name, $this->__fields)) {
+                            return $this->__fields[$name];
+                        }
+                        return $this->__original->$name;
+                    }
+
+                    public function __set($name, $value)
+                    {
+                        if (array_key_exists($name, $this->__fields)) {
+                            return $this->__fields[$name] = $value;
+                        }
+                        return $this->__original->$name = $value;
+                    }
+
+                    public function __call($name, $arguments)
+                    {
+                        if (array_key_exists($name, $this->__methods)) {
+                            return $this->__methods[$name](...$arguments);
+                        }
+                        return $this->__original->$name(...$arguments);
+                    }
+
+                    public static function __callStatic($name, $arguments)
+                    {
+                        if (array_key_exists($name, self::$__staticMethods)) {
+                            return (self::$__staticMethods)[$name](...$arguments);
+                        }
+                        return self::$__originalClass::$name(...$arguments);
+                    }
+                }
+            );
+            // @codeCoverageIgnoreEnd
+            $sl = $template_reflection->getStartLine();
+            $el = $template_reflection->getEndLine();
+            $template_source = implode("", array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1));
+        }
+
+        /** @var \ReflectionClass[][] $spawners */
+        static $spawners = [];
+
+        $classname = get_class($object);
+        if (!isset($spawners[$classname])) {
+            $classalias = str_replace('\\', '__', $classname);
+
+            $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            if (!file_exists($cachefile)) {
+                $declares = [];
+                foreach ((new \ReflectionClass($classname))->getMethods() as $method) {
+                    if (!$method->isFinal() && !$method->isAbstract()) {
+                        if (!in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
+                            $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
+                            $name = $method->getName();
+                            $reference = $method->returnsReference() ? '&' : '';
+                            $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+
+                            $params = (function_parameter)($method);
+                            $prms = implode(', ', $params);
+                            $args = implode(', ', array_keys($params));
+                            $declares[] = "$modifier function $reference$name($prms) {
+                                \$return = $reference $receiver$name(...[$args]);
+                                return \$return;
+                            }";
+                        }
+                    }
+                }
+                $code = "class X$classalias extends $classname$template_source" . implode("\n", $declares) . '}';
+                file_put_contents($cachefile, "<?php\n" . $code, LOCK_EX);
+            }
+            require_once $cachefile;
+            $spawners[$classname] = [
+                'original'   => new \ReflectionClass($classname),
+                'reflection' => new \ReflectionClass("X$classalias"),
+            ];
+        }
+        return $spawners[$classname]['reflection']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
+    }
+
+    /**
      * パス形式でプロパティ値を取得
      *
      * 存在しない場合は $default を返す。
