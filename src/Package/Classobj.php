@@ -105,15 +105,12 @@ class Classobj
     public static function class_loader($startdir = null)
     {
         $file = (cache)('path', function () use ($startdir) {
-            $dir = $startdir ?: __DIR__;
-            while ($dir !== ($pdir = dirname($dir))) {
-                $dir = $pdir;
+            $cache = (dirname_r)($startdir ?: __DIR__, function ($dir) {
                 if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
-                    $cache = $file;
-                    break;
+                    return $file;
                 }
-            }
-            if (!isset($cache)) {
+            });
+            if (!$cache) {
                 throw new \DomainException('autoloader is not found.');
             }
             return $cache;
