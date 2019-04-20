@@ -283,7 +283,7 @@ class Classobj
             }
 
             $newclass = "\\$origspace\\{$origclass}_";
-            eval("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
+            (evaluate)("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
         }
 
         class_alias($newclass, $class);

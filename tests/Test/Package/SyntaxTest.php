@@ -4,6 +4,157 @@ namespace ryunosuke\Test\Package;
 
 class SyntaxTest extends AbstractTestCase
 {
+    function test_evaluate()
+    {
+        $tmpdir = self::TMPDIR . getenv('TEST_TARGET');
+        (rm_rf)($tmpdir, false);
+        $this->assertEquals(1, (evaluate)('return $x * $x;', ['x' => 1]));
+        $this->assertEquals(4, (evaluate)('return $x * $x;', ['x' => 2]));
+        $this->assertEquals(9, (evaluate)('return $x * $x;', ['x' => 3]));
+        // 短すぎするのでキャッシュはされない
+        $this->assertCount(0, glob("$tmpdir/*.php"));
+
+        $this->assertIsObject((evaluate)('
+return new class($x)
+{
+    private $var1;
+    private $var2;
+
+    public function method1($arg)
+    {
+        if ($arg) {
+            return true;
+        }
+        return $arg;
+    }
+
+    public function method2($arg)
+    {
+        if (!$arg) {
+            return true;
+        }
+        return $arg;
+    }
+};
+', ['x' => 3]));
+        // ある程度長ければキャッシュされる
+        $this->assertCount(1, glob("$tmpdir/*.php"));
+
+        $this->assertException(new \ParseError(<<<ERR
+on line 14
+ERR
+        ), evaluate, '
+return new class()
+{
+    private $var1;
+    private $var2;
+
+    public function method1($arg)
+    {
+        if ($arg) {
+            return true;
+        }
+        return $arg;
+    }
+syntax error
+    public function method2($arg)
+    {
+        if (!$arg) {
+            return true;
+        }
+        return $arg;
+    }
+};
+');
+
+        $this->assertException(new \ParseError(<<<ERR
+>>> syntax error
+ERR
+        ), evaluate, 'syntax error');
+
+        $this->assertException(new \ParseError(<<<ERR
+// 01
+>>> syntax error // 02
+// 03
+// 04
+// 05
+// 06
+// 07
+ERR
+        ), evaluate, <<<PHP
+// 01
+syntax error // 02
+// 03
+// 04
+// 05
+// 06
+// 07
+// 08
+// 09
+// 10
+// 11
+// 12
+// 13
+PHP
+        );
+
+        $this->assertException(new \ParseError(<<<ERR
+// 07
+// 08
+// 09
+// 10
+// 11
+>>> syntax error // 12
+// 13
+ERR
+        ), evaluate, <<<PHP
+// 01
+// 02
+// 03
+// 04
+// 05
+// 06
+// 07
+// 08
+// 09
+// 10
+// 11
+syntax error // 12
+// 13
+PHP
+        );
+
+        $this->assertException(new \ParseError(<<<ERR
+// 02
+// 03
+// 04
+// 05
+// 06
+>>> syntax error // 07
+// 08
+// 09
+// 10
+// 11
+// 12
+ERR
+        ), evaluate, <<<PHP
+// 01
+// 02
+// 03
+// 04
+// 05
+// 06
+syntax error // 07
+// 08
+// 09
+// 10
+// 11
+// 12
+// 13
+PHP
+        );
+    }
+
     function test_parse_php()
     {
         $code = 'a(123);';

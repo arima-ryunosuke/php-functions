@@ -29,7 +29,7 @@ class AbstractTestCase extends TestCase
         try {
             $callback(...$args);
         }
-        catch (\Exception $ex) {
+        catch (\Throwable $ex) {
             // 型は常に判定
             self::assertInstanceOf(get_class($e), $ex, $message);
             // コードは指定されていたときのみ

@@ -11,6 +11,73 @@ class Syntax
     const TOKEN_NAME = 2;
 
     /**
+     * eval のプロキシ関数
+     *
+     * 一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。
+     * また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。
+     *
+     * 関数化してる以上 eval におけるコンテキストの引き継ぎはできない。
+     * ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。
+     *
+     * 短いステートメントだと opcode が少ないのでファイルを経由せず直接 eval したほうが速いことに留意。
+     * 一応内部で振り分けるようにはしてある。
+     *
+     * Example:
+     * ```php
+     * $a = 1;
+     * $b = 2;
+     * $phpcode = ';
+     * $c = $a + $b;
+     * return $c * 3;
+     * ';
+     * assertSame(evaluate($phpcode, get_defined_vars()), 9);
+     * ```
+     *
+     * @param string $phpcode 実行する php コード
+     * @param array $contextvars コンテキスト変数配列
+     * @return mixed eval の return 値
+     */
+    public static function evaluate($phpcode, $contextvars = [])
+    {
+        $cachefile = null;
+        if (strlen($phpcode) >= 256) {
+            $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+            if (!file_exists($cachefile)) {
+                file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
+            }
+        }
+
+        try {
+            if ($cachefile) {
+                return (static function () {
+                    extract(func_get_arg(1));
+                    return require func_get_arg(0);
+                })($cachefile, $contextvars);
+            }
+            else {
+                return (static function () {
+                    extract(func_get_arg(1));
+                    return eval(func_get_arg(0));
+                })($phpcode, $contextvars);
+            }
+        }
+        catch (\ParseError $ex) {
+            $errline = $ex->getLine();
+            $errline_1 = $errline - 1;
+            $codes = preg_split('#\\R#u', $phpcode);
+            $codes[$errline_1] = '>>> ' . $codes[$errline_1];
+
+            $N = 5; // 前後の行数
+            $message = $ex->getMessage();
+            $message .= "\n" . implode("\n", array_slice($codes, max(0, $errline_1 - $N), $N * 2 + 1));
+            if ($cachefile) {
+                $message .= "\n in " . realpath($cachefile) . " on line " . $errline . "\n";
+            }
+            throw new \ParseError($message, $ex->getCode(), $ex);
+        }
+    }
+
+    /**
      * php のコード断片をパースする
      *
      * 結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。
