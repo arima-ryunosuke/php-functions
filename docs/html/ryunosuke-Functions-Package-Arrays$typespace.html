@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3072" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3077" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
@@ -108,7 +108,7 @@ assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -269,7 +269,7 @@ assertSame(first_key([], 999), 999);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -327,7 +327,7 @@ assertSame(first_value([], 999), 999);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -385,7 +385,7 @@ assertSame(first_keyvalue([], 999), 999);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -443,7 +443,7 @@ assertSame(last_key([], 999), 999);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -501,7 +501,7 @@ assertSame(last_value([], 999), 999);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -559,7 +559,7 @@ assertSame(last_keyvalue([], 999), 999);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -913,7 +913,7 @@ assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr>string</td>
+				<td class="type">iterable<span class="type-separator"></span><wbr>string</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -1221,7 +1221,7 @@ assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr>string</td>
+				<td class="type">iterable<span class="type-separator"></span><wbr>string</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -1294,7 +1294,7 @@ assertSame(array_sprintf([
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -1363,7 +1363,7 @@ assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', '
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -1842,7 +1842,7 @@ assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1121-L1200" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1121-L1204" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_unset()" tabindex="-1" class="structure-title ">
                         array_unset						<small>(&amp;$array, $key, $default = null)</small>
@@ -1851,6 +1851,7 @@ assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' 
 						<div class="description"><p>伏せると同時にその値を返す</p>
 <p>$key に配列を与えると全て伏せて配列で返す。<br />
 その場合、$default が活きるのは「全て無かった場合」となる。</p>
+<p>さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。</p>
 <p>配列を与えた場合の返り値は与えた配列の順番・キーが活きる。<br />
 これを利用すると list の展開の利便性が上がったり、連想配列で返すことができる。</p>
 <p>同様に、$key にクロージャを与えると、その返り値が true 相当のものを伏せて配列で返す。<br />
@@ -1929,7 +1930,7 @@ assertSame($array, ['piyo' =&gt; 'PIYO']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1202-L1241" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1206-L1245" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_dive()" tabindex="-1" class="structure-title ">
                         array_dive						<small>($array, $path, $default = null, $delimiter = &#039;.&#039;)</small>
@@ -2008,7 +2009,7 @@ assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1243-L1296" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1247-L1300" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_keys_exist()" tabindex="-1" class="structure-title ">
                         array_keys_exist						<small>($keys, $array)</small>
@@ -2073,7 +2074,7 @@ assertTrue(array_keys_exist(['a', 'x' =&gt; ['x1', 'x2']], ['a' =&gt; 'A', 'x' =
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1298-L1336" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1302-L1340" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_find()" tabindex="-1" class="structure-title ">
                         array_find						<small>($array, $callback, $is_key = true)</small>
@@ -2097,7 +2098,7 @@ assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>調べる配列</p>
 </td>
@@ -2144,7 +2145,7 @@ assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1338-L1362" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1342-L1366" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_grep_key()" tabindex="-1" class="structure-title ">
                         array_grep_key						<small>($array, $regex, $not = false)</small>
@@ -2160,7 +2161,7 @@ assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2207,7 +2208,7 @@ assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1364-L1427" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1368-L1431" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_recursive()" tabindex="-1" class="structure-title ">
                         array_map_recursive						<small>($array, $callback, $iterable = true)</small>
@@ -2255,7 +2256,7 @@ assertSame(array_map_recursive([
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2302,7 +2303,7 @@ assertSame(array_map_recursive([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1429-L1454" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1433-L1458" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_key()" tabindex="-1" class="structure-title ">
                         array_map_key						<small>($array, $callback)</small>
@@ -2319,7 +2320,7 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2360,7 +2361,7 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1456-L1473" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1460-L1477" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_not()" tabindex="-1" class="structure-title ">
                         array_filter_not						<small>($array, $callback)</small>
@@ -2376,7 +2377,7 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2417,7 +2418,7 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1475-L1500" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1479-L1504" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_key()" tabindex="-1" class="structure-title ">
                         array_filter_key						<small>($array, $callback)</small>
@@ -2435,7 +2436,7 @@ assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== '
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2476,7 +2477,7 @@ assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== '
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1502-L1520" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1506-L1524" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_eval()" tabindex="-1" class="structure-title ">
                         array_filter_eval						<small>($array, $expression)</small>
@@ -2493,7 +2494,7 @@ assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&g
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2534,7 +2535,7 @@ assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1522-L1627" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1526-L1631" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_where()" tabindex="-1" class="structure-title ">
                         array_where						<small>($array, $column = null, $callback = null)</small>
@@ -2590,7 +2591,7 @@ assertSame(array_where($array, [
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2637,7 +2638,7 @@ assertSame(array_where($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1629-L1659" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1633-L1663" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_filter()" tabindex="-1" class="structure-title ">
                         array_map_filter						<small>($array, $callback, $strict = false)</small>
@@ -2656,7 +2657,7 @@ assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2703,7 +2704,7 @@ assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1661-L1700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1665-L1704" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_method()" tabindex="-1" class="structure-title ">
                         array_map_method						<small>($array, $method, $args = [], $ignore = false)</small>
@@ -2729,7 +2730,7 @@ assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), [
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2782,7 +2783,7 @@ assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1702-L1754" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1706-L1758" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_maps()" tabindex="-1" class="structure-title ">
                         array_maps						<small>($array, ...$callbacks)</small>
@@ -2809,7 +2810,7 @@ assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage')
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2850,7 +2851,7 @@ assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage')
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1756-L1795" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1760-L1799" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_kmap()" tabindex="-1" class="structure-title ">
                         array_kmap						<small>($array, $callback)</small>
@@ -2882,7 +2883,7 @@ assertSame(array_kmap([
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2923,7 +2924,7 @@ assertSame(array_kmap([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1797-L1867" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1801-L1871" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nmap()" tabindex="-1" class="structure-title ">
                         array_nmap						<small>($array, $callback, $n, ...$variadic)</small>
@@ -2945,7 +2946,7 @@ assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -2998,7 +2999,7 @@ assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1869-L1886" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1873-L1890" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lmap()" tabindex="-1" class="structure-title ">
                         array_lmap						<small>($array, $callback, ...$variadic)</small>
@@ -3014,7 +3015,7 @@ assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -3061,7 +3062,7 @@ assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1888-L1905" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1892-L1909" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_rmap()" tabindex="-1" class="structure-title ">
                         array_rmap						<small>($array, $callback, ...$variadic)</small>
@@ -3077,7 +3078,7 @@ assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -3124,7 +3125,7 @@ assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1907-L1986" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1911-L1990" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_each()" tabindex="-1" class="structure-title ">
                         array_each						<small>($array, $callback, $default = null)</small>
@@ -3183,7 +3184,7 @@ assertSame(
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -3230,7 +3231,7 @@ assertSame(
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1988-L2031" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1992-L2035" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_depth()" tabindex="-1" class="structure-title ">
                         array_depth						<small>($array, $max_depth = null)</small>
@@ -3292,7 +3293,7 @@ assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2033-L2063" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2037-L2067" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_insert()" tabindex="-1" class="structure-title ">
                         array_insert						<small>($array, $value, $position = null)</small>
@@ -3360,7 +3361,7 @@ assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2065-L2110" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2069-L2114" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_assort()" tabindex="-1" class="structure-title ">
                         array_assort						<small>($array, $rules)</small>
@@ -3394,7 +3395,7 @@ assertSame(array_assort(['1', '2', '3'], [
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -3435,7 +3436,7 @@ assertSame(array_assort(['1', '2', '3'], [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2112-L2164" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2116-L2168" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_count()" tabindex="-1" class="structure-title ">
                         array_count						<small>($array, $callback)</small>
@@ -3466,7 +3467,7 @@ assertSame(array_count($array, [
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -3507,7 +3508,7 @@ assertSame(array_count($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2166-L2225" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2170-L2229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_group()" tabindex="-1" class="structure-title ">
                         array_group						<small>($array, $callback = null, $preserve_keys = false)</small>
@@ -3589,7 +3590,7 @@ assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2227-L2258" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2231-L2262" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_all()" tabindex="-1" class="structure-title ">
                         array_all						<small>($array, $callback = null, $default = true)</small>
@@ -3653,7 +3654,7 @@ assertFalse(array_all([false, false]));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2260-L2291" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2264-L2295" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_any()" tabindex="-1" class="structure-title ">
                         array_any						<small>($array, $callback = null, $default = false)</small>
@@ -3717,7 +3718,7 @@ assertFalse(array_any([false, false]));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2293-L2425" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2297-L2429" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_order()" tabindex="-1" class="structure-title ">
                         array_order						<small>($array, $orders, $preserve_keys = false)</small>
@@ -3794,7 +3795,7 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2427-L2448" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2431-L2452" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shuffle()" tabindex="-1" class="structure-title ">
                         array_shuffle						<small>($array)</small>
@@ -3844,7 +3845,7 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2450-L2478" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2454-L2482" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" tabindex="-1" class="structure-title ">
                         array_shrink_key						<small>(...$variadic)</small>
@@ -3865,7 +3866,7 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a>[]</td>
+				<td class="type">iterable[]</td>
 				<td class="rest">...$variadic</td>
 				<td class="desc"><p>共通項を取る配列（可変引数）</p>
 </td>
@@ -3900,7 +3901,7 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2480-L2510" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2484-L2515" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_callback()" tabindex="-1" class="structure-title ">
                         array_fill_callback						<small>($keys, $callback)</small>
@@ -3929,7 +3930,7 @@ assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v));
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$keys</td>
 				<td class="desc"><p>キーとなる配列</p>
 </td>
@@ -3970,7 +3971,7 @@ assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2512-L2555" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2517-L2560" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pickup()" tabindex="-1" class="structure-title ">
                         array_pickup						<small>($array, $keys)</small>
@@ -3994,7 +3995,7 @@ assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; '
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -4035,7 +4036,7 @@ assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; '
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2557-L2610" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2562-L2615" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lookup()" tabindex="-1" class="structure-title ">
                         array_lookup						<small>($array, $column_key = null, $index_key = null)</small>
@@ -4064,7 +4065,7 @@ assertSame(array_lookup($array, 'name'), [
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -4111,7 +4112,7 @@ assertSame(array_lookup($array, 'name'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2612-L2647" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2617-L2652" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_columns()" tabindex="-1" class="structure-title ">
                         array_columns						<small>($array, $column_keys = null, $index_key = null)</small>
@@ -4179,7 +4180,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2649-L2691" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2654-L2696" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" tabindex="-1" class="structure-title ">
                         array_uncolumns						<small>($array, $template = null)</small>
@@ -4243,7 +4244,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2693-L2816" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2698-L2821" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_convert()" tabindex="-1" class="structure-title ">
                         array_convert						<small>($array, $callback, $apply_array = false)</small>
@@ -4345,7 +4346,7 @@ assertSame(array_convert($array, $callback, true), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2818-L2893" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2823-L2898" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_flatten()" tabindex="-1" class="structure-title ">
                         array_flatten						<small>($array, $delimiter = null)</small>
@@ -4393,7 +4394,7 @@ assertSame(array_flatten($array, '.'), [
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -4434,7 +4435,7 @@ assertSame(array_flatten($array, '.'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2895-L2969" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2900-L2974" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
                         array_nest						<small>($array, $delimiter = &#039;.&#039;)</small>
@@ -4491,7 +4492,7 @@ catch (\Exception $e) {
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
@@ -4532,7 +4533,7 @@ catch (\Exception $e) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2971-L3071" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2976-L3076" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_difference()" tabindex="-1" class="structure-title ">
                         array_difference						<small>($array1, $array2, $delimiter = &#039;.&#039;)</small>
@@ -4575,13 +4576,13 @@ assertSame(array_difference([
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array1</td>
 				<td class="desc"><p>対象配列1</p>
 </td>
 			</tr>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a></td>
+				<td class="type">iterable</td>
 				<td class="rest">$array2</td>
 				<td class="desc"><p>対象配列2</p>
 </td>

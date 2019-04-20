@@ -25,10 +25,10 @@ class Classobj
      * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
      * ```
      *
-     * @param array|\Traversable $fields フィールド配列
+     * @param iterable $fields フィールド配列
      * @return \stdClass 生成した stdClass インスタンス
      */
-    public static function stdclass($fields = [])
+    public static function stdclass(iterable $fields = [])
     {
         $stdclass = new \stdClass();
         foreach ($fields as $key => $value) {
@@ -218,10 +218,9 @@ class Classobj
      * ```
      *
      * @param string $class 対象クラス名
-     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列。「返せる」のは php7.0 以降のみ
-     * @param string $dirname 一時ファイル書き出しディレクトリ。指定すると実質的にキャッシュとして振る舞う
+     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
      */
-    public static function class_replace($class, $register, $dirname = null)
+    public static function class_replace($class, $register)
     {
         $class = ltrim($class, '\\');
 
@@ -232,7 +231,7 @@ class Classobj
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
         $classfile = (class_loader)()->findFile($class);
-        $fname = rtrim(($dirname ?: sys_get_temp_dir()), '/\\') . '/' . str_replace('\\', '/', $class) . '.php';
+        $fname = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
         if (func_num_args() === 2 || !file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);

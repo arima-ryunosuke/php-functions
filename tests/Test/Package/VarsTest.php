@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class VarsTest extends \ryunosuke\Test\AbstractTestCase
+class VarsTest extends AbstractTestCase
 {
     function test_stringify()
     {
@@ -182,13 +182,6 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertException('too large or small', si_prefix, pow(10, 30));
     }
 
-    function test_si_prefix_regression()
-    {
-        $this->assertEquals('1.001 k', (si_prefix)("1001"));
-        $this->assertEquals('X1.001 kX', (si_prefix)("1001", 'X%.3f %sX'));
-        $this->assertEquals([1.001, 'k'], (si_prefix)("1001", null));
-    }
-
     function test_si_unprefix()
     {
         $units = [
@@ -258,36 +251,6 @@ class VarsTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertNotSame(empty('0'), $is_empty('0'));
         $this->assertNotSame(empty($xmlelem2), $is_empty($xmlelem2));
         $this->assertNotSame(empty($arrayo2), $is_empty($arrayo2));
-    }
-
-    function test_is_empty_compatible()
-    {
-        $stdclass = new \stdClass();
-        $arrayo1 = new \ArrayObject([1]);
-        $arrayo2 = new \ArrayObject([]);
-        $xmlelem1 = new \SimpleXMLElement('<foo>1</foo>');
-        $xmlelem2 = new \SimpleXMLElement('<foo></foo>');
-        // この辺は empty と全く同じ（true）
-        $this->assertSame(empty(null), (is_empty)(null));
-        $this->assertSame(empty(false), (is_empty)(false));
-        $this->assertSame(empty(0), (is_empty)(0));
-        $this->assertSame(empty(0.0), (is_empty)(0.0));
-        $this->assertSame(empty(''), (is_empty)(''));
-        $this->assertSame(empty([]), (is_empty)([]));
-        // この辺は empty と全く同じ（false）
-        $this->assertSame(empty($stdclass), (is_empty)($stdclass));
-        $this->assertSame(empty($arrayo1), (is_empty)($arrayo1));
-        $this->assertSame(empty($arrayo2), (is_empty)($arrayo2));
-        $this->assertSame(empty($xmlelem1), (is_empty)($xmlelem1));
-        $this->assertSame(empty(true), (is_empty)(true));
-        $this->assertSame(empty(1), (is_empty)(1));
-        $this->assertSame(empty(1.0), (is_empty)(1.0));
-        $this->assertSame(empty('0.0'), (is_empty)('0.0'));
-        $this->assertSame(empty('00'), (is_empty)('00'));
-        $this->assertSame(empty([1]), (is_empty)([1]));
-        // この辺は差異がある
-        $this->assertNotSame(empty('0'), (is_empty)('0'));
-        $this->assertNotSame(empty($xmlelem2), (is_empty)($xmlelem2));
     }
 
     function test_is_primitive()

@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class SyntaxTest extends \ryunosuke\Test\AbstractTestCase
+class SyntaxTest extends AbstractTestCase
 {
     function test_parse_php()
     {

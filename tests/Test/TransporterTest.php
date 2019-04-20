@@ -96,7 +96,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
             return;
         }
 
-        $dir = sys_get_temp_dir() . '/rft';
+        $dir = (cachedir)() . '/' . __FUNCTION__;
         (rm_rf)($dir);
         (mkdir_p)($dir);
 
@@ -160,5 +160,34 @@ DUMMY
         $this->assertContains('callable_code', $contents);    // 自分自身が含まれている
         $this->assertContains('const TOKEN_NAME', $contents); // 依存している定数が含まれている
         $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
+    }
+
+    function test_parseSymbol()
+    {
+        $refmethod = new \ReflectionMethod(Transporter::class, 'parseSymbol');
+        $refmethod->setAccessible(true);
+
+        $symbols = $refmethod->invoke(null, true);
+        $this->assertEquals([
+            'constant',
+            'function',
+            'phpblock',
+        ], array_keys($symbols));
+    }
+
+    function test_exportVar()
+    {
+        $refmethod = new \ReflectionMethod(Transporter::class, 'exportVar');
+        $refmethod->setAccessible(true);
+
+        $this->assertEquals('123', $refmethod->invoke(null, 123));
+        $this->assertEquals('"hoge"', $refmethod->invoke(null, 'hoge'));
+        $this->assertEquals('["a"]', $refmethod->invoke(null, ['a']));
+        $this->assertEquals('[
+    ["a"],
+]', $refmethod->invoke(null, [['a']]));
+        $this->assertEquals('[
+    "a" => "A",
+]', $refmethod->invoke(null, ['a' => 'A']));
     }
 }

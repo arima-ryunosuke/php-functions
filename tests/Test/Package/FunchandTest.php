@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class FunchandTest extends \ryunosuke\Test\AbstractTestCase
+class FunchandTest extends AbstractTestCase
 {
     function test_nbind()
     {
@@ -284,7 +284,7 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
 
         $code = (callable_code)([$this, 'createResult']);
         $this->assertEquals([
-            'function createResult()',
+            'function createResult(): TestResult',
             '{
         return new TestResult;
     }',
@@ -638,16 +638,6 @@ class FunchandTest extends \ryunosuke\Test\AbstractTestCase
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedFunctionInspection */
             $this->assertEquals('X', \O\trim4('aXa', 'a'));
-
-            // キャッシュ
-            $cachedir = sys_get_temp_dir() . '/rf-fa';
-            (mkdir_p)($cachedir);
-            (rm_rf)($cachedir, false);
-            file_put_contents("$cachedir/trim-trim000.php", '<?php function trim000(){return "000";}');
-            (function_alias)('trim', 'trim000', $cachedir);
-            (function_alias)('trim', 'trim998', $cachedir);
-            (function_alias)('FA\\_trim', 'trim999', $cachedir);
-            $this->assertEquals('000', trim000());
         }
 
         // 例外

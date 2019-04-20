@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class UtilityTest extends \ryunosuke\Test\AbstractTestCase
+class UtilityTest extends AbstractTestCase
 {
     function test_date_interval()
     {
@@ -286,6 +286,15 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         ], $actual);
     }
 
+    function test_cachedir()
+    {
+        $tmpdir = sys_get_temp_dir() . '/test';
+        (rm_rf)($tmpdir);
+        $this->assertEquals((path_normalize)(self::TMPDIR . getenv('TEST_TARGET')), (cachedir)($tmpdir));
+        $this->assertEquals((path_normalize)($tmpdir), (cachedir)());
+        $this->assertEquals((path_normalize)($tmpdir), (cachedir)(sys_get_temp_dir()));
+    }
+
     function test_cache()
     {
         $provider = function () {
@@ -306,28 +315,23 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals(1, (cache)('test', function () { return 1; }, __FUNCTION__, false));
     }
 
-    function test_cache_internal()
+    function test_cache_object()
     {
-        if (DIRECTORY_SEPARATOR !== '\\') {
-            return;
-        }
+        (cache)(null, null);
+        $value = sha1(uniqid(mt_rand(), true));
 
-        $provider = function () {
-            return sha1(uniqid(mt_rand(), true));
-        };
+        $tmpdir = self::TMPDIR . '/cache_object';
+        (rm_rf)($tmpdir);
+        (cachedir)($tmpdir);
+        (cache)('key', function () use ($value) { return $value; }, 'hoge');
+        (cache)(null, null);
+        $this->assertFileExists("$tmpdir/hoge.php-cache");
+        $this->assertEquals($value, (cache)('key', function () { return 'dummy'; }, 'hoge'));
 
-        // 何度呼んでもキャッシュされるので一致する
-        $current = (cache)('test', $provider, null, true);
-        $this->assertEquals($current, (cache)('test', $provider, null, true));
-        $this->assertEquals($current, (cache)('test', $provider, null, true));
-        $this->assertEquals($current, (cache)('test', $provider, null, true));
-
-        // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
-        $this->assertNotEquals($current, (cache)('test', $provider, __FUNCTION__, true));
-
-        // null を与えると削除される
-        $this->assertTrue((cache)('test', null, __FUNCTION__, true));
-        $this->assertEquals(1, (cache)('test', function () { return 1; }, __FUNCTION__, true));
+        (cache)('key', function () use ($value) { return $value; }, 'fuga');
+        /** @noinspection PhpUndefinedMethodInspection */
+        (reflect_callable)(cache)->getStaticVariables()['cacheobject']->clear();
+        $this->assertFileNotExists("$tmpdir/hoge.php-cache");
     }
 
     function test_process()
@@ -592,12 +596,12 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
             'limit'    => 2,
         ]);
         $this->assertCount(2, $traces);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ], $traces[0]);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
@@ -608,17 +612,17 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
             'limit' => 3,
         ]);
         $this->assertCount(3, $traces);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm1',
             'class'    => get_class($mock),
         ], $traces[0]);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ], $traces[1]);
-        $this->assertArraySubset([
+        $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
@@ -652,7 +656,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $persistences = (reflect_callable)((error))->getStaticVariables()['persistences'];
         $this->assertCount(1, $persistences);
         $this->assertArrayHasKey($t, $persistences);
-        $this->assertInternalType('resource', $persistences[$t]);
+        $this->assertIsResource($persistences[$t]);
 
         $this->assertException('must be resource or string', error, 'int', 1);
     }
@@ -685,9 +689,9 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertLessThan(0.4, $t);
 
         // それらしい結果が返ってきている
-        $this->assertInternalType('string', $return[0]['name']);
-        $this->assertInternalType('integer', $return[0]['called']);
-        $this->assertInternalType('numeric', $return[0]['ratio']);
+        $this->assertIsString($return[0]['name']);
+        $this->assertIsInt($return[0]['called']);
+        $this->assertIsNumeric($return[0]['ratio']);
 
         // それらしい名前が振られている
         $this->assertContains('Concrete::getName', $output);
@@ -699,7 +703,7 @@ class UtilityTest extends \ryunosuke\Test\AbstractTestCase
 
         // usleep(15000) の平均実行時間は 15ms のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
         $output = (benchmark)(['usleep'], [15000], 300, false);
-        $this->assertLessThan(15 + 5, $output[0]['mills']);
+        $this->assertLessThan(15 + 7, $output[0]['mills']);
 
         // 参照渡しも呼べる
         (benchmark)(['reset', 'end'], [['hoge']], 10, false);

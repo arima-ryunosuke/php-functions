@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class MathTest extends \ryunosuke\Test\AbstractTestCase
+class MathTest extends AbstractTestCase
 {
     static function provideData()
     {

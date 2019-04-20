@@ -1216,10 +1216,10 @@
  * @method   \ChainObject  build_uri()
  * @method   \ChainObject  by_builtin($function)
  * @method   \ChainObject  by_builtin1($class)
- * @method   \ChainObject  cache($provider, $namespace = null, $use_internal = true)
- * @method   \ChainObject  cache1($key, $namespace = null, $use_internal = true)
- * @method   \ChainObject  cache2($key, $provider, $use_internal = true)
- * @method   \ChainObject  cache3($key, $provider, $namespace = null)
+ * @method   \ChainObject  cache($provider, $namespace = null)
+ * @method   \ChainObject  cache1($key, $namespace = null)
+ * @method   \ChainObject  cache2($key, $provider)
+ * @method   \ChainObject  cachedir()
  * @property \ChainObject $call_safely
  * @method   \ChainObject  call_safely(...$variadic)
  * @method   \ChainObject  call_safely1($callback, ...$variadic)
@@ -1298,9 +1298,8 @@
  * @method   \ChainObject  class_loader()
  * @property \ChainObject $class_namespace
  * @method   \ChainObject  class_namespace()
- * @method   \ChainObject  class_replace($register, $dirname = null)
- * @method   \ChainObject  class_replace1($class, $dirname = null)
- * @method   \ChainObject  class_replace2($class, $register)
+ * @method   \ChainObject  class_replace($register)
+ * @method   \ChainObject  class_replace1($class)
  * @property \ChainObject $class_shorten
  * @method   \ChainObject  class_shorten()
  * @method   \ChainObject  clearstatcache($filename = null)
@@ -1709,9 +1708,8 @@
  * @method   \ChainObject  func_user_func_array()
  * @method   \ChainObject  func_user_func_arrayP()
  * @method   \ChainObject  func_user_func_arrayE()
- * @method   \ChainObject  function_alias($alias, $cachedir = false)
- * @method   \ChainObject  function_alias1($original, $cachedir = false)
- * @method   \ChainObject  function_alias2($original, $alias)
+ * @method   \ChainObject  function_alias($alias)
+ * @method   \ChainObject  function_alias1($original)
  * @property \ChainObject $function_exists
  * @method   \ChainObject  function_exists()
  * @property \ChainObject $function_shorten
@@ -1976,8 +1974,7 @@
  * @property \ChainObject $is_double
  * @method   \ChainObject  is_double()
  * @property \ChainObject $is_empty
- * @method   \ChainObject  is_empty($countable_object = false)
- * @method   \ChainObject  is_empty1($var)
+ * @method   \ChainObject  is_empty()
  * @property \ChainObject $is_executable
  * @method   \ChainObject  is_executable()
  * @property \ChainObject $is_file

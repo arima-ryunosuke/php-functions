@@ -10,6 +10,21 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.0
+
+- [*change] 対応バージョンを php 7.1 に格上げ
+- [*change][all] empty より is_empty のほうがふさわしい箇所を変更
+- [*change][all] キャッシュの仕様を変更
+  - 変な依存が気持ち悪いので無名クラスで実装し直した
+  - デフォルト設定をキャッシュを使う方向に寄せた
+- [*change][Arrays] array_unset でキーに配列を与えた場合の未指定デフォルト値は空配列にする
+- [*change][Vars] is_empty の $countable_object 引数を削除
+- [*change][Vars] si_prefix の互換性コードを削除
+- [*change][Vars] var_export2 で出力のみ改行を出すように変更
+- [change][Funchand] closurize をネイティブ呼び出しに変更
+- [refactor][all] 7.1 から iterable 疑似型が使えるので使用する
+- [feature][Transporter] エクスポート時に(定数)呼び出しを単純化するように変更
+
 ## 1.2.10
 
 - [feature][FileSystem] file_suffix を追加

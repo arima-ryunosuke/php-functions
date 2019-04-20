@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class StringsTest extends \ryunosuke\Test\AbstractTestCase
+class StringsTest extends AbstractTestCase
 {
     function test_strcat()
     {

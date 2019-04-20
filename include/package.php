@@ -5,7 +5,7 @@
 namespace ryunosuke\Functions\Package;
 
 # constants
-
+/** SQL キーワード（全 RDBMS ごちゃまぜ） */
 const KEYWORDS = [
     ""  => "",
     0   => "ACCESSIBLE",
@@ -602,9 +602,12 @@ const KEYWORDS = [
     591 => "YEARWEEK",
 ];
 
+/** json_*** 関数で $depth 引数を表す定数 */
 const JSON_MAX_DEPTH = -1;
 
+/** parse_php 関数でトークン名変換をするか */
 const TOKEN_NAME = 2;
+
 
 # functions
 const arrays = ["ryunosuke\\Functions\\Package\\Arrays", "arrays"];
@@ -793,6 +796,7 @@ const try_finally = ["ryunosuke\\Functions\\Package\\Syntax", "try_finally"];
 const try_catch_finally = ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_finally"];
 const date_interval = ["ryunosuke\\Functions\\Package\\Utility", "date_interval"];
 const get_uploaded_files = ["ryunosuke\\Functions\\Package\\Utility", "get_uploaded_files"];
+const cachedir = ["ryunosuke\\Functions\\Package\\Utility", "cachedir"];
 const cache = ["ryunosuke\\Functions\\Package\\Utility", "cache"];
 const process = ["ryunosuke\\Functions\\Package\\Utility", "process"];
 const arguments = ["ryunosuke\\Functions\\Package\\Utility", "arguments"];

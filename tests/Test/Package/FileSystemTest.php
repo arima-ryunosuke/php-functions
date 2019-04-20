@@ -3,7 +3,7 @@ declare(ticks=1);
 
 namespace ryunosuke\Test\Package;
 
-class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
+class FileSystemTest extends AbstractTestCase
 {
     function test_file_list()
     {
@@ -154,7 +154,7 @@ class FileSystemTest extends \ryunosuke\Test\AbstractTestCase
         // standard
         $bytes = (file_rewrite_contents)($testpath, function ($contents, $fp) {
             $this->assertEquals('dummy', $contents);
-            $this->assertInternalType('resource', $fp);
+            $this->assertIsResource($fp);
             return 'rewrite!';
         });
         $this->assertEquals(8, $bytes);

@@ -287,6 +287,7 @@ class Sql
                         $result[] = $MARK_BR . $virttoken . $MARK_SP;
                         $subcontext = $uppertoken;
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "BETWEEN":
                         $subcontext = $uppertoken;
                         goto _DEFAULT;
@@ -305,6 +306,7 @@ class Sql
                             $result[] = $MARK_BR;
                         }
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "AND":
                         // BETWEEN A AND B と論理演算子の AND が競合するので分岐後にフォールスルー
                         if ($subcontext === 'BETWEEN') {
@@ -334,6 +336,7 @@ class Sql
                         $context = $uppertoken;
                         break;
                     case "LEFT":
+                        /** @noinspection PhpMissingBreakStatementInspection */
                     case "RIGHT":
                         // 例えば LEFT や RIGHT は関数呼び出しの場合もあるので分岐後にフォールスルー
                         if ($seek($index, +1) === '(') {

@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class SqlTest extends \ryunosuke\Test\AbstractTestCase
+class SqlTest extends AbstractTestCase
 {
     function test_sql_quote()
     {

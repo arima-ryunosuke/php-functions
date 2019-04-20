@@ -374,7 +374,7 @@ class Strings
      * })()), "a,b,c\nd,e,f");
      * ```
      *
-     * @param array|\Traversable $array 値の配列 or 値の配列の配列
+     * @param iterable $array 値の配列 or 値の配列の配列
      * @param string $delimiter フィールド区切り文字
      * @param string $enclosure フィールドを囲む文字
      * @param string $escape エスケープ文字
@@ -435,12 +435,10 @@ class Strings
      */
     public static function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
     {
-        if (!is_array($replaces)) {
-            $replaces = [$replaces];
-        }
+        $replaces = (is_iterable)($replaces) ? $replaces : [$replaces];
 
         // 空はそのまま返す
-        if (empty($replaces)) {
+        if ((is_empty)($replaces)) {
             return $subject;
         }
 
@@ -1134,6 +1132,7 @@ class Strings
      */
     public static function parse_uri($uri, $default = [])
     {
+        /** @noinspection RequiredAttributes */
         $regex = "
             (?:(?<scheme>[a-z][-+.0-9a-z]*)://)?
             (?:

@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class NetworkTest extends \ryunosuke\Test\AbstractTestCase
+class NetworkTest extends AbstractTestCase
 {
     function test_getipaddress()
     {

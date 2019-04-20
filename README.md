@@ -32,9 +32,6 @@ require __DIR__ . '/vendor/autoload.php';
 `importAsGlobal` はまさにグローバルへ展開されます。
 `importAsNamespace` は `\ryunosuke\Functions\functionname` で定義されます。
 
-php 5.6 未満だと関数の use が出来ないのでグローバルのほうが利便性があるでしょう。
-5.6 以降なら名前空間の方がいいでしょう（use が増えますけど）。
-
 どちらにしても各関数前で定義チェックは行われます。具体的には下記の動作です。
 
 - 定義されていないなら定義
@@ -73,8 +70,6 @@ file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::expo
 これの利点は名前空間を変更できる点と、管理下のディレクトリに吐き出せることでカスタムができる点です。
 逆に言えば既存の処理しか使わないなら任意名前空間に吐き出すメリットはあまりありません。
 
-名前空間エクスポートを使うと後述のキャッシュはほぼ無効になります（リクエスト中はキャッシュされるがリクエストをまたいだキャッシュは無効になる）。
-
 下記のようにすると指定した関数と依存関係にある関数のみが吐き出されます。
 
 ```php
@@ -104,23 +99,6 @@ array_map('\\ryunosuke\\Functions\\strcat', ['something array']);
 // らくちん
 array_map(strcat, ['something array']);
 ```
-
-ただし、上記の通り定数 use が可能な 5.6 以降でないとあまり意味はありません。
-
-### cache
-
-リクエスト間でのパフォーマンス向上のため、雑なキャッシュが組み込まれています。
-下記のようにするとキャッシュがオンになります。
-
-```php
-require __DIR__ . '/vendor/autoload.php';
-
-\ryunosuke\Functions\Cacher::initialize(new \ryunosuke\Functions\FileCache('/path/to/cache'));
-```
-
-initialize に渡すオブジェクトは PSR-16 の simple-cache 実装オブジェクトです。
-組み込みの FileCache は有効期限とかそういったリッチな機能は一切ありません。
-また、ファイル名や行数でキャッシュしたりするので、有効にした場合は必ずデプロイ後にクリアしてください。
 
 ## Development
 

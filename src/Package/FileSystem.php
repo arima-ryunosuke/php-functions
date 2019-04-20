@@ -355,7 +355,7 @@ class FileSystem
     public static function fnmatch_and($patterns, $string, $flags = 0)
     {
         $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
-        if (empty($patterns)) {
+        if ((is_empty)($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
 
@@ -389,7 +389,7 @@ class FileSystem
     public static function fnmatch_or($patterns, $string, $flags = 0)
     {
         $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
-        if (empty($patterns)) {
+        if ((is_empty)($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
 
@@ -629,7 +629,7 @@ class FileSystem
     public static function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
-        $dir = $dir ?: sys_get_temp_dir();
+        $dir = $dir ?: (cachedir)();
         $tempfile = tempnam($dir, $prefix);
 
         // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？

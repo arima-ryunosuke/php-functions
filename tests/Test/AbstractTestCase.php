@@ -3,7 +3,6 @@
 namespace ryunosuke\Test;
 
 use PHPUnit\Framework\TestCase;
-use ryunosuke\Functions\Package\Funchand;
 
 class AbstractTestCase extends TestCase
 {
@@ -59,8 +58,27 @@ class AbstractTestCase extends TestCase
         self::assertLessThan($max, $actual);
     }
 
-    public function __invoke($f)
+    /**
+     * 部分配列アサーション
+     *
+     * @param array $expected
+     * @param iterable $actual
+     * @param bool $strict
+     * @param string $message
+     */
+    public static function assertSubarray($expected, $actual, $strict = false, $message = '')
     {
-        return Funchand::closurize($f);
+        if ($actual instanceof \Traversable) {
+            $actual = iterator_to_array($actual);
+        }
+
+        $expected = array_replace_recursive($actual, $expected);
+
+        if ($strict) {
+            self::assertSame($expected, $actual);
+        }
+        else {
+            self::assertEquals($expected, $actual);
+        }
     }
 }

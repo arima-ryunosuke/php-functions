@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
+class ClassobjTest extends AbstractTestCase
 {
     function test_stdclass()
     {
@@ -72,7 +72,6 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
 
         (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\B', function () {
             require_once __DIR__ . '/Classobj/B_.php';
-            /** @noinspection PhpUndefinedClassInspection */
             return new \B();
         });
 
@@ -82,6 +81,7 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
                     return 'this is ' . (new \ReflectionClass($this))->getShortName();
                 },
                 'f'         => function () {
+                    /** @noinspection PhpUndefinedMethodInspection */
                     return parent::f();
                 },
             ];
@@ -98,6 +98,7 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
             'this is exB',
             'this is C',
         ], $classC->f());
+        /** @noinspection PhpUndefinedMethodInspection */
         $this->assertEquals('this is C__', $classC->newMethod());
 
         $classD = new \ryunosuke\Test\package\Classobj\D();
@@ -107,6 +108,7 @@ class ClassobjTest extends \ryunosuke\Test\AbstractTestCase
             'this is C',
             'this is D',
         ], $classD->f());
+        /** @noinspection PhpUndefinedMethodInspection */
         $this->assertEquals('this is D', $classD->newMethod());
     }
 

@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
-class ArraysTest extends \ryunosuke\Test\AbstractTestCase
+class ArraysTest extends AbstractTestCase
 {
     function test_arrays()
     {
@@ -75,6 +75,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         $this->assertEquals([2, 3], (last_keyvalue)(new \ArrayObject([1, 2, 3])));
         $this->assertEquals(null, (last_keyvalue)(new \ArrayObject([])));
+        $this->assertEquals(null, (last_keyvalue)(new \stdClass()));
     }
 
     function test_prev_key()
@@ -502,6 +503,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertSame(['B', 'A'], (array_unset)($array, ['b', 'a']));
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
         $this->assertSame([1 => 'A', 0 => 'B'], (array_unset)($array, [1 => 'a', 0 => 'b']));
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertSame([], (array_unset)($array, ['XXX']));
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a', 'b', 'c']);
@@ -719,6 +722,7 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
     function test_array_filter_not()
     {
         $this->assertEquals([1 => ''], (array_filter_not)(['a', '', 'c'], 'strlen'));
+        $this->assertEquals([1 => ''], (array_filter_not)(new \ArrayObject(['a', '', 'c']), 'strlen'));
     }
 
     function test_array_filter_key()
@@ -825,6 +829,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
 
         // $ignore=null するとそのまま返す
         $this->assertEquals(['a', null, 123], (array_map_method)([$o1, null, 123], 'getName', [], null));
+
+        // iterable
+        $this->assertEquals(['a', null, 123], (array_map_method)(new \ArrayObject([$o1, null, 123]), 'getName', [], null));
     }
 
     function test_array_maps()
@@ -843,6 +850,9 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         $this->assertEquals([3, 3, 3], (array_maps)([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'));
 
         $objs = [new \Concrete('a'), new \Concrete('b'), new \Concrete('c')];
+        $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
+
+        $objs = new \ArrayObject([new \Concrete('a'), new \Concrete('b'), new \Concrete('c')]);
         $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
     }
 
@@ -925,8 +935,8 @@ class ArraysTest extends \ryunosuke\Test\AbstractTestCase
         }));
 
         // 推奨しないが見た目が気に入っている使い方
-        $this->assertSame('start123', (array_each)([1, 2, 3], function (&$carry = 'start', $v) { $carry .= $v; }));
-        $this->assertSame('start', (array_each)([], function (&$carry = 'start', $v) { $carry .= $v; }));
+        $this->assertSame('start123', (array_each)([1, 2, 3], function (&$carry = 'start', $v = null) { $carry .= $v; }));
+        $this->assertSame('start', (array_each)([], function (&$carry = 'start', $v = null) { $carry .= $v; }));
         $this->assertSame(null, (array_each)([], function (&$carry, $v) { $carry .= $v; }));
     }
 
