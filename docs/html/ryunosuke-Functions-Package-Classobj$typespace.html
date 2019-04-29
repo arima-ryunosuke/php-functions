@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L377" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L562" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -192,7 +192,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L92-L122" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L92-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader						<small>($startdir = null)</small>
@@ -243,7 +243,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L124-L144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L121-L141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace						<small>($class)</small>
@@ -293,7 +293,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L146-L165" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L143-L162" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten						<small>($class)</small>
@@ -343,7 +343,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L167-L290" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L164-L287" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace						<small>($class, $register)</small>
@@ -436,7 +436,154 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L292-L328" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L289-L436" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_extends()" tabindex="-1" class="structure-title ">
+                        class_extends						<small>($object, $methods, $fields = [])</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>インスタンスを動的に拡張する</p>
+<p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
+ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。<br />
+そのクラスの <strong>set/</strong>get が禁止されている場合に使えるかもしれない程度。</p>
+<p>クロージャ配列を渡すと特異メソッドになる。<br />
+そのクロージャの $this は元オブジェクトで bind される。<br />
+ただし、static closure を渡した場合はそれは static メソッドとして扱われる。</p>
+<p>内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。<br />
+当然ながら final クラスの拡張もできない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
+$object = new \Exception('hoge', 123);
+$newobject = class_extends($object, [
+    'codemessage' =&gt; function() {
+        // bind されるので protected フィールドが使える
+        return $this-&gt;code . ':' . $this-&gt;message;
+    },
+]);
+assertSame($newobject-&gt;codemessage(), '123:hoge');
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$object</td>
+				<td class="desc"><p>対象オブジェクト</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a>[]</td>
+				<td class="rest">$methods</td>
+				<td class="desc"><p>注入するメソッド</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$fields = []</td>
+				<td class="desc"><p>注入するフィールド</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">object</td>
+			<td class="desc"><p>$object を拡張した object</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L438-L475" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::const_exists()" tabindex="-1" class="structure-title ">
+                        const_exists						<small>($classname, $constname = null)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>クラス定数が存在するか調べる</p>
+<p>グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。</p>
+<ul>
+<li>defined は単一引数しか与えられないが、この関数は2つの引数も受け入れる</li>
+<li>defined は private const で即死するが、この関数はきちんと調べることができる</li>
+</ul>
+<p>あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（<code>property_exists</code> と同じ）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// クラス定数が調べられる（1引数、2引数どちらでも良い）
+assertTrue(const_exists('ArrayObject::STD_PROP_LIST'));
+assertTrue(const_exists('ArrayObject', 'STD_PROP_LIST'));
+assertFalse(const_exists('ArrayObject::UNDEFINED'));
+assertFalse(const_exists('ArrayObject', 'UNDEFINED'));
+// グローバル（名前空間）もいける
+assertTrue(const_exists('PHP_VERSION'));
+assertFalse(const_exists('UNDEFINED'));
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>object</td>
+				<td class="rest">$classname</td>
+				<td class="desc"><p>調べるクラス</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$constname = null</td>
+				<td class="desc"><p>調べるクラス定数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc"><p>定数が存在するなら true</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L477-L513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
                         object_dive						<small>($object, $path, $default = null, $delimiter = &#039;.&#039;)</small>
@@ -515,7 +662,7 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L330-L376" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L515-L561" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
                         get_object_properties						<small>($object)</small>

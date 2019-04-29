@@ -626,7 +626,7 @@ if (!isset($excluded_functions["arrays"]) && (!function_exists("ryunosuke\\Funct
      * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * $nkv = [];
-     * foreach (arrays($array) as $n => list($k, $v)) { // php7.1 以降なら list ではなく [] でも行ける
+     * foreach (arrays($array) as $n => [$k, $v]) {
      *     $nkv[] = "$n,$k,$v";
      * }
      * assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
@@ -3310,17 +3310,15 @@ if (!isset($excluded_functions["array_pickup"]) && (!function_exists("ryunosuke\
      * ```
      *
      * @param iterable $array 対象配列
-     * @param array $keys 取り出すキー（可変引数）
+     * @param array $keys 取り出すキー
      * @return array 新しい配列
      */
     function array_pickup($array, $keys)
     {
-        if (!is_array($array)) {
-            $array = arrayval($array, false);
-        }
+        $array = arrayval($array, false);
 
         $result = [];
-        foreach ($keys as $k => $key) {
+        foreach (arrayval($keys, false) as $k => $key) {
             if (is_int($k)) {
                 if (array_key_exists($key, $array)) {
                     $result[$key] = $array[$key];
@@ -3333,6 +3331,36 @@ if (!isset($excluded_functions["array_pickup"]) && (!function_exists("ryunosuke\
             }
         }
         return $result;
+    }
+}
+
+const array_remove = "ryunosuke\\Functions\\array_remove";
+if (!isset($excluded_functions["array_remove"]) && (!function_exists("ryunosuke\\Functions\\array_remove") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_remove"))->isInternal()))) {
+    /**
+     * キーを指定してそれらを除いた配列にする
+     *
+     * `array_diff_key($array, array_flip($keys))` とほぼ同義。
+     * 違いは Traversable を渡せること。
+     *
+     * array_pickup の逆とも言える。
+     *
+     * Example:
+     * ```php
+     * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+     * // a と c を伏せる（b を残す）
+     * assertSame(array_remove($array, ['a', 'c']), ['b' => 'B']);
+     * ```
+     *
+     * @param array|\Traversable $array 対象配列
+     * @param array $keys 伏せるキー
+     * @return array 新しい配列
+     */
+    function array_remove($array, $keys)
+    {
+        foreach (arrayval($keys, false) as $k) {
+            unset($array[$k]);
+        }
+        return $array;
     }
 }
 
@@ -3979,15 +4007,12 @@ if (!isset($excluded_functions["class_loader"]) && (!function_exists("ryunosuke\
     function class_loader($startdir = null)
     {
         $file = cache('path', function () use ($startdir) {
-            $dir = $startdir ?: __DIR__;
-            while ($dir !== ($pdir = dirname($dir))) {
-                $dir = $pdir;
+            $cache = dirname_r($startdir ?: __DIR__, function ($dir) {
                 if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
-                    $cache = $file;
-                    break;
+                    return $file;
                 }
-            }
-            if (!isset($cache)) {
+            });
+            if (!$cache) {
                 throw new \DomainException('autoloader is not found.');
             }
             return $cache;
@@ -4118,7 +4143,7 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
         if (func_num_args() === 2 || !file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
-            file_set_contents($fname, $content);
+            file_put_contents($fname, $content, LOCK_EX);
         }
         require_once $fname;
 
@@ -4166,10 +4191,204 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
             }
 
             $newclass = "\\$origspace\\{$origclass}_";
-            eval("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
+            evaluate("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
         }
 
         class_alias($newclass, $class);
+    }
+}
+
+const class_extends = "ryunosuke\\Functions\\class_extends";
+if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke\\Functions\\class_extends") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\class_extends"))->isInternal()))) {
+    /**
+     * インスタンスを動的に拡張する
+     *
+     * インスタンスに特異メソッド・特異フィールドのようなものを生やす。
+     * ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。
+     * そのクラスの __set/__get が禁止されている場合に使えるかもしれない程度。
+     *
+     * クロージャ配列を渡すと特異メソッドになる。
+     * そのクロージャの $this は元オブジェクトで bind される。
+     * ただし、static closure を渡した場合はそれは static メソッドとして扱われる。
+     *
+     * 内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。
+     * 当然ながら final クラスの拡張もできない。
+     *
+     * Example:
+     * ```php
+     * // Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
+     * $object = new \Exception('hoge', 123);
+     * $newobject = class_extends($object, [
+     *     'codemessage' => function() {
+     *         // bind されるので protected フィールドが使える
+     *         return $this->code . ':' . $this->message;
+     *     },
+     * ]);
+     * assertSame($newobject->codemessage(), '123:hoge');
+     * ```
+     *
+     * @param string $object 対象オブジェクト
+     * @param \Closure[] $methods 注入するメソッド
+     * @param array $fields 注入するフィールド
+     * @return object $object を拡張した object
+     */
+    function class_extends($object, $methods, $fields = [])
+    {
+        static $template_source, $template_reflection;
+        if (!isset($template_source)) {
+            // コード補完やフォーマッタを効かせたいので文字列 eval ではなく直に new する（1回だけだし）
+            // @codeCoverageIgnoreStart
+            $template_reflection = new \ReflectionClass(
+                new class()
+                {
+                    private static $__originalClass;
+                    private        $__original;
+                    private        $__fields;
+                    private        $__methods;
+                    private static $__staticMethods = [];
+
+                    public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
+                    {
+                        if ($refclass === null) {
+                            return;
+                        }
+                        self::$__originalClass = get_class($original);
+
+                        $this->__original = $original;
+                        $this->__fields = $fields;
+
+                        foreach ($methods as $name => $method) {
+                            $method = \Closure::fromCallable($method);
+                            $bmethod = @$method->bindTo($this->__original, $refclass->isInternal() ? $this : $this->__original);
+                            // 内部クラスは $this バインドできないので original じゃなく自身にする
+                            if ($bmethod) {
+                                $this->__methods[$name] = $bmethod;
+                            }
+                            else {
+                                self::$__staticMethods[$name] = $method->bindTo(null, self::$__originalClass);
+                            }
+                        }
+                    }
+
+                    public function __get($name)
+                    {
+                        if (array_key_exists($name, $this->__fields)) {
+                            return $this->__fields[$name];
+                        }
+                        return $this->__original->$name;
+                    }
+
+                    public function __set($name, $value)
+                    {
+                        if (array_key_exists($name, $this->__fields)) {
+                            return $this->__fields[$name] = $value;
+                        }
+                        return $this->__original->$name = $value;
+                    }
+
+                    public function __call($name, $arguments)
+                    {
+                        if (array_key_exists($name, $this->__methods)) {
+                            return $this->__methods[$name](...$arguments);
+                        }
+                        return $this->__original->$name(...$arguments);
+                    }
+
+                    public static function __callStatic($name, $arguments)
+                    {
+                        if (array_key_exists($name, self::$__staticMethods)) {
+                            return (self::$__staticMethods)[$name](...$arguments);
+                        }
+                        return self::$__originalClass::$name(...$arguments);
+                    }
+                }
+            );
+            // @codeCoverageIgnoreEnd
+            $sl = $template_reflection->getStartLine();
+            $el = $template_reflection->getEndLine();
+            $template_source = implode("", array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1));
+        }
+
+        /** @var \ReflectionClass[][] $spawners */
+        static $spawners = [];
+
+        $classname = get_class($object);
+        if (!isset($spawners[$classname])) {
+            $classalias = str_replace('\\', '__', $classname);
+
+            $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            if (!file_exists($cachefile)) {
+                $declares = [];
+                foreach ((new \ReflectionClass($classname))->getMethods() as $method) {
+                    if (!$method->isFinal() && !$method->isAbstract()) {
+                        if (!in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
+                            $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
+                            $name = $method->getName();
+                            $reference = $method->returnsReference() ? '&' : '';
+                            $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+
+                            $params = function_parameter($method);
+                            $prms = implode(', ', $params);
+                            $args = implode(', ', array_keys($params));
+                            $declares[] = "$modifier function $reference$name($prms) {
+                                \$return = $reference $receiver$name(...[$args]);
+                                return \$return;
+                            }";
+                        }
+                    }
+                }
+                $code = "class X$classalias extends $classname$template_source" . implode("\n", $declares) . '}';
+                file_put_contents($cachefile, "<?php\n" . $code, LOCK_EX);
+            }
+            require_once $cachefile;
+            $spawners[$classname] = [
+                'original'   => new \ReflectionClass($classname),
+                'reflection' => new \ReflectionClass("X$classalias"),
+            ];
+        }
+        return $spawners[$classname]['reflection']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
+    }
+}
+
+const const_exists = "ryunosuke\\Functions\\const_exists";
+if (!isset($excluded_functions["const_exists"]) && (!function_exists("ryunosuke\\Functions\\const_exists") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\const_exists"))->isInternal()))) {
+    /**
+     * クラス定数が存在するか調べる
+     *
+     * グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。
+     *
+     * - defined は単一引数しか与えられないが、この関数は2つの引数も受け入れる
+     * - defined は private const で即死するが、この関数はきちんと調べることができる
+     *
+     * あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（`property_exists` と同じ）。
+     *
+     * Example:
+     * ```php
+     * // クラス定数が調べられる（1引数、2引数どちらでも良い）
+     * assertTrue(const_exists('ArrayObject::STD_PROP_LIST'));
+     * assertTrue(const_exists('ArrayObject', 'STD_PROP_LIST'));
+     * assertFalse(const_exists('ArrayObject::UNDEFINED'));
+     * assertFalse(const_exists('ArrayObject', 'UNDEFINED'));
+     * // グローバル（名前空間）もいける
+     * assertTrue(const_exists('PHP_VERSION'));
+     * assertFalse(const_exists('UNDEFINED'));
+     * ```
+     *
+     * @param string|object $classname 調べるクラス
+     * @param string $constname 調べるクラス定数
+     * @return bool 定数が存在するなら true
+     */
+    function const_exists($classname, $constname = null)
+    {
+        try {
+            // defined は private const などの不可視定数に対して呼ぶと即死する
+            return defined($classname . concat('::', $constname));
+        }
+        catch (\Throwable $t) {
+            // 即死するのは private/protected な定数だけで、存在しなかったり public なら defined は機能する
+            // つまり、ここに到達した時点で「存在する」とみなすことができる（でなければ例外は飛ばない）
+            return true;
+        }
     }
 }
 
@@ -6276,52 +6495,83 @@ if (!isset($excluded_functions["function_alias"]) && (!function_exists("ryunosuk
 
         // キャッシュ指定有りなら読み込むだけで eval しない
         $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
-        if (file_exists($cachefile)) {
-            require $cachefile;
-            return;
-        }
+        if (!file_exists($cachefile)) {
+            $parts = explode('\\', ltrim($alias, '\\'));
+            $reference = $ref->returnsReference() ? '&' : '';
+            $funcname = $reference . array_pop($parts);
+            $namespace = implode('\\', $parts);
 
-        // 仮引数と実引数の構築
-        $params = [];
-        $args = [];
-        foreach ($ref->getParameters() as $param) {
-            $default = '';
-            if ($param->isOptional()) {
+            $params = function_parameter($ref);
+            $prms = implode(', ', array_values($params));
+            $args = implode(', ', array_keys($params));
+            if ($ref->isInternal()) {
+                $args = "array_slice([$args] + func_get_args(), 0, func_num_args())";
+            }
+            else {
+                $args = "[$args]";
+            }
+
+            $code = <<<CODE
+namespace $namespace {
+    function $funcname($prms) {
+        \$return = $reference \\$calllname(...$args);
+        return \$return;
+    }
+}
+CODE;
+            file_put_contents($cachefile, "<?php\n" . $code);
+        }
+        require_once $cachefile;
+    }
+}
+
+const function_parameter = "ryunosuke\\Functions\\function_parameter";
+if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryunosuke\\Functions\\function_parameter") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\function_parameter"))->isInternal()))) {
+    /**
+     * 関数/メソッドの引数定義を取得する
+     *
+     * ほぼ内部向けで外から呼ぶことはあまり想定していない。
+     *
+     * @param \ReflectionFunctionAbstract|callable $eitherReffuncOrCallable 関数/メソッドリフレクション or callable
+     * @return array [引数名 => 引数宣言] の配列
+     */
+    function function_parameter($eitherReffuncOrCallable)
+    {
+        $reffunc = $eitherReffuncOrCallable instanceof \ReflectionFunctionAbstract
+            ? $eitherReffuncOrCallable
+            : reflect_callable($eitherReffuncOrCallable);
+
+        $result = [];
+        foreach ($reffunc->getParameters() as $parameter) {
+            $declare = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+
+            if ($parameter->isVariadic()) {
+                $declare = '...' . $declare;
+            }
+            elseif ($parameter->isOptional()) {
                 // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
-                if ($param->isDefaultValueAvailable()) {
-                    $defval = var_export($param->getDefaultValue(), true);
+                if ($parameter->isDefaultValueAvailable()) {
+                    // 修飾なしでデフォルト定数が使われているとその名前空間で解決してしまうので場合分けが必要
+                    if ($parameter->isDefaultValueConstant() && strpos($parameter->getDefaultValueConstantName(), '\\') === false) {
+                        $defval = $parameter->getDefaultValueConstantName();
+                    }
+                    else {
+                        $defval = var_export2($parameter->getDefaultValue(), true);
+                    }
                 }
                 // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
                 // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
                 else {
                     $defval = 'null';
                 }
-                $default = ' = ' . $defval;
+                $declare .= ' = ' . $defval;
             }
-            $varname = ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
-            $params[] = $varname . $default;
-            $args[] = $varname;
+
+            $name = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+            $result[$name] = $declare;
         }
 
-        $parts = explode('\\', ltrim($alias, '\\'));
-        $reference = $ref->returnsReference() ? '&' : '';
-        $funcname = $reference . array_pop($parts);
-        $namespace = implode('\\', $parts);
-
-        $params = implode(', ', $params);
-        $args = implode(', ', $args);
-
-        $code = <<<CODE
-namespace $namespace {
-    function $funcname($params) {
-        \$return = $reference \\$calllname(...array_slice([$args] + func_get_args(), 0, func_num_args()));
-        return \$return;
-    }
-}
-CODE;
-
-        eval($code);
-        file_put_contents($cachefile, "<?php\n" . $code);
+        return $result;
     }
 }
 
@@ -9688,6 +9938,76 @@ if (!isset($excluded_functions["include_string"]) && (!function_exists("ryunosuk
     }
 }
 
+const evaluate = "ryunosuke\\Functions\\evaluate";
+if (!isset($excluded_functions["evaluate"]) && (!function_exists("ryunosuke\\Functions\\evaluate") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\evaluate"))->isInternal()))) {
+    /**
+     * eval のプロキシ関数
+     *
+     * 一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。
+     * また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。
+     *
+     * 関数化してる以上 eval におけるコンテキストの引き継ぎはできない。
+     * ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。
+     *
+     * 短いステートメントだと opcode が少ないのでファイルを経由せず直接 eval したほうが速いことに留意。
+     * 一応内部で振り分けるようにはしてある。
+     *
+     * Example:
+     * ```php
+     * $a = 1;
+     * $b = 2;
+     * $phpcode = ';
+     * $c = $a + $b;
+     * return $c * 3;
+     * ';
+     * assertSame(evaluate($phpcode, get_defined_vars()), 9);
+     * ```
+     *
+     * @param string $phpcode 実行する php コード
+     * @param array $contextvars コンテキスト変数配列
+     * @return mixed eval の return 値
+     */
+    function evaluate($phpcode, $contextvars = [])
+    {
+        $cachefile = null;
+        if (strlen($phpcode) >= 256) {
+            $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+            if (!file_exists($cachefile)) {
+                file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
+            }
+        }
+
+        try {
+            if ($cachefile) {
+                return (static function () {
+                    extract(func_get_arg(1));
+                    return require func_get_arg(0);
+                })($cachefile, $contextvars);
+            }
+            else {
+                return (static function () {
+                    extract(func_get_arg(1));
+                    return eval(func_get_arg(0));
+                })($phpcode, $contextvars);
+            }
+        }
+        catch (\ParseError $ex) {
+            $errline = $ex->getLine();
+            $errline_1 = $errline - 1;
+            $codes = preg_split('#\\R#u', $phpcode);
+            $codes[$errline_1] = '>>> ' . $codes[$errline_1];
+
+            $N = 5; // 前後の行数
+            $message = $ex->getMessage();
+            $message .= "\n" . implode("\n", array_slice($codes, max(0, $errline_1 - $N), $N * 2 + 1));
+            if ($cachefile) {
+                $message .= "\n in " . realpath($cachefile) . " on line " . $errline . "\n";
+            }
+            throw new \ParseError($message, $ex->getCode(), $ex);
+        }
+    }
+}
+
 const parse_php = "ryunosuke\\Functions\\parse_php";
 if (!isset($excluded_functions["parse_php"]) && (!function_exists("ryunosuke\\Functions\\parse_php") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\parse_php"))->isInternal()))) {
     /**
@@ -10716,10 +11036,8 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functi
                     $this->changed = [];
 
                     // ファイルも消す
-                    if ($this->cachedir !== null) {
-                        foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
-                            unlink($file);
-                        }
+                    foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
+                        unlink($file);
                     }
                 }
             };
@@ -11102,7 +11420,7 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
         foreach ($traces as $i => $trace) {
             // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）
             if (!isset($trace['file'])) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             $file = $trace['file'];

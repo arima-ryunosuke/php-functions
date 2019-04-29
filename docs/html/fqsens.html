@@ -65,7 +65,7 @@
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 $nkv = [];
-foreach (arrays($array) as $n =&gt; list($k, $v)) { // php7.1 以降なら list ではなく [] でも行ける
+foreach (arrays($array) as $n =&gt; [$k, $v]) {
     $nkv[] = "$n,$k,$v";
 }
 assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
@@ -979,6 +979,17 @@ assertSame(array_pickup($array, ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
 assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; 'C', 'aX' =&gt; 'A']);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_remove()"> ryunosuke\Functions\Package\Arrays::array_remove()</a></h2>
+	<div class="description"><p>キーを指定してそれらを除いた配列にする</p>
+<p><code>array_diff_key($array, array_flip($keys))</code> とほぼ同義。<br />
+違いは Traversable を渡せること。</p>
+<p>array_pickup の逆とも言える。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// a と c を伏せる（b を残す）
+assertSame(array_remove($array, ['a', 'c']), ['b' =&gt; 'B']);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()"> ryunosuke\Functions\Package\Arrays::array_lookup()</a></h2>
 	<div class="description"><p>キー保存可能な array_column</p>
 <p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。</p>
@@ -1277,6 +1288,47 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
 // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2d');
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_extends()"> ryunosuke\Functions\Package\Classobj::class_extends()</a></h2>
+	<div class="description"><p>インスタンスを動的に拡張する</p>
+<p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
+ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。<br />
+そのクラスの <strong>set/</strong>get が禁止されている場合に使えるかもしれない程度。</p>
+<p>クロージャ配列を渡すと特異メソッドになる。<br />
+そのクロージャの $this は元オブジェクトで bind される。<br />
+ただし、static closure を渡した場合はそれは static メソッドとして扱われる。</p>
+<p>内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。<br />
+当然ながら final クラスの拡張もできない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
+$object = new \Exception('hoge', 123);
+$newobject = class_extends($object, [
+    'codemessage' =&gt; function() {
+        // bind されるので protected フィールドが使える
+        return $this-&gt;code . ':' . $this-&gt;message;
+    },
+]);
+assertSame($newobject-&gt;codemessage(), '123:hoge');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::const_exists()"> ryunosuke\Functions\Package\Classobj::const_exists()</a></h2>
+	<div class="description"><p>クラス定数が存在するか調べる</p>
+<p>グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。</p>
+<ul>
+<li>defined は単一引数しか与えられないが、この関数は2つの引数も受け入れる</li>
+<li>defined は private const で即死するが、この関数はきちんと調べることができる</li>
+</ul>
+<p>あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（<code>property_exists</code> と同じ）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// クラス定数が調べられる（1引数、2引数どちらでも良い）
+assertTrue(const_exists('ArrayObject::STD_PROP_LIST'));
+assertTrue(const_exists('ArrayObject', 'STD_PROP_LIST'));
+assertFalse(const_exists('ArrayObject::UNDEFINED'));
+assertFalse(const_exists('ArrayObject', 'UNDEFINED'));
+// グローバル（名前空間）もいける
+assertTrue(const_exists('PHP_VERSION'));
+assertFalse(const_exists('UNDEFINED'));
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::object_dive()"> ryunosuke\Functions\Package\Classobj::object_dive()</a></h2>
@@ -1841,6 +1893,10 @@ assertSame($hoge789($object), '7,8,9');
 function_alias('trim', 'trim_alias');
 assertSame(trim_alias(' abc '), 'abc');
 </code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_parameter()"> ryunosuke\Functions\Package\Funchand::function_parameter()</a></h2>
+	<div class="description"><p>関数/メソッドの引数定義を取得する</p>
+<p>ほぼ内部向けで外から呼ぶことはあまり想定していない。</p>
 </div>
             	<h2>class<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math"> ryunosuke\Functions\Package\Math</a></h2>
 	<div class="description"><p>数学関連のユーティリティ</p>
@@ -2807,7 +2863,25 @@ This is HOGE.
         	<h2>classconstant<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::TOKEN_NAME"> ryunosuke\Functions\Package\Syntax::TOKEN_NAME</a></h2>
 	<div class="description"><p>parse_php 関数でトークン名変換をするか</p>
 </div>
-            	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::parse_php()"> ryunosuke\Functions\Package\Syntax::parse_php()</a></h2>
+            	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::evaluate()"> ryunosuke\Functions\Package\Syntax::evaluate()</a></h2>
+	<div class="description"><p>eval のプロキシ関数</p>
+<p>一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。<br />
+また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。</p>
+<p>関数化してる以上 eval におけるコンテキストの引き継ぎはできない。<br />
+ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。</p>
+<p>短いステートメントだと opcode が少ないのでファイルを経由せず直接 eval したほうが速いことに留意。<br />
+一応内部で振り分けるようにはしてある。</p>
+<p>Example:</p>
+<pre><code class="language-php">$a = 1;
+$b = 2;
+$phpcode = ';
+$c = $a + $b;
+return $c * 3;
+';
+assertSame(evaluate($phpcode, get_defined_vars()), 9);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::parse_php()"> ryunosuke\Functions\Package\Syntax::parse_php()</a></h2>
 	<div class="description"><p>php のコード断片をパースする</p>
 <p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
 つまり必ず <code>[TOKENID, TOKEN, LINE]</code> で返す。</p>

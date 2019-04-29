@@ -861,6 +861,10 @@
  * @method   \ChainObject  reduceE($callback, $initial = null)
  * @method   \ChainObject  reduceE1($arg, $initial = null)
  * @method   \ChainObject  reduceE2($arg, $callback)
+ * @method   \ChainObject  array_remove($keys)
+ * @method   \ChainObject  array_remove1($array)
+ * @method   \ChainObject  remove($keys)
+ * @method   \ChainObject  remove1($array)
  * @property \ChainObject $array_replace
  * @method   \ChainObject  array_replace(...$arrays)
  * @method   \ChainObject  array_replace1($arr1, ...$arrays)
@@ -1295,6 +1299,9 @@
  * @property \ChainObject $class_exists
  * @method   \ChainObject  class_exists($autoload = null)
  * @method   \ChainObject  class_exists1($classname)
+ * @method   \ChainObject  class_extends($methods, $fields = [])
+ * @method   \ChainObject  class_extends1($object, $fields = [])
+ * @method   \ChainObject  class_extends2($object, $methods)
  * @method   \ChainObject  class_loader()
  * @property \ChainObject $class_namespace
  * @method   \ChainObject  class_namespace()
@@ -1335,6 +1342,9 @@
  * @method   \ChainObject  console_log3(...$values)
  * @method   \ChainObject  console_log4(...$values)
  * @method   \ChainObject  console_log5(...$values)
+ * @property \ChainObject $const_exists
+ * @method   \ChainObject  const_exists($constname = null)
+ * @method   \ChainObject  const_exists1($classname)
  * @property \ChainObject $constant
  * @method   \ChainObject  constant()
  * @method   \ChainObject  convert_cyr_string($from, $to)
@@ -1536,6 +1546,9 @@
  * @method   \ChainObject  eval_func4($expression, ...$variadic)
  * @method   \ChainObject  eval_func5($expression, ...$variadic)
  * @method   \ChainObject  eval_func6($expression, ...$variadic)
+ * @property \ChainObject $evaluate
+ * @method   \ChainObject  evaluate($contextvars = [])
+ * @method   \ChainObject  evaluate1($phpcode)
  * @property \ChainObject $exp
  * @method   \ChainObject  exp()
  * @method   \ChainObject  explode($str, $limit = null)
@@ -1712,6 +1725,8 @@
  * @method   \ChainObject  function_alias1($original)
  * @property \ChainObject $function_exists
  * @method   \ChainObject  function_exists()
+ * @property \ChainObject $function_parameter
+ * @method   \ChainObject  function_parameter()
  * @property \ChainObject $function_shorten
  * @method   \ChainObject  function_shorten()
  * @method   \ChainObject  fwrite($str, $length = null)
