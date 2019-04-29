@@ -131,9 +131,8 @@ class Syntax
         $option += $default;
 
         static $cache = [];
-        if (!$option['cache'] || !isset($cache[$phpcode])) {
-            // token_get_all の結果は微妙に扱いづらいので少し調整する（string/array だったり、名前変換の必要があったり）
-            $cache[$phpcode] = array_map(function ($token) use ($option) {
+        $tokens = $cache[$phpcode] ?? array_map(function ($token) use ($option) {
+                // token_get_all の結果は微妙に扱いづらいので少し調整する（string/array だったり、名前変換の必要があったり）
                 if (is_array($token)) {
                     // for debug
                     if ($option['flags'] & TOKEN_NAME) {
@@ -146,8 +145,9 @@ class Syntax
                     return [null, $token, 0];
                 }
             }, token_get_all("<?php $phpcode", $option['flags']));
+        if ($option['cache']) {
+            $cache[$phpcode] = $tokens;
         }
-        $tokens = $cache[$phpcode];
 
         $begin_tokens = (array) $option['begin'];
         $end_tokens = (array) $option['end'];
