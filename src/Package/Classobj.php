@@ -436,6 +436,45 @@ class Classobj
     }
 
     /**
+     * クラス定数が存在するか調べる
+     *
+     * グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。
+     *
+     * - defined は単一引数しか与えられないが、この関数は2つの引数も受け入れる
+     * - defined は private const で即死するが、この関数はきちんと調べることができる
+     *
+     * あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（`property_exists` と同じ）。
+     *
+     * Example:
+     * ```php
+     * // クラス定数が調べられる（1引数、2引数どちらでも良い）
+     * assertTrue(const_exists('ArrayObject::STD_PROP_LIST'));
+     * assertTrue(const_exists('ArrayObject', 'STD_PROP_LIST'));
+     * assertFalse(const_exists('ArrayObject::UNDEFINED'));
+     * assertFalse(const_exists('ArrayObject', 'UNDEFINED'));
+     * // グローバル（名前空間）もいける
+     * assertTrue(const_exists('PHP_VERSION'));
+     * assertFalse(const_exists('UNDEFINED'));
+     * ```
+     *
+     * @param string|object $classname 調べるクラス
+     * @param string $constname 調べるクラス定数
+     * @return bool 定数が存在するなら true
+     */
+    public static function const_exists($classname, $constname = null)
+    {
+        try {
+            // defined は private const などの不可視定数に対して呼ぶと即死する
+            return defined($classname . (concat)('::', $constname));
+        }
+        catch (\Throwable $t) {
+            // 即死するのは private/protected な定数だけで、存在しなかったり public なら defined は機能する
+            // つまり、ここに到達した時点で「存在する」とみなすことができる（でなければ例外は飛ばない）
+            return true;
+        }
+    }
+
+    /**
      * パス形式でプロパティ値を取得
      *
      * 存在しない場合は $default を返す。

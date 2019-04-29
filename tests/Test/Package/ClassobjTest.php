@@ -192,6 +192,33 @@ class ClassobjTest extends AbstractTestCase
         $this->assertEquals('123:message', $e->codemessage());
     }
 
+    function test_const_exists()
+    {
+        $class = get_class(new class
+        {
+            private const   /** @noinspection PhpUnusedPrivateFieldInspection */
+                            PRIVATE_CONST   = null;
+            protected const PROTECTED_CONST = null;
+            public const    PUBLIC_CONST    = null;
+        });
+
+        // クラス定数（2引数）
+        $this->assertTrue((const_exists)($class, "PRIVATE_CONST"));
+        $this->assertTrue((const_exists)($class, "PROTECTED_CONST"));
+        $this->assertTrue((const_exists)($class, "PUBLIC_CONST"));
+        $this->assertFalse((const_exists)($class, "UNDEFINED"));
+
+        // クラス定数（1引数）
+        $this->assertTrue((const_exists)("$class::PRIVATE_CONST"));
+        $this->assertTrue((const_exists)("$class::PROTECTED_CONST"));
+        $this->assertTrue((const_exists)("$class::PUBLIC_CONST"));
+        $this->assertFalse((const_exists)("$class::UNDEFINED"));
+
+        // グローバル定数
+        $this->assertTrue((const_exists)("PHP_VERSION"));
+        $this->assertFalse((const_exists)("UNDEFINED"));
+    }
+
     function test_object_dive()
     {
         $class = (stdclass)([
