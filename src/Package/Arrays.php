@@ -69,6 +69,36 @@ class Arrays
     }
 
     /**
+     * 配列が数値配列か調べる
+     *
+     * 空の配列も数値配列とみなす。
+     * さらにいわゆる「連番配列」ではなく「キーが数値のみか？」で判定する。
+     *
+     * つまり、 is_hasharray とは排他的ではない。
+     *
+     * Example:
+     * ```php
+     * assertTrue(is_indexarray([]));
+     * assertTrue(is_indexarray([1, 2, 3]));
+     * assertFalse(is_indexarray(['x' => 'X']));
+     * // 抜け番があっても true になる（これは is_hasharray も true になる）
+     * assertTrue(is_indexarray([1 => 1, 2 => 2, 3 => 3]));
+     * ```
+     *
+     * @param array $array 調べる配列
+     * @return bool 数値配列なら true
+     */
+    public static function is_indexarray($array)
+    {
+        foreach ($array as $k => $dummy) {
+            if (!is_int($k)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * 配列が連想配列か調べる
      *
      * 空の配列は普通の配列とみなす。

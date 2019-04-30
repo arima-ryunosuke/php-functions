@@ -15,6 +15,16 @@ class ArraysTest extends AbstractTestCase
         $this->assertEquals([1, 2, 3], (arrayize)([1], 2, 3));
     }
 
+    function test_is_indexarray()
+    {
+        $this->assertTrue((is_indexarray)([]));
+        $this->assertTrue((is_indexarray)([1]));
+        $this->assertTrue((is_indexarray)([0 => 1]));
+        $this->assertTrue((is_indexarray)([1 => 1]));
+        $this->assertTrue((is_indexarray)(['1' => 1]));
+        $this->assertFalse((is_indexarray)(['key' => 1]));
+    }
+
     function test_is_hasharray()
     {
         $this->assertFalse((is_hasharray)([]));
