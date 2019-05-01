@@ -5,6 +5,35 @@
 namespace ryunosuke\Functions\Package;
 
 # constants
+/** 和暦 */
+const JP_ERA = [
+    [
+        "name"  => "令和",
+        "abbr"  => "R",
+        "since" => 1556636400,
+    ],
+    [
+        "name"  => "平成",
+        "abbr"  => "H",
+        "since" => 600188400,
+    ],
+    [
+        "name"  => "昭和",
+        "abbr"  => "S",
+        "since" => -1357635600,
+    ],
+    [
+        "name"  => "大正",
+        "abbr"  => "T",
+        "since" => -1812186000,
+    ],
+    [
+        "name"  => "明治",
+        "abbr"  => "M",
+        "since" => -3216790800,
+    ],
+];
+
 /** SQL キーワード（全 RDBMS ごちゃまぜ） */
 const KEYWORDS = [
     ""  => "",
@@ -612,6 +641,7 @@ const TOKEN_NAME = 2;
 # functions
 const arrays = ["ryunosuke\\Functions\\Package\\Arrays", "arrays"];
 const arrayize = ["ryunosuke\\Functions\\Package\\Arrays", "arrayize"];
+const is_indexarray = ["ryunosuke\\Functions\\Package\\Arrays", "is_indexarray"];
 const is_hasharray = ["ryunosuke\\Functions\\Package\\Arrays", "is_hasharray"];
 const first_key = ["ryunosuke\\Functions\\Package\\Arrays", "first_key"];
 const first_value = ["ryunosuke\\Functions\\Package\\Arrays", "first_value"];
@@ -686,6 +716,9 @@ const class_extends = ["ryunosuke\\Functions\\Package\\Classobj", "class_extends
 const const_exists = ["ryunosuke\\Functions\\Package\\Classobj", "const_exists"];
 const object_dive = ["ryunosuke\\Functions\\Package\\Classobj", "object_dive"];
 const get_object_properties = ["ryunosuke\\Functions\\Package\\Classobj", "get_object_properties"];
+const date_timestamp = ["ryunosuke\\Functions\\Package\\Date", "date_timestamp"];
+const date_convert = ["ryunosuke\\Functions\\Package\\Date", "date_convert"];
+const date_interval = ["ryunosuke\\Functions\\Package\\Date", "date_interval"];
 const file_list = ["ryunosuke\\Functions\\Package\\FileSystem", "file_list"];
 const file_tree = ["ryunosuke\\Functions\\Package\\FileSystem", "file_tree"];
 const file_suffix = ["ryunosuke\\Functions\\Package\\FileSystem", "file_suffix"];
@@ -723,6 +756,7 @@ const namedcallize = ["ryunosuke\\Functions\\Package\\Funchand", "namedcallize"]
 const parameter_length = ["ryunosuke\\Functions\\Package\\Funchand", "parameter_length"];
 const function_shorten = ["ryunosuke\\Functions\\Package\\Funchand", "function_shorten"];
 const func_user_func_array = ["ryunosuke\\Functions\\Package\\Funchand", "func_user_func_array"];
+const func_new = ["ryunosuke\\Functions\\Package\\Funchand", "func_new"];
 const func_method = ["ryunosuke\\Functions\\Package\\Funchand", "func_method"];
 const function_alias = ["ryunosuke\\Functions\\Package\\Funchand", "function_alias"];
 const function_parameter = ["ryunosuke\\Functions\\Package\\Funchand", "function_parameter"];
@@ -796,10 +830,10 @@ const throws = ["ryunosuke\\Functions\\Package\\Syntax", "throws"];
 const throw_if = ["ryunosuke\\Functions\\Package\\Syntax", "throw_if"];
 const ifelse = ["ryunosuke\\Functions\\Package\\Syntax", "ifelse"];
 const switchs = ["ryunosuke\\Functions\\Package\\Syntax", "switchs"];
+const try_null = ["ryunosuke\\Functions\\Package\\Syntax", "try_null"];
 const try_catch = ["ryunosuke\\Functions\\Package\\Syntax", "try_catch"];
 const try_finally = ["ryunosuke\\Functions\\Package\\Syntax", "try_finally"];
 const try_catch_finally = ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_finally"];
-const date_interval = ["ryunosuke\\Functions\\Package\\Utility", "date_interval"];
 const get_uploaded_files = ["ryunosuke\\Functions\\Package\\Utility", "get_uploaded_files"];
 const cachedir = ["ryunosuke\\Functions\\Package\\Utility", "cachedir"];
 const cache = ["ryunosuke\\Functions\\Package\\Utility", "cache"];

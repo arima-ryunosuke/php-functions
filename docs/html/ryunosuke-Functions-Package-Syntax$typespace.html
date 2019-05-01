@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L703" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L732" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -766,7 +766,69 @@ assertSame(switchs(3, $cases, 'undefined'), 'undefined');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L601-L624" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L601-L628" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Syntax::try_null()" tabindex="-1" class="structure-title ">
+                        try_null						<small>($try, ...$variadic)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>例外を握りつぶす try 構文</p>
+<p>例外機構構文が冗長なことがまれによくあるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
+$try = function($a, $b, $c){return [$a, $b, $c];};
+assertSame(try_null($try, 1, 2, 3), [1, 2, 3]);
+// 例外が飛ぶ場合は null が返ってくる
+$try = function(){throw new \Exception('tried');};
+assertSame(try_null($try), null);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$try</td>
+				<td class="desc"><p>try ブロッククロージャ</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">...$variadic</td>
+				<td class="desc"><p>$try に渡る引数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>例外が飛ばなかったら $try ブロックの返り値、飛んだなら null</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L630-L653" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch						<small>($try, $catch = null, ...$variadic)</small>
@@ -834,7 +896,7 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L626-L653" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L655-L682" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally						<small>($try, $finally = null, ...$variadic)</small>
@@ -906,7 +968,7 @@ assertSame($finally_count, 2); // 呼ばれている
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L655-L702" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L684-L731" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally						<small>($try, $catch = null, $finally = null, ...$variadic)</small>

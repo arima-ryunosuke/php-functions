@@ -1395,6 +1395,9 @@
  * @method   \ChainObject  date1($format)
  * @method   \ChainObject  date_add($interval)
  * @method   \ChainObject  date_add1($object)
+ * @property \ChainObject $date_convert
+ * @method   \ChainObject  date_convert($datetimedata = null)
+ * @method   \ChainObject  date_convert1($format)
  * @method   \ChainObject  date_create($timezone = null)
  * @method   \ChainObject  date_create1($time = null)
  * @method   \ChainObject  date_create_from_format($time, $object = null)
@@ -1460,6 +1463,8 @@
  * @method   \ChainObject  date_time_set2($object, $hour, $second = null, $microseconds = null)
  * @method   \ChainObject  date_time_set3($object, $hour, $minute, $microseconds = null)
  * @method   \ChainObject  date_time_set4($object, $hour, $minute, $second = null)
+ * @property \ChainObject $date_timestamp
+ * @method   \ChainObject  date_timestamp()
  * @property \ChainObject $date_timestamp_get
  * @method   \ChainObject  date_timestamp_get()
  * @method   \ChainObject  date_timestamp_set($unixtimestamp)
@@ -1717,6 +1722,14 @@
  * @method   \ChainObject  func_method4($methodname, ...$defaultargs)
  * @method   \ChainObject  func_method5($methodname, ...$defaultargs)
  * @method   \ChainObject  func_method6($methodname, ...$defaultargs)
+ * @property \ChainObject $func_new
+ * @method   \ChainObject  func_new(...$defaultargs)
+ * @method   \ChainObject  func_new1($classname, ...$defaultargs)
+ * @method   \ChainObject  func_new2($classname, ...$defaultargs)
+ * @method   \ChainObject  func_new3($classname, ...$defaultargs)
+ * @method   \ChainObject  func_new4($classname, ...$defaultargs)
+ * @method   \ChainObject  func_new5($classname, ...$defaultargs)
+ * @method   \ChainObject  func_new6($classname, ...$defaultargs)
  * @property \ChainObject $func_user_func_array
  * @method   \ChainObject  func_user_func_array()
  * @method   \ChainObject  func_user_func_arrayP()
@@ -2000,6 +2013,8 @@
  * @method   \ChainObject  is_float()
  * @property \ChainObject $is_hasharray
  * @method   \ChainObject  is_hasharray()
+ * @property \ChainObject $is_indexarray
+ * @method   \ChainObject  is_indexarray()
  * @property \ChainObject $is_infinite
  * @method   \ChainObject  is_infinite()
  * @property \ChainObject $is_int
@@ -3212,6 +3227,14 @@
  * @method   \ChainObject  try_finally5($try, $finally = null, ...$variadic)
  * @method   \ChainObject  try_finally6($try, $finally = null, ...$variadic)
  * @method   \ChainObject  try_finally7($try, $finally = null, ...$variadic)
+ * @property \ChainObject $try_null
+ * @method   \ChainObject  try_null(...$variadic)
+ * @method   \ChainObject  try_null1($try, ...$variadic)
+ * @method   \ChainObject  try_null2($try, ...$variadic)
+ * @method   \ChainObject  try_null3($try, ...$variadic)
+ * @method   \ChainObject  try_null4($try, ...$variadic)
+ * @method   \ChainObject  try_null5($try, ...$variadic)
+ * @method   \ChainObject  try_null6($try, ...$variadic)
  * @property \ChainObject $ucfirst
  * @method   \ChainObject  ucfirst()
  * @property \ChainObject $ucwords

@@ -83,6 +83,19 @@ $object = new \stdClass();
 assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_indexarray()"> ryunosuke\Functions\Package\Arrays::is_indexarray()</a></h2>
+	<div class="description"><p>配列が数値配列か調べる</p>
+<p>空の配列も数値配列とみなす。<br />
+さらにいわゆる「連番配列」ではなく「キーが数値のみか？」で判定する。</p>
+<p>つまり、 is_hasharray とは排他的ではない。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertTrue(is_indexarray([]));
+assertTrue(is_indexarray([1, 2, 3]));
+assertFalse(is_indexarray(['x' =&gt; 'X']));
+// 抜け番があっても true になる（これは is_hasharray も true になる）
+assertTrue(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]));
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_hasharray()"> ryunosuke\Functions\Package\Arrays::is_hasharray()</a></h2>
 	<div class="description"><p>配列が連想配列か調べる</p>
 <p>空の配列は普通の配列とみなす。</p>
@@ -1369,6 +1382,91 @@ assertArraySubset([
 ], get_object_properties($object));
 </code></pre>
 </div>
+            	<h2>class<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date"> ryunosuke\Functions\Package\Date</a></h2>
+	<div class="description"><p>日付・時刻関連のユーティリティ</p>
+</div>
+        	<h2>classconstant<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::JP_ERA"> ryunosuke\Functions\Package\Date::JP_ERA</a></h2>
+	<div class="description"><p>和暦</p>
+</div>
+            	<h2>method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_timestamp()"> ryunosuke\Functions\Package\Date::date_timestamp()</a></h2>
+	<div class="description"><p>日時文字列をよしなにタイムスタンプに変換する</p>
+<p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
+また、相対指定の +1 month の月末問題は起きないようにしてある。</p>
+<p>かなり適当に和暦にも対応している。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 普通の日時文字列
+assertSame(date_timestamp('2014/12/24 12:34:56'), strtotime('2014/12/24 12:34:56'));
+// 和暦
+assertSame(date_timestamp('昭和31年12月24日 12時34分56秒'), strtotime('1956/12/24 12:34:56'));
+// 相対指定
+assertSame(date_timestamp('2012/01/31 +1 month'), strtotime('2012/02/29'));
+assertSame(date_timestamp('2012/03/31 -1 month'), strtotime('2012/02/29'));
+// マイクロ秒
+assertSame(date_timestamp('2014/12/24 12:34:56.789'), 1419392096.789);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_convert()"> ryunosuke\Functions\Package\Date::date_convert()</a></h2>
+	<div class="description"><p>日時文字列をよしなに別のフォーマットに変換する</p>
+<p>マイクロ秒にも対応している。<br />
+かなり適当に和暦にも対応している。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 和暦を Y/m/d H:i:s に変換
+assertSame(date_convert('Y/m/d H:i:s', '昭和31年12月24日 12時34分56秒'), '1956/12/24 12:34:56');
+// 単純に「マイクロ秒が使える date」としても使える
+$now = 1234567890.123; // テストがしづらいので固定時刻にする
+assertSame(date_convert('Y/m/d H:i:s.u', $now), '2009/02/14 08:31:30.123000');
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_interval()"> ryunosuke\Functions\Package\Date::date_interval()</a></h2>
+	<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
+<p>例えば <code>60 * 60 * 24 * 900 + 12345.678</code> （約900日12345秒）は・・・</p>
+<ul>
+<li>2 年（約900日なので）</li>
+<li>5 ヶ月（約(900 - 365 * 2 = 170)日なので）</li>
+<li>18 日（約(170 - 30.416 * 5 = 18)日なので）</li>
+<li>3 時間（約12345秒なので）</li>
+<li>25 分（約(12345 - 3600 * 3 = 1545)秒なので）</li>
+<li>45 秒（約(1545 - 60 * 25 = 45)秒なので）</li>
+<li>678 ミリ秒（.678 部分そのまま）</li>
+</ul>
+<p>となる（年はうるう年未考慮で365日、月は30.41666666日で換算）。</p>
+<p>$format を与えると DateInterval::format して文字列で返す。与えないと DateInterval をそのまま返す。<br />
+$format はクロージャを与えることができる。クロージャを与えた場合、各要素を引数としてコールバックされる。<br />
+$format は配列で与えることができる。配列で与えた場合、 0 になる要素は省かれる。<br />
+セパレータを与えたり、pre/suffix を与えたりできるが、難解なので省略する。</p>
+<p>$limit_type で換算のリミットを指定できる。例えば 'y' を指定すると「2年5ヶ月」となるが、 'm' を指定すると「29ヶ月」となる。<br />
+数値を与えるとその範囲でオートスケールする。例えば 3 を指定すると値が大きいとき <code>ymd</code> の表示になり、年が 0 になると <code>mdh</code> の表示に切り替わるようになる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 書式文字列指定（%vはミリ秒）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'), '02/05/18 03:25:45.678');
+
+// 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}), '678,45,25,3,18,5,2,0');
+
+// リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'), '00/29/18 03:25:45.678');
+
+// 書式に配列を与えてリミットに数値を与えるとその範囲でオートスケールする
+$format = [
+    'y' =&gt; '%y年',
+    'm' =&gt; '%mヶ月',
+    'd' =&gt; '%d日',
+    ' ',
+    'h' =&gt; '%h時間',
+    'i' =&gt; '%i分',
+    's' =&gt; '%s秒',
+];
+// 数が大きいので年・月・日の3要素のみ
+assertSame(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3), '2年5ヶ月18日');
+// 数がそこそこだと日・時間・分の3要素に切り替わる
+assertSame(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3), '20日 3時間25分');
+// どんなに数が小さくても3要素以下にはならない
+assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
+
+// 書式指定なし（DateInterval を返す）
+assertInstanceOf(\DateInterval::class, date_interval(123.456));
+</code></pre>
+</div>
             	<h2>class<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem"> ryunosuke\Functions\Package\FileSystem</a></h2>
 	<div class="description"><p>ファイルシステム関連のユーティリティ</p>
 </div>
@@ -1855,6 +1953,19 @@ assertSame(parameter_length('trim', true), 1);
 <pre><code class="language-php">// strlen に2つの引数を渡してもエラーにならない
 $strlen = func_user_func_array('strlen');
 assertSame($strlen('abc', null), 3);
+</code></pre>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_new()"> ryunosuke\Functions\Package\Funchand::func_new()</a></h2>
+	<div class="description"><p>指定クラスのコンストラクタを呼び出すクロージャを返す</p>
+<p>この関数を呼ぶとコンストラクタのクロージャを返す。</p>
+<p>オプションでデフォルト引数を設定できる（Example を参照）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Exception のコンストラクタを呼ぶクロージャ
+$newException = func_new(\Exception::class, 'hoge');
+// デフォルト引数を使用して Exception を作成
+assertSame($newException()-&gt;getMessage(), 'hoge');
+// 引数を指定して Exception を作成
+assertSame($newException('fuga')-&gt;getMessage(), 'fuga');
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_method()"> ryunosuke\Functions\Package\Funchand::func_method()</a></h2>
@@ -3077,6 +3188,18 @@ assertSame(switchs(2, $cases), 'value is 2');
 assertSame(switchs(3, $cases, 'undefined'), 'undefined');
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_null()"> ryunosuke\Functions\Package\Syntax::try_null()</a></h2>
+	<div class="description"><p>例外を握りつぶす try 構文</p>
+<p>例外機構構文が冗長なことがまれによくあるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
+$try = function($a, $b, $c){return [$a, $b, $c];};
+assertSame(try_null($try, 1, 2, 3), [1, 2, 3]);
+// 例外が飛ぶ場合は null が返ってくる
+$try = function(){throw new \Exception('tried');};
+assertSame(try_null($try), null);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch()"> ryunosuke\Functions\Package\Syntax::try_catch()</a></h2>
 	<div class="description"><p>try ～ catch 構文の関数版</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
@@ -3124,57 +3247,7 @@ assertSame($finally_count, 2); // 呼ばれている
             	<h2>class<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility"> ryunosuke\Functions\Package\Utility</a></h2>
 	<div class="description"><p>汎用的なユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::date_interval()"> ryunosuke\Functions\Package\Utility::date_interval()</a></h2>
-	<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
-<p>例えば <code>60 * 60 * 24 * 900 + 12345.678</code> （約900日12345秒）は・・・</p>
-<ul>
-<li>2 年（約900日なので）</li>
-<li>5 ヶ月（約(900 - 365 * 2 = 170)日なので）</li>
-<li>18 日（約(170 - 30.416 * 5 = 18)日なので）</li>
-<li>3 時間（約12345秒なので）</li>
-<li>25 分（約(12345 - 3600 * 3 = 1545)秒なので）</li>
-<li>45 秒（約(1545 - 60 * 25 = 45)秒なので）</li>
-<li>678 ミリ秒（.678 部分そのまま）</li>
-</ul>
-<p>となる（年はうるう年未考慮で365日、月は30.41666666日で換算）。</p>
-<p>$format を与えると DateInterval::format して文字列で返す。与えないと DateInterval をそのまま返す。<br />
-$format はクロージャを与えることができる。クロージャを与えた場合、各要素を引数としてコールバックされる。<br />
-$format は配列で与えることができる。配列で与えた場合、 0 になる要素は省かれる。<br />
-セパレータを与えたり、pre/suffix を与えたりできるが、難解なので省略する。</p>
-<p>$limit_type で換算のリミットを指定できる。例えば 'y' を指定すると「2年5ヶ月」となるが、 'm' を指定すると「29ヶ月」となる。<br />
-数値を与えるとその範囲でオートスケールする。例えば 3 を指定すると値が大きいとき <code>ymd</code> の表示になり、年が 0 になると <code>mdh</code> の表示に切り替わるようになる。</p>
-<p>Example:</p>
-<pre><code class="language-php">// 書式文字列指定（%vはミリ秒）
-assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'), '02/05/18 03:25:45.678');
-
-// 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
-assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}), '678,45,25,3,18,5,2,0');
-
-// リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
-assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'), '00/29/18 03:25:45.678');
-
-// 書式に配列を与えてリミットに数値を与えるとその範囲でオートスケールする
-$format = [
-    'y' =&gt; '%y年',
-    'm' =&gt; '%mヶ月',
-    'd' =&gt; '%d日',
-    ' ',
-    'h' =&gt; '%h時間',
-    'i' =&gt; '%i分',
-    's' =&gt; '%s秒',
-];
-// 数が大きいので年・月・日の3要素のみ
-assertSame(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3), '2年5ヶ月18日');
-// 数がそこそこだと日・時間・分の3要素に切り替わる
-assertSame(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3), '20日 3時間25分');
-// どんなに数が小さくても3要素以下にはならない
-assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
-
-// 書式指定なし（DateInterval を返す）
-assertInstanceOf(\DateInterval::class, date_interval(123.456));
-</code></pre>
-</div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()"> ryunosuke\Functions\Package\Utility::get_uploaded_files()</a></h2>
+                	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()"> ryunosuke\Functions\Package\Utility::get_uploaded_files()</a></h2>
 	<div class="description"><p>$_FILES の構造を組み替えて $_POST などと同じにする</p>
 <p>$_FILES の配列構造はバグとしか思えないのでそれを是正する関数。<br />
 第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。</p>
