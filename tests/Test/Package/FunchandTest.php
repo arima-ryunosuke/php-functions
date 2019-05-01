@@ -552,6 +552,8 @@ class FunchandTest extends AbstractTestCase
     {
         $object = new class()
         {
+            static function fuga(...$args) { return implode(',', $args); }
+
             function hoge(...$args) { return implode(',', $args); }
         };
 
@@ -562,6 +564,21 @@ class FunchandTest extends AbstractTestCase
         $this->assertEquals('X,Y,Z', $hoge($object));
         $this->assertEquals('x,Y,Z', $hoge($object, 'x'));
         $this->assertEquals('x,y,z', $hoge($object, 'x', 'y', 'z'));
+
+        $fuga = (func_method)('fuga');
+        $this->assertEquals('x,y,z', $fuga(get_class($object), 'x', 'y', 'z'));
+
+        // __construct モード
+        $exnames = [
+            \Exception::class,
+            \InvalidArgumentException::class,
+            \UnexpectedValueException::class,
+        ];
+        /** @var \Exception[] $exs */
+        $exs = array_map((func_method)('__construct', 'hoge'), $exnames);
+        $this->assertEquals('hoge', $exs[0]->getMessage());
+        $this->assertEquals('hoge', $exs[1]->getMessage());
+        $this->assertEquals('hoge', $exs[2]->getMessage());
 
         // array_maps とか array_map_method とかの模倣
         $exs = [

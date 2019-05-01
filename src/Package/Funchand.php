@@ -877,6 +877,11 @@ class Funchand
      */
     public static function func_method($methodname, ...$defaultargs)
     {
+        if ($methodname === '__construct') {
+            return function ($object, ...$args) use ($defaultargs) {
+                return new $object(...$args + $defaultargs);
+            };
+        }
         return function ($object, ...$args) use ($methodname, $defaultargs) {
             return ([$object, $methodname])(...$args + $defaultargs);
         };
