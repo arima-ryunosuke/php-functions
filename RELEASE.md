@@ -10,6 +10,17 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.2
+
+- [feature][Date] date_convert を追加
+- [feature][Date] date_timestamp を追加
+- [feature][Funchand] func_method のコンストラクタ対応
+- [feature][Funchand] func_new を追加
+- [feature][Syntax] try_null を追加
+- [feature][Arrays] is_indexarray を追加
+- [fixbug][Syntax] parse_php で cache: false を指定しても溜め込まれる不具合を修正
+  - false を指定しても溜め込まれていた
+
 ## 1.3.1
 
 - [feature][Arrays] array_pickup の $keys が配列しか受け付けていなかったのを修正
