@@ -131,6 +131,70 @@ class Date
     }
 
     /**
+     * 日時文字列をよしなに別のフォーマットに変換する
+     *
+     * マイクロ秒にも対応している。
+     * かなり適当に和暦にも対応している。
+     *
+     * Example:
+     * ```php
+     * // 和暦を Y/m/d H:i:s に変換
+     * assertSame(date_convert('Y/m/d H:i:s', '昭和31年12月24日 12時34分56秒'), '1956/12/24 12:34:56');
+     * // 単純に「マイクロ秒が使える date」としても使える
+     * $now = 1234567890.123; // テストがしづらいので固定時刻にする
+     * assertSame(date_convert('Y/m/d H:i:s.u', $now), '2009/02/14 08:31:30.123000');
+     * ```
+     *
+     * @param string $format フォーマット
+     * @param string|int|float $datetimedata 日時データ。省略時は microtime
+     * @return string 日時文字列
+     */
+    public static function date_convert($format, $datetimedata = null)
+    {
+        // 省略時は microtime
+        if ($datetimedata === null) {
+            $timestamp = microtime(true);
+        }
+        else {
+            $timestamp = (date_timestamp)($datetimedata);
+            if ($timestamp === null) {
+                throw new \InvalidArgumentException("parse failed '$datetimedata'");
+            }
+        }
+
+        $replace = function ($string, $char, $replace) {
+            $string = preg_replace('/(?<!\\\)' . $char . '/', '${1}' . $replace, $string);
+            return preg_replace('/\\\\' . $char . '/', $char, $string);
+        };
+
+        if (preg_match('/[JbKk]/', $format)) {
+            $era = (array_find)(JP_ERA, function ($v) use ($timestamp) {
+                if ($v['since'] <= $timestamp) {
+                    return $v;
+                }
+            }, false);
+            if ($era === false) {
+                throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'");
+            }
+
+            $y = idate('Y', $timestamp) - idate('Y', $era['since']) + 1;
+            $format = $replace($format, 'J', $era['name']);
+            $format = $replace($format, 'b', $era['abbr']);
+            $format = $replace($format, 'K', $y === 1 ? '元' : $y);
+            $format = $replace($format, 'k', $y);
+        }
+
+        $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', $timestamp)]);
+
+        if (is_float($timestamp)) {
+            list($second, $micro) = explode('.', $timestamp) + [1 => '000000'];
+            $datetime = \DateTime::createFromFormat('Y/m/d H:i:s.u', date('Y/m/d H:i:s.', $second) . $micro);
+            return $datetime->format($format);
+        }
+        return date($format, $timestamp);
+    }
+
+    /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
      *
      * 例えば `60 * 60 * 24 * 900 + 12345.678` （約900日12345秒）は・・・

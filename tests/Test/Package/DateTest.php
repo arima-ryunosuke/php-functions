@@ -89,6 +89,29 @@ class DateTest extends AbstractTestCase
         $this->assertEquals(null, $test('2014/12/24 12:34:70'));  // 秒が不正
     }
 
+    function test_date_convert()
+    {
+        $this->assertEquals('2009/02/14 08:31:30', (date_convert)('Y/m/d H:i:s', 1234567890));
+        $this->assertEquals('2009/02/14 08:31:30', (date_convert)('Y/m/d H:i:s', 1234567890.123));
+        $this->assertEquals('2009/02/14 08:31:30.000000', (date_convert)('Y/m/d H:i:s.u', 1234567890));
+        $this->assertEquals('2009/02/14 08:31:30.123000', (date_convert)('Y/m/d H:i:s.u', 1234567890.123));
+        $this->assertEquals('2014/12/24 12:34:56.123000', (date_convert)('Y/m/d H:i:s.u', '2014/12/24 12:34:56.123'));
+        $this->assertEquals('2019/12/24 12:34:56.123000', (date_convert)('Y/m/d H:i:s.u', '令和元年12月24日 12時34分56.123秒'));
+
+        $this->assertEquals(date('Y/m/d H:i:s'), (date_convert)('Y/m/d H:i:s')); // microtime はテストがつらすぎるので u を付けない
+
+        $this->assertEquals('明治41年12月24日', (date_convert)('Jk年m月d日', '1908/12/24'));
+        $this->assertEquals('大正12年12月24日', (date_convert)('Jk年m月d日', '1923/12/24'));
+        $this->assertEquals('昭和37年12月24日', (date_convert)('Jk年m月d日', '1962/12/24'));
+        $this->assertEquals('平成元年12月24日', (date_convert)('JK年m月d日', '1989/12/24'));
+        $this->assertEquals('R元年12月24日', (date_convert)('bK年m月d日', '2019/12/24'));
+        $this->assertEquals('令和1年12月24日（火曜日）', (date_convert)('Jk年m月d日（x曜日）', '2019/12/24'));
+        $this->assertEquals('YJKkbx', (date_convert)('\\Y\\J\\K\\k\\b\\x', '2019/12/24'));
+
+        $this->assertException('parse failed', date_convert, 'Y/m/d H:i:s.u', 'hogera');
+        $this->assertException('notfound JP_ERA', date_convert, 'JY/m/d H:i:s.u', '1200/12/23');
+    }
+
     function test_date_interval()
     {
         $HOUR_1 = 60 * 60;
