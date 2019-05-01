@@ -538,6 +538,16 @@ class FunchandTest extends AbstractTestCase
         $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen', '-'));
     }
 
+    function test_func_new()
+    {
+        $newException = (func_new)(\Exception::class, 'hoge');
+        /** @var \Exception $ex */
+        $ex = $newException();
+        $this->assertEquals('hoge', $ex->getMessage());
+        $ex = $newException('fuga');
+        $this->assertEquals('fuga', $ex->getMessage());
+    }
+
     function test_func_method()
     {
         $object = new class()

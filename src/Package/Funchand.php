@@ -814,6 +814,34 @@ class Funchand
     }
 
     /**
+     * 指定クラスのコンストラクタを呼び出すクロージャを返す
+     *
+     * この関数を呼ぶとコンストラクタのクロージャを返す。
+     *
+     * オプションでデフォルト引数を設定できる（Example を参照）。
+     *
+     * Example:
+     * ```php
+     * // Exception のコンストラクタを呼ぶクロージャ
+     * $newException = func_new(\Exception::class, 'hoge');
+     * // デフォルト引数を使用して Exception を作成
+     * assertSame($newException()->getMessage(), 'hoge');
+     * // 引数を指定して Exception を作成
+     * assertSame($newException('fuga')->getMessage(), 'fuga');
+     * ```
+     *
+     * @param string $classname クラス名
+     * @param array $defaultargs コンストラクタのデフォルト引数
+     * @return \Closure コンストラクタを呼び出すクロージャ
+     */
+    public static function func_new($classname, ...$defaultargs)
+    {
+        return function (...$args) use ($classname, $defaultargs) {
+            return new $classname(...$args + $defaultargs);
+        };
+    }
+
+    /**
      * 指定メソッドを呼び出すクロージャを返す
      *
      * この関数を呼ぶとメソッドのクロージャを返す。
