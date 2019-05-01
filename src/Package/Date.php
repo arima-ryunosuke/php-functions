@@ -7,6 +7,129 @@ namespace ryunosuke\Functions\Package;
  */
 class Date
 {
+    /** 和暦 */
+    const JP_ERA = [
+        ['name' => '令和', 'abbr' => 'R', 'since' => +1556636400], // 2019-05-01
+        ['name' => '平成', 'abbr' => 'H', 'since' => +600188400],  // 1989-01-08
+        ['name' => '昭和', 'abbr' => 'S', 'since' => -1357635600], // 1926-12-25
+        ['name' => '大正', 'abbr' => 'T', 'since' => -1812186000], // 1912-07-30
+        ['name' => '明治', 'abbr' => 'M', 'since' => -3216790800], // 1868-01-25
+    ];
+
+    /**
+     * 日時文字列をよしなにタイムスタンプに変換する
+     *
+     * マイクロ秒にも対応している。つまり返り値は int か float になる。
+     * また、相対指定の +1 month の月末問題は起きないようにしてある。
+     *
+     * かなり適当に和暦にも対応している。
+     *
+     * Example:
+     * ```php
+     * // 普通の日時文字列
+     * assertSame(date_timestamp('2014/12/24 12:34:56'), strtotime('2014/12/24 12:34:56'));
+     * // 和暦
+     * assertSame(date_timestamp('昭和31年12月24日 12時34分56秒'), strtotime('1956/12/24 12:34:56'));
+     * // 相対指定
+     * assertSame(date_timestamp('2012/01/31 +1 month'), strtotime('2012/02/29'));
+     * assertSame(date_timestamp('2012/03/31 -1 month'), strtotime('2012/02/29'));
+     * // マイクロ秒
+     * assertSame(date_timestamp('2014/12/24 12:34:56.789'), 1419392096.789);
+     * ```
+     *
+     * @param string|int|float $datetimedata 日時データ
+     * @return int|float|null タイムスタンプ。パース失敗時は null
+     */
+    public static function date_timestamp($datetimedata)
+    {
+        // 全角を含めた trim
+        $chars = "[\\x0-\x20\x7f\xc2\xa0\xe3\x80\x80]";
+        $datetimedata = preg_replace("/\A{$chars}++|{$chars}++\z/u", '', $datetimedata);
+
+        // 和暦を西暦に置換
+        $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
+        $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
+            list(, $era, $year) = $matches;
+            $eratime = (array_find)(JP_ERA, function ($v) use ($era) {
+                if (in_array($era, [$v['name'], $v['abbr']], true)) {
+                    return $v['since'];
+                }
+            }, false);
+            return idate('Y', $eratime) + ($year === '元' ? 1 : $year) - 1;
+        }, $datetimedata);
+
+        // 単位文字列を置換
+        $datetimedata = strtr($datetimedata, [
+            '　'  => ' ',
+            '西暦' => '',
+            '年'  => '-',
+            '月'  => '-',
+            '日'  => ' ',
+            '時'  => ':',
+            '分'  => ':',
+            '秒'  => '',
+        ]);
+        $datetimedata = trim($datetimedata, " \t\n\r\0\x0B:-");
+
+        // 数値4桁は年と解釈されるように
+        if (preg_match('/^[0-9]{4}$/', $datetimedata)) {
+            $datetimedata .= '-01-01';
+        }
+
+        // 数値系はタイムスタンプとみなす
+        if (ctype_digit("$datetimedata")) {
+            return (int) $datetimedata;
+        }
+        if (is_numeric($datetimedata)) {
+            return (float) $datetimedata;
+        }
+
+        // date_parse してみる
+        $parts = date_parse($datetimedata);
+        if (!$parts) {
+            // ドキュメントに「成功した場合に日付情報を含む配列、失敗した場合に FALSE を返します」とあるが、失敗する気配がない
+            return null; // @codeCoverageIgnore
+        }
+        if ($parts['error_count']) {
+            return null;
+        }
+
+        if (!checkdate($parts['month'], $parts['day'], $parts['year'])) {
+            return null;
+        }
+
+        if (isset($parts['relative'])) {
+            $relative = $parts['relative'];
+            $parts['year'] += $relative['year'];
+            $parts['month'] += $relative['month'];
+            // php の相対指定は割と腐っているので補正する（末日を超えても月は変わらないようにする）
+            if ($parts['month'] > 12) {
+                $parts['year'] += intdiv($parts['month'], 12);
+                $parts['month'] = $parts['month'] % 12;
+            }
+            if ($parts['month'] < 1) {
+                $parts['year'] += intdiv(-12 + $parts['month'], 12);
+                $parts['month'] = 12 + $parts['month'] % 12;
+            }
+            if (!checkdate($parts['month'], $parts['day'], $parts['year'])) {
+                $parts['day'] = idate('t', mktime(12, 12, 12, $parts['month'], 1, $parts['year']));
+            }
+            $parts['day'] += $relative['day'];
+            $parts['hour'] += $relative['hour'];
+            $parts['minute'] += $relative['minute'];
+            $parts['second'] += $relative['second'];
+        }
+
+        // ドキュメントに「引数が不正な場合、 この関数は FALSE を返します」とあるが、 date_parse の結果を与える分には失敗しないはず
+        $time = mktime($parts['hour'], $parts['minute'], $parts['second'], $parts['month'], $parts['day'], $parts['year']);
+        if ($parts['fraction']) {
+            // 1970 以前なら減算、以降なら加算じゃないと帳尻が合わなくなる
+            $time += $time >= 0 ? $parts['fraction'] : -$parts['fraction'];
+        }
+
+        return $time;
+    }
+
     /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
      *

@@ -4,6 +4,91 @@ namespace ryunosuke\Test\Package;
 
 class DateTest extends AbstractTestCase
 {
+    function test_date_timestamp()
+    {
+        // テストがコケてタイムスタンプが出力されても分かりにくすぎるので文字列化してテストする
+        $test = function ($val) {
+            $timestamp = (date_timestamp)($val);
+            if ($timestamp === null) {
+                return null;
+            }
+            list($second, $micro) = explode('.', $timestamp) + [1 => '000000'];
+            return date('Y/m/d H:i:s', $second) . ".$micro";
+        };
+
+        // 割と普通のやつ
+        $this->assertEquals('2014/12/24 12:34:56.000000', $test('2014/12/24 12:34:56'));
+        $this->assertEquals('2014/12/24 00:00:00.000000', $test('2014/12/24'));
+        // 日本語
+        $this->assertEquals('2014/12/24 12:34:56.000000', $test('西暦2014年12月24日12時34分56秒'));
+        $this->assertEquals('2014/12/24 00:00:00.000000', $test('西暦2014年12月24日'));
+        // 西暦なし
+        $this->assertEquals('2014/12/24 12:34:56.000000', $test('2014年12月24日12時34分56秒'));
+        $this->assertEquals('2014/12/24 00:00:00.000000', $test('2014年12月24日'));
+        // 和暦
+        $this->assertEquals('1956/12/24 12:34:56.000000', $test('昭和31年12月24日 12時34分56秒'));
+        $this->assertEquals('1956/12/24 00:00:00.000000', $test('昭和31年12月24日'));
+        $this->assertEquals('2019/12/24 12:34:56.000000', $test('令和元年12月24日 12時34分56秒'));
+        $this->assertEquals('2019/12/24 00:00:00.000000', $test('令和元年12月24日'));
+        // 数値X桁
+        $this->assertEquals('2014/01/01 00:00:00.000000', $test('2014'));
+        $this->assertEquals('2014/01/01 00:00:00.000000', $test('西暦2014'));
+        $this->assertEquals('2014/01/01 00:00:00.000000', $test('平成26'));
+        $this->assertEquals('2014/01/01 00:00:00.000000', $test('2014年'));
+        $this->assertEquals('2014/01/01 00:00:00.000000', $test('西暦2014年'));
+        $this->assertEquals('2014/01/01 00:00:00.000000', $test('平成26年'));
+        // マイクロ秒
+        $this->assertEquals('2009/02/14 08:31:30.000000', $test(1234567890));
+        $this->assertEquals('2009/02/14 08:31:30.000000', $test('1234567890'));
+        $this->assertEquals('2009/02/14 08:31:30.789', $test(1234567890.789));
+        $this->assertEquals('2009/02/14 08:31:30.789', $test('1234567890.789'));
+        $this->assertEquals('2014/12/24 12:34:56.789', $test('2014/12/24 12:34:56.789'));
+        $this->assertEquals('1956/12/24 12:34:56.789', $test('昭和31年12月24日 12時34分56.789秒'));
+        // 相対指定
+        $this->assertEquals('2012/02/28 12:34:56.000000', $test('2012/01/28 12:34:56 +1 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/01/29 12:34:56 +1 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/01/30 12:34:56 +1 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/01/31 12:34:56 +1 month'));
+        $this->assertEquals('2012/03/01 12:34:56.000000', $test('2012/02/01 12:34:56 +1 month'));
+        $this->assertEquals('2012/02/28 12:34:56.000000', $test('2011/12/28 12:34:56 +2 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2011/12/29 12:34:56 +2 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2011/12/30 12:34:56 +2 month'));
+        $this->assertEquals('2012/03/01 12:34:56.000000', $test('2012/01/01 12:34:56 +2 month'));
+        $this->assertEquals('2012/03/01 12:34:56.000000', $test('2012/04/01 12:34:56 -1 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/03/31 12:34:56 -1 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/03/30 12:34:56 -1 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/03/29 12:34:56 -1 month'));
+        $this->assertEquals('2012/02/28 12:34:56.000000', $test('2012/03/28 12:34:56 -1 month'));
+        $this->assertEquals('2012/03/01 12:34:56.000000', $test('2012/05/01 12:34:56 -2 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/04/30 12:34:56 -2 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2012/04/29 12:34:56 -2 month'));
+        $this->assertEquals('2012/02/28 12:34:56.000000', $test('2012/04/28 12:34:56 -2 month'));
+        $this->assertEquals('2012/04/28 12:34:56.000000', $test('2011/04/28 12:34:56 +12 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2011/01/31 12:34:56 +13 month'));
+        $this->assertEquals('2012/04/28 12:34:56.000000', $test('2013/04/28 12:34:56 -12 month'));
+        $this->assertEquals('2012/02/29 12:34:56.000000', $test('2013/03/31 12:34:56 -13 month'));
+        $this->assertEquals('2021/04/28 12:34:56.000000', $test('2011/04/28 12:34:56 +120 month'));
+        $this->assertEquals('2022/01/31 12:34:56.000000', $test('2011/01/31 12:34:56 +132 month'));
+        $this->assertEquals('2003/04/28 12:34:56.000000', $test('2013/04/28 12:34:56 -120 month'));
+        $this->assertEquals('2002/03/31 12:34:56.000000', $test('2013/03/31 12:34:56 -132 month'));
+        // 月がメインなのでほかはさっと流す
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2011/12/24 12:34:56 +1 year'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2013/12/24 12:34:56 -1 year'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/23 12:34:56 +1 day'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/25 12:34:56 -1 day'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/24 11:34:56 +1 hour'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/24 13:34:56 -1 hour'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/24 12:33:56 +1 minute'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/24 12:35:56 -1 minute'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/24 12:34:55 +1 second'));
+        $this->assertEquals('2012/12/24 12:34:56.000000', $test('2012/12/24 12:34:57 -1 second'));
+        // 不正系
+        $this->assertEquals(null, $test('hogera'));     // 明らかにヤバイ1
+        $this->assertEquals(null, $test('9999/99/99')); // 明らかにヤバイ2
+        $this->assertEquals(null, $test('2014/2/29'));  // 閏日でない
+        $this->assertEquals(null, $test('2014/12/24 12:34:70'));  // 秒が不正
+    }
+
     function test_date_interval()
     {
         $HOUR_1 = 60 * 60;
