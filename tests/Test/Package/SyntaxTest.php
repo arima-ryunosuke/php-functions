@@ -392,6 +392,19 @@ PHP
         $this->assertException('is not defined in', switchs, 9, $cases);
     }
 
+    function test_try_null()
+    {
+        $try = function ($x) {
+            if ($x) {
+                return $x;
+            }
+            throw new \Exception();
+        };
+        $this->assertEquals(null, (try_null)($try, 0));
+        $this->assertEquals(1, (try_null)($try, 1));
+        $this->assertEquals(2, (try_null)($try, 2));
+    }
+
     function test_try_catch()
     {
         $try = function () {

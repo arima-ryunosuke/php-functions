@@ -599,6 +599,35 @@ class Syntax
     }
 
     /**
+     * 例外を握りつぶす try 構文
+     *
+     * 例外機構構文が冗長なことがまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // 例外が飛ばない場合は平和極まりない
+     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * assertSame(try_null($try, 1, 2, 3), [1, 2, 3]);
+     * // 例外が飛ぶ場合は null が返ってくる
+     * $try = function(){throw new \Exception('tried');};
+     * assertSame(try_null($try), null);
+     * ```
+     *
+     * @param callable $try try ブロッククロージャ
+     * @param array $variadic $try に渡る引数
+     * @return mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら null
+     */
+    public static function try_null($try, ...$variadic)
+    {
+        try {
+            return $try(...$variadic);
+        }
+        catch (\Exception $tried_ex) {
+            return null;
+        }
+    }
+
+    /**
      * try ～ catch 構文の関数版
      *
      * 例外機構構文が冗長なことがまれによくあるはず。
