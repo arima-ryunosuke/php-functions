@@ -10,6 +10,10 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.3
+
+- [feature][Syntax] evaluate を追加
+
 ## 1.3.2
 
 - [feature][Date] date_convert を追加
