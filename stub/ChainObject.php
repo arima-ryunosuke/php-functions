@@ -1552,8 +1552,9 @@
  * @method   \ChainObject  eval_func5($expression, ...$variadic)
  * @method   \ChainObject  eval_func6($expression, ...$variadic)
  * @property \ChainObject $evaluate
- * @method   \ChainObject  evaluate($contextvars = [])
- * @method   \ChainObject  evaluate1($phpcode)
+ * @method   \ChainObject  evaluate($contextvars = [], $cachesize = 256)
+ * @method   \ChainObject  evaluate1($phpcode, $cachesize = 256)
+ * @method   \ChainObject  evaluate2($phpcode, $contextvars = [])
  * @property \ChainObject $exp
  * @method   \ChainObject  exp()
  * @method   \ChainObject  explode($str, $limit = null)

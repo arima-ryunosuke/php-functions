@@ -10437,7 +10437,7 @@ if (!isset($excluded_functions["evaluate"]) && (!function_exists("evaluate") || 
      * ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。
      *
      * 短いステートメントだと opcode が少ないのでファイルを経由せず直接 eval したほうが速いことに留意。
-     * 一応内部で振り分けるようにはしてある。
+     * 一応引数で指定できるようにはしてある。
      *
      * Example:
      * ```php
@@ -10452,12 +10452,13 @@ if (!isset($excluded_functions["evaluate"]) && (!function_exists("evaluate") || 
      *
      * @param string $phpcode 実行する php コード
      * @param array $contextvars コンテキスト変数配列
+     * @param int $cachesize キャッシュするサイズ
      * @return mixed eval の return 値
      */
-    function evaluate($phpcode, $contextvars = [])
+    function evaluate($phpcode, $contextvars = [], $cachesize = 256)
     {
         $cachefile = null;
-        if (strlen($phpcode) >= 256) {
+        if ($cachesize && strlen($phpcode) >= $cachesize) {
             $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
             if (!file_exists($cachefile)) {
                 file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
