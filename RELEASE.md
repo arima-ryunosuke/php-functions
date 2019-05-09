@@ -10,6 +10,18 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.4
+
+- [fixbug][Classobj] get_object_properties で親の private フィールドが含まれていない不具合を修正
+- [feature][Utility] is_ansi を追加
+- [feature][Utility] ansi_colorize を追加
+- [feature][Vars] var_pretty を追加
+- [feature][Vars] varcmp の SORT_STRICT 対応
+- [fixbug][Arrays] array_strpad で値関係を指定していないのに処理が走る不具合を修正
+- [feature][Arrays] array_distinct を追加
+- [feature][Network] ping を追加
+- [change][Transporter] グローバル側で定数が重複する可能性があるので if を追加
+
 ## 1.3.3
 
 - [feature][Syntax] evaluate を追加
