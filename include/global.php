@@ -4,637 +4,650 @@
 
 
 # constants
-/** 和暦 */
-const JP_ERA = [
-    [
-        "name"  => "令和",
-        "abbr"  => "R",
-        "since" => 1556636400,
-    ],
-    [
-        "name"  => "平成",
-        "abbr"  => "H",
-        "since" => 600188400,
-    ],
-    [
-        "name"  => "昭和",
-        "abbr"  => "S",
-        "since" => -1357635600,
-    ],
-    [
-        "name"  => "大正",
-        "abbr"  => "T",
-        "since" => -1812186000,
-    ],
-    [
-        "name"  => "明治",
-        "abbr"  => "M",
-        "since" => -3216790800,
-    ],
-];
+if (!defined("JP_ERA")) {
+    /** 和暦 */
+    define("JP_ERA", [
+        [
+            "name"  => "令和",
+            "abbr"  => "R",
+            "since" => 1556636400,
+        ],
+        [
+            "name"  => "平成",
+            "abbr"  => "H",
+            "since" => 600188400,
+        ],
+        [
+            "name"  => "昭和",
+            "abbr"  => "S",
+            "since" => -1357635600,
+        ],
+        [
+            "name"  => "大正",
+            "abbr"  => "T",
+            "since" => -1812186000,
+        ],
+        [
+            "name"  => "明治",
+            "abbr"  => "M",
+            "since" => -3216790800,
+        ],
+    ]);
+}
 
-/** SQL キーワード（全 RDBMS ごちゃまぜ） */
-const KEYWORDS = [
-    ""  => "",
-    0   => "ACCESSIBLE",
-    1   => "ACTION",
-    2   => "ADD",
-    3   => "AFTER",
-    4   => "AGAINST",
-    5   => "AGGREGATE",
-    6   => "ALGORITHM",
-    7   => "ALL",
-    8   => "ALTER",
-    9   => "ALTER TABLE",
-    10  => "ANALYSE",
-    11  => "ANALYZE",
-    12  => "AND",
-    13  => "AS",
-    14  => "ASC",
-    15  => "AUTOCOMMIT",
-    16  => "AUTO_INCREMENT",
-    17  => "BACKUP",
-    18  => "BEGIN",
-    19  => "BETWEEN",
-    20  => "BINLOG",
-    21  => "BOTH",
-    22  => "CASCADE",
-    23  => "CASE",
-    24  => "CHANGE",
-    25  => "CHANGED",
-    26  => "CHARACTER SET",
-    27  => "CHARSET",
-    28  => "CHECK",
-    29  => "CHECKSUM",
-    30  => "COLLATE",
-    31  => "COLLATION",
-    32  => "COLUMN",
-    33  => "COLUMNS",
-    34  => "COMMENT",
-    35  => "COMMIT",
-    36  => "COMMITTED",
-    37  => "COMPRESSED",
-    38  => "CONCURRENT",
-    39  => "CONSTRAINT",
-    40  => "CONTAINS",
-    41  => "CONVERT",
-    42  => "CREATE",
-    43  => "CROSS",
-    44  => "CURRENT_TIMESTAMP",
-    45  => "DATABASE",
-    46  => "DATABASES",
-    47  => "DAY",
-    48  => "DAY_HOUR",
-    49  => "DAY_MINUTE",
-    50  => "DAY_SECOND",
-    51  => "DEFAULT",
-    52  => "DEFINER",
-    53  => "DELAYED",
-    54  => "DELETE",
-    55  => "DELETE FROM",
-    56  => "DESC",
-    57  => "DESCRIBE",
-    58  => "DETERMINISTIC",
-    59  => "DISTINCT",
-    60  => "DISTINCTROW",
-    61  => "DIV",
-    62  => "DO",
-    63  => "DROP",
-    64  => "DUMPFILE",
-    65  => "DUPLICATE",
-    66  => "DYNAMIC",
-    67  => "ELSE",
-    68  => "ENCLOSED",
-    69  => "END",
-    70  => "ENGINE",
-    71  => "ENGINES",
-    72  => "ENGINE_TYPE",
-    73  => "ESCAPE",
-    74  => "ESCAPED",
-    75  => "EVENTS",
-    76  => "EXCEPT",
-    77  => "EXECUTE",
-    78  => "EXISTS",
-    79  => "EXPLAIN",
-    80  => "EXTENDED",
-    81  => "FAST",
-    82  => "FIELDS",
-    83  => "FILE",
-    84  => "FIRST",
-    85  => "FIXED",
-    86  => "FLUSH",
-    87  => "FOR",
-    88  => "FORCE",
-    89  => "FOREIGN",
-    90  => "FROM",
-    91  => "FULL",
-    92  => "FULLTEXT",
-    93  => "FUNCTION",
-    94  => "GLOBAL",
-    95  => "GRANT",
-    96  => "GRANTS",
-    97  => "GROUP BY",
-    98  => "GROUP_CONCAT",
-    99  => "HAVING",
-    100 => "HEAP",
-    101 => "HIGH_PRIORITY",
-    102 => "HOSTS",
-    103 => "HOUR",
-    104 => "HOUR_MINUTE",
-    105 => "HOUR_SECOND",
-    106 => "IDENTIFIED",
-    107 => "IF",
-    108 => "IFNULL",
-    109 => "IGNORE",
-    110 => "IN",
-    111 => "INDEX",
-    112 => "INDEXES",
-    113 => "INFILE",
-    114 => "INNER",
-    115 => "INSERT",
-    116 => "INSERT_ID",
-    117 => "INSERT_METHOD",
-    118 => "INTERSECT",
-    119 => "INTERVAL",
-    120 => "INTO",
-    121 => "INVOKER",
-    122 => "IS",
-    123 => "ISOLATION",
-    124 => "JOIN",
-    125 => "KEY",
-    126 => "KEYS",
-    127 => "KILL",
-    128 => "LAST_INSERT_ID",
-    129 => "LEADING",
-    130 => "LEFT",
-    131 => "LEVEL",
-    132 => "LIKE",
-    133 => "LIMIT",
-    134 => "LINEAR",
-    135 => "LINES",
-    136 => "LOAD",
-    137 => "LOCAL",
-    138 => "LOCK",
-    139 => "LOCKS",
-    140 => "LOGS",
-    141 => "LOW_PRIORITY",
-    142 => "MARIA",
-    143 => "MASTER",
-    144 => "MASTER_CONNECT_RETRY",
-    145 => "MASTER_HOST",
-    146 => "MASTER_LOG_FILE",
-    147 => "MATCH",
-    148 => "MAX_CONNECTIONS_PER_HOUR",
-    149 => "MAX_QUERIES_PER_HOUR",
-    150 => "MAX_ROWS",
-    151 => "MAX_UPDATES_PER_HOUR",
-    152 => "MAX_USER_CONNECTIONS",
-    153 => "MEDIUM",
-    154 => "MERGE",
-    155 => "MINUTE",
-    156 => "MINUTE_SECOND",
-    157 => "MIN_ROWS",
-    158 => "MODE",
-    159 => "MODIFY",
-    160 => "MONTH",
-    161 => "MRG_MYISAM",
-    162 => "MYISAM",
-    163 => "NAMES",
-    164 => "NATURAL",
-    165 => "NOT",
-    166 => "NOW()",
-    167 => "NULL",
-    168 => "OFFSET",
-    169 => "ON",
-    170 => "ON DELETE",
-    171 => "ON UPDATE",
-    172 => "OPEN",
-    173 => "OPTIMIZE",
-    174 => "OPTION",
-    175 => "OPTIONALLY",
-    176 => "OR",
-    177 => "ORDER BY",
-    178 => "OUTER",
-    179 => "OUTFILE",
-    180 => "PACK_KEYS",
-    181 => "PAGE",
-    182 => "PARTIAL",
-    183 => "PARTITION",
-    184 => "PARTITIONS",
-    185 => "PASSWORD",
-    186 => "PRIMARY",
-    187 => "PRIVILEGES",
-    188 => "PROCEDURE",
-    189 => "PROCESS",
-    190 => "PROCESSLIST",
-    191 => "PURGE",
-    192 => "QUICK",
-    193 => "RAID0",
-    194 => "RAID_CHUNKS",
-    195 => "RAID_CHUNKSIZE",
-    196 => "RAID_TYPE",
-    197 => "RANGE",
-    198 => "READ",
-    199 => "READ_ONLY",
-    200 => "READ_WRITE",
-    201 => "REFERENCES",
-    202 => "REGEXP",
-    203 => "RELOAD",
-    204 => "RENAME",
-    205 => "REPAIR",
-    206 => "REPEATABLE",
-    207 => "REPLACE",
-    208 => "REPLICATION",
-    209 => "RESET",
-    210 => "RESTORE",
-    211 => "RESTRICT",
-    212 => "RETURN",
-    213 => "RETURNS",
-    214 => "REVOKE",
-    215 => "RIGHT",
-    216 => "RLIKE",
-    217 => "ROLLBACK",
-    218 => "ROW",
-    219 => "ROWS",
-    220 => "ROW_FORMAT",
-    221 => "SECOND",
-    222 => "SECURITY",
-    223 => "SELECT",
-    224 => "SEPARATOR",
-    225 => "SERIALIZABLE",
-    226 => "SESSION",
-    227 => "SET",
-    228 => "SHARE",
-    229 => "SHOW",
-    230 => "SHUTDOWN",
-    231 => "SLAVE",
-    232 => "SONAME",
-    233 => "SOUNDS",
-    234 => "SQL",
-    235 => "SQL_AUTO_IS_NULL",
-    236 => "SQL_BIG_RESULT",
-    237 => "SQL_BIG_SELECTS",
-    238 => "SQL_BIG_TABLES",
-    239 => "SQL_BUFFER_RESULT",
-    240 => "SQL_CACHE",
-    241 => "SQL_CALC_FOUND_ROWS",
-    242 => "SQL_LOG_BIN",
-    243 => "SQL_LOG_OFF",
-    244 => "SQL_LOG_UPDATE",
-    245 => "SQL_LOW_PRIORITY_UPDATES",
-    246 => "SQL_MAX_JOIN_SIZE",
-    247 => "SQL_NO_CACHE",
-    248 => "SQL_QUOTE_SHOW_CREATE",
-    249 => "SQL_SAFE_UPDATES",
-    250 => "SQL_SELECT_LIMIT",
-    251 => "SQL_SLAVE_SKIP_COUNTER",
-    252 => "SQL_SMALL_RESULT",
-    253 => "SQL_WARNINGS",
-    254 => "START",
-    255 => "STARTING",
-    256 => "STATUS",
-    257 => "STOP",
-    258 => "STORAGE",
-    259 => "STRAIGHT_JOIN",
-    260 => "STRING",
-    261 => "STRIPED",
-    262 => "SUPER",
-    263 => "TABLE",
-    264 => "TABLES",
-    265 => "TEMPORARY",
-    266 => "TERMINATED",
-    267 => "THEN",
-    268 => "TO",
-    269 => "TRAILING",
-    270 => "TRANSACTIONAL",
-    271 => "TRUE",
-    272 => "TRUNCATE",
-    273 => "TYPE",
-    274 => "TYPES",
-    275 => "UNCOMMITTED",
-    276 => "UNION",
-    277 => "UNION ALL",
-    278 => "UNIQUE",
-    279 => "UNLOCK",
-    280 => "UNSIGNED",
-    281 => "UPDATE",
-    282 => "USAGE",
-    283 => "USE",
-    284 => "USING",
-    285 => "VALUES",
-    286 => "VARIABLES",
-    287 => "VIEW",
-    288 => "WHEN",
-    289 => "WHERE",
-    290 => "WITH",
-    291 => "WORK",
-    292 => "WRITE",
-    293 => "XOR",
-    294 => "YEAR_MONTH",
-    295 => "ABS",
-    296 => "ACOS",
-    297 => "ADDDATE",
-    298 => "ADDTIME",
-    299 => "AES_DECRYPT",
-    300 => "AES_ENCRYPT",
-    301 => "AREA",
-    302 => "ASBINARY",
-    303 => "ASCII",
-    304 => "ASIN",
-    305 => "ASTEXT",
-    306 => "ATAN",
-    307 => "ATAN2",
-    308 => "AVG",
-    309 => "BDMPOLYFROMTEXT",
-    310 => "BDMPOLYFROMWKB",
-    311 => "BDPOLYFROMTEXT",
-    312 => "BDPOLYFROMWKB",
-    313 => "BENCHMARK",
-    314 => "BIN",
-    315 => "BIT_AND",
-    316 => "BIT_COUNT",
-    317 => "BIT_LENGTH",
-    318 => "BIT_OR",
-    319 => "BIT_XOR",
-    320 => "BOUNDARY",
-    321 => "BUFFER",
-    322 => "CAST",
-    323 => "CEIL",
-    324 => "CEILING",
-    325 => "CENTROID",
-    326 => "CHAR",
-    327 => "CHARACTER_LENGTH",
-    328 => "CHARSET",
-    329 => "CHAR_LENGTH",
-    330 => "COALESCE",
-    331 => "COERCIBILITY",
-    332 => "COLLATION",
-    333 => "COMPRESS",
-    334 => "CONCAT",
-    335 => "CONCAT_WS",
-    336 => "CONNECTION_ID",
-    337 => "CONTAINS",
-    338 => "CONV",
-    339 => "CONVERT",
-    340 => "CONVERT_TZ",
-    341 => "CONVEXHULL",
-    342 => "COS",
-    343 => "COT",
-    344 => "COUNT",
-    345 => "CRC32",
-    346 => "CROSSES",
-    347 => "CURDATE",
-    348 => "CURRENT_DATE",
-    349 => "CURRENT_TIME",
-    350 => "CURRENT_TIMESTAMP",
-    351 => "CURRENT_USER",
-    352 => "CURTIME",
-    353 => "DATABASE",
-    354 => "DATE",
-    355 => "DATEDIFF",
-    356 => "DATE_ADD",
-    357 => "DATE_DIFF",
-    358 => "DATE_FORMAT",
-    359 => "DATE_SUB",
-    360 => "DAY",
-    361 => "DAYNAME",
-    362 => "DAYOFMONTH",
-    363 => "DAYOFWEEK",
-    364 => "DAYOFYEAR",
-    365 => "DECODE",
-    366 => "DEFAULT",
-    367 => "DEGREES",
-    368 => "DES_DECRYPT",
-    369 => "DES_ENCRYPT",
-    370 => "DIFFERENCE",
-    371 => "DIMENSION",
-    372 => "DISJOINT",
-    373 => "DISTANCE",
-    374 => "ELT",
-    375 => "ENCODE",
-    376 => "ENCRYPT",
-    377 => "ENDPOINT",
-    378 => "ENVELOPE",
-    379 => "EQUALS",
-    380 => "EXP",
-    381 => "EXPORT_SET",
-    382 => "EXTERIORRING",
-    383 => "EXTRACT",
-    384 => "EXTRACTVALUE",
-    385 => "FIELD",
-    386 => "FIND_IN_SET",
-    387 => "FLOOR",
-    388 => "FORMAT",
-    389 => "FOUND_ROWS",
-    390 => "FROM_DAYS",
-    391 => "FROM_UNIXTIME",
-    392 => "GEOMCOLLFROMTEXT",
-    393 => "GEOMCOLLFROMWKB",
-    394 => "GEOMETRYCOLLECTION",
-    395 => "GEOMETRYCOLLECTIONFROMTEXT",
-    396 => "GEOMETRYCOLLECTIONFROMWKB",
-    397 => "GEOMETRYFROMTEXT",
-    398 => "GEOMETRYFROMWKB",
-    399 => "GEOMETRYN",
-    400 => "GEOMETRYTYPE",
-    401 => "GEOMFROMTEXT",
-    402 => "GEOMFROMWKB",
-    403 => "GET_FORMAT",
-    404 => "GET_LOCK",
-    405 => "GLENGTH",
-    406 => "GREATEST",
-    407 => "GROUP_CONCAT",
-    408 => "GROUP_UNIQUE_USERS",
-    409 => "HEX",
-    410 => "HOUR",
-    411 => "IF",
-    412 => "IFNULL",
-    413 => "INET_ATON",
-    414 => "INET_NTOA",
-    415 => "INSERT",
-    416 => "INSTR",
-    417 => "INTERIORRINGN",
-    418 => "INTERSECTION",
-    419 => "INTERSECTS",
-    420 => "INTERVAL",
-    421 => "ISCLOSED",
-    422 => "ISEMPTY",
-    423 => "ISNULL",
-    424 => "ISRING",
-    425 => "ISSIMPLE",
-    426 => "IS_FREE_LOCK",
-    427 => "IS_USED_LOCK",
-    428 => "LAST_DAY",
-    429 => "LAST_INSERT_ID",
-    430 => "LCASE",
-    431 => "LEAST",
-    432 => "LEFT",
-    433 => "LENGTH",
-    434 => "LINEFROMTEXT",
-    435 => "LINEFROMWKB",
-    436 => "LINESTRING",
-    437 => "LINESTRINGFROMTEXT",
-    438 => "LINESTRINGFROMWKB",
-    439 => "LN",
-    440 => "LOAD_FILE",
-    441 => "LOCALTIME",
-    442 => "LOCALTIMESTAMP",
-    443 => "LOCATE",
-    444 => "LOG",
-    445 => "LOG10",
-    446 => "LOG2",
-    447 => "LOWER",
-    448 => "LPAD",
-    449 => "LTRIM",
-    450 => "MAKEDATE",
-    451 => "MAKETIME",
-    452 => "MAKE_SET",
-    453 => "MASTER_POS_WAIT",
-    454 => "MAX",
-    455 => "MBRCONTAINS",
-    456 => "MBRDISJOINT",
-    457 => "MBREQUAL",
-    458 => "MBRINTERSECTS",
-    459 => "MBROVERLAPS",
-    460 => "MBRTOUCHES",
-    461 => "MBRWITHIN",
-    462 => "MD5",
-    463 => "MICROSECOND",
-    464 => "MID",
-    465 => "MIN",
-    466 => "MINUTE",
-    467 => "MLINEFROMTEXT",
-    468 => "MLINEFROMWKB",
-    469 => "MOD",
-    470 => "MONTH",
-    471 => "MONTHNAME",
-    472 => "MPOINTFROMTEXT",
-    473 => "MPOINTFROMWKB",
-    474 => "MPOLYFROMTEXT",
-    475 => "MPOLYFROMWKB",
-    476 => "MULTILINESTRING",
-    477 => "MULTILINESTRINGFROMTEXT",
-    478 => "MULTILINESTRINGFROMWKB",
-    479 => "MULTIPOINT",
-    480 => "MULTIPOINTFROMTEXT",
-    481 => "MULTIPOINTFROMWKB",
-    482 => "MULTIPOLYGON",
-    483 => "MULTIPOLYGONFROMTEXT",
-    484 => "MULTIPOLYGONFROMWKB",
-    485 => "NAME_CONST",
-    486 => "NULLIF",
-    487 => "NUMGEOMETRIES",
-    488 => "NUMINTERIORRINGS",
-    489 => "NUMPOINTS",
-    490 => "OCT",
-    491 => "OCTET_LENGTH",
-    492 => "OLD_PASSWORD",
-    493 => "ORD",
-    494 => "OVERLAPS",
-    495 => "PASSWORD",
-    496 => "PERIOD_ADD",
-    497 => "PERIOD_DIFF",
-    498 => "PI",
-    499 => "POINT",
-    500 => "POINTFROMTEXT",
-    501 => "POINTFROMWKB",
-    502 => "POINTN",
-    503 => "POINTONSURFACE",
-    504 => "POLYFROMTEXT",
-    505 => "POLYFROMWKB",
-    506 => "POLYGON",
-    507 => "POLYGONFROMTEXT",
-    508 => "POLYGONFROMWKB",
-    509 => "POSITION",
-    510 => "POW",
-    511 => "POWER",
-    512 => "QUARTER",
-    513 => "QUOTE",
-    514 => "RADIANS",
-    515 => "RAND",
-    516 => "RELATED",
-    517 => "RELEASE_LOCK",
-    518 => "REPEAT",
-    519 => "REPLACE",
-    520 => "REVERSE",
-    521 => "RIGHT",
-    522 => "ROUND",
-    523 => "ROW_COUNT",
-    524 => "RPAD",
-    525 => "RTRIM",
-    526 => "SCHEMA",
-    527 => "SECOND",
-    528 => "SEC_TO_TIME",
-    529 => "SESSION_USER",
-    530 => "SHA",
-    531 => "SHA1",
-    532 => "SIGN",
-    533 => "SIN",
-    534 => "SLEEP",
-    535 => "SOUNDEX",
-    536 => "SPACE",
-    537 => "SQRT",
-    538 => "SRID",
-    539 => "STARTPOINT",
-    540 => "STD",
-    541 => "STDDEV",
-    542 => "STDDEV_POP",
-    543 => "STDDEV_SAMP",
-    544 => "STRCMP",
-    545 => "STR_TO_DATE",
-    546 => "SUBDATE",
-    547 => "SUBSTR",
-    548 => "SUBSTRING",
-    549 => "SUBSTRING_INDEX",
-    550 => "SUBTIME",
-    551 => "SUM",
-    552 => "SYMDIFFERENCE",
-    553 => "SYSDATE",
-    554 => "SYSTEM_USER",
-    555 => "TAN",
-    556 => "TIME",
-    557 => "TIMEDIFF",
-    558 => "TIMESTAMP",
-    559 => "TIMESTAMPADD",
-    560 => "TIMESTAMPDIFF",
-    561 => "TIME_FORMAT",
-    562 => "TIME_TO_SEC",
-    563 => "TOUCHES",
-    564 => "TO_DAYS",
-    565 => "TRIM",
-    566 => "TRUNCATE",
-    567 => "UCASE",
-    568 => "UNCOMPRESS",
-    569 => "UNCOMPRESSED_LENGTH",
-    570 => "UNHEX",
-    571 => "UNIQUE_USERS",
-    572 => "UNIX_TIMESTAMP",
-    573 => "UPDATEXML",
-    574 => "UPPER",
-    575 => "USER",
-    576 => "UTC_DATE",
-    577 => "UTC_TIME",
-    578 => "UTC_TIMESTAMP",
-    579 => "UUID",
-    580 => "VARIANCE",
-    581 => "VAR_POP",
-    582 => "VAR_SAMP",
-    583 => "VERSION",
-    584 => "WEEK",
-    585 => "WEEKDAY",
-    586 => "WEEKOFYEAR",
-    587 => "WITHIN",
-    588 => "X",
-    589 => "Y",
-    590 => "YEAR",
-    591 => "YEARWEEK",
-];
+if (!defined("KEYWORDS")) {
+    /** SQL キーワード（全 RDBMS ごちゃまぜ） */
+    define("KEYWORDS", [
+        ""  => "",
+        0   => "ACCESSIBLE",
+        1   => "ACTION",
+        2   => "ADD",
+        3   => "AFTER",
+        4   => "AGAINST",
+        5   => "AGGREGATE",
+        6   => "ALGORITHM",
+        7   => "ALL",
+        8   => "ALTER",
+        9   => "ALTER TABLE",
+        10  => "ANALYSE",
+        11  => "ANALYZE",
+        12  => "AND",
+        13  => "AS",
+        14  => "ASC",
+        15  => "AUTOCOMMIT",
+        16  => "AUTO_INCREMENT",
+        17  => "BACKUP",
+        18  => "BEGIN",
+        19  => "BETWEEN",
+        20  => "BINLOG",
+        21  => "BOTH",
+        22  => "CASCADE",
+        23  => "CASE",
+        24  => "CHANGE",
+        25  => "CHANGED",
+        26  => "CHARACTER SET",
+        27  => "CHARSET",
+        28  => "CHECK",
+        29  => "CHECKSUM",
+        30  => "COLLATE",
+        31  => "COLLATION",
+        32  => "COLUMN",
+        33  => "COLUMNS",
+        34  => "COMMENT",
+        35  => "COMMIT",
+        36  => "COMMITTED",
+        37  => "COMPRESSED",
+        38  => "CONCURRENT",
+        39  => "CONSTRAINT",
+        40  => "CONTAINS",
+        41  => "CONVERT",
+        42  => "CREATE",
+        43  => "CROSS",
+        44  => "CURRENT_TIMESTAMP",
+        45  => "DATABASE",
+        46  => "DATABASES",
+        47  => "DAY",
+        48  => "DAY_HOUR",
+        49  => "DAY_MINUTE",
+        50  => "DAY_SECOND",
+        51  => "DEFAULT",
+        52  => "DEFINER",
+        53  => "DELAYED",
+        54  => "DELETE",
+        55  => "DELETE FROM",
+        56  => "DESC",
+        57  => "DESCRIBE",
+        58  => "DETERMINISTIC",
+        59  => "DISTINCT",
+        60  => "DISTINCTROW",
+        61  => "DIV",
+        62  => "DO",
+        63  => "DROP",
+        64  => "DUMPFILE",
+        65  => "DUPLICATE",
+        66  => "DYNAMIC",
+        67  => "ELSE",
+        68  => "ENCLOSED",
+        69  => "END",
+        70  => "ENGINE",
+        71  => "ENGINES",
+        72  => "ENGINE_TYPE",
+        73  => "ESCAPE",
+        74  => "ESCAPED",
+        75  => "EVENTS",
+        76  => "EXCEPT",
+        77  => "EXECUTE",
+        78  => "EXISTS",
+        79  => "EXPLAIN",
+        80  => "EXTENDED",
+        81  => "FAST",
+        82  => "FIELDS",
+        83  => "FILE",
+        84  => "FIRST",
+        85  => "FIXED",
+        86  => "FLUSH",
+        87  => "FOR",
+        88  => "FORCE",
+        89  => "FOREIGN",
+        90  => "FROM",
+        91  => "FULL",
+        92  => "FULLTEXT",
+        93  => "FUNCTION",
+        94  => "GLOBAL",
+        95  => "GRANT",
+        96  => "GRANTS",
+        97  => "GROUP BY",
+        98  => "GROUP_CONCAT",
+        99  => "HAVING",
+        100 => "HEAP",
+        101 => "HIGH_PRIORITY",
+        102 => "HOSTS",
+        103 => "HOUR",
+        104 => "HOUR_MINUTE",
+        105 => "HOUR_SECOND",
+        106 => "IDENTIFIED",
+        107 => "IF",
+        108 => "IFNULL",
+        109 => "IGNORE",
+        110 => "IN",
+        111 => "INDEX",
+        112 => "INDEXES",
+        113 => "INFILE",
+        114 => "INNER",
+        115 => "INSERT",
+        116 => "INSERT_ID",
+        117 => "INSERT_METHOD",
+        118 => "INTERSECT",
+        119 => "INTERVAL",
+        120 => "INTO",
+        121 => "INVOKER",
+        122 => "IS",
+        123 => "ISOLATION",
+        124 => "JOIN",
+        125 => "KEY",
+        126 => "KEYS",
+        127 => "KILL",
+        128 => "LAST_INSERT_ID",
+        129 => "LEADING",
+        130 => "LEFT",
+        131 => "LEVEL",
+        132 => "LIKE",
+        133 => "LIMIT",
+        134 => "LINEAR",
+        135 => "LINES",
+        136 => "LOAD",
+        137 => "LOCAL",
+        138 => "LOCK",
+        139 => "LOCKS",
+        140 => "LOGS",
+        141 => "LOW_PRIORITY",
+        142 => "MARIA",
+        143 => "MASTER",
+        144 => "MASTER_CONNECT_RETRY",
+        145 => "MASTER_HOST",
+        146 => "MASTER_LOG_FILE",
+        147 => "MATCH",
+        148 => "MAX_CONNECTIONS_PER_HOUR",
+        149 => "MAX_QUERIES_PER_HOUR",
+        150 => "MAX_ROWS",
+        151 => "MAX_UPDATES_PER_HOUR",
+        152 => "MAX_USER_CONNECTIONS",
+        153 => "MEDIUM",
+        154 => "MERGE",
+        155 => "MINUTE",
+        156 => "MINUTE_SECOND",
+        157 => "MIN_ROWS",
+        158 => "MODE",
+        159 => "MODIFY",
+        160 => "MONTH",
+        161 => "MRG_MYISAM",
+        162 => "MYISAM",
+        163 => "NAMES",
+        164 => "NATURAL",
+        165 => "NOT",
+        166 => "NOW()",
+        167 => "NULL",
+        168 => "OFFSET",
+        169 => "ON",
+        170 => "ON DELETE",
+        171 => "ON UPDATE",
+        172 => "OPEN",
+        173 => "OPTIMIZE",
+        174 => "OPTION",
+        175 => "OPTIONALLY",
+        176 => "OR",
+        177 => "ORDER BY",
+        178 => "OUTER",
+        179 => "OUTFILE",
+        180 => "PACK_KEYS",
+        181 => "PAGE",
+        182 => "PARTIAL",
+        183 => "PARTITION",
+        184 => "PARTITIONS",
+        185 => "PASSWORD",
+        186 => "PRIMARY",
+        187 => "PRIVILEGES",
+        188 => "PROCEDURE",
+        189 => "PROCESS",
+        190 => "PROCESSLIST",
+        191 => "PURGE",
+        192 => "QUICK",
+        193 => "RAID0",
+        194 => "RAID_CHUNKS",
+        195 => "RAID_CHUNKSIZE",
+        196 => "RAID_TYPE",
+        197 => "RANGE",
+        198 => "READ",
+        199 => "READ_ONLY",
+        200 => "READ_WRITE",
+        201 => "REFERENCES",
+        202 => "REGEXP",
+        203 => "RELOAD",
+        204 => "RENAME",
+        205 => "REPAIR",
+        206 => "REPEATABLE",
+        207 => "REPLACE",
+        208 => "REPLICATION",
+        209 => "RESET",
+        210 => "RESTORE",
+        211 => "RESTRICT",
+        212 => "RETURN",
+        213 => "RETURNS",
+        214 => "REVOKE",
+        215 => "RIGHT",
+        216 => "RLIKE",
+        217 => "ROLLBACK",
+        218 => "ROW",
+        219 => "ROWS",
+        220 => "ROW_FORMAT",
+        221 => "SECOND",
+        222 => "SECURITY",
+        223 => "SELECT",
+        224 => "SEPARATOR",
+        225 => "SERIALIZABLE",
+        226 => "SESSION",
+        227 => "SET",
+        228 => "SHARE",
+        229 => "SHOW",
+        230 => "SHUTDOWN",
+        231 => "SLAVE",
+        232 => "SONAME",
+        233 => "SOUNDS",
+        234 => "SQL",
+        235 => "SQL_AUTO_IS_NULL",
+        236 => "SQL_BIG_RESULT",
+        237 => "SQL_BIG_SELECTS",
+        238 => "SQL_BIG_TABLES",
+        239 => "SQL_BUFFER_RESULT",
+        240 => "SQL_CACHE",
+        241 => "SQL_CALC_FOUND_ROWS",
+        242 => "SQL_LOG_BIN",
+        243 => "SQL_LOG_OFF",
+        244 => "SQL_LOG_UPDATE",
+        245 => "SQL_LOW_PRIORITY_UPDATES",
+        246 => "SQL_MAX_JOIN_SIZE",
+        247 => "SQL_NO_CACHE",
+        248 => "SQL_QUOTE_SHOW_CREATE",
+        249 => "SQL_SAFE_UPDATES",
+        250 => "SQL_SELECT_LIMIT",
+        251 => "SQL_SLAVE_SKIP_COUNTER",
+        252 => "SQL_SMALL_RESULT",
+        253 => "SQL_WARNINGS",
+        254 => "START",
+        255 => "STARTING",
+        256 => "STATUS",
+        257 => "STOP",
+        258 => "STORAGE",
+        259 => "STRAIGHT_JOIN",
+        260 => "STRING",
+        261 => "STRIPED",
+        262 => "SUPER",
+        263 => "TABLE",
+        264 => "TABLES",
+        265 => "TEMPORARY",
+        266 => "TERMINATED",
+        267 => "THEN",
+        268 => "TO",
+        269 => "TRAILING",
+        270 => "TRANSACTIONAL",
+        271 => "TRUE",
+        272 => "TRUNCATE",
+        273 => "TYPE",
+        274 => "TYPES",
+        275 => "UNCOMMITTED",
+        276 => "UNION",
+        277 => "UNION ALL",
+        278 => "UNIQUE",
+        279 => "UNLOCK",
+        280 => "UNSIGNED",
+        281 => "UPDATE",
+        282 => "USAGE",
+        283 => "USE",
+        284 => "USING",
+        285 => "VALUES",
+        286 => "VARIABLES",
+        287 => "VIEW",
+        288 => "WHEN",
+        289 => "WHERE",
+        290 => "WITH",
+        291 => "WORK",
+        292 => "WRITE",
+        293 => "XOR",
+        294 => "YEAR_MONTH",
+        295 => "ABS",
+        296 => "ACOS",
+        297 => "ADDDATE",
+        298 => "ADDTIME",
+        299 => "AES_DECRYPT",
+        300 => "AES_ENCRYPT",
+        301 => "AREA",
+        302 => "ASBINARY",
+        303 => "ASCII",
+        304 => "ASIN",
+        305 => "ASTEXT",
+        306 => "ATAN",
+        307 => "ATAN2",
+        308 => "AVG",
+        309 => "BDMPOLYFROMTEXT",
+        310 => "BDMPOLYFROMWKB",
+        311 => "BDPOLYFROMTEXT",
+        312 => "BDPOLYFROMWKB",
+        313 => "BENCHMARK",
+        314 => "BIN",
+        315 => "BIT_AND",
+        316 => "BIT_COUNT",
+        317 => "BIT_LENGTH",
+        318 => "BIT_OR",
+        319 => "BIT_XOR",
+        320 => "BOUNDARY",
+        321 => "BUFFER",
+        322 => "CAST",
+        323 => "CEIL",
+        324 => "CEILING",
+        325 => "CENTROID",
+        326 => "CHAR",
+        327 => "CHARACTER_LENGTH",
+        328 => "CHARSET",
+        329 => "CHAR_LENGTH",
+        330 => "COALESCE",
+        331 => "COERCIBILITY",
+        332 => "COLLATION",
+        333 => "COMPRESS",
+        334 => "CONCAT",
+        335 => "CONCAT_WS",
+        336 => "CONNECTION_ID",
+        337 => "CONTAINS",
+        338 => "CONV",
+        339 => "CONVERT",
+        340 => "CONVERT_TZ",
+        341 => "CONVEXHULL",
+        342 => "COS",
+        343 => "COT",
+        344 => "COUNT",
+        345 => "CRC32",
+        346 => "CROSSES",
+        347 => "CURDATE",
+        348 => "CURRENT_DATE",
+        349 => "CURRENT_TIME",
+        350 => "CURRENT_TIMESTAMP",
+        351 => "CURRENT_USER",
+        352 => "CURTIME",
+        353 => "DATABASE",
+        354 => "DATE",
+        355 => "DATEDIFF",
+        356 => "DATE_ADD",
+        357 => "DATE_DIFF",
+        358 => "DATE_FORMAT",
+        359 => "DATE_SUB",
+        360 => "DAY",
+        361 => "DAYNAME",
+        362 => "DAYOFMONTH",
+        363 => "DAYOFWEEK",
+        364 => "DAYOFYEAR",
+        365 => "DECODE",
+        366 => "DEFAULT",
+        367 => "DEGREES",
+        368 => "DES_DECRYPT",
+        369 => "DES_ENCRYPT",
+        370 => "DIFFERENCE",
+        371 => "DIMENSION",
+        372 => "DISJOINT",
+        373 => "DISTANCE",
+        374 => "ELT",
+        375 => "ENCODE",
+        376 => "ENCRYPT",
+        377 => "ENDPOINT",
+        378 => "ENVELOPE",
+        379 => "EQUALS",
+        380 => "EXP",
+        381 => "EXPORT_SET",
+        382 => "EXTERIORRING",
+        383 => "EXTRACT",
+        384 => "EXTRACTVALUE",
+        385 => "FIELD",
+        386 => "FIND_IN_SET",
+        387 => "FLOOR",
+        388 => "FORMAT",
+        389 => "FOUND_ROWS",
+        390 => "FROM_DAYS",
+        391 => "FROM_UNIXTIME",
+        392 => "GEOMCOLLFROMTEXT",
+        393 => "GEOMCOLLFROMWKB",
+        394 => "GEOMETRYCOLLECTION",
+        395 => "GEOMETRYCOLLECTIONFROMTEXT",
+        396 => "GEOMETRYCOLLECTIONFROMWKB",
+        397 => "GEOMETRYFROMTEXT",
+        398 => "GEOMETRYFROMWKB",
+        399 => "GEOMETRYN",
+        400 => "GEOMETRYTYPE",
+        401 => "GEOMFROMTEXT",
+        402 => "GEOMFROMWKB",
+        403 => "GET_FORMAT",
+        404 => "GET_LOCK",
+        405 => "GLENGTH",
+        406 => "GREATEST",
+        407 => "GROUP_CONCAT",
+        408 => "GROUP_UNIQUE_USERS",
+        409 => "HEX",
+        410 => "HOUR",
+        411 => "IF",
+        412 => "IFNULL",
+        413 => "INET_ATON",
+        414 => "INET_NTOA",
+        415 => "INSERT",
+        416 => "INSTR",
+        417 => "INTERIORRINGN",
+        418 => "INTERSECTION",
+        419 => "INTERSECTS",
+        420 => "INTERVAL",
+        421 => "ISCLOSED",
+        422 => "ISEMPTY",
+        423 => "ISNULL",
+        424 => "ISRING",
+        425 => "ISSIMPLE",
+        426 => "IS_FREE_LOCK",
+        427 => "IS_USED_LOCK",
+        428 => "LAST_DAY",
+        429 => "LAST_INSERT_ID",
+        430 => "LCASE",
+        431 => "LEAST",
+        432 => "LEFT",
+        433 => "LENGTH",
+        434 => "LINEFROMTEXT",
+        435 => "LINEFROMWKB",
+        436 => "LINESTRING",
+        437 => "LINESTRINGFROMTEXT",
+        438 => "LINESTRINGFROMWKB",
+        439 => "LN",
+        440 => "LOAD_FILE",
+        441 => "LOCALTIME",
+        442 => "LOCALTIMESTAMP",
+        443 => "LOCATE",
+        444 => "LOG",
+        445 => "LOG10",
+        446 => "LOG2",
+        447 => "LOWER",
+        448 => "LPAD",
+        449 => "LTRIM",
+        450 => "MAKEDATE",
+        451 => "MAKETIME",
+        452 => "MAKE_SET",
+        453 => "MASTER_POS_WAIT",
+        454 => "MAX",
+        455 => "MBRCONTAINS",
+        456 => "MBRDISJOINT",
+        457 => "MBREQUAL",
+        458 => "MBRINTERSECTS",
+        459 => "MBROVERLAPS",
+        460 => "MBRTOUCHES",
+        461 => "MBRWITHIN",
+        462 => "MD5",
+        463 => "MICROSECOND",
+        464 => "MID",
+        465 => "MIN",
+        466 => "MINUTE",
+        467 => "MLINEFROMTEXT",
+        468 => "MLINEFROMWKB",
+        469 => "MOD",
+        470 => "MONTH",
+        471 => "MONTHNAME",
+        472 => "MPOINTFROMTEXT",
+        473 => "MPOINTFROMWKB",
+        474 => "MPOLYFROMTEXT",
+        475 => "MPOLYFROMWKB",
+        476 => "MULTILINESTRING",
+        477 => "MULTILINESTRINGFROMTEXT",
+        478 => "MULTILINESTRINGFROMWKB",
+        479 => "MULTIPOINT",
+        480 => "MULTIPOINTFROMTEXT",
+        481 => "MULTIPOINTFROMWKB",
+        482 => "MULTIPOLYGON",
+        483 => "MULTIPOLYGONFROMTEXT",
+        484 => "MULTIPOLYGONFROMWKB",
+        485 => "NAME_CONST",
+        486 => "NULLIF",
+        487 => "NUMGEOMETRIES",
+        488 => "NUMINTERIORRINGS",
+        489 => "NUMPOINTS",
+        490 => "OCT",
+        491 => "OCTET_LENGTH",
+        492 => "OLD_PASSWORD",
+        493 => "ORD",
+        494 => "OVERLAPS",
+        495 => "PASSWORD",
+        496 => "PERIOD_ADD",
+        497 => "PERIOD_DIFF",
+        498 => "PI",
+        499 => "POINT",
+        500 => "POINTFROMTEXT",
+        501 => "POINTFROMWKB",
+        502 => "POINTN",
+        503 => "POINTONSURFACE",
+        504 => "POLYFROMTEXT",
+        505 => "POLYFROMWKB",
+        506 => "POLYGON",
+        507 => "POLYGONFROMTEXT",
+        508 => "POLYGONFROMWKB",
+        509 => "POSITION",
+        510 => "POW",
+        511 => "POWER",
+        512 => "QUARTER",
+        513 => "QUOTE",
+        514 => "RADIANS",
+        515 => "RAND",
+        516 => "RELATED",
+        517 => "RELEASE_LOCK",
+        518 => "REPEAT",
+        519 => "REPLACE",
+        520 => "REVERSE",
+        521 => "RIGHT",
+        522 => "ROUND",
+        523 => "ROW_COUNT",
+        524 => "RPAD",
+        525 => "RTRIM",
+        526 => "SCHEMA",
+        527 => "SECOND",
+        528 => "SEC_TO_TIME",
+        529 => "SESSION_USER",
+        530 => "SHA",
+        531 => "SHA1",
+        532 => "SIGN",
+        533 => "SIN",
+        534 => "SLEEP",
+        535 => "SOUNDEX",
+        536 => "SPACE",
+        537 => "SQRT",
+        538 => "SRID",
+        539 => "STARTPOINT",
+        540 => "STD",
+        541 => "STDDEV",
+        542 => "STDDEV_POP",
+        543 => "STDDEV_SAMP",
+        544 => "STRCMP",
+        545 => "STR_TO_DATE",
+        546 => "SUBDATE",
+        547 => "SUBSTR",
+        548 => "SUBSTRING",
+        549 => "SUBSTRING_INDEX",
+        550 => "SUBTIME",
+        551 => "SUM",
+        552 => "SYMDIFFERENCE",
+        553 => "SYSDATE",
+        554 => "SYSTEM_USER",
+        555 => "TAN",
+        556 => "TIME",
+        557 => "TIMEDIFF",
+        558 => "TIMESTAMP",
+        559 => "TIMESTAMPADD",
+        560 => "TIMESTAMPDIFF",
+        561 => "TIME_FORMAT",
+        562 => "TIME_TO_SEC",
+        563 => "TOUCHES",
+        564 => "TO_DAYS",
+        565 => "TRIM",
+        566 => "TRUNCATE",
+        567 => "UCASE",
+        568 => "UNCOMPRESS",
+        569 => "UNCOMPRESSED_LENGTH",
+        570 => "UNHEX",
+        571 => "UNIQUE_USERS",
+        572 => "UNIX_TIMESTAMP",
+        573 => "UPDATEXML",
+        574 => "UPPER",
+        575 => "USER",
+        576 => "UTC_DATE",
+        577 => "UTC_TIME",
+        578 => "UTC_TIMESTAMP",
+        579 => "UUID",
+        580 => "VARIANCE",
+        581 => "VAR_POP",
+        582 => "VAR_SAMP",
+        583 => "VERSION",
+        584 => "WEEK",
+        585 => "WEEKDAY",
+        586 => "WEEKOFYEAR",
+        587 => "WITHIN",
+        588 => "X",
+        589 => "Y",
+        590 => "YEAR",
+        591 => "YEARWEEK",
+    ]);
+}
 
-/** json_*** 関数で $depth 引数を表す定数 */
-const JSON_MAX_DEPTH = -1;
+if (!defined("JSON_MAX_DEPTH")) {
+    /** json_*** 関数で $depth 引数を表す定数 */
+    define("JSON_MAX_DEPTH", -1);
+}
 
-/** parse_php 関数でトークン名変換をするか */
-const TOKEN_NAME = 2;
+if (!defined("TOKEN_NAME")) {
+    /** parse_php 関数でトークン名変換をするか */
+    define("TOKEN_NAME", 2);
+}
+
+if (!defined("SORT_STRICT")) {
+    /** SORT_XXX 定数の厳密版 */
+    define("SORT_STRICT", 256);
+}
 
 
 # functions
@@ -1535,10 +1548,17 @@ if (!isset($excluded_functions["array_strpad"]) && (!function_exists("array_strp
             list($val_suffix, $val_prefix) = $val_prefix + [1 => ''];
         }
 
+        $enable_key = strlen($key_prefix) || strlen($key_suffix);
+        $enable_val = strlen($val_prefix) || strlen($val_suffix);
+
         $result = [];
         foreach ($array as $key => $val) {
-            $key = $key_prefix . $key . $key_suffix;
-            $val = $val_prefix . $val . $val_suffix;
+            if ($enable_key) {
+                $key = $key_prefix . $key . $key_suffix;
+            }
+            if ($enable_val) {
+                $val = $val_prefix . $val . $val_suffix;
+            }
             $result[$key] = $val;
         }
         return $result;
@@ -3117,6 +3137,102 @@ if (!isset($excluded_functions["array_any"]) && (!function_exists("array_any") |
     }
 }
 
+const array_distinct = "array_distinct";
+if (!isset($excluded_functions["array_distinct"]) && (!function_exists("array_distinct") || (!false && (new \ReflectionFunction("array_distinct"))->isInternal()))) {
+    /**
+     * 比較関数が渡せる array_unique
+     *
+     * array_unique は微妙に癖があるのでシンプルに使いやすくしたもの。
+     *
+     * - SORT_STRING|SORT_FLAG_CASE のような指定が使える（大文字小文字を無視した重複除去）
+     *   - 厳密に言えば array_unique も指定すれば動く（が、ドキュメントに記載がない）
+     * - 配列を渡すと下記の動作になる
+     *   - 数値キーは配列アクセス
+     *   - 文字キーはメソッドコール（値は引数）
+     * - もちろん（$a, $b を受け取る）クロージャも渡せる
+     *
+     * Example:
+     * ```php
+     * // シンプルな重複除去
+     * assertSame(array_distinct([1, 2, 3, '3']), [1, 2, 3]);
+     * // 大文字小文字を無視した重複除去
+     * assertSame(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE), ['a', 'b']);
+     *
+     * $v1 = new \ArrayObject(['id' => '1', 'group' => 'aaa']);
+     * $v2 = new \ArrayObject(['id' => '2', 'group' => 'bbb', 'dummy' => 123]);
+     * $v3 = new \ArrayObject(['id' => '3', 'group' => 'aaa', 'dummy' => 456]);
+     * $v4 = new \ArrayObject(['id' => '4', 'group' => 'bbb', 'dummy' => 789]);
+     * // クロージャを指定して重複除去
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] <=> $b['group']; }), [$v1, $v2]);
+     * // 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], 'group'), [$v1, $v2]);
+     * // 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], ['count' => []]), [$v1, $v2]);
+     * // 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' => []]), [$v1, $v2, 2 => $v3]);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param callable|int|string $comparator 比較関数
+     * @return array 重複が除去された配列
+     */
+    function array_distinct($array, $comparator = null)
+    {
+        // 配列化と個数チェック（1以下は重複のしようがないので不要）
+        $array = arrayval($array, false);
+        if (count($array) <= 1) {
+            return $array;
+        }
+
+        // 省略時は宇宙船
+        if ($comparator === null) {
+            $comparator = static function ($a, $b) {
+                return $a <=> $b;
+            };
+        }
+        // 数字が来たら varcmp とする
+        elseif (is_int($comparator)) {
+            $comparator = static function ($a, $b) use ($comparator) {
+                return varcmp($a, $b, $comparator);
+            };
+        }
+        // 文字列・配列が来たらキーアクセス/メソッドコールとする
+        elseif (is_string($comparator) || is_array($comparator)) {
+            $comparator = static function ($a, $b) use ($comparator) {
+                foreach (arrayize ($comparator) as $method => $args) {
+                    if (is_int($method)) {
+                        $delta = $a[$args] <=> $b[$args];
+                    }
+                    else {
+                        $args = arrayize($args);
+                        $delta = $a->$method(...$args) <=> $b->$method(...$args);
+                    }
+                    if ($delta !== 0) {
+                        return $delta;
+                    }
+                }
+                return 0;
+            };
+        }
+
+        // 2重ループで探すよりは1度ソートしてしまったほうがマシ…だと思う（php の実装もそうだし）
+        $backup = $array;
+        uasort($array, $comparator);
+        $keys = array_keys($array);
+
+        // できるだけ元の順番は維持したいので、詰めて返すのではなくキーを導出して共通項を返す（ただし、この仕様は変えるかもしれない）
+        $current = $keys[0];
+        $keepkeys = [$current => null];
+        for ($i = 1, $l = count($keys); $i < $l; $i++) {
+            if ($comparator($array[$current], $array[$keys[$i]]) !== 0) {
+                $current = $keys[$i];
+                $keepkeys[$current] = null;
+            }
+        }
+        return array_intersect_key($backup, $keepkeys);
+    }
+}
+
 const array_order = "array_order";
 if (!isset($excluded_functions["array_order"]) && (!function_exists("array_order") || (!false && (new \ReflectionFunction("array_order"))->isInternal()))) {
     /**
@@ -4528,13 +4644,18 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("g
         static $refs = [];
         $class = get_class($object);
         if (!isset($refs[$class])) {
-            $props = (new \ReflectionClass($class))->getProperties();
-            $refs[$class] = array_each($props, function (&$carry, \ReflectionProperty $rp) {
-                if (!$rp->isStatic()) {
-                    $rp->setAccessible(true);
-                    $carry[$rp->getName()] = $rp;
-                }
-            }, []);
+            // var_export や var_dump で得られるものは「親が優先」となっているが、不具合的動作だと思うので「子を優先」とする
+            $refs[$class] = [];
+            $ref = new \ReflectionClass($class);
+            do {
+                $refs[$ref->name] = array_each($ref->getProperties(), function (&$carry, \ReflectionProperty $rp) {
+                    if (!$rp->isStatic()) {
+                        $rp->setAccessible(true);
+                        $carry[$rp->getName()] = $rp;
+                    }
+                }, []);
+                $refs[$class] += $refs[$ref->name];
+            } while ($ref = $ref->getParentClass());
         }
 
         // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
@@ -7400,6 +7521,116 @@ if (!isset($excluded_functions["incidr"]) && (!function_exists("incidr") || (!fa
             }
         }
         return false;
+    }
+}
+
+const ping = "ping";
+if (!isset($excluded_functions["ping"]) && (!function_exists("ping") || (!false && (new \ReflectionFunction("ping"))->isInternal()))) {
+    /**
+     * ネットワーク疎通を返す
+     *
+     * $port を指定すると TCP/UDP、省略（null）すると ICMP で繋ぐ。
+     * が、 ICMP は root ユーザしか実行できないので ping コマンドにフォールバックする。
+     * TCP/UDP の分岐はマニュアル通り tcp://, udp:// のようなスキームで行う（スキームがなければ tcp）。
+     *
+     * udp は結果が不安定なので信頼しないこと（タイムアウトも疎通 OK とみなされる。プロトコルの仕様上どうしようもない）。
+     *
+     * Example:
+     * ```php
+     * // 自身へ ICMP ping を打つ（正常終了なら float を返し、失敗なら false を返す）
+     * assertInternalType('float', ping('127.0.0.1'));
+     * // 自身の tcp:1234 が開いているか（開いていれば float を返し、開いていなければ false を返す）
+     * assertFalse(ping('tcp://127.0.0.1', 1234));
+     * assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
+     * ```
+     *
+     * @param string $host ホスト名（プロトコルも指定できる）
+     * @param int|null $port ポート番号。指定しないと ICMP になる
+     * @param int $timeout タイムアウト秒
+     * @param string $errstr エラー文字列が格納される
+     * @return float|bool 成功したときは疎通時間。失敗したときは false
+     */
+    function ping($host, $port = null, $timeout = 1, &$errstr = '')
+    {
+        $errstr = '';
+
+        $parts = parse_url($host);
+        if (!isset($parts['scheme'])) {
+            if (strlen($port)) {
+                $parts['scheme'] = 'tcp';
+            }
+            else {
+                $parts['scheme'] = 'icmp';
+            }
+        }
+        $protocol = strtolower($parts['scheme']);
+        $host = $parts['host'] ?? $parts['path'];
+
+        // icmp で linux かつ非 root は SOCK_RAW が使えないので ping コマンドへフォールバック
+        if ($protocol === 'icmp' && DIRECTORY_SEPARATOR === '/' && !is_readable('/root')) {
+            // @codeCoverageIgnoreStart
+            /** @noinspection PhpUndefinedVariableInspection */
+            process('ping -c 1 -W ' . escapeshellarg($timeout), escapeshellarg($host), null, $stdout, $errstr);
+            // min/avg/max/mdev = 0.026/0.026/0.026/0.000
+            if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
+                return $m[1] / 1000.0;
+            }
+            return false;
+            // @codeCoverageIgnoreEnd
+        }
+
+        if ($protocol === 'icmp') {
+            $socket = socket_create(AF_INET, SOCK_RAW, getprotobyname($protocol));
+        }
+        elseif ($protocol === 'tcp') {
+            $socket = socket_create(AF_INET, SOCK_STREAM, getprotobyname($protocol));
+        }
+        elseif ($protocol === 'udp') {
+            $socket = socket_create(AF_INET, SOCK_DGRAM, getprotobyname($protocol));
+        }
+        else {
+            throw new \InvalidArgumentException("'$protocol' is not supported.");
+        }
+
+        $mtime = microtime(true);
+        try {
+            call_safely(function ($socket, $protocol, $host, $port, $timeout) {
+                socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
+                socket_connect($socket, $host, $port);
+
+                // icmp は ping メッセージを送信
+                if ($protocol === 'icmp') {
+                    $message = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
+                    socket_send($socket, $message, strlen($message), 0);
+                    socket_read($socket, 255);
+                }
+                // tcp は接続自体ができれば OK
+                if ($protocol === 'tcp') {
+                    assert(true); // PhpStatementHasEmptyBodyInspection
+                }
+                // udp は何か送ってみてその挙動で判断（=> catch 節）
+                if ($protocol === 'udp') {
+                    $message = ""; // noop
+                    socket_send($socket, $message, strlen($message), 0);
+                    socket_read($socket, 255);
+                }
+            }, $socket, $protocol, $host, $port, $timeout);
+            return microtime(true) - $mtime;
+        }
+        catch (\Throwable $t) {
+            $errno = socket_last_error($socket);
+            // windows では到達できても socket_read がエラーを返すので errno で判断
+            // 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかったため、接続できませんでした。
+            // または接続済みのホストが応答しなかったため、確立された接続は失敗しました。
+            if (DIRECTORY_SEPARATOR === '\\' && $errno === 10060 && $protocol === 'udp') {
+                return microtime(true) - $mtime;
+            }
+            $errstr = socket_strerror($errno);
+            return false;
+        }
+        finally {
+            socket_close($socket);
+        }
     }
 }
 
@@ -11376,6 +11607,117 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!fals
     }
 }
 
+const is_ansi = "is_ansi";
+if (!isset($excluded_functions["is_ansi"]) && (!function_exists("is_ansi") || (!false && (new \ReflectionFunction("is_ansi"))->isInternal()))) {
+    /**
+     * リソースが ansi color に対応しているか返す
+     *
+     * パイプしたりリダイレクトしていると false を返す。
+     *
+     * @see https://github.com/symfony/console/blob/v4.2.8/Output/StreamOutput.php#L98
+     *
+     * @param resource $stream 調べるリソース
+     * @return bool ansi color に対応しているなら true
+     */
+    function is_ansi($stream)
+    {
+        // テスト用に隠し引数で DS を取っておく
+        $DIRECTORY_SEPARATOR = DIRECTORY_SEPARATOR;
+        assert(!!$DIRECTORY_SEPARATOR = func_num_args() > 1 ? func_get_arg(1) : $DIRECTORY_SEPARATOR);
+
+        if ('Hyper' === getenv('TERM_PROGRAM')) {
+            return true;
+        }
+
+        if ($DIRECTORY_SEPARATOR === '\\') {
+            return (\function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support($stream))
+                || false !== getenv('ANSICON')
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM');
+        }
+
+        if (\function_exists('stream_isatty')) {
+            return @stream_isatty($stream); // @codeCoverageIgnore
+        }
+
+        if (\function_exists('posix_isatty')) {
+            return @posix_isatty($stream); // @codeCoverageIgnore
+        }
+
+        $stat = @fstat($stream);
+        // Check if formatted mode is S_IFCHR
+        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+    }
+}
+
+const ansi_colorize = "ansi_colorize";
+if (!isset($excluded_functions["ansi_colorize"]) && (!function_exists("ansi_colorize") || (!false && (new \ReflectionFunction("ansi_colorize"))->isInternal()))) {
+    /**
+     * 文字列に ANSI Color エスケープシーケンスを埋め込む
+     *
+     * - "blue" のような小文字色名は文字色
+     * - "BLUE" のような大文字色名は背景色
+     * - "bold" のようなスタイル名は装飾
+     *
+     * となる。その区切り文字は現在のところ厳密に定めていない（`fore+back|bold` のような形式で定めることも考えたけどメリットがない）。
+     * つまり、アルファベット以外で分割するので、
+     *
+     * - `blue|WHITE@bold`: 文字青・背景白・太字
+     * - `blue WHITE bold underscore`: 文字青・背景白・太字・下線
+     * - `italic|bold,blue+WHITE  `: 文字青・背景白・太字・斜体
+     *
+     * という動作になる（記号で区切られていれば形式はどうでも良いということ）。
+     * ただ、この指定方法は変更が入る可能性が高いのでスペースあたりで区切っておくのがもっとも無難。
+     *
+     * @param string $string 対象文字列
+     * @param string $color 色とスタイル文字列
+     * @return string エスケープシーケンス付きの文字列
+     */
+    function ansi_colorize($string, $color)
+    {
+        // see https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+        // see https://misc.flogisoft.com/bash/tip_colors_and_formatting
+        $ansicodes = [
+            // forecolor
+            'default'    => [39, 39],
+            'black'      => [30, 39],
+            'red'        => [31, 39],
+            'green'      => [32, 39],
+            'yellow'     => [33, 39],
+            'blue'       => [34, 39],
+            'magenta'    => [35, 39],
+            'cyan'       => [36, 39],
+            'white'      => [97, 39],
+            'gray'       => [90, 39],
+            // backcolor
+            'DEFAULT'    => [49, 49],
+            'BLACK'      => [40, 49],
+            'RED'        => [41, 49],
+            'GREEN'      => [42, 49],
+            'YELLOW'     => [43, 49],
+            'BLUE'       => [44, 49],
+            'MAGENTA'    => [45, 49],
+            'CYAN'       => [46, 49],
+            'WHITE'      => [47, 49],
+            'GRAY'       => [100, 49],
+            // style
+            'bold'       => [1, 22],
+            'faint'      => [2, 22], // not working ?
+            'italic'     => [3, 23],
+            'underscore' => [4, 24],
+            'blink'      => [5, 25],
+            'reverse'    => [7, 27],
+            'conceal'    => [8, 28],
+        ];
+
+        $names = array_flip(preg_split('#[^a-z]#i', $color));
+        $styles = array_intersect_key($ansicodes, $names);
+        $setters = implode(';', array_column($styles, 0));
+        $unsetters = implode(';', array_column($styles, 1));
+        return "\033[{$setters}m{$string}\033[{$unsetters}m";
+    }
+}
+
 const process = "process";
 if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!false && (new \ReflectionFunction("process"))->isInternal()))) {
     /**
@@ -12628,6 +12970,7 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("varcmp") || (!fa
      * php7 の `<=>` の関数版
      *
      * 引数で大文字小文字とか自然順とか型モードとかが指定できる。
+     * さらに追加で SORT_STRICT という厳密比較フラグを渡すことができる。
      *
      * Example:
      * ```php
@@ -12644,6 +12987,10 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("varcmp") || (!fa
      * // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
      * assertTrue(varcmp('12', '2', SORT_NATURAL) > 0);
      * assertTrue(varcmp('2', '12', SORT_NATURAL) < 0);
+     *
+     * // SORT_STRICT 定数が使える（下記はすべて宇宙船演算子を使うと 0 になる）
+     * assertTrue(varcmp(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT) < 0);
+     * assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) < 0);
      * ```
      *
      * @param mixed $a 比較する値1
@@ -12680,6 +13027,9 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("varcmp") || (!fa
                 return strnatcasecmp($a, $b);
             }
             return strnatcmp($a, $b);
+        }
+        if ($mode === SORT_STRICT) {
+            return $a === $b ? 0 : ($a > $b ? 1 : -1);
         }
 
         // for SORT_REGULAR
@@ -12996,6 +13346,176 @@ if (!isset($excluded_functions["var_html"]) && (!function_exists("var_html") || 
         // @codeCoverageIgnoreEnd
 
         echo "<pre class='var_html'>{$export($value, [])}</pre>";
+    }
+}
+
+const var_pretty = "var_pretty";
+if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty") || (!false && (new \ReflectionFunction("var_pretty"))->isInternal()))) {
+    /**
+     * var_dump の出力を見やすくしたもの
+     *
+     * var_dump はとても縦に長い上見づらいので色や改行・空白を調整して見やすくした。
+     * sapi に応じて自動で色分けがなされる（$context で指定もできる）。
+     * また、 xdebug のように呼び出しファイル:行数が先頭に付与される。
+     *
+     * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // 下記のように出力される（実際は色付きで出力される）
+     * $using = 123;
+     * var_pretty([
+     *     "array"   => [1, 2, 3],
+     *     "hash"    => [
+     *         "a" => "A",
+     *         "b" => "B",
+     *         "c" => "C",
+     *     ],
+     *     "object"  => new \Exception(),
+     *     "closure" => function () use($using) { },
+     * ]);
+     * ?>
+     * {
+     *   array: [1, 2, 3],
+     *   hash: {
+     *     a: 'A',
+     *     b: 'B',
+     *     c: 'C',
+     *   },
+     *   object: Exception#1 {
+     *     message: '',
+     *     string: '',
+     *     code: 0,
+     *     file: '...',
+     *     line: 19,
+     *     trace: [],
+     *     previous: null,
+     *   },
+     *   closure: Closure#0(static) use {
+     *     using: 123,
+     *   },
+     * }
+     * <?php
+     * ```
+     *
+     * @param mixed $value 出力する値
+     * @param string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
+     * @param bool $return 出力するのではなく値を返すなら true
+     * @return string $return: true なら値の出力結果
+     */
+    function var_pretty($value, $context = null, $return = false)
+    {
+        // インデントの空白数
+        $INDENT = 2;
+
+        if ($context === null) {
+            $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
+            if (PHP_SAPI === 'cli') {
+                $context = is_ansi(STDOUT) && !$return ? 'cli' : 'plain';
+            }
+        }
+
+        $colorAdapter = static function ($value, $style) use ($context) {
+            switch ($context) {
+                default:
+                    throw new \InvalidArgumentException("'$context' is not supported.");
+                case 'plain':
+                    return $value;
+                case 'cli':
+                    return ansi_colorize($value, $style);
+                case 'html':
+                    // 今のところ bold しか使っていないのでこれでよい
+                    $style = $style === 'bold' ? 'font-weight:bold' : "color:$style";
+                    return "<span style='$style'>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+            }
+        };
+
+        $colorKey = static function ($value) use ($colorAdapter) {
+            if (is_int($value)) {
+                return $colorAdapter($value, 'bold');
+            }
+            return $colorAdapter($value, 'red');
+        };
+        $colorVal = static function ($value) use ($colorAdapter) {
+            switch (true) {
+                case is_null($value):
+                    return $colorAdapter('null', 'bold');
+                case is_object($value):
+                    if (function_exists('spl_object_id')) {
+                        $id = spl_object_id($value); // @codeCoverageIgnore
+                    }
+                    // backport: spl_object_id
+                    else {
+                        // 桁がでかすぎて視認性が悪いので現在の hash をオフセットとして減算する
+                        // 場合によっては負数が出るが許容する（少なくとも同じオブジェクトなら同じ id になるはず。嫌なら php 7.2 を使えば良い）
+                        static $offset = null;
+                        if ($offset === null) {
+                            $offset = intval(substr(spl_object_hash($value), 1, 15), 16);
+                        }
+                        $id = intval(substr(spl_object_hash($value), 1, 15), 16) - $offset + 1;
+                    }
+                    return $colorAdapter(get_class($value), 'green') . "#$id";
+                case is_bool($value):
+                    return $colorAdapter(var_export($value, true), 'bold');
+                case is_int($value) || is_float($value) || is_string($value):
+                    return $colorAdapter(var_export($value, true), 'magenta');
+                case is_resource($value):
+                    return $colorAdapter(sprintf('%s of type (%s)', $value, get_resource_type($value)), 'bold');
+            }
+        };
+
+        // 再帰用クロージャ
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT, $colorKey, $colorVal) {
+            // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+            foreach ($parents as $parent) {
+                if ($parent === $value) {
+                    return $export('*RECURSION*');
+                }
+            }
+            if (is_array($value)) {
+                // スカラー値のみで構成されているならシンプルな再帰
+                if (!is_hasharray($value) && array_all($value, is_primitive)) {
+                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                }
+
+                $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
+                $spacer2 = str_repeat(' ', $nest * $INDENT);
+
+                $kvl = '';
+                $parents[] = $value;
+                foreach ($value as $k => $v) {
+                    $keystr = $colorKey($k) . ': ';
+                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                }
+                return "{\n{$kvl}{$spacer2}}";
+            }
+            elseif ($value instanceof \Closure) {
+                $ref = reflect_callable($value);
+                $that = $ref->getClosureThis();
+                $thatT = $that ? $colorVal($that) : 'static';
+                $properties = $ref->getStaticVariables();
+                $propT = $properties ? $export($properties, $nest, $parents) : '{}';
+                return $colorVal($value) . "($thatT) use $propT";
+            }
+            elseif (is_object($value)) {
+                $parents[] = $value;
+                $properties = get_object_properties($value);
+                return $colorVal($value) . ' ' . ($properties ? $export($properties, $nest, $parents) : '{}');
+            }
+            else {
+                return $colorVal($value);
+            }
+        };
+
+        // 結果を返したり出力したり
+        $result = stacktrace(null, "%s:%s") . "\n" . $export($value);
+        if ($context === 'html') {
+            $result = "<pre>$result</pre>";
+        }
+        if ($return) {
+            return $result;
+        }
+        echo $result, "\n";
     }
 }
 

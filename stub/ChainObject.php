@@ -15,6 +15,8 @@
  * @method   \ChainObject  addcslashes1($str)
  * @property \ChainObject $addslashes
  * @method   \ChainObject  addslashes()
+ * @method   \ChainObject  ansi_colorize($color)
+ * @method   \ChainObject  ansi_colorize1($string)
  * @property \ChainObject $arguments
  * @method   \ChainObject  arguments($argv = null)
  * @method   \ChainObject  arguments1($rule)
@@ -238,6 +240,12 @@
  * @method   \ChainObject  difference($array2, $delimiter = ".")
  * @method   \ChainObject  difference1($array1, $delimiter = ".")
  * @method   \ChainObject  difference2($array1, $array2)
+ * @property \ChainObject $array_distinct
+ * @method   \ChainObject  array_distinct($comparator = null)
+ * @method   \ChainObject  array_distinct1($array)
+ * @property \ChainObject $distinct
+ * @method   \ChainObject  distinct($comparator = null)
+ * @method   \ChainObject  distinct1($array)
  * @method   \ChainObject  array_dive($path, $default = null, $delimiter = ".")
  * @method   \ChainObject  array_dive1($array, $default = null, $delimiter = ".")
  * @method   \ChainObject  array_dive2($array, $path, $delimiter = ".")
@@ -1988,6 +1996,8 @@
  * @method   \ChainObject  is_a($class_name, $allow_string = null)
  * @method   \ChainObject  is_a1($object, $allow_string = null)
  * @method   \ChainObject  is_a2($object, $class_name)
+ * @property \ChainObject $is_ansi
+ * @method   \ChainObject  is_ansi()
  * @property \ChainObject $is_array
  * @method   \ChainObject  is_array()
  * @property \ChainObject $is_arrayable
@@ -3331,6 +3341,10 @@
  * @method   \ChainObject  var_export21($value)
  * @property \ChainObject $var_html
  * @method   \ChainObject  var_html()
+ * @property \ChainObject $var_pretty
+ * @method   \ChainObject  var_pretty($context = null, $return = false)
+ * @method   \ChainObject  var_pretty1($value, $return = false)
+ * @method   \ChainObject  var_pretty2($value, $context = null)
  * @property \ChainObject $var_type
  * @method   \ChainObject  var_type()
  * @method   \ChainObject  varcmp($b, $mode = null)

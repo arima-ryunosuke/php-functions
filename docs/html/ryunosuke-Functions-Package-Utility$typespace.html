@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L824" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L929" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
@@ -84,7 +84,7 @@
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L10-L33" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
-                                    							<span class="display-none" data-fqsen="ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()">			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/tests/Test/Package/UtilityTest.php#L7-L192" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    							<span class="display-none" data-fqsen="ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()">			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/tests/Test/Package/UtilityTest.php#L9-L194" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
             </span>
                         					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::get_uploaded_files()" tabindex="-1" class="structure-title ">
@@ -255,7 +255,133 @@ assertNotSame($rand1, $rand3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L192-L284" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L192-L230" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::is_ansi()" tabindex="-1" class="structure-title ">
+                        is_ansi						<small>($stream)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>リソースが ansi color に対応しているか返す</p>
+<p>パイプしたりリダイレクトしていると false を返す。</p>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">resource</td>
+				<td class="rest">$stream</td>
+				<td class="desc"><p>調べるリソース</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc"><p>ansi color に対応しているなら true</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            	<table class="table">
+		<caption>See</caption>
+		<tbody>
+        			<tr>
+				<td class="type">
+                    						<a href="https://github.com/symfony/console/blob/v4.2.8/Output/StreamOutput.php#L98" target="_blank">https://github.com/symfony/console/blob/v4.2.8/Output/StreamOutput.php#L98</a>
+                    				</td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+    					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L232-L295" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Utility::ansi_colorize()" tabindex="-1" class="structure-title ">
+                        ansi_colorize						<small>($string, $color)</small>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>文字列に ANSI Color エスケープシーケンスを埋め込む</p>
+<ul>
+<li>"blue" のような小文字色名は文字色</li>
+<li>"BLUE" のような大文字色名は背景色</li>
+<li>"bold" のようなスタイル名は装飾</li>
+</ul>
+<p>となる。その区切り文字は現在のところ厳密に定めていない（<code>fore+back|bold</code> のような形式で定めることも考えたけどメリットがない）。<br />
+つまり、アルファベット以外で分割するので、</p>
+<ul>
+<li><code>blue|WHITE@bold</code>: 文字青・背景白・太字</li>
+<li><code>blue WHITE bold underscore</code>: 文字青・背景白・太字・下線</li>
+<li><code>italic|bold,blue+WHITE  </code>: 文字青・背景白・太字・斜体</li>
+</ul>
+<p>という動作になる（記号で区切られていれば形式はどうでも良いということ）。<br />
+ただ、この指定方法は変更が入る可能性が高いのでスペースあたりで区切っておくのがもっとも無難。</p>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$string</td>
+				<td class="desc"><p>対象文字列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$color</td>
+				<td class="desc"><p>色とスタイル文字列</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc"><p>エスケープシーケンス付きの文字列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L297-L389" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
                         process						<small>($command, $args = [], $stdin = &#039;&#039;, &amp;$stdout = &#039;&#039;, &amp;$stderr = &#039;&#039;, $cwd = null, $env = null)</small>
@@ -356,7 +482,7 @@ assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "er
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L286-L459" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L391-L564" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
                         arguments						<small>($rule, $argv = null)</small>
@@ -474,7 +600,7 @@ assertSame(arguments($rule, '--long A -short B'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L461-L561" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L566-L666" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::stacktrace()" tabindex="-1" class="structure-title ">
                         stacktrace						<small>($traces = null, $option = [
@@ -539,7 +665,7 @@ assertSame(arguments($rule, '--long A -short B'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L563-L620" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L668-L725" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::backtrace()" tabindex="-1" class="structure-title ">
                         backtrace						<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = [])</small>
@@ -610,7 +736,7 @@ assertArraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L622-L681" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L727-L786" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error						<small>($message, $destination = null)</small>
@@ -668,7 +794,7 @@ assertArraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L683-L710" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L788-L815" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
                         timer						<small>($callable, $count = 1)</small>
@@ -726,7 +852,7 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L712-L823" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L817-L928" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>

@@ -637,6 +637,9 @@ const JSON_MAX_DEPTH = -1;
 /** parse_php 関数でトークン名変換をするか */
 const TOKEN_NAME = 2;
 
+/** SORT_XXX 定数の厳密版 */
+const SORT_STRICT = 256;
+
 
 # functions
 const arrays = "ryunosuke\\Functions\\arrays";
@@ -1536,10 +1539,17 @@ if (!isset($excluded_functions["array_strpad"]) && (!function_exists("ryunosuke\
             list($val_suffix, $val_prefix) = $val_prefix + [1 => ''];
         }
 
+        $enable_key = strlen($key_prefix) || strlen($key_suffix);
+        $enable_val = strlen($val_prefix) || strlen($val_suffix);
+
         $result = [];
         foreach ($array as $key => $val) {
-            $key = $key_prefix . $key . $key_suffix;
-            $val = $val_prefix . $val . $val_suffix;
+            if ($enable_key) {
+                $key = $key_prefix . $key . $key_suffix;
+            }
+            if ($enable_val) {
+                $val = $val_prefix . $val . $val_suffix;
+            }
             $result[$key] = $val;
         }
         return $result;
@@ -3118,6 +3128,102 @@ if (!isset($excluded_functions["array_any"]) && (!function_exists("ryunosuke\\Fu
     }
 }
 
+const array_distinct = "ryunosuke\\Functions\\array_distinct";
+if (!isset($excluded_functions["array_distinct"]) && (!function_exists("ryunosuke\\Functions\\array_distinct") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_distinct"))->isInternal()))) {
+    /**
+     * 比較関数が渡せる array_unique
+     *
+     * array_unique は微妙に癖があるのでシンプルに使いやすくしたもの。
+     *
+     * - SORT_STRING|SORT_FLAG_CASE のような指定が使える（大文字小文字を無視した重複除去）
+     *   - 厳密に言えば array_unique も指定すれば動く（が、ドキュメントに記載がない）
+     * - 配列を渡すと下記の動作になる
+     *   - 数値キーは配列アクセス
+     *   - 文字キーはメソッドコール（値は引数）
+     * - もちろん（$a, $b を受け取る）クロージャも渡せる
+     *
+     * Example:
+     * ```php
+     * // シンプルな重複除去
+     * assertSame(array_distinct([1, 2, 3, '3']), [1, 2, 3]);
+     * // 大文字小文字を無視した重複除去
+     * assertSame(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE), ['a', 'b']);
+     *
+     * $v1 = new \ArrayObject(['id' => '1', 'group' => 'aaa']);
+     * $v2 = new \ArrayObject(['id' => '2', 'group' => 'bbb', 'dummy' => 123]);
+     * $v3 = new \ArrayObject(['id' => '3', 'group' => 'aaa', 'dummy' => 456]);
+     * $v4 = new \ArrayObject(['id' => '4', 'group' => 'bbb', 'dummy' => 789]);
+     * // クロージャを指定して重複除去
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] <=> $b['group']; }), [$v1, $v2]);
+     * // 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], 'group'), [$v1, $v2]);
+     * // 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], ['count' => []]), [$v1, $v2]);
+     * // 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
+     * assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' => []]), [$v1, $v2, 2 => $v3]);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param callable|int|string $comparator 比較関数
+     * @return array 重複が除去された配列
+     */
+    function array_distinct($array, $comparator = null)
+    {
+        // 配列化と個数チェック（1以下は重複のしようがないので不要）
+        $array = arrayval($array, false);
+        if (count($array) <= 1) {
+            return $array;
+        }
+
+        // 省略時は宇宙船
+        if ($comparator === null) {
+            $comparator = static function ($a, $b) {
+                return $a <=> $b;
+            };
+        }
+        // 数字が来たら varcmp とする
+        elseif (is_int($comparator)) {
+            $comparator = static function ($a, $b) use ($comparator) {
+                return varcmp($a, $b, $comparator);
+            };
+        }
+        // 文字列・配列が来たらキーアクセス/メソッドコールとする
+        elseif (is_string($comparator) || is_array($comparator)) {
+            $comparator = static function ($a, $b) use ($comparator) {
+                foreach (arrayize ($comparator) as $method => $args) {
+                    if (is_int($method)) {
+                        $delta = $a[$args] <=> $b[$args];
+                    }
+                    else {
+                        $args = arrayize($args);
+                        $delta = $a->$method(...$args) <=> $b->$method(...$args);
+                    }
+                    if ($delta !== 0) {
+                        return $delta;
+                    }
+                }
+                return 0;
+            };
+        }
+
+        // 2重ループで探すよりは1度ソートしてしまったほうがマシ…だと思う（php の実装もそうだし）
+        $backup = $array;
+        uasort($array, $comparator);
+        $keys = array_keys($array);
+
+        // できるだけ元の順番は維持したいので、詰めて返すのではなくキーを導出して共通項を返す（ただし、この仕様は変えるかもしれない）
+        $current = $keys[0];
+        $keepkeys = [$current => null];
+        for ($i = 1, $l = count($keys); $i < $l; $i++) {
+            if ($comparator($array[$current], $array[$keys[$i]]) !== 0) {
+                $current = $keys[$i];
+                $keepkeys[$current] = null;
+            }
+        }
+        return array_intersect_key($backup, $keepkeys);
+    }
+}
+
 const array_order = "ryunosuke\\Functions\\array_order";
 if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\Functions\\array_order") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_order"))->isInternal()))) {
     /**
@@ -4529,13 +4635,18 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("r
         static $refs = [];
         $class = get_class($object);
         if (!isset($refs[$class])) {
-            $props = (new \ReflectionClass($class))->getProperties();
-            $refs[$class] = array_each($props, function (&$carry, \ReflectionProperty $rp) {
-                if (!$rp->isStatic()) {
-                    $rp->setAccessible(true);
-                    $carry[$rp->getName()] = $rp;
-                }
-            }, []);
+            // var_export や var_dump で得られるものは「親が優先」となっているが、不具合的動作だと思うので「子を優先」とする
+            $refs[$class] = [];
+            $ref = new \ReflectionClass($class);
+            do {
+                $refs[$ref->name] = array_each($ref->getProperties(), function (&$carry, \ReflectionProperty $rp) {
+                    if (!$rp->isStatic()) {
+                        $rp->setAccessible(true);
+                        $carry[$rp->getName()] = $rp;
+                    }
+                }, []);
+                $refs[$class] += $refs[$ref->name];
+            } while ($ref = $ref->getParentClass());
         }
 
         // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
@@ -7401,6 +7512,116 @@ if (!isset($excluded_functions["incidr"]) && (!function_exists("ryunosuke\\Funct
             }
         }
         return false;
+    }
+}
+
+const ping = "ryunosuke\\Functions\\ping";
+if (!isset($excluded_functions["ping"]) && (!function_exists("ryunosuke\\Functions\\ping") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ping"))->isInternal()))) {
+    /**
+     * ネットワーク疎通を返す
+     *
+     * $port を指定すると TCP/UDP、省略（null）すると ICMP で繋ぐ。
+     * が、 ICMP は root ユーザしか実行できないので ping コマンドにフォールバックする。
+     * TCP/UDP の分岐はマニュアル通り tcp://, udp:// のようなスキームで行う（スキームがなければ tcp）。
+     *
+     * udp は結果が不安定なので信頼しないこと（タイムアウトも疎通 OK とみなされる。プロトコルの仕様上どうしようもない）。
+     *
+     * Example:
+     * ```php
+     * // 自身へ ICMP ping を打つ（正常終了なら float を返し、失敗なら false を返す）
+     * assertInternalType('float', ping('127.0.0.1'));
+     * // 自身の tcp:1234 が開いているか（開いていれば float を返し、開いていなければ false を返す）
+     * assertFalse(ping('tcp://127.0.0.1', 1234));
+     * assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
+     * ```
+     *
+     * @param string $host ホスト名（プロトコルも指定できる）
+     * @param int|null $port ポート番号。指定しないと ICMP になる
+     * @param int $timeout タイムアウト秒
+     * @param string $errstr エラー文字列が格納される
+     * @return float|bool 成功したときは疎通時間。失敗したときは false
+     */
+    function ping($host, $port = null, $timeout = 1, &$errstr = '')
+    {
+        $errstr = '';
+
+        $parts = parse_url($host);
+        if (!isset($parts['scheme'])) {
+            if (strlen($port)) {
+                $parts['scheme'] = 'tcp';
+            }
+            else {
+                $parts['scheme'] = 'icmp';
+            }
+        }
+        $protocol = strtolower($parts['scheme']);
+        $host = $parts['host'] ?? $parts['path'];
+
+        // icmp で linux かつ非 root は SOCK_RAW が使えないので ping コマンドへフォールバック
+        if ($protocol === 'icmp' && DIRECTORY_SEPARATOR === '/' && !is_readable('/root')) {
+            // @codeCoverageIgnoreStart
+            /** @noinspection PhpUndefinedVariableInspection */
+            process('ping -c 1 -W ' . escapeshellarg($timeout), escapeshellarg($host), null, $stdout, $errstr);
+            // min/avg/max/mdev = 0.026/0.026/0.026/0.000
+            if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
+                return $m[1] / 1000.0;
+            }
+            return false;
+            // @codeCoverageIgnoreEnd
+        }
+
+        if ($protocol === 'icmp') {
+            $socket = socket_create(AF_INET, SOCK_RAW, getprotobyname($protocol));
+        }
+        elseif ($protocol === 'tcp') {
+            $socket = socket_create(AF_INET, SOCK_STREAM, getprotobyname($protocol));
+        }
+        elseif ($protocol === 'udp') {
+            $socket = socket_create(AF_INET, SOCK_DGRAM, getprotobyname($protocol));
+        }
+        else {
+            throw new \InvalidArgumentException("'$protocol' is not supported.");
+        }
+
+        $mtime = microtime(true);
+        try {
+            call_safely(function ($socket, $protocol, $host, $port, $timeout) {
+                socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
+                socket_connect($socket, $host, $port);
+
+                // icmp は ping メッセージを送信
+                if ($protocol === 'icmp') {
+                    $message = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
+                    socket_send($socket, $message, strlen($message), 0);
+                    socket_read($socket, 255);
+                }
+                // tcp は接続自体ができれば OK
+                if ($protocol === 'tcp') {
+                    assert(true); // PhpStatementHasEmptyBodyInspection
+                }
+                // udp は何か送ってみてその挙動で判断（=> catch 節）
+                if ($protocol === 'udp') {
+                    $message = ""; // noop
+                    socket_send($socket, $message, strlen($message), 0);
+                    socket_read($socket, 255);
+                }
+            }, $socket, $protocol, $host, $port, $timeout);
+            return microtime(true) - $mtime;
+        }
+        catch (\Throwable $t) {
+            $errno = socket_last_error($socket);
+            // windows では到達できても socket_read がエラーを返すので errno で判断
+            // 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかったため、接続できませんでした。
+            // または接続済みのホストが応答しなかったため、確立された接続は失敗しました。
+            if (DIRECTORY_SEPARATOR === '\\' && $errno === 10060 && $protocol === 'udp') {
+                return microtime(true) - $mtime;
+            }
+            $errstr = socket_strerror($errno);
+            return false;
+        }
+        finally {
+            socket_close($socket);
+        }
     }
 }
 
@@ -11377,6 +11598,117 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functi
     }
 }
 
+const is_ansi = "ryunosuke\\Functions\\is_ansi";
+if (!isset($excluded_functions["is_ansi"]) && (!function_exists("ryunosuke\\Functions\\is_ansi") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_ansi"))->isInternal()))) {
+    /**
+     * リソースが ansi color に対応しているか返す
+     *
+     * パイプしたりリダイレクトしていると false を返す。
+     *
+     * @see https://github.com/symfony/console/blob/v4.2.8/Output/StreamOutput.php#L98
+     *
+     * @param resource $stream 調べるリソース
+     * @return bool ansi color に対応しているなら true
+     */
+    function is_ansi($stream)
+    {
+        // テスト用に隠し引数で DS を取っておく
+        $DIRECTORY_SEPARATOR = DIRECTORY_SEPARATOR;
+        assert(!!$DIRECTORY_SEPARATOR = func_num_args() > 1 ? func_get_arg(1) : $DIRECTORY_SEPARATOR);
+
+        if ('Hyper' === getenv('TERM_PROGRAM')) {
+            return true;
+        }
+
+        if ($DIRECTORY_SEPARATOR === '\\') {
+            return (\function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support($stream))
+                || false !== getenv('ANSICON')
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM');
+        }
+
+        if (\function_exists('stream_isatty')) {
+            return @stream_isatty($stream); // @codeCoverageIgnore
+        }
+
+        if (\function_exists('posix_isatty')) {
+            return @posix_isatty($stream); // @codeCoverageIgnore
+        }
+
+        $stat = @fstat($stream);
+        // Check if formatted mode is S_IFCHR
+        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+    }
+}
+
+const ansi_colorize = "ryunosuke\\Functions\\ansi_colorize";
+if (!isset($excluded_functions["ansi_colorize"]) && (!function_exists("ryunosuke\\Functions\\ansi_colorize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ansi_colorize"))->isInternal()))) {
+    /**
+     * 文字列に ANSI Color エスケープシーケンスを埋め込む
+     *
+     * - "blue" のような小文字色名は文字色
+     * - "BLUE" のような大文字色名は背景色
+     * - "bold" のようなスタイル名は装飾
+     *
+     * となる。その区切り文字は現在のところ厳密に定めていない（`fore+back|bold` のような形式で定めることも考えたけどメリットがない）。
+     * つまり、アルファベット以外で分割するので、
+     *
+     * - `blue|WHITE@bold`: 文字青・背景白・太字
+     * - `blue WHITE bold underscore`: 文字青・背景白・太字・下線
+     * - `italic|bold,blue+WHITE  `: 文字青・背景白・太字・斜体
+     *
+     * という動作になる（記号で区切られていれば形式はどうでも良いということ）。
+     * ただ、この指定方法は変更が入る可能性が高いのでスペースあたりで区切っておくのがもっとも無難。
+     *
+     * @param string $string 対象文字列
+     * @param string $color 色とスタイル文字列
+     * @return string エスケープシーケンス付きの文字列
+     */
+    function ansi_colorize($string, $color)
+    {
+        // see https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+        // see https://misc.flogisoft.com/bash/tip_colors_and_formatting
+        $ansicodes = [
+            // forecolor
+            'default'    => [39, 39],
+            'black'      => [30, 39],
+            'red'        => [31, 39],
+            'green'      => [32, 39],
+            'yellow'     => [33, 39],
+            'blue'       => [34, 39],
+            'magenta'    => [35, 39],
+            'cyan'       => [36, 39],
+            'white'      => [97, 39],
+            'gray'       => [90, 39],
+            // backcolor
+            'DEFAULT'    => [49, 49],
+            'BLACK'      => [40, 49],
+            'RED'        => [41, 49],
+            'GREEN'      => [42, 49],
+            'YELLOW'     => [43, 49],
+            'BLUE'       => [44, 49],
+            'MAGENTA'    => [45, 49],
+            'CYAN'       => [46, 49],
+            'WHITE'      => [47, 49],
+            'GRAY'       => [100, 49],
+            // style
+            'bold'       => [1, 22],
+            'faint'      => [2, 22], // not working ?
+            'italic'     => [3, 23],
+            'underscore' => [4, 24],
+            'blink'      => [5, 25],
+            'reverse'    => [7, 27],
+            'conceal'    => [8, 28],
+        ];
+
+        $names = array_flip(preg_split('#[^a-z]#i', $color));
+        $styles = array_intersect_key($ansicodes, $names);
+        $setters = implode(';', array_column($styles, 0));
+        $unsetters = implode(';', array_column($styles, 1));
+        return "\033[{$setters}m{$string}\033[{$unsetters}m";
+    }
+}
+
 const process = "ryunosuke\\Functions\\process";
 if (!isset($excluded_functions["process"]) && (!function_exists("ryunosuke\\Functions\\process") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\process"))->isInternal()))) {
     /**
@@ -12629,6 +12961,7 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("ryunosuke\\Funct
      * php7 の `<=>` の関数版
      *
      * 引数で大文字小文字とか自然順とか型モードとかが指定できる。
+     * さらに追加で SORT_STRICT という厳密比較フラグを渡すことができる。
      *
      * Example:
      * ```php
@@ -12645,6 +12978,10 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("ryunosuke\\Funct
      * // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
      * assertTrue(varcmp('12', '2', SORT_NATURAL) > 0);
      * assertTrue(varcmp('2', '12', SORT_NATURAL) < 0);
+     *
+     * // SORT_STRICT 定数が使える（下記はすべて宇宙船演算子を使うと 0 になる）
+     * assertTrue(varcmp(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT) < 0);
+     * assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) < 0);
      * ```
      *
      * @param mixed $a 比較する値1
@@ -12681,6 +13018,9 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("ryunosuke\\Funct
                 return strnatcasecmp($a, $b);
             }
             return strnatcmp($a, $b);
+        }
+        if ($mode === SORT_STRICT) {
+            return $a === $b ? 0 : ($a > $b ? 1 : -1);
         }
 
         // for SORT_REGULAR
@@ -12997,6 +13337,176 @@ if (!isset($excluded_functions["var_html"]) && (!function_exists("ryunosuke\\Fun
         // @codeCoverageIgnoreEnd
 
         echo "<pre class='var_html'>{$export($value, [])}</pre>";
+    }
+}
+
+const var_pretty = "ryunosuke\\Functions\\var_pretty";
+if (!isset($excluded_functions["var_pretty"]) && (!function_exists("ryunosuke\\Functions\\var_pretty") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_pretty"))->isInternal()))) {
+    /**
+     * var_dump の出力を見やすくしたもの
+     *
+     * var_dump はとても縦に長い上見づらいので色や改行・空白を調整して見やすくした。
+     * sapi に応じて自動で色分けがなされる（$context で指定もできる）。
+     * また、 xdebug のように呼び出しファイル:行数が先頭に付与される。
+     *
+     * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // 下記のように出力される（実際は色付きで出力される）
+     * $using = 123;
+     * var_pretty([
+     *     "array"   => [1, 2, 3],
+     *     "hash"    => [
+     *         "a" => "A",
+     *         "b" => "B",
+     *         "c" => "C",
+     *     ],
+     *     "object"  => new \Exception(),
+     *     "closure" => function () use($using) { },
+     * ]);
+     * ?>
+     * {
+     *   array: [1, 2, 3],
+     *   hash: {
+     *     a: 'A',
+     *     b: 'B',
+     *     c: 'C',
+     *   },
+     *   object: Exception#1 {
+     *     message: '',
+     *     string: '',
+     *     code: 0,
+     *     file: '...',
+     *     line: 19,
+     *     trace: [],
+     *     previous: null,
+     *   },
+     *   closure: Closure#0(static) use {
+     *     using: 123,
+     *   },
+     * }
+     * <?php
+     * ```
+     *
+     * @param mixed $value 出力する値
+     * @param string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
+     * @param bool $return 出力するのではなく値を返すなら true
+     * @return string $return: true なら値の出力結果
+     */
+    function var_pretty($value, $context = null, $return = false)
+    {
+        // インデントの空白数
+        $INDENT = 2;
+
+        if ($context === null) {
+            $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
+            if (PHP_SAPI === 'cli') {
+                $context = is_ansi(STDOUT) && !$return ? 'cli' : 'plain';
+            }
+        }
+
+        $colorAdapter = static function ($value, $style) use ($context) {
+            switch ($context) {
+                default:
+                    throw new \InvalidArgumentException("'$context' is not supported.");
+                case 'plain':
+                    return $value;
+                case 'cli':
+                    return ansi_colorize($value, $style);
+                case 'html':
+                    // 今のところ bold しか使っていないのでこれでよい
+                    $style = $style === 'bold' ? 'font-weight:bold' : "color:$style";
+                    return "<span style='$style'>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+            }
+        };
+
+        $colorKey = static function ($value) use ($colorAdapter) {
+            if (is_int($value)) {
+                return $colorAdapter($value, 'bold');
+            }
+            return $colorAdapter($value, 'red');
+        };
+        $colorVal = static function ($value) use ($colorAdapter) {
+            switch (true) {
+                case is_null($value):
+                    return $colorAdapter('null', 'bold');
+                case is_object($value):
+                    if (function_exists('spl_object_id')) {
+                        $id = spl_object_id($value); // @codeCoverageIgnore
+                    }
+                    // backport: spl_object_id
+                    else {
+                        // 桁がでかすぎて視認性が悪いので現在の hash をオフセットとして減算する
+                        // 場合によっては負数が出るが許容する（少なくとも同じオブジェクトなら同じ id になるはず。嫌なら php 7.2 を使えば良い）
+                        static $offset = null;
+                        if ($offset === null) {
+                            $offset = intval(substr(spl_object_hash($value), 1, 15), 16);
+                        }
+                        $id = intval(substr(spl_object_hash($value), 1, 15), 16) - $offset + 1;
+                    }
+                    return $colorAdapter(get_class($value), 'green') . "#$id";
+                case is_bool($value):
+                    return $colorAdapter(var_export($value, true), 'bold');
+                case is_int($value) || is_float($value) || is_string($value):
+                    return $colorAdapter(var_export($value, true), 'magenta');
+                case is_resource($value):
+                    return $colorAdapter(sprintf('%s of type (%s)', $value, get_resource_type($value)), 'bold');
+            }
+        };
+
+        // 再帰用クロージャ
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT, $colorKey, $colorVal) {
+            // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+            foreach ($parents as $parent) {
+                if ($parent === $value) {
+                    return $export('*RECURSION*');
+                }
+            }
+            if (is_array($value)) {
+                // スカラー値のみで構成されているならシンプルな再帰
+                if (!is_hasharray($value) && array_all($value, is_primitive)) {
+                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                }
+
+                $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
+                $spacer2 = str_repeat(' ', $nest * $INDENT);
+
+                $kvl = '';
+                $parents[] = $value;
+                foreach ($value as $k => $v) {
+                    $keystr = $colorKey($k) . ': ';
+                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                }
+                return "{\n{$kvl}{$spacer2}}";
+            }
+            elseif ($value instanceof \Closure) {
+                $ref = reflect_callable($value);
+                $that = $ref->getClosureThis();
+                $thatT = $that ? $colorVal($that) : 'static';
+                $properties = $ref->getStaticVariables();
+                $propT = $properties ? $export($properties, $nest, $parents) : '{}';
+                return $colorVal($value) . "($thatT) use $propT";
+            }
+            elseif (is_object($value)) {
+                $parents[] = $value;
+                $properties = get_object_properties($value);
+                return $colorVal($value) . ' ' . ($properties ? $export($properties, $nest, $parents) : '{}');
+            }
+            else {
+                return $colorVal($value);
+            }
+        };
+
+        // 結果を返したり出力したり
+        $result = stacktrace(null, "%s:%s") . "\n" . $export($value);
+        if ($context === 'html') {
+            $result = "<pre>$result</pre>";
+        }
+        if ($return) {
+            return $result;
+        }
+        echo $result, "\n";
     }
 }
 

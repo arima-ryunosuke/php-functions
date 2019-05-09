@@ -918,6 +918,41 @@ assertTrue(array_any([true, false]));
 assertFalse(array_any([false, false]));
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_distinct()"> ryunosuke\Functions\Package\Arrays::array_distinct()</a></h2>
+	<div class="description"><p>比較関数が渡せる array_unique</p>
+<p>array_unique は微妙に癖があるのでシンプルに使いやすくしたもの。</p>
+<ul>
+<li>SORT_STRING|SORT_FLAG_CASE のような指定が使える（大文字小文字を無視した重複除去）<ul>
+<li>厳密に言えば array_unique も指定すれば動く（が、ドキュメントに記載がない）</li>
+</ul>
+</li>
+<li>配列を渡すと下記の動作になる<ul>
+<li>数値キーは配列アクセス</li>
+<li>文字キーはメソッドコール（値は引数）</li>
+</ul>
+</li>
+<li>もちろん（$a, $b を受け取る）クロージャも渡せる</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// シンプルな重複除去
+assertSame(array_distinct([1, 2, 3, '3']), [1, 2, 3]);
+// 大文字小文字を無視した重複除去
+assertSame(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE), ['a', 'b']);
+
+$v1 = new \ArrayObject(['id' =&gt; '1', 'group' =&gt; 'aaa']);
+$v2 = new \ArrayObject(['id' =&gt; '2', 'group' =&gt; 'bbb', 'dummy' =&gt; 123]);
+$v3 = new \ArrayObject(['id' =&gt; '3', 'group' =&gt; 'aaa', 'dummy' =&gt; 456]);
+$v4 = new \ArrayObject(['id' =&gt; '4', 'group' =&gt; 'bbb', 'dummy' =&gt; 789]);
+// クロージャを指定して重複除去
+assertSame(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] &lt;=&gt; $b['group']; }), [$v1, $v2]);
+// 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
+assertSame(array_distinct([$v1, $v2, $v3, $v4], 'group'), [$v1, $v2]);
+// 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
+assertSame(array_distinct([$v1, $v2, $v3, $v4], ['count' =&gt; []]), [$v1, $v2]);
+// 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
+assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$v1, $v2, 2 =&gt; $v3]);
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_order()"> ryunosuke\Functions\Package\Arrays::array_order()</a></h2>
 	<div class="description"><p>配列を $orders に従って並べ替える</p>
 <p>データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' =&gt; 'value'])にも対応している。<br />
@@ -2141,6 +2176,20 @@ assertTrue(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']));
 assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::ping()"> ryunosuke\Functions\Package\Network::ping()</a></h2>
+	<div class="description"><p>ネットワーク疎通を返す</p>
+<p>$port を指定すると TCP/UDP、省略（null）すると ICMP で繋ぐ。<br />
+が、 ICMP は root ユーザしか実行できないので ping コマンドにフォールバックする。<br />
+TCP/UDP の分岐はマニュアル通り tcp://, udp:// のようなスキームで行う（スキームがなければ tcp）。</p>
+<p>udp は結果が不安定なので信頼しないこと（タイムアウトも疎通 OK とみなされる。プロトコルの仕様上どうしようもない）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 自身へ ICMP ping を打つ（正常終了なら float を返し、失敗なら false を返す）
+assertInternalType('float', ping('127.0.0.1'));
+// 自身の tcp:1234 が開いているか（開いていれば float を返し、開いていなければ false を返す）
+assertFalse(ping('tcp://127.0.0.1', 1234));
+assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
+</code></pre>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()"> ryunosuke\Functions\Package\Network::http_requests()</a></h2>
 	<div class="description"><p>http リクエストを並列で投げる</p>
 <p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
@@ -3273,6 +3322,27 @@ $rand3 = cache('rand', $provider);
 assertNotSame($rand1, $rand3);
 </code></pre>
 </div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::is_ansi()"> ryunosuke\Functions\Package\Utility::is_ansi()</a></h2>
+	<div class="description"><p>リソースが ansi color に対応しているか返す</p>
+<p>パイプしたりリダイレクトしていると false を返す。</p>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::ansi_colorize()"> ryunosuke\Functions\Package\Utility::ansi_colorize()</a></h2>
+	<div class="description"><p>文字列に ANSI Color エスケープシーケンスを埋め込む</p>
+<ul>
+<li>"blue" のような小文字色名は文字色</li>
+<li>"BLUE" のような大文字色名は背景色</li>
+<li>"bold" のようなスタイル名は装飾</li>
+</ul>
+<p>となる。その区切り文字は現在のところ厳密に定めていない（<code>fore+back|bold</code> のような形式で定めることも考えたけどメリットがない）。<br />
+つまり、アルファベット以外で分割するので、</p>
+<ul>
+<li><code>blue|WHITE@bold</code>: 文字青・背景白・太字</li>
+<li><code>blue WHITE bold underscore</code>: 文字青・背景白・太字・下線</li>
+<li><code>italic|bold,blue+WHITE  </code>: 文字青・背景白・太字・斜体</li>
+</ul>
+<p>という動作になる（記号で区切られていれば形式はどうでも良いということ）。<br />
+ただ、この指定方法は変更が入る可能性が高いのでスペースあたりで区切っておくのがもっとも無難。</p>
+</div>
     	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process()"> ryunosuke\Functions\Package\Utility::process()</a></h2>
 	<div class="description"><p>proc_open ～ proc_close の一連の処理を行う</p>
 <p>標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。</p>
@@ -3424,7 +3494,10 @@ benchmark([
             	<h2>class<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars"> ryunosuke\Functions\Package\Vars</a></h2>
 	<div class="description"><p>変数関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::stringify()"> ryunosuke\Functions\Package\Vars::stringify()</a></h2>
+        	<h2>classconstant<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SORT_STRICT"> ryunosuke\Functions\Package\Vars::SORT_STRICT</a></h2>
+	<div class="description"><p>SORT_XXX 定数の厳密版</p>
+</div>
+            	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::stringify()"> ryunosuke\Functions\Package\Vars::stringify()</a></h2>
 	<div class="description"><p>値を何とかして文字列化する</p>
 <p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p>
 </div>
@@ -3619,7 +3692,8 @@ assertFalse(is_countable(new \stdClass()));
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()"> ryunosuke\Functions\Package\Vars::varcmp()</a></h2>
 	<div class="description"><p>php7 の <code>&lt;=&gt;</code> の関数版</p>
-<p>引数で大文字小文字とか自然順とか型モードとかが指定できる。</p>
+<p>引数で大文字小文字とか自然順とか型モードとかが指定できる。<br />
+さらに追加で SORT_STRICT という厳密比較フラグを渡すことができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 'a' と 'z' なら 'z' の方が大きい
 assertTrue(varcmp('z', 'a') &gt; 0);
@@ -3634,6 +3708,10 @@ assertTrue(varcmp('a', 'A', SORT_FLAG_CASE) === 0);
 // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
 assertTrue(varcmp('12', '2', SORT_NATURAL) &gt; 0);
 assertTrue(varcmp('2', '12', SORT_NATURAL) &lt; 0);
+
+// SORT_STRICT 定数が使える（下記はすべて宇宙船演算子を使うと 0 になる）
+assertTrue(varcmp(['a' =&gt; 'A', 'b' =&gt; 'B'], ['b' =&gt; 'B', 'a' =&gt; 'A'], SORT_STRICT) &lt; 0);
+assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0);
 </code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_type()"> ryunosuke\Functions\Package\Vars::var_type()</a></h2>
@@ -3742,6 +3820,49 @@ assertSame(var_export2(compact('rarray', 'robject'), true), '[
 <li>Content-Type が強制的に text/html になる</li>
 </ul>
 <p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p>
+</div>
+    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_pretty()"> ryunosuke\Functions\Package\Vars::var_pretty()</a></h2>
+	<div class="description"><p>var_dump の出力を見やすくしたもの</p>
+<p>var_dump はとても縦に長い上見づらいので色や改行・空白を調整して見やすくした。<br />
+sapi に応じて自動で色分けがなされる（$context で指定もできる）。<br />
+また、 xdebug のように呼び出しファイル:行数が先頭に付与される。</p>
+<p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 下記のように出力される（実際は色付きで出力される）
+$using = 123;
+var_pretty([
+    "array"   =&gt; [1, 2, 3],
+    "hash"    =&gt; [
+        "a" =&gt; "A",
+        "b" =&gt; "B",
+        "c" =&gt; "C",
+    ],
+    "object"  =&gt; new \Exception(),
+    "closure" =&gt; function () use($using) { },
+]);
+?&gt;
+{
+  array: [1, 2, 3],
+  hash: {
+    a: 'A',
+    b: 'B',
+    c: 'C',
+  },
+  object: Exception#1 {
+    message: '',
+    string: '',
+    code: 0,
+    file: '...',
+    line: 19,
+    trace: [],
+    previous: null,
+  },
+  closure: Closure#0(static) use {
+    using: 123,
+  },
+}
+&lt;?php
+</code></pre>
 </div>
     	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::console_log()"> ryunosuke\Functions\Package\Vars::console_log()</a></h2>
 	<div class="description"><p>js の console に値を吐き出す</p>

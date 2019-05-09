@@ -637,6 +637,9 @@ const JSON_MAX_DEPTH = -1;
 /** parse_php 関数でトークン名変換をするか */
 const TOKEN_NAME = 2;
 
+/** SORT_XXX 定数の厳密版 */
+const SORT_STRICT = 256;
+
 
 # functions
 const arrays = ["ryunosuke\\Functions\\Package\\Arrays", "arrays"];
@@ -693,6 +696,7 @@ const array_count = ["ryunosuke\\Functions\\Package\\Arrays", "array_count"];
 const array_group = ["ryunosuke\\Functions\\Package\\Arrays", "array_group"];
 const array_all = ["ryunosuke\\Functions\\Package\\Arrays", "array_all"];
 const array_any = ["ryunosuke\\Functions\\Package\\Arrays", "array_any"];
+const array_distinct = ["ryunosuke\\Functions\\Package\\Arrays", "array_distinct"];
 const array_order = ["ryunosuke\\Functions\\Package\\Arrays", "array_order"];
 const array_shuffle = ["ryunosuke\\Functions\\Package\\Arrays", "array_shuffle"];
 const array_shrink_key = ["ryunosuke\\Functions\\Package\\Arrays", "array_shrink_key"];
@@ -771,6 +775,7 @@ const random_at = ["ryunosuke\\Functions\\Package\\Math", "random_at"];
 const probability = ["ryunosuke\\Functions\\Package\\Math", "probability"];
 const getipaddress = ["ryunosuke\\Functions\\Package\\Network", "getipaddress"];
 const incidr = ["ryunosuke\\Functions\\Package\\Network", "incidr"];
+const ping = ["ryunosuke\\Functions\\Package\\Network", "ping"];
 const http_requests = ["ryunosuke\\Functions\\Package\\Network", "http_requests"];
 const sql_quote = ["ryunosuke\\Functions\\Package\\Sql", "sql_quote"];
 const sql_bind = ["ryunosuke\\Functions\\Package\\Sql", "sql_bind"];
@@ -837,6 +842,8 @@ const try_catch_finally = ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_f
 const get_uploaded_files = ["ryunosuke\\Functions\\Package\\Utility", "get_uploaded_files"];
 const cachedir = ["ryunosuke\\Functions\\Package\\Utility", "cachedir"];
 const cache = ["ryunosuke\\Functions\\Package\\Utility", "cache"];
+const is_ansi = ["ryunosuke\\Functions\\Package\\Utility", "is_ansi"];
+const ansi_colorize = ["ryunosuke\\Functions\\Package\\Utility", "ansi_colorize"];
 const process = ["ryunosuke\\Functions\\Package\\Utility", "process"];
 const arguments = ["ryunosuke\\Functions\\Package\\Utility", "arguments"];
 const stacktrace = ["ryunosuke\\Functions\\Package\\Utility", "stacktrace"];
@@ -863,5 +870,6 @@ const var_apply = ["ryunosuke\\Functions\\Package\\Vars", "var_apply"];
 const var_applys = ["ryunosuke\\Functions\\Package\\Vars", "var_applys"];
 const var_export2 = ["ryunosuke\\Functions\\Package\\Vars", "var_export2"];
 const var_html = ["ryunosuke\\Functions\\Package\\Vars", "var_html"];
+const var_pretty = ["ryunosuke\\Functions\\Package\\Vars", "var_pretty"];
 const console_log = ["ryunosuke\\Functions\\Package\\Vars", "console_log"];
 const hashvar = ["ryunosuke\\Functions\\Package\\Vars", "hashvar"];
