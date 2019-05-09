@@ -608,6 +608,43 @@ VAR
         (var_html)($value);
     }
 
+    function test_var_pretty()
+    {
+        $this->assertException('is not supported', var_pretty, null, 'hoge');
+
+        $recur = ['a' => 'A'];
+        $recur['r'] = &$recur;
+        $closure = function () use ($recur) { return $recur; };
+        $value = [
+            new \ArrayObject([
+                'A' => new \ArrayObject([
+                    'X' => new \stdClass(),
+                ]),
+            ]),
+            'E' => new \DateTime('2014/12/24 12:34:56'),
+            'A' => ["str", 1, 2, 3, true, null],
+            'H' => ['a' => 'A', 'b' => 'B'],
+            'C' => $closure,
+            'R' => STDOUT,
+        ];
+
+        $pretty = (var_pretty)($value, 'plain', true);
+        $this->assertContains("  0: ArrayObject#", $pretty);
+        $this->assertContains("      X: stdClass#", $pretty);
+        $this->assertContains("    date: '2014-12-24 12:34:56.000000'", $pretty);
+        $this->assertContains("  A: ['str', 1, 2, 3, true, null]", $pretty);
+        $this->assertContains("ryunosuke\\Test\\Package\\VarsTest#", $pretty);
+        $this->assertContains("    recur: {", $pretty);
+        $this->assertContains("      r: '*RECURSION*'", $pretty);
+        $this->assertContains("  R: Resource id #2 of type (stream)", $pretty);
+
+        $this->assertContains("\033", (var_pretty)($value, 'cli', true));
+        $this->assertContains("<span", (var_pretty)($value, 'html', true));
+
+        $this->expectOutputRegex('#ArrayObject#');
+        (var_pretty)($value);
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled

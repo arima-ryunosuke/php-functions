@@ -920,6 +920,173 @@ class Vars
     }
 
     /**
+     * var_dump の出力を見やすくしたもの
+     *
+     * var_dump はとても縦に長い上見づらいので色や改行・空白を調整して見やすくした。
+     * sapi に応じて自動で色分けがなされる（$context で指定もできる）。
+     * また、 xdebug のように呼び出しファイル:行数が先頭に付与される。
+     *
+     * この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // 下記のように出力される（実際は色付きで出力される）
+     * $using = 123;
+     * var_pretty([
+     *     "array"   => [1, 2, 3],
+     *     "hash"    => [
+     *         "a" => "A",
+     *         "b" => "B",
+     *         "c" => "C",
+     *     ],
+     *     "object"  => new \Exception(),
+     *     "closure" => function () use($using) { },
+     * ]);
+     * ?>
+     * {
+     *   array: [1, 2, 3],
+     *   hash: {
+     *     a: 'A',
+     *     b: 'B',
+     *     c: 'C',
+     *   },
+     *   object: Exception#1 {
+     *     message: '',
+     *     string: '',
+     *     code: 0,
+     *     file: '...',
+     *     line: 19,
+     *     trace: [],
+     *     previous: null,
+     *   },
+     *   closure: Closure#0(static) use {
+     *     using: 123,
+     *   },
+     * }
+     * <?php
+     * ```
+     *
+     * @param mixed $value 出力する値
+     * @param string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
+     * @param bool $return 出力するのではなく値を返すなら true
+     * @return string $return: true なら値の出力結果
+     */
+    public static function var_pretty($value, $context = null, $return = false)
+    {
+        // インデントの空白数
+        $INDENT = 2;
+
+        if ($context === null) {
+            $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
+            if (PHP_SAPI === 'cli') {
+                $context = (is_ansi)(STDOUT) && !$return ? 'cli' : 'plain';
+            }
+        }
+
+        $colorAdapter = static function ($value, $style) use ($context) {
+            switch ($context) {
+                default:
+                    throw new \InvalidArgumentException("'$context' is not supported.");
+                case 'plain':
+                    return $value;
+                case 'cli':
+                    return (ansi_colorize)($value, $style);
+                case 'html':
+                    // 今のところ bold しか使っていないのでこれでよい
+                    $style = $style === 'bold' ? 'font-weight:bold' : "color:$style";
+                    return "<span style='$style'>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+            }
+        };
+
+        $colorKey = static function ($value) use ($colorAdapter) {
+            if (is_int($value)) {
+                return $colorAdapter($value, 'bold');
+            }
+            return $colorAdapter($value, 'red');
+        };
+        $colorVal = static function ($value) use ($colorAdapter) {
+            switch (true) {
+                case is_null($value):
+                    return $colorAdapter('null', 'bold');
+                case is_object($value):
+                    if (function_exists('spl_object_id')) {
+                        $id = spl_object_id($value); // @codeCoverageIgnore
+                    }
+                    // backport: spl_object_id
+                    else {
+                        // 桁がでかすぎて視認性が悪いので現在の hash をオフセットとして減算する
+                        // 場合によっては負数が出るが許容する（少なくとも同じオブジェクトなら同じ id になるはず。嫌なら php 7.2 を使えば良い）
+                        static $offset = null;
+                        if ($offset === null) {
+                            $offset = intval(substr(spl_object_hash($value), 1, 15), 16);
+                        }
+                        $id = intval(substr(spl_object_hash($value), 1, 15), 16) - $offset + 1;
+                    }
+                    return $colorAdapter(get_class($value), 'green') . "#$id";
+                case is_bool($value):
+                    return $colorAdapter(var_export($value, true), 'bold');
+                case is_int($value) || is_float($value) || is_string($value):
+                    return $colorAdapter(var_export($value, true), 'magenta');
+                case is_resource($value):
+                    return $colorAdapter(sprintf('%s of type (%s)', $value, get_resource_type($value)), 'bold');
+            }
+        };
+
+        // 再帰用クロージャ
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT, $colorKey, $colorVal) {
+            // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+            foreach ($parents as $parent) {
+                if ($parent === $value) {
+                    return $export('*RECURSION*');
+                }
+            }
+            if (is_array($value)) {
+                // スカラー値のみで構成されているならシンプルな再帰
+                if (!(is_hasharray)($value) && (array_all)($value, is_primitive)) {
+                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                }
+
+                $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
+                $spacer2 = str_repeat(' ', $nest * $INDENT);
+
+                $kvl = '';
+                $parents[] = $value;
+                foreach ($value as $k => $v) {
+                    $keystr = $colorKey($k) . ': ';
+                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                }
+                return "{\n{$kvl}{$spacer2}}";
+            }
+            elseif ($value instanceof \Closure) {
+                $ref = (reflect_callable)($value);
+                $that = $ref->getClosureThis();
+                $thatT = $that ? $colorVal($that) : 'static';
+                $properties = $ref->getStaticVariables();
+                $propT = $properties ? $export($properties, $nest, $parents) : '{}';
+                return $colorVal($value) . "($thatT) use $propT";
+            }
+            elseif (is_object($value)) {
+                $parents[] = $value;
+                $properties = (get_object_properties)($value);
+                return $colorVal($value) . ' ' . ($properties ? $export($properties, $nest, $parents) : '{}');
+            }
+            else {
+                return $colorVal($value);
+            }
+        };
+
+        // 結果を返したり出力したり
+        $result = (stacktrace)(null, "%s:%s") . "\n" . $export($value);
+        if ($context === 'html') {
+            $result = "<pre>$result</pre>";
+        }
+        if ($return) {
+            return $result;
+        }
+        echo $result, "\n";
+    }
+
+    /**
      * js の console に値を吐き出す
      *
      * script タグではなく X-ChromeLogger-Data を使用する。
