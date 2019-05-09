@@ -179,3 +179,41 @@ class BuiltIn implements \Countable
         return (int) \ryunosuke\Functions\Package\Funchand::by_builtin($this, 'count');
     }
 }
+
+class Nest1
+{
+    private $private = 1;
+
+    private $private1 = 1;
+}
+
+class Nest2 extends Nest1
+{
+    private $private = 2;
+
+    private $private2 = 2;
+}
+
+class Nest3 extends Nest2
+{
+    private $private = 3;
+
+    private $private3 = 3;
+
+    public function set($val)
+    {
+        $this->private = $val;
+    }
+
+    public function get()
+    {
+        return $this->private;
+    }
+
+    public static function __set_state($array)
+    {
+        $obj = new self;
+        $obj->private = $array['private'];
+        return $obj;
+    }
+}

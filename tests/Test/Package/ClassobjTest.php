@@ -244,5 +244,15 @@ class ClassobjTest extends AbstractTestCase
             'name'   => 'name',
             'oreore' => 'oreore',
         ], (get_object_properties)($concrete));
+
+        // 標準の var_export が親優先になっているのを変更しているテスト
+        $object = new \Nest3();
+        $object->set(999);
+
+        // 復元したのに 999 になっていない（どうも同じキーの配列で __set_state されている模様）
+        $this->assertSame(1, (eval('return ' . var_export($object, true) . ';'))->get());
+
+        // get_object_properties はそのようなことにはならない
+        $this->assertSame(999, (eval('return ' . (var_export2)($object, true) . ';'))->get());
     }
 }

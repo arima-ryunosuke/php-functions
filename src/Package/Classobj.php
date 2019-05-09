@@ -544,13 +544,18 @@ class Classobj
         static $refs = [];
         $class = get_class($object);
         if (!isset($refs[$class])) {
-            $props = (new \ReflectionClass($class))->getProperties();
-            $refs[$class] = (array_each)($props, function (&$carry, \ReflectionProperty $rp) {
-                if (!$rp->isStatic()) {
-                    $rp->setAccessible(true);
-                    $carry[$rp->getName()] = $rp;
-                }
-            }, []);
+            // var_export や var_dump で得られるものは「親が優先」となっているが、不具合的動作だと思うので「子を優先」とする
+            $refs[$class] = [];
+            $ref = new \ReflectionClass($class);
+            do {
+                $refs[$ref->name] = (array_each)($ref->getProperties(), function (&$carry, \ReflectionProperty $rp) {
+                    if (!$rp->isStatic()) {
+                        $rp->setAccessible(true);
+                        $carry[$rp->getName()] = $rp;
+                    }
+                }, []);
+                $refs[$class] += $refs[$ref->name];
+            } while ($ref = $ref->getParentClass());
         }
 
         // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
