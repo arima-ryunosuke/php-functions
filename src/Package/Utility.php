@@ -190,6 +190,46 @@ class Utility
     }
 
     /**
+     * リソースが ansi color に対応しているか返す
+     *
+     * パイプしたりリダイレクトしていると false を返す。
+     *
+     * @see https://github.com/symfony/console/blob/v4.2.8/Output/StreamOutput.php#L98
+     *
+     * @param resource $stream 調べるリソース
+     * @return bool ansi color に対応しているなら true
+     */
+    public static function is_ansi($stream)
+    {
+        // テスト用に隠し引数で DS を取っておく
+        $DIRECTORY_SEPARATOR = DIRECTORY_SEPARATOR;
+        assert(!!$DIRECTORY_SEPARATOR = func_num_args() > 1 ? func_get_arg(1) : $DIRECTORY_SEPARATOR);
+
+        if ('Hyper' === getenv('TERM_PROGRAM')) {
+            return true;
+        }
+
+        if ($DIRECTORY_SEPARATOR === '\\') {
+            return (\function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support($stream))
+                || false !== getenv('ANSICON')
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM');
+        }
+
+        if (\function_exists('stream_isatty')) {
+            return @stream_isatty($stream); // @codeCoverageIgnore
+        }
+
+        if (\function_exists('posix_isatty')) {
+            return @posix_isatty($stream); // @codeCoverageIgnore
+        }
+
+        $stat = @fstat($stream);
+        // Check if formatted mode is S_IFCHR
+        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+    }
+
+    /**
      * proc_open ～ proc_close の一連の処理を行う
      *
      * 標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。

@@ -2,6 +2,10 @@
 
 namespace ryunosuke\Test\Package;
 
+use const STDERR;
+use function tempnam;
+use function tmpfile;
+
 class UtilityTest extends AbstractTestCase
 {
     function test_get_uploaded_files()
@@ -237,6 +241,24 @@ class UtilityTest extends AbstractTestCase
         /** @noinspection PhpUndefinedMethodInspection */
         (reflect_callable)(cache)->getStaticVariables()['cacheobject']->clear();
         $this->assertFileNotExists("$tmpdir/hoge.php-cache");
+    }
+
+    function test_is_ansi()
+    {
+        // common
+        putenv('TERM_PROGRAM=Hyper');
+        $this->assertTrue((is_ansi)(STDOUT));
+        putenv('TERM_PROGRAM=');
+
+        // windows
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $this->assertFalse((is_ansi)(STDOUT, '\\'));
+            putenv('TERM=xterm');
+            $this->assertTrue((is_ansi)(STDOUT, '\\'));
+            putenv('TERM=');
+            $this->assertFalse((is_ansi)(STDOUT, '/'));
+            $this->assertFalse((is_ansi)(tmpfile(), '/'));
+        }
     }
 
     function test_process()
