@@ -2,8 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use const STDERR;
-use function tempnam;
 use function tmpfile;
 
 class UtilityTest extends AbstractTestCase
@@ -259,6 +257,51 @@ class UtilityTest extends AbstractTestCase
             $this->assertFalse((is_ansi)(STDOUT, '/'));
             $this->assertFalse((is_ansi)(tmpfile(), '/'));
         }
+    }
+
+    function test_ansi_colorize()
+    {
+        $this->assertSame('"\u001b[30;41mhoge\u001b[39;49m"', json_encode((ansi_colorize)('hoge', 'RED black')));
+        $this->assertSame('"\u001b[30;41;1;3mhoge\u001b[39;49;22;23m"', json_encode((ansi_colorize)('hoge', 'black+RED|bold,italic')));
+        $this->assertSame('"\u001b[mhoge\u001b[m"', json_encode((ansi_colorize)('hoge', 'foo+bar')));
+        $this->assertSame('"\u001b[41mA\u001b[34mhoge\u001b[39mZ\u001b[49m"', json_encode((ansi_colorize)('A' . (ansi_colorize)('hoge', 'blue') . 'Z', 'RED')));
+
+        // 視覚的に確認したいことがあるのでコピペ用に残しておく
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $test = function () {
+            $styles = [
+                'default',
+                'black',
+                'red',
+                'green',
+                'yellow',
+                'blue',
+                'magenta',
+                'cyan',
+                'white',
+                'gray',
+                'DEFAULT',
+                'BLACK',
+                'RED',
+                'GREEN',
+                'YELLOW',
+                'BLUE',
+                'MAGENTA',
+                'CYAN',
+                'WHITE',
+                'GRAY',
+                'bold',
+                'faint',
+                'italic',
+                'underscore',
+                'blink',
+                'reverse',
+                'conceal',
+            ];
+            foreach ($styles as $style) {
+                printf("%10s: %s\n", $style, ansi_colorize("test", $style));
+            }
+        };
     }
 
     function test_process()
