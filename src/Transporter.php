@@ -99,8 +99,21 @@ class Transporter
                 continue;
             }
             $doccomment = $const->getDocComment();
-            $cvalue = $ve($const->getValue());
-            $consts[] = "$doccomment\nconst $name = $cvalue;\n";
+            $cname = $ve($name);
+            if ($namespace) {
+                $cvalue = $ve($const->getValue());
+                $consts[] = "$doccomment\nconst $name = $cvalue;\n";
+            }
+            else {
+                $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
+                $consts[] = <<<CONSTANT
+if (!defined($cname)) {
+    $doccomment
+    define($cname, $cvalue);
+}
+
+CONSTANT;
+            }
         }
 
         // 関数コードの取得
