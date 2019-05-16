@@ -339,6 +339,9 @@ class ArraysTest extends AbstractTestCase
         $this->assertEquals(['KaK' => 'VAV', 'KbK' => 'VBV', 'KcK' => 'VCV'], (array_strpad)($array, ['K', 'K'], ['V', 'V']));
         // prefix key, suffix val
         $this->assertEquals(['Ka' => 'AV', 'Kb' => 'BV', 'Kc' => 'CV'], (array_strpad)($array, 'K', ['V']));
+
+        // value not string
+        $this->assertEquals(['Kx' => [1, 2, 3]], (array_strpad)(['x' => [1, 2, 3]], 'K'));
     }
 
     function test_array_pos()

@@ -839,10 +839,17 @@ class Arrays
             list($val_suffix, $val_prefix) = $val_prefix + [1 => ''];
         }
 
+        $enable_key = strlen($key_prefix) || strlen($key_suffix);
+        $enable_val = strlen($val_prefix) || strlen($val_suffix);
+
         $result = [];
         foreach ($array as $key => $val) {
-            $key = $key_prefix . $key . $key_suffix;
-            $val = $val_prefix . $val . $val_suffix;
+            if ($enable_key) {
+                $key = $key_prefix . $key . $key_suffix;
+            }
+            if ($enable_val) {
+                $val = $val_prefix . $val . $val_suffix;
+            }
             $result[$key] = $val;
         }
         return $result;
