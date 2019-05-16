@@ -1154,6 +1154,55 @@ class ArraysTest extends AbstractTestCase
         $this->assertTrue((array_any)($array, function ($v, $k) { return $k && $v['flag']; }));
     }
 
+    function test_array_distinct()
+    {
+        // シンプルなもの
+        $this->assertSame([], (array_distinct)([]));
+        $this->assertSame([1], (array_distinct)([1]));
+        $this->assertSame([1, '2', 3 => 3], (array_distinct)([1, '2', 2, 3, '3']));
+        $this->assertSame([1, 2, 3 => 3], (array_distinct)([1, 2, 2, 3, 3, 3], SORT_NUMERIC));
+        $this->assertSame(['a', 'A'], (array_distinct)(['a', 'A'], SORT_STRING));
+        $this->assertSame(['a'], (array_distinct)(['a', 'A'], SORT_STRING | SORT_FLAG_CASE));
+
+        // クロージャを与える
+        $this->assertEquals([1, 2, 3 => 3], (array_distinct)([1, 2, -2, 3, -3], function ($a, $b) {
+            return abs($a) <=> abs($b);
+        }));
+
+        // 配列の配列
+        $rows = [
+            11 => $r1 = ['id' => 1, 'group1' => 'groupA', 'group2' => 'groupA'],
+            12 => $r2 = ['id' => 2, 'group1' => 'groupB', 'group2' => 'groupB'],
+            13 => $r3 = ['id' => 3, 'group1' => 'groupA', 'group2' => 'groupB'],
+            14 => $r4 = ['id' => 4, 'group1' => 'groupA', 'group2' => 'groupB'],
+        ];
+        $this->assertEquals([
+            11 => $r1,
+            12 => $r2,
+        ], (array_distinct)($rows, 'group1'));
+        $this->assertEquals([
+            11 => $r1,
+            12 => $r2,
+            13 => $r3,
+        ], (array_distinct)($rows, ['group1', 'group2']));
+
+        $objects = [
+            11 => $e1 = new \Exception('a', 1),
+            12 => $e2 = new \Exception('b', 2),
+            13 => $e3 = new \Exception('b', 3),
+            14 => $e4 = new \Exception('b', 3),
+        ];
+        $this->assertEquals([
+            11 => $e1,
+            12 => $e2,
+        ], (array_distinct)($objects, ['getMessage' => []]));
+        $this->assertEquals([
+            11 => $e1,
+            12 => $e2,
+            13 => $e3,
+        ], (array_distinct)($objects, ['getMessage' => [], 'getCode' => []]));
+    }
+
     function test_array_order()
     {
         $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9], (array_order)([2, 4, 5, 1, 8, 6, 9, 3, 7], true));
