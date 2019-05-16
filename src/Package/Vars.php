@@ -7,6 +7,9 @@ namespace ryunosuke\Functions\Package;
  */
 class Vars
 {
+    /** SORT_XXX 定数の厳密版 */
+    const SORT_STRICT = 256;
+
     /**
      * 値を何とかして文字列化する
      *
@@ -564,6 +567,7 @@ class Vars
      * php7 の `<=>` の関数版
      *
      * 引数で大文字小文字とか自然順とか型モードとかが指定できる。
+     * さらに追加で SORT_STRICT という厳密比較フラグを渡すことができる。
      *
      * Example:
      * ```php
@@ -580,6 +584,10 @@ class Vars
      * // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
      * assertTrue(varcmp('12', '2', SORT_NATURAL) > 0);
      * assertTrue(varcmp('2', '12', SORT_NATURAL) < 0);
+     *
+     * // SORT_STRICT 定数が使える（下記はすべて宇宙船演算子を使うと 0 になる）
+     * assertTrue(varcmp(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT) < 0);
+     * assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) < 0);
      * ```
      *
      * @param mixed $a 比較する値1
@@ -616,6 +624,9 @@ class Vars
                 return strnatcasecmp($a, $b);
             }
             return strnatcmp($a, $b);
+        }
+        if ($mode === SORT_STRICT) {
+            return $a === $b ? 0 : ($a > $b ? 1 : -1);
         }
 
         // for SORT_REGULAR

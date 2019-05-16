@@ -349,6 +349,11 @@ class VarsTest extends AbstractTestCase
 
     function test_varcmp()
     {
+        // strict
+        $this->assertLessThan(0, (varcmp)(['b' => 'B', 'a' => 'A'], ['a' => 'A', 'b' => 'B'], SORT_STRICT)); // 推移律が成り立ってない
+        $this->assertLessThan(0, (varcmp)(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT));
+        $this->assertEquals(0, (varcmp)(['a' => 'A', 'b' => 'B'], ['a' => 'A', 'b' => 'B'], SORT_STRICT));
+
         // regular int
         $this->assertGreaterThan(0, (varcmp)(1, 0));
         $this->assertLessThan(0, (varcmp)(0, 1));
