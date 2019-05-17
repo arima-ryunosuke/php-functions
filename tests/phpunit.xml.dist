@@ -11,6 +11,7 @@
 
     <php>
         <!--><const name="TESTWEBSERVER" value="http://localhost"/><-->
+        <!--><const name="TESTPINGSERVER" value="http://localhost"/><-->
     </php>
 
     <filter>

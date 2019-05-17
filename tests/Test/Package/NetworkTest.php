@@ -38,6 +38,33 @@ class NetworkTest extends AbstractTestCase
         }
     }
 
+    function test_ping()
+    {
+        if (!defined('TESTPINGSERVER')) {
+            return;
+        }
+        $server = TESTPINGSERVER;
+        $err = null;
+
+        $this->assertIsFloat((ping)($server, 80, 1, $err));
+        $this->assertEmpty($err);
+
+        $this->assertFalse((ping)($server, 888, 1, $err));
+        $this->assertNotEmpty($err);
+
+        $this->assertIsFloat((ping)($server, null, 1, $err));
+        $this->assertEmpty($err);
+
+        $this->assertIsFloat((ping)("udp://128.0.0.1", 1234, 1, $err));
+        $this->assertEmpty($err);
+
+        $this->assertFalse((ping)("unknown-host", null, 1, $err));
+        $this->assertNotEmpty('lookup', $err);
+
+        $this->assertException('is not supported', ping, "http://hostname");
+
+    }
+
     function test_http_requests()
     {
         if (!defined('TESTWEBSERVER')) {
