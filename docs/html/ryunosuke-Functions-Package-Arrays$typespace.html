@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3232" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3362" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
@@ -86,8 +86,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L10-L39" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::arrays()" tabindex="-1" class="structure-title ">
-                        arrays						<small>($array)</small>
-					</h4>
+                        arrays                        	<small>($array) : <a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a></small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列をシーケンシャルに走査するジェネレータを返す</p>
 <p>「シーケンシャルに」とは要するに数値連番が得られるように走査するということ。<br />
@@ -146,8 +146,8 @@ assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L41-L69" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::arrayize()" tabindex="-1" class="structure-title ">
-                        arrayize						<small>(...$variadic)</small>
-					</h4>
+                        arrayize                        	<small>(...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>引数の配列を生成する。</p>
 <p>配列以外を渡すと配列化されて追加される。<br />
@@ -202,8 +202,8 @@ assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L71-L99" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::is_indexarray()" tabindex="-1" class="structure-title ">
-                        is_indexarray						<small>($array)</small>
-					</h4>
+                        is_indexarray                        	<small>($array) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列が数値配列か調べる</p>
 <p>空の配列も数値配列とみなす。<br />
@@ -259,8 +259,8 @@ assertTrue(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L101-L125" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::is_hasharray()" tabindex="-1" class="structure-title ">
-                        is_hasharray						<small>($array)</small>
-					</h4>
+                        is_hasharray                        	<small>($array) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列が連想配列か調べる</p>
 <p>空の配列は普通の配列とみなす。</p>
@@ -312,8 +312,8 @@ assertTrue(is_hasharray(['x' =&gt; 'X']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L127-L150" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::first_key()" tabindex="-1" class="structure-title ">
-                        first_key						<small>($array, $default = null)</small>
-					</h4>
+                        first_key                        	<small>($array, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の最初のキーを返す</p>
 <p>空の場合は $default を返す。</p>
@@ -370,8 +370,8 @@ assertSame(first_key([], 999), 999);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L152-L175" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::first_value()" tabindex="-1" class="structure-title ">
-                        first_value						<small>($array, $default = null)</small>
-					</h4>
+                        first_value                        	<small>($array, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の最初の値を返す</p>
 <p>空の場合は $default を返す。</p>
@@ -428,8 +428,8 @@ assertSame(first_value([], 999), 999);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L177-L198" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::first_keyvalue()" tabindex="-1" class="structure-title ">
-                        first_keyvalue						<small>($array, $default = null)</small>
-					</h4>
+                        first_keyvalue                        	<small>($array, $default = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の最初のキー/値ペアをタプルで返す</p>
 <p>空の場合は $default を返す。</p>
@@ -486,8 +486,8 @@ assertSame(first_keyvalue([], 999), 999);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L200-L223" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::last_key()" tabindex="-1" class="structure-title ">
-                        last_key						<small>($array, $default = null)</small>
-					</h4>
+                        last_key                        	<small>($array, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の最後のキーを返す</p>
 <p>空の場合は $default を返す。</p>
@@ -544,8 +544,8 @@ assertSame(last_key([], 999), 999);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L225-L248" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::last_value()" tabindex="-1" class="structure-title ">
-                        last_value						<small>($array, $default = null)</small>
-					</h4>
+                        last_value                        	<small>($array, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の最後の値を返す</p>
 <p>空の場合は $default を返す。</p>
@@ -602,8 +602,8 @@ assertSame(last_value([], 999), 999);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L250-L285" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::last_keyvalue()" tabindex="-1" class="structure-title ">
-                        last_keyvalue						<small>($array, $default = null)</small>
-					</h4>
+                        last_keyvalue                        	<small>($array, $default = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の最後のキー/値ペアをタプルで返す</p>
 <p>空の場合は $default を返す。</p>
@@ -660,8 +660,8 @@ assertSame(last_keyvalue([], 999), 999);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L287-L319" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::prev_key()" tabindex="-1" class="structure-title ">
-                        prev_key						<small>($array, $key)</small>
-					</h4>
+                        prev_key                        	<small>($array, $key) : string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>bool<span class="type-separator"></span><wbr>null</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の指定キーの前のキーを返す</p>
 <p>$key が最初のキーだった場合は null を返す。<br />
@@ -724,8 +724,8 @@ assertSame(prev_key($array, 'x'), false);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L321-L371" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::next_key()" tabindex="-1" class="structure-title ">
-                        next_key						<small>($array, $key = null)</small>
-					</h4>
+                        next_key                        	<small>($array, $key = null) : string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>bool<span class="type-separator"></span><wbr>null</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の指定キーの次のキーを返す</p>
 <p>$key が最後のキーだった場合は null を返す。<br />
@@ -792,8 +792,8 @@ assertSame(next_key($array, null), 10);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L373-L406" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::in_array_and()" tabindex="-1" class="structure-title ">
-                        in_array_and						<small>($needle, $haystack, $strict = false)</small>
-					</h4>
+                        in_array_and                        	<small>($needle, $haystack, $strict = false) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>in_array の複数版（AND）</p>
 <p>配列 $haystack が $needle の「すべてを含む」ときに true を返す。</p>
@@ -859,8 +859,8 @@ assertFalse(in_array_and([1, 9], [1, 2, 3]));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L408-L441" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::in_array_or()" tabindex="-1" class="structure-title ">
-                        in_array_or						<small>($needle, $haystack, $strict = false)</small>
-					</h4>
+                        in_array_or                        	<small>($needle, $haystack, $strict = false) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>in_array の複数版（OR）</p>
 <p>配列 $haystack が $needle の「どれかを含む」ときに true を返す。</p>
@@ -926,8 +926,8 @@ assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L443-L514" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::kvsort()" tabindex="-1" class="structure-title ">
-                        kvsort						<small>($array, $comparator = null)</small>
-					</h4>
+                        kvsort                        	<small>($array, $comparator = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>比較関数にキーも渡ってくる安定ソート</p>
 <p>比較関数は ($avalue, $bvalue, $akey, $bkey) という引数を取る。<br />
@@ -1014,8 +1014,8 @@ assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L516-L537" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_add()" tabindex="-1" class="structure-title ">
-                        array_add						<small>($array, ...$variadic)</small>
-					</h4>
+                        array_add                        	<small>($array, ...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の+演算子の関数版</p>
 <p>Example:</p>
@@ -1073,8 +1073,8 @@ assertSame(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']), ['a', 'b', 'c', 'x' =&gt
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L539-L591" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_mix()" tabindex="-1" class="structure-title ">
-                        array_mix						<small>(...$variadic)</small>
-					</h4>
+                        array_mix                        	<small>(...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列を交互に追加する</p>
 <p>引数の配列を横断的に追加して返す。<br />
@@ -1135,8 +1135,8 @@ assertSame(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]), ['a' =&gt; 'A',
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L593-L666" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_zip()" tabindex="-1" class="structure-title ">
-                        array_zip						<small>(...$arrays)</small>
-					</h4>
+                        array_zip                        	<small>(...$arrays) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の各要素値で順番に配列を作る</p>
 <p><code>array_map(null, ...$arrays)</code> とほぼ同義。ただし</p>
@@ -1199,8 +1199,8 @@ assertEquals(array_zip(
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L668-L711" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_cross()" tabindex="-1" class="structure-title ">
-                        array_cross						<small>(...$arrays)</small>
-					</h4>
+                        array_cross                        	<small>(...$arrays) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の直積を返す</p>
 <p>文字キーは保存されるが数値キーは再割り振りされる。<br />
@@ -1260,8 +1260,8 @@ assertSame(array_cross(
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L713-L752" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_implode()" tabindex="-1" class="structure-title ">
-                        array_implode						<small>($array, $glue)</small>
-					</h4>
+                        array_implode                        	<small>($array, $glue) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の各要素の間に要素を差し込む</p>
 <p>歴史的な理由はないが、引数をどちらの順番でも受けつけることが可能。<br />
@@ -1322,8 +1322,8 @@ assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L754-L808" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_sprintf()" tabindex="-1" class="structure-title ">
-                        array_sprintf						<small>($array, $format = null, $glue = null)</small>
-					</h4>
+                        array_sprintf                        	<small>($array, $format = null, $glue = null) : array<span class="type-separator"></span><wbr>string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーと値で sprintf する</p>
 <p>配列の各要素を文字列化して返すイメージ。<br />
@@ -1401,8 +1401,8 @@ assertSame(array_sprintf([
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L810-L856" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_strpad()" tabindex="-1" class="structure-title ">
-                        array_strpad						<small>($array, $key_prefix, $val_prefix = &quot;&quot;)</small>
-					</h4>
+                        array_strpad                        	<small>($array, $key_prefix, $val_prefix = &quot;&quot;) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列のキー・要素に文字列を付加する</p>
 <p>$key_prefix, $val_prefix でそれぞれ「キーに付与する文字列」「値に付与する文字列」が指定できる。<br />
@@ -1470,8 +1470,8 @@ assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', '
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L858-L898" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pos()" tabindex="-1" class="structure-title ">
-                        array_pos						<small>($array, $position, $return_key = false)</small>
-					</h4>
+                        array_pos                        	<small>($array, $position, $return_key = false) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列・連想配列を問わず「N番目(0ベース)」の要素を返す</p>
 <p>負数を与えると逆から N 番目となる。</p>
@@ -1536,8 +1536,8 @@ assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true), 'b
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L900-L931" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pos_key()" tabindex="-1" class="structure-title ">
-                        array_pos_key						<small>($array, $key, $default = null)</small>
-					</h4>
+                        array_pos_key                        	<small>($array, $key, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の指定キーの位置を返す</p>
 <p>Example:</p>
@@ -1599,8 +1599,8 @@ assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1)
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L933-L963" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_of()" tabindex="-1" class="structure-title ">
-                        array_of						<small>($key, $default = null)</small>
-					</h4>
+                        array_of                        	<small>($key, $default = null) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列を与えると指定キーの値を返すクロージャを返す</p>
 <p>存在しない場合は $default を返す。</p>
@@ -1660,8 +1660,8 @@ assertSame($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']), 'FUGA');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L965-L1041" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_get()" tabindex="-1" class="structure-title ">
-                        array_get						<small>($array, $key, $default = null)</small>
-					</h4>
+                        array_get                        	<small>($array, $key, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>デフォルト値付きの配列値取得</p>
 <p>存在しない場合は $default を返す。</p>
@@ -1741,8 +1741,8 @@ assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c'
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1043-L1095" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_set()" tabindex="-1" class="structure-title ">
-                        array_set						<small>(&amp;$array, $value, $key = null, $require_return = true)</small>
-					</h4>
+                        array_set                        	<small>(&amp;$array, $value, $key = null, $require_return = true) : string<span class="type-separator"></span><wbr>int</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キー指定の配列値設定</p>
 <p>第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。<br />
@@ -1821,8 +1821,8 @@ assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt;
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1097-L1156" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_put()" tabindex="-1" class="structure-title ">
-                        array_put						<small>(&amp;$array, $value, $key = null)</small>
-					</h4>
+                        array_put                        	<small>(&amp;$array, $value, $key = null) : string<span class="type-separator"></span><wbr>int</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キー指定の配列値設定</p>
 <p>array_set とほとんど同じ。<br />
@@ -1902,8 +1902,8 @@ assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' 
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1158-L1241" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_unset()" tabindex="-1" class="structure-title ">
-                        array_unset						<small>(&amp;$array, $key, $default = null)</small>
-					</h4>
+                        array_unset                        	<small>(&amp;$array, $key, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>伏せると同時にその値を返す</p>
 <p>$key に配列を与えると全て伏せて配列で返す。<br />
@@ -1990,8 +1990,8 @@ assertSame($array, ['piyo' =&gt; 'PIYO']);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1243-L1282" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_dive()" tabindex="-1" class="structure-title ">
-                        array_dive						<small>($array, $path, $default = null, $delimiter = &quot;.&quot;)</small>
-					</h4>
+                        array_dive                        	<small>($array, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>パス形式で配列値を取得</p>
 <p>存在しない場合は $default を返す。</p>
@@ -2069,8 +2069,8 @@ assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1284-L1337" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_keys_exist()" tabindex="-1" class="structure-title ">
-                        array_keys_exist						<small>($keys, $array)</small>
-					</h4>
+                        array_keys_exist                        	<small>($keys, $array) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_key_exists の複数版</p>
 <p>指定キーが全て存在するなら true を返す。<br />
@@ -2134,8 +2134,8 @@ assertTrue(array_keys_exist(['a', 'x' =&gt; ['x1', 'x2']], ['a' =&gt; 'A', 'x' =
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1339-L1377" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_find()" tabindex="-1" class="structure-title ">
-                        array_find						<small>($array, $callback, $is_key = true)</small>
-					</h4>
+                        array_find                        	<small>($array, $callback, $is_key = true) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_search のクロージャ版のようなもの</p>
 <p>コールバックの返り値が true 相当のものを返す。<br />
@@ -2202,11 +2202,74 @@ assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1379-L1403" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1379-L1414" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_rekey()" tabindex="-1" class="structure-title ">
+                        array_rekey                        	<small>($array, $keymap) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>キーをマップ配列で置換する</p>
+<p>変換先が null だとその要素は取り除かれる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
+// a は x に c は z に置換される
+assertSame(array_rekey($array, ['a' =&gt; 'x', 'c' =&gt; 'z']), ['x' =&gt; 'A', 'b' =&gt; 'B', 'z' =&gt; 'C']);
+// b は削除され c は z に置換される
+assertSame(array_rekey($array, ['b' =&gt; null, 'c' =&gt; 'z']), ['a' =&gt; 'A', 'z' =&gt; 'C']);
+// キーの交換にも使える（a ⇔ c）
+assertSame(array_rekey($array, ['a' =&gt; 'c', 'c' =&gt; 'a']), ['c' =&gt; 'A', 'b' =&gt; 'B', 'a' =&gt; 'C']);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">iterable</td>
+				<td class="rest">$array</td>
+				<td class="desc"><p>対象配列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$keymap</td>
+				<td class="desc"><p>正規表現</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>キーが置換された配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1416-L1440" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_grep_key()" tabindex="-1" class="structure-title ">
-                        array_grep_key						<small>($array, $regex, $not = false)</small>
-					</h4>
+                        array_grep_key                        	<small>($array, $regex, $not = false) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーを正規表現でフィルタする</p>
 <p>Example:</p>
@@ -2265,11 +2328,11 @@ assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1405-L1468" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1442-L1505" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_recursive()" tabindex="-1" class="structure-title ">
-                        array_map_recursive						<small>($array, $callback, $iterable = true)</small>
-					</h4>
+                        array_map_recursive                        	<small>($array, $callback, $iterable = true) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_map の再帰版</p>
 <p>下記の点で少し array_map とは挙動が異なる。</p>
@@ -2360,11 +2423,11 @@ assertSame(array_map_recursive([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1470-L1495" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1507-L1532" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_key()" tabindex="-1" class="structure-title ">
-                        array_map_key						<small>($array, $callback)</small>
-					</h4>
+                        array_map_key                        	<small>($array, $callback) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーをマップして変換する</p>
 <p>$callback が null を返すとその要素は取り除かれる。</p>
@@ -2418,11 +2481,11 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1497-L1514" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1534-L1551" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_not()" tabindex="-1" class="structure-title ">
-                        array_filter_not						<small>($array, $callback)</small>
-					</h4>
+                        array_filter_not                        	<small>($array, $callback) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_filter の否定版</p>
 <p>単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。</p>
@@ -2475,11 +2538,11 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1516-L1541" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1553-L1578" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_key()" tabindex="-1" class="structure-title ">
-                        array_filter_key						<small>($array, $callback)</small>
-					</h4>
+                        array_filter_key                        	<small>($array, $callback) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーを主軸とした array_filter</p>
 <p>$callback が要求するなら値も渡ってくる。 php 5.6 の array_filter の ARRAY_FILTER_USE_BOTH と思えばよい。<br />
@@ -2534,11 +2597,11 @@ assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== '
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1543-L1561" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1580-L1598" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_eval()" tabindex="-1" class="structure-title ">
-                        array_filter_eval						<small>($array, $expression)</small>
-					</h4>
+                        array_filter_eval                        	<small>($array, $expression) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>eval で評価して array_filter する</p>
 <p>キーは $k, 値は $v で宣言される。</p>
@@ -2592,11 +2655,11 @@ assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1563-L1668" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1600-L1705" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_where()" tabindex="-1" class="structure-title ">
-                        array_where						<small>($array, $column = null, $callback = null)</small>
-					</h4>
+                        array_where                        	<small>($array, $column = null, $callback = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>指定キーの要素で array_filter する</p>
 <p>array_column があるなら array_where があってもいいはず。</p>
@@ -2695,11 +2758,11 @@ assertSame(array_where($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1670-L1700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1707-L1737" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_filter()" tabindex="-1" class="structure-title ">
-                        array_map_filter						<small>($array, $callback, $strict = false)</small>
-					</h4>
+                        array_map_filter                        	<small>($array, $callback, $strict = false) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_map + array_filter する</p>
 <p>コールバックを適用して、結果が true 相当の要素のみ取り出す。<br />
@@ -2761,11 +2824,11 @@ assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1702-L1741" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1739-L1778" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_method()" tabindex="-1" class="structure-title ">
-                        array_map_method						<small>($array, $method, $args = [], $ignore = false)</small>
-					</h4>
+                        array_map_method                        	<small>($array, $method, $args = [], $ignore = false) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>メソッドを指定できるようにした array_map</p>
 <p>配列内の要素は全て同一（少なくともシグネチャが同じ $method が存在する）オブジェクトでなければならない。<br />
@@ -2840,11 +2903,11 @@ assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1743-L1795" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1780-L1832" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_maps()" tabindex="-1" class="structure-title ">
-                        array_maps						<small>($array, ...$callbacks)</small>
-					</h4>
+                        array_maps                        	<small>($array, ...$callbacks) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>複数コールバックを指定できる array_map</p>
 <p>指定したコールバックで複数回回してマップする。<br />
@@ -2908,11 +2971,11 @@ assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage')
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1797-L1836" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1834-L1873" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_kmap()" tabindex="-1" class="structure-title ">
-                        array_kmap						<small>($array, $callback)</small>
-					</h4>
+                        array_kmap                        	<small>($array, $callback) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーも渡ってくる array_map</p>
 <p><code>array_map($callback, $array, array_keys($array))</code> とほとんど変わりはない。<br />
@@ -2981,11 +3044,11 @@ assertSame(array_kmap([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1838-L1908" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1875-L1945" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nmap()" tabindex="-1" class="structure-title ">
-                        array_nmap						<small>($array, $callback, $n, ...$variadic)</small>
-					</h4>
+                        array_nmap                        	<small>($array, $callback, $n, ...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>要素値を $callback の n 番目(0ベース)に適用して array_map する</p>
 <p>引数 $n に配列を与えると [キー番目 =&gt; 値番目] とみなしてキー・値も渡される（Example 参照）。<br />
@@ -3056,11 +3119,11 @@ assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1910-L1927" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1947-L1964" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lmap()" tabindex="-1" class="structure-title ">
-                        array_lmap						<small>($array, $callback, ...$variadic)</small>
-					</h4>
+                        array_lmap                        	<small>($array, $callback, ...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>要素値を $callback の最左に適用して array_map する</p>
 <p>Example:</p>
@@ -3119,11 +3182,11 @@ assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1929-L1946" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1966-L1983" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_rmap()" tabindex="-1" class="structure-title ">
-                        array_rmap						<small>($array, $callback, ...$variadic)</small>
-					</h4>
+                        array_rmap                        	<small>($array, $callback, ...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>要素値を $callback の最右に適用して array_map する</p>
 <p>Example:</p>
@@ -3182,11 +3245,11 @@ assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1948-L2027" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1985-L2064" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_each()" tabindex="-1" class="structure-title ">
-                        array_each						<small>($array, $callback, $default = null)</small>
-					</h4>
+                        array_each                        	<small>($array, $callback, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_reduce の参照版（のようなもの）</p>
 <p>配列をループで回し、その途中経過、値、キー、連番をコールバック引数で渡して最終的な結果を返り値として返す。<br />
@@ -3288,11 +3351,11 @@ assertSame(
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2029-L2072" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2066-L2109" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_depth()" tabindex="-1" class="structure-title ">
-                        array_depth						<small>($array, $max_depth = null)</small>
-					</h4>
+                        array_depth                        	<small>($array, $max_depth = null) : int</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の次元数を返す</p>
 <p>フラット配列は 1 と定義する。<br />
@@ -3350,11 +3413,11 @@ assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2074-L2104" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2111-L2141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_insert()" tabindex="-1" class="structure-title ">
-                        array_insert						<small>($array, $value, $position = null)</small>
-					</h4>
+                        array_insert                        	<small>($array, $value, $position = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列・連想配列を問わず任意の位置に値を挿入する</p>
 <p>$position を省略すると最後に挿入される（≒ array_push）。<br />
@@ -3418,11 +3481,11 @@ assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2106-L2151" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2143-L2188" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_assort()" tabindex="-1" class="structure-title ">
-                        array_assort						<small>($array, $rules)</small>
-					</h4>
+                        array_assort                        	<small>($array, $rules) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列をコールバックに従って分類する</p>
 <p>コールバックは配列で複数与える。そのキーが結果配列のキーになるが、一切マッチしなくてもキー自体は作られる。<br />
@@ -3493,11 +3556,11 @@ assertSame(array_assort(['1', '2', '3'], [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2153-L2205" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2190-L2242" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_count()" tabindex="-1" class="structure-title ">
-                        array_count						<small>($array, $callback)</small>
-					</h4>
+                        array_count                        	<small>($array, $callback) : int<span class="type-separator"></span><wbr>array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列をコールバックに従ってカウントする</p>
 <p>コールバックが true 相当を返した要素をカウントして返す。<br />
@@ -3565,11 +3628,11 @@ assertSame(array_count($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2207-L2266" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2244-L2303" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_group()" tabindex="-1" class="structure-title ">
-                        array_group						<small>($array, $callback = null, $preserve_keys = false)</small>
-					</h4>
+                        array_group                        	<small>($array, $callback = null, $preserve_keys = false) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列をコールバックの返り値でグループ化する</p>
 <p>コールバックを省略すると値そのもので評価する。<br />
@@ -3647,11 +3710,11 @@ assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2268-L2299" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2305-L2336" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_all()" tabindex="-1" class="structure-title ">
-                        array_all						<small>($array, $callback = null, $default = true)</small>
-					</h4>
+                        array_all                        	<small>($array, $callback = null, $default = true) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>全要素が true になるなら true を返す（1つでも false なら false を返す）</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
@@ -3711,11 +3774,11 @@ assertFalse(array_all([false, false]));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2301-L2332" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2338-L2369" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_any()" tabindex="-1" class="structure-title ">
-                        array_any						<small>($array, $callback = null, $default = false)</small>
-					</h4>
+                        array_any                        	<small>($array, $callback = null, $default = false) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>全要素が false になるなら false を返す（1つでも true なら true を返す）</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
@@ -3775,11 +3838,11 @@ assertFalse(array_any([false, false]));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2334-L2425" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2371-L2462" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_distinct()" tabindex="-1" class="structure-title ">
-                        array_distinct						<small>($array, $comparator = null)</small>
-					</h4>
+                        array_distinct                        	<small>($array, $comparator = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>比較関数が渡せる array_unique</p>
 <p>array_unique は微妙に癖があるのでシンプルに使いやすくしたもの。</p>
@@ -3860,11 +3923,11 @@ assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2427-L2559" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2464-L2596" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_order()" tabindex="-1" class="structure-title ">
-                        array_order						<small>($array, $orders, $preserve_keys = false)</small>
-					</h4>
+                        array_order                        	<small>($array, $orders, $preserve_keys = false) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列を $orders に従って並べ替える</p>
 <p>データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' =&gt; 'value'])にも対応している。<br />
@@ -3937,11 +4000,11 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2561-L2582" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2598-L2619" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shuffle()" tabindex="-1" class="structure-title ">
-                        array_shuffle						<small>($array)</small>
-					</h4>
+                        array_shuffle                        	<small>($array) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>shuffle のキーが保存される＋参照渡しではない版</p>
 <p>Example:</p>
@@ -3987,11 +4050,11 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2584-L2612" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2621-L2649" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" tabindex="-1" class="structure-title ">
-                        array_shrink_key						<small>(...$variadic)</small>
-					</h4>
+                        array_shrink_key                        	<small>(...$variadic) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>値の優先順位を逆にした array_intersect_key</p>
 <p>array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。<br />
@@ -4043,11 +4106,114 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2614-L2645" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2651-L2742" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_gap()" tabindex="-1" class="structure-title ">
+                        array_fill_gap                        	<small>($array, ...$values) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列の隙間を埋める</p>
+<p>「隙間」とは数値キーの隙間のこと。文字キーには関与しない。<br />
+連番の抜けている箇所に $values の値を順次詰めていく動作となる。</p>
+<p>値が足りなくてもエラーにはならない。つまり、この関数を通したとしても隙間が無くなるわけではない。<br />
+また、隙間を埋めても値が余る場合（隙間より与えられた値が多い場合）は末尾に全て追加される。</p>
+<p>負数キーは考慮しない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// ところどころキーが抜け落ちている配列の・・・
+$array = [
+    1 =&gt; 'b',
+    2 =&gt; 'c',
+    5 =&gt; 'f',
+    7 =&gt; 'h',
+];
+// 抜けているところを可変引数で順次埋める（'i', 'j' は隙間というより末尾追加）
+assertSame(array_fill_gap($array, 'a', 'd', 'e', 'g', 'i', 'j'), [
+    0 =&gt; 'a',
+    1 =&gt; 'b',
+    2 =&gt; 'c',
+    3 =&gt; 'd',
+    4 =&gt; 'e',
+    5 =&gt; 'f',
+    6 =&gt; 'g',
+    7 =&gt; 'h',
+    8 =&gt; 'i',
+    9 =&gt; 'j',
+]);
+
+// 文字キーには関与しないし、値は足りなくても良い
+$array = [
+    1   =&gt; 'b',
+    'x' =&gt; 'noize',
+    4   =&gt; 'e',
+    'y' =&gt; 'noize',
+    7   =&gt; 'h',
+    'z' =&gt; 'noize',
+];
+// 文字キーはそのまま保持され、値が足りないので 6 キーはない
+assertSame(array_fill_gap($array, 'a', 'c', 'd', 'f'), [
+    0   =&gt; 'a',
+    1   =&gt; 'b',
+    'x' =&gt; 'noize',
+    2   =&gt; 'c',
+    3   =&gt; 'd',
+    4   =&gt; 'e',
+    'y' =&gt; 'noize',
+    5   =&gt; 'f',
+    7   =&gt; 'h',
+    'z' =&gt; 'noize',
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$array</td>
+				<td class="desc"><p>対象配列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$values</td>
+				<td class="desc"><p>詰める値（可変引数）</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>隙間が詰められた配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2744-L2775" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_callback()" tabindex="-1" class="structure-title ">
-                        array_fill_callback						<small>($keys, $callback)</small>
-					</h4>
+                        array_fill_callback                        	<small>($keys, $callback) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_fill_keys のコールバック版のようなもの</p>
 <p>指定したキー配列をそれらのマップしたもので配列を生成する。<br />
@@ -4113,11 +4279,11 @@ assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2647-L2688" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2777-L2818" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pickup()" tabindex="-1" class="structure-title ">
-                        array_pickup						<small>($array, $keys)</small>
-					</h4>
+                        array_pickup                        	<small>($array, $keys) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーを指定してそれだけの配列にする</p>
 <p><code>array_intersect_key($array, array_flip($keys))</code> とほぼ同義。<br />
@@ -4178,11 +4344,11 @@ assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; '
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2690-L2715" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2820-L2845" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_remove()" tabindex="-1" class="structure-title ">
-                        array_remove						<small>($array, $keys)</small>
-					</h4>
+                        array_remove                        	<small>($array, $keys) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キーを指定してそれらを除いた配列にする</p>
 <p><code>array_diff_key($array, array_flip($keys))</code> とほぼ同義。<br />
@@ -4239,11 +4405,11 @@ assertSame(array_remove($array, ['a', 'c']), ['b' =&gt; 'B']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2717-L2770" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2847-L2900" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lookup()" tabindex="-1" class="structure-title ">
-                        array_lookup						<small>($array, $column_key = null, $index_key = null)</small>
-					</h4>
+                        array_lookup                        	<small>($array, $column_key = null, $index_key = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キー保存可能な array_column</p>
 <p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。</p>
@@ -4315,11 +4481,11 @@ assertSame(array_lookup($array, 'name'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2772-L2807" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2902-L2937" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_columns()" tabindex="-1" class="structure-title ">
-                        array_columns						<small>($array, $column_keys = null, $index_key = null)</small>
-					</h4>
+                        array_columns                        	<small>($array, $column_keys = null, $index_key = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>全要素に対して array_column する</p>
 <p>行列が逆転するイメージ。</p>
@@ -4383,11 +4549,11 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2809-L2851" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2939-L2981" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" tabindex="-1" class="structure-title ">
-                        array_uncolumns						<small>($array, $template = null)</small>
-					</h4>
+                        array_uncolumns                        	<small>($array, $template = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>array_columns のほぼ逆で [キー =&gt; [要素]] 配列から連想配列の配列を生成する</p>
 <p>$template を指定すると「それに含まれる配列かつ値がデフォルト」になる（要するに $default みたいなもの）。<br />
@@ -4447,11 +4613,11 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2853-L2976" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2983-L3106" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_convert()" tabindex="-1" class="structure-title ">
-                        array_convert						<small>($array, $callback, $apply_array = false)</small>
-					</h4>
+                        array_convert                        	<small>($array, $callback, $apply_array = false) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の各要素に再帰的にコールバックを適用して変換する</p>
 <p>$callback は下記の仕様。</p>
@@ -4549,11 +4715,11 @@ assertSame(array_convert($array, $callback, true), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2978-L3053" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3108-L3183" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_flatten()" tabindex="-1" class="structure-title ">
-                        array_flatten						<small>($array, $delimiter = null)</small>
-					</h4>
+                        array_flatten                        	<small>($array, $delimiter = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>多階層配列をフラットに展開する</p>
 <p>巷にあふれている実装と違って、 ["$pkey.$ckey" =&gt; $value] 形式の配列でも返せる。<br />
@@ -4638,11 +4804,11 @@ assertSame(array_flatten($array, '.'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3055-L3129" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3185-L3259" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
-                        array_nest						<small>($array, $delimiter = &quot;.&quot;)</small>
-					</h4>
+                        array_nest                        	<small>($array, $delimiter = &quot;.&quot;) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>シンプルな [キー =&gt; 値] な配列から階層配列を生成する</p>
 <p>定義的に array_flatten の逆関数のような扱いになる。<br />
@@ -4736,11 +4902,11 @@ catch (\Exception $e) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3131-L3231" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3261-L3361" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_difference()" tabindex="-1" class="structure-title ">
-                        array_difference						<small>($array1, $array2, $delimiter = &quot;.&quot;)</small>
-					</h4>
+                        array_difference                        	<small>($array1, $array2, $delimiter = &quot;.&quot;) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の差分を取り配列で返す</p>
 <p>返り値の配列は構造化されたデータではない。<br />

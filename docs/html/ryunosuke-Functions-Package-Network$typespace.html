@@ -86,8 +86,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::getipaddress()" tabindex="-1" class="structure-title ">
-                        getipaddress						<small>($target = &quot;128.0.0.0&quot;)</small>
-					</h4>
+                        getipaddress                        	<small>($target = &quot;128.0.0.0&quot;) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>接続元となる IP を返す</p>
 <p>要するに自分の IP を返す。</p>
@@ -140,8 +140,8 @@ assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L40-L86" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::incidr()" tabindex="-1" class="structure-title ">
-                        incidr						<small>($ipaddr, $cidr)</small>
-					</h4>
+                        incidr                        	<small>($ipaddr, $cidr) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>ipv4 の cidr チェック</p>
 <p>$ipaddr が $cidr のレンジ内なら true を返す。<br />
@@ -206,8 +206,8 @@ assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L88-L193" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::ping()" tabindex="-1" class="structure-title ">
-                        ping						<small>($host, $port = null, $timeout = 1, &amp;$errstr = &quot;&quot;)</small>
-					</h4>
+                        ping                        	<small>($host, $port = null, $timeout = 1, &amp;$errstr = &quot;&quot;) : float<span class="type-separator"></span><wbr>bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>ネットワーク疎通を返す</p>
 <p>$port を指定すると TCP/UDP、省略（null）すると ICMP で繋ぐ。<br />
@@ -282,8 +282,8 @@ assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L195-L310" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_requests()" tabindex="-1" class="structure-title ">
-                        http_requests						<small>($urls, $default_options = [])</small>
-					</h4>
+                        http_requests                        	<small>($urls, $default_options = []) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>http リクエストを並列で投げる</p>
 <p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />

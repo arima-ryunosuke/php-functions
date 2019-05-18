@@ -2107,6 +2107,46 @@ if (!isset($excluded_functions["array_find"]) && (!function_exists("ryunosuke\\F
     }
 }
 
+const array_rekey = "ryunosuke\\Functions\\array_rekey";
+if (!isset($excluded_functions["array_rekey"]) && (!function_exists("ryunosuke\\Functions\\array_rekey") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_rekey"))->isInternal()))) {
+    /**
+     * キーをマップ配列で置換する
+     *
+     * 変換先が null だとその要素は取り除かれる。
+     *
+     * Example:
+     * ```php
+     * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+     * // a は x に c は z に置換される
+     * assertSame(array_rekey($array, ['a' => 'x', 'c' => 'z']), ['x' => 'A', 'b' => 'B', 'z' => 'C']);
+     * // b は削除され c は z に置換される
+     * assertSame(array_rekey($array, ['b' => null, 'c' => 'z']), ['a' => 'A', 'z' => 'C']);
+     * // キーの交換にも使える（a ⇔ c）
+     * assertSame(array_rekey($array, ['a' => 'c', 'c' => 'a']), ['c' => 'A', 'b' => 'B', 'a' => 'C']);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param array $keymap 正規表現
+     * @return array キーが置換された配列
+     */
+    function array_rekey($array, $keymap)
+    {
+        $result = [];
+        foreach ($array as $k => $v) {
+            if (array_key_exists($k, $keymap)) {
+                // null は突っ込まない（除去）
+                if ($keymap[$k] !== null) {
+                    $result[$keymap[$k]] = $v;
+                }
+            }
+            else {
+                $result[$k] = $v;
+            }
+        }
+        return $result;
+    }
+}
+
 const array_grep_key = "ryunosuke\\Functions\\array_grep_key";
 if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("ryunosuke\\Functions\\array_grep_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_grep_key"))->isInternal()))) {
     /**
@@ -3417,6 +3457,102 @@ if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("ryunos
             $result = array_replace($result, $variadic[$n]);
         }
         return array_intersect_key($result, ...$variadic);
+    }
+}
+
+const array_fill_gap = "ryunosuke\\Functions\\array_fill_gap";
+if (!isset($excluded_functions["array_fill_gap"]) && (!function_exists("ryunosuke\\Functions\\array_fill_gap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_fill_gap"))->isInternal()))) {
+    /**
+     * 配列の隙間を埋める
+     *
+     * 「隙間」とは数値キーの隙間のこと。文字キーには関与しない。
+     * 連番の抜けている箇所に $values の値を順次詰めていく動作となる。
+     *
+     * 値が足りなくてもエラーにはならない。つまり、この関数を通したとしても隙間が無くなるわけではない。
+     * また、隙間を埋めても値が余る場合（隙間より与えられた値が多い場合）は末尾に全て追加される。
+     *
+     * 負数キーは考慮しない。
+     *
+     * Example:
+     * ```php
+     * // ところどころキーが抜け落ちている配列の・・・
+     * $array = [
+     *     1 => 'b',
+     *     2 => 'c',
+     *     5 => 'f',
+     *     7 => 'h',
+     * ];
+     * // 抜けているところを可変引数で順次埋める（'i', 'j' は隙間というより末尾追加）
+     * assertSame(array_fill_gap($array, 'a', 'd', 'e', 'g', 'i', 'j'), [
+     *     0 => 'a',
+     *     1 => 'b',
+     *     2 => 'c',
+     *     3 => 'd',
+     *     4 => 'e',
+     *     5 => 'f',
+     *     6 => 'g',
+     *     7 => 'h',
+     *     8 => 'i',
+     *     9 => 'j',
+     * ]);
+     *
+     * // 文字キーには関与しないし、値は足りなくても良い
+     * $array = [
+     *     1   => 'b',
+     *     'x' => 'noize',
+     *     4   => 'e',
+     *     'y' => 'noize',
+     *     7   => 'h',
+     *     'z' => 'noize',
+     * ];
+     * // 文字キーはそのまま保持され、値が足りないので 6 キーはない
+     * assertSame(array_fill_gap($array, 'a', 'c', 'd', 'f'), [
+     *     0   => 'a',
+     *     1   => 'b',
+     *     'x' => 'noize',
+     *     2   => 'c',
+     *     3   => 'd',
+     *     4   => 'e',
+     *     'y' => 'noize',
+     *     5   => 'f',
+     *     7   => 'h',
+     *     'z' => 'noize',
+     * ]);
+     * ```
+     *
+     * @param array $array 対象配列
+     * @param mixed $values 詰める値（可変引数）
+     * @return array 隙間が詰められた配列
+     */
+    function array_fill_gap($array, ...$values)
+    {
+        $n = 0;
+        $keys = array_keys($array);
+
+        $result = [];
+        for ($i = 0, $l = count($keys); $i < $l; $i++) {
+            $key = $keys[$i];
+            if (is_string($key)) {
+                $result[$key] = $array[$key];
+                continue;
+            }
+
+            if (array_key_exists($n, $array)) {
+                $result[] = $array[$n];
+            }
+            elseif ($values) {
+                $result[] = array_shift($values);
+                $i--;
+            }
+            else {
+                $result[$key] = $array[$key];
+            }
+            $n++;
+        }
+        if ($values) {
+            $result = array_merge($result, $values);
+        }
+        return $result;
     }
 }
 
@@ -6170,6 +6306,29 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Fun
     }
 }
 
+const abind = "ryunosuke\\Functions\\abind";
+if (!isset($excluded_functions["abind"]) && (!function_exists("ryunosuke\\Functions\\abind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\abind"))->isInternal()))) {
+    /**
+     * $callable の引数を指定配列で束縛したクロージャを返す
+     *
+     * Example:
+     * ```php
+     * $bind = abind('sprintf', [1 => 'a', 3 => 'c']);
+     * assertSame($bind('%s%s%s', 'b'), 'abc');
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param array $default_args 本来の引数
+     * @return \Closure 束縛したクロージャ
+     */
+    function abind($callable, $default_args)
+    {
+        return delegate(function ($callable, $args) use ($default_args) {
+            return $callable(...array_fill_gap($default_args, ...$args));
+        }, $callable, parameter_length($callable, true) - count($default_args));
+    }
+}
+
 const nbind = "ryunosuke\\Functions\\nbind";
 if (!isset($excluded_functions["nbind"]) && (!function_exists("ryunosuke\\Functions\\nbind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\nbind"))->isInternal()))) {
     /**
@@ -7371,6 +7530,57 @@ if (!isset($excluded_functions["sum"]) && (!function_exists("ryunosuke\\Function
     }
 }
 
+const clamp = "ryunosuke\\Functions\\clamp";
+if (!isset($excluded_functions["clamp"]) && (!function_exists("ryunosuke\\Functions\\clamp") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\clamp"))->isInternal()))) {
+    /**
+     * 値を一定範囲に収める
+     *
+     * $circulative に true を渡すと値が循環する。
+     * ただし、循環的な型に限る（整数のみ？）。
+     *
+     * Example:
+     * ```php
+     * // 5～9 に収める
+     * assertSame(clamp(4, 5, 9), 5); // 4 は [5～9] の範囲外なので 5 に切り上げられる
+     * assertSame(clamp(5, 5, 9), 5); // 範囲内なのでそのまま
+     * assertSame(clamp(6, 5, 9), 6); // 範囲内なのでそのまま
+     * assertSame(clamp(7, 5, 9), 7); // 範囲内なのでそのまま
+     * assertSame(clamp(8, 5, 9), 8); // 範囲内なのでそのまま
+     * assertSame(clamp(9, 5, 9), 9); // 範囲内なのでそのまま
+     * assertSame(clamp(10, 5, 9), 9); // 10 は [5～9] の範囲外なので 9 に切り下げられる
+     *
+     * // 5～9 に収まるように循環する
+     * assertSame(clamp(4, 5, 9, true), 9); // 4 は [5～9] の範囲外なので循環して 9 になる
+     * assertSame(clamp(5, 5, 9, true), 5); // 範囲内なのでそのまま
+     * assertSame(clamp(6, 5, 9, true), 6); // 範囲内なのでそのまま
+     * assertSame(clamp(7, 5, 9, true), 7); // 範囲内なのでそのまま
+     * assertSame(clamp(8, 5, 9, true), 8); // 範囲内なのでそのまま
+     * assertSame(clamp(9, 5, 9, true), 9); // 範囲内なのでそのまま
+     * assertSame(clamp(10, 5, 9, true), 5); // 10 は [5～9] の範囲外なので循環して 5 になる
+     * ```
+     *
+     * @param int|mixed $value 対象の値
+     * @param int|mixed $min 最小値
+     * @param int|mixed $max 最大値
+     * @param bool $circulative true だと切り詰めるのではなく循環する
+     * @return int 一定範囲に収められた値
+     */
+    function clamp($value, $min, $max, $circulative = false)
+    {
+        if (!$circulative) {
+            return max($min, min($max, $value));
+        }
+
+        if ($value < $min) {
+            return $max + ($value - $max) % ($max - $min + 1);
+        }
+        if ($value > $max) {
+            return $min + ($value - $min) % ($max - $min + 1);
+        }
+        return $value;
+    }
+}
+
 const random_at = "ryunosuke\\Functions\\random_at";
 if (!isset($excluded_functions["random_at"]) && (!function_exists("ryunosuke\\Functions\\random_at") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\random_at"))->isInternal()))) {
     /**
@@ -7428,6 +7638,51 @@ if (!isset($excluded_functions["probability"]) && (!function_exists("ryunosuke\\
         // 2. $probability が 1 だとするとこの式を満たす数は 0 の1個のみ
         // 3. 100 個中1個なので 1%
         return $probability > mt_rand(0, $divisor - 1);
+    }
+}
+
+const normal_rand = "ryunosuke\\Functions\\normal_rand";
+if (!isset($excluded_functions["normal_rand"]) && (!function_exists("ryunosuke\\Functions\\normal_rand") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\normal_rand"))->isInternal()))) {
+    /**
+     * 正規乱数（正規分布に従う乱数）を返す
+     *
+     * ※ ボックス＝ミュラー法
+     *
+     * Example:
+     * ```php
+     * mt_srand(4); // テストがコケるので種固定
+     *
+     * // 平均 100, 標準偏差 10 の正規乱数を得る
+     * assertSame(normal_rand(100, 10), 101.16879645296162);
+     * assertSame(normal_rand(100, 10), 96.49615862542069);
+     * assertSame(normal_rand(100, 10), 87.74557282679618);
+     * assertSame(normal_rand(100, 10), 117.93697951557125);
+     * assertSame(normal_rand(100, 10), 99.1917453115627);
+     * assertSame(normal_rand(100, 10), 96.74688207698713);
+     * ```
+     *
+     * @param float $average 平均
+     * @param float $std_deviation 標準偏差
+     * @return float 正規乱数
+     */
+    function normal_rand($average = 0.0, $std_deviation = 1.0)
+    {
+        static $z2, $rand_max, $generate = true;
+        $rand_max = $rand_max ?? mt_getrandmax();
+        $generate = !$generate;
+
+        if ($generate) {
+            return $z2 * $std_deviation + $average;
+        }
+
+        $u1 = mt_rand(1, $rand_max) / $rand_max;
+        $u2 = mt_rand(0, $rand_max) / $rand_max;
+        $v1 = sqrt(-2 * log($u1));
+        $v2 = 2 * M_PI * $u2;
+        $z1 = $v1 * cos($v2);
+        $z2 = $v1 * sin($v2);
+
+        return $z1 * $std_deviation + $average;
     }
 }
 
@@ -7807,15 +8062,22 @@ if (!isset($excluded_functions["sql_bind"]) && (!function_exists("ryunosuke\\Fun
      */
     function sql_bind($sql, $values)
     {
-        $values = arrayize($values);
-        $n = 0;
-        return preg_replace_callback('#(\?)|(:([a-z_][a-z_0-9]*))#ui', function ($m) use ($values, &$n) {
-            $name = $m[1] === '?' ? $n++ : $m[3];
-            if (!array_key_exists($name, $values)) {
-                return $m[0];
+        $embed = [];
+        foreach (arrayval($values, false) as $k => $v) {
+            if (is_int($k)) {
+                $embed['?'][] = sql_quote($v);
             }
-            return sql_quote($values[$name]);
-        }, $sql);
+            else {
+                $embed[":$k"] = sql_quote($v);
+            }
+        }
+
+        return str_embed($sql, $embed, [
+            "'"   => "'",
+            '"'   => '"',
+            '-- ' => "\n",
+            '/*'  => "*/",
+        ]);
     }
 }
 
@@ -8432,6 +8694,47 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("ryunosuke\
     }
 }
 
+const str_anyof = "ryunosuke\\Functions\\str_anyof";
+if (!isset($excluded_functions["str_anyof"]) && (!function_exists("ryunosuke\\Functions\\str_anyof") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_anyof"))->isInternal()))) {
+    /**
+     * 文字列が候補の中にあるか調べる
+     *
+     * 候補配列の中に対象文字列があるならそのキーを返す。ないなら null を返す。
+     *
+     * あくまで文字列としての比較に徹する（in_array/array_search の第3引数は厳密すぎて使いにくいことがある）。
+     * ので array_search の文字列特化版とも言える。
+     * 動作的には `array_flip($haystack)[$needle] ?? null` と同じ（大文字小文字オプションはあるけど）。
+     * ただ array_flip は巨大配列に弱いし、大文字小文字などの融通が効かないので foreach での素朴な実装になっている。
+     *
+     * Example:
+     * ```php
+     * assertSame(str_anyof('b', ['a', 'b', 'c']), 1);       // 見つかったキーを返す
+     * assertSame(str_anyof('x', ['a', 'b', 'c']), null);    // 見つからないなら null を返す
+     * assertSame(str_anyof('C', ['a', 'b', 'c'], true), 2); // 大文字文字を区別しない
+     * assertSame(str_anyof('1', [1, 2, 3]), 0);             // 文字列の比較に徹する
+     * assertSame(str_anyof(2, ['1', '2', '3']), 1);         // 同上
+     * ```
+     *
+     * @param string $needle 調べる文字列
+     * @param iterable $haystack 候補配列
+     * @param bool $case_insensitivity 大文字小文字を無視するか
+     * @return bool 候補の中にあるならそのキー。無いなら null
+     */
+    function str_anyof($needle, $haystack, $case_insensitivity = false)
+    {
+        $needle = (string) $needle;
+        foreach ($haystack as $k => $v) {
+            if (!$case_insensitivity && strcmp($needle, $v) === 0) {
+                return $k;
+            }
+            elseif ($case_insensitivity && strcasecmp($needle, $v) === 0) {
+                return $k;
+            }
+        }
+        return null;
+    }
+}
+
 const str_equals = "ryunosuke\\Functions\\str_equals";
 if (!isset($excluded_functions["str_equals"]) && (!function_exists("ryunosuke\\Functions\\str_equals") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_equals"))->isInternal()))) {
     /**
@@ -8830,6 +9133,106 @@ if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\F
             }
             return $matches[0];
         }, $subject);
+    }
+}
+
+const str_embed = "ryunosuke\\Functions\\str_embed";
+if (!isset($excluded_functions["str_embed"]) && (!function_exists("ryunosuke\\Functions\\str_embed") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_embed"))->isInternal()))) {
+    /**
+     * エスケープ付きで文字列を置換する
+     *
+     * $replacemap で from -> to 文字列を指定する。
+     * to は文字列と配列を受け付ける。
+     * 文字列の場合は普通に想起される動作で単純な置換となる。
+     * 配列の場合は順次置換していく。要素が足りなくなったら例外を投げる。
+     *
+     * strtr と同様、最も長いキーから置換を行い、置換後の文字列は対象にならない。
+     *
+     * $enclosure で「特定文字に囲まれている」場合を無視することができる。
+     * $escape で「特定文字が前にある」場合を無視することができる。
+     *
+     * Example:
+     * ```php
+     * // 最も単純な置換
+     * assertSame(str_embed('a, b, c', ['a' => 'A', 'b' => 'B', 'c' => 'C']), 'A, B, C');
+     * // 最も長いキーから置換される
+     * assertSame(str_embed('abc', ['a' => 'X', 'ab' => 'AB']), 'ABc');
+     * // 配列を渡すと「N番目の置換」が実現できる（文字列の場合は再利用される）
+     * assertSame(str_embed('a, a, b, b', [
+     *     'a' => 'A',          // 全ての a が A になる
+     *     'b' => ['B1', 'B2'], // 1番目の b が B1, 2番目の b が B2 になる
+     * ]), 'A, A, B1, B2');
+     * // 最も重要な性質として "' で囲まれていると対象にならない
+     * assertSame(str_embed('a, "a", b, "b", b', [
+     *     'a' => 'A',
+     *     'b' => ['B1', 'B2'],
+     * ]), 'A, "a", B1, "b", B2');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param array $replacemap 置換文字列
+     * @param string|array $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
+     * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+     * @return string 置換された文字列
+     */
+    function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\')
+    {
+        assert(is_iterable($replacemap));
+
+        $string = (string) $string;
+
+        // 長いキーから処理するためソートしておく
+        $replacemap = arrayval($replacemap, false);
+        uksort($replacemap, function ($a, $b) { return strlen($b) - strlen($a); });
+
+        if (is_string($enclosure)) {
+            $chars = str_split($enclosure);
+            $enclosure = array_combine($chars, $chars);
+        }
+
+        $enclosing = [];
+        $counter = array_fill_keys(array_keys($replacemap), 0);
+        for ($i = 0; $i < strlen($string); $i++) {
+            if ($i !== 0 && $string[$i - 1] === $escape) {
+                continue;
+            }
+            foreach ($enclosure as $start => $end) {
+                if (substr_compare($string, $end, $i, strlen($end)) === 0) {
+                    if ($enclosing && $enclosing[count($enclosing) - 1] === $end) {
+                        array_pop($enclosing);
+                        $i += strlen($end) - 1;
+                        continue 2;
+                    }
+                }
+                if (substr_compare($string, $start, $i, strlen($start)) === 0) {
+                    $enclosing[] = $end;
+                    $i += strlen($start) - 1;
+                    continue 2;
+                }
+            }
+
+            if (empty($enclosing)) {
+                foreach ($replacemap as $src => $dst) {
+                    $srclen = strlen($src);
+                    if ($srclen === 0) {
+                        throw new \InvalidArgumentException("src length is 0.");
+                    }
+                    if (substr_compare($string, $src, $i, $srclen) === 0) {
+                        if (is_array($dst)) {
+                            $n = $counter[$src]++;
+                            if (!isset($dst[$n])) {
+                                throw new \InvalidArgumentException("notfound search string '$src' of {$n}th.");
+                            }
+                            $dst = $dst[$n];
+                        }
+                        $string = substr_replace($string, $dst, $i, $srclen);
+                        $i += strlen($dst) - 1;
+                        break;
+                    }
+                }
+            }
+        }
+        return $string;
     }
 }
 
@@ -10321,32 +10724,66 @@ if (!isset($excluded_functions["damerau_levenshtein"]) && (!function_exists("ryu
     }
 }
 
+const ngram = "ryunosuke\\Functions\\ngram";
+if (!isset($excluded_functions["ngram"]) && (!function_exists("ryunosuke\\Functions\\ngram") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ngram"))->isInternal()))) {
+    /**
+     * N-gram 化して配列で返す
+     *
+     * 素朴な実装であり特記事項はない。
+     * 末端要素や除去フィルタくらいは実装するかもしれない。
+     *
+     * Example:
+     * ```php
+     * assertSame(ngram("あいうえお", 1), ["あ", "い", "う", "え", "お"]);
+     * assertSame(ngram("あいうえお", 2), ["あい", "いう", "うえ", "えお", "お"]);
+     * assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", "えお", "お"]);
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param int $N N-gram の N
+     * @param string $encoding マルチバイトエンコーディング
+     * @return array N-gram 配列
+     */
+    function ngram($string, $N, $encoding = 'UTF-8')
+    {
+        if (func_num_args() < 3) {
+            $encoding = mb_internal_encoding();
+        }
+
+        $result = [];
+        for ($i = 0, $l = mb_strlen($string, $encoding); $i < $l; ++$i) {
+            $result[] = mb_substr($string, $i, $N, $encoding);
+        }
+
+        return $result;
+    }
+}
+
 const str_guess = "ryunosuke\\Functions\\str_guess";
 if (!isset($excluded_functions["str_guess"]) && (!function_exists("ryunosuke\\Functions\\str_guess") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_guess"))->isInternal()))) {
     /**
      * $string に最も近い文字列を返す
      *
-     * レーベンシュタイン比の最も小さい要素を返す。
+     * N-gram 化して類似度の高い結果を返す。
      *
      * この関数の結果（内部実装）は互換性を考慮しない。
-     * 例えば現在は damerau_levenshtein で実装されているが、 similar_text になる可能性もある。
      *
      * Example:
      * ```php
-     * // 「あいうえお」と最も距離の近い文字列は「あいゆえに」である
+     * // 「あいうえお」と最も近い文字列は「あいゆえに」である
      * assertSame(str_guess("あいうえお", [
      *     'かきくけこ', // マッチ度 0%（1文字もかすらない）
-     *     'ぎぼあいこ', // マッチ度 0%（"あい"はあるが位置が異なる）
-     *     'かとうあい', // マッチ度 20%（"う"の位置が等しい）
-     *     'あいしてる', // マッチ度 40&（"あい"がマッチ）
-     *     'あいゆえに', // マッチ度 60&（"あい", "え"がマッチ）
+     *     'ぎぼあいこ', // マッチ度約 13.1%（"あい"はあるが位置が異なる）
+     *     'あいしてる', // マッチ度約 13.8%（"あい"がマッチ）
+     *     'かとうあい', // マッチ度約 16.7%（"あい"があり"う"の位置が等しい）
+     *     'あいゆえに', // マッチ度約 17.4%（"あい", "え"がマッチ）
      * ]), 'あいゆえに');
      * ```
      *
      * @param string $string 調べる文字列
      * @param array $candidates 候補文字列配列
-     * @param int $percent マッチ度（％）を受ける変数
-     * @return string 最も近い文字列
+     * @param float $percent マッチ度（％）を受ける変数
+     * @return string 候補の中で最も近い文字列
      */
     function str_guess($string, $candidates, &$percent = null)
     {
@@ -10355,26 +10792,51 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("ryunosuke\\Fu
             throw new \InvalidArgumentException('$candidates is empty.');
         }
 
-        $sarray = preg_split('//u', $string, -1, PREG_SPLIT_NO_EMPTY);
-        $closest = null;
-        $shortest = PHP_INT_MAX;
-        foreach ($candidates as $candidate) {
-            $carray = preg_split('//u', $candidate, -1, PREG_SPLIT_NO_EMPTY);
-            $delta = damerau_levenshtein($sarray, $carray) / max(count($sarray), count($carray));
-
-            if ($delta < $shortest) {
-                $closest = $candidate;
-                $shortest = $delta;
+        // uni, bi, tri して配列で返すクロージャ
+        $ngramer = static function ($string) {
+            $result = [];
+            foreach ([1, 2, 3] as $n) {
+                $result[$n] = ngram($string, $n);
             }
+            return $result;
+        };
 
-            if ($delta === 0) {
-                break;
+        $sngram = $ngramer($string);
+
+        $result = null;
+        $percent = 0;
+        foreach ($candidates as $i => $candidate) {
+            $cngram = $ngramer($candidate);
+
+            // uni, bi, tri で重み付けスコア（var_dump したいことが多いので配列に入れる）
+            $scores = [];
+            foreach ($sngram as $n => $_) {
+                $scores[$n] = count(array_intersect($sngram[$n], $cngram[$n])) / max(count($sngram[$n]), count($cngram[$n])) * $n;
+            }
+            $score = array_sum($scores) * 10 + 1;
+
+            // ↑のスコアが同じだった場合を考慮してレーベンシュタイン距離で下駄を履かせる
+            $score -= damerau_levenshtein($sngram[1], $cngram[1]) / max(count($sngram[1]), count($cngram[1]));
+
+            // 10(uni) + 20(bi) + 30(tri) + 1(levenshtein) で最大は 61
+            $score = $score / 61 * 100;
+
+            /*
+            echo "$string <=> $candidate:
+  score1     : $scores[1]
+  score2     : $scores[2]
+  score3     : $scores[3]
+  score      : $score
+";
+            */
+
+            if ($percent <= $score) {
+                $percent = $score;
+                $result = $i;
             }
         }
 
-        $percent = intval(100 - $shortest * 100);
-
-        return $closest;
+        return $candidates[$result];
     }
 }
 
@@ -11174,6 +11636,109 @@ if (!isset($excluded_functions["throw_if"]) && (!function_exists("ryunosuke\\Fun
             }
             throw $ex;
         }
+    }
+}
+
+const blank_if = "ryunosuke\\Functions\\blank_if";
+if (!isset($excluded_functions["blank_if"]) && (!function_exists("ryunosuke\\Functions\\blank_if") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\blank_if"))->isInternal()))) {
+    /**
+     * 値が空なら null を返す
+     *
+     * `is_empty($value) ? $value : null` とほぼ同じ。
+     * 言ってしまえば「falsy な値を null に変換する」とも言える。
+     *
+     * ここでいう falsy とは php 標準の `empty` ではなく本ライブラリの `is_empty` であることに留意（"0" は空ではない）。
+     * さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。
+     * 乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。
+     *
+     * - 「 `$var ?: 'default'` で十分なんだけど "0" が…」
+     * - 「 `$var ?? 'default'` で十分なんだけど false が…」
+     *
+     * という状況はまれによくあるはず。
+     *
+     * ?? との親和性のため null を返す動作がデフォルトだが、そのデフォルト値は引数で渡すこともできる。
+     * 用途は Example を参照。
+     *
+     * Example:
+     * ```php
+     * // falsy な値は null を返すので null 合体演算子でデフォルト値が得られる
+     * assertSame(blank_if(null) ?? 'default', 'default');
+     * assertSame(blank_if('')   ?? 'default', 'default');
+     * // falsy じゃない値の場合は引数をそのまま返すので null 合体演算子には反応しない
+     * assertSame(blank_if(0)   ?? 'default', 0);   // 0 は空ではない
+     * assertSame(blank_if('0') ?? 'default', '0'); // "0" は空ではない
+     * assertSame(blank_if(1)   ?? 'default', 1);
+     * assertSame(blank_if('X') ?? 'default', 'X');
+     * // 第2引数で返る値を指定できるので下記も等価となる。ただし、php の仕様上第2引数が必ず評価されるため、関数呼び出しなどだと無駄な処理となる
+     * assertSame(blank_if(null, 'default'), 'default');
+     * assertSame(blank_if('',   'default'), 'default');
+     * assertSame(blank_if(0,    'default'), 0);
+     * assertSame(blank_if('0',  'default'), '0');
+     * assertSame(blank_if(1,    'default'), 1);
+     * assertSame(blank_if('X',  'default'), 'X');
+     * // 第2引数の用途は少し短く書けることと演算子の優先順位のつらみの回避程度（`??` は結構優先順位が低い。下記を参照）
+     * assertFalse(0 < blank_if(null) ?? 1);  // (0 < null) ?? 1 となるので false
+     * assertTrue(0 < blank_if(null, 1));     // 0 < 1 となるので true
+     * assertTrue(0 < (blank_if(null) ?? 1)); // ?? で同じことしたいならこのように括弧が必要
+     *
+     * # ここから下は既存言語機構との比較（愚痴っぽいので読まなくてもよい）
+     *
+     * // エルビス演算子は "0" にも反応するので正直言って使いづらい（php における falsy の定義は広すぎる）
+     * assertSame(null ?: 'default', 'default');
+     * assertSame(''   ?: 'default', 'default');
+     * assertSame(1    ?: 'default', 1);
+     * assertSame('0'  ?: 'default', 'default'); // こいつが反応してしまう
+     * assertSame('X'  ?: 'default', 'X');
+     * // 逆に null 合体演算子は null にしか反応しないので微妙に使い勝手が悪い（php の標準関数が false を返したりするし）
+     * assertSame(null ?? 'default', 'default'); // こいつしか反応しない
+     * assertSame(''   ?? 'default', '');
+     * assertSame(1    ?? 'default', 1);
+     * assertSame('0'  ?? 'default', '0');
+     * assertSame('X'  ?? 'default', 'X');
+     * // 恣意的な例だが、 substr は false も '0' も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
+     * assertSame(substr('000', 1, 1) ?: 'default', 'default'); // '0' を返すので 'default' になる
+     * assertSame(substr('xxx', 9, 1) ?: 'default', 'default'); // （文字数が足りなくて）false を返すので 'default' になる
+     * assertSame(substr('000', 1, 1) ?? 'default', '0');   // substr が null を返すことはないので 'default' になることはない
+     * assertSame(substr('xxx', 9, 1) ?? 'default', false); // substr が null を返すことはないので 'default' になることはない
+     * // 要するに単に「false が返ってきた場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
+     * assertSame(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1), 'default'); // 3項演算子で2回呼ぶ
+     * assertSame(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp, 'default');       // 一時変数を使用する（あるいは if 文）
+     * // このように書きたかった
+     * assertSame(blank_if(substr('xxx', 9, 1)) ?? 'default', 'default'); // null 合体演算子版
+     * assertSame(blank_if(substr('xxx', 9, 1), 'default'), 'default');   // 第2引数版
+     *
+     * // 恣意的な例その2。 0 は空ではないので array_search などにも応用できる（見つからない場合に false を返すので ?? はできないし、 false 相当を返し得るので ?: もできない）
+     * assertSame(array_search('x', ['a', 'b', 'c']) ?? 'default', false);     // 見つからないので 'default' としたいが false になってしまう
+     * assertSame(array_search('a', ['a', 'b', 'c']) ?: 'default', 'default'); // 見つかったのに 0 に反応するので 'default' になってしまう
+     * assertSame(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default', 'default'); // このように書きたかった
+     * assertSame(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default', 0);         // このように書きたかった
+     * ```
+     *
+     * @param mixed $var 判定する値
+     * @param mixed $default 空だった場合のデフォルト値
+     * @return mixed 空なら $default, 空じゃないなら $var をそのまま返す
+     */
+    function blank_if($var, $default = null)
+    {
+        if (is_object($var)) {
+            // 文字列化できるかが優先
+            if (is_stringable($var)) {
+                return strlen($var) ? $var : $default;
+            }
+            // 次点で countable
+            if (is_countable($var)) {
+                return count($var) ? $var : $default;
+            }
+            return $var;
+        }
+
+        // 0, "0" は false
+        if ($var === 0 || $var === '0') {
+            return $var;
+        }
+
+        // 上記以外は empty に任せる
+        return empty($var) ? $default : $var;
     }
 }
 
@@ -11995,31 +12560,47 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
      * 第1引数 $traces はトレース的配列を受け取る（`(new \Exception())->getTrace()` とか）。
      * 未指定時は debug_backtrace() で採取する。
      *
-     * 第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。
-     * 今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。
+     * 第2引数 $option は文字列化する際の設定を指定する。
+     * 情報量が増える分、機密も含まれる可能性があるため、 mask オプションで塗りつぶすキーや引数名を指定できる（クロージャの引数までは手出ししないため留意）。
+     * limit と format は比較的指定頻度が高いかつ互換性維持のため配列オプションではなく直に渡すことが可能になっている。
      *
      * @param array $traces debug_backtrace 的な配列
      * @param int|string|array $option オプション
-     * @return string トレース文字列
+     * @return string|array トレース文字列（delimiter オプションに null を渡すと配列で返す）
      */
-    function stacktrace($traces = null, $option = ['format' => '%s:%s %s', 'limit' => 16])
+    function stacktrace($traces = null, $option = [])
     {
         if (is_int($option)) {
-            $limit = $option;
-            $format = '%s:%s %s';
+            $option = ['limit' => $option];
         }
         elseif (is_string($option)) {
-            $limit = 16;
-            $format = $option;
-        }
-        else {
-            $limit = $option['limit'] ?? 16;
-            $format = $option['format'] ?? '%s:%s %s';
+            $option = ['format' => $option];
         }
 
-        $stringify = function ($value) use ($limit) {
+        $option += [
+            'format'    => '%s:%s %s', // 文字列化するときの sprintf フォーマット
+            'args'      => true,       // 引数情報を埋め込むか否か
+            'limit'     => 16,         // 配列や文字列を千切る長さ
+            'delimiter' => "\n",       // スタックトレースの区切り文字（null で配列になる）
+            'mask'      => ['#^password#', '#^secret#', '#^credential#', '#^credit#'],
+        ];
+        $limit = $option['limit'];
+        $maskregexs = (array) $option['mask'];
+        $mask = static function ($key, $value) use ($maskregexs) {
+            if (!is_string($value)) {
+                return $value;
+            }
+            foreach ($maskregexs as $regex) {
+                if (preg_match($regex, $key)) {
+                    return str_repeat('*', strlen($value));
+                }
+            }
+            return $value;
+        };
+
+        $stringify = static function ($value) use ($limit, $mask) {
             // 再帰用クロージャ
-            $export = function ($value, $nest = 0, $parents = []) use (&$export, $limit) {
+            $export = static function ($value, $nest = 0, $parents = []) use (&$export, $limit, $mask) {
                 // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
                 foreach ($parents as $parent) {
                     if ($parent === $value) {
@@ -12036,11 +12617,11 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
                             $kvl[] = sprintf('...(more %d length)', count($value) - $limit);
                             break;
                         }
-                        $kvl[] = ($flat ? '' : $k . ':') . $export($v, $nest + 1, $parents);
+                        $kvl[] = ($flat ? '' : $k . ':') . $export(call_user_func($mask, $k, $v), $nest + 1, $parents);
                     }
                     return ($flat ? '[' : '{') . implode(', ', $kvl) . ($flat ? ']' : '}');
                 }
-                // オブジェクトは単にプロパティを __set_state する文字列を出力する
+                // オブジェクトは単にプロパティを配列的に出力する
                 elseif (is_object($value)) {
                     $parents[] = $value;
                     return get_class($value) . $export(get_object_properties($value), $nest, $parents);
@@ -12077,15 +12658,38 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
                 $line = $traces[$i + 1]['line'] . "." . $trace['line'];
             }
 
-            $callee = $trace['function'];
             if (isset($trace['type'])) {
-                $callee = $trace['class'] . $trace['type'] . $callee;
+                $callee = $trace['class'] . $trace['type'] . $trace['function'];
+                if ($option['args'] && $maskregexs && method_exists($trace['class'], $trace['function'])) {
+                    $ref = new \ReflectionMethod($trace['class'], $trace['function']);
+                }
             }
-            $callee .= '(' . implode(', ', array_map($stringify, $trace['args'] ?? [])) . ')';
+            else {
+                $callee = $trace['function'];
+                if ($option['args'] && $maskregexs && function_exists($callee)) {
+                    $ref = new \ReflectionFunction($trace['function']);
+                }
+            }
+            $args = [];
+            if ($option['args']) {
+                $args = $trace['args'] ?? [];
+                if (isset($ref)) {
+                    $params = $ref->getParameters();
+                    foreach ($params as $n => $param) {
+                        if (array_key_exists($n, $args)) {
+                            $args[$n] = $mask($param->getName(), $args[$n]);
+                        }
+                    }
+                }
+            }
+            $callee .= '(' . implode(', ', array_map($stringify, $args)) . ')';
 
-            $result[] = sprintf($format, $file, $line, $callee);
+            $result[] = sprintf($option['format'], $file, $line, $callee);
         }
-        return implode("\n", $result);
+        if ($option['delimiter'] === null) {
+            return $result;
+        }
+        return implode($option['delimiter'], $result);
     }
 }
 
@@ -12720,6 +13324,9 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("ryunosuke\\Fun
      * - countable である object で count() > 0
      *
      * は false 判定する。
+     * ただし、 $empty_stcClass に true を指定すると「フィールドのない stdClass」も true を返すようになる。
+     * これは stdClass の立ち位置はかなり特殊で「フィールドアクセスできる組み込み配列」のような扱いをされることが多いため。
+     * （例えば `json_decode('{}')` は stdClass を返すが、このような状況は空判定したいことが多いだろう）。
      *
      * なお、関数の仕様上、未定義変数を true 判定することはできない。
      * 未定義変数をチェックしたい状況は大抵の場合コードが悪いが `$array['key1']['key2']` を調べたいことはある。
@@ -12737,15 +13344,26 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("ryunosuke\\Fun
      * // この辺だけが異なる
      * assertFalse(is_empty('0'));
      * assertFalse(is_empty(new \SimpleXMLElement('<foo></foo>')));
+     * // 第2引数に true を渡すと空の stdClass も empty 判定される
+     * $stdclass = new \stdClass();
+     * assertTrue(is_empty($stdclass, true));
+     * // フィールドがあれば empty ではない
+     * $stdclass->hoge = 123;
+     * assertFalse(is_empty($stdclass, true));
      * ```
      *
      * @param mixed $var 判定する値
+     * @param bool $empty_stdClass 空の stdClass を空とみなすか
      * @return bool 空なら true
      */
-    function is_empty($var)
+    function is_empty($var, $empty_stdClass = false)
     {
         // object は is_countable 次第
         if (is_object($var)) {
+            // が、 stdClass だけは特別扱い（stdClass は継承もできるので、クラス名で判定する（継承していたらそれはもう stdClass ではないと思う））
+            if ($empty_stdClass && get_class($var) === 'stdClass') {
+                return !(array) $var;
+            }
             if (is_countable($var)) {
                 return !count($var);
             }
@@ -13499,7 +14117,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("ryunosuke\\F
         };
 
         // 結果を返したり出力したり
-        $result = stacktrace(null, "%s:%s") . "\n" . $export($value);
+        $result = stacktrace(null, ['format' => "%s:%s", 'args' => false]) . "\n" . $export($value);
         if ($context === 'html') {
             $result = "<pre>$result</pre>";
         }

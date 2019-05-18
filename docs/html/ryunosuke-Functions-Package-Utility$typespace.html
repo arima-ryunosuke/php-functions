@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L929" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L968" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
@@ -88,8 +88,8 @@
             </span>
                         					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::get_uploaded_files()" tabindex="-1" class="structure-title ">
-                        get_uploaded_files						<small>($files = null)</small>
-					</h4>
+                        get_uploaded_files                        	<small>($files = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>$_FILES の構造を組み替えて $_POST などと同じにする</p>
 <p>$_FILES の配列構造はバグとしか思えないのでそれを是正する関数。<br />
@@ -138,8 +138,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L35-L54" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::cachedir()" tabindex="-1" class="structure-title ">
-                        cachedir						<small>($dirname = null)</small>
-					</h4>
+                        cachedir                        	<small>($dirname = null) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>本ライブラリで使用するキャッシュディレクトリを設定する</p>
 </div>
@@ -185,8 +185,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L56-L190" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::cache()" tabindex="-1" class="structure-title ">
-                        cache						<small>($key, $provider, $namespace = null)</small>
-					</h4>
+                        cache                        	<small>($key, $provider, $namespace = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>シンプルにキャッシュする</p>
 <p>この関数は get/set/delete を兼ねる。<br />
@@ -258,8 +258,8 @@ assertNotSame($rand1, $rand3);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L192-L230" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::is_ansi()" tabindex="-1" class="structure-title ">
-                        is_ansi						<small>($stream)</small>
-					</h4>
+                        is_ansi                        	<small>($stream) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>リソースが ansi color に対応しているか返す</p>
 <p>パイプしたりリダイレクトしていると false を返す。</p>
@@ -317,8 +317,8 @@ assertNotSame($rand1, $rand3);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L232-L295" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::ansi_colorize()" tabindex="-1" class="structure-title ">
-                        ansi_colorize						<small>($string, $color)</small>
-					</h4>
+                        ansi_colorize                        	<small>($string, $color) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>文字列に ANSI Color エスケープシーケンスを埋め込む</p>
 <ul>
@@ -384,8 +384,8 @@ assertNotSame($rand1, $rand3);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L297-L389" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
-                        process						<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null)</small>
-					</h4>
+                        process                        	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : int</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>proc_open ～ proc_close の一連の処理を行う</p>
 <p>標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。</p>
@@ -485,8 +485,8 @@ assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "er
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L391-L564" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
-                        arguments						<small>($rule, $argv = null)</small>
-					</h4>
+                        arguments                        	<small>($rule, $argv = null) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>コマンドライン引数をパースして引数とオプションを返す</p>
 <p>少しリッチな <tag_link data-kind='uri' data-type='http://php.net/manual/function.getopt.php' data-description='getopt'>getopt</tag_link> として使える（shell 由来のオプション構文(a:b::)はどうも馴染みにくい）。<br />
@@ -600,22 +600,20 @@ assertSame(arguments($rule, '--long A -short B'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L566-L666" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L566-L705" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::stacktrace()" tabindex="-1" class="structure-title ">
-                        stacktrace						<small>($traces = null, $option = [
-    &quot;format&quot; =&gt; &quot;%s:%s %s&quot;,
-    &quot;limit&quot;  =&gt; 16,
-])</small>
-					</h4>
+                        stacktrace                        	<small>($traces = null, $option = []) : string<span class="type-separator"></span><wbr>array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>スタックトレースを文字列で返す</p>
 <p><code>(new \Exception())-&gt;getTraceAsString()</code> と実質的な役割は同じ。<br />
 ただし、 getTraceAsString は引数が Array になったりクラス名しか取れなかったり微妙に使い勝手が悪いのでもうちょっと情報量を増やしたもの。</p>
 <p>第1引数 $traces はトレース的配列を受け取る（<code>(new \Exception())-&gt;getTrace()</code> とか）。<br />
 未指定時は debug_backtrace() で採取する。</p>
-<p>第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。<br />
-今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。</p>
+<p>第2引数 $option は文字列化する際の設定を指定する。<br />
+情報量が増える分、機密も含まれる可能性があるため、 mask オプションで塗りつぶすキーや引数名を指定できる（クロージャの引数までは手出ししないため留意）。<br />
+limit と format は比較的指定頻度が高いかつ互換性維持のため配列オプションではなく直に渡すことが可能になっている。</p>
 </div>
                         	<table class="table">
 		<caption>Parameters</caption>
@@ -628,10 +626,7 @@ assertSame(arguments($rule, '--long A -short B'), [
 			</tr>
         			<tr>
 				<td class="type">int<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>array</td>
-				<td class="rest">$option = [
-    &quot;format&quot; =&gt; &quot;%s:%s %s&quot;,
-    &quot;limit&quot;  =&gt; 16,
-]</td>
+				<td class="rest">$option = []</td>
 				<td class="desc"><p>オプション</p>
 </td>
 			</tr>
@@ -641,8 +636,8 @@ assertSame(arguments($rule, '--long A -short B'), [
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type">string</td>
-			<td class="desc"><p>トレース文字列</p>
+			<td class="type">string<span class="type-separator"></span><wbr>array</td>
+			<td class="desc"><p>トレース文字列（delimiter オプションに null を渡すと配列で返す）</p>
 </td>
 			<td class="rest"></td>
 		</tr>
@@ -665,11 +660,11 @@ assertSame(arguments($rule, '--long A -short B'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L668-L725" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L707-L764" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::backtrace()" tabindex="-1" class="structure-title ">
-                        backtrace						<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = [])</small>
-					</h4>
+                        backtrace                        	<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = []) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>特定条件までのバックトレースを取得する</p>
 <p>第2引数 $options を満たすトレース以降を返す。<br />
@@ -736,11 +731,11 @@ assertArraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L727-L786" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L766-L825" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
-                        error						<small>($message, $destination = null)</small>
-					</h4>
+                        error                        	<small>($message, $destination = null) : int</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>エラー出力する</p>
 <p>第1引数 $message はそれらしく文字列化されて出力される。基本的にはあらゆる型を与えて良い。</p>
@@ -794,11 +789,11 @@ assertArraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L788-L815" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L827-L854" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
-                        timer						<small>($callable, $count = 1)</small>
-					</h4>
+                        timer                        	<small>($callable, $count = 1) : float</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>処理時間を計測する</p>
 <p>第1引数 $callable を $count 回回してその処理時間を返す。</p>
@@ -852,11 +847,11 @@ assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L817-L928" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L856-L967" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
-                        benchmark						<small>($suite, $args = [], $millisec = 1000, $output = true)</small>
-					</h4>
+                        benchmark                        	<small>($suite, $args = [], $millisec = 1000, $output = true) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>簡易ベンチマークを取る</p>
 <p>「指定ミリ秒内で何回コールできるか？」でベンチする。</p>

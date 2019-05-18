@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L733" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L833" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -103,8 +103,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L13-L79" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::evaluate()" tabindex="-1" class="structure-title ">
-                        evaluate						<small>($phpcode, $contextvars = [], $cachesize = 256)</small>
-					</h4>
+                        evaluate                        	<small>($phpcode, $contextvars = [], $cachesize = 256) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>eval のプロキシ関数</p>
 <p>一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。<br />
@@ -177,8 +177,8 @@ assertSame(evaluate($phpcode, get_defined_vars()), 9);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L81-L192" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::parse_php()" tabindex="-1" class="structure-title ">
-                        parse_php						<small>($phpcode, $option = [])</small>
-					</h4>
+                        parse_php                        	<small>($phpcode, $option = []) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>php のコード断片をパースする</p>
 <p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
@@ -253,8 +253,8 @@ assertSame(implode('', array_column($part, 1)), "class Example\n{");
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L194-L211" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::returns()" tabindex="-1" class="structure-title ">
-                        returns						<small>($v)</small>
-					</h4>
+                        returns                        	<small>($v) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>引数をそのまま返す</p>
 <p>clone などでそのまま返す関数が欲しいことがまれによくあるはず。</p>
@@ -305,8 +305,8 @@ assertSame(returns($object), $object);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L213-L280" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::optional()" tabindex="-1" class="structure-title ">
-                        optional						<small>($object, $expected = null)</small>
-					</h4>
+                        optional                        	<small>($object, $expected = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
 <p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。</p>
@@ -385,8 +385,8 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L282-L469" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::chain()" tabindex="-1" class="structure-title ">
-                        chain						<small>($source)</small>
-					</h4>
+                        chain                        	<small>($source) : <a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
 <p>ChainObject という関数をチェーンできるオブジェクトを返す。<br />
@@ -504,8 +504,8 @@ assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L471-L491" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
-                        throws						<small>($ex)</small>
-					</h4>
+                        throws                        	<small>($ex) : void</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>throw の関数版</p>
 <p>hoge() or throw などしたいことがまれによくあるはず。</p>
@@ -559,8 +559,8 @@ catch (\Exception $ex) {
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L493-L520" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throw_if()" tabindex="-1" class="structure-title ">
-                        throw_if						<small>($flag, $ex, ...$ex_args)</small>
-					</h4>
+                        throw_if                        	<small>($flag, $ex, ...$ex_args) : void</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>条件付き throw</p>
 <p>第1引数が true 相当のときに例外を投げる。</p>
@@ -623,11 +623,129 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L522-L560" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L522-L620" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Syntax::blank_if()" tabindex="-1" class="structure-title ">
+                        blank_if                        	<small>($var, $default = null) : mixed</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>値が空なら null を返す</p>
+<p><code>is_empty($value) ? $value : null</code> とほぼ同じ。<br />
+言ってしまえば「falsy な値を null に変換する」とも言える。</p>
+<p>ここでいう falsy とは php 標準の <code>empty</code> ではなく本ライブラリの <code>is_empty</code> であることに留意（"0" は空ではない）。<br />
+さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。<br />
+乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。</p>
+<ul>
+<li>「 <code>$var ?: 'default'</code> で十分なんだけど "0" が…」</li>
+<li>「 <code>$var ?? 'default'</code> で十分なんだけど false が…」</li>
+</ul>
+<p>という状況はまれによくあるはず。</p>
+<p>?? との親和性のため null を返す動作がデフォルトだが、そのデフォルト値は引数で渡すこともできる。<br />
+用途は Example を参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">// falsy な値は null を返すので null 合体演算子でデフォルト値が得られる
+assertSame(blank_if(null) ?? 'default', 'default');
+assertSame(blank_if('')   ?? 'default', 'default');
+// falsy じゃない値の場合は引数をそのまま返すので null 合体演算子には反応しない
+assertSame(blank_if(0)   ?? 'default', 0);   // 0 は空ではない
+assertSame(blank_if('0') ?? 'default', '0'); // "0" は空ではない
+assertSame(blank_if(1)   ?? 'default', 1);
+assertSame(blank_if('X') ?? 'default', 'X');
+// 第2引数で返る値を指定できるので下記も等価となる。ただし、php の仕様上第2引数が必ず評価されるため、関数呼び出しなどだと無駄な処理となる
+assertSame(blank_if(null, 'default'), 'default');
+assertSame(blank_if('',   'default'), 'default');
+assertSame(blank_if(0,    'default'), 0);
+assertSame(blank_if('0',  'default'), '0');
+assertSame(blank_if(1,    'default'), 1);
+assertSame(blank_if('X',  'default'), 'X');
+// 第2引数の用途は少し短く書けることと演算子の優先順位のつらみの回避程度（`??` は結構優先順位が低い。下記を参照）
+assertFalse(0 &lt; blank_if(null) ?? 1);  // (0 &lt; null) ?? 1 となるので false
+assertTrue(0 &lt; blank_if(null, 1));     // 0 &lt; 1 となるので true
+assertTrue(0 &lt; (blank_if(null) ?? 1)); // ?? で同じことしたいならこのように括弧が必要
+
+# ここから下は既存言語機構との比較（愚痴っぽいので読まなくてもよい）
+
+// エルビス演算子は "0" にも反応するので正直言って使いづらい（php における falsy の定義は広すぎる）
+assertSame(null ?: 'default', 'default');
+assertSame(''   ?: 'default', 'default');
+assertSame(1    ?: 'default', 1);
+assertSame('0'  ?: 'default', 'default'); // こいつが反応してしまう
+assertSame('X'  ?: 'default', 'X');
+// 逆に null 合体演算子は null にしか反応しないので微妙に使い勝手が悪い（php の標準関数が false を返したりするし）
+assertSame(null ?? 'default', 'default'); // こいつしか反応しない
+assertSame(''   ?? 'default', '');
+assertSame(1    ?? 'default', 1);
+assertSame('0'  ?? 'default', '0');
+assertSame('X'  ?? 'default', 'X');
+// 恣意的な例だが、 substr は false も '0' も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
+assertSame(substr('000', 1, 1) ?: 'default', 'default'); // '0' を返すので 'default' になる
+assertSame(substr('xxx', 9, 1) ?: 'default', 'default'); // （文字数が足りなくて）false を返すので 'default' になる
+assertSame(substr('000', 1, 1) ?? 'default', '0');   // substr が null を返すことはないので 'default' になることはない
+assertSame(substr('xxx', 9, 1) ?? 'default', false); // substr が null を返すことはないので 'default' になることはない
+// 要するに単に「false が返ってきた場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
+assertSame(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1), 'default'); // 3項演算子で2回呼ぶ
+assertSame(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp, 'default');       // 一時変数を使用する（あるいは if 文）
+// このように書きたかった
+assertSame(blank_if(substr('xxx', 9, 1)) ?? 'default', 'default'); // null 合体演算子版
+assertSame(blank_if(substr('xxx', 9, 1), 'default'), 'default');   // 第2引数版
+
+// 恣意的な例その2。 0 は空ではないので array_search などにも応用できる（見つからない場合に false を返すので ?? はできないし、 false 相当を返し得るので ?: もできない）
+assertSame(array_search('x', ['a', 'b', 'c']) ?? 'default', false);     // 見つからないので 'default' としたいが false になってしまう
+assertSame(array_search('a', ['a', 'b', 'c']) ?: 'default', 'default'); // 見つかったのに 0 に反応するので 'default' になってしまう
+assertSame(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default', 'default'); // このように書きたかった
+assertSame(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default', 0);         // このように書きたかった
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$var</td>
+				<td class="desc"><p>判定する値</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$default = null</td>
+				<td class="desc"><p>空だった場合のデフォルト値</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>空なら $default, 空じゃないなら $var をそのまま返す</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L622-L660" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::ifelse()" tabindex="-1" class="structure-title ">
-                        ifelse						<small>($actual, $expected, $then, $else = null)</small>
-					</h4>
+                        ifelse                        	<small>($actual, $expected, $then, $else = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>if ～ else 構文の関数版</p>
 <p>一言で言えば <code>$actual === $expected ? $then : $else</code> という動作になる。<br />
@@ -702,11 +820,11 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L562-L600" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L662-L700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::switchs()" tabindex="-1" class="structure-title ">
-                        switchs						<small>($value, $cases, $default = null)</small>
-					</h4>
+                        switchs                        	<small>($value, $cases, $default = null) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>switch 構文の関数版</p>
 <p>case にクロージャを与えると実行して返す。<br />
@@ -772,11 +890,11 @@ assertSame(switchs(3, $cases, 'undefined'), 'undefined');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L602-L629" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L702-L729" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_null()" tabindex="-1" class="structure-title ">
-                        try_null						<small>($try, ...$variadic)</small>
-					</h4>
+                        try_null                        	<small>($try, ...$variadic) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>例外を握りつぶす try 構文</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
@@ -834,11 +952,11 @@ assertSame(try_null($try), null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L631-L654" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L731-L754" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
-                        try_catch						<small>($try, $catch = null, ...$variadic)</small>
-					</h4>
+                        try_catch                        	<small>($try, $catch = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>try ～ catch 構文の関数版</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
@@ -902,11 +1020,11 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L656-L683" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L756-L783" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
-                        try_finally						<small>($try, $finally = null, ...$variadic)</small>
-					</h4>
+                        try_finally                        	<small>($try, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>try ～ finally 構文の関数版</p>
 <p>例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。</p>
@@ -974,11 +1092,11 @@ assertSame($finally_count, 2); // 呼ばれている
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L685-L732" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L785-L832" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
-                        try_catch_finally						<small>($try, $catch = null, $finally = null, ...$variadic)</small>
-					</h4>
+                        try_catch_finally                        	<small>($try, $catch = null, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>try ～ catch ～ finally 構文の関数版</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>

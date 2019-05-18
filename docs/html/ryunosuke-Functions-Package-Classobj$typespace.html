@@ -86,8 +86,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::stdclass()" tabindex="-1" class="structure-title ">
-                        stdclass						<small>($fields = [])</small>
-					</h4>
+                        stdclass                        	<small>($fields = []) : <a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>初期フィールド値を与えて stdClass を生成する</p>
 <p>手元にある配列でサクッと stdClass を作りたいことがまれによくあるはず。</p>
@@ -144,8 +144,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L40-L90" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
-                        detect_namespace						<small>($location)</small>
-					</h4>
+                        detect_namespace                        	<small>($location) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>ディレクトリ構造から名前空間を推測して返す</p>
 <p>指定パスに名前空間を持つような php ファイルが有るならその名前空間を返す。<br />
@@ -195,8 +195,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L92-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
-                        class_loader						<small>($startdir = null)</small>
-					</h4>
+                        class_loader                        	<small>($startdir = null) : <a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>composer のクラスローダを返す</p>
 <p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
@@ -246,8 +246,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L121-L141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
-                        class_namespace						<small>($class)</small>
-					</h4>
+                        class_namespace                        	<small>($class) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>クラスの名前空間部分を取得する</p>
 <p>Example:</p>
@@ -296,8 +296,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L143-L162" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
-                        class_shorten						<small>($class)</small>
-					</h4>
+                        class_shorten                        	<small>($class) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>クラスの名前空間部分を除いた短い名前を取得する</p>
 <p>Example:</p>
@@ -346,8 +346,8 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L164-L287" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
-                        class_replace						<small>($class, $register)</small>
-					</h4>
+                        class_replace                        	<small>($class, $register) : void</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>既存（未読み込みに限る）クラスを強制的に置換する</p>
 <p>例えば継承ツリーが下記の場合を考える。</p>
@@ -439,8 +439,8 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L289-L436" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_extends()" tabindex="-1" class="structure-title ">
-                        class_extends						<small>($object, $methods, $fields = [])</small>
-					</h4>
+                        class_extends                        	<small>($object, $methods, $fields = []) : object</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>インスタンスを動的に拡張する</p>
 <p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
@@ -517,8 +517,8 @@ assertSame($newobject-&gt;codemessage(), '123:hoge');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L438-L475" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::const_exists()" tabindex="-1" class="structure-title ">
-                        const_exists						<small>($classname, $constname = null)</small>
-					</h4>
+                        const_exists                        	<small>($classname, $constname = null) : bool</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>クラス定数が存在するか調べる</p>
 <p>グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。</p>
@@ -586,8 +586,8 @@ assertFalse(const_exists('UNDEFINED'));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L477-L513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
-                        object_dive						<small>($object, $path, $default = null, $delimiter = &quot;.&quot;)</small>
-					</h4>
+                        object_dive                        	<small>($object, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>パス形式でプロパティ値を取得</p>
 <p>存在しない場合は $default を返す。</p>
@@ -665,8 +665,8 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L515-L566" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
-                        get_object_properties						<small>($object)</small>
-					</h4>
+                        get_object_properties                        	<small>($object) : array</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
 <p>get_object_vars + no public プロパティを返すイメージ。</p>

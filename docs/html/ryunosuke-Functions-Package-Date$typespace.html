@@ -129,8 +129,8 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L19-L131" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_timestamp()" tabindex="-1" class="structure-title ">
-                        date_timestamp						<small>($datetimedata)</small>
-					</h4>
+                        date_timestamp                        	<small>($datetimedata) : int<span class="type-separator"></span><wbr>float<span class="type-separator"></span><wbr>null</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>日時文字列をよしなにタイムスタンプに変換する</p>
 <p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
@@ -190,8 +190,8 @@ assertSame(date_timestamp('2014/12/24 12:34:56.789'), 1419392096.789);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L133-L195" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_convert()" tabindex="-1" class="structure-title ">
-                        date_convert						<small>($format, $datetimedata = null)</small>
-					</h4>
+                        date_convert                        	<small>($format, $datetimedata = null) : string</small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>日時文字列をよしなに別のフォーマットに変換する</p>
 <p>マイクロ秒にも対応している。<br />
@@ -252,8 +252,8 @@ assertSame(date_convert('Y/m/d H:i:s.u', $now), '2009/02/14 08:31:30.123000');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L197-L398" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_interval()" tabindex="-1" class="structure-title ">
-                        date_interval						<small>($sec, $format = null, $limit_type = &quot;y&quot;)</small>
-					</h4>
+                        date_interval                        	<small>($sec, $format = null, $limit_type = &quot;y&quot;) : string<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.dateinterval.php" class="fqsen" target="_blank">\DateInterval</a></small>
+						</h4>
 					<div class="inner-item">
 						<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
 <p>例えば <code>60 * 60 * 24 * 900 + 12345.678</code> （約900日12345秒）は・・・</p>
