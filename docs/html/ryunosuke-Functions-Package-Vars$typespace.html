@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Vars)</small>
@@ -353,7 +353,7 @@ assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので�
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L204-L284" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::si_prefix()" tabindex="-1" class="structure-title ">
-                        si_prefix						<small>($var, $unit = 1000, $format = &#039;%.3f %s&#039;)</small>
+                        si_prefix						<small>($var, $unit = 1000, $format = &quot;%.3f %s&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>数値に SI 接頭辞を付与する</p>
@@ -392,7 +392,7 @@ assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$format = &#039;%.3f %s&#039;</td>
+				<td class="rest">$format = &quot;%.3f %s&quot;</td>
 				<td class="desc"><p>書式フォーマット。 null を与えると sprintf せずに配列で返す</p>
 </td>
 			</tr>

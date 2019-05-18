@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="fqsen">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	All Fqsen (for search Ctrl+F)
 	<span class="pull-right">
 		<small class="frame-switch">
@@ -45,17 +45,17 @@
 	</span>
 </h1>
 <div class="main-wrapper">
-            	<h2>namespace<a href="ryunosuke-$namespace.html#ryunosuke\"> ryunosuke\</a></h2>
+            	<h4 class="fqsen-title">namespace<a href="ryunosuke-$namespace.html#ryunosuke\"> ryunosuke\</a></h4>
 	<div class="description"></div>
-                	<h2>namespace<a href="ryunosuke-Functions-$namespace.html#ryunosuke\Functions\"> ryunosuke\Functions\</a></h2>
+                	<h4 class="fqsen-title">namespace<a href="ryunosuke-Functions-$namespace.html#ryunosuke\Functions\"> ryunosuke\Functions\</a></h4>
 	<div class="description"></div>
-                	<h2>namespace<a href="ryunosuke-Functions-Package-$namespace.html#ryunosuke\Functions\Package\"> ryunosuke\Functions\Package\</a></h2>
+                	<h4 class="fqsen-title">namespace<a href="ryunosuke-Functions-Package-$namespace.html#ryunosuke\Functions\Package\"> ryunosuke\Functions\Package\</a></h4>
 	<div class="description"></div>
                 
-                	<h2>class<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays"> ryunosuke\Functions\Package\Arrays</a></h2>
+                	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays"> ryunosuke\Functions\Package\Arrays</a></h4>
 	<div class="description"><p>配列関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrays()"> ryunosuke\Functions\Package\Arrays::arrays()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrays()"> ryunosuke\Functions\Package\Arrays::arrays()</a></h4>
 	<div class="description"><p>配列をシーケンシャルに走査するジェネレータを返す</p>
 <p>「シーケンシャルに」とは要するに数値連番が得られるように走査するということ。<br />
 0ベースの連番を作ってインクリメントしながら foreach するのと全く変わらない。</p>
@@ -71,7 +71,7 @@ foreach (arrays($array) as $n =&gt; [$k, $v]) {
 assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrayize()"> ryunosuke\Functions\Package\Arrays::arrayize()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::arrayize()"> ryunosuke\Functions\Package\Arrays::arrayize()</a></h4>
 	<div class="description"><p>引数の配列を生成する。</p>
 <p>配列以外を渡すと配列化されて追加される。<br />
 連想配列は未対応。あくまで普通の配列化のみ。<br />
@@ -83,7 +83,7 @@ $object = new \stdClass();
 assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_indexarray()"> ryunosuke\Functions\Package\Arrays::is_indexarray()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_indexarray()"> ryunosuke\Functions\Package\Arrays::is_indexarray()</a></h4>
 	<div class="description"><p>配列が数値配列か調べる</p>
 <p>空の配列も数値配列とみなす。<br />
 さらにいわゆる「連番配列」ではなく「キーが数値のみか？」で判定する。</p>
@@ -96,7 +96,7 @@ assertFalse(is_indexarray(['x' =&gt; 'X']));
 assertTrue(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_hasharray()"> ryunosuke\Functions\Package\Arrays::is_hasharray()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::is_hasharray()"> ryunosuke\Functions\Package\Arrays::is_hasharray()</a></h4>
 	<div class="description"><p>配列が連想配列か調べる</p>
 <p>空の配列は普通の配列とみなす。</p>
 <p>Example:</p>
@@ -105,7 +105,7 @@ assertFalse(is_hasharray([1, 2, 3]));
 assertTrue(is_hasharray(['x' =&gt; 'X']));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_key()"> ryunosuke\Functions\Package\Arrays::first_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_key()"> ryunosuke\Functions\Package\Arrays::first_key()</a></h4>
 	<div class="description"><p>配列の最初のキーを返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
@@ -113,7 +113,7 @@ assertTrue(is_hasharray(['x' =&gt; 'X']));
 assertSame(first_key([], 999), 999);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_value()"> ryunosuke\Functions\Package\Arrays::first_value()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_value()"> ryunosuke\Functions\Package\Arrays::first_value()</a></h4>
 	<div class="description"><p>配列の最初の値を返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
@@ -121,7 +121,7 @@ assertSame(first_key([], 999), 999);
 assertSame(first_value([], 999), 999);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_keyvalue()"> ryunosuke\Functions\Package\Arrays::first_keyvalue()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::first_keyvalue()"> ryunosuke\Functions\Package\Arrays::first_keyvalue()</a></h4>
 	<div class="description"><p>配列の最初のキー/値ペアをタプルで返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
@@ -129,7 +129,7 @@ assertSame(first_value([], 999), 999);
 assertSame(first_keyvalue([], 999), 999);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_key()"> ryunosuke\Functions\Package\Arrays::last_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_key()"> ryunosuke\Functions\Package\Arrays::last_key()</a></h4>
 	<div class="description"><p>配列の最後のキーを返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
@@ -137,7 +137,7 @@ assertSame(first_keyvalue([], 999), 999);
 assertSame(last_key([], 999), 999);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_value()"> ryunosuke\Functions\Package\Arrays::last_value()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_value()"> ryunosuke\Functions\Package\Arrays::last_value()</a></h4>
 	<div class="description"><p>配列の最後の値を返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
@@ -145,7 +145,7 @@ assertSame(last_key([], 999), 999);
 assertSame(last_value([], 999), 999);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_keyvalue()"> ryunosuke\Functions\Package\Arrays::last_keyvalue()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::last_keyvalue()"> ryunosuke\Functions\Package\Arrays::last_keyvalue()</a></h4>
 	<div class="description"><p>配列の最後のキー/値ペアをタプルで返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
@@ -153,7 +153,7 @@ assertSame(last_value([], 999), 999);
 assertSame(last_keyvalue([], 999), 999);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::prev_key()"> ryunosuke\Functions\Package\Arrays::prev_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::prev_key()"> ryunosuke\Functions\Package\Arrays::prev_key()</a></h4>
 	<div class="description"><p>配列の指定キーの前のキーを返す</p>
 <p>$key が最初のキーだった場合は null を返す。<br />
 $key が存在しない場合は false を返す。</p>
@@ -167,7 +167,7 @@ assertSame(prev_key($array, 'a'), null);
 assertSame(prev_key($array, 'x'), false);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::next_key()"> ryunosuke\Functions\Package\Arrays::next_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::next_key()"> ryunosuke\Functions\Package\Arrays::next_key()</a></h4>
 	<div class="description"><p>配列の指定キーの次のキーを返す</p>
 <p>$key が最後のキーだった場合は null を返す。<br />
 $key が存在しない場合は false を返す。<br />
@@ -185,7 +185,7 @@ assertSame(next_key($array, 'x'), false);
 assertSame(next_key($array, null), 10);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_and()"> ryunosuke\Functions\Package\Arrays::in_array_and()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_and()"> ryunosuke\Functions\Package\Arrays::in_array_and()</a></h4>
 	<div class="description"><p>in_array の複数版（AND）</p>
 <p>配列 $haystack が $needle の「すべてを含む」ときに true を返す。</p>
 <p>$needle が非配列の場合は配列化される。<br />
@@ -196,7 +196,7 @@ assertFalse(in_array_and([9], [1, 2, 3]));
 assertFalse(in_array_and([1, 9], [1, 2, 3]));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_or()"> ryunosuke\Functions\Package\Arrays::in_array_or()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::in_array_or()"> ryunosuke\Functions\Package\Arrays::in_array_or()</a></h4>
 	<div class="description"><p>in_array の複数版（OR）</p>
 <p>配列 $haystack が $needle の「どれかを含む」ときに true を返す。</p>
 <p>$needle が非配列の場合は配列化される。<br />
@@ -207,7 +207,7 @@ assertFalse(in_array_or([9], [1, 2, 3]), false);
 assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::kvsort()"> ryunosuke\Functions\Package\Arrays::kvsort()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::kvsort()"> ryunosuke\Functions\Package\Arrays::kvsort()</a></h4>
 	<div class="description"><p>比較関数にキーも渡ってくる安定ソート</p>
 <p>比較関数は ($avalue, $bvalue, $akey, $bkey) という引数を取る。<br />
 「値で比較して同値だったらキーも見たい」という状況はまれによくあるはず。<br />
@@ -245,7 +245,7 @@ assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_add()"> ryunosuke\Functions\Package\Arrays::array_add()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_add()"> ryunosuke\Functions\Package\Arrays::array_add()</a></h4>
 	<div class="description"><p>配列の+演算子の関数版</p>
 <p>Example:</p>
 <pre><code class="language-php">// ただの加算の関数版なので同じキーは上書きされない
@@ -254,7 +254,7 @@ assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
 assertSame(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']), ['a', 'b', 'c', 'x' =&gt; 'X']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_mix()"> ryunosuke\Functions\Package\Arrays::array_mix()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_mix()"> ryunosuke\Functions\Package\Arrays::array_mix()</a></h4>
 	<div class="description"><p>配列を交互に追加する</p>
 <p>引数の配列を横断的に追加して返す。<br />
 数値キーは振り直される。文字キーはそのまま追加される（同じキーは後方上書き）。</p>
@@ -272,7 +272,7 @@ assertSame(array_mix([1, 4, 6], [2, 5], [3]), [1, 2, 3, 4, 5, 6]);
 assertSame(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]), ['a' =&gt; 'A', 'b' =&gt; 'B', 1, 2, 3]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_zip()"> ryunosuke\Functions\Package\Arrays::array_zip()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_zip()"> ryunosuke\Functions\Package\Arrays::array_zip()</a></h4>
 	<div class="description"><p>配列の各要素値で順番に配列を作る</p>
 <p><code>array_map(null, ...$arrays)</code> とほぼ同義。ただし</p>
 <ul>
@@ -292,7 +292,7 @@ assertEquals(array_zip(
 ), [['a' =&gt; 1, 'hoge'], [2, 'b' =&gt; 'fuga'], [3, 'piyo']]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_cross()"> ryunosuke\Functions\Package\Arrays::array_cross()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_cross()"> ryunosuke\Functions\Package\Arrays::array_cross()</a></h4>
 	<div class="description"><p>配列の直積を返す</p>
 <p>文字キーは保存されるが数値キーは再割り振りされる。<br />
 ただし、文字キーが重複すると例外を投げる。</p>
@@ -309,7 +309,7 @@ assertSame(array_cross(
 ), [['a' =&gt; 1, 'b' =&gt; 3], ['a' =&gt; 1, 4], [2, 'b' =&gt; 3], [2, 4]]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_implode()"> ryunosuke\Functions\Package\Arrays::array_implode()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_implode()"> ryunosuke\Functions\Package\Arrays::array_implode()</a></h4>
 	<div class="description"><p>配列の各要素の間に要素を差し込む</p>
 <p>歴史的な理由はないが、引数をどちらの順番でも受けつけることが可能。<br />
 ただし、$glue を先に渡すパターンの場合は配列指定が可変引数渡しになる。</p>
@@ -321,7 +321,7 @@ assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
 assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_sprintf()"> ryunosuke\Functions\Package\Arrays::array_sprintf()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_sprintf()"> ryunosuke\Functions\Package\Arrays::array_sprintf()</a></h4>
 	<div class="description"><p>キーと値で sprintf する</p>
 <p>配列の各要素を文字列化して返すイメージ。<br />
 $glue を与えるとさらに implode して返す（返り値が文字列になる）。</p>
@@ -344,7 +344,7 @@ assertSame(array_sprintf([
 ], null, '|'), 'str:sss,int:3|single:str');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_strpad()"> ryunosuke\Functions\Package\Arrays::array_strpad()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_strpad()"> ryunosuke\Functions\Package\Arrays::array_strpad()</a></h4>
 	<div class="description"><p>配列のキー・要素に文字列を付加する</p>
 <p>$key_prefix, $val_prefix でそれぞれ「キーに付与する文字列」「値に付与する文字列」が指定できる。<br />
 配列を与えると [サフィックス, プレフィックス] という意味になる。<br />
@@ -357,7 +357,7 @@ assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' =&gt; 'val1', 'prefix
 assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', 'key2' =&gt; 'val2-suffix']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos()"> ryunosuke\Functions\Package\Arrays::array_pos()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos()"> ryunosuke\Functions\Package\Arrays::array_pos()</a></h4>
 	<div class="description"><p>配列・連想配列を問わず「N番目(0ベース)」の要素を返す</p>
 <p>負数を与えると逆から N 番目となる。</p>
 <p>Example:</p>
@@ -367,14 +367,14 @@ assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1), 'B');
 assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true), 'b');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos_key()"> ryunosuke\Functions\Package\Arrays::array_pos_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pos_key()"> ryunosuke\Functions\Package\Arrays::array_pos_key()</a></h4>
 	<div class="description"><p>配列の指定キーの位置を返す</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'c'), 2);
 assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1), -1);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_of()"> ryunosuke\Functions\Package\Arrays::array_of()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_of()"> ryunosuke\Functions\Package\Arrays::array_of()</a></h4>
 	<div class="description"><p>配列を与えると指定キーの値を返すクロージャを返す</p>
 <p>存在しない場合は $default を返す。</p>
 <p>$key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。<br />
@@ -385,7 +385,7 @@ assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1)
 assertSame($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']), 'FUGA');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_get()"> ryunosuke\Functions\Package\Arrays::array_get()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_get()"> ryunosuke\Functions\Package\Arrays::array_get()</a></h4>
 	<div class="description"><p>デフォルト値付きの配列値取得</p>
 <p>存在しない場合は $default を返す。</p>
 <p>$key に配列を与えるとそれらの値の配列を返す（lookup 的な動作）。<br />
@@ -410,7 +410,7 @@ assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c'
 assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []), [1 =&gt; 'b', 2 =&gt; 'c']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_set()"> ryunosuke\Functions\Package\Arrays::array_set()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_set()"> ryunosuke\Functions\Package\Arrays::array_set()</a></h4>
 	<div class="description"><p>キー指定の配列値設定</p>
 <p>第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。<br />
 第3引数に配列を指定すると潜って設定する。</p>
@@ -428,7 +428,7 @@ assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
 assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_put()"> ryunosuke\Functions\Package\Arrays::array_put()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_put()"> ryunosuke\Functions\Package\Arrays::array_put()</a></h4>
 	<div class="description"><p>キー指定の配列値設定</p>
 <p>array_set とほとんど同じ。<br />
 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。<br />
@@ -453,7 +453,7 @@ assertSame(array_put($array, 'Z', ['x', 'y', 'z']), 'z');
 assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_unset()"> ryunosuke\Functions\Package\Arrays::array_unset()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_unset()"> ryunosuke\Functions\Package\Arrays::array_unset()</a></h4>
 	<div class="description"><p>伏せると同時にその値を返す</p>
 <p>$key に配列を与えると全て伏せて配列で返す。<br />
 その場合、$default が活きるのは「全て無かった場合」となる。</p>
@@ -485,7 +485,7 @@ assertSame(array_unset($array, function($v){return strpos($v, 'G') !== false;}),
 assertSame($array, ['piyo' =&gt; 'PIYO']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_dive()"> ryunosuke\Functions\Package\Arrays::array_dive()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_dive()"> ryunosuke\Functions\Package\Arrays::array_dive()</a></h4>
 	<div class="description"><p>パス形式で配列値を取得</p>
 <p>存在しない場合は $default を返す。</p>
 <p>Example:</p>
@@ -502,7 +502,7 @@ assertSame(array_dive($array, 'a.b.x', 9), 9);
 assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_keys_exist()"> ryunosuke\Functions\Package\Arrays::array_keys_exist()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_keys_exist()"> ryunosuke\Functions\Package\Arrays::array_keys_exist()</a></h4>
 	<div class="description"><p>array_key_exists の複数版</p>
 <p>指定キーが全て存在するなら true を返す。<br />
 配列ではなく単一文字列を与えても動作する（array_key_exists と全く同じ動作になる）。</p>
@@ -517,7 +517,7 @@ assertFalse(array_keys_exist(['a', 'b', 'N'], ['a' =&gt; 'A', 'b' =&gt; 'B', 'c'
 assertTrue(array_keys_exist(['a', 'x' =&gt; ['x1', 'x2']], ['a' =&gt; 'A', 'x' =&gt; ['x1' =&gt; 'X1', 'x2' =&gt; 'X2']]));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_find()"> ryunosuke\Functions\Package\Arrays::array_find()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_find()"> ryunosuke\Functions\Package\Arrays::array_find()</a></h4>
 	<div class="description"><p>array_search のクロージャ版のようなもの</p>
 <p>コールバックの返り値が true 相当のものを返す。<br />
 $is_key に true を与えるとそのキーを返す（デフォルトの動作）。<br />
@@ -532,14 +532,14 @@ $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
 assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_grep_key()"> ryunosuke\Functions\Package\Arrays::array_grep_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_grep_key()"> ryunosuke\Functions\Package\Arrays::array_grep_key()</a></h4>
 	<div class="description"><p>キーを正規表現でフィルタする</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#'), ['a' =&gt; 'A', 'aa' =&gt; 'AA']);
 assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', true), ['b' =&gt; 'B']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_recursive()"> ryunosuke\Functions\Package\Arrays::array_map_recursive()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_recursive()"> ryunosuke\Functions\Package\Arrays::array_map_recursive()</a></h4>
 	<div class="description"><p>array_map の再帰版</p>
 <p>下記の点で少し array_map とは挙動が異なる。</p>
 <ul>
@@ -578,7 +578,7 @@ assertSame(array_map_recursive([
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_key()"> ryunosuke\Functions\Package\Arrays::array_map_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_key()"> ryunosuke\Functions\Package\Arrays::array_map_key()</a></h4>
 	<div class="description"><p>キーをマップして変換する</p>
 <p>$callback が null を返すとその要素は取り除かれる。</p>
 <p>Example:</p>
@@ -586,14 +586,14 @@ assertSame(array_map_recursive([
 assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_not()"> ryunosuke\Functions\Package\Arrays::array_filter_not()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_not()"> ryunosuke\Functions\Package\Arrays::array_filter_not()</a></h4>
 	<div class="description"><p>array_filter の否定版</p>
 <p>単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 =&gt; '']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_key()"> ryunosuke\Functions\Package\Arrays::array_filter_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_key()"> ryunosuke\Functions\Package\Arrays::array_filter_key()</a></h4>
 	<div class="description"><p>キーを主軸とした array_filter</p>
 <p>$callback が要求するなら値も渡ってくる。 php 5.6 の array_filter の ARRAY_FILTER_USE_BOTH と思えばよい。<br />
 ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。</p>
@@ -602,7 +602,7 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 =&gt; 'a', 2 =&gt; 'c']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_eval()"> ryunosuke\Functions\Package\Arrays::array_filter_eval()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_eval()"> ryunosuke\Functions\Package\Arrays::array_filter_eval()</a></h4>
 	<div class="description"><p>eval で評価して array_filter する</p>
 <p>キーは $k, 値は $v で宣言される。</p>
 <p>Example:</p>
@@ -610,7 +610,7 @@ assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== '
 assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&gt; 'c']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_where()"> ryunosuke\Functions\Package\Arrays::array_where()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_where()"> ryunosuke\Functions\Package\Arrays::array_where()</a></h4>
 	<div class="description"><p>指定キーの要素で array_filter する</p>
 <p>array_column があるなら array_where があってもいいはず。</p>
 <p>$column はコールバックに渡ってくる配列のキー名を渡す。null を与えると行全体が渡ってくる。<br />
@@ -657,7 +657,7 @@ assertSame(array_where($array, [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_filter()"> ryunosuke\Functions\Package\Arrays::array_map_filter()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_filter()"> ryunosuke\Functions\Package\Arrays::array_map_filter()</a></h4>
 	<div class="description"><p>array_map + array_filter する</p>
 <p>コールバックを適用して、結果が true 相当の要素のみ取り出す。<br />
 $strict に true を与えると「null でない」要素のみ返される。</p>
@@ -667,7 +667,7 @@ $strict に true を与えると「null でない」要素のみ返される。<
 assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_method()"> ryunosuke\Functions\Package\Arrays::array_map_method()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_method()"> ryunosuke\Functions\Package\Arrays::array_map_method()</a></h4>
 	<div class="description"><p>メソッドを指定できるようにした array_map</p>
 <p>配列内の要素は全て同一（少なくともシグネチャが同じ $method が存在する）オブジェクトでなければならない。<br />
 スルーする場合は $ignore=true とする。スルーした場合 map ではなく filter される（結果配列に含まれない）。<br />
@@ -684,7 +684,7 @@ assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), [
 assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_maps()"> ryunosuke\Functions\Package\Arrays::array_maps()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_maps()"> ryunosuke\Functions\Package\Arrays::array_maps()</a></h4>
 	<div class="description"><p>複数コールバックを指定できる array_map</p>
 <p>指定したコールバックで複数回回してマップする。<br />
 <code>array_maps($array, $f, $g)</code> は <code>array_map($g, array_map($f, $array))</code> とほぼ等しい。<br />
@@ -702,7 +702,7 @@ assertSame(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' 
 assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_kmap()"> ryunosuke\Functions\Package\Arrays::array_kmap()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_kmap()"> ryunosuke\Functions\Package\Arrays::array_kmap()</a></h4>
 	<div class="description"><p>キーも渡ってくる array_map</p>
 <p><code>array_map($callback, $array, array_keys($array))</code> とほとんど変わりはない。<br />
 違いは下記。</p>
@@ -725,7 +725,7 @@ assertSame(array_kmap([
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nmap()"> ryunosuke\Functions\Package\Arrays::array_nmap()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nmap()"> ryunosuke\Functions\Package\Arrays::array_nmap()</a></h4>
 	<div class="description"><p>要素値を $callback の n 番目(0ベース)に適用して array_map する</p>
 <p>引数 $n に配列を与えると [キー番目 =&gt; 値番目] とみなしてキー・値も渡される（Example 参照）。<br />
 その際、「挿入後の番目」ではなく、単純に「元の引数の番目」であることに留意。キー・値が同じ位置を指定している場合はキーが先にくる。</p>
@@ -738,21 +738,21 @@ $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
 assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['k' =&gt; 'a k b v c']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lmap()"> ryunosuke\Functions\Package\Arrays::array_lmap()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lmap()"> ryunosuke\Functions\Package\Arrays::array_lmap()</a></h4>
 	<div class="description"><p>要素値を $callback の最左に適用して array_map する</p>
 <p>Example:</p>
 <pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
 assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rmap()"> ryunosuke\Functions\Package\Arrays::array_rmap()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rmap()"> ryunosuke\Functions\Package\Arrays::array_rmap()</a></h4>
 	<div class="description"><p>要素値を $callback の最右に適用して array_map する</p>
 <p>Example:</p>
 <pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
 assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_each()"> ryunosuke\Functions\Package\Arrays::array_each()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_each()"> ryunosuke\Functions\Package\Arrays::array_each()</a></h4>
 	<div class="description"><p>array_reduce の参照版（のようなもの）</p>
 <p>配列をループで回し、その途中経過、値、キー、連番をコールバック引数で渡して最終的な結果を返り値として返す。<br />
 array_reduce と少し似てるが、下記の点が異なる。</p>
@@ -802,7 +802,7 @@ assertSame(
 );
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_depth()"> ryunosuke\Functions\Package\Arrays::array_depth()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_depth()"> ryunosuke\Functions\Package\Arrays::array_depth()</a></h4>
 	<div class="description"><p>配列の次元数を返す</p>
 <p>フラット配列は 1 と定義する。<br />
 つまり、配列を与える限りは 0 以下を返すことはない。</p>
@@ -814,7 +814,7 @@ assertSame(array_depth(['hoge']), 1);
 assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_insert()"> ryunosuke\Functions\Package\Arrays::array_insert()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_insert()"> ryunosuke\Functions\Package\Arrays::array_insert()</a></h4>
 	<div class="description"><p>配列・連想配列を問わず任意の位置に値を挿入する</p>
 <p>$position を省略すると最後に挿入される（≒ array_push）。<br />
 $position に負数を与えると後ろから数えられる。<br />
@@ -826,7 +826,7 @@ assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
 assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =&gt; 'A', 'b' =&gt; 'B', 2, 3]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_assort()"> ryunosuke\Functions\Package\Arrays::array_assort()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_assort()"> ryunosuke\Functions\Package\Arrays::array_assort()</a></h4>
 	<div class="description"><p>配列をコールバックに従って分類する</p>
 <p>コールバックは配列で複数与える。そのキーが結果配列のキーになるが、一切マッチしなくてもキー自体は作られる。<br />
 複数のコールバックにマッチしたらその分代入されるし、どれにもマッチしなければ代入されない。<br />
@@ -851,7 +851,7 @@ assertSame(array_assort(['1', '2', '3'], [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()"> ryunosuke\Functions\Package\Arrays::array_count()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()"> ryunosuke\Functions\Package\Arrays::array_count()</a></h4>
 	<div class="description"><p>配列をコールバックに従ってカウントする</p>
 <p>コールバックが true 相当を返した要素をカウントして返す。<br />
 普通に使う分には <code>count(array_filter($array, $callback))</code> とほとんど同じだが、下記の点が微妙に異なる。</p>
@@ -873,7 +873,7 @@ assertSame(array_count($array, [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_group()"> ryunosuke\Functions\Package\Arrays::array_group()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_group()"> ryunosuke\Functions\Package\Arrays::array_group()</a></h4>
 	<div class="description"><p>配列をコールバックの返り値でグループ化する</p>
 <p>コールバックを省略すると値そのもので評価する。<br />
 コールバックが配列を返すと入れ子としてグループ化する。</p>
@@ -900,7 +900,7 @@ assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_all()"> ryunosuke\Functions\Package\Arrays::array_all()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_all()"> ryunosuke\Functions\Package\Arrays::array_all()</a></h4>
 	<div class="description"><p>全要素が true になるなら true を返す（1つでも false なら false を返す）</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
@@ -909,7 +909,7 @@ assertFalse(array_all([true, false]));
 assertFalse(array_all([false, false]));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_any()"> ryunosuke\Functions\Package\Arrays::array_any()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_any()"> ryunosuke\Functions\Package\Arrays::array_any()</a></h4>
 	<div class="description"><p>全要素が false になるなら false を返す（1つでも true なら true を返す）</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
@@ -918,7 +918,7 @@ assertTrue(array_any([true, false]));
 assertFalse(array_any([false, false]));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_distinct()"> ryunosuke\Functions\Package\Arrays::array_distinct()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_distinct()"> ryunosuke\Functions\Package\Arrays::array_distinct()</a></h4>
 	<div class="description"><p>比較関数が渡せる array_unique</p>
 <p>array_unique は微妙に癖があるのでシンプルに使いやすくしたもの。</p>
 <ul>
@@ -953,7 +953,7 @@ assertSame(array_distinct([$v1, $v2, $v3, $v4], ['count' =&gt; []]), [$v1, $v2])
 assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$v1, $v2, 2 =&gt; $v3]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_order()"> ryunosuke\Functions\Package\Arrays::array_order()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_order()"> ryunosuke\Functions\Package\Arrays::array_order()</a></h4>
 	<div class="description"><p>配列を $orders に従って並べ替える</p>
 <p>データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' =&gt; 'value'])にも対応している。<br />
 その場合 $orders に配列ではなく直値を渡せば良い。</p>
@@ -974,13 +974,13 @@ $v3 = ['id' =&gt; '3', 'no' =&gt; 'a12', 'name' =&gt; 'xxx'];
 assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL]), [$v3, $v2, $v1]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shuffle()"> ryunosuke\Functions\Package\Arrays::array_shuffle()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shuffle()"> ryunosuke\Functions\Package\Arrays::array_shuffle()</a></h4>
 	<div class="description"><p>shuffle のキーが保存される＋参照渡しではない版</p>
 <p>Example:</p>
 <pre><code class="language-php">assertEquals(array_shuffle(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']), ['b' =&gt; 'B', 'a' =&gt; 'A', 'c' =&gt; 'C']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shrink_key()"> ryunosuke\Functions\Package\Arrays::array_shrink_key()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_shrink_key()"> ryunosuke\Functions\Package\Arrays::array_shrink_key()</a></h4>
 	<div class="description"><p>値の優先順位を逆にした array_intersect_key</p>
 <p>array_intersect_key は「左優先で共通項を取る」という動作だが、この関数は「右優先で共通項を取る」という動作になる。<br />
 「配列の並び順はそのままで値だけ変えたい/削ぎ落としたい」という状況はまれによくあるはず。</p>
@@ -992,7 +992,7 @@ $array3 = ['c' =&gt; 'C3', 'dummy' =&gt; 'DUMMY'];
 assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_fill_callback()"> ryunosuke\Functions\Package\Arrays::array_fill_callback()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_fill_callback()"> ryunosuke\Functions\Package\Arrays::array_fill_callback()</a></h4>
 	<div class="description"><p>array_fill_keys のコールバック版のようなもの</p>
 <p>指定したキー配列をそれらのマップしたもので配列を生成する。<br />
 <code>array_combine($keys, array_map($callback, $keys))</code> とほぼ等価。</p>
@@ -1012,7 +1012,7 @@ assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v));
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pickup()"> ryunosuke\Functions\Package\Arrays::array_pickup()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_pickup()"> ryunosuke\Functions\Package\Arrays::array_pickup()</a></h4>
 	<div class="description"><p>キーを指定してそれだけの配列にする</p>
 <p><code>array_intersect_key($array, array_flip($keys))</code> とほぼ同義。<br />
 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。</p>
@@ -1027,7 +1027,7 @@ assertSame(array_pickup($array, ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
 assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; 'C', 'aX' =&gt; 'A']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_remove()"> ryunosuke\Functions\Package\Arrays::array_remove()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_remove()"> ryunosuke\Functions\Package\Arrays::array_remove()</a></h4>
 	<div class="description"><p>キーを指定してそれらを除いた配列にする</p>
 <p><code>array_diff_key($array, array_flip($keys))</code> とほぼ同義。<br />
 違いは Traversable を渡せること。</p>
@@ -1038,7 +1038,7 @@ assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; '
 assertSame(array_remove($array, ['a', 'c']), ['b' =&gt; 'B']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()"> ryunosuke\Functions\Package\Arrays::array_lookup()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_lookup()"> ryunosuke\Functions\Package\Arrays::array_lookup()</a></h4>
 	<div class="description"><p>キー保存可能な array_column</p>
 <p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。</p>
 <p>Example:</p>
@@ -1058,7 +1058,7 @@ assertSame(array_lookup($array, 'name'), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_columns()"> ryunosuke\Functions\Package\Arrays::array_columns()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_columns()"> ryunosuke\Functions\Package\Arrays::array_columns()</a></h4>
 	<div class="description"><p>全要素に対して array_column する</p>
 <p>行列が逆転するイメージ。</p>
 <p>Example:</p>
@@ -1070,7 +1070,7 @@ assertSame(array_columns($rows, 'id'), ['id' =&gt; [1, 2]]);
 assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&gt; 'B']]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_uncolumns()"> ryunosuke\Functions\Package\Arrays::array_uncolumns()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_uncolumns()"> ryunosuke\Functions\Package\Arrays::array_uncolumns()</a></h4>
 	<div class="description"><p>array_columns のほぼ逆で [キー =&gt; [要素]] 配列から連想配列の配列を生成する</p>
 <p>$template を指定すると「それに含まれる配列かつ値がデフォルト」になる（要するに $default みたいなもの）。<br />
 キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。</p>
@@ -1084,7 +1084,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_convert()"> ryunosuke\Functions\Package\Arrays::array_convert()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_convert()"> ryunosuke\Functions\Package\Arrays::array_convert()</a></h4>
 	<div class="description"><p>配列の各要素に再帰的にコールバックを適用して変換する</p>
 <p>$callback は下記の仕様。</p>
 <p>引数は (キー, 値, 今まで処理したキー配列) で渡ってくる。<br />
@@ -1130,7 +1130,7 @@ assertSame(array_convert($array, $callback, true), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_flatten()"> ryunosuke\Functions\Package\Arrays::array_flatten()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_flatten()"> ryunosuke\Functions\Package\Arrays::array_flatten()</a></h4>
 	<div class="description"><p>多階層配列をフラットに展開する</p>
 <p>巷にあふれている実装と違って、 ["$pkey.$ckey" =&gt; $value] 形式の配列でも返せる。<br />
 $delimiter で区切り文字を指定した場合にそのようになる。<br />
@@ -1169,7 +1169,7 @@ assertSame(array_flatten($array, '.'), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nest()"> ryunosuke\Functions\Package\Arrays::array_nest()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_nest()"> ryunosuke\Functions\Package\Arrays::array_nest()</a></h4>
 	<div class="description"><p>シンプルな [キー =&gt; 値] な配列から階層配列を生成する</p>
 <p>定義的に array_flatten の逆関数のような扱いになる。<br />
 $delimiter で階層を表現する。</p>
@@ -1217,7 +1217,7 @@ catch (\Exception $e) {
 }
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_difference()"> ryunosuke\Functions\Package\Arrays::array_difference()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_difference()"> ryunosuke\Functions\Package\Arrays::array_difference()</a></h4>
 	<div class="description"><p>配列の差分を取り配列で返す</p>
 <p>返り値の配列は構造化されたデータではない。<br />
 主に文字列化して出力することを想定している。</p>
@@ -1251,10 +1251,10 @@ assertSame(array_difference([
 ]);
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj"> ryunosuke\Functions\Package\Classobj</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj"> ryunosuke\Functions\Package\Classobj</a></h4>
 	<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()"> ryunosuke\Functions\Package\Classobj::stdclass()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()"> ryunosuke\Functions\Package\Classobj::stdclass()</a></h4>
 	<div class="description"><p>初期フィールド値を与えて stdClass を生成する</p>
 <p>手元にある配列でサクッと stdClass を作りたいことがまれによくあるはず。</p>
 <p>object キャストでもいいんだが、 Iterator/Traversable とかも stdClass 化したいかもしれない。<br />
@@ -1268,33 +1268,33 @@ assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コール
 assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::detect_namespace()"> ryunosuke\Functions\Package\Classobj::detect_namespace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::detect_namespace()"> ryunosuke\Functions\Package\Classobj::detect_namespace()</a></h4>
 	<div class="description"><p>ディレクトリ構造から名前空間を推測して返す</p>
 <p>指定パスに名前空間を持つような php ファイルが有るならその名前空間を返す。<br />
 指定パスに名前空間を持つような php ファイルが無いなら親をたどる。<br />
 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。</p>
 <p>言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()"> ryunosuke\Functions\Package\Classobj::class_loader()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()"> ryunosuke\Functions\Package\Classobj::class_loader()</a></h4>
 	<div class="description"><p>composer のクラスローダを返す</p>
 <p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_namespace()"> ryunosuke\Functions\Package\Classobj::class_namespace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_namespace()"> ryunosuke\Functions\Package\Classobj::class_namespace()</a></h4>
 	<div class="description"><p>クラスの名前空間部分を取得する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_shorten()"> ryunosuke\Functions\Package\Classobj::class_shorten()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_shorten()"> ryunosuke\Functions\Package\Classobj::class_shorten()</a></h4>
 	<div class="description"><p>クラスの名前空間部分を除いた短い名前を取得する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_replace()"> ryunosuke\Functions\Package\Classobj::class_replace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_replace()"> ryunosuke\Functions\Package\Classobj::class_replace()</a></h4>
 	<div class="description"><p>既存（未読み込みに限る）クラスを強制的に置換する</p>
 <p>例えば継承ツリーが下記の場合を考える。</p>
 <p>classA &lt;- classB &lt;- classC</p>
@@ -1338,7 +1338,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_extends()"> ryunosuke\Functions\Package\Classobj::class_extends()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_extends()"> ryunosuke\Functions\Package\Classobj::class_extends()</a></h4>
 	<div class="description"><p>インスタンスを動的に拡張する</p>
 <p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
 ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。<br />
@@ -1360,7 +1360,7 @@ $newobject = class_extends($object, [
 assertSame($newobject-&gt;codemessage(), '123:hoge');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::const_exists()"> ryunosuke\Functions\Package\Classobj::const_exists()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::const_exists()"> ryunosuke\Functions\Package\Classobj::const_exists()</a></h4>
 	<div class="description"><p>クラス定数が存在するか調べる</p>
 <p>グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。</p>
 <ul>
@@ -1379,7 +1379,7 @@ assertTrue(const_exists('PHP_VERSION'));
 assertFalse(const_exists('UNDEFINED'));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::object_dive()"> ryunosuke\Functions\Package\Classobj::object_dive()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::object_dive()"> ryunosuke\Functions\Package\Classobj::object_dive()</a></h4>
 	<div class="description"><p>パス形式でプロパティ値を取得</p>
 <p>存在しない場合は $default を返す。</p>
 <p>Example:</p>
@@ -1396,7 +1396,7 @@ assertSame(object_dive($class, 'a.b.x', 9), 9);
 assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::get_object_properties()"> ryunosuke\Functions\Package\Classobj::get_object_properties()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::get_object_properties()"> ryunosuke\Functions\Package\Classobj::get_object_properties()</a></h4>
 	<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
 <p>get_object_vars + no public プロパティを返すイメージ。</p>
 <p>Example:</p>
@@ -1417,13 +1417,13 @@ assertArraySubset([
 ], get_object_properties($object));
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date"> ryunosuke\Functions\Package\Date</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date"> ryunosuke\Functions\Package\Date</a></h4>
 	<div class="description"><p>日付・時刻関連のユーティリティ</p>
 </div>
-        	<h2>classconstant<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::JP_ERA"> ryunosuke\Functions\Package\Date::JP_ERA</a></h2>
+        	<h4 class="fqsen-title">classconstant<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::JP_ERA"> ryunosuke\Functions\Package\Date::JP_ERA</a></h4>
 	<div class="description"><p>和暦</p>
 </div>
-            	<h2>method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_timestamp()"> ryunosuke\Functions\Package\Date::date_timestamp()</a></h2>
+            	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_timestamp()"> ryunosuke\Functions\Package\Date::date_timestamp()</a></h4>
 	<div class="description"><p>日時文字列をよしなにタイムスタンプに変換する</p>
 <p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
 また、相対指定の +1 month の月末問題は起きないようにしてある。</p>
@@ -1440,7 +1440,7 @@ assertSame(date_timestamp('2012/03/31 -1 month'), strtotime('2012/02/29'));
 assertSame(date_timestamp('2014/12/24 12:34:56.789'), 1419392096.789);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_convert()"> ryunosuke\Functions\Package\Date::date_convert()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_convert()"> ryunosuke\Functions\Package\Date::date_convert()</a></h4>
 	<div class="description"><p>日時文字列をよしなに別のフォーマットに変換する</p>
 <p>マイクロ秒にも対応している。<br />
 かなり適当に和暦にも対応している。</p>
@@ -1452,7 +1452,7 @@ $now = 1234567890.123; // テストがしづらいので固定時刻にする
 assertSame(date_convert('Y/m/d H:i:s.u', $now), '2009/02/14 08:31:30.123000');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_interval()"> ryunosuke\Functions\Package\Date::date_interval()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_interval()"> ryunosuke\Functions\Package\Date::date_interval()</a></h4>
 	<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
 <p>例えば <code>60 * 60 * 24 * 900 + 12345.678</code> （約900日12345秒）は・・・</p>
 <ul>
@@ -1502,10 +1502,10 @@ assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
 assertInstanceOf(\DateInterval::class, date_interval(123.456));
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem"> ryunosuke\Functions\Package\FileSystem</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem"> ryunosuke\Functions\Package\FileSystem</a></h4>
 	<div class="description"><p>ファイルシステム関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_list()"> ryunosuke\Functions\Package\FileSystem::file_list()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_list()"> ryunosuke\Functions\Package\FileSystem::file_list()</a></h4>
 	<div class="description"><p>ファイル一覧を配列で返す</p>
 <p>Example:</p>
 <pre><code class="language-php">// 適当にファイルを用意
@@ -1523,7 +1523,7 @@ assertEquals(file_list($tmp), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_tree()"> ryunosuke\Functions\Package\FileSystem::file_tree()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_tree()"> ryunosuke\Functions\Package\FileSystem::file_tree()</a></h4>
 	<div class="description"><p>ディレクトリ階層をツリー構造で返す</p>
 <p>Example:</p>
 <pre><code class="language-php">// 適当にファイルを用意
@@ -1547,7 +1547,7 @@ assertEquals(file_tree($tmp), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_suffix()"> ryunosuke\Functions\Package\FileSystem::file_suffix()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_suffix()"> ryunosuke\Functions\Package\FileSystem::file_suffix()</a></h4>
 	<div class="description"><p>ファイル名にサフィックスを付与する</p>
 <p>pathinfoに非準拠。例えば「filename.hoge.fuga」のような形式は「filename」が変換対象になる。</p>
 <p>Example:</p>
@@ -1555,7 +1555,7 @@ assertEquals(file_tree($tmp), [
 assertSame(file_suffix('filename.ext1.ext2', '-min'), 'filename-min.ext1.ext2');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_extension()"> ryunosuke\Functions\Package\FileSystem::file_extension()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_extension()"> ryunosuke\Functions\Package\FileSystem::file_extension()</a></h4>
 	<div class="description"><p>ファイルの拡張子を変更する。引数を省略すると拡張子を返す</p>
 <p>pathinfo に準拠。例えば「filename.hoge.fuga」のような形式は「fuga」が変換対象になる。</p>
 <p>Example:</p>
@@ -1564,14 +1564,14 @@ assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
 assertSame(file_extension('filename.ext', ''), 'filename');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_set_contents()"> ryunosuke\Functions\Package\FileSystem::file_set_contents()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_set_contents()"> ryunosuke\Functions\Package\FileSystem::file_set_contents()</a></h4>
 	<div class="description"><p>ディレクトリも掘る file_put_contents</p>
 <p>Example:</p>
 <pre><code class="language-php">file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
 assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_rewrite_contents()"> ryunosuke\Functions\Package\FileSystem::file_rewrite_contents()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_rewrite_contents()"> ryunosuke\Functions\Package\FileSystem::file_rewrite_contents()</a></h4>
 	<div class="description"><p>ファイルを読み込んで内容をコールバックに渡して書き込む</p>
 <p>Example:</p>
 <pre><code class="language-php">// 適当にファイルを用意
@@ -1582,11 +1582,11 @@ file_rewrite_contents($testpath, function($contents, $fp){ return "pre-$contents
 assertStringEqualsFile($testpath, 'pre-hoge-fix');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::mkdir_p()"> ryunosuke\Functions\Package\FileSystem::mkdir_p()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::mkdir_p()"> ryunosuke\Functions\Package\FileSystem::mkdir_p()</a></h4>
 	<div class="description"><p>ディレクトリを再帰的に掘る</p>
 <p>既に存在する場合は何もしない（エラーも出さない）。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::dirname_r()"> ryunosuke\Functions\Package\FileSystem::dirname_r()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::dirname_r()"> ryunosuke\Functions\Package\FileSystem::dirname_r()</a></h4>
 	<div class="description"><p>コールバックが true 相当を返すまで親ディレクトリを辿り続ける</p>
 <p>コールバックには親ディレクトリが引数として渡ってくる。</p>
 <p>Example:</p>
@@ -1598,7 +1598,7 @@ $callback = function($path){return realpath("$path/file.txt");};
 assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_and()"> ryunosuke\Functions\Package\FileSystem::fnmatch_and()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_and()"> ryunosuke\Functions\Package\FileSystem::fnmatch_and()</a></h4>
 	<div class="description"><p>fnmatch の AND 版</p>
 <p>$patterns のうちどれか一つでもマッチしなかったら false を返す。<br />
 $patterns が空だと例外を投げる。</p>
@@ -1609,7 +1609,7 @@ assertTrue(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'));
 assertFalse(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_or()"> ryunosuke\Functions\Package\FileSystem::fnmatch_or()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_or()"> ryunosuke\Functions\Package\FileSystem::fnmatch_or()</a></h4>
 	<div class="description"><p>fnmatch の OR 版</p>
 <p>$patterns のうちどれか一つでもマッチしたら true を返す。<br />
 $patterns が空だと例外を投げる。</p>
@@ -1620,7 +1620,7 @@ assertTrue(fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'));
 assertFalse(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_is_absolute()"> ryunosuke\Functions\Package\FileSystem::path_is_absolute()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_is_absolute()"> ryunosuke\Functions\Package\FileSystem::path_is_absolute()</a></h4>
 	<div class="description"><p>パスが絶対パスか判定する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(path_is_absolute('/absolute/path'));
@@ -1632,7 +1632,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 }
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_resolve()"> ryunosuke\Functions\Package\FileSystem::path_resolve()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_resolve()"> ryunosuke\Functions\Package\FileSystem::path_resolve()</a></h4>
 	<div class="description"><p>パスを絶対パスに変換して正規化する</p>
 <p>可変引数で与えられた文字列群を結合して絶対パス化して返す。<br />
 出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。</p>
@@ -1643,7 +1643,7 @@ assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
 assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_normalize()"> ryunosuke\Functions\Package\FileSystem::path_normalize()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_normalize()"> ryunosuke\Functions\Package\FileSystem::path_normalize()</a></h4>
 	<div class="description"><p>パスを正規化する</p>
 <p>具体的には ./ や ../ を取り除いたり連続したディレクトリ区切りをまとめたりする。<br />
 realpath ではない。のでシンボリックリンクの解決などはしない。その代わりファイルが存在しなくても使用することができる。</p>
@@ -1654,7 +1654,7 @@ assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}somethin
 assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::cp_rf()"> ryunosuke\Functions\Package\FileSystem::cp_rf()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::cp_rf()"> ryunosuke\Functions\Package\FileSystem::cp_rf()</a></h4>
 	<div class="description"><p>ディレクトリのコピー</p>
 <p>$dst に / を付けると「$dst に自身をコピー」する。付けないと「$dst に中身をコピー」するという動作になる。</p>
 <p>ディレクトリではなくファイルを与えても動作する（copy とほぼ同じ動作になるが、対象にディレクトリを指定できる点が異なる）。</p>
@@ -1681,7 +1681,7 @@ cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
 assertStringEqualsFile("$tmp/dst4", 'hoge');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::rm_rf()"> ryunosuke\Functions\Package\FileSystem::rm_rf()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::rm_rf()"> ryunosuke\Functions\Package\FileSystem::rm_rf()</a></h4>
 	<div class="description"><p>中身があっても消せる rmdir</p>
 <p>Example:</p>
 <pre><code class="language-php">mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
@@ -1689,7 +1689,7 @@ rm_rf(sys_get_temp_dir() . '/new');
 assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::tmpname()"> ryunosuke\Functions\Package\FileSystem::tmpname()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::tmpname()"> ryunosuke\Functions\Package\FileSystem::tmpname()</a></h4>
 	<div class="description"><p>終了時に削除される一時ファイル名を生成する</p>
 <p>tempnam とほぼ同じで違いは下記。</p>
 <ul>
@@ -1698,7 +1698,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
 <li>失敗時に false を返すのではなく例外を投げる</li>
 </ul>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::memory_path()"> ryunosuke\Functions\Package\FileSystem::memory_path()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::memory_path()"> ryunosuke\Functions\Package\FileSystem::memory_path()</a></h4>
 	<div class="description"><p>ファイルのように扱えるメモリ上のパスを返す</p>
 <p>劣化 vfsStream のようなもの。<br />
 stream wrapper を用いて実装しており、そのプロトコルは初回呼び出し時に1度だけ登録される。<br />
@@ -1721,35 +1721,35 @@ assertSame(unlink($memory_path), true);
 assertSame(file_exists($memory_path), false);
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand"> ryunosuke\Functions\Package\Funchand</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand"> ryunosuke\Functions\Package\Funchand</a></h4>
 	<div class="description"><p>callable 関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::delegate()"> ryunosuke\Functions\Package\Funchand::delegate()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::delegate()"> ryunosuke\Functions\Package\Funchand::delegate()</a></h4>
 	<div class="description"><p>指定 callable を指定クロージャで実行するクロージャを返す</p>
 <p>ほぼ内部向けで外から呼ぶことはあまり想定していない。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::nbind()"> ryunosuke\Functions\Package\Funchand::nbind()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::nbind()"> ryunosuke\Functions\Package\Funchand::nbind()</a></h4>
 	<div class="description"><p>$callable の指定位置に引数を束縛したクロージャを返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = nbind('sprintf', 2, 'X');
 assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::lbind()"> ryunosuke\Functions\Package\Funchand::lbind()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::lbind()"> ryunosuke\Functions\Package\Funchand::lbind()</a></h4>
 	<div class="description"><p>$callable の最左に引数を束縛した callable を返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = lbind('sprintf', '%s%s');
 assertSame($bind('N', 'M'), 'NM');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::rbind()"> ryunosuke\Functions\Package\Funchand::rbind()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::rbind()"> ryunosuke\Functions\Package\Funchand::rbind()</a></h4>
 	<div class="description"><p>$callable の最右に引数を束縛した callable を返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = rbind('sprintf', 'X');
 assertSame($bind('%s%s', 'N'), 'NX');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::composite()"> ryunosuke\Functions\Package\Funchand::composite()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::composite()"> ryunosuke\Functions\Package\Funchand::composite()</a></h4>
 	<div class="description"><p>合成関数を返す</p>
 <p>基本的には callable を可変引数で呼び出せばそれらの合成関数を返す。<br />
 ただし $arrayalbe=true のときは若干挙動が異なり、連鎖のときに「前の返り値を<strong>配列として</strong>次の引数へ渡す」動作になる。<br />
@@ -1779,7 +1779,7 @@ $composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成し
 assertSame($composite('hoge'), 'EGOHegoh-erp');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::return_arg()"> ryunosuke\Functions\Package\Funchand::return_arg()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::return_arg()"> ryunosuke\Functions\Package\Funchand::return_arg()</a></h4>
 	<div class="description"><p>$n 番目の引数（0 ベース）をそのまま返すクロージャを返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$arg0 = return_arg(0);
@@ -1788,7 +1788,7 @@ $arg1 = return_arg(1);
 assertSame($arg1('dummy', 'hoge'), 'hoge');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ope_func()"> ryunosuke\Functions\Package\Funchand::ope_func()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ope_func()"> ryunosuke\Functions\Package\Funchand::ope_func()</a></h4>
 	<div class="description"><p>演算子のクロージャを返す</p>
 <p>関数ベースなので <code>??</code> のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。</p>
 <p>Example:</p>
@@ -1804,7 +1804,7 @@ assertSame('OK' ?: 'NG', $cond('OK', 'NG'));               // 引数2つで呼�
 assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼ぶと3項演算子
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::not_func()"> ryunosuke\Functions\Package\Funchand::not_func()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::not_func()"> ryunosuke\Functions\Package\Funchand::not_func()</a></h4>
 	<div class="description"><p>返り値の真偽値を逆転した新しいクロージャを返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$not_strlen = not_func('strlen');
@@ -1812,7 +1812,7 @@ assertFalse($not_strlen('hoge'));
 assertTrue($not_strlen(''));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::eval_func()"> ryunosuke\Functions\Package\Funchand::eval_func()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::eval_func()"> ryunosuke\Functions\Package\Funchand::eval_func()</a></h4>
 	<div class="description"><p>指定コードで eval するクロージャを返す</p>
 <p>create_function のクロージャ版みたいなもの。<br />
 参照渡しは未対応。</p>
@@ -1821,14 +1821,14 @@ assertTrue($not_strlen(''));
 assertSame($evalfunc(1, 2, 3), 6);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::reflect_callable()"> ryunosuke\Functions\Package\Funchand::reflect_callable()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::reflect_callable()"> ryunosuke\Functions\Package\Funchand::reflect_callable()</a></h4>
 	<div class="description"><p>callable から ReflectionFunctionAbstract を生成する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
 assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::closurize()"> ryunosuke\Functions\Package\Funchand::closurize()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::closurize()"> ryunosuke\Functions\Package\Funchand::closurize()</a></h4>
 	<div class="description"><p>callable を Closure に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">$sprintf = closurize('sprintf');
@@ -1836,7 +1836,7 @@ assertInstanceof(\Closure::class, $sprintf);
 assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::callable_code()"> ryunosuke\Functions\Package\Funchand::callable_code()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::callable_code()"> ryunosuke\Functions\Package\Funchand::callable_code()</a></h4>
 	<div class="description"><p>callable のコードブロックを返す</p>
 <p>返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。</p>
 <p>Example:</p>
@@ -1845,7 +1845,7 @@ assertSame($meta, 'function(...$args)');
 assertSame($body, '{return true;}');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::call_safely()"> ryunosuke\Functions\Package\Funchand::call_safely()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::call_safely()"> ryunosuke\Functions\Package\Funchand::call_safely()</a></h4>
 	<div class="description"><p>エラーを例外に変換するブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">try {
@@ -1856,7 +1856,7 @@ catch (\Exception $ex) {
 }
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ob_capture()"> ryunosuke\Functions\Package\Funchand::ob_capture()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ob_capture()"> ryunosuke\Functions\Package\Funchand::ob_capture()</a></h4>
 	<div class="description"><p>ob_start ～ ob_get_clean のブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">// コールバック内のテキストが得られる
@@ -1870,14 +1870,14 @@ bare string2
 }), "bare string1\nbare string2\n");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::is_bindable_closure()"> ryunosuke\Functions\Package\Funchand::is_bindable_closure()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::is_bindable_closure()"> ryunosuke\Functions\Package\Funchand::is_bindable_closure()</a></h4>
 	<div class="description"><p>$this を bind 可能なクロージャか調べる</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(is_bindable_closure(function(){}));
 assertFalse(is_bindable_closure(static function(){}));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::by_builtin()"> ryunosuke\Functions\Package\Funchand::by_builtin()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::by_builtin()"> ryunosuke\Functions\Package\Funchand::by_builtin()</a></h4>
 	<div class="description"><p>Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す</p>
 <p>Countable#count, Serializable#serialize のように「インターフェースのメソッド名」と「ネイティブ関数名」が一致している必要がある。</p>
 <p>Example:</p>
@@ -1894,7 +1894,7 @@ assertSame($counter-&gt;count(), 0);
 </code></pre>
 <p>のように判定できる。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::namedcallize()"> ryunosuke\Functions\Package\Funchand::namedcallize()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::namedcallize()"> ryunosuke\Functions\Package\Funchand::namedcallize()</a></h4>
 	<div class="description"><p>callable を名前付き引数で呼べるようにしたクロージャを返す</p>
 <p>callable のデフォルト引数は適用されるが、それ以外にも $default でデフォルト値を与えることができる（部分適用のようなものだと思えば良い）。<br />
 最終的な優先順位は下記。上に行くほど優先。</p>
@@ -1963,7 +1963,7 @@ assertSame($f2(['other' =&gt; [4, 5, 6]]), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::parameter_length()"> ryunosuke\Functions\Package\Funchand::parameter_length()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::parameter_length()"> ryunosuke\Functions\Package\Funchand::parameter_length()</a></h4>
 	<div class="description"><p>callable の引数の数を返す</p>
 <p>クロージャはキャッシュされない。毎回リフレクションを生成し、引数の数を調べてそれを返す。<br />
 （クロージャには一意性がないので key-value なキャッシュが適用できない）。<br />
@@ -1975,10 +1975,10 @@ assertSame(parameter_length('trim'), 2);
 assertSame(parameter_length('trim', true), 1);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_shorten()"> ryunosuke\Functions\Package\Funchand::function_shorten()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_shorten()"> ryunosuke\Functions\Package\Funchand::function_shorten()</a></h4>
 	<div class="description"><p>関数の名前空間部分を除いた短い名前を取得する</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_user_func_array()"> ryunosuke\Functions\Package\Funchand::func_user_func_array()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_user_func_array()"> ryunosuke\Functions\Package\Funchand::func_user_func_array()</a></h4>
 	<div class="description"><p>パラメータ定義数に応じて呼び出し引数を可変にしてコールする</p>
 <p>デフォルト引数はカウントされない。必須パラメータの数で呼び出す。<br />
 もちろん可変引数は未対応。</p>
@@ -1990,7 +1990,7 @@ $strlen = func_user_func_array('strlen');
 assertSame($strlen('abc', null), 3);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_new()"> ryunosuke\Functions\Package\Funchand::func_new()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_new()"> ryunosuke\Functions\Package\Funchand::func_new()</a></h4>
 	<div class="description"><p>指定クラスのコンストラクタを呼び出すクロージャを返す</p>
 <p>この関数を呼ぶとコンストラクタのクロージャを返す。</p>
 <p>オプションでデフォルト引数を設定できる（Example を参照）。</p>
@@ -2003,7 +2003,7 @@ assertSame($newException()-&gt;getMessage(), 'hoge');
 assertSame($newException('fuga')-&gt;getMessage(), 'fuga');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_method()"> ryunosuke\Functions\Package\Funchand::func_method()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_method()"> ryunosuke\Functions\Package\Funchand::func_method()</a></h4>
 	<div class="description"><p>指定メソッドを呼び出すクロージャを返す</p>
 <p>この関数を呼ぶとメソッドのクロージャを返す。<br />
 そのクロージャにオブジェクトを与えて呼び出すとそれはメソッド呼び出しとなる。</p>
@@ -2029,7 +2029,7 @@ assertSame($hoge789($object, 1, 2), '1,2,9');
 assertSame($hoge789($object), '7,8,9');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_alias()"> ryunosuke\Functions\Package\Funchand::function_alias()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_alias()"> ryunosuke\Functions\Package\Funchand::function_alias()</a></h4>
 	<div class="description"><p>関数のエイリアスを作成する</p>
 <p>単に移譲するだけではなく、参照渡し・参照返しも模倣される。<br />
 その代わり、単純なエイリアスではなく別定義で吐き出すので「エイリアス」ではなく「処理が同じな別関数」と思ったほうがよい。</p>
@@ -2040,14 +2040,14 @@ function_alias('trim', 'trim_alias');
 assertSame(trim_alias(' abc '), 'abc');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_parameter()"> ryunosuke\Functions\Package\Funchand::function_parameter()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_parameter()"> ryunosuke\Functions\Package\Funchand::function_parameter()</a></h4>
 	<div class="description"><p>関数/メソッドの引数定義を取得する</p>
 <p>ほぼ内部向けで外から呼ぶことはあまり想定していない。</p>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math"> ryunosuke\Functions\Package\Math</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math"> ryunosuke\Functions\Package\Math</a></h4>
 	<div class="description"><p>数学関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::minimum()"> ryunosuke\Functions\Package\Math::minimum()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::minimum()"> ryunosuke\Functions\Package\Math::minimum()</a></h4>
 	<div class="description"><p>引数の最小値を返す</p>
 <ul>
 <li>配列は個数ではなくフラット展開した要素を対象にする</li>
@@ -2057,7 +2057,7 @@ assertSame(trim_alias(' abc '), 'abc');
 <pre><code class="language-php">assertSame(minimum(-1, 0, 1), -1);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::maximum()"> ryunosuke\Functions\Package\Math::maximum()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::maximum()"> ryunosuke\Functions\Package\Math::maximum()</a></h4>
 	<div class="description"><p>引数の最大値を返す</p>
 <ul>
 <li>配列は個数ではなくフラット展開した要素を対象にする</li>
@@ -2067,7 +2067,7 @@ assertSame(trim_alias(' abc '), 'abc');
 <pre><code class="language-php">assertSame(maximum(-1, 0, 1), 1);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mode()"> ryunosuke\Functions\Package\Math::mode()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mode()"> ryunosuke\Functions\Package\Math::mode()</a></h4>
 	<div class="description"><p>引数の最頻値を返す</p>
 <ul>
 <li>等価比較は文字列で行う。小数時は注意。おそらく php.ini の precision に従うはず</li>
@@ -2079,7 +2079,7 @@ assertSame(trim_alias(' abc '), 'abc');
 <pre><code class="language-php">assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mean()"> ryunosuke\Functions\Package\Math::mean()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::mean()"> ryunosuke\Functions\Package\Math::mean()</a></h4>
 	<div class="description"><p>引数の相加平均値を返す</p>
 <ul>
 <li>is_numeric でない値は除外される（計算結果に影響しない）</li>
@@ -2091,7 +2091,7 @@ assertSame(trim_alias(' abc '), 'abc');
 assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::median()"> ryunosuke\Functions\Package\Math::median()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::median()"> ryunosuke\Functions\Package\Math::median()</a></h4>
 	<div class="description"><p>引数の中央値を返す</p>
 <ul>
 <li>要素数が奇数の場合は完全な中央値/偶数の場合は中2つの平均。「平均」という概念が存在しない値なら中2つの後の値</li>
@@ -2107,7 +2107,7 @@ assertSame(median(1, 2, 3, 4, 5), 3);
 assertSame(median('a', 'b', 'c', 'd'), 'c');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::average()"> ryunosuke\Functions\Package\Math::average()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::average()"> ryunosuke\Functions\Package\Math::average()</a></h4>
 	<div class="description"><p>引数の意味平均値を返す</p>
 <ul>
 <li>3座標の重心座標とか日付の平均とかそういうもの</li>
@@ -2115,7 +2115,7 @@ assertSame(median('a', 'b', 'c', 'd'), 'c');
 <li>候補がない場合はエラーではなく例外を投げる</li>
 </ul>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::sum()"> ryunosuke\Functions\Package\Math::sum()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::sum()"> ryunosuke\Functions\Package\Math::sum()</a></h4>
 	<div class="description"><p>引数の合計値を返す</p>
 <ul>
 <li>is_numeric でない値は除外される（計算結果に影響しない）</li>
@@ -2126,7 +2126,7 @@ assertSame(median('a', 'b', 'c', 'd'), 'c');
 <pre><code class="language-php">assertSame(sum(1, 2, 3, 4, 5, 6), 21);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::random_at()"> ryunosuke\Functions\Package\Math::random_at()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::random_at()"> ryunosuke\Functions\Package\Math::random_at()</a></h4>
 	<div class="description"><p>引数をランダムで返す</p>
 <ul>
 <li>候補がない場合はエラーではなく例外を投げる</li>
@@ -2136,7 +2136,7 @@ assertSame(median('a', 'b', 'c', 'd'), 'c');
 assertContains(random_at(1, 2, 3, 4, 5, 6), [1, 2, 3, 4, 5, 6]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::probability()"> ryunosuke\Functions\Package\Math::probability()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::probability()"> ryunosuke\Functions\Package\Math::probability()</a></h4>
 	<div class="description"><p>一定確率で true を返す</p>
 <p>具体的には $probability / $divisor の確率で true を返す。<br />
 $divisor のデフォルトは 100 にしてあるので、 $probability だけ与えれば $probability パーセントで true を返すことになる。</p>
@@ -2147,10 +2147,10 @@ if (probability(50)) {
 }
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network"> ryunosuke\Functions\Package\Network</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network"> ryunosuke\Functions\Package\Network</a></h4>
 	<div class="description"><p>ネットワーク関連のユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::getipaddress()"> ryunosuke\Functions\Package\Network::getipaddress()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::getipaddress()"> ryunosuke\Functions\Package\Network::getipaddress()</a></h4>
 	<div class="description"><p>接続元となる IP を返す</p>
 <p>要するに自分の IP を返す。</p>
 <p>Example:</p>
@@ -2160,7 +2160,7 @@ assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', getipaddress());
 assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::incidr()"> ryunosuke\Functions\Package\Network::incidr()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::incidr()"> ryunosuke\Functions\Package\Network::incidr()</a></h4>
 	<div class="description"><p>ipv4 の cidr チェック</p>
 <p>$ipaddr が $cidr のレンジ内なら true を返す。<br />
 $cidr は複数与えることができ、どれかに合致したら true を返す。</p>
@@ -2176,7 +2176,7 @@ assertTrue(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']));
 assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::ping()"> ryunosuke\Functions\Package\Network::ping()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::ping()"> ryunosuke\Functions\Package\Network::ping()</a></h4>
 	<div class="description"><p>ネットワーク疎通を返す</p>
 <p>$port を指定すると TCP/UDP、省略（null）すると ICMP で繋ぐ。<br />
 が、 ICMP は root ユーザしか実行できないので ping コマンドにフォールバックする。<br />
@@ -2190,7 +2190,7 @@ assertFalse(ping('tcp://127.0.0.1', 1234));
 assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()"> ryunosuke\Functions\Package\Network::http_requests()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()"> ryunosuke\Functions\Package\Network::http_requests()</a></h4>
 	<div class="description"><p>http リクエストを並列で投げる</p>
 <p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
 $urls の要素は単一の文字列か curl のオプションである必要がある。</p>
@@ -2227,13 +2227,13 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 ];
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql"> ryunosuke\Functions\Package\Sql</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql"> ryunosuke\Functions\Package\Sql</a></h4>
 	<div class="description"><p>Sql 関連のユーティリティ</p>
 </div>
-        	<h2>classconstant<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::KEYWORDS"> ryunosuke\Functions\Package\Sql::KEYWORDS</a></h2>
+        	<h4 class="fqsen-title">classconstant<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::KEYWORDS"> ryunosuke\Functions\Package\Sql::KEYWORDS</a></h4>
 	<div class="description"><p>SQL キーワード（全 RDBMS ごちゃまぜ）</p>
 </div>
-            	<h2>method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_quote()"> ryunosuke\Functions\Package\Sql::sql_quote()</a></h2>
+            	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_quote()"> ryunosuke\Functions\Package\Sql::sql_quote()</a></h4>
 	<div class="description"><p>ものすごく雑に値をクオートする</p>
 <p>非常に荒くアドホックに実装しているのでこの関数で得られた値で<strong>実際に実行してはならない</strong>。<br />
 あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
@@ -2250,7 +2250,7 @@ assertSame(sql_quote(true), 1);
 assertSame(sql_quote("hoge"), "'hoge'");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_bind()"> ryunosuke\Functions\Package\Sql::sql_bind()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_bind()"> ryunosuke\Functions\Package\Sql::sql_bind()</a></h4>
 	<div class="description"><p>ものすごく雑に SQL に値を埋め込む</p>
 <p>非常に荒くアドホックに実装しているのでこの関数で得られた SQL を<strong>実際に実行してはならない</strong>。<br />
 あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
@@ -2261,26 +2261,26 @@ assertSame(sql_bind('select :hoge', ['hoge' =&gt; 'hoge']), "select 'hoge'");
 assertSame(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']), "select 1, 'hoge'");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_format()"> ryunosuke\Functions\Package\Sql::sql_format()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::sql_format()"> ryunosuke\Functions\Package\Sql::sql_format()</a></h4>
 	<div class="description"><p>ものすごく雑に SQL を整形する</p>
 <p>非常に荒くアドホックに実装しているのでこの関数で得られた SQL を<strong>実際に実行してはならない</strong>。<br />
 あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
 <p>JOIN 句は FROM 句とみなさず、別句として処理する。<br />
 AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &amp;&amp; は改行されない（OR と || も同様）。</p>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings"> ryunosuke\Functions\Package\Strings</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings"> ryunosuke\Functions\Package\Strings</a></h4>
 	<div class="description"><p>文字列関連のユーティリティ</p>
 </div>
-        	<h2>classconstant<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH"> ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH</a></h2>
+        	<h4 class="fqsen-title">classconstant<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH"> ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH</a></h4>
 	<div class="description"><p>json_*** 関数で $depth 引数を表す定数</p>
 </div>
-            	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()"> ryunosuke\Functions\Package\Strings::strcat()</a></h2>
+            	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()"> ryunosuke\Functions\Package\Strings::strcat()</a></h4>
 	<div class="description"><p>文字列結合の関数版</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(strcat('a', 'b', 'c'), 'abc');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::concat()"> ryunosuke\Functions\Package\Strings::concat()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::concat()"> ryunosuke\Functions\Package\Strings::concat()</a></h4>
 	<div class="description"><p>strcat の空文字回避版</p>
 <p>基本は strcat と同じ。ただし、<strong>引数の内1つでも空文字を含むなら空文字を返す</strong>。</p>
 <p>「プレフィックスやサフィックスを付けたいんだけど、空文字の場合はそのままで居て欲しい」という状況はまれによくあるはず。<br />
@@ -2290,7 +2290,7 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
 assertSame(concat('prefix-', '', '-suffix'), '');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::split_noempty()"> ryunosuke\Functions\Package\Strings::split_noempty()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::split_noempty()"> ryunosuke\Functions\Package\Strings::split_noempty()</a></h4>
 	<div class="description"><p>空文字を除外する文字列分割</p>
 <ul>
 <li>空文字を任意の区切り文字で分割しても常に空配列</li>
@@ -2304,7 +2304,7 @@ assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
 assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::multiexplode()"> ryunosuke\Functions\Package\Strings::multiexplode()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::multiexplode()"> ryunosuke\Functions\Package\Strings::multiexplode()</a></h4>
 	<div class="description"><p>explode の配列対応と $limit の挙動を変えたもの</p>
 <p>$delimiter には配列が使える。いわゆる「複数文字列での分割」の動作になる。</p>
 <p>$limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。<br />
@@ -2318,7 +2318,7 @@ assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
 assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::quoteexplode()"> ryunosuke\Functions\Package\Strings::quoteexplode()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::quoteexplode()"> ryunosuke\Functions\Package\Strings::quoteexplode()</a></h4>
 	<div class="description"><p>エスケープやクオートに対応した explode</p>
 <p>$enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。</p>
 <p>Example:</p>
@@ -2338,7 +2338,7 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_equals()"> ryunosuke\Functions\Package\Strings::str_equals()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_equals()"> ryunosuke\Functions\Package\Strings::str_equals()</a></h4>
 	<div class="description"><p>文字列比較の関数版</p>
 <p>文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。</p>
 <p>Example:</p>
@@ -2347,7 +2347,7 @@ assertTrue(str_equals('abc', 'ABC', true));
 assertTrue(str_equals('\0abc', '\0abc'));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_contains()"> ryunosuke\Functions\Package\Strings::str_contains()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_contains()"> ryunosuke\Functions\Package\Strings::str_contains()</a></h4>
 	<div class="description"><p>指定文字列を含むか返す</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(str_contains('abc', 'b'));
@@ -2356,7 +2356,7 @@ assertTrue(str_contains('abc', ['b', 'x'], false, false));
 assertFalse(str_contains('abc', ['b', 'x'], false, true));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_chop()"> ryunosuke\Functions\Package\Strings::str_chop()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_chop()"> ryunosuke\Functions\Package\Strings::str_chop()</a></h4>
 	<div class="description"><p>先頭・末尾の指定文字列を削ぎ落とす</p>
 <p>Example:</p>
 <pre><code class="language-php">// 文字列からパス文字列と拡張子を削ぎ落とす
@@ -2364,7 +2364,7 @@ $PATH = '/path/to/something';
 assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_lchop()"> ryunosuke\Functions\Package\Strings::str_lchop()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_lchop()"> ryunosuke\Functions\Package\Strings::str_lchop()</a></h4>
 	<div class="description"><p>先頭の指定文字列を削ぎ落とす</p>
 <p>Example:</p>
 <pre><code class="language-php">// 文字列からパス文字列を削ぎ落とす
@@ -2372,7 +2372,7 @@ $PATH = '/path/to/something';
 assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_rchop()"> ryunosuke\Functions\Package\Strings::str_rchop()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_rchop()"> ryunosuke\Functions\Package\Strings::str_rchop()</a></h4>
 	<div class="description"><p>末尾の指定文字列を削ぎ落とす</p>
 <p>Example:</p>
 <pre><code class="language-php">// 文字列から .php を削ぎ落とす
@@ -2380,7 +2380,7 @@ $PATH = '/path/to/something';
 assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_putcsv()"> ryunosuke\Functions\Package\Strings::str_putcsv()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_putcsv()"> ryunosuke\Functions\Package\Strings::str_putcsv()</a></h4>
 	<div class="description"><p>fputcsv の文字列版（str_getcsv の put 版）</p>
 <p>エラーは例外に変換される。</p>
 <p>普通の配列を与えるとシンプルに "a,b,c" のような1行を返す。<br />
@@ -2399,7 +2399,7 @@ assertSame(str_putcsv((function() {
 })()), "a,b,c\nd,e,f");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_subreplace()"> ryunosuke\Functions\Package\Strings::str_subreplace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_subreplace()"> ryunosuke\Functions\Package\Strings::str_subreplace()</a></h4>
 	<div class="description"><p>指定文字列を置換する</p>
 <p>$subject 内の $search を $replaces に置換する。<br />
 str_replace とは「N 番目のみ置換できる」点で異なる。<br />
@@ -2420,7 +2420,7 @@ assertSame(str_subreplace('!xxx!', 'x', [0 =&gt; 'Xa', -1 =&gt; 'Xz']), '!XaxXz!
 assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_submap()"> ryunosuke\Functions\Package\Strings::str_submap()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_submap()"> ryunosuke\Functions\Package\Strings::str_submap()</a></h4>
 	<div class="description"><p>指定文字列を置換する</p>
 <p>$subject を $replaces に従って置換する。<br />
 具体的には「$replaces を 複数指定できる str_subreplace」に近い。</p>
@@ -2448,7 +2448,7 @@ assertSame(str_submap('hello, world', [
 ]), 'heL1lo, wOrL3d');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_between()"> ryunosuke\Functions\Package\Strings::str_between()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_between()"> ryunosuke\Functions\Package\Strings::str_between()</a></h4>
 	<div class="description"><p>指定文字で囲まれた文字列を取得する</p>
 <p>$from, $to で指定した文字間を取得する（$from, $to 自体は結果に含まれない）。<br />
 ネストしている場合、一番外側の文字間を返す。</p>
@@ -2466,7 +2466,7 @@ assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}
 assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_ellipsis()"> ryunosuke\Functions\Package\Strings::str_ellipsis()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_ellipsis()"> ryunosuke\Functions\Package\Strings::str_ellipsis()</a></h4>
 	<div class="description"><p>文字列を指定幅に丸める</p>
 <p>mb_strimwidth と機能的には同じだが、省略文字の差し込み位置を $pos で指定できる。<br />
 $pos は負数が指定できる。負数の場合後ろから数えられる。<br />
@@ -2480,7 +2480,7 @@ assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
 assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()"> ryunosuke\Functions\Package\Strings::starts_with()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()"> ryunosuke\Functions\Package\Strings::starts_with()</a></h4>
 	<div class="description"><p>指定文字列で始まるか調べる</p>
 <p>$with に配列を渡すといずれかで始まるときに true を返す。</p>
 <p>Example:</p>
@@ -2491,7 +2491,7 @@ assertTrue(starts_with('abcdef', ['a', 'b', 'c']));
 assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ends_with()"> ryunosuke\Functions\Package\Strings::ends_with()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ends_with()"> ryunosuke\Functions\Package\Strings::ends_with()</a></h4>
 	<div class="description"><p>指定文字列で終わるか調べる</p>
 <p>$with に配列を渡すといずれかで終わるときに true を返す。</p>
 <p>Example:</p>
@@ -2502,31 +2502,31 @@ assertTrue(ends_with('abcdef', ['d', 'e', 'f']));
 assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::camel_case()"> ryunosuke\Functions\Package\Strings::camel_case()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::camel_case()"> ryunosuke\Functions\Package\Strings::camel_case()</a></h4>
 	<div class="description"><p>camelCase に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::pascal_case()"> ryunosuke\Functions\Package\Strings::pascal_case()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::pascal_case()"> ryunosuke\Functions\Package\Strings::pascal_case()</a></h4>
 	<div class="description"><p>PascalCase に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::snake_case()"> ryunosuke\Functions\Package\Strings::snake_case()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::snake_case()"> ryunosuke\Functions\Package\Strings::snake_case()</a></h4>
 	<div class="description"><p>snake_case に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::chain_case()"> ryunosuke\Functions\Package\Strings::chain_case()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::chain_case()"> ryunosuke\Functions\Package\Strings::chain_case()</a></h4>
 	<div class="description"><p>chain-case に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::namespace_split()"> ryunosuke\Functions\Package\Strings::namespace_split()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::namespace_split()"> ryunosuke\Functions\Package\Strings::namespace_split()</a></h4>
 	<div class="description"><p>文字列を名前空間とローカル名に区切ってタプルで返す</p>
 <p>class_namespace/class_shorten や function_shorten とほぼ同じだが下記の違いがある。</p>
 <ul>
@@ -2547,7 +2547,7 @@ assertSame(namespace_split('ns\\'), ['ns', '']);
 assertSame(namespace_split('\\hoge'), ['', 'hoge']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::htmltag()"> ryunosuke\Functions\Package\Strings::htmltag()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::htmltag()"> ryunosuke\Functions\Package\Strings::htmltag()</a></h4>
 	<div class="description"><p>css セレクタから html 文字列を生成する</p>
 <p><code>tag#id.class[attr=value]</code> のような css セレクタから <code>&lt;tag id="id" class="class" attr="value"&gt;&lt;/tag&gt;</code> のような html 文字列を返す。<br />
 配列を与えるとキーがセレクタ、値がコンテント文字列になる。<br />
@@ -2582,7 +2582,7 @@ assertSame(
 );
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::build_uri()"> ryunosuke\Functions\Package\Strings::build_uri()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::build_uri()"> ryunosuke\Functions\Package\Strings::build_uri()</a></h4>
 	<div class="description"><p>parse_uri の逆</p>
 <p>URI のパーツを与えると URI として構築する。<br />
 パーツは不完全でも良い。例えば scheme を省略すると "://" すら付かない URI が生成される。</p>
@@ -2608,7 +2608,7 @@ assertSame(build_uri([
 ]), 'http://localhost/path/to/file#hash');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::parse_uri()"> ryunosuke\Functions\Package\Strings::parse_uri()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::parse_uri()"> ryunosuke\Functions\Package\Strings::parse_uri()</a></h4>
 	<div class="description"><p>parse_url の仕様を少しいじったもの</p>
 <p>parse_url とは下記が異なる。</p>
 <ul>
@@ -2647,7 +2647,7 @@ assertEquals(parse_uri('localhost/path/to/file', [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ini_export()"> ryunosuke\Functions\Package\Strings::ini_export()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ini_export()"> ryunosuke\Functions\Package\Strings::ini_export()</a></h4>
 	<div class="description"><p>連想配列を INI 的文字列に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertEquals(ini_export(['a' =&gt; 1, 'b' =&gt; 'B', 'c' =&gt; PHP_SAPI]), 'a = 1
@@ -2656,7 +2656,7 @@ c = "cli"
 ');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ini_import()"> ryunosuke\Functions\Package\Strings::ini_import()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ini_import()"> ryunosuke\Functions\Package\Strings::ini_import()</a></h4>
 	<div class="description"><p>INI 的文字列を連想配列に変換する</p>
 <p>Example:</p>
 <pre><code class="language-php">assertEquals(ini_import("
@@ -2666,7 +2666,7 @@ c = PHP_VERSION
 "), ['a' =&gt; 1, 'b' =&gt; 'B', 'c' =&gt; PHP_VERSION]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::csv_export()"> ryunosuke\Functions\Package\Strings::csv_export()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::csv_export()"> ryunosuke\Functions\Package\Strings::csv_export()</a></h4>
 	<div class="description"><p>連想配列の配列を CSV 的文字列に変換する</p>
 <p>CSV ヘッダ行は全連想配列のキーの共通項となる。<br />
 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。<br />
@@ -2699,7 +2699,7 @@ A3,C3
 ");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::csv_import()"> ryunosuke\Functions\Package\Strings::csv_import()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::csv_import()"> ryunosuke\Functions\Package\Strings::csv_import()</a></h4>
 	<div class="description"><p>CSV 的文字列を連想配列の配列に変換する</p>
 <p>1行目をヘッダ文字列とみなしてそれをキーとした連想配列の配列を返す。<br />
 ただし、オプションで headers が与えられた場合はそれを使用する。<br />
@@ -2750,7 +2750,7 @@ A3,B3,C3
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::json_export()"> ryunosuke\Functions\Package\Strings::json_export()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::json_export()"> ryunosuke\Functions\Package\Strings::json_export()</a></h4>
 	<div class="description"><p>json_encode のプロキシ関数</p>
 <p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
 <p>Example:</p>
@@ -2760,7 +2760,7 @@ assertEquals(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
 ]), '{"a":"A","b":"B"}');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::json_import()"> ryunosuke\Functions\Package\Strings::json_import()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::json_import()"> ryunosuke\Functions\Package\Strings::json_import()</a></h4>
 	<div class="description"><p>json_decode のプロキシ関数</p>
 <p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
 <p>Example:</p>
@@ -2770,7 +2770,7 @@ assertEquals(json_import('{"a":"A","b":"B"}', [
 ]), ['a' =&gt; 'A', 'b' =&gt; 'B']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_table()"> ryunosuke\Functions\Package\Strings::markdown_table()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_table()"> ryunosuke\Functions\Package\Strings::markdown_table()</a></h4>
 	<div class="description"><p>連想配列の配列を markdown テーブル文字列にする</p>
 <p>見出しはキーの和集合で生成され、改行は <code>&lt;br&gt;</code> に置換される。<br />
 要素が全て数値の場合は右寄せになる。</p>
@@ -2789,7 +2789,7 @@ assertEquals("\n" . markdown_table([
 ");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_list()"> ryunosuke\Functions\Package\Strings::markdown_list()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_list()"> ryunosuke\Functions\Package\Strings::markdown_list()</a></h4>
 	<div class="description"><p>配列を markdown リスト文字列にする</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
@@ -2819,17 +2819,17 @@ assertEquals("\n" . markdown_list([
 ");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::random_string()"> ryunosuke\Functions\Package\Strings::random_string()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::random_string()"> ryunosuke\Functions\Package\Strings::random_string()</a></h4>
 	<div class="description"><p>安全な乱数文字列を生成する</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::kvsprintf()"> ryunosuke\Functions\Package\Strings::kvsprintf()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::kvsprintf()"> ryunosuke\Functions\Package\Strings::kvsprintf()</a></h4>
 	<div class="description"><p>連想配列を指定できるようにした vsprintf</p>
 <p>sprintf の順序指定構文('%1$d')にキーを指定できる。</p>
 <p>Example:</p>
 <pre><code class="language-php">assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' =&gt; 'ThisIs', 'fuga' =&gt; '3.14']), 'ThisIs 3');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_capture()"> ryunosuke\Functions\Package\Strings::preg_capture()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_capture()"> ryunosuke\Functions\Package\Strings::preg_capture()</a></h4>
 	<div class="description"><p>キャプチャを主軸においた preg_match</p>
 <p>$pattern で $subject をマッチングして $default で埋めて返す。$default はフィルタも兼ねる。<br />
 空文字マッチは「マッチしていない」とみなすので注意（$default が使用される）。</p>
@@ -2846,7 +2846,7 @@ assertSame(preg_capture($pattern, '2014/12', $default), [1 =&gt; '2014', 2 =&gt;
 assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1', 4 =&gt; '1']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_splice()"> ryunosuke\Functions\Package\Strings::preg_splice()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_splice()"> ryunosuke\Functions\Package\Strings::preg_splice()</a></h4>
 	<div class="description"><p>キャプチャも行える preg_replace</p>
 <p>「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。</p>
 <p>$replacement に callable を渡すと preg_replace_callback がコールされる。<br />
@@ -2866,7 +2866,7 @@ assertSame(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123')
 assertSame($m, ['abc']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_replaces()"> ryunosuke\Functions\Package\Strings::preg_replaces()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_replaces()"> ryunosuke\Functions\Package\Strings::preg_replaces()</a></h4>
 	<div class="description"><p>パターン番号を指定して preg_replace する</p>
 <p>パターン番号を指定してそれのみを置換する。<br />
 名前付きキャプチャを使用している場合はキーに文字列も使える。<br />
@@ -2886,7 +2886,7 @@ assertSame(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;targ
 ], '&lt;a href="hoge" target="fuga"&gt;inner text&lt;/a&gt;'), '&lt;a href="HOGE" target="FUGA"&gt;inner text&lt;/a&gt;');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::damerau_levenshtein()"> ryunosuke\Functions\Package\Strings::damerau_levenshtein()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::damerau_levenshtein()"> ryunosuke\Functions\Package\Strings::damerau_levenshtein()</a></h4>
 	<div class="description"><p>Damerau–Levenshtein 距離を返す</p>
 <p>簡単に言えば「転置（入れ替え）を考慮したレーベンシュタイン」である。<br />
 例えば "destroy" と "destory" は 「1挿入1削除=2」であるが、Damerau 版だと「1転置=1」となる。</p>
@@ -2900,7 +2900,7 @@ assertSame(damerau_levenshtein("destroy", "destory"), 1);
 assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_guess()"> ryunosuke\Functions\Package\Strings::str_guess()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_guess()"> ryunosuke\Functions\Package\Strings::str_guess()</a></h4>
 	<div class="description"><p>$string に最も近い文字列を返す</p>
 <p>レーベンシュタイン比の最も小さい要素を返す。</p>
 <p>この関数の結果（内部実装）は互換性を考慮しない。<br />
@@ -2916,7 +2916,7 @@ assertSame(str_guess("あいうえお", [
 ]), 'あいゆえに');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_array()"> ryunosuke\Functions\Package\Strings::str_array()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_array()"> ryunosuke\Functions\Package\Strings::str_array()</a></h4>
 	<div class="description"><p>文字列を区切り文字で区切って配列に変換する</p>
 <p>典型的には http ヘッダとか sar の結果とかを配列にする。</p>
 <p>Example:</p>
@@ -2960,7 +2960,7 @@ assertSame(str_array("
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_substr_replace()"> ryunosuke\Functions\Package\Strings::mb_substr_replace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_substr_replace()"> ryunosuke\Functions\Package\Strings::mb_substr_replace()</a></h4>
 	<div class="description"><p>マルチバイト対応 substr_replace</p>
 <p>本家は配列を与えたりできるが、ややこしいし使う気がしないので未対応。</p>
 <p>Example:</p>
@@ -2968,7 +2968,7 @@ assertSame(str_array("
 assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()"> ryunosuke\Functions\Package\Strings::render_string()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()"> ryunosuke\Functions\Package\Strings::render_string()</a></h4>
 	<div class="description"><p>"hoge {$hoge}" 形式のレンダリング</p>
 <p>文字列を eval して "hoge {$hoge}" 形式の文字列に変数を埋め込む。<br />
 基本処理は <code>eval("return '" . addslashes($template) . "';");</code> と考えて良いが、下記が異なる。</p>
@@ -2994,10 +2994,10 @@ assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' =&gt; ['a', 'n',
 assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_file()"> ryunosuke\Functions\Package\Strings::render_file()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_file()"> ryunosuke\Functions\Package\Strings::render_file()</a></h4>
 	<div class="description"><p>"hoge {$hoge}" 形式のレンダリングのファイル版</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ob_include()"> ryunosuke\Functions\Package\Strings::ob_include()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ob_include()"> ryunosuke\Functions\Package\Strings::ob_include()</a></h4>
 	<div class="description"><p>変数を extract して include する</p>
 <p>Example:</p>
 <pre><code class="language-php">// このようなテンプレートファイルを用意すると
@@ -3014,16 +3014,16 @@ This is HOGE.
 ');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::include_string()"> ryunosuke\Functions\Package\Strings::include_string()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::include_string()"> ryunosuke\Functions\Package\Strings::include_string()</a></h4>
 	<div class="description"><p>変数を extract して include する（文字列指定）</p>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax"> ryunosuke\Functions\Package\Syntax</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax"> ryunosuke\Functions\Package\Syntax</a></h4>
 	<div class="description"><p>構文関連のユーティリティ</p>
 </div>
-        	<h2>classconstant<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::TOKEN_NAME"> ryunosuke\Functions\Package\Syntax::TOKEN_NAME</a></h2>
+        	<h4 class="fqsen-title">classconstant<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::TOKEN_NAME"> ryunosuke\Functions\Package\Syntax::TOKEN_NAME</a></h4>
 	<div class="description"><p>parse_php 関数でトークン名変換をするか</p>
 </div>
-            	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::evaluate()"> ryunosuke\Functions\Package\Syntax::evaluate()</a></h2>
+            	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::evaluate()"> ryunosuke\Functions\Package\Syntax::evaluate()</a></h4>
 	<div class="description"><p>eval のプロキシ関数</p>
 <p>一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。<br />
 また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。</p>
@@ -3041,7 +3041,7 @@ return $c * 3;
 assertSame(evaluate($phpcode, get_defined_vars()), 9);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::parse_php()"> ryunosuke\Functions\Package\Syntax::parse_php()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::parse_php()"> ryunosuke\Functions\Package\Syntax::parse_php()</a></h4>
 	<div class="description"><p>php のコード断片をパースする</p>
 <p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
 つまり必ず <code>[TOKENID, TOKEN, LINE]</code> で返す。</p>
@@ -3067,7 +3067,7 @@ $part = parse_php($phpcode, [
 assertSame(implode('', array_column($part, 1)), "class Example\n{");
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()"> ryunosuke\Functions\Package\Syntax::returns()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()"> ryunosuke\Functions\Package\Syntax::returns()</a></h4>
 	<div class="description"><p>引数をそのまま返す</p>
 <p>clone などでそのまま返す関数が欲しいことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -3075,7 +3075,7 @@ assertSame(implode('', array_column($part, 1)), "class Example\n{");
 assertSame(returns($object), $object);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()"> ryunosuke\Functions\Package\Syntax::optional()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()"> ryunosuke\Functions\Package\Syntax::optional()</a></h4>
 	<div class="description"><p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
 <p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。</p>
 <p>NullObject は 基本的に null を返すが、return type が規約されている場合は null 以外を返すこともある。<br />
@@ -3105,7 +3105,7 @@ assertSame(iterator_to_array(optional($getobject())), []);
 assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::chain()"> ryunosuke\Functions\Package\Syntax::chain()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::chain()"> ryunosuke\Functions\Package\Syntax::chain()</a></h4>
 	<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
 <p>ChainObject という関数をチェーンできるオブジェクトを返す。<br />
 ChainObject は大抵のグローバル関数がアノテーションされており、コード補完することが出来る（利便性のためであり、IDE がエラーなどを出しても呼び出し自体は可能）。<br />
@@ -3181,7 +3181,7 @@ assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&g
 assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throws()"> ryunosuke\Functions\Package\Syntax::throws()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throws()"> ryunosuke\Functions\Package\Syntax::throws()</a></h4>
 	<div class="description"><p>throw の関数版</p>
 <p>hoge() or throw などしたいことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -3193,7 +3193,7 @@ catch (\Exception $ex) {
 }
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throw_if()"> ryunosuke\Functions\Package\Syntax::throw_if()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throw_if()"> ryunosuke\Functions\Package\Syntax::throw_if()</a></h4>
 	<div class="description"><p>条件付き throw</p>
 <p>第1引数が true 相当のときに例外を投げる。</p>
 <p>Example:</p>
@@ -3205,7 +3205,7 @@ try{throw_if(true, new \Exception());}catch(\Exception $ex){}
 try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::ifelse()"> ryunosuke\Functions\Package\Syntax::ifelse()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::ifelse()"> ryunosuke\Functions\Package\Syntax::ifelse()</a></h4>
 	<div class="description"><p>if ～ else 構文の関数版</p>
 <p>一言で言えば <code>$actual === $expected ? $then : $else</code> という動作になる。<br />
 ただし、 $expected が callable の場合は呼び出した結果を緩い bool 判定する。<br />
@@ -3222,7 +3222,7 @@ assertSame(ifelse($heavyfunc(null), false, 'default'), null);
 assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::switchs()"> ryunosuke\Functions\Package\Syntax::switchs()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::switchs()"> ryunosuke\Functions\Package\Syntax::switchs()</a></h4>
 	<div class="description"><p>switch 構文の関数版</p>
 <p>case にクロージャを与えると実行して返す。<br />
 つまり、クロージャを返すことは出来ないので注意。</p>
@@ -3237,7 +3237,7 @@ assertSame(switchs(2, $cases), 'value is 2');
 assertSame(switchs(3, $cases, 'undefined'), 'undefined');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_null()"> ryunosuke\Functions\Package\Syntax::try_null()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_null()"> ryunosuke\Functions\Package\Syntax::try_null()</a></h4>
 	<div class="description"><p>例外を握りつぶす try 構文</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -3249,7 +3249,7 @@ $try = function(){throw new \Exception('tried');};
 assertSame(try_null($try), null);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch()"> ryunosuke\Functions\Package\Syntax::try_catch()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch()"> ryunosuke\Functions\Package\Syntax::try_catch()</a></h4>
 	<div class="description"><p>try ～ catch 構文の関数版</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -3261,7 +3261,7 @@ $try = function(){throw new \Exception('tried');};
 assertSame(try_catch($try)-&gt;getMessage(), 'tried');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_finally()"> ryunosuke\Functions\Package\Syntax::try_finally()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_finally()"> ryunosuke\Functions\Package\Syntax::try_finally()</a></h4>
 	<div class="description"><p>try ～ finally 構文の関数版</p>
 <p>例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -3277,7 +3277,7 @@ try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
 assertSame($finally_count, 2); // 呼ばれている
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch_finally()"> ryunosuke\Functions\Package\Syntax::try_catch_finally()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::try_catch_finally()"> ryunosuke\Functions\Package\Syntax::try_catch_finally()</a></h4>
 	<div class="description"><p>try ～ catch ～ finally 構文の関数版</p>
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
@@ -3293,19 +3293,19 @@ assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)-&gt;getMessage(), 't
 assertSame($finally_count, 2); // 呼ばれている
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility"> ryunosuke\Functions\Package\Utility</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility"> ryunosuke\Functions\Package\Utility</a></h4>
 	<div class="description"><p>汎用的なユーティリティ</p>
 </div>
-                	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()"> ryunosuke\Functions\Package\Utility::get_uploaded_files()</a></h2>
+                	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()"> ryunosuke\Functions\Package\Utility::get_uploaded_files()</a></h4>
 	<div class="description"><p>$_FILES の構造を組み替えて $_POST などと同じにする</p>
 <p>$_FILES の配列構造はバグとしか思えないのでそれを是正する関数。<br />
 第1引数 $files は指定可能だが、大抵は $_FILES であり、指定するのはテスト用。</p>
 <p>サンプルを書くと長くなるので例は<tag_source data-fqsen='ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()' data-description='テストファイル'>テストファイル</tag_source>を参照。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()"> ryunosuke\Functions\Package\Utility::cachedir()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()"> ryunosuke\Functions\Package\Utility::cachedir()</a></h4>
 	<div class="description"><p>本ライブラリで使用するキャッシュディレクトリを設定する</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cache()"> ryunosuke\Functions\Package\Utility::cache()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cache()"> ryunosuke\Functions\Package\Utility::cache()</a></h4>
 	<div class="description"><p>シンプルにキャッシュする</p>
 <p>この関数は get/set/delete を兼ねる。<br />
 キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
@@ -3322,11 +3322,11 @@ $rand3 = cache('rand', $provider);
 assertNotSame($rand1, $rand3);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::is_ansi()"> ryunosuke\Functions\Package\Utility::is_ansi()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::is_ansi()"> ryunosuke\Functions\Package\Utility::is_ansi()</a></h4>
 	<div class="description"><p>リソースが ansi color に対応しているか返す</p>
 <p>パイプしたりリダイレクトしていると false を返す。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::ansi_colorize()"> ryunosuke\Functions\Package\Utility::ansi_colorize()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::ansi_colorize()"> ryunosuke\Functions\Package\Utility::ansi_colorize()</a></h4>
 	<div class="description"><p>文字列に ANSI Color エスケープシーケンスを埋め込む</p>
 <ul>
 <li>"blue" のような小文字色名は文字色</li>
@@ -3343,7 +3343,7 @@ assertNotSame($rand1, $rand3);
 <p>という動作になる（記号で区切られていれば形式はどうでも良いということ）。<br />
 ただ、この指定方法は変更が入る可能性が高いのでスペースあたりで区切っておくのがもっとも無難。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process()"> ryunosuke\Functions\Package\Utility::process()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process()"> ryunosuke\Functions\Package\Utility::process()</a></h4>
 	<div class="description"><p>proc_open ～ proc_close の一連の処理を行う</p>
 <p>標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。</p>
 <p>Example:</p>
@@ -3364,7 +3364,7 @@ assertSame($stdout, 'out'); // 標準出力に標準入力を書き込んでい�
 assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "err" が格納される
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::arguments()"> ryunosuke\Functions\Package\Utility::arguments()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::arguments()"> ryunosuke\Functions\Package\Utility::arguments()</a></h4>
 	<div class="description"><p>コマンドライン引数をパースして引数とオプションを返す</p>
 <p>少しリッチな <tag_link data-kind='uri' data-type='http://php.net/manual/function.getopt.php' data-description='getopt'>getopt</tag_link> として使える（shell 由来のオプション構文(a:b::)はどうも馴染みにくい）。<br />
 ただし「値が必須なオプション」はサポートしない。<br />
@@ -3432,7 +3432,7 @@ assertSame(arguments($rule, '--long A -short B'), [
 ]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::stacktrace()"> ryunosuke\Functions\Package\Utility::stacktrace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::stacktrace()"> ryunosuke\Functions\Package\Utility::stacktrace()</a></h4>
 	<div class="description"><p>スタックトレースを文字列で返す</p>
 <p><code>(new \Exception())-&gt;getTraceAsString()</code> と実質的な役割は同じ。<br />
 ただし、 getTraceAsString は引数が Array になったりクラス名しか取れなかったり微妙に使い勝手が悪いのでもうちょっと情報量を増やしたもの。</p>
@@ -3441,7 +3441,7 @@ assertSame(arguments($rule, '--long A -short B'), [
 <p>第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。<br />
 今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::backtrace()"> ryunosuke\Functions\Package\Utility::backtrace()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::backtrace()"> ryunosuke\Functions\Package\Utility::backtrace()</a></h4>
 	<div class="description"><p>特定条件までのバックトレースを取得する</p>
 <p>第2引数 $options を満たすトレース以降を返す。<br />
 $options は ['$trace の key' =&gt; "条件"] を渡す。<br />
@@ -3462,7 +3462,7 @@ assertArraySubset([
 ], $traces[1]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::error()"> ryunosuke\Functions\Package\Utility::error()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::error()"> ryunosuke\Functions\Package\Utility::error()</a></h4>
 	<div class="description"><p>エラー出力する</p>
 <p>第1引数 $message はそれらしく文字列化されて出力される。基本的にはあらゆる型を与えて良い。</p>
 <p>第2引数 $destination で出力対象を指定する。省略すると error_log 設定に従う。<br />
@@ -3470,7 +3470,7 @@ assertArraySubset([
 ファイルを開くが、<strong>ファイルは閉じない</strong>。閉じ処理は php の終了処理に身を任せる。<br />
 したがって閉じる必要がある場合はファイルポインタを渡す必要がある。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::timer()"> ryunosuke\Functions\Package\Utility::timer()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::timer()"> ryunosuke\Functions\Package\Utility::timer()</a></h4>
 	<div class="description"><p>処理時間を計測する</p>
 <p>第1引数 $callable を $count 回回してその処理時間を返す。</p>
 <p>Example:</p>
@@ -3478,7 +3478,7 @@ assertArraySubset([
 assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::benchmark()"> ryunosuke\Functions\Package\Utility::benchmark()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::benchmark()"> ryunosuke\Functions\Package\Utility::benchmark()</a></h4>
 	<div class="description"><p>簡易ベンチマークを取る</p>
 <p>「指定ミリ秒内で何回コールできるか？」でベンチする。</p>
 <p>$suite は ['表示名' =&gt; $callable] 形式の配列。<br />
@@ -3491,17 +3491,17 @@ benchmark([
 ], ['12345'], 10);
 </code></pre>
 </div>
-            	<h2>class<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars"> ryunosuke\Functions\Package\Vars</a></h2>
+            	<h4 class="fqsen-title">class<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars"> ryunosuke\Functions\Package\Vars</a></h4>
 	<div class="description"><p>変数関連のユーティリティ</p>
 </div>
-        	<h2>classconstant<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SORT_STRICT"> ryunosuke\Functions\Package\Vars::SORT_STRICT</a></h2>
+        	<h4 class="fqsen-title">classconstant<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SORT_STRICT"> ryunosuke\Functions\Package\Vars::SORT_STRICT</a></h4>
 	<div class="description"><p>SORT_XXX 定数の厳密版</p>
 </div>
-            	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::stringify()"> ryunosuke\Functions\Package\Vars::stringify()</a></h2>
+            	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::stringify()"> ryunosuke\Functions\Package\Vars::stringify()</a></h4>
 	<div class="description"><p>値を何とかして文字列化する</p>
 <p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numberify()"> ryunosuke\Functions\Package\Vars::numberify()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numberify()"> ryunosuke\Functions\Package\Vars::numberify()</a></h4>
 	<div class="description"><p>値を何とかして数値化する</p>
 <ul>
 <li>配列は要素数</li>
@@ -3524,7 +3524,7 @@ assertSame(numberify('a1b2c3'), 123);
 assertSame(numberify('a1b2.c3', true), 12.3);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numval()"> ryunosuke\Functions\Package\Vars::numval()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::numval()"> ryunosuke\Functions\Package\Vars::numval()</a></h4>
 	<div class="description"><p>値を数値化する</p>
 <p>int か float ならそのまま返す。<br />
 文字列の場合、一言で言えば「.を含むなら float、含まないなら int」を返す。<br />
@@ -3535,7 +3535,7 @@ assertSame(numval('3.14'), 3.14); // . を含む文字列は float を返す
 assertSame(numval('11', 8), 9);   // 基数が指定できる
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::arrayval()"> ryunosuke\Functions\Package\Vars::arrayval()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::arrayval()"> ryunosuke\Functions\Package\Vars::arrayval()</a></h4>
 	<div class="description"><p>array キャストの関数版</p>
 <p>intval とか strval とかの array 版。<br />
 ただキャストするだけだが、関数なのでコールバックとして使える。</p>
@@ -3553,7 +3553,7 @@ assertSame(arrayval([$stdclass], true), [['key' =&gt; 'val']]); // true なの�
 assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので中身は変わらない
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_prefix()"> ryunosuke\Functions\Package\Vars::si_prefix()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_prefix()"> ryunosuke\Functions\Package\Vars::si_prefix()</a></h4>
 	<div class="description"><p>数値に SI 接頭辞を付与する</p>
 <p>値は 1 &lt;= $var &lt; 1000(1024) の範囲内に収められる。<br />
 ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。</p>
@@ -3573,7 +3573,7 @@ assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
 assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_unprefix()"> ryunosuke\Functions\Package\Vars::si_unprefix()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_unprefix()"> ryunosuke\Functions\Package\Vars::si_unprefix()</a></h4>
 	<div class="description"><p>SI 接頭辞が付与された文字列を数値化する</p>
 <p>典型的な用途は ini_get で得られた値を数値化したいとき。<br />
 ただし、 ini は 1m のように小文字で指定することもあるので大文字化する必要はある。</p>
@@ -3590,7 +3590,7 @@ assertSame(si_unprefix('1M'), 1000000);
 assertSame(si_unprefix('1K'), 1000);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_empty()"> ryunosuke\Functions\Package\Vars::is_empty()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_empty()"> ryunosuke\Functions\Package\Vars::is_empty()</a></h4>
 	<div class="description"><p>値が空か検査する</p>
 <p><code>empty</code> とほぼ同じ。ただし</p>
 <ul>
@@ -3614,7 +3614,7 @@ assertFalse(is_empty('0'));
 assertFalse(is_empty(new \SimpleXMLElement('&lt;foo&gt;&lt;/foo&gt;')));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_primitive()"> ryunosuke\Functions\Package\Vars::is_primitive()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_primitive()"> ryunosuke\Functions\Package\Vars::is_primitive()</a></h4>
 	<div class="description"><p>値が複合型でないか検査する</p>
 <p>「複合型」とはオブジェクトと配列のこと。<br />
 つまり</p>
@@ -3631,7 +3631,7 @@ assertFalse(is_primitive(new \stdClass));
 assertFalse(is_primitive(['array']));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_recursive()"> ryunosuke\Functions\Package\Vars::is_recursive()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_recursive()"> ryunosuke\Functions\Package\Vars::is_recursive()</a></h4>
 	<div class="description"><p>変数が再帰参照を含むか調べる</p>
 <p>Example:</p>
 <pre><code class="language-php">// 配列の再帰
@@ -3644,7 +3644,7 @@ $object-&gt;recursive = $object;
 assertTrue(is_recursive($object));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_stringable()"> ryunosuke\Functions\Package\Vars::is_stringable()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_stringable()"> ryunosuke\Functions\Package\Vars::is_stringable()</a></h4>
 	<div class="description"><p>変数が文字列化できるか調べる</p>
 <p>「配列」「__toString を持たないオブジェクト」が false になる。<br />
 （厳密に言えば配列は "Array" になるので文字列化できるといえるがここでは考えない）。</p>
@@ -3660,7 +3660,7 @@ assertFalse(is_stringable(new \ArrayObject()));
 assertFalse(is_stringable([1, 2, 3]));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_arrayable()"> ryunosuke\Functions\Package\Vars::is_arrayable()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_arrayable()"> ryunosuke\Functions\Package\Vars::is_arrayable()</a></h4>
 	<div class="description"><p>変数が配列アクセス可能か調べる</p>
 <p>Example:</p>
 <pre><code class="language-php">assertTrue(is_arrayable([]));
@@ -3668,7 +3668,7 @@ assertTrue(is_arrayable(new \ArrayObject()));
 assertFalse(is_arrayable(new \stdClass()));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()"> ryunosuke\Functions\Package\Vars::is_iterable()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()"> ryunosuke\Functions\Package\Vars::is_iterable()</a></h4>
 	<div class="description"><p>変数が foreach で回せるか調べる</p>
 <p>オブジェクトの場合は \Traversable のみ。<br />
 要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-iterable.php' data-description='is_iterable'>is_iterable</tag_link> の polyfill。</p>
@@ -3679,7 +3679,7 @@ assertFalse(is_iterable(1));
 assertFalse(is_iterable(new \stdClass()));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()"> ryunosuke\Functions\Package\Vars::is_countable()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()"> ryunosuke\Functions\Package\Vars::is_countable()</a></h4>
 	<div class="description"><p>変数が count でカウントできるか調べる</p>
 <p>要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-countable.php' data-description='is_countable'>is_countable</tag_link> の polyfill。</p>
 <p>Example:</p>
@@ -3690,7 +3690,7 @@ assertFalse(is_countable(1));
 assertFalse(is_countable(new \stdClass()));
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()"> ryunosuke\Functions\Package\Vars::varcmp()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()"> ryunosuke\Functions\Package\Vars::varcmp()</a></h4>
 	<div class="description"><p>php7 の <code>&lt;=&gt;</code> の関数版</p>
 <p>引数で大文字小文字とか自然順とか型モードとかが指定できる。<br />
 さらに追加で SORT_STRICT という厳密比較フラグを渡すことができる。</p>
@@ -3714,7 +3714,7 @@ assertTrue(varcmp(['a' =&gt; 'A', 'b' =&gt; 'B'], ['b' =&gt; 'B', 'a' =&gt; 'A']
 assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_type()"> ryunosuke\Functions\Package\Vars::var_type()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_type()"> ryunosuke\Functions\Package\Vars::var_type()</a></h4>
 	<div class="description"><p>値の型を取得する（gettype + get_class）</p>
 <p>プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。<br />
 ただし、オブジェクトの場合は先頭に '\' が必ず付く。</p>
@@ -3729,7 +3729,7 @@ assertSame(var_type(new \stdClass), '\\stdClass');
 assertSame(var_type(new \Exception()), '\\Exception');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_apply()"> ryunosuke\Functions\Package\Vars::var_apply()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_apply()"> ryunosuke\Functions\Package\Vars::var_apply()</a></h4>
 	<div class="description"><p>値にコールバックを適用する</p>
 <p>普通のスカラー値であれば <code>$callback($var)</code> と全く同じ。<br />
 この関数は「$var が配列だったら中身に適用して返す（再帰）」という点で上記とは異なる。</p>
@@ -3745,7 +3745,7 @@ assertSame(var_apply(['!x!', '!y!'], 'trim', '!'), ['x', 'y']);
 assertSame(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'), ['&amp;lt;x&amp;gt;', ['&amp;lt;y&amp;gt;']]);
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_applys()"> ryunosuke\Functions\Package\Vars::var_applys()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_applys()"> ryunosuke\Functions\Package\Vars::var_applys()</a></h4>
 	<div class="description"><p>配列にコールバックを適用する</p>
 <p>配列であれば <code>$callback($var)</code> と全く同じ。<br />
 この関数は「$var がスカラー値だったら配列化して適用してスカラーで返す」という点で上記とは異なる。</p>
@@ -3764,7 +3764,7 @@ assertSame(var_applys('a', $upper), 'A');
 # 「strtoupper だけ切り出せばよいのでは？」と思うかもしれないが、「（外部ライブラリなどで）手元に配列しか受け取ってくれない処理しかない」状況がまれによくある
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_export2()"> ryunosuke\Functions\Package\Vars::var_export2()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_export2()"> ryunosuke\Functions\Package\Vars::var_export2()</a></h4>
 	<div class="description"><p>組み込みの var_export をいい感じにしたもの</p>
 <p>下記の点が異なる。</p>
 <ul>
@@ -3811,7 +3811,7 @@ assertSame(var_export2(compact('rarray', 'robject'), true), '[
 ]');
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_html()"> ryunosuke\Functions\Package\Vars::var_html()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_html()"> ryunosuke\Functions\Package\Vars::var_html()</a></h4>
 	<div class="description"><p>var_export2 を html コンテキストに特化させたようなもの</p>
 <p>下記のような出力になる。</p>
 <ul>
@@ -3821,7 +3821,7 @@ assertSame(var_export2(compact('rarray', 'robject'), true), '[
 </ul>
 <p>この関数の出力は互換性を考慮しない。頻繁に変更される可能性がある。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_pretty()"> ryunosuke\Functions\Package\Vars::var_pretty()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_pretty()"> ryunosuke\Functions\Package\Vars::var_pretty()</a></h4>
 	<div class="description"><p>var_dump の出力を見やすくしたもの</p>
 <p>var_dump はとても縦に長い上見づらいので色や改行・空白を調整して見やすくした。<br />
 sapi に応じて自動で色分けがなされる（$context で指定もできる）。<br />
@@ -3864,12 +3864,12 @@ var_pretty([
 &lt;?php
 </code></pre>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::console_log()"> ryunosuke\Functions\Package\Vars::console_log()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::console_log()"> ryunosuke\Functions\Package\Vars::console_log()</a></h4>
 	<div class="description"><p>js の console に値を吐き出す</p>
 <p>script タグではなく X-ChromeLogger-Data を使用する。<br />
 したがってヘッダ送信前に呼ぶ必要がある。</p>
 </div>
-    	<h2>method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::hashvar()"> ryunosuke\Functions\Package\Vars::hashvar()</a></h2>
+    	<h4 class="fqsen-title">method<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::hashvar()"> ryunosuke\Functions\Package\Vars::hashvar()</a></h4>
 	<div class="description"><p>変数指定をできるようにした compact</p>
 <p>名前空間指定の呼び出しは未対応。use して関数名だけで呼び出す必要がある。</p>
 <p>Example:</p>

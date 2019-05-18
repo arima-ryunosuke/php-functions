@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\FileSystem)</small>
@@ -286,7 +286,7 @@ assertSame(file_suffix('filename.ext1.ext2', '-min'), 'filename-min.ext1.ext2');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L157-L191" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_extension()" tabindex="-1" class="structure-title ">
-                        file_extension						<small>($filename, $extension = &#039;&#039;)</small>
+                        file_extension						<small>($filename, $extension = &quot;&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>ファイルの拡張子を変更する。引数を省略すると拡張子を返す</p>
@@ -308,7 +308,7 @@ assertSame(file_extension('filename.ext', ''), 'filename');
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$extension = &#039;&#039;</td>
+				<td class="rest">$extension = &quot;&quot;</td>
 				<td class="desc"><p>拡張子。nullや空文字なら拡張子削除</p>
 </td>
 			</tr>
@@ -1026,7 +1026,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L616-L661" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::tmpname()" tabindex="-1" class="structure-title ">
-                        tmpname						<small>($prefix = &#039;rft&#039;, $dir = null)</small>
+                        tmpname						<small>($prefix = &quot;rft&quot;, $dir = null)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>終了時に削除される一時ファイル名を生成する</p>
@@ -1042,7 +1042,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
 		<tbody>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$prefix = &#039;rft&#039;</td>
+				<td class="rest">$prefix = &quot;rft&quot;</td>
 				<td class="desc"><p>ファイル名プレフィックス</p>
 </td>
 			</tr>

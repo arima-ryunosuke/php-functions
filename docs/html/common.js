@@ -32,8 +32,7 @@ $.open = function (fqsen, noclick) {
 $.fn.titleattr = function () {
     return this.each(function () {
         var $this = $(this);
-        var content = $this.find('.ellipsis-text');
-        $this.attr('title', content.text() || $this.text());
+        $this.attr('title', $this.find('.ellipsis-text').text());
     });
 };
 // replace first comment node
@@ -55,8 +54,7 @@ $.fn.collapse = function (mode, animation) {
     if (animation) {
         var slideToggle = mode ? 'slideDown' : 'slideUp';
         holding[slideToggle](133);
-    }
-    else {
+    } else {
         holding.toggle(mode);
     }
     switcher.toggleClass('glyphicon-minus', mode);
@@ -150,8 +148,7 @@ $(function () {
         if ($this.data('kind') === 'uri') {
             $a.attr('href', $this.data('type'));
             $a.attr('target', '_blank');
-        }
-        else {
+        } else {
             var fqsen = $this.data('type-fqsen');
             var suffix = fqsen.slice(-1) === '\\' ? '$namespace' : '$typespace';
             $a.attr('href', fqsen.split('::')[0].split('\\').join('-') + suffix + '.html#' + fqsen);

@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Classobj)</small>
@@ -586,7 +586,7 @@ assertFalse(const_exists('UNDEFINED'));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L477-L513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
-                        object_dive						<small>($object, $path, $default = null, $delimiter = &#039;.&#039;)</small>
+                        object_dive						<small>($object, $path, $default = null, $delimiter = &quot;.&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>パス形式でプロパティ値を取得</p>
@@ -628,7 +628,7 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;.&#039;</td>
+				<td class="rest">$delimiter = &quot;.&quot;</td>
 				<td class="desc"><p>パスの区切り文字。大抵は '.' か '/'</p>
 </td>
 			</tr>

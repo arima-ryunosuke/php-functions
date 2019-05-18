@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Utility)</small>
@@ -384,7 +384,7 @@ assertNotSame($rand1, $rand3);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L297-L389" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
-                        process						<small>($command, $args = [], $stdin = &#039;&#039;, &amp;$stdout = &#039;&#039;, &amp;$stderr = &#039;&#039;, $cwd = null, $env = null)</small>
+                        process						<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>proc_open ～ proc_close の一連の処理を行う</p>
@@ -424,19 +424,19 @@ assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "er
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$stdin = &#039;&#039;</td>
+				<td class="rest">$stdin = &quot;&quot;</td>
 				<td class="desc"><p>標準入力</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">&amp;$stdout = &#039;&#039;</td>
+				<td class="rest">&amp;$stdout = &quot;&quot;</td>
 				<td class="desc"><p>標準出力（参照渡しで格納される）</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">&amp;$stderr = &#039;&#039;</td>
+				<td class="rest">&amp;$stderr = &quot;&quot;</td>
 				<td class="desc"><p>標準エラー（参照渡しで格納される）</p>
 </td>
 			</tr>
@@ -604,8 +604,8 @@ assertSame(arguments($rule, '--long A -short B'), [
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::stacktrace()" tabindex="-1" class="structure-title ">
                         stacktrace						<small>($traces = null, $option = [
-    &#039;format&#039; =&gt; &#039;%s:%s %s&#039;,
-    &#039;limit&#039;  =&gt; 16,
+    &quot;format&quot; =&gt; &quot;%s:%s %s&quot;,
+    &quot;limit&quot;  =&gt; 16,
 ])</small>
 					</h4>
 					<div class="inner-item">
@@ -629,8 +629,8 @@ assertSame(arguments($rule, '--long A -short B'), [
         			<tr>
 				<td class="type">int<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>array</td>
 				<td class="rest">$option = [
-    &#039;format&#039; =&gt; &#039;%s:%s %s&#039;,
-    &#039;limit&#039;  =&gt; 16,
+    &quot;format&quot; =&gt; &quot;%s:%s %s&quot;,
+    &quot;limit&quot;  =&gt; 16,
 ]</td>
 				<td class="desc"><p>オプション</p>
 </td>

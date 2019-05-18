@@ -29,26 +29,30 @@ div.nheader {
 }
 
 .focused, a[id]:focus, [tabindex]:focus {
-    color: red;
+    color: #286090;
     outline: none;
     background-color: antiquewhite;
 }
 
 h1 {
-    position: fixed;
-    top: 0;
     margin-top: 0;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
-    padding: 4px;
-    background: #336699;
+    padding: 8px;
+    background: #476678;
     color: #fff;
     width: 100%;
+    height: 40px;
+}
+
+h1.fixed {
+    position: fixed;
+    top: 0;
     z-index: 10000;
 }
 
-h1 a {
-    color: #fff;
+h1 a, h1 a:hover, h1 a:focus {
+    color: #ff9c9c;
 }
 
 h1 small {
@@ -56,18 +60,25 @@ h1 small {
 }
 
 h2 {
-    color: #793862;
+    color: #fff;
     font-size: 18px;
     font-weight: bold;
     margin-top: 0;
-    border-bottom: 2px solid #dddddd;
+    padding: 6px;
+    background-color: #555;
+}
+
+h2 a {
+    color: #ccc;
+    text-decoration: underline;
 }
 
 h3 {
-    color: #793862;
+    color: #fff;
     font-size: 17px;
     font-weight: bold;
-    border-bottom: 1px solid #dddddd;
+    padding: 6px;
+    background-color: #555;
 }
 
 h4 {
@@ -226,26 +237,23 @@ ul > li {
 
 .main-wrapper {
     padding: 0 0.7em;
-    margin-top: 36px;
+    margin-top: 46px;
 }
 
 #search {
     font-weight: normal;
     font-size: 14px;
     display: inline;
-    width: calc(100% - 11.1em);
+    width: calc(100% - 12.1em);
     height: 100%;
     padding: 2px;
-}
-
-h1 a, h1 a:hover, h1 a:focus {
-    color: #ff9c9c;
 }
 
 .typeahead.dropdown-menu {
     z-index: 10002;
     left: 0 !important;
     width: 100%;
+    overflow-x: scroll;
 }
 
 .hierarchy {
@@ -282,42 +290,56 @@ h1 a, h1 a:hover, h1 a:focus {
 .description h5,
 .description h6 {
     position: static;
-    color: #592842;
-    background: #eef3ff;
+    color: #333;
+    background-color: white;
     margin: 2px 0;
     padding: 4px;
     border: none;
     font-weight: bold;
+    border-bottom: 2px solid #dddddd;
 }
 
+.markdown li,
 .description li {
     margin-left: 2.0rem;
 }
 
+.markdown ul > li,
 .description ul > li {
     list-style: disc;
 }
 
+.markdown ol > li,
 .description ol > li {
     list-style: decimal;
 }
 
+.markdown ol > li > ol > li,
 .description ol > li > ol > li {
     list-style: lower-alpha;
 }
 
+.markdown ol > li > ol > li > ol > li,
 .description ol > li > ol > li > ol > li {
     list-style: lower-roman;
 }
 
+.markdown table.table,
 .description table.table {
     table-layout: auto;
 }
 
+.markdown table.table > thead,
 .description table.table > thead {
     white-space: nowrap;
 }
 
+.markdown pre,
+.description pre {
+    border-radius: unset;
+}
+
+.markdown code,
 .description code {
     font-size: 12px;
     overflow-x: auto;
@@ -331,7 +353,6 @@ h1 a, h1 a:hover, h1 a:focus {
 .category-name {
     font-size: 111%;
     font-weight: normal;
-    color: #333;
 }
 
 td.type {
@@ -362,10 +383,14 @@ td.rest {
     padding: 3px 3px 3px 0;
 }
 
+.fqsen-title {
+    padding: 6px;
+    margin: 0 0 4px;
+    background-color: #dee3e9;
+}
+
 .structure-item {
     white-space: normal;
-    border-radius: 2px;
-    border: 1px solid #beadb0;
     margin-bottom: 6px;
     padding: 0;
     background-color: #fff;
@@ -373,12 +398,11 @@ td.rest {
 
 .structure-item .structure-title {
     padding: 6px;
-    margin: 0;
-    background: #f3f3f3;
+    margin: 0 0 4px;
+    background-color: #dee3e9;
 }
 
 .structure-item .inner-item {
-    border-top: 1px solid #beadb0;
     padding: 0 6px;
 }
 
@@ -393,6 +417,15 @@ td.rest {
 
 /* bootstrap */
 
+a {
+    color: #3d7e9a;
+}
+
+a:hover,
+a:focus {
+    color: #286090;
+}
+
 .table {
     margin-bottom: 10px;
     table-layout: fixed;
@@ -404,10 +437,6 @@ td.rest {
     padding: 2px 8px 0;
     border-top: none;
     border-bottom: 1px dashed #ddd;
-}
-
-.glyphicon {
-    vertical-align: text-top;
 }
 
 .glyphicon-accessible {

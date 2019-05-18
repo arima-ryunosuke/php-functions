@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Strings)</small>
@@ -347,7 +347,7 @@ assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L133-L202" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::quoteexplode()" tabindex="-1" class="structure-title ">
-                        quoteexplode						<small>($delimiter, $string, $enclosures = &#039;\&#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
+                        quoteexplode						<small>($delimiter, $string, $enclosures = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>エスケープやクオートに対応した explode</p>
@@ -386,13 +386,13 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
 			</tr>
         			<tr>
 				<td class="type">array<span class="type-separator"></span><wbr>string</td>
-				<td class="rest">$enclosures = &#039;\&#039;&quot;&#039;</td>
+				<td class="rest">$enclosures = &quot;&#039;\&quot;&quot;</td>
 				<td class="desc"><p>囲い文字。 ["start" =&gt; "end"] で開始・終了が指定できる</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$escape = &#039;\\&#039;</td>
+				<td class="rest">$escape = &quot;\\&quot;</td>
 				<td class="desc"><p>エスケープ文字</p>
 </td>
 			</tr>
@@ -763,7 +763,7 @@ assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L354-L401" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_putcsv()" tabindex="-1" class="structure-title ">
-                        str_putcsv						<small>($array, $delimiter = &#039;,&#039;, $enclosure = &#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
+                        str_putcsv						<small>($array, $delimiter = &quot;,&quot;, $enclosure = &quot;\&quot;&quot;, $escape = &quot;\\&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>fputcsv の文字列版（str_getcsv の put 版）</p>
@@ -795,19 +795,19 @@ assertSame(str_putcsv((function() {
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;,&#039;</td>
+				<td class="rest">$delimiter = &quot;,&quot;</td>
 				<td class="desc"><p>フィールド区切り文字</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$enclosure = &#039;&quot;&#039;</td>
+				<td class="rest">$enclosure = &quot;\&quot;&quot;</td>
 				<td class="desc"><p>フィールドを囲む文字</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$escape = &#039;\\&#039;</td>
+				<td class="rest">$escape = &quot;\\&quot;</td>
 				<td class="desc"><p>エスケープ文字</p>
 </td>
 			</tr>
@@ -1011,7 +1011,7 @@ assertSame(str_submap('hello, world', [
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L581-L653" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_between()" tabindex="-1" class="structure-title ">
-                        str_between						<small>($string, $from, $to, &amp;$position = 0, $enclosure = &#039;\&#039;&quot;&#039;, $escape = &#039;\\&#039;)</small>
+                        str_between						<small>($string, $from, $to, &amp;$position = 0, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>指定文字で囲まれた文字列を取得する</p>
@@ -1060,13 +1060,13 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$enclosure = &#039;\&#039;&quot;&#039;</td>
+				<td class="rest">$enclosure = &quot;&#039;\&quot;&quot;</td>
 				<td class="desc"><p>囲い文字。この文字中にいる $from, $to 文字は走査外になる</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$escape = &#039;\\&#039;</td>
+				<td class="rest">$escape = &quot;\\&quot;</td>
 				<td class="desc"><p>エスケープ文字。この文字が前にある $from, $to 文字は走査外になる</p>
 </td>
 			</tr>
@@ -1103,7 +1103,7 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L655-L700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_ellipsis()" tabindex="-1" class="structure-title ">
-                        str_ellipsis						<small>($string, $width, $trimmarker = &#039;...&#039;, $pos = null)</small>
+                        str_ellipsis						<small>($string, $width, $trimmarker = &quot;...&quot;, $pos = null)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>文字列を指定幅に丸める</p>
@@ -1136,7 +1136,7 @@ assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$trimmarker = &#039;...&#039;</td>
+				<td class="rest">$trimmarker = &quot;...&quot;</td>
 				<td class="desc"><p>省略文字列</p>
 </td>
 			</tr>
@@ -1313,7 +1313,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L770-L785" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::camel_case()" tabindex="-1" class="structure-title ">
-                        camel_case						<small>($string, $delimiter = &#039;_&#039;)</small>
+                        camel_case						<small>($string, $delimiter = &quot;_&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>camelCase に変換する</p>
@@ -1332,7 +1332,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;_&#039;</td>
+				<td class="rest">$delimiter = &quot;_&quot;</td>
 				<td class="desc"><p>デリミタ</p>
 </td>
 			</tr>
@@ -1369,7 +1369,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L787-L802" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::pascal_case()" tabindex="-1" class="structure-title ">
-                        pascal_case						<small>($string, $delimiter = &#039;_&#039;)</small>
+                        pascal_case						<small>($string, $delimiter = &quot;_&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>PascalCase に変換する</p>
@@ -1388,7 +1388,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;_&#039;</td>
+				<td class="rest">$delimiter = &quot;_&quot;</td>
 				<td class="desc"><p>デリミタ</p>
 </td>
 			</tr>
@@ -1425,7 +1425,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L804-L819" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::snake_case()" tabindex="-1" class="structure-title ">
-                        snake_case						<small>($string, $delimiter = &#039;_&#039;)</small>
+                        snake_case						<small>($string, $delimiter = &quot;_&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>snake_case に変換する</p>
@@ -1444,7 +1444,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;_&#039;</td>
+				<td class="rest">$delimiter = &quot;_&quot;</td>
 				<td class="desc"><p>デリミタ</p>
 </td>
 			</tr>
@@ -1481,7 +1481,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L821-L836" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::chain_case()" tabindex="-1" class="structure-title ">
-                        chain_case						<small>($string, $delimiter = &#039;-&#039;)</small>
+                        chain_case						<small>($string, $delimiter = &quot;-&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>chain-case に変換する</p>
@@ -1500,7 +1500,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;-&#039;</td>
+				<td class="rest">$delimiter = &quot;-&quot;</td>
 				<td class="desc"><p>デリミタ</p>
 </td>
 			</tr>
@@ -2405,7 +2405,7 @@ assertEquals("\n" . markdown_list([
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1703-L1729" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::random_string()" tabindex="-1" class="structure-title ">
-                        random_string						<small>($length = 8, $charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;)</small>
+                        random_string						<small>($length = 8, $charlist = &quot;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>安全な乱数文字列を生成する</p>
@@ -2421,7 +2421,7 @@ assertEquals("\n" . markdown_list([
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$charlist = &#039;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#039;</td>
+				<td class="rest">$charlist = &quot;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</td>
 				<td class="desc"><p>使用する文字セット</p>
 </td>
 			</tr>

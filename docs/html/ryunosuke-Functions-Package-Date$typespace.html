@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Date)</small>
@@ -78,29 +78,29 @@
 						<small>array</small>
                         JP_ERA						<var> = [
     [
-        &#039;name&#039;  =&gt; &#039;令和&#039;,
-        &#039;abbr&#039;  =&gt; &#039;R&#039;,
-        &#039;since&#039; =&gt; 1556636400,
+        &quot;name&quot;  =&gt; &quot;令和&quot;,
+        &quot;abbr&quot;  =&gt; &quot;R&quot;,
+        &quot;since&quot; =&gt; 1556636400,
     ],
     [
-        &#039;name&#039;  =&gt; &#039;平成&#039;,
-        &#039;abbr&#039;  =&gt; &#039;H&#039;,
-        &#039;since&#039; =&gt; 600188400,
+        &quot;name&quot;  =&gt; &quot;平成&quot;,
+        &quot;abbr&quot;  =&gt; &quot;H&quot;,
+        &quot;since&quot; =&gt; 600188400,
     ],
     [
-        &#039;name&#039;  =&gt; &#039;昭和&#039;,
-        &#039;abbr&#039;  =&gt; &#039;S&#039;,
-        &#039;since&#039; =&gt; -1357635600,
+        &quot;name&quot;  =&gt; &quot;昭和&quot;,
+        &quot;abbr&quot;  =&gt; &quot;S&quot;,
+        &quot;since&quot; =&gt; -1357635600,
     ],
     [
-        &#039;name&#039;  =&gt; &#039;大正&#039;,
-        &#039;abbr&#039;  =&gt; &#039;T&#039;,
-        &#039;since&#039; =&gt; -1812186000,
+        &quot;name&quot;  =&gt; &quot;大正&quot;,
+        &quot;abbr&quot;  =&gt; &quot;T&quot;,
+        &quot;since&quot; =&gt; -1812186000,
     ],
     [
-        &#039;name&#039;  =&gt; &#039;明治&#039;,
-        &#039;abbr&#039;  =&gt; &#039;M&#039;,
-        &#039;since&#039; =&gt; -3216790800,
+        &quot;name&quot;  =&gt; &quot;明治&quot;,
+        &quot;abbr&quot;  =&gt; &quot;M&quot;,
+        &quot;since&quot; =&gt; -3216790800,
     ],
 ]</var>
 					</h4>
@@ -252,7 +252,7 @@ assertSame(date_convert('Y/m/d H:i:s.u', $now), '2009/02/14 08:31:30.123000');
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L197-L398" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_interval()" tabindex="-1" class="structure-title ">
-                        date_interval						<small>($sec, $format = null, $limit_type = &#039;y&#039;)</small>
+                        date_interval						<small>($sec, $format = null, $limit_type = &quot;y&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する</p>
@@ -321,7 +321,7 @@ assertInstanceOf(\DateInterval::class, date_interval(123.456));
 			</tr>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>int</td>
-				<td class="rest">$limit_type = &#039;y&#039;</td>
+				<td class="rest">$limit_type = &quot;y&quot;</td>
 				<td class="desc"><p>どこまで換算するか（[c|y|m|d|h|i|s]）</p>
 </td>
 			</tr>

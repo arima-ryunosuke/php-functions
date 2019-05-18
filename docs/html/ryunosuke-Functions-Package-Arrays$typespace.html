@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Arrays)</small>
@@ -1401,7 +1401,7 @@ assertSame(array_sprintf([
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L810-L856" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_strpad()" tabindex="-1" class="structure-title ">
-                        array_strpad						<small>($array, $key_prefix, $val_prefix = &#039;&#039;)</small>
+                        array_strpad						<small>($array, $key_prefix, $val_prefix = &quot;&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列のキー・要素に文字列を付加する</p>
@@ -1433,7 +1433,7 @@ assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', '
 			</tr>
         			<tr>
 				<td class="type">string<span class="type-separator"></span><wbr>array</td>
-				<td class="rest">$val_prefix = &#039;&#039;</td>
+				<td class="rest">$val_prefix = &quot;&quot;</td>
 				<td class="desc"><p>値側の付加文字列</p>
 </td>
 			</tr>
@@ -1990,7 +1990,7 @@ assertSame($array, ['piyo' =&gt; 'PIYO']);
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1243-L1282" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_dive()" tabindex="-1" class="structure-title ">
-                        array_dive						<small>($array, $path, $default = null, $delimiter = &#039;.&#039;)</small>
+                        array_dive						<small>($array, $path, $default = null, $delimiter = &quot;.&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>パス形式で配列値を取得</p>
@@ -2032,7 +2032,7 @@ assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;.&#039;</td>
+				<td class="rest">$delimiter = &quot;.&quot;</td>
 				<td class="desc"><p>パスの区切り文字。大抵は '.' か '/'</p>
 </td>
 			</tr>
@@ -4641,7 +4641,7 @@ assertSame(array_flatten($array, '.'), [
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3055-L3129" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
-                        array_nest						<small>($array, $delimiter = &#039;.&#039;)</small>
+                        array_nest						<small>($array, $delimiter = &quot;.&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>シンプルな [キー =&gt; 値] な配列から階層配列を生成する</p>
@@ -4702,7 +4702,7 @@ catch (\Exception $e) {
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;.&#039;</td>
+				<td class="rest">$delimiter = &quot;.&quot;</td>
 				<td class="desc"><p>キーの区切り文字</p>
 </td>
 			</tr>
@@ -4739,7 +4739,7 @@ catch (\Exception $e) {
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3131-L3231" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_difference()" tabindex="-1" class="structure-title ">
-                        array_difference						<small>($array1, $array2, $delimiter = &#039;.&#039;)</small>
+                        array_difference						<small>($array1, $array2, $delimiter = &quot;.&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>配列の差分を取り配列で返す</p>
@@ -4792,7 +4792,7 @@ assertSame(array_difference([
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$delimiter = &#039;.&#039;</td>
+				<td class="rest">$delimiter = &quot;.&quot;</td>
 				<td class="desc"><p>差分配列のキー区切り文字</p>
 </td>
 			</tr>

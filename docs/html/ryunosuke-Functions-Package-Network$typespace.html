@@ -3,7 +3,7 @@
 <head>	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/zenburn.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/foundation.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
 	<link rel="stylesheet" type="text/css" data-href="common.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -34,9 +34,9 @@
         })();
 	</script>
     </head>
-<body>
+<body class="typespace">
 <a id="anchor" href="./" style="display: none"></a>
-<h1 class="ellipsis">
+<h1 class="ellipsis fixed">
 	<span class="pull-left">
 	Structure
 	<small class="ellipsis-text">(ryunosuke\Functions\Package\Network)</small>
@@ -86,7 +86,7 @@
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::getipaddress()" tabindex="-1" class="structure-title ">
-                        getipaddress						<small>($target = &#039;128.0.0.0&#039;)</small>
+                        getipaddress						<small>($target = &quot;128.0.0.0&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>接続元となる IP を返す</p>
@@ -103,7 +103,7 @@ assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
 		<tbody>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">$target = &#039;128.0.0.0&#039;</td>
+				<td class="rest">$target = &quot;128.0.0.0&quot;</td>
 				<td class="desc"><p>接続先。基本的に指定することはない</p>
 </td>
 			</tr>
@@ -206,7 +206,7 @@ assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
                         			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L88-L193" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::ping()" tabindex="-1" class="structure-title ">
-                        ping						<small>($host, $port = null, $timeout = 1, &amp;$errstr = &#039;&#039;)</small>
+                        ping						<small>($host, $port = null, $timeout = 1, &amp;$errstr = &quot;&quot;)</small>
 					</h4>
 					<div class="inner-item">
 						<div class="description"><p>ネットワーク疎通を返す</p>
@@ -245,7 +245,7 @@ assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
 			</tr>
         			<tr>
 				<td class="type">string</td>
-				<td class="rest">&amp;$errstr = &#039;&#039;</td>
+				<td class="rest">&amp;$errstr = &quot;&quot;</td>
 				<td class="desc"><p>エラー文字列が格納される</p>
 </td>
 			</tr>
