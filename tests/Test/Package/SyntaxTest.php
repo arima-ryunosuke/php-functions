@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test\Package;
 
+use stdClass;
+
 class SyntaxTest extends AbstractTestCase
 {
     function test_evaluate()
@@ -349,6 +351,39 @@ PHP
         (throw_if)(false, new \Exception('message', 123));
         $this->assertException(new \Exception('message', 123), throw_if, true, new \Exception('message', 123));
         $this->assertException(new \Exception('message', 123), throw_if, true, \Exception::class, 'message', 123);
+    }
+
+    function test_blank_if()
+    {
+        $stdclass = new stdClass();
+        $countableF = new \ArrayObject([]);
+        $stringableF = new \SplFileInfo('');
+        $countableT = new \ArrayObject(['hoge']);
+        $stringableT = new \SplFileInfo('hoge');
+
+        $this->assertSame('default', (blank_if)(null) ?? 'default');
+        $this->assertSame('default', (blank_if)(false) ?? 'default');
+        $this->assertSame('default', (blank_if)('') ?? 'default');
+        $this->assertSame('default', (blank_if)($countableF) ?? 'default');
+        $this->assertSame('default', (blank_if)($stringableF) ?? 'default');
+        $this->assertSame(0, (blank_if)(0) ?? 'default');
+        $this->assertSame('0', (blank_if)('0') ?? 'default');
+        $this->assertSame('X', (blank_if)('X') ?? 'default');
+        $this->assertSame($stdclass, (blank_if)($stdclass) ?? 'default');
+        $this->assertSame($countableT, (blank_if)($countableT) ?? 'default');
+        $this->assertSame($stringableT, (blank_if)($stringableT) ?? 'default');
+
+        $this->assertSame('default', (blank_if)(null, 'default'));
+        $this->assertSame('default', (blank_if)(false, 'default'));
+        $this->assertSame('default', (blank_if)('', 'default'));
+        $this->assertSame('default', (blank_if)($countableF, 'default'));
+        $this->assertSame('default', (blank_if)($stringableF, 'default'));
+        $this->assertSame(0, (blank_if)(0, 'default'));
+        $this->assertSame('0', (blank_if)('0', 'default'));
+        $this->assertSame('X', (blank_if)('X', 'default'));
+        $this->assertSame($stdclass, (blank_if)($stdclass, 'default'));
+        $this->assertSame($countableT, (blank_if)($countableT, 'default'));
+        $this->assertSame($stringableT, (blank_if)($stringableT, 'default'));
     }
 
     function test_ifelse()

@@ -520,6 +520,106 @@ class Syntax
     }
 
     /**
+     * 値が空なら null を返す
+     *
+     * `is_empty($value) ? $value : null` とほぼ同じ。
+     * 言ってしまえば「falsy な値を null に変換する」とも言える。
+     *
+     * ここでいう falsy とは php 標準の `empty` ではなく本ライブラリの `is_empty` であることに留意（"0" は空ではない）。
+     * さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。
+     * 乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。
+     *
+     * - 「 `$var ?: 'default'` で十分なんだけど "0" が…」
+     * - 「 `$var ?? 'default'` で十分なんだけど false が…」
+     *
+     * という状況はまれによくあるはず。
+     *
+     * ?? との親和性のため null を返す動作がデフォルトだが、そのデフォルト値は引数で渡すこともできる。
+     * 用途は Example を参照。
+     *
+     * Example:
+     * ```php
+     * // falsy な値は null を返すので null 合体演算子でデフォルト値が得られる
+     * assertSame(blank_if(null) ?? 'default', 'default');
+     * assertSame(blank_if('')   ?? 'default', 'default');
+     * // falsy じゃない値の場合は引数をそのまま返すので null 合体演算子には反応しない
+     * assertSame(blank_if(0)   ?? 'default', 0);   // 0 は空ではない
+     * assertSame(blank_if('0') ?? 'default', '0'); // "0" は空ではない
+     * assertSame(blank_if(1)   ?? 'default', 1);
+     * assertSame(blank_if('X') ?? 'default', 'X');
+     * // 第2引数で返る値を指定できるので下記も等価となる。ただし、php の仕様上第2引数が必ず評価されるため、関数呼び出しなどだと無駄な処理となる
+     * assertSame(blank_if(null, 'default'), 'default');
+     * assertSame(blank_if('',   'default'), 'default');
+     * assertSame(blank_if(0,    'default'), 0);
+     * assertSame(blank_if('0',  'default'), '0');
+     * assertSame(blank_if(1,    'default'), 1);
+     * assertSame(blank_if('X',  'default'), 'X');
+     * // 第2引数の用途は少し短く書けることと演算子の優先順位のつらみの回避程度（`??` は結構優先順位が低い。下記を参照）
+     * assertFalse(0 < blank_if(null) ?? 1);  // (0 < null) ?? 1 となるので false
+     * assertTrue(0 < blank_if(null, 1));     // 0 < 1 となるので true
+     * assertTrue(0 < (blank_if(null) ?? 1)); // ?? で同じことしたいならこのように括弧が必要
+     *
+     * # ここから下は既存言語機構との比較（愚痴っぽいので読まなくてもよい）
+     *
+     * // エルビス演算子は "0" にも反応するので正直言って使いづらい（php における falsy の定義は広すぎる）
+     * assertSame(null ?: 'default', 'default');
+     * assertSame(''   ?: 'default', 'default');
+     * assertSame(1    ?: 'default', 1);
+     * assertSame('0'  ?: 'default', 'default'); // こいつが反応してしまう
+     * assertSame('X'  ?: 'default', 'X');
+     * // 逆に null 合体演算子は null にしか反応しないので微妙に使い勝手が悪い（php の標準関数が false を返したりするし）
+     * assertSame(null ?? 'default', 'default'); // こいつしか反応しない
+     * assertSame(''   ?? 'default', '');
+     * assertSame(1    ?? 'default', 1);
+     * assertSame('0'  ?? 'default', '0');
+     * assertSame('X'  ?? 'default', 'X');
+     * // 恣意的な例だが、 substr は false も '0' も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
+     * assertSame(substr('000', 1, 1) ?: 'default', 'default'); // '0' を返すので 'default' になる
+     * assertSame(substr('xxx', 9, 1) ?: 'default', 'default'); // （文字数が足りなくて）false を返すので 'default' になる
+     * assertSame(substr('000', 1, 1) ?? 'default', '0');   // substr が null を返すことはないので 'default' になることはない
+     * assertSame(substr('xxx', 9, 1) ?? 'default', false); // substr が null を返すことはないので 'default' になることはない
+     * // 要するに単に「false が返ってきた場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
+     * assertSame(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1), 'default'); // 3項演算子で2回呼ぶ
+     * assertSame(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp, 'default');       // 一時変数を使用する（あるいは if 文）
+     * // このように書きたかった
+     * assertSame(blank_if(substr('xxx', 9, 1)) ?? 'default', 'default'); // null 合体演算子版
+     * assertSame(blank_if(substr('xxx', 9, 1), 'default'), 'default');   // 第2引数版
+     *
+     * // 恣意的な例その2。 0 は空ではないので array_search などにも応用できる（見つからない場合に false を返すので ?? はできないし、 false 相当を返し得るので ?: もできない）
+     * assertSame(array_search('x', ['a', 'b', 'c']) ?? 'default', false);     // 見つからないので 'default' としたいが false になってしまう
+     * assertSame(array_search('a', ['a', 'b', 'c']) ?: 'default', 'default'); // 見つかったのに 0 に反応するので 'default' になってしまう
+     * assertSame(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default', 'default'); // このように書きたかった
+     * assertSame(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default', 0);         // このように書きたかった
+     * ```
+     *
+     * @param mixed $var 判定する値
+     * @param mixed $default 空だった場合のデフォルト値
+     * @return mixed 空なら $default, 空じゃないなら $var をそのまま返す
+     */
+    public static function blank_if($var, $default = null)
+    {
+        if (is_object($var)) {
+            // 文字列化できるかが優先
+            if ((is_stringable)($var)) {
+                return strlen($var) ? $var : $default;
+            }
+            // 次点で countable
+            if ((is_countable)($var)) {
+                return count($var) ? $var : $default;
+            }
+            return $var;
+        }
+
+        // 0, "0" は false
+        if ($var === 0 || $var === '0') {
+            return $var;
+        }
+
+        // 上記以外は empty に任せる
+        return empty($var) ? $default : $var;
+    }
+
+    /**
      * if ～ else 構文の関数版
      *
      * 一言で言えば `$actual === $expected ? $then : $else` という動作になる。
