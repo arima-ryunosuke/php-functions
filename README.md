@@ -70,7 +70,7 @@ file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::expo
 これの利点は名前空間を変更できる点と、管理下のディレクトリに吐き出せることでカスタムができる点です。
 逆に言えば既存の処理しか使わないなら任意名前空間に吐き出すメリットはあまりありません。
 
-下記のようにすると指定した関数と依存関係にある関数のみが吐き出されます。
+下記のように第3引数を指定すると指定した関数と依存関係にある関数のみが吐き出されます。
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
@@ -79,7 +79,16 @@ require __DIR__ . '/vendor/autoload.php';
 file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', false, ['funcA', 'funcB']));
 ```
 
-`funcA` や `funcB` が例えば `funcC` に依存していれば `funcC` も吐き出されます。
+さらに第3引数にファイル名やディレクトリ名を与えるとそれらを php とみなして実際に使用されている関数のみが吐き出されます。
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+
+// /path/to/project 内で使われている関数だけを出力
+file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', false, '/path/to/project'));
+```
+
+依存関係も解決するので、例えば `funcA` や `funcB` が `funcC` に依存していれば `funcC` も吐き出されます。
 用途はちょろっとしたコード片のコピペ用です（全体は要らんけど特定のやつだけ吐き出したい用途が個人的にあった）。
 
 ### constant

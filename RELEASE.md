@@ -10,6 +10,26 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.5
+
+- [feature][Math] normal_rand を追加
+- [feature][Math] clamp を追加
+- [feature][Funchand] abind を追加
+- [feature][Arrays] array_fill_gap を追加
+- [feature][Arrays] array_rekey を追加
+- [feature][Strings] str_anyof を追加
+- [feature][Strings] str_embed を追加
+- [feature][Strings] ngram を追加
+- [change][Strings] str_guess の内部実装を変更
+- [feature][Syntax] blank_if を追加
+- [fixbug][Sql] sql_bind でクオートやコメント内でも埋め込まれてしまう不具合を修正
+- [feature][Vars] is_empty の空 stdClass 対応
+- [feature][Utility] stacktrace にオプションを追加
+  - 引数包含オプション
+  - デリミタオプション
+  - 機密マスクオプション
+- [feature][Transporter] ファイル内で使用している関数の出力機能
+
 ## 1.3.4
 
 - [fixbug][Classobj] get_object_properties で親の private フィールドが含まれていない不具合を修正
