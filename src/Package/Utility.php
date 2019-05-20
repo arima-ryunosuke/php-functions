@@ -572,31 +572,47 @@ class Utility
      * 第1引数 $traces はトレース的配列を受け取る（`(new \Exception())->getTrace()` とか）。
      * 未指定時は debug_backtrace() で採取する。
      *
-     * 第2引数 $option は文字列化する際の設定を指定するが、あまり指定することはないはず。
-     * 今のところ limit と format のみであり、かつこれらは比較的指定頻度が高いので配列オプションではなく直に渡すことが可能になっている。
+     * 第2引数 $option は文字列化する際の設定を指定する。
+     * 情報量が増える分、機密も含まれる可能性があるため、 mask オプションで塗りつぶすキーや引数名を指定できる（クロージャの引数までは手出ししないため留意）。
+     * limit と format は比較的指定頻度が高いかつ互換性維持のため配列オプションではなく直に渡すことが可能になっている。
      *
      * @param array $traces debug_backtrace 的な配列
      * @param int|string|array $option オプション
-     * @return string トレース文字列
+     * @return string|array トレース文字列（delimiter オプションに null を渡すと配列で返す）
      */
-    public static function stacktrace($traces = null, $option = ['format' => '%s:%s %s', 'limit' => 16])
+    public static function stacktrace($traces = null, $option = [])
     {
         if (is_int($option)) {
-            $limit = $option;
-            $format = '%s:%s %s';
+            $option = ['limit' => $option];
         }
         elseif (is_string($option)) {
-            $limit = 16;
-            $format = $option;
-        }
-        else {
-            $limit = $option['limit'] ?? 16;
-            $format = $option['format'] ?? '%s:%s %s';
+            $option = ['format' => $option];
         }
 
-        $stringify = function ($value) use ($limit) {
+        $option += [
+            'format'    => '%s:%s %s', // 文字列化するときの sprintf フォーマット
+            'args'      => true,       // 引数情報を埋め込むか否か
+            'limit'     => 16,         // 配列や文字列を千切る長さ
+            'delimiter' => "\n",       // スタックトレースの区切り文字（null で配列になる）
+            'mask'      => ['#^password#', '#^secret#', '#^credential#', '#^credit#'],
+        ];
+        $limit = $option['limit'];
+        $maskregexs = (array) $option['mask'];
+        $mask = static function ($key, $value) use ($maskregexs) {
+            if (!is_string($value)) {
+                return $value;
+            }
+            foreach ($maskregexs as $regex) {
+                if (preg_match($regex, $key)) {
+                    return str_repeat('*', strlen($value));
+                }
+            }
+            return $value;
+        };
+
+        $stringify = static function ($value) use ($limit, $mask) {
             // 再帰用クロージャ
-            $export = function ($value, $nest = 0, $parents = []) use (&$export, $limit) {
+            $export = static function ($value, $nest = 0, $parents = []) use (&$export, $limit, $mask) {
                 // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
                 foreach ($parents as $parent) {
                     if ($parent === $value) {
@@ -613,11 +629,11 @@ class Utility
                             $kvl[] = sprintf('...(more %d length)', count($value) - $limit);
                             break;
                         }
-                        $kvl[] = ($flat ? '' : $k . ':') . $export($v, $nest + 1, $parents);
+                        $kvl[] = ($flat ? '' : $k . ':') . $export(call_user_func($mask, $k, $v), $nest + 1, $parents);
                     }
                     return ($flat ? '[' : '{') . implode(', ', $kvl) . ($flat ? ']' : '}');
                 }
-                // オブジェクトは単にプロパティを __set_state する文字列を出力する
+                // オブジェクトは単にプロパティを配列的に出力する
                 elseif (is_object($value)) {
                     $parents[] = $value;
                     return get_class($value) . $export((get_object_properties)($value), $nest, $parents);
@@ -654,15 +670,38 @@ class Utility
                 $line = $traces[$i + 1]['line'] . "." . $trace['line'];
             }
 
-            $callee = $trace['function'];
             if (isset($trace['type'])) {
-                $callee = $trace['class'] . $trace['type'] . $callee;
+                $callee = $trace['class'] . $trace['type'] . $trace['function'];
+                if ($option['args'] && $maskregexs && method_exists($trace['class'], $trace['function'])) {
+                    $ref = new \ReflectionMethod($trace['class'], $trace['function']);
+                }
             }
-            $callee .= '(' . implode(', ', array_map($stringify, $trace['args'] ?? [])) . ')';
+            else {
+                $callee = $trace['function'];
+                if ($option['args'] && $maskregexs && function_exists($callee)) {
+                    $ref = new \ReflectionFunction($trace['function']);
+                }
+            }
+            $args = [];
+            if ($option['args']) {
+                $args = $trace['args'] ?? [];
+                if (isset($ref)) {
+                    $params = $ref->getParameters();
+                    foreach ($params as $n => $param) {
+                        if (array_key_exists($n, $args)) {
+                            $args[$n] = $mask($param->getName(), $args[$n]);
+                        }
+                    }
+                }
+            }
+            $callee .= '(' . implode(', ', array_map($stringify, $args)) . ')';
 
-            $result[] = sprintf($format, $file, $line, $callee);
+            $result[] = sprintf($option['format'], $file, $line, $callee);
         }
-        return implode("\n", $result);
+        if ($option['delimiter'] === null) {
+            return $result;
+        }
+        return implode($option['delimiter'], $result);
     }
 
     /**

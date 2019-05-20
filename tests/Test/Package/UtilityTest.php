@@ -493,6 +493,7 @@ class UtilityTest extends AbstractTestCase
             function im() { return $this::sm(); }
         };
 
+        // stack
         $traces = explode("\n", $mock->im());
         $this->assertContains('test_stacktrace_in', $traces[0]);
         $this->assertContains('eval', $traces[1]);
@@ -501,6 +502,7 @@ class UtilityTest extends AbstractTestCase
         $this->assertContains('::sm', $traces[4]);
         $this->assertContains('->im', $traces[5]);
 
+        // limit
         $traces = (stacktrace)([
             [
                 'file'     => 'hoge',
@@ -527,15 +529,7 @@ class UtilityTest extends AbstractTestCase
         $this->assertContains('{n:{e:{s:{t:"X"}}}}', $traces);
         $this->assertContains('["la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", ...(more 1 length)', $traces);
 
-        $traces = (stacktrace)([
-            [
-                'file'     => 'hoge',
-                'line'     => 1,
-                'function' => 'func',
-            ]
-        ], '%s');
-        $this->assertEquals('hoge', $traces);
-
+        // limit (specify)
         $traces = (stacktrace)([
             [
                 'file'     => 'hoge',
@@ -548,6 +542,72 @@ class UtilityTest extends AbstractTestCase
             ]
         ], 2);
         $this->assertEquals('hoge:1 func("ab...(more 1 length)", ["a", "b", ...(more 1 length)])', $traces);
+
+        // format
+        $traces = (stacktrace)([
+            [
+                'file'     => 'hoge',
+                'line'     => 1,
+                'function' => 'func',
+            ]
+        ], '%s');
+        $this->assertEquals('hoge', $traces);
+
+        // args
+        $traces = (stacktrace)([
+            [
+                'file'     => 'hoge',
+                'line'     => 1,
+                'function' => 'func',
+                'args'     => [
+                    'abc',
+                    ['a', 'b', 'c'],
+                ],
+            ]
+        ], ['args' => false]);
+        $this->assertEquals('hoge:1 func()', $traces);
+
+        // delimiter
+        $traces = (stacktrace)([
+            [
+                'file'     => 'hoge',
+                'line'     => 1,
+                'function' => 'func',
+                'args'     => [
+                    'abc',
+                    ['a', 'b', 'c'],
+                ],
+            ]
+        ], ['delimiter' => null]);
+        $this->assertEquals(['hoge:1 func("abc", ["a", "b", "c"])'], $traces);
+
+        function test_stacktrace_mask($password, $array, $config)
+        {
+            assert(!!$password);
+            assert(!!$array);
+            assert(!!$config);
+            return (stacktrace)();
+        }
+
+        $class = new class()
+        {
+            static function sm($password, $array, $config)
+            {
+                return test_stacktrace_mask($password, $array, $config);
+            }
+
+            function im($password, $array, $config)
+            {
+                return self::sm($password, $array, $config);
+            }
+        };
+
+        // mask
+        $actual = $class->im('XXX', ['secret' => 'XXX'], (object) ['credit' => 'XXX']);
+        // XXX は塗りつぶされるので決して出現しない
+        $this->assertNotContains('XXX', $actual);
+        // im, sm, test_stacktrace_mask の3回呼び出してるので計9個塗りつぶされる
+        $this->assertEquals(9, substr_count($actual, '***'));
     }
 
     function test_backtrace()
