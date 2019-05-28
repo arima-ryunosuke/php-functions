@@ -4,6 +4,12 @@ namespace ryunosuke\Test\Package;
 
 class FunchandTest extends AbstractTestCase
 {
+    function test_abind()
+    {
+        $sprintf = (abind)('sprintf', [1 => 'a', 3 => 'c']);
+        $this->assertEquals('abcZ', $sprintf('%s%s%s%s', 'b', 'Z'));
+    }
+
     function test_nbind()
     {
         $arrayize_2X = (nbind)(arrayize, 2, 'X');

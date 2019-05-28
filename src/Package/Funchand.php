@@ -67,6 +67,26 @@ class Funchand
     }
 
     /**
+     * $callable の引数を指定配列で束縛したクロージャを返す
+     *
+     * Example:
+     * ```php
+     * $bind = abind('sprintf', [1 => 'a', 3 => 'c']);
+     * assertSame($bind('%s%s%s', 'b'), 'abc');
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param array $default_args 本来の引数
+     * @return \Closure 束縛したクロージャ
+     */
+    public static function abind($callable, $default_args)
+    {
+        return (delegate)(function ($callable, $args) use ($default_args) {
+            return $callable(...(array_fill_gap)($default_args, ...$args));
+        }, $callable, (parameter_length)($callable, true) - count($default_args));
+    }
+
+    /**
      * $callable の指定位置に引数を束縛したクロージャを返す
      *
      * Example:
