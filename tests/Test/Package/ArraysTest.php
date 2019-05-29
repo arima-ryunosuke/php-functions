@@ -1587,6 +1587,18 @@ class ArraysTest extends AbstractTestCase
         $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], (array_shrink_key)($object, $object1, $object2, $object3));
     }
 
+    function test_array_fill_gap()
+    {
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)(['a', 'b', 'c'], 'd', 'e'));
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)(['a', 'b', 3 => 'd'], 'c', 'e'));
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)([1 => 'b', 3 => 'd'], 'a', 'c', 'e'));
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)([], 'a', 'b', 'c', 'd', 'e'));
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)(['a', 'b', 'c', 'd', 'e']));
+        $this->assertSame(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 'c', 'd', 'z' => 'Noise', 'e'], (array_fill_gap)(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 3 => 'd', 'z' => 'Noise'], 'c', 'e'));
+        $this->assertSame(['a', 'b', 'c', 4 => 'e'], (array_fill_gap)(['a', 4 => 'e'], 'b', 'c'));
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)((array_fill_gap)(['a', 4 => 'e'], 'b', 'c'), 'd'));
+    }
+
     function test_array_fill_callback()
     {
         $this->assertSame(array_combine($keys = ['a', 'b', 'c'], array_map('strtoupper', $keys)), (array_fill_callback)(['a', 'b', 'c'], 'strtoupper'));
