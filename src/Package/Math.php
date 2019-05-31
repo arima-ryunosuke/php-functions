@@ -184,6 +184,54 @@ class Math
     }
 
     /**
+     * 値を一定範囲に収める
+     *
+     * $circulative に true を渡すと値が循環する。
+     * ただし、循環的な型に限る（整数のみ？）。
+     *
+     * Example:
+     * ```php
+     * // 5～9 に収める
+     * assertSame(clamp(4, 5, 9), 5); // 4 は [5～9] の範囲外なので 5 に切り上げられる
+     * assertSame(clamp(5, 5, 9), 5); // 範囲内なのでそのまま
+     * assertSame(clamp(6, 5, 9), 6); // 範囲内なのでそのまま
+     * assertSame(clamp(7, 5, 9), 7); // 範囲内なのでそのまま
+     * assertSame(clamp(8, 5, 9), 8); // 範囲内なのでそのまま
+     * assertSame(clamp(9, 5, 9), 9); // 範囲内なのでそのまま
+     * assertSame(clamp(10, 5, 9), 9); // 10 は [5～9] の範囲外なので 9 に切り下げられる
+     *
+     * // 5～9 に収まるように循環する
+     * assertSame(clamp(4, 5, 9, true), 9); // 4 は [5～9] の範囲外なので循環して 9 になる
+     * assertSame(clamp(5, 5, 9, true), 5); // 範囲内なのでそのまま
+     * assertSame(clamp(6, 5, 9, true), 6); // 範囲内なのでそのまま
+     * assertSame(clamp(7, 5, 9, true), 7); // 範囲内なのでそのまま
+     * assertSame(clamp(8, 5, 9, true), 8); // 範囲内なのでそのまま
+     * assertSame(clamp(9, 5, 9, true), 9); // 範囲内なのでそのまま
+     * assertSame(clamp(10, 5, 9, true), 5); // 10 は [5～9] の範囲外なので循環して 5 になる
+     * ```
+     *
+     * @param int|mixed $value 対象の値
+     * @param int|mixed $min 最小値
+     * @param int|mixed $max 最大値
+     * @param bool $circulative true だと切り詰めるのではなく循環する
+     * @return int 一定範囲に収められた値
+     */
+    public static function clamp($value, $min, $max, $circulative = false)
+    {
+        if (!$circulative) {
+            return max($min, min($max, $value));
+        }
+
+        if ($value < $min) {
+            return $max + ($value - $max) % ($max - $min + 1);
+        }
+        if ($value > $max) {
+            return $min + ($value - $min) % ($max - $min + 1);
+        }
+        return $value;
+    }
+
+    /**
      * 引数をランダムで返す
      *
      * - 候補がない場合はエラーではなく例外を投げる

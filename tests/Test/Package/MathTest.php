@@ -115,6 +115,139 @@ class MathTest extends AbstractTestCase
         $this->assertEquals(6.5, (sum)('1', 2, 3.5, 'x'));
     }
 
+    function test_clamp()
+    {
+        $circulative_false = [
+            -8  => 5,
+            -7  => 5,
+            -6  => 5,
+            -5  => 5,
+            -4  => 5,
+            -3  => 5,
+            -2  => 5,
+            -1  => 5,
+            0   => 5,
+            +1  => 5,
+            +2  => 5,
+            +3  => 5,
+            +4  => 5,
+            +5  => 5,
+            +6  => 6,
+            +7  => 7,
+            +8  => 8,
+            +9  => 9,
+            +10 => 10,
+            +11 => 10,
+        ];
+        foreach ($circulative_false as $actual => $expected) {
+            $this->assertEquals($expected, (clamp)($actual, 5, 10, false), json_encode(compact('actual', 'expected')));
+        }
+
+        $circulative_true = [
+            -8  => 10,
+            -7  => 5,
+            -6  => 6,
+            -5  => 7,
+            -4  => 8,
+            -3  => 9,
+            -2  => 10,
+            -1  => 5,
+            0   => 6,
+            +1  => 7,
+            +2  => 8,
+            +3  => 9,
+            +4  => 10,
+            +5  => 5,
+            +6  => 6,
+            +7  => 7,
+            +8  => 8,
+            +9  => 9,
+            +10 => 10,
+            +11 => 5,
+        ];
+        foreach ($circulative_true as $actual => $expected) {
+            $this->assertEquals($expected, (clamp)($actual, 5, 10, true), json_encode(compact('actual', 'expected')));
+        }
+
+        $circulative_false = [
+            -11 => -10,
+            -10 => -10,
+            -9  => -9,
+            -8  => -8,
+            -7  => -7,
+            -6  => -6,
+            -5  => -5,
+            -4  => -5,
+            -3  => -5,
+            -2  => -5,
+            -1  => -5,
+            0   => -5,
+            +1  => -5,
+            +2  => -5,
+        ];
+        foreach ($circulative_false as $actual => $expected) {
+            $this->assertEquals($expected, (clamp)($actual, -10, -5, false), json_encode(compact('actual', 'expected')));
+        }
+
+        $circulative_false = [
+            -11 => -5,
+            -10 => -10,
+            -9  => -9,
+            -8  => -8,
+            -7  => -7,
+            -6  => -6,
+            -5  => -5,
+            -4  => -10,
+            -3  => -9,
+            -2  => -8,
+            -1  => -7,
+            0   => -6,
+            +1  => -5,
+            +2  => -10,
+        ];
+        foreach ($circulative_false as $actual => $expected) {
+            $this->assertEquals($expected, (clamp)($actual, -10, -5, true), json_encode(compact('actual', 'expected')));
+        }
+
+        $circulative_false = [
+            -6 => -5,
+            -5 => -5,
+            -4 => -4,
+            -3 => -3,
+            -2 => -2,
+            -1 => -1,
+            0  => 0,
+            +1 => 1,
+            +2 => 2,
+            +3 => 3,
+            +4 => 4,
+            +5 => 5,
+            +6 => 5,
+        ];
+        foreach ($circulative_false as $actual => $expected) {
+            $this->assertEquals($expected, (clamp)($actual, -5, 5, false), json_encode(compact('actual', 'expected')));
+        }
+
+        $circulative_false = [
+            -6 => 5,
+            -5 => -5,
+            -4 => -4,
+            -3 => -3,
+            -2 => -2,
+            -1 => -1,
+            0  => 0,
+            +1 => 1,
+            +2 => 2,
+            +3 => 3,
+            +4 => 4,
+            +5 => 5,
+            +6 => -5,
+        ];
+        foreach ($circulative_false as $actual => $expected) {
+            $this->assertEquals($expected, (clamp)($actual, -5, 5, true), json_encode(compact('actual', 'expected')));
+        }
+    }
+
     function test_random_at()
     {
         mt_srand(123); // 時々変えた方がいい
