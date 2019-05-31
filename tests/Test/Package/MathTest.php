@@ -305,4 +305,24 @@ class MathTest extends AbstractTestCase
         $this->assertException('probability must be positive number', probability, -1, 1);
         $this->assertException('divisor must be positive number', probability, 1, -1);
     }
+
+    function test_normal_rand()
+    {
+        mt_srand(234);
+
+        $this->assertEquals(61.517088409096196, (normal_rand)(50, 5));
+        $this->assertEquals(47.46220149346318, (normal_rand)(50, 5));
+        $this->assertEquals(48.86526339618124, (normal_rand)(50, 5));
+        $this->assertEquals(55.70268085601572, (normal_rand)(50, 5));
+        $this->assertEquals(52.42643082618295, (normal_rand)(50, 5));
+
+        $average = [
+            (normal_rand)(50, 5),
+            (normal_rand)(50, 5),
+            (normal_rand)(50, 5),
+            (normal_rand)(50, 5),
+            (normal_rand)(50, 5),
+        ];
+        $this->assertRange(45, 55, array_sum($average) / count($average));
+    }
 }

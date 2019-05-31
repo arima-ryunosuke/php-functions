@@ -284,4 +284,46 @@ class Math
         // 3. 100 個中1個なので 1%
         return $probability > mt_rand(0, $divisor - 1);
     }
+
+    /**
+     * 正規乱数（正規分布に従う乱数）を返す
+     *
+     * ※ ボックス＝ミュラー法
+     *
+     * Example:
+     * ```php
+     * mt_srand(4); // テストがコケるので種固定
+     *
+     * // 平均 100, 標準偏差 10 の正規乱数を得る
+     * assertSame(normal_rand(100, 10), 101.16879645296162);
+     * assertSame(normal_rand(100, 10), 96.49615862542069);
+     * assertSame(normal_rand(100, 10), 87.74557282679618);
+     * assertSame(normal_rand(100, 10), 117.93697951557125);
+     * assertSame(normal_rand(100, 10), 99.1917453115627);
+     * assertSame(normal_rand(100, 10), 96.74688207698713);
+     * ```
+     *
+     * @param float $average 平均
+     * @param float $std_deviation 標準偏差
+     * @return float 正規乱数
+     */
+    public static function normal_rand($average = 0.0, $std_deviation = 1.0)
+    {
+        static $z2, $rand_max, $generate = true;
+        $rand_max = $rand_max ?? mt_getrandmax();
+        $generate = !$generate;
+
+        if ($generate) {
+            return $z2 * $std_deviation + $average;
+        }
+
+        $u1 = mt_rand(1, $rand_max) / $rand_max;
+        $u2 = mt_rand(0, $rand_max) / $rand_max;
+        $v1 = sqrt(-2 * log($u1));
+        $v2 = 2 * M_PI * $u2;
+        $z1 = $v1 * cos($v2);
+        $z2 = $v1 * sin($v2);
+
+        return $z1 * $std_deviation + $average;
+    }
 }
