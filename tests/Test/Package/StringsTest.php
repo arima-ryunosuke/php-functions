@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test\Package;
 
+use Concrete;
+
 class StringsTest extends AbstractTestCase
 {
     function test_strcat()
@@ -116,6 +118,34 @@ class StringsTest extends AbstractTestCase
             'a"bc "',
             '',
         ], (quoteexplode)(' ', 'a"bc " ', '"'));
+    }
+
+    function test_str_anyof()
+    {
+        $this->assertSame((str_anyof)('a', ['a', 'b', 'c']), 0);
+        $this->assertSame((str_anyof)('b', ['a', 'b', 'c']), 1);
+        $this->assertSame((str_anyof)('c', ['a', 'b', 'c']), 2);
+        $this->assertSame((str_anyof)('x', ['a', 'b', 'c']), null);
+        $this->assertSame((str_anyof)('A', ['a', 'b', 'c'], true), 0);
+        $this->assertSame((str_anyof)('B', ['a', 'b', 'c'], true), 1);
+        $this->assertSame((str_anyof)('C', ['a', 'b', 'c'], true), 2);
+        $this->assertSame((str_anyof)('', ['a', 'b', 'c']), null);
+        $this->assertSame((str_anyof)(false, ['a', 'b', 'c']), null);
+        $this->assertSame((str_anyof)(null, ['a', 'b', 'c']), null);
+        $this->assertSame((str_anyof)('', ['', 'a', 'b', 'c']), 0);
+        $this->assertSame((str_anyof)(false, ['', 'a', 'b', 'c']), 0);
+        $this->assertSame((str_anyof)(null, ['', 'a', 'b', 'c']), 0);
+        $this->assertSame((str_anyof)('a', [new Concrete('a'), new Concrete('b'), new Concrete('c')]), 0);
+        $this->assertSame((str_anyof)('x', [new Concrete('a'), new Concrete('b'), new Concrete('c')]), null);
+        $this->assertSame((str_anyof)('A', [new Concrete('a'), new Concrete('b'), new Concrete('c')], true), 0);
+        $this->assertSame((str_anyof)('1', [1, 2, 3]), 0);
+        $this->assertSame((str_anyof)('2', [1, 2, 3]), 1);
+        $this->assertSame((str_anyof)('3', [1, 2, 3]), 2);
+        $this->assertSame((str_anyof)('9', [1, 2, 3]), null);
+        $this->assertSame((str_anyof)(1, ['1', '2', '3']), 0);
+        $this->assertSame((str_anyof)(2, ['1', '2', '3']), 1);
+        $this->assertSame((str_anyof)(3, ['1', '2', '3']), 2);
+        $this->assertSame((str_anyof)(9, ['1', '2', '3']), null);
     }
 
     function test_str_equals()
