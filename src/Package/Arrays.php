@@ -1377,6 +1377,43 @@ class Arrays
     }
 
     /**
+     * キーをマップ配列で置換する
+     *
+     * 変換先が null だとその要素は取り除かれる。
+     *
+     * Example:
+     * ```php
+     * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+     * // a は x に c は z に置換される
+     * assertSame(array_rekey($array, ['a' => 'x', 'c' => 'z']), ['x' => 'A', 'b' => 'B', 'z' => 'C']);
+     * // b は削除され c は z に置換される
+     * assertSame(array_rekey($array, ['b' => null, 'c' => 'z']), ['a' => 'A', 'z' => 'C']);
+     * // キーの交換にも使える（a ⇔ c）
+     * assertSame(array_rekey($array, ['a' => 'c', 'c' => 'a']), ['c' => 'A', 'b' => 'B', 'a' => 'C']);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param array $keymap 正規表現
+     * @return array キーが置換された配列
+     */
+    public static function array_rekey($array, $keymap)
+    {
+        $result = [];
+        foreach ($array as $k => $v) {
+            if (array_key_exists($k, $keymap)) {
+                // null は突っ込まない（除去）
+                if ($keymap[$k] !== null) {
+                    $result[$keymap[$k]] = $v;
+                }
+            }
+            else {
+                $result[$k] = $v;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * キーを正規表現でフィルタする
      *
      * Example:

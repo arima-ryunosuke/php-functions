@@ -691,6 +691,18 @@ class ArraysTest extends AbstractTestCase
         }, false));
     }
 
+    function test_array_rekey()
+    {
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertEquals(['x' => 'A', 'b' => 'B', 'z' => 'C'], (array_rekey)($array, ['a' => 'x', 'c' => 'z']));
+        $this->assertEquals(['x' => 'A', 'b' => 'B', 'z' => 'C'], (array_rekey)($array, ['c' => 'z', 'a' => 'x']));
+        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_rekey)($array, ['x' => 'X', 'y' => 'Y', 'z' => 'Z']));
+        $this->assertEquals(['c' => 'A', 'b' => 'B', 'a' => 'C'], (array_rekey)($array, ['a' => 'c', 'c' => 'a']));
+        $this->assertEquals(['c' => 'A', 'b' => 'B', 'a' => 'C'], (array_rekey)($array, ['c' => 'a', 'a' => 'c']));
+        $this->assertEquals(['a' => 'A', 'c' => 'C'], (array_rekey)($array, ['b' => null]));
+        $this->assertEquals([], (array_rekey)($array, ['a' => null, 'b' => null, 'c' => null]));
+    }
+
     function test_array_grep_key()
     {
         $this->assertEquals(['a', 'b', 'c'], (array_grep_key)(['a', 'b', 'c'], '#\d#'));
