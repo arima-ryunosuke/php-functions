@@ -327,6 +327,79 @@ class StringsTest extends AbstractTestCase
         $this->assertException("'l' of -4th.", str_submap, $string, ['l' => [-4 => 'nodef']]);
     }
 
+    function test_str_embed()
+    {
+        $string = 'hello, world and "hello", \'world\' and \\"hello, \\\'world';
+
+        // 単純な置換
+        $this->assertEquals('HELLO, WORLD and "hello", \'world\' and \\"HELLO, \\\'WORLD', (str_embed)($string, [
+            'hello' => 'HELLO',
+            'world' => 'WORLD',
+        ]));
+        $this->assertEquals('hello1, world1 and "hello", \'world\' and \\"hello2, \\\'world2', (str_embed)($string, [
+            'hello' => ['hello1', 'hello2'],
+            'world' => ['world1', 'world2'],
+        ]));
+
+        // 隣り合う境界
+        $this->assertEquals('AAAAA', (str_embed)('aaaaa', [
+            'a' => 'A',
+        ]));
+        $this->assertEquals('12345', (str_embed)('aaaaa', [
+            'a' => ['1', '2', 3, 4, new Concrete(5)],
+        ]));
+        $this->assertEquals('12"a"34', (str_embed)('aa"a"aa', [
+            'a' => ['1', '2', 3, 4],
+        ]));
+
+        // 長いものから置換される
+        $this->assertEquals('A3A2', (str_embed)('aaaaa', [
+            'aaa' => 'A3',
+            'aa'  => 'A2',
+        ]));
+        $this->assertEquals('A3A2', (str_embed)('aaaaa', [
+            'aa'  => 'A2',
+            'aaa' => 'A3',
+        ]));
+
+        // 置換後の文字列は置換対象にならない
+        $this->assertEquals('xyzYYYz', (str_embed)('xyz', [
+            'x' => 'xyz',
+            'y' => 'YYY',
+        ]));
+        $this->assertEquals('xyzYYYz', (str_embed)('xyz', [
+            'y' => 'YYY',
+            'x' => 'xyz',
+        ]));
+
+        // 空文字
+        $this->assertEquals('X', (str_embed)('xyz', [
+            'y' => '',
+            'z' => '',
+            'x' => 'X',
+        ]));
+
+        // enclosure 指定
+        $this->assertEquals('X{x}X', (str_embed)('x{x}x', [
+            'x' => 'X',
+            '{' => '[',
+            '}' => ']',
+        ], ['{' => '}']));
+        $this->assertEquals('X[X]X{{x}}', (str_embed)('x{x}x{{x}}', [
+            'x' => 'X',
+            '{' => '[',
+            '}' => ']',
+        ], ['{{' => '}}']));
+
+        // 見つからない場合はスルー
+        $this->assertEquals('xyz', (str_embed)('xyz', [
+            'notfound' => 'notfound',
+        ]));
+
+        $this->assertException("src length is 0", str_embed, 'hoge', ['' => 'empty']);
+        $this->assertException("'h' of 0th.", str_embed, 'hoge', ['h' => [3 => 'nodef']]);
+    }
+
     function test_str_between()
     {
         ////////// 0123456789A1234567891B23456789C123456789D
