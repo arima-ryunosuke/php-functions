@@ -76,15 +76,22 @@ class Sql
      */
     public static function sql_bind($sql, $values)
     {
-        $values = (arrayize)($values);
-        $n = 0;
-        return preg_replace_callback('#(\?)|(:([a-z_][a-z_0-9]*))#ui', function ($m) use ($values, &$n) {
-            $name = $m[1] === '?' ? $n++ : $m[3];
-            if (!array_key_exists($name, $values)) {
-                return $m[0];
+        $embed = [];
+        foreach ((arrayval)($values, false) as $k => $v) {
+            if (is_int($k)) {
+                $embed['?'][] = (sql_quote)($v);
             }
-            return (sql_quote)($values[$name]);
-        }, $sql);
+            else {
+                $embed[":$k"] = (sql_quote)($v);
+            }
+        }
+
+        return (str_embed)($sql, $embed, [
+            "'"   => "'",
+            '"'   => '"',
+            '-- ' => "\n",
+            '/*'  => "*/",
+        ]);
     }
 
     /**

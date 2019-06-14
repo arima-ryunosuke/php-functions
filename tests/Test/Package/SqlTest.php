@@ -23,9 +23,16 @@ class SqlTest extends AbstractTestCase
         $this->assertEquals('select 1', (sql_bind)('select ?', 1));
         $this->assertEquals('select 1, 2', (sql_bind)('select ?, ?', [1, 2]));
         $this->assertEquals('select 1', (sql_bind)('select :name', ['name' => 1]));
-        $this->assertEquals('select ":name"', (sql_bind)('select ":name"', ['xxx' => 1]));
+        $this->assertEquals('select ":name", 1, 1', (sql_bind)('select ":name", :name, :name', ['name' => 1]));
         $this->assertEquals('select 1, 3, 2, 4', (sql_bind)('select ?, :hoge, ?, :fuga', [1, 2, 'hoge' => 3, 'fuga' => 4]));
         $this->assertEquals("select 'a', 'c', 'b', 'd'", (sql_bind)('select ?, :hoge, ?, :fuga', ['a', 'b', 'hoge' => 'c', 'fuga' => 'd']));
+        $this->assertEquals("select /* this is comment? */ '?'
+-- this is :comment
+'a', 'b'
+", (sql_bind)("select /* this is comment? */ '?'
+-- this is :comment
+?, :comment
+", ['a', 'comment' => 'b']));
     }
 
     function test_sql_format_create()
