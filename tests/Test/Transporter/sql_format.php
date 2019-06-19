@@ -1,0 +1,3 @@
+<?php
+
+sql_format('');

@@ -57,7 +57,7 @@ class Transporter
      *
      * @param string $namespace 吐き出す名前空間
      * @param bool $classmode メソッドモード（内部用）
-     * @param array $funcname 吐き出す関数名
+     * @param array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
     public static function exportNamespace($namespace, $classmode = false, $funcname = null)
@@ -84,7 +84,34 @@ class Transporter
 
             $result = array_fill_keys(['constant', 'function'], []);
             foreach ((array) $funcname as $name) {
-                $main($name, $result);
+                // 直指定ならそのまま使う
+                if (isset($depends[$name])) {
+                    $main($name, $result);
+                }
+                // ファイルエントリなら php とみなしてトークンで検出する
+                elseif (file_exists($name)) {
+                    if (is_dir($name)) {
+                        $rdi = new \RecursiveDirectoryIterator($name, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME);
+                        $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::LEAVES_ONLY);
+                        $name = iterator_to_array($rii);
+                    }
+                    foreach ((array) $name as $file) {
+                        $tokens = token_get_all(file_get_contents($file));
+                        foreach ($tokens as $token) {
+                            if ($token[0] === T_STRING && isset($depends[$token[1]])) {
+                                $main($token[1], $result);
+                            }
+                        }
+                    }
+                }
+                // それ以外のただの文字列なら含まれている文字列を検出する
+                else {
+                    foreach ($depends as $fname => $dummy) {
+                        if (strpos($name, $fname) !== false) {
+                            $main($fname, $result);
+                        }
+                    }
+                }
             }
             $funcname = $result;
         }
