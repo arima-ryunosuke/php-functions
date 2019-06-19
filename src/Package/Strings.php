@@ -2158,27 +2158,26 @@ class Strings
     /**
      * $string に最も近い文字列を返す
      *
-     * レーベンシュタイン比の最も小さい要素を返す。
+     * N-gram 化して類似度の高い結果を返す。
      *
      * この関数の結果（内部実装）は互換性を考慮しない。
-     * 例えば現在は damerau_levenshtein で実装されているが、 similar_text になる可能性もある。
      *
      * Example:
      * ```php
-     * // 「あいうえお」と最も距離の近い文字列は「あいゆえに」である
+     * // 「あいうえお」と最も近い文字列は「あいゆえに」である
      * assertSame(str_guess("あいうえお", [
      *     'かきくけこ', // マッチ度 0%（1文字もかすらない）
-     *     'ぎぼあいこ', // マッチ度 0%（"あい"はあるが位置が異なる）
-     *     'かとうあい', // マッチ度 20%（"う"の位置が等しい）
-     *     'あいしてる', // マッチ度 40&（"あい"がマッチ）
-     *     'あいゆえに', // マッチ度 60&（"あい", "え"がマッチ）
+     *     'ぎぼあいこ', // マッチ度約 13.1%（"あい"はあるが位置が異なる）
+     *     'あいしてる', // マッチ度約 13.8%（"あい"がマッチ）
+     *     'かとうあい', // マッチ度約 16.7%（"あい"があり"う"の位置が等しい）
+     *     'あいゆえに', // マッチ度約 17.4%（"あい", "え"がマッチ）
      * ]), 'あいゆえに');
      * ```
      *
      * @param string $string 調べる文字列
      * @param array $candidates 候補文字列配列
-     * @param int $percent マッチ度（％）を受ける変数
-     * @return string 最も近い文字列
+     * @param float $percent マッチ度（％）を受ける変数
+     * @return string 候補の中で最も近い文字列
      */
     public static function str_guess($string, $candidates, &$percent = null)
     {
@@ -2187,26 +2186,51 @@ class Strings
             throw new \InvalidArgumentException('$candidates is empty.');
         }
 
-        $sarray = preg_split('//u', $string, -1, PREG_SPLIT_NO_EMPTY);
-        $closest = null;
-        $shortest = PHP_INT_MAX;
-        foreach ($candidates as $candidate) {
-            $carray = preg_split('//u', $candidate, -1, PREG_SPLIT_NO_EMPTY);
-            $delta = (damerau_levenshtein)($sarray, $carray) / max(count($sarray), count($carray));
-
-            if ($delta < $shortest) {
-                $closest = $candidate;
-                $shortest = $delta;
+        // uni, bi, tri して配列で返すクロージャ
+        $ngramer = static function ($string) {
+            $result = [];
+            foreach ([1, 2, 3] as $n) {
+                $result[$n] = (ngram)($string, $n);
             }
+            return $result;
+        };
 
-            if ($delta === 0) {
-                break;
+        $sngram = $ngramer($string);
+
+        $result = null;
+        $percent = 0;
+        foreach ($candidates as $i => $candidate) {
+            $cngram = $ngramer($candidate);
+
+            // uni, bi, tri で重み付けスコア（var_dump したいことが多いので配列に入れる）
+            $scores = [];
+            foreach ($sngram as $n => $_) {
+                $scores[$n] = count(array_intersect($sngram[$n], $cngram[$n])) / max(count($sngram[$n]), count($cngram[$n])) * $n;
+            }
+            $score = array_sum($scores) * 10 + 1;
+
+            // ↑のスコアが同じだった場合を考慮してレーベンシュタイン距離で下駄を履かせる
+            $score -= (damerau_levenshtein)($sngram[1], $cngram[1]) / max(count($sngram[1]), count($cngram[1]));
+
+            // 10(uni) + 20(bi) + 30(tri) + 1(levenshtein) で最大は 61
+            $score = $score / 61 * 100;
+
+            /*
+            echo "$string <=> $candidate:
+  score1     : $scores[1]
+  score2     : $scores[2]
+  score3     : $scores[3]
+  score      : $score
+";
+            */
+
+            if ($percent <= $score) {
+                $percent = $score;
+                $result = $i;
             }
         }
 
-        $percent = intval(100 - $shortest * 100);
-
-        return $closest;
+        return $candidates[$result];
     }
 
     /**

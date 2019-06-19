@@ -1379,15 +1379,15 @@ a3,b3,c3
             "123",
             "1234",
         ], $percent));
-        $this->assertEquals(80, $percent);
+        $this->assertEquals(53.77049180327869, $percent);
 
         $this->assertSame("x12345x", (str_guess)("12345", [
             "x12345x",
             "xx12345xx",
         ], $percent));
-        $this->assertEquals(71, $percent);
+        $this->assertEquals(52.69320843091335, $percent);
 
-        $this->assertSame("x12345x", (str_guess)("notfound", [
+        $this->assertSame("xx12345xx", (str_guess)("notfound", [
             "x12345x",
             "xx12345xx",
         ], $percent));
