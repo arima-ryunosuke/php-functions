@@ -1358,6 +1358,13 @@ a3,b3,c3
         $this->assertSame(3, (damerau_levenshtein)("あいうえお", "xあういえおx"));
     }
 
+    public function test_ngram()
+    {
+        $this->assertSame(["あ", "い", "う", "え", "お"], (ngram)("あいうえお", 1));
+        $this->assertSame(["あい", "いう", "うえ", "えお", "お"], (ngram)("あいうえお", 2));
+        $this->assertSame(["あいう", "いうえ", "うえお", "えお", "お"], (ngram)("あいうえお", 3));
+    }
+
     public function test_str_guess()
     {
         $percent = 0;

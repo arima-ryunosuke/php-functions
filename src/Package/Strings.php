@@ -2124,6 +2124,38 @@ class Strings
     }
 
     /**
+     * N-gram 化して配列で返す
+     *
+     * 素朴な実装であり特記事項はない。
+     * 末端要素や除去フィルタくらいは実装するかもしれない。
+     *
+     * Example:
+     * ```php
+     * assertSame(ngram("あいうえお", 1), ["あ", "い", "う", "え", "お"]);
+     * assertSame(ngram("あいうえお", 2), ["あい", "いう", "うえ", "えお", "お"]);
+     * assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", "えお", "お"]);
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param int $N N-gram の N
+     * @param string $encoding マルチバイトエンコーディング
+     * @return array N-gram 配列
+     */
+    public static function ngram($string, $N, $encoding = 'UTF-8')
+    {
+        if (func_num_args() < 3) {
+            $encoding = mb_internal_encoding();
+        }
+
+        $result = [];
+        for ($i = 0, $l = mb_strlen($string, $encoding); $i < $l; ++$i) {
+            $result[] = mb_substr($string, $i, $N, $encoding);
+        }
+
+        return $result;
+    }
+
+    /**
      * $string に最も近い文字列を返す
      *
      * レーベンシュタイン比の最も小さい要素を返す。
