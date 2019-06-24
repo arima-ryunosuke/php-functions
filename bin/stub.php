@@ -73,31 +73,27 @@ $reffuncs = kvsort($reffuncs, function ($a, $b) { return strcmp($a->name, $b->na
 // ここから本懐。アノテーション文字列を生成する
 $anotations = [];
 foreach ($reffuncs as $funcname => $reffunc) {
+    $anotations[] = " * @see " . $reffunc->name;
+
     // 実質引数が1つならフィールド呼び出しが可能
     if ($reffunc->getNumberOfRequiredParameters() === 1) {
         $anotations[] = " * @property \ChainObject \$$funcname";
     }
 
     // 仮引数文字列を構築
-    $hasCallback = false;
-    $params = [];
-    foreach ($reffunc->getParameters() as $param) {
+    $hasCallback = array_find($reffunc->getParameters(), function (\ReflectionParameter $p) {
+        if ($p->hasType()) {
+            $type = (string) $p->getType();
+            if (strpos($type, 'callable') !== false || strpos($type, 'Closure') !== false) {
+                return true;
+            }
+        }
         // 組み込み関数は大抵の場合 $callback で登録されているようだ（ここは結構な頻度でいじると思う）
-        if (strpos($param->getName(), 'callback') !== false) {
-            $hasCallback = true;
+        if (strpos($p->getName(), 'callback') !== false || strpos($p->getName(), 'callable') !== false) {
+            return true;
         }
-        $default = '';
-        if ($param->isOptional() && !$param->isVariadic()) {
-            if ($param->isDefaultValueAvailable()) {
-                $defval = $export($param->getDefaultValue());
-            }
-            else {
-                $defval = 'null';
-            }
-            $default = ' = ' . $defval;
-        }
-        $params[] = ($param->isVariadic() ? '...' : '') . '$' . $param->getName() . $default;
-    }
+    }, false);
+    $params = array_values(function_parameter($reffunc));
 
     // callback を受け取る関数なら P, E も登録
     $funcs = [$funcname];
@@ -119,6 +115,7 @@ foreach ($reffuncs as $funcname => $reffunc) {
             $anotations[] = " * @method   \ChainObject  $f{$i}({$implode(', ', $args)})";
         }
     }
+    $anotations[] = " *";
 }
 
 $vars = [
