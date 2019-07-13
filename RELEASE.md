@@ -10,6 +10,13 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.6
+
+- [change][Vars] var_pretty で return 時はスタックトレースを出さないように変更
+- [feature][Utility] backtrace に offset オプションを追加
+- [feature][Strings] ltsv_import/ltsv_export を追加
+- [feature][Strings] mb_trim を追加
+
 ## 1.3.5
 
 - [feature][Math] normal_rand を追加
