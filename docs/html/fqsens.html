@@ -3290,6 +3290,67 @@ assertEquals(json_import('{"a":"A","b":"B"}', [
 ]), ['a' =&gt; 'A', 'b' =&gt; 'B']);
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ltsv_export()">
+                                    ryunosuke\Functions\Package\Strings::ltsv_export		</a>	<small>($ltsvarray, $options = []) : string</small>
+		</h4>
+	<div class="description"><p>配列を LTSV 的文字列に変換する</p>
+<p>ラベル文字列に ":" を含む場合は例外を投げる（ラベルにコロンが来るとどうしようもない）。</p>
+<p>escape オプションで「LTSV 的にまずい文字」がその文字でエスケープされる（具体的には "\n" と "\t"）。<br />
+デフォルトでは "\" でエスケープされるので、整合性が崩れることはない。</p>
+<p>encode オプションで「文字列化できない値」が来たときのその関数を通して出力される（その場合、目印として値の両サイドに ` が付く）。<br />
+デフォルトでは json_encode される。</p>
+<p>エンコード機能はおまけに過ぎない（大抵の場合はそんな機能は必要ない）。<br />
+ので、この実装は互換性を維持せず変更される可能性がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// シンプルな実行例
+assertEquals(ltsv_export([
+    "label1" =&gt; "value1",
+    "label2" =&gt; "value2",
+]), "label1:value1	label2:value2");
+
+// タブや改行文字のエスケープ
+assertEquals(ltsv_export([
+    "label1" =&gt; "val\tue1",
+    "label2" =&gt; "val\nue2",
+]), "label1:val\\tue1	label2:val\\nue2");
+
+// 配列のエンコード
+assertEquals(ltsv_export([
+    "label1" =&gt; "value1",
+    "label2" =&gt; [1, 2, 3],
+]), "label1:value1	label2:`[1,2,3]`");
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ltsv_import()">
+                                    ryunosuke\Functions\Package\Strings::ltsv_import		</a>	<small>($ltsvstring, $options = []) : array</small>
+		</h4>
+	<div class="description"><p>LTSV 的文字列を配列に変換する</p>
+<p>escape オプションで「LTSV 的にまずい文字」がその文字でエスケープされる（具体的には "\n" と "\t"）。<br />
+デフォルトでは "\" でエスケープされるので、整合性が崩れることはない。</p>
+<p>decode オプションで「`` で囲まれた値」が来たときのその関数を通して出力される。<br />
+デフォルトでは json_decode される。</p>
+<p>エンコード機能はおまけに過ぎない（大抵の場合はそんな機能は必要ない）。<br />
+ので、この実装は互換性を維持せず変更される可能性がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// シンプルな実行例
+assertEquals(ltsv_import("label1:value1	label2:value2"), [
+    "label1" =&gt; "value1",
+    "label2" =&gt; "value2",
+]);
+
+// タブや改行文字のエスケープ
+assertEquals(ltsv_import("label1:val\\tue1	label2:val\\nue2"), [
+    "label1" =&gt; "val\tue1",
+    "label2" =&gt; "val\nue2",
+]);
+
+// 配列のデコード
+assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
+    "label1" =&gt; "value1",
+    "label2" =&gt; [1, 2, 3],
+]);
+</code></pre>
+</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_table()">
                                     ryunosuke\Functions\Package\Strings::markdown_table		</a>	<small>($array) : string</small>
 		</h4>
@@ -3519,6 +3580,14 @@ assertSame(str_array("
 <p>Example:</p>
 <pre><code class="language-php">// 2文字目から5文字を「あいうえお」に置換する
 assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_trim()">
+                                    ryunosuke\Functions\Package\Strings::mb_trim		</a>	<small>($string) : string</small>
+		</h4>
+	<div class="description"><p>マルチバイト対応 trim</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(mb_trim(' 　 あああ　 　'), 'あああ');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()">

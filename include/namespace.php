@@ -10272,6 +10272,162 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
     }
 }
 
+const ltsv_export = "ryunosuke\\Functions\\ltsv_export";
+if (!isset($excluded_functions["ltsv_export"]) && (!function_exists("ryunosuke\\Functions\\ltsv_export") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ltsv_export"))->isInternal()))) {
+    /**
+     * 配列を LTSV 的文字列に変換する
+     *
+     * ラベル文字列に ":" を含む場合は例外を投げる（ラベルにコロンが来るとどうしようもない）。
+     *
+     * escape オプションで「LTSV 的にまずい文字」がその文字でエスケープされる（具体的には "\n" と "\t"）。
+     * デフォルトでは "\\" でエスケープされるので、整合性が崩れることはない。
+     *
+     * encode オプションで「文字列化できない値」が来たときのその関数を通して出力される（その場合、目印として値の両サイドに ` が付く）。
+     * デフォルトでは json_encode される。
+     *
+     * エンコード機能はおまけに過ぎない（大抵の場合はそんな機能は必要ない）。
+     * ので、この実装は互換性を維持せず変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * assertEquals(ltsv_export([
+     *     "label1" => "value1",
+     *     "label2" => "value2",
+     * ]), "label1:value1	label2:value2");
+     *
+     * // タブや改行文字のエスケープ
+     * assertEquals(ltsv_export([
+     *     "label1" => "val\tue1",
+     *     "label2" => "val\nue2",
+     * ]), "label1:val\\tue1	label2:val\\nue2");
+     *
+     * // 配列のエンコード
+     * assertEquals(ltsv_export([
+     *     "label1" => "value1",
+     *     "label2" => [1, 2, 3],
+     * ]), "label1:value1	label2:`[1,2,3]`");
+     * ```
+     *
+     * @param array $ltsvarray 配列
+     * @param array $options オプション配列
+     * @return string LTSV 的文字列
+     */
+    function ltsv_export($ltsvarray, $options = [])
+    {
+        $options += [
+            'escape' => '\\',
+            'encode' => function ($v) { return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); },
+        ];
+        $escape = $options['escape'];
+        $encode = $options['encode'];
+
+        $map = [];
+        if (strlen($escape)) {
+            $map["\\"] = "{$escape}\\";
+            $map["\t"] = "{$escape}t";
+            $map["\n"] = "{$escape}n";
+        }
+
+        $parts = [];
+        foreach ($ltsvarray as $label => $value) {
+            if (strpos($label, ':')) {
+                throw new \InvalidArgumentException('label contains ":".');
+            }
+            $should_encode = !is_stringable($value);
+            if ($should_encode) {
+                $value = "`{$encode($value)}`";
+            }
+            if ($map) {
+                $label = strtr($label, $map);
+                if (!$should_encode) {
+                    $value = strtr($value, $map);
+                }
+            }
+            $parts[] = $label . ':' . $value;
+        }
+        return implode("\t", $parts);
+    }
+}
+
+const ltsv_import = "ryunosuke\\Functions\\ltsv_import";
+if (!isset($excluded_functions["ltsv_import"]) && (!function_exists("ryunosuke\\Functions\\ltsv_import") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ltsv_import"))->isInternal()))) {
+    /**
+     * LTSV 的文字列を配列に変換する
+     *
+     * escape オプションで「LTSV 的にまずい文字」がその文字でエスケープされる（具体的には "\n" と "\t"）。
+     * デフォルトでは "\\" でエスケープされるので、整合性が崩れることはない。
+     *
+     * decode オプションで「`` で囲まれた値」が来たときのその関数を通して出力される。
+     * デフォルトでは json_decode される。
+     *
+     * エンコード機能はおまけに過ぎない（大抵の場合はそんな機能は必要ない）。
+     * ので、この実装は互換性を維持せず変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * assertEquals(ltsv_import("label1:value1	label2:value2"), [
+     *     "label1" => "value1",
+     *     "label2" => "value2",
+     * ]);
+     *
+     * // タブや改行文字のエスケープ
+     * assertEquals(ltsv_import("label1:val\\tue1	label2:val\\nue2"), [
+     *     "label1" => "val\tue1",
+     *     "label2" => "val\nue2",
+     * ]);
+     *
+     * // 配列のデコード
+     * assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
+     *     "label1" => "value1",
+     *     "label2" => [1, 2, 3],
+     * ]);
+     * ```
+     *
+     * @param string $ltsvstring LTSV 的文字列
+     * @param array $options オプション配列
+     * @return array 配列
+     */
+    function ltsv_import($ltsvstring, $options = [])
+    {
+        $options += [
+            'escape' => '\\',
+            'decode' => function ($v) { return json_decode($v, true); },
+        ];
+        $escape = $options['escape'];
+        $decode = $options['decode'];
+
+        $map = [];
+        if (strlen($escape)) {
+            $map["{$escape}\\"] = "\\";
+            $map["{$escape}t"] = "\t";
+            $map["{$escape}n"] = "\n";
+        }
+
+        $result = [];
+        foreach (explode("\t", $ltsvstring) as $part) {
+            list($label, $value) = explode(':', $part, 2);
+            $should_decode = substr($value, 0, 1) === '`' && substr($value, -1, 1) === '`';
+            if ($map) {
+                $label = strtr($label, $map);
+                if (!$should_decode) {
+                    $value = strtr($value, $map);
+                }
+            }
+            if ($should_decode) {
+                $value2 = $decode(substr($value, 1, -1));
+                // たまたま ` が付いているだけかも知れないので結果で判定する
+                if (!is_stringable($value2)) {
+                    $value = $value2;
+                }
+            }
+            $result[$label] = $value;
+        }
+        return $result;
+    }
+}
+
 const markdown_table = "ryunosuke\\Functions\\markdown_table";
 if (!isset($excluded_functions["markdown_table"]) && (!function_exists("ryunosuke\\Functions\\markdown_table") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\markdown_table"))->isInternal()))) {
     /**
@@ -10956,6 +11112,25 @@ if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("ryuno
         }
 
         return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, null);
+    }
+}
+
+const mb_trim = "ryunosuke\\Functions\\mb_trim";
+if (!isset($excluded_functions["mb_trim"]) && (!function_exists("ryunosuke\\Functions\\mb_trim") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\mb_trim"))->isInternal()))) {
+    /**
+     * マルチバイト対応 trim
+     *
+     * Example:
+     * ```php
+     * assertSame(mb_trim(' 　 あああ　 　'), 'あああ');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @return string trim した文字列
+     */
+    function mb_trim($string)
+    {
+        return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
     }
 }
 
@@ -12746,9 +12921,9 @@ if (!isset($excluded_functions["backtrace"]) && (!function_exists("ryunosuke\\Fu
             }
         }
 
-        // limit は特別扱いで千切り指定
-        if (isset($options['limit'])) {
-            $result = array_slice($result, 0, $options['limit']);
+        // offset, limit は特別扱いで千切り指定
+        if (isset($options['offset']) || isset($options['limit'])) {
+            $result = array_slice($result, $options['offset'] ?? 0, $options['limit'] ?? count($result));
         }
 
         return $result;
@@ -14117,7 +14292,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("ryunosuke\\F
         };
 
         // 結果を返したり出力したり
-        $result = stacktrace(null, ['format' => "%s:%s", 'args' => false]) . "\n" . $export($value);
+        $result = ($return ? '' : stacktrace(null, ['format' => "%s:%s", 'args' => false]) . "\n") . $export($value);
         if ($context === 'html') {
             $result = "<pre>$result</pre>";
         }

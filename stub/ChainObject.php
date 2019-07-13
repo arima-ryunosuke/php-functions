@@ -3272,6 +3272,16 @@
  * @method   \ChainObject  ltrim($character_mask = null)
  * @method   \ChainObject  ltrim1($str)
  *
+ * @see ltsv_export
+ * @property \ChainObject $ltsv_export
+ * @method   \ChainObject  ltsv_export($options = [])
+ * @method   \ChainObject  ltsv_export1($ltsvarray)
+ *
+ * @see ltsv_import
+ * @property \ChainObject $ltsv_import
+ * @method   \ChainObject  ltsv_import($options = [])
+ * @method   \ChainObject  ltsv_import1($ltsvstring)
+ *
  * @see mail
  * @method   \ChainObject  mail($subject, $message, $additional_headers = null, $additional_parameters = null)
  * @method   \ChainObject  mail1($to, $message, $additional_headers = null, $additional_parameters = null)
@@ -3570,6 +3580,10 @@
  * @method   \ChainObject  mb_substr_replace1($string, $start, $length = null)
  * @method   \ChainObject  mb_substr_replace2($string, $replacement, $length = null)
  * @method   \ChainObject  mb_substr_replace3($string, $replacement, $start)
+ *
+ * @see mb_trim
+ * @property \ChainObject $mb_trim
+ * @method   \ChainObject  mb_trim()
  *
  * @see mbereg_match
  * @method   \ChainObject  mbereg_match($string, $option = null)

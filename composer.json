@@ -31,10 +31,10 @@
   },
   "scripts": {
     "build": [
-      "@composer export",
-      "@composer stub",
-      "@composer test",
-      "@composer document"
+      "@export",
+      "@stub",
+      "@test",
+      "@document"
     ],
     "stub": [
       "php bin/stub.php"
