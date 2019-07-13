@@ -623,9 +623,7 @@ class UtilityTest extends AbstractTestCase
 
         $traces = $mock->m3([
             'function' => 'm2',
-            'limit'    => 2,
         ]);
-        $this->assertCount(2, $traces);
         $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm2',
@@ -639,9 +637,7 @@ class UtilityTest extends AbstractTestCase
 
         $traces = $mock->m3([
             'class' => function ($v) { return (str_contains)($v, 'class@anonymous'); },
-            'limit' => 3,
         ]);
-        $this->assertCount(3, $traces);
         $this->assertSubarray([
             'file'     => __FILE__,
             'function' => 'm1',
@@ -662,6 +658,33 @@ class UtilityTest extends AbstractTestCase
             'class' => 'not found',
         ]);
         $this->assertCount(0, $traces);
+
+        $traces = $mock->m3([
+            'hoge' => 'not found',
+        ]);
+        $this->assertCount(0, $traces);
+
+        $traces = $mock->m3([
+            'file'   => __FILE__,
+            'offset' => 1,
+            'limit'  => 3,
+        ]);
+        $this->assertCount(3, $traces);
+        $this->assertSubarray([
+            'file'     => __FILE__,
+            'function' => 'm1',
+            'class'    => get_class($mock),
+        ], $traces[0]);
+        $this->assertSubarray([
+            'file'     => __FILE__,
+            'function' => 'm2',
+            'class'    => get_class($mock),
+        ], $traces[1]);
+        $this->assertSubarray([
+            'file'     => __FILE__,
+            'function' => 'm3',
+            'class'    => get_class($mock),
+        ], $traces[2]);
     }
 
     function test_error()

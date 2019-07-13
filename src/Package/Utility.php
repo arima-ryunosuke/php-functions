@@ -755,9 +755,9 @@ class Utility
             }
         }
 
-        // limit は特別扱いで千切り指定
-        if (isset($options['limit'])) {
-            $result = array_slice($result, 0, $options['limit']);
+        // offset, limit は特別扱いで千切り指定
+        if (isset($options['offset']) || isset($options['limit'])) {
+            $result = array_slice($result, $options['offset'] ?? 0, $options['limit'] ?? count($result));
         }
 
         return $result;
