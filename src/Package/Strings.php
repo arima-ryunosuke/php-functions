@@ -2347,6 +2347,22 @@ class Strings
     }
 
     /**
+     * マルチバイト対応 trim
+     *
+     * Example:
+     * ```php
+     * assertSame(mb_trim(' 　 あああ　 　'), 'あああ');
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @return string trim した文字列
+     */
+    public static function mb_trim($string)
+    {
+        return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
+    }
+
+    /**
      * "hoge {$hoge}" 形式のレンダリング
      *
      * 文字列を eval して "hoge {$hoge}" 形式の文字列に変数を埋め込む。

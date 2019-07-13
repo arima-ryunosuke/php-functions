@@ -1421,6 +1421,19 @@ a3,b3,c3
         $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', -8, -2));
     }
 
+    function test_mb_trim()
+    {
+        $this->assertEquals('', (mb_trim)(' 　 　 　'));
+        $this->assertEquals('あああ', (mb_trim)(' 　 あああ　 　'));
+        $this->assertEquals('あああ　 　
+ 　 いいい
+ 　 ううう', (mb_trim)(' 　
+あああ　 　
+ 　 いいい
+ 　 ううう　 　
+'));
+    }
+
     public function test_str_array()
     {
         // http header
