@@ -91,6 +91,15 @@ file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::expo
 依存関係も解決するので、例えば `funcA` や `funcB` が `funcC` に依存していれば `funcC` も吐き出されます。
 用途はちょろっとしたコード片のコピペ用です（全体は要らんけど特定のやつだけ吐き出したい用途が個人的にあった）。
 
+一応、上記の関数版ではなくクラス版もあります。
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+
+// /path/to/project 内で使われている関数だけをクラスに出力
+file_put_contents('path/to/Utils.php', \ryunosuke\Functions\Transporter::exportClass('hoge\\Utils', '/path/to/project'));
+```
+
 ### constant
 
 少し変わった仕様として、関数名と同名の定数も定義されます。

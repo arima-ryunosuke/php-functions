@@ -10,6 +10,24 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.7
+
+- [feature][Arrays] array_explode を追加
+- [feature][Arrays] array_flatten の Iterator 対応
+- [change][Arrays] array_add の第一引数が必須になっていたので修正
+- [feature][Arrays] array_where で配列 OR に対応
+- [feature][Classobj] class_replace の trait 対応
+- [feature][Date] date_convert の DateTime 対応
+- [change][FileSystem] file_set_contest の相対パス対応とアトミック化
+- [feature][FileSystem] path_is_absolute のスキーム対応
+- [feature][Sql] sql_format の mysql ユーザ変数対応
+- [feature][Syntax] call_if を追加
+- [feature][Syntax] chain の遅延引数モードを追加
+- [change][Utility] error の完全デフォルトを STDERR に変更
+- [feature][Vars] var_type の無名クラス対応
+- [change][Transporter] 必要なときのみ定数が定義されるように変更
+- [feature][Transporter] exportClass を追加
+
 ## 1.3.6
 
 - [change][Vars] var_pretty で return 時はスタックトレースを出さないように変更
