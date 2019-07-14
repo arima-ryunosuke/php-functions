@@ -42,4 +42,16 @@ switch ($env) {
         require_once(__DIR__ . '/temporary/package.php');
         assert(constant('arrayize') === ['ryunosuke\\Functions\\Package\\Arrays', 'arrayize']);
         break;
+
+    case 'class':
+        $classname = '\\Utility\\Klass';
+        file_put_contents(__DIR__ . '/temporary/Klass.php', \ryunosuke\Functions\Transporter::exportClass($classname));
+        require_once(__DIR__ . '/temporary/Klass.php');
+        assert(constant("$classname::arrayize") === [$classname, 'arrayize']);
+        foreach ((new \ReflectionClass($classname))->getConstants() as $name => $value) {
+            if (is_array($value) && isset($value[0]) && $value[0] === $classname) {
+                define($name, $value);
+            }
+        }
+        break;
 }

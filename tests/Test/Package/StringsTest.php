@@ -1100,7 +1100,7 @@ a3,b3,c3
         ]));
 
         // depth
-        $this->assertException('Maximum stack depth exceeded', json_export, [[[[[[]]]]]], [JSON_MAX_DEPTH => 3]);
+        $this->assertException('Maximum stack depth exceeded', json_export, [[[[[[]]]]]], [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]);
     }
 
     function test_json_import()
@@ -1117,7 +1117,7 @@ a3,b3,c3
         ]));
 
         // depth
-        $this->assertException('Maximum stack depth exceeded', json_import, '[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3]);
+        $this->assertException('Maximum stack depth exceeded', json_import, '[[[[[[]]]]]]', [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]);
     }
 
     function test_ltsv_import()

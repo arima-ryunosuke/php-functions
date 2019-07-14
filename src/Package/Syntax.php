@@ -403,15 +403,22 @@ class Syntax
             private function _resolve($name)
             {
                 if (false
+                    // for global
                     || function_exists($fname = $name)
                     || function_exists($fname = "array_$name")
                     || function_exists($fname = "str_$name")
+                    // for package
                     || (defined($cname = $name) && is_callable($fname = constant($cname)))
                     || (defined($cname = "array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    // for namespace
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                    // for class
+                    || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */
                     return $fname;

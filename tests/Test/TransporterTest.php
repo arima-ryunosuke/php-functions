@@ -207,6 +207,42 @@ DUMMY
         $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_exportClass()
+    {
+        if (getenv('TEST_TARGET') !== 'package') {
+            return;
+        }
+
+        $contents = Transporter::exportClass('ns\Utils');
+
+        $this->assertContains('const JP_ERA', $contents);                    // 定数が含まれている
+        $this->assertContains('const arrayize', $contents);                  // メソッド定数が含まれている
+        $this->assertContains('["\\\\ns\\\\Utils", "arrayize"]', $contents); // メソッド定数の値が含まれている
+        $this->assertContains('public static function arrayize', $contents); // メソッド定義が含まれている
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_exportClass_func()
+    {
+        if (getenv('TEST_TARGET') !== 'package') {
+            return;
+        }
+
+        $contents = Transporter::exportClass('ns\Utils', ['callable_code']);
+
+        $this->assertContains('const TOKEN_NAME', $contents);                 // 依存している定数が含まれている
+        $this->assertContains('const parse_php', $contents);                  // 依存しているメソッド定数が含まれている
+        $this->assertContains('["\\\\ns\\\\Utils", "parse_php"]', $contents); // 依存しているメソッド定数の値が含まれている
+        $this->assertContains('public static function parse_php', $contents); // 依存しているメソッド定義が含まれている
+    }
+
     function test_parseSymbol()
     {
         $refmethod = new \ReflectionMethod(Transporter::class, 'parseSymbol');

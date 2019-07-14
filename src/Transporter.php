@@ -67,53 +67,7 @@ class Transporter
 
         // 関数が指定されているときは依存関係を解決する
         if ($funcname !== null) {
-            $depends = self::detectDependent();
-
-            $main = function ($funcname, &$result) use (&$main, $depends) {
-                foreach ($depends[$funcname]['constant'] ?? [] as $const) {
-                    $result['constant'][$const] = true;
-                }
-
-                $result['function'][$funcname] = true;
-                foreach ($depends[$funcname]['function'] ?? [] as $func) {
-                    if (!isset($result['function'][$func])) {
-                        $main($func, $result);
-                    }
-                }
-            };
-
-            $result = array_fill_keys(['constant', 'function'], []);
-            foreach ((array) $funcname as $name) {
-                // 直指定ならそのまま使う
-                if (isset($depends[$name])) {
-                    $main($name, $result);
-                }
-                // ファイルエントリなら php とみなしてトークンで検出する
-                elseif (file_exists($name)) {
-                    if (is_dir($name)) {
-                        $rdi = new \RecursiveDirectoryIterator($name, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME);
-                        $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::LEAVES_ONLY);
-                        $name = iterator_to_array($rii);
-                    }
-                    foreach ((array) $name as $file) {
-                        $tokens = token_get_all(file_get_contents($file));
-                        foreach ($tokens as $token) {
-                            if ($token[0] === T_STRING && isset($depends[$token[1]])) {
-                                $main($token[1], $result);
-                            }
-                        }
-                    }
-                }
-                // それ以外のただの文字列なら含まれている文字列を検出する
-                else {
-                    foreach ($depends as $fname => $dummy) {
-                        if (strpos($name, $fname) !== false) {
-                            $main($fname, $result);
-                        }
-                    }
-                }
-            }
-            $funcname = $result;
+            $funcname = self::detectDependent($funcname);
         }
 
         $symbols = self::parseSymbol();
@@ -160,7 +114,7 @@ CONSTANT;
                 $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
 
                 $block = $symbols['phpblock'][$name];
-                $block = self::replaceConstant($block);
+                $block = self::replaceConstant($block, '');
                 $block = preg_replace('#public static #', '', $block, 1);
                 $block = trim($block);
 
@@ -188,6 +142,89 @@ FUNCTION;
 
 # functions
 {$_(implode("\n", $funcs))}
+CONTENTS;
+    }
+
+    /**
+     * 単一の静的クラスにエクスポートする
+     *
+     * @param string $classname 吐き出すクラス名（完全修飾名）
+     * @param array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @return string php コード
+     */
+    public static function exportClass($classname, $funcname = null)
+    {
+        $ve = function ($v) { return self::exportVar($v); };
+        $_ = function ($v) { return $v; };
+
+        // 関数が指定されているときは依存関係を解決する
+        if ($funcname !== null) {
+            $funcname = self::detectDependent($funcname);
+        }
+
+        $classname = trim($classname, '\\');
+        $shortname = $classname;
+        $namespace = '';
+        $parts = explode('\\', $classname);
+        if (count($parts) > 1) {
+            $shortname = array_pop($parts);
+            $namespace = implode('\\', $parts);
+        }
+
+        $symbols = self::parseSymbol();
+
+        // 定数コードの取得
+        $consts = [];
+        foreach ($symbols['constant'] as $name => $const) {
+            /** @var \ReflectionClassConstant $const */
+            if ($funcname !== null && !isset($funcname['constant'][$name])) {
+                continue;
+            }
+            $doccomment = $const->getDocComment();
+            $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
+            $consts[] = <<<CONSTANT
+    $doccomment
+    const $name = $cvalue;
+
+CONSTANT;
+        }
+
+        // 関数コードの取得
+        $funcs = [];
+        foreach ($symbols['function'] as $name => $method) {
+            /** @var \ReflectionMethod $method */
+            if ($funcname !== null && !isset($funcname['function'][$name])) {
+                continue;
+            }
+
+            $doccomment = $method->getDocComment();
+
+            $block = $symbols['phpblock'][$name];
+            $block = self::replaceConstant($block, "\\$classname");
+            $block = trim($block);
+
+            $consts[] = <<<CONSTANT
+    const $name = {$_($ve(["\\$classname", $name]))};
+CONSTANT;
+            $funcs[] = <<<FUNCTION
+    $doccomment
+    $block
+FUNCTION;
+        }
+
+        // 完全な php コードを返す
+        return <<<CONTENTS
+<?php
+
+# Don't touch this code. This is auto generated.
+
+{$_($namespace ? "namespace $namespace;\n" : "")}
+class $shortname
+{
+{$_(implode("\n", $consts))}
+
+{$_(implode("\n\n", $funcs))}
+}
 CONTENTS;
     }
 
@@ -230,9 +267,10 @@ CONTENTS;
     /**
      * 配下の Package から定数・関数の依存関係を導出する
      *
+     * @param string|array $funcname 依存関数
      * @return array
      */
-    private static function detectDependent()
+    private static function detectDependent($funcname)
     {
         $symbols = self::parseSymbol();
 
@@ -253,26 +291,81 @@ CONTENTS;
                 }
             }
         }
-        return array_map(function ($v) { return array_map('array_keys', $v); }, $depends);
+        $depends = array_map(function ($v) { return array_map('array_keys', $v); }, $depends);
+
+        $main = function ($funcname, &$result) use (&$main, $depends) {
+            foreach ($depends[$funcname]['constant'] ?? [] as $const) {
+                $result['constant'][$const] = true;
+            }
+
+            $result['function'][$funcname] = true;
+            foreach ($depends[$funcname]['function'] ?? [] as $func) {
+                if (!isset($result['function'][$func])) {
+                    $main($func, $result);
+                }
+            }
+        };
+
+        $result = array_fill_keys(['constant', 'function'], []);
+        foreach ((array) $funcname as $name) {
+            // 直指定ならそのまま使う
+            if (isset($depends[$name])) {
+                $main($name, $result);
+            }
+            // ファイルエントリなら php とみなしてトークンで検出する
+            elseif (file_exists($name)) {
+                if (is_dir($name)) {
+                    $rdi = new \RecursiveDirectoryIterator($name, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME);
+                    $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::LEAVES_ONLY);
+                    $name = iterator_to_array($rii);
+                }
+                foreach ((array) $name as $file) {
+                    $tokens = token_get_all(file_get_contents($file));
+                    foreach ($tokens as $token) {
+                        if ($token[0] === T_STRING && isset($depends[$token[1]])) {
+                            $main($token[1], $result);
+                        }
+                    }
+                }
+            }
+            // それ以外のただの文字列なら含まれている文字列を検出する
+            else {
+                foreach ($depends as $fname => $dummy) {
+                    if (strpos($name, $fname) !== false) {
+                        $main($fname, $result);
+                    }
+                }
+            }
+        }
+        return $result;
     }
 
     /**
      * 関数のコードブロックの定数呼び出し箇所を単純呼び出しに変更する
      *
      * @param string $code コードブロック
+     * @param string $classname クラス名
      * @return string
      */
-    private static function replaceConstant($code)
+    private static function replaceConstant($code, $classname)
     {
         $symbols = self::parseSymbol();
 
+        $classname = str_replace('\\', '\\\\', $classname);
+        $prefix = strlen($classname) ? "$classname::" : '';
         $codes = explode("\n", $code);
         $tokens = token_get_all("<?php $code");
         foreach ($tokens as $n => $token) {
             if ($token[0] === T_STRING) {
                 if (isset($symbols['function'][$token[1]]) && $tokens[$n - 1] === '(' && $tokens[$n + 1] === ')') {
-                    $codes[$token[2] - 1] = preg_replace('#\((' . $token[1] . ')\)#', '$1', $codes[$token[2] - 1]);
+                    $codes[$token[2] - 1] = preg_replace('#\((' . $token[1] . ')\)#', $prefix . '$1', $codes[$token[2] - 1], 1);
                 }
+                if ($prefix && isset($symbols['constant'][$token[1]])) {
+                    $codes[$token[2] - 1] = preg_replace('#(?<!::)(' . $token[1] . ')#', $prefix . '$1', $codes[$token[2] - 1], 1);
+                }
+            }
+            if ($prefix && $token[0] === T_CLASS_C) {
+                $codes[$token[2] - 1] = preg_replace('#(' . $token[1] . ')#', var_export($classname, true), $codes[$token[2] - 1], 1);
             }
         }
         return implode("\n", $codes);

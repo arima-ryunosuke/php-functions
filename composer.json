@@ -45,7 +45,8 @@
     "test": [
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml",
       "env TEST_TARGET=global    vendor/bin/phpunit --configuration=tests/phpunit.xml",
-      "env TEST_TARGET=namespace vendor/bin/phpunit --configuration=tests/phpunit.xml"
+      "env TEST_TARGET=namespace vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=class     vendor/bin/phpunit --configuration=tests/phpunit.xml"
     ],
     "test-coverage": [
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
