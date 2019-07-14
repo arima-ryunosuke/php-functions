@@ -1696,6 +1696,156 @@ class Strings
     }
 
     /**
+     * 配列を LTSV 的文字列に変換する
+     *
+     * ラベル文字列に ":" を含む場合は例外を投げる（ラベルにコロンが来るとどうしようもない）。
+     *
+     * escape オプションで「LTSV 的にまずい文字」がその文字でエスケープされる（具体的には "\n" と "\t"）。
+     * デフォルトでは "\\" でエスケープされるので、整合性が崩れることはない。
+     *
+     * encode オプションで「文字列化できない値」が来たときのその関数を通して出力される（その場合、目印として値の両サイドに ` が付く）。
+     * デフォルトでは json_encode される。
+     *
+     * エンコード機能はおまけに過ぎない（大抵の場合はそんな機能は必要ない）。
+     * ので、この実装は互換性を維持せず変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * assertEquals(ltsv_export([
+     *     "label1" => "value1",
+     *     "label2" => "value2",
+     * ]), "label1:value1	label2:value2");
+     *
+     * // タブや改行文字のエスケープ
+     * assertEquals(ltsv_export([
+     *     "label1" => "val\tue1",
+     *     "label2" => "val\nue2",
+     * ]), "label1:val\\tue1	label2:val\\nue2");
+     *
+     * // 配列のエンコード
+     * assertEquals(ltsv_export([
+     *     "label1" => "value1",
+     *     "label2" => [1, 2, 3],
+     * ]), "label1:value1	label2:`[1,2,3]`");
+     * ```
+     *
+     * @param array $ltsvarray 配列
+     * @param array $options オプション配列
+     * @return string LTSV 的文字列
+     */
+    public static function ltsv_export($ltsvarray, $options = [])
+    {
+        $options += [
+            'escape' => '\\',
+            'encode' => function ($v) { return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); },
+        ];
+        $escape = $options['escape'];
+        $encode = $options['encode'];
+
+        $map = [];
+        if (strlen($escape)) {
+            $map["\\"] = "{$escape}\\";
+            $map["\t"] = "{$escape}t";
+            $map["\n"] = "{$escape}n";
+        }
+
+        $parts = [];
+        foreach ($ltsvarray as $label => $value) {
+            if (strpos($label, ':')) {
+                throw new \InvalidArgumentException('label contains ":".');
+            }
+            $should_encode = !(is_stringable)($value);
+            if ($should_encode) {
+                $value = "`{$encode($value)}`";
+            }
+            if ($map) {
+                $label = strtr($label, $map);
+                if (!$should_encode) {
+                    $value = strtr($value, $map);
+                }
+            }
+            $parts[] = $label . ':' . $value;
+        }
+        return implode("\t", $parts);
+    }
+
+    /**
+     * LTSV 的文字列を配列に変換する
+     *
+     * escape オプションで「LTSV 的にまずい文字」がその文字でエスケープされる（具体的には "\n" と "\t"）。
+     * デフォルトでは "\\" でエスケープされるので、整合性が崩れることはない。
+     *
+     * decode オプションで「`` で囲まれた値」が来たときのその関数を通して出力される。
+     * デフォルトでは json_decode される。
+     *
+     * エンコード機能はおまけに過ぎない（大抵の場合はそんな機能は必要ない）。
+     * ので、この実装は互換性を維持せず変更される可能性がある。
+     *
+     * Example:
+     * ```php
+     * // シンプルな実行例
+     * assertEquals(ltsv_import("label1:value1	label2:value2"), [
+     *     "label1" => "value1",
+     *     "label2" => "value2",
+     * ]);
+     *
+     * // タブや改行文字のエスケープ
+     * assertEquals(ltsv_import("label1:val\\tue1	label2:val\\nue2"), [
+     *     "label1" => "val\tue1",
+     *     "label2" => "val\nue2",
+     * ]);
+     *
+     * // 配列のデコード
+     * assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
+     *     "label1" => "value1",
+     *     "label2" => [1, 2, 3],
+     * ]);
+     * ```
+     *
+     * @param string $ltsvstring LTSV 的文字列
+     * @param array $options オプション配列
+     * @return array 配列
+     */
+    public static function ltsv_import($ltsvstring, $options = [])
+    {
+        $options += [
+            'escape' => '\\',
+            'decode' => function ($v) { return json_decode($v, true); },
+        ];
+        $escape = $options['escape'];
+        $decode = $options['decode'];
+
+        $map = [];
+        if (strlen($escape)) {
+            $map["{$escape}\\"] = "\\";
+            $map["{$escape}t"] = "\t";
+            $map["{$escape}n"] = "\n";
+        }
+
+        $result = [];
+        foreach (explode("\t", $ltsvstring) as $part) {
+            list($label, $value) = explode(':', $part, 2);
+            $should_decode = substr($value, 0, 1) === '`' && substr($value, -1, 1) === '`';
+            if ($map) {
+                $label = strtr($label, $map);
+                if (!$should_decode) {
+                    $value = strtr($value, $map);
+                }
+            }
+            if ($should_decode) {
+                $value2 = $decode(substr($value, 1, -1));
+                // たまたま ` が付いているだけかも知れないので結果で判定する
+                if (!(is_stringable)($value2)) {
+                    $value = $value2;
+                }
+            }
+            $result[$label] = $value;
+        }
+        return $result;
+    }
+
+    /**
      * 連想配列の配列を markdown テーブル文字列にする
      *
      * 見出しはキーの和集合で生成され、改行は `<br>` に置換される。

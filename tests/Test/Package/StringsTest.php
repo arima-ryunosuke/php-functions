@@ -1120,6 +1120,28 @@ a3,b3,c3
         $this->assertException('Maximum stack depth exceeded', json_import, '[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3]);
     }
 
+    function test_ltsv_import()
+    {
+        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], (ltsv_import)("a:A	b:B	c:C"));
+        $this->assertEquals(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C'], (ltsv_import)('a\ta:a	b:b\tb	c\\\\t:C\\\\C'));
+
+        $this->assertEquals(['a' => ['x', 'y'], 'b' => 'B'], (ltsv_import)('a:`["x","y"]`	b:B'));
+        $this->assertEquals(['a' => '`xyz`', 'b' => 'B'], (ltsv_import)('a:`xyz`	b:B'));
+    }
+
+    function test_ltsv_export()
+    {
+        $this->assertEquals("a:A	b:B	c:C", (ltsv_export)(['a' => 'A', 'b' => 'B', 'c' => 'C']));
+        $this->assertEquals('a\ta:a	b:b\tb	c\\\\t:C\\\\C', (ltsv_export)(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C']));
+        $this->assertEquals("a%ta:a	b:b%tb", (ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => '%']));
+        $this->assertEquals("a	a:a	b:b	b", (ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => null]));
+
+        $this->assertEquals('a:`["x","y"]`	b:B', (ltsv_export)(['a' => ['x', 'y'], 'b' => 'B']));
+        $this->assertEquals('a:hoge	b:B', (ltsv_export)(['a' => new Concrete('hoge'), 'b' => 'B']));
+
+        $this->assertException('label contains ":"', ltsv_export, ['a:a' => 'A']);
+    }
+
     function test_markdown_table()
     {
         $this->assertEquals("
