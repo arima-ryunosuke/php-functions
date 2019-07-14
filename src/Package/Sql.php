@@ -267,7 +267,8 @@ class Sql
                         $next = $seek($index, +1);
 
                         // "tablename. columnname" になってしまう
-                        if ($prev !== '.') {
+                        // "@var" になってしまう
+                        if ($prev !== '.' && $prev !== '@') {
                             $result[] = $MARK_SP;
                         }
 
@@ -280,6 +281,9 @@ class Sql
                         if (($next !== '.' && $next !== ',' && $next !== '(') || ($next === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $token))) {
                             $result[] = $MARK_SP;
                         }
+                        break;
+                    case "@":
+                        $result[] = $MARK_SP . $virttoken;
                         break;
                     case ";":
                         $result[] = $MARK_BR . $virttoken . $MARK_BR;

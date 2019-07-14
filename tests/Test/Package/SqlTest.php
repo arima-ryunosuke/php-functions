@@ -510,6 +510,13 @@ from
 
     function test_sql_format_other()
     {
+        // mysql set variable
+        $this->assertFormatSql("
+set
+  @hoge = 123,
+  @fuga = 456
+", "set @hoge=123,@fuga=456");
+
         // contain tag
         $this->assertFormatSql("
 select
