@@ -651,7 +651,6 @@ if (!defined("SORT_STRICT")) {
 
 
 # functions
-const arrays = "arrays";
 if (!isset($excluded_functions["arrays"]) && (!function_exists("arrays") || (!false && (new \ReflectionFunction("arrays"))->isInternal()))) {
     /**
      * 配列をシーケンシャルに走査するジェネレータを返す
@@ -684,8 +683,10 @@ if (!isset($excluded_functions["arrays"]) && (!function_exists("arrays") || (!fa
         }
     }
 }
+if (function_exists("arrays") && !defined("arrays")) {
+    define("arrays", "arrays");
+}
 
-const arrayize = "arrayize";
 if (!isset($excluded_functions["arrayize"]) && (!function_exists("arrayize") || (!false && (new \ReflectionFunction("arrayize"))->isInternal()))) {
     /**
      * 引数の配列を生成する。
@@ -717,8 +718,10 @@ if (!isset($excluded_functions["arrayize"]) && (!function_exists("arrayize") || 
         return $result;
     }
 }
+if (function_exists("arrayize") && !defined("arrayize")) {
+    define("arrayize", "arrayize");
+}
 
-const is_indexarray = "is_indexarray";
 if (!isset($excluded_functions["is_indexarray"]) && (!function_exists("is_indexarray") || (!false && (new \ReflectionFunction("is_indexarray"))->isInternal()))) {
     /**
      * 配列が数値配列か調べる
@@ -750,8 +753,10 @@ if (!isset($excluded_functions["is_indexarray"]) && (!function_exists("is_indexa
         return true;
     }
 }
+if (function_exists("is_indexarray") && !defined("is_indexarray")) {
+    define("is_indexarray", "is_indexarray");
+}
 
-const is_hasharray = "is_hasharray";
 if (!isset($excluded_functions["is_hasharray"]) && (!function_exists("is_hasharray") || (!false && (new \ReflectionFunction("is_hasharray"))->isInternal()))) {
     /**
      * 配列が連想配列か調べる
@@ -779,8 +784,10 @@ if (!isset($excluded_functions["is_hasharray"]) && (!function_exists("is_hasharr
         return false;
     }
 }
+if (function_exists("is_hasharray") && !defined("is_hasharray")) {
+    define("is_hasharray", "is_hasharray");
+}
 
-const first_key = "first_key";
 if (!isset($excluded_functions["first_key"]) && (!function_exists("first_key") || (!false && (new \ReflectionFunction("first_key"))->isInternal()))) {
     /**
      * 配列の最初のキーを返す
@@ -807,8 +814,10 @@ if (!isset($excluded_functions["first_key"]) && (!function_exists("first_key") |
         return $k;
     }
 }
+if (function_exists("first_key") && !defined("first_key")) {
+    define("first_key", "first_key");
+}
 
-const first_value = "first_value";
 if (!isset($excluded_functions["first_value"]) && (!function_exists("first_value") || (!false && (new \ReflectionFunction("first_value"))->isInternal()))) {
     /**
      * 配列の最初の値を返す
@@ -835,8 +844,10 @@ if (!isset($excluded_functions["first_value"]) && (!function_exists("first_value
         return $v;
     }
 }
+if (function_exists("first_value") && !defined("first_value")) {
+    define("first_value", "first_value");
+}
 
-const first_keyvalue = "first_keyvalue";
 if (!isset($excluded_functions["first_keyvalue"]) && (!function_exists("first_keyvalue") || (!false && (new \ReflectionFunction("first_keyvalue"))->isInternal()))) {
     /**
      * 配列の最初のキー/値ペアをタプルで返す
@@ -861,8 +872,10 @@ if (!isset($excluded_functions["first_keyvalue"]) && (!function_exists("first_ke
         return $default;
     }
 }
+if (function_exists("first_keyvalue") && !defined("first_keyvalue")) {
+    define("first_keyvalue", "first_keyvalue");
+}
 
-const last_key = "last_key";
 if (!isset($excluded_functions["last_key"]) && (!function_exists("last_key") || (!false && (new \ReflectionFunction("last_key"))->isInternal()))) {
     /**
      * 配列の最後のキーを返す
@@ -889,8 +902,10 @@ if (!isset($excluded_functions["last_key"]) && (!function_exists("last_key") || 
         return $k;
     }
 }
+if (function_exists("last_key") && !defined("last_key")) {
+    define("last_key", "last_key");
+}
 
-const last_value = "last_value";
 if (!isset($excluded_functions["last_value"]) && (!function_exists("last_value") || (!false && (new \ReflectionFunction("last_value"))->isInternal()))) {
     /**
      * 配列の最後の値を返す
@@ -917,8 +932,10 @@ if (!isset($excluded_functions["last_value"]) && (!function_exists("last_value")
         return $v;
     }
 }
+if (function_exists("last_value") && !defined("last_value")) {
+    define("last_value", "last_value");
+}
 
-const last_keyvalue = "last_keyvalue";
 if (!isset($excluded_functions["last_keyvalue"]) && (!function_exists("last_keyvalue") || (!false && (new \ReflectionFunction("last_keyvalue"))->isInternal()))) {
     /**
      * 配列の最後のキー/値ペアをタプルで返す
@@ -957,8 +974,10 @@ if (!isset($excluded_functions["last_keyvalue"]) && (!function_exists("last_keyv
         return $default;
     }
 }
+if (function_exists("last_keyvalue") && !defined("last_keyvalue")) {
+    define("last_keyvalue", "last_keyvalue");
+}
 
-const prev_key = "prev_key";
 if (!isset($excluded_functions["prev_key"]) && (!function_exists("prev_key") || (!false && (new \ReflectionFunction("prev_key"))->isInternal()))) {
     /**
      * 配列の指定キーの前のキーを返す
@@ -994,8 +1013,10 @@ if (!isset($excluded_functions["prev_key"]) && (!function_exists("prev_key") || 
         return false;
     }
 }
+if (function_exists("prev_key") && !defined("prev_key")) {
+    define("prev_key", "prev_key");
+}
 
-const next_key = "next_key";
 if (!isset($excluded_functions["next_key"]) && (!function_exists("next_key") || (!false && (new \ReflectionFunction("next_key"))->isInternal()))) {
     /**
      * 配列の指定キーの次のキーを返す
@@ -1049,8 +1070,10 @@ if (!isset($excluded_functions["next_key"]) && (!function_exists("next_key") || 
         }
     }
 }
+if (function_exists("next_key") && !defined("next_key")) {
+    define("next_key", "next_key");
+}
 
-const in_array_and = "in_array_and";
 if (!isset($excluded_functions["in_array_and"]) && (!function_exists("in_array_and") || (!false && (new \ReflectionFunction("in_array_and"))->isInternal()))) {
     /**
      * in_array の複数版（AND）
@@ -1087,8 +1110,10 @@ if (!isset($excluded_functions["in_array_and"]) && (!function_exists("in_array_a
         return true;
     }
 }
+if (function_exists("in_array_and") && !defined("in_array_and")) {
+    define("in_array_and", "in_array_and");
+}
 
-const in_array_or = "in_array_or";
 if (!isset($excluded_functions["in_array_or"]) && (!function_exists("in_array_or") || (!false && (new \ReflectionFunction("in_array_or"))->isInternal()))) {
     /**
      * in_array の複数版（OR）
@@ -1125,8 +1150,10 @@ if (!isset($excluded_functions["in_array_or"]) && (!function_exists("in_array_or
         return false;
     }
 }
+if (function_exists("in_array_or") && !defined("in_array_or")) {
+    define("in_array_or", "in_array_or");
+}
 
-const kvsort = "kvsort";
 if (!isset($excluded_functions["kvsort"]) && (!function_exists("kvsort") || (!false && (new \ReflectionFunction("kvsort"))->isInternal()))) {
     /**
      * 比較関数にキーも渡ってくる安定ソート
@@ -1201,8 +1228,10 @@ if (!isset($excluded_functions["kvsort"]) && (!function_exists("kvsort") || (!fa
         return $tmp;
     }
 }
+if (function_exists("kvsort") && !defined("kvsort")) {
+    define("kvsort", "kvsort");
+}
 
-const array_add = "array_add";
 if (!isset($excluded_functions["array_add"]) && (!function_exists("array_add") || (!false && (new \ReflectionFunction("array_add"))->isInternal()))) {
     /**
      * 配列の+演算子の関数版
@@ -1215,20 +1244,22 @@ if (!isset($excluded_functions["array_add"]) && (!function_exists("array_add") |
      * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
      * ```
      *
-     * @param array $array 対象配列
-     * @param array $variadic 足す配列
+     * @param array $variadic 足す配列（可変引数）
      * @return array 足された配列
      */
-    function array_add($array, ...$variadic)
+    function array_add(...$variadic)
     {
+        $array = [];
         foreach ($variadic as $arg) {
             $array += $arg;
         }
         return $array;
     }
 }
+if (function_exists("array_add") && !defined("array_add")) {
+    define("array_add", "array_add");
+}
 
-const array_mix = "array_mix";
 if (!isset($excluded_functions["array_mix"]) && (!function_exists("array_mix") || (!false && (new \ReflectionFunction("array_mix"))->isInternal()))) {
     /**
      * 配列を交互に追加する
@@ -1284,8 +1315,10 @@ if (!isset($excluded_functions["array_mix"]) && (!function_exists("array_mix") |
         return $result;
     }
 }
+if (function_exists("array_mix") && !defined("array_mix")) {
+    define("array_mix", "array_mix");
+}
 
-const array_zip = "array_zip";
 if (!isset($excluded_functions["array_zip"]) && (!function_exists("array_zip") || (!false && (new \ReflectionFunction("array_zip"))->isInternal()))) {
     /**
      * 配列の各要素値で順番に配列を作る
@@ -1362,8 +1395,10 @@ if (!isset($excluded_functions["array_zip"]) && (!function_exists("array_zip") |
         */
     }
 }
+if (function_exists("array_zip") && !defined("array_zip")) {
+    define("array_zip", "array_zip");
+}
 
-const array_cross = "array_cross";
 if (!isset($excluded_functions["array_cross"]) && (!function_exists("array_cross") || (!false && (new \ReflectionFunction("array_cross"))->isInternal()))) {
     /**
      * 配列の直積を返す
@@ -1410,8 +1445,10 @@ if (!isset($excluded_functions["array_cross"]) && (!function_exists("array_cross
         return $result;
     }
 }
+if (function_exists("array_cross") && !defined("array_cross")) {
+    define("array_cross", "array_cross");
+}
 
-const array_implode = "array_implode";
 if (!isset($excluded_functions["array_implode"]) && (!function_exists("array_implode") || (!false && (new \ReflectionFunction("array_implode"))->isInternal()))) {
     /**
      * 配列の各要素の間に要素を差し込む
@@ -1454,8 +1491,88 @@ if (!isset($excluded_functions["array_implode"]) && (!function_exists("array_imp
         return $result;
     }
 }
+if (function_exists("array_implode") && !defined("array_implode")) {
+    define("array_implode", "array_implode");
+}
 
-const array_sprintf = "array_sprintf";
+if (!isset($excluded_functions["array_explode"]) && (!function_exists("array_explode") || (!false && (new \ReflectionFunction("array_explode"))->isInternal()))) {
+    /**
+     * 配列を指定条件で分割する
+     *
+     * 文字列の explode を更に一階層掘り下げたイメージ。
+     * $condition で指定された要素は結果配列に含まれない。
+     *
+     * $condition にはクロージャが指定できる。クロージャの場合は true 相当を返した場合に分割要素とみなされる。
+     * 引数は (値, キー)の順番。
+     *
+     * $limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。
+     * 端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。
+     *
+     * Example:
+     * ```php
+     * // null 要素で分割
+     * assertSame(array_explode(['a', null, 'b', 'c'], null), [['a'], [2 => 'b', 3 => 'c']]);
+     * // クロージャで分割（大文字で分割）
+     * assertSame(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}), [['a'], [2 => 'c'], [4 => 'e']]);
+     * // 負数指定
+     * assertSame(array_explode(['a', null, 'b', null, 'c'], null, -2), [[0 => 'a', 1 => null, 2 => 'b'], [4 => 'c']]);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param mixed $condition 分割条件
+     * @param int $limit 最大分割数
+     * @return array 分割された配列
+     */
+    function array_explode($array, $condition, $limit = \PHP_INT_MAX)
+    {
+        $array = arrayval($array, false);
+
+        $limit = (int) $limit;
+        if ($limit < 0) {
+            // キーまで考慮するとかなりややこしくなるので富豪的にやる
+            $reverse = array_explode(array_reverse($array, true), $condition, -$limit);
+            $reverse = array_map(function ($v) { return array_reverse($v, true); }, $reverse);
+            return array_reverse($reverse);
+        }
+        // explode において 0 は 1 と等しい
+        if ($limit === 0) {
+            $limit = 1;
+        }
+
+        $result = [];
+        $chunk = [];
+        $n = 0;
+        foreach ($array as $k => $v) {
+            if ($limit === 1) {
+                $chunk = array_slice($array, $n, null, true);
+                break;
+            }
+
+            $n++;
+            if ($condition instanceof \Closure) {
+                $match = $condition($v, $k);
+            }
+            else {
+                $match = $condition === $v;
+            }
+
+            if ($match) {
+                $limit--;
+                $result[] = $chunk;
+                $chunk = [];
+            }
+            else {
+                $chunk[$k] = $v;
+            }
+        }
+        $result[] = $chunk;
+        return $result;
+    }
+}
+if (function_exists("array_explode") && !defined("array_explode")) {
+    define("array_explode", "array_explode");
+}
+
 if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("array_sprintf") || (!false && (new \ReflectionFunction("array_sprintf"))->isInternal()))) {
     /**
      * キーと値で sprintf する
@@ -1513,8 +1630,10 @@ if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("array_spr
         return $result;
     }
 }
+if (function_exists("array_sprintf") && !defined("array_sprintf")) {
+    define("array_sprintf", "array_sprintf");
+}
 
-const array_strpad = "array_strpad";
 if (!isset($excluded_functions["array_strpad"]) && (!function_exists("array_strpad") || (!false && (new \ReflectionFunction("array_strpad"))->isInternal()))) {
     /**
      * 配列のキー・要素に文字列を付加する
@@ -1564,8 +1683,10 @@ if (!isset($excluded_functions["array_strpad"]) && (!function_exists("array_strp
         return $result;
     }
 }
+if (function_exists("array_strpad") && !defined("array_strpad")) {
+    define("array_strpad", "array_strpad");
+}
 
-const array_pos = "array_pos";
 if (!isset($excluded_functions["array_pos"]) && (!function_exists("array_pos") || (!false && (new \ReflectionFunction("array_pos"))->isInternal()))) {
     /**
      * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
@@ -1609,8 +1730,10 @@ if (!isset($excluded_functions["array_pos"]) && (!function_exists("array_pos") |
         throw new \OutOfBoundsException("$position is not found.");
     }
 }
+if (function_exists("array_pos") && !defined("array_pos")) {
+    define("array_pos", "array_pos");
+}
 
-const array_pos_key = "array_pos_key";
 if (!isset($excluded_functions["array_pos_key"]) && (!function_exists("array_pos_key") || (!false && (new \ReflectionFunction("array_pos_key"))->isInternal()))) {
     /**
      * 配列の指定キーの位置を返す
@@ -1645,8 +1768,10 @@ if (!isset($excluded_functions["array_pos_key"]) && (!function_exists("array_pos
         return $default;
     }
 }
+if (function_exists("array_pos_key") && !defined("array_pos_key")) {
+    define("array_pos_key", "array_pos_key");
+}
 
-const array_of = "array_of";
 if (!isset($excluded_functions["array_of"]) && (!function_exists("array_of") || (!false && (new \ReflectionFunction("array_of"))->isInternal()))) {
     /**
      * 配列を与えると指定キーの値を返すクロージャを返す
@@ -1680,8 +1805,10 @@ if (!isset($excluded_functions["array_of"]) && (!function_exists("array_of") || 
         };
     }
 }
+if (function_exists("array_of") && !defined("array_of")) {
+    define("array_of", "array_of");
+}
 
-const array_get = "array_get";
 if (!isset($excluded_functions["array_get"]) && (!function_exists("array_get") || (!false && (new \ReflectionFunction("array_get"))->isInternal()))) {
     /**
      * デフォルト値付きの配列値取得
@@ -1761,8 +1888,10 @@ if (!isset($excluded_functions["array_get"]) && (!function_exists("array_get") |
         return $default;
     }
 }
+if (function_exists("array_get") && !defined("array_get")) {
+    define("array_get", "array_get");
+}
 
-const array_set = "array_set";
 if (!isset($excluded_functions["array_set"]) && (!function_exists("array_set") || (!false && (new \ReflectionFunction("array_set"))->isInternal()))) {
     /**
      * キー指定の配列値設定
@@ -1818,8 +1947,10 @@ if (!isset($excluded_functions["array_set"]) && (!function_exists("array_set") |
         return $key;
     }
 }
+if (function_exists("array_set") && !defined("array_set")) {
+    define("array_set", "array_set");
+}
 
-const array_put = "array_put";
 if (!isset($excluded_functions["array_put"]) && (!function_exists("array_put") || (!false && (new \ReflectionFunction("array_put"))->isInternal()))) {
     /**
      * キー指定の配列値設定
@@ -1882,8 +2013,10 @@ if (!isset($excluded_functions["array_put"]) && (!function_exists("array_put") |
         return $key;
     }
 }
+if (function_exists("array_put") && !defined("array_put")) {
+    define("array_put", "array_put");
+}
 
-const array_unset = "array_unset";
 if (!isset($excluded_functions["array_unset"]) && (!function_exists("array_unset") || (!false && (new \ReflectionFunction("array_unset"))->isInternal()))) {
     /**
      * 伏せると同時にその値を返す
@@ -1970,8 +2103,10 @@ if (!isset($excluded_functions["array_unset"]) && (!function_exists("array_unset
         return $default;
     }
 }
+if (function_exists("array_unset") && !defined("array_unset")) {
+    define("array_unset", "array_unset");
+}
 
-const array_dive = "array_dive";
 if (!isset($excluded_functions["array_dive"]) && (!function_exists("array_dive") || (!false && (new \ReflectionFunction("array_dive"))->isInternal()))) {
     /**
      * パス形式で配列値を取得
@@ -2014,8 +2149,10 @@ if (!isset($excluded_functions["array_dive"]) && (!function_exists("array_dive")
         return $array;
     }
 }
+if (function_exists("array_dive") && !defined("array_dive")) {
+    define("array_dive", "array_dive");
+}
 
-const array_keys_exist = "array_keys_exist";
 if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("array_keys_exist") || (!false && (new \ReflectionFunction("array_keys_exist"))->isInternal()))) {
     /**
      * array_key_exists の複数版
@@ -2072,8 +2209,10 @@ if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("array_
         return true;
     }
 }
+if (function_exists("array_keys_exist") && !defined("array_keys_exist")) {
+    define("array_keys_exist", "array_keys_exist");
+}
 
-const array_find = "array_find";
 if (!isset($excluded_functions["array_find"]) && (!function_exists("array_find") || (!false && (new \ReflectionFunction("array_find"))->isInternal()))) {
     /**
      * array_search のクロージャ版のようなもの
@@ -2115,8 +2254,10 @@ if (!isset($excluded_functions["array_find"]) && (!function_exists("array_find")
         return false;
     }
 }
+if (function_exists("array_find") && !defined("array_find")) {
+    define("array_find", "array_find");
+}
 
-const array_rekey = "array_rekey";
 if (!isset($excluded_functions["array_rekey"]) && (!function_exists("array_rekey") || (!false && (new \ReflectionFunction("array_rekey"))->isInternal()))) {
     /**
      * キーをマップ配列で置換する
@@ -2155,8 +2296,10 @@ if (!isset($excluded_functions["array_rekey"]) && (!function_exists("array_rekey
         return $result;
     }
 }
+if (function_exists("array_rekey") && !defined("array_rekey")) {
+    define("array_rekey", "array_rekey");
+}
 
-const array_grep_key = "array_grep_key";
 if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("array_grep_key") || (!false && (new \ReflectionFunction("array_grep_key"))->isInternal()))) {
     /**
      * キーを正規表現でフィルタする
@@ -2184,8 +2327,10 @@ if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("array_gr
         return $result;
     }
 }
+if (function_exists("array_grep_key") && !defined("array_grep_key")) {
+    define("array_grep_key", "array_grep_key");
+}
 
-const array_map_recursive = "array_map_recursive";
 if (!isset($excluded_functions["array_map_recursive"]) && (!function_exists("array_map_recursive") || (!false && (new \ReflectionFunction("array_map_recursive"))->isInternal()))) {
     /**
      * array_map の再帰版
@@ -2252,8 +2397,10 @@ if (!isset($excluded_functions["array_map_recursive"]) && (!function_exists("arr
         return $main($array);
     }
 }
+if (function_exists("array_map_recursive") && !defined("array_map_recursive")) {
+    define("array_map_recursive", "array_map_recursive");
+}
 
-const array_map_key = "array_map_key";
 if (!isset($excluded_functions["array_map_key"]) && (!function_exists("array_map_key") || (!false && (new \ReflectionFunction("array_map_key"))->isInternal()))) {
     /**
      * キーをマップして変換する
@@ -2282,8 +2429,10 @@ if (!isset($excluded_functions["array_map_key"]) && (!function_exists("array_map
         return $result;
     }
 }
+if (function_exists("array_map_key") && !defined("array_map_key")) {
+    define("array_map_key", "array_map_key");
+}
 
-const array_filter_not = "array_filter_not";
 if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("array_filter_not") || (!false && (new \ReflectionFunction("array_filter_not"))->isInternal()))) {
     /**
      * array_filter の否定版
@@ -2304,8 +2453,10 @@ if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("array_
         return array_filter(arrayval($array, false), not_func($callback));
     }
 }
+if (function_exists("array_filter_not") && !defined("array_filter_not")) {
+    define("array_filter_not", "array_filter_not");
+}
 
-const array_filter_key = "array_filter_key";
 if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("array_filter_key") || (!false && (new \ReflectionFunction("array_filter_key"))->isInternal()))) {
     /**
      * キーを主軸とした array_filter
@@ -2334,8 +2485,10 @@ if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("array_
         return $result;
     }
 }
+if (function_exists("array_filter_key") && !defined("array_filter_key")) {
+    define("array_filter_key", "array_filter_key");
+}
 
-const array_filter_eval = "array_filter_eval";
 if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("array_filter_eval") || (!false && (new \ReflectionFunction("array_filter_eval"))->isInternal()))) {
     /**
      * eval で評価して array_filter する
@@ -2357,8 +2510,10 @@ if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("array
         return array_filter_key($array, eval_func($expression, 'k', 'v'));
     }
 }
+if (function_exists("array_filter_eval") && !defined("array_filter_eval")) {
+    define("array_filter_eval", "array_filter_eval");
+}
 
-const array_where = "array_where";
 if (!isset($excluded_functions["array_where"]) && (!function_exists("array_where") || (!false && (new \ReflectionFunction("array_where"))->isInternal()))) {
     /**
      * 指定キーの要素で array_filter する
@@ -2404,6 +2559,11 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("array_where
      * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
+     * // 上記において値に配列を渡すと in_array で判定される
+     * assertSame(array_where($array, ['id' => [2, 3]]), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
      * assertSame(array_where($array, [
      *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
@@ -2430,7 +2590,12 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("array_where
                     if ($c instanceof \Closure) {
                         return $c;
                     }
-                    return $callback ? function ($v) use ($c) { return $v === $c; } : function ($v) use ($c) { return $v == $c; };
+                    if ($callback) {
+                        return function ($v) use ($c) { return $v === $c; };
+                    }
+                    else {
+                        return function ($v) use ($c) { return is_array($c) ? in_array($v, $c) : $v == $c; };
+                    }
                 }, $column);
                 $callback = function ($vv, $k) use ($callbacks) {
                     foreach ($callbacks as $c => $callback) {
@@ -2467,8 +2632,10 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("array_where
         return $result;
     }
 }
+if (function_exists("array_where") && !defined("array_where")) {
+    define("array_where", "array_where");
+}
 
-const array_map_filter = "array_map_filter";
 if (!isset($excluded_functions["array_map_filter"]) && (!function_exists("array_map_filter") || (!false && (new \ReflectionFunction("array_map_filter"))->isInternal()))) {
     /**
      * array_map + array_filter する
@@ -2502,8 +2669,10 @@ if (!isset($excluded_functions["array_map_filter"]) && (!function_exists("array_
         return $result;
     }
 }
+if (function_exists("array_map_filter") && !defined("array_map_filter")) {
+    define("array_map_filter", "array_map_filter");
+}
 
-const array_map_method = "array_map_method";
 if (!isset($excluded_functions["array_map_method"]) && (!function_exists("array_map_method") || (!false && (new \ReflectionFunction("array_map_method"))->isInternal()))) {
     /**
      * メソッドを指定できるようにした array_map
@@ -2546,8 +2715,10 @@ if (!isset($excluded_functions["array_map_method"]) && (!function_exists("array_
         }, arrayval($array, false));
     }
 }
+if (function_exists("array_map_method") && !defined("array_map_method")) {
+    define("array_map_method", "array_map_method");
+}
 
-const array_maps = "array_maps";
 if (!isset($excluded_functions["array_maps"]) && (!function_exists("array_maps") || (!false && (new \ReflectionFunction("array_maps"))->isInternal()))) {
     /**
      * 複数コールバックを指定できる array_map
@@ -2603,8 +2774,10 @@ if (!isset($excluded_functions["array_maps"]) && (!function_exists("array_maps")
         return $result;
     }
 }
+if (function_exists("array_maps") && !defined("array_maps")) {
+    define("array_maps", "array_maps");
+}
 
-const array_kmap = "array_kmap";
 if (!isset($excluded_functions["array_kmap"]) && (!function_exists("array_kmap") || (!false && (new \ReflectionFunction("array_kmap"))->isInternal()))) {
     /**
      * キーも渡ってくる array_map
@@ -2647,8 +2820,10 @@ if (!isset($excluded_functions["array_kmap"]) && (!function_exists("array_kmap")
         return $result;
     }
 }
+if (function_exists("array_kmap") && !defined("array_kmap")) {
+    define("array_kmap", "array_kmap");
+}
 
-const array_nmap = "array_nmap";
 if (!isset($excluded_functions["array_nmap"]) && (!function_exists("array_nmap") || (!false && (new \ReflectionFunction("array_nmap"))->isInternal()))) {
     /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
@@ -2722,8 +2897,10 @@ if (!isset($excluded_functions["array_nmap"]) && (!function_exists("array_nmap")
         return $result;
     }
 }
+if (function_exists("array_nmap") && !defined("array_nmap")) {
+    define("array_nmap", "array_nmap");
+}
 
-const array_lmap = "array_lmap";
 if (!isset($excluded_functions["array_lmap"]) && (!function_exists("array_lmap") || (!false && (new \ReflectionFunction("array_lmap"))->isInternal()))) {
     /**
      * 要素値を $callback の最左に適用して array_map する
@@ -2744,8 +2921,10 @@ if (!isset($excluded_functions["array_lmap"]) && (!function_exists("array_lmap")
         return array_nmap(...array_insert(func_get_args(), 0, 2));
     }
 }
+if (function_exists("array_lmap") && !defined("array_lmap")) {
+    define("array_lmap", "array_lmap");
+}
 
-const array_rmap = "array_rmap";
 if (!isset($excluded_functions["array_rmap"]) && (!function_exists("array_rmap") || (!false && (new \ReflectionFunction("array_rmap"))->isInternal()))) {
     /**
      * 要素値を $callback の最右に適用して array_map する
@@ -2766,8 +2945,10 @@ if (!isset($excluded_functions["array_rmap"]) && (!function_exists("array_rmap")
         return array_nmap(...array_insert(func_get_args(), func_num_args() - 2, 2));
     }
 }
+if (function_exists("array_rmap") && !defined("array_rmap")) {
+    define("array_rmap", "array_rmap");
+}
 
-const array_each = "array_each";
 if (!isset($excluded_functions["array_each"]) && (!function_exists("array_each") || (!false && (new \ReflectionFunction("array_each"))->isInternal()))) {
     /**
      * array_reduce の参照版（のようなもの）
@@ -2850,8 +3031,10 @@ if (!isset($excluded_functions["array_each"]) && (!function_exists("array_each")
         return $default;
     }
 }
+if (function_exists("array_each") && !defined("array_each")) {
+    define("array_each", "array_each");
+}
 
-const array_depth = "array_depth";
 if (!isset($excluded_functions["array_depth"]) && (!function_exists("array_depth") || (!false && (new \ReflectionFunction("array_depth"))->isInternal()))) {
     /**
      * 配列の次元数を返す
@@ -2898,8 +3081,10 @@ if (!isset($excluded_functions["array_depth"]) && (!function_exists("array_depth
         return $main($array, 1);
     }
 }
+if (function_exists("array_depth") && !defined("array_depth")) {
+    define("array_depth", "array_depth");
+}
 
-const array_insert = "array_insert";
 if (!isset($excluded_functions["array_insert"]) && (!function_exists("array_insert") || (!false && (new \ReflectionFunction("array_insert"))->isInternal()))) {
     /**
      * 配列・連想配列を問わず任意の位置に値を挿入する
@@ -2933,8 +3118,10 @@ if (!isset($excluded_functions["array_insert"]) && (!function_exists("array_inse
         return array_merge($sarray, $value, $array);
     }
 }
+if (function_exists("array_insert") && !defined("array_insert")) {
+    define("array_insert", "array_insert");
+}
 
-const array_assort = "array_assort";
 if (!isset($excluded_functions["array_assort"]) && (!function_exists("array_assort") || (!false && (new \ReflectionFunction("array_assort"))->isInternal()))) {
     /**
      * 配列をコールバックに従って分類する
@@ -2983,8 +3170,10 @@ if (!isset($excluded_functions["array_assort"]) && (!function_exists("array_asso
         return $result;
     }
 }
+if (function_exists("array_assort") && !defined("array_assort")) {
+    define("array_assort", "array_assort");
+}
 
-const array_count = "array_count";
 if (!isset($excluded_functions["array_count"]) && (!function_exists("array_count") || (!false && (new \ReflectionFunction("array_count"))->isInternal()))) {
     /**
      * 配列をコールバックに従ってカウントする
@@ -3040,8 +3229,10 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("array_count
         return $result;
     }
 }
+if (function_exists("array_count") && !defined("array_count")) {
+    define("array_count", "array_count");
+}
 
-const array_group = "array_group";
 if (!isset($excluded_functions["array_group"]) && (!function_exists("array_group") || (!false && (new \ReflectionFunction("array_group"))->isInternal()))) {
     /**
      * 配列をコールバックの返り値でグループ化する
@@ -3104,8 +3295,10 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("array_group
         return $result;
     }
 }
+if (function_exists("array_group") && !defined("array_group")) {
+    define("array_group", "array_group");
+}
 
-const array_all = "array_all";
 if (!isset($excluded_functions["array_all"]) && (!function_exists("array_all") || (!false && (new \ReflectionFunction("array_all"))->isInternal()))) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
@@ -3140,8 +3333,10 @@ if (!isset($excluded_functions["array_all"]) && (!function_exists("array_all") |
         return true;
     }
 }
+if (function_exists("array_all") && !defined("array_all")) {
+    define("array_all", "array_all");
+}
 
-const array_any = "array_any";
 if (!isset($excluded_functions["array_any"]) && (!function_exists("array_any") || (!false && (new \ReflectionFunction("array_any"))->isInternal()))) {
     /**
      * 全要素が false になるなら false を返す（1つでも true なら true を返す）
@@ -3176,8 +3371,10 @@ if (!isset($excluded_functions["array_any"]) && (!function_exists("array_any") |
         return false;
     }
 }
+if (function_exists("array_any") && !defined("array_any")) {
+    define("array_any", "array_any");
+}
 
-const array_distinct = "array_distinct";
 if (!isset($excluded_functions["array_distinct"]) && (!function_exists("array_distinct") || (!false && (new \ReflectionFunction("array_distinct"))->isInternal()))) {
     /**
      * 比較関数が渡せる array_unique
@@ -3272,8 +3469,10 @@ if (!isset($excluded_functions["array_distinct"]) && (!function_exists("array_di
         return array_intersect_key($backup, $keepkeys);
     }
 }
+if (function_exists("array_distinct") && !defined("array_distinct")) {
+    define("array_distinct", "array_distinct");
+}
 
-const array_order = "array_order";
 if (!isset($excluded_functions["array_order"]) && (!function_exists("array_order") || (!false && (new \ReflectionFunction("array_order"))->isInternal()))) {
     /**
      * 配列を $orders に従って並べ替える
@@ -3409,8 +3608,10 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("array_order
         }
     }
 }
+if (function_exists("array_order") && !defined("array_order")) {
+    define("array_order", "array_order");
+}
 
-const array_shuffle = "array_shuffle";
 if (!isset($excluded_functions["array_shuffle"]) && (!function_exists("array_shuffle") || (!false && (new \ReflectionFunction("array_shuffle"))->isInternal()))) {
     /**
      * shuffle のキーが保存される＋参照渡しではない版
@@ -3435,8 +3636,10 @@ if (!isset($excluded_functions["array_shuffle"]) && (!function_exists("array_shu
         return $result;
     }
 }
+if (function_exists("array_shuffle") && !defined("array_shuffle")) {
+    define("array_shuffle", "array_shuffle");
+}
 
-const array_shrink_key = "array_shrink_key";
 if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("array_shrink_key") || (!false && (new \ReflectionFunction("array_shrink_key"))->isInternal()))) {
     /**
      * 値の優先順位を逆にした array_intersect_key
@@ -3468,8 +3671,10 @@ if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("array_
         return array_intersect_key($result, ...$variadic);
     }
 }
+if (function_exists("array_shrink_key") && !defined("array_shrink_key")) {
+    define("array_shrink_key", "array_shrink_key");
+}
 
-const array_fill_gap = "array_fill_gap";
 if (!isset($excluded_functions["array_fill_gap"]) && (!function_exists("array_fill_gap") || (!false && (new \ReflectionFunction("array_fill_gap"))->isInternal()))) {
     /**
      * 配列の隙間を埋める
@@ -3564,8 +3769,10 @@ if (!isset($excluded_functions["array_fill_gap"]) && (!function_exists("array_fi
         return $result;
     }
 }
+if (function_exists("array_fill_gap") && !defined("array_fill_gap")) {
+    define("array_fill_gap", "array_fill_gap");
+}
 
-const array_fill_callback = "array_fill_callback";
 if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("array_fill_callback") || (!false && (new \ReflectionFunction("array_fill_callback"))->isInternal()))) {
     /**
      * array_fill_keys のコールバック版のようなもの
@@ -3600,8 +3807,10 @@ if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("arr
         return array_combine($keys, array_map(func_user_func_array($callback), $keys));
     }
 }
+if (function_exists("array_fill_callback") && !defined("array_fill_callback")) {
+    define("array_fill_callback", "array_fill_callback");
+}
 
-const array_pickup = "array_pickup";
 if (!isset($excluded_functions["array_pickup"]) && (!function_exists("array_pickup") || (!false && (new \ReflectionFunction("array_pickup"))->isInternal()))) {
     /**
      * キーを指定してそれだけの配列にする
@@ -3646,8 +3855,10 @@ if (!isset($excluded_functions["array_pickup"]) && (!function_exists("array_pick
         return $result;
     }
 }
+if (function_exists("array_pickup") && !defined("array_pickup")) {
+    define("array_pickup", "array_pickup");
+}
 
-const array_remove = "array_remove";
 if (!isset($excluded_functions["array_remove"]) && (!function_exists("array_remove") || (!false && (new \ReflectionFunction("array_remove"))->isInternal()))) {
     /**
      * キーを指定してそれらを除いた配列にする
@@ -3676,8 +3887,10 @@ if (!isset($excluded_functions["array_remove"]) && (!function_exists("array_remo
         return $array;
     }
 }
+if (function_exists("array_remove") && !defined("array_remove")) {
+    define("array_remove", "array_remove");
+}
 
-const array_lookup = "array_lookup";
 if (!isset($excluded_functions["array_lookup"]) && (!function_exists("array_lookup") || (!false && (new \ReflectionFunction("array_lookup"))->isInternal()))) {
     /**
      * キー保存可能な array_column
@@ -3734,8 +3947,10 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("array_look
         return $result;
     }
 }
+if (function_exists("array_lookup") && !defined("array_lookup")) {
+    define("array_lookup", "array_lookup");
+}
 
-const array_columns = "array_columns";
 if (!isset($excluded_functions["array_columns"]) && (!function_exists("array_columns") || (!false && (new \ReflectionFunction("array_columns"))->isInternal()))) {
     /**
      * 全要素に対して array_column する
@@ -3774,8 +3989,10 @@ if (!isset($excluded_functions["array_columns"]) && (!function_exists("array_col
         return $result;
     }
 }
+if (function_exists("array_columns") && !defined("array_columns")) {
+    define("array_columns", "array_columns");
+}
 
-const array_uncolumns = "array_uncolumns";
 if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("array_uncolumns") || (!false && (new \ReflectionFunction("array_uncolumns"))->isInternal()))) {
     /**
      * array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する
@@ -3821,8 +4038,10 @@ if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("array_u
         return $result;
     }
 }
+if (function_exists("array_uncolumns") && !defined("array_uncolumns")) {
+    define("array_uncolumns", "array_uncolumns");
+}
 
-const array_convert = "array_convert";
 if (!isset($excluded_functions["array_convert"]) && (!function_exists("array_convert") || (!false && (new \ReflectionFunction("array_convert"))->isInternal()))) {
     /**
      * 配列の各要素に再帰的にコールバックを適用して変換する
@@ -3949,8 +4168,10 @@ if (!isset($excluded_functions["array_convert"]) && (!function_exists("array_con
         return $result;
     }
 }
+if (function_exists("array_convert") && !defined("array_convert")) {
+    define("array_convert", "array_convert");
+}
 
-const array_flatten = "array_flatten";
 if (!isset($excluded_functions["array_flatten"]) && (!function_exists("array_flatten") || (!false && (new \ReflectionFunction("array_flatten"))->isInternal()))) {
     /**
      * 多階層配列をフラットに展開する
@@ -4004,7 +4225,7 @@ if (!isset($excluded_functions["array_flatten"]) && (!function_exists("array_fla
         $core = function ($array, $delimiter) use (&$core) {
             $result = [];
             foreach ($array as $k => $v) {
-                if (is_array($v)) {
+                if (is_iterable($v)) {
                     foreach ($core($v, $delimiter) as $ik => $iv) {
                         if ($delimiter === null) {
                             $result[] = $iv;
@@ -4029,8 +4250,10 @@ if (!isset($excluded_functions["array_flatten"]) && (!function_exists("array_fla
         return $core($array, $delimiter);
     }
 }
+if (function_exists("array_flatten") && !defined("array_flatten")) {
+    define("array_flatten", "array_flatten");
+}
 
-const array_nest = "array_nest";
 if (!isset($excluded_functions["array_nest"]) && (!function_exists("array_nest") || (!false && (new \ReflectionFunction("array_nest"))->isInternal()))) {
     /**
      * シンプルな [キー => 値] な配列から階層配列を生成する
@@ -4108,8 +4331,10 @@ if (!isset($excluded_functions["array_nest"]) && (!function_exists("array_nest")
         return $result;
     }
 }
+if (function_exists("array_nest") && !defined("array_nest")) {
+    define("array_nest", "array_nest");
+}
 
-const array_difference = "array_difference";
 if (!isset($excluded_functions["array_difference"]) && (!function_exists("array_difference") || (!false && (new \ReflectionFunction("array_difference"))->isInternal()))) {
     /**
      * 配列の差分を取り配列で返す
@@ -4135,6 +4360,7 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("array_
      *         ]
      *     ],
      *     'key1'   => 'hoge',
+     *     'array'  => ['a', 'b', 'c'],
      * ], [
      *     'common' => [
      *         'sub' => [
@@ -4142,9 +4368,11 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("array_
      *         ]
      *     ],
      *     'key2'   => 'fuga',
+     *     'array'  => ['c', 'd', 'e'],
      * ]), [
      *     'common.sub.x' => ['-' => 'val', '+' => 'VAL'],
      *     'key1'         => ['-' => 'hoge'],
+     *     'array'        => ['-' => ['a', 'b'], '+' => ['d', 'e']],
      *     'key2'         => ['+' => 'fuga'],
      * ]);
      * ```
@@ -4213,8 +4441,10 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("array_
         }, $array1, $array2);
     }
 }
+if (function_exists("array_difference") && !defined("array_difference")) {
+    define("array_difference", "array_difference");
+}
 
-const stdclass = "stdclass";
 if (!isset($excluded_functions["stdclass"]) && (!function_exists("stdclass") || (!false && (new \ReflectionFunction("stdclass"))->isInternal()))) {
     /**
      * 初期フィールド値を与えて stdClass を生成する
@@ -4246,8 +4476,10 @@ if (!isset($excluded_functions["stdclass"]) && (!function_exists("stdclass") || 
         return $stdclass;
     }
 }
+if (function_exists("stdclass") && !defined("stdclass")) {
+    define("stdclass", "stdclass");
+}
 
-const detect_namespace = "detect_namespace";
 if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect_namespace") || (!false && (new \ReflectionFunction("detect_namespace"))->isInternal()))) {
     /**
      * ディレクトリ構造から名前空間を推測して返す
@@ -4257,6 +4489,14 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect
      * 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。
      *
      * 言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。
+     *
+     * Example:
+     * ```php
+     * // Example 用としてこのクラスのディレクトリを使用してみる
+     * $dirname = dirname(class_loader()->findFile(\ryunosuke\Functions\Package\Classobj::class));
+     * // "$dirname/Hoge" の名前空間を推測して返す
+     * assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+     * ```
      *
      * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
      * @return string 名前空間
@@ -4301,8 +4541,10 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect
         }) ?: throws(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 }
+if (function_exists("detect_namespace") && !defined("detect_namespace")) {
+    define("detect_namespace", "detect_namespace");
+}
 
-const class_loader = "class_loader";
 if (!isset($excluded_functions["class_loader"]) && (!function_exists("class_loader") || (!false && (new \ReflectionFunction("class_loader"))->isInternal()))) {
     /**
      * composer のクラスローダを返す
@@ -4333,8 +4575,10 @@ if (!isset($excluded_functions["class_loader"]) && (!function_exists("class_load
         return require $file;
     }
 }
+if (function_exists("class_loader") && !defined("class_loader")) {
+    define("class_loader", "class_loader");
+}
 
-const class_namespace = "class_namespace";
 if (!isset($excluded_functions["class_namespace"]) && (!function_exists("class_namespace") || (!false && (new \ReflectionFunction("class_namespace"))->isInternal()))) {
     /**
      * クラスの名前空間部分を取得する
@@ -4358,8 +4602,10 @@ if (!isset($excluded_functions["class_namespace"]) && (!function_exists("class_n
         return ltrim(implode('\\', $parts), '\\');
     }
 }
+if (function_exists("class_namespace") && !defined("class_namespace")) {
+    define("class_namespace", "class_namespace");
+}
 
-const class_shorten = "class_shorten";
 if (!isset($excluded_functions["class_shorten"]) && (!function_exists("class_shorten") || (!false && (new \ReflectionFunction("class_shorten"))->isInternal()))) {
     /**
      * クラスの名前空間部分を除いた短い名前を取得する
@@ -4382,8 +4628,10 @@ if (!isset($excluded_functions["class_shorten"]) && (!function_exists("class_sho
         return array_pop($parts);
     }
 }
+if (function_exists("class_shorten") && !defined("class_shorten")) {
+    define("class_shorten", "class_shorten");
+}
 
-const class_replace = "class_replace";
 if (!isset($excluded_functions["class_replace"]) && (!function_exists("class_replace") || (!false && (new \ReflectionFunction("class_replace"))->isInternal()))) {
     /**
      * 既存（未読み込みに限る）クラスを強制的に置換する
@@ -4436,10 +4684,20 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("class_rep
      * // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
      * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->method(), 'this is X2d');
      * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod(), 'this is newmethod');
+     *
+     * // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
+     *     [\ryunosuke\Test\Package\Classobj\XTrait::class],
+     *     'method' => function(){return 'this is X3d';},
+     * ]);
+     * // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->method(), 'this is X3d');
+     * // トレイトのメソッドも生えている
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->traitMethod(), 'this is XTrait::traitMethod');
      * ```
      *
      * @param string $class 対象クラス名
-     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
+     * @param \Closure|array $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
      */
     function class_replace($class, $register)
     {
@@ -4461,7 +4719,12 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("class_rep
         require_once $fname;
 
         $classess = get_declared_classes();
-        $newclass = $register();
+        if ($register instanceof \Closure) {
+            $newclass = $register();
+        }
+        else {
+            $newclass = $register;
+        }
 
         // クロージャ内部でクラス定義した場合（増えたクラスでエイリアスする）
         if ($newclass === null) {
@@ -4496,29 +4759,38 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("class_rep
             $origspace = trim(implode('', array_column($origspace, 1)));
             $origclass = trim(implode('', array_column($origclass, 1)));
 
-            $methods = '';
-            foreach ($newclass as $name => $func) {
-                $codes = callable_code($func);
-                $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $codes[0]);
-                $methods .= "public $mname {$codes[1]}";
+            $classcode = '';
+            foreach ($newclass as $name => $member) {
+                if (is_array($member)) {
+                    foreach ($member as $trait) {
+                        $classcode .= "use \\" . trim($trait, '\\') . ";\n";
+                    }
+                }
+                else {
+                    $codes = callable_code($member);
+                    $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $codes[0]);
+                    $classcode .= "public $mname {$codes[1]}\n";
+                }
             }
 
             $newclass = "\\$origspace\\{$origclass}_";
-            evaluate("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
+            evaluate("namespace $origspace;\nclass {$origclass}_ extends {$origclass}\n{\n$classcode}");
         }
 
         class_alias($newclass, $class);
     }
 }
+if (function_exists("class_replace") && !defined("class_replace")) {
+    define("class_replace", "class_replace");
+}
 
-const class_extends = "class_extends";
 if (!isset($excluded_functions["class_extends"]) && (!function_exists("class_extends") || (!false && (new \ReflectionFunction("class_extends"))->isInternal()))) {
     /**
      * インスタンスを動的に拡張する
      *
      * インスタンスに特異メソッド・特異フィールドのようなものを生やす。
      * ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。
-     * そのクラスの __set/__get が禁止されている場合に使えるかもしれない程度。
+     * そのクラスの `__set`/`__get` が禁止されている場合に使えるかもしれない程度。
      *
      * クロージャ配列を渡すと特異メソッドになる。
      * そのクロージャの $this は元オブジェクトで bind される。
@@ -4662,8 +4934,10 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("class_ext
         return $spawners[$classname]['reflection']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
     }
 }
+if (function_exists("class_extends") && !defined("class_extends")) {
+    define("class_extends", "class_extends");
+}
 
-const const_exists = "const_exists";
 if (!isset($excluded_functions["const_exists"]) && (!function_exists("const_exists") || (!false && (new \ReflectionFunction("const_exists"))->isInternal()))) {
     /**
      * クラス定数が存在するか調べる
@@ -4704,8 +4978,10 @@ if (!isset($excluded_functions["const_exists"]) && (!function_exists("const_exis
         }
     }
 }
+if (function_exists("const_exists") && !defined("const_exists")) {
+    define("const_exists", "const_exists");
+}
 
-const object_dive = "object_dive";
 if (!isset($excluded_functions["object_dive"]) && (!function_exists("object_dive") || (!false && (new \ReflectionFunction("object_dive"))->isInternal()))) {
     /**
      * パス形式でプロパティ値を取得
@@ -4745,8 +5021,10 @@ if (!isset($excluded_functions["object_dive"]) && (!function_exists("object_dive
         return $object;
     }
 }
+if (function_exists("object_dive") && !defined("object_dive")) {
+    define("object_dive", "object_dive");
+}
 
-const get_object_properties = "get_object_properties";
 if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("get_object_properties") || (!false && (new \ReflectionFunction("get_object_properties"))->isInternal()))) {
     /**
      * オブジェクトのプロパティを可視・不可視を問わず取得する
@@ -4801,8 +5079,10 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("g
         return $vars;
     }
 }
+if (function_exists("get_object_properties") && !defined("get_object_properties")) {
+    define("get_object_properties", "get_object_properties");
+}
 
-const date_timestamp = "date_timestamp";
 if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("date_timestamp") || (!false && (new \ReflectionFunction("date_timestamp"))->isInternal()))) {
     /**
      * 日時文字列をよしなにタイムスタンプに変換する
@@ -4918,8 +5198,10 @@ if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("date_tim
         return $time;
     }
 }
+if (function_exists("date_timestamp") && !defined("date_timestamp")) {
+    define("date_timestamp", "date_timestamp");
+}
 
-const date_convert = "date_convert";
 if (!isset($excluded_functions["date_convert"]) && (!function_exists("date_convert") || (!false && (new \ReflectionFunction("date_convert"))->isInternal()))) {
     /**
      * 日時文字列をよしなに別のフォーマットに変換する
@@ -4937,7 +5219,7 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("date_conve
      * ```
      *
      * @param string $format フォーマット
-     * @param string|int|float $datetimedata 日時データ。省略時は microtime
+     * @param string|int|float|\DateTime $datetimedata 日時データ。省略時は microtime
      * @return string 日時文字列
      */
     function date_convert($format, $datetimedata = null)
@@ -4945,6 +5227,10 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("date_conve
         // 省略時は microtime
         if ($datetimedata === null) {
             $timestamp = microtime(true);
+        }
+        elseif ($datetimedata instanceof \DateTime) {
+            // @fixme DateTime オブジェクトって timestamp を float で得られないの？
+            $timestamp = (float) $datetimedata->format('U.u');
         }
         else {
             $timestamp = date_timestamp($datetimedata);
@@ -4985,8 +5271,10 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("date_conve
         return date($format, $timestamp);
     }
 }
+if (function_exists("date_convert") && !defined("date_convert")) {
+    define("date_convert", "date_convert");
+}
 
-const date_interval = "date_interval";
 if (!isset($excluded_functions["date_interval"]) && (!function_exists("date_interval") || (!false && (new \ReflectionFunction("date_interval"))->isInternal()))) {
     /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
@@ -5191,8 +5479,10 @@ if (!isset($excluded_functions["date_interval"]) && (!function_exists("date_inte
         return $interval->format($format);
     }
 }
+if (function_exists("date_interval") && !defined("date_interval")) {
+    define("date_interval", "date_interval");
+}
 
-const file_list = "file_list";
 if (!isset($excluded_functions["file_list"]) && (!function_exists("file_list") || (!false && (new \ReflectionFunction("file_list"))->isInternal()))) {
     /**
      * ファイル一覧を配列で返す
@@ -5239,8 +5529,10 @@ if (!isset($excluded_functions["file_list"]) && (!function_exists("file_list") |
         return $result;
     }
 }
+if (function_exists("file_list") && !defined("file_list")) {
+    define("file_list", "file_list");
+}
 
-const file_tree = "file_tree";
 if (!isset($excluded_functions["file_tree"]) && (!function_exists("file_tree") || (!false && (new \ReflectionFunction("file_tree"))->isInternal()))) {
     /**
      * ディレクトリ階層をツリー構造で返す
@@ -5309,8 +5601,10 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("file_tree") |
         return $result;
     }
 }
+if (function_exists("file_tree") && !defined("file_tree")) {
+    define("file_tree", "file_tree");
+}
 
-const file_suffix = "file_suffix";
 if (!isset($excluded_functions["file_suffix"]) && (!function_exists("file_suffix") || (!false && (new \ReflectionFunction("file_suffix"))->isInternal()))) {
     /**
      * ファイル名にサフィックスを付与する
@@ -5347,8 +5641,10 @@ if (!isset($excluded_functions["file_suffix"]) && (!function_exists("file_suffix
         return $dirname . DIRECTORY_SEPARATOR . $basename;
     }
 }
+if (function_exists("file_suffix") && !defined("file_suffix")) {
+    define("file_suffix", "file_suffix");
+}
 
-const file_extension = "file_extension";
 if (!isset($excluded_functions["file_extension"]) && (!function_exists("file_extension") || (!false && (new \ReflectionFunction("file_extension"))->isInternal()))) {
     /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
@@ -5386,11 +5682,15 @@ if (!isset($excluded_functions["file_extension"]) && (!function_exists("file_ext
         return $pathinfo['dirname'] . DIRECTORY_SEPARATOR . $basename;
     }
 }
+if (function_exists("file_extension") && !defined("file_extension")) {
+    define("file_extension", "file_extension");
+}
 
-const file_set_contents = "file_set_contents";
 if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("file_set_contents") || (!false && (new \ReflectionFunction("file_set_contents"))->isInternal()))) {
     /**
      * ディレクトリも掘る file_put_contents
+     *
+     * 書き込みは一時ファイルと rename を使用してアトミックに行われる。
      *
      * Example:
      * ```php
@@ -5409,16 +5709,29 @@ if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("file_
             $umask = umask();
         }
 
+        $filename = path_normalize($filename);
+
         if (!is_dir($dirname = dirname($filename))) {
             if (!@mkdir_p($dirname, $umask)) {
                 throw new \RuntimeException("failed to mkdir($dirname)");
             }
         }
-        return file_put_contents($filename, $data);
+
+        $tempnam = tempnam($dirname, 'tmp');
+        if (($result = file_put_contents($tempnam, $data)) !== false) {
+            if (rename($tempnam, $filename)) {
+                @chmod($filename, 0666 & ~$umask);
+                return $result;
+            }
+            unlink($tempnam);
+        }
+        return false;
     }
 }
+if (function_exists("file_set_contents") && !defined("file_set_contents")) {
+    define("file_set_contents", "file_set_contents");
+}
 
-const file_rewrite_contents = "file_rewrite_contents";
 if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("file_rewrite_contents") || (!false && (new \ReflectionFunction("file_rewrite_contents"))->isInternal()))) {
     /**
      * ファイルを読み込んで内容をコールバックに渡して書き込む
@@ -5440,6 +5753,7 @@ if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("f
      */
     function file_rewrite_contents($filename, $callback, $operation = 0)
     {
+        /** @var resource $fp */
         try {
             // 開いて
             $fp = fopen($filename, 'c+b') ?: throws(new \UnexpectedValueException('failed to fopen.'));
@@ -5480,8 +5794,10 @@ if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("f
         }
     }
 }
+if (function_exists("file_rewrite_contents") && !defined("file_rewrite_contents")) {
+    define("file_rewrite_contents", "file_rewrite_contents");
+}
 
-const mkdir_p = "mkdir_p";
 if (!isset($excluded_functions["mkdir_p"]) && (!function_exists("mkdir_p") || (!false && (new \ReflectionFunction("mkdir_p"))->isInternal()))) {
     /**
      * ディレクトリを再帰的に掘る
@@ -5505,8 +5821,10 @@ if (!isset($excluded_functions["mkdir_p"]) && (!function_exists("mkdir_p") || (!
         return mkdir($dirname, 0777 & (~$umask), true);
     }
 }
+if (function_exists("mkdir_p") && !defined("mkdir_p")) {
+    define("mkdir_p", "mkdir_p");
+}
 
-const dirname_r = "dirname_r";
 if (!isset($excluded_functions["dirname_r"]) && (!function_exists("dirname_r") || (!false && (new \ReflectionFunction("dirname_r"))->isInternal()))) {
     /**
      * コールバックが true 相当を返すまで親ディレクトリを辿り続ける
@@ -5541,8 +5859,10 @@ if (!isset($excluded_functions["dirname_r"]) && (!function_exists("dirname_r") |
         return dirname_r($dirname, $callback);
     }
 }
+if (function_exists("dirname_r") && !defined("dirname_r")) {
+    define("dirname_r", "dirname_r");
+}
 
-const fnmatch_and = "fnmatch_and";
 if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("fnmatch_and") || (!false && (new \ReflectionFunction("fnmatch_and"))->isInternal()))) {
     /**
      * fnmatch の AND 版
@@ -5578,8 +5898,10 @@ if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("fnmatch_and
         return true;
     }
 }
+if (function_exists("fnmatch_and") && !defined("fnmatch_and")) {
+    define("fnmatch_and", "fnmatch_and");
+}
 
-const fnmatch_or = "fnmatch_or";
 if (!isset($excluded_functions["fnmatch_or"]) && (!function_exists("fnmatch_or") || (!false && (new \ReflectionFunction("fnmatch_or"))->isInternal()))) {
     /**
      * fnmatch の OR 版
@@ -5615,8 +5937,10 @@ if (!isset($excluded_functions["fnmatch_or"]) && (!function_exists("fnmatch_or")
         return false;
     }
 }
+if (function_exists("fnmatch_or") && !defined("fnmatch_or")) {
+    define("fnmatch_or", "fnmatch_or");
+}
 
-const path_is_absolute = "path_is_absolute";
 if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("path_is_absolute") || (!false && (new \ReflectionFunction("path_is_absolute"))->isInternal()))) {
     /**
      * パスが絶対パスか判定する
@@ -5637,7 +5961,16 @@ if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("path_i
      */
     function path_is_absolute($path)
     {
-        if (substr($path, 0, 1) == '/') {
+        // スキームが付いている場合は path 部分で判定
+        $parts = parse_url($path);
+        if (isset($parts['scheme'], $parts['path'])) {
+            $path = $parts['path'];
+        }
+        elseif (isset($parts['scheme'], $parts['host'])) {
+            $path = $parts['host'];
+        }
+
+        if (substr($path, 0, 1) === '/') {
             return true;
         }
 
@@ -5650,8 +5983,10 @@ if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("path_i
         return false;
     }
 }
+if (function_exists("path_is_absolute") && !defined("path_is_absolute")) {
+    define("path_is_absolute", "path_is_absolute");
+}
 
-const path_resolve = "path_resolve";
 if (!isset($excluded_functions["path_resolve"]) && (!function_exists("path_resolve") || (!false && (new \ReflectionFunction("path_resolve"))->isInternal()))) {
     /**
      * パスを絶対パスに変換して正規化する
@@ -5683,8 +6018,10 @@ if (!isset($excluded_functions["path_resolve"]) && (!function_exists("path_resol
         return path_normalize($path);
     }
 }
+if (function_exists("path_resolve") && !defined("path_resolve")) {
+    define("path_resolve", "path_resolve");
+}
 
-const path_normalize = "path_normalize";
 if (!isset($excluded_functions["path_normalize"]) && (!function_exists("path_normalize") || (!false && (new \ReflectionFunction("path_normalize"))->isInternal()))) {
     /**
      * パスを正規化する
@@ -5730,8 +6067,10 @@ if (!isset($excluded_functions["path_normalize"]) && (!function_exists("path_nor
         return implode(DIRECTORY_SEPARATOR, $result);
     }
 }
+if (function_exists("path_normalize") && !defined("path_normalize")) {
+    define("path_normalize", "path_normalize");
+}
 
-const cp_rf = "cp_rf";
 if (!isset($excluded_functions["cp_rf"]) && (!function_exists("cp_rf") || (!false && (new \ReflectionFunction("cp_rf"))->isInternal()))) {
     /**
      * ディレクトリのコピー
@@ -5802,8 +6141,10 @@ if (!isset($excluded_functions["cp_rf"]) && (!function_exists("cp_rf") || (!fals
         return file_exists($dst);
     }
 }
+if (function_exists("cp_rf") && !defined("cp_rf")) {
+    define("cp_rf", "cp_rf");
+}
 
-const rm_rf = "rm_rf";
 if (!isset($excluded_functions["rm_rf"]) && (!function_exists("rm_rf") || (!false && (new \ReflectionFunction("rm_rf"))->isInternal()))) {
     /**
      * 中身があっても消せる rmdir
@@ -5842,8 +6183,10 @@ if (!isset($excluded_functions["rm_rf"]) && (!function_exists("rm_rf") || (!fals
         }
     }
 }
+if (function_exists("rm_rf") && !defined("rm_rf")) {
+    define("rm_rf", "rm_rf");
+}
 
-const tmpname = "tmpname";
 if (!isset($excluded_functions["tmpname"]) && (!function_exists("tmpname") || (!false && (new \ReflectionFunction("tmpname"))->isInternal()))) {
     /**
      * 終了時に削除される一時ファイル名を生成する
@@ -5892,8 +6235,10 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("tmpname") || (!
         return $tempfile;
     }
 }
+if (function_exists("tmpname") && !defined("tmpname")) {
+    define("tmpname", "tmpname");
+}
 
-const memory_path = "memory_path";
 if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path") || (!false && (new \ReflectionFunction("memory_path"))->isInternal()))) {
     /**
      * ファイルのように扱えるメモリ上のパスを返す
@@ -6252,8 +6597,10 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
         return "$STREAM_NAME://$path";
     }
 }
+if (function_exists("memory_path") && !defined("memory_path")) {
+    define("memory_path", "memory_path");
+}
 
-const delegate = "delegate";
 if (!isset($excluded_functions["delegate"]) && (!function_exists("delegate") || (!false && (new \ReflectionFunction("delegate"))->isInternal()))) {
     /**
      * 指定 callable を指定クロージャで実行するクロージャを返す
@@ -6269,6 +6616,7 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("delegate") || 
     {
         // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
         $__rfunc_delegate_marker = true;
+        assert($__rfunc_delegate_marker === true); // phpstorm の警告解除
 
         if ($arity === null) {
             $arity = parameter_length($callable, true, true);
@@ -6307,15 +6655,17 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("delegate") || 
                     return $invoker($callable, func_get_args());
                 };
             default:
-                $argstring = array_rmap(range(1, $arity), strcat, '$_');
+                $argstring = array_map(function ($v) { return '$_' . $v; }, range(1, $arity));
                 return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
         }
     }
 }
+if (function_exists("delegate") && !defined("delegate")) {
+    define("delegate", "delegate");
+}
 
-const abind = "abind";
 if (!isset($excluded_functions["abind"]) && (!function_exists("abind") || (!false && (new \ReflectionFunction("abind"))->isInternal()))) {
     /**
      * $callable の引数を指定配列で束縛したクロージャを返す
@@ -6337,8 +6687,10 @@ if (!isset($excluded_functions["abind"]) && (!function_exists("abind") || (!fals
         }, $callable, parameter_length($callable, true) - count($default_args));
     }
 }
+if (function_exists("abind") && !defined("abind")) {
+    define("abind", "abind");
+}
 
-const nbind = "nbind";
 if (!isset($excluded_functions["nbind"]) && (!function_exists("nbind") || (!false && (new \ReflectionFunction("nbind"))->isInternal()))) {
     /**
      * $callable の指定位置に引数を束縛したクロージャを返す
@@ -6361,8 +6713,10 @@ if (!isset($excluded_functions["nbind"]) && (!function_exists("nbind") || (!fals
         }, $callable, parameter_length($callable, true) - count($variadic));
     }
 }
+if (function_exists("nbind") && !defined("nbind")) {
+    define("nbind", "nbind");
+}
 
-const lbind = "lbind";
 if (!isset($excluded_functions["lbind"]) && (!function_exists("lbind") || (!false && (new \ReflectionFunction("lbind"))->isInternal()))) {
     /**
      * $callable の最左に引数を束縛した callable を返す
@@ -6382,8 +6736,10 @@ if (!isset($excluded_functions["lbind"]) && (!function_exists("lbind") || (!fals
         return nbind(...array_insert(func_get_args(), 0, 1));
     }
 }
+if (function_exists("lbind") && !defined("lbind")) {
+    define("lbind", "lbind");
+}
 
-const rbind = "rbind";
 if (!isset($excluded_functions["rbind"]) && (!function_exists("rbind") || (!false && (new \ReflectionFunction("rbind"))->isInternal()))) {
     /**
      * $callable の最右に引数を束縛した callable を返す
@@ -6403,8 +6759,10 @@ if (!isset($excluded_functions["rbind"]) && (!function_exists("rbind") || (!fals
         return nbind(...array_insert(func_get_args(), null, 1));
     }
 }
+if (function_exists("rbind") && !defined("rbind")) {
+    define("rbind", "rbind");
+}
 
-const composite = "composite";
 if (!isset($excluded_functions["composite"]) && (!function_exists("composite") || (!false && (new \ReflectionFunction("composite"))->isInternal()))) {
     /**
      * 合成関数を返す
@@ -6476,8 +6834,10 @@ if (!isset($excluded_functions["composite"]) && (!function_exists("composite") |
         }, $first);
     }
 }
+if (function_exists("composite") && !defined("composite")) {
+    define("composite", "composite");
+}
 
-const return_arg = "return_arg";
 if (!isset($excluded_functions["return_arg"]) && (!function_exists("return_arg") || (!false && (new \ReflectionFunction("return_arg"))->isInternal()))) {
     /**
      * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
@@ -6504,8 +6864,10 @@ if (!isset($excluded_functions["return_arg"]) && (!function_exists("return_arg")
         return $cache[$n];
     }
 }
+if (function_exists("return_arg") && !defined("return_arg")) {
+    define("return_arg", "return_arg");
+}
 
-const ope_func = "ope_func";
 if (!isset($excluded_functions["ope_func"]) && (!function_exists("ope_func") || (!false && (new \ReflectionFunction("ope_func"))->isInternal()))) {
     /**
      * 演算子のクロージャを返す
@@ -6573,8 +6935,10 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ope_func") || 
         return $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
     }
 }
+if (function_exists("ope_func") && !defined("ope_func")) {
+    define("ope_func", "ope_func");
+}
 
-const not_func = "not_func";
 if (!isset($excluded_functions["not_func"]) && (!function_exists("not_func") || (!false && (new \ReflectionFunction("not_func"))->isInternal()))) {
     /**
      * 返り値の真偽値を逆転した新しいクロージャを返す
@@ -6596,8 +6960,10 @@ if (!isset($excluded_functions["not_func"]) && (!function_exists("not_func") || 
         }, $callable);
     }
 }
+if (function_exists("not_func") && !defined("not_func")) {
+    define("not_func", "not_func");
+}
 
-const eval_func = "eval_func";
 if (!isset($excluded_functions["eval_func"]) && (!function_exists("eval_func") || (!false && (new \ReflectionFunction("eval_func"))->isInternal()))) {
     /**
      * 指定コードで eval するクロージャを返す
@@ -6626,8 +6992,10 @@ if (!isset($excluded_functions["eval_func"]) && (!function_exists("eval_func") |
         return $cache[$declare];
     }
 }
+if (function_exists("eval_func") && !defined("eval_func")) {
+    define("eval_func", "eval_func");
+}
 
-const reflect_callable = "reflect_callable";
 if (!isset($excluded_functions["reflect_callable"]) && (!function_exists("reflect_callable") || (!false && (new \ReflectionFunction("reflect_callable"))->isInternal()))) {
     /**
      * callable から ReflectionFunctionAbstract を生成する
@@ -6662,8 +7030,10 @@ if (!isset($excluded_functions["reflect_callable"]) && (!function_exists("reflec
         }
     }
 }
+if (function_exists("reflect_callable") && !defined("reflect_callable")) {
+    define("reflect_callable", "reflect_callable");
+}
 
-const closurize = "closurize";
 if (!isset($excluded_functions["closurize"]) && (!function_exists("closurize") || (!false && (new \ReflectionFunction("closurize"))->isInternal()))) {
     /**
      * callable を Closure に変換する
@@ -6683,8 +7053,10 @@ if (!isset($excluded_functions["closurize"]) && (!function_exists("closurize") |
         return \Closure::fromCallable($callable);
     }
 }
+if (function_exists("closurize") && !defined("closurize")) {
+    define("closurize", "closurize");
+}
 
-const callable_code = "callable_code";
 if (!isset($excluded_functions["callable_code"]) && (!function_exists("callable_code") || (!false && (new \ReflectionFunction("callable_code"))->isInternal()))) {
     /**
      * callable のコードブロックを返す
@@ -6725,8 +7097,10 @@ if (!isset($excluded_functions["callable_code"]) && (!function_exists("callable_
         return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
     }
 }
+if (function_exists("callable_code") && !defined("callable_code")) {
+    define("callable_code", "callable_code");
+}
 
-const call_safely = "call_safely";
 if (!isset($excluded_functions["call_safely"]) && (!function_exists("call_safely") || (!false && (new \ReflectionFunction("call_safely"))->isInternal()))) {
     /**
      * エラーを例外に変換するブロックでコールバックを実行する
@@ -6762,8 +7136,10 @@ if (!isset($excluded_functions["call_safely"]) && (!function_exists("call_safely
         }
     }
 }
+if (function_exists("call_safely") && !defined("call_safely")) {
+    define("call_safely", "call_safely");
+}
 
-const ob_capture = "ob_capture";
 if (!isset($excluded_functions["ob_capture"]) && (!function_exists("ob_capture") || (!false && (new \ReflectionFunction("ob_capture"))->isInternal()))) {
     /**
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
@@ -6797,8 +7173,10 @@ if (!isset($excluded_functions["ob_capture"]) && (!function_exists("ob_capture")
         }
     }
 }
+if (function_exists("ob_capture") && !defined("ob_capture")) {
+    define("ob_capture", "ob_capture");
+}
 
-const is_bindable_closure = "is_bindable_closure";
 if (!isset($excluded_functions["is_bindable_closure"]) && (!function_exists("is_bindable_closure") || (!false && (new \ReflectionFunction("is_bindable_closure"))->isInternal()))) {
     /**
      * $this を bind 可能なクロージャか調べる
@@ -6817,8 +7195,10 @@ if (!isset($excluded_functions["is_bindable_closure"]) && (!function_exists("is_
         return !!@$closure->bindTo(new \stdClass());
     }
 }
+if (function_exists("is_bindable_closure") && !defined("is_bindable_closure")) {
+    define("is_bindable_closure", "is_bindable_closure");
+}
 
-const by_builtin = "by_builtin";
 if (!isset($excluded_functions["by_builtin"]) && (!function_exists("by_builtin") || (!false && (new \ReflectionFunction("by_builtin"))->isInternal()))) {
     /**
      * Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す
@@ -6878,8 +7258,10 @@ if (!isset($excluded_functions["by_builtin"]) && (!function_exists("by_builtin")
         throw new \RuntimeException('failed to search backtrace.');
     }
 }
+if (function_exists("by_builtin") && !defined("by_builtin")) {
+    define("by_builtin", "by_builtin");
+}
 
-const namedcallize = "namedcallize";
 if (!isset($excluded_functions["namedcallize"]) && (!function_exists("namedcallize") || (!false && (new \ReflectionFunction("namedcallize"))->isInternal()))) {
     /**
      * callable を名前付き引数で呼べるようにしたクロージャを返す
@@ -7022,8 +7404,10 @@ if (!isset($excluded_functions["namedcallize"]) && (!function_exists("namedcalli
         };
     }
 }
+if (function_exists("namedcallize") && !defined("namedcallize")) {
+    define("namedcallize", "namedcallize");
+}
 
-const parameter_length = "parameter_length";
 if (!isset($excluded_functions["parameter_length"]) && (!function_exists("parameter_length") || (!false && (new \ReflectionFunction("parameter_length"))->isInternal()))) {
     /**
      * callable の引数の数を返す
@@ -7078,8 +7462,10 @@ if (!isset($excluded_functions["parameter_length"]) && (!function_exists("parame
         return $cache[(int) $require_only . (int) $thought_variadic];
     }
 }
+if (function_exists("parameter_length") && !defined("parameter_length")) {
+    define("parameter_length", "parameter_length");
+}
 
-const function_shorten = "function_shorten";
 if (!isset($excluded_functions["function_shorten"]) && (!function_exists("function_shorten") || (!false && (new \ReflectionFunction("function_shorten"))->isInternal()))) {
     /**
      * 関数の名前空間部分を除いた短い名前を取得する
@@ -7093,8 +7479,10 @@ if (!isset($excluded_functions["function_shorten"]) && (!function_exists("functi
         return array_pop($parts);
     }
 }
+if (function_exists("function_shorten") && !defined("function_shorten")) {
+    define("function_shorten", "function_shorten");
+}
 
-const func_user_func_array = "func_user_func_array";
 if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("func_user_func_array") || (!false && (new \ReflectionFunction("func_user_func_array"))->isInternal()))) {
     /**
      * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
@@ -7141,8 +7529,10 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("fu
         }, $callback, $plength);
     }
 }
+if (function_exists("func_user_func_array") && !defined("func_user_func_array")) {
+    define("func_user_func_array", "func_user_func_array");
+}
 
-const func_new = "func_new";
 if (!isset($excluded_functions["func_new"]) && (!function_exists("func_new") || (!false && (new \ReflectionFunction("func_new"))->isInternal()))) {
     /**
      * 指定クラスのコンストラクタを呼び出すクロージャを返す
@@ -7172,8 +7562,10 @@ if (!isset($excluded_functions["func_new"]) && (!function_exists("func_new") || 
         };
     }
 }
+if (function_exists("func_new") && !defined("func_new")) {
+    define("func_new", "func_new");
+}
 
-const func_method = "func_method";
 if (!isset($excluded_functions["func_method"]) && (!function_exists("func_method") || (!false && (new \ReflectionFunction("func_method"))->isInternal()))) {
     /**
      * 指定メソッドを呼び出すクロージャを返す
@@ -7221,8 +7613,10 @@ if (!isset($excluded_functions["func_method"]) && (!function_exists("func_method
         };
     }
 }
+if (function_exists("func_method") && !defined("func_method")) {
+    define("func_method", "func_method");
+}
 
-const function_alias = "function_alias";
 if (!isset($excluded_functions["function_alias"]) && (!function_exists("function_alias") || (!false && (new \ReflectionFunction("function_alias"))->isInternal()))) {
     /**
      * 関数のエイリアスを作成する
@@ -7291,8 +7685,10 @@ CODE;
         require_once $cachefile;
     }
 }
+if (function_exists("function_alias") && !defined("function_alias")) {
+    define("function_alias", "function_alias");
+}
 
-const function_parameter = "function_parameter";
 if (!isset($excluded_functions["function_parameter"]) && (!function_exists("function_parameter") || (!false && (new \ReflectionFunction("function_parameter"))->isInternal()))) {
     /**
      * 関数/メソッドの引数定義を取得する
@@ -7341,8 +7737,10 @@ if (!isset($excluded_functions["function_parameter"]) && (!function_exists("func
         return $result;
     }
 }
+if (function_exists("function_parameter") && !defined("function_parameter")) {
+    define("function_parameter", "function_parameter");
+}
 
-const minimum = "minimum";
 if (!isset($excluded_functions["minimum"]) && (!function_exists("minimum") || (!false && (new \ReflectionFunction("minimum"))->isInternal()))) {
     /**
      * 引数の最小値を返す
@@ -7364,8 +7762,10 @@ if (!isset($excluded_functions["minimum"]) && (!function_exists("minimum") || (!
         return min($args);
     }
 }
+if (function_exists("minimum") && !defined("minimum")) {
+    define("minimum", "minimum");
+}
 
-const maximum = "maximum";
 if (!isset($excluded_functions["maximum"]) && (!function_exists("maximum") || (!false && (new \ReflectionFunction("maximum"))->isInternal()))) {
     /**
      * 引数の最大値を返す
@@ -7387,8 +7787,10 @@ if (!isset($excluded_functions["maximum"]) && (!function_exists("maximum") || (!
         return max($args);
     }
 }
+if (function_exists("maximum") && !defined("maximum")) {
+    define("maximum", "maximum");
+}
 
-const mode = "mode";
 if (!isset($excluded_functions["mode"]) && (!function_exists("mode") || (!false && (new \ReflectionFunction("mode"))->isInternal()))) {
     /**
      * 引数の最頻値を返す
@@ -7427,8 +7829,10 @@ if (!isset($excluded_functions["mode"]) && (!function_exists("mode") || (!false 
         return $args[key($counts)];
     }
 }
+if (function_exists("mode") && !defined("mode")) {
+    define("mode", "mode");
+}
 
-const mean = "mean";
 if (!isset($excluded_functions["mean"]) && (!function_exists("mean") || (!false && (new \ReflectionFunction("mean"))->isInternal()))) {
     /**
      * 引数の相加平均値を返す
@@ -7453,8 +7857,10 @@ if (!isset($excluded_functions["mean"]) && (!function_exists("mean") || (!false 
         return array_sum($args) / count($args);
     }
 }
+if (function_exists("mean") && !defined("mean")) {
+    define("mean", "mean");
+}
 
-const median = "median";
 if (!isset($excluded_functions["median"]) && (!function_exists("median") || (!false && (new \ReflectionFunction("median"))->isInternal()))) {
     /**
      * 引数の中央値を返す
@@ -7492,8 +7898,10 @@ if (!isset($excluded_functions["median"]) && (!function_exists("median") || (!fa
         }
     }
 }
+if (function_exists("median") && !defined("median")) {
+    define("median", "median");
+}
 
-const average = "average";
 if (!isset($excluded_functions["average"]) && (!function_exists("average") || (!false && (new \ReflectionFunction("average"))->isInternal()))) {
     /**
      * 引数の意味平均値を返す
@@ -7513,8 +7921,10 @@ if (!isset($excluded_functions["average"]) && (!function_exists("average") || (!
         throw new \DomainException('not implement yet.');
     }
 }
+if (function_exists("average") && !defined("average")) {
+    define("average", "average");
+}
 
-const sum = "sum";
 if (!isset($excluded_functions["sum"]) && (!function_exists("sum") || (!false && (new \ReflectionFunction("sum"))->isInternal()))) {
     /**
      * 引数の合計値を返す
@@ -7538,8 +7948,10 @@ if (!isset($excluded_functions["sum"]) && (!function_exists("sum") || (!false &&
         return array_sum($args);
     }
 }
+if (function_exists("sum") && !defined("sum")) {
+    define("sum", "sum");
+}
 
-const clamp = "clamp";
 if (!isset($excluded_functions["clamp"]) && (!function_exists("clamp") || (!false && (new \ReflectionFunction("clamp"))->isInternal()))) {
     /**
      * 値を一定範囲に収める
@@ -7589,8 +8001,10 @@ if (!isset($excluded_functions["clamp"]) && (!function_exists("clamp") || (!fals
         return $value;
     }
 }
+if (function_exists("clamp") && !defined("clamp")) {
+    define("clamp", "clamp");
+}
 
-const random_at = "random_at";
 if (!isset($excluded_functions["random_at"]) && (!function_exists("random_at") || (!false && (new \ReflectionFunction("random_at"))->isInternal()))) {
     /**
      * 引数をランダムで返す
@@ -7611,8 +8025,10 @@ if (!isset($excluded_functions["random_at"]) && (!function_exists("random_at") |
         return $args[mt_rand(0, count($args) - 1)];
     }
 }
+if (function_exists("random_at") && !defined("random_at")) {
+    define("random_at", "random_at");
+}
 
-const probability = "probability";
 if (!isset($excluded_functions["probability"]) && (!function_exists("probability") || (!false && (new \ReflectionFunction("probability"))->isInternal()))) {
     /**
      * 一定確率で true を返す
@@ -7649,8 +8065,10 @@ if (!isset($excluded_functions["probability"]) && (!function_exists("probability
         return $probability > mt_rand(0, $divisor - 1);
     }
 }
+if (function_exists("probability") && !defined("probability")) {
+    define("probability", "probability");
+}
 
-const normal_rand = "normal_rand";
 if (!isset($excluded_functions["normal_rand"]) && (!function_exists("normal_rand") || (!false && (new \ReflectionFunction("normal_rand"))->isInternal()))) {
     /**
      * 正規乱数（正規分布に従う乱数）を返す
@@ -7694,8 +8112,10 @@ if (!isset($excluded_functions["normal_rand"]) && (!function_exists("normal_rand
         return $z1 * $std_deviation + $average;
     }
 }
+if (function_exists("normal_rand") && !defined("normal_rand")) {
+    define("normal_rand", "normal_rand");
+}
 
-const getipaddress = "getipaddress";
 if (!isset($excluded_functions["getipaddress"]) && (!function_exists("getipaddress") || (!false && (new \ReflectionFunction("getipaddress"))->isInternal()))) {
     /**
      * 接続元となる IP を返す
@@ -7727,8 +8147,10 @@ if (!isset($excluded_functions["getipaddress"]) && (!function_exists("getipaddre
         return $ipaddr;
     }
 }
+if (function_exists("getipaddress") && !defined("getipaddress")) {
+    define("getipaddress", "getipaddress");
+}
 
-const incidr = "incidr";
 if (!isset($excluded_functions["incidr"]) && (!function_exists("incidr") || (!false && (new \ReflectionFunction("incidr"))->isInternal()))) {
     /**
      * ipv4 の cidr チェック
@@ -7778,8 +8200,10 @@ if (!isset($excluded_functions["incidr"]) && (!function_exists("incidr") || (!fa
         return false;
     }
 }
+if (function_exists("incidr") && !defined("incidr")) {
+    define("incidr", "incidr");
+}
 
-const ping = "ping";
 if (!isset($excluded_functions["ping"]) && (!function_exists("ping") || (!false && (new \ReflectionFunction("ping"))->isInternal()))) {
     /**
      * ネットワーク疎通を返す
@@ -7888,8 +8312,10 @@ if (!isset($excluded_functions["ping"]) && (!function_exists("ping") || (!false 
         }
     }
 }
+if (function_exists("ping") && !defined("ping")) {
+    define("ping", "ping");
+}
 
-const http_requests = "http_requests";
 if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requests") || (!false && (new \ReflectionFunction("http_requests"))->isInternal()))) {
     /**
      * http リクエストを並列で投げる
@@ -8008,8 +8434,10 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
         return $responses;
     }
 }
+if (function_exists("http_requests") && !defined("http_requests")) {
+    define("http_requests", "http_requests");
+}
 
-const sql_quote = "sql_quote";
 if (!isset($excluded_functions["sql_quote"]) && (!function_exists("sql_quote") || (!false && (new \ReflectionFunction("sql_quote"))->isInternal()))) {
     /**
      * ものすごく雑に値をクオートする
@@ -8047,8 +8475,10 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("sql_quote") |
         return "'" . addslashes("$value") . "'";
     }
 }
+if (function_exists("sql_quote") && !defined("sql_quote")) {
+    define("sql_quote", "sql_quote");
+}
 
-const sql_bind = "sql_bind";
 if (!isset($excluded_functions["sql_bind"]) && (!function_exists("sql_bind") || (!false && (new \ReflectionFunction("sql_bind"))->isInternal()))) {
     /**
      * ものすごく雑に SQL に値を埋め込む
@@ -8089,8 +8519,10 @@ if (!isset($excluded_functions["sql_bind"]) && (!function_exists("sql_bind") || 
         ]);
     }
 }
+if (function_exists("sql_bind") && !defined("sql_bind")) {
+    define("sql_bind", "sql_bind");
+}
 
-const sql_format = "sql_format";
 if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format") || (!false && (new \ReflectionFunction("sql_format"))->isInternal()))) {
     /**
      * ものすごく雑に SQL を整形する
@@ -8265,7 +8697,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         $next = $seek($index, +1);
 
                         // "tablename. columnname" になってしまう
-                        if ($prev !== '.') {
+                        // "@var" になってしまう
+                        if ($prev !== '.' && $prev !== '@') {
                             $result[] = $MARK_SP;
                         }
 
@@ -8278,6 +8711,9 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         if (($next !== '.' && $next !== ',' && $next !== '(') || ($next === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $token))) {
                             $result[] = $MARK_SP;
                         }
+                        break;
+                    case "@":
+                        $result[] = $MARK_SP . $virttoken;
                         break;
                     case ";":
                         $result[] = $MARK_BR . $virttoken . $MARK_BR;
@@ -8496,8 +8932,10 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
         return trim($result);
     }
 }
+if (function_exists("sql_format") && !defined("sql_format")) {
+    define("sql_format", "sql_format");
+}
 
-const strcat = "strcat";
 if (!isset($excluded_functions["strcat"]) && (!function_exists("strcat") || (!false && (new \ReflectionFunction("strcat"))->isInternal()))) {
     /**
      * 文字列結合の関数版
@@ -8515,8 +8953,10 @@ if (!isset($excluded_functions["strcat"]) && (!function_exists("strcat") || (!fa
         return implode('', $variadic);
     }
 }
+if (function_exists("strcat") && !defined("strcat")) {
+    define("strcat", "strcat");
+}
 
-const concat = "concat";
 if (!isset($excluded_functions["concat"]) && (!function_exists("concat") || (!false && (new \ReflectionFunction("concat"))->isInternal()))) {
     /**
      * strcat の空文字回避版
@@ -8547,8 +8987,10 @@ if (!isset($excluded_functions["concat"]) && (!function_exists("concat") || (!fa
         return $result;
     }
 }
+if (function_exists("concat") && !defined("concat")) {
+    define("concat", "concat");
+}
 
-const split_noempty = "split_noempty";
 if (!isset($excluded_functions["split_noempty"]) && (!function_exists("split_noempty") || (!false && (new \ReflectionFunction("split_noempty"))->isInternal()))) {
     /**
      * 空文字を除外する文字列分割
@@ -8587,8 +9029,10 @@ if (!isset($excluded_functions["split_noempty"]) && (!function_exists("split_noe
         return $parts;
     }
 }
+if (function_exists("split_noempty") && !defined("split_noempty")) {
+    define("split_noempty", "split_noempty");
+}
 
-const multiexplode = "multiexplode";
 if (!isset($excluded_functions["multiexplode"]) && (!function_exists("multiexplode") || (!false && (new \ReflectionFunction("multiexplode"))->isInternal()))) {
     /**
      * explode の配列対応と $limit の挙動を変えたもの
@@ -8628,8 +9072,10 @@ if (!isset($excluded_functions["multiexplode"]) && (!function_exists("multiexplo
         return preg_split('#' . implode('|', $delimiter) . '#', $string, $limit);
     }
 }
+if (function_exists("multiexplode") && !defined("multiexplode")) {
+    define("multiexplode", "multiexplode");
+}
 
-const quoteexplode = "quoteexplode";
 if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplode") || (!false && (new \ReflectionFunction("quoteexplode"))->isInternal()))) {
     /**
      * エスケープやクオートに対応した explode
@@ -8702,8 +9148,10 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplo
         return $result;
     }
 }
+if (function_exists("quoteexplode") && !defined("quoteexplode")) {
+    define("quoteexplode", "quoteexplode");
+}
 
-const str_anyof = "str_anyof";
 if (!isset($excluded_functions["str_anyof"]) && (!function_exists("str_anyof") || (!false && (new \ReflectionFunction("str_anyof"))->isInternal()))) {
     /**
      * 文字列が候補の中にあるか調べる
@@ -8743,8 +9191,10 @@ if (!isset($excluded_functions["str_anyof"]) && (!function_exists("str_anyof") |
         return null;
     }
 }
+if (function_exists("str_anyof") && !defined("str_anyof")) {
+    define("str_anyof", "str_anyof");
+}
 
-const str_equals = "str_equals";
 if (!isset($excluded_functions["str_equals"]) && (!function_exists("str_equals") || (!false && (new \ReflectionFunction("str_equals"))->isInternal()))) {
     /**
      * 文字列比較の関数版
@@ -8785,8 +9235,10 @@ if (!isset($excluded_functions["str_equals"]) && (!function_exists("str_equals")
         return $str1 === $str2;
     }
 }
+if (function_exists("str_equals") && !defined("str_equals")) {
+    define("str_equals", "str_equals");
+}
 
-const str_contains = "str_contains";
 if (!isset($excluded_functions["str_contains"]) && (!function_exists("str_contains") || (!false && (new \ReflectionFunction("str_contains"))->isInternal()))) {
     /**
      * 指定文字列を含むか返す
@@ -8830,8 +9282,10 @@ if (!isset($excluded_functions["str_contains"]) && (!function_exists("str_contai
         return !!$and_flag;
     }
 }
+if (function_exists("str_contains") && !defined("str_contains")) {
+    define("str_contains", "str_contains");
+}
 
-const str_chop = "str_chop";
 if (!isset($excluded_functions["str_chop"]) && (!function_exists("str_chop") || (!false && (new \ReflectionFunction("str_chop"))->isInternal()))) {
     /**
      * 先頭・末尾の指定文字列を削ぎ落とす
@@ -8862,8 +9316,10 @@ if (!isset($excluded_functions["str_chop"]) && (!function_exists("str_chop") || 
         return preg_replace('#' . implode('|', $pattern) . '#' . $flag, '', $string);
     }
 }
+if (function_exists("str_chop") && !defined("str_chop")) {
+    define("str_chop", "str_chop");
+}
 
-const str_lchop = "str_lchop";
 if (!isset($excluded_functions["str_lchop"]) && (!function_exists("str_lchop") || (!false && (new \ReflectionFunction("str_lchop"))->isInternal()))) {
     /**
      * 先頭の指定文字列を削ぎ落とす
@@ -8885,8 +9341,10 @@ if (!isset($excluded_functions["str_lchop"]) && (!function_exists("str_lchop") |
         return str_chop($string, $prefix, null, $case_insensitivity);
     }
 }
+if (function_exists("str_lchop") && !defined("str_lchop")) {
+    define("str_lchop", "str_lchop");
+}
 
-const str_rchop = "str_rchop";
 if (!isset($excluded_functions["str_rchop"]) && (!function_exists("str_rchop") || (!false && (new \ReflectionFunction("str_rchop"))->isInternal()))) {
     /**
      * 末尾の指定文字列を削ぎ落とす
@@ -8908,8 +9366,10 @@ if (!isset($excluded_functions["str_rchop"]) && (!function_exists("str_rchop") |
         return str_chop($string, null, $suffix, $case_insensitivity);
     }
 }
+if (function_exists("str_rchop") && !defined("str_rchop")) {
+    define("str_rchop", "str_rchop");
+}
 
-const str_putcsv = "str_putcsv";
 if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("str_putcsv") || (!false && (new \ReflectionFunction("str_putcsv"))->isInternal()))) {
     /**
      * fputcsv の文字列版（str_getcsv の put 版）
@@ -8960,8 +9420,10 @@ if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("str_putcsv")
         }
     }
 }
+if (function_exists("str_putcsv") && !defined("str_putcsv")) {
+    define("str_putcsv", "str_putcsv");
+}
 
-const str_subreplace = "str_subreplace";
 if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("str_subreplace") || (!false && (new \ReflectionFunction("str_subreplace"))->isInternal()))) {
     /**
      * 指定文字列を置換する
@@ -9039,8 +9501,10 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("str_subr
         return $subject;
     }
 }
+if (function_exists("str_subreplace") && !defined("str_subreplace")) {
+    define("str_subreplace", "str_subreplace");
+}
 
-const str_submap = "str_submap";
 if (!isset($excluded_functions["str_submap"]) && (!function_exists("str_submap") || (!false && (new \ReflectionFunction("str_submap"))->isInternal()))) {
     /**
      * 指定文字列を置換する
@@ -9144,8 +9608,10 @@ if (!isset($excluded_functions["str_submap"]) && (!function_exists("str_submap")
         }, $subject);
     }
 }
+if (function_exists("str_submap") && !defined("str_submap")) {
+    define("str_submap", "str_submap");
+}
 
-const str_embed = "str_embed";
 if (!isset($excluded_functions["str_embed"]) && (!function_exists("str_embed") || (!false && (new \ReflectionFunction("str_embed"))->isInternal()))) {
     /**
      * エスケープ付きで文字列を置換する
@@ -9244,8 +9710,10 @@ if (!isset($excluded_functions["str_embed"]) && (!function_exists("str_embed") |
         return $string;
     }
 }
+if (function_exists("str_embed") && !defined("str_embed")) {
+    define("str_embed", "str_embed");
+}
 
-const str_between = "str_between";
 if (!isset($excluded_functions["str_between"]) && (!function_exists("str_between") || (!false && (new \ReflectionFunction("str_between"))->isInternal()))) {
     /**
      * 指定文字で囲まれた文字列を取得する
@@ -9321,8 +9789,10 @@ if (!isset($excluded_functions["str_between"]) && (!function_exists("str_between
         return false;
     }
 }
+if (function_exists("str_between") && !defined("str_between")) {
+    define("str_between", "str_between");
+}
 
-const str_ellipsis = "str_ellipsis";
 if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("str_ellipsis") || (!false && (new \ReflectionFunction("str_ellipsis"))->isInternal()))) {
     /**
      * 文字列を指定幅に丸める
@@ -9371,8 +9841,10 @@ if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("str_ellips
         return mb_substr_replace($string, $trimmarker, $pos, $strlen - $length);
     }
 }
+if (function_exists("str_ellipsis") && !defined("str_ellipsis")) {
+    define("str_ellipsis", "str_ellipsis");
+}
 
-const starts_with = "starts_with";
 if (!isset($excluded_functions["starts_with"]) && (!function_exists("starts_with") || (!false && (new \ReflectionFunction("starts_with"))->isInternal()))) {
     /**
      * 指定文字列で始まるか調べる
@@ -9408,8 +9880,10 @@ if (!isset($excluded_functions["starts_with"]) && (!function_exists("starts_with
         return false;
     }
 }
+if (function_exists("starts_with") && !defined("starts_with")) {
+    define("starts_with", "starts_with");
+}
 
-const ends_with = "ends_with";
 if (!isset($excluded_functions["ends_with"]) && (!function_exists("ends_with") || (!false && (new \ReflectionFunction("ends_with"))->isInternal()))) {
     /**
      * 指定文字列で終わるか調べる
@@ -9445,8 +9919,10 @@ if (!isset($excluded_functions["ends_with"]) && (!function_exists("ends_with") |
         return false;
     }
 }
+if (function_exists("ends_with") && !defined("ends_with")) {
+    define("ends_with", "ends_with");
+}
 
-const camel_case = "camel_case";
 if (!isset($excluded_functions["camel_case"]) && (!function_exists("camel_case") || (!false && (new \ReflectionFunction("camel_case"))->isInternal()))) {
     /**
      * camelCase に変換する
@@ -9465,8 +9941,10 @@ if (!isset($excluded_functions["camel_case"]) && (!function_exists("camel_case")
         return lcfirst(pascal_case($string, $delimiter));
     }
 }
+if (function_exists("camel_case") && !defined("camel_case")) {
+    define("camel_case", "camel_case");
+}
 
-const pascal_case = "pascal_case";
 if (!isset($excluded_functions["pascal_case"]) && (!function_exists("pascal_case") || (!false && (new \ReflectionFunction("pascal_case"))->isInternal()))) {
     /**
      * PascalCase に変換する
@@ -9485,8 +9963,10 @@ if (!isset($excluded_functions["pascal_case"]) && (!function_exists("pascal_case
         return strtr(ucwords(strtr($string, [$delimiter => ' '])), [' ' => '']);
     }
 }
+if (function_exists("pascal_case") && !defined("pascal_case")) {
+    define("pascal_case", "pascal_case");
+}
 
-const snake_case = "snake_case";
 if (!isset($excluded_functions["snake_case"]) && (!function_exists("snake_case") || (!false && (new \ReflectionFunction("snake_case"))->isInternal()))) {
     /**
      * snake_case に変換する
@@ -9505,8 +9985,10 @@ if (!isset($excluded_functions["snake_case"]) && (!function_exists("snake_case")
         return ltrim(strtolower(preg_replace('/[A-Z]/', $delimiter . '\0', $string)), $delimiter);
     }
 }
+if (function_exists("snake_case") && !defined("snake_case")) {
+    define("snake_case", "snake_case");
+}
 
-const chain_case = "chain_case";
 if (!isset($excluded_functions["chain_case"]) && (!function_exists("chain_case") || (!false && (new \ReflectionFunction("chain_case"))->isInternal()))) {
     /**
      * chain-case に変換する
@@ -9525,8 +10007,10 @@ if (!isset($excluded_functions["chain_case"]) && (!function_exists("chain_case")
         return snake_case($string, $delimiter);
     }
 }
+if (function_exists("chain_case") && !defined("chain_case")) {
+    define("chain_case", "chain_case");
+}
 
-const namespace_split = "namespace_split";
 if (!isset($excluded_functions["namespace_split"]) && (!function_exists("namespace_split") || (!false && (new \ReflectionFunction("namespace_split"))->isInternal()))) {
     /**
      * 文字列を名前空間とローカル名に区切ってタプルで返す
@@ -9559,8 +10043,10 @@ if (!isset($excluded_functions["namespace_split"]) && (!function_exists("namespa
         return [substr($string, 0, $pos), substr($string, $pos + 1)];
     }
 }
+if (function_exists("namespace_split") && !defined("namespace_split")) {
+    define("namespace_split", "namespace_split");
+}
 
-const htmltag = "htmltag";
 if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!false && (new \ReflectionFunction("htmltag"))->isInternal()))) {
     /**
      * css セレクタから html 文字列を生成する
@@ -9721,8 +10207,10 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!
         return $result;
     }
 }
+if (function_exists("htmltag") && !defined("htmltag")) {
+    define("htmltag", "htmltag");
+}
 
-const build_uri = "build_uri";
 if (!isset($excluded_functions["build_uri"]) && (!function_exists("build_uri") || (!false && (new \ReflectionFunction("build_uri"))->isInternal()))) {
     /**
      * parse_uri の逆
@@ -9784,8 +10272,10 @@ if (!isset($excluded_functions["build_uri"]) && (!function_exists("build_uri") |
         return $uri;
     }
 }
+if (function_exists("build_uri") && !defined("build_uri")) {
+    define("build_uri", "build_uri");
+}
 
-const parse_uri = "parse_uri";
 if (!isset($excluded_functions["parse_uri"]) && (!function_exists("parse_uri") || (!false && (new \ReflectionFunction("parse_uri"))->isInternal()))) {
     /**
      * parse_url の仕様を少しいじったもの
@@ -9878,8 +10368,10 @@ if (!isset($excluded_functions["parse_uri"]) && (!function_exists("parse_uri") |
         return $parts;
     }
 }
+if (function_exists("parse_uri") && !defined("parse_uri")) {
+    define("parse_uri", "parse_uri");
+}
 
-const ini_export = "ini_export";
 if (!isset($excluded_functions["ini_export"]) && (!function_exists("ini_export") || (!false && (new \ReflectionFunction("ini_export"))->isInternal()))) {
     /**
      * 連想配列を INI 的文字列に変換する
@@ -9926,8 +10418,10 @@ if (!isset($excluded_functions["ini_export"]) && (!function_exists("ini_export")
         return $generate($iniarray) . "\n";
     }
 }
+if (function_exists("ini_export") && !defined("ini_export")) {
+    define("ini_export", "ini_export");
+}
 
-const ini_import = "ini_import";
 if (!isset($excluded_functions["ini_import"]) && (!function_exists("ini_import") || (!false && (new \ReflectionFunction("ini_import"))->isInternal()))) {
     /**
      * INI 的文字列を連想配列に変換する
@@ -9955,8 +10449,10 @@ if (!isset($excluded_functions["ini_import"]) && (!function_exists("ini_import")
         return parse_ini_string($inistring, $options['process_sections'], $options['scanner_mode']);
     }
 }
+if (function_exists("ini_import") && !defined("ini_import")) {
+    define("ini_import", "ini_import");
+}
 
-const csv_export = "csv_export";
 if (!isset($excluded_functions["csv_export"]) && (!function_exists("csv_export") || (!false && (new \ReflectionFunction("csv_export"))->isInternal()))) {
     /**
      * 連想配列の配列を CSV 的文字列に変換する
@@ -9998,7 +10494,7 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("csv_export")
      *
      * @param array $csvarrays 連想配列の配列
      * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
-     * @return array|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
+     * @return string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
      */
     function csv_export($csvarrays, $options = [])
     {
@@ -10066,8 +10562,10 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("csv_export")
         }
     }
 }
+if (function_exists("csv_export") && !defined("csv_export")) {
+    define("csv_export", "csv_export");
+}
 
-const csv_import = "csv_import";
 if (!isset($excluded_functions["csv_import"]) && (!function_exists("csv_import") || (!false && (new \ReflectionFunction("csv_import"))->isInternal()))) {
     /**
      * CSV 的文字列を連想配列の配列に変換する
@@ -10193,8 +10691,10 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("csv_import")
         }
     }
 }
+if (function_exists("csv_import") && !defined("csv_import")) {
+    define("csv_import", "csv_import");
+}
 
-const json_export = "json_export";
 if (!isset($excluded_functions["json_export"]) && (!function_exists("json_export") || (!false && (new \ReflectionFunction("json_export"))->isInternal()))) {
     /**
      * json_encode のプロキシ関数
@@ -10237,8 +10737,10 @@ if (!isset($excluded_functions["json_export"]) && (!function_exists("json_export
         return $result;
     }
 }
+if (function_exists("json_export") && !defined("json_export")) {
+    define("json_export", "json_export");
+}
 
-const json_import = "json_import";
 if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import") || (!false && (new \ReflectionFunction("json_import"))->isInternal()))) {
     /**
      * json_decode のプロキシ関数
@@ -10280,8 +10782,10 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
         return $result;
     }
 }
+if (function_exists("json_import") && !defined("json_import")) {
+    define("json_import", "json_import");
+}
 
-const ltsv_export = "ltsv_export";
 if (!isset($excluded_functions["ltsv_export"]) && (!function_exists("ltsv_export") || (!false && (new \ReflectionFunction("ltsv_export"))->isInternal()))) {
     /**
      * 配列を LTSV 的文字列に変換する
@@ -10358,8 +10862,10 @@ if (!isset($excluded_functions["ltsv_export"]) && (!function_exists("ltsv_export
         return implode("\t", $parts);
     }
 }
+if (function_exists("ltsv_export") && !defined("ltsv_export")) {
+    define("ltsv_export", "ltsv_export");
+}
 
-const ltsv_import = "ltsv_import";
 if (!isset($excluded_functions["ltsv_import"]) && (!function_exists("ltsv_import") || (!false && (new \ReflectionFunction("ltsv_import"))->isInternal()))) {
     /**
      * LTSV 的文字列を配列に変換する
@@ -10436,8 +10942,10 @@ if (!isset($excluded_functions["ltsv_import"]) && (!function_exists("ltsv_import
         return $result;
     }
 }
+if (function_exists("ltsv_import") && !defined("ltsv_import")) {
+    define("ltsv_import", "ltsv_import");
+}
 
-const markdown_table = "markdown_table";
 if (!isset($excluded_functions["markdown_table"]) && (!function_exists("markdown_table") || (!false && (new \ReflectionFunction("markdown_table"))->isInternal()))) {
     /**
      * 連想配列の配列を markdown テーブル文字列にする
@@ -10507,8 +11015,10 @@ if (!isset($excluded_functions["markdown_table"]) && (!function_exists("markdown
         return implode("\n", $result) . "\n";
     }
 }
+if (function_exists("markdown_table") && !defined("markdown_table")) {
+    define("markdown_table", "markdown_table");
+}
 
-const markdown_list = "markdown_list";
 if (!isset($excluded_functions["markdown_list"]) && (!function_exists("markdown_list") || (!false && (new \ReflectionFunction("markdown_list"))->isInternal()))) {
     /**
      * 配列を markdown リスト文字列にする
@@ -10582,8 +11092,10 @@ if (!isset($excluded_functions["markdown_list"]) && (!function_exists("markdown_
         return implode("\n", $f($array, 0)) . "\n";
     }
 }
+if (function_exists("markdown_list") && !defined("markdown_list")) {
+    define("markdown_list", "markdown_list");
+}
 
-const random_string = "random_string";
 if (!isset($excluded_functions["random_string"]) && (!function_exists("random_string") || (!false && (new \ReflectionFunction("random_string"))->isInternal()))) {
     /**
      * 安全な乱数文字列を生成する
@@ -10613,8 +11125,10 @@ if (!isset($excluded_functions["random_string"]) && (!function_exists("random_st
         return $string;
     }
 }
+if (function_exists("random_string") && !defined("random_string")) {
+    define("random_string", "random_string");
+}
 
-const kvsprintf = "kvsprintf";
 if (!isset($excluded_functions["kvsprintf"]) && (!function_exists("kvsprintf") || (!false && (new \ReflectionFunction("kvsprintf"))->isInternal()))) {
     /**
      * 連想配列を指定できるようにした vsprintf
@@ -10652,8 +11166,10 @@ if (!isset($excluded_functions["kvsprintf"]) && (!function_exists("kvsprintf") |
         return vsprintf($format, $vals);
     }
 }
+if (function_exists("kvsprintf") && !defined("kvsprintf")) {
+    define("kvsprintf", "kvsprintf");
+}
 
-const preg_capture = "preg_capture";
 if (!isset($excluded_functions["preg_capture"]) && (!function_exists("preg_capture") || (!false && (new \ReflectionFunction("preg_capture"))->isInternal()))) {
     /**
      * キャプチャを主軸においた preg_match
@@ -10694,8 +11210,10 @@ if (!isset($excluded_functions["preg_capture"]) && (!function_exists("preg_captu
         return $default;
     }
 }
+if (function_exists("preg_capture") && !defined("preg_capture")) {
+    define("preg_capture", "preg_capture");
+}
 
-const preg_splice = "preg_splice";
 if (!isset($excluded_functions["preg_splice"]) && (!function_exists("preg_splice") || (!false && (new \ReflectionFunction("preg_splice"))->isInternal()))) {
     /**
      * キャプチャも行える preg_replace
@@ -10740,8 +11258,10 @@ if (!isset($excluded_functions["preg_splice"]) && (!function_exists("preg_splice
         return $subject;
     }
 }
+if (function_exists("preg_splice") && !defined("preg_splice")) {
+    define("preg_splice", "preg_splice");
+}
 
-const preg_replaces = "preg_replaces";
 if (!isset($excluded_functions["preg_replaces"]) && (!function_exists("preg_replaces") || (!false && (new \ReflectionFunction("preg_replaces"))->isInternal()))) {
     /**
      * パターン番号を指定して preg_replace する
@@ -10808,8 +11328,10 @@ if (!isset($excluded_functions["preg_replaces"]) && (!function_exists("preg_repl
         return $subject;
     }
 }
+if (function_exists("preg_replaces") && !defined("preg_replaces")) {
+    define("preg_replaces", "preg_replaces");
+}
 
-const damerau_levenshtein = "damerau_levenshtein";
 if (!isset($excluded_functions["damerau_levenshtein"]) && (!function_exists("damerau_levenshtein") || (!false && (new \ReflectionFunction("damerau_levenshtein"))->isInternal()))) {
     /**
      * Damerau–Levenshtein 距離を返す
@@ -10888,8 +11410,10 @@ if (!isset($excluded_functions["damerau_levenshtein"]) && (!function_exists("dam
         return (int) $p1[$l2];
     }
 }
+if (function_exists("damerau_levenshtein") && !defined("damerau_levenshtein")) {
+    define("damerau_levenshtein", "damerau_levenshtein");
+}
 
-const ngram = "ngram";
 if (!isset($excluded_functions["ngram"]) && (!function_exists("ngram") || (!false && (new \ReflectionFunction("ngram"))->isInternal()))) {
     /**
      * N-gram 化して配列で返す
@@ -10923,8 +11447,10 @@ if (!isset($excluded_functions["ngram"]) && (!function_exists("ngram") || (!fals
         return $result;
     }
 }
+if (function_exists("ngram") && !defined("ngram")) {
+    define("ngram", "ngram");
+}
 
-const str_guess = "str_guess";
 if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") || (!false && (new \ReflectionFunction("str_guess"))->isInternal()))) {
     /**
      * $string に最も近い文字列を返す
@@ -11004,8 +11530,10 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") |
         return $candidates[$result];
     }
 }
+if (function_exists("str_guess") && !defined("str_guess")) {
+    define("str_guess", "str_guess");
+}
 
-const str_array = "str_array";
 if (!isset($excluded_functions["str_array"]) && (!function_exists("str_array") || (!false && (new \ReflectionFunction("str_array"))->isInternal()))) {
     /**
      * 文字列を区切り文字で区切って配列に変換する
@@ -11088,8 +11616,10 @@ if (!isset($excluded_functions["str_array"]) && (!function_exists("str_array") |
         return $result;
     }
 }
+if (function_exists("str_array") && !defined("str_array")) {
+    define("str_array", "str_array");
+}
 
-const mb_substr_replace = "mb_substr_replace";
 if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("mb_substr_replace") || (!false && (new \ReflectionFunction("mb_substr_replace"))->isInternal()))) {
     /**
      * マルチバイト対応 substr_replace
@@ -11123,8 +11653,10 @@ if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("mb_su
         return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, null);
     }
 }
+if (function_exists("mb_substr_replace") && !defined("mb_substr_replace")) {
+    define("mb_substr_replace", "mb_substr_replace");
+}
 
-const mb_trim = "mb_trim";
 if (!isset($excluded_functions["mb_trim"]) && (!function_exists("mb_trim") || (!false && (new \ReflectionFunction("mb_trim"))->isInternal()))) {
     /**
      * マルチバイト対応 trim
@@ -11142,8 +11674,10 @@ if (!isset($excluded_functions["mb_trim"]) && (!function_exists("mb_trim") || (!
         return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
     }
 }
+if (function_exists("mb_trim") && !defined("mb_trim")) {
+    define("mb_trim", "mb_trim");
+}
 
-const render_string = "render_string";
 if (!isset($excluded_functions["render_string"]) && (!function_exists("render_string") || (!false && (new \ReflectionFunction("render_string"))->isInternal()))) {
     /**
      * "hoge {$hoge}" 形式のレンダリング
@@ -11217,8 +11751,10 @@ if (!isset($excluded_functions["render_string"]) && (!function_exists("render_st
         }
     }
 }
+if (function_exists("render_string") && !defined("render_string")) {
+    define("render_string", "render_string");
+}
 
-const render_file = "render_file";
 if (!isset($excluded_functions["render_file"]) && (!function_exists("render_file") || (!false && (new \ReflectionFunction("render_file"))->isInternal()))) {
     /**
      * "hoge {$hoge}" 形式のレンダリングのファイル版
@@ -11234,8 +11770,10 @@ if (!isset($excluded_functions["render_file"]) && (!function_exists("render_file
         return render_string(file_get_contents($template_file), $array);
     }
 }
+if (function_exists("render_file") && !defined("render_file")) {
+    define("render_file", "render_file");
+}
 
-const ob_include = "ob_include";
 if (!isset($excluded_functions["ob_include"]) && (!function_exists("ob_include") || (!false && (new \ReflectionFunction("ob_include"))->isInternal()))) {
     /**
      * 変数を extract して include する
@@ -11270,8 +11808,10 @@ if (!isset($excluded_functions["ob_include"]) && (!function_exists("ob_include")
         })($include_file, $array);
     }
 }
+if (function_exists("ob_include") && !defined("ob_include")) {
+    define("ob_include", "ob_include");
+}
 
-const include_string = "include_string";
 if (!isset($excluded_functions["include_string"]) && (!function_exists("include_string") || (!false && (new \ReflectionFunction("include_string"))->isInternal()))) {
     /**
      * 変数を extract して include する（文字列指定）
@@ -11292,8 +11832,10 @@ if (!isset($excluded_functions["include_string"]) && (!function_exists("include_
         return $result;
     }
 }
+if (function_exists("include_string") && !defined("include_string")) {
+    define("include_string", "include_string");
+}
 
-const evaluate = "evaluate";
 if (!isset($excluded_functions["evaluate"]) && (!function_exists("evaluate") || (!false && (new \ReflectionFunction("evaluate"))->isInternal()))) {
     /**
      * eval のプロキシ関数
@@ -11363,8 +11905,10 @@ if (!isset($excluded_functions["evaluate"]) && (!function_exists("evaluate") || 
         }
     }
 }
+if (function_exists("evaluate") && !defined("evaluate")) {
+    define("evaluate", "evaluate");
+}
 
-const parse_php = "parse_php";
 if (!isset($excluded_functions["parse_php"]) && (!function_exists("parse_php") || (!false && (new \ReflectionFunction("parse_php"))->isInternal()))) {
     /**
      * php のコード断片をパースする
@@ -11479,8 +12023,10 @@ if (!isset($excluded_functions["parse_php"]) && (!function_exists("parse_php") |
         return $result;
     }
 }
+if (function_exists("parse_php") && !defined("parse_php")) {
+    define("parse_php", "parse_php");
+}
 
-const returns = "returns";
 if (!isset($excluded_functions["returns"]) && (!function_exists("returns") || (!false && (new \ReflectionFunction("returns"))->isInternal()))) {
     /**
      * 引数をそのまま返す
@@ -11501,8 +12047,10 @@ if (!isset($excluded_functions["returns"]) && (!function_exists("returns") || (!
         return $v;
     }
 }
+if (function_exists("returns") && !defined("returns")) {
+    define("returns", "returns");
+}
 
-const optional = "optional";
 if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || (!false && (new \ReflectionFunction("optional"))->isInternal()))) {
     /**
      * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
@@ -11573,8 +12121,10 @@ if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || 
         return $nullobject;
     }
 }
+if (function_exists("optional") && !defined("optional")) {
+    define("optional", "optional");
+}
 
-const chain = "chain";
 if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!false && (new \ReflectionFunction("chain"))->isInternal()))) {
     /**
      * 関数をメソッドチェーンできるオブジェクトを返す
@@ -11609,6 +12159,10 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
      * 用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。
      * ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。
      *
+     * なお、最初の引数を省略するとスタックモードになり、一切の処理が適用されなくなる。
+     * その代わり `invoke` で遅延的に値を渡すことができるようになる。
+     * 「処理の流れだけ決めておいて後で適用する」イメージ。
+     *
      * Example:
      * ```php
      * # 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
@@ -11630,42 +12184,71 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
      * assertSame(chain($string)->explode1(' ')->filter()->map('ucfirst')->implode1('/')->rot13->md5->strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
      *
      *  # よくある DB レコードをあれこれするシチュエーション
-     * $co = chain([
+     * $rows = [
      *     ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
      *     ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
      *     ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
      *     ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
-     * ]);
+     * ];
      * // e.g. 男性の平均給料
-     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
+     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
      * // e.g. 女性の平均年齢
-     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
+     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
      * // e.g. 30歳以上の平均給料
-     * assertSame((clone $co)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
+     * assertSame(chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
      * // e.g. 20～30歳の平均給料
-     * assertSame((clone $co)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
+     * assertSame(chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
      * // e.g. 男性の最小年齢
-     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
+     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
      * // e.g. 女性の最大給料
-     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     *
+     * # 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
+     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows), 375000);
+     * assertSame(chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows), 400000);
+     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows), 21);
      * ```
      *
      * @param mixed $source 元データ
      * @return \ChainObject
      */
-    function chain($source)
+    function chain($source = null)
     {
-        return new class($source) implements \IteratorAggregate
+        return new class(...func_get_args()) implements \IteratorAggregate
         {
             private $data;
+            private $stack;
 
-            public function __construct($source)
+            public function __construct($source = null)
             {
+                if (func_num_args() === 0) {
+                    $this->stack = [];
+                }
                 $this->data = $source;
             }
 
-            public function __invoke()
+            public function __invoke(...$source)
             {
+                $func_num_args = func_num_args();
+
+                if ($this->stack !== null && $func_num_args === 0) {
+                    throw new \InvalidArgumentException('nonempty stack and no parameter given. maybe invalid __invoke args.');
+                }
+                if ($this->stack === null && $func_num_args > 0) {
+                    throw new \UnexpectedValueException('empty stack and parameter given > 0. maybe invalid __invoke args.');
+                }
+
+                if ($func_num_args > 0) {
+                    $result = [];
+                    foreach ($source as $s) {
+                        $chain = chain($s);
+                        foreach ($this->stack as $stack) {
+                            $chain->{$stack[0]}(...$stack[1]);
+                        }
+                        $result[] = $chain();
+                    }
+                    return $func_num_args === 1 ? reset($result) : $result;
+                }
                 return $this->data;
             }
 
@@ -11693,6 +12276,11 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
 
             public function apply($callback, ...$args)
             {
+                if (is_array($this->stack)) {
+                    $this->stack[] = [__FUNCTION__, func_get_args()];
+                    return $this;
+                }
+
                 $this->data = $callback($this->data, ...$args);
                 return $this;
             }
@@ -11700,15 +12288,22 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
             private function _resolve($name)
             {
                 if (false
+                    // for global
                     || function_exists($fname = $name)
                     || function_exists($fname = "array_$name")
                     || function_exists($fname = "str_$name")
+                    // for package
                     || (defined($cname = $name) && is_callable($fname = constant($cname)))
                     || (defined($cname = "array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    // for namespace
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                    // for class
+                    || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */
                     return $fname;
@@ -11717,6 +12312,11 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
 
             private function _apply($name, $arguments)
             {
+                if (is_array($this->stack)) {
+                    $this->stack[] = [$name, $arguments];
+                    return $this;
+                }
+
                 // 特別扱い1: map は非常によく呼ぶので引数を補正する
                 if ($name === 'map') {
                     /** @noinspection PhpUndefinedMethodInspection */
@@ -11765,8 +12365,10 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
         };
     }
 }
+if (function_exists("chain") && !defined("chain")) {
+    define("chain", "chain");
+}
 
-const throws = "throws";
 if (!isset($excluded_functions["throws"]) && (!function_exists("throws") || (!false && (new \ReflectionFunction("throws"))->isInternal()))) {
     /**
      * throw の関数版
@@ -11784,14 +12386,17 @@ if (!isset($excluded_functions["throws"]) && (!function_exists("throws") || (!fa
      * ```
      *
      * @param \Exception $ex 投げる例外
+     * @return mixed （`return hoge or throws` のようなコードで警告が出るので抑止用）
      */
     function throws($ex)
     {
         throw $ex;
     }
 }
+if (function_exists("throws") && !defined("throws")) {
+    define("throws", "throws");
+}
 
-const throw_if = "throw_if";
 if (!isset($excluded_functions["throw_if"]) && (!function_exists("throw_if") || (!false && (new \ReflectionFunction("throw_if"))->isInternal()))) {
     /**
      * 条件付き throw
@@ -11822,8 +12427,10 @@ if (!isset($excluded_functions["throw_if"]) && (!function_exists("throw_if") || 
         }
     }
 }
+if (function_exists("throw_if") && !defined("throw_if")) {
+    define("throw_if", "throw_if");
+}
 
-const blank_if = "blank_if";
 if (!isset($excluded_functions["blank_if"]) && (!function_exists("blank_if") || (!false && (new \ReflectionFunction("blank_if"))->isInternal()))) {
     /**
      * 値が空なら null を返す
@@ -11925,8 +12532,75 @@ if (!isset($excluded_functions["blank_if"]) && (!function_exists("blank_if") || 
         return empty($var) ? $default : $var;
     }
 }
+if (function_exists("blank_if") && !defined("blank_if")) {
+    define("blank_if", "blank_if");
+}
 
-const ifelse = "ifelse";
+if (!isset($excluded_functions["call_if"]) && (!function_exists("call_if") || (!false && (new \ReflectionFunction("call_if"))->isInternal()))) {
+    /**
+     * 条件を満たしたときにコールバックを実行する
+     *
+     * `if ($condition) $callable(...$arguments);` と（$condition はクロージャを受け入れるけど）ほぼ同じ。
+     * ただし、 $condition に数値を与えると「指定回数呼ばれたあとに実行する」という意味になる。
+     * 主に「ループ内でデバッグ出力したいけど、毎回だと少しうざい」というデバッグ用途。
+     *
+     * $condition が正数だと「指定回数呼ばれた次のみ」負数だと「指定回数呼ばれた次以降」実行される。
+     * 0 のときは無条件で実行される。
+     *
+     * Example:
+     * ```php
+     * $output = [];
+     * $debug_print = function ($debug) use (&$output) { $output[] = $debug; };
+     * for ($i=0; $i<4; $i++) {
+     *     call_if($i == 1, $debug_print, '$i == 1のとき呼ばれた');
+     *     call_if(2, $debug_print, '2回呼ばれた');
+     *     call_if(-2, $debug_print, '2回以上呼ばれた');
+     * }
+     * assertSame($output, [
+     *     '$i == 1のとき呼ばれた',
+     *     '2回呼ばれた',
+     *     '2回以上呼ばれた',
+     *     '2回以上呼ばれた',
+     * ]);
+     * ```
+     *
+     * @param mixed $condition 呼ばれる条件
+     * @param callable $callable 呼ばれる処理
+     * @param array $arguments $callable の引数（可変引数）
+     * @return mixed 呼ばれた場合は $callable の返り値
+     */
+    function call_if($condition, $callable, ...$arguments)
+    {
+        // 数値の場合はかなり特殊な動きになる
+        if (is_int($condition)) {
+            static $counts = [];
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+            $caller = $trace['file'] . '#' . $trace['line'];
+            $counts[$caller] = $counts[$caller] ?? 0;
+            if ($condition === 0) {
+                $condition = true;
+            }
+            elseif ($condition > 0) {
+                $condition = $condition === $counts[$caller]++;
+            }
+            else {
+                $condition = -$condition <= $counts[$caller]++;
+            }
+        }
+        elseif (is_callable($condition)) {
+            $condition = (func_user_func_array($condition))();
+        }
+
+        if ($condition) {
+            return $callable(...$arguments);
+        }
+        return null;
+    }
+}
+if (function_exists("call_if") && !defined("call_if")) {
+    define("call_if", "call_if");
+}
+
 if (!isset($excluded_functions["ifelse"]) && (!function_exists("ifelse") || (!false && (new \ReflectionFunction("ifelse"))->isInternal()))) {
     /**
      * if ～ else 構文の関数版
@@ -11968,8 +12642,10 @@ if (!isset($excluded_functions["ifelse"]) && (!function_exists("ifelse") || (!fa
         return $expected === $actual ? $then : $else;
     }
 }
+if (function_exists("ifelse") && !defined("ifelse")) {
+    define("ifelse", "ifelse");
+}
 
-const switchs = "switchs";
 if (!isset($excluded_functions["switchs"]) && (!function_exists("switchs") || (!false && (new \ReflectionFunction("switchs"))->isInternal()))) {
     /**
      * switch 構文の関数版
@@ -12011,8 +12687,10 @@ if (!isset($excluded_functions["switchs"]) && (!function_exists("switchs") || (!
         return $case;
     }
 }
+if (function_exists("switchs") && !defined("switchs")) {
+    define("switchs", "switchs");
+}
 
-const try_null = "try_null";
 if (!isset($excluded_functions["try_null"]) && (!function_exists("try_null") || (!false && (new \ReflectionFunction("try_null"))->isInternal()))) {
     /**
      * 例外を握りつぶす try 構文
@@ -12043,8 +12721,10 @@ if (!isset($excluded_functions["try_null"]) && (!function_exists("try_null") || 
         }
     }
 }
+if (function_exists("try_null") && !defined("try_null")) {
+    define("try_null", "try_null");
+}
 
-const try_catch = "try_catch";
 if (!isset($excluded_functions["try_catch"]) && (!function_exists("try_catch") || (!false && (new \ReflectionFunction("try_catch"))->isInternal()))) {
     /**
      * try ～ catch 構文の関数版
@@ -12071,8 +12751,10 @@ if (!isset($excluded_functions["try_catch"]) && (!function_exists("try_catch") |
         return try_catch_finally($try, $catch, null, ...$variadic);
     }
 }
+if (function_exists("try_catch") && !defined("try_catch")) {
+    define("try_catch", "try_catch");
+}
 
-const try_finally = "try_finally";
 if (!isset($excluded_functions["try_finally"]) && (!function_exists("try_finally") || (!false && (new \ReflectionFunction("try_finally"))->isInternal()))) {
     /**
      * try ～ finally 構文の関数版
@@ -12103,8 +12785,10 @@ if (!isset($excluded_functions["try_finally"]) && (!function_exists("try_finally
         return try_catch_finally($try, throws, $finally, ...$variadic);
     }
 }
+if (function_exists("try_finally") && !defined("try_finally")) {
+    define("try_finally", "try_finally");
+}
 
-const try_catch_finally = "try_catch_finally";
 if (!isset($excluded_functions["try_catch_finally"]) && (!function_exists("try_catch_finally") || (!false && (new \ReflectionFunction("try_catch_finally"))->isInternal()))) {
     /**
      * try ～ catch ～ finally 構文の関数版
@@ -12155,8 +12839,10 @@ if (!isset($excluded_functions["try_catch_finally"]) && (!function_exists("try_c
         }
     }
 }
+if (function_exists("try_catch_finally") && !defined("try_catch_finally")) {
+    define("try_catch_finally", "try_catch_finally");
+}
 
-const get_uploaded_files = "get_uploaded_files";
 if (!isset($excluded_functions["get_uploaded_files"]) && (!function_exists("get_uploaded_files") || (!false && (new \ReflectionFunction("get_uploaded_files"))->isInternal()))) {
     /**
      * $_FILES の構造を組み替えて $_POST などと同じにする
@@ -12183,8 +12869,10 @@ if (!isset($excluded_functions["get_uploaded_files"]) && (!function_exists("get_
         return $result;
     }
 }
+if (function_exists("get_uploaded_files") && !defined("get_uploaded_files")) {
+    define("get_uploaded_files", "get_uploaded_files");
+}
 
-const cachedir = "cachedir";
 if (!isset($excluded_functions["cachedir"]) && (!function_exists("cachedir") || (!false && (new \ReflectionFunction("cachedir"))->isInternal()))) {
     /**
      * 本ライブラリで使用するキャッシュディレクトリを設定する
@@ -12207,8 +12895,10 @@ if (!isset($excluded_functions["cachedir"]) && (!function_exists("cachedir") || 
         return $result;
     }
 }
+if (function_exists("cachedir") && !defined("cachedir")) {
+    define("cachedir", "cachedir");
+}
 
-const cache = "cache";
 if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!false && (new \ReflectionFunction("cache"))->isInternal()))) {
     /**
      * シンプルにキャッシュする
@@ -12346,8 +13036,10 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!fals
         return $cacheobject->get($namespace, $key);
     }
 }
+if (function_exists("cache") && !defined("cache")) {
+    define("cache", "cache");
+}
 
-const is_ansi = "is_ansi";
 if (!isset($excluded_functions["is_ansi"]) && (!function_exists("is_ansi") || (!false && (new \ReflectionFunction("is_ansi"))->isInternal()))) {
     /**
      * リソースが ansi color に対応しているか返す
@@ -12389,8 +13081,10 @@ if (!isset($excluded_functions["is_ansi"]) && (!function_exists("is_ansi") || (!
         return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
     }
 }
+if (function_exists("is_ansi") && !defined("is_ansi")) {
+    define("is_ansi", "is_ansi");
+}
 
-const ansi_colorize = "ansi_colorize";
 if (!isset($excluded_functions["ansi_colorize"]) && (!function_exists("ansi_colorize") || (!false && (new \ReflectionFunction("ansi_colorize"))->isInternal()))) {
     /**
      * 文字列に ANSI Color エスケープシーケンスを埋め込む
@@ -12457,8 +13151,10 @@ if (!isset($excluded_functions["ansi_colorize"]) && (!function_exists("ansi_colo
         return "\033[{$setters}m{$string}\033[{$unsetters}m";
     }
 }
+if (function_exists("ansi_colorize") && !defined("ansi_colorize")) {
+    define("ansi_colorize", "ansi_colorize");
+}
 
-const process = "process";
 if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!false && (new \ReflectionFunction("process"))->isInternal()))) {
     /**
      * proc_open ～ proc_close の一連の処理を行う
@@ -12554,8 +13250,10 @@ if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!
         return $rc;
     }
 }
+if (function_exists("process") && !defined("process")) {
+    define("process", "process");
+}
 
-const arguments = "arguments";
 if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") || (!false && (new \ReflectionFunction("arguments"))->isInternal()))) {
     /**
      * コマンドライン引数をパースして引数とオプションを返す
@@ -12732,8 +13430,10 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
         return $result + $argsdefaults;
     }
 }
+if (function_exists("arguments") && !defined("arguments")) {
+    define("arguments", "arguments");
+}
 
-const stacktrace = "stacktrace";
 if (!isset($excluded_functions["stacktrace"]) && (!function_exists("stacktrace") || (!false && (new \ReflectionFunction("stacktrace"))->isInternal()))) {
     /**
      * スタックトレースを文字列で返す
@@ -12876,8 +13576,10 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("stacktrace")
         return implode($option['delimiter'], $result);
     }
 }
+if (function_exists("stacktrace") && !defined("stacktrace")) {
+    define("stacktrace", "stacktrace");
+}
 
-const backtrace = "backtrace";
 if (!isset($excluded_functions["backtrace"]) && (!function_exists("backtrace") || (!false && (new \ReflectionFunction("backtrace"))->isInternal()))) {
     /**
      * 特定条件までのバックトレースを取得する
@@ -12938,8 +13640,10 @@ if (!isset($excluded_functions["backtrace"]) && (!function_exists("backtrace") |
         return $result;
     }
 }
+if (function_exists("backtrace") && !defined("backtrace")) {
+    define("backtrace", "backtrace");
+}
 
-const error = "error";
 if (!isset($excluded_functions["error"]) && (!function_exists("error") || (!false && (new \ReflectionFunction("error"))->isInternal()))) {
     /**
      * エラー出力する
@@ -12973,7 +13677,7 @@ if (!isset($excluded_functions["error"]) && (!function_exists("error") || (!fals
         $line = "[$time] PHP Log:  $content$location\n";
 
         if ($destination === null) {
-            $destination = ini_get('error_log');
+            $destination = blank_if(ini_get('error_log'), 'php://stderr');
         }
 
         if ($destination === 'syslog') {
@@ -13002,8 +13706,10 @@ if (!isset($excluded_functions["error"]) && (!function_exists("error") || (!fals
         return strlen($line);
     }
 }
+if (function_exists("error") && !defined("error")) {
+    define("error", "error");
+}
 
-const timer = "timer";
 if (!isset($excluded_functions["timer"]) && (!function_exists("timer") || (!false && (new \ReflectionFunction("timer"))->isInternal()))) {
     /**
      * 処理時間を計測する
@@ -13034,8 +13740,10 @@ if (!isset($excluded_functions["timer"]) && (!function_exists("timer") || (!fals
         return microtime(true) - $t;
     }
 }
+if (function_exists("timer") && !defined("timer")) {
+    define("timer", "timer");
+}
 
-const benchmark = "benchmark";
 if (!isset($excluded_functions["benchmark"]) && (!function_exists("benchmark") || (!false && (new \ReflectionFunction("benchmark"))->isInternal()))) {
     /**
      * 簡易ベンチマークを取る
@@ -13150,8 +13858,10 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("benchmark") |
         return $result;
     }
 }
+if (function_exists("benchmark") && !defined("benchmark")) {
+    define("benchmark", "benchmark");
+}
 
-const stringify = "stringify";
 if (!isset($excluded_functions["stringify"]) && (!function_exists("stringify") || (!false && (new \ReflectionFunction("stringify"))->isInternal()))) {
     /**
      * 値を何とかして文字列化する
@@ -13188,8 +13898,10 @@ if (!isset($excluded_functions["stringify"]) && (!function_exists("stringify") |
         }
     }
 }
+if (function_exists("stringify") && !defined("stringify")) {
+    define("stringify", "stringify");
+}
 
-const numberify = "numberify";
 if (!isset($excluded_functions["numberify"]) && (!function_exists("numberify") || (!false && (new \ReflectionFunction("numberify"))->isInternal()))) {
     /**
      * 値を何とかして数値化する
@@ -13266,8 +13978,10 @@ if (!isset($excluded_functions["numberify"]) && (!function_exists("numberify") |
         return (int) $number;
     }
 }
+if (function_exists("numberify") && !defined("numberify")) {
+    define("numberify", "numberify");
+}
 
-const numval = "numval";
 if (!isset($excluded_functions["numval"]) && (!function_exists("numval") || (!false && (new \ReflectionFunction("numval"))->isInternal()))) {
     /**
      * 値を数値化する
@@ -13301,8 +14015,10 @@ if (!isset($excluded_functions["numval"]) && (!function_exists("numval") || (!fa
         return intval($var, $base);
     }
 }
+if (function_exists("numval") && !defined("numval")) {
+    define("numval", "numval");
+}
 
-const arrayval = "arrayval";
 if (!isset($excluded_functions["arrayval"]) && (!function_exists("arrayval") || (!false && (new \ReflectionFunction("arrayval"))->isInternal()))) {
     /**
      * array キャストの関数版
@@ -13353,8 +14069,10 @@ if (!isset($excluded_functions["arrayval"]) && (!function_exists("arrayval") || 
         return $result;
     }
 }
+if (function_exists("arrayval") && !defined("arrayval")) {
+    define("arrayval", "arrayval");
+}
 
-const si_prefix = "si_prefix";
 if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") || (!false && (new \ReflectionFunction("si_prefix"))->isInternal()))) {
     /**
      * 数値に SI 接頭辞を付与する
@@ -13438,8 +14156,10 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") |
         return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n]);
     }
 }
+if (function_exists("si_prefix") && !defined("si_prefix")) {
+    define("si_prefix", "si_prefix");
+}
 
-const si_unprefix = "si_unprefix";
 if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("si_unprefix") || (!false && (new \ReflectionFunction("si_unprefix"))->isInternal()))) {
     /**
      * SI 接頭辞が付与された文字列を数値化する
@@ -13495,8 +14215,10 @@ if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("si_unprefix
         return numval($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
     }
 }
+if (function_exists("si_unprefix") && !defined("si_unprefix")) {
+    define("si_unprefix", "si_unprefix");
+}
 
-const is_empty = "is_empty";
 if (!isset($excluded_functions["is_empty"]) && (!function_exists("is_empty") || (!false && (new \ReflectionFunction("is_empty"))->isInternal()))) {
     /**
      * 値が空か検査する
@@ -13563,8 +14285,10 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("is_empty") || 
         return empty($var);
     }
 }
+if (function_exists("is_empty") && !defined("is_empty")) {
+    define("is_empty", "is_empty");
+}
 
-const is_primitive = "is_primitive";
 if (!isset($excluded_functions["is_primitive"]) && (!function_exists("is_primitive") || (!false && (new \ReflectionFunction("is_primitive"))->isInternal()))) {
     /**
      * 値が複合型でないか検査する
@@ -13594,8 +14318,10 @@ if (!isset($excluded_functions["is_primitive"]) && (!function_exists("is_primiti
         return is_scalar($var) || is_null($var) || is_resource($var);
     }
 }
+if (function_exists("is_primitive") && !defined("is_primitive")) {
+    define("is_primitive", "is_primitive");
+}
 
-const is_recursive = "is_recursive";
 if (!isset($excluded_functions["is_recursive"]) && (!function_exists("is_recursive") || (!false && (new \ReflectionFunction("is_recursive"))->isInternal()))) {
     /**
      * 変数が再帰参照を含むか調べる
@@ -13645,8 +14371,10 @@ if (!isset($excluded_functions["is_recursive"]) && (!function_exists("is_recursi
         return $core($var, []);
     }
 }
+if (function_exists("is_recursive") && !defined("is_recursive")) {
+    define("is_recursive", "is_recursive");
+}
 
-const is_stringable = "is_stringable";
 if (!isset($excluded_functions["is_stringable"]) && (!function_exists("is_stringable") || (!false && (new \ReflectionFunction("is_stringable"))->isInternal()))) {
     /**
      * 変数が文字列化できるか調べる
@@ -13681,8 +14409,10 @@ if (!isset($excluded_functions["is_stringable"]) && (!function_exists("is_string
         return true;
     }
 }
+if (function_exists("is_stringable") && !defined("is_stringable")) {
+    define("is_stringable", "is_stringable");
+}
 
-const is_arrayable = "is_arrayable";
 if (!isset($excluded_functions["is_arrayable"]) && (!function_exists("is_arrayable") || (!false && (new \ReflectionFunction("is_arrayable"))->isInternal()))) {
     /**
      * 変数が配列アクセス可能か調べる
@@ -13702,8 +14432,10 @@ if (!isset($excluded_functions["is_arrayable"]) && (!function_exists("is_arrayab
         return is_array($var) || $var instanceof \ArrayAccess;
     }
 }
+if (function_exists("is_arrayable") && !defined("is_arrayable")) {
+    define("is_arrayable", "is_arrayable");
+}
 
-const is_iterable = "is_iterable";
 if (!isset($excluded_functions["is_iterable"]) && (!function_exists("is_iterable") || (!true && (new \ReflectionFunction("is_iterable"))->isInternal()))) {
     /**
      * 変数が foreach で回せるか調べる
@@ -13729,8 +14461,10 @@ if (!isset($excluded_functions["is_iterable"]) && (!function_exists("is_iterable
         return is_array($var) || $var instanceof \Traversable;
     }
 }
+if (function_exists("is_iterable") && !defined("is_iterable")) {
+    define("is_iterable", "is_iterable");
+}
 
-const is_countable = "is_countable";
 if (!isset($excluded_functions["is_countable"]) && (!function_exists("is_countable") || (!true && (new \ReflectionFunction("is_countable"))->isInternal()))) {
     /**
      * 変数が count でカウントできるか調べる
@@ -13756,8 +14490,10 @@ if (!isset($excluded_functions["is_countable"]) && (!function_exists("is_countab
         return is_array($var) || $var instanceof \Countable;
     }
 }
+if (function_exists("is_countable") && !defined("is_countable")) {
+    define("is_countable", "is_countable");
+}
 
-const varcmp = "varcmp";
 if (!isset($excluded_functions["varcmp"]) && (!function_exists("varcmp") || (!false && (new \ReflectionFunction("varcmp"))->isInternal()))) {
     /**
      * php7 の `<=>` の関数版
@@ -13829,14 +14565,19 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("varcmp") || (!fa
         return $a == $b ? 0 : ($a > $b ? 1 : -1);
     }
 }
+if (function_exists("varcmp") && !defined("varcmp")) {
+    define("varcmp", "varcmp");
+}
 
-const var_type = "var_type";
 if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || (!false && (new \ReflectionFunction("var_type"))->isInternal()))) {
     /**
      * 値の型を取得する（gettype + get_class）
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
+     *
+     * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
+     * 継承も実装もされていない場合は標準の get_class の結果を返す。
      *
      * Example:
      * ```php
@@ -13848,6 +14589,11 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || 
      * // オブジェクトは型名を返す
      * assertSame(var_type(new \stdClass), '\\stdClass');
      * assertSame(var_type(new \Exception()), '\\Exception');
+     * // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
+     * assertSame(var_type(new class extends \Exception{}), '\\Exception');
+     * assertSame(var_type(new class implements \JsonSerializable{
+     *     public function jsonSerialize() { return ''; }
+     * }), '\\JsonSerializable');
      * ```
      *
      * @param mixed $var 型を取得する値
@@ -13856,13 +14602,24 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || 
     function var_type($var)
     {
         if (is_object($var)) {
+            $ref = new \ReflectionObject($var);
+            if ($ref->isAnonymous()) {
+                if ($pc = $ref->getParentClass()) {
+                    return '\\' . $pc->name;
+                }
+                if ($is = $ref->getInterfaceNames()) {
+                    return '\\' . reset($is);
+                }
+            }
             return '\\' . get_class($var);
         }
         return gettype($var);
     }
 }
+if (function_exists("var_type") && !defined("var_type")) {
+    define("var_type", "var_type");
+}
 
-const var_apply = "var_apply";
 if (!isset($excluded_functions["var_apply"]) && (!function_exists("var_apply") || (!false && (new \ReflectionFunction("var_apply"))->isInternal()))) {
     /**
      * 値にコールバックを適用する
@@ -13903,8 +14660,10 @@ if (!isset($excluded_functions["var_apply"]) && (!function_exists("var_apply") |
         return $callback($var, ...$args);
     }
 }
+if (function_exists("var_apply") && !defined("var_apply")) {
+    define("var_apply", "var_apply");
+}
 
-const var_applys = "var_applys";
 if (!isset($excluded_functions["var_applys"]) && (!function_exists("var_applys") || (!false && (new \ReflectionFunction("var_applys"))->isInternal()))) {
     /**
      * 配列にコールバックを適用する
@@ -13944,8 +14703,10 @@ if (!isset($excluded_functions["var_applys"]) && (!function_exists("var_applys")
         return $iterable ? $var : $var[0];
     }
 }
+if (function_exists("var_applys") && !defined("var_applys")) {
+    define("var_applys", "var_applys");
+}
 
-const var_export2 = "var_export2";
 if (!isset($excluded_functions["var_export2"]) && (!function_exists("var_export2") || (!false && (new \ReflectionFunction("var_export2"))->isInternal()))) {
     /**
      * 組み込みの var_export をいい感じにしたもの
@@ -14066,8 +14827,10 @@ if (!isset($excluded_functions["var_export2"]) && (!function_exists("var_export2
         echo $result, "\n";
     }
 }
+if (function_exists("var_export2") && !defined("var_export2")) {
+    define("var_export2", "var_export2");
+}
 
-const var_html = "var_html";
 if (!isset($excluded_functions["var_html"]) && (!function_exists("var_html") || (!false && (new \ReflectionFunction("var_html"))->isInternal()))) {
     /**
      * var_export2 を html コンテキストに特化させたようなもの
@@ -14141,8 +14904,10 @@ if (!isset($excluded_functions["var_html"]) && (!function_exists("var_html") || 
         echo "<pre class='var_html'>{$export($value, [])}</pre>";
     }
 }
+if (function_exists("var_html") && !defined("var_html")) {
+    define("var_html", "var_html");
+}
 
-const var_pretty = "var_pretty";
 if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty") || (!false && (new \ReflectionFunction("var_pretty"))->isInternal()))) {
     /**
      * var_dump の出力を見やすくしたもの
@@ -14311,8 +15076,10 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
         echo $result, "\n";
     }
 }
+if (function_exists("var_pretty") && !defined("var_pretty")) {
+    define("var_pretty", "var_pretty");
+}
 
-const console_log = "console_log";
 if (!isset($excluded_functions["console_log"]) && (!function_exists("console_log") || (!false && (new \ReflectionFunction("console_log"))->isInternal()))) {
     /**
      * js の console に値を吐き出す
@@ -14354,8 +15121,10 @@ if (!isset($excluded_functions["console_log"]) && (!function_exists("console_log
         }
     }
 }
+if (function_exists("console_log") && !defined("console_log")) {
+    define("console_log", "console_log");
+}
 
-const hashvar = "hashvar";
 if (!isset($excluded_functions["hashvar"]) && (!function_exists("hashvar") || (!false && (new \ReflectionFunction("hashvar"))->isInternal()))) {
     /**
      * 変数指定をできるようにした compact
@@ -14443,4 +15212,7 @@ if (!isset($excluded_functions["hashvar"]) && (!function_exists("hashvar") || (!
         // 仕組み上ここへは到達しないはず（呼び出し元のシンタックスが壊れてるときに到達しうるが、それならばそもそもこの関数自体が呼ばれないはず）。
         throw new \DomainException('syntax error.'); // @codeCoverageIgnore
     }
+}
+if (function_exists("hashvar") && !defined("hashvar")) {
+    define("hashvar", "hashvar");
 }

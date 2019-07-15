@@ -217,3 +217,13 @@ class Nest3 extends Nest2
         return $obj;
     }
 }
+
+trait Traitable
+{
+    public $publicField = __TRAIT__;
+
+    public function traitMethod()
+    {
+        return __TRAIT__;
+    }
+}

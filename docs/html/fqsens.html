@@ -280,7 +280,7 @@ assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_add()">
-                                    ryunosuke\Functions\Package\Arrays::array_add		</a>	<small>($array, ...$variadic) : array</small>
+                                    ryunosuke\Functions\Package\Arrays::array_add		</a>	<small>(...$variadic) : array</small>
 		</h4>
 	<div class="description"><p>配列の+演算子の関数版</p>
 <p>Example:</p>
@@ -363,6 +363,25 @@ assertSame(array_cross(
 assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
 // (要素, ...配列) の呼び出し
 assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_explode()">
+                                    ryunosuke\Functions\Package\Arrays::array_explode		</a>	<small>($array, $condition, $limit = PHP_INT_MAX) : array</small>
+		</h4>
+	<div class="description"><p>配列を指定条件で分割する</p>
+<p>文字列の explode を更に一階層掘り下げたイメージ。<br />
+$condition で指定された要素は結果配列に含まれない。</p>
+<p>$condition にはクロージャが指定できる。クロージャの場合は true 相当を返した場合に分割要素とみなされる。<br />
+引数は (値, キー)の順番。</p>
+<p>$limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。<br />
+端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// null 要素で分割
+assertSame(array_explode(['a', null, 'b', 'c'], null), [['a'], [2 =&gt; 'b', 3 =&gt; 'c']]);
+// クロージャで分割（大文字で分割）
+assertSame(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}), [['a'], [2 =&gt; 'c'], [4 =&gt; 'e']]);
+// 負数指定
+assertSame(array_explode(['a', null, 'b', null, 'c'], null, -2), [[0 =&gt; 'a', 1 =&gt; null, 2 =&gt; 'b'], [4 =&gt; 'c']]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_sprintf()">
@@ -743,6 +762,11 @@ assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [
 ]);
 // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
 assertSame(array_where($array, ['name' =&gt; 'piyo', 'flag' =&gt; false]), [
+    2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
+]);
+// 上記において値に配列を渡すと in_array で判定される
+assertSame(array_where($array, ['id' =&gt; [2, 3]]), [
+    1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
 // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
@@ -1447,6 +1471,7 @@ assertSame(array_difference([
         ]
     ],
     'key1'   =&gt; 'hoge',
+    'array'  =&gt; ['a', 'b', 'c'],
 ], [
     'common' =&gt; [
         'sub' =&gt; [
@@ -1454,9 +1479,11 @@ assertSame(array_difference([
         ]
     ],
     'key2'   =&gt; 'fuga',
+    'array'  =&gt; ['c', 'd', 'e'],
 ]), [
     'common.sub.x' =&gt; ['-' =&gt; 'val', '+' =&gt; 'VAL'],
     'key1'         =&gt; ['-' =&gt; 'hoge'],
+    'array'        =&gt; ['-' =&gt; ['a', 'b'], '+' =&gt; ['d', 'e']],
     'key2'         =&gt; ['+' =&gt; 'fuga'],
 ]);
 </code></pre>
@@ -1489,6 +1516,12 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 指定パスに名前空間を持つような php ファイルが無いなら親をたどる。<br />
 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。</p>
 <p>言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Example 用としてこのクラスのディレクトリを使用してみる
+$dirname = dirname(class_loader()-&gt;findFile(\ryunosuke\Functions\Package\Classobj::class));
+// "$dirname/Hoge" の名前空間を推測して返す
+assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()">
                                     ryunosuke\Functions\Package\Classobj::class_loader		</a>	<small>($startdir = null) : <a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></small>
@@ -1559,6 +1592,16 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
 // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2d');
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
+
+// メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
+    [\ryunosuke\Test\Package\Classobj\XTrait::class],
+    'method' =&gt; function(){return 'this is X3d';},
+]);
+// X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
+assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method(), 'this is X3d');
+// トレイトのメソッドも生えている
+assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod(), 'this is XTrait::traitMethod');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_extends()">
@@ -1567,7 +1610,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is
 	<div class="description"><p>インスタンスを動的に拡張する</p>
 <p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
 ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。<br />
-そのクラスの <strong>set/</strong>get が禁止されている場合に使えるかもしれない程度。</p>
+そのクラスの <code>__set</code>/<code>__get</code> が禁止されている場合に使えるかもしれない程度。</p>
 <p>クロージャ配列を渡すと特異メソッドになる。<br />
 そのクロージャの $this は元オブジェクトで bind される。<br />
 ただし、static closure を渡した場合はそれは static メソッドとして扱われる。</p>
@@ -1816,6 +1859,7 @@ assertSame(file_extension('filename.ext', ''), 'filename');
                                     ryunosuke\Functions\Package\FileSystem::file_set_contents		</a>	<small>($filename, $data, $umask = 2) : int</small>
 		</h4>
 	<div class="description"><p>ディレクトリも掘る file_put_contents</p>
+<p>書き込みは一時ファイルと rename を使用してアトミックに行われる。</p>
 <p>Example:</p>
 <pre><code class="language-php">file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
 assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
@@ -3179,7 +3223,7 @@ c = PHP_VERSION
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::csv_export()">
-                                    ryunosuke\Functions\Package\Strings::csv_export		</a>	<small>($csvarrays, $options = []) : array<span class="type-separator"></span><wbr>int</small>
+                                    ryunosuke\Functions\Package\Strings::csv_export		</a>	<small>($csvarrays, $options = []) : string<span class="type-separator"></span><wbr>int</small>
 		</h4>
 	<div class="description"><p>連想配列の配列を CSV 的文字列に変換する</p>
 <p>CSV ヘッダ行は全連想配列のキーの共通項となる。<br />
@@ -3746,7 +3790,7 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::chain()">
-                                    ryunosuke\Functions\Package\Syntax::chain		</a>	<small>($source) : <a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></small>
+                                    ryunosuke\Functions\Package\Syntax::chain		</a>	<small>($source = null) : <a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></small>
 		</h4>
 	<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
 <p>ChainObject という関数をチェーンできるオブジェクトを返す。<br />
@@ -3783,6 +3827,9 @@ map や filter を駆使しようとすると必要になるが、イテレー�
 さらに、 __toString も実装されているので、文字列的値の場合に限り自動で文字列化される。</p>
 <p>用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。<br />
 ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。</p>
+<p>なお、最初の引数を省略するとスタックモードになり、一切の処理が適用されなくなる。<br />
+その代わり <code>invoke</code> で遅延的に値を渡すことができるようになる。<br />
+「処理の流れだけ決めておいて後で適用する」イメージ。</p>
 <p>Example:</p>
 <pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
 $n1_9 = range(1, 9);
@@ -3803,28 +3850,33 @@ assertSame(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filt
 assertSame(chain($string)-&gt;explode1(' ')-&gt;filter()-&gt;map('ucfirst')-&gt;implode1('/')-&gt;rot13-&gt;md5-&gt;strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
 
  # よくある DB レコードをあれこれするシチュエーション
-$co = chain([
+$rows = [
     ['id' =&gt; 1, 'name' =&gt; 'hoge', 'sex' =&gt; 'F', 'age' =&gt; 17, 'salary' =&gt; 230000],
     ['id' =&gt; 3, 'name' =&gt; 'fuga', 'sex' =&gt; 'M', 'age' =&gt; 43, 'salary' =&gt; 480000],
     ['id' =&gt; 7, 'name' =&gt; 'piyo', 'sex' =&gt; 'M', 'age' =&gt; 21, 'salary' =&gt; 270000],
     ['id' =&gt; 9, 'name' =&gt; 'hage', 'sex' =&gt; 'F', 'age' =&gt; 30, 'salary' =&gt; 320000],
-]);
+];
 // e.g. 男性の平均給料
-assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()(), 375000);
+assertSame(chain($rows)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()(), 375000);
 // e.g. 女性の平均年齢
-assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()(), 23.5);
+assertSame(chain($rows)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()(), 23.5);
 // e.g. 30歳以上の平均給料
-assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()(), 400000);
+assertSame(chain($rows)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()(), 400000);
 // e.g. 20～30歳の平均給料
-assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()(), 295000);
+assertSame(chain($rows)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()(), 295000);
 // e.g. 男性の最小年齢
-assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()(), 21);
+assertSame(chain($rows)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()(), 21);
 // e.g. 女性の最大給料
-assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
+assertSame(chain($rows)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
+
+# 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
+assertSame(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()($rows), 375000);
+assertSame(chain()-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()($rows), 400000);
+assertSame(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()($rows), 21);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::throws()">
-                                    ryunosuke\Functions\Package\Syntax::throws		</a>	<small>($ex) : void</small>
+                                    ryunosuke\Functions\Package\Syntax::throws		</a>	<small>($ex) : mixed</small>
 		</h4>
 	<div class="description"><p>throw の関数版</p>
 <p>hoge() or throw などしたいことがまれによくあるはず。</p>
@@ -3919,6 +3971,31 @@ assertSame(array_search('x', ['a', 'b', 'c']) ?? 'default', false);     // 見�
 assertSame(array_search('a', ['a', 'b', 'c']) ?: 'default', 'default'); // 見つかったのに 0 に反応するので 'default' になってしまう
 assertSame(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default', 'default'); // このように書きたかった
 assertSame(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default', 0);         // このように書きたかった
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::call_if()">
+                                    ryunosuke\Functions\Package\Syntax::call_if		</a>	<small>($condition, $callable, ...$arguments) : mixed</small>
+		</h4>
+	<div class="description"><p>条件を満たしたときにコールバックを実行する</p>
+<p><code>if ($condition) $callable(...$arguments);</code> と（$condition はクロージャを受け入れるけど）ほぼ同じ。<br />
+ただし、 $condition に数値を与えると「指定回数呼ばれたあとに実行する」という意味になる。<br />
+主に「ループ内でデバッグ出力したいけど、毎回だと少しうざい」というデバッグ用途。</p>
+<p>$condition が正数だと「指定回数呼ばれた次のみ」負数だと「指定回数呼ばれた次以降」実行される。<br />
+0 のときは無条件で実行される。</p>
+<p>Example:</p>
+<pre><code class="language-php">$output = [];
+$debug_print = function ($debug) use (&amp;$output) { $output[] = $debug; };
+for ($i=0; $i&lt;4; $i++) {
+    call_if($i == 1, $debug_print, '$i == 1のとき呼ばれた');
+    call_if(2, $debug_print, '2回呼ばれた');
+    call_if(-2, $debug_print, '2回以上呼ばれた');
+}
+assertSame($output, [
+    '$i == 1のとき呼ばれた',
+    '2回呼ばれた',
+    '2回以上呼ばれた',
+    '2回以上呼ばれた',
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::ifelse()">
@@ -4513,6 +4590,8 @@ assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0);
 	<div class="description"><p>値の型を取得する（gettype + get_class）</p>
 <p>プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。<br />
 ただし、オブジェクトの場合は先頭に '\' が必ず付く。</p>
+<p>無名クラスの場合は extends, implements の優先順位でその名前を使う。<br />
+継承も実装もされていない場合は標準の get_class の結果を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// プリミティブ型は gettype と同義
 assertSame(var_type(false), 'boolean');
@@ -4522,6 +4601,11 @@ assertSame(var_type([1, 2, 3]), 'array');
 // オブジェクトは型名を返す
 assertSame(var_type(new \stdClass), '\\stdClass');
 assertSame(var_type(new \Exception()), '\\Exception');
+// 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
+assertSame(var_type(new class extends \Exception{}), '\\Exception');
+assertSame(var_type(new class implements \JsonSerializable{
+    public function jsonSerialize() { return ''; }
+}), '\\JsonSerializable');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_apply()">

@@ -5,644 +5,653 @@
 namespace ryunosuke\Functions;
 
 # constants
-/** 和暦 */
-const JP_ERA = [
-    [
-        "name"  => "令和",
-        "abbr"  => "R",
-        "since" => 1556636400,
-    ],
-    [
-        "name"  => "平成",
-        "abbr"  => "H",
-        "since" => 600188400,
-    ],
-    [
-        "name"  => "昭和",
-        "abbr"  => "S",
-        "since" => -1357635600,
-    ],
-    [
-        "name"  => "大正",
-        "abbr"  => "T",
-        "since" => -1812186000,
-    ],
-    [
-        "name"  => "明治",
-        "abbr"  => "M",
-        "since" => -3216790800,
-    ],
-];
+if (!defined("ryunosuke\\Functions\\JP_ERA")) {
+    /** 和暦 */
+    define("ryunosuke\\Functions\\JP_ERA", [
+        [
+            "name"  => "令和",
+            "abbr"  => "R",
+            "since" => 1556636400,
+        ],
+        [
+            "name"  => "平成",
+            "abbr"  => "H",
+            "since" => 600188400,
+        ],
+        [
+            "name"  => "昭和",
+            "abbr"  => "S",
+            "since" => -1357635600,
+        ],
+        [
+            "name"  => "大正",
+            "abbr"  => "T",
+            "since" => -1812186000,
+        ],
+        [
+            "name"  => "明治",
+            "abbr"  => "M",
+            "since" => -3216790800,
+        ],
+    ]);
+}
 
-/** SQL キーワード（全 RDBMS ごちゃまぜ） */
-const KEYWORDS = [
-    ""  => "",
-    0   => "ACCESSIBLE",
-    1   => "ACTION",
-    2   => "ADD",
-    3   => "AFTER",
-    4   => "AGAINST",
-    5   => "AGGREGATE",
-    6   => "ALGORITHM",
-    7   => "ALL",
-    8   => "ALTER",
-    9   => "ALTER TABLE",
-    10  => "ANALYSE",
-    11  => "ANALYZE",
-    12  => "AND",
-    13  => "AS",
-    14  => "ASC",
-    15  => "AUTOCOMMIT",
-    16  => "AUTO_INCREMENT",
-    17  => "BACKUP",
-    18  => "BEGIN",
-    19  => "BETWEEN",
-    20  => "BINLOG",
-    21  => "BOTH",
-    22  => "CASCADE",
-    23  => "CASE",
-    24  => "CHANGE",
-    25  => "CHANGED",
-    26  => "CHARACTER SET",
-    27  => "CHARSET",
-    28  => "CHECK",
-    29  => "CHECKSUM",
-    30  => "COLLATE",
-    31  => "COLLATION",
-    32  => "COLUMN",
-    33  => "COLUMNS",
-    34  => "COMMENT",
-    35  => "COMMIT",
-    36  => "COMMITTED",
-    37  => "COMPRESSED",
-    38  => "CONCURRENT",
-    39  => "CONSTRAINT",
-    40  => "CONTAINS",
-    41  => "CONVERT",
-    42  => "CREATE",
-    43  => "CROSS",
-    44  => "CURRENT_TIMESTAMP",
-    45  => "DATABASE",
-    46  => "DATABASES",
-    47  => "DAY",
-    48  => "DAY_HOUR",
-    49  => "DAY_MINUTE",
-    50  => "DAY_SECOND",
-    51  => "DEFAULT",
-    52  => "DEFINER",
-    53  => "DELAYED",
-    54  => "DELETE",
-    55  => "DELETE FROM",
-    56  => "DESC",
-    57  => "DESCRIBE",
-    58  => "DETERMINISTIC",
-    59  => "DISTINCT",
-    60  => "DISTINCTROW",
-    61  => "DIV",
-    62  => "DO",
-    63  => "DROP",
-    64  => "DUMPFILE",
-    65  => "DUPLICATE",
-    66  => "DYNAMIC",
-    67  => "ELSE",
-    68  => "ENCLOSED",
-    69  => "END",
-    70  => "ENGINE",
-    71  => "ENGINES",
-    72  => "ENGINE_TYPE",
-    73  => "ESCAPE",
-    74  => "ESCAPED",
-    75  => "EVENTS",
-    76  => "EXCEPT",
-    77  => "EXECUTE",
-    78  => "EXISTS",
-    79  => "EXPLAIN",
-    80  => "EXTENDED",
-    81  => "FAST",
-    82  => "FIELDS",
-    83  => "FILE",
-    84  => "FIRST",
-    85  => "FIXED",
-    86  => "FLUSH",
-    87  => "FOR",
-    88  => "FORCE",
-    89  => "FOREIGN",
-    90  => "FROM",
-    91  => "FULL",
-    92  => "FULLTEXT",
-    93  => "FUNCTION",
-    94  => "GLOBAL",
-    95  => "GRANT",
-    96  => "GRANTS",
-    97  => "GROUP BY",
-    98  => "GROUP_CONCAT",
-    99  => "HAVING",
-    100 => "HEAP",
-    101 => "HIGH_PRIORITY",
-    102 => "HOSTS",
-    103 => "HOUR",
-    104 => "HOUR_MINUTE",
-    105 => "HOUR_SECOND",
-    106 => "IDENTIFIED",
-    107 => "IF",
-    108 => "IFNULL",
-    109 => "IGNORE",
-    110 => "IN",
-    111 => "INDEX",
-    112 => "INDEXES",
-    113 => "INFILE",
-    114 => "INNER",
-    115 => "INSERT",
-    116 => "INSERT_ID",
-    117 => "INSERT_METHOD",
-    118 => "INTERSECT",
-    119 => "INTERVAL",
-    120 => "INTO",
-    121 => "INVOKER",
-    122 => "IS",
-    123 => "ISOLATION",
-    124 => "JOIN",
-    125 => "KEY",
-    126 => "KEYS",
-    127 => "KILL",
-    128 => "LAST_INSERT_ID",
-    129 => "LEADING",
-    130 => "LEFT",
-    131 => "LEVEL",
-    132 => "LIKE",
-    133 => "LIMIT",
-    134 => "LINEAR",
-    135 => "LINES",
-    136 => "LOAD",
-    137 => "LOCAL",
-    138 => "LOCK",
-    139 => "LOCKS",
-    140 => "LOGS",
-    141 => "LOW_PRIORITY",
-    142 => "MARIA",
-    143 => "MASTER",
-    144 => "MASTER_CONNECT_RETRY",
-    145 => "MASTER_HOST",
-    146 => "MASTER_LOG_FILE",
-    147 => "MATCH",
-    148 => "MAX_CONNECTIONS_PER_HOUR",
-    149 => "MAX_QUERIES_PER_HOUR",
-    150 => "MAX_ROWS",
-    151 => "MAX_UPDATES_PER_HOUR",
-    152 => "MAX_USER_CONNECTIONS",
-    153 => "MEDIUM",
-    154 => "MERGE",
-    155 => "MINUTE",
-    156 => "MINUTE_SECOND",
-    157 => "MIN_ROWS",
-    158 => "MODE",
-    159 => "MODIFY",
-    160 => "MONTH",
-    161 => "MRG_MYISAM",
-    162 => "MYISAM",
-    163 => "NAMES",
-    164 => "NATURAL",
-    165 => "NOT",
-    166 => "NOW()",
-    167 => "NULL",
-    168 => "OFFSET",
-    169 => "ON",
-    170 => "ON DELETE",
-    171 => "ON UPDATE",
-    172 => "OPEN",
-    173 => "OPTIMIZE",
-    174 => "OPTION",
-    175 => "OPTIONALLY",
-    176 => "OR",
-    177 => "ORDER BY",
-    178 => "OUTER",
-    179 => "OUTFILE",
-    180 => "PACK_KEYS",
-    181 => "PAGE",
-    182 => "PARTIAL",
-    183 => "PARTITION",
-    184 => "PARTITIONS",
-    185 => "PASSWORD",
-    186 => "PRIMARY",
-    187 => "PRIVILEGES",
-    188 => "PROCEDURE",
-    189 => "PROCESS",
-    190 => "PROCESSLIST",
-    191 => "PURGE",
-    192 => "QUICK",
-    193 => "RAID0",
-    194 => "RAID_CHUNKS",
-    195 => "RAID_CHUNKSIZE",
-    196 => "RAID_TYPE",
-    197 => "RANGE",
-    198 => "READ",
-    199 => "READ_ONLY",
-    200 => "READ_WRITE",
-    201 => "REFERENCES",
-    202 => "REGEXP",
-    203 => "RELOAD",
-    204 => "RENAME",
-    205 => "REPAIR",
-    206 => "REPEATABLE",
-    207 => "REPLACE",
-    208 => "REPLICATION",
-    209 => "RESET",
-    210 => "RESTORE",
-    211 => "RESTRICT",
-    212 => "RETURN",
-    213 => "RETURNS",
-    214 => "REVOKE",
-    215 => "RIGHT",
-    216 => "RLIKE",
-    217 => "ROLLBACK",
-    218 => "ROW",
-    219 => "ROWS",
-    220 => "ROW_FORMAT",
-    221 => "SECOND",
-    222 => "SECURITY",
-    223 => "SELECT",
-    224 => "SEPARATOR",
-    225 => "SERIALIZABLE",
-    226 => "SESSION",
-    227 => "SET",
-    228 => "SHARE",
-    229 => "SHOW",
-    230 => "SHUTDOWN",
-    231 => "SLAVE",
-    232 => "SONAME",
-    233 => "SOUNDS",
-    234 => "SQL",
-    235 => "SQL_AUTO_IS_NULL",
-    236 => "SQL_BIG_RESULT",
-    237 => "SQL_BIG_SELECTS",
-    238 => "SQL_BIG_TABLES",
-    239 => "SQL_BUFFER_RESULT",
-    240 => "SQL_CACHE",
-    241 => "SQL_CALC_FOUND_ROWS",
-    242 => "SQL_LOG_BIN",
-    243 => "SQL_LOG_OFF",
-    244 => "SQL_LOG_UPDATE",
-    245 => "SQL_LOW_PRIORITY_UPDATES",
-    246 => "SQL_MAX_JOIN_SIZE",
-    247 => "SQL_NO_CACHE",
-    248 => "SQL_QUOTE_SHOW_CREATE",
-    249 => "SQL_SAFE_UPDATES",
-    250 => "SQL_SELECT_LIMIT",
-    251 => "SQL_SLAVE_SKIP_COUNTER",
-    252 => "SQL_SMALL_RESULT",
-    253 => "SQL_WARNINGS",
-    254 => "START",
-    255 => "STARTING",
-    256 => "STATUS",
-    257 => "STOP",
-    258 => "STORAGE",
-    259 => "STRAIGHT_JOIN",
-    260 => "STRING",
-    261 => "STRIPED",
-    262 => "SUPER",
-    263 => "TABLE",
-    264 => "TABLES",
-    265 => "TEMPORARY",
-    266 => "TERMINATED",
-    267 => "THEN",
-    268 => "TO",
-    269 => "TRAILING",
-    270 => "TRANSACTIONAL",
-    271 => "TRUE",
-    272 => "TRUNCATE",
-    273 => "TYPE",
-    274 => "TYPES",
-    275 => "UNCOMMITTED",
-    276 => "UNION",
-    277 => "UNION ALL",
-    278 => "UNIQUE",
-    279 => "UNLOCK",
-    280 => "UNSIGNED",
-    281 => "UPDATE",
-    282 => "USAGE",
-    283 => "USE",
-    284 => "USING",
-    285 => "VALUES",
-    286 => "VARIABLES",
-    287 => "VIEW",
-    288 => "WHEN",
-    289 => "WHERE",
-    290 => "WITH",
-    291 => "WORK",
-    292 => "WRITE",
-    293 => "XOR",
-    294 => "YEAR_MONTH",
-    295 => "ABS",
-    296 => "ACOS",
-    297 => "ADDDATE",
-    298 => "ADDTIME",
-    299 => "AES_DECRYPT",
-    300 => "AES_ENCRYPT",
-    301 => "AREA",
-    302 => "ASBINARY",
-    303 => "ASCII",
-    304 => "ASIN",
-    305 => "ASTEXT",
-    306 => "ATAN",
-    307 => "ATAN2",
-    308 => "AVG",
-    309 => "BDMPOLYFROMTEXT",
-    310 => "BDMPOLYFROMWKB",
-    311 => "BDPOLYFROMTEXT",
-    312 => "BDPOLYFROMWKB",
-    313 => "BENCHMARK",
-    314 => "BIN",
-    315 => "BIT_AND",
-    316 => "BIT_COUNT",
-    317 => "BIT_LENGTH",
-    318 => "BIT_OR",
-    319 => "BIT_XOR",
-    320 => "BOUNDARY",
-    321 => "BUFFER",
-    322 => "CAST",
-    323 => "CEIL",
-    324 => "CEILING",
-    325 => "CENTROID",
-    326 => "CHAR",
-    327 => "CHARACTER_LENGTH",
-    328 => "CHARSET",
-    329 => "CHAR_LENGTH",
-    330 => "COALESCE",
-    331 => "COERCIBILITY",
-    332 => "COLLATION",
-    333 => "COMPRESS",
-    334 => "CONCAT",
-    335 => "CONCAT_WS",
-    336 => "CONNECTION_ID",
-    337 => "CONTAINS",
-    338 => "CONV",
-    339 => "CONVERT",
-    340 => "CONVERT_TZ",
-    341 => "CONVEXHULL",
-    342 => "COS",
-    343 => "COT",
-    344 => "COUNT",
-    345 => "CRC32",
-    346 => "CROSSES",
-    347 => "CURDATE",
-    348 => "CURRENT_DATE",
-    349 => "CURRENT_TIME",
-    350 => "CURRENT_TIMESTAMP",
-    351 => "CURRENT_USER",
-    352 => "CURTIME",
-    353 => "DATABASE",
-    354 => "DATE",
-    355 => "DATEDIFF",
-    356 => "DATE_ADD",
-    357 => "DATE_DIFF",
-    358 => "DATE_FORMAT",
-    359 => "DATE_SUB",
-    360 => "DAY",
-    361 => "DAYNAME",
-    362 => "DAYOFMONTH",
-    363 => "DAYOFWEEK",
-    364 => "DAYOFYEAR",
-    365 => "DECODE",
-    366 => "DEFAULT",
-    367 => "DEGREES",
-    368 => "DES_DECRYPT",
-    369 => "DES_ENCRYPT",
-    370 => "DIFFERENCE",
-    371 => "DIMENSION",
-    372 => "DISJOINT",
-    373 => "DISTANCE",
-    374 => "ELT",
-    375 => "ENCODE",
-    376 => "ENCRYPT",
-    377 => "ENDPOINT",
-    378 => "ENVELOPE",
-    379 => "EQUALS",
-    380 => "EXP",
-    381 => "EXPORT_SET",
-    382 => "EXTERIORRING",
-    383 => "EXTRACT",
-    384 => "EXTRACTVALUE",
-    385 => "FIELD",
-    386 => "FIND_IN_SET",
-    387 => "FLOOR",
-    388 => "FORMAT",
-    389 => "FOUND_ROWS",
-    390 => "FROM_DAYS",
-    391 => "FROM_UNIXTIME",
-    392 => "GEOMCOLLFROMTEXT",
-    393 => "GEOMCOLLFROMWKB",
-    394 => "GEOMETRYCOLLECTION",
-    395 => "GEOMETRYCOLLECTIONFROMTEXT",
-    396 => "GEOMETRYCOLLECTIONFROMWKB",
-    397 => "GEOMETRYFROMTEXT",
-    398 => "GEOMETRYFROMWKB",
-    399 => "GEOMETRYN",
-    400 => "GEOMETRYTYPE",
-    401 => "GEOMFROMTEXT",
-    402 => "GEOMFROMWKB",
-    403 => "GET_FORMAT",
-    404 => "GET_LOCK",
-    405 => "GLENGTH",
-    406 => "GREATEST",
-    407 => "GROUP_CONCAT",
-    408 => "GROUP_UNIQUE_USERS",
-    409 => "HEX",
-    410 => "HOUR",
-    411 => "IF",
-    412 => "IFNULL",
-    413 => "INET_ATON",
-    414 => "INET_NTOA",
-    415 => "INSERT",
-    416 => "INSTR",
-    417 => "INTERIORRINGN",
-    418 => "INTERSECTION",
-    419 => "INTERSECTS",
-    420 => "INTERVAL",
-    421 => "ISCLOSED",
-    422 => "ISEMPTY",
-    423 => "ISNULL",
-    424 => "ISRING",
-    425 => "ISSIMPLE",
-    426 => "IS_FREE_LOCK",
-    427 => "IS_USED_LOCK",
-    428 => "LAST_DAY",
-    429 => "LAST_INSERT_ID",
-    430 => "LCASE",
-    431 => "LEAST",
-    432 => "LEFT",
-    433 => "LENGTH",
-    434 => "LINEFROMTEXT",
-    435 => "LINEFROMWKB",
-    436 => "LINESTRING",
-    437 => "LINESTRINGFROMTEXT",
-    438 => "LINESTRINGFROMWKB",
-    439 => "LN",
-    440 => "LOAD_FILE",
-    441 => "LOCALTIME",
-    442 => "LOCALTIMESTAMP",
-    443 => "LOCATE",
-    444 => "LOG",
-    445 => "LOG10",
-    446 => "LOG2",
-    447 => "LOWER",
-    448 => "LPAD",
-    449 => "LTRIM",
-    450 => "MAKEDATE",
-    451 => "MAKETIME",
-    452 => "MAKE_SET",
-    453 => "MASTER_POS_WAIT",
-    454 => "MAX",
-    455 => "MBRCONTAINS",
-    456 => "MBRDISJOINT",
-    457 => "MBREQUAL",
-    458 => "MBRINTERSECTS",
-    459 => "MBROVERLAPS",
-    460 => "MBRTOUCHES",
-    461 => "MBRWITHIN",
-    462 => "MD5",
-    463 => "MICROSECOND",
-    464 => "MID",
-    465 => "MIN",
-    466 => "MINUTE",
-    467 => "MLINEFROMTEXT",
-    468 => "MLINEFROMWKB",
-    469 => "MOD",
-    470 => "MONTH",
-    471 => "MONTHNAME",
-    472 => "MPOINTFROMTEXT",
-    473 => "MPOINTFROMWKB",
-    474 => "MPOLYFROMTEXT",
-    475 => "MPOLYFROMWKB",
-    476 => "MULTILINESTRING",
-    477 => "MULTILINESTRINGFROMTEXT",
-    478 => "MULTILINESTRINGFROMWKB",
-    479 => "MULTIPOINT",
-    480 => "MULTIPOINTFROMTEXT",
-    481 => "MULTIPOINTFROMWKB",
-    482 => "MULTIPOLYGON",
-    483 => "MULTIPOLYGONFROMTEXT",
-    484 => "MULTIPOLYGONFROMWKB",
-    485 => "NAME_CONST",
-    486 => "NULLIF",
-    487 => "NUMGEOMETRIES",
-    488 => "NUMINTERIORRINGS",
-    489 => "NUMPOINTS",
-    490 => "OCT",
-    491 => "OCTET_LENGTH",
-    492 => "OLD_PASSWORD",
-    493 => "ORD",
-    494 => "OVERLAPS",
-    495 => "PASSWORD",
-    496 => "PERIOD_ADD",
-    497 => "PERIOD_DIFF",
-    498 => "PI",
-    499 => "POINT",
-    500 => "POINTFROMTEXT",
-    501 => "POINTFROMWKB",
-    502 => "POINTN",
-    503 => "POINTONSURFACE",
-    504 => "POLYFROMTEXT",
-    505 => "POLYFROMWKB",
-    506 => "POLYGON",
-    507 => "POLYGONFROMTEXT",
-    508 => "POLYGONFROMWKB",
-    509 => "POSITION",
-    510 => "POW",
-    511 => "POWER",
-    512 => "QUARTER",
-    513 => "QUOTE",
-    514 => "RADIANS",
-    515 => "RAND",
-    516 => "RELATED",
-    517 => "RELEASE_LOCK",
-    518 => "REPEAT",
-    519 => "REPLACE",
-    520 => "REVERSE",
-    521 => "RIGHT",
-    522 => "ROUND",
-    523 => "ROW_COUNT",
-    524 => "RPAD",
-    525 => "RTRIM",
-    526 => "SCHEMA",
-    527 => "SECOND",
-    528 => "SEC_TO_TIME",
-    529 => "SESSION_USER",
-    530 => "SHA",
-    531 => "SHA1",
-    532 => "SIGN",
-    533 => "SIN",
-    534 => "SLEEP",
-    535 => "SOUNDEX",
-    536 => "SPACE",
-    537 => "SQRT",
-    538 => "SRID",
-    539 => "STARTPOINT",
-    540 => "STD",
-    541 => "STDDEV",
-    542 => "STDDEV_POP",
-    543 => "STDDEV_SAMP",
-    544 => "STRCMP",
-    545 => "STR_TO_DATE",
-    546 => "SUBDATE",
-    547 => "SUBSTR",
-    548 => "SUBSTRING",
-    549 => "SUBSTRING_INDEX",
-    550 => "SUBTIME",
-    551 => "SUM",
-    552 => "SYMDIFFERENCE",
-    553 => "SYSDATE",
-    554 => "SYSTEM_USER",
-    555 => "TAN",
-    556 => "TIME",
-    557 => "TIMEDIFF",
-    558 => "TIMESTAMP",
-    559 => "TIMESTAMPADD",
-    560 => "TIMESTAMPDIFF",
-    561 => "TIME_FORMAT",
-    562 => "TIME_TO_SEC",
-    563 => "TOUCHES",
-    564 => "TO_DAYS",
-    565 => "TRIM",
-    566 => "TRUNCATE",
-    567 => "UCASE",
-    568 => "UNCOMPRESS",
-    569 => "UNCOMPRESSED_LENGTH",
-    570 => "UNHEX",
-    571 => "UNIQUE_USERS",
-    572 => "UNIX_TIMESTAMP",
-    573 => "UPDATEXML",
-    574 => "UPPER",
-    575 => "USER",
-    576 => "UTC_DATE",
-    577 => "UTC_TIME",
-    578 => "UTC_TIMESTAMP",
-    579 => "UUID",
-    580 => "VARIANCE",
-    581 => "VAR_POP",
-    582 => "VAR_SAMP",
-    583 => "VERSION",
-    584 => "WEEK",
-    585 => "WEEKDAY",
-    586 => "WEEKOFYEAR",
-    587 => "WITHIN",
-    588 => "X",
-    589 => "Y",
-    590 => "YEAR",
-    591 => "YEARWEEK",
-];
+if (!defined("ryunosuke\\Functions\\KEYWORDS")) {
+    /** SQL キーワード（全 RDBMS ごちゃまぜ） */
+    define("ryunosuke\\Functions\\KEYWORDS", [
+        ""  => "",
+        0   => "ACCESSIBLE",
+        1   => "ACTION",
+        2   => "ADD",
+        3   => "AFTER",
+        4   => "AGAINST",
+        5   => "AGGREGATE",
+        6   => "ALGORITHM",
+        7   => "ALL",
+        8   => "ALTER",
+        9   => "ALTER TABLE",
+        10  => "ANALYSE",
+        11  => "ANALYZE",
+        12  => "AND",
+        13  => "AS",
+        14  => "ASC",
+        15  => "AUTOCOMMIT",
+        16  => "AUTO_INCREMENT",
+        17  => "BACKUP",
+        18  => "BEGIN",
+        19  => "BETWEEN",
+        20  => "BINLOG",
+        21  => "BOTH",
+        22  => "CASCADE",
+        23  => "CASE",
+        24  => "CHANGE",
+        25  => "CHANGED",
+        26  => "CHARACTER SET",
+        27  => "CHARSET",
+        28  => "CHECK",
+        29  => "CHECKSUM",
+        30  => "COLLATE",
+        31  => "COLLATION",
+        32  => "COLUMN",
+        33  => "COLUMNS",
+        34  => "COMMENT",
+        35  => "COMMIT",
+        36  => "COMMITTED",
+        37  => "COMPRESSED",
+        38  => "CONCURRENT",
+        39  => "CONSTRAINT",
+        40  => "CONTAINS",
+        41  => "CONVERT",
+        42  => "CREATE",
+        43  => "CROSS",
+        44  => "CURRENT_TIMESTAMP",
+        45  => "DATABASE",
+        46  => "DATABASES",
+        47  => "DAY",
+        48  => "DAY_HOUR",
+        49  => "DAY_MINUTE",
+        50  => "DAY_SECOND",
+        51  => "DEFAULT",
+        52  => "DEFINER",
+        53  => "DELAYED",
+        54  => "DELETE",
+        55  => "DELETE FROM",
+        56  => "DESC",
+        57  => "DESCRIBE",
+        58  => "DETERMINISTIC",
+        59  => "DISTINCT",
+        60  => "DISTINCTROW",
+        61  => "DIV",
+        62  => "DO",
+        63  => "DROP",
+        64  => "DUMPFILE",
+        65  => "DUPLICATE",
+        66  => "DYNAMIC",
+        67  => "ELSE",
+        68  => "ENCLOSED",
+        69  => "END",
+        70  => "ENGINE",
+        71  => "ENGINES",
+        72  => "ENGINE_TYPE",
+        73  => "ESCAPE",
+        74  => "ESCAPED",
+        75  => "EVENTS",
+        76  => "EXCEPT",
+        77  => "EXECUTE",
+        78  => "EXISTS",
+        79  => "EXPLAIN",
+        80  => "EXTENDED",
+        81  => "FAST",
+        82  => "FIELDS",
+        83  => "FILE",
+        84  => "FIRST",
+        85  => "FIXED",
+        86  => "FLUSH",
+        87  => "FOR",
+        88  => "FORCE",
+        89  => "FOREIGN",
+        90  => "FROM",
+        91  => "FULL",
+        92  => "FULLTEXT",
+        93  => "FUNCTION",
+        94  => "GLOBAL",
+        95  => "GRANT",
+        96  => "GRANTS",
+        97  => "GROUP BY",
+        98  => "GROUP_CONCAT",
+        99  => "HAVING",
+        100 => "HEAP",
+        101 => "HIGH_PRIORITY",
+        102 => "HOSTS",
+        103 => "HOUR",
+        104 => "HOUR_MINUTE",
+        105 => "HOUR_SECOND",
+        106 => "IDENTIFIED",
+        107 => "IF",
+        108 => "IFNULL",
+        109 => "IGNORE",
+        110 => "IN",
+        111 => "INDEX",
+        112 => "INDEXES",
+        113 => "INFILE",
+        114 => "INNER",
+        115 => "INSERT",
+        116 => "INSERT_ID",
+        117 => "INSERT_METHOD",
+        118 => "INTERSECT",
+        119 => "INTERVAL",
+        120 => "INTO",
+        121 => "INVOKER",
+        122 => "IS",
+        123 => "ISOLATION",
+        124 => "JOIN",
+        125 => "KEY",
+        126 => "KEYS",
+        127 => "KILL",
+        128 => "LAST_INSERT_ID",
+        129 => "LEADING",
+        130 => "LEFT",
+        131 => "LEVEL",
+        132 => "LIKE",
+        133 => "LIMIT",
+        134 => "LINEAR",
+        135 => "LINES",
+        136 => "LOAD",
+        137 => "LOCAL",
+        138 => "LOCK",
+        139 => "LOCKS",
+        140 => "LOGS",
+        141 => "LOW_PRIORITY",
+        142 => "MARIA",
+        143 => "MASTER",
+        144 => "MASTER_CONNECT_RETRY",
+        145 => "MASTER_HOST",
+        146 => "MASTER_LOG_FILE",
+        147 => "MATCH",
+        148 => "MAX_CONNECTIONS_PER_HOUR",
+        149 => "MAX_QUERIES_PER_HOUR",
+        150 => "MAX_ROWS",
+        151 => "MAX_UPDATES_PER_HOUR",
+        152 => "MAX_USER_CONNECTIONS",
+        153 => "MEDIUM",
+        154 => "MERGE",
+        155 => "MINUTE",
+        156 => "MINUTE_SECOND",
+        157 => "MIN_ROWS",
+        158 => "MODE",
+        159 => "MODIFY",
+        160 => "MONTH",
+        161 => "MRG_MYISAM",
+        162 => "MYISAM",
+        163 => "NAMES",
+        164 => "NATURAL",
+        165 => "NOT",
+        166 => "NOW()",
+        167 => "NULL",
+        168 => "OFFSET",
+        169 => "ON",
+        170 => "ON DELETE",
+        171 => "ON UPDATE",
+        172 => "OPEN",
+        173 => "OPTIMIZE",
+        174 => "OPTION",
+        175 => "OPTIONALLY",
+        176 => "OR",
+        177 => "ORDER BY",
+        178 => "OUTER",
+        179 => "OUTFILE",
+        180 => "PACK_KEYS",
+        181 => "PAGE",
+        182 => "PARTIAL",
+        183 => "PARTITION",
+        184 => "PARTITIONS",
+        185 => "PASSWORD",
+        186 => "PRIMARY",
+        187 => "PRIVILEGES",
+        188 => "PROCEDURE",
+        189 => "PROCESS",
+        190 => "PROCESSLIST",
+        191 => "PURGE",
+        192 => "QUICK",
+        193 => "RAID0",
+        194 => "RAID_CHUNKS",
+        195 => "RAID_CHUNKSIZE",
+        196 => "RAID_TYPE",
+        197 => "RANGE",
+        198 => "READ",
+        199 => "READ_ONLY",
+        200 => "READ_WRITE",
+        201 => "REFERENCES",
+        202 => "REGEXP",
+        203 => "RELOAD",
+        204 => "RENAME",
+        205 => "REPAIR",
+        206 => "REPEATABLE",
+        207 => "REPLACE",
+        208 => "REPLICATION",
+        209 => "RESET",
+        210 => "RESTORE",
+        211 => "RESTRICT",
+        212 => "RETURN",
+        213 => "RETURNS",
+        214 => "REVOKE",
+        215 => "RIGHT",
+        216 => "RLIKE",
+        217 => "ROLLBACK",
+        218 => "ROW",
+        219 => "ROWS",
+        220 => "ROW_FORMAT",
+        221 => "SECOND",
+        222 => "SECURITY",
+        223 => "SELECT",
+        224 => "SEPARATOR",
+        225 => "SERIALIZABLE",
+        226 => "SESSION",
+        227 => "SET",
+        228 => "SHARE",
+        229 => "SHOW",
+        230 => "SHUTDOWN",
+        231 => "SLAVE",
+        232 => "SONAME",
+        233 => "SOUNDS",
+        234 => "SQL",
+        235 => "SQL_AUTO_IS_NULL",
+        236 => "SQL_BIG_RESULT",
+        237 => "SQL_BIG_SELECTS",
+        238 => "SQL_BIG_TABLES",
+        239 => "SQL_BUFFER_RESULT",
+        240 => "SQL_CACHE",
+        241 => "SQL_CALC_FOUND_ROWS",
+        242 => "SQL_LOG_BIN",
+        243 => "SQL_LOG_OFF",
+        244 => "SQL_LOG_UPDATE",
+        245 => "SQL_LOW_PRIORITY_UPDATES",
+        246 => "SQL_MAX_JOIN_SIZE",
+        247 => "SQL_NO_CACHE",
+        248 => "SQL_QUOTE_SHOW_CREATE",
+        249 => "SQL_SAFE_UPDATES",
+        250 => "SQL_SELECT_LIMIT",
+        251 => "SQL_SLAVE_SKIP_COUNTER",
+        252 => "SQL_SMALL_RESULT",
+        253 => "SQL_WARNINGS",
+        254 => "START",
+        255 => "STARTING",
+        256 => "STATUS",
+        257 => "STOP",
+        258 => "STORAGE",
+        259 => "STRAIGHT_JOIN",
+        260 => "STRING",
+        261 => "STRIPED",
+        262 => "SUPER",
+        263 => "TABLE",
+        264 => "TABLES",
+        265 => "TEMPORARY",
+        266 => "TERMINATED",
+        267 => "THEN",
+        268 => "TO",
+        269 => "TRAILING",
+        270 => "TRANSACTIONAL",
+        271 => "TRUE",
+        272 => "TRUNCATE",
+        273 => "TYPE",
+        274 => "TYPES",
+        275 => "UNCOMMITTED",
+        276 => "UNION",
+        277 => "UNION ALL",
+        278 => "UNIQUE",
+        279 => "UNLOCK",
+        280 => "UNSIGNED",
+        281 => "UPDATE",
+        282 => "USAGE",
+        283 => "USE",
+        284 => "USING",
+        285 => "VALUES",
+        286 => "VARIABLES",
+        287 => "VIEW",
+        288 => "WHEN",
+        289 => "WHERE",
+        290 => "WITH",
+        291 => "WORK",
+        292 => "WRITE",
+        293 => "XOR",
+        294 => "YEAR_MONTH",
+        295 => "ABS",
+        296 => "ACOS",
+        297 => "ADDDATE",
+        298 => "ADDTIME",
+        299 => "AES_DECRYPT",
+        300 => "AES_ENCRYPT",
+        301 => "AREA",
+        302 => "ASBINARY",
+        303 => "ASCII",
+        304 => "ASIN",
+        305 => "ASTEXT",
+        306 => "ATAN",
+        307 => "ATAN2",
+        308 => "AVG",
+        309 => "BDMPOLYFROMTEXT",
+        310 => "BDMPOLYFROMWKB",
+        311 => "BDPOLYFROMTEXT",
+        312 => "BDPOLYFROMWKB",
+        313 => "BENCHMARK",
+        314 => "BIN",
+        315 => "BIT_AND",
+        316 => "BIT_COUNT",
+        317 => "BIT_LENGTH",
+        318 => "BIT_OR",
+        319 => "BIT_XOR",
+        320 => "BOUNDARY",
+        321 => "BUFFER",
+        322 => "CAST",
+        323 => "CEIL",
+        324 => "CEILING",
+        325 => "CENTROID",
+        326 => "CHAR",
+        327 => "CHARACTER_LENGTH",
+        328 => "CHARSET",
+        329 => "CHAR_LENGTH",
+        330 => "COALESCE",
+        331 => "COERCIBILITY",
+        332 => "COLLATION",
+        333 => "COMPRESS",
+        334 => "CONCAT",
+        335 => "CONCAT_WS",
+        336 => "CONNECTION_ID",
+        337 => "CONTAINS",
+        338 => "CONV",
+        339 => "CONVERT",
+        340 => "CONVERT_TZ",
+        341 => "CONVEXHULL",
+        342 => "COS",
+        343 => "COT",
+        344 => "COUNT",
+        345 => "CRC32",
+        346 => "CROSSES",
+        347 => "CURDATE",
+        348 => "CURRENT_DATE",
+        349 => "CURRENT_TIME",
+        350 => "CURRENT_TIMESTAMP",
+        351 => "CURRENT_USER",
+        352 => "CURTIME",
+        353 => "DATABASE",
+        354 => "DATE",
+        355 => "DATEDIFF",
+        356 => "DATE_ADD",
+        357 => "DATE_DIFF",
+        358 => "DATE_FORMAT",
+        359 => "DATE_SUB",
+        360 => "DAY",
+        361 => "DAYNAME",
+        362 => "DAYOFMONTH",
+        363 => "DAYOFWEEK",
+        364 => "DAYOFYEAR",
+        365 => "DECODE",
+        366 => "DEFAULT",
+        367 => "DEGREES",
+        368 => "DES_DECRYPT",
+        369 => "DES_ENCRYPT",
+        370 => "DIFFERENCE",
+        371 => "DIMENSION",
+        372 => "DISJOINT",
+        373 => "DISTANCE",
+        374 => "ELT",
+        375 => "ENCODE",
+        376 => "ENCRYPT",
+        377 => "ENDPOINT",
+        378 => "ENVELOPE",
+        379 => "EQUALS",
+        380 => "EXP",
+        381 => "EXPORT_SET",
+        382 => "EXTERIORRING",
+        383 => "EXTRACT",
+        384 => "EXTRACTVALUE",
+        385 => "FIELD",
+        386 => "FIND_IN_SET",
+        387 => "FLOOR",
+        388 => "FORMAT",
+        389 => "FOUND_ROWS",
+        390 => "FROM_DAYS",
+        391 => "FROM_UNIXTIME",
+        392 => "GEOMCOLLFROMTEXT",
+        393 => "GEOMCOLLFROMWKB",
+        394 => "GEOMETRYCOLLECTION",
+        395 => "GEOMETRYCOLLECTIONFROMTEXT",
+        396 => "GEOMETRYCOLLECTIONFROMWKB",
+        397 => "GEOMETRYFROMTEXT",
+        398 => "GEOMETRYFROMWKB",
+        399 => "GEOMETRYN",
+        400 => "GEOMETRYTYPE",
+        401 => "GEOMFROMTEXT",
+        402 => "GEOMFROMWKB",
+        403 => "GET_FORMAT",
+        404 => "GET_LOCK",
+        405 => "GLENGTH",
+        406 => "GREATEST",
+        407 => "GROUP_CONCAT",
+        408 => "GROUP_UNIQUE_USERS",
+        409 => "HEX",
+        410 => "HOUR",
+        411 => "IF",
+        412 => "IFNULL",
+        413 => "INET_ATON",
+        414 => "INET_NTOA",
+        415 => "INSERT",
+        416 => "INSTR",
+        417 => "INTERIORRINGN",
+        418 => "INTERSECTION",
+        419 => "INTERSECTS",
+        420 => "INTERVAL",
+        421 => "ISCLOSED",
+        422 => "ISEMPTY",
+        423 => "ISNULL",
+        424 => "ISRING",
+        425 => "ISSIMPLE",
+        426 => "IS_FREE_LOCK",
+        427 => "IS_USED_LOCK",
+        428 => "LAST_DAY",
+        429 => "LAST_INSERT_ID",
+        430 => "LCASE",
+        431 => "LEAST",
+        432 => "LEFT",
+        433 => "LENGTH",
+        434 => "LINEFROMTEXT",
+        435 => "LINEFROMWKB",
+        436 => "LINESTRING",
+        437 => "LINESTRINGFROMTEXT",
+        438 => "LINESTRINGFROMWKB",
+        439 => "LN",
+        440 => "LOAD_FILE",
+        441 => "LOCALTIME",
+        442 => "LOCALTIMESTAMP",
+        443 => "LOCATE",
+        444 => "LOG",
+        445 => "LOG10",
+        446 => "LOG2",
+        447 => "LOWER",
+        448 => "LPAD",
+        449 => "LTRIM",
+        450 => "MAKEDATE",
+        451 => "MAKETIME",
+        452 => "MAKE_SET",
+        453 => "MASTER_POS_WAIT",
+        454 => "MAX",
+        455 => "MBRCONTAINS",
+        456 => "MBRDISJOINT",
+        457 => "MBREQUAL",
+        458 => "MBRINTERSECTS",
+        459 => "MBROVERLAPS",
+        460 => "MBRTOUCHES",
+        461 => "MBRWITHIN",
+        462 => "MD5",
+        463 => "MICROSECOND",
+        464 => "MID",
+        465 => "MIN",
+        466 => "MINUTE",
+        467 => "MLINEFROMTEXT",
+        468 => "MLINEFROMWKB",
+        469 => "MOD",
+        470 => "MONTH",
+        471 => "MONTHNAME",
+        472 => "MPOINTFROMTEXT",
+        473 => "MPOINTFROMWKB",
+        474 => "MPOLYFROMTEXT",
+        475 => "MPOLYFROMWKB",
+        476 => "MULTILINESTRING",
+        477 => "MULTILINESTRINGFROMTEXT",
+        478 => "MULTILINESTRINGFROMWKB",
+        479 => "MULTIPOINT",
+        480 => "MULTIPOINTFROMTEXT",
+        481 => "MULTIPOINTFROMWKB",
+        482 => "MULTIPOLYGON",
+        483 => "MULTIPOLYGONFROMTEXT",
+        484 => "MULTIPOLYGONFROMWKB",
+        485 => "NAME_CONST",
+        486 => "NULLIF",
+        487 => "NUMGEOMETRIES",
+        488 => "NUMINTERIORRINGS",
+        489 => "NUMPOINTS",
+        490 => "OCT",
+        491 => "OCTET_LENGTH",
+        492 => "OLD_PASSWORD",
+        493 => "ORD",
+        494 => "OVERLAPS",
+        495 => "PASSWORD",
+        496 => "PERIOD_ADD",
+        497 => "PERIOD_DIFF",
+        498 => "PI",
+        499 => "POINT",
+        500 => "POINTFROMTEXT",
+        501 => "POINTFROMWKB",
+        502 => "POINTN",
+        503 => "POINTONSURFACE",
+        504 => "POLYFROMTEXT",
+        505 => "POLYFROMWKB",
+        506 => "POLYGON",
+        507 => "POLYGONFROMTEXT",
+        508 => "POLYGONFROMWKB",
+        509 => "POSITION",
+        510 => "POW",
+        511 => "POWER",
+        512 => "QUARTER",
+        513 => "QUOTE",
+        514 => "RADIANS",
+        515 => "RAND",
+        516 => "RELATED",
+        517 => "RELEASE_LOCK",
+        518 => "REPEAT",
+        519 => "REPLACE",
+        520 => "REVERSE",
+        521 => "RIGHT",
+        522 => "ROUND",
+        523 => "ROW_COUNT",
+        524 => "RPAD",
+        525 => "RTRIM",
+        526 => "SCHEMA",
+        527 => "SECOND",
+        528 => "SEC_TO_TIME",
+        529 => "SESSION_USER",
+        530 => "SHA",
+        531 => "SHA1",
+        532 => "SIGN",
+        533 => "SIN",
+        534 => "SLEEP",
+        535 => "SOUNDEX",
+        536 => "SPACE",
+        537 => "SQRT",
+        538 => "SRID",
+        539 => "STARTPOINT",
+        540 => "STD",
+        541 => "STDDEV",
+        542 => "STDDEV_POP",
+        543 => "STDDEV_SAMP",
+        544 => "STRCMP",
+        545 => "STR_TO_DATE",
+        546 => "SUBDATE",
+        547 => "SUBSTR",
+        548 => "SUBSTRING",
+        549 => "SUBSTRING_INDEX",
+        550 => "SUBTIME",
+        551 => "SUM",
+        552 => "SYMDIFFERENCE",
+        553 => "SYSDATE",
+        554 => "SYSTEM_USER",
+        555 => "TAN",
+        556 => "TIME",
+        557 => "TIMEDIFF",
+        558 => "TIMESTAMP",
+        559 => "TIMESTAMPADD",
+        560 => "TIMESTAMPDIFF",
+        561 => "TIME_FORMAT",
+        562 => "TIME_TO_SEC",
+        563 => "TOUCHES",
+        564 => "TO_DAYS",
+        565 => "TRIM",
+        566 => "TRUNCATE",
+        567 => "UCASE",
+        568 => "UNCOMPRESS",
+        569 => "UNCOMPRESSED_LENGTH",
+        570 => "UNHEX",
+        571 => "UNIQUE_USERS",
+        572 => "UNIX_TIMESTAMP",
+        573 => "UPDATEXML",
+        574 => "UPPER",
+        575 => "USER",
+        576 => "UTC_DATE",
+        577 => "UTC_TIME",
+        578 => "UTC_TIMESTAMP",
+        579 => "UUID",
+        580 => "VARIANCE",
+        581 => "VAR_POP",
+        582 => "VAR_SAMP",
+        583 => "VERSION",
+        584 => "WEEK",
+        585 => "WEEKDAY",
+        586 => "WEEKOFYEAR",
+        587 => "WITHIN",
+        588 => "X",
+        589 => "Y",
+        590 => "YEAR",
+        591 => "YEARWEEK",
+    ]);
+}
 
-/** json_*** 関数で $depth 引数を表す定数 */
-const JSON_MAX_DEPTH = -1;
+if (!defined("ryunosuke\\Functions\\JSON_MAX_DEPTH")) {
+    /** json_*** 関数で $depth 引数を表す定数 */
+    define("ryunosuke\\Functions\\JSON_MAX_DEPTH", -1);
+}
 
-/** parse_php 関数でトークン名変換をするか */
-const TOKEN_NAME = 2;
+if (!defined("ryunosuke\\Functions\\TOKEN_NAME")) {
+    /** parse_php 関数でトークン名変換をするか */
+    define("ryunosuke\\Functions\\TOKEN_NAME", 2);
+}
 
-/** SORT_XXX 定数の厳密版 */
-const SORT_STRICT = 256;
+if (!defined("ryunosuke\\Functions\\SORT_STRICT")) {
+    /** SORT_XXX 定数の厳密版 */
+    define("ryunosuke\\Functions\\SORT_STRICT", 256);
+}
 
 
 # functions
-const arrays = "ryunosuke\\Functions\\arrays";
 if (!isset($excluded_functions["arrays"]) && (!function_exists("ryunosuke\\Functions\\arrays") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\arrays"))->isInternal()))) {
     /**
      * 配列をシーケンシャルに走査するジェネレータを返す
@@ -675,8 +684,10 @@ if (!isset($excluded_functions["arrays"]) && (!function_exists("ryunosuke\\Funct
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\arrays") && !defined("ryunosuke\\Functions\\arrays")) {
+    define("ryunosuke\\Functions\\arrays", "ryunosuke\\Functions\\arrays");
+}
 
-const arrayize = "ryunosuke\\Functions\\arrayize";
 if (!isset($excluded_functions["arrayize"]) && (!function_exists("ryunosuke\\Functions\\arrayize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\arrayize"))->isInternal()))) {
     /**
      * 引数の配列を生成する。
@@ -708,8 +719,10 @@ if (!isset($excluded_functions["arrayize"]) && (!function_exists("ryunosuke\\Fun
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\arrayize") && !defined("ryunosuke\\Functions\\arrayize")) {
+    define("ryunosuke\\Functions\\arrayize", "ryunosuke\\Functions\\arrayize");
+}
 
-const is_indexarray = "ryunosuke\\Functions\\is_indexarray";
 if (!isset($excluded_functions["is_indexarray"]) && (!function_exists("ryunosuke\\Functions\\is_indexarray") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_indexarray"))->isInternal()))) {
     /**
      * 配列が数値配列か調べる
@@ -741,8 +754,10 @@ if (!isset($excluded_functions["is_indexarray"]) && (!function_exists("ryunosuke
         return true;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_indexarray") && !defined("ryunosuke\\Functions\\is_indexarray")) {
+    define("ryunosuke\\Functions\\is_indexarray", "ryunosuke\\Functions\\is_indexarray");
+}
 
-const is_hasharray = "ryunosuke\\Functions\\is_hasharray";
 if (!isset($excluded_functions["is_hasharray"]) && (!function_exists("ryunosuke\\Functions\\is_hasharray") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_hasharray"))->isInternal()))) {
     /**
      * 配列が連想配列か調べる
@@ -770,8 +785,10 @@ if (!isset($excluded_functions["is_hasharray"]) && (!function_exists("ryunosuke\
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_hasharray") && !defined("ryunosuke\\Functions\\is_hasharray")) {
+    define("ryunosuke\\Functions\\is_hasharray", "ryunosuke\\Functions\\is_hasharray");
+}
 
-const first_key = "ryunosuke\\Functions\\first_key";
 if (!isset($excluded_functions["first_key"]) && (!function_exists("ryunosuke\\Functions\\first_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\first_key"))->isInternal()))) {
     /**
      * 配列の最初のキーを返す
@@ -798,8 +815,10 @@ if (!isset($excluded_functions["first_key"]) && (!function_exists("ryunosuke\\Fu
         return $k;
     }
 }
+if (function_exists("ryunosuke\\Functions\\first_key") && !defined("ryunosuke\\Functions\\first_key")) {
+    define("ryunosuke\\Functions\\first_key", "ryunosuke\\Functions\\first_key");
+}
 
-const first_value = "ryunosuke\\Functions\\first_value";
 if (!isset($excluded_functions["first_value"]) && (!function_exists("ryunosuke\\Functions\\first_value") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\first_value"))->isInternal()))) {
     /**
      * 配列の最初の値を返す
@@ -826,8 +845,10 @@ if (!isset($excluded_functions["first_value"]) && (!function_exists("ryunosuke\\
         return $v;
     }
 }
+if (function_exists("ryunosuke\\Functions\\first_value") && !defined("ryunosuke\\Functions\\first_value")) {
+    define("ryunosuke\\Functions\\first_value", "ryunosuke\\Functions\\first_value");
+}
 
-const first_keyvalue = "ryunosuke\\Functions\\first_keyvalue";
 if (!isset($excluded_functions["first_keyvalue"]) && (!function_exists("ryunosuke\\Functions\\first_keyvalue") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\first_keyvalue"))->isInternal()))) {
     /**
      * 配列の最初のキー/値ペアをタプルで返す
@@ -852,8 +873,10 @@ if (!isset($excluded_functions["first_keyvalue"]) && (!function_exists("ryunosuk
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\first_keyvalue") && !defined("ryunosuke\\Functions\\first_keyvalue")) {
+    define("ryunosuke\\Functions\\first_keyvalue", "ryunosuke\\Functions\\first_keyvalue");
+}
 
-const last_key = "ryunosuke\\Functions\\last_key";
 if (!isset($excluded_functions["last_key"]) && (!function_exists("ryunosuke\\Functions\\last_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\last_key"))->isInternal()))) {
     /**
      * 配列の最後のキーを返す
@@ -880,8 +903,10 @@ if (!isset($excluded_functions["last_key"]) && (!function_exists("ryunosuke\\Fun
         return $k;
     }
 }
+if (function_exists("ryunosuke\\Functions\\last_key") && !defined("ryunosuke\\Functions\\last_key")) {
+    define("ryunosuke\\Functions\\last_key", "ryunosuke\\Functions\\last_key");
+}
 
-const last_value = "ryunosuke\\Functions\\last_value";
 if (!isset($excluded_functions["last_value"]) && (!function_exists("ryunosuke\\Functions\\last_value") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\last_value"))->isInternal()))) {
     /**
      * 配列の最後の値を返す
@@ -908,8 +933,10 @@ if (!isset($excluded_functions["last_value"]) && (!function_exists("ryunosuke\\F
         return $v;
     }
 }
+if (function_exists("ryunosuke\\Functions\\last_value") && !defined("ryunosuke\\Functions\\last_value")) {
+    define("ryunosuke\\Functions\\last_value", "ryunosuke\\Functions\\last_value");
+}
 
-const last_keyvalue = "ryunosuke\\Functions\\last_keyvalue";
 if (!isset($excluded_functions["last_keyvalue"]) && (!function_exists("ryunosuke\\Functions\\last_keyvalue") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\last_keyvalue"))->isInternal()))) {
     /**
      * 配列の最後のキー/値ペアをタプルで返す
@@ -948,8 +975,10 @@ if (!isset($excluded_functions["last_keyvalue"]) && (!function_exists("ryunosuke
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\last_keyvalue") && !defined("ryunosuke\\Functions\\last_keyvalue")) {
+    define("ryunosuke\\Functions\\last_keyvalue", "ryunosuke\\Functions\\last_keyvalue");
+}
 
-const prev_key = "ryunosuke\\Functions\\prev_key";
 if (!isset($excluded_functions["prev_key"]) && (!function_exists("ryunosuke\\Functions\\prev_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\prev_key"))->isInternal()))) {
     /**
      * 配列の指定キーの前のキーを返す
@@ -985,8 +1014,10 @@ if (!isset($excluded_functions["prev_key"]) && (!function_exists("ryunosuke\\Fun
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\prev_key") && !defined("ryunosuke\\Functions\\prev_key")) {
+    define("ryunosuke\\Functions\\prev_key", "ryunosuke\\Functions\\prev_key");
+}
 
-const next_key = "ryunosuke\\Functions\\next_key";
 if (!isset($excluded_functions["next_key"]) && (!function_exists("ryunosuke\\Functions\\next_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\next_key"))->isInternal()))) {
     /**
      * 配列の指定キーの次のキーを返す
@@ -1040,8 +1071,10 @@ if (!isset($excluded_functions["next_key"]) && (!function_exists("ryunosuke\\Fun
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\next_key") && !defined("ryunosuke\\Functions\\next_key")) {
+    define("ryunosuke\\Functions\\next_key", "ryunosuke\\Functions\\next_key");
+}
 
-const in_array_and = "ryunosuke\\Functions\\in_array_and";
 if (!isset($excluded_functions["in_array_and"]) && (!function_exists("ryunosuke\\Functions\\in_array_and") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\in_array_and"))->isInternal()))) {
     /**
      * in_array の複数版（AND）
@@ -1078,8 +1111,10 @@ if (!isset($excluded_functions["in_array_and"]) && (!function_exists("ryunosuke\
         return true;
     }
 }
+if (function_exists("ryunosuke\\Functions\\in_array_and") && !defined("ryunosuke\\Functions\\in_array_and")) {
+    define("ryunosuke\\Functions\\in_array_and", "ryunosuke\\Functions\\in_array_and");
+}
 
-const in_array_or = "ryunosuke\\Functions\\in_array_or";
 if (!isset($excluded_functions["in_array_or"]) && (!function_exists("ryunosuke\\Functions\\in_array_or") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\in_array_or"))->isInternal()))) {
     /**
      * in_array の複数版（OR）
@@ -1116,8 +1151,10 @@ if (!isset($excluded_functions["in_array_or"]) && (!function_exists("ryunosuke\\
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\in_array_or") && !defined("ryunosuke\\Functions\\in_array_or")) {
+    define("ryunosuke\\Functions\\in_array_or", "ryunosuke\\Functions\\in_array_or");
+}
 
-const kvsort = "ryunosuke\\Functions\\kvsort";
 if (!isset($excluded_functions["kvsort"]) && (!function_exists("ryunosuke\\Functions\\kvsort") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\kvsort"))->isInternal()))) {
     /**
      * 比較関数にキーも渡ってくる安定ソート
@@ -1192,8 +1229,10 @@ if (!isset($excluded_functions["kvsort"]) && (!function_exists("ryunosuke\\Funct
         return $tmp;
     }
 }
+if (function_exists("ryunosuke\\Functions\\kvsort") && !defined("ryunosuke\\Functions\\kvsort")) {
+    define("ryunosuke\\Functions\\kvsort", "ryunosuke\\Functions\\kvsort");
+}
 
-const array_add = "ryunosuke\\Functions\\array_add";
 if (!isset($excluded_functions["array_add"]) && (!function_exists("ryunosuke\\Functions\\array_add") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_add"))->isInternal()))) {
     /**
      * 配列の+演算子の関数版
@@ -1206,20 +1245,22 @@ if (!isset($excluded_functions["array_add"]) && (!function_exists("ryunosuke\\Fu
      * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
      * ```
      *
-     * @param array $array 対象配列
-     * @param array $variadic 足す配列
+     * @param array $variadic 足す配列（可変引数）
      * @return array 足された配列
      */
-    function array_add($array, ...$variadic)
+    function array_add(...$variadic)
     {
+        $array = [];
         foreach ($variadic as $arg) {
             $array += $arg;
         }
         return $array;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_add") && !defined("ryunosuke\\Functions\\array_add")) {
+    define("ryunosuke\\Functions\\array_add", "ryunosuke\\Functions\\array_add");
+}
 
-const array_mix = "ryunosuke\\Functions\\array_mix";
 if (!isset($excluded_functions["array_mix"]) && (!function_exists("ryunosuke\\Functions\\array_mix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_mix"))->isInternal()))) {
     /**
      * 配列を交互に追加する
@@ -1275,8 +1316,10 @@ if (!isset($excluded_functions["array_mix"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_mix") && !defined("ryunosuke\\Functions\\array_mix")) {
+    define("ryunosuke\\Functions\\array_mix", "ryunosuke\\Functions\\array_mix");
+}
 
-const array_zip = "ryunosuke\\Functions\\array_zip";
 if (!isset($excluded_functions["array_zip"]) && (!function_exists("ryunosuke\\Functions\\array_zip") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_zip"))->isInternal()))) {
     /**
      * 配列の各要素値で順番に配列を作る
@@ -1353,8 +1396,10 @@ if (!isset($excluded_functions["array_zip"]) && (!function_exists("ryunosuke\\Fu
         */
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_zip") && !defined("ryunosuke\\Functions\\array_zip")) {
+    define("ryunosuke\\Functions\\array_zip", "ryunosuke\\Functions\\array_zip");
+}
 
-const array_cross = "ryunosuke\\Functions\\array_cross";
 if (!isset($excluded_functions["array_cross"]) && (!function_exists("ryunosuke\\Functions\\array_cross") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_cross"))->isInternal()))) {
     /**
      * 配列の直積を返す
@@ -1401,8 +1446,10 @@ if (!isset($excluded_functions["array_cross"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_cross") && !defined("ryunosuke\\Functions\\array_cross")) {
+    define("ryunosuke\\Functions\\array_cross", "ryunosuke\\Functions\\array_cross");
+}
 
-const array_implode = "ryunosuke\\Functions\\array_implode";
 if (!isset($excluded_functions["array_implode"]) && (!function_exists("ryunosuke\\Functions\\array_implode") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_implode"))->isInternal()))) {
     /**
      * 配列の各要素の間に要素を差し込む
@@ -1445,8 +1492,88 @@ if (!isset($excluded_functions["array_implode"]) && (!function_exists("ryunosuke
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_implode") && !defined("ryunosuke\\Functions\\array_implode")) {
+    define("ryunosuke\\Functions\\array_implode", "ryunosuke\\Functions\\array_implode");
+}
 
-const array_sprintf = "ryunosuke\\Functions\\array_sprintf";
+if (!isset($excluded_functions["array_explode"]) && (!function_exists("ryunosuke\\Functions\\array_explode") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_explode"))->isInternal()))) {
+    /**
+     * 配列を指定条件で分割する
+     *
+     * 文字列の explode を更に一階層掘り下げたイメージ。
+     * $condition で指定された要素は結果配列に含まれない。
+     *
+     * $condition にはクロージャが指定できる。クロージャの場合は true 相当を返した場合に分割要素とみなされる。
+     * 引数は (値, キー)の順番。
+     *
+     * $limit に負数を与えると「その絶対値-1までを結合したものと残り」を返す。
+     * 端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。
+     *
+     * Example:
+     * ```php
+     * // null 要素で分割
+     * assertSame(array_explode(['a', null, 'b', 'c'], null), [['a'], [2 => 'b', 3 => 'c']]);
+     * // クロージャで分割（大文字で分割）
+     * assertSame(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}), [['a'], [2 => 'c'], [4 => 'e']]);
+     * // 負数指定
+     * assertSame(array_explode(['a', null, 'b', null, 'c'], null, -2), [[0 => 'a', 1 => null, 2 => 'b'], [4 => 'c']]);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param mixed $condition 分割条件
+     * @param int $limit 最大分割数
+     * @return array 分割された配列
+     */
+    function array_explode($array, $condition, $limit = \PHP_INT_MAX)
+    {
+        $array = arrayval($array, false);
+
+        $limit = (int) $limit;
+        if ($limit < 0) {
+            // キーまで考慮するとかなりややこしくなるので富豪的にやる
+            $reverse = array_explode(array_reverse($array, true), $condition, -$limit);
+            $reverse = array_map(function ($v) { return array_reverse($v, true); }, $reverse);
+            return array_reverse($reverse);
+        }
+        // explode において 0 は 1 と等しい
+        if ($limit === 0) {
+            $limit = 1;
+        }
+
+        $result = [];
+        $chunk = [];
+        $n = 0;
+        foreach ($array as $k => $v) {
+            if ($limit === 1) {
+                $chunk = array_slice($array, $n, null, true);
+                break;
+            }
+
+            $n++;
+            if ($condition instanceof \Closure) {
+                $match = $condition($v, $k);
+            }
+            else {
+                $match = $condition === $v;
+            }
+
+            if ($match) {
+                $limit--;
+                $result[] = $chunk;
+                $chunk = [];
+            }
+            else {
+                $chunk[$k] = $v;
+            }
+        }
+        $result[] = $chunk;
+        return $result;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\array_explode") && !defined("ryunosuke\\Functions\\array_explode")) {
+    define("ryunosuke\\Functions\\array_explode", "ryunosuke\\Functions\\array_explode");
+}
+
 if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("ryunosuke\\Functions\\array_sprintf") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_sprintf"))->isInternal()))) {
     /**
      * キーと値で sprintf する
@@ -1504,8 +1631,10 @@ if (!isset($excluded_functions["array_sprintf"]) && (!function_exists("ryunosuke
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_sprintf") && !defined("ryunosuke\\Functions\\array_sprintf")) {
+    define("ryunosuke\\Functions\\array_sprintf", "ryunosuke\\Functions\\array_sprintf");
+}
 
-const array_strpad = "ryunosuke\\Functions\\array_strpad";
 if (!isset($excluded_functions["array_strpad"]) && (!function_exists("ryunosuke\\Functions\\array_strpad") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_strpad"))->isInternal()))) {
     /**
      * 配列のキー・要素に文字列を付加する
@@ -1555,8 +1684,10 @@ if (!isset($excluded_functions["array_strpad"]) && (!function_exists("ryunosuke\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_strpad") && !defined("ryunosuke\\Functions\\array_strpad")) {
+    define("ryunosuke\\Functions\\array_strpad", "ryunosuke\\Functions\\array_strpad");
+}
 
-const array_pos = "ryunosuke\\Functions\\array_pos";
 if (!isset($excluded_functions["array_pos"]) && (!function_exists("ryunosuke\\Functions\\array_pos") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_pos"))->isInternal()))) {
     /**
      * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
@@ -1600,8 +1731,10 @@ if (!isset($excluded_functions["array_pos"]) && (!function_exists("ryunosuke\\Fu
         throw new \OutOfBoundsException("$position is not found.");
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_pos") && !defined("ryunosuke\\Functions\\array_pos")) {
+    define("ryunosuke\\Functions\\array_pos", "ryunosuke\\Functions\\array_pos");
+}
 
-const array_pos_key = "ryunosuke\\Functions\\array_pos_key";
 if (!isset($excluded_functions["array_pos_key"]) && (!function_exists("ryunosuke\\Functions\\array_pos_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_pos_key"))->isInternal()))) {
     /**
      * 配列の指定キーの位置を返す
@@ -1636,8 +1769,10 @@ if (!isset($excluded_functions["array_pos_key"]) && (!function_exists("ryunosuke
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_pos_key") && !defined("ryunosuke\\Functions\\array_pos_key")) {
+    define("ryunosuke\\Functions\\array_pos_key", "ryunosuke\\Functions\\array_pos_key");
+}
 
-const array_of = "ryunosuke\\Functions\\array_of";
 if (!isset($excluded_functions["array_of"]) && (!function_exists("ryunosuke\\Functions\\array_of") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_of"))->isInternal()))) {
     /**
      * 配列を与えると指定キーの値を返すクロージャを返す
@@ -1671,8 +1806,10 @@ if (!isset($excluded_functions["array_of"]) && (!function_exists("ryunosuke\\Fun
         };
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_of") && !defined("ryunosuke\\Functions\\array_of")) {
+    define("ryunosuke\\Functions\\array_of", "ryunosuke\\Functions\\array_of");
+}
 
-const array_get = "ryunosuke\\Functions\\array_get";
 if (!isset($excluded_functions["array_get"]) && (!function_exists("ryunosuke\\Functions\\array_get") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_get"))->isInternal()))) {
     /**
      * デフォルト値付きの配列値取得
@@ -1752,8 +1889,10 @@ if (!isset($excluded_functions["array_get"]) && (!function_exists("ryunosuke\\Fu
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_get") && !defined("ryunosuke\\Functions\\array_get")) {
+    define("ryunosuke\\Functions\\array_get", "ryunosuke\\Functions\\array_get");
+}
 
-const array_set = "ryunosuke\\Functions\\array_set";
 if (!isset($excluded_functions["array_set"]) && (!function_exists("ryunosuke\\Functions\\array_set") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_set"))->isInternal()))) {
     /**
      * キー指定の配列値設定
@@ -1809,8 +1948,10 @@ if (!isset($excluded_functions["array_set"]) && (!function_exists("ryunosuke\\Fu
         return $key;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_set") && !defined("ryunosuke\\Functions\\array_set")) {
+    define("ryunosuke\\Functions\\array_set", "ryunosuke\\Functions\\array_set");
+}
 
-const array_put = "ryunosuke\\Functions\\array_put";
 if (!isset($excluded_functions["array_put"]) && (!function_exists("ryunosuke\\Functions\\array_put") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_put"))->isInternal()))) {
     /**
      * キー指定の配列値設定
@@ -1873,8 +2014,10 @@ if (!isset($excluded_functions["array_put"]) && (!function_exists("ryunosuke\\Fu
         return $key;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_put") && !defined("ryunosuke\\Functions\\array_put")) {
+    define("ryunosuke\\Functions\\array_put", "ryunosuke\\Functions\\array_put");
+}
 
-const array_unset = "ryunosuke\\Functions\\array_unset";
 if (!isset($excluded_functions["array_unset"]) && (!function_exists("ryunosuke\\Functions\\array_unset") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_unset"))->isInternal()))) {
     /**
      * 伏せると同時にその値を返す
@@ -1961,8 +2104,10 @@ if (!isset($excluded_functions["array_unset"]) && (!function_exists("ryunosuke\\
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_unset") && !defined("ryunosuke\\Functions\\array_unset")) {
+    define("ryunosuke\\Functions\\array_unset", "ryunosuke\\Functions\\array_unset");
+}
 
-const array_dive = "ryunosuke\\Functions\\array_dive";
 if (!isset($excluded_functions["array_dive"]) && (!function_exists("ryunosuke\\Functions\\array_dive") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_dive"))->isInternal()))) {
     /**
      * パス形式で配列値を取得
@@ -2005,8 +2150,10 @@ if (!isset($excluded_functions["array_dive"]) && (!function_exists("ryunosuke\\F
         return $array;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_dive") && !defined("ryunosuke\\Functions\\array_dive")) {
+    define("ryunosuke\\Functions\\array_dive", "ryunosuke\\Functions\\array_dive");
+}
 
-const array_keys_exist = "ryunosuke\\Functions\\array_keys_exist";
 if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("ryunosuke\\Functions\\array_keys_exist") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_keys_exist"))->isInternal()))) {
     /**
      * array_key_exists の複数版
@@ -2063,8 +2210,10 @@ if (!isset($excluded_functions["array_keys_exist"]) && (!function_exists("ryunos
         return true;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_keys_exist") && !defined("ryunosuke\\Functions\\array_keys_exist")) {
+    define("ryunosuke\\Functions\\array_keys_exist", "ryunosuke\\Functions\\array_keys_exist");
+}
 
-const array_find = "ryunosuke\\Functions\\array_find";
 if (!isset($excluded_functions["array_find"]) && (!function_exists("ryunosuke\\Functions\\array_find") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_find"))->isInternal()))) {
     /**
      * array_search のクロージャ版のようなもの
@@ -2106,8 +2255,10 @@ if (!isset($excluded_functions["array_find"]) && (!function_exists("ryunosuke\\F
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_find") && !defined("ryunosuke\\Functions\\array_find")) {
+    define("ryunosuke\\Functions\\array_find", "ryunosuke\\Functions\\array_find");
+}
 
-const array_rekey = "ryunosuke\\Functions\\array_rekey";
 if (!isset($excluded_functions["array_rekey"]) && (!function_exists("ryunosuke\\Functions\\array_rekey") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_rekey"))->isInternal()))) {
     /**
      * キーをマップ配列で置換する
@@ -2146,8 +2297,10 @@ if (!isset($excluded_functions["array_rekey"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_rekey") && !defined("ryunosuke\\Functions\\array_rekey")) {
+    define("ryunosuke\\Functions\\array_rekey", "ryunosuke\\Functions\\array_rekey");
+}
 
-const array_grep_key = "ryunosuke\\Functions\\array_grep_key";
 if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("ryunosuke\\Functions\\array_grep_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_grep_key"))->isInternal()))) {
     /**
      * キーを正規表現でフィルタする
@@ -2175,8 +2328,10 @@ if (!isset($excluded_functions["array_grep_key"]) && (!function_exists("ryunosuk
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_grep_key") && !defined("ryunosuke\\Functions\\array_grep_key")) {
+    define("ryunosuke\\Functions\\array_grep_key", "ryunosuke\\Functions\\array_grep_key");
+}
 
-const array_map_recursive = "ryunosuke\\Functions\\array_map_recursive";
 if (!isset($excluded_functions["array_map_recursive"]) && (!function_exists("ryunosuke\\Functions\\array_map_recursive") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_map_recursive"))->isInternal()))) {
     /**
      * array_map の再帰版
@@ -2243,8 +2398,10 @@ if (!isset($excluded_functions["array_map_recursive"]) && (!function_exists("ryu
         return $main($array);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_map_recursive") && !defined("ryunosuke\\Functions\\array_map_recursive")) {
+    define("ryunosuke\\Functions\\array_map_recursive", "ryunosuke\\Functions\\array_map_recursive");
+}
 
-const array_map_key = "ryunosuke\\Functions\\array_map_key";
 if (!isset($excluded_functions["array_map_key"]) && (!function_exists("ryunosuke\\Functions\\array_map_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_map_key"))->isInternal()))) {
     /**
      * キーをマップして変換する
@@ -2273,8 +2430,10 @@ if (!isset($excluded_functions["array_map_key"]) && (!function_exists("ryunosuke
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_map_key") && !defined("ryunosuke\\Functions\\array_map_key")) {
+    define("ryunosuke\\Functions\\array_map_key", "ryunosuke\\Functions\\array_map_key");
+}
 
-const array_filter_not = "ryunosuke\\Functions\\array_filter_not";
 if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("ryunosuke\\Functions\\array_filter_not") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_filter_not"))->isInternal()))) {
     /**
      * array_filter の否定版
@@ -2295,8 +2454,10 @@ if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("ryunos
         return array_filter(arrayval($array, false), not_func($callback));
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_filter_not") && !defined("ryunosuke\\Functions\\array_filter_not")) {
+    define("ryunosuke\\Functions\\array_filter_not", "ryunosuke\\Functions\\array_filter_not");
+}
 
-const array_filter_key = "ryunosuke\\Functions\\array_filter_key";
 if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("ryunosuke\\Functions\\array_filter_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_filter_key"))->isInternal()))) {
     /**
      * キーを主軸とした array_filter
@@ -2325,8 +2486,10 @@ if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("ryunos
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_filter_key") && !defined("ryunosuke\\Functions\\array_filter_key")) {
+    define("ryunosuke\\Functions\\array_filter_key", "ryunosuke\\Functions\\array_filter_key");
+}
 
-const array_filter_eval = "ryunosuke\\Functions\\array_filter_eval";
 if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("ryunosuke\\Functions\\array_filter_eval") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_filter_eval"))->isInternal()))) {
     /**
      * eval で評価して array_filter する
@@ -2348,8 +2511,10 @@ if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("ryuno
         return array_filter_key($array, eval_func($expression, 'k', 'v'));
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_filter_eval") && !defined("ryunosuke\\Functions\\array_filter_eval")) {
+    define("ryunosuke\\Functions\\array_filter_eval", "ryunosuke\\Functions\\array_filter_eval");
+}
 
-const array_where = "ryunosuke\\Functions\\array_where";
 if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\Functions\\array_where") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_where"))->isInternal()))) {
     /**
      * 指定キーの要素で array_filter する
@@ -2395,6 +2560,11 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
      * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
+     * // 上記において値に配列を渡すと in_array で判定される
+     * assertSame(array_where($array, ['id' => [2, 3]]), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
      * assertSame(array_where($array, [
      *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
@@ -2421,7 +2591,12 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
                     if ($c instanceof \Closure) {
                         return $c;
                     }
-                    return $callback ? function ($v) use ($c) { return $v === $c; } : function ($v) use ($c) { return $v == $c; };
+                    if ($callback) {
+                        return function ($v) use ($c) { return $v === $c; };
+                    }
+                    else {
+                        return function ($v) use ($c) { return is_array($c) ? in_array($v, $c) : $v == $c; };
+                    }
                 }, $column);
                 $callback = function ($vv, $k) use ($callbacks) {
                     foreach ($callbacks as $c => $callback) {
@@ -2458,8 +2633,10 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_where") && !defined("ryunosuke\\Functions\\array_where")) {
+    define("ryunosuke\\Functions\\array_where", "ryunosuke\\Functions\\array_where");
+}
 
-const array_map_filter = "ryunosuke\\Functions\\array_map_filter";
 if (!isset($excluded_functions["array_map_filter"]) && (!function_exists("ryunosuke\\Functions\\array_map_filter") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_map_filter"))->isInternal()))) {
     /**
      * array_map + array_filter する
@@ -2493,8 +2670,10 @@ if (!isset($excluded_functions["array_map_filter"]) && (!function_exists("ryunos
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_map_filter") && !defined("ryunosuke\\Functions\\array_map_filter")) {
+    define("ryunosuke\\Functions\\array_map_filter", "ryunosuke\\Functions\\array_map_filter");
+}
 
-const array_map_method = "ryunosuke\\Functions\\array_map_method";
 if (!isset($excluded_functions["array_map_method"]) && (!function_exists("ryunosuke\\Functions\\array_map_method") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_map_method"))->isInternal()))) {
     /**
      * メソッドを指定できるようにした array_map
@@ -2537,8 +2716,10 @@ if (!isset($excluded_functions["array_map_method"]) && (!function_exists("ryunos
         }, arrayval($array, false));
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_map_method") && !defined("ryunosuke\\Functions\\array_map_method")) {
+    define("ryunosuke\\Functions\\array_map_method", "ryunosuke\\Functions\\array_map_method");
+}
 
-const array_maps = "ryunosuke\\Functions\\array_maps";
 if (!isset($excluded_functions["array_maps"]) && (!function_exists("ryunosuke\\Functions\\array_maps") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_maps"))->isInternal()))) {
     /**
      * 複数コールバックを指定できる array_map
@@ -2594,8 +2775,10 @@ if (!isset($excluded_functions["array_maps"]) && (!function_exists("ryunosuke\\F
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_maps") && !defined("ryunosuke\\Functions\\array_maps")) {
+    define("ryunosuke\\Functions\\array_maps", "ryunosuke\\Functions\\array_maps");
+}
 
-const array_kmap = "ryunosuke\\Functions\\array_kmap";
 if (!isset($excluded_functions["array_kmap"]) && (!function_exists("ryunosuke\\Functions\\array_kmap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_kmap"))->isInternal()))) {
     /**
      * キーも渡ってくる array_map
@@ -2638,8 +2821,10 @@ if (!isset($excluded_functions["array_kmap"]) && (!function_exists("ryunosuke\\F
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_kmap") && !defined("ryunosuke\\Functions\\array_kmap")) {
+    define("ryunosuke\\Functions\\array_kmap", "ryunosuke\\Functions\\array_kmap");
+}
 
-const array_nmap = "ryunosuke\\Functions\\array_nmap";
 if (!isset($excluded_functions["array_nmap"]) && (!function_exists("ryunosuke\\Functions\\array_nmap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_nmap"))->isInternal()))) {
     /**
      * 要素値を $callback の n 番目(0ベース)に適用して array_map する
@@ -2713,8 +2898,10 @@ if (!isset($excluded_functions["array_nmap"]) && (!function_exists("ryunosuke\\F
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_nmap") && !defined("ryunosuke\\Functions\\array_nmap")) {
+    define("ryunosuke\\Functions\\array_nmap", "ryunosuke\\Functions\\array_nmap");
+}
 
-const array_lmap = "ryunosuke\\Functions\\array_lmap";
 if (!isset($excluded_functions["array_lmap"]) && (!function_exists("ryunosuke\\Functions\\array_lmap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_lmap"))->isInternal()))) {
     /**
      * 要素値を $callback の最左に適用して array_map する
@@ -2735,8 +2922,10 @@ if (!isset($excluded_functions["array_lmap"]) && (!function_exists("ryunosuke\\F
         return array_nmap(...array_insert(func_get_args(), 0, 2));
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_lmap") && !defined("ryunosuke\\Functions\\array_lmap")) {
+    define("ryunosuke\\Functions\\array_lmap", "ryunosuke\\Functions\\array_lmap");
+}
 
-const array_rmap = "ryunosuke\\Functions\\array_rmap";
 if (!isset($excluded_functions["array_rmap"]) && (!function_exists("ryunosuke\\Functions\\array_rmap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_rmap"))->isInternal()))) {
     /**
      * 要素値を $callback の最右に適用して array_map する
@@ -2757,8 +2946,10 @@ if (!isset($excluded_functions["array_rmap"]) && (!function_exists("ryunosuke\\F
         return array_nmap(...array_insert(func_get_args(), func_num_args() - 2, 2));
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_rmap") && !defined("ryunosuke\\Functions\\array_rmap")) {
+    define("ryunosuke\\Functions\\array_rmap", "ryunosuke\\Functions\\array_rmap");
+}
 
-const array_each = "ryunosuke\\Functions\\array_each";
 if (!isset($excluded_functions["array_each"]) && (!function_exists("ryunosuke\\Functions\\array_each") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_each"))->isInternal()))) {
     /**
      * array_reduce の参照版（のようなもの）
@@ -2841,8 +3032,10 @@ if (!isset($excluded_functions["array_each"]) && (!function_exists("ryunosuke\\F
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_each") && !defined("ryunosuke\\Functions\\array_each")) {
+    define("ryunosuke\\Functions\\array_each", "ryunosuke\\Functions\\array_each");
+}
 
-const array_depth = "ryunosuke\\Functions\\array_depth";
 if (!isset($excluded_functions["array_depth"]) && (!function_exists("ryunosuke\\Functions\\array_depth") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_depth"))->isInternal()))) {
     /**
      * 配列の次元数を返す
@@ -2889,8 +3082,10 @@ if (!isset($excluded_functions["array_depth"]) && (!function_exists("ryunosuke\\
         return $main($array, 1);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_depth") && !defined("ryunosuke\\Functions\\array_depth")) {
+    define("ryunosuke\\Functions\\array_depth", "ryunosuke\\Functions\\array_depth");
+}
 
-const array_insert = "ryunosuke\\Functions\\array_insert";
 if (!isset($excluded_functions["array_insert"]) && (!function_exists("ryunosuke\\Functions\\array_insert") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_insert"))->isInternal()))) {
     /**
      * 配列・連想配列を問わず任意の位置に値を挿入する
@@ -2924,8 +3119,10 @@ if (!isset($excluded_functions["array_insert"]) && (!function_exists("ryunosuke\
         return array_merge($sarray, $value, $array);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_insert") && !defined("ryunosuke\\Functions\\array_insert")) {
+    define("ryunosuke\\Functions\\array_insert", "ryunosuke\\Functions\\array_insert");
+}
 
-const array_assort = "ryunosuke\\Functions\\array_assort";
 if (!isset($excluded_functions["array_assort"]) && (!function_exists("ryunosuke\\Functions\\array_assort") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_assort"))->isInternal()))) {
     /**
      * 配列をコールバックに従って分類する
@@ -2974,8 +3171,10 @@ if (!isset($excluded_functions["array_assort"]) && (!function_exists("ryunosuke\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_assort") && !defined("ryunosuke\\Functions\\array_assort")) {
+    define("ryunosuke\\Functions\\array_assort", "ryunosuke\\Functions\\array_assort");
+}
 
-const array_count = "ryunosuke\\Functions\\array_count";
 if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\Functions\\array_count") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_count"))->isInternal()))) {
     /**
      * 配列をコールバックに従ってカウントする
@@ -3031,8 +3230,10 @@ if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_count") && !defined("ryunosuke\\Functions\\array_count")) {
+    define("ryunosuke\\Functions\\array_count", "ryunosuke\\Functions\\array_count");
+}
 
-const array_group = "ryunosuke\\Functions\\array_group";
 if (!isset($excluded_functions["array_group"]) && (!function_exists("ryunosuke\\Functions\\array_group") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_group"))->isInternal()))) {
     /**
      * 配列をコールバックの返り値でグループ化する
@@ -3095,8 +3296,10 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_group") && !defined("ryunosuke\\Functions\\array_group")) {
+    define("ryunosuke\\Functions\\array_group", "ryunosuke\\Functions\\array_group");
+}
 
-const array_all = "ryunosuke\\Functions\\array_all";
 if (!isset($excluded_functions["array_all"]) && (!function_exists("ryunosuke\\Functions\\array_all") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_all"))->isInternal()))) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
@@ -3131,8 +3334,10 @@ if (!isset($excluded_functions["array_all"]) && (!function_exists("ryunosuke\\Fu
         return true;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_all") && !defined("ryunosuke\\Functions\\array_all")) {
+    define("ryunosuke\\Functions\\array_all", "ryunosuke\\Functions\\array_all");
+}
 
-const array_any = "ryunosuke\\Functions\\array_any";
 if (!isset($excluded_functions["array_any"]) && (!function_exists("ryunosuke\\Functions\\array_any") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_any"))->isInternal()))) {
     /**
      * 全要素が false になるなら false を返す（1つでも true なら true を返す）
@@ -3167,8 +3372,10 @@ if (!isset($excluded_functions["array_any"]) && (!function_exists("ryunosuke\\Fu
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_any") && !defined("ryunosuke\\Functions\\array_any")) {
+    define("ryunosuke\\Functions\\array_any", "ryunosuke\\Functions\\array_any");
+}
 
-const array_distinct = "ryunosuke\\Functions\\array_distinct";
 if (!isset($excluded_functions["array_distinct"]) && (!function_exists("ryunosuke\\Functions\\array_distinct") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_distinct"))->isInternal()))) {
     /**
      * 比較関数が渡せる array_unique
@@ -3263,8 +3470,10 @@ if (!isset($excluded_functions["array_distinct"]) && (!function_exists("ryunosuk
         return array_intersect_key($backup, $keepkeys);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_distinct") && !defined("ryunosuke\\Functions\\array_distinct")) {
+    define("ryunosuke\\Functions\\array_distinct", "ryunosuke\\Functions\\array_distinct");
+}
 
-const array_order = "ryunosuke\\Functions\\array_order";
 if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\Functions\\array_order") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_order"))->isInternal()))) {
     /**
      * 配列を $orders に従って並べ替える
@@ -3400,8 +3609,10 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_order") && !defined("ryunosuke\\Functions\\array_order")) {
+    define("ryunosuke\\Functions\\array_order", "ryunosuke\\Functions\\array_order");
+}
 
-const array_shuffle = "ryunosuke\\Functions\\array_shuffle";
 if (!isset($excluded_functions["array_shuffle"]) && (!function_exists("ryunosuke\\Functions\\array_shuffle") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_shuffle"))->isInternal()))) {
     /**
      * shuffle のキーが保存される＋参照渡しではない版
@@ -3426,8 +3637,10 @@ if (!isset($excluded_functions["array_shuffle"]) && (!function_exists("ryunosuke
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_shuffle") && !defined("ryunosuke\\Functions\\array_shuffle")) {
+    define("ryunosuke\\Functions\\array_shuffle", "ryunosuke\\Functions\\array_shuffle");
+}
 
-const array_shrink_key = "ryunosuke\\Functions\\array_shrink_key";
 if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("ryunosuke\\Functions\\array_shrink_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_shrink_key"))->isInternal()))) {
     /**
      * 値の優先順位を逆にした array_intersect_key
@@ -3459,8 +3672,10 @@ if (!isset($excluded_functions["array_shrink_key"]) && (!function_exists("ryunos
         return array_intersect_key($result, ...$variadic);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_shrink_key") && !defined("ryunosuke\\Functions\\array_shrink_key")) {
+    define("ryunosuke\\Functions\\array_shrink_key", "ryunosuke\\Functions\\array_shrink_key");
+}
 
-const array_fill_gap = "ryunosuke\\Functions\\array_fill_gap";
 if (!isset($excluded_functions["array_fill_gap"]) && (!function_exists("ryunosuke\\Functions\\array_fill_gap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_fill_gap"))->isInternal()))) {
     /**
      * 配列の隙間を埋める
@@ -3555,8 +3770,10 @@ if (!isset($excluded_functions["array_fill_gap"]) && (!function_exists("ryunosuk
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_fill_gap") && !defined("ryunosuke\\Functions\\array_fill_gap")) {
+    define("ryunosuke\\Functions\\array_fill_gap", "ryunosuke\\Functions\\array_fill_gap");
+}
 
-const array_fill_callback = "ryunosuke\\Functions\\array_fill_callback";
 if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("ryunosuke\\Functions\\array_fill_callback") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_fill_callback"))->isInternal()))) {
     /**
      * array_fill_keys のコールバック版のようなもの
@@ -3591,8 +3808,10 @@ if (!isset($excluded_functions["array_fill_callback"]) && (!function_exists("ryu
         return array_combine($keys, array_map(func_user_func_array($callback), $keys));
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_fill_callback") && !defined("ryunosuke\\Functions\\array_fill_callback")) {
+    define("ryunosuke\\Functions\\array_fill_callback", "ryunosuke\\Functions\\array_fill_callback");
+}
 
-const array_pickup = "ryunosuke\\Functions\\array_pickup";
 if (!isset($excluded_functions["array_pickup"]) && (!function_exists("ryunosuke\\Functions\\array_pickup") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_pickup"))->isInternal()))) {
     /**
      * キーを指定してそれだけの配列にする
@@ -3637,8 +3856,10 @@ if (!isset($excluded_functions["array_pickup"]) && (!function_exists("ryunosuke\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_pickup") && !defined("ryunosuke\\Functions\\array_pickup")) {
+    define("ryunosuke\\Functions\\array_pickup", "ryunosuke\\Functions\\array_pickup");
+}
 
-const array_remove = "ryunosuke\\Functions\\array_remove";
 if (!isset($excluded_functions["array_remove"]) && (!function_exists("ryunosuke\\Functions\\array_remove") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_remove"))->isInternal()))) {
     /**
      * キーを指定してそれらを除いた配列にする
@@ -3667,8 +3888,10 @@ if (!isset($excluded_functions["array_remove"]) && (!function_exists("ryunosuke\
         return $array;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_remove") && !defined("ryunosuke\\Functions\\array_remove")) {
+    define("ryunosuke\\Functions\\array_remove", "ryunosuke\\Functions\\array_remove");
+}
 
-const array_lookup = "ryunosuke\\Functions\\array_lookup";
 if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\\Functions\\array_lookup") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_lookup"))->isInternal()))) {
     /**
      * キー保存可能な array_column
@@ -3725,8 +3948,10 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_lookup") && !defined("ryunosuke\\Functions\\array_lookup")) {
+    define("ryunosuke\\Functions\\array_lookup", "ryunosuke\\Functions\\array_lookup");
+}
 
-const array_columns = "ryunosuke\\Functions\\array_columns";
 if (!isset($excluded_functions["array_columns"]) && (!function_exists("ryunosuke\\Functions\\array_columns") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_columns"))->isInternal()))) {
     /**
      * 全要素に対して array_column する
@@ -3765,8 +3990,10 @@ if (!isset($excluded_functions["array_columns"]) && (!function_exists("ryunosuke
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_columns") && !defined("ryunosuke\\Functions\\array_columns")) {
+    define("ryunosuke\\Functions\\array_columns", "ryunosuke\\Functions\\array_columns");
+}
 
-const array_uncolumns = "ryunosuke\\Functions\\array_uncolumns";
 if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("ryunosuke\\Functions\\array_uncolumns") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_uncolumns"))->isInternal()))) {
     /**
      * array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する
@@ -3812,8 +4039,10 @@ if (!isset($excluded_functions["array_uncolumns"]) && (!function_exists("ryunosu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_uncolumns") && !defined("ryunosuke\\Functions\\array_uncolumns")) {
+    define("ryunosuke\\Functions\\array_uncolumns", "ryunosuke\\Functions\\array_uncolumns");
+}
 
-const array_convert = "ryunosuke\\Functions\\array_convert";
 if (!isset($excluded_functions["array_convert"]) && (!function_exists("ryunosuke\\Functions\\array_convert") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_convert"))->isInternal()))) {
     /**
      * 配列の各要素に再帰的にコールバックを適用して変換する
@@ -3940,8 +4169,10 @@ if (!isset($excluded_functions["array_convert"]) && (!function_exists("ryunosuke
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_convert") && !defined("ryunosuke\\Functions\\array_convert")) {
+    define("ryunosuke\\Functions\\array_convert", "ryunosuke\\Functions\\array_convert");
+}
 
-const array_flatten = "ryunosuke\\Functions\\array_flatten";
 if (!isset($excluded_functions["array_flatten"]) && (!function_exists("ryunosuke\\Functions\\array_flatten") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_flatten"))->isInternal()))) {
     /**
      * 多階層配列をフラットに展開する
@@ -3995,7 +4226,7 @@ if (!isset($excluded_functions["array_flatten"]) && (!function_exists("ryunosuke
         $core = function ($array, $delimiter) use (&$core) {
             $result = [];
             foreach ($array as $k => $v) {
-                if (is_array($v)) {
+                if (is_iterable($v)) {
                     foreach ($core($v, $delimiter) as $ik => $iv) {
                         if ($delimiter === null) {
                             $result[] = $iv;
@@ -4020,8 +4251,10 @@ if (!isset($excluded_functions["array_flatten"]) && (!function_exists("ryunosuke
         return $core($array, $delimiter);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_flatten") && !defined("ryunosuke\\Functions\\array_flatten")) {
+    define("ryunosuke\\Functions\\array_flatten", "ryunosuke\\Functions\\array_flatten");
+}
 
-const array_nest = "ryunosuke\\Functions\\array_nest";
 if (!isset($excluded_functions["array_nest"]) && (!function_exists("ryunosuke\\Functions\\array_nest") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_nest"))->isInternal()))) {
     /**
      * シンプルな [キー => 値] な配列から階層配列を生成する
@@ -4099,8 +4332,10 @@ if (!isset($excluded_functions["array_nest"]) && (!function_exists("ryunosuke\\F
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_nest") && !defined("ryunosuke\\Functions\\array_nest")) {
+    define("ryunosuke\\Functions\\array_nest", "ryunosuke\\Functions\\array_nest");
+}
 
-const array_difference = "ryunosuke\\Functions\\array_difference";
 if (!isset($excluded_functions["array_difference"]) && (!function_exists("ryunosuke\\Functions\\array_difference") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_difference"))->isInternal()))) {
     /**
      * 配列の差分を取り配列で返す
@@ -4126,6 +4361,7 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("ryunos
      *         ]
      *     ],
      *     'key1'   => 'hoge',
+     *     'array'  => ['a', 'b', 'c'],
      * ], [
      *     'common' => [
      *         'sub' => [
@@ -4133,9 +4369,11 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("ryunos
      *         ]
      *     ],
      *     'key2'   => 'fuga',
+     *     'array'  => ['c', 'd', 'e'],
      * ]), [
      *     'common.sub.x' => ['-' => 'val', '+' => 'VAL'],
      *     'key1'         => ['-' => 'hoge'],
+     *     'array'        => ['-' => ['a', 'b'], '+' => ['d', 'e']],
      *     'key2'         => ['+' => 'fuga'],
      * ]);
      * ```
@@ -4204,8 +4442,10 @@ if (!isset($excluded_functions["array_difference"]) && (!function_exists("ryunos
         }, $array1, $array2);
     }
 }
+if (function_exists("ryunosuke\\Functions\\array_difference") && !defined("ryunosuke\\Functions\\array_difference")) {
+    define("ryunosuke\\Functions\\array_difference", "ryunosuke\\Functions\\array_difference");
+}
 
-const stdclass = "ryunosuke\\Functions\\stdclass";
 if (!isset($excluded_functions["stdclass"]) && (!function_exists("ryunosuke\\Functions\\stdclass") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\stdclass"))->isInternal()))) {
     /**
      * 初期フィールド値を与えて stdClass を生成する
@@ -4237,8 +4477,10 @@ if (!isset($excluded_functions["stdclass"]) && (!function_exists("ryunosuke\\Fun
         return $stdclass;
     }
 }
+if (function_exists("ryunosuke\\Functions\\stdclass") && !defined("ryunosuke\\Functions\\stdclass")) {
+    define("ryunosuke\\Functions\\stdclass", "ryunosuke\\Functions\\stdclass");
+}
 
-const detect_namespace = "ryunosuke\\Functions\\detect_namespace";
 if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("ryunosuke\\Functions\\detect_namespace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\detect_namespace"))->isInternal()))) {
     /**
      * ディレクトリ構造から名前空間を推測して返す
@@ -4248,6 +4490,14 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("ryunos
      * 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。
      *
      * 言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。
+     *
+     * Example:
+     * ```php
+     * // Example 用としてこのクラスのディレクトリを使用してみる
+     * $dirname = dirname(class_loader()->findFile(\ryunosuke\Functions\Package\Classobj::class));
+     * // "$dirname/Hoge" の名前空間を推測して返す
+     * assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+     * ```
      *
      * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
      * @return string 名前空間
@@ -4292,8 +4542,10 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("ryunos
         }) ?: throws(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 }
+if (function_exists("ryunosuke\\Functions\\detect_namespace") && !defined("ryunosuke\\Functions\\detect_namespace")) {
+    define("ryunosuke\\Functions\\detect_namespace", "ryunosuke\\Functions\\detect_namespace");
+}
 
-const class_loader = "ryunosuke\\Functions\\class_loader";
 if (!isset($excluded_functions["class_loader"]) && (!function_exists("ryunosuke\\Functions\\class_loader") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\class_loader"))->isInternal()))) {
     /**
      * composer のクラスローダを返す
@@ -4324,8 +4576,10 @@ if (!isset($excluded_functions["class_loader"]) && (!function_exists("ryunosuke\
         return require $file;
     }
 }
+if (function_exists("ryunosuke\\Functions\\class_loader") && !defined("ryunosuke\\Functions\\class_loader")) {
+    define("ryunosuke\\Functions\\class_loader", "ryunosuke\\Functions\\class_loader");
+}
 
-const class_namespace = "ryunosuke\\Functions\\class_namespace";
 if (!isset($excluded_functions["class_namespace"]) && (!function_exists("ryunosuke\\Functions\\class_namespace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\class_namespace"))->isInternal()))) {
     /**
      * クラスの名前空間部分を取得する
@@ -4349,8 +4603,10 @@ if (!isset($excluded_functions["class_namespace"]) && (!function_exists("ryunosu
         return ltrim(implode('\\', $parts), '\\');
     }
 }
+if (function_exists("ryunosuke\\Functions\\class_namespace") && !defined("ryunosuke\\Functions\\class_namespace")) {
+    define("ryunosuke\\Functions\\class_namespace", "ryunosuke\\Functions\\class_namespace");
+}
 
-const class_shorten = "ryunosuke\\Functions\\class_shorten";
 if (!isset($excluded_functions["class_shorten"]) && (!function_exists("ryunosuke\\Functions\\class_shorten") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\class_shorten"))->isInternal()))) {
     /**
      * クラスの名前空間部分を除いた短い名前を取得する
@@ -4373,8 +4629,10 @@ if (!isset($excluded_functions["class_shorten"]) && (!function_exists("ryunosuke
         return array_pop($parts);
     }
 }
+if (function_exists("ryunosuke\\Functions\\class_shorten") && !defined("ryunosuke\\Functions\\class_shorten")) {
+    define("ryunosuke\\Functions\\class_shorten", "ryunosuke\\Functions\\class_shorten");
+}
 
-const class_replace = "ryunosuke\\Functions\\class_replace";
 if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke\\Functions\\class_replace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\class_replace"))->isInternal()))) {
     /**
      * 既存（未読み込みに限る）クラスを強制的に置換する
@@ -4427,10 +4685,20 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
      * // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
      * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->method(), 'this is X2d');
      * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod(), 'this is newmethod');
+     *
+     * // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
+     *     [\ryunosuke\Test\Package\Classobj\XTrait::class],
+     *     'method' => function(){return 'this is X3d';},
+     * ]);
+     * // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->method(), 'this is X3d');
+     * // トレイトのメソッドも生えている
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->traitMethod(), 'this is XTrait::traitMethod');
      * ```
      *
      * @param string $class 対象クラス名
-     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
+     * @param \Closure|array $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
      */
     function class_replace($class, $register)
     {
@@ -4452,7 +4720,12 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
         require_once $fname;
 
         $classess = get_declared_classes();
-        $newclass = $register();
+        if ($register instanceof \Closure) {
+            $newclass = $register();
+        }
+        else {
+            $newclass = $register;
+        }
 
         // クロージャ内部でクラス定義した場合（増えたクラスでエイリアスする）
         if ($newclass === null) {
@@ -4487,29 +4760,38 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
             $origspace = trim(implode('', array_column($origspace, 1)));
             $origclass = trim(implode('', array_column($origclass, 1)));
 
-            $methods = '';
-            foreach ($newclass as $name => $func) {
-                $codes = callable_code($func);
-                $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $codes[0]);
-                $methods .= "public $mname {$codes[1]}";
+            $classcode = '';
+            foreach ($newclass as $name => $member) {
+                if (is_array($member)) {
+                    foreach ($member as $trait) {
+                        $classcode .= "use \\" . trim($trait, '\\') . ";\n";
+                    }
+                }
+                else {
+                    $codes = callable_code($member);
+                    $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $codes[0]);
+                    $classcode .= "public $mname {$codes[1]}\n";
+                }
             }
 
             $newclass = "\\$origspace\\{$origclass}_";
-            evaluate("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
+            evaluate("namespace $origspace;\nclass {$origclass}_ extends {$origclass}\n{\n$classcode}");
         }
 
         class_alias($newclass, $class);
     }
 }
+if (function_exists("ryunosuke\\Functions\\class_replace") && !defined("ryunosuke\\Functions\\class_replace")) {
+    define("ryunosuke\\Functions\\class_replace", "ryunosuke\\Functions\\class_replace");
+}
 
-const class_extends = "ryunosuke\\Functions\\class_extends";
 if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke\\Functions\\class_extends") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\class_extends"))->isInternal()))) {
     /**
      * インスタンスを動的に拡張する
      *
      * インスタンスに特異メソッド・特異フィールドのようなものを生やす。
      * ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。
-     * そのクラスの __set/__get が禁止されている場合に使えるかもしれない程度。
+     * そのクラスの `__set`/`__get` が禁止されている場合に使えるかもしれない程度。
      *
      * クロージャ配列を渡すと特異メソッドになる。
      * そのクロージャの $this は元オブジェクトで bind される。
@@ -4653,8 +4935,10 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
         return $spawners[$classname]['reflection']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
     }
 }
+if (function_exists("ryunosuke\\Functions\\class_extends") && !defined("ryunosuke\\Functions\\class_extends")) {
+    define("ryunosuke\\Functions\\class_extends", "ryunosuke\\Functions\\class_extends");
+}
 
-const const_exists = "ryunosuke\\Functions\\const_exists";
 if (!isset($excluded_functions["const_exists"]) && (!function_exists("ryunosuke\\Functions\\const_exists") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\const_exists"))->isInternal()))) {
     /**
      * クラス定数が存在するか調べる
@@ -4695,8 +4979,10 @@ if (!isset($excluded_functions["const_exists"]) && (!function_exists("ryunosuke\
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\const_exists") && !defined("ryunosuke\\Functions\\const_exists")) {
+    define("ryunosuke\\Functions\\const_exists", "ryunosuke\\Functions\\const_exists");
+}
 
-const object_dive = "ryunosuke\\Functions\\object_dive";
 if (!isset($excluded_functions["object_dive"]) && (!function_exists("ryunosuke\\Functions\\object_dive") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\object_dive"))->isInternal()))) {
     /**
      * パス形式でプロパティ値を取得
@@ -4736,8 +5022,10 @@ if (!isset($excluded_functions["object_dive"]) && (!function_exists("ryunosuke\\
         return $object;
     }
 }
+if (function_exists("ryunosuke\\Functions\\object_dive") && !defined("ryunosuke\\Functions\\object_dive")) {
+    define("ryunosuke\\Functions\\object_dive", "ryunosuke\\Functions\\object_dive");
+}
 
-const get_object_properties = "ryunosuke\\Functions\\get_object_properties";
 if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("ryunosuke\\Functions\\get_object_properties") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\get_object_properties"))->isInternal()))) {
     /**
      * オブジェクトのプロパティを可視・不可視を問わず取得する
@@ -4792,8 +5080,10 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("r
         return $vars;
     }
 }
+if (function_exists("ryunosuke\\Functions\\get_object_properties") && !defined("ryunosuke\\Functions\\get_object_properties")) {
+    define("ryunosuke\\Functions\\get_object_properties", "ryunosuke\\Functions\\get_object_properties");
+}
 
-const date_timestamp = "ryunosuke\\Functions\\date_timestamp";
 if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("ryunosuke\\Functions\\date_timestamp") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\date_timestamp"))->isInternal()))) {
     /**
      * 日時文字列をよしなにタイムスタンプに変換する
@@ -4909,8 +5199,10 @@ if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("ryunosuk
         return $time;
     }
 }
+if (function_exists("ryunosuke\\Functions\\date_timestamp") && !defined("ryunosuke\\Functions\\date_timestamp")) {
+    define("ryunosuke\\Functions\\date_timestamp", "ryunosuke\\Functions\\date_timestamp");
+}
 
-const date_convert = "ryunosuke\\Functions\\date_convert";
 if (!isset($excluded_functions["date_convert"]) && (!function_exists("ryunosuke\\Functions\\date_convert") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\date_convert"))->isInternal()))) {
     /**
      * 日時文字列をよしなに別のフォーマットに変換する
@@ -4928,7 +5220,7 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("ryunosuke\
      * ```
      *
      * @param string $format フォーマット
-     * @param string|int|float $datetimedata 日時データ。省略時は microtime
+     * @param string|int|float|\DateTime $datetimedata 日時データ。省略時は microtime
      * @return string 日時文字列
      */
     function date_convert($format, $datetimedata = null)
@@ -4936,6 +5228,10 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("ryunosuke\
         // 省略時は microtime
         if ($datetimedata === null) {
             $timestamp = microtime(true);
+        }
+        elseif ($datetimedata instanceof \DateTime) {
+            // @fixme DateTime オブジェクトって timestamp を float で得られないの？
+            $timestamp = (float) $datetimedata->format('U.u');
         }
         else {
             $timestamp = date_timestamp($datetimedata);
@@ -4976,8 +5272,10 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("ryunosuke\
         return date($format, $timestamp);
     }
 }
+if (function_exists("ryunosuke\\Functions\\date_convert") && !defined("ryunosuke\\Functions\\date_convert")) {
+    define("ryunosuke\\Functions\\date_convert", "ryunosuke\\Functions\\date_convert");
+}
 
-const date_interval = "ryunosuke\\Functions\\date_interval";
 if (!isset($excluded_functions["date_interval"]) && (!function_exists("ryunosuke\\Functions\\date_interval") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\date_interval"))->isInternal()))) {
     /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
@@ -5182,8 +5480,10 @@ if (!isset($excluded_functions["date_interval"]) && (!function_exists("ryunosuke
         return $interval->format($format);
     }
 }
+if (function_exists("ryunosuke\\Functions\\date_interval") && !defined("ryunosuke\\Functions\\date_interval")) {
+    define("ryunosuke\\Functions\\date_interval", "ryunosuke\\Functions\\date_interval");
+}
 
-const file_list = "ryunosuke\\Functions\\file_list";
 if (!isset($excluded_functions["file_list"]) && (!function_exists("ryunosuke\\Functions\\file_list") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_list"))->isInternal()))) {
     /**
      * ファイル一覧を配列で返す
@@ -5230,8 +5530,10 @@ if (!isset($excluded_functions["file_list"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\file_list") && !defined("ryunosuke\\Functions\\file_list")) {
+    define("ryunosuke\\Functions\\file_list", "ryunosuke\\Functions\\file_list");
+}
 
-const file_tree = "ryunosuke\\Functions\\file_tree";
 if (!isset($excluded_functions["file_tree"]) && (!function_exists("ryunosuke\\Functions\\file_tree") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_tree"))->isInternal()))) {
     /**
      * ディレクトリ階層をツリー構造で返す
@@ -5300,8 +5602,10 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\file_tree") && !defined("ryunosuke\\Functions\\file_tree")) {
+    define("ryunosuke\\Functions\\file_tree", "ryunosuke\\Functions\\file_tree");
+}
 
-const file_suffix = "ryunosuke\\Functions\\file_suffix";
 if (!isset($excluded_functions["file_suffix"]) && (!function_exists("ryunosuke\\Functions\\file_suffix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_suffix"))->isInternal()))) {
     /**
      * ファイル名にサフィックスを付与する
@@ -5338,8 +5642,10 @@ if (!isset($excluded_functions["file_suffix"]) && (!function_exists("ryunosuke\\
         return $dirname . DIRECTORY_SEPARATOR . $basename;
     }
 }
+if (function_exists("ryunosuke\\Functions\\file_suffix") && !defined("ryunosuke\\Functions\\file_suffix")) {
+    define("ryunosuke\\Functions\\file_suffix", "ryunosuke\\Functions\\file_suffix");
+}
 
-const file_extension = "ryunosuke\\Functions\\file_extension";
 if (!isset($excluded_functions["file_extension"]) && (!function_exists("ryunosuke\\Functions\\file_extension") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_extension"))->isInternal()))) {
     /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
@@ -5377,11 +5683,15 @@ if (!isset($excluded_functions["file_extension"]) && (!function_exists("ryunosuk
         return $pathinfo['dirname'] . DIRECTORY_SEPARATOR . $basename;
     }
 }
+if (function_exists("ryunosuke\\Functions\\file_extension") && !defined("ryunosuke\\Functions\\file_extension")) {
+    define("ryunosuke\\Functions\\file_extension", "ryunosuke\\Functions\\file_extension");
+}
 
-const file_set_contents = "ryunosuke\\Functions\\file_set_contents";
 if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("ryunosuke\\Functions\\file_set_contents") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_set_contents"))->isInternal()))) {
     /**
      * ディレクトリも掘る file_put_contents
+     *
+     * 書き込みは一時ファイルと rename を使用してアトミックに行われる。
      *
      * Example:
      * ```php
@@ -5400,16 +5710,29 @@ if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("ryuno
             $umask = umask();
         }
 
+        $filename = path_normalize($filename);
+
         if (!is_dir($dirname = dirname($filename))) {
             if (!@mkdir_p($dirname, $umask)) {
                 throw new \RuntimeException("failed to mkdir($dirname)");
             }
         }
-        return file_put_contents($filename, $data);
+
+        $tempnam = tempnam($dirname, 'tmp');
+        if (($result = file_put_contents($tempnam, $data)) !== false) {
+            if (rename($tempnam, $filename)) {
+                @chmod($filename, 0666 & ~$umask);
+                return $result;
+            }
+            unlink($tempnam);
+        }
+        return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\file_set_contents") && !defined("ryunosuke\\Functions\\file_set_contents")) {
+    define("ryunosuke\\Functions\\file_set_contents", "ryunosuke\\Functions\\file_set_contents");
+}
 
-const file_rewrite_contents = "ryunosuke\\Functions\\file_rewrite_contents";
 if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("ryunosuke\\Functions\\file_rewrite_contents") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_rewrite_contents"))->isInternal()))) {
     /**
      * ファイルを読み込んで内容をコールバックに渡して書き込む
@@ -5431,6 +5754,7 @@ if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("r
      */
     function file_rewrite_contents($filename, $callback, $operation = 0)
     {
+        /** @var resource $fp */
         try {
             // 開いて
             $fp = fopen($filename, 'c+b') ?: throws(new \UnexpectedValueException('failed to fopen.'));
@@ -5471,8 +5795,10 @@ if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("r
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\file_rewrite_contents") && !defined("ryunosuke\\Functions\\file_rewrite_contents")) {
+    define("ryunosuke\\Functions\\file_rewrite_contents", "ryunosuke\\Functions\\file_rewrite_contents");
+}
 
-const mkdir_p = "ryunosuke\\Functions\\mkdir_p";
 if (!isset($excluded_functions["mkdir_p"]) && (!function_exists("ryunosuke\\Functions\\mkdir_p") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\mkdir_p"))->isInternal()))) {
     /**
      * ディレクトリを再帰的に掘る
@@ -5496,8 +5822,10 @@ if (!isset($excluded_functions["mkdir_p"]) && (!function_exists("ryunosuke\\Func
         return mkdir($dirname, 0777 & (~$umask), true);
     }
 }
+if (function_exists("ryunosuke\\Functions\\mkdir_p") && !defined("ryunosuke\\Functions\\mkdir_p")) {
+    define("ryunosuke\\Functions\\mkdir_p", "ryunosuke\\Functions\\mkdir_p");
+}
 
-const dirname_r = "ryunosuke\\Functions\\dirname_r";
 if (!isset($excluded_functions["dirname_r"]) && (!function_exists("ryunosuke\\Functions\\dirname_r") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\dirname_r"))->isInternal()))) {
     /**
      * コールバックが true 相当を返すまで親ディレクトリを辿り続ける
@@ -5532,8 +5860,10 @@ if (!isset($excluded_functions["dirname_r"]) && (!function_exists("ryunosuke\\Fu
         return dirname_r($dirname, $callback);
     }
 }
+if (function_exists("ryunosuke\\Functions\\dirname_r") && !defined("ryunosuke\\Functions\\dirname_r")) {
+    define("ryunosuke\\Functions\\dirname_r", "ryunosuke\\Functions\\dirname_r");
+}
 
-const fnmatch_and = "ryunosuke\\Functions\\fnmatch_and";
 if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("ryunosuke\\Functions\\fnmatch_and") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\fnmatch_and"))->isInternal()))) {
     /**
      * fnmatch の AND 版
@@ -5569,8 +5899,10 @@ if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("ryunosuke\\
         return true;
     }
 }
+if (function_exists("ryunosuke\\Functions\\fnmatch_and") && !defined("ryunosuke\\Functions\\fnmatch_and")) {
+    define("ryunosuke\\Functions\\fnmatch_and", "ryunosuke\\Functions\\fnmatch_and");
+}
 
-const fnmatch_or = "ryunosuke\\Functions\\fnmatch_or";
 if (!isset($excluded_functions["fnmatch_or"]) && (!function_exists("ryunosuke\\Functions\\fnmatch_or") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\fnmatch_or"))->isInternal()))) {
     /**
      * fnmatch の OR 版
@@ -5606,8 +5938,10 @@ if (!isset($excluded_functions["fnmatch_or"]) && (!function_exists("ryunosuke\\F
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\fnmatch_or") && !defined("ryunosuke\\Functions\\fnmatch_or")) {
+    define("ryunosuke\\Functions\\fnmatch_or", "ryunosuke\\Functions\\fnmatch_or");
+}
 
-const path_is_absolute = "ryunosuke\\Functions\\path_is_absolute";
 if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("ryunosuke\\Functions\\path_is_absolute") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\path_is_absolute"))->isInternal()))) {
     /**
      * パスが絶対パスか判定する
@@ -5628,7 +5962,16 @@ if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("ryunos
      */
     function path_is_absolute($path)
     {
-        if (substr($path, 0, 1) == '/') {
+        // スキームが付いている場合は path 部分で判定
+        $parts = parse_url($path);
+        if (isset($parts['scheme'], $parts['path'])) {
+            $path = $parts['path'];
+        }
+        elseif (isset($parts['scheme'], $parts['host'])) {
+            $path = $parts['host'];
+        }
+
+        if (substr($path, 0, 1) === '/') {
             return true;
         }
 
@@ -5641,8 +5984,10 @@ if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("ryunos
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\path_is_absolute") && !defined("ryunosuke\\Functions\\path_is_absolute")) {
+    define("ryunosuke\\Functions\\path_is_absolute", "ryunosuke\\Functions\\path_is_absolute");
+}
 
-const path_resolve = "ryunosuke\\Functions\\path_resolve";
 if (!isset($excluded_functions["path_resolve"]) && (!function_exists("ryunosuke\\Functions\\path_resolve") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\path_resolve"))->isInternal()))) {
     /**
      * パスを絶対パスに変換して正規化する
@@ -5674,8 +6019,10 @@ if (!isset($excluded_functions["path_resolve"]) && (!function_exists("ryunosuke\
         return path_normalize($path);
     }
 }
+if (function_exists("ryunosuke\\Functions\\path_resolve") && !defined("ryunosuke\\Functions\\path_resolve")) {
+    define("ryunosuke\\Functions\\path_resolve", "ryunosuke\\Functions\\path_resolve");
+}
 
-const path_normalize = "ryunosuke\\Functions\\path_normalize";
 if (!isset($excluded_functions["path_normalize"]) && (!function_exists("ryunosuke\\Functions\\path_normalize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\path_normalize"))->isInternal()))) {
     /**
      * パスを正規化する
@@ -5721,8 +6068,10 @@ if (!isset($excluded_functions["path_normalize"]) && (!function_exists("ryunosuk
         return implode(DIRECTORY_SEPARATOR, $result);
     }
 }
+if (function_exists("ryunosuke\\Functions\\path_normalize") && !defined("ryunosuke\\Functions\\path_normalize")) {
+    define("ryunosuke\\Functions\\path_normalize", "ryunosuke\\Functions\\path_normalize");
+}
 
-const cp_rf = "ryunosuke\\Functions\\cp_rf";
 if (!isset($excluded_functions["cp_rf"]) && (!function_exists("ryunosuke\\Functions\\cp_rf") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\cp_rf"))->isInternal()))) {
     /**
      * ディレクトリのコピー
@@ -5793,8 +6142,10 @@ if (!isset($excluded_functions["cp_rf"]) && (!function_exists("ryunosuke\\Functi
         return file_exists($dst);
     }
 }
+if (function_exists("ryunosuke\\Functions\\cp_rf") && !defined("ryunosuke\\Functions\\cp_rf")) {
+    define("ryunosuke\\Functions\\cp_rf", "ryunosuke\\Functions\\cp_rf");
+}
 
-const rm_rf = "ryunosuke\\Functions\\rm_rf";
 if (!isset($excluded_functions["rm_rf"]) && (!function_exists("ryunosuke\\Functions\\rm_rf") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\rm_rf"))->isInternal()))) {
     /**
      * 中身があっても消せる rmdir
@@ -5833,8 +6184,10 @@ if (!isset($excluded_functions["rm_rf"]) && (!function_exists("ryunosuke\\Functi
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\rm_rf") && !defined("ryunosuke\\Functions\\rm_rf")) {
+    define("ryunosuke\\Functions\\rm_rf", "ryunosuke\\Functions\\rm_rf");
+}
 
-const tmpname = "ryunosuke\\Functions\\tmpname";
 if (!isset($excluded_functions["tmpname"]) && (!function_exists("ryunosuke\\Functions\\tmpname") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\tmpname"))->isInternal()))) {
     /**
      * 終了時に削除される一時ファイル名を生成する
@@ -5883,8 +6236,10 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("ryunosuke\\Func
         return $tempfile;
     }
 }
+if (function_exists("ryunosuke\\Functions\\tmpname") && !defined("ryunosuke\\Functions\\tmpname")) {
+    define("ryunosuke\\Functions\\tmpname", "ryunosuke\\Functions\\tmpname");
+}
 
-const memory_path = "ryunosuke\\Functions\\memory_path";
 if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\Functions\\memory_path") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\memory_path"))->isInternal()))) {
     /**
      * ファイルのように扱えるメモリ上のパスを返す
@@ -6243,8 +6598,10 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
         return "$STREAM_NAME://$path";
     }
 }
+if (function_exists("ryunosuke\\Functions\\memory_path") && !defined("ryunosuke\\Functions\\memory_path")) {
+    define("ryunosuke\\Functions\\memory_path", "ryunosuke\\Functions\\memory_path");
+}
 
-const delegate = "ryunosuke\\Functions\\delegate";
 if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Functions\\delegate") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\delegate"))->isInternal()))) {
     /**
      * 指定 callable を指定クロージャで実行するクロージャを返す
@@ -6260,6 +6617,7 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Fun
     {
         // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
         $__rfunc_delegate_marker = true;
+        assert($__rfunc_delegate_marker === true); // phpstorm の警告解除
 
         if ($arity === null) {
             $arity = parameter_length($callable, true, true);
@@ -6298,15 +6656,17 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Fun
                     return $invoker($callable, func_get_args());
                 };
             default:
-                $argstring = array_rmap(range(1, $arity), strcat, '$_');
+                $argstring = array_map(function ($v) { return '$_' . $v; }, range(1, $arity));
                 return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\delegate") && !defined("ryunosuke\\Functions\\delegate")) {
+    define("ryunosuke\\Functions\\delegate", "ryunosuke\\Functions\\delegate");
+}
 
-const abind = "ryunosuke\\Functions\\abind";
 if (!isset($excluded_functions["abind"]) && (!function_exists("ryunosuke\\Functions\\abind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\abind"))->isInternal()))) {
     /**
      * $callable の引数を指定配列で束縛したクロージャを返す
@@ -6328,8 +6688,10 @@ if (!isset($excluded_functions["abind"]) && (!function_exists("ryunosuke\\Functi
         }, $callable, parameter_length($callable, true) - count($default_args));
     }
 }
+if (function_exists("ryunosuke\\Functions\\abind") && !defined("ryunosuke\\Functions\\abind")) {
+    define("ryunosuke\\Functions\\abind", "ryunosuke\\Functions\\abind");
+}
 
-const nbind = "ryunosuke\\Functions\\nbind";
 if (!isset($excluded_functions["nbind"]) && (!function_exists("ryunosuke\\Functions\\nbind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\nbind"))->isInternal()))) {
     /**
      * $callable の指定位置に引数を束縛したクロージャを返す
@@ -6352,8 +6714,10 @@ if (!isset($excluded_functions["nbind"]) && (!function_exists("ryunosuke\\Functi
         }, $callable, parameter_length($callable, true) - count($variadic));
     }
 }
+if (function_exists("ryunosuke\\Functions\\nbind") && !defined("ryunosuke\\Functions\\nbind")) {
+    define("ryunosuke\\Functions\\nbind", "ryunosuke\\Functions\\nbind");
+}
 
-const lbind = "ryunosuke\\Functions\\lbind";
 if (!isset($excluded_functions["lbind"]) && (!function_exists("ryunosuke\\Functions\\lbind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\lbind"))->isInternal()))) {
     /**
      * $callable の最左に引数を束縛した callable を返す
@@ -6373,8 +6737,10 @@ if (!isset($excluded_functions["lbind"]) && (!function_exists("ryunosuke\\Functi
         return nbind(...array_insert(func_get_args(), 0, 1));
     }
 }
+if (function_exists("ryunosuke\\Functions\\lbind") && !defined("ryunosuke\\Functions\\lbind")) {
+    define("ryunosuke\\Functions\\lbind", "ryunosuke\\Functions\\lbind");
+}
 
-const rbind = "ryunosuke\\Functions\\rbind";
 if (!isset($excluded_functions["rbind"]) && (!function_exists("ryunosuke\\Functions\\rbind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\rbind"))->isInternal()))) {
     /**
      * $callable の最右に引数を束縛した callable を返す
@@ -6394,8 +6760,10 @@ if (!isset($excluded_functions["rbind"]) && (!function_exists("ryunosuke\\Functi
         return nbind(...array_insert(func_get_args(), null, 1));
     }
 }
+if (function_exists("ryunosuke\\Functions\\rbind") && !defined("ryunosuke\\Functions\\rbind")) {
+    define("ryunosuke\\Functions\\rbind", "ryunosuke\\Functions\\rbind");
+}
 
-const composite = "ryunosuke\\Functions\\composite";
 if (!isset($excluded_functions["composite"]) && (!function_exists("ryunosuke\\Functions\\composite") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\composite"))->isInternal()))) {
     /**
      * 合成関数を返す
@@ -6467,8 +6835,10 @@ if (!isset($excluded_functions["composite"]) && (!function_exists("ryunosuke\\Fu
         }, $first);
     }
 }
+if (function_exists("ryunosuke\\Functions\\composite") && !defined("ryunosuke\\Functions\\composite")) {
+    define("ryunosuke\\Functions\\composite", "ryunosuke\\Functions\\composite");
+}
 
-const return_arg = "ryunosuke\\Functions\\return_arg";
 if (!isset($excluded_functions["return_arg"]) && (!function_exists("ryunosuke\\Functions\\return_arg") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\return_arg"))->isInternal()))) {
     /**
      * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
@@ -6495,8 +6865,10 @@ if (!isset($excluded_functions["return_arg"]) && (!function_exists("ryunosuke\\F
         return $cache[$n];
     }
 }
+if (function_exists("ryunosuke\\Functions\\return_arg") && !defined("ryunosuke\\Functions\\return_arg")) {
+    define("ryunosuke\\Functions\\return_arg", "ryunosuke\\Functions\\return_arg");
+}
 
-const ope_func = "ryunosuke\\Functions\\ope_func";
 if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Functions\\ope_func") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ope_func"))->isInternal()))) {
     /**
      * 演算子のクロージャを返す
@@ -6564,8 +6936,10 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Fun
         return $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
     }
 }
+if (function_exists("ryunosuke\\Functions\\ope_func") && !defined("ryunosuke\\Functions\\ope_func")) {
+    define("ryunosuke\\Functions\\ope_func", "ryunosuke\\Functions\\ope_func");
+}
 
-const not_func = "ryunosuke\\Functions\\not_func";
 if (!isset($excluded_functions["not_func"]) && (!function_exists("ryunosuke\\Functions\\not_func") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\not_func"))->isInternal()))) {
     /**
      * 返り値の真偽値を逆転した新しいクロージャを返す
@@ -6587,8 +6961,10 @@ if (!isset($excluded_functions["not_func"]) && (!function_exists("ryunosuke\\Fun
         }, $callable);
     }
 }
+if (function_exists("ryunosuke\\Functions\\not_func") && !defined("ryunosuke\\Functions\\not_func")) {
+    define("ryunosuke\\Functions\\not_func", "ryunosuke\\Functions\\not_func");
+}
 
-const eval_func = "ryunosuke\\Functions\\eval_func";
 if (!isset($excluded_functions["eval_func"]) && (!function_exists("ryunosuke\\Functions\\eval_func") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\eval_func"))->isInternal()))) {
     /**
      * 指定コードで eval するクロージャを返す
@@ -6617,8 +6993,10 @@ if (!isset($excluded_functions["eval_func"]) && (!function_exists("ryunosuke\\Fu
         return $cache[$declare];
     }
 }
+if (function_exists("ryunosuke\\Functions\\eval_func") && !defined("ryunosuke\\Functions\\eval_func")) {
+    define("ryunosuke\\Functions\\eval_func", "ryunosuke\\Functions\\eval_func");
+}
 
-const reflect_callable = "ryunosuke\\Functions\\reflect_callable";
 if (!isset($excluded_functions["reflect_callable"]) && (!function_exists("ryunosuke\\Functions\\reflect_callable") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\reflect_callable"))->isInternal()))) {
     /**
      * callable から ReflectionFunctionAbstract を生成する
@@ -6653,8 +7031,10 @@ if (!isset($excluded_functions["reflect_callable"]) && (!function_exists("ryunos
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\reflect_callable") && !defined("ryunosuke\\Functions\\reflect_callable")) {
+    define("ryunosuke\\Functions\\reflect_callable", "ryunosuke\\Functions\\reflect_callable");
+}
 
-const closurize = "ryunosuke\\Functions\\closurize";
 if (!isset($excluded_functions["closurize"]) && (!function_exists("ryunosuke\\Functions\\closurize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\closurize"))->isInternal()))) {
     /**
      * callable を Closure に変換する
@@ -6674,8 +7054,10 @@ if (!isset($excluded_functions["closurize"]) && (!function_exists("ryunosuke\\Fu
         return \Closure::fromCallable($callable);
     }
 }
+if (function_exists("ryunosuke\\Functions\\closurize") && !defined("ryunosuke\\Functions\\closurize")) {
+    define("ryunosuke\\Functions\\closurize", "ryunosuke\\Functions\\closurize");
+}
 
-const callable_code = "ryunosuke\\Functions\\callable_code";
 if (!isset($excluded_functions["callable_code"]) && (!function_exists("ryunosuke\\Functions\\callable_code") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\callable_code"))->isInternal()))) {
     /**
      * callable のコードブロックを返す
@@ -6716,8 +7098,10 @@ if (!isset($excluded_functions["callable_code"]) && (!function_exists("ryunosuke
         return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
     }
 }
+if (function_exists("ryunosuke\\Functions\\callable_code") && !defined("ryunosuke\\Functions\\callable_code")) {
+    define("ryunosuke\\Functions\\callable_code", "ryunosuke\\Functions\\callable_code");
+}
 
-const call_safely = "ryunosuke\\Functions\\call_safely";
 if (!isset($excluded_functions["call_safely"]) && (!function_exists("ryunosuke\\Functions\\call_safely") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\call_safely"))->isInternal()))) {
     /**
      * エラーを例外に変換するブロックでコールバックを実行する
@@ -6753,8 +7137,10 @@ if (!isset($excluded_functions["call_safely"]) && (!function_exists("ryunosuke\\
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\call_safely") && !defined("ryunosuke\\Functions\\call_safely")) {
+    define("ryunosuke\\Functions\\call_safely", "ryunosuke\\Functions\\call_safely");
+}
 
-const ob_capture = "ryunosuke\\Functions\\ob_capture";
 if (!isset($excluded_functions["ob_capture"]) && (!function_exists("ryunosuke\\Functions\\ob_capture") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ob_capture"))->isInternal()))) {
     /**
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
@@ -6788,8 +7174,10 @@ if (!isset($excluded_functions["ob_capture"]) && (!function_exists("ryunosuke\\F
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\ob_capture") && !defined("ryunosuke\\Functions\\ob_capture")) {
+    define("ryunosuke\\Functions\\ob_capture", "ryunosuke\\Functions\\ob_capture");
+}
 
-const is_bindable_closure = "ryunosuke\\Functions\\is_bindable_closure";
 if (!isset($excluded_functions["is_bindable_closure"]) && (!function_exists("ryunosuke\\Functions\\is_bindable_closure") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_bindable_closure"))->isInternal()))) {
     /**
      * $this を bind 可能なクロージャか調べる
@@ -6808,8 +7196,10 @@ if (!isset($excluded_functions["is_bindable_closure"]) && (!function_exists("ryu
         return !!@$closure->bindTo(new \stdClass());
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_bindable_closure") && !defined("ryunosuke\\Functions\\is_bindable_closure")) {
+    define("ryunosuke\\Functions\\is_bindable_closure", "ryunosuke\\Functions\\is_bindable_closure");
+}
 
-const by_builtin = "ryunosuke\\Functions\\by_builtin";
 if (!isset($excluded_functions["by_builtin"]) && (!function_exists("ryunosuke\\Functions\\by_builtin") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\by_builtin"))->isInternal()))) {
     /**
      * Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す
@@ -6869,8 +7259,10 @@ if (!isset($excluded_functions["by_builtin"]) && (!function_exists("ryunosuke\\F
         throw new \RuntimeException('failed to search backtrace.');
     }
 }
+if (function_exists("ryunosuke\\Functions\\by_builtin") && !defined("ryunosuke\\Functions\\by_builtin")) {
+    define("ryunosuke\\Functions\\by_builtin", "ryunosuke\\Functions\\by_builtin");
+}
 
-const namedcallize = "ryunosuke\\Functions\\namedcallize";
 if (!isset($excluded_functions["namedcallize"]) && (!function_exists("ryunosuke\\Functions\\namedcallize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\namedcallize"))->isInternal()))) {
     /**
      * callable を名前付き引数で呼べるようにしたクロージャを返す
@@ -7013,8 +7405,10 @@ if (!isset($excluded_functions["namedcallize"]) && (!function_exists("ryunosuke\
         };
     }
 }
+if (function_exists("ryunosuke\\Functions\\namedcallize") && !defined("ryunosuke\\Functions\\namedcallize")) {
+    define("ryunosuke\\Functions\\namedcallize", "ryunosuke\\Functions\\namedcallize");
+}
 
-const parameter_length = "ryunosuke\\Functions\\parameter_length";
 if (!isset($excluded_functions["parameter_length"]) && (!function_exists("ryunosuke\\Functions\\parameter_length") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\parameter_length"))->isInternal()))) {
     /**
      * callable の引数の数を返す
@@ -7069,8 +7463,10 @@ if (!isset($excluded_functions["parameter_length"]) && (!function_exists("ryunos
         return $cache[(int) $require_only . (int) $thought_variadic];
     }
 }
+if (function_exists("ryunosuke\\Functions\\parameter_length") && !defined("ryunosuke\\Functions\\parameter_length")) {
+    define("ryunosuke\\Functions\\parameter_length", "ryunosuke\\Functions\\parameter_length");
+}
 
-const function_shorten = "ryunosuke\\Functions\\function_shorten";
 if (!isset($excluded_functions["function_shorten"]) && (!function_exists("ryunosuke\\Functions\\function_shorten") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\function_shorten"))->isInternal()))) {
     /**
      * 関数の名前空間部分を除いた短い名前を取得する
@@ -7084,8 +7480,10 @@ if (!isset($excluded_functions["function_shorten"]) && (!function_exists("ryunos
         return array_pop($parts);
     }
 }
+if (function_exists("ryunosuke\\Functions\\function_shorten") && !defined("ryunosuke\\Functions\\function_shorten")) {
+    define("ryunosuke\\Functions\\function_shorten", "ryunosuke\\Functions\\function_shorten");
+}
 
-const func_user_func_array = "ryunosuke\\Functions\\func_user_func_array";
 if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("ryunosuke\\Functions\\func_user_func_array") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\func_user_func_array"))->isInternal()))) {
     /**
      * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
@@ -7132,8 +7530,10 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("ry
         }, $callback, $plength);
     }
 }
+if (function_exists("ryunosuke\\Functions\\func_user_func_array") && !defined("ryunosuke\\Functions\\func_user_func_array")) {
+    define("ryunosuke\\Functions\\func_user_func_array", "ryunosuke\\Functions\\func_user_func_array");
+}
 
-const func_new = "ryunosuke\\Functions\\func_new";
 if (!isset($excluded_functions["func_new"]) && (!function_exists("ryunosuke\\Functions\\func_new") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\func_new"))->isInternal()))) {
     /**
      * 指定クラスのコンストラクタを呼び出すクロージャを返す
@@ -7163,8 +7563,10 @@ if (!isset($excluded_functions["func_new"]) && (!function_exists("ryunosuke\\Fun
         };
     }
 }
+if (function_exists("ryunosuke\\Functions\\func_new") && !defined("ryunosuke\\Functions\\func_new")) {
+    define("ryunosuke\\Functions\\func_new", "ryunosuke\\Functions\\func_new");
+}
 
-const func_method = "ryunosuke\\Functions\\func_method";
 if (!isset($excluded_functions["func_method"]) && (!function_exists("ryunosuke\\Functions\\func_method") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\func_method"))->isInternal()))) {
     /**
      * 指定メソッドを呼び出すクロージャを返す
@@ -7212,8 +7614,10 @@ if (!isset($excluded_functions["func_method"]) && (!function_exists("ryunosuke\\
         };
     }
 }
+if (function_exists("ryunosuke\\Functions\\func_method") && !defined("ryunosuke\\Functions\\func_method")) {
+    define("ryunosuke\\Functions\\func_method", "ryunosuke\\Functions\\func_method");
+}
 
-const function_alias = "ryunosuke\\Functions\\function_alias";
 if (!isset($excluded_functions["function_alias"]) && (!function_exists("ryunosuke\\Functions\\function_alias") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\function_alias"))->isInternal()))) {
     /**
      * 関数のエイリアスを作成する
@@ -7282,8 +7686,10 @@ CODE;
         require_once $cachefile;
     }
 }
+if (function_exists("ryunosuke\\Functions\\function_alias") && !defined("ryunosuke\\Functions\\function_alias")) {
+    define("ryunosuke\\Functions\\function_alias", "ryunosuke\\Functions\\function_alias");
+}
 
-const function_parameter = "ryunosuke\\Functions\\function_parameter";
 if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryunosuke\\Functions\\function_parameter") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\function_parameter"))->isInternal()))) {
     /**
      * 関数/メソッドの引数定義を取得する
@@ -7332,8 +7738,10 @@ if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryun
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\function_parameter") && !defined("ryunosuke\\Functions\\function_parameter")) {
+    define("ryunosuke\\Functions\\function_parameter", "ryunosuke\\Functions\\function_parameter");
+}
 
-const minimum = "ryunosuke\\Functions\\minimum";
 if (!isset($excluded_functions["minimum"]) && (!function_exists("ryunosuke\\Functions\\minimum") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\minimum"))->isInternal()))) {
     /**
      * 引数の最小値を返す
@@ -7355,8 +7763,10 @@ if (!isset($excluded_functions["minimum"]) && (!function_exists("ryunosuke\\Func
         return min($args);
     }
 }
+if (function_exists("ryunosuke\\Functions\\minimum") && !defined("ryunosuke\\Functions\\minimum")) {
+    define("ryunosuke\\Functions\\minimum", "ryunosuke\\Functions\\minimum");
+}
 
-const maximum = "ryunosuke\\Functions\\maximum";
 if (!isset($excluded_functions["maximum"]) && (!function_exists("ryunosuke\\Functions\\maximum") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\maximum"))->isInternal()))) {
     /**
      * 引数の最大値を返す
@@ -7378,8 +7788,10 @@ if (!isset($excluded_functions["maximum"]) && (!function_exists("ryunosuke\\Func
         return max($args);
     }
 }
+if (function_exists("ryunosuke\\Functions\\maximum") && !defined("ryunosuke\\Functions\\maximum")) {
+    define("ryunosuke\\Functions\\maximum", "ryunosuke\\Functions\\maximum");
+}
 
-const mode = "ryunosuke\\Functions\\mode";
 if (!isset($excluded_functions["mode"]) && (!function_exists("ryunosuke\\Functions\\mode") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\mode"))->isInternal()))) {
     /**
      * 引数の最頻値を返す
@@ -7418,8 +7830,10 @@ if (!isset($excluded_functions["mode"]) && (!function_exists("ryunosuke\\Functio
         return $args[key($counts)];
     }
 }
+if (function_exists("ryunosuke\\Functions\\mode") && !defined("ryunosuke\\Functions\\mode")) {
+    define("ryunosuke\\Functions\\mode", "ryunosuke\\Functions\\mode");
+}
 
-const mean = "ryunosuke\\Functions\\mean";
 if (!isset($excluded_functions["mean"]) && (!function_exists("ryunosuke\\Functions\\mean") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\mean"))->isInternal()))) {
     /**
      * 引数の相加平均値を返す
@@ -7444,8 +7858,10 @@ if (!isset($excluded_functions["mean"]) && (!function_exists("ryunosuke\\Functio
         return array_sum($args) / count($args);
     }
 }
+if (function_exists("ryunosuke\\Functions\\mean") && !defined("ryunosuke\\Functions\\mean")) {
+    define("ryunosuke\\Functions\\mean", "ryunosuke\\Functions\\mean");
+}
 
-const median = "ryunosuke\\Functions\\median";
 if (!isset($excluded_functions["median"]) && (!function_exists("ryunosuke\\Functions\\median") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\median"))->isInternal()))) {
     /**
      * 引数の中央値を返す
@@ -7483,8 +7899,10 @@ if (!isset($excluded_functions["median"]) && (!function_exists("ryunosuke\\Funct
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\median") && !defined("ryunosuke\\Functions\\median")) {
+    define("ryunosuke\\Functions\\median", "ryunosuke\\Functions\\median");
+}
 
-const average = "ryunosuke\\Functions\\average";
 if (!isset($excluded_functions["average"]) && (!function_exists("ryunosuke\\Functions\\average") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\average"))->isInternal()))) {
     /**
      * 引数の意味平均値を返す
@@ -7504,8 +7922,10 @@ if (!isset($excluded_functions["average"]) && (!function_exists("ryunosuke\\Func
         throw new \DomainException('not implement yet.');
     }
 }
+if (function_exists("ryunosuke\\Functions\\average") && !defined("ryunosuke\\Functions\\average")) {
+    define("ryunosuke\\Functions\\average", "ryunosuke\\Functions\\average");
+}
 
-const sum = "ryunosuke\\Functions\\sum";
 if (!isset($excluded_functions["sum"]) && (!function_exists("ryunosuke\\Functions\\sum") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\sum"))->isInternal()))) {
     /**
      * 引数の合計値を返す
@@ -7529,8 +7949,10 @@ if (!isset($excluded_functions["sum"]) && (!function_exists("ryunosuke\\Function
         return array_sum($args);
     }
 }
+if (function_exists("ryunosuke\\Functions\\sum") && !defined("ryunosuke\\Functions\\sum")) {
+    define("ryunosuke\\Functions\\sum", "ryunosuke\\Functions\\sum");
+}
 
-const clamp = "ryunosuke\\Functions\\clamp";
 if (!isset($excluded_functions["clamp"]) && (!function_exists("ryunosuke\\Functions\\clamp") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\clamp"))->isInternal()))) {
     /**
      * 値を一定範囲に収める
@@ -7580,8 +8002,10 @@ if (!isset($excluded_functions["clamp"]) && (!function_exists("ryunosuke\\Functi
         return $value;
     }
 }
+if (function_exists("ryunosuke\\Functions\\clamp") && !defined("ryunosuke\\Functions\\clamp")) {
+    define("ryunosuke\\Functions\\clamp", "ryunosuke\\Functions\\clamp");
+}
 
-const random_at = "ryunosuke\\Functions\\random_at";
 if (!isset($excluded_functions["random_at"]) && (!function_exists("ryunosuke\\Functions\\random_at") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\random_at"))->isInternal()))) {
     /**
      * 引数をランダムで返す
@@ -7602,8 +8026,10 @@ if (!isset($excluded_functions["random_at"]) && (!function_exists("ryunosuke\\Fu
         return $args[mt_rand(0, count($args) - 1)];
     }
 }
+if (function_exists("ryunosuke\\Functions\\random_at") && !defined("ryunosuke\\Functions\\random_at")) {
+    define("ryunosuke\\Functions\\random_at", "ryunosuke\\Functions\\random_at");
+}
 
-const probability = "ryunosuke\\Functions\\probability";
 if (!isset($excluded_functions["probability"]) && (!function_exists("ryunosuke\\Functions\\probability") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\probability"))->isInternal()))) {
     /**
      * 一定確率で true を返す
@@ -7640,8 +8066,10 @@ if (!isset($excluded_functions["probability"]) && (!function_exists("ryunosuke\\
         return $probability > mt_rand(0, $divisor - 1);
     }
 }
+if (function_exists("ryunosuke\\Functions\\probability") && !defined("ryunosuke\\Functions\\probability")) {
+    define("ryunosuke\\Functions\\probability", "ryunosuke\\Functions\\probability");
+}
 
-const normal_rand = "ryunosuke\\Functions\\normal_rand";
 if (!isset($excluded_functions["normal_rand"]) && (!function_exists("ryunosuke\\Functions\\normal_rand") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\normal_rand"))->isInternal()))) {
     /**
      * 正規乱数（正規分布に従う乱数）を返す
@@ -7685,8 +8113,10 @@ if (!isset($excluded_functions["normal_rand"]) && (!function_exists("ryunosuke\\
         return $z1 * $std_deviation + $average;
     }
 }
+if (function_exists("ryunosuke\\Functions\\normal_rand") && !defined("ryunosuke\\Functions\\normal_rand")) {
+    define("ryunosuke\\Functions\\normal_rand", "ryunosuke\\Functions\\normal_rand");
+}
 
-const getipaddress = "ryunosuke\\Functions\\getipaddress";
 if (!isset($excluded_functions["getipaddress"]) && (!function_exists("ryunosuke\\Functions\\getipaddress") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\getipaddress"))->isInternal()))) {
     /**
      * 接続元となる IP を返す
@@ -7718,8 +8148,10 @@ if (!isset($excluded_functions["getipaddress"]) && (!function_exists("ryunosuke\
         return $ipaddr;
     }
 }
+if (function_exists("ryunosuke\\Functions\\getipaddress") && !defined("ryunosuke\\Functions\\getipaddress")) {
+    define("ryunosuke\\Functions\\getipaddress", "ryunosuke\\Functions\\getipaddress");
+}
 
-const incidr = "ryunosuke\\Functions\\incidr";
 if (!isset($excluded_functions["incidr"]) && (!function_exists("ryunosuke\\Functions\\incidr") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\incidr"))->isInternal()))) {
     /**
      * ipv4 の cidr チェック
@@ -7769,8 +8201,10 @@ if (!isset($excluded_functions["incidr"]) && (!function_exists("ryunosuke\\Funct
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\incidr") && !defined("ryunosuke\\Functions\\incidr")) {
+    define("ryunosuke\\Functions\\incidr", "ryunosuke\\Functions\\incidr");
+}
 
-const ping = "ryunosuke\\Functions\\ping";
 if (!isset($excluded_functions["ping"]) && (!function_exists("ryunosuke\\Functions\\ping") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ping"))->isInternal()))) {
     /**
      * ネットワーク疎通を返す
@@ -7879,8 +8313,10 @@ if (!isset($excluded_functions["ping"]) && (!function_exists("ryunosuke\\Functio
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\ping") && !defined("ryunosuke\\Functions\\ping")) {
+    define("ryunosuke\\Functions\\ping", "ryunosuke\\Functions\\ping");
+}
 
-const http_requests = "ryunosuke\\Functions\\http_requests";
 if (!isset($excluded_functions["http_requests"]) && (!function_exists("ryunosuke\\Functions\\http_requests") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\http_requests"))->isInternal()))) {
     /**
      * http リクエストを並列で投げる
@@ -7999,8 +8435,10 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("ryunosuke
         return $responses;
     }
 }
+if (function_exists("ryunosuke\\Functions\\http_requests") && !defined("ryunosuke\\Functions\\http_requests")) {
+    define("ryunosuke\\Functions\\http_requests", "ryunosuke\\Functions\\http_requests");
+}
 
-const sql_quote = "ryunosuke\\Functions\\sql_quote";
 if (!isset($excluded_functions["sql_quote"]) && (!function_exists("ryunosuke\\Functions\\sql_quote") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\sql_quote"))->isInternal()))) {
     /**
      * ものすごく雑に値をクオートする
@@ -8038,8 +8476,10 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("ryunosuke\\Fu
         return "'" . addslashes("$value") . "'";
     }
 }
+if (function_exists("ryunosuke\\Functions\\sql_quote") && !defined("ryunosuke\\Functions\\sql_quote")) {
+    define("ryunosuke\\Functions\\sql_quote", "ryunosuke\\Functions\\sql_quote");
+}
 
-const sql_bind = "ryunosuke\\Functions\\sql_bind";
 if (!isset($excluded_functions["sql_bind"]) && (!function_exists("ryunosuke\\Functions\\sql_bind") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\sql_bind"))->isInternal()))) {
     /**
      * ものすごく雑に SQL に値を埋め込む
@@ -8080,8 +8520,10 @@ if (!isset($excluded_functions["sql_bind"]) && (!function_exists("ryunosuke\\Fun
         ]);
     }
 }
+if (function_exists("ryunosuke\\Functions\\sql_bind") && !defined("ryunosuke\\Functions\\sql_bind")) {
+    define("ryunosuke\\Functions\\sql_bind", "ryunosuke\\Functions\\sql_bind");
+}
 
-const sql_format = "ryunosuke\\Functions\\sql_format";
 if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\Functions\\sql_format") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\sql_format"))->isInternal()))) {
     /**
      * ものすごく雑に SQL を整形する
@@ -8256,7 +8698,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
                         $next = $seek($index, +1);
 
                         // "tablename. columnname" になってしまう
-                        if ($prev !== '.') {
+                        // "@var" になってしまう
+                        if ($prev !== '.' && $prev !== '@') {
                             $result[] = $MARK_SP;
                         }
 
@@ -8269,6 +8712,9 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
                         if (($next !== '.' && $next !== ',' && $next !== '(') || ($next === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $token))) {
                             $result[] = $MARK_SP;
                         }
+                        break;
+                    case "@":
+                        $result[] = $MARK_SP . $virttoken;
                         break;
                     case ";":
                         $result[] = $MARK_BR . $virttoken . $MARK_BR;
@@ -8487,8 +8933,10 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("ryunosuke\\F
         return trim($result);
     }
 }
+if (function_exists("ryunosuke\\Functions\\sql_format") && !defined("ryunosuke\\Functions\\sql_format")) {
+    define("ryunosuke\\Functions\\sql_format", "ryunosuke\\Functions\\sql_format");
+}
 
-const strcat = "ryunosuke\\Functions\\strcat";
 if (!isset($excluded_functions["strcat"]) && (!function_exists("ryunosuke\\Functions\\strcat") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\strcat"))->isInternal()))) {
     /**
      * 文字列結合の関数版
@@ -8506,8 +8954,10 @@ if (!isset($excluded_functions["strcat"]) && (!function_exists("ryunosuke\\Funct
         return implode('', $variadic);
     }
 }
+if (function_exists("ryunosuke\\Functions\\strcat") && !defined("ryunosuke\\Functions\\strcat")) {
+    define("ryunosuke\\Functions\\strcat", "ryunosuke\\Functions\\strcat");
+}
 
-const concat = "ryunosuke\\Functions\\concat";
 if (!isset($excluded_functions["concat"]) && (!function_exists("ryunosuke\\Functions\\concat") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\concat"))->isInternal()))) {
     /**
      * strcat の空文字回避版
@@ -8538,8 +8988,10 @@ if (!isset($excluded_functions["concat"]) && (!function_exists("ryunosuke\\Funct
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\concat") && !defined("ryunosuke\\Functions\\concat")) {
+    define("ryunosuke\\Functions\\concat", "ryunosuke\\Functions\\concat");
+}
 
-const split_noempty = "ryunosuke\\Functions\\split_noempty";
 if (!isset($excluded_functions["split_noempty"]) && (!function_exists("ryunosuke\\Functions\\split_noempty") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\split_noempty"))->isInternal()))) {
     /**
      * 空文字を除外する文字列分割
@@ -8578,8 +9030,10 @@ if (!isset($excluded_functions["split_noempty"]) && (!function_exists("ryunosuke
         return $parts;
     }
 }
+if (function_exists("ryunosuke\\Functions\\split_noempty") && !defined("ryunosuke\\Functions\\split_noempty")) {
+    define("ryunosuke\\Functions\\split_noempty", "ryunosuke\\Functions\\split_noempty");
+}
 
-const multiexplode = "ryunosuke\\Functions\\multiexplode";
 if (!isset($excluded_functions["multiexplode"]) && (!function_exists("ryunosuke\\Functions\\multiexplode") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\multiexplode"))->isInternal()))) {
     /**
      * explode の配列対応と $limit の挙動を変えたもの
@@ -8619,8 +9073,10 @@ if (!isset($excluded_functions["multiexplode"]) && (!function_exists("ryunosuke\
         return preg_split('#' . implode('|', $delimiter) . '#', $string, $limit);
     }
 }
+if (function_exists("ryunosuke\\Functions\\multiexplode") && !defined("ryunosuke\\Functions\\multiexplode")) {
+    define("ryunosuke\\Functions\\multiexplode", "ryunosuke\\Functions\\multiexplode");
+}
 
-const quoteexplode = "ryunosuke\\Functions\\quoteexplode";
 if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("ryunosuke\\Functions\\quoteexplode") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\quoteexplode"))->isInternal()))) {
     /**
      * エスケープやクオートに対応した explode
@@ -8693,8 +9149,10 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("ryunosuke\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\quoteexplode") && !defined("ryunosuke\\Functions\\quoteexplode")) {
+    define("ryunosuke\\Functions\\quoteexplode", "ryunosuke\\Functions\\quoteexplode");
+}
 
-const str_anyof = "ryunosuke\\Functions\\str_anyof";
 if (!isset($excluded_functions["str_anyof"]) && (!function_exists("ryunosuke\\Functions\\str_anyof") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_anyof"))->isInternal()))) {
     /**
      * 文字列が候補の中にあるか調べる
@@ -8734,8 +9192,10 @@ if (!isset($excluded_functions["str_anyof"]) && (!function_exists("ryunosuke\\Fu
         return null;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_anyof") && !defined("ryunosuke\\Functions\\str_anyof")) {
+    define("ryunosuke\\Functions\\str_anyof", "ryunosuke\\Functions\\str_anyof");
+}
 
-const str_equals = "ryunosuke\\Functions\\str_equals";
 if (!isset($excluded_functions["str_equals"]) && (!function_exists("ryunosuke\\Functions\\str_equals") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_equals"))->isInternal()))) {
     /**
      * 文字列比較の関数版
@@ -8776,8 +9236,10 @@ if (!isset($excluded_functions["str_equals"]) && (!function_exists("ryunosuke\\F
         return $str1 === $str2;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_equals") && !defined("ryunosuke\\Functions\\str_equals")) {
+    define("ryunosuke\\Functions\\str_equals", "ryunosuke\\Functions\\str_equals");
+}
 
-const str_contains = "ryunosuke\\Functions\\str_contains";
 if (!isset($excluded_functions["str_contains"]) && (!function_exists("ryunosuke\\Functions\\str_contains") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_contains"))->isInternal()))) {
     /**
      * 指定文字列を含むか返す
@@ -8821,8 +9283,10 @@ if (!isset($excluded_functions["str_contains"]) && (!function_exists("ryunosuke\
         return !!$and_flag;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_contains") && !defined("ryunosuke\\Functions\\str_contains")) {
+    define("ryunosuke\\Functions\\str_contains", "ryunosuke\\Functions\\str_contains");
+}
 
-const str_chop = "ryunosuke\\Functions\\str_chop";
 if (!isset($excluded_functions["str_chop"]) && (!function_exists("ryunosuke\\Functions\\str_chop") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_chop"))->isInternal()))) {
     /**
      * 先頭・末尾の指定文字列を削ぎ落とす
@@ -8853,8 +9317,10 @@ if (!isset($excluded_functions["str_chop"]) && (!function_exists("ryunosuke\\Fun
         return preg_replace('#' . implode('|', $pattern) . '#' . $flag, '', $string);
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_chop") && !defined("ryunosuke\\Functions\\str_chop")) {
+    define("ryunosuke\\Functions\\str_chop", "ryunosuke\\Functions\\str_chop");
+}
 
-const str_lchop = "ryunosuke\\Functions\\str_lchop";
 if (!isset($excluded_functions["str_lchop"]) && (!function_exists("ryunosuke\\Functions\\str_lchop") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_lchop"))->isInternal()))) {
     /**
      * 先頭の指定文字列を削ぎ落とす
@@ -8876,8 +9342,10 @@ if (!isset($excluded_functions["str_lchop"]) && (!function_exists("ryunosuke\\Fu
         return str_chop($string, $prefix, null, $case_insensitivity);
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_lchop") && !defined("ryunosuke\\Functions\\str_lchop")) {
+    define("ryunosuke\\Functions\\str_lchop", "ryunosuke\\Functions\\str_lchop");
+}
 
-const str_rchop = "ryunosuke\\Functions\\str_rchop";
 if (!isset($excluded_functions["str_rchop"]) && (!function_exists("ryunosuke\\Functions\\str_rchop") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_rchop"))->isInternal()))) {
     /**
      * 末尾の指定文字列を削ぎ落とす
@@ -8899,8 +9367,10 @@ if (!isset($excluded_functions["str_rchop"]) && (!function_exists("ryunosuke\\Fu
         return str_chop($string, null, $suffix, $case_insensitivity);
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_rchop") && !defined("ryunosuke\\Functions\\str_rchop")) {
+    define("ryunosuke\\Functions\\str_rchop", "ryunosuke\\Functions\\str_rchop");
+}
 
-const str_putcsv = "ryunosuke\\Functions\\str_putcsv";
 if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("ryunosuke\\Functions\\str_putcsv") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_putcsv"))->isInternal()))) {
     /**
      * fputcsv の文字列版（str_getcsv の put 版）
@@ -8951,8 +9421,10 @@ if (!isset($excluded_functions["str_putcsv"]) && (!function_exists("ryunosuke\\F
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_putcsv") && !defined("ryunosuke\\Functions\\str_putcsv")) {
+    define("ryunosuke\\Functions\\str_putcsv", "ryunosuke\\Functions\\str_putcsv");
+}
 
-const str_subreplace = "ryunosuke\\Functions\\str_subreplace";
 if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuke\\Functions\\str_subreplace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_subreplace"))->isInternal()))) {
     /**
      * 指定文字列を置換する
@@ -9030,8 +9502,10 @@ if (!isset($excluded_functions["str_subreplace"]) && (!function_exists("ryunosuk
         return $subject;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_subreplace") && !defined("ryunosuke\\Functions\\str_subreplace")) {
+    define("ryunosuke\\Functions\\str_subreplace", "ryunosuke\\Functions\\str_subreplace");
+}
 
-const str_submap = "ryunosuke\\Functions\\str_submap";
 if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\Functions\\str_submap") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_submap"))->isInternal()))) {
     /**
      * 指定文字列を置換する
@@ -9135,8 +9609,10 @@ if (!isset($excluded_functions["str_submap"]) && (!function_exists("ryunosuke\\F
         }, $subject);
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_submap") && !defined("ryunosuke\\Functions\\str_submap")) {
+    define("ryunosuke\\Functions\\str_submap", "ryunosuke\\Functions\\str_submap");
+}
 
-const str_embed = "ryunosuke\\Functions\\str_embed";
 if (!isset($excluded_functions["str_embed"]) && (!function_exists("ryunosuke\\Functions\\str_embed") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_embed"))->isInternal()))) {
     /**
      * エスケープ付きで文字列を置換する
@@ -9235,8 +9711,10 @@ if (!isset($excluded_functions["str_embed"]) && (!function_exists("ryunosuke\\Fu
         return $string;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_embed") && !defined("ryunosuke\\Functions\\str_embed")) {
+    define("ryunosuke\\Functions\\str_embed", "ryunosuke\\Functions\\str_embed");
+}
 
-const str_between = "ryunosuke\\Functions\\str_between";
 if (!isset($excluded_functions["str_between"]) && (!function_exists("ryunosuke\\Functions\\str_between") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_between"))->isInternal()))) {
     /**
      * 指定文字で囲まれた文字列を取得する
@@ -9312,8 +9790,10 @@ if (!isset($excluded_functions["str_between"]) && (!function_exists("ryunosuke\\
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_between") && !defined("ryunosuke\\Functions\\str_between")) {
+    define("ryunosuke\\Functions\\str_between", "ryunosuke\\Functions\\str_between");
+}
 
-const str_ellipsis = "ryunosuke\\Functions\\str_ellipsis";
 if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("ryunosuke\\Functions\\str_ellipsis") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_ellipsis"))->isInternal()))) {
     /**
      * 文字列を指定幅に丸める
@@ -9362,8 +9842,10 @@ if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("ryunosuke\
         return mb_substr_replace($string, $trimmarker, $pos, $strlen - $length);
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_ellipsis") && !defined("ryunosuke\\Functions\\str_ellipsis")) {
+    define("ryunosuke\\Functions\\str_ellipsis", "ryunosuke\\Functions\\str_ellipsis");
+}
 
-const starts_with = "ryunosuke\\Functions\\starts_with";
 if (!isset($excluded_functions["starts_with"]) && (!function_exists("ryunosuke\\Functions\\starts_with") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\starts_with"))->isInternal()))) {
     /**
      * 指定文字列で始まるか調べる
@@ -9399,8 +9881,10 @@ if (!isset($excluded_functions["starts_with"]) && (!function_exists("ryunosuke\\
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\starts_with") && !defined("ryunosuke\\Functions\\starts_with")) {
+    define("ryunosuke\\Functions\\starts_with", "ryunosuke\\Functions\\starts_with");
+}
 
-const ends_with = "ryunosuke\\Functions\\ends_with";
 if (!isset($excluded_functions["ends_with"]) && (!function_exists("ryunosuke\\Functions\\ends_with") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ends_with"))->isInternal()))) {
     /**
      * 指定文字列で終わるか調べる
@@ -9436,8 +9920,10 @@ if (!isset($excluded_functions["ends_with"]) && (!function_exists("ryunosuke\\Fu
         return false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\ends_with") && !defined("ryunosuke\\Functions\\ends_with")) {
+    define("ryunosuke\\Functions\\ends_with", "ryunosuke\\Functions\\ends_with");
+}
 
-const camel_case = "ryunosuke\\Functions\\camel_case";
 if (!isset($excluded_functions["camel_case"]) && (!function_exists("ryunosuke\\Functions\\camel_case") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\camel_case"))->isInternal()))) {
     /**
      * camelCase に変換する
@@ -9456,8 +9942,10 @@ if (!isset($excluded_functions["camel_case"]) && (!function_exists("ryunosuke\\F
         return lcfirst(pascal_case($string, $delimiter));
     }
 }
+if (function_exists("ryunosuke\\Functions\\camel_case") && !defined("ryunosuke\\Functions\\camel_case")) {
+    define("ryunosuke\\Functions\\camel_case", "ryunosuke\\Functions\\camel_case");
+}
 
-const pascal_case = "ryunosuke\\Functions\\pascal_case";
 if (!isset($excluded_functions["pascal_case"]) && (!function_exists("ryunosuke\\Functions\\pascal_case") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\pascal_case"))->isInternal()))) {
     /**
      * PascalCase に変換する
@@ -9476,8 +9964,10 @@ if (!isset($excluded_functions["pascal_case"]) && (!function_exists("ryunosuke\\
         return strtr(ucwords(strtr($string, [$delimiter => ' '])), [' ' => '']);
     }
 }
+if (function_exists("ryunosuke\\Functions\\pascal_case") && !defined("ryunosuke\\Functions\\pascal_case")) {
+    define("ryunosuke\\Functions\\pascal_case", "ryunosuke\\Functions\\pascal_case");
+}
 
-const snake_case = "ryunosuke\\Functions\\snake_case";
 if (!isset($excluded_functions["snake_case"]) && (!function_exists("ryunosuke\\Functions\\snake_case") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\snake_case"))->isInternal()))) {
     /**
      * snake_case に変換する
@@ -9496,8 +9986,10 @@ if (!isset($excluded_functions["snake_case"]) && (!function_exists("ryunosuke\\F
         return ltrim(strtolower(preg_replace('/[A-Z]/', $delimiter . '\0', $string)), $delimiter);
     }
 }
+if (function_exists("ryunosuke\\Functions\\snake_case") && !defined("ryunosuke\\Functions\\snake_case")) {
+    define("ryunosuke\\Functions\\snake_case", "ryunosuke\\Functions\\snake_case");
+}
 
-const chain_case = "ryunosuke\\Functions\\chain_case";
 if (!isset($excluded_functions["chain_case"]) && (!function_exists("ryunosuke\\Functions\\chain_case") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\chain_case"))->isInternal()))) {
     /**
      * chain-case に変換する
@@ -9516,8 +10008,10 @@ if (!isset($excluded_functions["chain_case"]) && (!function_exists("ryunosuke\\F
         return snake_case($string, $delimiter);
     }
 }
+if (function_exists("ryunosuke\\Functions\\chain_case") && !defined("ryunosuke\\Functions\\chain_case")) {
+    define("ryunosuke\\Functions\\chain_case", "ryunosuke\\Functions\\chain_case");
+}
 
-const namespace_split = "ryunosuke\\Functions\\namespace_split";
 if (!isset($excluded_functions["namespace_split"]) && (!function_exists("ryunosuke\\Functions\\namespace_split") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\namespace_split"))->isInternal()))) {
     /**
      * 文字列を名前空間とローカル名に区切ってタプルで返す
@@ -9550,8 +10044,10 @@ if (!isset($excluded_functions["namespace_split"]) && (!function_exists("ryunosu
         return [substr($string, 0, $pos), substr($string, $pos + 1)];
     }
 }
+if (function_exists("ryunosuke\\Functions\\namespace_split") && !defined("ryunosuke\\Functions\\namespace_split")) {
+    define("ryunosuke\\Functions\\namespace_split", "ryunosuke\\Functions\\namespace_split");
+}
 
-const htmltag = "ryunosuke\\Functions\\htmltag";
 if (!isset($excluded_functions["htmltag"]) && (!function_exists("ryunosuke\\Functions\\htmltag") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\htmltag"))->isInternal()))) {
     /**
      * css セレクタから html 文字列を生成する
@@ -9712,8 +10208,10 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("ryunosuke\\Func
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\htmltag") && !defined("ryunosuke\\Functions\\htmltag")) {
+    define("ryunosuke\\Functions\\htmltag", "ryunosuke\\Functions\\htmltag");
+}
 
-const build_uri = "ryunosuke\\Functions\\build_uri";
 if (!isset($excluded_functions["build_uri"]) && (!function_exists("ryunosuke\\Functions\\build_uri") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\build_uri"))->isInternal()))) {
     /**
      * parse_uri の逆
@@ -9775,8 +10273,10 @@ if (!isset($excluded_functions["build_uri"]) && (!function_exists("ryunosuke\\Fu
         return $uri;
     }
 }
+if (function_exists("ryunosuke\\Functions\\build_uri") && !defined("ryunosuke\\Functions\\build_uri")) {
+    define("ryunosuke\\Functions\\build_uri", "ryunosuke\\Functions\\build_uri");
+}
 
-const parse_uri = "ryunosuke\\Functions\\parse_uri";
 if (!isset($excluded_functions["parse_uri"]) && (!function_exists("ryunosuke\\Functions\\parse_uri") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\parse_uri"))->isInternal()))) {
     /**
      * parse_url の仕様を少しいじったもの
@@ -9869,8 +10369,10 @@ if (!isset($excluded_functions["parse_uri"]) && (!function_exists("ryunosuke\\Fu
         return $parts;
     }
 }
+if (function_exists("ryunosuke\\Functions\\parse_uri") && !defined("ryunosuke\\Functions\\parse_uri")) {
+    define("ryunosuke\\Functions\\parse_uri", "ryunosuke\\Functions\\parse_uri");
+}
 
-const ini_export = "ryunosuke\\Functions\\ini_export";
 if (!isset($excluded_functions["ini_export"]) && (!function_exists("ryunosuke\\Functions\\ini_export") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ini_export"))->isInternal()))) {
     /**
      * 連想配列を INI 的文字列に変換する
@@ -9917,8 +10419,10 @@ if (!isset($excluded_functions["ini_export"]) && (!function_exists("ryunosuke\\F
         return $generate($iniarray) . "\n";
     }
 }
+if (function_exists("ryunosuke\\Functions\\ini_export") && !defined("ryunosuke\\Functions\\ini_export")) {
+    define("ryunosuke\\Functions\\ini_export", "ryunosuke\\Functions\\ini_export");
+}
 
-const ini_import = "ryunosuke\\Functions\\ini_import";
 if (!isset($excluded_functions["ini_import"]) && (!function_exists("ryunosuke\\Functions\\ini_import") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ini_import"))->isInternal()))) {
     /**
      * INI 的文字列を連想配列に変換する
@@ -9946,8 +10450,10 @@ if (!isset($excluded_functions["ini_import"]) && (!function_exists("ryunosuke\\F
         return parse_ini_string($inistring, $options['process_sections'], $options['scanner_mode']);
     }
 }
+if (function_exists("ryunosuke\\Functions\\ini_import") && !defined("ryunosuke\\Functions\\ini_import")) {
+    define("ryunosuke\\Functions\\ini_import", "ryunosuke\\Functions\\ini_import");
+}
 
-const csv_export = "ryunosuke\\Functions\\csv_export";
 if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\Functions\\csv_export") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\csv_export"))->isInternal()))) {
     /**
      * 連想配列の配列を CSV 的文字列に変換する
@@ -9989,7 +10495,7 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
      *
      * @param array $csvarrays 連想配列の配列
      * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
-     * @return array|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
+     * @return string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
      */
     function csv_export($csvarrays, $options = [])
     {
@@ -10057,8 +10563,10 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\csv_export") && !defined("ryunosuke\\Functions\\csv_export")) {
+    define("ryunosuke\\Functions\\csv_export", "ryunosuke\\Functions\\csv_export");
+}
 
-const csv_import = "ryunosuke\\Functions\\csv_import";
 if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\Functions\\csv_import") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\csv_import"))->isInternal()))) {
     /**
      * CSV 的文字列を連想配列の配列に変換する
@@ -10184,8 +10692,10 @@ if (!isset($excluded_functions["csv_import"]) && (!function_exists("ryunosuke\\F
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\csv_import") && !defined("ryunosuke\\Functions\\csv_import")) {
+    define("ryunosuke\\Functions\\csv_import", "ryunosuke\\Functions\\csv_import");
+}
 
-const json_export = "ryunosuke\\Functions\\json_export";
 if (!isset($excluded_functions["json_export"]) && (!function_exists("ryunosuke\\Functions\\json_export") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\json_export"))->isInternal()))) {
     /**
      * json_encode のプロキシ関数
@@ -10228,8 +10738,10 @@ if (!isset($excluded_functions["json_export"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\json_export") && !defined("ryunosuke\\Functions\\json_export")) {
+    define("ryunosuke\\Functions\\json_export", "ryunosuke\\Functions\\json_export");
+}
 
-const json_import = "ryunosuke\\Functions\\json_import";
 if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\Functions\\json_import") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\json_import"))->isInternal()))) {
     /**
      * json_decode のプロキシ関数
@@ -10271,8 +10783,10 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\json_import") && !defined("ryunosuke\\Functions\\json_import")) {
+    define("ryunosuke\\Functions\\json_import", "ryunosuke\\Functions\\json_import");
+}
 
-const ltsv_export = "ryunosuke\\Functions\\ltsv_export";
 if (!isset($excluded_functions["ltsv_export"]) && (!function_exists("ryunosuke\\Functions\\ltsv_export") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ltsv_export"))->isInternal()))) {
     /**
      * 配列を LTSV 的文字列に変換する
@@ -10349,8 +10863,10 @@ if (!isset($excluded_functions["ltsv_export"]) && (!function_exists("ryunosuke\\
         return implode("\t", $parts);
     }
 }
+if (function_exists("ryunosuke\\Functions\\ltsv_export") && !defined("ryunosuke\\Functions\\ltsv_export")) {
+    define("ryunosuke\\Functions\\ltsv_export", "ryunosuke\\Functions\\ltsv_export");
+}
 
-const ltsv_import = "ryunosuke\\Functions\\ltsv_import";
 if (!isset($excluded_functions["ltsv_import"]) && (!function_exists("ryunosuke\\Functions\\ltsv_import") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ltsv_import"))->isInternal()))) {
     /**
      * LTSV 的文字列を配列に変換する
@@ -10427,8 +10943,10 @@ if (!isset($excluded_functions["ltsv_import"]) && (!function_exists("ryunosuke\\
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\ltsv_import") && !defined("ryunosuke\\Functions\\ltsv_import")) {
+    define("ryunosuke\\Functions\\ltsv_import", "ryunosuke\\Functions\\ltsv_import");
+}
 
-const markdown_table = "ryunosuke\\Functions\\markdown_table";
 if (!isset($excluded_functions["markdown_table"]) && (!function_exists("ryunosuke\\Functions\\markdown_table") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\markdown_table"))->isInternal()))) {
     /**
      * 連想配列の配列を markdown テーブル文字列にする
@@ -10498,8 +11016,10 @@ if (!isset($excluded_functions["markdown_table"]) && (!function_exists("ryunosuk
         return implode("\n", $result) . "\n";
     }
 }
+if (function_exists("ryunosuke\\Functions\\markdown_table") && !defined("ryunosuke\\Functions\\markdown_table")) {
+    define("ryunosuke\\Functions\\markdown_table", "ryunosuke\\Functions\\markdown_table");
+}
 
-const markdown_list = "ryunosuke\\Functions\\markdown_list";
 if (!isset($excluded_functions["markdown_list"]) && (!function_exists("ryunosuke\\Functions\\markdown_list") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\markdown_list"))->isInternal()))) {
     /**
      * 配列を markdown リスト文字列にする
@@ -10573,8 +11093,10 @@ if (!isset($excluded_functions["markdown_list"]) && (!function_exists("ryunosuke
         return implode("\n", $f($array, 0)) . "\n";
     }
 }
+if (function_exists("ryunosuke\\Functions\\markdown_list") && !defined("ryunosuke\\Functions\\markdown_list")) {
+    define("ryunosuke\\Functions\\markdown_list", "ryunosuke\\Functions\\markdown_list");
+}
 
-const random_string = "ryunosuke\\Functions\\random_string";
 if (!isset($excluded_functions["random_string"]) && (!function_exists("ryunosuke\\Functions\\random_string") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\random_string"))->isInternal()))) {
     /**
      * 安全な乱数文字列を生成する
@@ -10604,8 +11126,10 @@ if (!isset($excluded_functions["random_string"]) && (!function_exists("ryunosuke
         return $string;
     }
 }
+if (function_exists("ryunosuke\\Functions\\random_string") && !defined("ryunosuke\\Functions\\random_string")) {
+    define("ryunosuke\\Functions\\random_string", "ryunosuke\\Functions\\random_string");
+}
 
-const kvsprintf = "ryunosuke\\Functions\\kvsprintf";
 if (!isset($excluded_functions["kvsprintf"]) && (!function_exists("ryunosuke\\Functions\\kvsprintf") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\kvsprintf"))->isInternal()))) {
     /**
      * 連想配列を指定できるようにした vsprintf
@@ -10643,8 +11167,10 @@ if (!isset($excluded_functions["kvsprintf"]) && (!function_exists("ryunosuke\\Fu
         return vsprintf($format, $vals);
     }
 }
+if (function_exists("ryunosuke\\Functions\\kvsprintf") && !defined("ryunosuke\\Functions\\kvsprintf")) {
+    define("ryunosuke\\Functions\\kvsprintf", "ryunosuke\\Functions\\kvsprintf");
+}
 
-const preg_capture = "ryunosuke\\Functions\\preg_capture";
 if (!isset($excluded_functions["preg_capture"]) && (!function_exists("ryunosuke\\Functions\\preg_capture") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\preg_capture"))->isInternal()))) {
     /**
      * キャプチャを主軸においた preg_match
@@ -10685,8 +11211,10 @@ if (!isset($excluded_functions["preg_capture"]) && (!function_exists("ryunosuke\
         return $default;
     }
 }
+if (function_exists("ryunosuke\\Functions\\preg_capture") && !defined("ryunosuke\\Functions\\preg_capture")) {
+    define("ryunosuke\\Functions\\preg_capture", "ryunosuke\\Functions\\preg_capture");
+}
 
-const preg_splice = "ryunosuke\\Functions\\preg_splice";
 if (!isset($excluded_functions["preg_splice"]) && (!function_exists("ryunosuke\\Functions\\preg_splice") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\preg_splice"))->isInternal()))) {
     /**
      * キャプチャも行える preg_replace
@@ -10731,8 +11259,10 @@ if (!isset($excluded_functions["preg_splice"]) && (!function_exists("ryunosuke\\
         return $subject;
     }
 }
+if (function_exists("ryunosuke\\Functions\\preg_splice") && !defined("ryunosuke\\Functions\\preg_splice")) {
+    define("ryunosuke\\Functions\\preg_splice", "ryunosuke\\Functions\\preg_splice");
+}
 
-const preg_replaces = "ryunosuke\\Functions\\preg_replaces";
 if (!isset($excluded_functions["preg_replaces"]) && (!function_exists("ryunosuke\\Functions\\preg_replaces") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\preg_replaces"))->isInternal()))) {
     /**
      * パターン番号を指定して preg_replace する
@@ -10799,8 +11329,10 @@ if (!isset($excluded_functions["preg_replaces"]) && (!function_exists("ryunosuke
         return $subject;
     }
 }
+if (function_exists("ryunosuke\\Functions\\preg_replaces") && !defined("ryunosuke\\Functions\\preg_replaces")) {
+    define("ryunosuke\\Functions\\preg_replaces", "ryunosuke\\Functions\\preg_replaces");
+}
 
-const damerau_levenshtein = "ryunosuke\\Functions\\damerau_levenshtein";
 if (!isset($excluded_functions["damerau_levenshtein"]) && (!function_exists("ryunosuke\\Functions\\damerau_levenshtein") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\damerau_levenshtein"))->isInternal()))) {
     /**
      * Damerau–Levenshtein 距離を返す
@@ -10879,8 +11411,10 @@ if (!isset($excluded_functions["damerau_levenshtein"]) && (!function_exists("ryu
         return (int) $p1[$l2];
     }
 }
+if (function_exists("ryunosuke\\Functions\\damerau_levenshtein") && !defined("ryunosuke\\Functions\\damerau_levenshtein")) {
+    define("ryunosuke\\Functions\\damerau_levenshtein", "ryunosuke\\Functions\\damerau_levenshtein");
+}
 
-const ngram = "ryunosuke\\Functions\\ngram";
 if (!isset($excluded_functions["ngram"]) && (!function_exists("ryunosuke\\Functions\\ngram") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ngram"))->isInternal()))) {
     /**
      * N-gram 化して配列で返す
@@ -10914,8 +11448,10 @@ if (!isset($excluded_functions["ngram"]) && (!function_exists("ryunosuke\\Functi
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\ngram") && !defined("ryunosuke\\Functions\\ngram")) {
+    define("ryunosuke\\Functions\\ngram", "ryunosuke\\Functions\\ngram");
+}
 
-const str_guess = "ryunosuke\\Functions\\str_guess";
 if (!isset($excluded_functions["str_guess"]) && (!function_exists("ryunosuke\\Functions\\str_guess") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_guess"))->isInternal()))) {
     /**
      * $string に最も近い文字列を返す
@@ -10995,8 +11531,10 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("ryunosuke\\Fu
         return $candidates[$result];
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_guess") && !defined("ryunosuke\\Functions\\str_guess")) {
+    define("ryunosuke\\Functions\\str_guess", "ryunosuke\\Functions\\str_guess");
+}
 
-const str_array = "ryunosuke\\Functions\\str_array";
 if (!isset($excluded_functions["str_array"]) && (!function_exists("ryunosuke\\Functions\\str_array") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_array"))->isInternal()))) {
     /**
      * 文字列を区切り文字で区切って配列に変換する
@@ -11079,8 +11617,10 @@ if (!isset($excluded_functions["str_array"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\str_array") && !defined("ryunosuke\\Functions\\str_array")) {
+    define("ryunosuke\\Functions\\str_array", "ryunosuke\\Functions\\str_array");
+}
 
-const mb_substr_replace = "ryunosuke\\Functions\\mb_substr_replace";
 if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("ryunosuke\\Functions\\mb_substr_replace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\mb_substr_replace"))->isInternal()))) {
     /**
      * マルチバイト対応 substr_replace
@@ -11114,8 +11654,10 @@ if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("ryuno
         return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, null);
     }
 }
+if (function_exists("ryunosuke\\Functions\\mb_substr_replace") && !defined("ryunosuke\\Functions\\mb_substr_replace")) {
+    define("ryunosuke\\Functions\\mb_substr_replace", "ryunosuke\\Functions\\mb_substr_replace");
+}
 
-const mb_trim = "ryunosuke\\Functions\\mb_trim";
 if (!isset($excluded_functions["mb_trim"]) && (!function_exists("ryunosuke\\Functions\\mb_trim") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\mb_trim"))->isInternal()))) {
     /**
      * マルチバイト対応 trim
@@ -11133,8 +11675,10 @@ if (!isset($excluded_functions["mb_trim"]) && (!function_exists("ryunosuke\\Func
         return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
     }
 }
+if (function_exists("ryunosuke\\Functions\\mb_trim") && !defined("ryunosuke\\Functions\\mb_trim")) {
+    define("ryunosuke\\Functions\\mb_trim", "ryunosuke\\Functions\\mb_trim");
+}
 
-const render_string = "ryunosuke\\Functions\\render_string";
 if (!isset($excluded_functions["render_string"]) && (!function_exists("ryunosuke\\Functions\\render_string") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\render_string"))->isInternal()))) {
     /**
      * "hoge {$hoge}" 形式のレンダリング
@@ -11208,8 +11752,10 @@ if (!isset($excluded_functions["render_string"]) && (!function_exists("ryunosuke
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\render_string") && !defined("ryunosuke\\Functions\\render_string")) {
+    define("ryunosuke\\Functions\\render_string", "ryunosuke\\Functions\\render_string");
+}
 
-const render_file = "ryunosuke\\Functions\\render_file";
 if (!isset($excluded_functions["render_file"]) && (!function_exists("ryunosuke\\Functions\\render_file") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\render_file"))->isInternal()))) {
     /**
      * "hoge {$hoge}" 形式のレンダリングのファイル版
@@ -11225,8 +11771,10 @@ if (!isset($excluded_functions["render_file"]) && (!function_exists("ryunosuke\\
         return render_string(file_get_contents($template_file), $array);
     }
 }
+if (function_exists("ryunosuke\\Functions\\render_file") && !defined("ryunosuke\\Functions\\render_file")) {
+    define("ryunosuke\\Functions\\render_file", "ryunosuke\\Functions\\render_file");
+}
 
-const ob_include = "ryunosuke\\Functions\\ob_include";
 if (!isset($excluded_functions["ob_include"]) && (!function_exists("ryunosuke\\Functions\\ob_include") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ob_include"))->isInternal()))) {
     /**
      * 変数を extract して include する
@@ -11261,8 +11809,10 @@ if (!isset($excluded_functions["ob_include"]) && (!function_exists("ryunosuke\\F
         })($include_file, $array);
     }
 }
+if (function_exists("ryunosuke\\Functions\\ob_include") && !defined("ryunosuke\\Functions\\ob_include")) {
+    define("ryunosuke\\Functions\\ob_include", "ryunosuke\\Functions\\ob_include");
+}
 
-const include_string = "ryunosuke\\Functions\\include_string";
 if (!isset($excluded_functions["include_string"]) && (!function_exists("ryunosuke\\Functions\\include_string") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\include_string"))->isInternal()))) {
     /**
      * 変数を extract して include する（文字列指定）
@@ -11283,8 +11833,10 @@ if (!isset($excluded_functions["include_string"]) && (!function_exists("ryunosuk
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\include_string") && !defined("ryunosuke\\Functions\\include_string")) {
+    define("ryunosuke\\Functions\\include_string", "ryunosuke\\Functions\\include_string");
+}
 
-const evaluate = "ryunosuke\\Functions\\evaluate";
 if (!isset($excluded_functions["evaluate"]) && (!function_exists("ryunosuke\\Functions\\evaluate") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\evaluate"))->isInternal()))) {
     /**
      * eval のプロキシ関数
@@ -11354,8 +11906,10 @@ if (!isset($excluded_functions["evaluate"]) && (!function_exists("ryunosuke\\Fun
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\evaluate") && !defined("ryunosuke\\Functions\\evaluate")) {
+    define("ryunosuke\\Functions\\evaluate", "ryunosuke\\Functions\\evaluate");
+}
 
-const parse_php = "ryunosuke\\Functions\\parse_php";
 if (!isset($excluded_functions["parse_php"]) && (!function_exists("ryunosuke\\Functions\\parse_php") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\parse_php"))->isInternal()))) {
     /**
      * php のコード断片をパースする
@@ -11470,8 +12024,10 @@ if (!isset($excluded_functions["parse_php"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\parse_php") && !defined("ryunosuke\\Functions\\parse_php")) {
+    define("ryunosuke\\Functions\\parse_php", "ryunosuke\\Functions\\parse_php");
+}
 
-const returns = "ryunosuke\\Functions\\returns";
 if (!isset($excluded_functions["returns"]) && (!function_exists("ryunosuke\\Functions\\returns") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\returns"))->isInternal()))) {
     /**
      * 引数をそのまま返す
@@ -11492,8 +12048,10 @@ if (!isset($excluded_functions["returns"]) && (!function_exists("ryunosuke\\Func
         return $v;
     }
 }
+if (function_exists("ryunosuke\\Functions\\returns") && !defined("ryunosuke\\Functions\\returns")) {
+    define("ryunosuke\\Functions\\returns", "ryunosuke\\Functions\\returns");
+}
 
-const optional = "ryunosuke\\Functions\\optional";
 if (!isset($excluded_functions["optional"]) && (!function_exists("ryunosuke\\Functions\\optional") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\optional"))->isInternal()))) {
     /**
      * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
@@ -11564,8 +12122,10 @@ if (!isset($excluded_functions["optional"]) && (!function_exists("ryunosuke\\Fun
         return $nullobject;
     }
 }
+if (function_exists("ryunosuke\\Functions\\optional") && !defined("ryunosuke\\Functions\\optional")) {
+    define("ryunosuke\\Functions\\optional", "ryunosuke\\Functions\\optional");
+}
 
-const chain = "ryunosuke\\Functions\\chain";
 if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functions\\chain") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\chain"))->isInternal()))) {
     /**
      * 関数をメソッドチェーンできるオブジェクトを返す
@@ -11600,6 +12160,10 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
      * 用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。
      * ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。
      *
+     * なお、最初の引数を省略するとスタックモードになり、一切の処理が適用されなくなる。
+     * その代わり `invoke` で遅延的に値を渡すことができるようになる。
+     * 「処理の流れだけ決めておいて後で適用する」イメージ。
+     *
      * Example:
      * ```php
      * # 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
@@ -11621,42 +12185,71 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
      * assertSame(chain($string)->explode1(' ')->filter()->map('ucfirst')->implode1('/')->rot13->md5->strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
      *
      *  # よくある DB レコードをあれこれするシチュエーション
-     * $co = chain([
+     * $rows = [
      *     ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
      *     ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
      *     ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
      *     ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
-     * ]);
+     * ];
      * // e.g. 男性の平均給料
-     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
+     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
      * // e.g. 女性の平均年齢
-     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
+     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
      * // e.g. 30歳以上の平均給料
-     * assertSame((clone $co)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
+     * assertSame(chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
      * // e.g. 20～30歳の平均給料
-     * assertSame((clone $co)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
+     * assertSame(chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
      * // e.g. 男性の最小年齢
-     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
+     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
      * // e.g. 女性の最大給料
-     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     *
+     * # 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
+     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows), 375000);
+     * assertSame(chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows), 400000);
+     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows), 21);
      * ```
      *
      * @param mixed $source 元データ
      * @return \ChainObject
      */
-    function chain($source)
+    function chain($source = null)
     {
-        return new class($source) implements \IteratorAggregate
+        return new class(...func_get_args()) implements \IteratorAggregate
         {
             private $data;
+            private $stack;
 
-            public function __construct($source)
+            public function __construct($source = null)
             {
+                if (func_num_args() === 0) {
+                    $this->stack = [];
+                }
                 $this->data = $source;
             }
 
-            public function __invoke()
+            public function __invoke(...$source)
             {
+                $func_num_args = func_num_args();
+
+                if ($this->stack !== null && $func_num_args === 0) {
+                    throw new \InvalidArgumentException('nonempty stack and no parameter given. maybe invalid __invoke args.');
+                }
+                if ($this->stack === null && $func_num_args > 0) {
+                    throw new \UnexpectedValueException('empty stack and parameter given > 0. maybe invalid __invoke args.');
+                }
+
+                if ($func_num_args > 0) {
+                    $result = [];
+                    foreach ($source as $s) {
+                        $chain = chain($s);
+                        foreach ($this->stack as $stack) {
+                            $chain->{$stack[0]}(...$stack[1]);
+                        }
+                        $result[] = $chain();
+                    }
+                    return $func_num_args === 1 ? reset($result) : $result;
+                }
                 return $this->data;
             }
 
@@ -11684,6 +12277,11 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
 
             public function apply($callback, ...$args)
             {
+                if (is_array($this->stack)) {
+                    $this->stack[] = [__FUNCTION__, func_get_args()];
+                    return $this;
+                }
+
                 $this->data = $callback($this->data, ...$args);
                 return $this;
             }
@@ -11691,15 +12289,22 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
             private function _resolve($name)
             {
                 if (false
+                    // for global
                     || function_exists($fname = $name)
                     || function_exists($fname = "array_$name")
                     || function_exists($fname = "str_$name")
+                    // for package
                     || (defined($cname = $name) && is_callable($fname = constant($cname)))
                     || (defined($cname = "array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    // for namespace
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                    // for class
+                    || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */
                     return $fname;
@@ -11708,6 +12313,11 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
 
             private function _apply($name, $arguments)
             {
+                if (is_array($this->stack)) {
+                    $this->stack[] = [$name, $arguments];
+                    return $this;
+                }
+
                 // 特別扱い1: map は非常によく呼ぶので引数を補正する
                 if ($name === 'map') {
                     /** @noinspection PhpUndefinedMethodInspection */
@@ -11756,8 +12366,10 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
         };
     }
 }
+if (function_exists("ryunosuke\\Functions\\chain") && !defined("ryunosuke\\Functions\\chain")) {
+    define("ryunosuke\\Functions\\chain", "ryunosuke\\Functions\\chain");
+}
 
-const throws = "ryunosuke\\Functions\\throws";
 if (!isset($excluded_functions["throws"]) && (!function_exists("ryunosuke\\Functions\\throws") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\throws"))->isInternal()))) {
     /**
      * throw の関数版
@@ -11775,14 +12387,17 @@ if (!isset($excluded_functions["throws"]) && (!function_exists("ryunosuke\\Funct
      * ```
      *
      * @param \Exception $ex 投げる例外
+     * @return mixed （`return hoge or throws` のようなコードで警告が出るので抑止用）
      */
     function throws($ex)
     {
         throw $ex;
     }
 }
+if (function_exists("ryunosuke\\Functions\\throws") && !defined("ryunosuke\\Functions\\throws")) {
+    define("ryunosuke\\Functions\\throws", "ryunosuke\\Functions\\throws");
+}
 
-const throw_if = "ryunosuke\\Functions\\throw_if";
 if (!isset($excluded_functions["throw_if"]) && (!function_exists("ryunosuke\\Functions\\throw_if") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\throw_if"))->isInternal()))) {
     /**
      * 条件付き throw
@@ -11813,8 +12428,10 @@ if (!isset($excluded_functions["throw_if"]) && (!function_exists("ryunosuke\\Fun
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\throw_if") && !defined("ryunosuke\\Functions\\throw_if")) {
+    define("ryunosuke\\Functions\\throw_if", "ryunosuke\\Functions\\throw_if");
+}
 
-const blank_if = "ryunosuke\\Functions\\blank_if";
 if (!isset($excluded_functions["blank_if"]) && (!function_exists("ryunosuke\\Functions\\blank_if") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\blank_if"))->isInternal()))) {
     /**
      * 値が空なら null を返す
@@ -11916,8 +12533,75 @@ if (!isset($excluded_functions["blank_if"]) && (!function_exists("ryunosuke\\Fun
         return empty($var) ? $default : $var;
     }
 }
+if (function_exists("ryunosuke\\Functions\\blank_if") && !defined("ryunosuke\\Functions\\blank_if")) {
+    define("ryunosuke\\Functions\\blank_if", "ryunosuke\\Functions\\blank_if");
+}
 
-const ifelse = "ryunosuke\\Functions\\ifelse";
+if (!isset($excluded_functions["call_if"]) && (!function_exists("ryunosuke\\Functions\\call_if") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\call_if"))->isInternal()))) {
+    /**
+     * 条件を満たしたときにコールバックを実行する
+     *
+     * `if ($condition) $callable(...$arguments);` と（$condition はクロージャを受け入れるけど）ほぼ同じ。
+     * ただし、 $condition に数値を与えると「指定回数呼ばれたあとに実行する」という意味になる。
+     * 主に「ループ内でデバッグ出力したいけど、毎回だと少しうざい」というデバッグ用途。
+     *
+     * $condition が正数だと「指定回数呼ばれた次のみ」負数だと「指定回数呼ばれた次以降」実行される。
+     * 0 のときは無条件で実行される。
+     *
+     * Example:
+     * ```php
+     * $output = [];
+     * $debug_print = function ($debug) use (&$output) { $output[] = $debug; };
+     * for ($i=0; $i<4; $i++) {
+     *     call_if($i == 1, $debug_print, '$i == 1のとき呼ばれた');
+     *     call_if(2, $debug_print, '2回呼ばれた');
+     *     call_if(-2, $debug_print, '2回以上呼ばれた');
+     * }
+     * assertSame($output, [
+     *     '$i == 1のとき呼ばれた',
+     *     '2回呼ばれた',
+     *     '2回以上呼ばれた',
+     *     '2回以上呼ばれた',
+     * ]);
+     * ```
+     *
+     * @param mixed $condition 呼ばれる条件
+     * @param callable $callable 呼ばれる処理
+     * @param array $arguments $callable の引数（可変引数）
+     * @return mixed 呼ばれた場合は $callable の返り値
+     */
+    function call_if($condition, $callable, ...$arguments)
+    {
+        // 数値の場合はかなり特殊な動きになる
+        if (is_int($condition)) {
+            static $counts = [];
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+            $caller = $trace['file'] . '#' . $trace['line'];
+            $counts[$caller] = $counts[$caller] ?? 0;
+            if ($condition === 0) {
+                $condition = true;
+            }
+            elseif ($condition > 0) {
+                $condition = $condition === $counts[$caller]++;
+            }
+            else {
+                $condition = -$condition <= $counts[$caller]++;
+            }
+        }
+        elseif (is_callable($condition)) {
+            $condition = (func_user_func_array($condition))();
+        }
+
+        if ($condition) {
+            return $callable(...$arguments);
+        }
+        return null;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\call_if") && !defined("ryunosuke\\Functions\\call_if")) {
+    define("ryunosuke\\Functions\\call_if", "ryunosuke\\Functions\\call_if");
+}
+
 if (!isset($excluded_functions["ifelse"]) && (!function_exists("ryunosuke\\Functions\\ifelse") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ifelse"))->isInternal()))) {
     /**
      * if ～ else 構文の関数版
@@ -11959,8 +12643,10 @@ if (!isset($excluded_functions["ifelse"]) && (!function_exists("ryunosuke\\Funct
         return $expected === $actual ? $then : $else;
     }
 }
+if (function_exists("ryunosuke\\Functions\\ifelse") && !defined("ryunosuke\\Functions\\ifelse")) {
+    define("ryunosuke\\Functions\\ifelse", "ryunosuke\\Functions\\ifelse");
+}
 
-const switchs = "ryunosuke\\Functions\\switchs";
 if (!isset($excluded_functions["switchs"]) && (!function_exists("ryunosuke\\Functions\\switchs") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\switchs"))->isInternal()))) {
     /**
      * switch 構文の関数版
@@ -12002,8 +12688,10 @@ if (!isset($excluded_functions["switchs"]) && (!function_exists("ryunosuke\\Func
         return $case;
     }
 }
+if (function_exists("ryunosuke\\Functions\\switchs") && !defined("ryunosuke\\Functions\\switchs")) {
+    define("ryunosuke\\Functions\\switchs", "ryunosuke\\Functions\\switchs");
+}
 
-const try_null = "ryunosuke\\Functions\\try_null";
 if (!isset($excluded_functions["try_null"]) && (!function_exists("ryunosuke\\Functions\\try_null") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\try_null"))->isInternal()))) {
     /**
      * 例外を握りつぶす try 構文
@@ -12034,8 +12722,10 @@ if (!isset($excluded_functions["try_null"]) && (!function_exists("ryunosuke\\Fun
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\try_null") && !defined("ryunosuke\\Functions\\try_null")) {
+    define("ryunosuke\\Functions\\try_null", "ryunosuke\\Functions\\try_null");
+}
 
-const try_catch = "ryunosuke\\Functions\\try_catch";
 if (!isset($excluded_functions["try_catch"]) && (!function_exists("ryunosuke\\Functions\\try_catch") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\try_catch"))->isInternal()))) {
     /**
      * try ～ catch 構文の関数版
@@ -12062,8 +12752,10 @@ if (!isset($excluded_functions["try_catch"]) && (!function_exists("ryunosuke\\Fu
         return try_catch_finally($try, $catch, null, ...$variadic);
     }
 }
+if (function_exists("ryunosuke\\Functions\\try_catch") && !defined("ryunosuke\\Functions\\try_catch")) {
+    define("ryunosuke\\Functions\\try_catch", "ryunosuke\\Functions\\try_catch");
+}
 
-const try_finally = "ryunosuke\\Functions\\try_finally";
 if (!isset($excluded_functions["try_finally"]) && (!function_exists("ryunosuke\\Functions\\try_finally") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\try_finally"))->isInternal()))) {
     /**
      * try ～ finally 構文の関数版
@@ -12094,8 +12786,10 @@ if (!isset($excluded_functions["try_finally"]) && (!function_exists("ryunosuke\\
         return try_catch_finally($try, throws, $finally, ...$variadic);
     }
 }
+if (function_exists("ryunosuke\\Functions\\try_finally") && !defined("ryunosuke\\Functions\\try_finally")) {
+    define("ryunosuke\\Functions\\try_finally", "ryunosuke\\Functions\\try_finally");
+}
 
-const try_catch_finally = "ryunosuke\\Functions\\try_catch_finally";
 if (!isset($excluded_functions["try_catch_finally"]) && (!function_exists("ryunosuke\\Functions\\try_catch_finally") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\try_catch_finally"))->isInternal()))) {
     /**
      * try ～ catch ～ finally 構文の関数版
@@ -12146,8 +12840,10 @@ if (!isset($excluded_functions["try_catch_finally"]) && (!function_exists("ryuno
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\try_catch_finally") && !defined("ryunosuke\\Functions\\try_catch_finally")) {
+    define("ryunosuke\\Functions\\try_catch_finally", "ryunosuke\\Functions\\try_catch_finally");
+}
 
-const get_uploaded_files = "ryunosuke\\Functions\\get_uploaded_files";
 if (!isset($excluded_functions["get_uploaded_files"]) && (!function_exists("ryunosuke\\Functions\\get_uploaded_files") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\get_uploaded_files"))->isInternal()))) {
     /**
      * $_FILES の構造を組み替えて $_POST などと同じにする
@@ -12174,8 +12870,10 @@ if (!isset($excluded_functions["get_uploaded_files"]) && (!function_exists("ryun
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\get_uploaded_files") && !defined("ryunosuke\\Functions\\get_uploaded_files")) {
+    define("ryunosuke\\Functions\\get_uploaded_files", "ryunosuke\\Functions\\get_uploaded_files");
+}
 
-const cachedir = "ryunosuke\\Functions\\cachedir";
 if (!isset($excluded_functions["cachedir"]) && (!function_exists("ryunosuke\\Functions\\cachedir") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\cachedir"))->isInternal()))) {
     /**
      * 本ライブラリで使用するキャッシュディレクトリを設定する
@@ -12198,8 +12896,10 @@ if (!isset($excluded_functions["cachedir"]) && (!function_exists("ryunosuke\\Fun
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\cachedir") && !defined("ryunosuke\\Functions\\cachedir")) {
+    define("ryunosuke\\Functions\\cachedir", "ryunosuke\\Functions\\cachedir");
+}
 
-const cache = "ryunosuke\\Functions\\cache";
 if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functions\\cache") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\cache"))->isInternal()))) {
     /**
      * シンプルにキャッシュする
@@ -12337,8 +13037,10 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functi
         return $cacheobject->get($namespace, $key);
     }
 }
+if (function_exists("ryunosuke\\Functions\\cache") && !defined("ryunosuke\\Functions\\cache")) {
+    define("ryunosuke\\Functions\\cache", "ryunosuke\\Functions\\cache");
+}
 
-const is_ansi = "ryunosuke\\Functions\\is_ansi";
 if (!isset($excluded_functions["is_ansi"]) && (!function_exists("ryunosuke\\Functions\\is_ansi") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_ansi"))->isInternal()))) {
     /**
      * リソースが ansi color に対応しているか返す
@@ -12380,8 +13082,10 @@ if (!isset($excluded_functions["is_ansi"]) && (!function_exists("ryunosuke\\Func
         return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_ansi") && !defined("ryunosuke\\Functions\\is_ansi")) {
+    define("ryunosuke\\Functions\\is_ansi", "ryunosuke\\Functions\\is_ansi");
+}
 
-const ansi_colorize = "ryunosuke\\Functions\\ansi_colorize";
 if (!isset($excluded_functions["ansi_colorize"]) && (!function_exists("ryunosuke\\Functions\\ansi_colorize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ansi_colorize"))->isInternal()))) {
     /**
      * 文字列に ANSI Color エスケープシーケンスを埋め込む
@@ -12448,8 +13152,10 @@ if (!isset($excluded_functions["ansi_colorize"]) && (!function_exists("ryunosuke
         return "\033[{$setters}m{$string}\033[{$unsetters}m";
     }
 }
+if (function_exists("ryunosuke\\Functions\\ansi_colorize") && !defined("ryunosuke\\Functions\\ansi_colorize")) {
+    define("ryunosuke\\Functions\\ansi_colorize", "ryunosuke\\Functions\\ansi_colorize");
+}
 
-const process = "ryunosuke\\Functions\\process";
 if (!isset($excluded_functions["process"]) && (!function_exists("ryunosuke\\Functions\\process") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\process"))->isInternal()))) {
     /**
      * proc_open ～ proc_close の一連の処理を行う
@@ -12545,8 +13251,10 @@ if (!isset($excluded_functions["process"]) && (!function_exists("ryunosuke\\Func
         return $rc;
     }
 }
+if (function_exists("ryunosuke\\Functions\\process") && !defined("ryunosuke\\Functions\\process")) {
+    define("ryunosuke\\Functions\\process", "ryunosuke\\Functions\\process");
+}
 
-const arguments = "ryunosuke\\Functions\\arguments";
 if (!isset($excluded_functions["arguments"]) && (!function_exists("ryunosuke\\Functions\\arguments") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\arguments"))->isInternal()))) {
     /**
      * コマンドライン引数をパースして引数とオプションを返す
@@ -12723,8 +13431,10 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("ryunosuke\\Fu
         return $result + $argsdefaults;
     }
 }
+if (function_exists("ryunosuke\\Functions\\arguments") && !defined("ryunosuke\\Functions\\arguments")) {
+    define("ryunosuke\\Functions\\arguments", "ryunosuke\\Functions\\arguments");
+}
 
-const stacktrace = "ryunosuke\\Functions\\stacktrace";
 if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\Functions\\stacktrace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\stacktrace"))->isInternal()))) {
     /**
      * スタックトレースを文字列で返す
@@ -12867,8 +13577,10 @@ if (!isset($excluded_functions["stacktrace"]) && (!function_exists("ryunosuke\\F
         return implode($option['delimiter'], $result);
     }
 }
+if (function_exists("ryunosuke\\Functions\\stacktrace") && !defined("ryunosuke\\Functions\\stacktrace")) {
+    define("ryunosuke\\Functions\\stacktrace", "ryunosuke\\Functions\\stacktrace");
+}
 
-const backtrace = "ryunosuke\\Functions\\backtrace";
 if (!isset($excluded_functions["backtrace"]) && (!function_exists("ryunosuke\\Functions\\backtrace") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\backtrace"))->isInternal()))) {
     /**
      * 特定条件までのバックトレースを取得する
@@ -12929,8 +13641,10 @@ if (!isset($excluded_functions["backtrace"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\backtrace") && !defined("ryunosuke\\Functions\\backtrace")) {
+    define("ryunosuke\\Functions\\backtrace", "ryunosuke\\Functions\\backtrace");
+}
 
-const error = "ryunosuke\\Functions\\error";
 if (!isset($excluded_functions["error"]) && (!function_exists("ryunosuke\\Functions\\error") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\error"))->isInternal()))) {
     /**
      * エラー出力する
@@ -12964,7 +13678,7 @@ if (!isset($excluded_functions["error"]) && (!function_exists("ryunosuke\\Functi
         $line = "[$time] PHP Log:  $content$location\n";
 
         if ($destination === null) {
-            $destination = ini_get('error_log');
+            $destination = blank_if(ini_get('error_log'), 'php://stderr');
         }
 
         if ($destination === 'syslog') {
@@ -12993,8 +13707,10 @@ if (!isset($excluded_functions["error"]) && (!function_exists("ryunosuke\\Functi
         return strlen($line);
     }
 }
+if (function_exists("ryunosuke\\Functions\\error") && !defined("ryunosuke\\Functions\\error")) {
+    define("ryunosuke\\Functions\\error", "ryunosuke\\Functions\\error");
+}
 
-const timer = "ryunosuke\\Functions\\timer";
 if (!isset($excluded_functions["timer"]) && (!function_exists("ryunosuke\\Functions\\timer") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\timer"))->isInternal()))) {
     /**
      * 処理時間を計測する
@@ -13025,8 +13741,10 @@ if (!isset($excluded_functions["timer"]) && (!function_exists("ryunosuke\\Functi
         return microtime(true) - $t;
     }
 }
+if (function_exists("ryunosuke\\Functions\\timer") && !defined("ryunosuke\\Functions\\timer")) {
+    define("ryunosuke\\Functions\\timer", "ryunosuke\\Functions\\timer");
+}
 
-const benchmark = "ryunosuke\\Functions\\benchmark";
 if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Functions\\benchmark") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\benchmark"))->isInternal()))) {
     /**
      * 簡易ベンチマークを取る
@@ -13141,8 +13859,10 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\benchmark") && !defined("ryunosuke\\Functions\\benchmark")) {
+    define("ryunosuke\\Functions\\benchmark", "ryunosuke\\Functions\\benchmark");
+}
 
-const stringify = "ryunosuke\\Functions\\stringify";
 if (!isset($excluded_functions["stringify"]) && (!function_exists("ryunosuke\\Functions\\stringify") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\stringify"))->isInternal()))) {
     /**
      * 値を何とかして文字列化する
@@ -13179,8 +13899,10 @@ if (!isset($excluded_functions["stringify"]) && (!function_exists("ryunosuke\\Fu
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\stringify") && !defined("ryunosuke\\Functions\\stringify")) {
+    define("ryunosuke\\Functions\\stringify", "ryunosuke\\Functions\\stringify");
+}
 
-const numberify = "ryunosuke\\Functions\\numberify";
 if (!isset($excluded_functions["numberify"]) && (!function_exists("ryunosuke\\Functions\\numberify") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\numberify"))->isInternal()))) {
     /**
      * 値を何とかして数値化する
@@ -13257,8 +13979,10 @@ if (!isset($excluded_functions["numberify"]) && (!function_exists("ryunosuke\\Fu
         return (int) $number;
     }
 }
+if (function_exists("ryunosuke\\Functions\\numberify") && !defined("ryunosuke\\Functions\\numberify")) {
+    define("ryunosuke\\Functions\\numberify", "ryunosuke\\Functions\\numberify");
+}
 
-const numval = "ryunosuke\\Functions\\numval";
 if (!isset($excluded_functions["numval"]) && (!function_exists("ryunosuke\\Functions\\numval") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\numval"))->isInternal()))) {
     /**
      * 値を数値化する
@@ -13292,8 +14016,10 @@ if (!isset($excluded_functions["numval"]) && (!function_exists("ryunosuke\\Funct
         return intval($var, $base);
     }
 }
+if (function_exists("ryunosuke\\Functions\\numval") && !defined("ryunosuke\\Functions\\numval")) {
+    define("ryunosuke\\Functions\\numval", "ryunosuke\\Functions\\numval");
+}
 
-const arrayval = "ryunosuke\\Functions\\arrayval";
 if (!isset($excluded_functions["arrayval"]) && (!function_exists("ryunosuke\\Functions\\arrayval") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\arrayval"))->isInternal()))) {
     /**
      * array キャストの関数版
@@ -13344,8 +14070,10 @@ if (!isset($excluded_functions["arrayval"]) && (!function_exists("ryunosuke\\Fun
         return $result;
     }
 }
+if (function_exists("ryunosuke\\Functions\\arrayval") && !defined("ryunosuke\\Functions\\arrayval")) {
+    define("ryunosuke\\Functions\\arrayval", "ryunosuke\\Functions\\arrayval");
+}
 
-const si_prefix = "ryunosuke\\Functions\\si_prefix";
 if (!isset($excluded_functions["si_prefix"]) && (!function_exists("ryunosuke\\Functions\\si_prefix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\si_prefix"))->isInternal()))) {
     /**
      * 数値に SI 接頭辞を付与する
@@ -13429,8 +14157,10 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("ryunosuke\\Fu
         return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n]);
     }
 }
+if (function_exists("ryunosuke\\Functions\\si_prefix") && !defined("ryunosuke\\Functions\\si_prefix")) {
+    define("ryunosuke\\Functions\\si_prefix", "ryunosuke\\Functions\\si_prefix");
+}
 
-const si_unprefix = "ryunosuke\\Functions\\si_unprefix";
 if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("ryunosuke\\Functions\\si_unprefix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\si_unprefix"))->isInternal()))) {
     /**
      * SI 接頭辞が付与された文字列を数値化する
@@ -13486,8 +14216,10 @@ if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("ryunosuke\\
         return numval($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
     }
 }
+if (function_exists("ryunosuke\\Functions\\si_unprefix") && !defined("ryunosuke\\Functions\\si_unprefix")) {
+    define("ryunosuke\\Functions\\si_unprefix", "ryunosuke\\Functions\\si_unprefix");
+}
 
-const is_empty = "ryunosuke\\Functions\\is_empty";
 if (!isset($excluded_functions["is_empty"]) && (!function_exists("ryunosuke\\Functions\\is_empty") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_empty"))->isInternal()))) {
     /**
      * 値が空か検査する
@@ -13554,8 +14286,10 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("ryunosuke\\Fun
         return empty($var);
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_empty") && !defined("ryunosuke\\Functions\\is_empty")) {
+    define("ryunosuke\\Functions\\is_empty", "ryunosuke\\Functions\\is_empty");
+}
 
-const is_primitive = "ryunosuke\\Functions\\is_primitive";
 if (!isset($excluded_functions["is_primitive"]) && (!function_exists("ryunosuke\\Functions\\is_primitive") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_primitive"))->isInternal()))) {
     /**
      * 値が複合型でないか検査する
@@ -13585,8 +14319,10 @@ if (!isset($excluded_functions["is_primitive"]) && (!function_exists("ryunosuke\
         return is_scalar($var) || is_null($var) || is_resource($var);
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_primitive") && !defined("ryunosuke\\Functions\\is_primitive")) {
+    define("ryunosuke\\Functions\\is_primitive", "ryunosuke\\Functions\\is_primitive");
+}
 
-const is_recursive = "ryunosuke\\Functions\\is_recursive";
 if (!isset($excluded_functions["is_recursive"]) && (!function_exists("ryunosuke\\Functions\\is_recursive") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_recursive"))->isInternal()))) {
     /**
      * 変数が再帰参照を含むか調べる
@@ -13636,8 +14372,10 @@ if (!isset($excluded_functions["is_recursive"]) && (!function_exists("ryunosuke\
         return $core($var, []);
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_recursive") && !defined("ryunosuke\\Functions\\is_recursive")) {
+    define("ryunosuke\\Functions\\is_recursive", "ryunosuke\\Functions\\is_recursive");
+}
 
-const is_stringable = "ryunosuke\\Functions\\is_stringable";
 if (!isset($excluded_functions["is_stringable"]) && (!function_exists("ryunosuke\\Functions\\is_stringable") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_stringable"))->isInternal()))) {
     /**
      * 変数が文字列化できるか調べる
@@ -13672,8 +14410,10 @@ if (!isset($excluded_functions["is_stringable"]) && (!function_exists("ryunosuke
         return true;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_stringable") && !defined("ryunosuke\\Functions\\is_stringable")) {
+    define("ryunosuke\\Functions\\is_stringable", "ryunosuke\\Functions\\is_stringable");
+}
 
-const is_arrayable = "ryunosuke\\Functions\\is_arrayable";
 if (!isset($excluded_functions["is_arrayable"]) && (!function_exists("ryunosuke\\Functions\\is_arrayable") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\is_arrayable"))->isInternal()))) {
     /**
      * 変数が配列アクセス可能か調べる
@@ -13693,8 +14433,10 @@ if (!isset($excluded_functions["is_arrayable"]) && (!function_exists("ryunosuke\
         return is_array($var) || $var instanceof \ArrayAccess;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_arrayable") && !defined("ryunosuke\\Functions\\is_arrayable")) {
+    define("ryunosuke\\Functions\\is_arrayable", "ryunosuke\\Functions\\is_arrayable");
+}
 
-const is_iterable = "ryunosuke\\Functions\\is_iterable";
 if (!isset($excluded_functions["is_iterable"]) && (!function_exists("ryunosuke\\Functions\\is_iterable") || (!true && (new \ReflectionFunction("ryunosuke\\Functions\\is_iterable"))->isInternal()))) {
     /**
      * 変数が foreach で回せるか調べる
@@ -13720,8 +14462,10 @@ if (!isset($excluded_functions["is_iterable"]) && (!function_exists("ryunosuke\\
         return is_array($var) || $var instanceof \Traversable;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_iterable") && !defined("ryunosuke\\Functions\\is_iterable")) {
+    define("ryunosuke\\Functions\\is_iterable", "ryunosuke\\Functions\\is_iterable");
+}
 
-const is_countable = "ryunosuke\\Functions\\is_countable";
 if (!isset($excluded_functions["is_countable"]) && (!function_exists("ryunosuke\\Functions\\is_countable") || (!true && (new \ReflectionFunction("ryunosuke\\Functions\\is_countable"))->isInternal()))) {
     /**
      * 変数が count でカウントできるか調べる
@@ -13747,8 +14491,10 @@ if (!isset($excluded_functions["is_countable"]) && (!function_exists("ryunosuke\
         return is_array($var) || $var instanceof \Countable;
     }
 }
+if (function_exists("ryunosuke\\Functions\\is_countable") && !defined("ryunosuke\\Functions\\is_countable")) {
+    define("ryunosuke\\Functions\\is_countable", "ryunosuke\\Functions\\is_countable");
+}
 
-const varcmp = "ryunosuke\\Functions\\varcmp";
 if (!isset($excluded_functions["varcmp"]) && (!function_exists("ryunosuke\\Functions\\varcmp") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\varcmp"))->isInternal()))) {
     /**
      * php7 の `<=>` の関数版
@@ -13820,14 +14566,19 @@ if (!isset($excluded_functions["varcmp"]) && (!function_exists("ryunosuke\\Funct
         return $a == $b ? 0 : ($a > $b ? 1 : -1);
     }
 }
+if (function_exists("ryunosuke\\Functions\\varcmp") && !defined("ryunosuke\\Functions\\varcmp")) {
+    define("ryunosuke\\Functions\\varcmp", "ryunosuke\\Functions\\varcmp");
+}
 
-const var_type = "ryunosuke\\Functions\\var_type";
 if (!isset($excluded_functions["var_type"]) && (!function_exists("ryunosuke\\Functions\\var_type") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_type"))->isInternal()))) {
     /**
      * 値の型を取得する（gettype + get_class）
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
+     *
+     * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
+     * 継承も実装もされていない場合は標準の get_class の結果を返す。
      *
      * Example:
      * ```php
@@ -13839,6 +14590,11 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("ryunosuke\\Fun
      * // オブジェクトは型名を返す
      * assertSame(var_type(new \stdClass), '\\stdClass');
      * assertSame(var_type(new \Exception()), '\\Exception');
+     * // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
+     * assertSame(var_type(new class extends \Exception{}), '\\Exception');
+     * assertSame(var_type(new class implements \JsonSerializable{
+     *     public function jsonSerialize() { return ''; }
+     * }), '\\JsonSerializable');
      * ```
      *
      * @param mixed $var 型を取得する値
@@ -13847,13 +14603,24 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("ryunosuke\\Fun
     function var_type($var)
     {
         if (is_object($var)) {
+            $ref = new \ReflectionObject($var);
+            if ($ref->isAnonymous()) {
+                if ($pc = $ref->getParentClass()) {
+                    return '\\' . $pc->name;
+                }
+                if ($is = $ref->getInterfaceNames()) {
+                    return '\\' . reset($is);
+                }
+            }
             return '\\' . get_class($var);
         }
         return gettype($var);
     }
 }
+if (function_exists("ryunosuke\\Functions\\var_type") && !defined("ryunosuke\\Functions\\var_type")) {
+    define("ryunosuke\\Functions\\var_type", "ryunosuke\\Functions\\var_type");
+}
 
-const var_apply = "ryunosuke\\Functions\\var_apply";
 if (!isset($excluded_functions["var_apply"]) && (!function_exists("ryunosuke\\Functions\\var_apply") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_apply"))->isInternal()))) {
     /**
      * 値にコールバックを適用する
@@ -13894,8 +14661,10 @@ if (!isset($excluded_functions["var_apply"]) && (!function_exists("ryunosuke\\Fu
         return $callback($var, ...$args);
     }
 }
+if (function_exists("ryunosuke\\Functions\\var_apply") && !defined("ryunosuke\\Functions\\var_apply")) {
+    define("ryunosuke\\Functions\\var_apply", "ryunosuke\\Functions\\var_apply");
+}
 
-const var_applys = "ryunosuke\\Functions\\var_applys";
 if (!isset($excluded_functions["var_applys"]) && (!function_exists("ryunosuke\\Functions\\var_applys") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_applys"))->isInternal()))) {
     /**
      * 配列にコールバックを適用する
@@ -13935,8 +14704,10 @@ if (!isset($excluded_functions["var_applys"]) && (!function_exists("ryunosuke\\F
         return $iterable ? $var : $var[0];
     }
 }
+if (function_exists("ryunosuke\\Functions\\var_applys") && !defined("ryunosuke\\Functions\\var_applys")) {
+    define("ryunosuke\\Functions\\var_applys", "ryunosuke\\Functions\\var_applys");
+}
 
-const var_export2 = "ryunosuke\\Functions\\var_export2";
 if (!isset($excluded_functions["var_export2"]) && (!function_exists("ryunosuke\\Functions\\var_export2") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_export2"))->isInternal()))) {
     /**
      * 組み込みの var_export をいい感じにしたもの
@@ -14057,8 +14828,10 @@ if (!isset($excluded_functions["var_export2"]) && (!function_exists("ryunosuke\\
         echo $result, "\n";
     }
 }
+if (function_exists("ryunosuke\\Functions\\var_export2") && !defined("ryunosuke\\Functions\\var_export2")) {
+    define("ryunosuke\\Functions\\var_export2", "ryunosuke\\Functions\\var_export2");
+}
 
-const var_html = "ryunosuke\\Functions\\var_html";
 if (!isset($excluded_functions["var_html"]) && (!function_exists("ryunosuke\\Functions\\var_html") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_html"))->isInternal()))) {
     /**
      * var_export2 を html コンテキストに特化させたようなもの
@@ -14132,8 +14905,10 @@ if (!isset($excluded_functions["var_html"]) && (!function_exists("ryunosuke\\Fun
         echo "<pre class='var_html'>{$export($value, [])}</pre>";
     }
 }
+if (function_exists("ryunosuke\\Functions\\var_html") && !defined("ryunosuke\\Functions\\var_html")) {
+    define("ryunosuke\\Functions\\var_html", "ryunosuke\\Functions\\var_html");
+}
 
-const var_pretty = "ryunosuke\\Functions\\var_pretty";
 if (!isset($excluded_functions["var_pretty"]) && (!function_exists("ryunosuke\\Functions\\var_pretty") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\var_pretty"))->isInternal()))) {
     /**
      * var_dump の出力を見やすくしたもの
@@ -14302,8 +15077,10 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("ryunosuke\\F
         echo $result, "\n";
     }
 }
+if (function_exists("ryunosuke\\Functions\\var_pretty") && !defined("ryunosuke\\Functions\\var_pretty")) {
+    define("ryunosuke\\Functions\\var_pretty", "ryunosuke\\Functions\\var_pretty");
+}
 
-const console_log = "ryunosuke\\Functions\\console_log";
 if (!isset($excluded_functions["console_log"]) && (!function_exists("ryunosuke\\Functions\\console_log") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\console_log"))->isInternal()))) {
     /**
      * js の console に値を吐き出す
@@ -14345,8 +15122,10 @@ if (!isset($excluded_functions["console_log"]) && (!function_exists("ryunosuke\\
         }
     }
 }
+if (function_exists("ryunosuke\\Functions\\console_log") && !defined("ryunosuke\\Functions\\console_log")) {
+    define("ryunosuke\\Functions\\console_log", "ryunosuke\\Functions\\console_log");
+}
 
-const hashvar = "ryunosuke\\Functions\\hashvar";
 if (!isset($excluded_functions["hashvar"]) && (!function_exists("ryunosuke\\Functions\\hashvar") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\hashvar"))->isInternal()))) {
     /**
      * 変数指定をできるようにした compact
@@ -14434,4 +15213,7 @@ if (!isset($excluded_functions["hashvar"]) && (!function_exists("ryunosuke\\Func
         // 仕組み上ここへは到達しないはず（呼び出し元のシンタックスが壊れてるときに到達しうるが、それならばそもそもこの関数自体が呼ばれないはず）。
         throw new \DomainException('syntax error.'); // @codeCoverageIgnore
     }
+}
+if (function_exists("ryunosuke\\Functions\\hashvar") && !defined("ryunosuke\\Functions\\hashvar")) {
+    define("ryunosuke\\Functions\\hashvar", "ryunosuke\\Functions\\hashvar");
 }

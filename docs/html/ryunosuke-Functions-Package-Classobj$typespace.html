@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L567" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L597" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -141,7 +141,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L40-L90" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L40-L98" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
                         detect_namespace                        	<small>($location) : string</small>
@@ -152,6 +152,12 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 指定パスに名前空間を持つような php ファイルが無いなら親をたどる。<br />
 親に名前空間を持つような php ファイルが有るならその名前空間＋ローカルパスを返す。</p>
 <p>言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">// Example 用としてこのクラスのディレクトリを使用してみる
+$dirname = dirname(class_loader()-&gt;findFile(\ryunosuke\Functions\Package\Classobj::class));
+// "$dirname/Hoge" の名前空間を推測して返す
+assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+</code></pre>
 </div>
                         	<table class="table">
 		<caption>Parameters</caption>
@@ -192,7 +198,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L92-L119" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L100-L127" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader                        	<small>($startdir = null) : <a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></small>
@@ -243,7 +249,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L121-L141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L129-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace                        	<small>($class) : string</small>
@@ -293,7 +299,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L143-L162" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L151-L170" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten                        	<small>($class) : string</small>
@@ -343,7 +349,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L164-L287" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L172-L317" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace                        	<small>($class, $register) : void</small>
@@ -390,6 +396,16 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
 // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2d');
 assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
+
+// メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
+    [\ryunosuke\Test\Package\Classobj\XTrait::class],
+    'method' =&gt; function(){return 'this is X3d';},
+]);
+// X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
+assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method(), 'this is X3d');
+// トレイトのメソッドも生えている
+assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod(), 'this is XTrait::traitMethod');
 </code></pre>
 </div>
                         	<table class="table">
@@ -402,7 +418,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is
 </td>
 			</tr>
         			<tr>
-				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+				<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a><span class="type-separator"></span><wbr>array</td>
 				<td class="rest">$register</td>
 				<td class="desc"><p>置換クラスを定義 or 返すクロージャ or 定義メソッド配列</p>
 </td>
@@ -436,7 +452,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L289-L436" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L319-L466" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_extends()" tabindex="-1" class="structure-title ">
                         class_extends                        	<small>($object, $methods, $fields = []) : object</small>
@@ -445,7 +461,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is
 						<div class="description"><p>インスタンスを動的に拡張する</p>
 <p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
 ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。<br />
-そのクラスの <strong>set/</strong>get が禁止されている場合に使えるかもしれない程度。</p>
+そのクラスの <code>__set</code>/<code>__get</code> が禁止されている場合に使えるかもしれない程度。</p>
 <p>クロージャ配列を渡すと特異メソッドになる。<br />
 そのクロージャの $this は元オブジェクトで bind される。<br />
 ただし、static closure を渡した場合はそれは static メソッドとして扱われる。</p>
@@ -514,7 +530,7 @@ assertSame($newobject-&gt;codemessage(), '123:hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L438-L475" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L468-L505" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::const_exists()" tabindex="-1" class="structure-title ">
                         const_exists                        	<small>($classname, $constname = null) : bool</small>
@@ -583,7 +599,7 @@ assertFalse(const_exists('UNDEFINED'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L477-L513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L507-L543" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
                         object_dive                        	<small>($object, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
@@ -662,7 +678,7 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L515-L566" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L545-L596" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
                         get_object_properties                        	<small>($object) : array</small>

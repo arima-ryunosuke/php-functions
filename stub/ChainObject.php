@@ -43,24 +43,20 @@
  * @method   \ChainObject  arguments1($rule)
  *
  * @see array_add
- * @property \ChainObject $array_add
  * @method   \ChainObject  array_add(...$variadic)
- * @method   \ChainObject  array_add1($array, ...$variadic)
- * @method   \ChainObject  array_add2($array, ...$variadic)
- * @method   \ChainObject  array_add3($array, ...$variadic)
- * @method   \ChainObject  array_add4($array, ...$variadic)
- * @method   \ChainObject  array_add5($array, ...$variadic)
- * @method   \ChainObject  array_add6($array, ...$variadic)
+ * @method   \ChainObject  array_add1(...$variadic)
+ * @method   \ChainObject  array_add2(...$variadic)
+ * @method   \ChainObject  array_add3(...$variadic)
+ * @method   \ChainObject  array_add4(...$variadic)
+ * @method   \ChainObject  array_add5(...$variadic)
  *
  * @see array_add
- * @property \ChainObject $add
  * @method   \ChainObject  add(...$variadic)
- * @method   \ChainObject  add1($array, ...$variadic)
- * @method   \ChainObject  add2($array, ...$variadic)
- * @method   \ChainObject  add3($array, ...$variadic)
- * @method   \ChainObject  add4($array, ...$variadic)
- * @method   \ChainObject  add5($array, ...$variadic)
- * @method   \ChainObject  add6($array, ...$variadic)
+ * @method   \ChainObject  add1(...$variadic)
+ * @method   \ChainObject  add2(...$variadic)
+ * @method   \ChainObject  add3(...$variadic)
+ * @method   \ChainObject  add4(...$variadic)
+ * @method   \ChainObject  add5(...$variadic)
  *
  * @see array_all
  * @property \ChainObject $array_all
@@ -383,6 +379,11 @@
  * @method   \ChainObject  eachE($callback, $default = null)
  * @method   \ChainObject  eachE1($array, $default = null)
  * @method   \ChainObject  eachE2($array, $callback)
+ *
+ * @see array_explode
+ * @method   \ChainObject  array_explode($condition, $limit = PHP_INT_MAX)
+ * @method   \ChainObject  array_explode1($array, $limit = PHP_INT_MAX)
+ * @method   \ChainObject  array_explode2($array, $condition)
  *
  * @see array_fill
  * @method   \ChainObject  array_fill($num, $val)
@@ -1685,6 +1686,32 @@
  * @see cachedir
  * @method   \ChainObject  cachedir()
  *
+ * @see call_if
+ * @method   \ChainObject  call_if($callable, ...$arguments)
+ * @method   \ChainObject  call_if1($condition, ...$arguments)
+ * @method   \ChainObject  call_if2($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_if3($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_if4($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_if5($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_if6($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_if7($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifP($callable, ...$arguments)
+ * @method   \ChainObject  call_ifP1($condition, ...$arguments)
+ * @method   \ChainObject  call_ifP2($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifP3($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifP4($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifP5($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifP6($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifP7($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifE($callable, ...$arguments)
+ * @method   \ChainObject  call_ifE1($condition, ...$arguments)
+ * @method   \ChainObject  call_ifE2($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifE3($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifE4($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifE5($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifE6($condition, $callable, ...$arguments)
+ * @method   \ChainObject  call_ifE7($condition, $callable, ...$arguments)
+ *
  * @see call_safely
  * @property \ChainObject $call_safely
  * @method   \ChainObject  call_safely(...$variadic)
@@ -1739,7 +1766,6 @@
  * @method   \ChainObject  ceil()
  *
  * @see chain
- * @property \ChainObject $chain
  * @method   \ChainObject  chain()
  *
  * @see chain_case
@@ -5368,7 +5394,7 @@
  */
 class ChainObject implements \IteratorAggregate
 {
-    public function __invoke() { }
+    public function __invoke(...$source) { }
 
     public function __toString() { return ''; }
 

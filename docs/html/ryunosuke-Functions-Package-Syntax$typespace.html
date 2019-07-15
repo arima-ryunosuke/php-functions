@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L833" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L944" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -382,10 +382,10 @@ assertSame(optional(new \ArrayObject([1]), 'stdClass')-&gt;count(), null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L282-L469" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L282-L519" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::chain()" tabindex="-1" class="structure-title ">
-                        chain                        	<small>($source) : <a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></small>
+                        chain                        	<small>($source = null) : <a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
@@ -423,6 +423,9 @@ map や filter を駆使しようとすると必要になるが、イテレー�
 さらに、 __toString も実装されているので、文字列的値の場合に限り自動で文字列化される。</p>
 <p>用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。<br />
 ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。</p>
+<p>なお、最初の引数を省略するとスタックモードになり、一切の処理が適用されなくなる。<br />
+その代わり <code>invoke</code> で遅延的に値を渡すことができるようになる。<br />
+「処理の流れだけ決めておいて後で適用する」イメージ。</p>
 <p>Example:</p>
 <pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
 $n1_9 = range(1, 9);
@@ -443,24 +446,29 @@ assertSame(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filt
 assertSame(chain($string)-&gt;explode1(' ')-&gt;filter()-&gt;map('ucfirst')-&gt;implode1('/')-&gt;rot13-&gt;md5-&gt;strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
 
  # よくある DB レコードをあれこれするシチュエーション
-$co = chain([
+$rows = [
     ['id' =&gt; 1, 'name' =&gt; 'hoge', 'sex' =&gt; 'F', 'age' =&gt; 17, 'salary' =&gt; 230000],
     ['id' =&gt; 3, 'name' =&gt; 'fuga', 'sex' =&gt; 'M', 'age' =&gt; 43, 'salary' =&gt; 480000],
     ['id' =&gt; 7, 'name' =&gt; 'piyo', 'sex' =&gt; 'M', 'age' =&gt; 21, 'salary' =&gt; 270000],
     ['id' =&gt; 9, 'name' =&gt; 'hage', 'sex' =&gt; 'F', 'age' =&gt; 30, 'salary' =&gt; 320000],
-]);
+];
 // e.g. 男性の平均給料
-assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()(), 375000);
+assertSame(chain($rows)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()(), 375000);
 // e.g. 女性の平均年齢
-assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()(), 23.5);
+assertSame(chain($rows)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()(), 23.5);
 // e.g. 30歳以上の平均給料
-assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()(), 400000);
+assertSame(chain($rows)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()(), 400000);
 // e.g. 20～30歳の平均給料
-assertSame((clone $co)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()(), 295000);
+assertSame(chain($rows)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()(), 295000);
 // e.g. 男性の最小年齢
-assertSame((clone $co)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()(), 21);
+assertSame(chain($rows)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()(), 21);
 // e.g. 女性の最大給料
-assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
+assertSame(chain($rows)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()(), 320000);
+
+# 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
+assertSame(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()($rows), 375000);
+assertSame(chain()-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()($rows), 400000);
+assertSame(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()($rows), 21);
 </code></pre>
 </div>
                         	<table class="table">
@@ -468,7 +476,7 @@ assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max
 		<tbody>
         			<tr>
 				<td class="type">mixed</td>
-				<td class="rest">$source</td>
+				<td class="rest">$source = null</td>
 				<td class="desc"><p>元データ</p>
 </td>
 			</tr>
@@ -501,10 +509,10 @@ assertSame((clone $co)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L471-L491" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L521-L542" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
-                        throws                        	<small>($ex) : void</small>
+                        throws                        	<small>($ex) : mixed</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>throw の関数版</p>
@@ -533,8 +541,9 @@ catch (\Exception $ex) {
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type">void</td>
-			<td class="desc"></td>
+			<td class="type">mixed</td>
+			<td class="desc"><p>（<code>return hoge or throws</code> のようなコードで警告が出るので抑止用）</p>
+</td>
 			<td class="rest"></td>
 		</tr>
 		</tbody>
@@ -556,7 +565,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L493-L520" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L544-L571" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throw_if()" tabindex="-1" class="structure-title ">
                         throw_if                        	<small>($flag, $ex, ...$ex_args) : void</small>
@@ -623,7 +632,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L522-L620" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L573-L671" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::blank_if()" tabindex="-1" class="structure-title ">
                         blank_if                        	<small>($var, $default = null) : mixed</small>
@@ -741,7 +750,86 @@ assertSame(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default', 0);       
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L622-L660" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L673-L731" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Syntax::call_if()" tabindex="-1" class="structure-title ">
+                        call_if                        	<small>($condition, $callable, ...$arguments) : mixed</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>条件を満たしたときにコールバックを実行する</p>
+<p><code>if ($condition) $callable(...$arguments);</code> と（$condition はクロージャを受け入れるけど）ほぼ同じ。<br />
+ただし、 $condition に数値を与えると「指定回数呼ばれたあとに実行する」という意味になる。<br />
+主に「ループ内でデバッグ出力したいけど、毎回だと少しうざい」というデバッグ用途。</p>
+<p>$condition が正数だと「指定回数呼ばれた次のみ」負数だと「指定回数呼ばれた次以降」実行される。<br />
+0 のときは無条件で実行される。</p>
+<p>Example:</p>
+<pre><code class="language-php">$output = [];
+$debug_print = function ($debug) use (&amp;$output) { $output[] = $debug; };
+for ($i=0; $i&lt;4; $i++) {
+    call_if($i == 1, $debug_print, '$i == 1のとき呼ばれた');
+    call_if(2, $debug_print, '2回呼ばれた');
+    call_if(-2, $debug_print, '2回以上呼ばれた');
+}
+assertSame($output, [
+    '$i == 1のとき呼ばれた',
+    '2回呼ばれた',
+    '2回以上呼ばれた',
+    '2回以上呼ばれた',
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$condition</td>
+				<td class="desc"><p>呼ばれる条件</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc"><p>呼ばれる処理</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">...$arguments</td>
+				<td class="desc"><p>$callable の引数（可変引数）</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>呼ばれた場合は $callable の返り値</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L733-L771" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::ifelse()" tabindex="-1" class="structure-title ">
                         ifelse                        	<small>($actual, $expected, $then, $else = null) : mixed</small>
@@ -820,7 +908,7 @@ assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L662-L700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L773-L811" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::switchs()" tabindex="-1" class="structure-title ">
                         switchs                        	<small>($value, $cases, $default = null) : mixed</small>
@@ -890,7 +978,7 @@ assertSame(switchs(3, $cases, 'undefined'), 'undefined');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L702-L729" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L813-L840" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_null()" tabindex="-1" class="structure-title ">
                         try_null                        	<small>($try, ...$variadic) : mixed</small>
@@ -952,7 +1040,7 @@ assertSame(try_null($try), null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L731-L754" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L842-L865" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch                        	<small>($try, $catch = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1020,7 +1108,7 @@ assertSame(try_catch($try)-&gt;getMessage(), 'tried');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L756-L783" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L867-L894" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally                        	<small>($try, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1092,7 +1180,7 @@ assertSame($finally_count, 2); // 呼ばれている
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L785-L832" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L896-L943" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally                        	<small>($try, $catch = null, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>

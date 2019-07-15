@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L1019" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L1042" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\FileSystem</span></h2>
@@ -342,13 +342,14 @@ assertSame(file_extension('filename.ext', ''), 'filename');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L193-L219" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L193-L232" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_set_contents()" tabindex="-1" class="structure-title ">
                         file_set_contents                        	<small>($filename, $data, $umask = 2) : int</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>ディレクトリも掘る file_put_contents</p>
+<p>書き込みは一時ファイルと rename を使用してアトミックに行われる。</p>
 <p>Example:</p>
 <pre><code class="language-php">file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
 assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
@@ -405,7 +406,7 @@ assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L221-L279" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L234-L293" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::file_rewrite_contents()" tabindex="-1" class="structure-title ">
                         file_rewrite_contents                        	<small>($filename, $callback, $operation = 0) : int</small>
@@ -472,7 +473,7 @@ assertStringEqualsFile($testpath, 'pre-hoge-fix');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L281-L301" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L295-L315" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::mkdir_p()" tabindex="-1" class="structure-title ">
                         mkdir_p                        	<small>($dirname, $umask = 2) : bool</small>
@@ -526,7 +527,7 @@ assertStringEqualsFile($testpath, 'pre-hoge-fix');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L303-L334" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L317-L348" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::dirname_r()" tabindex="-1" class="structure-title ">
                         dirname_r                        	<small>($path, $callback) : mixed</small>
@@ -588,7 +589,7 @@ assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L336-L368" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L350-L382" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::fnmatch_and()" tabindex="-1" class="structure-title ">
                         fnmatch_and                        	<small>($patterns, $string, $flags = 0) : bool</small>
@@ -655,7 +656,7 @@ assertFalse(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L370-L402" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L384-L416" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::fnmatch_or()" tabindex="-1" class="structure-title ">
                         fnmatch_or                        	<small>($patterns, $string, $flags = 0) : bool</small>
@@ -722,7 +723,7 @@ assertFalse(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L404-L434" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L418-L457" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::path_is_absolute()" tabindex="-1" class="structure-title ">
                         path_is_absolute                        	<small>($path) : bool</small>
@@ -778,7 +779,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L436-L464" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L459-L487" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::path_resolve()" tabindex="-1" class="structure-title ">
                         path_resolve                        	<small>(...$paths) : string</small>
@@ -833,7 +834,7 @@ assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}ab
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L466-L508" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L489-L531" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::path_normalize()" tabindex="-1" class="structure-title ">
                         path_normalize                        	<small>($path) : string</small>
@@ -888,7 +889,7 @@ assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}cu
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L510-L577" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L533-L600" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::cp_rf()" tabindex="-1" class="structure-title ">
                         cp_rf                        	<small>($src, $dst) : bool</small>
@@ -965,7 +966,7 @@ assertStringEqualsFile("$tmp/dst4", 'hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L579-L614" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L602-L637" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::rm_rf()" tabindex="-1" class="structure-title ">
                         rm_rf                        	<small>($dirname, $self = true) : bool</small>
@@ -1023,7 +1024,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L616-L661" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L639-L684" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::tmpname()" tabindex="-1" class="structure-title ">
                         tmpname                        	<small>($prefix = &quot;rft&quot;, $dir = null) : string</small>
@@ -1082,7 +1083,7 @@ assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L663-L1018" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L686-L1041" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::memory_path()" tabindex="-1" class="structure-title ">
                         memory_path                        	<small>($path) : string</small>
