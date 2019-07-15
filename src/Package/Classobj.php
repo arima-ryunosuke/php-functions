@@ -212,10 +212,20 @@ class Classobj
      * // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
      * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->method(), 'this is X2d');
      * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod(), 'this is newmethod');
+     *
+     * // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
+     *     [\ryunosuke\Test\Package\Classobj\XTrait::class],
+     *     'method' => function(){return 'this is X3d';},
+     * ]);
+     * // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->method(), 'this is X3d');
+     * // トレイトのメソッドも生えている
+     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->traitMethod(), 'this is XTrait::traitMethod');
      * ```
      *
      * @param string $class 対象クラス名
-     * @param \Closure $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
+     * @param \Closure|array $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
      */
     public static function class_replace($class, $register)
     {
@@ -237,7 +247,12 @@ class Classobj
         require_once $fname;
 
         $classess = get_declared_classes();
-        $newclass = $register();
+        if ($register instanceof \Closure) {
+            $newclass = $register();
+        }
+        else {
+            $newclass = $register;
+        }
 
         // クロージャ内部でクラス定義した場合（増えたクラスでエイリアスする）
         if ($newclass === null) {
@@ -272,15 +287,22 @@ class Classobj
             $origspace = trim(implode('', array_column($origspace, 1)));
             $origclass = trim(implode('', array_column($origclass, 1)));
 
-            $methods = '';
-            foreach ($newclass as $name => $func) {
-                $codes = (callable_code)($func);
-                $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $codes[0]);
-                $methods .= "public $mname {$codes[1]}";
+            $classcode = '';
+            foreach ($newclass as $name => $member) {
+                if (is_array($member)) {
+                    foreach ($member as $trait) {
+                        $classcode .= "use \\" . trim($trait, '\\') . ";\n";
+                    }
+                }
+                else {
+                    $codes = (callable_code)($member);
+                    $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $codes[0]);
+                    $classcode .= "public $mname {$codes[1]}\n";
+                }
             }
 
             $newclass = "\\$origspace\\{$origclass}_";
-            (evaluate)("namespace $origspace;class {$origclass}_ extends {$origclass}{ $methods }");
+            (evaluate)("namespace $origspace;\nclass {$origclass}_ extends {$origclass}\n{\n$classcode}");
         }
 
         class_alias($newclass, $class);

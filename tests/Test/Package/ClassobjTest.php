@@ -75,31 +75,35 @@ class ClassobjTest extends AbstractTestCase
             return new \B();
         });
 
-        (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\C', function () {
-            return [
-                'newMethod' => function () {
-                    return 'this is ' . (new \ReflectionClass($this))->getShortName();
-                },
-                'f'         => function () {
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    return parent::f();
-                },
-            ];
-        });
+        (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\C', [
+            [\Traitable::class],
+            'newMethod' => function () {
+                return 'this is ' . (new \ReflectionClass($this))->getShortName();
+            },
+            'f'         => function () {
+                /** @noinspection PhpUndefinedMethodInspection */
+                return parent::f();
+            },
+        ]);
 
         $this->assertEquals([
             'this is exA',
             'this is exB',
         ], (new \ryunosuke\Test\package\Classobj\B())->f());
 
+        /** @var \Traitable $classC */
         $classC = new \ryunosuke\Test\package\Classobj\C();
-        $this->assertEquals([
-            'this is exA',
-            'this is exB',
-            'this is C',
-        ], $classC->f());
+        $this->assertEquals('Traitable', $classC->publicField);
+        $this->assertEquals('Traitable', $classC->traitMethod());
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->assertEquals('this is C__', $classC->newMethod());
+        {
+            $this->assertEquals([
+                'this is exA',
+                'this is exB',
+                'this is C',
+            ], $classC->f());
+            $this->assertEquals('this is C__', $classC->newMethod());
+        }
 
         $classD = new \ryunosuke\Test\package\Classobj\D();
         $this->assertEquals([
