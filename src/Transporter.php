@@ -70,6 +70,11 @@ class Transporter
             $funcname = self::detectDependent($funcname);
         }
 
+        $namespace = trim($namespace, '\\');
+        $nameprefix = $namespace;
+        if (strlen($nameprefix)) {
+            $nameprefix .= '\\';
+        }
         $symbols = self::parseSymbol();
 
         // 定数コードの取得
@@ -80,21 +85,15 @@ class Transporter
                 continue;
             }
             $doccomment = $const->getDocComment();
-            $cname = $ve($name);
-            if ($namespace) {
-                $cvalue = $ve($const->getValue());
-                $consts[] = "$doccomment\nconst $name = $cvalue;\n";
-            }
-            else {
-                $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
-                $consts[] = <<<CONSTANT
+            $cname = $ve("{$nameprefix}$name");
+            $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
+            $consts[] = <<<CONSTANT
 if (!defined($cname)) {
     $doccomment
     define($cname, $cvalue);
 }
 
 CONSTANT;
-            }
         }
 
         // 関数コードの取得
@@ -106,8 +105,9 @@ CONSTANT;
             }
 
             if ($classmode) {
+                $cname = $ve("{$nameprefix}$name");
                 $id = '[' . $ve($method->class) . ', ' . $ve($name) . ']';
-                $funcs[] = "const $name = $id;";
+                $funcs[] = "define($cname, $id);";
             }
             else {
                 $doccomment = $method->getDocComment();
@@ -118,15 +118,20 @@ CONSTANT;
                 $block = preg_replace('#public static #', '', $block, 1);
                 $block = trim($block);
 
-                $id = $ve(ltrim("$namespace\\$name", '\\'));
-                $funcs[] = "const $name = $id;";
+                $cname = $ve("{$nameprefix}$name");
+                $id = $ve("{$nameprefix}$name");
                 $funcs[] = <<<FUNCTION
 if (!isset(\$excluded_functions[{$ve($name)}]) && (!function_exists($id) || (!$polyfill && (new \\ReflectionFunction($id))->isInternal()))) {
     $doccomment
     $block
 }
-
 FUNCTION;
+                $funcs[] = <<<CONSTANT
+if (function_exists($id) && !defined($cname)) {
+    define($cname, $id);
+}
+
+CONSTANT;
             }
         }
 

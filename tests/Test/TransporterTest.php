@@ -139,7 +139,7 @@ DUMMY
         unlink(__DIR__ . '/../../src/Package/Dummy.php');
 
         $this->assertContains('namespace test\hoge;', $contents);
-        $this->assertContains('const arrayize = ', $contents);
+        $this->assertContains('define("test\\\\hoge\\\\arrayize"', $contents);
         $this->assertContains('function arrayize', $contents);
     }
 
@@ -158,7 +158,7 @@ DUMMY
         ]);
 
         $this->assertContains('callable_code', $contents);    // 自分自身が含まれている
-        $this->assertContains('const TOKEN_NAME', $contents); // 依存している定数が含まれている
+        $this->assertContains('TOKEN_NAME', $contents);       // 依存している定数が含まれている
         $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
     }
 
@@ -174,19 +174,19 @@ DUMMY
 
         $contents = Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/');
 
-        $this->assertContains('parse_uri', $contents);      // file1 が含まれている
-        $this->assertContains('sql_format', $contents);     // file2 が含まれている
-        $this->assertContains('const KEYWORDS', $contents); // file2 に依存している定数が含まれている
-        $this->assertContains('preg_capture', $contents);   // file1 に依存している関数が含まれている
-        $this->assertContains('throws', $contents);         // file2 に依存している関数が含まれている
+        $this->assertContains('parse_uri', $contents);    // file1 が含まれている
+        $this->assertContains('sql_format', $contents);   // file2 が含まれている
+        $this->assertContains('KEYWORDS', $contents);     // file2 に依存している定数が含まれている
+        $this->assertContains('preg_capture', $contents); // file1 に依存している関数が含まれている
+        $this->assertContains('throws', $contents);       // file2 に依存している関数が含まれている
 
         $contents = Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/parse_uri.php');
 
-        $this->assertContains('parse_uri', $contents);         // file1 が含まれている
-        $this->assertNotContains('sql_format', $contents);     // file2 は含まれていない
-        $this->assertNotContains('const KEYWORDS', $contents); // file2 に依存している定数が含まれていない
-        $this->assertContains('preg_capture', $contents);      // file1 に依存している関数が含まれている
-        $this->assertNotContains('throws', $contents);         // file2 に依存している関数が含まれている
+        $this->assertContains('parse_uri', $contents);     // file1 が含まれている
+        $this->assertNotContains('sql_format', $contents); // file2 は含まれていない
+        $this->assertNotContains('KEYWORDS', $contents);   // file2 に依存している定数が含まれていない
+        $this->assertContains('preg_capture', $contents);  // file1 に依存している関数が含まれている
+        $this->assertNotContains('throws', $contents);     // file2 に依存している関数が含まれている
     }
 
     /**
@@ -203,7 +203,7 @@ DUMMY
 
         $this->assertContains('arrayize', $contents);         // 指定したものが含まれている
         $this->assertContains('callable_code', $contents);    // 指定したものが含まれている
-        $this->assertContains('const TOKEN_NAME', $contents); // 依存している定数が含まれている
+        $this->assertContains('TOKEN_NAME', $contents);       // 依存している定数が含まれている
         $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
     }
 
