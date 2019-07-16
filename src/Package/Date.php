@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Functions\Package;
 
+
 /**
  * 日付・時刻関連のユーティリティ
  */
@@ -146,7 +147,7 @@ class Date
      * ```
      *
      * @param string $format フォーマット
-     * @param string|int|float $datetimedata 日時データ。省略時は microtime
+     * @param string|int|float|\DateTime $datetimedata 日時データ。省略時は microtime
      * @return string 日時文字列
      */
     public static function date_convert($format, $datetimedata = null)
@@ -154,6 +155,10 @@ class Date
         // 省略時は microtime
         if ($datetimedata === null) {
             $timestamp = microtime(true);
+        }
+        elseif ($datetimedata instanceof \DateTime) {
+            // @fixme DateTime オブジェクトって timestamp を float で得られないの？
+            $timestamp = (float) $datetimedata->format('U.u');
         }
         else {
             $timestamp = (date_timestamp)($datetimedata);

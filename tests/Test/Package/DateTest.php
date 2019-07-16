@@ -97,6 +97,7 @@ class DateTest extends AbstractTestCase
         $this->assertEquals('2009/02/14 08:31:30.123000', (date_convert)('Y/m/d H:i:s.u', 1234567890.123));
         $this->assertEquals('2014/12/24 12:34:56.123000', (date_convert)('Y/m/d H:i:s.u', '2014/12/24 12:34:56.123'));
         $this->assertEquals('2019/12/24 12:34:56.123000', (date_convert)('Y/m/d H:i:s.u', '令和元年12月24日 12時34分56.123秒'));
+        $this->assertEquals('2019/12/24 12:34:56.123000', (date_convert)('Y/m/d H:i:s.u', \DateTime::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')));
 
         $this->assertEquals(date('Y/m/d H:i:s'), (date_convert)('Y/m/d H:i:s')); // microtime はテストがつらすぎるので u を付けない
 
