@@ -294,6 +294,97 @@ class ArraysTest extends AbstractTestCase
         $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)([1 => 'a', 0 => 'b', 2 => 'c'], ','));
     }
 
+    function test_array_explode()
+    {
+        $this->assertEquals([[]], (array_explode)([], '|'));
+        $this->assertEquals([['a'], [2 => 'b', 3 => 'c']], (array_explode)(['a', '|', 'b', 'c'], '|'));
+        $this->assertEquals([[], [1 => 'a'], [], []], (array_explode)(['|', 'a', '|', '|'], '|'));
+
+        $this->assertEquals([[], [], [2 => null, 3 => null]], (array_explode)([null, null, null, null], null, 3));
+
+        $this->assertEquals([['a', '|', 'b', '|', 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 0));
+        $this->assertEquals([['a', '|', 'b', '|', 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 1));
+        $this->assertEquals([['a'], [2 => 'b', 3 => '|', 4 => 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 2));
+        $this->assertEquals([['a'], [2 => 'b'], [4 => 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 3));
+        $this->assertEquals([['a'], [2 => 'b'], [4 => 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 4));
+
+        $this->assertEquals([
+            [
+                0 => 'a',
+                1 => null,
+                2 => 'b',
+                3 => null,
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, 1));
+        $this->assertEquals([
+            [0 => 'a'],
+            [
+                2 => 'b',
+                3 => null,
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, 2));
+        $this->assertEquals([
+            [0 => 'a'],
+            [2 => 'b'],
+            [
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, 3));
+        $this->assertEquals([
+            [0 => 'a'],
+            [2 => 'b'],
+            [
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, 4));
+
+        $this->assertEquals([
+            [
+                0 => 'a',
+                1 => null,
+                2 => 'b',
+                3 => null,
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, -1));
+        $this->assertEquals([
+            [
+                0 => 'a',
+                1 => null,
+                2 => 'b',
+            ],
+            [
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, -2));
+        $this->assertEquals([
+            [0 => 'a'],
+            [2 => 'b'],
+            [
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, -3));
+        $this->assertEquals([
+            [0 => 'a'],
+            [2 => 'b'],
+            [
+                4 => 'c',
+            ],
+        ], (array_explode)(['a', null, 'b', null, 'c'], null, -4));
+
+        $rows = [
+            1 => $r1 = ['id' => 1, 'name' => 'A'],
+            2 => $r2 = ['id' => 2, 'name' => 'B'],
+            3 => $r3 = ['id' => 3, 'name' => 'C'],
+            4 => $r4 = ['id' => 4, 'name' => 'D'],
+        ];
+        $this->assertEquals([[1 => $r1, 2 => $r2], [4 => $r4]], (array_explode)($rows, function ($v, $k) {
+            return $k === 3 && $v['name'] === 'C';
+        }));
+    }
+
     function test_array_sprintf()
     {
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
