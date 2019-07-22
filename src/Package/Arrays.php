@@ -524,12 +524,12 @@ class Arrays
      * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
      * ```
      *
-     * @param array $array 対象配列
-     * @param array $variadic 足す配列
+     * @param array $variadic 足す配列（可変引数）
      * @return array 足された配列
      */
-    public static function array_add($array, ...$variadic)
+    public static function array_add(...$variadic)
     {
+        $array = [];
         foreach ($variadic as $arg) {
             $array += $arg;
         }
