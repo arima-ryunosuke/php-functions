@@ -193,6 +193,8 @@ class FileSystem
     /**
      * ディレクトリも掘る file_put_contents
      *
+     * 書き込みは一時ファイルと rename を使用してアトミックに行われる。
+     *
      * Example:
      * ```php
      * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
@@ -210,12 +212,23 @@ class FileSystem
             $umask = umask();
         }
 
+        $filename = (path_normalize)($filename);
+
         if (!is_dir($dirname = dirname($filename))) {
             if (!@(mkdir_p)($dirname, $umask)) {
                 throw new \RuntimeException("failed to mkdir($dirname)");
             }
         }
-        return file_put_contents($filename, $data);
+
+        $tempnam = tempnam($dirname, 'tmp');
+        if (($result = file_put_contents($tempnam, $data)) !== false) {
+            if (rename($tempnam, $filename)) {
+                @chmod($filename, 0666 & ~$umask);
+                return $result;
+            }
+            unlink($tempnam);
+        }
+        return false;
     }
 
     /**

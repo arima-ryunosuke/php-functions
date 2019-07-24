@@ -196,7 +196,16 @@ class FileSystemTest extends AbstractTestCase
         (file_set_contents)("$dir/hoge.txt", 'hoge');
         $this->assertStringEqualsFile("$dir/hoge.txt", 'hoge');
 
+        (file_set_contents)("$dir/dir4/fuga/../", 'fuga');
+        $this->assertStringEqualsFile("$dir/dir4", 'fuga');
+
         $this->assertException('failed to mkdir', file_set_contents, '/dev/null/::::::/a', '');
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            error_clear_last();
+            @(file_set_contents)('/dev/null/::::::', '');
+            $this->assertContains('rename', error_get_last()['message']);
+        }
     }
 
     function test_dirname_r()
