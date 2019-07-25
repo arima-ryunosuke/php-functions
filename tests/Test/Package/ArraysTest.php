@@ -2073,6 +2073,27 @@ class ArraysTest extends AbstractTestCase
             'k2.k23.2' => 3,
             'o'        => $o,
         ], (array_flatten)($array, '.'));
+
+        // Generator
+        $this->assertSame([
+            '1'        => 1,
+            '2.10'     => 10,
+            '2.11.100' => 100,
+            '2.11.200' => 200,
+            '2.20'     => 20,
+            '2'        => 2,
+        ], (array_flatten)((function () {
+            yield 1 => 1;
+            yield (function () {
+                yield 10 => 10;
+                yield (function () {
+                    yield 100 => 100;
+                    yield 200 => 200;
+                })();
+                yield 20 => 20;
+            })();
+            yield 2 => 2;
+        })(), '.'));
     }
 
     function test_array_nest()

@@ -3231,7 +3231,7 @@ class Arrays
         $core = function ($array, $delimiter) use (&$core) {
             $result = [];
             foreach ($array as $k => $v) {
-                if (is_array($v)) {
+                if ((is_iterable)($v)) {
                     foreach ($core($v, $delimiter) as $ik => $iv) {
                         if ($delimiter === null) {
                             $result[] = $iv;
