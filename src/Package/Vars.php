@@ -653,6 +653,9 @@ class Vars
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
      *
+     * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
+     * 継承も実装もされていない場合は標準の get_class の結果を返す。
+     *
      * Example:
      * ```php
      * // プリミティブ型は gettype と同義
@@ -663,6 +666,11 @@ class Vars
      * // オブジェクトは型名を返す
      * assertSame(var_type(new \stdClass), '\\stdClass');
      * assertSame(var_type(new \Exception()), '\\Exception');
+     * // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
+     * assertSame(var_type(new class extends \Exception{}), '\\Exception');
+     * assertSame(var_type(new class implements \JsonSerializable{
+     *     public function jsonSerialize() { return ''; }
+     * }), '\\JsonSerializable');
      * ```
      *
      * @param mixed $var 型を取得する値
@@ -671,6 +679,15 @@ class Vars
     public static function var_type($var)
     {
         if (is_object($var)) {
+            $ref = new \ReflectionObject($var);
+            if ($ref->isAnonymous()) {
+                if ($pc = $ref->getParentClass()) {
+                    return '\\' . $pc->name;
+                }
+                if ($is = $ref->getInterfaceNames()) {
+                    return '\\' . reset($is);
+                }
+            }
             return '\\' . get_class($var);
         }
         return gettype($var);

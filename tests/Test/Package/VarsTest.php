@@ -470,6 +470,21 @@ class VarsTest extends AbstractTestCase
         $this->assertEquals('array', (var_type)(['array']));
         $this->assertEquals('\\' . \stdClass::class, (var_type)(new \stdClass()));
         $this->assertEquals('\\' . \Concrete::class, (var_type)(new \Concrete('hoge')));
+
+        $this->assertEquals('\stdClass', ((var_type)(new class extends \stdClass implements \JsonSerializable
+        {
+            public function jsonSerialize() { return ''; }
+        })));
+        $this->assertEquals('\JsonSerializable', ((var_type)(new class implements \JsonSerializable
+        {
+            public function jsonSerialize() { return ''; }
+        })));
+        $this->assertEquals('\stdClass', ((var_type)(new class extends \stdClass
+        {
+        })));
+        $this->assertContains('anonymous', ((var_type)(new class
+        {
+        })));
     }
 
     function test_var_apply()
