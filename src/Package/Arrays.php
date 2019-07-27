@@ -1715,6 +1715,11 @@ class Arrays
      * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
+     * // 上記において値に配列を渡すと in_array で判定される
+     * assertSame(array_where($array, ['id' => [2, 3]]), [
+     *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+     *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+     * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
      * assertSame(array_where($array, [
      *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
@@ -1741,7 +1746,12 @@ class Arrays
                     if ($c instanceof \Closure) {
                         return $c;
                     }
-                    return $callback ? function ($v) use ($c) { return $v === $c; } : function ($v) use ($c) { return $v == $c; };
+                    if ($callback) {
+                        return function ($v) use ($c) { return $v === $c; };
+                    }
+                    else {
+                        return function ($v) use ($c) { return is_array($c) ? in_array($v, $c) : $v == $c; };
+                    }
                 }, $column);
                 $callback = function ($vv, $k) use ($callbacks) {
                     foreach ($callbacks as $c => $callback) {

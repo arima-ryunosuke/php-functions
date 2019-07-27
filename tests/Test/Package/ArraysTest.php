@@ -899,6 +899,10 @@ class ArraysTest extends AbstractTestCase
         ], (array_where)($array, ['flag' => 1], false));
         $this->assertEquals([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ], (array_where)($array, ['id' => [2, 3]], false));
+        $this->assertEquals([
+            1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
         ], (array_where)($array, ['flag' => true], true));
         $this->assertEquals([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
