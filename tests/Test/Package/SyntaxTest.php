@@ -386,6 +386,39 @@ PHP
         $this->assertSame($stringableT, (blank_if)($stringableT, 'default'));
     }
 
+    function test_call_if()
+    {
+        $receiver = [];
+        $callback = function ($name) use (&$receiver) {
+            $receiver[$name] = ($receiver[$name] ?? 0) + 1;
+            return $name;
+        };
+
+        $this->assertEquals('true', (call_if)(true, $callback, 'true'));
+        $this->assertEquals(null, (call_if)(false, $callback, 'false'));
+
+        $this->assertEquals('closure_true', (call_if)(function () { return true; }, $callback, 'closure_true'));
+        $this->assertEquals(null, (call_if)(function () { return false; }, $callback, 'closure_false'));
+
+        for ($i = 0; $i < 5; $i++) {
+            (call_if)(-2, $callback, 'number:-2');
+            (call_if)(-1, $callback, 'number:-1');
+            (call_if)(0, $callback, 'number: 0');
+            (call_if)(+1, $callback, 'number:+1');
+            (call_if)(+2, $callback, 'number:+2');
+        }
+
+        $this->assertEquals([
+            'true'         => 1,
+            'closure_true' => 1,
+            'number:-2'    => 3,
+            'number:-1'    => 4,
+            'number: 0'    => 5,
+            'number:+1'    => 1,
+            'number:+2'    => 1,
+        ], $receiver);
+    }
+
     function test_ifelse()
     {
         // ユースケースとしては例えば null と 0/false を区別したいことがある
