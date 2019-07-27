@@ -795,7 +795,7 @@ class Utility
         $line = "[$time] PHP Log:  $content$location\n";
 
         if ($destination === null) {
-            $destination = ini_get('error_log');
+            $destination = (blank_if)(ini_get('error_log'), 'php://stderr');
         }
 
         if ($destination === 'syslog') {
