@@ -21,6 +21,7 @@ class Funchand
     {
         // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
         $__rfunc_delegate_marker = true;
+        assert($__rfunc_delegate_marker === true); // phpstorm の警告解除
 
         if ($arity === null) {
             $arity = (parameter_length)($callable, true, true);
@@ -59,7 +60,7 @@ class Funchand
                     return $invoker($callable, func_get_args());
                 };
             default:
-                $argstring = (array_rmap)(range(1, $arity), strcat, '$_');
+                $argstring = array_map(function ($v) { return '$_' . $v; }, range(1, $arity));
                 return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
                     return $invoker($callable, func_get_args());
                 };');
