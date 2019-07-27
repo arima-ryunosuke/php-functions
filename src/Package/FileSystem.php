@@ -433,7 +433,16 @@ class FileSystem
      */
     public static function path_is_absolute($path)
     {
-        if (substr($path, 0, 1) == '/') {
+        // スキームが付いている場合は path 部分で判定
+        $parts = parse_url($path);
+        if (isset($parts['scheme'], $parts['path'])) {
+            $path = $parts['path'];
+        }
+        elseif (isset($parts['scheme'], $parts['host'])) {
+            $path = $parts['host'];
+        }
+
+        if (substr($path, 0, 1) === '/') {
             return true;
         }
 

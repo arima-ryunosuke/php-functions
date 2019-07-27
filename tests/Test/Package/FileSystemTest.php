@@ -258,7 +258,13 @@ class FileSystemTest extends AbstractTestCase
             $this->assertTrue((path_is_absolute)("C:\\path"));
             $this->assertTrue((path_is_absolute)("\\a\\/b\\c"));
             $this->assertFalse((path_is_absolute)('a\\b\\c'));
+            $this->assertTrue((path_is_absolute)('file:///C:\\path'));
         }
+
+        $this->assertFalse((path_is_absolute)('http://example.jp'));
+        $this->assertTrue((path_is_absolute)('http://example.jp/path'));
+        $this->assertTrue((path_is_absolute)('file:///path'));
+        $this->assertTrue((path_is_absolute)('file://localhost/C:\\path'));
     }
 
     function test_path_resolve()
