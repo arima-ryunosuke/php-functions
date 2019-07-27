@@ -534,6 +534,7 @@ class Syntax
      * ```
      *
      * @param \Exception $ex 投げる例外
+     * @return mixed （`return hoge or throws` のようなコードで警告が出るので抑止用）
      */
     public static function throws($ex)
     {

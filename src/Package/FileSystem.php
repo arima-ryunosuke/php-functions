@@ -251,6 +251,7 @@ class FileSystem
      */
     public static function file_rewrite_contents($filename, $callback, $operation = 0)
     {
+        /** @var resource $fp */
         try {
             // 開いて
             $fp = fopen($filename, 'c+b') ?: (throws)(new \UnexpectedValueException('failed to fopen.'));

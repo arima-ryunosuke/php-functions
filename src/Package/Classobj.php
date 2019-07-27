@@ -46,6 +46,14 @@ class Classobj
      *
      * 言葉で表すとややこしいが、「そのパスに配置しても違和感の無い名前空間」を返してくれるはず。
      *
+     * Example:
+     * ```php
+     * // Example 用としてこのクラスのディレクトリを使用してみる
+     * $dirname = dirname(class_loader()->findFile(\ryunosuke\Functions\Package\Classobj::class));
+     * // "$dirname/Hoge" の名前空間を推測して返す
+     * assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+     * ```
+     *
      * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
      * @return string 名前空間
      */
@@ -313,7 +321,7 @@ class Classobj
      *
      * インスタンスに特異メソッド・特異フィールドのようなものを生やす。
      * ただし、特異フィールドの用途はほとんどない（php はデフォルトで特異フィールドのような動作なので）。
-     * そのクラスの __set/__get が禁止されている場合に使えるかもしれない程度。
+     * そのクラスの `__set`/`__get` が禁止されている場合に使えるかもしれない程度。
      *
      * クロージャ配列を渡すと特異メソッドになる。
      * そのクロージャの $this は元オブジェクトで bind される。

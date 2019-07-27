@@ -1422,7 +1422,7 @@ class Strings
      *
      * @param array $csvarrays 連想配列の配列
      * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
-     * @return array|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
+     * @return string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
      */
     public static function csv_export($csvarrays, $options = [])
     {

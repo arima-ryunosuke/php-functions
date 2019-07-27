@@ -3366,6 +3366,7 @@ class Arrays
      *         ]
      *     ],
      *     'key1'   => 'hoge',
+     *     'array'  => ['a', 'b', 'c'],
      * ], [
      *     'common' => [
      *         'sub' => [
@@ -3373,9 +3374,11 @@ class Arrays
      *         ]
      *     ],
      *     'key2'   => 'fuga',
+     *     'array'  => ['c', 'd', 'e'],
      * ]), [
      *     'common.sub.x' => ['-' => 'val', '+' => 'VAL'],
      *     'key1'         => ['-' => 'hoge'],
+     *     'array'        => ['-' => ['a', 'b'], '+' => ['d', 'e']],
      *     'key2'         => ['+' => 'fuga'],
      * ]);
      * ```
