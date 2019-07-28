@@ -267,71 +267,95 @@ PHP
 
     function test_chain()
     {
-        /** @var \ChainObject $co */
+        // (chain)呼び出しだとコード補完が効かないのでラップする
+        $chain = function (...$v) {
+            /** @var \ChainObject $co */
+            $co = (chain)(...$v);
+            return $co;
+        };
 
         // funcO
-        $co = (chain)([1, 2, 3, 4, 5]);
-        $this->assertEquals([-1, -2, -3, -4, -5], (clone $co)->mapP(['-'])());
-        $this->assertEquals([0, 5, 5, 5, 5], (clone $co)->mapP(['-' => 1])->mapP(['?:' => [5, 0]])());
-        $this->assertEquals([2 => 8, 9, 10], (clone $co)->filterP(['>=' => 3])->mapP(['+' => 5])());
+        $array = [1, 2, 3, 4, 5];
+        $this->assertEquals([-1, -2, -3, -4, -5], $chain($array)->mapP(['-'])());
+        $this->assertEquals([0, 5, 5, 5, 5], $chain($array)->mapP(['-' => 1])->mapP(['?:' => [5, 0]])());
+        $this->assertEquals([2 => 8, 9, 10], $chain($array)->filterP(['>=' => 3])->mapP(['+' => 5])());
 
         // funcE
-        $co = (chain)([1, 2, 3, 4, 5]);
-        $this->assertEquals([2 => 6, 8, 10], (clone $co)->mapE('*2')->filterE('>5')());
-        $this->assertEquals('1,4,9,16,25', (clone $co)->mapE('$_ * $_')->vsprintf1('%d,%d,%d,%d,%d')());
+        $array = [1, 2, 3, 4, 5];
+        $this->assertEquals([2 => 6, 8, 10], $chain($array)->mapE('*2')->filterE('>5')());
+        $this->assertEquals('1,4,9,16,25', $chain($array)->mapE('$_ * $_')->vsprintf1('%d,%d,%d,%d,%d')());
 
         // apply
-        $co = (chain)('a12345z');
-        $this->assertEquals('12,345.000', $co->apply('ltrim', 'a')->apply('rtrim', 'z')->apply('number_format', 3)());
-        $this->assertEquals('12,345.000', (string) $co);
+        $string = 'a12345z';
+        $this->assertEquals('12,345.000', $chain($string)->apply('ltrim', 'a')->apply('rtrim', 'z')->apply('number_format', 3)());
+        $this->assertEquals($string, (string) $chain($string));
 
         // iterator
-        $co = (chain)(['a' => 'A', 'b' => 'B', 'c' => 'C']);
-        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], iterator_to_array($co));
+        $hash = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], iterator_to_array($chain($hash)));
 
         // string
-        $co = (chain)('hello');
-        $this->assertEquals('H,e,l,l,o', $co->ucfirst->str_split->implode1(',')());
-        $this->assertEquals('H,e,l,l,o', (string) $co);
+        $string = 'hello';
+        $this->assertEquals('H,e,l,l,o', $chain($string)->ucfirst->str_split->implode1(',')());
+        $this->assertEquals($string, (string) $chain($string));
 
         // internal
-        $co = (chain)('1,2,3,4,5');
-        $this->assertEquals([6, 8, 10], $co->multiexplode1(',')->filter_notP(['<' => 3])->mapsE('*2')->values()());
+        $list = '1,2,3,4,5';
+        $this->assertEquals([6, 8, 10], $chain($list)->multiexplode1(',')->filter_notP(['<' => 3])->mapsE('*2')->values()());
 
         // exception
-        $this->assertException('is not defined', [(chain)(null), 'undefined_function']);
+        $this->assertException('is not defined', [$chain(null), 'undefined_function']);
 
         // use case
-        $co = (chain)([
+        $rows = [
             ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
             ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
             ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
             ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
-        ]);
+        ];
 
         // e.g. 男性の平均給料
-        $this->assertEquals(375000, (clone $co)->whereP('sex', ['===' => 'M'])->column('salary')->mean()());
+        $this->assertEquals(375000, $chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()());
+        $this->assertEquals(375000, $chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows));
 
         // e.g. 女性の平均年齢
-        $this->assertEquals(23.5, (clone $co)->whereE('sex', '=== "F"')->column('age')->mean()());
+        $this->assertEquals(23.5, $chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()());
+        $this->assertEquals(23.5, $chain()->whereE('sex', '=== "F"')->column('age')->mean()($rows));
 
         // e.g. 30歳以上の平均給料
-        $this->assertEquals(400000, (clone $co)->whereP('age', ['>=' => 30])->column('salary')->mean()());
+        $this->assertEquals(400000, $chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()());
+        $this->assertEquals(400000, $chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows));
 
         // e.g. 20～30歳の平均給料
-        $this->assertEquals(295000, (clone $co)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()());
+        $this->assertEquals(295000, $chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()());
+        $this->assertEquals(295000, $chain()->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()($rows));
 
         // e.g. 男性の最小年齢
-        $this->assertEquals(21, (clone $co)->whereP('sex', ['===' => 'M'])->column('age')->min()());
+        $this->assertEquals(21, $chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()());
+        $this->assertEquals(21, $chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows));
 
         // e.g. 女性の最大給料
-        $this->assertEquals(320000, (clone $co)->whereE('sex', '=== "F"')->column('salary')->max()());
+        $this->assertEquals(320000, $chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()());
+        $this->assertEquals(320000, $chain()->whereE('sex', '=== "F"')->column('salary')->max()($rows));
 
         // e.g. 30歳以上の id => name
         $this->assertEquals([
             3 => 'fuga',
             9 => 'hage',
-        ], (clone $co)->whereP('age', ['>=' => 30])->column('name', 'id')());
+        ], $chain($rows)->whereP('age', ['>=' => 30])->column('name', 'id')());
+        $this->assertEquals([
+            3 => 'fuga',
+            9 => 'hage',
+        ], $chain()->whereP('age', ['>=' => 30])->column('name', 'id')($rows));
+
+        // 引数遅延モード
+        $chainer = $chain()->sha1->md5()->substr(0, 3)->apply('ltrim', 'abcdef');
+        $this->assertEquals('69', $chainer('hello'));
+        $this->assertEquals('880', $chainer('world'));
+        $this->assertEquals(['69', '880'], $chainer('hello', 'world'));
+
+        $this->assertException('nonempty stack and no parameter given', $chain());
+        $this->assertException('empty stack and parameter given > 0', $chain('hoge'), null);
     }
 
     function test_throws()

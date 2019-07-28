@@ -312,6 +312,10 @@ class Syntax
      * 用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。
      * ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。
      *
+     * なお、最初の引数を省略するとスタックモードになり、一切の処理が適用されなくなる。
+     * その代わり `invoke` で遅延的に値を渡すことができるようになる。
+     * 「処理の流れだけ決めておいて後で適用する」イメージ。
+     *
      * Example:
      * ```php
      * # 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
@@ -333,42 +337,71 @@ class Syntax
      * assertSame(chain($string)->explode1(' ')->filter()->map('ucfirst')->implode1('/')->rot13->md5->strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
      *
      *  # よくある DB レコードをあれこれするシチュエーション
-     * $co = chain([
+     * $rows = [
      *     ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
      *     ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
      *     ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
      *     ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
-     * ]);
+     * ];
      * // e.g. 男性の平均給料
-     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
+     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
      * // e.g. 女性の平均年齢
-     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
+     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
      * // e.g. 30歳以上の平均給料
-     * assertSame((clone $co)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
+     * assertSame(chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
      * // e.g. 20～30歳の平均給料
-     * assertSame((clone $co)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
+     * assertSame(chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
      * // e.g. 男性の最小年齢
-     * assertSame((clone $co)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
+     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
      * // e.g. 女性の最大給料
-     * assertSame((clone $co)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     *
+     * # 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
+     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows), 375000);
+     * assertSame(chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows), 400000);
+     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows), 21);
      * ```
      *
      * @param mixed $source 元データ
      * @return \ChainObject
      */
-    public static function chain($source)
+    public static function chain($source = null)
     {
-        return new class($source) implements \IteratorAggregate
+        return new class(...func_get_args()) implements \IteratorAggregate
         {
             private $data;
+            private $stack;
 
-            public function __construct($source)
+            public function __construct($source = null)
             {
+                if (func_num_args() === 0) {
+                    $this->stack = [];
+                }
                 $this->data = $source;
             }
 
-            public function __invoke()
+            public function __invoke(...$source)
             {
+                $func_num_args = func_num_args();
+
+                if ($this->stack !== null && $func_num_args === 0) {
+                    throw new \InvalidArgumentException('nonempty stack and no parameter given. maybe invalid __invoke args.');
+                }
+                if ($this->stack === null && $func_num_args > 0) {
+                    throw new \UnexpectedValueException('empty stack and parameter given > 0. maybe invalid __invoke args.');
+                }
+
+                if ($func_num_args > 0) {
+                    $result = [];
+                    foreach ($source as $s) {
+                        $chain = (chain)($s);
+                        foreach ($this->stack as $stack) {
+                            $chain->{$stack[0]}(...$stack[1]);
+                        }
+                        $result[] = $chain();
+                    }
+                    return $func_num_args === 1 ? reset($result) : $result;
+                }
                 return $this->data;
             }
 
@@ -396,6 +429,11 @@ class Syntax
 
             public function apply($callback, ...$args)
             {
+                if (is_array($this->stack)) {
+                    $this->stack[] = [__FUNCTION__, func_get_args()];
+                    return $this;
+                }
+
                 $this->data = $callback($this->data, ...$args);
                 return $this;
             }
@@ -427,6 +465,11 @@ class Syntax
 
             private function _apply($name, $arguments)
             {
+                if (is_array($this->stack)) {
+                    $this->stack[] = [$name, $arguments];
+                    return $this;
+                }
+
                 // 特別扱い1: map は非常によく呼ぶので引数を補正する
                 if ($name === 'map') {
                     /** @noinspection PhpUndefinedMethodInspection */
