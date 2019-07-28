@@ -51,7 +51,7 @@
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
     ],
     "document": [
-      "@php documentize.phar generate src/Package docs --ansi --force --contain ryunosuke --template-config docconfig.php"
+      "@php bin/documentize.phar generate src/Package docs --ansi --force --contain ryunosuke --template-config docconfig.php"
     ]
   }
 }
