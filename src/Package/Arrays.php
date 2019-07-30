@@ -2512,7 +2512,7 @@ class Arrays
         // 文字列・配列が来たらキーアクセス/メソッドコールとする
         elseif (is_string($comparator) || is_array($comparator)) {
             $comparator = static function ($a, $b) use ($comparator) {
-                foreach ((arrayize) ($comparator) as $method => $args) {
+                foreach ((arrayize)($comparator) as $method => $args) {
                     if (is_int($method)) {
                         $delta = $a[$args] <=> $b[$args];
                     }
