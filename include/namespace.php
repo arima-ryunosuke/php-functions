@@ -3437,7 +3437,7 @@ if (!isset($excluded_functions["array_distinct"]) && (!function_exists("ryunosuk
         // 文字列・配列が来たらキーアクセス/メソッドコールとする
         elseif (is_string($comparator) || is_array($comparator)) {
             $comparator = static function ($a, $b) use ($comparator) {
-                foreach (arrayize ($comparator) as $method => $args) {
+                foreach (arrayize($comparator) as $method => $args) {
                     if (is_int($method)) {
                         $delta = $a[$args] <=> $b[$args];
                     }
@@ -4768,9 +4768,25 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
                     }
                 }
                 else {
-                    $codes = callable_code($member);
-                    $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $codes[0]);
-                    $classcode .= "public $mname {$codes[1]}\n";
+                    list($declare, $codeblock) = callable_code($member);
+                    $parentclass = new \ReflectionClass("\\$origspace\\$origclass");
+                    // 元クラスに定義されているならオーバーライドとして特殊な処理を行う
+                    if ($parentclass->hasMethod($name)) {
+                        /** @var \ReflectionFunctionAbstract $refmember */
+                        $refmember = reflect_callable($member);
+                        $refmethod = $parentclass->getMethod($name);
+                        // 指定クロージャに引数が無くて、元メソッドに有るなら継承
+                        if (!$refmember->getNumberOfParameters() && $refmethod->getNumberOfParameters()) {
+                            $declare = 'function (' . implode(', ', function_parameter($refmethod)) . ')';
+                        }
+                        // 同上。返り値版
+                        if (!$refmember->hasReturnType() && $refmethod->hasReturnType()) {
+                            $rtype = $refmethod->getReturnType();
+                            $declare .= ':' . ($rtype->allowsNull() ? '?' : '') . ($rtype->isBuiltin() ? '' : '\\') . $rtype->getName();
+                        }
+                    }
+                    $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $declare);
+                    $classcode .= "public $mname $codeblock\n";
                 }
             }
 
@@ -4798,7 +4814,7 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
      * ただし、static closure を渡した場合はそれは static メソッドとして扱われる。
      *
      * 内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。
-     * 当然ながら final クラスの拡張もできない。
+     * 当然ながら final クラス/メソッドの拡張もできない。
      *
      * Example:
      * ```php
@@ -4811,6 +4827,16 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
      *     },
      * ]);
      * assertSame($newobject->codemessage(), '123:hoge');
+     *
+     * // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
+     * $object = new \ArrayObject([1, 2, 3]);
+     * $newobject = class_extends($object, [
+     *     'count' => function() {
+     *         // parent は元オブジェクトを表す
+     *         return parent::count() * 2;
+     *     },
+     * ]);
+     * assertSame($newobject->count(), 6);
      * ```
      *
      * @param string $object 対象オブジェクト
@@ -4830,7 +4856,7 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
                     private static $__originalClass;
                     private        $__original;
                     private        $__fields;
-                    private        $__methods;
+                    private        $__methods       = [];
                     private static $__staticMethods = [];
 
                     public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
@@ -4844,7 +4870,6 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
                         $this->__fields = $fields;
 
                         foreach ($methods as $name => $method) {
-                            $method = \Closure::fromCallable($method);
                             $bmethod = @$method->bindTo($this->__original, $refclass->isInternal() ? $this : $this->__original);
                             // 内部クラスは $this バインドできないので original じゃなく自身にする
                             if ($bmethod) {
@@ -4895,44 +4920,107 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
             $template_source = implode("", array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1));
         }
 
-        /** @var \ReflectionClass[][] $spawners */
+        /** @var \ReflectionClass[][]|\ReflectionMethod[][][] $spawners */
         static $spawners = [];
 
         $classname = get_class($object);
+        $classalias = str_replace('\\', '__', $classname);
+
         if (!isset($spawners[$classname])) {
-            $classalias = str_replace('\\', '__', $classname);
-
-            $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            $refclass = new \ReflectionClass($classname);
+            $classmethods = [];
+            foreach ($refclass->getMethods() as $method) {
+                if (!$method->isFinal() && !$method->isAbstract() && !in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
+                    $classmethods[$method->name] = $method;
+                }
+            }
+            $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname);
             if (!file_exists($cachefile)) {
-                $declares = [];
-                foreach ((new \ReflectionClass($classname))->getMethods() as $method) {
-                    if (!$method->isFinal() && !$method->isAbstract()) {
-                        if (!in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
-                            $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
-                            $name = $method->getName();
-                            $reference = $method->returnsReference() ? '&' : '';
-                            $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+                touch($cachefile);
+                $declares = "";
+                foreach ($classmethods as $name => $method) {
+                    $ref = $method->returnsReference() ? '&' : '';
+                    $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+                    $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
 
-                            $params = function_parameter($method);
-                            $prms = implode(', ', $params);
-                            $args = implode(', ', array_keys($params));
-                            $declares[] = "$modifier function $reference$name($prms) {
-                                \$return = $reference $receiver$name(...[$args]);
-                                return \$return;
-                            }";
+                    $params = function_parameter($method);
+                    $prms = implode(', ', $params);
+                    $args = implode(', ', array_keys($params));
+                    $rtype = '';
+                    if ($method->hasReturnType()) {
+                        $rt = $method->getReturnType();
+                        $rtype = ':' . ($rt->allowsNull() ? '?' : '') . ($rt->isBuiltin() ? '' : '\\') . $rt->getName();
+                    }
+                    $declares .= "$modifier function $ref$name($prms)$rtype { \$return = $ref$receiver$name(...[$args]);return \$return; }\n";
+                }
+                $traitcode = "trait X{$classalias}Trait\n$template_source$declares}";
+                file_put_contents("$cachefile-trait.php", "<?php\n" . $traitcode, LOCK_EX);
+
+                $classcode = "class X{$classalias}Class extends $classname\n{use X{$classalias}Trait;}";
+                file_put_contents("$cachefile-class.php", "<?php\n" . $classcode, LOCK_EX);
+            }
+            require_once "$cachefile-trait.php";
+            require_once "$cachefile-class.php";
+            $spawners[$classname] = [
+                'original' => $refclass,
+                'methods'  => $classmethods,
+                'trait'    => new \ReflectionClass("X{$classalias}Trait"),
+                'class'    => new \ReflectionClass("X{$classalias}Class"),
+            ];
+        }
+
+        $overrides = array_intersect_key($methods, $spawners[$classname]['methods']);
+        if ($overrides) {
+            $declares = "";
+            foreach ($overrides as $name => $override) {
+                $method = $spawners[$classname]['methods'][$name];
+                $ref = $method->returnsReference() ? '&' : '';
+                $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+                $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
+
+                list(, $codeblock) = callable_code($override);
+                /** @var \ReflectionFunctionAbstract $refmember */
+                $refmember = reflect_callable($override);
+                // 指定クロージャに引数が無くて、元メソッドに有るなら継承
+                $params = function_parameter($override);
+                if (!$refmember->getNumberOfParameters() && $method->getNumberOfParameters()) {
+                    $params = function_parameter($method);
+                }
+                // 同上。返り値版
+                $rtype = '';
+                if (!$refmember->hasReturnType() && $method->hasReturnType()) {
+                    $rt = $method->getReturnType();
+                    $rtype = ':' . ($rt->allowsNull() ? '?' : '') . ($rt->isBuiltin() ? '' : '\\') . $rt->getName();
+                }
+
+                $tokens = parse_php($codeblock);
+                array_shift($tokens);
+                $parented = null;
+                foreach ($tokens as $n => $token) {
+                    if ($token[0] !== T_WHITESPACE) {
+                        if ($token[0] === T_STRING && $token[1] === 'parent') {
+                            $parented = $n;
+                        }
+                        elseif ($parented !== null && $token[0] === T_DOUBLE_COLON) {
+                            unset($tokens[$parented]);
+                            $tokens[$n][1] = $receiver;
+                        }
+                        else {
+                            $parented = null;
                         }
                     }
                 }
-                $code = "class X$classalias extends $classname$template_source" . implode("\n", $declares) . '}';
-                file_put_contents($cachefile, "<?php\n" . $code, LOCK_EX);
+                $codeblock = implode('', array_column($tokens, 1));
+
+                $prms = implode(', ', $params);
+                $declares .= "$modifier function $ref$name($prms)$rtype $codeblock";
             }
-            require_once $cachefile;
-            $spawners[$classname] = [
-                'original'   => new \ReflectionClass($classname),
-                'reflection' => new \ReflectionClass("X$classalias"),
-            ];
+            $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
+            evaluate("class $newclassname extends $classname\n{use X{$classalias}Trait;\n$declares}");
+            return new $newclassname($spawners[$classname]['original'], $object, $fields, $methods);
         }
-        return $spawners[$classname]['reflection']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
+
+        return $spawners[$classname]['class']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
     }
 }
 if (function_exists("ryunosuke\\Functions\\class_extends") && !defined("ryunosuke\\Functions\\class_extends")) {
@@ -7707,7 +7795,14 @@ if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryun
 
         $result = [];
         foreach ($reffunc->getParameters() as $parameter) {
-            $declare = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+            $declare = '';
+
+            if ($parameter->hasType()) {
+                $type = $parameter->getType();
+                $declare .= ($type->allowsNull() ? '?' : '') . ($type->isBuiltin() ? '' : '\\') . $type->getName() . ' ';
+            }
+
+            $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
 
             if ($parameter->isVariadic()) {
                 $declare = '...' . $declare;
@@ -9151,6 +9246,55 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("ryunosuke\
 }
 if (function_exists("ryunosuke\\Functions\\quoteexplode") && !defined("ryunosuke\\Functions\\quoteexplode")) {
     define("ryunosuke\\Functions\\quoteexplode", "ryunosuke\\Functions\\quoteexplode");
+}
+
+if (!isset($excluded_functions["strrstr"]) && (!function_exists("ryunosuke\\Functions\\strrstr") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\strrstr"))->isInternal()))) {
+    /**
+     * 文字列が最後に現れる位置以前を返す
+     *
+     * strstr の逆のイメージで文字列を後ろから探索する動作となる。
+     * strstr の動作は「文字列を前から探索して指定文字列があったらそれ以後を返す」なので、
+     * その逆の動作の「文字列を後ろから探索して指定文字列があったらそれ以前を返す」という挙動を示す。
+     *
+     * strstr の「needle が文字列でない場合は、 それを整数に変換し、その番号に対応する文字として扱います」は直感的じゃないので踏襲しない。
+     * （全体的にこの動作をやめよう、という RFC もあったはず）。
+     *
+     * 第3引数の意味合いもデフォルト値も逆になるので、単純に呼べばよくある「指定文字列より後ろを（指定文字列を含めないで）返す」という動作になる。
+     *
+     * Example:
+     * ```php
+     * // パス中の最後のディレクトリを取得
+     * assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":"), 'path/to/3');
+     * // $after_needle を false にすると逆の動作になる
+     * assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":", false), 'path/to/1:path/to/2:');
+     * // （参考）strrchr と違い、文字列が使えるしその文字そのものは含まれない
+     * assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
+     * ```
+     *
+     * @param string $haystack 調べる文字列
+     * @param string $needle 検索文字列
+     * @param bool $after_needle $needle より後ろを返すか
+     * @return string
+     */
+    function strrstr($haystack, $needle, $after_needle = true)
+    {
+        // return strrev(strstr(strrev($haystack), strrev($needle), $after_needle));
+
+        $lastpos = mb_strrpos($haystack, $needle);
+        if ($lastpos === false) {
+            return false;
+        }
+
+        if ($after_needle) {
+            return mb_substr($haystack, $lastpos + mb_strlen($needle));
+        }
+        else {
+            return mb_substr($haystack, 0, $lastpos + mb_strlen($needle));
+        }
+    }
+}
+if (function_exists("ryunosuke\\Functions\\strrstr") && !defined("ryunosuke\\Functions\\strrstr")) {
+    define("ryunosuke\\Functions\\strrstr", "ryunosuke\\Functions\\strrstr");
 }
 
 if (!isset($excluded_functions["str_anyof"]) && (!function_exists("ryunosuke\\Functions\\str_anyof") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_anyof"))->isInternal()))) {

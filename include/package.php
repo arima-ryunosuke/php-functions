@@ -801,6 +801,7 @@ define("ryunosuke\\Functions\\Package\\concat", ["ryunosuke\\Functions\\Package\
 define("ryunosuke\\Functions\\Package\\split_noempty", ["ryunosuke\\Functions\\Package\\Strings", "split_noempty"]);
 define("ryunosuke\\Functions\\Package\\multiexplode", ["ryunosuke\\Functions\\Package\\Strings", "multiexplode"]);
 define("ryunosuke\\Functions\\Package\\quoteexplode", ["ryunosuke\\Functions\\Package\\Strings", "quoteexplode"]);
+define("ryunosuke\\Functions\\Package\\strrstr", ["ryunosuke\\Functions\\Package\\Strings", "strrstr"]);
 define("ryunosuke\\Functions\\Package\\str_anyof", ["ryunosuke\\Functions\\Package\\Strings", "str_anyof"]);
 define("ryunosuke\\Functions\\Package\\str_equals", ["ryunosuke\\Functions\\Package\\Strings", "str_equals"]);
 define("ryunosuke\\Functions\\Package\\str_contains", ["ryunosuke\\Functions\\Package\\Strings", "str_contains"]);

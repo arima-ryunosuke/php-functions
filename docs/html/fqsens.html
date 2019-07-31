@@ -1615,7 +1615,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod(), 'this 
 そのクロージャの $this は元オブジェクトで bind される。<br />
 ただし、static closure を渡した場合はそれは static メソッドとして扱われる。</p>
 <p>内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。<br />
-当然ながら final クラスの拡張もできない。</p>
+当然ながら final クラス/メソッドの拡張もできない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
 $object = new \Exception('hoge', 123);
@@ -1626,6 +1626,16 @@ $newobject = class_extends($object, [
     },
 ]);
 assertSame($newobject-&gt;codemessage(), '123:hoge');
+
+// オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
+$object = new \ArrayObject([1, 2, 3]);
+$newobject = class_extends($object, [
+    'count' =&gt; function() {
+        // parent は元オブジェクトを表す
+        return parent::count() * 2;
+    },
+]);
+assertSame($newobject-&gt;count(), 6);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::const_exists()">
@@ -2803,6 +2813,25 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
     'b', // 普通に分割される
     '{e,f}', // { } で囲まれているので区切り文字とみなされない
 ]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strrstr()">
+                                    ryunosuke\Functions\Package\Strings::strrstr		</a>	<small>($haystack, $needle, $after_needle = true) : string</small>
+		</h4>
+	<div class="description"><p>文字列が最後に現れる位置以前を返す</p>
+<p>strstr の逆のイメージで文字列を後ろから探索する動作となる。<br />
+strstr の動作は「文字列を前から探索して指定文字列があったらそれ以後を返す」なので、<br />
+その逆の動作の「文字列を後ろから探索して指定文字列があったらそれ以前を返す」という挙動を示す。</p>
+<p>strstr の「needle が文字列でない場合は、 それを整数に変換し、その番号に対応する文字として扱います」は直感的じゃないので踏襲しない。<br />
+（全体的にこの動作をやめよう、という RFC もあったはず）。</p>
+<p>第3引数の意味合いもデフォルト値も逆になるので、単純に呼べばよくある「指定文字列より後ろを（指定文字列を含めないで）返す」という動作になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// パス中の最後のディレクトリを取得
+assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":"), 'path/to/3');
+// $after_needle を false にすると逆の動作になる
+assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":", false), 'path/to/1:path/to/2:');
+// （参考）strrchr と違い、文字列が使えるしその文字そのものは含まれない
+assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_anyof()">

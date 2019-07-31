@@ -1105,13 +1105,13 @@
  *
  * @see array_order
  * @method   \ChainObject  array_order($orders, $preserve_keys = false)
- * @method   \ChainObject  array_order1($array, $preserve_keys = false)
- * @method   \ChainObject  array_order2($array, $orders)
+ * @method   \ChainObject  array_order1(array $array, $preserve_keys = false)
+ * @method   \ChainObject  array_order2(array $array, $orders)
  *
  * @see array_order
  * @method   \ChainObject  order($orders, $preserve_keys = false)
- * @method   \ChainObject  order1($array, $preserve_keys = false)
- * @method   \ChainObject  order2($array, $orders)
+ * @method   \ChainObject  order1(array $array, $preserve_keys = false)
+ * @method   \ChainObject  order2(array $array, $orders)
  *
  * @see array_pad
  * @method   \ChainObject  array_pad($pad_size, $pad_value)
@@ -2008,8 +2008,8 @@
  * @method   \ChainObject  date_create1($time = null)
  *
  * @see date_create_from_format
- * @method   \ChainObject  date_create_from_format($time, $object = null)
- * @method   \ChainObject  date_create_from_format1($format, $object = null)
+ * @method   \ChainObject  date_create_from_format($time, ?\DateTimeZone $object = null)
+ * @method   \ChainObject  date_create_from_format1($format, ?\DateTimeZone $object = null)
  * @method   \ChainObject  date_create_from_format2($format, $time)
  *
  * @see date_create_immutable
@@ -2017,8 +2017,8 @@
  * @method   \ChainObject  date_create_immutable1($time = null)
  *
  * @see date_create_immutable_from_format
- * @method   \ChainObject  date_create_immutable_from_format($time, $object = null)
- * @method   \ChainObject  date_create_immutable_from_format1($format, $object = null)
+ * @method   \ChainObject  date_create_immutable_from_format($time, ?\DateTimeZone $object = null)
+ * @method   \ChainObject  date_create_immutable_from_format1($format, ?\DateTimeZone $object = null)
  * @method   \ChainObject  date_create_immutable_from_format2($format, $time)
  *
  * @see date_date_set
@@ -3199,7 +3199,7 @@
  * @method   \ChainObject  kvsort1($array)
  *
  * @see kvsprintf
- * @method   \ChainObject  kvsprintf($array)
+ * @method   \ChainObject  kvsprintf(array $array)
  * @method   \ChainObject  kvsprintf1($format)
  *
  * @see last_key
@@ -4988,6 +4988,11 @@
  * @method   \ChainObject  strrpos1($haystack, $offset = null)
  * @method   \ChainObject  strrpos2($haystack, $needle)
  *
+ * @see strrstr
+ * @method   \ChainObject  strrstr($needle, $after_needle = true)
+ * @method   \ChainObject  strrstr1($haystack, $after_needle = true)
+ * @method   \ChainObject  strrstr2($haystack, $needle)
+ *
  * @see strspn
  * @method   \ChainObject  strspn($mask, $start = null, $len = null)
  * @method   \ChainObject  strspn1($str, $start = null, $len = null)
@@ -5108,11 +5113,11 @@
  * @see timer
  * @property \ChainObject $timer
  * @method   \ChainObject  timer($count = 1)
- * @method   \ChainObject  timer1($callable)
+ * @method   \ChainObject  timer1(callable $callable)
  * @method   \ChainObject  timerP($count = 1)
- * @method   \ChainObject  timerP1($callable)
+ * @method   \ChainObject  timerP1(callable $callable)
  * @method   \ChainObject  timerE($count = 1)
- * @method   \ChainObject  timerE1($callable)
+ * @method   \ChainObject  timerE1(callable $callable)
  *
  * @see timezone_identifiers_list
  * @method   \ChainObject  timezone_identifiers_list($country = null)
@@ -5133,8 +5138,8 @@
  * @method   \ChainObject  timezone_name_get()
  *
  * @see timezone_offset_get
- * @method   \ChainObject  timezone_offset_get($datetime)
- * @method   \ChainObject  timezone_offset_get1($object)
+ * @method   \ChainObject  timezone_offset_get(\DateTimeInterface $datetime)
+ * @method   \ChainObject  timezone_offset_get1(\DateTimeZone $object)
  *
  * @see timezone_open
  * @property \ChainObject $timezone_open
