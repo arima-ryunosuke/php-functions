@@ -10,6 +10,13 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.8
+
+- [feature][Strings] strrstr を追加
+- [feature][Classobj] class_replace のオーバーライド対応
+- [feature][Classobj] class_extends のオーバーライド対応
+- [feature][Funchand] function_parameter の型宣言対応
+
 ## 1.3.7
 
 - [feature][Arrays] array_explode を追加
