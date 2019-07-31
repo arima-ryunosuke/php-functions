@@ -202,6 +202,50 @@ class Strings
     }
 
     /**
+     * 文字列が最後に現れる位置以前を返す
+     *
+     * strstr の逆のイメージで文字列を後ろから探索する動作となる。
+     * strstr の動作は「文字列を前から探索して指定文字列があったらそれ以後を返す」なので、
+     * その逆の動作の「文字列を後ろから探索して指定文字列があったらそれ以前を返す」という挙動を示す。
+     *
+     * strstr の「needle が文字列でない場合は、 それを整数に変換し、その番号に対応する文字として扱います」は直感的じゃないので踏襲しない。
+     * （全体的にこの動作をやめよう、という RFC もあったはず）。
+     *
+     * 第3引数の意味合いもデフォルト値も逆になるので、単純に呼べばよくある「指定文字列より後ろを（指定文字列を含めないで）返す」という動作になる。
+     *
+     * Example:
+     * ```php
+     * // パス中の最後のディレクトリを取得
+     * assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":"), 'path/to/3');
+     * // $after_needle を false にすると逆の動作になる
+     * assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":", false), 'path/to/1:path/to/2:');
+     * // （参考）strrchr と違い、文字列が使えるしその文字そのものは含まれない
+     * assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
+     * ```
+     *
+     * @param string $haystack 調べる文字列
+     * @param string $needle 検索文字列
+     * @param bool $after_needle $needle より後ろを返すか
+     * @return string
+     */
+    public static function strrstr($haystack, $needle, $after_needle = true)
+    {
+        // return strrev(strstr(strrev($haystack), strrev($needle), $after_needle));
+
+        $lastpos = mb_strrpos($haystack, $needle);
+        if ($lastpos === false) {
+            return false;
+        }
+
+        if ($after_needle) {
+            return mb_substr($haystack, $lastpos + mb_strlen($needle));
+        }
+        else {
+            return mb_substr($haystack, 0, $lastpos + mb_strlen($needle));
+        }
+    }
+
+    /**
      * 文字列が候補の中にあるか調べる
      *
      * 候補配列の中に対象文字列があるならそのキーを返す。ないなら null を返す。

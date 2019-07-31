@@ -120,6 +120,24 @@ class StringsTest extends AbstractTestCase
         ], (quoteexplode)(' ', 'a"bc " ', '"'));
     }
 
+    function test_strrstr()
+    {
+        $this->assertSame(false, (strrstr)('/a/b/c', 'not', true));
+        $this->assertSame(false, (strrstr)('/a/b/c', 'not', false));
+
+        $this->assertSame('c', (strrstr)('/a/b/c', '/'));
+        $this->assertSame('c', (strrstr)('//a//b//c', '//'));
+
+        $this->assertSame('c', (strrstr)('/a/b/c', '/', true));
+        $this->assertSame('c', (strrstr)('//a//b//c', '//', true));
+
+        $this->assertSame('/a/b/', (strrstr)('/a/b/c', '/', false));
+        $this->assertSame('//a//b//', (strrstr)('//a//b//c', '//', false));
+
+        $this->assertSame('う', (strrstr)('あ＿＿い＿＿う', '＿＿', true));
+        $this->assertSame('あ＿＿い＿＿', (strrstr)('あ＿＿い＿＿う', '＿＿', false));
+    }
+
     function test_str_anyof()
     {
         $this->assertSame((str_anyof)('a', ['a', 'b', 'c']), 0);
