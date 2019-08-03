@@ -2,8 +2,6 @@
 
 namespace ryunosuke\Test\Package;
 
-use ArrayObject;
-
 class ClassobjTest extends AbstractTestCase
 {
     function test_stdclass()
@@ -130,7 +128,7 @@ class ClassobjTest extends AbstractTestCase
         $original = new \ryunosuke\Test\Package\Classobj\ClassExtends();
         /** @var \ryunosuke\Test\Package\Classobj\ClassExtends $object */
         $object = (class_extends)($original, [
-            'hoge'       => function ($arg) {
+            'hoge'            => function ($arg) {
                 /** @noinspection PhpUndefinedMethodInspection */
                 return [
                     'this'   => $this,
@@ -138,13 +136,19 @@ class ClassobjTest extends AbstractTestCase
                     'arg'    => $arg,
                 ];
             },
-            'staticHoge' => static function ($arg) {
+            'staticHoge'      => static function ($arg) {
                 /** @noinspection PhpUndefinedMethodInspection */
                 return [
                     'self'   => get_called_class(),
                     'method' => self::staticMethod(),
                     'arg'    => $arg,
                 ];
+            },
+            'overrideMethod1' => function (string $oreorearg) {
+                return 'A-' . parent::{__FUNCTION__}($oreorearg) . '-Z';
+            },
+            'overrideMethod2' => function () {
+                return parent::{__FUNCTION__}(...func_get_args()) . $this->{'overrideMethod1'}('++');
             },
         ], [
             'fuga' => 'dummy',
@@ -191,6 +195,9 @@ class ClassobjTest extends AbstractTestCase
             'method' => 'static:bar',
             'arg'    => 123,
         ], $object::staticHoge(123));
+
+        $this->assertEquals('A-overrideMethod1:XX-Z', $object->overrideMethod1('XX'));
+        $this->assertEquals('overrideMethod2:--A-overrideMethod1:++-Z', $object->overrideMethod2('--'));
 
         // internal
         $e = (class_extends)(new \Exception('message', 123), [

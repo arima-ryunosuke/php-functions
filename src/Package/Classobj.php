@@ -344,7 +344,7 @@ class Classobj
      * ただし、static closure を渡した場合はそれは static メソッドとして扱われる。
      *
      * 内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。
-     * 当然ながら final クラスの拡張もできない。
+     * 当然ながら final クラス/メソッドの拡張もできない。
      *
      * Example:
      * ```php
@@ -357,6 +357,16 @@ class Classobj
      *     },
      * ]);
      * assertSame($newobject->codemessage(), '123:hoge');
+     *
+     * // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
+     * $object = new \ArrayObject([1, 2, 3]);
+     * $newobject = class_extends($object, [
+     *     'count' => function() {
+     *         // parent は元オブジェクトを表す
+     *         return parent::count() * 2;
+     *     },
+     * ]);
+     * assertSame($newobject->count(), 6);
      * ```
      *
      * @param string $object 対象オブジェクト
@@ -376,7 +386,7 @@ class Classobj
                     private static $__originalClass;
                     private        $__original;
                     private        $__fields;
-                    private        $__methods;
+                    private        $__methods       = [];
                     private static $__staticMethods = [];
 
                     public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
@@ -390,7 +400,6 @@ class Classobj
                         $this->__fields = $fields;
 
                         foreach ($methods as $name => $method) {
-                            $method = \Closure::fromCallable($method);
                             $bmethod = @$method->bindTo($this->__original, $refclass->isInternal() ? $this : $this->__original);
                             // 内部クラスは $this バインドできないので original じゃなく自身にする
                             if ($bmethod) {
@@ -441,44 +450,107 @@ class Classobj
             $template_source = implode("", array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1));
         }
 
-        /** @var \ReflectionClass[][] $spawners */
+        /** @var \ReflectionClass[][]|\ReflectionMethod[][][] $spawners */
         static $spawners = [];
 
         $classname = get_class($object);
+        $classalias = str_replace('\\', '__', $classname);
+
         if (!isset($spawners[$classname])) {
-            $classalias = str_replace('\\', '__', $classname);
-
-            $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            $refclass = new \ReflectionClass($classname);
+            $classmethods = [];
+            foreach ($refclass->getMethods() as $method) {
+                if (!$method->isFinal() && !$method->isAbstract() && !in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
+                    $classmethods[$method->name] = $method;
+                }
+            }
+            $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname);
             if (!file_exists($cachefile)) {
-                $declares = [];
-                foreach ((new \ReflectionClass($classname))->getMethods() as $method) {
-                    if (!$method->isFinal() && !$method->isAbstract()) {
-                        if (!in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
-                            $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
-                            $name = $method->getName();
-                            $reference = $method->returnsReference() ? '&' : '';
-                            $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+                touch($cachefile);
+                $declares = "";
+                foreach ($classmethods as $name => $method) {
+                    $ref = $method->returnsReference() ? '&' : '';
+                    $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+                    $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
 
-                            $params = (function_parameter)($method);
-                            $prms = implode(', ', $params);
-                            $args = implode(', ', array_keys($params));
-                            $declares[] = "$modifier function $reference$name($prms) {
-                                \$return = $reference $receiver$name(...[$args]);
-                                return \$return;
-                            }";
+                    $params = (function_parameter)($method);
+                    $prms = implode(', ', $params);
+                    $args = implode(', ', array_keys($params));
+                    $rtype = '';
+                    if ($method->hasReturnType()) {
+                        $rt = $method->getReturnType();
+                        $rtype = ':' . ($rt->allowsNull() ? '?' : '') . ($rt->isBuiltin() ? '' : '\\') . $rt->getName();
+                    }
+                    $declares .= "$modifier function $ref$name($prms)$rtype { \$return = $ref$receiver$name(...[$args]);return \$return; }\n";
+                }
+                $traitcode = "trait X{$classalias}Trait\n$template_source$declares}";
+                file_put_contents("$cachefile-trait.php", "<?php\n" . $traitcode, LOCK_EX);
+
+                $classcode = "class X{$classalias}Class extends $classname\n{use X{$classalias}Trait;}";
+                file_put_contents("$cachefile-class.php", "<?php\n" . $classcode, LOCK_EX);
+            }
+            require_once "$cachefile-trait.php";
+            require_once "$cachefile-class.php";
+            $spawners[$classname] = [
+                'original' => $refclass,
+                'methods'  => $classmethods,
+                'trait'    => new \ReflectionClass("X{$classalias}Trait"),
+                'class'    => new \ReflectionClass("X{$classalias}Class"),
+            ];
+        }
+
+        $overrides = array_intersect_key($methods, $spawners[$classname]['methods']);
+        if ($overrides) {
+            $declares = "";
+            foreach ($overrides as $name => $override) {
+                $method = $spawners[$classname]['methods'][$name];
+                $ref = $method->returnsReference() ? '&' : '';
+                $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
+                $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
+
+                list(, $codeblock) = (callable_code)($override);
+                /** @var \ReflectionFunctionAbstract $refmember */
+                $refmember = (reflect_callable)($override);
+                // 指定クロージャに引数が無くて、元メソッドに有るなら継承
+                $params = (function_parameter)($override);
+                if (!$refmember->getNumberOfParameters() && $method->getNumberOfParameters()) {
+                    $params = (function_parameter)($method);
+                }
+                // 同上。返り値版
+                $rtype = '';
+                if (!$refmember->hasReturnType() && $method->hasReturnType()) {
+                    $rt = $method->getReturnType();
+                    $rtype = ':' . ($rt->allowsNull() ? '?' : '') . ($rt->isBuiltin() ? '' : '\\') . $rt->getName();
+                }
+
+                $tokens = (parse_php)($codeblock);
+                array_shift($tokens);
+                $parented = null;
+                foreach ($tokens as $n => $token) {
+                    if ($token[0] !== T_WHITESPACE) {
+                        if ($token[0] === T_STRING && $token[1] === 'parent') {
+                            $parented = $n;
+                        }
+                        elseif ($parented !== null && $token[0] === T_DOUBLE_COLON) {
+                            unset($tokens[$parented]);
+                            $tokens[$n][1] = $receiver;
+                        }
+                        else {
+                            $parented = null;
                         }
                     }
                 }
-                $code = "class X$classalias extends $classname$template_source" . implode("\n", $declares) . '}';
-                file_put_contents($cachefile, "<?php\n" . $code, LOCK_EX);
+                $codeblock = implode('', array_column($tokens, 1));
+
+                $prms = implode(', ', $params);
+                $declares .= "$modifier function $ref$name($prms)$rtype $codeblock";
             }
-            require_once $cachefile;
-            $spawners[$classname] = [
-                'original'   => new \ReflectionClass($classname),
-                'reflection' => new \ReflectionClass("X$classalias"),
-            ];
+            $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
+            (evaluate)("class $newclassname extends $classname\n{use X{$classalias}Trait;\n$declares}");
+            return new $newclassname($spawners[$classname]['original'], $object, $fields, $methods);
         }
-        return $spawners[$classname]['reflection']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
+
+        return $spawners[$classname]['class']->newInstance($spawners[$classname]['original'], $object, $fields, $methods);
     }
 
     /**
