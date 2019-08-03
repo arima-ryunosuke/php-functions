@@ -702,6 +702,14 @@ class FunchandTest extends AbstractTestCase
             '$x'  => '...$x',
         ], $params);
 
+        // type hint
+        $params = (function_parameter)(function (string $a, int $b, ?FunchandTest $c) { });
+        $this->assertSame([
+            '$a' => 'string $a',
+            '$b' => 'int $b',
+            '$c' => '?\\' . __CLASS__ . ' $c',
+        ], $params);
+
         // ns\const
         $params = (function_parameter)(function ($a = PHP_SAPI) { });
         $this->assertSame([

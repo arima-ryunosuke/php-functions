@@ -991,7 +991,14 @@ CODE;
 
         $result = [];
         foreach ($reffunc->getParameters() as $parameter) {
-            $declare = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+            $declare = '';
+
+            if ($parameter->hasType()) {
+                $type = $parameter->getType();
+                $declare .= ($type->allowsNull() ? '?' : '') . ($type->isBuiltin() ? '' : '\\') . $type->getName() . ' ';
+            }
+
+            $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
 
             if ($parameter->isVariadic()) {
                 $declare = '...' . $declare;
