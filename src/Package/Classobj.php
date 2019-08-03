@@ -303,9 +303,25 @@ class Classobj
                     }
                 }
                 else {
-                    $codes = (callable_code)($member);
-                    $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $codes[0]);
-                    $classcode .= "public $mname {$codes[1]}\n";
+                    list($declare, $codeblock) = (callable_code)($member);
+                    $parentclass = new \ReflectionClass("\\$origspace\\$origclass");
+                    // 元クラスに定義されているならオーバーライドとして特殊な処理を行う
+                    if ($parentclass->hasMethod($name)) {
+                        /** @var \ReflectionFunctionAbstract $refmember */
+                        $refmember = (reflect_callable)($member);
+                        $refmethod = $parentclass->getMethod($name);
+                        // 指定クロージャに引数が無くて、元メソッドに有るなら継承
+                        if (!$refmember->getNumberOfParameters() && $refmethod->getNumberOfParameters()) {
+                            $declare = 'function (' . implode(', ', (function_parameter)($refmethod)) . ')';
+                        }
+                        // 同上。返り値版
+                        if (!$refmember->hasReturnType() && $refmethod->hasReturnType()) {
+                            $rtype = $refmethod->getReturnType();
+                            $declare .= ':' . ($rtype->allowsNull() ? '?' : '') . ($rtype->isBuiltin() ? '' : '\\') . $rtype->getName();
+                        }
+                    }
+                    $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $declare);
+                    $classcode .= "public $mname $codeblock\n";
                 }
             }
 

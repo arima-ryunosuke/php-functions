@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test\Package;
 
+use ArrayObject;
+
 class ClassobjTest extends AbstractTestCase
 {
     function test_stdclass()
@@ -84,6 +86,10 @@ class ClassobjTest extends AbstractTestCase
                 /** @noinspection PhpUndefinedMethodInspection */
                 return parent::f();
             },
+            'g'         => function () {
+                /** @noinspection PhpUndefinedMethodInspection */
+                return parent::g(...func_get_args());
+            },
         ]);
 
         $this->assertEquals([
@@ -102,6 +108,7 @@ class ClassobjTest extends AbstractTestCase
                 'this is exB',
                 'this is C',
             ], $classC->f());
+            $this->assertEquals(['string', true, new \ArrayObject([3])], $classC->g('string', true, new \ArrayObject([3])));
             $this->assertEquals('this is C__', $classC->newMethod());
         }
 
