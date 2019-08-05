@@ -714,6 +714,47 @@ class UtilityTest extends AbstractTestCase
         $this->assertException('must be resource or string', error, 'int', 1);
     }
 
+    function test_add_error_handler()
+    {
+        $handler1 = function ($errno) use (&$receiver) {
+            if ($errno === E_WARNING) {
+                return false;
+            }
+            $receiver = 'handler1';
+        };
+        $handler2 = function ($errno) use (&$receiver) {
+            if (error_reporting() === 0) {
+                return false;
+            }
+            $receiver = 'handler2';
+        };
+        $phpunit = (add_error_handler)($handler1);
+        $current = (add_error_handler)($handler2);
+
+        // 返り値は直前に設定していたもの
+        $this->assertEquals(["PHPUnit\\Util\\ErrorHandler", 'handleError'], $phpunit);
+        $this->assertEquals($handler1, $current);
+
+        // @ をつけなければ handler2 が呼ばれる（receiver = handler2）
+        $receiver = null;
+        $dummy[] = []['hoge'];
+        $this->assertEquals('handler2', $receiver);
+
+        // @ をつけると handler1 に移譲される（receiver = handler1）
+        $receiver = null;
+        $dummy[] = @[]['hoge'];
+        $this->assertEquals('handler1', $receiver);
+
+        // さらに WARNING ならその前（phpunit のハンドラ）に移譲される（receiver が設定されない）
+        $receiver = null;
+        /** @noinspection PhpWrongStringConcatenationInspection */
+        $dummy[] = @('hoge' + 123);
+        $this->assertEquals(null, $receiver);
+
+        restore_error_handler();
+        restore_error_handler();
+    }
+
     function test_timer()
     {
         $time = (timer)(function () {
