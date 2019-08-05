@@ -10,6 +10,12 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.9
+
+- [feature][Utility] add_error_handler を追加
+- [fixbug][Utility] cachedir が競合する不具合を修正
+- [fixbug][Classobj] class_replace で常に保存されていた不具合を修正
+
 ## 1.3.8
 
 - [feature][Strings] strrstr を追加
