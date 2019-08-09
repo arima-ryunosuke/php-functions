@@ -247,7 +247,7 @@ class Classobj
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
         $classfile = (class_loader)()->findFile($class);
         $fname = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
-        if (func_num_args() === 2 || !file_exists($fname)) {
+        if (!file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
             file_put_contents($fname, $content, LOCK_EX);
