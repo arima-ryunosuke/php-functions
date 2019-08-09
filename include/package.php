@@ -874,6 +874,7 @@ define("ryunosuke\\Functions\\Package\\arguments", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\stacktrace", ["ryunosuke\\Functions\\Package\\Utility", "stacktrace"]);
 define("ryunosuke\\Functions\\Package\\backtrace", ["ryunosuke\\Functions\\Package\\Utility", "backtrace"]);
 define("ryunosuke\\Functions\\Package\\error", ["ryunosuke\\Functions\\Package\\Utility", "error"]);
+define("ryunosuke\\Functions\\Package\\add_error_handler", ["ryunosuke\\Functions\\Package\\Utility", "add_error_handler"]);
 define("ryunosuke\\Functions\\Package\\timer", ["ryunosuke\\Functions\\Package\\Utility", "timer"]);
 define("ryunosuke\\Functions\\Package\\benchmark", ["ryunosuke\\Functions\\Package\\Utility", "benchmark"]);
 define("ryunosuke\\Functions\\Package\\stringify", ["ryunosuke\\Functions\\Package\\Vars", "stringify"]);

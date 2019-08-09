@@ -25,6 +25,11 @@
  * @property \ChainObject $acosh
  * @method   \ChainObject  acosh()
  *
+ * @see add_error_handler
+ * @property \ChainObject $add_error_handler
+ * @method   \ChainObject  add_error_handler($error_types = 32767)
+ * @method   \ChainObject  add_error_handler1($handler)
+ *
  * @see addcslashes
  * @method   \ChainObject  addcslashes($charlist)
  * @method   \ChainObject  addcslashes1($str)

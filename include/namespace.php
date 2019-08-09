@@ -4712,7 +4712,7 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
         $classfile = class_loader()->findFile($class);
         $fname = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
-        if (func_num_args() === 2 || !file_exists($fname)) {
+        if (!file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
             file_put_contents($fname, $content, LOCK_EX);
@@ -13028,8 +13028,13 @@ if (!isset($excluded_functions["cachedir"]) && (!function_exists("ryunosuke\\Fun
     function cachedir($dirname = null)
     {
         static $cachedir;
+        if ($cachedir === null) {
+            $cachedir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
+            cachedir($cachedir); // for mkdir
+        }
+
         if ($dirname === null) {
-            return $cachedir = $cachedir ?? sys_get_temp_dir();
+            return $cachedir;
         }
 
         if (!file_exists($dirname)) {
@@ -13853,6 +13858,50 @@ if (!isset($excluded_functions["error"]) && (!function_exists("ryunosuke\\Functi
 }
 if (function_exists("ryunosuke\\Functions\\error") && !defined("ryunosuke\\Functions\\error")) {
     define("ryunosuke\\Functions\\error", "ryunosuke\\Functions\\error");
+}
+
+if (!isset($excluded_functions["add_error_handler"]) && (!function_exists("ryunosuke\\Functions\\add_error_handler") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\add_error_handler"))->isInternal()))) {
+    /**
+     * エラーハンドラを追加する
+     *
+     * 追加したエラーハンドラが false を返すと標準のエラーハンドラではなく、直近の設定されていたエラーハンドラに移譲される。
+     * （直近にエラーハンドラが設定されていなかったら標準ハンドラになる）。
+     *
+     * 「局所的にエラーハンドラを変更したいけど特定の状況は設定済みハンドラへ流したい」という状況はまれによくあるはず。
+     *
+     * Example:
+     * ```php
+     * // @ 付きなら元々のハンドラに移譲、@ なしなら何らかのハンドリングを行う例
+     * add_error_handler(function () {
+     *     if (error_reporting() === 0) {
+     *         // この false はマニュアルにある「この関数が FALSE を返した場合は、通常のエラーハンドラが処理を引き継ぎます」ではなく、
+     *         // 「さっきまで設定されていたエラーハンドラが処理を引き継ぎます」という意味になる
+     *         return false;
+     *     }
+     *     // do something
+     * });
+     * // false の扱いが異なるだけでその他の挙動はすべて set_error_handler と同じなので restore_error_handler で戻せる
+     * restore_error_handler();
+     * ```
+     *
+     * @param callable $handler エラーハンドラ
+     * @param int $error_types エラータイプ
+     * @return callable|null 直近に設定されていたエラーハンドラ（未設定の場合は null）
+     */
+    function add_error_handler($handler, $error_types = \E_ALL | \E_STRICT)
+    {
+        $already = set_error_handler(static function () use ($handler, &$already) {
+            $result = $handler(...func_get_args());
+            if ($result === false && $already !== null) {
+                return $already(...func_get_args());
+            }
+            return $result;
+        }, $error_types);
+        return $already;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\add_error_handler") && !defined("ryunosuke\\Functions\\add_error_handler")) {
+    define("ryunosuke\\Functions\\add_error_handler", "ryunosuke\\Functions\\add_error_handler");
 }
 
 if (!isset($excluded_functions["timer"]) && (!function_exists("ryunosuke\\Functions\\timer") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\timer"))->isInternal()))) {

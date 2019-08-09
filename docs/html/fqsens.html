@@ -4326,6 +4326,27 @@ assertArraySubset([
 ファイルを開くが、<strong>ファイルは閉じない</strong>。閉じ処理は php の終了処理に身を任せる。<br />
 したがって閉じる必要がある場合はファイルポインタを渡す必要がある。</p>
 </div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::add_error_handler()">
+                                    ryunosuke\Functions\Package\Utility::add_error_handler		</a>	<small>($handler, $error_types = 32767) : callable<span class="type-separator"></span><wbr>null</small>
+		</h4>
+	<div class="description"><p>エラーハンドラを追加する</p>
+<p>追加したエラーハンドラが false を返すと標準のエラーハンドラではなく、直近の設定されていたエラーハンドラに移譲される。<br />
+（直近にエラーハンドラが設定されていなかったら標準ハンドラになる）。</p>
+<p>「局所的にエラーハンドラを変更したいけど特定の状況は設定済みハンドラへ流したい」という状況はまれによくあるはず。</p>
+<p>Example:</p>
+<pre><code class="language-php">// @ 付きなら元々のハンドラに移譲、@ なしなら何らかのハンドリングを行う例
+add_error_handler(function () {
+    if (error_reporting() === 0) {
+        // この false はマニュアルにある「この関数が FALSE を返した場合は、通常のエラーハンドラが処理を引き継ぎます」ではなく、
+        // 「さっきまで設定されていたエラーハンドラが処理を引き継ぎます」という意味になる
+        return false;
+    }
+    // do something
+});
+// false の扱いが異なるだけでその他の挙動はすべて set_error_handler と同じなので restore_error_handler で戻せる
+restore_error_handler();
+</code></pre>
+</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::timer()">
                                     ryunosuke\Functions\Package\Utility::timer		</a>	<small>($callable, $count = 1) : float</small>
 		</h4>
