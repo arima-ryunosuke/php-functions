@@ -744,6 +744,7 @@ define("ryunosuke\\Functions\\Package\\file_set_contents", ["ryunosuke\\Function
 define("ryunosuke\\Functions\\Package\\file_rewrite_contents", ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"]);
 define("ryunosuke\\Functions\\Package\\mkdir_p", ["ryunosuke\\Functions\\Package\\FileSystem", "mkdir_p"]);
 define("ryunosuke\\Functions\\Package\\dirname_r", ["ryunosuke\\Functions\\Package\\FileSystem", "dirname_r"]);
+define("ryunosuke\\Functions\\Package\\dirmtime", ["ryunosuke\\Functions\\Package\\FileSystem", "dirmtime"]);
 define("ryunosuke\\Functions\\Package\\fnmatch_and", ["ryunosuke\\Functions\\Package\\FileSystem", "fnmatch_and"]);
 define("ryunosuke\\Functions\\Package\\fnmatch_or", ["ryunosuke\\Functions\\Package\\FileSystem", "fnmatch_or"]);
 define("ryunosuke\\Functions\\Package\\path_is_absolute", ["ryunosuke\\Functions\\Package\\FileSystem", "path_is_absolute"]);

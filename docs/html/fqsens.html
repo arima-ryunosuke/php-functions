@@ -1815,7 +1815,7 @@ assertEquals(file_list($tmp), [
     "$tmp{$DS}a.txt",
     "$tmp{$DS}dir{$DS}b.txt",
     "$tmp{$DS}dir{$DS}dir{$DS}c.txt",
-]);
+], '', 0, 10, true);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_tree()">
@@ -1906,6 +1906,26 @@ file_set_contents("$tmp/a/b/file.txt", 'hoge');
 // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
 $callback = function($path){return realpath("$path/file.txt");};
 assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::dirmtime()">
+                                    ryunosuke\Functions\Package\FileSystem::dirmtime		</a>	<small>($dirname, $recursive = true) : int</small>
+		</h4>
+	<div class="description"><p>ディレクトリの最終更新日時を返す</p>
+<p>「ディレクトリの最終更新日時」とは filemtime で得られる結果ではなく、「配下のファイル群で最も新しい日時」を表す。<br />
+ディレクトリの mtime も検出に含まれるので、ファイルを削除した場合も検知できる。</p>
+<p>ファイル名を与えると例外を投げる。<br />
+空ディレクトリの場合は自身の mtime を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$dirname = sys_get_temp_dir() . '/mtime';
+rm_rf($dirname);
+mkdir($dirname);
+
+// この時点では現在日時（単純に自身の更新日時）
+assertSame(dirmtime($dirname), time());
+// ファイルを作って更新するとその時刻
+touch("$dirname/tmp", time() + 10);
+assertSame(dirmtime($dirname), time() + 10);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::fnmatch_and()">
@@ -4464,6 +4484,10 @@ assertSame(si_prefix(12345, 1000, '%d %sbyte'), '12 kbyte');
 assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
 // フォーマットに null を与えると sprintf せずに配列で返す
 assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
+// フォーマットにクロージャを与えると実行して返す
+assertSame(si_prefix(12345, 1000, function ($v, $u){
+    return number_format($v, 2) . $u;
+}), '12.35k');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_unprefix()">
@@ -4511,7 +4535,6 @@ assertTrue(is_empty(0));
 assertTrue(is_empty(''));
 // この辺だけが異なる
 assertFalse(is_empty('0'));
-assertFalse(is_empty(new \SimpleXMLElement('&lt;foo&gt;&lt;/foo&gt;')));
 // 第2引数に true を渡すと空の stdClass も empty 判定される
 $stdclass = new \stdClass();
 assertTrue(is_empty($stdclass, true));

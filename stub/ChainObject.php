@@ -708,6 +708,22 @@
  * @method   \ChainObject  array_key_exists($search)
  * @method   \ChainObject  array_key_exists1($key)
  *
+ * @see array_key_first
+ * @property \ChainObject $array_key_first
+ * @method   \ChainObject  array_key_first()
+ *
+ * @see array_key_first
+ * @property \ChainObject $key_first
+ * @method   \ChainObject  key_first()
+ *
+ * @see array_key_last
+ * @property \ChainObject $array_key_last
+ * @method   \ChainObject  array_key_last()
+ *
+ * @see array_key_last
+ * @property \ChainObject $key_last
+ * @method   \ChainObject  key_last()
+ *
  * @see array_keys
  * @property \ChainObject $array_keys
  * @method   \ChainObject  array_keys($search_value = null, $strict = null)
@@ -2197,6 +2213,11 @@
  * @method   \ChainObject  dir($context = null)
  * @method   \ChainObject  dir1($directory)
  *
+ * @see dirmtime
+ * @property \ChainObject $dirmtime
+ * @method   \ChainObject  dirmtime($recursive = true)
+ * @method   \ChainObject  dirmtime1($dirname)
+ *
  * @see dirname
  * @property \ChainObject $dirname
  * @method   \ChainObject  dirname($levels = null)
@@ -2854,6 +2875,10 @@
  * @property \ChainObject $highlight_string
  * @method   \ChainObject  highlight_string($return = null)
  * @method   \ChainObject  highlight_string1($string)
+ *
+ * @see hrtime
+ * @property \ChainObject $hrtime
+ * @method   \ChainObject  hrtime()
  *
  * @see html_entity_decode
  * @property \ChainObject $html_entity_decode
@@ -4360,13 +4385,13 @@
  *
  * @see setcookie
  * @property \ChainObject $setcookie
- * @method   \ChainObject  setcookie($value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie1($name, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setcookie($value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setcookie1($name, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
  * @method   \ChainObject  setcookie2($name, $value = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie3($name, $value = null, $expires = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie4($name, $value = null, $expires = null, $path = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie5($name, $value = null, $expires = null, $path = null, $domain = null, $httponly = null)
- * @method   \ChainObject  setcookie6($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null)
+ * @method   \ChainObject  setcookie3($name, $value = null, $expires_or_options = null, $domain = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setcookie4($name, $value = null, $expires_or_options = null, $path = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setcookie5($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $httponly = null)
+ * @method   \ChainObject  setcookie6($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null)
  *
  * @see setlocale
  * @method   \ChainObject  setlocale(...$locales)
@@ -4379,13 +4404,13 @@
  *
  * @see setrawcookie
  * @property \ChainObject $setrawcookie
- * @method   \ChainObject  setrawcookie($value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie1($name, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setrawcookie($value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setrawcookie1($name, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
  * @method   \ChainObject  setrawcookie2($name, $value = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie3($name, $value = null, $expires = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie4($name, $value = null, $expires = null, $path = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie5($name, $value = null, $expires = null, $path = null, $domain = null, $httponly = null)
- * @method   \ChainObject  setrawcookie6($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null)
+ * @method   \ChainObject  setrawcookie3($name, $value = null, $expires_or_options = null, $domain = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setrawcookie4($name, $value = null, $expires_or_options = null, $path = null, $secure = null, $httponly = null)
+ * @method   \ChainObject  setrawcookie5($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $httponly = null)
+ * @method   \ChainObject  setrawcookie6($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null)
  *
  * @see sha1
  * @property \ChainObject $sha1

@@ -5055,15 +5055,16 @@ if (!isset($excluded_functions["const_exists"]) && (!function_exists("const_exis
      */
     function const_exists($classname, $constname = null)
     {
-        try {
-            // defined は private const などの不可視定数に対して呼ぶと即死する
-            return defined($classname . concat('::', $constname));
+        $colonp = strpos($classname, '::');
+        if ($colonp === false && strlen($constname) === 0) {
+            return defined($classname);
         }
-        catch (\Throwable $t) {
-            // 即死するのは private/protected な定数だけで、存在しなかったり public なら defined は機能する
-            // つまり、ここに到達した時点で「存在する」とみなすことができる（でなければ例外は飛ばない）
-            return true;
+        if (strlen($constname) === 0) {
+            $constname = substr($classname, $colonp + 2);
+            $classname = substr($classname, 0, $colonp);
         }
+        $refclass = new \ReflectionClass($classname);
+        return $refclass->hasConstant($constname);
     }
 }
 if (function_exists("const_exists") && !defined("const_exists")) {
@@ -5589,7 +5590,7 @@ if (!isset($excluded_functions["file_list"]) && (!function_exists("file_list") |
      *     "$tmp{$DS}a.txt",
      *     "$tmp{$DS}dir{$DS}b.txt",
      *     "$tmp{$DS}dir{$DS}dir{$DS}c.txt",
-     * ]);
+     * ], '', 0, 10, true);
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
@@ -5949,6 +5950,58 @@ if (!isset($excluded_functions["dirname_r"]) && (!function_exists("dirname_r") |
 }
 if (function_exists("dirname_r") && !defined("dirname_r")) {
     define("dirname_r", "dirname_r");
+}
+
+if (!isset($excluded_functions["dirmtime"]) && (!function_exists("dirmtime") || (!false && (new \ReflectionFunction("dirmtime"))->isInternal()))) {
+    /**
+     * ディレクトリの最終更新日時を返す
+     *
+     * 「ディレクトリの最終更新日時」とは filemtime で得られる結果ではなく、「配下のファイル群で最も新しい日時」を表す。
+     * ディレクトリの mtime も検出に含まれるので、ファイルを削除した場合も検知できる。
+     *
+     * ファイル名を与えると例外を投げる。
+     * 空ディレクトリの場合は自身の mtime を返す。
+     *
+     * Example:
+     * ```php
+     * $dirname = sys_get_temp_dir() . '/mtime';
+     * rm_rf($dirname);
+     * mkdir($dirname);
+     *
+     * // この時点では現在日時（単純に自身の更新日時）
+     * assertSame(dirmtime($dirname), time());
+     * // ファイルを作って更新するとその時刻
+     * touch("$dirname/tmp", time() + 10);
+     * assertSame(dirmtime($dirname), time() + 10);
+     * ```
+     *
+     * @param string $dirname ディレクトリ名
+     * @param bool $recursive 再帰フラグ
+     * @return int 最終更新日時
+     */
+    function dirmtime($dirname, $recursive = true)
+    {
+        if (!is_dir($dirname)) {
+            throw new \InvalidArgumentException("'$dirname' is not directory.");
+        }
+
+        $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS);
+        $dirtime = filemtime($dirname);
+        foreach ($rdi as $path) {
+            /** @var \SplFileInfo $path */
+            $mtime = $path->getMTime();
+            if ($path->isDir() && $recursive) {
+                $mtime = max($mtime, dirmtime($path->getPathname(), $recursive));
+            }
+            if ($dirtime < $mtime) {
+                $dirtime = $mtime;
+            }
+        }
+        return $dirtime;
+    }
+}
+if (function_exists("dirmtime") && !defined("dirmtime")) {
+    define("dirmtime", "dirmtime");
 }
 
 if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("fnmatch_and") || (!false && (new \ReflectionFunction("fnmatch_and"))->isInternal()))) {
@@ -14288,11 +14341,15 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") |
      * assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
      * assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
+     * // フォーマットにクロージャを与えると実行して返す
+     * assertSame(si_prefix(12345, 1000, function ($v, $u){
+     *     return number_format($v, 2) . $u;
+     * }), '12.35k');
      * ```
      *
      * @param mixed $var 丸める値
      * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
-     * @param string $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
+     * @param string|\Closure $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
      * @return string|array 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
      */
     function si_prefix($var, $unit = 1000, $format = '%.3f %s')
@@ -14320,6 +14377,9 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") |
         assert($unit > 0);
 
         $result = function ($format, $var, $unit) {
+            if ($format instanceof \Closure) {
+                return $format($var, $unit);
+            }
             if ($format === null) {
                 return [$var, $unit];
             }
@@ -14442,7 +14502,6 @@ if (!isset($excluded_functions["is_empty"]) && (!function_exists("is_empty") || 
      * assertTrue(is_empty(''));
      * // この辺だけが異なる
      * assertFalse(is_empty('0'));
-     * assertFalse(is_empty(new \SimpleXMLElement('<foo></foo>')));
      * // 第2引数に true を渡すと空の stdClass も empty 判定される
      * $stdclass = new \stdClass();
      * assertTrue(is_empty($stdclass, true));
