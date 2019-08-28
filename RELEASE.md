@@ -10,6 +10,12 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.10
+
+- [feature] php7.3 対応
+- [feature][Vars] si_prefix のクロージャ対応
+- [feature][FileSystem] dirmtime を追加
+
 ## 1.3.9
 
 - [feature][Utility] add_error_handler を追加
