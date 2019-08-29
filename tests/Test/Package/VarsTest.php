@@ -180,6 +180,9 @@ class VarsTest extends AbstractTestCase
         $this->assertEquals('1.001 k', (si_prefix)(1025, 1024));
         $this->assertEquals([0, ''], (si_prefix)(0, 1000, null));
         $this->assertEquals([12.345, 'k'], (si_prefix)(12345, 1000, null));
+        $this->assertEquals('12.35k', (si_prefix)(12345, 1000, function ($v, $u) {
+            return number_format($v, 2) . $u;
+        }));
 
         $this->assertException('too large or small', si_prefix, pow(10, 30));
     }

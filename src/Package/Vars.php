@@ -222,11 +222,15 @@ class Vars
      * assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
      * assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
+     * // フォーマットにクロージャを与えると実行して返す
+     * assertSame(si_prefix(12345, 1000, function ($v, $u){
+     *     return number_format($v, 2) . $u;
+     * }), '12.35k');
      * ```
      *
      * @param mixed $var 丸める値
      * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
-     * @param string $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
+     * @param string|\Closure $format 書式フォーマット。 null を与えると sprintf せずに配列で返す
      * @return string|array 丸めた数値と SI 接頭辞で sprintf した文字列（$format が null の場合は配列）
      */
     public static function si_prefix($var, $unit = 1000, $format = '%.3f %s')
@@ -254,6 +258,9 @@ class Vars
         assert($unit > 0);
 
         $result = function ($format, $var, $unit) {
+            if ($format instanceof \Closure) {
+                return $format($var, $unit);
+            }
             if ($format === null) {
                 return [$var, $unit];
             }
