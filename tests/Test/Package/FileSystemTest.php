@@ -232,6 +232,43 @@ class FileSystemTest extends AbstractTestCase
         ], $paths);
     }
 
+    function test_dirmtime()
+    {
+        $dir = sys_get_temp_dir() . '/mtime';
+        (mkdir_p)($dir);
+        (rm_rf)($dir, false);
+        $base = strtotime('2036/12/31 12:34:56');
+
+        // 空っぽなので自身の mtime
+        touch($dir, $base);
+        $this->assertEquals($base, (dirmtime)($dir));
+
+        // ファイルが有ればその mtime
+        touch("$dir/tmp1", $base + 10);
+        $this->assertEquals($base + 10, (dirmtime)($dir));
+
+        // 更に新しい方
+        touch("$dir/tmp2", $base + 20);
+        $this->assertEquals($base + 20, (dirmtime)($dir));
+
+        // 新しい方を消すと古い方
+        unlink("$dir/tmp2");
+        $this->assertEquals($base + 10, (dirmtime)($dir));
+
+        // 古い方も消すと自分自身（他にエントリがなく、削除によって自身も更新されているので現在時刻になる）
+        unlink("$dir/tmp1");
+        $this->assertEquals(time(), (dirmtime)($dir));
+
+        // 再帰フラグの確認
+        (file_set_contents)("$dir/dir1/tmp", 'dummy');
+        touch("$dir/dir1/tmp", $base + 20);
+        touch("$dir/dir1", $base + 10);
+        $this->assertEquals($base + 20, (dirmtime)($dir, true));
+        $this->assertEquals($base + 10, (dirmtime)($dir, false));
+
+        $this->assertException('is not directory', dirmtime, __FILE__);
+    }
+
     function test_fnmatch_and()
     {
         $this->assertTrue((fnmatch_and)(['*aaa*', '*bbb*'], 'aaaXbbbX'));
