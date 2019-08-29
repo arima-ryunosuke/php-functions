@@ -20,30 +20,30 @@ class FileSystemTest extends AbstractTestCase
 
         // 単純列挙
         $tree = (file_list)($base);
-        $this->assertSame([
+        $this->assertEquals([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
             realpath($base . '/a/b/ab1.txt'),
             realpath($base . '/a/b/ab2.log'),
             realpath($base . '/a/b/c/abc1.log'),
             realpath($base . '/a/b/c/abc2.log'),
-        ], $tree);
+        ], $tree, '', 0, 10, true);
 
         // 拡張子でフィルタ
         $tree = (file_list)($base, function ($fname) { return (file_extension)($fname) === 'txt'; });
-        $this->assertSame([
+        $this->assertEquals([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
             realpath($base . '/a/b/ab1.txt'),
-        ], $tree);
+        ], $tree, '', 0, 10, true);
 
         // ファイルサイズでフィルタ
         $tree = (file_list)($base, function ($fname) { return filesize($fname) > 0; });
-        $this->assertSame([
+        $this->assertEquals([
             realpath($base . '/a/b/ab2.log'),
             realpath($base . '/a/b/c/abc1.log'),
             realpath($base . '/a/b/c/abc2.log'),
-        ], $tree);
+        ], $tree, '', 0, 10, true);
     }
 
     function test_file_tree()
@@ -597,13 +597,13 @@ class FileSystemTest extends AbstractTestCase
     function test_memory_path_leak()
     {
         $path = (memory_path)('path');
-        $usage = memory_get_usage(true);
+        $usage = memory_get_usage();
 
         file_put_contents($path, str_repeat('x', 4 * 1024 * 1024));
-        $this->assertGreaterThan(4 * 1024 * 1024, memory_get_usage(true) - $usage);
+        $this->assertGreaterThan(4 * 1024 * 1024, memory_get_usage() - $usage);
 
         unlink($path);
-        $this->assertLessThan(100, memory_get_usage(true) - $usage);
+        $this->assertLessThan(70000, memory_get_usage() - $usage);
     }
 
     /**

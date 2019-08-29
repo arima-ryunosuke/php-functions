@@ -336,7 +336,7 @@ CONTENTS;
             // それ以外のただの文字列なら含まれている文字列を検出する
             else {
                 foreach ($depends as $fname => $dummy) {
-                    if (strpos($name, $fname) !== false) {
+                    if (strpos($name, "$fname") !== false) {
                         $main($fname, $result);
                     }
                 }

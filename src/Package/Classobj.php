@@ -581,15 +581,16 @@ class Classobj
      */
     public static function const_exists($classname, $constname = null)
     {
-        try {
-            // defined は private const などの不可視定数に対して呼ぶと即死する
-            return defined($classname . (concat)('::', $constname));
+        $colonp = strpos($classname, '::');
+        if ($colonp === false && strlen($constname) === 0) {
+            return defined($classname);
         }
-        catch (\Throwable $t) {
-            // 即死するのは private/protected な定数だけで、存在しなかったり public なら defined は機能する
-            // つまり、ここに到達した時点で「存在する」とみなすことができる（でなければ例外は飛ばない）
-            return true;
+        if (strlen($constname) === 0) {
+            $constname = substr($classname, $colonp + 2);
+            $classname = substr($classname, 0, $colonp);
         }
+        $refclass = new \ReflectionClass($classname);
+        return $refclass->hasConstant($constname);
     }
 
     /**

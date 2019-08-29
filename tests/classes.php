@@ -18,6 +18,10 @@ abstract class AbstractConcrete
  */
 class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggregate
 {
+    private const   PRIVATE_CONST   = null;
+    protected const PROTECTED_CONST = null;
+    public const    PUBLIC_CONST    = null;
+
     private static $staticFiled;
 
     public $value;

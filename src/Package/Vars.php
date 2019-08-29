@@ -373,7 +373,6 @@ class Vars
      * assertTrue(is_empty(''));
      * // この辺だけが異なる
      * assertFalse(is_empty('0'));
-     * assertFalse(is_empty(new \SimpleXMLElement('<foo></foo>')));
      * // 第2引数に true を渡すと空の stdClass も empty 判定される
      * $stdclass = new \stdClass();
      * assertTrue(is_empty($stdclass, true));

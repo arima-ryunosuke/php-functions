@@ -232,8 +232,6 @@ class VarsTest extends AbstractTestCase
         $stdclass = new \stdClass();
         $arrayo1 = new \ArrayObject([1]);
         $arrayo2 = new \ArrayObject([]);
-        $xmlelem1 = new \SimpleXMLElement('<foo>1</foo>');
-        $xmlelem2 = new \SimpleXMLElement('<foo></foo>');
         // この辺は empty と全く同じ（true）
         $this->assertSame(empty(null), (is_empty)(null));
         $this->assertSame(empty(false), (is_empty)(false));
@@ -244,7 +242,6 @@ class VarsTest extends AbstractTestCase
         // この辺は empty と全く同じ（false）
         $this->assertSame(empty($stdclass), (is_empty)($stdclass));
         $this->assertSame(empty($arrayo1), (is_empty)($arrayo1));
-        $this->assertSame(empty($xmlelem1), (is_empty)($xmlelem1));
         $this->assertSame(empty(true), (is_empty)(true));
         $this->assertSame(empty(1), (is_empty)(1));
         $this->assertSame(empty(1.0), (is_empty)(1.0));
@@ -253,7 +250,6 @@ class VarsTest extends AbstractTestCase
         $this->assertSame(empty([1]), (is_empty)([1]));
         // この辺は差異がある
         $this->assertNotSame(empty('0'), (is_empty)('0'));
-        $this->assertNotSame(empty($xmlelem2), (is_empty)($xmlelem2));
         $this->assertNotSame(empty($arrayo2), (is_empty)($arrayo2));
 
         /// stdClass だけは引数で分岐できる

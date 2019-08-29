@@ -24,7 +24,7 @@ class FileSystem
      *     "$tmp{$DS}a.txt",
      *     "$tmp{$DS}dir{$DS}b.txt",
      *     "$tmp{$DS}dir{$DS}dir{$DS}c.txt",
-     * ]);
+     * ], '', 0, 10, true);
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
