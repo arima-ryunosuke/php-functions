@@ -495,7 +495,7 @@ class FileSystem
         }
 
         if (DIRECTORY_SEPARATOR === '\\') {
-            if (preg_match('#^([a-z]+:(\\\\|\\/|$)|\\\\)#i', $path) !== 0) {
+            if (preg_match('#^([a-z]+:(\\\\|/|$)|\\\\)#i', $path) !== 0) {
                 return true;
             }
         }

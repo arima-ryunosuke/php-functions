@@ -75,10 +75,10 @@ class AbstractTestCase extends TestCase
         $expected = array_replace_recursive($actual, $expected);
 
         if ($strict) {
-            self::assertSame($expected, $actual);
+            self::assertSame($expected, $actual, $message);
         }
         else {
-            self::assertEquals($expected, $actual);
+            self::assertEquals($expected, $actual, $message);
         }
     }
 }

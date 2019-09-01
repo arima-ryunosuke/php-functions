@@ -1106,6 +1106,7 @@ class Vars
                 return "{\n{$kvl}{$spacer2}}";
             }
             elseif ($value instanceof \Closure) {
+                /** @var \ReflectionFunctionAbstract $ref */
                 $ref = (reflect_callable)($value);
                 $that = $ref->getClosureThis();
                 $thatT = $that ? $colorVal($that) : 'static';

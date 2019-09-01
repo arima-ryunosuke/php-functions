@@ -18,7 +18,7 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
             $contents = [];
             foreach ($matches as $match) {
                 $contents[] = '// ' . $match[2];
-                $contents[] = "(function () {" . rtrim(preg_replace('#^     \* ?#um', '', $match[1])) . "\n})();\n";
+                $contents[] = "(function () {" . rtrim(preg_replace('#^ {5}\* ?#um', '', $match[1])) . "\n})();\n";
             }
 
             $exfile = __DIR__ . '/../examples/' . basename($file);

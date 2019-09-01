@@ -157,9 +157,9 @@ class ClassobjTest extends AbstractTestCase
         $this->assertEquals('dummy', $object->fuga);
         $object->fuga = 'dummy2';
         $this->assertEquals('dummy2', $object->fuga);
-        $object->piyo = 'dummy3';
         /** @noinspection PhpUndefinedFieldInspection */
         {
+            $object->piyo = 'dummy3';
             $this->assertEquals('dummy3', $object->piyo);
             $this->assertEquals('dummy3', $original->piyo);
             $original->piyo = 'dummy4';
