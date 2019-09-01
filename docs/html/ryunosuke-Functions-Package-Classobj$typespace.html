@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L686" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L803" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -68,6 +68,68 @@
 	<div class="hierarchy"></div>
 
 	<h3>Constants</h3>
+    		<ul>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L10-L11" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::IS_OWNSELF" tabindex="-1" class="structure-title">
+						<small>integer</small>
+                        IS_OWNSELF						<var> = 128</var>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>自分自身を表す定数</p>
+</div>
+
+                                                					</div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L13-L14" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::IS_PUBLIC" tabindex="-1" class="structure-title">
+						<small>integer</small>
+                        IS_PUBLIC						<var> = 256</var>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>public を表す定数 @see \ReflectionMethod::IS_PUBLIC</p>
+</div>
+
+                                                					</div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L16-L17" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::IS_PROTECTED" tabindex="-1" class="structure-title">
+						<small>integer</small>
+                        IS_PROTECTED						<var> = 512</var>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>protected を表す定数 @see \ReflectionMethod::IS_PROTECTED</p>
+</div>
+
+                                                					</div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L19-L20" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::IS_PRIVATE" tabindex="-1" class="structure-title">
+						<small>integer</small>
+                        IS_PRIVATE						<var> = 1024</var>
+					</h4>
+					<div class="inner-item">
+						<div class="description"><p>private を表す定数 @see \ReflectionMethod::IS_PRIVATE</p>
+</div>
+
+                                                					</div>
+				</li>
+            		</ul>
     
 	<h3>Properties</h3>
     
@@ -83,7 +145,7 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L23-L51" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::stdclass()" tabindex="-1" class="structure-title ">
                         stdclass                        	<small>($fields = []) : <a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></small>
@@ -141,7 +203,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L40-L98" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L53-L111" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::detect_namespace()" tabindex="-1" class="structure-title ">
                         detect_namespace                        	<small>($location) : string</small>
@@ -198,7 +260,70 @@ assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Ho
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L100-L127" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L113-L159" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_uses_all()" tabindex="-1" class="structure-title ">
+                        class_uses_all                        	<small>($class, $autoload = true) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>クラスが use しているトレイトを再帰的に取得する</p>
+<p>トレイトが use しているトレイトが use しているトレイトが use している・・・のような場合もすべて返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">trait T1{}
+trait T2{use T1;}
+trait T3{use T2;}
+assertSame(class_uses_all(new class{use T3;}), [
+    'Example\\T3', // クラスが直接 use している
+    'Example\\T2', // T3 が use している
+    'Example\\T1', // T2 が use している
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>object</td>
+				<td class="rest">$class</td>
+				<td class="desc"></td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$autoload = true</td>
+				<td class="desc"><p>オートロードを呼ぶか</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>トレイト名の配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L161-L188" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader                        	<small>($startdir = null) : <a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></small>
@@ -249,7 +374,7 @@ assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Ho
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L129-L149" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L190-L210" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace                        	<small>($class) : string</small>
@@ -299,7 +424,7 @@ assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Ho
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L151-L170" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L212-L231" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten                        	<small>($class) : string</small>
@@ -349,7 +474,7 @@ assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Ho
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L172-L333" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L233-L394" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace                        	<small>($class, $register) : void</small>
@@ -452,7 +577,7 @@ assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod(), 'this 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L335-L554" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L396-L615" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_extends()" tabindex="-1" class="structure-title ">
                         class_extends                        	<small>($object, $methods, $fields = []) : object</small>
@@ -540,7 +665,7 @@ assertSame($newobject-&gt;count(), 6);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L556-L594" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L617-L655" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::const_exists()" tabindex="-1" class="structure-title ">
                         const_exists                        	<small>($classname, $constname = null) : bool</small>
@@ -609,7 +734,7 @@ assertFalse(const_exists('UNDEFINED'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L596-L632" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L657-L693" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
                         object_dive                        	<small>($object, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
@@ -688,7 +813,88 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L634-L685" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L695-L749" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::get_class_constants()" tabindex="-1" class="structure-title ">
+                        get_class_constants                        	<small>($class, $filter = null) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>クラス定数を配列で返す</p>
+<p><code>(new \ReflectionClass($class))-&gt;getConstants()</code> とほぼ同じだが、可視性でフィルタができる。<br />
+さらに「自分自身の定義か？」でもフィルタできる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$class = new class extends \ArrayObject
+{
+    private   const C_PRIVATE   = 'private';
+    protected const C_PROTECTED = 'protected';
+    public    const C_PUBLIC    = 'public';
+};
+// 普通に全定数を返す
+assertSame(get_class_constants($class), [
+    'C_PRIVATE'      =&gt; 'private',
+    'C_PROTECTED'    =&gt; 'protected',
+    'C_PUBLIC'       =&gt; 'public',
+    'STD_PROP_LIST'  =&gt; \ArrayObject::STD_PROP_LIST,
+    'ARRAY_AS_PROPS' =&gt; \ArrayObject::ARRAY_AS_PROPS,
+]);
+// public のみを返す
+assertSame(get_class_constants($class, IS_PUBLIC), [
+    'C_PUBLIC'       =&gt; 'public',
+    'STD_PROP_LIST'  =&gt; \ArrayObject::STD_PROP_LIST,
+    'ARRAY_AS_PROPS' =&gt; \ArrayObject::ARRAY_AS_PROPS,
+]);
+// 自身定義でかつ public のみを返す
+assertSame(get_class_constants($class, IS_OWNSELF | IS_PUBLIC), [
+    'C_PUBLIC'       =&gt; 'public',
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>object</td>
+				<td class="rest">$class</td>
+				<td class="desc"><p>クラス名 or オブジェクト</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$filter = null</td>
+				<td class="desc"><p>アクセスレベル定数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>クラス定数の配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L751-L802" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
                         get_object_properties                        	<small>($object) : array</small>

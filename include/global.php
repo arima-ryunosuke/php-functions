@@ -4,6 +4,26 @@
 
 
 # constants
+if (!defined("IS_OWNSELF")) {
+    /** 自分自身を表す定数 */
+    define("IS_OWNSELF", 128);
+}
+
+if (!defined("IS_PUBLIC")) {
+    /** public を表す定数 @see \ReflectionMethod::IS_PUBLIC */
+    define("IS_PUBLIC", 256);
+}
+
+if (!defined("IS_PROTECTED")) {
+    /** protected を表す定数 @see \ReflectionMethod::IS_PROTECTED */
+    define("IS_PROTECTED", 512);
+}
+
+if (!defined("IS_PRIVATE")) {
+    /** private を表す定数 @see \ReflectionMethod::IS_PRIVATE */
+    define("IS_PRIVATE", 1024);
+}
+
 if (!defined("JP_ERA")) {
     /** 和暦 */
     define("JP_ERA", [
@@ -2419,9 +2439,10 @@ if (!isset($excluded_functions["array_map_key"]) && (!function_exists("array_map
      */
     function array_map_key($array, $callback)
     {
+        $callback = func_user_func_array($callback);
         $result = [];
         foreach ($array as $k => $v) {
-            $k2 = $callback($k);
+            $k2 = $callback($k, $v);
             if ($k2 !== null) {
                 $result[$k2] = $v;
             }
@@ -2476,6 +2497,7 @@ if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("array_
      */
     function array_filter_key($array, $callback)
     {
+        $callback = func_user_func_array($callback);
         $result = [];
         foreach ($array as $k => $v) {
             if ($callback($k, $v)) {
@@ -4545,6 +4567,59 @@ if (function_exists("detect_namespace") && !defined("detect_namespace")) {
     define("detect_namespace", "detect_namespace");
 }
 
+if (!isset($excluded_functions["class_uses_all"]) && (!function_exists("class_uses_all") || (!false && (new \ReflectionFunction("class_uses_all"))->isInternal()))) {
+    /**
+     * クラスが use しているトレイトを再帰的に取得する
+     *
+     * トレイトが use しているトレイトが use しているトレイトが use している・・・のような場合もすべて返す。
+     *
+     * Example:
+     * ```php
+     * trait T1{}
+     * trait T2{use T1;}
+     * trait T3{use T2;}
+     * assertSame(class_uses_all(new class{use T3;}), [
+     *     'Example\\T3', // クラスが直接 use している
+     *     'Example\\T2', // T3 が use している
+     *     'Example\\T1', // T2 が use している
+     * ]);
+     * ```
+     *
+     * @param string|object $class
+     * @param bool $autoload オートロードを呼ぶか
+     * @return array トレイト名の配列
+     */
+    function class_uses_all($class, $autoload = true)
+    {
+        // まずはクラス階層から取得
+        $traits = [];
+        do {
+            $traits += array_fill_keys(class_uses($class, $autoload), false);
+        } while ($class = get_parent_class($class));
+
+        // そのそれぞれのトレイトに対してさらに再帰的に探す
+        // 見つかったトレイトがさらに use している可能性もあるので「増えなくなるまで」 while ループして探す必要がある
+        // （まずないと思うが）再帰的に use していることもあるかもしれないのでムダを省くためにチェック済みフラグを設けてある（ただ多分不要）
+        $count = count($traits);
+        while (true) {
+            foreach ($traits as $trait => $checked) {
+                if (!$checked) {
+                    $traits[$trait] = true;
+                    $traits += array_fill_keys(class_uses($trait, $autoload), false);
+                }
+            }
+            if ($count === count($traits)) {
+                break;
+            }
+            $count = count($traits);
+        }
+        return array_keys($traits);
+    }
+}
+if (function_exists("class_uses_all") && !defined("class_uses_all")) {
+    define("class_uses_all", "class_uses_all");
+}
+
 if (!isset($excluded_functions["class_loader"]) && (!function_exists("class_loader") || (!false && (new \ReflectionFunction("class_loader"))->isInternal()))) {
     /**
      * composer のクラスローダを返す
@@ -5112,6 +5187,67 @@ if (!isset($excluded_functions["object_dive"]) && (!function_exists("object_dive
 }
 if (function_exists("object_dive") && !defined("object_dive")) {
     define("object_dive", "object_dive");
+}
+
+if (!isset($excluded_functions["get_class_constants"]) && (!function_exists("get_class_constants") || (!false && (new \ReflectionFunction("get_class_constants"))->isInternal()))) {
+    /**
+     * クラス定数を配列で返す
+     *
+     * `(new \ReflectionClass($class))->getConstants()` とほぼ同じだが、可視性でフィルタができる。
+     * さらに「自分自身の定義か？」でもフィルタできる。
+     *
+     * Example:
+     * ```php
+     * $class = new class extends \ArrayObject
+     * {
+     *     private   const C_PRIVATE   = 'private';
+     *     protected const C_PROTECTED = 'protected';
+     *     public    const C_PUBLIC    = 'public';
+     * };
+     * // 普通に全定数を返す
+     * assertSame(get_class_constants($class), [
+     *     'C_PRIVATE'      => 'private',
+     *     'C_PROTECTED'    => 'protected',
+     *     'C_PUBLIC'       => 'public',
+     *     'STD_PROP_LIST'  => \ArrayObject::STD_PROP_LIST,
+     *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
+     * ]);
+     * // public のみを返す
+     * assertSame(get_class_constants($class, IS_PUBLIC), [
+     *     'C_PUBLIC'       => 'public',
+     *     'STD_PROP_LIST'  => \ArrayObject::STD_PROP_LIST,
+     *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
+     * ]);
+     * // 自身定義でかつ public のみを返す
+     * assertSame(get_class_constants($class, IS_OWNSELF | IS_PUBLIC), [
+     *     'C_PUBLIC'       => 'public',
+     * ]);
+     * ```
+     *
+     * @param string|object $class クラス名 or オブジェクト
+     * @param int $filter アクセスレベル定数
+     * @return array クラス定数の配列
+     */
+    function get_class_constants($class, $filter = null)
+    {
+        $class = ltrim(is_object($class) ? get_class($class) : $class, '\\');
+        $filter = $filter ?? (IS_PUBLIC | IS_PROTECTED | IS_PRIVATE);
+
+        $result = [];
+        foreach ((new \ReflectionClass($class))->getReflectionConstants() as $constant) {
+            if (($filter & IS_OWNSELF) === IS_OWNSELF && $constant->getDeclaringClass()->name !== $class) {
+                continue;
+            }
+            $modifiers = $constant->getModifiers();
+            if (($modifiers & $filter) === $modifiers) {
+                $result[$constant->name] = $constant->getValue();
+            }
+        }
+        return $result;
+    }
+}
+if (function_exists("get_class_constants") && !defined("get_class_constants")) {
+    define("get_class_constants", "get_class_constants");
 }
 
 if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("get_object_properties") || (!false && (new \ReflectionFunction("get_object_properties"))->isInternal()))) {
@@ -6116,7 +6252,7 @@ if (!isset($excluded_functions["path_is_absolute"]) && (!function_exists("path_i
         }
 
         if (DIRECTORY_SEPARATOR === '\\') {
-            if (preg_match('#^([a-z]+:(\\\\|\\/|$)|\\\\)#i', $path) !== 0) {
+            if (preg_match('#^([a-z]+:(\\\\|/|$)|\\\\)#i', $path) !== 0) {
                 return true;
             }
         }
@@ -7209,15 +7345,19 @@ if (!isset($excluded_functions["callable_code"]) && (!function_exists("callable_
      * list($meta, $body) = callable_code(function(...$args){return true;});
      * assertSame($meta, 'function(...$args)');
      * assertSame($body, '{return true;}');
+     *
+     * // ReflectionFunctionAbstract を渡しても動作する
+     * list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
+     * assertSame($meta, 'function(...$args)');
+     * assertSame($body, '{return true;}');
      * ```
      *
-     * @param callable $callable コードを取得する callable
+     * @param callable|\ReflectionFunctionAbstract $callable コードを取得する callable
      * @return array ['定義部分', '{処理コード}']
      */
     function callable_code($callable)
     {
-        /** @var \ReflectionFunctionAbstract $ref */
-        $ref = reflect_callable($callable);
+        $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : reflect_callable($callable);
         $contents = file($ref->getFileName());
         $start = $ref->getStartLine();
         $end = $ref->getEndLine();
@@ -9230,6 +9370,8 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplo
      *
      * $enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。
      *
+     * 歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。
+     *
      * Example:
      * ```php
      * // シンプルな例
@@ -9246,16 +9388,37 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplo
      *     'b', // 普通に分割される
      *     '{e,f}', // { } で囲まれているので区切り文字とみなされない
      * ]);
+     *
+     * // このように第3引数に $limit 引数を差し込むことができる
+     * assertSame(quoteexplode(',', 'a,b,{e,f}', 2, ['{' => '}']), [
+     *     'a',
+     *     'b,{e,f}',
+     * ]);
      * ```
      *
      * @param string|array $delimiter 分割文字列
      * @param string $string 対象文字列
+     * @param int $limit 分割数。負数未対応
      * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
      * @param string $escape エスケープ文字
      * @return array 分割された配列
      */
-    function quoteexplode($delimiter, $string, $enclosures = "'\"", $escape = '\\')
+    function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\')
     {
+        // for compatible 1.3.x
+        if (!is_int($limit) && $limit !== null) {
+            if (func_num_args() > 3) {
+                $escape = $enclosures;
+            }
+            $enclosures = $limit;
+            $limit = PHP_INT_MAX;
+        }
+
+        if ($limit === null) {
+            $limit = PHP_INT_MAX;
+        }
+        $limit = max(1, $limit);
+
         if (is_string($enclosures)) {
             $chars = str_split($enclosures);
             $enclosures = array_combine($chars, $chars);
@@ -9290,9 +9453,12 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplo
                         break;
                     }
                 }
+                if (count($result) === $limit - 1) {
+                    break;
+                }
             }
         }
-        $result[] = substr($string, $current, $i);
+        $result[] = substr($string, $current, $l);
         return $result;
     }
 }
@@ -10981,6 +11147,203 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
 }
 if (function_exists("json_import") && !defined("json_import")) {
     define("json_import", "json_import");
+}
+
+if (!isset($excluded_functions["paml_export"]) && (!function_exists("paml_export") || (!false && (new \ReflectionFunction("paml_export"))->isInternal()))) {
+    /**
+     * 連想配列を paml 的文字列に変換する
+     *
+     * paml で出力することはまずないのでおまけ（import との対称性のために定義している）。
+     *
+     * Example:
+     * ```php
+     * assertSame(paml_export([
+     *     'n' => null,
+     *     'f' => false,
+     *     'i' => 123,
+     *     'd' => 3.14,
+     *     's' => 'this is string',
+     * ]), 'n: null, f: false, i: 123, d: 3.14, s: "this is string"');
+     * ```
+     *
+     * @param array $pamlarray 配列
+     * @param array $options オプション配列
+     * @return string PAML 的文字列
+     */
+    function paml_export($pamlarray, $options = [])
+    {
+        $options += [
+            'trailing-comma' => false,
+            'pretty-space'   => true,
+        ];
+
+        $space = $options['pretty-space'] ? ' ' : '';
+
+        $result = [];
+        $n = 0;
+        foreach ($pamlarray as $k => $v) {
+            if (is_array($v)) {
+                $inner = paml_export($v, $options);
+                if (is_hasharray($v)) {
+                    $v = '{' . $inner . '}';
+                }
+                else {
+                    $v = '[' . $inner . ']';
+                }
+            }
+            elseif ($v === null) {
+                $v = 'null';
+            }
+            elseif ($v === false) {
+                $v = 'false';
+            }
+            elseif ($v === true) {
+                $v = 'true';
+            }
+            elseif (is_string($v)) {
+                $v = '"' . addcslashes($v, "\"\0\\") . '"';
+            }
+
+            if ($k === $n++) {
+                $result[] = "$v";
+            }
+            else {
+                $result[] = "$k:{$space}$v";
+            }
+        }
+        return implode(",$space", $result) . ($options['trailing-comma'] ? ',' : '');
+    }
+}
+if (function_exists("paml_export") && !defined("paml_export")) {
+    define("paml_export", "paml_export");
+}
+
+if (!isset($excluded_functions["paml_import"]) && (!function_exists("paml_import") || (!false && (new \ReflectionFunction("paml_import"))->isInternal()))) {
+    /**
+     * paml 的文字列をパースする
+     *
+     * paml とは yaml を簡易化したような独自フォーマットを指す。
+     * ざっくりと下記のような特徴がある。
+     *
+     * - ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要
+     * - yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応
+     * - 配列を前提にしているので、トップレベルの `[]` `{}` は不要
+     * - 配列・連想配列の区別はなし。 `[]` でいわゆる php の配列、 `{}` で stdClass を表す
+     * - bare string で php の定数を表す
+     *
+     * 簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。
+     * なお、かなり緩くパースしてるので基本的にエラーにはならない。
+     *
+     * 早見表：
+     *
+     * - php:  `["n" => null, "f" => false, "i" => 123, "d" => 3.14, "s" => "this is string", "a" => [1, 2, "x" => "X"]]`
+     *     - ダブルアローとキーのクオートが冗長
+     * - json: `{"n":null, "f":false, "i":123, "d":3.14, "s":"this is string", "a":{"0": 1, "1": 2, "x": "X"}}`
+     *     - キーのクオートが冗長だしケツカンマ非許容
+     * - yaml: `{n: null, f: false, i: 123, d: 3.14, s: "this is string", a: {0: 1, 1: 2, x: X}}`
+     *     - 理想に近いが、コロンの後にスペースが必要だし連想配列が少々難。なにより拡張や外部ライブラリが必要
+     * - paml: `n:null, f:false, i:123, d:3.14, s:"this is string", a:[1, 2, x:X]`
+     *     - シンプルイズベスト
+     *
+     * Example:
+     * ```php
+     * // こういったスカラー型はほとんど yaml と一緒だが、コロンの後のスペースは不要（あってもよい）
+     * assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
+     *     'n' => null,
+     *     'f' => false,
+     *     'i' => 123,
+     *     'd' => 3.14,
+     *     's' => 'this is string',
+     * ]);
+     * // 配列が使える（キーは連番なら不要）。ネストも可能
+     * assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
+     *     'a'    => [1, 2, 'x' => 'X', 3],
+     *     'nest' => [
+     *         'a' => [
+     *             'b' => [
+     *                 'c' => ['X']
+     *             ],
+     *         ],
+     *     ],
+     * ]);
+     * // bare 文字列で定数が使える
+     * assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
+     *     'pv' => \PHP_VERSION,
+     *     'ao' => \ArrayObject::STD_PROP_LIST,
+     * ]);
+     * ```
+     *
+     * @param string $pamlstring PAML 文字列
+     * @param array $options オプション配列
+     * @return array php 配列
+     */
+    function paml_import($pamlstring, $options = [])
+    {
+        $options += [
+            'cache'          => true,
+            'trailing-comma' => true,
+        ];
+
+        static $caches = [];
+        if ($options['cache']) {
+            return $caches[$pamlstring] = $caches[$pamlstring] ?? paml_import($pamlstring, ['cache' => false] + $options);
+        }
+
+        $escapers = ['"' => '"', "'" => "'", '[' => ']', '{' => '}'];
+
+        $values = array_map('trim', quoteexplode(',', $pamlstring, null, $escapers));
+        if ($options['trailing-comma'] && end($values) === '') {
+            array_pop($values);
+        }
+
+        $result = [];
+        foreach ($values as $value) {
+            $key = null;
+            $kv = array_map('trim', quoteexplode(':', $value, 2, $escapers));
+            if (count($kv) === 2) {
+                list($key, $value) = $kv;
+            }
+
+            $prefix = $value[0] ?? null;
+            $suffix = $value[-1] ?? null;
+
+            if ($prefix === '[' && $suffix === ']') {
+                $value = (array) paml_import(substr($value, 1, -1), $options);
+            }
+            elseif ($prefix === '{' && $suffix === '}') {
+                $value = (object) paml_import(substr($value, 1, -1), $options);
+            }
+            elseif ($prefix === '"' && $suffix === '"') {
+                //$value = stripslashes(substr($value, 1, -1));
+                $value = json_decode($value);
+            }
+            elseif ($prefix === "'" && $suffix === "'") {
+                $value = substr($value, 1, -1);
+            }
+            elseif (defined($value)) {
+                $value = constant($value);
+            }
+            elseif (is_numeric($value)) {
+                if (ctype_digit(ltrim($value, '+-'))) {
+                    $value = (int) $value;
+                }
+                else {
+                    $value = (double) $value;
+                }
+            }
+
+            if ($key === null) {
+                $result[] = $value;
+            }
+            else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+}
+if (function_exists("paml_import") && !defined("paml_import")) {
+    define("paml_import", "paml_import");
 }
 
 if (!isset($excluded_functions["ltsv_export"]) && (!function_exists("ltsv_export") || (!false && (new \ReflectionFunction("ltsv_export"))->isInternal()))) {
@@ -14319,6 +14682,69 @@ if (function_exists("arrayval") && !defined("arrayval")) {
     define("arrayval", "arrayval");
 }
 
+if (!isset($excluded_functions["arrayable_key_exists"]) && (!function_exists("arrayable_key_exists") || (!false && (new \ReflectionFunction("arrayable_key_exists"))->isInternal()))) {
+    /**
+     * 配列・Arrayable にキーがあるか調べる
+     *
+     * 配列が与えられた場合は array_key_exists と同じ。
+     * Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'k' => 'v',
+     *     'n' => null,
+     * ];
+     * // 配列は array_key_exists と同じ
+     * assertTrue(arrayable_key_exists('k', $array));  // もちろん存在する
+     * assertTrue(arrayable_key_exists('n', $array));  // isset ではないので null も true
+     * assertFalse(arrayable_key_exists('x', $array)); // 存在しないので false
+     * assertFalse(isset($array['n']));                // isset だと null が false になる（参考）
+     *
+     * $object = new \ArrayObject($array);
+     * // 配列は array_key_exists と同じ
+     * assertTrue(arrayable_key_exists('k', $object));  // もちろん存在する
+     * assertTrue(arrayable_key_exists('n', $object));  // isset ではないので null も true
+     * assertFalse(arrayable_key_exists('x', $object)); // 存在しないので false
+     * assertFalse(isset($object['n']));                // isset だと null が false になる（参考）
+     * ```
+     *
+     * @param string|int $key キー
+     * @param array|\ArrayAccess $arrayable 調べる値
+     * @return bool キーが存在するなら true
+     */
+    function arrayable_key_exists($key, $arrayable)
+    {
+        if (is_array($arrayable)) {
+            // see https://www.php.net/manual/function.array-key-exists.php#107786
+            return isset($arrayable[$key]) || array_key_exists($key, $arrayable);
+        }
+
+        if ($arrayable instanceof \ArrayAccess) {
+            // あるならあるでよい
+            if (isset($arrayable[$key])) {
+                return true;
+            }
+            // 問題は「ない場合」と「あるが null だった場合」の区別で、ArrayAccess の実装次第なので一元的に確定するのは不可能
+            // ここでは「ない場合はなんらかのエラー・例外が出るはず」という前提で実際に値を取得して確認する
+            try {
+                error_clear_last();
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                $dummy = @$arrayable[$key];
+                return !error_get_last();
+            }
+            catch (\Throwable $t) {
+                return false;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('%s is not arrayable (%s).', '$arrayable', var_type($arrayable)));
+    }
+}
+if (function_exists("arrayable_key_exists") && !defined("arrayable_key_exists")) {
+    define("arrayable_key_exists", "arrayable_key_exists");
+}
+
 if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") || (!false && (new \ReflectionFunction("si_prefix"))->isInternal()))) {
     /**
      * 数値に SI 接頭辞を付与する
@@ -15300,6 +15726,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                 return "{\n{$kvl}{$spacer2}}";
             }
             elseif ($value instanceof \Closure) {
+                /** @var \ReflectionFunctionAbstract $ref */
                 $ref = reflect_callable($value);
                 $that = $ref->getClosureThis();
                 $thatT = $that ? $colorVal($that) : 'static';

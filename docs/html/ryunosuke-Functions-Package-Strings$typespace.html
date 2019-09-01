@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L2696" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L2909" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Strings</span></h2>
@@ -344,14 +344,15 @@ assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L133-L202" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L133-L228" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::quoteexplode()" tabindex="-1" class="structure-title ">
-                        quoteexplode                        	<small>($delimiter, $string, $enclosures = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : array</small>
+                        quoteexplode                        	<small>($delimiter, $string, $limit = null, $enclosures = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : array</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>エスケープやクオートに対応した explode</p>
 <p>$enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。</p>
+<p>歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな例
 assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
@@ -366,6 +367,12 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
     'a', // 普通に分割される
     'b', // 普通に分割される
     '{e,f}', // { } で囲まれているので区切り文字とみなされない
+]);
+
+// このように第3引数に $limit 引数を差し込むことができる
+assertSame(quoteexplode(',', 'a,b,{e,f}', 2, ['{' =&gt; '}']), [
+    'a',
+    'b,{e,f}',
 ]);
 </code></pre>
 </div>
@@ -382,6 +389,12 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
 				<td class="type">string</td>
 				<td class="rest">$string</td>
 				<td class="desc"><p>対象文字列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$limit = null</td>
+				<td class="desc"><p>分割数。負数未対応</p>
 </td>
 			</tr>
         			<tr>
@@ -426,7 +439,7 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L204-L246" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L230-L272" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::strrstr()" tabindex="-1" class="structure-title ">
                         strrstr                        	<small>($haystack, $needle, $after_needle = true) : string</small>
@@ -498,7 +511,7 @@ assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L248-L284" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L274-L310" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_anyof()" tabindex="-1" class="structure-title ">
                         str_anyof                        	<small>($needle, $haystack, $case_insensitivity = false) : bool</small>
@@ -569,7 +582,7 @@ assertSame(str_anyof(2, ['1', '2', '3']), 1);         // 同上
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L286-L323" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L312-L349" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_equals()" tabindex="-1" class="structure-title ">
                         str_equals                        	<small>($str1, $str2, $case_insensitivity = false) : bool</small>
@@ -634,7 +647,7 @@ assertTrue(str_equals('\0abc', '\0abc'));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L325-L365" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L351-L391" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_contains()" tabindex="-1" class="structure-title ">
                         str_contains                        	<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false) : bool</small>
@@ -705,7 +718,7 @@ assertFalse(str_contains('abc', ['b', 'x'], false, true));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L367-L394" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L393-L420" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_chop()" tabindex="-1" class="structure-title ">
                         str_chop                        	<small>($string, $prefix = null, $suffix = null, $case_insensitivity = false) : string</small>
@@ -775,7 +788,7 @@ assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L396-L414" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L422-L440" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_lchop()" tabindex="-1" class="structure-title ">
                         str_lchop                        	<small>($string, $prefix, $case_insensitivity = false) : string</small>
@@ -839,7 +852,7 @@ assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L416-L434" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L442-L460" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_rchop()" tabindex="-1" class="structure-title ">
                         str_rchop                        	<small>($string, $suffix = null, $case_insensitivity = false) : string</small>
@@ -903,7 +916,7 @@ assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L436-L483" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L462-L509" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_putcsv()" tabindex="-1" class="structure-title ">
                         str_putcsv                        	<small>($array, $delimiter = &quot;,&quot;, $enclosure = &quot;\&quot;&quot;, $escape = &quot;\\&quot;) : string</small>
@@ -984,7 +997,7 @@ assertSame(str_putcsv((function() {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L485-L559" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L511-L585" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_subreplace()" tabindex="-1" class="structure-title ">
                         str_subreplace                        	<small>($subject, $search, $replaces, $case_insensitivity = false) : string</small>
@@ -1067,7 +1080,7 @@ assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L561-L661" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L587-L687" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_submap()" tabindex="-1" class="structure-title ">
                         str_submap                        	<small>($subject, $replaces, $case_insensitivity = false) : string</small>
@@ -1151,7 +1164,7 @@ assertSame(str_submap('hello, world', [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L663-L758" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L689-L784" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_embed()" tabindex="-1" class="structure-title ">
                         str_embed                        	<small>($string, $replacemap, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : string</small>
@@ -1239,7 +1252,7 @@ assertSame(str_embed('a, "a", b, "b", b', [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L760-L832" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L786-L858" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_between()" tabindex="-1" class="structure-title ">
                         str_between                        	<small>($string, $from, $to, &amp;$position = 0, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : string<span class="type-separator"></span><wbr>bool</small>
@@ -1331,7 +1344,7 @@ assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L834-L879" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L860-L905" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_ellipsis()" tabindex="-1" class="structure-title ">
                         str_ellipsis                        	<small>($string, $width, $trimmarker = &quot;...&quot;, $pos = null) : string</small>
@@ -1407,7 +1420,7 @@ assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L881-L913" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L907-L939" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::starts_with()" tabindex="-1" class="structure-title ">
                         starts_with                        	<small>($string, $with, $case_insensitivity = false) : bool</small>
@@ -1474,7 +1487,7 @@ assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L915-L947" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L941-L973" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ends_with()" tabindex="-1" class="structure-title ">
                         ends_with                        	<small>($string, $with, $case_insensitivity = false) : bool</small>
@@ -1541,7 +1554,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L949-L964" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L975-L990" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::camel_case()" tabindex="-1" class="structure-title ">
                         camel_case                        	<small>($string, $delimiter = &quot;_&quot;) : string</small>
@@ -1597,7 +1610,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L966-L981" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L992-L1007" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::pascal_case()" tabindex="-1" class="structure-title ">
                         pascal_case                        	<small>($string, $delimiter = &quot;_&quot;) : string</small>
@@ -1653,7 +1666,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L983-L998" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1009-L1024" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::snake_case()" tabindex="-1" class="structure-title ">
                         snake_case                        	<small>($string, $delimiter = &quot;_&quot;) : string</small>
@@ -1709,7 +1722,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1000-L1015" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1026-L1041" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::chain_case()" tabindex="-1" class="structure-title ">
                         chain_case                        	<small>($string, $delimiter = &quot;-&quot;) : string</small>
@@ -1765,7 +1778,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1017-L1046" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1043-L1072" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::namespace_split()" tabindex="-1" class="structure-title ">
                         namespace_split                        	<small>($string) : array</small>
@@ -1830,7 +1843,7 @@ assertSame(namespace_split('\\hoge'), ['', 'hoge']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1048-L1205" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1074-L1231" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::htmltag()" tabindex="-1" class="structure-title ">
                         htmltag                        	<small>($selector) : string</small>
@@ -1908,7 +1921,7 @@ assertSame(
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1207-L1265" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1233-L1291" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::build_uri()" tabindex="-1" class="structure-title ">
                         build_uri                        	<small>($parts) : string</small>
@@ -1978,7 +1991,7 @@ assertSame(build_uri([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1267-L1356" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1293-L1382" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::parse_uri()" tabindex="-1" class="structure-title ">
                         parse_uri                        	<small>($uri, $default = []) : array</small>
@@ -2067,7 +2080,7 @@ assertEquals(parse_uri('localhost/path/to/file', [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1358-L1401" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1384-L1427" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ini_export()" tabindex="-1" class="structure-title ">
                         ini_export                        	<small>($iniarray, $options = []) : string</small>
@@ -2126,7 +2139,7 @@ c = "cli"
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1403-L1427" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1429-L1453" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ini_import()" tabindex="-1" class="structure-title ">
                         ini_import                        	<small>($inistring, $options = []) : array</small>
@@ -2186,7 +2199,7 @@ c = PHP_VERSION
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1429-L1535" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1455-L1561" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::csv_export()" tabindex="-1" class="structure-title ">
                         csv_export                        	<small>($csvarrays, $options = []) : string<span class="type-separator"></span><wbr>int</small>
@@ -2269,7 +2282,7 @@ A3,C3
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1537-L1659" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1563-L1685" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::csv_import()" tabindex="-1" class="structure-title ">
                         csv_import                        	<small>($csvstring, $options = []) : array</small>
@@ -2370,7 +2383,7 @@ A3,B3,C3
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1661-L1700" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1687-L1726" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::json_export()" tabindex="-1" class="structure-title ">
                         json_export                        	<small>($value, $options = []) : string</small>
@@ -2430,7 +2443,7 @@ assertEquals(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1702-L1740" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1728-L1766" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::json_import()" tabindex="-1" class="structure-title ">
                         json_import                        	<small>($value, $options = []) : mixed</small>
@@ -2490,7 +2503,179 @@ assertEquals(json_import('{"a":"A","b":"B"}', [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1742-L1815" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1768-L1830" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::paml_export()" tabindex="-1" class="structure-title ">
+                        paml_export                        	<small>($pamlarray, $options = []) : string</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>連想配列を paml 的文字列に変換する</p>
+<p>paml で出力することはまずないのでおまけ（import との対称性のために定義している）。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(paml_export([
+    'n' =&gt; null,
+    'f' =&gt; false,
+    'i' =&gt; 123,
+    'd' =&gt; 3.14,
+    's' =&gt; 'this is string',
+]), 'n: null, f: false, i: 123, d: 3.14, s: "this is string"');
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$pamlarray</td>
+				<td class="desc"><p>配列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$options = []</td>
+				<td class="desc"><p>オプション配列</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc"><p>PAML 的文字列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1832-L1953" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::paml_import()" tabindex="-1" class="structure-title ">
+                        paml_import                        	<small>($pamlstring, $options = []) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>paml 的文字列をパースする</p>
+<p>paml とは yaml を簡易化したような独自フォーマットを指す。<br />
+ざっくりと下記のような特徴がある。</p>
+<ul>
+<li>ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要</li>
+<li>yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応</li>
+<li>配列を前提にしているので、トップレベルの <code>[]</code> <code>{}</code> は不要</li>
+<li>配列・連想配列の区別はなし。 <code>[]</code> でいわゆる php の配列、 <code>{}</code> で stdClass を表す</li>
+<li>bare string で php の定数を表す</li>
+</ul>
+<p>簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。<br />
+なお、かなり緩くパースしてるので基本的にエラーにはならない。</p>
+<p>早見表：</p>
+<ul>
+<li>php:  <code>["n" =&gt; null, "f" =&gt; false, "i" =&gt; 123, "d" =&gt; 3.14, "s" =&gt; "this is string", "a" =&gt; [1, 2, "x" =&gt; "X"]]</code><ul>
+<li>ダブルアローとキーのクオートが冗長</li>
+</ul>
+</li>
+<li>json: <code>{"n":null, "f":false, "i":123, "d":3.14, "s":"this is string", "a":{"0": 1, "1": 2, "x": "X"}}</code><ul>
+<li>キーのクオートが冗長だしケツカンマ非許容</li>
+</ul>
+</li>
+<li>yaml: <code>{n: null, f: false, i: 123, d: 3.14, s: "this is string", a: {0: 1, 1: 2, x: X}}</code><ul>
+<li>理想に近いが、コロンの後にスペースが必要だし連想配列が少々難。なにより拡張や外部ライブラリが必要</li>
+</ul>
+</li>
+<li>paml: <code>n:null, f:false, i:123, d:3.14, s:"this is string", a:[1, 2, x:X]</code><ul>
+<li>シンプルイズベスト</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// こういったスカラー型はほとんど yaml と一緒だが、コロンの後のスペースは不要（あってもよい）
+assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
+    'n' =&gt; null,
+    'f' =&gt; false,
+    'i' =&gt; 123,
+    'd' =&gt; 3.14,
+    's' =&gt; 'this is string',
+]);
+// 配列が使える（キーは連番なら不要）。ネストも可能
+assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
+    'a'    =&gt; [1, 2, 'x' =&gt; 'X', 3],
+    'nest' =&gt; [
+        'a' =&gt; [
+            'b' =&gt; [
+                'c' =&gt; ['X']
+            ],
+        ],
+    ],
+]);
+// bare 文字列で定数が使える
+assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
+    'pv' =&gt; \PHP_VERSION,
+    'ao' =&gt; \ArrayObject::STD_PROP_LIST,
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$pamlstring</td>
+				<td class="desc"><p>PAML 文字列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$options = []</td>
+				<td class="desc"><p>オプション配列</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>php 配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1955-L2028" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ltsv_export()" tabindex="-1" class="structure-title ">
                         ltsv_export                        	<small>($ltsvarray, $options = []) : string</small>
@@ -2569,7 +2754,7 @@ assertEquals(ltsv_export([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1817-L1890" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2030-L2103" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ltsv_import()" tabindex="-1" class="structure-title ">
                         ltsv_import                        	<small>($ltsvstring, $options = []) : array</small>
@@ -2647,7 +2832,7 @@ assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1892-L1958" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2105-L2171" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::markdown_table()" tabindex="-1" class="structure-title ">
                         markdown_table                        	<small>($array) : string</small>
@@ -2710,7 +2895,7 @@ assertEquals("\n" . markdown_table([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L1960-L2030" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2173-L2243" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::markdown_list()" tabindex="-1" class="structure-title ">
                         markdown_list                        	<small>($array, $option = []) : string</small>
@@ -2790,7 +2975,7 @@ assertEquals("\n" . markdown_list([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2032-L2058" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2245-L2271" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::random_string()" tabindex="-1" class="structure-title ">
                         random_string                        	<small>($length = 8, $charlist = &quot;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;) : string</small>
@@ -2843,7 +3028,7 @@ assertEquals("\n" . markdown_list([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2060-L2094" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2273-L2307" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::kvsprintf()" tabindex="-1" class="structure-title ">
                         kvsprintf                        	<small>($format, $array) : string</small>
@@ -2900,7 +3085,7 @@ assertEquals("\n" . markdown_list([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2096-L2133" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2309-L2346" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_capture()" tabindex="-1" class="structure-title ">
                         preg_capture                        	<small>($pattern, $subject, $default) : array</small>
@@ -2973,7 +3158,7 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2135-L2176" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2348-L2389" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_splice()" tabindex="-1" class="structure-title ">
                         preg_splice                        	<small>($pattern, $replacement, $subject, &amp;$matches = []) : string</small>
@@ -3055,7 +3240,7 @@ assertSame($m, ['abc']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2178-L2241" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2391-L2454" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_replaces()" tabindex="-1" class="structure-title ">
                         preg_replaces                        	<small>($pattern, $replacements, $subject, $limit = -1, &amp;$count = null) : string</small>
@@ -3143,7 +3328,7 @@ assertSame(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;targ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2243-L2318" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2456-L2531" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::damerau_levenshtein()" tabindex="-1" class="structure-title ">
                         damerau_levenshtein                        	<small>($s1, $s2, $cost_ins = 1, $cost_rep = 1, $cost_del = 1, $cost_swp = 1) : int</small>
@@ -3231,7 +3416,7 @@ assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2320-L2350" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2533-L2563" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ngram()" tabindex="-1" class="structure-title ">
                         ngram                        	<small>($string, $N, $encoding = &quot;UTF-8&quot;) : array</small>
@@ -3297,7 +3482,7 @@ assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2352-L2428" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2565-L2641" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_guess()" tabindex="-1" class="structure-title ">
                         str_guess                        	<small>($string, $candidates, &amp;$percent = null) : string</small>
@@ -3368,7 +3553,7 @@ assertSame(str_guess("あいうえお", [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2430-L2509" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2643-L2722" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_array()" tabindex="-1" class="structure-title ">
                         str_array                        	<small>($string, $delimiter, $hashmode) : array</small>
@@ -3468,7 +3653,7 @@ assertSame(str_array("
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2511-L2541" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2724-L2754" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::mb_substr_replace()" tabindex="-1" class="structure-title ">
                         mb_substr_replace                        	<small>($string, $replacement, $start, $length = null) : string</small>
@@ -3538,7 +3723,7 @@ assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2543-L2557" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2756-L2770" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::mb_trim()" tabindex="-1" class="structure-title ">
                         mb_trim                        	<small>($string) : string</small>
@@ -3588,7 +3773,7 @@ assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2559-L2629" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2772-L2842" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_string()" tabindex="-1" class="structure-title ">
                         render_string                        	<small>($template, $array) : string</small>
@@ -3664,7 +3849,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2631-L2643" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2844-L2856" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_file()" tabindex="-1" class="structure-title ">
                         render_file                        	<small>($template_file, $array) : string</small>
@@ -3727,7 +3912,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2645-L2676" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2858-L2889" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ob_include()" tabindex="-1" class="structure-title ">
                         ob_include                        	<small>($include_file, $array = []) : string</small>
@@ -3794,7 +3979,7 @@ This is HOGE.
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2678-L2695" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2891-L2908" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::include_string()" tabindex="-1" class="structure-title ">
                         include_string                        	<small>($template, $array = []) : string</small>

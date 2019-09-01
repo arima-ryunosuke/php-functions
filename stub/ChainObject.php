@@ -1589,6 +1589,10 @@
  * @method   \ChainObject  zip4(...$arrays)
  * @method   \ChainObject  zip5(...$arrays)
  *
+ * @see arrayable_key_exists
+ * @method   \ChainObject  arrayable_key_exists($arrayable)
+ * @method   \ChainObject  arrayable_key_exists1($key)
+ *
  * @see arrayize
  * @method   \ChainObject  arrayize(...$variadic)
  * @method   \ChainObject  arrayize1(...$variadic)
@@ -1874,6 +1878,11 @@
  * @see class_shorten
  * @property \ChainObject $class_shorten
  * @method   \ChainObject  class_shorten()
+ *
+ * @see class_uses_all
+ * @property \ChainObject $class_uses_all
+ * @method   \ChainObject  class_uses_all($autoload = true)
+ * @method   \ChainObject  class_uses_all1($class)
  *
  * @see clearstatcache
  * @method   \ChainObject  clearstatcache($filename = null)
@@ -2625,6 +2634,11 @@
  *
  * @see get_class
  * @method   \ChainObject  get_class()
+ *
+ * @see get_class_constants
+ * @property \ChainObject $get_class_constants
+ * @method   \ChainObject  get_class_constants($filter = null)
+ * @method   \ChainObject  get_class_constants1($class)
  *
  * @see get_class_methods
  * @property \ChainObject $get_class_methods
@@ -3992,6 +4006,16 @@
  * @method   \ChainObject  pack5($format, ...$args)
  * @method   \ChainObject  pack6($format, ...$args)
  *
+ * @see paml_export
+ * @property \ChainObject $paml_export
+ * @method   \ChainObject  paml_export($options = [])
+ * @method   \ChainObject  paml_export1($pamlarray)
+ *
+ * @see paml_import
+ * @property \ChainObject $paml_import
+ * @method   \ChainObject  paml_import($options = [])
+ * @method   \ChainObject  paml_import1($pamlstring)
+ *
  * @see parameter_length
  * @property \ChainObject $parameter_length
  * @method   \ChainObject  parameter_length($require_only = false, $thought_variadic = false)
@@ -4186,10 +4210,11 @@
  * @method   \ChainObject  quoted_printable_encode()
  *
  * @see quoteexplode
- * @method   \ChainObject  quoteexplode($string, $enclosures = "'\"", $escape = "\\")
- * @method   \ChainObject  quoteexplode1($delimiter, $enclosures = "'\"", $escape = "\\")
- * @method   \ChainObject  quoteexplode2($delimiter, $string, $escape = "\\")
- * @method   \ChainObject  quoteexplode3($delimiter, $string, $enclosures = "'\"")
+ * @method   \ChainObject  quoteexplode($string, $limit = null, $enclosures = "'\"", $escape = "\\")
+ * @method   \ChainObject  quoteexplode1($delimiter, $limit = null, $enclosures = "'\"", $escape = "\\")
+ * @method   \ChainObject  quoteexplode2($delimiter, $string, $enclosures = "'\"", $escape = "\\")
+ * @method   \ChainObject  quoteexplode3($delimiter, $string, $limit = null, $escape = "\\")
+ * @method   \ChainObject  quoteexplode4($delimiter, $string, $limit = null, $enclosures = "'\"")
  *
  * @see quotemeta
  * @property \ChainObject $quotemeta

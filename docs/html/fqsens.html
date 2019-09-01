@@ -1492,7 +1492,23 @@ assertSame(array_difference([
                                     ryunosuke\Functions\Package::Classobj		</a>	</h4>
 	<div class="description"><p>クラス・オブジェクト関連のユーティリティ</p>
 </div>
-                	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()">
+        	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_OWNSELF">
+                                    ryunosuke\Functions\Package\Classobj::IS_OWNSELF		</a>	</h4>
+	<div class="description"><p>自分自身を表す定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PUBLIC">
+                                    ryunosuke\Functions\Package\Classobj::IS_PUBLIC		</a>	</h4>
+	<div class="description"><p>public を表す定数 @see \ReflectionMethod::IS_PUBLIC</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PROTECTED">
+                                    ryunosuke\Functions\Package\Classobj::IS_PROTECTED		</a>	</h4>
+	<div class="description"><p>protected を表す定数 @see \ReflectionMethod::IS_PROTECTED</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PRIVATE">
+                                    ryunosuke\Functions\Package\Classobj::IS_PRIVATE		</a>	</h4>
+	<div class="description"><p>private を表す定数 @see \ReflectionMethod::IS_PRIVATE</p>
+</div>
+            	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()">
                                     ryunosuke\Functions\Package\Classobj::stdclass		</a>	<small>($fields = []) : <a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></small>
 		</h4>
 	<div class="description"><p>初期フィールド値を与えて stdClass を生成する</p>
@@ -1521,6 +1537,22 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 $dirname = dirname(class_loader()-&gt;findFile(\ryunosuke\Functions\Package\Classobj::class));
 // "$dirname/Hoge" の名前空間を推測して返す
 assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_uses_all()">
+                                    ryunosuke\Functions\Package\Classobj::class_uses_all		</a>	<small>($class, $autoload = true) : array</small>
+		</h4>
+	<div class="description"><p>クラスが use しているトレイトを再帰的に取得する</p>
+<p>トレイトが use しているトレイトが use しているトレイトが use している・・・のような場合もすべて返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">trait T1{}
+trait T2{use T1;}
+trait T3{use T2;}
+assertSame(class_uses_all(new class{use T3;}), [
+    'Example\\T3', // クラスが直接 use している
+    'Example\\T2', // T3 が use している
+    'Example\\T1', // T2 が use している
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()">
@@ -1676,6 +1708,39 @@ assertSame(object_dive($class, 'a.b.c'), 'vvv');
 assertSame(object_dive($class, 'a.b.x', 9), 9);
 // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
 assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::get_class_constants()">
+                                    ryunosuke\Functions\Package\Classobj::get_class_constants		</a>	<small>($class, $filter = null) : array</small>
+		</h4>
+	<div class="description"><p>クラス定数を配列で返す</p>
+<p><code>(new \ReflectionClass($class))-&gt;getConstants()</code> とほぼ同じだが、可視性でフィルタができる。<br />
+さらに「自分自身の定義か？」でもフィルタできる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$class = new class extends \ArrayObject
+{
+    private   const C_PRIVATE   = 'private';
+    protected const C_PROTECTED = 'protected';
+    public    const C_PUBLIC    = 'public';
+};
+// 普通に全定数を返す
+assertSame(get_class_constants($class), [
+    'C_PRIVATE'      =&gt; 'private',
+    'C_PROTECTED'    =&gt; 'protected',
+    'C_PUBLIC'       =&gt; 'public',
+    'STD_PROP_LIST'  =&gt; \ArrayObject::STD_PROP_LIST,
+    'ARRAY_AS_PROPS' =&gt; \ArrayObject::ARRAY_AS_PROPS,
+]);
+// public のみを返す
+assertSame(get_class_constants($class, IS_PUBLIC), [
+    'C_PUBLIC'       =&gt; 'public',
+    'STD_PROP_LIST'  =&gt; \ArrayObject::STD_PROP_LIST,
+    'ARRAY_AS_PROPS' =&gt; \ArrayObject::ARRAY_AS_PROPS,
+]);
+// 自身定義でかつ public のみを返す
+assertSame(get_class_constants($class, IS_OWNSELF | IS_PUBLIC), [
+    'C_PUBLIC'       =&gt; 'public',
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::get_object_properties()">
@@ -2223,6 +2288,11 @@ assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
 <p>返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。</p>
 <p>Example:</p>
 <pre><code class="language-php">list($meta, $body) = callable_code(function(...$args){return true;});
+assertSame($meta, 'function(...$args)');
+assertSame($body, '{return true;}');
+
+// ReflectionFunctionAbstract を渡しても動作する
+list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
 assertSame($meta, 'function(...$args)');
 assertSame($body, '{return true;}');
 </code></pre>
@@ -2814,10 +2884,11 @@ assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::quoteexplode()">
-                                    ryunosuke\Functions\Package\Strings::quoteexplode		</a>	<small>($delimiter, $string, $enclosures = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : array</small>
+                                    ryunosuke\Functions\Package\Strings::quoteexplode		</a>	<small>($delimiter, $string, $limit = null, $enclosures = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : array</small>
 		</h4>
 	<div class="description"><p>エスケープやクオートに対応した explode</p>
 <p>$enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。</p>
+<p>歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな例
 assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
@@ -2832,6 +2903,12 @@ assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
     'a', // 普通に分割される
     'b', // 普通に分割される
     '{e,f}', // { } で囲まれているので区切り文字とみなされない
+]);
+
+// このように第3引数に $limit 引数を差し込むことができる
+assertSame(quoteexplode(',', 'a,b,{e,f}', 2, ['{' =&gt; '}']), [
+    'a',
+    'b,{e,f}',
 ]);
 </code></pre>
 </div>
@@ -3381,6 +3458,82 @@ assertEquals(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
 assertEquals(json_import('{"a":"A","b":"B"}', [
    JSON_OBJECT_AS_ARRAY =&gt; true,
 ]), ['a' =&gt; 'A', 'b' =&gt; 'B']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::paml_export()">
+                                    ryunosuke\Functions\Package\Strings::paml_export		</a>	<small>($pamlarray, $options = []) : string</small>
+		</h4>
+	<div class="description"><p>連想配列を paml 的文字列に変換する</p>
+<p>paml で出力することはまずないのでおまけ（import との対称性のために定義している）。</p>
+<p>Example:</p>
+<pre><code class="language-php">assertSame(paml_export([
+    'n' =&gt; null,
+    'f' =&gt; false,
+    'i' =&gt; 123,
+    'd' =&gt; 3.14,
+    's' =&gt; 'this is string',
+]), 'n: null, f: false, i: 123, d: 3.14, s: "this is string"');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::paml_import()">
+                                    ryunosuke\Functions\Package\Strings::paml_import		</a>	<small>($pamlstring, $options = []) : array</small>
+		</h4>
+	<div class="description"><p>paml 的文字列をパースする</p>
+<p>paml とは yaml を簡易化したような独自フォーマットを指す。<br />
+ざっくりと下記のような特徴がある。</p>
+<ul>
+<li>ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要</li>
+<li>yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応</li>
+<li>配列を前提にしているので、トップレベルの <code>[]</code> <code>{}</code> は不要</li>
+<li>配列・連想配列の区別はなし。 <code>[]</code> でいわゆる php の配列、 <code>{}</code> で stdClass を表す</li>
+<li>bare string で php の定数を表す</li>
+</ul>
+<p>簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。<br />
+なお、かなり緩くパースしてるので基本的にエラーにはならない。</p>
+<p>早見表：</p>
+<ul>
+<li>php:  <code>["n" =&gt; null, "f" =&gt; false, "i" =&gt; 123, "d" =&gt; 3.14, "s" =&gt; "this is string", "a" =&gt; [1, 2, "x" =&gt; "X"]]</code><ul>
+<li>ダブルアローとキーのクオートが冗長</li>
+</ul>
+</li>
+<li>json: <code>{"n":null, "f":false, "i":123, "d":3.14, "s":"this is string", "a":{"0": 1, "1": 2, "x": "X"}}</code><ul>
+<li>キーのクオートが冗長だしケツカンマ非許容</li>
+</ul>
+</li>
+<li>yaml: <code>{n: null, f: false, i: 123, d: 3.14, s: "this is string", a: {0: 1, 1: 2, x: X}}</code><ul>
+<li>理想に近いが、コロンの後にスペースが必要だし連想配列が少々難。なにより拡張や外部ライブラリが必要</li>
+</ul>
+</li>
+<li>paml: <code>n:null, f:false, i:123, d:3.14, s:"this is string", a:[1, 2, x:X]</code><ul>
+<li>シンプルイズベスト</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// こういったスカラー型はほとんど yaml と一緒だが、コロンの後のスペースは不要（あってもよい）
+assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
+    'n' =&gt; null,
+    'f' =&gt; false,
+    'i' =&gt; 123,
+    'd' =&gt; 3.14,
+    's' =&gt; 'this is string',
+]);
+// 配列が使える（キーは連番なら不要）。ネストも可能
+assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
+    'a'    =&gt; [1, 2, 'x' =&gt; 'X', 3],
+    'nest' =&gt; [
+        'a' =&gt; [
+            'b' =&gt; [
+                'c' =&gt; ['X']
+            ],
+        ],
+    ],
+]);
+// bare 文字列で定数が使える
+assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
+    'pv' =&gt; \PHP_VERSION,
+    'ao' =&gt; \ArrayObject::STD_PROP_LIST,
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ltsv_export()">
@@ -4462,6 +4615,31 @@ assertSame(arrayval([123]), [123]); // 配列は配列のまま
 $stdclass = stdclass(['key' =&gt; 'val']);
 assertSame(arrayval([$stdclass], true), [['key' =&gt; 'val']]); // true なので中身も配列化される
 assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので中身は変わらない
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::arrayable_key_exists()">
+                                    ryunosuke\Functions\Package\Vars::arrayable_key_exists		</a>	<small>($key, $arrayable) : bool</small>
+		</h4>
+	<div class="description"><p>配列・Arrayable にキーがあるか調べる</p>
+<p>配列が与えられた場合は array_key_exists と同じ。<br />
+Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+    'k' =&gt; 'v',
+    'n' =&gt; null,
+];
+// 配列は array_key_exists と同じ
+assertTrue(arrayable_key_exists('k', $array));  // もちろん存在する
+assertTrue(arrayable_key_exists('n', $array));  // isset ではないので null も true
+assertFalse(arrayable_key_exists('x', $array)); // 存在しないので false
+assertFalse(isset($array['n']));                // isset だと null が false になる（参考）
+
+$object = new \ArrayObject($array);
+// 配列は array_key_exists と同じ
+assertTrue(arrayable_key_exists('k', $object));  // もちろん存在する
+assertTrue(arrayable_key_exists('n', $object));  // isset ではないので null も true
+assertFalse(arrayable_key_exists('x', $object)); // 存在しないので false
+assertFalse(isset($object['n']));                // isset だと null が false になる（参考）
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::si_prefix()">
