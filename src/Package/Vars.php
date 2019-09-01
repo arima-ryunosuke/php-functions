@@ -202,6 +202,64 @@ class Vars
     }
 
     /**
+     * 配列・Arrayable にキーがあるか調べる
+     *
+     * 配列が与えられた場合は array_key_exists と同じ。
+     * Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'k' => 'v',
+     *     'n' => null,
+     * ];
+     * // 配列は array_key_exists と同じ
+     * assertTrue(arrayable_key_exists('k', $array));  // もちろん存在する
+     * assertTrue(arrayable_key_exists('n', $array));  // isset ではないので null も true
+     * assertFalse(arrayable_key_exists('x', $array)); // 存在しないので false
+     * assertFalse(isset($array['n']));                // isset だと null が false になる（参考）
+     *
+     * $object = new \ArrayObject($array);
+     * // 配列は array_key_exists と同じ
+     * assertTrue(arrayable_key_exists('k', $object));  // もちろん存在する
+     * assertTrue(arrayable_key_exists('n', $object));  // isset ではないので null も true
+     * assertFalse(arrayable_key_exists('x', $object)); // 存在しないので false
+     * assertFalse(isset($object['n']));                // isset だと null が false になる（参考）
+     * ```
+     *
+     * @param string|int $key キー
+     * @param array|\ArrayAccess $arrayable 調べる値
+     * @return bool キーが存在するなら true
+     */
+    public static function arrayable_key_exists($key, $arrayable)
+    {
+        if (is_array($arrayable)) {
+            // see https://www.php.net/manual/function.array-key-exists.php#107786
+            return isset($arrayable[$key]) || array_key_exists($key, $arrayable);
+        }
+
+        if ($arrayable instanceof \ArrayAccess) {
+            // あるならあるでよい
+            if (isset($arrayable[$key])) {
+                return true;
+            }
+            // 問題は「ない場合」と「あるが null だった場合」の区別で、ArrayAccess の実装次第なので一元的に確定するのは不可能
+            // ここでは「ない場合はなんらかのエラー・例外が出るはず」という前提で実際に値を取得して確認する
+            try {
+                error_clear_last();
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                $dummy = @$arrayable[$key];
+                return !error_get_last();
+            }
+            catch (\Throwable $t) {
+                return false;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('%s is not arrayable (%s).', '$arrayable', (var_type)($arrayable)));
+    }
+
+    /**
      * 数値に SI 接頭辞を付与する
      *
      * 値は 1 <= $var < 1000(1024) の範囲内に収められる。

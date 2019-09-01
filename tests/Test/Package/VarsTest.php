@@ -129,6 +129,52 @@ class VarsTest extends AbstractTestCase
         ], (arrayval)($stdclass, false));
     }
 
+    function test_arrayable_key_exists()
+    {
+        $array = [
+            'ok'    => 'OK',
+            'null'  => null,
+            'false' => false,
+        ];
+        $this->assertTrue((arrayable_key_exists)('ok', $array));
+        $this->assertTrue((arrayable_key_exists)('null', $array));
+        $this->assertTrue((arrayable_key_exists)('false', $array));
+        $this->assertFalse((arrayable_key_exists)('notfound', $array));
+
+        $object = new class implements \ArrayAccess
+        {
+            private $holder = [
+                'ok'    => 'OK',
+                'null'  => null,
+                'false' => false,
+            ];
+
+            public function offsetExists($offset)
+            {
+                return isset($this->holder[$offset]);
+            }
+
+            public function offsetGet($offset)
+            {
+                if ($offset === 'ex') {
+                    throw new \OutOfBoundsException();
+                }
+                return $this->holder[$offset];
+            }
+
+            public function offsetSet($offset, $value) { }
+
+            public function offsetUnset($offset) { }
+        };
+        $this->assertTrue((arrayable_key_exists)('ok', $object));
+        $this->assertTrue((arrayable_key_exists)('null', $object));
+        $this->assertTrue((arrayable_key_exists)('false', $object));
+        $this->assertFalse((arrayable_key_exists)('notfound', $object));
+        $this->assertFalse((arrayable_key_exists)('ex', $object));
+
+        $this->assertException('is not arrayable', arrayable_key_exists, null, new \stdClass());
+    }
+
     function test_si_prefix()
     {
         $units = [
