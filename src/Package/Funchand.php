@@ -413,15 +413,19 @@ class Funchand
      * list($meta, $body) = callable_code(function(...$args){return true;});
      * assertSame($meta, 'function(...$args)');
      * assertSame($body, '{return true;}');
+     *
+     * // ReflectionFunctionAbstract を渡しても動作する
+     * list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
+     * assertSame($meta, 'function(...$args)');
+     * assertSame($body, '{return true;}');
      * ```
      *
-     * @param callable $callable コードを取得する callable
+     * @param callable|\ReflectionFunctionAbstract $callable コードを取得する callable
      * @return array ['定義部分', '{処理コード}']
      */
     public static function callable_code($callable)
     {
-        /** @var \ReflectionFunctionAbstract $ref */
-        $ref = (reflect_callable)($callable);
+        $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : (reflect_callable)($callable);
         $contents = file($ref->getFileName());
         $start = $ref->getStartLine();
         $end = $ref->getEndLine();

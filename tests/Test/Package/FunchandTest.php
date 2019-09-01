@@ -296,6 +296,14 @@ class FunchandTest extends AbstractTestCase
     }',
         ], $code);
 
+        $code = (callable_code)(new \ReflectionFunction(__NAMESPACE__ . "\\hoge_callable_code"));
+        $this->assertEquals([
+            'function hoge_callable_code()',
+            '{
+            return true;
+        }',
+        ], $code);
+
         $usevar = null;
         $code = (callable_code)(function ($arg1 = "{\n}") use ($usevar): \Closure {
             if (true) {
