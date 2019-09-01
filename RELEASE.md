@@ -10,6 +10,17 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.3.11
+
+- [feature][Arrays] array_map_key の値対応
+- [fixbug][Arrays] array_filter_key で標準関数を呼ぶとエラーになることがある不具合を修正
+- [change][Strings] quoteexplode の limit 対応
+- [feature][Strings] paml_export/paml_import を追加
+- [feature][Classobj] get_class_constants を追加
+- [feature][Classobj] class_uses_all を追加
+- [feature][Funchand] callable_code のリフレクション対応
+- [feature][Vars] arrayable_key_exists を追加
+
 ## 1.3.10
 
 - [feature] php7.3 対応
