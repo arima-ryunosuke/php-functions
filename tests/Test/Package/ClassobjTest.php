@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test\Package;
 
+use stdClass;
+
 class ClassobjTest extends AbstractTestCase
 {
     function test_stdclass()
@@ -29,6 +31,33 @@ class ClassobjTest extends AbstractTestCase
         $this->assertEquals('A\\B\\C\\Hoge', (detect_namespace)(__DIR__ . '/Classobj/NS/Valid/Hoge.php'));
         $this->assertEquals('ryunosuke\\Functions\\Package', (detect_namespace)(__DIR__ . '/../../../src/Package'));
         $this->assertException('can not detect namespace', detect_namespace, '/a/b/c/d/e/f/g/h/i/j/k/l/m/n');
+    }
+
+    function test_class_uses_all()
+    {
+        eval('trait T1{}');
+        eval('trait T2{use T1;}');
+        eval('trait T3{use T2;}');
+        $this->assertEquals(['T1'], (class_uses_all)(new class
+        {
+            use /** @noinspection PhpUndefinedClassInspection */ \T1;
+        }));
+        $this->assertEquals(['T2', 'T1'], (class_uses_all)(new class
+        {
+            use /** @noinspection PhpUndefinedClassInspection */ \T2;
+        }));
+        $this->assertEquals(['T3', 'T2', 'T1'], (class_uses_all)(new class
+        {
+            use /** @noinspection PhpUndefinedClassInspection */ \T3;
+        }));
+        $this->assertEquals(['T1', 'T2', 'T3'], (class_uses_all)(get_class(new class
+        {
+            use /** @noinspection PhpUndefinedClassInspection */ \T1;
+            use /** @noinspection PhpUndefinedClassInspection */ \T2;
+            use /** @noinspection PhpUndefinedClassInspection */ \T3;
+        })));
+
+        $this->assertEquals([], (class_uses_all)(new stdClass()));
     }
 
     function test_class_loader()
