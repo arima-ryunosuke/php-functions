@@ -135,6 +135,8 @@ class Strings
      *
      * $enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。
      *
+     * 歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。
+     *
      * Example:
      * ```php
      * // シンプルな例
@@ -151,16 +153,37 @@ class Strings
      *     'b', // 普通に分割される
      *     '{e,f}', // { } で囲まれているので区切り文字とみなされない
      * ]);
+     *
+     * // このように第3引数に $limit 引数を差し込むことができる
+     * assertSame(quoteexplode(',', 'a,b,{e,f}', 2, ['{' => '}']), [
+     *     'a',
+     *     'b,{e,f}',
+     * ]);
      * ```
      *
      * @param string|array $delimiter 分割文字列
      * @param string $string 対象文字列
+     * @param int $limit 分割数。負数未対応
      * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
      * @param string $escape エスケープ文字
      * @return array 分割された配列
      */
-    public static function quoteexplode($delimiter, $string, $enclosures = "'\"", $escape = '\\')
+    public static function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\')
     {
+        // for compatible 1.3.x
+        if (!is_int($limit) && $limit !== null) {
+            if (func_num_args() > 3) {
+                $escape = $enclosures;
+            }
+            $enclosures = $limit;
+            $limit = PHP_INT_MAX;
+        }
+
+        if ($limit === null) {
+            $limit = PHP_INT_MAX;
+        }
+        $limit = max(1, $limit);
+
         if (is_string($enclosures)) {
             $chars = str_split($enclosures);
             $enclosures = array_combine($chars, $chars);
@@ -195,9 +218,12 @@ class Strings
                         break;
                     }
                 }
+                if (count($result) === $limit - 1) {
+                    break;
+                }
             }
         }
-        $result[] = substr($string, $current, $i);
+        $result[] = substr($string, $current, $l);
         return $result;
     }
 

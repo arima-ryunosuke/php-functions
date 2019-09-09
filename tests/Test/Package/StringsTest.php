@@ -76,6 +76,46 @@ class StringsTest extends AbstractTestCase
     function test_quoteexplode()
     {
         $this->assertEquals([
+            'a,"x,y",["y", "z"],c\\,d,\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 1, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        $this->assertEquals([
+            'a',
+            '"x,y",["y", "z"],c\\,d,\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 2, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        $this->assertEquals([
+            'a',
+            '"x,y"',
+            '["y", "z"],c\\,d,\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 3, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        $this->assertEquals([
+            'a',
+            '"x,y"',
+            '["y", "z"]',
+            'c\\,d,\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 4, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        $this->assertEquals([
+            'a',
+            '"x,y"',
+            '["y", "z"]',
+            'c\,d',
+            '\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 5, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        $this->assertEquals([
+            'a',
+            '"x,y"',
+            '["y", "z"]',
+            'c\,d',
+            '\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 6, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        $this->assertEquals([
+            'a',
+            '"x,y"',
+            '["y", "z"]',
+            'c\,d',
+            '\'e,f\'',
+        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', null, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+
+        $this->assertEquals([
             'a',
             '"x,y"',
             '["y", "z"]',
