@@ -1161,6 +1161,122 @@ a3,b3,c3
         $this->assertException('Maximum stack depth exceeded', json_export, [[[[[[]]]]]], [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]);
     }
 
+    function test_paml_export()
+    {
+        $this->assertSame('null: null, bool1: false, bool2: true, int: 123, double: 3.14, string1: "xyz", string2: "[x, \\"y\\", z]"', (paml_export)([
+            "null"    => null,
+            "bool1"   => false,
+            "bool2"   => true,
+            "int"     => 123,
+            "double"  => 3.14,
+            "string1" => "xyz",
+            "string2" => '[x, "y", z]',
+        ]));
+
+        $this->assertSame('array:[1,2,"3",],nest:{a:{b:{c:["X",],},},},', (paml_export)([
+            "array" => [1, 2, "3"],
+            "nest"  => [
+                "a" => [
+                    "b" => [
+                        "c" => ["X"],
+                    ],
+                ],
+            ],
+        ], [
+            'trailing-comma' => true,
+            'pretty-space'   => false,
+        ]));
+    }
+
+    function test_paml_import()
+    {
+        $this->assertSame([
+            "null"    => null,
+            "bool1"   => false,
+            "bool2"   => true,
+            "int"     => 123,
+            "double"  => 3.14,
+            "string1" => "xyz",
+            "string2" => '[x, "y", \'z\']',
+        ], (paml_import)('null:null,bool1: false, bool2:true , int: 123, double: 3.14, string1:xyz,string2:"[x, \"y\", \'z\']"'));
+
+        $this->assertSame([
+            "hash" => [1, 2, 'a,b,', 'c,d,', 'x' => 'X', 'y:Y', 'z:Z', 4],
+        ], (paml_import)("hash:[1,2,'a,b,', \"c,d,\",x:'X','y:Y',\"z:Z\", 4]"));
+
+        $this->assertSame([
+            'd' => 'a\\nz',
+            's' => "a\\nz",
+        ], (paml_import)('d:\'a\\nz\', s:"a\\\\nz"'));
+
+        $this->assertSame([
+            "e"  => E_ERROR,
+            "ao" => \ArrayObject::STD_PROP_LIST,
+        ], (paml_import)('e: E_ERROR, ao: ArrayObject::STD_PROP_LIST'));
+
+        $this->assertSame([
+            "array" => [1, 2, "3"],
+            "nest"  => [
+                "a" => [
+                    "b" => [
+                        "c" => ["X"],
+                    ],
+                ],
+            ],
+        ], (paml_import)('array:[1,2,"3"], nest:[a: [b: [c: [X]]]]'));
+
+        $this->assertEquals([
+            'a'      => 'A',
+            'b'      => 'B',
+            "array"  => [1, 2, "3\n4"],
+            "object" => (object) [1, 2, "3\n4"],
+        ], (paml_import)("a:A,\nb:B,array:[1,\n2,\n\"3\\n4\",\n],object:{1,\n2,\n\"3\\n4\",\n}"));
+
+        $this->assertEquals([
+            "empty_array1"  => [],
+            "empty_array2"  => (object) [],
+            "empty_string1" => '',
+            "empty_string2" => '',
+        ], (paml_import)('empty_array1:[], empty_array2:{}, empty_string1:,empty_string2:""'));
+
+        $this->assertSame([], (paml_import)('  '));
+        $this->assertSame(['xxx'], (paml_import)(' xxx '));
+        $this->assertSame(['', ''], (paml_import)(',,'));
+        $this->assertSame([
+            "array" => [1, 2, "3"],
+        ], (paml_import)('array:[1,2,"3",]', [
+            'trailing-comma' => true,
+            'cache'          => false,
+        ]));
+        $this->assertSame([
+            "array" => [1, 2, "3", ""],
+        ], (paml_import)('array:[1,2,"3",]', [
+            'trailing-comma' => false,
+            'cache'          => false,
+        ]));
+    }
+
+    function test_paml_transport()
+    {
+        $string = file_get_contents(__DIR__ . '/Strings/text.paml');
+        $array = (paml_import)($string);
+        $this->assertEquals([
+            'text'   => 'this is raw string',
+            'break'  => 'this
+is
+break
+string',
+            'quote1' => 'a
+z',
+            'quote2' => 'a\nz',
+        ], $array);
+        $this->assertEquals('text: "this is raw string", break: "this
+is
+break
+string", quote1: "a
+z", quote2: "a\\\\nz"', (paml_export)($array));
+    }
+
     function test_json_import()
     {
         // エラー情報を突っ込んでおく

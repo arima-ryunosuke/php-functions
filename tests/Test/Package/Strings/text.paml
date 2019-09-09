@@ -1,0 +1,7 @@
+text: this is raw string,
+break: this
+is
+break
+string,
+quote1: "a\nz",
+quote2: 'a\nz',

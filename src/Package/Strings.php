@@ -1766,6 +1766,193 @@ class Strings
     }
 
     /**
+     * 連想配列を paml 的文字列に変換する
+     *
+     * paml で出力することはまずないのでおまけ（import との対称性のために定義している）。
+     *
+     * Example:
+     * ```php
+     * assertSame(paml_export([
+     *     'n' => null,
+     *     'f' => false,
+     *     'i' => 123,
+     *     'd' => 3.14,
+     *     's' => 'this is string',
+     * ]), 'n: null, f: false, i: 123, d: 3.14, s: "this is string"');
+     * ```
+     *
+     * @param array $pamlarray 配列
+     * @param array $options オプション配列
+     * @return string PAML 的文字列
+     */
+    public static function paml_export($pamlarray, $options = [])
+    {
+        $options += [
+            'trailing-comma' => false,
+            'pretty-space'   => true,
+        ];
+
+        $space = $options['pretty-space'] ? ' ' : '';
+
+        $result = [];
+        $n = 0;
+        foreach ($pamlarray as $k => $v) {
+            if (is_array($v)) {
+                $inner = (paml_export)($v, $options);
+                if ((is_hasharray)($v)) {
+                    $v = '{' . $inner . '}';
+                }
+                else {
+                    $v = '[' . $inner . ']';
+                }
+            }
+            elseif ($v === null) {
+                $v = 'null';
+            }
+            elseif ($v === false) {
+                $v = 'false';
+            }
+            elseif ($v === true) {
+                $v = 'true';
+            }
+            elseif (is_string($v)) {
+                $v = '"' . addcslashes($v, "\"\0\\") . '"';
+            }
+
+            if ($k === $n++) {
+                $result[] = "$v";
+            }
+            else {
+                $result[] = "$k:{$space}$v";
+            }
+        }
+        return implode(",$space", $result) . ($options['trailing-comma'] ? ',' : '');
+    }
+
+    /**
+     * paml 的文字列をパースする
+     *
+     * paml とは yaml を簡易化したような独自フォーマットを指す。
+     * ざっくりと下記のような特徴がある。
+     *
+     * - ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要
+     * - yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応
+     * - 配列を前提にしているので、トップレベルの `[]` `{}` は不要
+     * - 配列・連想配列の区別はなし。 `[]` でいわゆる php の配列、 `{}` で stdClass を表す
+     * - bare string で php の定数を表す
+     *
+     * 簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。
+     * なお、かなり緩くパースしてるので基本的にエラーにはならない。
+     *
+     * 早見表：
+     *
+     * - php:  `["n" => null, "f" => false, "i" => 123, "d" => 3.14, "s" => "this is string", "a" => [1, 2, "x" => "X"]]`
+     *     - ダブルアローとキーのクオートが冗長
+     * - json: `{"n":null, "f":false, "i":123, "d":3.14, "s":"this is string", "a":{"0": 1, "1": 2, "x": "X"}}`
+     *     - キーのクオートが冗長だしケツカンマ非許容
+     * - yaml: `{n: null, f: false, i: 123, d: 3.14, s: "this is string", a: {0: 1, 1: 2, x: X}}`
+     *     - 理想に近いが、コロンの後にスペースが必要だし連想配列が少々難。なにより拡張や外部ライブラリが必要
+     * - paml: `n:null, f:false, i:123, d:3.14, s:"this is string", a:[1, 2, x:X]`
+     *     - シンプルイズベスト
+     *
+     * Example:
+     * ```php
+     * // こういったスカラー型はほとんど yaml と一緒だが、コロンの後のスペースは不要（あってもよい）
+     * assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
+     *     'n' => null,
+     *     'f' => false,
+     *     'i' => 123,
+     *     'd' => 3.14,
+     *     's' => 'this is string',
+     * ]);
+     * // 配列が使える（キーは連番なら不要）。ネストも可能
+     * assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
+     *     'a'    => [1, 2, 'x' => 'X', 3],
+     *     'nest' => [
+     *         'a' => [
+     *             'b' => [
+     *                 'c' => ['X']
+     *             ],
+     *         ],
+     *     ],
+     * ]);
+     * // bare 文字列で定数が使える
+     * assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
+     *     'pv' => \PHP_VERSION,
+     *     'ao' => \ArrayObject::STD_PROP_LIST,
+     * ]);
+     * ```
+     *
+     * @param string $pamlstring PAML 文字列
+     * @param array $options オプション配列
+     * @return array php 配列
+     */
+    public static function paml_import($pamlstring, $options = [])
+    {
+        $options += [
+            'cache'          => true,
+            'trailing-comma' => true,
+        ];
+
+        static $caches = [];
+        if ($options['cache']) {
+            return $caches[$pamlstring] = $caches[$pamlstring] ?? (paml_import)($pamlstring, ['cache' => false] + $options);
+        }
+
+        $escapers = ['"' => '"', "'" => "'", '[' => ']', '{' => '}'];
+
+        $values = array_map('trim', (quoteexplode)(',', $pamlstring, null, $escapers));
+        if ($options['trailing-comma'] && end($values) === '') {
+            array_pop($values);
+        }
+
+        $result = [];
+        foreach ($values as $value) {
+            $key = null;
+            $kv = array_map('trim', (quoteexplode)(':', $value, 2, $escapers));
+            if (count($kv) === 2) {
+                list($key, $value) = $kv;
+            }
+
+            $prefix = $value[0] ?? null;
+            $suffix = $value[-1] ?? null;
+
+            if ($prefix === '[' && $suffix === ']') {
+                $value = (array) (paml_import)(substr($value, 1, -1), $options);
+            }
+            elseif ($prefix === '{' && $suffix === '}') {
+                $value = (object) (paml_import)(substr($value, 1, -1), $options);
+            }
+            elseif ($prefix === '"' && $suffix === '"') {
+                //$value = stripslashes(substr($value, 1, -1));
+                $value = json_decode($value);
+            }
+            elseif ($prefix === "'" && $suffix === "'") {
+                $value = substr($value, 1, -1);
+            }
+            elseif (defined($value)) {
+                $value = constant($value);
+            }
+            elseif (is_numeric($value)) {
+                if (ctype_digit(ltrim($value, '+-'))) {
+                    $value = (int) $value;
+                }
+                else {
+                    $value = (double) $value;
+                }
+            }
+
+            if ($key === null) {
+                $result[] = $value;
+            }
+            else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * 配列を LTSV 的文字列に変換する
      *
      * ラベル文字列に ":" を含む場合は例外を投げる（ラベルにコロンが来るとどうしようもない）。
