@@ -7,6 +7,19 @@ namespace ryunosuke\Functions\Package;
  */
 class Classobj
 {
+    /** 自分自身を表す定数 */
+    const IS_OWNSELF = 128;
+
+    /** public を表す定数 @see \ReflectionMethod::IS_PUBLIC */
+    const IS_PUBLIC = 256;
+
+    /** protected を表す定数 @see \ReflectionMethod::IS_PROTECTED */
+    const IS_PROTECTED = 512;
+
+    /** private を表す定数 @see \ReflectionMethod::IS_PRIVATE */
+    const IS_PRIVATE = 1024;
+
+
     /**
      * 初期フィールド値を与えて stdClass を生成する
      *
@@ -629,6 +642,62 @@ class Classobj
             $object = $object->$key;
         }
         return $object;
+    }
+
+    /**
+     * クラス定数を配列で返す
+     *
+     * `(new \ReflectionClass($class))->getConstants()` とほぼ同じだが、可視性でフィルタができる。
+     * さらに「自分自身の定義か？」でもフィルタできる。
+     *
+     * Example:
+     * ```php
+     * $class = new class extends \ArrayObject
+     * {
+     *     private   const C_PRIVATE   = 'private';
+     *     protected const C_PROTECTED = 'protected';
+     *     public    const C_PUBLIC    = 'public';
+     * };
+     * // 普通に全定数を返す
+     * assertSame(get_class_constants($class), [
+     *     'C_PRIVATE'      => 'private',
+     *     'C_PROTECTED'    => 'protected',
+     *     'C_PUBLIC'       => 'public',
+     *     'STD_PROP_LIST'  => \ArrayObject::STD_PROP_LIST,
+     *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
+     * ]);
+     * // public のみを返す
+     * assertSame(get_class_constants($class, IS_PUBLIC), [
+     *     'C_PUBLIC'       => 'public',
+     *     'STD_PROP_LIST'  => \ArrayObject::STD_PROP_LIST,
+     *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
+     * ]);
+     * // 自身定義でかつ public のみを返す
+     * assertSame(get_class_constants($class, IS_OWNSELF | IS_PUBLIC), [
+     *     'C_PUBLIC'       => 'public',
+     * ]);
+     * ```
+     *
+     * @param string|object $class クラス名 or オブジェクト
+     * @param int $filter アクセスレベル定数
+     * @return array クラス定数の配列
+     */
+    public static function get_class_constants($class, $filter = null)
+    {
+        $class = ltrim(is_object($class) ? get_class($class) : $class, '\\');
+        $filter = $filter ?? (IS_PUBLIC | IS_PROTECTED | IS_PRIVATE);
+
+        $result = [];
+        foreach ((new \ReflectionClass($class))->getReflectionConstants() as $constant) {
+            if (($filter & IS_OWNSELF) === IS_OWNSELF && $constant->getDeclaringClass()->name !== $class) {
+                continue;
+            }
+            $modifiers = $constant->getModifiers();
+            if (($modifiers & $filter) === $modifiers) {
+                $result[$constant->name] = $constant->getValue();
+            }
+        }
+        return $result;
     }
 
     /**

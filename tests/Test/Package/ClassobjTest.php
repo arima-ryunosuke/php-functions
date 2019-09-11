@@ -251,6 +251,49 @@ class ClassobjTest extends AbstractTestCase
         $this->assertEquals('none', (object_dive)($class, 'a.b.X', 'none'));
     }
 
+    function test_get_class_constants()
+    {
+        $concrete = new class('hoge') extends \Concrete
+        {
+            private const   PPP = 0;
+            protected const PP  = 1;
+            public const    P   = 2;
+
+            function dummy() { assert(self::PPP); }
+        };
+
+        $this->assertEquals([
+            'PROTECTED_CONST' => null,
+            'PUBLIC_CONST'    => null,
+            'PPP'             => 0,
+            'PP'              => 1,
+            'P'               => 2,
+        ], (get_class_constants)($concrete));
+
+        /** @var \ryunosuke\Functions\Package\Classobj $class */
+        $class = \ryunosuke\Functions\Package\Classobj::class;
+
+        $this->assertEquals([
+            'PPP' => 0,
+            'PP'  => 1,
+            'P'   => 2,
+        ], (get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED | $class::IS_PRIVATE));
+
+        $this->assertEquals([
+            'PP' => 1,
+            'P'  => 2,
+        ], (get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED));
+
+        $this->assertEquals([
+            'P' => 2,
+        ], (get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC));
+
+        $this->assertEquals([
+            'P'            => 2,
+            'PUBLIC_CONST' => null,
+        ], (get_class_constants)($concrete, $class::IS_PUBLIC));
+    }
+
     function test_get_object_properties()
     {
         $concrete = new \Concrete('name');
