@@ -1643,6 +1643,7 @@ class Arrays
      */
     public static function array_filter_key($array, $callback)
     {
+        $callback = (func_user_func_array)($callback);
         $result = [];
         foreach ($array as $k => $v) {
             if ($callback($k, $v)) {

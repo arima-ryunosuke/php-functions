@@ -849,6 +849,7 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_filter_key()
     {
+        $this->assertEquals(['a' => 'A', 'b' => 'B'], (array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], 'ctype_alpha'));
         $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }));
         $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }));
         $this->assertEquals(['a', 2 => 'c'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }));
