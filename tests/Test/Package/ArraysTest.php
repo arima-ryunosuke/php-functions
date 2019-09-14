@@ -831,8 +831,14 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_map_key()
     {
+        $this->assertEquals(['a' => 'A', 'b' => 'B'], (array_map_key)([' a ' => 'A', ' b ' => 'B'], 'trim'));
         $this->assertEquals(['A' => 'A', 'B' => 'B'], (array_map_key)(['a' => 'A', 'b' => 'B'], 'strtoupper'));
-        $this->assertEquals(['A' => 'A'], (array_map_key)(['a' => 'A', 'b' => 'B'], function ($k) { return $k === 'b' ? null : strtoupper($k); }));
+        $this->assertEquals(['A' => 'A'], (array_map_key)(['a' => 'A', 'b' => 'B'], function ($k) {
+            return $k === 'b' ? null : strtoupper($k);
+        }));
+        $this->assertEquals(['A' => 'A'], (array_map_key)(['a' => 'A', 'b' => 'B'], function ($k, $v) {
+            return $v === 'B' ? null : strtoupper($k);
+        }));
     }
 
     function test_array_filter_not()

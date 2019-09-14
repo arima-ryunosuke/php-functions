@@ -1595,9 +1595,10 @@ class Arrays
      */
     public static function array_map_key($array, $callback)
     {
+        $callback = (func_user_func_array)($callback);
         $result = [];
         foreach ($array as $k => $v) {
-            $k2 = $callback($k);
+            $k2 = $callback($k, $v);
             if ($k2 !== null) {
                 $result[$k2] = $v;
             }
