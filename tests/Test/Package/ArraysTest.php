@@ -1760,9 +1760,10 @@ class ArraysTest extends AbstractTestCase
 
         // 第3引数を与えれば array_column と全く同じ
         $this->assertSame(array_column($arrays, 'name', 'id'), (array_lookup)($arrays, 'name', 'id'));
+        $this->assertSame(array_column($arrays, null, 'id'), (array_lookup)($arrays, null, 'id'));
         // 与えなければキーが保存される array_column のような動作になる
         $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], (array_lookup)($arrays, 'name'));
-        $this->assertSame(array_combine(array_keys($arrays), array_column($arrays, null)), (array_lookup)($arrays, null));
+        $this->assertSame($arrays, (array_lookup)($arrays, null));
         // オブジェクトもOK
         $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], (array_lookup)($objects, 'name'));
     }

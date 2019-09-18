@@ -2960,29 +2960,11 @@ class Arrays
      */
     public static function array_lookup($array, $column_key = null, $index_key = null)
     {
+        $array = (arrayval)($array, false);
         if (func_num_args() === 3) {
-            return array_column((arrayval)($array, false), $column_key, $index_key);
+            return array_column($array, $column_key, $index_key);
         }
-
-        // null 対応できないし、php7 からオブジェクトに対応してるらしいので止め。ベタにやる
-        // return array_map(array_of($column_keys), $array);
-
-        // 実質的にはこれで良いはずだが、オブジェクト対応が救えないので止め。ベタにやる
-        // return array_combine(array_keys($array), array_column($array, $column_key));
-
-        $result = [];
-        foreach ($array as $k => $v) {
-            if ($column_key === null) {
-                $result[$k] = $v;
-            }
-            elseif (is_array($v) && array_key_exists($column_key, $v)) {
-                $result[$k] = $v[$column_key];
-            }
-            elseif (is_object($v) && (isset($v->$column_key) || property_exists($v, $column_key))) {
-                $result[$k] = $v->$column_key;
-            }
-        }
-        return $result;
+        return array_combine(array_keys($array), array_column($array, $column_key));
     }
 
     /**
