@@ -543,7 +543,7 @@ class Strings
      */
     public static function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
     {
-        $replaces = (is_iterable)($replaces) ? $replaces : [$replaces];
+        $replaces = is_iterable($replaces) ? $replaces : [$replaces];
 
         // 空はそのまま返す
         if ((is_empty)($replaces)) {
@@ -626,7 +626,7 @@ class Strings
      */
     public static function str_submap($subject, $replaces, $case_insensitivity = false)
     {
-        assert((is_iterable)($replaces));
+        assert(is_iterable($replaces));
 
         $isubject = $subject;
         if ($case_insensitivity) {
@@ -645,7 +645,7 @@ class Strings
                 continue;
             }
             $mapping[$ifrom] = [];
-            $map = (is_iterable)($map) ? $map : [$map];
+            $map = is_iterable($map) ? $map : [$map];
             foreach ($map as $n => $to) {
                 $origN = $n;
                 if (!is_int($n)) {
@@ -725,7 +725,7 @@ class Strings
      */
     public static function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\')
     {
-        assert((is_iterable)($replacemap));
+        assert(is_iterable($replacemap));
 
         $string = (string) $string;
 
@@ -1115,7 +1115,7 @@ class Strings
      */
     public static function htmltag($selector)
     {
-        if (!(is_iterable)($selector)) {
+        if (!is_iterable($selector)) {
             $selector = [$selector => ''];
         }
 
@@ -1220,7 +1220,7 @@ class Strings
             if (is_int($key)) {
                 $result .= $html($value);
             }
-            elseif ((is_iterable)($value)) {
+            elseif (is_iterable($value)) {
                 $result .= $build($key, (htmltag)($value), false);
             }
             else {
@@ -1406,7 +1406,7 @@ class Strings
         $generate = function ($array, $key = null) use (&$generate, $options) {
             $ishasharray = is_array($array) && (is_hasharray)($array);
             return (array_sprintf)($array, function ($v, $k) use ($generate, $key, $ishasharray) {
-                if ((is_iterable)($v)) {
+                if (is_iterable($v)) {
                     return $generate($v, $k);
                 }
 
@@ -2219,7 +2219,7 @@ class Strings
             $spacer = str_repeat($option['indent'], $nest);
             $result = [];
             foreach ((arrays)($array) as $n => list($k, $v)) {
-                if ((is_iterable)($v)) {
+                if (is_iterable($v)) {
                     if (!is_int($k)) {
                         $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];
                     }

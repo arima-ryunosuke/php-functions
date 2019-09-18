@@ -196,20 +196,6 @@ PHP
         $this->assertEquals('class C {function m(){if(false)return function(){};}}', implode('', array_column($tokens, 1)));
     }
 
-    function test_return()
-    {
-        $o = new \stdClass();
-        $o->hoge = 123;
-        $this->assertSame($o, (returns)($o));
-
-        // ユースケースとしては例えば clone してチェーンしたいことがある
-        // 下記は出来ない
-        /*
-        (clone $o)->hoge;
-        */
-        $this->assertEquals(123, (returns)(clone $o)->hoge);
-    }
-
     function test_optional()
     {
         $o = new \Concrete('hoge');
@@ -301,7 +287,7 @@ PHP
 
         // internal
         $list = '1,2,3,4,5';
-        $this->assertEquals([6, 8, 10], $chain($list)->multiexplode1(',')->filter_notP(['<' => 3])->mapsE('*2')->values()());
+        $this->assertEquals([6, 8, 10], $chain($list)->multiexplode1(',')->filter_keyP(['>=' => 2])->mapsE('*2')->values()());
 
         // exception
         $this->assertException('is not defined', [$chain(null), 'undefined_function']);
@@ -441,35 +427,6 @@ PHP
             'number:+1'    => 1,
             'number:+2'    => 1,
         ], $receiver);
-    }
-
-    function test_ifelse()
-    {
-        // ユースケースとしては例えば null と 0/false を区別したいことがある
-        // 下記は出来ない
-        /*
-        // $minute が偽なら 59 としたいが $minute は false かも知れない
-        $minute = $minute ?? 59;
-        // これでもいいが、$minute が変数ではなく何かの戻り値だったら？ しかもそれが激重で何回も呼びたくない場合は一時変数を作らざるをえない
-        $minute = $minute === null ? 59: $minute;
-        // 三項演算子で行けるような気もするが今度は緩すぎるので 0 も 59 になってしまう
-        $minute = $minute ?: 59;
-        */
-
-        // 上で挙げたユースケース
-        $minute = 13;
-        $this->assertEquals(13, (ifelse)($minute, false, 59));
-        $minute = false;
-        $this->assertEquals(59, (ifelse)($minute, false, 59));
-
-        // 'hoge' === 'hoge' なので 'OK' を返す
-        $this->assertEquals('OK', (ifelse)('hoge', 'hoge', 'OK', 'NG'));
-        // 'hoge' !== 'fuga' なので 'NG' を返す
-        $this->assertEquals('NG', (ifelse)('hoge', 'fuga', 'OK', 'NG'));
-        // 第4引数を省略すると第1引数を表す
-        $this->assertEquals('hoge', (ifelse)('hoge', 'fuga', 'OK'));
-        // callable を与えるとその結果で判定する
-        $this->assertEquals('OK', (ifelse)('hoge', 'is_string', 'OK'));
     }
 
     function test_switchs()

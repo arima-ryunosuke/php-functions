@@ -145,101 +145,6 @@ class Funchand
     }
 
     /**
-     * 合成関数を返す
-     *
-     * 基本的には callable を可変引数で呼び出せばそれらの合成関数を返す。
-     * ただし $arrayalbe=true のときは若干挙動が異なり、連鎖のときに「前の返り値を**配列として**次の引数へ渡す」動作になる。
-     * つまり、前の関数が `[1, 2, 3]` を返せば次の関数へは `f(1, 2, 3)` が渡る（ただしただの配列の場合のみ。連想配列は単値で渡る）。
-     * $arrayalbe=false のときは渡る引数は常に単値（単値というか素直に渡すだけ）。
-     * 上の例で言えば、前の関数が `[1, 2, 3]` を返せば次の関数へは `f($array=[1, 2, 3])` が渡る。
-     *
-     * $arrayalbe=true の方が利便性は高い。が、「本当にただの配列を渡したいとき」が判断できないので誤動作の原因にもなる。
-     * e.g. `[1, 2, 3]` を配列として渡したいが $arrayalbe=true だと3つの引数として渡ってしまう
-     *
-     * いずれにせよ $arrayalbe は必須ではなく、第1引数が bool ならオプションだと判断し、そうでないなら true とみなす。
-     *
-     * Example:
-     * ```php
-     * $add5 = function ($v) { return $v + 5; };            // 来た値を +5 するクロージャ
-     * $mul3 = function ($v) { return $v * 3; };            // 来た値を *3 するクロージャ
-     * $split = function ($v) { return str_split($v); };    // 文字列的に桁分割するクロージャ
-     * $union = function ($v) { return $v[0] + $v[1]; };    // 来た配列を足すクロージャ
-     * $composite = composite(false, $add5, $mul3, $split, $union);// 上記を合成したクロージャ
-     * // false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）
-     * // 7 + 5 -> 12 |> 12 * 3 -> 36 |> 36 -> [3, 6] |> 3 + 6 |> 9
-     * assertSame($composite(7), 9);
-     *
-     * $upper = function ($s) { return [$s, strtoupper($s)]; };   // 来た値と大文字化したものを配列で返すクロージャ
-     * $prefix = function ($s, $S) { return 'pre-' . $s . $S; };  // 来た値を結合して'pre-'を付けるクロージャ
-     * $hash = function ($sS) { return ['sS' => $sS]; };          // 来た値を連想配列にするクロージャ
-     * $key = function ($sSsS) { return strrev(reset($sSsS));};   // 来た配列の値をstrrevして返すクロージャ
-     * $composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成したクロージャ
-     * // true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
-     * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
-     * assertSame($composite('hoge'), 'EGOHegoh-erp');
-     * ```
-     *
-     * @param bool $arrayalbe 呼び出しチェーンを配列として扱うか
-     * @param callable[] $variadic 合成する関数（可変引数）
-     * @return callable 合成関数
-     */
-    public static function composite($arrayalbe = true, ...$variadic)
-    {
-        $callables = func_get_args();
-
-        // モード引数が来てるなら捨てる
-        if (!is_callable($arrayalbe)) {
-            array_shift($callables);
-        }
-        // 来てないなら前方省略なのでデフォルト値を代入
-        else {
-            $arrayalbe = true;
-        }
-
-        if (empty($callables)) {
-            throw new \InvalidArgumentException('too few arguments.');
-        }
-
-        $first = array_shift($callables);
-        return (delegate)(function ($first, $args) use ($callables, $arrayalbe) {
-            $result = $first(...$args);
-            foreach ($callables as $callable) {
-                // 「配列モードでただの配列」でないなら配列化
-                if (!($arrayalbe && is_array($result) && !(is_hasharray)($result))) {
-                    $result = [$result];
-                }
-                $result = $callable(...$result);
-            }
-            return $result;
-        }, $first);
-    }
-
-    /**
-     * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
-     *
-     * Example:
-     * ```php
-     * $arg0 = return_arg(0);
-     * assertSame($arg0('hoge'), 'hoge');
-     * $arg1 = return_arg(1);
-     * assertSame($arg1('dummy', 'hoge'), 'hoge');
-     * ```
-     *
-     * @param int $n $n 番目の引数
-     * @return \Closure $n 番目の引数をそのまま返すクロージャ
-     */
-    public static function return_arg($n)
-    {
-        static $cache = [];
-        if (!isset($cache[$n])) {
-            $cache[$n] = function () use ($n) {
-                return func_get_arg($n);
-            };
-        }
-        return $cache[$n];
-    }
-
-    /**
      * 演算子のクロージャを返す
      *
      * 関数ベースなので `??` のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。
@@ -383,24 +288,6 @@ class Funchand
             }
             return new \ReflectionMethod($class, $method);
         }
-    }
-
-    /**
-     * callable を Closure に変換する
-     *
-     * Example:
-     * ```php
-     * $sprintf = closurize('sprintf');
-     * assertInstanceof(\Closure::class, $sprintf);
-     * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
-     * ```
-     *
-     * @param callable $callable 変換する callable
-     * @return \Closure 変換したクロージャ
-     */
-    public static function closurize($callable)
-    {
-        return \Closure::fromCallable($callable);
     }
 
     /**

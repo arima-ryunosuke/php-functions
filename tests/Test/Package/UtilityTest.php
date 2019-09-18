@@ -250,6 +250,7 @@ class UtilityTest extends AbstractTestCase
 
         // windows
         if (DIRECTORY_SEPARATOR === '\\') {
+            putenv('TERM=dummy');
             $this->assertFalse((is_ansi)(STDOUT, '\\'));
             putenv('TERM=xterm');
             $this->assertTrue((is_ansi)(STDOUT, '\\'));

@@ -841,25 +841,12 @@ class ArraysTest extends AbstractTestCase
         }));
     }
 
-    function test_array_filter_not()
-    {
-        $this->assertEquals([1 => ''], (array_filter_not)(['a', '', 'c'], 'strlen'));
-        $this->assertEquals([1 => ''], (array_filter_not)(new \ArrayObject(['a', '', 'c']), 'strlen'));
-    }
-
     function test_array_filter_key()
     {
         $this->assertEquals(['a' => 'A', 'b' => 'B'], (array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], 'ctype_alpha'));
         $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }));
         $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }));
         $this->assertEquals(['a', 2 => 'c'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }));
-    }
-
-    function test_array_filter_eval()
-    {
-        $this->assertEquals([1 => 'b'], (array_filter_eval)(['a', 'b', 'c'], '$k === 1'));
-        $this->assertEquals([1 => 'b'], (array_filter_eval)(['a', 'b', 'c'], '$v === "b"'));
-        $this->assertEquals(['a', 2 => 'c'], (array_filter_eval)(['a', 'b', 'c'], '$v !== "b"'));
     }
 
     function test_array_where()
@@ -1169,7 +1156,7 @@ class ArraysTest extends AbstractTestCase
             'A' => 1,
             'B' => 2,
         ], (array_count)($array, [
-            'A' => (composite)((array_of)('group'), (lbind)(str_equals, 'A')),
+            'A' => function ($v) { return $v['group'] === 'A'; },
             'B' => function ($v) { return $v['group'] === 'B'; },
         ]));
     }
@@ -1568,8 +1555,8 @@ class ArraysTest extends AbstractTestCase
         ], $actual);
 
         $actual = (array_order)($data, [
-            'string' => (return_arg)(0),
-            ''       => (return_arg)(0),
+            'string' => SORT_STRING,
+            ''       => SORT_NUMERIC,
         ], true);
         $this->assertSame([
             0 => ['string' => 'aa', 'integer' => 7],

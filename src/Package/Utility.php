@@ -941,7 +941,7 @@ class Utility
                 throw new \InvalidArgumentException('duplicated benchname.');
             }
 
-            $benchset[$name] = (closurize)($caller);
+            $benchset[$name] = \Closure::fromCallable($caller);
         }
 
         if (!$benchset) {

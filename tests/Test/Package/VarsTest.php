@@ -391,16 +391,6 @@ class VarsTest extends AbstractTestCase
         $this->assertFalse((is_arrayable)(new \stdClass()));
     }
 
-    function test_is_iterable()
-    {
-        $this->assertTrue((is_iterable)([1, 2, 3]));
-        $this->assertTrue((is_iterable)(new \ArrayIterator([1, 2, 3])));
-        $this->assertTrue((is_iterable)((function () { yield 1; })()));
-
-        $this->assertFalse((is_iterable)(1));
-        $this->assertFalse((is_iterable)(new \stdClass()));
-    }
-
     function test_is_countable()
     {
         $this->assertTrue((is_countable)([1, 2, 3]));

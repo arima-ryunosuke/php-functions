@@ -392,7 +392,7 @@ class Arrays
      */
     public static function in_array_and($needle, $haystack, $strict = false)
     {
-        $needle = (is_iterable)($needle) ? $needle : [$needle];
+        $needle = is_iterable($needle) ? $needle : [$needle];
         if ((is_empty)($needle)) {
             return false;
         }
@@ -427,7 +427,7 @@ class Arrays
      */
     public static function in_array_or($needle, $haystack, $strict = false)
     {
-        $needle = (is_iterable)($needle) ? $needle : [$needle];
+        $needle = is_iterable($needle) ? $needle : [$needle];
         if ((is_empty)($needle)) {
             return false;
         }
@@ -1380,7 +1380,7 @@ class Arrays
      */
     public static function array_keys_exist($keys, $array)
     {
-        $keys = (is_iterable)($keys) ? $keys : [$keys];
+        $keys = is_iterable($keys) ? $keys : [$keys];
         if ((is_empty)($keys)) {
             throw new \InvalidArgumentException('$keys is empty.');
         }
@@ -1565,7 +1565,7 @@ class Arrays
         $main = static function ($array) use (&$main, $callback, $iterable) {
             $result = [];
             foreach ($array as $k => $v) {
-                if (($iterable && (is_iterable)($v)) || (!$iterable && is_array($v))) {
+                if (($iterable && is_iterable($v)) || (!$iterable && is_array($v))) {
                     $result[$k] = $main($v);
                 }
                 else {
@@ -1607,25 +1607,6 @@ class Arrays
     }
 
     /**
-     * array_filter の否定版
-     *
-     * 単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。
-     *
-     * Example:
-     * ```php
-     * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
-     * ```
-     *
-     * @param iterable $array 対象配列
-     * @param callable $callback 評価 callable
-     * @return array $callback が false を返した新しい配列
-     */
-    public static function array_filter_not($array, $callback)
-    {
-        return array_filter((arrayval)($array, false), (not_func)($callback));
-    }
-
-    /**
      * キーを主軸とした array_filter
      *
      * $callback が要求するなら値も渡ってくる。 php 5.6 の array_filter の ARRAY_FILTER_USE_BOTH と思えばよい。
@@ -1651,26 +1632,6 @@ class Arrays
             }
         }
         return $result;
-    }
-
-    /**
-     * eval で評価して array_filter する
-     *
-     * キーは $k, 値は $v で宣言される。
-     *
-     * Example:
-     * ```php
-     * assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 => 'a', 2 => 'c']);
-     * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
-     * ```
-     *
-     * @param iterable $array 対象配列
-     * @param string $expression eval コード
-     * @return array $expression が true を返した新しい配列
-     */
-    public static function array_filter_eval($array, $expression)
-    {
-        return (array_filter_key)($array, (eval_func)($expression, 'k', 'v'));
     }
 
     /**
@@ -2554,6 +2515,7 @@ class Arrays
      * その場合 $orders に配列ではなく直値を渡せば良い。
      *
      * $orders には下記のような配列を渡す。
+     * キーに空文字を渡すとそれは「キー自体」を意味する。
      *
      * ```php
      * $orders = [
@@ -3225,7 +3187,7 @@ class Arrays
         $core = function ($array, $delimiter) use (&$core) {
             $result = [];
             foreach ($array as $k => $v) {
-                if ((is_iterable)($v)) {
+                if (is_iterable($v)) {
                     foreach ($core($v, $delimiter) as $ik => $iv) {
                         if ($delimiter === null) {
                             $result[] = $iv;

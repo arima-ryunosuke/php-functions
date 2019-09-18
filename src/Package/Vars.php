@@ -594,30 +594,6 @@ class Vars
     }
 
     /**
-     * 変数が foreach で回せるか調べる
-     *
-     * オブジェクトの場合は \Traversable のみ。
-     * 要するに {@link http://php.net/manual/function.is-iterable.php is_iterable} の polyfill。
-     *
-     * Example:
-     * ```php
-     * assertTrue(is_iterable([1, 2, 3]));
-     * assertTrue(is_iterable((function () { yield 1; })()));
-     * assertFalse(is_iterable(1));
-     * assertFalse(is_iterable(new \stdClass()));
-     * ```
-     *
-     * @polyfill
-     *
-     * @param mixed $var 調べる値
-     * @return bool foreach で回せるなら true
-     */
-    public static function is_iterable($var)
-    {
-        return is_array($var) || $var instanceof \Traversable;
-    }
-
-    /**
      * 変数が count でカウントできるか調べる
      *
      * 要するに {@link http://php.net/manual/function.is-countable.php is_countable} の polyfill。
@@ -784,7 +760,7 @@ class Vars
      */
     public static function var_apply($var, $callback, ...$args)
     {
-        $iterable = (is_iterable)($var);
+        $iterable = is_iterable($var);
         if ($iterable) {
             $result = [];
             foreach ($var as $k => $v) {
@@ -826,7 +802,7 @@ class Vars
      */
     public static function var_applys($var, $callback, ...$args)
     {
-        $iterable = (is_iterable)($var);
+        $iterable = is_iterable($var);
         if (!$iterable) {
             $var = [$var];
         }

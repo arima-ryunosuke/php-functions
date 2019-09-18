@@ -192,25 +192,6 @@ class Syntax
     }
 
     /**
-     * 引数をそのまま返す
-     *
-     * clone などでそのまま返す関数が欲しいことがまれによくあるはず。
-     *
-     * Example:
-     * ```php
-     * $object = new \stdClass();
-     * assertSame(returns($object), $object);
-     * ```
-     *
-     * @param mixed $v return する値
-     * @return mixed $v を返す
-     */
-    public static function returns($v)
-    {
-        return $v;
-    }
-
-    /**
      * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
      *
      * null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。
@@ -728,46 +709,6 @@ class Syntax
             return $callable(...$arguments);
         }
         return null;
-    }
-
-    /**
-     * if ～ else 構文の関数版
-     *
-     * 一言で言えば `$actual === $expected ? $then : $else` という動作になる。
-     * ただし、 $expected が callable の場合は呼び出した結果を緩い bool 判定する。
-     * つまり `ifelse('hoge', 'is_string', true, false)` は常に true を返すので注意。
-     *
-     * ?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。
-     *
-     * Example:
-     * ```php
-     * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
-     * $heavyfunc = function($v){return $v;};
-     * // $heavyfunc(1) ?? 'default' とほぼ同義
-     * assertSame(ifelse($heavyfunc(1), false, 'default'), 1);
-     * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-     * assertSame(ifelse($heavyfunc(null), false, 'default'), null);
-     * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
-     * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
-     * ```
-     *
-     * @param mixed $actual 調べる値（左辺値）
-     * @param mixed $expected 比較する値（右辺値）
-     * @param mixed $then 真の場合の値
-     * @param mixed $else 偽の場合の値。省略時は $actual
-     * @return mixed $then or $else
-     */
-    public static function ifelse($actual, $expected, $then, $else = null)
-    {
-        // $else 省略時は $actual を返す
-        if (func_num_args() === 3) {
-            $else = $actual;
-        }
-
-        if (is_callable($expected)) {
-            return $expected($actual) ? $then : $else;
-        }
-        return $expected === $actual ? $then : $else;
     }
 
     /**

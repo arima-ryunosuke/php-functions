@@ -415,7 +415,7 @@ class FileSystem
      */
     public static function fnmatch_and($patterns, $string, $flags = 0)
     {
-        $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
+        $patterns = is_iterable($patterns) ? $patterns : [$patterns];
         if ((is_empty)($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
@@ -449,7 +449,7 @@ class FileSystem
      */
     public static function fnmatch_or($patterns, $string, $flags = 0)
     {
-        $patterns = (is_iterable)($patterns) ? $patterns : [$patterns];
+        $patterns = is_iterable($patterns) ? $patterns : [$patterns];
         if ((is_empty)($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
