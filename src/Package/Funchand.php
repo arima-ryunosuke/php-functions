@@ -15,55 +15,55 @@ class Funchand
      * @param \Closure $invoker クロージャを実行するためのクロージャ（実処理）
      * @param callable $callable 最終的に実行したいクロージャ
      * @param int $arity 引数の数
-     * @return \Closure $callable を実行するクロージャ
+     * @return callable $callable を実行するクロージャ
      */
     public static function delegate($invoker, $callable, $arity = null)
     {
-        // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
-        $__rfunc_delegate_marker = true;
-        assert($__rfunc_delegate_marker === true); // phpstorm の警告解除
+        $arity = $arity ?? (parameter_length)($callable, true, true);
 
-        if ($arity === null) {
-            $arity = (parameter_length)($callable, true, true);
-        }
+        if ((reflect_callable)($callable)->isInternal()) {
+            static $cache = [];
+            $cache[$arity] = $cache[$arity] ?? (evaluate)('return new class()
+            {
+                private $invoker, $callable;
 
-        if (is_infinite($arity)) {
-            return eval('return function (...$_) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                return $invoker($callable, func_get_args());
+                public function spawn($invoker, $callable)
+                {
+                    $that = clone($this);
+                    $that->invoker = $invoker;
+                    $that->callable = $callable;
+                    return $that;
+                }
+
+                public function __invoke(' . implode(',', is_infinite($arity)
+                        ? ['...$_']
+                        : array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null)))
+                    ) . ')
+                {
+                    return ($this->invoker)($this->callable, func_get_args());
+                }
             };');
+            return $cache[$arity]->spawn($invoker, $callable);
         }
 
-        $arity = abs($arity);
-        switch ($arity) {
-            case 0:
-                return function () use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 1:
-                return function ($_1) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 2:
-                return function ($_1, $_2) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 3:
-                return function ($_1, $_2, $_3) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 4:
-                return function ($_1, $_2, $_3, $_4) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 5:
-                return function ($_1, $_2, $_3, $_4, $_5) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
+        switch (true) {
+            case $arity === 0:
+                return function () use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 1:
+                return function ($_1) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 2:
+                return function ($_1, $_2) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 3:
+                return function ($_1, $_2, $_3) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 4:
+                return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 5:
+                return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case is_infinite($arity):
+                return function (...$_) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
             default:
-                $argstring = array_map(function ($v) { return '$_' . $v; }, range(1, $arity));
-                return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };');
+                $args = implode(',', array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null))));
+                return eval('return function (' . $args . ') use ($invoker, $callable) { return $invoker($callable, func_get_args()); };');
         }
     }
 
@@ -78,13 +78,13 @@ class Funchand
      *
      * @param callable $callable 対象 callable
      * @param array $default_args 本来の引数
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     public static function abind($callable, $default_args)
     {
         return (delegate)(function ($callable, $args) use ($default_args) {
             return $callable(...(array_fill_gap)($default_args, ...$args));
-        }, $callable, (parameter_length)($callable, true) - count($default_args));
+        }, $callable, (parameter_length)($callable, true, true) - count($default_args));
     }
 
     /**
@@ -99,13 +99,13 @@ class Funchand
      * @param callable $callable 対象 callable
      * @param int $n 挿入する引数位置
      * @param mixed $variadic 本来の引数（可変引数）
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     public static function nbind($callable, $n, ...$variadic)
     {
         return (delegate)(function ($callable, $args) use ($variadic, $n) {
             return $callable(...(array_insert)($args, $variadic, $n));
-        }, $callable, (parameter_length)($callable, true) - count($variadic));
+        }, $callable, (parameter_length)($callable, true, true) - count($variadic));
     }
 
     /**
@@ -119,7 +119,7 @@ class Funchand
      *
      * @param callable $callable 対象 callable
      * @param mixed $variadic 本来の引数（可変引数）
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     public static function lbind($callable, ...$variadic)
     {
@@ -137,7 +137,7 @@ class Funchand
      *
      * @param callable $callable 対象 callable
      * @param mixed $variadic 本来の引数（可変引数）
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     public static function rbind($callable, ...$variadic)
     {
@@ -181,7 +181,7 @@ class Funchand
      *
      * @param bool $arrayalbe 呼び出しチェーンを配列として扱うか
      * @param callable[] $variadic 合成する関数（可変引数）
-     * @return \Closure 合成関数
+     * @return callable 合成関数
      */
     public static function composite($arrayalbe = true, ...$variadic)
     {
@@ -316,7 +316,7 @@ class Funchand
      * ```
      *
      * @param callable $callable 対象 callable
-     * @return \Closure 新しいクロージャ
+     * @return callable 新しいクロージャ
      */
     public static function not_func($callable)
     {
@@ -797,7 +797,6 @@ class Funchand
      * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
      *
      * デフォルト引数はカウントされない。必須パラメータの数で呼び出す。
-     * もちろん可変引数は未対応。
      *
      * $callback に null を与えると例外的に「第1引数を返すクロージャ」を返す。
      *
@@ -811,7 +810,7 @@ class Funchand
      * ```
      *
      * @param callable $callback 呼び出すクロージャ
-     * @return \Closure 引数ぴったりで呼び出すクロージャ
+     * @return callable 引数ぴったりで呼び出すクロージャ
      */
     public static function func_user_func_array($callback)
     {
@@ -821,9 +820,8 @@ class Funchand
         }
         // クロージャはユーザ定義しかありえないので調べる必要がない
         if ($callback instanceof \Closure) {
-            // が、組み込みをバイパスする delegate はクロージャなのでそれだけは除外
-            $uses = (reflect_callable)($callback)->getStaticVariables();
-            if (!isset($uses['__rfunc_delegate_marker'])) {
+            // と思ったが、\Closure::fromCallable で作成されたクロージャは内部属性が伝播されるようなので除外
+            if ((reflect_callable)($callback)->isUserDefined()) {
                 return $callback;
             }
         }

@@ -963,10 +963,8 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_maps()
     {
-        $this->assertEquals(['_A', '_B', '_C'], (array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')));
-        // これでも同じ
-        $composite = (composite)(false, 'strtoupper', (lbind)(strcat, '_'));
-        $this->assertEquals(['_A', '_B', '_C'], (array_maps)(['a', 'b', 'c'], $composite));
+        $this->assertEquals(['_A0', '_B1', '_C2'], (array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')));
+        $this->assertEquals(['_-A0', '_-B1', '_-C2'], (array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_', '-')));
 
         $this->assertEquals(['a' => 'Aaa', 'b' => 'Bbb'], (array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat));
 
