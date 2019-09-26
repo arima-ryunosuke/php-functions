@@ -694,15 +694,6 @@ assertSame(array_map_recursive([
 assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 </code></pre>
 </div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_not()">
-                                    ryunosuke\Functions\Package\Arrays::array_filter_not		</a>	<small>($array, $callback) : array</small>
-		</h4>
-	<div class="description"><p>array_filter の否定版</p>
-<p>単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。</p>
-<p>Example:</p>
-<pre><code class="language-php">assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 =&gt; '']);
-</code></pre>
-</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_key()">
                                     ryunosuke\Functions\Package\Arrays::array_filter_key		</a>	<small>($array, $callback) : array</small>
 		</h4>
@@ -712,16 +703,6 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 <p>Example:</p>
 <pre><code class="language-php">assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 =&gt; 'a', 2 =&gt; 'c']);
 assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 =&gt; 'a', 2 =&gt; 'c']);
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_eval()">
-                                    ryunosuke\Functions\Package\Arrays::array_filter_eval		</a>	<small>($array, $expression) : array</small>
-		</h4>
-	<div class="description"><p>eval で評価して array_filter する</p>
-<p>キーは $k, 値は $v で宣言される。</p>
-<p>Example:</p>
-<pre><code class="language-php">assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 =&gt; 'a', 2 =&gt; 'c']);
-assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 =&gt; 'a', 2 =&gt; 'c']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_where()">
@@ -1112,7 +1093,8 @@ assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$
 	<div class="description"><p>配列を $orders に従って並べ替える</p>
 <p>データベースからフェッチしたような連想配列の配列を想定しているが、スカラー配列(['key' =&gt; 'value'])にも対応している。<br />
 その場合 $orders に配列ではなく直値を渡せば良い。</p>
-<p>$orders には下記のような配列を渡す。</p>
+<p>$orders には下記のような配列を渡す。<br />
+キーに空文字を渡すとそれは「キー自体」を意味する。</p>
 <pre><code class="language-php">$orders = [
     'col1' =&gt; true,                               // true: 昇順, false: 降順。照合は型に依存
     'col2' =&gt; SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
@@ -2139,13 +2121,13 @@ assertSame(file_exists($memory_path), false);
 	<div class="description"><p>callable 関連のユーティリティ</p>
 </div>
                 	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::delegate()">
-                                    ryunosuke\Functions\Package\Funchand::delegate		</a>	<small>($invoker, $callable, $arity = null) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::delegate		</a>	<small>($invoker, $callable, $arity = null) : callable</small>
 		</h4>
 	<div class="description"><p>指定 callable を指定クロージャで実行するクロージャを返す</p>
 <p>ほぼ内部向けで外から呼ぶことはあまり想定していない。</p>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::abind()">
-                                    ryunosuke\Functions\Package\Funchand::abind		</a>	<small>($callable, $default_args) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::abind		</a>	<small>($callable, $default_args) : callable</small>
 		</h4>
 	<div class="description"><p>$callable の引数を指定配列で束縛したクロージャを返す</p>
 <p>Example:</p>
@@ -2154,7 +2136,7 @@ assertSame($bind('%s%s%s', 'b'), 'abc');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::nbind()">
-                                    ryunosuke\Functions\Package\Funchand::nbind		</a>	<small>($callable, $n, ...$variadic) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::nbind		</a>	<small>($callable, $n, ...$variadic) : callable</small>
 		</h4>
 	<div class="description"><p>$callable の指定位置に引数を束縛したクロージャを返す</p>
 <p>Example:</p>
@@ -2163,7 +2145,7 @@ assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::lbind()">
-                                    ryunosuke\Functions\Package\Funchand::lbind		</a>	<small>($callable, ...$variadic) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::lbind		</a>	<small>($callable, ...$variadic) : callable</small>
 		</h4>
 	<div class="description"><p>$callable の最左に引数を束縛した callable を返す</p>
 <p>Example:</p>
@@ -2172,55 +2154,12 @@ assertSame($bind('N', 'M'), 'NM');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::rbind()">
-                                    ryunosuke\Functions\Package\Funchand::rbind		</a>	<small>($callable, ...$variadic) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::rbind		</a>	<small>($callable, ...$variadic) : callable</small>
 		</h4>
 	<div class="description"><p>$callable の最右に引数を束縛した callable を返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = rbind('sprintf', 'X');
 assertSame($bind('%s%s', 'N'), 'NX');
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::composite()">
-                                    ryunosuke\Functions\Package\Funchand::composite		</a>	<small>($arrayalbe = true, ...$variadic) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
-		</h4>
-	<div class="description"><p>合成関数を返す</p>
-<p>基本的には callable を可変引数で呼び出せばそれらの合成関数を返す。<br />
-ただし $arrayalbe=true のときは若干挙動が異なり、連鎖のときに「前の返り値を<strong>配列として</strong>次の引数へ渡す」動作になる。<br />
-つまり、前の関数が <code>[1, 2, 3]</code> を返せば次の関数へは <code>f(1, 2, 3)</code> が渡る（ただしただの配列の場合のみ。連想配列は単値で渡る）。<br />
-$arrayalbe=false のときは渡る引数は常に単値（単値というか素直に渡すだけ）。<br />
-上の例で言えば、前の関数が <code>[1, 2, 3]</code> を返せば次の関数へは <code>f($array=[1, 2, 3])</code> が渡る。</p>
-<p>$arrayalbe=true の方が利便性は高い。が、「本当にただの配列を渡したいとき」が判断できないので誤動作の原因にもなる。<br />
-e.g. <code>[1, 2, 3]</code> を配列として渡したいが $arrayalbe=true だと3つの引数として渡ってしまう</p>
-<p>いずれにせよ $arrayalbe は必須ではなく、第1引数が bool ならオプションだと判断し、そうでないなら true とみなす。</p>
-<p>Example:</p>
-<pre><code class="language-php">$add5 = function ($v) { return $v + 5; };            // 来た値を +5 するクロージャ
-$mul3 = function ($v) { return $v * 3; };            // 来た値を *3 するクロージャ
-$split = function ($v) { return str_split($v); };    // 文字列的に桁分割するクロージャ
-$union = function ($v) { return $v[0] + $v[1]; };    // 来た配列を足すクロージャ
-$composite = composite(false, $add5, $mul3, $split, $union);// 上記を合成したクロージャ
-// false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）
-// 7 + 5 -&gt; 12 |&gt; 12 * 3 -&gt; 36 |&gt; 36 -&gt; [3, 6] |&gt; 3 + 6 |&gt; 9
-assertSame($composite(7), 9);
-
-$upper = function ($s) { return [$s, strtoupper($s)]; };   // 来た値と大文字化したものを配列で返すクロージャ
-$prefix = function ($s, $S) { return 'pre-' . $s . $S; };  // 来た値を結合して'pre-'を付けるクロージャ
-$hash = function ($sS) { return ['sS' =&gt; $sS]; };          // 来た値を連想配列にするクロージャ
-$key = function ($sSsS) { return strrev(reset($sSsS));};   // 来た配列の値をstrrevして返すクロージャ
-$composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成したクロージャ
-// true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
-// ['hoge', 'HOGE'] |&gt; 'pre-hogeHOGE' |&gt; ['sS' =&gt; 'pre-hogeHOGE'] |&gt; 'EGOHegoh-erp'
-assertSame($composite('hoge'), 'EGOHegoh-erp');
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::return_arg()">
-                                    ryunosuke\Functions\Package\Funchand::return_arg		</a>	<small>($n) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
-		</h4>
-	<div class="description"><p>$n 番目の引数（0 ベース）をそのまま返すクロージャを返す</p>
-<p>Example:</p>
-<pre><code class="language-php">$arg0 = return_arg(0);
-assertSame($arg0('hoge'), 'hoge');
-$arg1 = return_arg(1);
-assertSame($arg1('dummy', 'hoge'), 'hoge');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ope_func()">
@@ -2242,7 +2181,7 @@ assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼�
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::not_func()">
-                                    ryunosuke\Functions\Package\Funchand::not_func		</a>	<small>($callable) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::not_func		</a>	<small>($callable) : callable</small>
 		</h4>
 	<div class="description"><p>返り値の真偽値を逆転した新しいクロージャを返す</p>
 <p>Example:</p>
@@ -2269,16 +2208,6 @@ assertSame($evalfunc(1, 2, 3), 6);
 <p>Example:</p>
 <pre><code class="language-php">assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
 assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::closurize()">
-                                    ryunosuke\Functions\Package\Funchand::closurize		</a>	<small>($callable) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
-		</h4>
-	<div class="description"><p>callable を Closure に変換する</p>
-<p>Example:</p>
-<pre><code class="language-php">$sprintf = closurize('sprintf');
-assertInstanceof(\Closure::class, $sprintf);
-assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::callable_code()">
@@ -2445,11 +2374,10 @@ assertSame(parameter_length('trim', true), 1);
 	<div class="description"><p>関数の名前空間部分を除いた短い名前を取得する</p>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_user_func_array()">
-                                    ryunosuke\Functions\Package\Funchand::func_user_func_array		</a>	<small>($callback) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::func_user_func_array		</a>	<small>($callback) : callable</small>
 		</h4>
 	<div class="description"><p>パラメータ定義数に応じて呼び出し引数を可変にしてコールする</p>
-<p>デフォルト引数はカウントされない。必須パラメータの数で呼び出す。<br />
-もちろん可変引数は未対応。</p>
+<p>デフォルト引数はカウントされない。必須パラメータの数で呼び出す。</p>
 <p>$callback に null を与えると例外的に「第1引数を返すクロージャ」を返す。</p>
 <p>php の標準関数は定義数より多い引数を投げるとエラーを出すのでそれを抑制したい場合に使う。</p>
 <p>Example:</p>
@@ -3949,16 +3877,6 @@ $part = parse_php($phpcode, [
 assertSame(implode('', array_column($part, 1)), "class Example\n{");
 </code></pre>
 </div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::returns()">
-                                    ryunosuke\Functions\Package\Syntax::returns		</a>	<small>($v) : mixed</small>
-		</h4>
-	<div class="description"><p>引数をそのまま返す</p>
-<p>clone などでそのまま返す関数が欲しいことがまれによくあるはず。</p>
-<p>Example:</p>
-<pre><code class="language-php">$object = new \stdClass();
-assertSame(returns($object), $object);
-</code></pre>
-</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()">
                                     ryunosuke\Functions\Package\Syntax::optional		</a>	<small>($object, $expected = null) : mixed</small>
 		</h4>
@@ -4198,25 +4116,6 @@ assertSame($output, [
     '2回以上呼ばれた',
     '2回以上呼ばれた',
 ]);
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::ifelse()">
-                                    ryunosuke\Functions\Package\Syntax::ifelse		</a>	<small>($actual, $expected, $then, $else = null) : mixed</small>
-		</h4>
-	<div class="description"><p>if ～ else 構文の関数版</p>
-<p>一言で言えば <code>$actual === $expected ? $then : $else</code> という動作になる。<br />
-ただし、 $expected が callable の場合は呼び出した結果を緩い bool 判定する。<br />
-つまり <code>ifelse('hoge', 'is_string', true, false)</code> は常に true を返すので注意。</p>
-<p>?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。</p>
-<p>Example:</p>
-<pre><code class="language-php">// とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
-$heavyfunc = function($v){return $v;};
-// $heavyfunc(1) ?? 'default' とほぼ同義
-assertSame(ifelse($heavyfunc(1), false, 'default'), 1);
-// $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-assertSame(ifelse($heavyfunc(null), false, 'default'), null);
-// $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
-assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::switchs()">
@@ -4781,19 +4680,6 @@ assertFalse(is_stringable([1, 2, 3]));
 <pre><code class="language-php">assertTrue(is_arrayable([]));
 assertTrue(is_arrayable(new \ArrayObject()));
 assertFalse(is_arrayable(new \stdClass()));
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_iterable()">
-                                    ryunosuke\Functions\Package\Vars::is_iterable		</a>	<small>($var) : bool</small>
-		</h4>
-	<div class="description"><p>変数が foreach で回せるか調べる</p>
-<p>オブジェクトの場合は \Traversable のみ。<br />
-要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-iterable.php' data-description='is_iterable'>is_iterable</tag_link> の polyfill。</p>
-<p>Example:</p>
-<pre><code class="language-php">assertTrue(is_iterable([1, 2, 3]));
-assertTrue(is_iterable((function () { yield 1; })()));
-assertFalse(is_iterable(1));
-assertFalse(is_iterable(new \stdClass()));
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()">

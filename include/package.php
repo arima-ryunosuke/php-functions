@@ -709,9 +709,7 @@ define("ryunosuke\\Functions\\Package\\array_rekey", ["ryunosuke\\Functions\\Pac
 define("ryunosuke\\Functions\\Package\\array_grep_key", ["ryunosuke\\Functions\\Package\\Arrays", "array_grep_key"]);
 define("ryunosuke\\Functions\\Package\\array_map_recursive", ["ryunosuke\\Functions\\Package\\Arrays", "array_map_recursive"]);
 define("ryunosuke\\Functions\\Package\\array_map_key", ["ryunosuke\\Functions\\Package\\Arrays", "array_map_key"]);
-define("ryunosuke\\Functions\\Package\\array_filter_not", ["ryunosuke\\Functions\\Package\\Arrays", "array_filter_not"]);
 define("ryunosuke\\Functions\\Package\\array_filter_key", ["ryunosuke\\Functions\\Package\\Arrays", "array_filter_key"]);
-define("ryunosuke\\Functions\\Package\\array_filter_eval", ["ryunosuke\\Functions\\Package\\Arrays", "array_filter_eval"]);
 define("ryunosuke\\Functions\\Package\\array_where", ["ryunosuke\\Functions\\Package\\Arrays", "array_where"]);
 define("ryunosuke\\Functions\\Package\\array_map_filter", ["ryunosuke\\Functions\\Package\\Arrays", "array_map_filter"]);
 define("ryunosuke\\Functions\\Package\\array_map_method", ["ryunosuke\\Functions\\Package\\Arrays", "array_map_method"]);
@@ -781,13 +779,10 @@ define("ryunosuke\\Functions\\Package\\abind", ["ryunosuke\\Functions\\Package\\
 define("ryunosuke\\Functions\\Package\\nbind", ["ryunosuke\\Functions\\Package\\Funchand", "nbind"]);
 define("ryunosuke\\Functions\\Package\\lbind", ["ryunosuke\\Functions\\Package\\Funchand", "lbind"]);
 define("ryunosuke\\Functions\\Package\\rbind", ["ryunosuke\\Functions\\Package\\Funchand", "rbind"]);
-define("ryunosuke\\Functions\\Package\\composite", ["ryunosuke\\Functions\\Package\\Funchand", "composite"]);
-define("ryunosuke\\Functions\\Package\\return_arg", ["ryunosuke\\Functions\\Package\\Funchand", "return_arg"]);
 define("ryunosuke\\Functions\\Package\\ope_func", ["ryunosuke\\Functions\\Package\\Funchand", "ope_func"]);
 define("ryunosuke\\Functions\\Package\\not_func", ["ryunosuke\\Functions\\Package\\Funchand", "not_func"]);
 define("ryunosuke\\Functions\\Package\\eval_func", ["ryunosuke\\Functions\\Package\\Funchand", "eval_func"]);
 define("ryunosuke\\Functions\\Package\\reflect_callable", ["ryunosuke\\Functions\\Package\\Funchand", "reflect_callable"]);
-define("ryunosuke\\Functions\\Package\\closurize", ["ryunosuke\\Functions\\Package\\Funchand", "closurize"]);
 define("ryunosuke\\Functions\\Package\\callable_code", ["ryunosuke\\Functions\\Package\\Funchand", "callable_code"]);
 define("ryunosuke\\Functions\\Package\\call_safely", ["ryunosuke\\Functions\\Package\\Funchand", "call_safely"]);
 define("ryunosuke\\Functions\\Package\\ob_capture", ["ryunosuke\\Functions\\Package\\Funchand", "ob_capture"]);
@@ -876,14 +871,12 @@ define("ryunosuke\\Functions\\Package\\ob_include", ["ryunosuke\\Functions\\Pack
 define("ryunosuke\\Functions\\Package\\include_string", ["ryunosuke\\Functions\\Package\\Strings", "include_string"]);
 define("ryunosuke\\Functions\\Package\\evaluate", ["ryunosuke\\Functions\\Package\\Syntax", "evaluate"]);
 define("ryunosuke\\Functions\\Package\\parse_php", ["ryunosuke\\Functions\\Package\\Syntax", "parse_php"]);
-define("ryunosuke\\Functions\\Package\\returns", ["ryunosuke\\Functions\\Package\\Syntax", "returns"]);
 define("ryunosuke\\Functions\\Package\\optional", ["ryunosuke\\Functions\\Package\\Syntax", "optional"]);
 define("ryunosuke\\Functions\\Package\\chain", ["ryunosuke\\Functions\\Package\\Syntax", "chain"]);
 define("ryunosuke\\Functions\\Package\\throws", ["ryunosuke\\Functions\\Package\\Syntax", "throws"]);
 define("ryunosuke\\Functions\\Package\\throw_if", ["ryunosuke\\Functions\\Package\\Syntax", "throw_if"]);
 define("ryunosuke\\Functions\\Package\\blank_if", ["ryunosuke\\Functions\\Package\\Syntax", "blank_if"]);
 define("ryunosuke\\Functions\\Package\\call_if", ["ryunosuke\\Functions\\Package\\Syntax", "call_if"]);
-define("ryunosuke\\Functions\\Package\\ifelse", ["ryunosuke\\Functions\\Package\\Syntax", "ifelse"]);
 define("ryunosuke\\Functions\\Package\\switchs", ["ryunosuke\\Functions\\Package\\Syntax", "switchs"]);
 define("ryunosuke\\Functions\\Package\\try_null", ["ryunosuke\\Functions\\Package\\Syntax", "try_null"]);
 define("ryunosuke\\Functions\\Package\\try_catch", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch"]);
@@ -914,7 +907,6 @@ define("ryunosuke\\Functions\\Package\\is_primitive", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\is_recursive", ["ryunosuke\\Functions\\Package\\Vars", "is_recursive"]);
 define("ryunosuke\\Functions\\Package\\is_stringable", ["ryunosuke\\Functions\\Package\\Vars", "is_stringable"]);
 define("ryunosuke\\Functions\\Package\\is_arrayable", ["ryunosuke\\Functions\\Package\\Vars", "is_arrayable"]);
-define("ryunosuke\\Functions\\Package\\is_iterable", ["ryunosuke\\Functions\\Package\\Vars", "is_iterable"]);
 define("ryunosuke\\Functions\\Package\\is_countable", ["ryunosuke\\Functions\\Package\\Vars", "is_countable"]);
 define("ryunosuke\\Functions\\Package\\varcmp", ["ryunosuke\\Functions\\Package\\Vars", "varcmp"]);
 define("ryunosuke\\Functions\\Package\\var_type", ["ryunosuke\\Functions\\Package\\Vars", "var_type"]);

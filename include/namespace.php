@@ -2455,30 +2455,6 @@ if (function_exists("ryunosuke\\Functions\\array_map_key") && !defined("ryunosuk
     define("ryunosuke\\Functions\\array_map_key", "ryunosuke\\Functions\\array_map_key");
 }
 
-if (!isset($excluded_functions["array_filter_not"]) && (!function_exists("ryunosuke\\Functions\\array_filter_not") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_filter_not"))->isInternal()))) {
-    /**
-     * array_filter の否定版
-     *
-     * 単に否定するだけなのにクロージャを書きたくないことはまれによくあるはず。
-     *
-     * Example:
-     * ```php
-     * assertSame(array_filter_not(['a', '', 'c'], 'strlen'), [1 => '']);
-     * ```
-     *
-     * @param iterable $array 対象配列
-     * @param callable $callback 評価 callable
-     * @return array $callback が false を返した新しい配列
-     */
-    function array_filter_not($array, $callback)
-    {
-        return array_filter(arrayval($array, false), not_func($callback));
-    }
-}
-if (function_exists("ryunosuke\\Functions\\array_filter_not") && !defined("ryunosuke\\Functions\\array_filter_not")) {
-    define("ryunosuke\\Functions\\array_filter_not", "ryunosuke\\Functions\\array_filter_not");
-}
-
 if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("ryunosuke\\Functions\\array_filter_key") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_filter_key"))->isInternal()))) {
     /**
      * キーを主軸とした array_filter
@@ -2510,31 +2486,6 @@ if (!isset($excluded_functions["array_filter_key"]) && (!function_exists("ryunos
 }
 if (function_exists("ryunosuke\\Functions\\array_filter_key") && !defined("ryunosuke\\Functions\\array_filter_key")) {
     define("ryunosuke\\Functions\\array_filter_key", "ryunosuke\\Functions\\array_filter_key");
-}
-
-if (!isset($excluded_functions["array_filter_eval"]) && (!function_exists("ryunosuke\\Functions\\array_filter_eval") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_filter_eval"))->isInternal()))) {
-    /**
-     * eval で評価して array_filter する
-     *
-     * キーは $k, 値は $v で宣言される。
-     *
-     * Example:
-     * ```php
-     * assertSame(array_filter_eval(['a', 'b', 'c'], '$k !== 1'), [0 => 'a', 2 => 'c']);
-     * assertSame(array_filter_eval(['a', 'b', 'c'], '$v !== "b"'), [0 => 'a', 2 => 'c']);
-     * ```
-     *
-     * @param iterable $array 対象配列
-     * @param string $expression eval コード
-     * @return array $expression が true を返した新しい配列
-     */
-    function array_filter_eval($array, $expression)
-    {
-        return array_filter_key($array, eval_func($expression, 'k', 'v'));
-    }
-}
-if (function_exists("ryunosuke\\Functions\\array_filter_eval") && !defined("ryunosuke\\Functions\\array_filter_eval")) {
-    define("ryunosuke\\Functions\\array_filter_eval", "ryunosuke\\Functions\\array_filter_eval");
 }
 
 if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\Functions\\array_where") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_where"))->isInternal()))) {
@@ -3504,6 +3455,7 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\
      * その場合 $orders に配列ではなく直値を渡せば良い。
      *
      * $orders には下記のような配列を渡す。
+     * キーに空文字を渡すとそれは「キー自体」を意味する。
      *
      * ```php
      * $orders = [
@@ -3945,29 +3897,11 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\
      */
     function array_lookup($array, $column_key = null, $index_key = null)
     {
+        $array = arrayval($array, false);
         if (func_num_args() === 3) {
-            return array_column(arrayval($array, false), $column_key, $index_key);
+            return array_column($array, $column_key, $index_key);
         }
-
-        // null 対応できないし、php7 からオブジェクトに対応してるらしいので止め。ベタにやる
-        // return array_map(array_of($column_keys), $array);
-
-        // 実質的にはこれで良いはずだが、オブジェクト対応が救えないので止め。ベタにやる
-        // return array_combine(array_keys($array), array_column($array, $column_key));
-
-        $result = [];
-        foreach ($array as $k => $v) {
-            if ($column_key === null) {
-                $result[$k] = $v;
-            }
-            elseif (is_array($v) && array_key_exists($column_key, $v)) {
-                $result[$k] = $v[$column_key];
-            }
-            elseif (is_object($v) && (isset($v->$column_key) || property_exists($v, $column_key))) {
-                $result[$k] = $v->$column_key;
-            }
-        }
-        return $result;
+        return array_combine(array_keys($array), array_column($array, $column_key));
     }
 }
 if (function_exists("ryunosuke\\Functions\\array_lookup") && !defined("ryunosuke\\Functions\\array_lookup")) {
@@ -6888,55 +6822,55 @@ if (!isset($excluded_functions["delegate"]) && (!function_exists("ryunosuke\\Fun
      * @param \Closure $invoker クロージャを実行するためのクロージャ（実処理）
      * @param callable $callable 最終的に実行したいクロージャ
      * @param int $arity 引数の数
-     * @return \Closure $callable を実行するクロージャ
+     * @return callable $callable を実行するクロージャ
      */
     function delegate($invoker, $callable, $arity = null)
     {
-        // 「delegate 経由で作成されたクロージャ」であることをマーキングするための use 変数
-        $__rfunc_delegate_marker = true;
-        assert($__rfunc_delegate_marker === true); // phpstorm の警告解除
+        $arity = $arity ?? parameter_length($callable, true, true);
 
-        if ($arity === null) {
-            $arity = parameter_length($callable, true, true);
-        }
+        if (reflect_callable($callable)->isInternal()) {
+            static $cache = [];
+            $cache[$arity] = $cache[$arity] ?? evaluate('return new class()
+            {
+                private $invoker, $callable;
 
-        if (is_infinite($arity)) {
-            return eval('return function (...$_) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                return $invoker($callable, func_get_args());
+                public function spawn($invoker, $callable)
+                {
+                    $that = clone($this);
+                    $that->invoker = $invoker;
+                    $that->callable = $callable;
+                    return $that;
+                }
+
+                public function __invoke(' . implode(',', is_infinite($arity)
+                        ? ['...$_']
+                        : array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null)))
+                    ) . ')
+                {
+                    return ($this->invoker)($this->callable, func_get_args());
+                }
             };');
+            return $cache[$arity]->spawn($invoker, $callable);
         }
 
-        $arity = abs($arity);
-        switch ($arity) {
-            case 0:
-                return function () use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 1:
-                return function ($_1) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 2:
-                return function ($_1, $_2) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 3:
-                return function ($_1, $_2, $_3) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 4:
-                return function ($_1, $_2, $_3, $_4) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
-            case 5:
-                return function ($_1, $_2, $_3, $_4, $_5) use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };
+        switch (true) {
+            case $arity === 0:
+                return function () use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 1:
+                return function ($_1) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 2:
+                return function ($_1, $_2) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 3:
+                return function ($_1, $_2, $_3) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 4:
+                return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case $arity === 5:
+                return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+            case is_infinite($arity):
+                return function (...$_) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
             default:
-                $argstring = array_map(function ($v) { return '$_' . $v; }, range(1, $arity));
-                return eval('return function (' . implode(', ', $argstring) . ') use ($__rfunc_delegate_marker, $invoker, $callable) {
-                    return $invoker($callable, func_get_args());
-                };');
+                $args = implode(',', array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null))));
+                return eval('return function (' . $args . ') use ($invoker, $callable) { return $invoker($callable, func_get_args()); };');
         }
     }
 }
@@ -6956,13 +6890,13 @@ if (!isset($excluded_functions["abind"]) && (!function_exists("ryunosuke\\Functi
      *
      * @param callable $callable 対象 callable
      * @param array $default_args 本来の引数
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     function abind($callable, $default_args)
     {
         return delegate(function ($callable, $args) use ($default_args) {
             return $callable(...array_fill_gap($default_args, ...$args));
-        }, $callable, parameter_length($callable, true) - count($default_args));
+        }, $callable, parameter_length($callable, true, true) - count($default_args));
     }
 }
 if (function_exists("ryunosuke\\Functions\\abind") && !defined("ryunosuke\\Functions\\abind")) {
@@ -6982,13 +6916,13 @@ if (!isset($excluded_functions["nbind"]) && (!function_exists("ryunosuke\\Functi
      * @param callable $callable 対象 callable
      * @param int $n 挿入する引数位置
      * @param mixed $variadic 本来の引数（可変引数）
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     function nbind($callable, $n, ...$variadic)
     {
         return delegate(function ($callable, $args) use ($variadic, $n) {
             return $callable(...array_insert($args, $variadic, $n));
-        }, $callable, parameter_length($callable, true) - count($variadic));
+        }, $callable, parameter_length($callable, true, true) - count($variadic));
     }
 }
 if (function_exists("ryunosuke\\Functions\\nbind") && !defined("ryunosuke\\Functions\\nbind")) {
@@ -7007,7 +6941,7 @@ if (!isset($excluded_functions["lbind"]) && (!function_exists("ryunosuke\\Functi
      *
      * @param callable $callable 対象 callable
      * @param mixed $variadic 本来の引数（可変引数）
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     function lbind($callable, ...$variadic)
     {
@@ -7030,7 +6964,7 @@ if (!isset($excluded_functions["rbind"]) && (!function_exists("ryunosuke\\Functi
      *
      * @param callable $callable 対象 callable
      * @param mixed $variadic 本来の引数（可変引数）
-     * @return \Closure 束縛したクロージャ
+     * @return callable 束縛したクロージャ
      */
     function rbind($callable, ...$variadic)
     {
@@ -7039,111 +6973,6 @@ if (!isset($excluded_functions["rbind"]) && (!function_exists("ryunosuke\\Functi
 }
 if (function_exists("ryunosuke\\Functions\\rbind") && !defined("ryunosuke\\Functions\\rbind")) {
     define("ryunosuke\\Functions\\rbind", "ryunosuke\\Functions\\rbind");
-}
-
-if (!isset($excluded_functions["composite"]) && (!function_exists("ryunosuke\\Functions\\composite") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\composite"))->isInternal()))) {
-    /**
-     * 合成関数を返す
-     *
-     * 基本的には callable を可変引数で呼び出せばそれらの合成関数を返す。
-     * ただし $arrayalbe=true のときは若干挙動が異なり、連鎖のときに「前の返り値を**配列として**次の引数へ渡す」動作になる。
-     * つまり、前の関数が `[1, 2, 3]` を返せば次の関数へは `f(1, 2, 3)` が渡る（ただしただの配列の場合のみ。連想配列は単値で渡る）。
-     * $arrayalbe=false のときは渡る引数は常に単値（単値というか素直に渡すだけ）。
-     * 上の例で言えば、前の関数が `[1, 2, 3]` を返せば次の関数へは `f($array=[1, 2, 3])` が渡る。
-     *
-     * $arrayalbe=true の方が利便性は高い。が、「本当にただの配列を渡したいとき」が判断できないので誤動作の原因にもなる。
-     * e.g. `[1, 2, 3]` を配列として渡したいが $arrayalbe=true だと3つの引数として渡ってしまう
-     *
-     * いずれにせよ $arrayalbe は必須ではなく、第1引数が bool ならオプションだと判断し、そうでないなら true とみなす。
-     *
-     * Example:
-     * ```php
-     * $add5 = function ($v) { return $v + 5; };            // 来た値を +5 するクロージャ
-     * $mul3 = function ($v) { return $v * 3; };            // 来た値を *3 するクロージャ
-     * $split = function ($v) { return str_split($v); };    // 文字列的に桁分割するクロージャ
-     * $union = function ($v) { return $v[0] + $v[1]; };    // 来た配列を足すクロージャ
-     * $composite = composite(false, $add5, $mul3, $split, $union);// 上記を合成したクロージャ
-     * // false を渡すと配列を考慮しない（つまり、単一の引数しか受け取れず、単一の返り値しか返せない）
-     * // 7 + 5 -> 12 |> 12 * 3 -> 36 |> 36 -> [3, 6] |> 3 + 6 |> 9
-     * assertSame($composite(7), 9);
-     *
-     * $upper = function ($s) { return [$s, strtoupper($s)]; };   // 来た値と大文字化したものを配列で返すクロージャ
-     * $prefix = function ($s, $S) { return 'pre-' . $s . $S; };  // 来た値を結合して'pre-'を付けるクロージャ
-     * $hash = function ($sS) { return ['sS' => $sS]; };          // 来た値を連想配列にするクロージャ
-     * $key = function ($sSsS) { return strrev(reset($sSsS));};   // 来た配列の値をstrrevして返すクロージャ
-     * $composite = composite(true, $upper, $prefix, $hash, $key);// 上記を合成したクロージャ
-     * // true を渡すとただの配列は引数として、連想配列は単値として渡ってくる
-     * // ['hoge', 'HOGE'] |> 'pre-hogeHOGE' |> ['sS' => 'pre-hogeHOGE'] |> 'EGOHegoh-erp'
-     * assertSame($composite('hoge'), 'EGOHegoh-erp');
-     * ```
-     *
-     * @param bool $arrayalbe 呼び出しチェーンを配列として扱うか
-     * @param callable[] $variadic 合成する関数（可変引数）
-     * @return \Closure 合成関数
-     */
-    function composite($arrayalbe = true, ...$variadic)
-    {
-        $callables = func_get_args();
-
-        // モード引数が来てるなら捨てる
-        if (!is_callable($arrayalbe)) {
-            array_shift($callables);
-        }
-        // 来てないなら前方省略なのでデフォルト値を代入
-        else {
-            $arrayalbe = true;
-        }
-
-        if (empty($callables)) {
-            throw new \InvalidArgumentException('too few arguments.');
-        }
-
-        $first = array_shift($callables);
-        return delegate(function ($first, $args) use ($callables, $arrayalbe) {
-            $result = $first(...$args);
-            foreach ($callables as $callable) {
-                // 「配列モードでただの配列」でないなら配列化
-                if (!($arrayalbe && is_array($result) && !is_hasharray($result))) {
-                    $result = [$result];
-                }
-                $result = $callable(...$result);
-            }
-            return $result;
-        }, $first);
-    }
-}
-if (function_exists("ryunosuke\\Functions\\composite") && !defined("ryunosuke\\Functions\\composite")) {
-    define("ryunosuke\\Functions\\composite", "ryunosuke\\Functions\\composite");
-}
-
-if (!isset($excluded_functions["return_arg"]) && (!function_exists("ryunosuke\\Functions\\return_arg") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\return_arg"))->isInternal()))) {
-    /**
-     * $n 番目の引数（0 ベース）をそのまま返すクロージャを返す
-     *
-     * Example:
-     * ```php
-     * $arg0 = return_arg(0);
-     * assertSame($arg0('hoge'), 'hoge');
-     * $arg1 = return_arg(1);
-     * assertSame($arg1('dummy', 'hoge'), 'hoge');
-     * ```
-     *
-     * @param int $n $n 番目の引数
-     * @return \Closure $n 番目の引数をそのまま返すクロージャ
-     */
-    function return_arg($n)
-    {
-        static $cache = [];
-        if (!isset($cache[$n])) {
-            $cache[$n] = function () use ($n) {
-                return func_get_arg($n);
-            };
-        }
-        return $cache[$n];
-    }
-}
-if (function_exists("ryunosuke\\Functions\\return_arg") && !defined("ryunosuke\\Functions\\return_arg")) {
-    define("ryunosuke\\Functions\\return_arg", "ryunosuke\\Functions\\return_arg");
 }
 
 if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Functions\\ope_func") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ope_func"))->isInternal()))) {
@@ -7229,7 +7058,7 @@ if (!isset($excluded_functions["not_func"]) && (!function_exists("ryunosuke\\Fun
      * ```
      *
      * @param callable $callable 対象 callable
-     * @return \Closure 新しいクロージャ
+     * @return callable 新しいクロージャ
      */
     function not_func($callable)
     {
@@ -7310,29 +7139,6 @@ if (!isset($excluded_functions["reflect_callable"]) && (!function_exists("ryunos
 }
 if (function_exists("ryunosuke\\Functions\\reflect_callable") && !defined("ryunosuke\\Functions\\reflect_callable")) {
     define("ryunosuke\\Functions\\reflect_callable", "ryunosuke\\Functions\\reflect_callable");
-}
-
-if (!isset($excluded_functions["closurize"]) && (!function_exists("ryunosuke\\Functions\\closurize") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\closurize"))->isInternal()))) {
-    /**
-     * callable を Closure に変換する
-     *
-     * Example:
-     * ```php
-     * $sprintf = closurize('sprintf');
-     * assertInstanceof(\Closure::class, $sprintf);
-     * assertSame($sprintf('%s %s', 'hello', 'world'), 'hello world');
-     * ```
-     *
-     * @param callable $callable 変換する callable
-     * @return \Closure 変換したクロージャ
-     */
-    function closurize($callable)
-    {
-        return \Closure::fromCallable($callable);
-    }
-}
-if (function_exists("ryunosuke\\Functions\\closurize") && !defined("ryunosuke\\Functions\\closurize")) {
-    define("ryunosuke\\Functions\\closurize", "ryunosuke\\Functions\\closurize");
 }
 
 if (!isset($excluded_functions["callable_code"]) && (!function_exists("ryunosuke\\Functions\\callable_code") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\callable_code"))->isInternal()))) {
@@ -7770,7 +7576,6 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("ry
      * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
      *
      * デフォルト引数はカウントされない。必須パラメータの数で呼び出す。
-     * もちろん可変引数は未対応。
      *
      * $callback に null を与えると例外的に「第1引数を返すクロージャ」を返す。
      *
@@ -7784,7 +7589,7 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("ry
      * ```
      *
      * @param callable $callback 呼び出すクロージャ
-     * @return \Closure 引数ぴったりで呼び出すクロージャ
+     * @return callable 引数ぴったりで呼び出すクロージャ
      */
     function func_user_func_array($callback)
     {
@@ -7794,9 +7599,8 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("ry
         }
         // クロージャはユーザ定義しかありえないので調べる必要がない
         if ($callback instanceof \Closure) {
-            // が、組み込みをバイパスする delegate はクロージャなのでそれだけは除外
-            $uses = reflect_callable($callback)->getStaticVariables();
-            if (!isset($uses['__rfunc_delegate_marker'])) {
+            // と思ったが、\Closure::fromCallable で作成されたクロージャは内部属性が伝播されるようなので除外
+            if (reflect_callable($callback)->isUserDefined()) {
                 return $callback;
             }
         }
@@ -12588,30 +12392,6 @@ if (function_exists("ryunosuke\\Functions\\parse_php") && !defined("ryunosuke\\F
     define("ryunosuke\\Functions\\parse_php", "ryunosuke\\Functions\\parse_php");
 }
 
-if (!isset($excluded_functions["returns"]) && (!function_exists("ryunosuke\\Functions\\returns") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\returns"))->isInternal()))) {
-    /**
-     * 引数をそのまま返す
-     *
-     * clone などでそのまま返す関数が欲しいことがまれによくあるはず。
-     *
-     * Example:
-     * ```php
-     * $object = new \stdClass();
-     * assertSame(returns($object), $object);
-     * ```
-     *
-     * @param mixed $v return する値
-     * @return mixed $v を返す
-     */
-    function returns($v)
-    {
-        return $v;
-    }
-}
-if (function_exists("ryunosuke\\Functions\\returns") && !defined("ryunosuke\\Functions\\returns")) {
-    define("ryunosuke\\Functions\\returns", "ryunosuke\\Functions\\returns");
-}
-
 if (!isset($excluded_functions["optional"]) && (!function_exists("ryunosuke\\Functions\\optional") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\optional"))->isInternal()))) {
     /**
      * オブジェクトならそれを、オブジェクトでないなら NullObject を返す
@@ -13160,51 +12940,6 @@ if (!isset($excluded_functions["call_if"]) && (!function_exists("ryunosuke\\Func
 }
 if (function_exists("ryunosuke\\Functions\\call_if") && !defined("ryunosuke\\Functions\\call_if")) {
     define("ryunosuke\\Functions\\call_if", "ryunosuke\\Functions\\call_if");
-}
-
-if (!isset($excluded_functions["ifelse"]) && (!function_exists("ryunosuke\\Functions\\ifelse") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ifelse"))->isInternal()))) {
-    /**
-     * if ～ else 構文の関数版
-     *
-     * 一言で言えば `$actual === $expected ? $then : $else` という動作になる。
-     * ただし、 $expected が callable の場合は呼び出した結果を緩い bool 判定する。
-     * つまり `ifelse('hoge', 'is_string', true, false)` は常に true を返すので注意。
-     *
-     * ?? 演算子があれば大抵の状況で不要だが、=== null 限定ではなく 他の値で判定したい場合などには使える。
-     *
-     * Example:
-     * ```php
-     * // とても処理が遅い関数。これの返り値が「false ならばデフォルト値、でなければ自身値」という処理が下記のように書ける（一時変数が不要）
-     * $heavyfunc = function($v){return $v;};
-     * // $heavyfunc(1) ?? 'default' とほぼ同義
-     * assertSame(ifelse($heavyfunc(1), false, 'default'), 1);
-     * // $heavyfunc(null) ?? 'default' とほぼ同義…ではない。厳密な比較で false ではないので第1引数を返す
-     * assertSame(ifelse($heavyfunc(null), false, 'default'), null);
-     * // $heavyfunc(false) ?? 'default' とほぼ同義…ではない。厳密な比較で false なので 'default' を返す
-     * assertSame(ifelse($heavyfunc(false), false, 'default'), 'default');
-     * ```
-     *
-     * @param mixed $actual 調べる値（左辺値）
-     * @param mixed $expected 比較する値（右辺値）
-     * @param mixed $then 真の場合の値
-     * @param mixed $else 偽の場合の値。省略時は $actual
-     * @return mixed $then or $else
-     */
-    function ifelse($actual, $expected, $then, $else = null)
-    {
-        // $else 省略時は $actual を返す
-        if (func_num_args() === 3) {
-            $else = $actual;
-        }
-
-        if (is_callable($expected)) {
-            return $expected($actual) ? $then : $else;
-        }
-        return $expected === $actual ? $then : $else;
-    }
-}
-if (function_exists("ryunosuke\\Functions\\ifelse") && !defined("ryunosuke\\Functions\\ifelse")) {
-    define("ryunosuke\\Functions\\ifelse", "ryunosuke\\Functions\\ifelse");
 }
 
 if (!isset($excluded_functions["switchs"]) && (!function_exists("ryunosuke\\Functions\\switchs") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\switchs"))->isInternal()))) {
@@ -14399,7 +14134,7 @@ if (!isset($excluded_functions["benchmark"]) && (!function_exists("ryunosuke\\Fu
                 throw new \InvalidArgumentException('duplicated benchname.');
             }
 
-            $benchset[$name] = closurize($caller);
+            $benchset[$name] = \Closure::fromCallable($caller);
         }
 
         if (!$benchset) {
@@ -15113,35 +14848,6 @@ if (!isset($excluded_functions["is_arrayable"]) && (!function_exists("ryunosuke\
 }
 if (function_exists("ryunosuke\\Functions\\is_arrayable") && !defined("ryunosuke\\Functions\\is_arrayable")) {
     define("ryunosuke\\Functions\\is_arrayable", "ryunosuke\\Functions\\is_arrayable");
-}
-
-if (!isset($excluded_functions["is_iterable"]) && (!function_exists("ryunosuke\\Functions\\is_iterable") || (!true && (new \ReflectionFunction("ryunosuke\\Functions\\is_iterable"))->isInternal()))) {
-    /**
-     * 変数が foreach で回せるか調べる
-     *
-     * オブジェクトの場合は \Traversable のみ。
-     * 要するに {@link http://php.net/manual/function.is-iterable.php is_iterable} の polyfill。
-     *
-     * Example:
-     * ```php
-     * assertTrue(is_iterable([1, 2, 3]));
-     * assertTrue(is_iterable((function () { yield 1; })()));
-     * assertFalse(is_iterable(1));
-     * assertFalse(is_iterable(new \stdClass()));
-     * ```
-     *
-     * @polyfill
-     *
-     * @param mixed $var 調べる値
-     * @return bool foreach で回せるなら true
-     */
-    function is_iterable($var)
-    {
-        return is_array($var) || $var instanceof \Traversable;
-    }
-}
-if (function_exists("ryunosuke\\Functions\\is_iterable") && !defined("ryunosuke\\Functions\\is_iterable")) {
-    define("ryunosuke\\Functions\\is_iterable", "ryunosuke\\Functions\\is_iterable");
 }
 
 if (!isset($excluded_functions["is_countable"]) && (!function_exists("ryunosuke\\Functions\\is_countable") || (!true && (new \ReflectionFunction("ryunosuke\\Functions\\is_countable"))->isInternal()))) {
