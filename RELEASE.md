@@ -10,6 +10,21 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.0
+
+- [*change] 使用頻度の低い関数を削除
+  - [Arrays] array_filter_not: not_func 呼び出し時で十分
+  - [Arrays] array_filter_eval: eval_func 呼び出し時で十分
+  - [Funchand] composite: クロージャで十分
+  - [Funchand] return_arg: 普通にベタ書きで十分
+  - [Funchand] closurize: Closure::fromCallable で十分
+  - [Syntax] returns: 即時 new とか clone 用だったがもはや不要
+  - [Syntax] ifelse: ?? や blank_if で十分
+  - [Vars] is_iterable: php 7.1 にそのものズバリがあるので不要
+- [*change][Vars] is_iterable を削除
+- [*change][Funchand] delegate の内部実装を変更
+- [change][Arrays] array_lookup の内部実装を変更
+
 ## 1.3.11
 
 - [feature][Arrays] array_map_key の値対応
