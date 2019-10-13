@@ -446,6 +446,9 @@ class FunchandTest extends AbstractTestCase
         // タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
         $this->assertEquals(1, (parameter_length)(new \Concrete('')));
         $this->assertEquals(0, (parameter_length)(new \Concrete(''), true));
+
+        // 可変引数
+        $this->assertEquals(INF, (parameter_length)(function (...$x) { }, false, true));
     }
 
     function test_function_shorten()

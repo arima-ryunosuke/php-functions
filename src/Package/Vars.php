@@ -1091,20 +1091,7 @@ class Vars
                 case is_null($value):
                     return $colorAdapter('null', 'bold');
                 case is_object($value):
-                    if (function_exists('spl_object_id')) {
-                        $id = spl_object_id($value); // @codeCoverageIgnore
-                    }
-                    // backport: spl_object_id
-                    else {
-                        // 桁がでかすぎて視認性が悪いので現在の hash をオフセットとして減算する
-                        // 場合によっては負数が出るが許容する（少なくとも同じオブジェクトなら同じ id になるはず。嫌なら php 7.2 を使えば良い）
-                        static $offset = null;
-                        if ($offset === null) {
-                            $offset = intval(substr(spl_object_hash($value), 1, 15), 16);
-                        }
-                        $id = intval(substr(spl_object_hash($value), 1, 15), 16) - $offset + 1;
-                    }
-                    return $colorAdapter(get_class($value), 'green') . "#$id";
+                    return $colorAdapter(get_class($value), 'green') . "#" . spl_object_id($value);
                 case is_bool($value):
                     return $colorAdapter(var_export($value, true), 'bold');
                 case is_int($value) || is_float($value) || is_string($value):
