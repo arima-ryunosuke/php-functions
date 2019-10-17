@@ -522,6 +522,17 @@ class VarsTest extends AbstractTestCase
         })));
     }
 
+    function test_var_type_valid()
+    {
+        $this->assertEquals('null', (var_type)(null, true));
+        $this->assertEquals('bool', (var_type)(true, true));
+        $this->assertEquals('int', (var_type)(123, true));
+        $this->assertEquals('float', (var_type)(123.456, true));
+        $this->assertEquals('string', (var_type)('hoge', true));
+        $this->assertEquals('resource', (var_type)(STDIN, true));
+        $this->assertEquals('array', (var_type)(['array'], true));
+    }
+
     function test_var_apply()
     {
         // 単値であればそのまま適用される

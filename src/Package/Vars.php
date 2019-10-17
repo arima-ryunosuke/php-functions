@@ -692,6 +692,8 @@ class Vars
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
+     * また、 $valid_name を true にするとタイプヒントとして正当な名前を返す（integer -> int, double -> float など）。
+     * 互換性のためデフォルト false になっているが、将来的にこの引数は削除されるかデフォルト true に変更される。
      *
      * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
      * 継承も実装もされていない場合は標準の get_class の結果を返す。
@@ -714,9 +716,10 @@ class Vars
      * ```
      *
      * @param mixed $var 型を取得する値
+     * @param bool $valid_name タイプヒントとして有効な名前を返すか
      * @return string 型名
      */
-    public static function var_type($var)
+    public static function var_type($var, $valid_name = false)
     {
         if (is_object($var)) {
             $ref = new \ReflectionObject($var);
@@ -730,7 +733,22 @@ class Vars
             }
             return '\\' . get_class($var);
         }
-        return gettype($var);
+        $type = gettype($var);
+        if (!$valid_name) {
+            return $type;
+        }
+        switch ($type) {
+            default:
+                return $type;
+            case 'NULL':
+                return 'null';
+            case 'boolean':
+                return 'bool';
+            case 'integer':
+                return 'int';
+            case 'double':
+                return 'float';
+        }
     }
 
     /**
