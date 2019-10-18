@@ -7,6 +7,27 @@ namespace ryunosuke\Functions\Package;
  */
 class Vars
 {
+    /** SI 接頭辞 */
+    const SI_UNITS = [
+        -8 => ['y'],           // ヨクト
+        -7 => ['z'],           // ゼプト
+        -6 => ['a'],           // アト
+        -5 => ['f'],           // フェムト
+        -4 => ['p'],           // ピコ
+        -3 => ['n'],           // ナノ
+        -2 => ['u', 'μ', 'µ'], // マイクロ（u で代用されることが多く、さらに μ は2つの文字体系がある）
+        -1 => ['m'],           // ミリ
+        0  => [],              // なし
+        1  => ['k', 'K'],      // キロ（歴史的に k が使われるが、他の倍量は大文字なので K が使われることもある）
+        2  => ['M'],           // メガ
+        3  => ['G'],           // ギガ
+        4  => ['T'],           // テラ
+        5  => ['P'],           // ペタ
+        6  => ['E'],           // エクサ
+        7  => ['Z'],           // ゼタ
+        8  => ['Y'],           // ヨタ
+    ];
+
     /** SORT_XXX 定数の厳密版 */
     const SORT_STRICT = 256;
 
@@ -293,26 +314,6 @@ class Vars
      */
     public static function si_prefix($var, $unit = 1000, $format = '%.3f %s')
     {
-        static $units = [
-            -8 => 'y', // ヨクト
-            -7 => 'z', // ゼプト
-            -6 => 'a', // アト
-            -5 => 'f', // フェムト
-            -4 => 'p', // ピコ
-            -3 => 'n', // ナノ
-            -2 => 'µ', // マイクロ
-            -1 => 'm', // ミリ
-            0  => '',  //
-            1  => 'k', // キロ
-            2  => 'M', // メガ
-            3  => 'G', // ギガ
-            4  => 'T', // テラ
-            5  => 'P', // ペタ
-            6  => 'E', // エクサ
-            7  => 'Z', // ゼタ
-            8  => 'Y', // ヨタ
-        ];
-
         assert($unit > 0);
 
         $result = function ($format, $var, $unit) {
@@ -342,10 +343,10 @@ class Vars
                 $var /= $unit;
             }
         }
-        if (!isset($units[$n])) {
+        if (!isset(SI_UNITS[$n])) {
             throw new \InvalidArgumentException("$original is too large or small ($n).");
         }
-        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n]);
+        return $result($format, ($original > 0 ? 1 : -1) * $var, SI_UNITS[$n][0] ?? '');
     }
 
     /**
@@ -374,32 +375,19 @@ class Vars
      */
     public static function si_unprefix($var, $unit = 1000)
     {
-        static $units = [
-            'y' => -8, // ヨクト
-            'z' => -7, // ゼプト
-            'a' => -6, // アト
-            'f' => -5, // フェムト
-            'p' => -4, // ピコ
-            'n' => -3, // ナノ
-            'µ' => -2, // マイクロ
-            'm' => -1, // ミリ
-            ''  => 0, //
-            'k' => 1, // キロ
-            'K' => 1, // キロ（特別扱い）
-            'M' => 2, // メガ
-            'G' => 3, // ギガ
-            'T' => 4, // テラ
-            'P' => 5, // ペタ
-            'E' => 6, // エクサ
-            'Z' => 7, // ゼタ
-            'Y' => 8, // ヨタ
-        ];
-
         assert($unit > 0);
 
         $var = trim($var);
-        preg_match('#[' . implode('', array_keys($units)) . ']$#u', $var, $m);
-        return (numval)($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
+
+        foreach (SI_UNITS as $exp => $sis) {
+            foreach ($sis as $si) {
+                if (strpos($var, $si) === (strlen($var) - strlen($si))) {
+                    return (numval)($var) * pow($unit, $exp);
+                }
+            }
+        }
+
+        return (numval)($var);
     }
 
     /**

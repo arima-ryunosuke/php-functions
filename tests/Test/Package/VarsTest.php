@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use ryunosuke\Functions\Package\Vars;
 use stdClass;
 
 class VarsTest extends AbstractTestCase
@@ -177,26 +178,8 @@ class VarsTest extends AbstractTestCase
 
     function test_si_prefix()
     {
-        $units = [
-            -8 => 'y', // ヨクト
-            -7 => 'z', // ゼプト
-            -6 => 'a', // アト
-            -5 => 'f', // フェムト
-            -4 => 'p', // ピコ
-            -3 => 'n', // ナノ
-            -2 => 'µ', // マイクロ
-            -1 => 'm', // ミリ
-            0  => ' ', //
-            1  => 'k', // キロ
-            2  => 'M', // メガ
-            3  => 'G', // ギガ
-            4  => 'T', // テラ
-            5  => 'P', // ペタ
-            6  => 'E', // エクサ
-            7  => 'Z', // ゼタ
-            8  => 'Y', // ヨタ
-        ];
-        foreach ($units as $exp => $unit) {
+        foreach (Vars::SI_UNITS as $exp => $units) {
+            $unit = $units[0] ?? ' ';
             $plus = (si_prefix)(+pow(1000, $exp));
             $this->assertContains('1.000', $plus, "+pow(1000, $exp)");
             $this->assertStringEndsWith($unit, $plus, "+pow(1000, $exp)");
@@ -235,31 +218,14 @@ class VarsTest extends AbstractTestCase
 
     function test_si_unprefix()
     {
-        $units = [
-            -8 => 'y', // ヨクト
-            -7 => 'z', // ゼプト
-            -6 => 'a', // アト
-            -5 => 'f', // フェムト
-            -4 => 'p', // ピコ
-            -3 => 'n', // ナノ
-            -2 => 'µ', // マイクロ
-            -1 => 'm', // ミリ
-            0  => ' ', //
-            1  => 'k', // キロ
-            2  => 'M', // メガ
-            3  => 'G', // ギガ
-            4  => 'T', // テラ
-            5  => 'P', // ペタ
-            6  => 'E', // エクサ
-            7  => 'Z', // ゼタ
-            8  => 'Y', // ヨタ
-        ];
-        foreach ($units as $exp => $unit) {
-            $this->assertEquals(+pow(1000, $exp), (si_unprefix)("1$unit"), "+pow(1000, $exp)");
-            $this->assertEquals(-pow(1000, $exp), (si_unprefix)("-1$unit"), "-pow(1000, $exp)");
+        foreach (Vars::SI_UNITS as $exp => $units) {
+            foreach ($units as $unit) {
+                $this->assertEquals(+pow(1000, $exp), (si_unprefix)("1$unit"), "+pow(1000, $exp)");
+                $this->assertEquals(-pow(1000, $exp), (si_unprefix)("-1$unit"), "-pow(1000, $exp)");
 
-            $this->assertEquals(+pow(2, $exp * 10), (si_unprefix)("1$unit", 1024), "+pow(2, $exp * 10)");
-            $this->assertEquals(-pow(2, $exp * 10), (si_unprefix)("-1$unit", 1024), "-pow(2, $exp * 10)");
+                $this->assertEquals(+pow(2, $exp * 10), (si_unprefix)("1$unit", 1024), "+pow(2, $exp * 10)");
+                $this->assertEquals(-pow(2, $exp * 10), (si_unprefix)("-1$unit", 1024), "-pow(2, $exp * 10)");
+            }
         }
 
         $this->assertEquals(0, (si_unprefix)("0.0"));
