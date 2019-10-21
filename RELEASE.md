@@ -10,6 +10,18 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.1
+
+- [change][all] 対応バージョンを php7.2 に変更
+- [fixbug][Syntax] blank_if で 0.0 が空扱いになっていた不具合を修正
+- [feature][Vars] var_type に $valid_name 引数を追加
+- [feature][Vars] si接頭辞を定数に逃がしてマイクロ（u）に対応
+- [feature][Utility] process のリソース型対応
+- [change][Sql] sql_format を修正
+  - 特定条件においてコメントが吹き飛ぶ不具合を修正
+  - SELECT オプションは SELECT と同レベルに置く
+  - 関数コールではない数式のカッコはネストしないように変更
+
 ## 1.4.0
 
 - [*change] 使用頻度の低い関数を削除
