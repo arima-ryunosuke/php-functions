@@ -292,7 +292,8 @@ class Utility
     /**
      * proc_open ～ proc_close の一連の処理を行う
      *
-     * 標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。
+     * 標準入出力は文字列で受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。
+     * また、標準入出力はリソース型を渡すこともできる。
      *
      * Example:
      * ```php
@@ -315,9 +316,9 @@ class Utility
      *
      * @param string $command 実行コマンド。escapeshellcmd される
      * @param array|string $args コマンドライン引数。文字列はそのまま結合される。配列は escapeshellarg された上でキーと結合される
-     * @param string $stdin 標準入力
-     * @param string $stdout 標準出力（参照渡しで格納される）
-     * @param string $stderr 標準エラー（参照渡しで格納される）
+     * @param string|resource $stdin 標準入力（string を渡すと単純に読み取れられる。resource を渡すと fread される）
+     * @param string|resource $stdout 標準出力（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
+     * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param string $cwd 作業ディレクトリ
      * @param array $env 環境変数
      * @return int リターンコード
@@ -334,7 +335,7 @@ class Utility
         }
 
         $proc = proc_open("$ecommand $args", [
-            0 => ['pipe', 'r'],
+            0 => is_resource($stdin) ? $stdin : ['pipe', 'r'],
             1 => ['pipe', 'w'],
             2 => ['pipe', 'w'],
         ], $pipes, $cwd, $env);
@@ -344,38 +345,54 @@ class Utility
             throw new \RuntimeException("$command start failed."); // @codeCoverageIgnore
         }
 
-        fwrite($pipes[0], $stdin);
-        fclose($pipes[0]);
+        if (!is_resource($stdin)) {
+            fwrite($pipes[0], $stdin);
+            fclose($pipes[0]);
+        }
+        if (!is_resource($stdout)) {
+            $stdout = '';
+        }
+        if (!is_resource($stderr)) {
+            $stderr = '';
+        }
 
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
-
-        $stdout = $stderr = '';
-        while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
-            $read = [$pipes[1], $pipes[2]];
-            $write = $except = null;
-            if (stream_select($read, $write, $except, 1) === false) {
-                // （システムコールが別のシグナルによって中断された場合などに起こりえます）
-                // @codeCoverageIgnoreStart
-                fclose($pipes[1]);
-                fclose($pipes[2]);
-                proc_close($proc);
-                throw new \RuntimeException('stream_select failed.');
-                // @codeCoverageIgnoreEnd
-            }
-            foreach ($read as $fp) {
-                if ($fp === $pipes[1]) {
-                    $stdout .= fread($fp, 1024);
+        try {
+            while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
+                $read = [$pipes[1], $pipes[2]];
+                $write = $except = null;
+                if (stream_select($read, $write, $except, 1) === false) {
+                    // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                    throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
                 }
-                elseif ($fp === $pipes[2]) {
-                    $stderr .= fread($fp, 1024);
+                foreach ($read as $fp) {
+                    $buffer = fread($fp, 1024);
+                    if ($fp === $pipes[1]) {
+                        if (!is_resource($stdout)) {
+                            $stdout .= $buffer;
+                        }
+                        else {
+                            fwrite($stdout, $buffer);
+                        }
+                    }
+                    elseif ($fp === $pipes[2]) {
+                        if (!is_resource($stderr)) {
+                            $stderr .= $buffer;
+                        }
+                        else {
+                            fwrite($stderr, $buffer);
+                        }
+                    }
                 }
             }
         }
+        finally {
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $rc = proc_close($proc);
+        }
 
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $rc = proc_close($proc);
         if ($rc === -1) {
             // どうしたら失敗するのかわからない
             throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore

@@ -307,6 +307,12 @@ class UtilityTest extends AbstractTestCase
 
     function test_process()
     {
+        $str_resource = function ($string) {
+            $handle = tmpfile();
+            fwrite($handle, $string);
+            return $handle;
+        };
+
         $file = sys_get_temp_dir() . '/rf-process.php';
         $stdout = null;
         $stderr = null;
@@ -320,6 +326,29 @@ class UtilityTest extends AbstractTestCase
         $this->assertSame(123, $return);
         $this->assertSame('STDIN!', $stdout);
         $this->assertSame('STDERR!', $stderr);
+
+        file_put_contents($file, '<?php
+            while (!feof(STDIN)) {
+                $line = fgets(STDIN);
+                fwrite(STDOUT, "out:$line");
+                fwrite(STDERR, "err:$line");
+            }
+            exit(123);
+        ');
+
+        $stdin = $str_resource("a\nb\nc");
+        $stdout = $str_resource("firstout\n");
+        $stderr = $str_resource("firsterr\n");
+        rewind($stdin);
+        $return = (process)(PHP_BINARY, $file, $stdin, $stdout, $stderr);
+        rewind($stdout);
+        rewind($stderr);
+        $this->assertSame(123, $return);
+        $this->assertSame("firstout\nout:a\nout:b\nout:c", stream_get_contents($stdout));
+        $this->assertSame("firsterr\nerr:a\nerr:b\nerr:c", stream_get_contents($stderr));
+
+        $stdout = null;
+        $stderr = null;
 
         file_put_contents($file, '<?php
             $out = str_repeat("o", 100);
