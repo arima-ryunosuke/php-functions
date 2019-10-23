@@ -558,7 +558,7 @@ class Syntax
      * 言ってしまえば「falsy な値を null に変換する」とも言える。
      *
      * ここでいう falsy とは php 標準の `empty` ではなく本ライブラリの `is_empty` であることに留意（"0" は空ではない）。
-     * さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。
+     * さらに利便性のため 0, 0.0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。
      * 乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。
      *
      * - 「 `$var ?: 'default'` で十分なんだけど "0" が…」
@@ -642,8 +642,8 @@ class Syntax
             return $var;
         }
 
-        // 0, "0" は false
-        if ($var === 0 || $var === '0') {
+        // 0, 0.0, "0" は false
+        if ($var === 0 || $var === 0.0 || $var === '0') {
             return $var;
         }
 

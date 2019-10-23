@@ -374,9 +374,11 @@ PHP
         $this->assertSame('default', (blank_if)(null) ?? 'default');
         $this->assertSame('default', (blank_if)(false) ?? 'default');
         $this->assertSame('default', (blank_if)('') ?? 'default');
+        $this->assertSame('default', (blank_if)([]) ?? 'default');
         $this->assertSame('default', (blank_if)($countableF) ?? 'default');
         $this->assertSame('default', (blank_if)($stringableF) ?? 'default');
         $this->assertSame(0, (blank_if)(0) ?? 'default');
+        $this->assertSame(0.0, (blank_if)(0.0) ?? 'default');
         $this->assertSame('0', (blank_if)('0') ?? 'default');
         $this->assertSame('X', (blank_if)('X') ?? 'default');
         $this->assertSame($stdclass, (blank_if)($stdclass) ?? 'default');
@@ -386,9 +388,11 @@ PHP
         $this->assertSame('default', (blank_if)(null, 'default'));
         $this->assertSame('default', (blank_if)(false, 'default'));
         $this->assertSame('default', (blank_if)('', 'default'));
+        $this->assertSame('default', (blank_if)([], 'default'));
         $this->assertSame('default', (blank_if)($countableF, 'default'));
         $this->assertSame('default', (blank_if)($stringableF, 'default'));
         $this->assertSame(0, (blank_if)(0, 'default'));
+        $this->assertSame(0.0, (blank_if)(0.0, 'default'));
         $this->assertSame('0', (blank_if)('0', 'default'));
         $this->assertSame('X', (blank_if)('X', 'default'));
         $this->assertSame($stdclass, (blank_if)($stdclass, 'default'));
