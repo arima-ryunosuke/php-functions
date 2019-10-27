@@ -117,7 +117,7 @@ class Sql
             'indent'    => "  ",
             // 括弧の展開レベル
             'nestlevel' => 1,
-            // キーワードの大文字/小文字可変換（true だと大文字化。false だと小文字化。あるいは 'strtoupper' 等の文字列関数を直接指定する。クロージャでも良い）
+            // キーワードの大文字/小文字可変換（true だと大文字化。false だと小文字化。あるいは 'ucfirst' 等の文字列関数を直接指定する。クロージャでも良い）
             'case'      => null,
             // シンタックス装飾（true だと SAPI に基づいてよしなに。"html", "cli" だと SAPI を明示的に指定。クロージャだと直接コール）
             'highlight' => null,
@@ -225,13 +225,22 @@ class Sql
         }
 
         // コメント以外の前後のトークンを返すクロージャ
-        $seek = function ($start, $step) use ($tokens) {
+        $seek = function ($start, $step) use ($tokens, $MARK_SP, $MARK_BR) {
+            $comments = [];
             for ($n = 1; ; $n++) {
-                $token = $tokens[$start + $n * $step] ?? [null, null];
-                if ($token[0] !== T_COMMENT && $token[0] !== T_DOC_COMMENT) {
-                    return $token[1];
+                $index = $start + $n * $step;
+                if (!isset($tokens[$index])) {
+                    break;
+                }
+                $token = $tokens[$index];
+                if ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT) {
+                    $comments[] = $MARK_SP . trim($token[1]) . $MARK_BR;
+                }
+                else {
+                    return [$index, trim($token[1]), $comments];
                 }
             }
+            return [$start, '', $comments];
         };
 
         $interpret = function (&$index = -1) use (&$interpret, $MARK_R, $MARK_N, $MARK_BR, $MARK_NT, $MARK_SP, $MARK_PT, $tokens, $options, $seek) {
@@ -239,6 +248,7 @@ class Sql
             $context = '';    // SELECT, INSERT などの大分類
             $subcontext = ''; // SET, VALUES などのサブ分類
             $modifier = '';   // RIGHT などのキーワード修飾語
+            $firstcol = null; // SELECT における最初の列か
 
             $result = [];
             for ($token_length = count($tokens); $index < $token_length; $index++) {
@@ -260,11 +270,19 @@ class Sql
                     continue;
                 }
 
+                // SELECT の直後には DISTINCT などのオプションが来ることがあるので特別扱い
+                if ($context === 'SELECT' && $firstcol) {
+                    if (!in_array($uppertoken, ['DISTINCT', 'DISTINCTROW', 'STRAIGHT_JOIN'], true) && !preg_match('#^SQL_#i', $uppertoken)) {
+                        $firstcol = false;
+                        $result[] = $MARK_BR;
+                    }
+                }
+
                 switch ($uppertoken) {
                     default:
                         _DEFAULT:
-                        $prev = $seek($index, -1);
-                        $next = $seek($index, +1);
+                        $prev = $seek($index, -1)[1];
+                        $next = $seek($index, +1)[1];
 
                         // "tablename. columnname" になってしまう
                         // "@var" になってしまう
@@ -311,8 +329,8 @@ class Sql
                     case "TABLE":
                         // CREATE TABLE tablename は括弧があるので何もしなくて済むが、
                         // ALTER TABLE tablename は括弧がなく ADD などで始まるので特別分岐
-                        $name = $seek($index++, +1);
-                        $result[] = $MARK_SP . $virttoken . $MARK_SP . $name . $MARK_SP;
+                        list($index, $name, $comments) = $seek($index, +1);
+                        $result[] = $MARK_SP . $virttoken . $MARK_SP . implode('', $comments) . $name . $MARK_SP;
                         if ($context !== 'CREATE' && $context !== 'DROP') {
                             $result[] = $MARK_BR;
                         }
@@ -343,14 +361,15 @@ class Sql
                         if ($context === 'INSERT') {
                             $result[] = $MARK_BR;
                         }
-                        $result[] = $virttoken . $MARK_BR;
+                        $result[] = $virttoken;
                         $context = $uppertoken;
+                        $firstcol = true;
                         break;
                     case "LEFT":
                         /** @noinspection PhpMissingBreakStatementInspection */
                     case "RIGHT":
                         // 例えば LEFT や RIGHT は関数呼び出しの場合もあるので分岐後にフォールスルー
-                        if ($seek($index, +1) === '(') {
+                        if ($seek($index, +1)[1] === '(') {
                             goto _DEFAULT;
                         }
                     case "CROSS":
@@ -376,7 +395,7 @@ class Sql
                         break;
                     case "ON":
                         // ON は ON でも mysql の ON DUPLICATED かもしれない（pgsql の ON CONFLICT も似たようなコンテキスト）
-                        $name = $seek($index, +1);
+                        $name = $seek($index, +1)[1];
                         if (in_array(strtoupper($name), ['DUPLICATE', 'CONFLICT'], true)) {
                             $result[] = $MARK_BR;
                             $subcontext = '';
@@ -450,15 +469,16 @@ class Sql
                         }
                         else {
                             $brnt = $MARK_BR . $MARK_NT;
-                            if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)) === 'SELECT') {
+                            if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)[1]) === 'SELECT') {
                                 $brnt .= $MARK_NT;
                             }
                             $parts = str_replace($MARK_BR, $brnt, $parts) . $MARK_BR . $MARK_NT;
                         }
 
-                        // IN はネストとみなさない
+                        // IN や数式はネストとみなさない
+                        $prev = $seek($current, -1)[1];
                         $suffix = $MARK_PT;
-                        if (strtoupper($seek($current, -1)) === 'IN') {
+                        if (strtoupper($prev) === 'IN' || !preg_match('#^[a-z0-9_]+$#i', $prev)) {
                             $suffix = '';
                         }
                         if ($subcontext === 'WITH') {

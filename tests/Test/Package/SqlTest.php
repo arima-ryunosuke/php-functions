@@ -189,6 +189,15 @@ from
   t_table 
 lock in share mode
 ', 'select * from t_table lock in share mode');
+
+        // select option
+        $this->assertFormatSql('
+select distinct straight_join 
+  t.a,
+  t.b 
+from
+  table t
+', 'select distinct straight_join t.a, t.b from table t');
     }
 
     function test_sql_format_insert()
