@@ -4030,7 +4030,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 <p><code>is_empty($value) ? $value : null</code> とほぼ同じ。<br />
 言ってしまえば「falsy な値を null に変換する」とも言える。</p>
 <p>ここでいう falsy とは php 標準の <code>empty</code> ではなく本ライブラリの <code>is_empty</code> であることに留意（"0" は空ではない）。<br />
-さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。<br />
+さらに利便性のため 0, 0.0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。<br />
 乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。</p>
 <ul>
 <li>「 <code>$var ?: 'default'</code> で十分なんだけど "0" が…」</li>
@@ -4264,7 +4264,8 @@ assertNotSame($rand1, $rand3);
                                     ryunosuke\Functions\Package\Utility::process		</a>	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : int</small>
 		</h4>
 	<div class="description"><p>proc_open ～ proc_close の一連の処理を行う</p>
-<p>標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。</p>
+<p>標準入出力は文字列で受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。<br />
+また、標準入出力はリソース型を渡すこともできる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// サンプル実行用ファイルを用意
 $phpfile = sys_get_temp_dir() . '/rf-sample.php';
@@ -4448,7 +4449,11 @@ benchmark([
                                     ryunosuke\Functions\Package::Vars		</a>	</h4>
 	<div class="description"><p>変数関連のユーティリティ</p>
 </div>
-        	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SORT_STRICT">
+        	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SI_UNITS">
+                                    ryunosuke\Functions\Package\Vars::SI_UNITS		</a>	</h4>
+	<div class="description"><p>SI 接頭辞</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SORT_STRICT">
                                     ryunosuke\Functions\Package\Vars::SORT_STRICT		</a>	</h4>
 	<div class="description"><p>SORT_XXX 定数の厳密版</p>
 </div>
@@ -4722,11 +4727,13 @@ assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_type()">
-                                    ryunosuke\Functions\Package\Vars::var_type		</a>	<small>($var) : string</small>
+                                    ryunosuke\Functions\Package\Vars::var_type		</a>	<small>($var, $valid_name = false) : string</small>
 		</h4>
 	<div class="description"><p>値の型を取得する（gettype + get_class）</p>
 <p>プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。<br />
-ただし、オブジェクトの場合は先頭に '\' が必ず付く。</p>
+ただし、オブジェクトの場合は先頭に '\' が必ず付く。<br />
+また、 $valid_name を true にするとタイプヒントとして正当な名前を返す（integer -&gt; int, double -&gt; float など）。<br />
+互換性のためデフォルト false になっているが、将来的にこの引数は削除されるかデフォルト true に変更される。</p>
 <p>無名クラスの場合は extends, implements の優先順位でその名前を使う。<br />
 継承も実装もされていない場合は標準の get_class の結果を返す。</p>
 <p>Example:</p>

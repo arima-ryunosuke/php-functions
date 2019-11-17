@@ -5345,7 +5345,8 @@
  *
  * @see var_type
  * @property \ChainObject $var_type
- * @method   \ChainObject  var_type()
+ * @method   \ChainObject  var_type($valid_name = false)
+ * @method   \ChainObject  var_type1($var)
  *
  * @see varcmp
  * @method   \ChainObject  varcmp($b, $mode = null)

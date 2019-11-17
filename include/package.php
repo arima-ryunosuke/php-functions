@@ -665,6 +665,29 @@ if (!defined("ryunosuke\\Functions\\Package\\TOKEN_NAME")) {
     define("ryunosuke\\Functions\\Package\\TOKEN_NAME", 2);
 }
 
+if (!defined("ryunosuke\\Functions\\Package\\SI_UNITS")) {
+    /** SI 接頭辞 */
+    define("ryunosuke\\Functions\\Package\\SI_UNITS", [
+        -8 => ["y"],
+        -7 => ["z"],
+        -6 => ["a"],
+        -5 => ["f"],
+        -4 => ["p"],
+        -3 => ["n"],
+        -2 => ["u", "μ", "µ"],
+        -1 => ["m"],
+        0  => [],
+        1  => ["k", "K"],
+        2  => ["M"],
+        3  => ["G"],
+        4  => ["T"],
+        5  => ["P"],
+        6  => ["E"],
+        7  => ["Z"],
+        8  => ["Y"],
+    ]);
+}
+
 if (!defined("ryunosuke\\Functions\\Package\\SORT_STRICT")) {
     /** SORT_XXX 定数の厳密版 */
     define("ryunosuke\\Functions\\Package\\SORT_STRICT", 256);

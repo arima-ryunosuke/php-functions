@@ -590,7 +590,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 <p><code>is_empty($value) ? $value : null</code> とほぼ同じ。<br />
 言ってしまえば「falsy な値を null に変換する」とも言える。</p>
 <p>ここでいう falsy とは php 標準の <code>empty</code> ではなく本ライブラリの <code>is_empty</code> であることに留意（"0" は空ではない）。<br />
-さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。<br />
+さらに利便性のため 0, 0.0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。<br />
 乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。</p>
 <ul>
 <li>「 <code>$var ?: 'default'</code> で十分なんだけど "0" が…」</li>

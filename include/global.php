@@ -664,6 +664,29 @@ if (!defined("TOKEN_NAME")) {
     define("TOKEN_NAME", 2);
 }
 
+if (!defined("SI_UNITS")) {
+    /** SI 接頭辞 */
+    define("SI_UNITS", [
+        -8 => ["y"],
+        -7 => ["z"],
+        -6 => ["a"],
+        -5 => ["f"],
+        -4 => ["p"],
+        -3 => ["n"],
+        -2 => ["u", "μ", "µ"],
+        -1 => ["m"],
+        0  => [],
+        1  => ["k", "K"],
+        2  => ["M"],
+        3  => ["G"],
+        4  => ["T"],
+        5  => ["P"],
+        6  => ["E"],
+        7  => ["Z"],
+        8  => ["Y"],
+    ]);
+}
+
 if (!defined("SORT_STRICT")) {
     /** SORT_XXX 定数の厳密版 */
     define("SORT_STRICT", 256);
@@ -8639,7 +8662,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
             'indent'    => "  ",
             // 括弧の展開レベル
             'nestlevel' => 1,
-            // キーワードの大文字/小文字可変換（true だと大文字化。false だと小文字化。あるいは 'strtoupper' 等の文字列関数を直接指定する。クロージャでも良い）
+            // キーワードの大文字/小文字可変換（true だと大文字化。false だと小文字化。あるいは 'ucfirst' 等の文字列関数を直接指定する。クロージャでも良い）
             'case'      => null,
             // シンタックス装飾（true だと SAPI に基づいてよしなに。"html", "cli" だと SAPI を明示的に指定。クロージャだと直接コール）
             'highlight' => null,
@@ -8747,13 +8770,22 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
         }
 
         // コメント以外の前後のトークンを返すクロージャ
-        $seek = function ($start, $step) use ($tokens) {
+        $seek = function ($start, $step) use ($tokens, $MARK_SP, $MARK_BR) {
+            $comments = [];
             for ($n = 1; ; $n++) {
-                $token = $tokens[$start + $n * $step] ?? [null, null];
-                if ($token[0] !== T_COMMENT && $token[0] !== T_DOC_COMMENT) {
-                    return $token[1];
+                $index = $start + $n * $step;
+                if (!isset($tokens[$index])) {
+                    break;
+                }
+                $token = $tokens[$index];
+                if ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT) {
+                    $comments[] = $MARK_SP . trim($token[1]) . $MARK_BR;
+                }
+                else {
+                    return [$index, trim($token[1]), $comments];
                 }
             }
+            return [$start, '', $comments];
         };
 
         $interpret = function (&$index = -1) use (&$interpret, $MARK_R, $MARK_N, $MARK_BR, $MARK_NT, $MARK_SP, $MARK_PT, $tokens, $options, $seek) {
@@ -8761,6 +8793,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
             $context = '';    // SELECT, INSERT などの大分類
             $subcontext = ''; // SET, VALUES などのサブ分類
             $modifier = '';   // RIGHT などのキーワード修飾語
+            $firstcol = null; // SELECT における最初の列か
 
             $result = [];
             for ($token_length = count($tokens); $index < $token_length; $index++) {
@@ -8782,11 +8815,19 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                     continue;
                 }
 
+                // SELECT の直後には DISTINCT などのオプションが来ることがあるので特別扱い
+                if ($context === 'SELECT' && $firstcol) {
+                    if (!in_array($uppertoken, ['DISTINCT', 'DISTINCTROW', 'STRAIGHT_JOIN'], true) && !preg_match('#^SQL_#i', $uppertoken)) {
+                        $firstcol = false;
+                        $result[] = $MARK_BR;
+                    }
+                }
+
                 switch ($uppertoken) {
                     default:
                         _DEFAULT:
-                        $prev = $seek($index, -1);
-                        $next = $seek($index, +1);
+                        $prev = $seek($index, -1)[1];
+                        $next = $seek($index, +1)[1];
 
                         // "tablename. columnname" になってしまう
                         // "@var" になってしまう
@@ -8833,8 +8874,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                     case "TABLE":
                         // CREATE TABLE tablename は括弧があるので何もしなくて済むが、
                         // ALTER TABLE tablename は括弧がなく ADD などで始まるので特別分岐
-                        $name = $seek($index++, +1);
-                        $result[] = $MARK_SP . $virttoken . $MARK_SP . $name . $MARK_SP;
+                        list($index, $name, $comments) = $seek($index, +1);
+                        $result[] = $MARK_SP . $virttoken . $MARK_SP . implode('', $comments) . $name . $MARK_SP;
                         if ($context !== 'CREATE' && $context !== 'DROP') {
                             $result[] = $MARK_BR;
                         }
@@ -8865,14 +8906,15 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         if ($context === 'INSERT') {
                             $result[] = $MARK_BR;
                         }
-                        $result[] = $virttoken . $MARK_BR;
+                        $result[] = $virttoken;
                         $context = $uppertoken;
+                        $firstcol = true;
                         break;
                     case "LEFT":
                         /** @noinspection PhpMissingBreakStatementInspection */
                     case "RIGHT":
                         // 例えば LEFT や RIGHT は関数呼び出しの場合もあるので分岐後にフォールスルー
-                        if ($seek($index, +1) === '(') {
+                        if ($seek($index, +1)[1] === '(') {
                             goto _DEFAULT;
                         }
                     case "CROSS":
@@ -8898,7 +8940,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         break;
                     case "ON":
                         // ON は ON でも mysql の ON DUPLICATED かもしれない（pgsql の ON CONFLICT も似たようなコンテキスト）
-                        $name = $seek($index, +1);
+                        $name = $seek($index, +1)[1];
                         if (in_array(strtoupper($name), ['DUPLICATE', 'CONFLICT'], true)) {
                             $result[] = $MARK_BR;
                             $subcontext = '';
@@ -8972,15 +9014,16 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         }
                         else {
                             $brnt = $MARK_BR . $MARK_NT;
-                            if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)) === 'SELECT') {
+                            if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)[1]) === 'SELECT') {
                                 $brnt .= $MARK_NT;
                             }
                             $parts = str_replace($MARK_BR, $brnt, $parts) . $MARK_BR . $MARK_NT;
                         }
 
-                        // IN はネストとみなさない
+                        // IN や数式はネストとみなさない
+                        $prev = $seek($current, -1)[1];
                         $suffix = $MARK_PT;
-                        if (strtoupper($seek($current, -1)) === 'IN') {
+                        if (strtoupper($prev) === 'IN' || !preg_match('#^[a-z0-9_]+$#i', $prev)) {
                             $suffix = '';
                         }
                         if ($subcontext === 'WITH') {
@@ -12779,7 +12822,7 @@ if (!isset($excluded_functions["blank_if"]) && (!function_exists("blank_if") || 
      * 言ってしまえば「falsy な値を null に変換する」とも言える。
      *
      * ここでいう falsy とは php 標準の `empty` ではなく本ライブラリの `is_empty` であることに留意（"0" は空ではない）。
-     * さらに利便性のため 0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。
+     * さらに利便性のため 0, 0.0 も空ではない判定をする（strpos や array_search などで「0 は意味のある値」という事が多いので）。
      * 乱暴に言えば「仮に文字列化したとき、情報量がゼロ」が falsy になる。
      *
      * - 「 `$var ?: 'default'` で十分なんだけど "0" が…」
@@ -12863,8 +12906,8 @@ if (!isset($excluded_functions["blank_if"]) && (!function_exists("blank_if") || 
             return $var;
         }
 
-        // 0, "0" は false
-        if ($var === 0 || $var === '0') {
+        // 0, 0.0, "0" は false
+        if ($var === 0 || $var === 0.0 || $var === '0') {
             return $var;
         }
 
@@ -13368,17 +13411,7 @@ if (!isset($excluded_functions["is_ansi"]) && (!function_exists("is_ansi") || (!
                 || 'xterm' === getenv('TERM');
         }
 
-        if (\function_exists('stream_isatty')) {
-            return @stream_isatty($stream); // @codeCoverageIgnore
-        }
-
-        if (\function_exists('posix_isatty')) {
-            return @posix_isatty($stream); // @codeCoverageIgnore
-        }
-
-        $stat = @fstat($stream);
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+        return @stream_isatty($stream);
     }
 }
 if (function_exists("is_ansi") && !defined("is_ansi")) {
@@ -13459,7 +13492,8 @@ if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!
     /**
      * proc_open ～ proc_close の一連の処理を行う
      *
-     * 標準入出力は受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。
+     * 標準入出力は文字列で受け渡しできるが、決め打ち実装なのでいわゆる対話型なプロセスは起動できない。
+     * また、標準入出力はリソース型を渡すこともできる。
      *
      * Example:
      * ```php
@@ -13482,9 +13516,9 @@ if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!
      *
      * @param string $command 実行コマンド。escapeshellcmd される
      * @param array|string $args コマンドライン引数。文字列はそのまま結合される。配列は escapeshellarg された上でキーと結合される
-     * @param string $stdin 標準入力
-     * @param string $stdout 標準出力（参照渡しで格納される）
-     * @param string $stderr 標準エラー（参照渡しで格納される）
+     * @param string|resource $stdin 標準入力（string を渡すと単純に読み取れられる。resource を渡すと fread される）
+     * @param string|resource $stdout 標準出力（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
+     * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param string $cwd 作業ディレクトリ
      * @param array $env 環境変数
      * @return int リターンコード
@@ -13501,7 +13535,7 @@ if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!
         }
 
         $proc = proc_open("$ecommand $args", [
-            0 => ['pipe', 'r'],
+            0 => is_resource($stdin) ? $stdin : ['pipe', 'r'],
             1 => ['pipe', 'w'],
             2 => ['pipe', 'w'],
         ], $pipes, $cwd, $env);
@@ -13511,38 +13545,54 @@ if (!isset($excluded_functions["process"]) && (!function_exists("process") || (!
             throw new \RuntimeException("$command start failed."); // @codeCoverageIgnore
         }
 
-        fwrite($pipes[0], $stdin);
-        fclose($pipes[0]);
+        if (!is_resource($stdin)) {
+            fwrite($pipes[0], $stdin);
+            fclose($pipes[0]);
+        }
+        if (!is_resource($stdout)) {
+            $stdout = '';
+        }
+        if (!is_resource($stderr)) {
+            $stderr = '';
+        }
 
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
-
-        $stdout = $stderr = '';
-        while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
-            $read = [$pipes[1], $pipes[2]];
-            $write = $except = null;
-            if (stream_select($read, $write, $except, 1) === false) {
-                // （システムコールが別のシグナルによって中断された場合などに起こりえます）
-                // @codeCoverageIgnoreStart
-                fclose($pipes[1]);
-                fclose($pipes[2]);
-                proc_close($proc);
-                throw new \RuntimeException('stream_select failed.');
-                // @codeCoverageIgnoreEnd
-            }
-            foreach ($read as $fp) {
-                if ($fp === $pipes[1]) {
-                    $stdout .= fread($fp, 1024);
+        try {
+            while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
+                $read = [$pipes[1], $pipes[2]];
+                $write = $except = null;
+                if (stream_select($read, $write, $except, 1) === false) {
+                    // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                    throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
                 }
-                elseif ($fp === $pipes[2]) {
-                    $stderr .= fread($fp, 1024);
+                foreach ($read as $fp) {
+                    $buffer = fread($fp, 1024);
+                    if ($fp === $pipes[1]) {
+                        if (!is_resource($stdout)) {
+                            $stdout .= $buffer;
+                        }
+                        else {
+                            fwrite($stdout, $buffer);
+                        }
+                    }
+                    elseif ($fp === $pipes[2]) {
+                        if (!is_resource($stderr)) {
+                            $stderr .= $buffer;
+                        }
+                        else {
+                            fwrite($stderr, $buffer);
+                        }
+                    }
                 }
             }
         }
+        finally {
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $rc = proc_close($proc);
+        }
 
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $rc = proc_close($proc);
         if ($rc === -1) {
             // どうしたら失敗するのかわからない
             throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
@@ -14515,26 +14565,6 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") |
      */
     function si_prefix($var, $unit = 1000, $format = '%.3f %s')
     {
-        static $units = [
-            -8 => 'y', // ヨクト
-            -7 => 'z', // ゼプト
-            -6 => 'a', // アト
-            -5 => 'f', // フェムト
-            -4 => 'p', // ピコ
-            -3 => 'n', // ナノ
-            -2 => 'µ', // マイクロ
-            -1 => 'm', // ミリ
-            0  => '',  //
-            1  => 'k', // キロ
-            2  => 'M', // メガ
-            3  => 'G', // ギガ
-            4  => 'T', // テラ
-            5  => 'P', // ペタ
-            6  => 'E', // エクサ
-            7  => 'Z', // ゼタ
-            8  => 'Y', // ヨタ
-        ];
-
         assert($unit > 0);
 
         $result = function ($format, $var, $unit) {
@@ -14564,10 +14594,10 @@ if (!isset($excluded_functions["si_prefix"]) && (!function_exists("si_prefix") |
                 $var /= $unit;
             }
         }
-        if (!isset($units[$n])) {
+        if (!isset(SI_UNITS[$n])) {
             throw new \InvalidArgumentException("$original is too large or small ($n).");
         }
-        return $result($format, ($original > 0 ? 1 : -1) * $var, $units[$n]);
+        return $result($format, ($original > 0 ? 1 : -1) * $var, SI_UNITS[$n][0] ?? '');
     }
 }
 if (function_exists("si_prefix") && !defined("si_prefix")) {
@@ -14601,32 +14631,19 @@ if (!isset($excluded_functions["si_unprefix"]) && (!function_exists("si_unprefix
      */
     function si_unprefix($var, $unit = 1000)
     {
-        static $units = [
-            'y' => -8, // ヨクト
-            'z' => -7, // ゼプト
-            'a' => -6, // アト
-            'f' => -5, // フェムト
-            'p' => -4, // ピコ
-            'n' => -3, // ナノ
-            'µ' => -2, // マイクロ
-            'm' => -1, // ミリ
-            ''  => 0, //
-            'k' => 1, // キロ
-            'K' => 1, // キロ（特別扱い）
-            'M' => 2, // メガ
-            'G' => 3, // ギガ
-            'T' => 4, // テラ
-            'P' => 5, // ペタ
-            'E' => 6, // エクサ
-            'Z' => 7, // ゼタ
-            'Y' => 8, // ヨタ
-        ];
-
         assert($unit > 0);
 
         $var = trim($var);
-        preg_match('#[' . implode('', array_keys($units)) . ']$#u', $var, $m);
-        return numval($var) * pow($unit, $units[$m[0] ?? ''] ?? 0);
+
+        foreach (SI_UNITS as $exp => $sis) {
+            foreach ($sis as $si) {
+                if (strpos($var, $si) === (strlen($var) - strlen($si))) {
+                    return numval($var) * pow($unit, $exp);
+                }
+            }
+        }
+
+        return numval($var);
     }
 }
 if (function_exists("si_unprefix") && !defined("si_unprefix")) {
@@ -14959,6 +14976,8 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || 
      *
      * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
      * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
+     * また、 $valid_name を true にするとタイプヒントとして正当な名前を返す（integer -> int, double -> float など）。
+     * 互換性のためデフォルト false になっているが、将来的にこの引数は削除されるかデフォルト true に変更される。
      *
      * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
      * 継承も実装もされていない場合は標準の get_class の結果を返す。
@@ -14981,9 +15000,10 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || 
      * ```
      *
      * @param mixed $var 型を取得する値
+     * @param bool $valid_name タイプヒントとして有効な名前を返すか
      * @return string 型名
      */
-    function var_type($var)
+    function var_type($var, $valid_name = false)
     {
         if (is_object($var)) {
             $ref = new \ReflectionObject($var);
@@ -14997,7 +15017,22 @@ if (!isset($excluded_functions["var_type"]) && (!function_exists("var_type") || 
             }
             return '\\' . get_class($var);
         }
-        return gettype($var);
+        $type = gettype($var);
+        if (!$valid_name) {
+            return $type;
+        }
+        switch ($type) {
+            default:
+                return $type;
+            case 'NULL':
+                return 'null';
+            case 'boolean':
+                return 'bool';
+            case 'integer':
+                return 'int';
+            case 'double':
+                return 'float';
+        }
     }
 }
 if (function_exists("var_type") && !defined("var_type")) {
@@ -15383,20 +15418,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                 case is_null($value):
                     return $colorAdapter('null', 'bold');
                 case is_object($value):
-                    if (function_exists('spl_object_id')) {
-                        $id = spl_object_id($value); // @codeCoverageIgnore
-                    }
-                    // backport: spl_object_id
-                    else {
-                        // 桁がでかすぎて視認性が悪いので現在の hash をオフセットとして減算する
-                        // 場合によっては負数が出るが許容する（少なくとも同じオブジェクトなら同じ id になるはず。嫌なら php 7.2 を使えば良い）
-                        static $offset = null;
-                        if ($offset === null) {
-                            $offset = intval(substr(spl_object_hash($value), 1, 15), 16);
-                        }
-                        $id = intval(substr(spl_object_hash($value), 1, 15), 16) - $offset + 1;
-                    }
-                    return $colorAdapter(get_class($value), 'green') . "#$id";
+                    return $colorAdapter(get_class($value), 'green') . "#" . spl_object_id($value);
                 case is_bool($value):
                     return $colorAdapter(var_export($value, true), 'bold');
                 case is_int($value) || is_float($value) || is_string($value):
