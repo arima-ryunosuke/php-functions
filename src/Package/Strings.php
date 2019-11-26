@@ -184,41 +184,23 @@ class Strings
         }
         $limit = max(1, $limit);
 
-        if (is_string($enclosures)) {
-            $chars = str_split($enclosures);
-            $enclosures = array_combine($chars, $chars);
-        }
-
         $delimiters = (arrayize)($delimiter);
-        $starts = implode('', array_keys($enclosures));
-        $ends = implode('', $enclosures);
-        $enclosing = [];
         $current = 0;
         $result = [];
         for ($i = 0, $l = strlen($string); $i < $l; $i++) {
-            if ($i !== 0 && $string[$i - 1] === $escape) {
-                continue;
+            if (count($result) === $limit - 1) {
+                break;
             }
-            if (strpos($ends, $string[$i]) !== false) {
-                if ($enclosing && $enclosures[$enclosing[count($enclosing) - 1]] === $string[$i]) {
-                    array_pop($enclosing);
-                    continue;
-                }
+            $i = (strpos_quoted)($string, $delimiters, $i, $enclosures, $escape);
+            if ($i === false) {
+                break;
             }
-            if (strpos($starts, $string[$i]) !== false) {
-                $enclosing[] = $string[$i];
-                continue;
-            }
-            if (empty($enclosing)) {
-                foreach ($delimiters as $delimiter) {
-                    $delimiterlen = strlen($delimiter);
-                    if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
-                        $result[] = substr($string, $current, $i - $current);
-                        $current = $i + $delimiterlen;
-                        break;
-                    }
-                }
-                if (count($result) === $limit - 1) {
+            foreach ($delimiters as $delimiter) {
+                $delimiterlen = strlen($delimiter);
+                if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
+                    $result[] = substr($string, $current, $i - $current);
+                    $current = $i + $delimiterlen;
+                    $i += $delimiterlen - 1;
                     break;
                 }
             }
@@ -309,6 +291,74 @@ class Strings
             }
         }
         return $result;
+    }
+
+    /**
+     * クオートを考慮して strpos する
+     *
+     * Example:
+     * ```php
+     * // クオート中は除外される
+     * assertSame(strpos_quoted('hello "this" is world', 'is'), 13);
+     * // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
+     * assertSame(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
+     * ```
+     *
+     * @param string $haystack 対象文字列
+     * @param string|iterable $needle 位置を取得したい文字列
+     * @param int $offset 開始位置
+     * @param string|array $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
+     * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+     * @return false|int $needle の位置
+     */
+    public static function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\')
+    {
+        if (is_string($enclosure) || is_null($enclosure)) {
+            if (strlen($enclosure)) {
+                $chars = str_split($enclosure);
+                $enclosure = array_combine($chars, $chars);
+            }
+            else {
+                $enclosure = [];
+            }
+        }
+        $needles = (arrayval)($needle);
+
+        $strlen = strlen($haystack);
+
+        if ($offset < 0) {
+            $offset += $strlen;
+        }
+
+        $enclosing = [];
+        for ($i = $offset; $i < $strlen; $i++) {
+            if ($i !== 0 && $haystack[$i - 1] === $escape) {
+                continue;
+            }
+            foreach ($enclosure as $start => $end) {
+                if (substr_compare($haystack, $end, $i, strlen($end)) === 0) {
+                    if ($enclosing && $enclosing[count($enclosing) - 1] === $end) {
+                        array_pop($enclosing);
+                        $i += strlen($end) - 1;
+                        continue 2;
+                    }
+                }
+                if (substr_compare($haystack, $start, $i, strlen($start)) === 0) {
+                    $enclosing[] = $end;
+                    $i += strlen($start) - 1;
+                    continue 2;
+                }
+            }
+
+            if (empty($enclosing)) {
+                foreach ($needles as $needle) {
+                    if (substr_compare($haystack, $needle, $i, strlen($needle)) === 0) {
+                        return $i;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -772,51 +822,31 @@ class Strings
         // 長いキーから処理するためソートしておく
         $replacemap = (arrayval)($replacemap, false);
         uksort($replacemap, function ($a, $b) { return strlen($b) - strlen($a); });
+        $srcs = array_keys($replacemap);
 
-        if (is_string($enclosure)) {
-            $chars = str_split($enclosure);
-            $enclosure = array_combine($chars, $chars);
-        }
-
-        $enclosing = [];
         $counter = array_fill_keys(array_keys($replacemap), 0);
         for ($i = 0; $i < strlen($string); $i++) {
-            if ($i !== 0 && $string[$i - 1] === $escape) {
-                continue;
-            }
-            foreach ($enclosure as $start => $end) {
-                if (substr_compare($string, $end, $i, strlen($end)) === 0) {
-                    if ($enclosing && $enclosing[count($enclosing) - 1] === $end) {
-                        array_pop($enclosing);
-                        $i += strlen($end) - 1;
-                        continue 2;
-                    }
-                }
-                if (substr_compare($string, $start, $i, strlen($start)) === 0) {
-                    $enclosing[] = $end;
-                    $i += strlen($start) - 1;
-                    continue 2;
-                }
+            $i = (strpos_quoted)($string, $srcs, $i, $enclosure, $escape);
+            if ($i === false) {
+                break;
             }
 
-            if (empty($enclosing)) {
-                foreach ($replacemap as $src => $dst) {
-                    $srclen = strlen($src);
-                    if ($srclen === 0) {
-                        throw new \InvalidArgumentException("src length is 0.");
-                    }
-                    if (substr_compare($string, $src, $i, $srclen) === 0) {
-                        if (is_array($dst)) {
-                            $n = $counter[$src]++;
-                            if (!isset($dst[$n])) {
-                                throw new \InvalidArgumentException("notfound search string '$src' of {$n}th.");
-                            }
-                            $dst = $dst[$n];
+            foreach ($replacemap as $src => $dst) {
+                $srclen = strlen($src);
+                if ($srclen === 0) {
+                    throw new \InvalidArgumentException("src length is 0.");
+                }
+                if (substr_compare($string, $src, $i, $srclen) === 0) {
+                    if (is_array($dst)) {
+                        $n = $counter[$src]++;
+                        if (!isset($dst[$n])) {
+                            throw new \InvalidArgumentException("notfound search string '$src' of {$n}th.");
                         }
-                        $string = substr_replace($string, $dst, $i, $srclen);
-                        $i += strlen($dst) - 1;
-                        break;
+                        $dst = $dst[$n];
                     }
+                    $string = substr_replace($string, $dst, $i, $srclen);
+                    $i += strlen($dst) - 1;
+                    break;
                 }
             }
         }
@@ -860,25 +890,16 @@ class Strings
         $fromlen = strlen($from);
         $tolen = strlen($to);
         $position = intval($position);
-        $enclosing = null;
         $nesting = 0;
         $start = null;
         for ($i = $position; $i < $strlen; $i++) {
-            if ($i !== 0 && $string[$i - 1] === $escape) {
-                continue;
-            }
-            if (strpos($enclosure, $string[$i]) !== false) {
-                if ($enclosing === null) {
-                    $enclosing = $string[$i];
-                }
-                elseif ($enclosing === $string[$i]) {
-                    $enclosing = null;
-                }
-                continue;
+            $i = (strpos_quoted)($string, [$from, $to], $i, $enclosure, $escape);
+            if ($i === false) {
+                break;
             }
 
             // 開始文字と終了文字が重複している可能性があるので $to からチェックする
-            if ($enclosing === null && substr_compare($string, $to, $i, $tolen) === 0) {
+            if (substr_compare($string, $to, $i, $tolen) === 0) {
                 if (--$nesting === 0) {
                     $position = $i + $tolen;
                     return substr($string, $start, $i - $start);
@@ -888,7 +909,7 @@ class Strings
                     $nesting = 0;
                 }
             }
-            if ($enclosing === null && substr_compare($string, $from, $i, $fromlen) === 0) {
+            if (substr_compare($string, $from, $i, $fromlen) === 0) {
                 if ($nesting++ === 0) {
                     $start = $i + $fromlen;
                 }

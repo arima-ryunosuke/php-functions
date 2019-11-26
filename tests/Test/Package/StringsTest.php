@@ -75,6 +75,9 @@ class StringsTest extends AbstractTestCase
 
     function test_quoteexplode()
     {
+        $this->assertEquals(['', '', '', 'a', '', '', 'z', '', '', ''], (quoteexplode)(',', ',,,a,,,z,,,'));
+        $this->assertEquals(['', 'A', '', 'A', ''], (quoteexplode)('zzz', 'zzzAzzzzzzAzzz'));
+
         $this->assertEquals([
             'a,"x,y",["y", "z"],c\\,d,\'e,f\'',
         ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 1, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
@@ -198,6 +201,28 @@ class StringsTest extends AbstractTestCase
             0 => 11,
             2 => 19,
         ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 10));
+    }
+
+    function test_strpos_quoted()
+    {
+        $this->assertSame(false, (strpos_quoted)("this is a 'special word' that special word", ['notfound']));
+        $this->assertSame(30, (strpos_quoted)('this is a "special word" that special word', 'special'));
+        $this->assertSame(38, (strpos_quoted)("this is a 'special word' that special word", 'word'));
+        $this->assertSame(20, (strpos_quoted)("this is a \\'special word' that special word", 'word'));
+
+        $this->assertSame(30, (strpos_quoted)('this is a "special word" that special word', 'special', 30));
+        $this->assertSame(false, (strpos_quoted)('this is a "special word" that special word', 'special', 31));
+
+        $this->assertSame(38, (strpos_quoted)('this is a "special word" that special word', 'word', -4));
+        $this->assertSame(false, (strpos_quoted)('this is a "special word" that special word', 'word', -3));
+
+        $this->assertSame(30, (strpos_quoted)("this is a 'special word' that special word", ['word', 'special']));
+        $this->assertSame(false, (strpos_quoted)("this is a 'special word' that special word", ['hoge', 'hoga']));
+
+        $this->assertSame((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
+        $this->assertSame((strpos_quoted)('1:hoge, 2:\\*hoge*, 3:hoge', 'hoge', 5, '*'), 12);
+
+        $this->assertSame((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '', ''), 11);
     }
 
     function test_str_anyof()
