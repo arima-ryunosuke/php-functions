@@ -178,6 +178,28 @@ class StringsTest extends AbstractTestCase
         $this->assertSame('あ＿＿い＿＿', (strrstr)('あ＿＿い＿＿う', '＿＿', false));
     }
 
+    function test_strpos_array()
+    {
+        $this->assertSame([], (strpos_array)('hogera', []));
+        $this->assertSame([
+            0    => 11,
+            'is' => 2,
+            2    => 19,
+        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word']));
+
+        $this->assertSame([], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], -4));
+        $this->assertSame([
+            2 => 19,
+        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], -5));
+        $this->assertSame([
+            2 => 19,
+        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 12));
+        $this->assertSame([
+            0 => 11,
+            2 => 19,
+        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 10));
+    }
+
     function test_str_anyof()
     {
         $this->assertSame((str_anyof)('a', ['a', 'b', 'c']), 0);

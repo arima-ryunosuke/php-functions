@@ -272,6 +272,46 @@ class Strings
     }
 
     /**
+     * 複数の文字列で strpos する
+     *
+     * $needles のそれぞれの位置を配列で返す。
+     * ただし、見つからなかった文字は結果に含まれない。
+     *
+     * Example:
+     * ```php
+     * // 見つかった位置を返す
+     * assertSame(strpos_array('hello world', ['hello', 'world']), [
+     *     0 => 0,
+     *     1 => 6,
+     * ]);
+     * // 見つからない文字は含まれない
+     * assertSame(strpos_array('hello world', ['notfound', 'world']), [
+     *     1 => 6,
+     * ]);
+     * ```
+     *
+     * @param string $haystack 対象文字列
+     * @param iterable $needles 位置を取得したい文字列配列
+     * @param int $offset 開始位置
+     * @return array $needles それぞれの位置配列
+     */
+    public static function strpos_array($haystack, $needles, $offset = 0)
+    {
+        if ($offset < 0) {
+            $offset += strlen($haystack);
+        }
+
+        $result = [];
+        foreach ((arrayval)($needles) as $key => $needle) {
+            $pos = strpos($haystack, $needle, $offset);
+            if ($pos !== false) {
+                $result[$key] = $pos;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * 文字列が候補の中にあるか調べる
      *
      * 候補配列の中に対象文字列があるならそのキーを返す。ないなら null を返す。
