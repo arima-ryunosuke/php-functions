@@ -389,9 +389,9 @@ assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので�
                         arrayable_key_exists                        	<small>($key, $arrayable) : bool</small>
 						</h4>
 					<div class="inner-item">
-						<div class="description"><p>配列・Arrayable にキーがあるか調べる</p>
+						<div class="description"><p>配列・ArrayAccess にキーがあるか調べる</p>
 <p>配列が与えられた場合は array_key_exists と同じ。<br />
-Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。</p>
+ArrayAccess は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = [
     'k' =&gt; 'v',

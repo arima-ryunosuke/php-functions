@@ -1028,6 +1028,68 @@ assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group
 ]);
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_aggregate()">
+                                    ryunosuke\Functions\Package\Arrays::array_aggregate		</a>	<small>($array, $columns, $key = null) : array</small>
+		</h4>
+	<div class="description"><p>配列をコールバックの返り値で集計する</p>
+<p>$columns で集計列を指定する。<br />
+単一の callable を渡すと結果も単一になる。<br />
+複数の callable 連想配列を渡すと [キー =&gt; 集系列] の連想配列になる。<br />
+いずれにせよ引数としてそのグループの配列が渡ってくるので返り値がその列の値になる。<br />
+第2引数には「今までの結果が詰まった配列」が渡ってくる（count, avg, sum など何度もでてくる集計で便利）。</p>
+<p>$key で集約列を指定する。<br />
+指定しなければ引数の配列そのままで集計される。<br />
+複数要素の配列を与えるとその数分潜って集計される。<br />
+クロージャを与えると返り値がキーになる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 単純な配列の集計
+assertSame(array_aggregate([1, 2, 3], [
+    'min' =&gt; function($elems) {return min($elems);},
+    'max' =&gt; function($elems) {return max($elems);},
+    'avg' =&gt; function($elems) {return array_sum($elems) / count($elems);},
+]), [
+    'min' =&gt; 1, // 最小値
+    'max' =&gt; 3, // 最大値
+    'avg' =&gt; 2, // 平均値
+]);
+
+$row1 = ['user_id' =&gt; 'hoge', 'group' =&gt; 'A', 'score' =&gt; 4];
+$row2 = ['user_id' =&gt; 'fuga', 'group' =&gt; 'B', 'score' =&gt; 6];
+$row3 = ['user_id' =&gt; 'fuga', 'group' =&gt; 'A', 'score' =&gt; 5];
+$row4 = ['user_id' =&gt; 'hoge', 'group' =&gt; 'A', 'score' =&gt; 8];
+
+// user_id, group ごとの score を集計して階層配列で返す（第2引数 $current を利用している）
+assertSame(array_aggregate([$row1, $row2, $row3, $row4], [
+    'scores' =&gt; function($rows) {return array_column($rows, 'score');},
+    'score'  =&gt; function($rows, $current) {return array_sum($current['scores']);},
+], ['user_id', 'group']), [
+    'hoge' =&gt; [
+        'A' =&gt; [
+            'scores' =&gt; [4, 8],
+            'score'  =&gt; 12,
+        ],
+    ],
+    'fuga' =&gt; [
+        'B' =&gt; [
+            'scores' =&gt; [6],
+            'score'  =&gt; 6,
+        ],
+        'A' =&gt; [
+            'scores' =&gt; [5],
+            'score'  =&gt; 5,
+        ],
+    ],
+]);
+
+// user_id ごとの score を集計して単一列で返す（キーのクロージャも利用している）
+assertSame(array_aggregate([$row1, $row2, $row3, $row4],
+    function($rows) {return array_sum(array_column($rows, 'score'));},
+    function($row) {return strtoupper($row['user_id']);}), [
+    'HOGE' =&gt; 12,
+    'FUGA' =&gt; 11,
+]);
+</code></pre>
+</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_all()">
                                     ryunosuke\Functions\Package\Arrays::array_all		</a>	<small>($array, $callback = null, $default = true) : bool</small>
 		</h4>
@@ -1480,15 +1542,15 @@ assertSame(array_difference([
 </div>
     	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PUBLIC">
                                     ryunosuke\Functions\Package\Classobj::IS_PUBLIC		</a>	</h4>
-	<div class="description"><p>public を表す定数 @see \ReflectionMethod::IS_PUBLIC</p>
+	<div class="description"><p>public を表す定数 @see \ReflectionProperty::IS_PUBLIC</p>
 </div>
     	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PROTECTED">
                                     ryunosuke\Functions\Package\Classobj::IS_PROTECTED		</a>	</h4>
-	<div class="description"><p>protected を表す定数 @see \ReflectionMethod::IS_PROTECTED</p>
+	<div class="description"><p>protected を表す定数 @see \ReflectionProperty::IS_PROTECTED</p>
 </div>
     	<h4 class="fqsen-title">classconstant		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PRIVATE">
                                     ryunosuke\Functions\Package\Classobj::IS_PRIVATE		</a>	</h4>
-	<div class="description"><p>private を表す定数 @see \ReflectionMethod::IS_PRIVATE</p>
+	<div class="description"><p>private を表す定数 @see \ReflectionProperty::IS_PRIVATE</p>
 </div>
             	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()">
                                     ryunosuke\Functions\Package\Classobj::stdclass		</a>	<small>($fields = []) : <a href="http://php.net/manual/ja/class.stdclass.php" class="fqsen" target="_blank">\stdClass</a></small>
@@ -1969,7 +2031,7 @@ rm_rf($dirname);
 mkdir($dirname);
 
 // この時点では現在日時（単純に自身の更新日時）
-assertSame(dirmtime($dirname), time());
+assertThat(time() - dirmtime($dirname), logicalOr(equalTo(0), equalTo(1)));
 // ファイルを作って更新するとその時刻
 touch("$dirname/tmp", time() + 10);
 assertSame(dirmtime($dirname), time() + 10);
@@ -2859,6 +2921,35 @@ assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":", false), 'path/to/1:path
 assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strpos_array()">
+                                    ryunosuke\Functions\Package\Strings::strpos_array		</a>	<small>($haystack, $needles, $offset = 0) : array</small>
+		</h4>
+	<div class="description"><p>複数の文字列で strpos する</p>
+<p>$needles のそれぞれの位置を配列で返す。<br />
+ただし、見つからなかった文字は結果に含まれない。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 見つかった位置を返す
+assertSame(strpos_array('hello world', ['hello', 'world']), [
+    0 =&gt; 0,
+    1 =&gt; 6,
+]);
+// 見つからない文字は含まれない
+assertSame(strpos_array('hello world', ['notfound', 'world']), [
+    1 =&gt; 6,
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strpos_quoted()">
+                                    ryunosuke\Functions\Package\Strings::strpos_quoted		</a>	<small>($haystack, $needle, $offset = 0, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : false<span class="type-separator"></span><wbr>int</small>
+		</h4>
+	<div class="description"><p>クオートを考慮して strpos する</p>
+<p>Example:</p>
+<pre><code class="language-php">// クオート中は除外される
+assertSame(strpos_quoted('hello "this" is world', 'is'), 13);
+// 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
+assertSame(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
+</code></pre>
+</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_anyof()">
                                     ryunosuke\Functions\Package\Strings::str_anyof		</a>	<small>($needle, $haystack, $case_insensitivity = false) : bool</small>
 		</h4>
@@ -3064,6 +3155,84 @@ assertSame(str_ellipsis('1234567890', 8, '...'), '12...890');
 assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
 // 8文字に丸める（$pos=-1 なので後ろから1文字目から省略される）
 assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_diff()">
+                                    ryunosuke\Functions\Package\Strings::str_diff		</a>	<small>($xstring, $ystring, $options = []) : string<span class="type-separator"></span><wbr>array</small>
+		</h4>
+	<div class="description"><p>テキストの diff を得る</p>
+<p><code>$options['iignore-case'] = true</code> で大文字小文字を無視する。<br />
+<code>$options['ignore-space-change'] = true</code> 空白文字の数を無視する。<br />
+<code>$options['ignore-all-space'] = true</code> ですべての空白文字を無視する<br />
+<code>$options['stringify']</code> で差分データを文字列化するクロージャを指定する。</p>
+<ul>
+<li>normal: 標準形式（diff のオプションなしに相当する）</li>
+<li>context: コンテキスト形式（context=3 のような形式で diff の -C 3 に相当する）</li>
+<li>unified: ユニファイド形式（unified=3 のような形式で diff の -U 3 に相当する）<ul>
+<li>unified のみを指定するとヘッダを含まない +- のみの差分を出す</li>
+</ul>
+</li>
+<li>html: ins, del の html タグ形式<ul>
+<li>html=perline とすると行レベルでの差分も出す</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// 前文字列
+$old = 'same
+delete
+same
+same
+change
+';
+// 後文字列
+$new = 'same
+same
+append
+same
+this is changed line
+';
+// シンプルな差分テキストを返す
+assertSame(str_diff($old, $new), ' same
+-delete
+ same
++append
+ same
+-change
++this is changed line
+');
+// html で差分を返す
+assertSame(str_diff($old, $new, ['stringify' =&gt; 'html']), 'same
+&lt;del&gt;delete&lt;/del&gt;
+same
+&lt;ins&gt;append&lt;/ins&gt;
+same
+&lt;del&gt;change&lt;/del&gt;
+&lt;ins&gt;this is changed line&lt;/ins&gt;
+');
+// 行レベルの html で差分を返す
+assertSame(str_diff($old, $new, ['stringify' =&gt; 'html=perline']), 'same
+&lt;del&gt;delete&lt;/del&gt;
+same
+&lt;ins&gt;append&lt;/ins&gt;
+same
+&lt;ins&gt;this is &lt;/ins&gt;chang&lt;ins&gt;ed lin&lt;/ins&gt;e
+');
+// raw な配列で差分を返す
+assertSame(str_diff($old, $new, ['stringify' =&gt; null]), [
+    // 等価行（'=' という記号と前後それぞれの文字列を返す（キーは行番号））
+    ['=', [0 =&gt; 'same'], [0 =&gt; 'same']],
+    // 削除行（'-' という記号と前の文字列を返す（キーは行番号）、後は int で行番号のみ）
+    ['-', [1 =&gt; 'delete'], 0],
+    // 等価行
+    ['=', [2 =&gt; 'same'], [1 =&gt; 'same']],
+    // 追加行（'+' という記号と後の文字列を返す（キーは行番号）、前は int で行番号のみ）
+    ['+', 2, [2 =&gt; 'append']],
+    // 等価行
+    ['=', [3 =&gt; 'same'], [3 =&gt; 'same']],
+    // 変更行（'*' という記号と前後それぞれの文字列を返す（キーは行番号））
+    ['*', [4 =&gt; 'change'], [4 =&gt; 'this is changed line']],
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::starts_with()">
@@ -3877,6 +4046,13 @@ $part = parse_php($phpcode, [
 assertSame(implode('', array_column($part, 1)), "class Example\n{");
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::highlight_php()">
+                                    ryunosuke\Functions\Package\Syntax::highlight_php		</a>	<small>($phpcode, $options = []) : string</small>
+		</h4>
+	<div class="description"><p>php のコードをハイライトする</p>
+<p>SAPI に応じて自動でハイライトする（html タグだったり ASCII color だったり）。<br />
+highlight_string の CLI 対応版とも言える。</p>
+</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()">
                                     ryunosuke\Functions\Package\Syntax::optional		</a>	<small>($object, $expected = null) : mixed</small>
 		</h4>
@@ -3901,7 +4077,7 @@ assertSame(strval(optional($getobject())), '');
 // __invoke は null を返す
 assertSame(call_user_func(optional($getobject())), null);
 // 配列アクセスは null を返す
-assertSame($getobject()['hoge'], null);
+assertSame(optional($getobject())['hoge'], null);
 // 空イテレータを返す
 assertSame(iterator_to_array(optional($getobject())), []);
 
@@ -4235,6 +4411,132 @@ $rand3 = cache('rand', $provider);
 assertNotSame($rand1, $rand3);
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::parse_namespace()">
+                                    ryunosuke\Functions\Package\Utility::parse_namespace		</a>	<small>($filename) : array</small>
+		</h4>
+	<div class="description"><p>php ファイルをパースして名前空間配列を返す</p>
+<p>ファイル内で use/use const/use function していたり、シンボルを定義していたりする箇所を検出して名前空間単位で返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// このような php ファイルをパースすると・・・
+file_set_contents(sys_get_temp_dir() . '/namespace.php', '
+&lt;?php
+namespace NS1;
+use ArrayObject as AO;
+use function strlen as SL;
+function InnerFunc(){}
+class InnerClass{}
+
+namespace NS2;
+use RuntimeException as RE;
+use const COUNT_RECURSIVE as CR;
+class InnerClass{}
+const InnerConst = 123;
+');
+// このような名前空間配列が得られる
+assertSame(parse_namespace(sys_get_temp_dir() . '/namespace.php'), [
+    'NS1' =&gt; [
+        'const'    =&gt; [],
+        'function' =&gt; [
+            'SL'        =&gt; 'strlen',
+            'InnerFunc' =&gt; 'NS1\\InnerFunc',
+        ],
+        'alias'    =&gt; [
+            'AO'         =&gt; 'ArrayObject',
+            'InnerClass' =&gt; 'NS1\\InnerClass',
+        ],
+    ],
+    'NS2' =&gt; [
+        'const'    =&gt; [
+            'CR'         =&gt; 'COUNT_RECURSIVE',
+            'InnerConst' =&gt; 'NS2\\InnerConst',
+        ],
+        'function' =&gt; [],
+        'alias'    =&gt; [
+            'RE'         =&gt; 'RuntimeException',
+            'InnerClass' =&gt; 'NS2\\InnerClass',
+        ],
+    ],
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::resolve_symbol()">
+                                    ryunosuke\Functions\Package\Utility::resolve_symbol		</a>	<small>($shortname, $nsfiles, $targets = [&quot;const&quot;, &quot;function&quot;, &quot;alias&quot;]) : string<span class="type-separator"></span><wbr>null</small>
+		</h4>
+	<div class="description"><p>エイリアス名を完全修飾名に解決する</p>
+<p>例えばあるファイルのある名前空間で <code>use Hoge\Fuga\Piyo;</code> してるときの <code>Piyo</code> を <code>Hoge\Fuga\Piyo</code> に解決する。</p>
+<p>Example:</p>
+<pre><code class="language-php">// このような php ファイルがあるとして・・・
+file_set_contents(sys_get_temp_dir() . '/symbol.php', '
+&lt;?php
+namespace vendor\NS;
+
+use ArrayObject as AO;
+use function strlen as SL;
+
+function InnerFunc(){}
+class InnerClass{}
+');
+// 下記のように解決される
+assertSame(resolve_symbol('AO', sys_get_temp_dir() . '/symbol.php'), 'ArrayObject');
+assertSame(resolve_symbol('SL', sys_get_temp_dir() . '/symbol.php'), 'strlen');
+assertSame(resolve_symbol('InnerFunc', sys_get_temp_dir() . '/symbol.php'), 'vendor\\NS\\InnerFunc');
+assertSame(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'), 'vendor\\NS\\InnerClass');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::parse_annotation()">
+                                    ryunosuke\Functions\Package\Utility::parse_annotation		</a>	<small>($annotation, $schema = [], $nsfiles = []) : array</small>
+		</h4>
+	<div class="description"><p>アノテーションっぽい文字列をそれっぽくパースして返す</p>
+<p>$annotation にはリフレクションオブジェクトも渡せる。<br />
+その場合、getDocComment や getFilename, getNamespaceName などを用いてある程度よしなに名前解決する。<br />
+もっとも、@Class(args) 形式を使わないのであれば特に意味はない。</p>
+<p>$schame で「どのように取得するか？」のスキーマ定義が渡せる。<br />
+ただし、現実装では「そのまま文字列で返すか？」の bool 値とクロージャしか渡すことはできない。</p>
+<p>アノテーションの仕様は下記（すべて $schema が false であるとする）。</p>
+<ul>
+<li>@から行末まで（1行に複数のアノテーションは含められない）</li>
+<li>同じアノテーションを複数見つけたときは配列化される</li>
+<li><code>@hogera</code>: 値なしは null を返す</li>
+<li><code>@hogera v1 "v2 v3"</code>: ["v1", "v2 v3"] という配列として返す</li>
+<li><code>@hogera {key: 123}</code>: ["key" =&gt; 123] という（連想）配列として返す</li>
+<li><code>@hogera [123, 456]</code>: [123, 456] という連番配列として返す</li>
+<li><code>@hogera ("2019/12/23")</code>: hogera で解決できるクラス名で new して返す（$filename 引数の指定が必要）</li>
+<li>下3つの形式はアノテーション区切りのスペースはあってもなくても良い</li>
+</ul>
+<p>あくまで簡易実装であり、本格的に何かをしたいなら専用のパッケージを導入したほうが良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">$annotations = parse_annotation('
+冒頭の - に意味はない
+- @noval
+- @single this is value
+- @closure this is value
+- @array this is value
+- @hash {key: 123}
+- @list [1, 2, 3]
+- @ArrayObject([1, 2, 3])
+- @same this is same value1
+- @same this is same value2
+- @same this is same value3
+', [
+    'single'  =&gt; true,
+    'closure' =&gt; function ($value) { return explode(' ', strtoupper($value)); },
+]);
+assertEquals($annotations, [
+    'noval'       =&gt; null,                        // 値なしは null になる
+    'single'      =&gt; 'this is value',             // $schema 指定してるので文字列になる
+    'closure'     =&gt; ['THIS', 'IS', 'VALUE'],     // $schema 指定してそれがクロージャだとコールバックされる
+    'array'       =&gt; ['this', 'is', 'value'],     // $schema 指定していないので配列になる
+    'hash'        =&gt; ['key' =&gt; '123'],            // 連想配列になる
+    'list'        =&gt; [1, 2, 3],                   // 連番配列になる
+    'ArrayObject' =&gt; new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
+    'same'        =&gt; [                            // 複数あるのでそれぞれの配列になる
+        ['this', 'is', 'same', 'value1'],
+        ['this', 'is', 'same', 'value2'],
+        ['this', 'is', 'same', 'value3'],
+    ],
+]);
+</code></pre>
+</div>
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::is_ansi()">
                                     ryunosuke\Functions\Package\Utility::is_ansi		</a>	<small>($stream) : bool</small>
 		</h4>
@@ -4524,9 +4826,9 @@ assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので�
     	<h4 class="fqsen-title">method		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::arrayable_key_exists()">
                                     ryunosuke\Functions\Package\Vars::arrayable_key_exists		</a>	<small>($key, $arrayable) : bool</small>
 		</h4>
-	<div class="description"><p>配列・Arrayable にキーがあるか調べる</p>
+	<div class="description"><p>配列・ArrayAccess にキーがあるか調べる</p>
 <p>配列が与えられた場合は array_key_exists と同じ。<br />
-Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。</p>
+ArrayAccess は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = [
     'k' =&gt; 'v',

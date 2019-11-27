@@ -10,17 +10,17 @@ if (!defined("IS_OWNSELF")) {
 }
 
 if (!defined("IS_PUBLIC")) {
-    /** public を表す定数 @see \ReflectionMethod::IS_PUBLIC */
+    /** public を表す定数 @see \ReflectionProperty::IS_PUBLIC */
     define("IS_PUBLIC", 256);
 }
 
 if (!defined("IS_PROTECTED")) {
-    /** protected を表す定数 @see \ReflectionMethod::IS_PROTECTED */
+    /** protected を表す定数 @see \ReflectionProperty::IS_PROTECTED */
     define("IS_PROTECTED", 512);
 }
 
 if (!defined("IS_PRIVATE")) {
-    /** private を表す定数 @see \ReflectionMethod::IS_PRIVATE */
+    /** private を表す定数 @see \ReflectionProperty::IS_PRIVATE */
     define("IS_PRIVATE", 1024);
 }
 
@@ -156,7 +156,7 @@ if (!defined("KEYWORDS")) {
         94  => "GLOBAL",
         95  => "GRANT",
         96  => "GRANTS",
-        97  => "GROUP BY",
+        97  => "GROUP",
         98  => "GROUP_CONCAT",
         99  => "HAVING",
         100 => "HEAP",
@@ -236,421 +236,422 @@ if (!defined("KEYWORDS")) {
         174 => "OPTION",
         175 => "OPTIONALLY",
         176 => "OR",
-        177 => "ORDER BY",
-        178 => "OUTER",
-        179 => "OUTFILE",
-        180 => "PACK_KEYS",
-        181 => "PAGE",
-        182 => "PARTIAL",
-        183 => "PARTITION",
-        184 => "PARTITIONS",
-        185 => "PASSWORD",
-        186 => "PRIMARY",
-        187 => "PRIVILEGES",
-        188 => "PROCEDURE",
-        189 => "PROCESS",
-        190 => "PROCESSLIST",
-        191 => "PURGE",
-        192 => "QUICK",
-        193 => "RAID0",
-        194 => "RAID_CHUNKS",
-        195 => "RAID_CHUNKSIZE",
-        196 => "RAID_TYPE",
-        197 => "RANGE",
-        198 => "READ",
-        199 => "READ_ONLY",
-        200 => "READ_WRITE",
-        201 => "REFERENCES",
-        202 => "REGEXP",
-        203 => "RELOAD",
-        204 => "RENAME",
-        205 => "REPAIR",
-        206 => "REPEATABLE",
-        207 => "REPLACE",
-        208 => "REPLICATION",
-        209 => "RESET",
-        210 => "RESTORE",
-        211 => "RESTRICT",
-        212 => "RETURN",
-        213 => "RETURNS",
-        214 => "REVOKE",
-        215 => "RIGHT",
-        216 => "RLIKE",
-        217 => "ROLLBACK",
-        218 => "ROW",
-        219 => "ROWS",
-        220 => "ROW_FORMAT",
-        221 => "SECOND",
-        222 => "SECURITY",
-        223 => "SELECT",
-        224 => "SEPARATOR",
-        225 => "SERIALIZABLE",
-        226 => "SESSION",
-        227 => "SET",
-        228 => "SHARE",
-        229 => "SHOW",
-        230 => "SHUTDOWN",
-        231 => "SLAVE",
-        232 => "SONAME",
-        233 => "SOUNDS",
-        234 => "SQL",
-        235 => "SQL_AUTO_IS_NULL",
-        236 => "SQL_BIG_RESULT",
-        237 => "SQL_BIG_SELECTS",
-        238 => "SQL_BIG_TABLES",
-        239 => "SQL_BUFFER_RESULT",
-        240 => "SQL_CACHE",
-        241 => "SQL_CALC_FOUND_ROWS",
-        242 => "SQL_LOG_BIN",
-        243 => "SQL_LOG_OFF",
-        244 => "SQL_LOG_UPDATE",
-        245 => "SQL_LOW_PRIORITY_UPDATES",
-        246 => "SQL_MAX_JOIN_SIZE",
-        247 => "SQL_NO_CACHE",
-        248 => "SQL_QUOTE_SHOW_CREATE",
-        249 => "SQL_SAFE_UPDATES",
-        250 => "SQL_SELECT_LIMIT",
-        251 => "SQL_SLAVE_SKIP_COUNTER",
-        252 => "SQL_SMALL_RESULT",
-        253 => "SQL_WARNINGS",
-        254 => "START",
-        255 => "STARTING",
-        256 => "STATUS",
-        257 => "STOP",
-        258 => "STORAGE",
-        259 => "STRAIGHT_JOIN",
-        260 => "STRING",
-        261 => "STRIPED",
-        262 => "SUPER",
-        263 => "TABLE",
-        264 => "TABLES",
-        265 => "TEMPORARY",
-        266 => "TERMINATED",
-        267 => "THEN",
-        268 => "TO",
-        269 => "TRAILING",
-        270 => "TRANSACTIONAL",
-        271 => "TRUE",
-        272 => "TRUNCATE",
-        273 => "TYPE",
-        274 => "TYPES",
-        275 => "UNCOMMITTED",
-        276 => "UNION",
-        277 => "UNION ALL",
-        278 => "UNIQUE",
-        279 => "UNLOCK",
-        280 => "UNSIGNED",
-        281 => "UPDATE",
-        282 => "USAGE",
-        283 => "USE",
-        284 => "USING",
-        285 => "VALUES",
-        286 => "VARIABLES",
-        287 => "VIEW",
-        288 => "WHEN",
-        289 => "WHERE",
-        290 => "WITH",
-        291 => "WORK",
-        292 => "WRITE",
-        293 => "XOR",
-        294 => "YEAR_MONTH",
-        295 => "ABS",
-        296 => "ACOS",
-        297 => "ADDDATE",
-        298 => "ADDTIME",
-        299 => "AES_DECRYPT",
-        300 => "AES_ENCRYPT",
-        301 => "AREA",
-        302 => "ASBINARY",
-        303 => "ASCII",
-        304 => "ASIN",
-        305 => "ASTEXT",
-        306 => "ATAN",
-        307 => "ATAN2",
-        308 => "AVG",
-        309 => "BDMPOLYFROMTEXT",
-        310 => "BDMPOLYFROMWKB",
-        311 => "BDPOLYFROMTEXT",
-        312 => "BDPOLYFROMWKB",
-        313 => "BENCHMARK",
-        314 => "BIN",
-        315 => "BIT_AND",
-        316 => "BIT_COUNT",
-        317 => "BIT_LENGTH",
-        318 => "BIT_OR",
-        319 => "BIT_XOR",
-        320 => "BOUNDARY",
-        321 => "BUFFER",
-        322 => "CAST",
-        323 => "CEIL",
-        324 => "CEILING",
-        325 => "CENTROID",
-        326 => "CHAR",
-        327 => "CHARACTER_LENGTH",
-        328 => "CHARSET",
-        329 => "CHAR_LENGTH",
-        330 => "COALESCE",
-        331 => "COERCIBILITY",
-        332 => "COLLATION",
-        333 => "COMPRESS",
-        334 => "CONCAT",
-        335 => "CONCAT_WS",
-        336 => "CONNECTION_ID",
-        337 => "CONTAINS",
-        338 => "CONV",
-        339 => "CONVERT",
-        340 => "CONVERT_TZ",
-        341 => "CONVEXHULL",
-        342 => "COS",
-        343 => "COT",
-        344 => "COUNT",
-        345 => "CRC32",
-        346 => "CROSSES",
-        347 => "CURDATE",
-        348 => "CURRENT_DATE",
-        349 => "CURRENT_TIME",
-        350 => "CURRENT_TIMESTAMP",
-        351 => "CURRENT_USER",
-        352 => "CURTIME",
-        353 => "DATABASE",
-        354 => "DATE",
-        355 => "DATEDIFF",
-        356 => "DATE_ADD",
-        357 => "DATE_DIFF",
-        358 => "DATE_FORMAT",
-        359 => "DATE_SUB",
-        360 => "DAY",
-        361 => "DAYNAME",
-        362 => "DAYOFMONTH",
-        363 => "DAYOFWEEK",
-        364 => "DAYOFYEAR",
-        365 => "DECODE",
-        366 => "DEFAULT",
-        367 => "DEGREES",
-        368 => "DES_DECRYPT",
-        369 => "DES_ENCRYPT",
-        370 => "DIFFERENCE",
-        371 => "DIMENSION",
-        372 => "DISJOINT",
-        373 => "DISTANCE",
-        374 => "ELT",
-        375 => "ENCODE",
-        376 => "ENCRYPT",
-        377 => "ENDPOINT",
-        378 => "ENVELOPE",
-        379 => "EQUALS",
-        380 => "EXP",
-        381 => "EXPORT_SET",
-        382 => "EXTERIORRING",
-        383 => "EXTRACT",
-        384 => "EXTRACTVALUE",
-        385 => "FIELD",
-        386 => "FIND_IN_SET",
-        387 => "FLOOR",
-        388 => "FORMAT",
-        389 => "FOUND_ROWS",
-        390 => "FROM_DAYS",
-        391 => "FROM_UNIXTIME",
-        392 => "GEOMCOLLFROMTEXT",
-        393 => "GEOMCOLLFROMWKB",
-        394 => "GEOMETRYCOLLECTION",
-        395 => "GEOMETRYCOLLECTIONFROMTEXT",
-        396 => "GEOMETRYCOLLECTIONFROMWKB",
-        397 => "GEOMETRYFROMTEXT",
-        398 => "GEOMETRYFROMWKB",
-        399 => "GEOMETRYN",
-        400 => "GEOMETRYTYPE",
-        401 => "GEOMFROMTEXT",
-        402 => "GEOMFROMWKB",
-        403 => "GET_FORMAT",
-        404 => "GET_LOCK",
-        405 => "GLENGTH",
-        406 => "GREATEST",
-        407 => "GROUP_CONCAT",
-        408 => "GROUP_UNIQUE_USERS",
-        409 => "HEX",
-        410 => "HOUR",
-        411 => "IF",
-        412 => "IFNULL",
-        413 => "INET_ATON",
-        414 => "INET_NTOA",
-        415 => "INSERT",
-        416 => "INSTR",
-        417 => "INTERIORRINGN",
-        418 => "INTERSECTION",
-        419 => "INTERSECTS",
-        420 => "INTERVAL",
-        421 => "ISCLOSED",
-        422 => "ISEMPTY",
-        423 => "ISNULL",
-        424 => "ISRING",
-        425 => "ISSIMPLE",
-        426 => "IS_FREE_LOCK",
-        427 => "IS_USED_LOCK",
-        428 => "LAST_DAY",
-        429 => "LAST_INSERT_ID",
-        430 => "LCASE",
-        431 => "LEAST",
-        432 => "LEFT",
-        433 => "LENGTH",
-        434 => "LINEFROMTEXT",
-        435 => "LINEFROMWKB",
-        436 => "LINESTRING",
-        437 => "LINESTRINGFROMTEXT",
-        438 => "LINESTRINGFROMWKB",
-        439 => "LN",
-        440 => "LOAD_FILE",
-        441 => "LOCALTIME",
-        442 => "LOCALTIMESTAMP",
-        443 => "LOCATE",
-        444 => "LOG",
-        445 => "LOG10",
-        446 => "LOG2",
-        447 => "LOWER",
-        448 => "LPAD",
-        449 => "LTRIM",
-        450 => "MAKEDATE",
-        451 => "MAKETIME",
-        452 => "MAKE_SET",
-        453 => "MASTER_POS_WAIT",
-        454 => "MAX",
-        455 => "MBRCONTAINS",
-        456 => "MBRDISJOINT",
-        457 => "MBREQUAL",
-        458 => "MBRINTERSECTS",
-        459 => "MBROVERLAPS",
-        460 => "MBRTOUCHES",
-        461 => "MBRWITHIN",
-        462 => "MD5",
-        463 => "MICROSECOND",
-        464 => "MID",
-        465 => "MIN",
-        466 => "MINUTE",
-        467 => "MLINEFROMTEXT",
-        468 => "MLINEFROMWKB",
-        469 => "MOD",
-        470 => "MONTH",
-        471 => "MONTHNAME",
-        472 => "MPOINTFROMTEXT",
-        473 => "MPOINTFROMWKB",
-        474 => "MPOLYFROMTEXT",
-        475 => "MPOLYFROMWKB",
-        476 => "MULTILINESTRING",
-        477 => "MULTILINESTRINGFROMTEXT",
-        478 => "MULTILINESTRINGFROMWKB",
-        479 => "MULTIPOINT",
-        480 => "MULTIPOINTFROMTEXT",
-        481 => "MULTIPOINTFROMWKB",
-        482 => "MULTIPOLYGON",
-        483 => "MULTIPOLYGONFROMTEXT",
-        484 => "MULTIPOLYGONFROMWKB",
-        485 => "NAME_CONST",
-        486 => "NULLIF",
-        487 => "NUMGEOMETRIES",
-        488 => "NUMINTERIORRINGS",
-        489 => "NUMPOINTS",
-        490 => "OCT",
-        491 => "OCTET_LENGTH",
-        492 => "OLD_PASSWORD",
-        493 => "ORD",
-        494 => "OVERLAPS",
-        495 => "PASSWORD",
-        496 => "PERIOD_ADD",
-        497 => "PERIOD_DIFF",
-        498 => "PI",
-        499 => "POINT",
-        500 => "POINTFROMTEXT",
-        501 => "POINTFROMWKB",
-        502 => "POINTN",
-        503 => "POINTONSURFACE",
-        504 => "POLYFROMTEXT",
-        505 => "POLYFROMWKB",
-        506 => "POLYGON",
-        507 => "POLYGONFROMTEXT",
-        508 => "POLYGONFROMWKB",
-        509 => "POSITION",
-        510 => "POW",
-        511 => "POWER",
-        512 => "QUARTER",
-        513 => "QUOTE",
-        514 => "RADIANS",
-        515 => "RAND",
-        516 => "RELATED",
-        517 => "RELEASE_LOCK",
-        518 => "REPEAT",
-        519 => "REPLACE",
-        520 => "REVERSE",
-        521 => "RIGHT",
-        522 => "ROUND",
-        523 => "ROW_COUNT",
-        524 => "RPAD",
-        525 => "RTRIM",
-        526 => "SCHEMA",
-        527 => "SECOND",
-        528 => "SEC_TO_TIME",
-        529 => "SESSION_USER",
-        530 => "SHA",
-        531 => "SHA1",
-        532 => "SIGN",
-        533 => "SIN",
-        534 => "SLEEP",
-        535 => "SOUNDEX",
-        536 => "SPACE",
-        537 => "SQRT",
-        538 => "SRID",
-        539 => "STARTPOINT",
-        540 => "STD",
-        541 => "STDDEV",
-        542 => "STDDEV_POP",
-        543 => "STDDEV_SAMP",
-        544 => "STRCMP",
-        545 => "STR_TO_DATE",
-        546 => "SUBDATE",
-        547 => "SUBSTR",
-        548 => "SUBSTRING",
-        549 => "SUBSTRING_INDEX",
-        550 => "SUBTIME",
-        551 => "SUM",
-        552 => "SYMDIFFERENCE",
-        553 => "SYSDATE",
-        554 => "SYSTEM_USER",
-        555 => "TAN",
-        556 => "TIME",
-        557 => "TIMEDIFF",
-        558 => "TIMESTAMP",
-        559 => "TIMESTAMPADD",
-        560 => "TIMESTAMPDIFF",
-        561 => "TIME_FORMAT",
-        562 => "TIME_TO_SEC",
-        563 => "TOUCHES",
-        564 => "TO_DAYS",
-        565 => "TRIM",
-        566 => "TRUNCATE",
-        567 => "UCASE",
-        568 => "UNCOMPRESS",
-        569 => "UNCOMPRESSED_LENGTH",
-        570 => "UNHEX",
-        571 => "UNIQUE_USERS",
-        572 => "UNIX_TIMESTAMP",
-        573 => "UPDATEXML",
-        574 => "UPPER",
-        575 => "USER",
-        576 => "UTC_DATE",
-        577 => "UTC_TIME",
-        578 => "UTC_TIMESTAMP",
-        579 => "UUID",
-        580 => "VARIANCE",
-        581 => "VAR_POP",
-        582 => "VAR_SAMP",
-        583 => "VERSION",
-        584 => "WEEK",
-        585 => "WEEKDAY",
-        586 => "WEEKOFYEAR",
-        587 => "WITHIN",
-        588 => "X",
-        589 => "Y",
-        590 => "YEAR",
-        591 => "YEARWEEK",
+        177 => "ORDER",
+        178 => "BY",
+        179 => "OUTER",
+        180 => "OUTFILE",
+        181 => "PACK_KEYS",
+        182 => "PAGE",
+        183 => "PARTIAL",
+        184 => "PARTITION",
+        185 => "PARTITIONS",
+        186 => "PASSWORD",
+        187 => "PRIMARY",
+        188 => "PRIVILEGES",
+        189 => "PROCEDURE",
+        190 => "PROCESS",
+        191 => "PROCESSLIST",
+        192 => "PURGE",
+        193 => "QUICK",
+        194 => "RAID0",
+        195 => "RAID_CHUNKS",
+        196 => "RAID_CHUNKSIZE",
+        197 => "RAID_TYPE",
+        198 => "RANGE",
+        199 => "READ",
+        200 => "READ_ONLY",
+        201 => "READ_WRITE",
+        202 => "REFERENCES",
+        203 => "REGEXP",
+        204 => "RELOAD",
+        205 => "RENAME",
+        206 => "REPAIR",
+        207 => "REPEATABLE",
+        208 => "REPLACE",
+        209 => "REPLICATION",
+        210 => "RESET",
+        211 => "RESTORE",
+        212 => "RESTRICT",
+        213 => "RETURN",
+        214 => "RETURNS",
+        215 => "REVOKE",
+        216 => "RIGHT",
+        217 => "RLIKE",
+        218 => "ROLLBACK",
+        219 => "ROW",
+        220 => "ROWS",
+        221 => "ROW_FORMAT",
+        222 => "SECOND",
+        223 => "SECURITY",
+        224 => "SELECT",
+        225 => "SEPARATOR",
+        226 => "SERIALIZABLE",
+        227 => "SESSION",
+        228 => "SET",
+        229 => "SHARE",
+        230 => "SHOW",
+        231 => "SHUTDOWN",
+        232 => "SLAVE",
+        233 => "SONAME",
+        234 => "SOUNDS",
+        235 => "SQL",
+        236 => "SQL_AUTO_IS_NULL",
+        237 => "SQL_BIG_RESULT",
+        238 => "SQL_BIG_SELECTS",
+        239 => "SQL_BIG_TABLES",
+        240 => "SQL_BUFFER_RESULT",
+        241 => "SQL_CACHE",
+        242 => "SQL_CALC_FOUND_ROWS",
+        243 => "SQL_LOG_BIN",
+        244 => "SQL_LOG_OFF",
+        245 => "SQL_LOG_UPDATE",
+        246 => "SQL_LOW_PRIORITY_UPDATES",
+        247 => "SQL_MAX_JOIN_SIZE",
+        248 => "SQL_NO_CACHE",
+        249 => "SQL_QUOTE_SHOW_CREATE",
+        250 => "SQL_SAFE_UPDATES",
+        251 => "SQL_SELECT_LIMIT",
+        252 => "SQL_SLAVE_SKIP_COUNTER",
+        253 => "SQL_SMALL_RESULT",
+        254 => "SQL_WARNINGS",
+        255 => "START",
+        256 => "STARTING",
+        257 => "STATUS",
+        258 => "STOP",
+        259 => "STORAGE",
+        260 => "STRAIGHT_JOIN",
+        261 => "STRING",
+        262 => "STRIPED",
+        263 => "SUPER",
+        264 => "TABLE",
+        265 => "TABLES",
+        266 => "TEMPORARY",
+        267 => "TERMINATED",
+        268 => "THEN",
+        269 => "TO",
+        270 => "TRAILING",
+        271 => "TRANSACTIONAL",
+        272 => "TRUE",
+        273 => "TRUNCATE",
+        274 => "TYPE",
+        275 => "TYPES",
+        276 => "UNCOMMITTED",
+        277 => "UNION",
+        278 => "UNION ALL",
+        279 => "UNIQUE",
+        280 => "UNLOCK",
+        281 => "UNSIGNED",
+        282 => "UPDATE",
+        283 => "USAGE",
+        284 => "USE",
+        285 => "USING",
+        286 => "VALUES",
+        287 => "VARIABLES",
+        288 => "VIEW",
+        289 => "WHEN",
+        290 => "WHERE",
+        291 => "WITH",
+        292 => "WORK",
+        293 => "WRITE",
+        294 => "XOR",
+        295 => "YEAR_MONTH",
+        296 => "ABS",
+        297 => "ACOS",
+        298 => "ADDDATE",
+        299 => "ADDTIME",
+        300 => "AES_DECRYPT",
+        301 => "AES_ENCRYPT",
+        302 => "AREA",
+        303 => "ASBINARY",
+        304 => "ASCII",
+        305 => "ASIN",
+        306 => "ASTEXT",
+        307 => "ATAN",
+        308 => "ATAN2",
+        309 => "AVG",
+        310 => "BDMPOLYFROMTEXT",
+        311 => "BDMPOLYFROMWKB",
+        312 => "BDPOLYFROMTEXT",
+        313 => "BDPOLYFROMWKB",
+        314 => "BENCHMARK",
+        315 => "BIN",
+        316 => "BIT_AND",
+        317 => "BIT_COUNT",
+        318 => "BIT_LENGTH",
+        319 => "BIT_OR",
+        320 => "BIT_XOR",
+        321 => "BOUNDARY",
+        322 => "BUFFER",
+        323 => "CAST",
+        324 => "CEIL",
+        325 => "CEILING",
+        326 => "CENTROID",
+        327 => "CHAR",
+        328 => "CHARACTER_LENGTH",
+        329 => "CHARSET",
+        330 => "CHAR_LENGTH",
+        331 => "COALESCE",
+        332 => "COERCIBILITY",
+        333 => "COLLATION",
+        334 => "COMPRESS",
+        335 => "CONCAT",
+        336 => "CONCAT_WS",
+        337 => "CONNECTION_ID",
+        338 => "CONTAINS",
+        339 => "CONV",
+        340 => "CONVERT",
+        341 => "CONVERT_TZ",
+        342 => "CONVEXHULL",
+        343 => "COS",
+        344 => "COT",
+        345 => "COUNT",
+        346 => "CRC32",
+        347 => "CROSSES",
+        348 => "CURDATE",
+        349 => "CURRENT_DATE",
+        350 => "CURRENT_TIME",
+        351 => "CURRENT_TIMESTAMP",
+        352 => "CURRENT_USER",
+        353 => "CURTIME",
+        354 => "DATABASE",
+        355 => "DATE",
+        356 => "DATEDIFF",
+        357 => "DATE_ADD",
+        358 => "DATE_DIFF",
+        359 => "DATE_FORMAT",
+        360 => "DATE_SUB",
+        361 => "DAY",
+        362 => "DAYNAME",
+        363 => "DAYOFMONTH",
+        364 => "DAYOFWEEK",
+        365 => "DAYOFYEAR",
+        366 => "DECODE",
+        367 => "DEFAULT",
+        368 => "DEGREES",
+        369 => "DES_DECRYPT",
+        370 => "DES_ENCRYPT",
+        371 => "DIFFERENCE",
+        372 => "DIMENSION",
+        373 => "DISJOINT",
+        374 => "DISTANCE",
+        375 => "ELT",
+        376 => "ENCODE",
+        377 => "ENCRYPT",
+        378 => "ENDPOINT",
+        379 => "ENVELOPE",
+        380 => "EQUALS",
+        381 => "EXP",
+        382 => "EXPORT_SET",
+        383 => "EXTERIORRING",
+        384 => "EXTRACT",
+        385 => "EXTRACTVALUE",
+        386 => "FIELD",
+        387 => "FIND_IN_SET",
+        388 => "FLOOR",
+        389 => "FORMAT",
+        390 => "FOUND_ROWS",
+        391 => "FROM_DAYS",
+        392 => "FROM_UNIXTIME",
+        393 => "GEOMCOLLFROMTEXT",
+        394 => "GEOMCOLLFROMWKB",
+        395 => "GEOMETRYCOLLECTION",
+        396 => "GEOMETRYCOLLECTIONFROMTEXT",
+        397 => "GEOMETRYCOLLECTIONFROMWKB",
+        398 => "GEOMETRYFROMTEXT",
+        399 => "GEOMETRYFROMWKB",
+        400 => "GEOMETRYN",
+        401 => "GEOMETRYTYPE",
+        402 => "GEOMFROMTEXT",
+        403 => "GEOMFROMWKB",
+        404 => "GET_FORMAT",
+        405 => "GET_LOCK",
+        406 => "GLENGTH",
+        407 => "GREATEST",
+        408 => "GROUP_CONCAT",
+        409 => "GROUP_UNIQUE_USERS",
+        410 => "HEX",
+        411 => "HOUR",
+        412 => "IF",
+        413 => "IFNULL",
+        414 => "INET_ATON",
+        415 => "INET_NTOA",
+        416 => "INSERT",
+        417 => "INSTR",
+        418 => "INTERIORRINGN",
+        419 => "INTERSECTION",
+        420 => "INTERSECTS",
+        421 => "INTERVAL",
+        422 => "ISCLOSED",
+        423 => "ISEMPTY",
+        424 => "ISNULL",
+        425 => "ISRING",
+        426 => "ISSIMPLE",
+        427 => "IS_FREE_LOCK",
+        428 => "IS_USED_LOCK",
+        429 => "LAST_DAY",
+        430 => "LAST_INSERT_ID",
+        431 => "LCASE",
+        432 => "LEAST",
+        433 => "LEFT",
+        434 => "LENGTH",
+        435 => "LINEFROMTEXT",
+        436 => "LINEFROMWKB",
+        437 => "LINESTRING",
+        438 => "LINESTRINGFROMTEXT",
+        439 => "LINESTRINGFROMWKB",
+        440 => "LN",
+        441 => "LOAD_FILE",
+        442 => "LOCALTIME",
+        443 => "LOCALTIMESTAMP",
+        444 => "LOCATE",
+        445 => "LOG",
+        446 => "LOG10",
+        447 => "LOG2",
+        448 => "LOWER",
+        449 => "LPAD",
+        450 => "LTRIM",
+        451 => "MAKEDATE",
+        452 => "MAKETIME",
+        453 => "MAKE_SET",
+        454 => "MASTER_POS_WAIT",
+        455 => "MAX",
+        456 => "MBRCONTAINS",
+        457 => "MBRDISJOINT",
+        458 => "MBREQUAL",
+        459 => "MBRINTERSECTS",
+        460 => "MBROVERLAPS",
+        461 => "MBRTOUCHES",
+        462 => "MBRWITHIN",
+        463 => "MD5",
+        464 => "MICROSECOND",
+        465 => "MID",
+        466 => "MIN",
+        467 => "MINUTE",
+        468 => "MLINEFROMTEXT",
+        469 => "MLINEFROMWKB",
+        470 => "MOD",
+        471 => "MONTH",
+        472 => "MONTHNAME",
+        473 => "MPOINTFROMTEXT",
+        474 => "MPOINTFROMWKB",
+        475 => "MPOLYFROMTEXT",
+        476 => "MPOLYFROMWKB",
+        477 => "MULTILINESTRING",
+        478 => "MULTILINESTRINGFROMTEXT",
+        479 => "MULTILINESTRINGFROMWKB",
+        480 => "MULTIPOINT",
+        481 => "MULTIPOINTFROMTEXT",
+        482 => "MULTIPOINTFROMWKB",
+        483 => "MULTIPOLYGON",
+        484 => "MULTIPOLYGONFROMTEXT",
+        485 => "MULTIPOLYGONFROMWKB",
+        486 => "NAME_CONST",
+        487 => "NULLIF",
+        488 => "NUMGEOMETRIES",
+        489 => "NUMINTERIORRINGS",
+        490 => "NUMPOINTS",
+        491 => "OCT",
+        492 => "OCTET_LENGTH",
+        493 => "OLD_PASSWORD",
+        494 => "ORD",
+        495 => "OVERLAPS",
+        496 => "PASSWORD",
+        497 => "PERIOD_ADD",
+        498 => "PERIOD_DIFF",
+        499 => "PI",
+        500 => "POINT",
+        501 => "POINTFROMTEXT",
+        502 => "POINTFROMWKB",
+        503 => "POINTN",
+        504 => "POINTONSURFACE",
+        505 => "POLYFROMTEXT",
+        506 => "POLYFROMWKB",
+        507 => "POLYGON",
+        508 => "POLYGONFROMTEXT",
+        509 => "POLYGONFROMWKB",
+        510 => "POSITION",
+        511 => "POW",
+        512 => "POWER",
+        513 => "QUARTER",
+        514 => "QUOTE",
+        515 => "RADIANS",
+        516 => "RAND",
+        517 => "RELATED",
+        518 => "RELEASE_LOCK",
+        519 => "REPEAT",
+        520 => "REPLACE",
+        521 => "REVERSE",
+        522 => "RIGHT",
+        523 => "ROUND",
+        524 => "ROW_COUNT",
+        525 => "RPAD",
+        526 => "RTRIM",
+        527 => "SCHEMA",
+        528 => "SECOND",
+        529 => "SEC_TO_TIME",
+        530 => "SESSION_USER",
+        531 => "SHA",
+        532 => "SHA1",
+        533 => "SIGN",
+        534 => "SIN",
+        535 => "SLEEP",
+        536 => "SOUNDEX",
+        537 => "SPACE",
+        538 => "SQRT",
+        539 => "SRID",
+        540 => "STARTPOINT",
+        541 => "STD",
+        542 => "STDDEV",
+        543 => "STDDEV_POP",
+        544 => "STDDEV_SAMP",
+        545 => "STRCMP",
+        546 => "STR_TO_DATE",
+        547 => "SUBDATE",
+        548 => "SUBSTR",
+        549 => "SUBSTRING",
+        550 => "SUBSTRING_INDEX",
+        551 => "SUBTIME",
+        552 => "SUM",
+        553 => "SYMDIFFERENCE",
+        554 => "SYSDATE",
+        555 => "SYSTEM_USER",
+        556 => "TAN",
+        557 => "TIME",
+        558 => "TIMEDIFF",
+        559 => "TIMESTAMP",
+        560 => "TIMESTAMPADD",
+        561 => "TIMESTAMPDIFF",
+        562 => "TIME_FORMAT",
+        563 => "TIME_TO_SEC",
+        564 => "TOUCHES",
+        565 => "TO_DAYS",
+        566 => "TRIM",
+        567 => "TRUNCATE",
+        568 => "UCASE",
+        569 => "UNCOMPRESS",
+        570 => "UNCOMPRESSED_LENGTH",
+        571 => "UNHEX",
+        572 => "UNIQUE_USERS",
+        573 => "UNIX_TIMESTAMP",
+        574 => "UPDATEXML",
+        575 => "UPPER",
+        576 => "USER",
+        577 => "UTC_DATE",
+        578 => "UTC_TIME",
+        579 => "UTC_TIMESTAMP",
+        580 => "UUID",
+        581 => "VARIANCE",
+        582 => "VAR_POP",
+        583 => "VAR_SAMP",
+        584 => "VERSION",
+        585 => "WEEK",
+        586 => "WEEKDAY",
+        587 => "WEEKOFYEAR",
+        588 => "WITHIN",
+        589 => "X",
+        590 => "Y",
+        591 => "YEAR",
+        592 => "YEARWEEK",
     ]);
 }
 
@@ -3260,7 +3261,7 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("array_group
      * ]);
      * ```
      *
-     * @param iterable 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
@@ -3295,6 +3296,143 @@ if (function_exists("array_group") && !defined("array_group")) {
     define("array_group", "array_group");
 }
 
+if (!isset($excluded_functions["array_aggregate"]) && (!function_exists("array_aggregate") || (!false && (new \ReflectionFunction("array_aggregate"))->isInternal()))) {
+    /**
+     * 配列をコールバックの返り値で集計する
+     *
+     * $columns で集計列を指定する。
+     * 単一の callable を渡すと結果も単一になる。
+     * 複数の callable 連想配列を渡すと [キー => 集系列] の連想配列になる。
+     * いずれにせよ引数としてそのグループの配列が渡ってくるので返り値がその列の値になる。
+     * 第2引数には「今までの結果が詰まった配列」が渡ってくる（count, avg, sum など何度もでてくる集計で便利）。
+     *
+     * $key で集約列を指定する。
+     * 指定しなければ引数の配列そのままで集計される。
+     * 複数要素の配列を与えるとその数分潜って集計される。
+     * クロージャを与えると返り値がキーになる。
+     *
+     * Example:
+     * ```php
+     * // 単純な配列の集計
+     * assertSame(array_aggregate([1, 2, 3], [
+     *     'min' => function($elems) {return min($elems);},
+     *     'max' => function($elems) {return max($elems);},
+     *     'avg' => function($elems) {return array_sum($elems) / count($elems);},
+     * ]), [
+     *     'min' => 1, // 最小値
+     *     'max' => 3, // 最大値
+     *     'avg' => 2, // 平均値
+     * ]);
+     *
+     * $row1 = ['user_id' => 'hoge', 'group' => 'A', 'score' => 4];
+     * $row2 = ['user_id' => 'fuga', 'group' => 'B', 'score' => 6];
+     * $row3 = ['user_id' => 'fuga', 'group' => 'A', 'score' => 5];
+     * $row4 = ['user_id' => 'hoge', 'group' => 'A', 'score' => 8];
+     *
+     * // user_id, group ごとの score を集計して階層配列で返す（第2引数 $current を利用している）
+     * assertSame(array_aggregate([$row1, $row2, $row3, $row4], [
+     *     'scores' => function($rows) {return array_column($rows, 'score');},
+     *     'score'  => function($rows, $current) {return array_sum($current['scores']);},
+     * ], ['user_id', 'group']), [
+     *     'hoge' => [
+     *         'A' => [
+     *             'scores' => [4, 8],
+     *             'score'  => 12,
+     *         ],
+     *     ],
+     *     'fuga' => [
+     *         'B' => [
+     *             'scores' => [6],
+     *             'score'  => 6,
+     *         ],
+     *         'A' => [
+     *             'scores' => [5],
+     *             'score'  => 5,
+     *         ],
+     *     ],
+     * ]);
+     *
+     * // user_id ごとの score を集計して単一列で返す（キーのクロージャも利用している）
+     * assertSame(array_aggregate([$row1, $row2, $row3, $row4],
+     *     function($rows) {return array_sum(array_column($rows, 'score'));},
+     *     function($row) {return strtoupper($row['user_id']);}), [
+     *     'HOGE' => 12,
+     *     'FUGA' => 11,
+     * ]);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param callable|callable[] $columns 集計関数
+     * @param string|array|null $key 集約列。クロージャを与えると返り値がキーになる
+     * @return array 集約配列
+     */
+    function array_aggregate($array, $columns, $key = null)
+    {
+        if ($key === null) {
+            $nest_level = 0;
+        }
+        elseif ($key instanceof \Closure) {
+            $nest_level = 1;
+        }
+        elseif (is_string($key)) {
+            $nest_level = 1;
+            $key = array_of($key);
+        }
+        else {
+            $nest_level = count($key);
+            $key = array_of($key);
+        }
+
+        if ($key === null) {
+            $group = arrayval($array);
+        }
+        else {
+            $group = [];
+            foreach ($array as $k => $v) {
+                $vv = $key($v, $k);
+
+                if (is_array($vv)) {
+                    $tmp = &$group;
+                    foreach ($vv as $vvv) {
+                        $tmp = &$tmp[$vvv];
+                    }
+                    $tmp[] = $v;
+                    unset($tmp);
+                }
+                else {
+                    $group[$vv][$k] = $v;
+                }
+            }
+        }
+
+        if (!is_callable($columns)) {
+            $columns = array_map(func_user_func_array, $columns);
+        }
+
+        $dive = function ($array, $level) use (&$dive, $columns) {
+            $result = [];
+            if ($level === 0) {
+                if (is_callable($columns)) {
+                    return $columns($array);
+                }
+                foreach ($columns as $name => $column) {
+                    $result[$name] = $column($array, $result);
+                }
+            }
+            else {
+                foreach ($array as $k => $v) {
+                    $result[$k] = $dive($v, $level - 1);
+                }
+            }
+            return $result;
+        };
+        return $dive($group, $nest_level);
+    }
+}
+if (function_exists("array_aggregate") && !defined("array_aggregate")) {
+    define("array_aggregate", "array_aggregate");
+}
+
 if (!isset($excluded_functions["array_all"]) && (!function_exists("array_all") || (!false && (new \ReflectionFunction("array_all"))->isInternal()))) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
@@ -3308,7 +3446,7 @@ if (!isset($excluded_functions["array_all"]) && (!function_exists("array_all") |
      * assertFalse(array_all([false, false]));
      * ```
      *
-     * @param iterable 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が true なら true
@@ -3346,7 +3484,7 @@ if (!isset($excluded_functions["array_any"]) && (!function_exists("array_any") |
      * assertFalse(array_any([false, false]));
      * ```
      *
-     * @param iterable 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が false なら false
@@ -3578,7 +3716,7 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("array_order
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    $type = $ref->hasReturnType() ? (string) $ref->getReturnType() : gettype(reset($arg));
+                    $type = $ref->hasReturnType() ? $ref->getReturnType()->getName() : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
@@ -5237,6 +5375,10 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("g
      */
     function get_object_properties($object)
     {
+        if (function_exists('get_mangled_object_vars')) {
+            get_mangled_object_vars($object); // @codeCoverageIgnore
+        }
+
         static $refs = [];
         $class = get_class($object);
         if (!isset($refs[$class])) {
@@ -6062,7 +6204,7 @@ if (!isset($excluded_functions["dirmtime"]) && (!function_exists("dirmtime") || 
      * mkdir($dirname);
      *
      * // この時点では現在日時（単純に自身の更新日時）
-     * assertSame(dirmtime($dirname), time());
+     * assertThat(time() - dirmtime($dirname), logicalOr(equalTo(0), equalTo(1)));
      * // ファイルを作って更新するとその時刻
      * touch("$dirname/tmp", time() + 10);
      * assertSame(dirmtime($dirname), time() + 10);
@@ -6521,6 +6663,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
                 private $entry;
                 private $id;
                 private $position;
+                // compatible: 下記は php7.4 以降では標準でエラーになるようにあったため基本的に不要
                 private $readable;
                 private $writable;
                 private $appendable;
@@ -6566,6 +6709,11 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
                 {
                     // 対応して無くても標準では警告止まりなので例外に変える
                     throw new \DomainException("$name is not supported.");
+                }
+
+                public function stream_set_option(int $option, int $arg1, int $arg2)
+                {
+                    return false;
                 }
 
                 public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
@@ -6660,9 +6808,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
 
                 public function stream_read(int $count): string
                 {
-                    if (!$this->readable) {
-                        return '';
-                    }
+                    assert($this->readable);
                     $result = substr($this->entry->content, $this->position, $count);
                     $this->position += strlen($result);
                     return $result;
@@ -6670,9 +6816,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
 
                 public function stream_write(string $data): int
                 {
-                    if (!$this->writable) {
-                        return 0;
-                    }
+                    assert($this->writable);
                     $datalen = strlen($data);
                     $posision = $this->position;
                     // このモードは、fseek() では何の効果もありません。書き込みは、常に追記となります。
@@ -6689,9 +6833,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
 
                 public function stream_truncate(int $new_size): bool
                 {
-                    if (!$this->writable) {
-                        return false;
-                    }
+                    assert($this->writable);
                     $current = substr($this->entry->content, 0, $new_size);
                     $this->entry->content = str_pad($current, $new_size, "\0", STR_PAD_RIGHT);
                     return true;
@@ -8727,6 +8869,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
         $MARK_R = "{$MARK}_R:}";   // \r マーク
         $MARK_N = "{$MARK}_N:}";   // \n マーク
         $MARK_BR = "{$MARK}_BR:}"; // 改行マーク
+        $MARK_CS = "{$MARK}_CS:}"; // コメント開始マーク
+        $MARK_CE = "{$MARK}_CE:}"; // コメント終了マーク
         $MARK_NT = "{$MARK}_NT:}"; // インデントマーク
         $MARK_SP = "{$MARK}_SP:}"; // スペースマーク
         $MARK_PT = "{$MARK}_PT:}"; // 括弧ネストマーク
@@ -8749,8 +8893,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                 $comment = $token[1];
             }
             // 改行は '--' コメントの終わり
-            elseif ($comment && $token[0] === T_WHITESPACE && strpos($token[1], "\n") !== false) {
-                $tokens[] = [T_COMMENT, $comment];
+            elseif ($comment && in_array($token[0], [T_WHITESPACE, T_COMMENT], true) && strpos($token[1], "\n") !== false) {
+                $tokens[] = [T_COMMENT, $comment . $token[1]];
                 $comment = '';
             }
             // コメント中はコメントに格納する
@@ -8770,7 +8914,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
         }
 
         // コメント以外の前後のトークンを返すクロージャ
-        $seek = function ($start, $step) use ($tokens, $MARK_SP, $MARK_BR) {
+        $seek = function ($start, $step) use ($tokens) {
             $comments = [];
             for ($n = 1; ; $n++) {
                 $index = $start + $n * $step;
@@ -8779,7 +8923,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                 }
                 $token = $tokens[$index];
                 if ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT) {
-                    $comments[] = $MARK_SP . trim($token[1]) . $MARK_BR;
+                    $comments[] = trim($token[1]);
                 }
                 else {
                     return [$index, trim($token[1]), $comments];
@@ -8788,12 +8932,13 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
             return [$start, '', $comments];
         };
 
-        $interpret = function (&$index = -1) use (&$interpret, $MARK_R, $MARK_N, $MARK_BR, $MARK_NT, $MARK_SP, $MARK_PT, $tokens, $options, $seek) {
+        $interpret = function (&$index = -1) use (&$interpret, $MARK_R, $MARK_N, $MARK_BR, $MARK_CS, $MARK_CE, $MARK_NT, $MARK_SP, $MARK_PT, $tokens, $options, $seek) {
             $index++;
-            $context = '';    // SELECT, INSERT などの大分類
-            $subcontext = ''; // SET, VALUES などのサブ分類
-            $modifier = '';   // RIGHT などのキーワード修飾語
-            $firstcol = null; // SELECT における最初の列か
+            $beginning = true; // クエリの冒頭か
+            $context = '';     // SELECT, INSERT などの大分類
+            $subcontext = '';  // SET, VALUES などのサブ分類
+            $modifier = '';    // RIGHT などのキーワード修飾語
+            $firstcol = null;  // SELECT における最初の列か
 
             $result = [];
             for ($token_length = count($tokens); $index < $token_length; $index++) {
@@ -8809,12 +8954,6 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                     "\n" => $MARK_N,
                 ]);
 
-                // コメントは特別扱いでただ付け足すだけ
-                if ($ttype === T_COMMENT || $ttype === T_DOC_COMMENT) {
-                    $result[] = $MARK_SP . $virttoken . $MARK_BR;
-                    continue;
-                }
-
                 // SELECT の直後には DISTINCT などのオプションが来ることがあるので特別扱い
                 if ($context === 'SELECT' && $firstcol) {
                     if (!in_array($uppertoken, ['DISTINCT', 'DISTINCTROW', 'STRAIGHT_JOIN'], true) && !preg_match('#^SQL_#i', $uppertoken)) {
@@ -8823,6 +8962,13 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                     }
                 }
 
+                // コメントは特別扱いでただ付け足すだけ
+                if ($ttype === T_COMMENT || $ttype === T_DOC_COMMENT) {
+                    $result[] = ($beginning ? '' : $MARK_CS) . $virttoken . $MARK_CE . $MARK_BR;
+                    continue;
+                }
+                $beginning = false;
+
                 switch ($uppertoken) {
                     default:
                         _DEFAULT:
@@ -8830,8 +8976,9 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         $next = $seek($index, +1)[1];
 
                         // "tablename. columnname" になってしまう
-                        // "@var" になってしまう
-                        if ($prev !== '.' && $prev !== '@') {
+                        // "@ var" になってしまう
+                        // ": holder" になってしまう
+                        if ($prev !== '.' && $prev !== '@' && $prev !== ':') {
                             $result[] = $MARK_SP;
                         }
 
@@ -8846,6 +8993,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         }
                         break;
                     case "@":
+                    case ":":
                         $result[] = $MARK_SP . $virttoken;
                         break;
                     case ";":
@@ -8875,7 +9023,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         // CREATE TABLE tablename は括弧があるので何もしなくて済むが、
                         // ALTER TABLE tablename は括弧がなく ADD などで始まるので特別分岐
                         list($index, $name, $comments) = $seek($index, +1);
-                        $result[] = $MARK_SP . $virttoken . $MARK_SP . implode('', $comments) . $name . $MARK_SP;
+                        $result[] = $MARK_SP . $virttoken . $MARK_SP . ($MARK_SP . implode('', $comments) . $MARK_CE) . $name . $MARK_SP;
                         if ($context !== 'CREATE' && $context !== 'DROP') {
                             $result[] = $MARK_BR;
                         }
@@ -9001,8 +9149,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         $current = $index;
                         $parts = $MARK_BR . $interpret($index);
 
-                        // 指定ネストレベル以下なら改行とインデントを吹き飛ばす
-                        if (substr_count($parts, $MARK_PT) < $options['nestlevel']) {
+                        // コメントを含まない指定ネストレベル以下なら改行とインデントを吹き飛ばす
+                        if (strpos($parts, $MARK_CE) === false && substr_count($parts, $MARK_PT) < $options['nestlevel']) {
                             $parts = strtr($parts, [
                                 $MARK_BR => "",
                                 $MARK_NT => "",
@@ -9017,7 +9165,8 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                             if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)[1]) === 'SELECT') {
                                 $brnt .= $MARK_NT;
                             }
-                            $parts = str_replace($MARK_BR, $brnt, $parts) . $MARK_BR . $MARK_NT;
+                            $parts = preg_replace("#($MARK_BR)+#u", $brnt, $parts) . $MARK_BR . $MARK_NT;
+                            $parts = preg_replace("#$MARK_CS#u", "", $parts);
                         }
 
                         // IN や数式はネストとみなさない
@@ -9043,11 +9192,15 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
         $result = preg_replaces("#" . implode('|', [
                 // 改行文字＋インデント文字をインデントとみなす（改行＋連続スペースもついでに）
                 "(?<indent>$MARK_BR(($MARK_NT|$MARK_SP)+))",
+                // 行末コメントと単一コメント
+                "(?<cs1>$MARK_BR$MARK_CS)",
+                "(?<cs2>$MARK_CS)",
                 // 連続改行は1つに集約
                 "(?<br>$MARK_BR(($MARK_NT|$MARK_SP)*)($MARK_BR)*)",
                 // 連続スペースは1つに集約
                 "(?<sp>($MARK_SP)+)",
                 // 下記はマーカ文字が現れないように単純置換
+                "(?<ce>$MARK_CE)",
                 "(?<nt>$MARK_NT)",
                 "(?<pt>$MARK_PT)",
                 "(?<R>$MARK_R)",
@@ -9056,8 +9209,11 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
             'indent' => function ($str) use ($options, $MARK_NT, $MARK_SP) {
                 return "\n" . str_repeat($options['indent'], (substr_count($str, $MARK_NT) + substr_count($str, $MARK_SP)));
             },
+            'cs1'    => "\n" . $options['indent'],
+            'cs2'    => "",
             'br'     => "\n",
             'sp'     => ' ',
+            'ce'     => "",
             'nt'     => "",
             'pt'     => "",
             'R'      => "\r",
@@ -9266,41 +9422,23 @@ if (!isset($excluded_functions["quoteexplode"]) && (!function_exists("quoteexplo
         }
         $limit = max(1, $limit);
 
-        if (is_string($enclosures)) {
-            $chars = str_split($enclosures);
-            $enclosures = array_combine($chars, $chars);
-        }
-
         $delimiters = arrayize($delimiter);
-        $starts = implode('', array_keys($enclosures));
-        $ends = implode('', $enclosures);
-        $enclosing = [];
         $current = 0;
         $result = [];
         for ($i = 0, $l = strlen($string); $i < $l; $i++) {
-            if ($i !== 0 && $string[$i - 1] === $escape) {
-                continue;
+            if (count($result) === $limit - 1) {
+                break;
             }
-            if (strpos($ends, $string[$i]) !== false) {
-                if ($enclosing && $enclosures[$enclosing[count($enclosing) - 1]] === $string[$i]) {
-                    array_pop($enclosing);
-                    continue;
-                }
+            $i = strpos_quoted($string, $delimiters, $i, $enclosures, $escape);
+            if ($i === false) {
+                break;
             }
-            if (strpos($starts, $string[$i]) !== false) {
-                $enclosing[] = $string[$i];
-                continue;
-            }
-            if (empty($enclosing)) {
-                foreach ($delimiters as $delimiter) {
-                    $delimiterlen = strlen($delimiter);
-                    if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
-                        $result[] = substr($string, $current, $i - $current);
-                        $current = $i + $delimiterlen;
-                        break;
-                    }
-                }
-                if (count($result) === $limit - 1) {
+            foreach ($delimiters as $delimiter) {
+                $delimiterlen = strlen($delimiter);
+                if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
+                    $result[] = substr($string, $current, $i - $current);
+                    $current = $i + $delimiterlen;
+                    $i += $delimiterlen - 1;
                     break;
                 }
             }
@@ -9360,6 +9498,124 @@ if (!isset($excluded_functions["strrstr"]) && (!function_exists("strrstr") || (!
 }
 if (function_exists("strrstr") && !defined("strrstr")) {
     define("strrstr", "strrstr");
+}
+
+if (!isset($excluded_functions["strpos_array"]) && (!function_exists("strpos_array") || (!false && (new \ReflectionFunction("strpos_array"))->isInternal()))) {
+    /**
+     * 複数の文字列で strpos する
+     *
+     * $needles のそれぞれの位置を配列で返す。
+     * ただし、見つからなかった文字は結果に含まれない。
+     *
+     * Example:
+     * ```php
+     * // 見つかった位置を返す
+     * assertSame(strpos_array('hello world', ['hello', 'world']), [
+     *     0 => 0,
+     *     1 => 6,
+     * ]);
+     * // 見つからない文字は含まれない
+     * assertSame(strpos_array('hello world', ['notfound', 'world']), [
+     *     1 => 6,
+     * ]);
+     * ```
+     *
+     * @param string $haystack 対象文字列
+     * @param iterable $needles 位置を取得したい文字列配列
+     * @param int $offset 開始位置
+     * @return array $needles それぞれの位置配列
+     */
+    function strpos_array($haystack, $needles, $offset = 0)
+    {
+        if ($offset < 0) {
+            $offset += strlen($haystack);
+        }
+
+        $result = [];
+        foreach (arrayval($needles) as $key => $needle) {
+            $pos = strpos($haystack, $needle, $offset);
+            if ($pos !== false) {
+                $result[$key] = $pos;
+            }
+        }
+        return $result;
+    }
+}
+if (function_exists("strpos_array") && !defined("strpos_array")) {
+    define("strpos_array", "strpos_array");
+}
+
+if (!isset($excluded_functions["strpos_quoted"]) && (!function_exists("strpos_quoted") || (!false && (new \ReflectionFunction("strpos_quoted"))->isInternal()))) {
+    /**
+     * クオートを考慮して strpos する
+     *
+     * Example:
+     * ```php
+     * // クオート中は除外される
+     * assertSame(strpos_quoted('hello "this" is world', 'is'), 13);
+     * // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
+     * assertSame(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
+     * ```
+     *
+     * @param string $haystack 対象文字列
+     * @param string|iterable $needle 位置を取得したい文字列
+     * @param int $offset 開始位置
+     * @param string|array $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
+     * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+     * @return false|int $needle の位置
+     */
+    function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\')
+    {
+        if (is_string($enclosure) || is_null($enclosure)) {
+            if (strlen($enclosure)) {
+                $chars = str_split($enclosure);
+                $enclosure = array_combine($chars, $chars);
+            }
+            else {
+                $enclosure = [];
+            }
+        }
+        $needles = arrayval($needle);
+
+        $strlen = strlen($haystack);
+
+        if ($offset < 0) {
+            $offset += $strlen;
+        }
+
+        $enclosing = [];
+        for ($i = $offset; $i < $strlen; $i++) {
+            if ($i !== 0 && $haystack[$i - 1] === $escape) {
+                continue;
+            }
+            foreach ($enclosure as $start => $end) {
+                if (substr_compare($haystack, $end, $i, strlen($end)) === 0) {
+                    if ($enclosing && $enclosing[count($enclosing) - 1] === $end) {
+                        array_pop($enclosing);
+                        $i += strlen($end) - 1;
+                        continue 2;
+                    }
+                }
+                if (substr_compare($haystack, $start, $i, strlen($start)) === 0) {
+                    $enclosing[] = $end;
+                    $i += strlen($start) - 1;
+                    continue 2;
+                }
+            }
+
+            if (empty($enclosing)) {
+                foreach ($needles as $needle) {
+                    if (substr_compare($haystack, $needle, $i, strlen($needle)) === 0) {
+                        return $i;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
+if (function_exists("strpos_quoted") && !defined("strpos_quoted")) {
+    define("strpos_quoted", "strpos_quoted");
 }
 
 if (!isset($excluded_functions["str_anyof"]) && (!function_exists("str_anyof") || (!false && (new \ReflectionFunction("str_anyof"))->isInternal()))) {
@@ -9869,51 +10125,31 @@ if (!isset($excluded_functions["str_embed"]) && (!function_exists("str_embed") |
         // 長いキーから処理するためソートしておく
         $replacemap = arrayval($replacemap, false);
         uksort($replacemap, function ($a, $b) { return strlen($b) - strlen($a); });
+        $srcs = array_keys($replacemap);
 
-        if (is_string($enclosure)) {
-            $chars = str_split($enclosure);
-            $enclosure = array_combine($chars, $chars);
-        }
-
-        $enclosing = [];
         $counter = array_fill_keys(array_keys($replacemap), 0);
         for ($i = 0; $i < strlen($string); $i++) {
-            if ($i !== 0 && $string[$i - 1] === $escape) {
-                continue;
-            }
-            foreach ($enclosure as $start => $end) {
-                if (substr_compare($string, $end, $i, strlen($end)) === 0) {
-                    if ($enclosing && $enclosing[count($enclosing) - 1] === $end) {
-                        array_pop($enclosing);
-                        $i += strlen($end) - 1;
-                        continue 2;
-                    }
-                }
-                if (substr_compare($string, $start, $i, strlen($start)) === 0) {
-                    $enclosing[] = $end;
-                    $i += strlen($start) - 1;
-                    continue 2;
-                }
+            $i = strpos_quoted($string, $srcs, $i, $enclosure, $escape);
+            if ($i === false) {
+                break;
             }
 
-            if (empty($enclosing)) {
-                foreach ($replacemap as $src => $dst) {
-                    $srclen = strlen($src);
-                    if ($srclen === 0) {
-                        throw new \InvalidArgumentException("src length is 0.");
-                    }
-                    if (substr_compare($string, $src, $i, $srclen) === 0) {
-                        if (is_array($dst)) {
-                            $n = $counter[$src]++;
-                            if (!isset($dst[$n])) {
-                                throw new \InvalidArgumentException("notfound search string '$src' of {$n}th.");
-                            }
-                            $dst = $dst[$n];
+            foreach ($replacemap as $src => $dst) {
+                $srclen = strlen($src);
+                if ($srclen === 0) {
+                    throw new \InvalidArgumentException("src length is 0.");
+                }
+                if (substr_compare($string, $src, $i, $srclen) === 0) {
+                    if (is_array($dst)) {
+                        $n = $counter[$src]++;
+                        if (!isset($dst[$n])) {
+                            throw new \InvalidArgumentException("notfound search string '$src' of {$n}th.");
                         }
-                        $string = substr_replace($string, $dst, $i, $srclen);
-                        $i += strlen($dst) - 1;
-                        break;
+                        $dst = $dst[$n];
                     }
+                    $string = substr_replace($string, $dst, $i, $srclen);
+                    $i += strlen($dst) - 1;
+                    break;
                 }
             }
         }
@@ -9962,25 +10198,16 @@ if (!isset($excluded_functions["str_between"]) && (!function_exists("str_between
         $fromlen = strlen($from);
         $tolen = strlen($to);
         $position = intval($position);
-        $enclosing = null;
         $nesting = 0;
         $start = null;
         for ($i = $position; $i < $strlen; $i++) {
-            if ($i !== 0 && $string[$i - 1] === $escape) {
-                continue;
-            }
-            if (strpos($enclosure, $string[$i]) !== false) {
-                if ($enclosing === null) {
-                    $enclosing = $string[$i];
-                }
-                elseif ($enclosing === $string[$i]) {
-                    $enclosing = null;
-                }
-                continue;
+            $i = strpos_quoted($string, [$from, $to], $i, $enclosure, $escape);
+            if ($i === false) {
+                break;
             }
 
             // 開始文字と終了文字が重複している可能性があるので $to からチェックする
-            if ($enclosing === null && substr_compare($string, $to, $i, $tolen) === 0) {
+            if (substr_compare($string, $to, $i, $tolen) === 0) {
                 if (--$nesting === 0) {
                     $position = $i + $tolen;
                     return substr($string, $start, $i - $start);
@@ -9990,7 +10217,7 @@ if (!isset($excluded_functions["str_between"]) && (!function_exists("str_between
                     $nesting = 0;
                 }
             }
-            if ($enclosing === null && substr_compare($string, $from, $i, $fromlen) === 0) {
+            if (substr_compare($string, $from, $i, $fromlen) === 0) {
                 if ($nesting++ === 0) {
                     $start = $i + $fromlen;
                 }
@@ -10053,6 +10280,494 @@ if (!isset($excluded_functions["str_ellipsis"]) && (!function_exists("str_ellips
 }
 if (function_exists("str_ellipsis") && !defined("str_ellipsis")) {
     define("str_ellipsis", "str_ellipsis");
+}
+
+if (!isset($excluded_functions["str_diff"]) && (!function_exists("str_diff") || (!false && (new \ReflectionFunction("str_diff"))->isInternal()))) {
+    /**
+     * テキストの diff を得る
+     *
+     * `$options['iignore-case'] = true` で大文字小文字を無視する。
+     * `$options['ignore-space-change'] = true` 空白文字の数を無視する。
+     * `$options['ignore-all-space'] = true` ですべての空白文字を無視する
+     * `$options['stringify']` で差分データを文字列化するクロージャを指定する。
+     *
+     * - normal: 標準形式（diff のオプションなしに相当する）
+     * - context: コンテキスト形式（context=3 のような形式で diff の -C 3 に相当する）
+     * - unified: ユニファイド形式（unified=3 のような形式で diff の -U 3 に相当する）
+     *     - unified のみを指定するとヘッダを含まない +- のみの差分を出す
+     * - html: ins, del の html タグ形式
+     *     - html=perline とすると行レベルでの差分も出す
+     *
+     * Example:
+     * ```php
+     * // 前文字列
+     * $old = 'same
+     * delete
+     * same
+     * same
+     * change
+     * ';
+     * // 後文字列
+     * $new = 'same
+     * same
+     * append
+     * same
+     * this is changed line
+     * ';
+     * // シンプルな差分テキストを返す
+     * assertSame(str_diff($old, $new), ' same
+     * -delete
+     *  same
+     * +append
+     *  same
+     * -change
+     * +this is changed line
+     * ');
+     * // html で差分を返す
+     * assertSame(str_diff($old, $new, ['stringify' => 'html']), 'same
+     * <del>delete</del>
+     * same
+     * <ins>append</ins>
+     * same
+     * <del>change</del>
+     * <ins>this is changed line</ins>
+     * ');
+     * // 行レベルの html で差分を返す
+     * assertSame(str_diff($old, $new, ['stringify' => 'html=perline']), 'same
+     * <del>delete</del>
+     * same
+     * <ins>append</ins>
+     * same
+     * <ins>this is </ins>chang<ins>ed lin</ins>e
+     * ');
+     * // raw な配列で差分を返す
+     * assertSame(str_diff($old, $new, ['stringify' => null]), [
+     *     // 等価行（'=' という記号と前後それぞれの文字列を返す（キーは行番号））
+     *     ['=', [0 => 'same'], [0 => 'same']],
+     *     // 削除行（'-' という記号と前の文字列を返す（キーは行番号）、後は int で行番号のみ）
+     *     ['-', [1 => 'delete'], 0],
+     *     // 等価行
+     *     ['=', [2 => 'same'], [1 => 'same']],
+     *     // 追加行（'+' という記号と後の文字列を返す（キーは行番号）、前は int で行番号のみ）
+     *     ['+', 2, [2 => 'append']],
+     *     // 等価行
+     *     ['=', [3 => 'same'], [3 => 'same']],
+     *     // 変更行（'*' という記号と前後それぞれの文字列を返す（キーは行番号））
+     *     ['*', [4 => 'change'], [4 => 'this is changed line']],
+     * ]);
+     * ```
+     *
+     * @param string|array $xstring 元文字列
+     * @param string|array $ystring 比較文字列
+     * @param array $options オプション配列
+     * @return string|array 差分テキスト。 stringify が null の場合は raw な差分配列
+     */
+    function str_diff($xstring, $ystring, $options = [])
+    {
+        $options += [
+            'ignore-case'         => false,
+            'ignore-space-change' => false,
+            'ignore-all-space'    => false,
+            'stringify'           => 'unified',
+        ];
+
+        $xstring = is_array($xstring) ? array_values($xstring) : preg_split('#\R#u', $xstring);
+        $ystring = is_array($ystring) ? array_values($ystring) : preg_split('#\R#u', $ystring);
+        $trailingN = "";
+        if ($xstring[count($xstring) - 1] === '' && $ystring[count($ystring) - 1] === '') {
+            $trailingN = "\n";
+            array_pop($xstring);
+            array_pop($ystring);
+        }
+
+        $getdiff = function (array $xarray, array $yarray, $converter) {
+            $lcs = function (array $xarray, array $yarray) use (&$lcs) {
+                $length = function (array $xarray, array $yarray) {
+                    $xcount = count($xarray);
+                    $ycount = count($yarray);
+                    $current = array_fill(0, $ycount + 1, 0);
+                    for ($i = 0; $i < $xcount; $i++) {
+                        $prev = $current;
+                        for ($j = 0; $j < $ycount; $j++) {
+                            $current[$j + 1] = $xarray[$i] === $yarray[$j] ? $prev[$j] + 1 : max($current[$j], $prev[$j + 1]);
+                        }
+                    }
+                    return $current;
+                };
+
+                $xcount = count($xarray);
+                $ycount = count($yarray);
+                if ($xcount === 0) {
+                    return [];
+                }
+                if ($xcount === 1) {
+                    if (in_array($xarray[0], $yarray, true)) {
+                        return [$xarray[0]];
+                    }
+                    return [];
+                }
+                $i = (int) ($xcount / 2);
+                $xprefix = array_slice($xarray, 0, $i);
+                $xsuffix = array_slice($xarray, $i);
+                $llB = $length($xprefix, $yarray);
+                $llE = $length(array_reverse($xsuffix), array_reverse($yarray));
+                $jMax = 0;
+                $max = 0;
+                for ($j = 0; $j <= $ycount; $j++) {
+                    $m = $llB[$j] + $llE[$ycount - $j];
+                    if ($m >= $max) {
+                        $max = $m;
+                        $jMax = $j;
+                    }
+                }
+                $yprefix = array_slice($yarray, 0, $jMax);
+                $ysuffix = array_slice($yarray, $jMax);
+                return array_merge($lcs($xprefix, $yprefix), $lcs($xsuffix, $ysuffix));
+            };
+
+            $xarray2 = array_map($converter, $xarray);
+            $yarray2 = array_map($converter, $yarray);
+            $xcount = count($xarray2);
+            $ycount = count($yarray2);
+
+            $head = [];
+            reset($yarray2);
+            foreach ($xarray2 as $xk => $xv) {
+                $yk = key($yarray2);
+                if ($yk !== $xk || $xv !== $yarray2[$xk]) {
+                    break;
+                }
+                $head[$xk] = $xv;
+                unset($xarray2[$xk], $yarray2[$xk]);
+            }
+
+            $tail = [];
+            end($xarray2);
+            end($yarray2);
+            do {
+                $xk = key($xarray2);
+                $yk = key($yarray2);
+                if (null === $xk || null === $yk || current($xarray2) !== current($yarray2)) {
+                    break;
+                }
+                prev($xarray2);
+                prev($yarray2);
+                $tail = [$xk - $xcount => $xarray2[$xk]] + $tail;
+                unset($xarray2[$xk], $yarray2[$yk]);
+            } while (true);
+
+            $common = $lcs(array_values($xarray2), array_values($yarray2));
+
+            $xchanged = $ychanged = [];
+            foreach ($head as $n => $line) {
+                $xchanged[$n] = false;
+                $ychanged[$n] = false;
+            }
+            foreach ($common as $line) {
+                foreach ($xarray2 as $n => $l) {
+                    unset($xarray2[$n]);
+                    $xchanged[$n] = $line !== $l;
+                    if (!$xchanged[$n]) {
+                        break;
+                    }
+                }
+                foreach ($yarray2 as $n => $l) {
+                    unset($yarray2[$n]);
+                    $ychanged[$n] = $line !== $l;
+                    if (!$ychanged[$n]) {
+                        break;
+                    }
+                }
+            }
+            foreach ($xarray2 as $n => $line) {
+                $xchanged[$n] = true;
+            }
+            foreach ($yarray2 as $n => $line) {
+                $ychanged[$n] = true;
+            }
+            foreach ($tail as $n => $line) {
+                $xchanged[$n + $xcount] = false;
+                $ychanged[$n + $ycount] = false;
+            }
+
+            $diffs = [];
+            $xi = $yi = 0;
+            while ($xi < $xcount || $yi < $ycount) {
+                for ($xequal = [], $yequal = []; $xi < $xcount && $yi < $ycount && !$xchanged[$xi] && !$ychanged[$yi]; $xi++, $yi++) {
+                    $xequal[$xi] = $xarray[$xi];
+                    $yequal[$yi] = $yarray[$yi];
+                }
+                for ($delete = []; $xi < $xcount && $xchanged[$xi]; $xi++) {
+                    $delete[$xi] = $xarray[$xi];
+                }
+                for ($append = []; $yi < $ycount && $ychanged[$yi]; $yi++) {
+                    $append[$yi] = $yarray[$yi];
+                }
+
+                if ($xequal && $yequal) {
+                    $diffs[] = ['=', $xequal, $yequal];
+                }
+                if ($delete && $append) {
+                    $diffs[] = ['*', $delete, $append];
+                }
+                elseif ($delete) {
+                    $diffs[] = ['-', $delete, $yi - 1];
+                }
+                elseif ($append) {
+                    $diffs[] = ['+', $xi - 1, $append];
+                }
+            }
+            return $diffs;
+        };
+
+        $diffs = $getdiff($xstring, $ystring, function ($string) use ($options) {
+            if ($options['ignore-case']) {
+                $string = strtoupper($string);
+            }
+            if ($options['ignore-space-change']) {
+                $string = preg_replace('#\s+#u', ' ', $string);
+            }
+            if ($options['ignore-all-space']) {
+                $string = preg_replace('#\s+#u', '', $string);
+            }
+            return $string;
+        });
+
+        if (!$options['stringify']) {
+            return $diffs;
+        }
+
+        $htmlescape = function ($v) use (&$htmlescape) {
+            return is_array($v) ? array_map($htmlescape, $v) : htmlspecialchars($v, ENT_QUOTES);
+        };
+        $prefixjoin = function ($prefix, $array, $glue) {
+            return implode($glue, array_map(function ($v) use ($prefix) { return $prefix . $v; }, $array));
+        };
+        $minmaxlen = function ($diffs) {
+            $xmin = $ymin = PHP_INT_MAX;
+            $xmax = $ymax = -1;
+            $xlen = $ylen = 0;
+            foreach ($diffs as $diff) {
+                $xargs = (is_array($diff[1]) ? array_keys($diff[1]) : [$diff[1]]);
+                $yargs = (is_array($diff[2]) ? array_keys($diff[2]) : [$diff[2]]);
+                $xmin = min($xmin, ...$xargs);
+                $ymin = min($ymin, ...$yargs);
+                $xmax = max($xmax, ...$xargs);
+                $ymax = max($ymax, ...$yargs);
+                $xlen += is_array($diff[1]) ? count($diff[1]) : 0;
+                $ylen += is_array($diff[2]) ? count($diff[2]) : 0;
+            }
+            if ($xmin === -1 && $xlen > 0) {
+                $xmin = 0;
+            }
+            if ($ymin === -1 && $ylen > 0) {
+                $ymin = 0;
+            }
+            return [$xmin + 1, $xmax + 1, $xlen, $ymin + 1, $ymax + 1, $ylen];
+        };
+
+        $block_size = null;
+
+        if (is_string($options['stringify']) && preg_match('#html(=(.+))?#', $options['stringify'], $m)) {
+            $mode = $m[2] ?? null;
+            $options['stringify'] = function ($diffs) use ($htmlescape, $mode, $options) {
+                $taging = function ($tag, $content) { return strlen($tag) && strlen($content) ? "<$tag>$content</$tag>" : $content; };
+                $rule = [
+                    '+' => [2 => 'ins'],
+                    '-' => [1 => 'del'],
+                    '*' => [1 => 'del', 2 => 'ins'],
+                    '=' => [1 => null],
+                ];
+                $result = [];
+                foreach ($diffs as $diff) {
+                    if ($mode === 'perline' && $diff[0] === '*') {
+                        $length = min(count($diff[1]), count($diff[2]));
+                        $delete = array_splice($diff[1], 0, $length, []);
+                        $append = array_splice($diff[2], 0, $length, []);
+                        for ($i = 0; $i < $length; $i++) {
+                            $options2 = ['stringify' => null] + $options;
+                            $diffs2 = str_diff(preg_split('/(?<!^)(?!$)/u', $delete[$i]), preg_split('/(?<!^)(?!$)/u', $append[$i]), $options2);
+                            $result2 = [];
+                            foreach ($diffs2 as $diff2) {
+                                foreach ($rule[$diff2[0]] as $n => $tag) {
+                                    $content = $taging($tag, implode("", $htmlescape($diff2[$n])));
+                                    if (strlen($content)) {
+                                        $result2[] = $content;
+                                    }
+                                }
+                            }
+                            $result[] = implode("", $result2);
+                        }
+                    }
+                    foreach ($rule[$diff[0]] as $n => $tag) {
+                        $content = $taging($tag, implode("\n", $htmlescape($diff[$n])));
+                        if ($diff[0] === '=' && !strlen($content)) {
+                            $result[] = "";
+                        }
+                        if (strlen($content)) {
+                            $result[] = $content;
+                        }
+                    }
+                }
+                return implode("\n", $result);
+            };
+        }
+
+        if ($options['stringify'] === 'normal') {
+            $options['stringify'] = function ($diffs) use ($prefixjoin) {
+                $index = function ($v) {
+                    if (!is_array($v)) {
+                        return $v + 1;
+                    }
+                    $keys = array_keys($v);
+                    $s = reset($keys) + 1;
+                    $e = end($keys) + 1;
+                    return $s === $e ? "$s" : "$s,$e";
+                };
+
+                $rule = [
+                    '+' => ['a', [2 => '> ']],
+                    '-' => ['d', [1 => '< ']],
+                    '*' => ['c', [1 => '< ', 2 => '> ']],
+                ];
+                $result = [];
+                foreach ($diffs as $diff) {
+                    if (isset($rule[$diff[0]])) {
+                        $difftext = [];
+                        foreach ($rule[$diff[0]][1] as $n => $sign) {
+                            $difftext[] = $prefixjoin($sign, $diff[$n], "\n");
+                        }
+                        $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
+                        $result[] = implode("\n---\n", $difftext);
+                    }
+                }
+                return implode("\n", $result);
+            };
+        }
+
+        if (is_string($options['stringify']) && preg_match('#context(=(\d+))?#', $options['stringify'], $m)) {
+            $block_size = (int) ($m[2] ?? 3);
+            $options['stringify'] = function ($diffs) use ($prefixjoin, $minmaxlen) {
+                $result = ["***************"];
+
+                list($xmin, $xmax, , $ymin, $ymax,) = $minmaxlen($diffs);
+                $xheader = $xmin === $xmax ? "$xmin" : "$xmin,$xmax";
+                $yheader = $ymin === $ymax ? "$ymin" : "$ymin,$ymax";
+
+                $rules = [
+                    '-*' => [
+                        'header' => "*** {$xheader} ****",
+                        '-'      => [1 => '- '],
+                        '*'      => [1 => '! '],
+                        '='      => [1 => '  '],
+                    ],
+                    '+*' => [
+                        'header' => "--- {$yheader} ----",
+                        '+'      => [2 => '+ '],
+                        '*'      => [2 => '! '],
+                        '='      => [2 => '  '],
+                    ],
+                ];
+                foreach ($rules as $key => $rule) {
+                    $result[] = $rule['header'];
+                    if (array_filter($diffs, function ($d) use ($key) { return strpos($key, $d[0]) !== false; })) {
+                        foreach ($diffs as $diff) {
+                            foreach ($rule[$diff[0]] ?? [] as $n => $sign) {
+                                $result[] = $prefixjoin($sign, $diff[$n], "\n");
+                            }
+                        }
+                    }
+                }
+                return implode("\n", $result);
+            };
+        }
+
+        if (is_string($options['stringify']) && preg_match('#unified(=(\d+))?#', $options['stringify'], $m)) {
+            $block_size = isset($m[2]) ? (int) $m[2] : null;
+            $options['stringify'] = function ($diffs) use ($prefixjoin, $minmaxlen, $block_size) {
+                $result = [];
+
+                if ($block_size !== null) {
+                    list($xmin, , $xlen, $ymin, , $ylen) = $minmaxlen($diffs);
+                    $xheader = $xlen === 1 ? "$xmin" : "$xmin,$xlen";
+                    $yheader = $ylen === 1 ? "$ymin" : "$ymin,$ylen";
+                    $result[] = "@@ -{$xheader} +{$yheader} @@";
+                }
+
+                $rule = [
+                    '+' => [2 => '+'],
+                    '-' => [1 => '-'],
+                    '*' => [1 => '-', 2 => '+'],
+                    '=' => [1 => ' '],
+                ];
+                foreach ($diffs as $diff) {
+                    foreach ($rule[$diff[0]] as $n => $sign) {
+                        $result[] = $prefixjoin($sign, $diff[$n], "\n");
+                    }
+                }
+                return implode("\n", $result);
+            };
+        }
+
+        if (!strlen($block_size)) {
+            $result = $options['stringify']($diffs);
+            if (strlen($result)) {
+                $result .= $trailingN;
+            }
+            return $result;
+        }
+
+        $head = function ($array) use ($block_size) { return array_slice($array, 0, $block_size, true); };
+        $tail = function ($array) use ($block_size) { return array_slice($array, -$block_size, null, true); };
+
+        $blocks = [];
+        $block = [];
+        $last = count($diffs) - 1;
+        foreach ($diffs as $n => $diff) {
+            if ($diff[0] !== '=') {
+                $block[] = $diff;
+                continue;
+            }
+
+            if (!$block) {
+                if ($block_size) {
+                    $block[] = ['=', $tail($diff[1]), $tail($diff[2])];
+                }
+            }
+            elseif ($last === $n) {
+                if ($block_size) {
+                    $block[] = ['=', $head($diff[1]), $head($diff[2])];
+                }
+            }
+            elseif (count($diff[1]) > $block_size * 2) {
+                if ($block_size) {
+                    $block[] = ['=', $head($diff[1]), $head($diff[2])];
+                }
+                $blocks[] = $block;
+                $block = [];
+                if ($block_size) {
+                    $block[] = ['=', $tail($diff[1]), $tail($diff[2])];
+                }
+            }
+            else {
+                if ($block_size) {
+                    $block[] = $diff;
+                }
+            }
+        }
+        if (trim(implode('', array_column($block, 0)), '=')) {
+            $blocks[] = $block;
+        }
+
+        $result = implode("\n", array_map($options['stringify'], $blocks));
+        if (strlen($result)) {
+            $result .= $trailingN;
+        }
+        return $result;
+    }
+}
+if (function_exists("str_diff") && !defined("str_diff")) {
+    define("str_diff", "str_diff");
 }
 
 if (!isset($excluded_functions["starts_with"]) && (!function_exists("starts_with") || (!false && (new \ReflectionFunction("starts_with"))->isInternal()))) {
@@ -12409,7 +13124,7 @@ if (!isset($excluded_functions["parse_php"]) && (!function_exists("parse_php") |
                 continue;
             }
 
-            $result[] = $token;
+            $result[$i] = $token;
 
             foreach ($end_tokens as $t) {
                 if (isset($nest_tokens[$t])) {
@@ -12432,6 +13147,187 @@ if (!isset($excluded_functions["parse_php"]) && (!function_exists("parse_php") |
 }
 if (function_exists("parse_php") && !defined("parse_php")) {
     define("parse_php", "parse_php");
+}
+
+if (!isset($excluded_functions["highlight_php"]) && (!function_exists("highlight_php") || (!false && (new \ReflectionFunction("highlight_php"))->isInternal()))) {
+    /**
+     * php のコードをハイライトする
+     *
+     * SAPI に応じて自動でハイライトする（html タグだったり ASCII color だったり）。
+     * highlight_string の CLI 対応版とも言える。
+     *
+     * @param string $phpcode ハイライトする php コード
+     * @param array|int $options オプション
+     * @return string ハイライトされた php コード
+     */
+    function highlight_php($phpcode, $options = [])
+    {
+        $options += [
+            'context' => null,
+        ];
+
+        $context = $options['context'];
+
+        if ($context === null) {
+            $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
+            if (PHP_SAPI === 'cli') {
+                $context = is_ansi(STDOUT) ? 'cli' : 'plain';
+            }
+        }
+
+        $colorize = static function ($value, $style) use ($context) {
+            switch ($context) {
+                default:
+                    throw new \InvalidArgumentException("'$context' is not supported.");
+                case 'plain':
+                    return $value;
+                case 'cli':
+                    return ansi_colorize($value, $style);
+                case 'html':
+                    $names = array_flip(preg_split('#[^a-z]#i', $style));
+                    $keys = [
+                        'bold'       => 'font-weight:bold',
+                        'faint'      => '',
+                        'italic'     => 'font-style:italic',
+                        'underscore' => 'text-decoration:underline',
+                        'blink'      => '',
+                        'reverse'    => '',
+                        'conceal'    => '',
+                    ];
+                    $colors = array_keys(array_diff_key($names, $keys));
+                    $styles = array_intersect_key($keys, $names);
+                    $styles[] = 'color:' . reset($colors);
+                    $style = implode(';', $styles);
+                    return "<span style='$style'>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+            }
+        };
+
+        $type = 'bold';
+        $keyword = 'magenta|bold';
+        $symbol = 'green|italic';
+        $literal = 'red';
+        $variable = 'underscore';
+        $comment = 'blue|italic';
+
+        $rules = [
+            'null'                     => $type,
+            'false'                    => $type,
+            'true'                     => $type,
+            'iterable'                 => $type,
+            'bool'                     => $type,
+            'float'                    => $type,
+            'int'                      => $type,
+            'string'                   => $type,
+            T_ABSTRACT                 => $keyword,
+            T_ARRAY                    => $keyword,
+            T_CALLABLE                 => $keyword,
+            T_CLASS_C                  => $keyword,
+            T_DIR                      => $keyword,
+            T_FILE                     => $keyword,
+            T_FUNC_C                   => $keyword,
+            T_LINE                     => $keyword,
+            T_METHOD_C                 => $keyword,
+            T_NS_C                     => $keyword,
+            T_TRAIT_C                  => $keyword,
+            T_AS                       => $keyword,
+            T_BOOLEAN_AND              => $keyword,
+            T_BOOLEAN_OR               => $keyword,
+            T_BREAK                    => $keyword,
+            T_CASE                     => $keyword,
+            T_CATCH                    => $keyword,
+            T_CLASS                    => $keyword,
+            T_CLONE                    => $keyword,
+            T_CONST                    => $keyword,
+            T_CONTINUE                 => $keyword,
+            T_DECLARE                  => $keyword,
+            T_DEFAULT                  => $keyword,
+            T_DO                       => $keyword,
+            T_ELSE                     => $keyword,
+            T_ELSEIF                   => $keyword,
+            T_ENDDECLARE               => $keyword,
+            T_ENDFOR                   => $keyword,
+            T_ENDFOREACH               => $keyword,
+            T_ENDIF                    => $keyword,
+            T_ENDSWITCH                => $keyword,
+            T_ENDWHILE                 => $keyword,
+            T_END_HEREDOC              => $keyword,
+            T_EXIT                     => $keyword,
+            T_EXTENDS                  => $keyword,
+            T_FINAL                    => $keyword,
+            T_FINALLY                  => $keyword,
+            T_FOR                      => $keyword,
+            T_FOREACH                  => $keyword,
+            T_ECHO                     => $keyword,
+            T_FUNCTION                 => $keyword,
+            T_GLOBAL                   => $keyword,
+            T_GOTO                     => $keyword,
+            T_IF                       => $keyword,
+            T_IMPLEMENTS               => $keyword,
+            T_INSTANCEOF               => $keyword,
+            T_INSTEADOF                => $keyword,
+            T_INTERFACE                => $keyword,
+            T_LOGICAL_AND              => $keyword,
+            T_LOGICAL_OR               => $keyword,
+            T_LOGICAL_XOR              => $keyword,
+            T_NAMESPACE                => $keyword,
+            T_NEW                      => $keyword,
+            T_PRIVATE                  => $keyword,
+            T_PUBLIC                   => $keyword,
+            T_PROTECTED                => $keyword,
+            T_RETURN                   => $keyword,
+            T_STATIC                   => $keyword,
+            T_SWITCH                   => $keyword,
+            T_THROW                    => $keyword,
+            T_TRAIT                    => $keyword,
+            T_TRY                      => $keyword,
+            T_USE                      => $keyword,
+            T_VAR                      => $keyword,
+            T_WHILE                    => $keyword,
+            T_YIELD                    => $keyword,
+            T_YIELD_FROM               => $keyword,
+            T_EMPTY                    => $keyword,
+            T_EVAL                     => $keyword,
+            T_ISSET                    => $keyword,
+            T_LIST                     => $keyword,
+            T_PRINT                    => $keyword,
+            T_UNSET                    => $keyword,
+            T_INCLUDE                  => $keyword,
+            T_INCLUDE_ONCE             => $keyword,
+            T_REQUIRE                  => $keyword,
+            T_REQUIRE_ONCE             => $keyword,
+            T_HALT_COMPILER            => $keyword,
+            T_STRING                   => $symbol,
+            T_CONSTANT_ENCAPSED_STRING => $literal,
+            T_ENCAPSED_AND_WHITESPACE  => $literal,
+            T_NUM_STRING               => $literal,
+            T_DNUMBER                  => $literal,
+            T_LNUMBER                  => $literal,
+            // T_STRING_VARNAME           => $literal,
+            // T_CURLY_OPEN               => $literal,
+            // T_DOLLAR_OPEN_CURLY_BRACES => $literal,
+            '"'                        => $literal,
+            T_VARIABLE                 => $variable,
+            T_COMMENT                  => $comment,
+            T_DOC_COMMENT              => $comment,
+        ];
+
+        $tokens = token_get_all($phpcode, TOKEN_PARSE);
+        foreach ($tokens as $n => $token) {
+            if (is_string($token)) {
+                $token = [null, $token, null];
+            }
+
+            $style = $rules[strtolower($token[1])] ?? $rules[$token[0]] ?? null;
+            if ($style !== null) {
+                $token[1] = $colorize($token[1], $style);
+            }
+            $tokens[$n] = $token;
+        }
+        return implode('', array_column($tokens, 1));
+    }
+}
+if (function_exists("highlight_php") && !defined("highlight_php")) {
+    define("highlight_php", "highlight_php");
 }
 
 if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || (!false && (new \ReflectionFunction("optional"))->isInternal()))) {
@@ -12461,7 +13357,7 @@ if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || 
      * // __invoke は null を返す
      * assertSame(call_user_func(optional($getobject())), null);
      * // 配列アクセスは null を返す
-     * assertSame($getobject()['hoge'], null);
+     * assertSame(optional($getobject())['hoge'], null);
      * // 空イテレータを返す
      * assertSame(iterator_to_array(optional($getobject())), []);
      *
@@ -13362,6 +14258,9 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!fals
 
         // flush (for test)
         if ($key === null) {
+            if ($provider === null) {
+                $cacheobject->clear();
+            }
             $cacheobject = null;
             return;
         }
@@ -13381,6 +14280,395 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!fals
 }
 if (function_exists("cache") && !defined("cache")) {
     define("cache", "cache");
+}
+
+if (!isset($excluded_functions["parse_namespace"]) && (!function_exists("parse_namespace") || (!false && (new \ReflectionFunction("parse_namespace"))->isInternal()))) {
+    /**
+     * php ファイルをパースして名前空間配列を返す
+     *
+     * ファイル内で use/use const/use function していたり、シンボルを定義していたりする箇所を検出して名前空間単位で返す。
+     *
+     * Example:
+     * ```php
+     * // このような php ファイルをパースすると・・・
+     * file_set_contents(sys_get_temp_dir() . '/namespace.php', '
+     * <?php
+     * namespace NS1;
+     * use ArrayObject as AO;
+     * use function strlen as SL;
+     * function InnerFunc(){}
+     * class InnerClass{}
+     *
+     * namespace NS2;
+     * use RuntimeException as RE;
+     * use const COUNT_RECURSIVE as CR;
+     * class InnerClass{}
+     * const InnerConst = 123;
+     * ');
+     * // このような名前空間配列が得られる
+     * assertSame(parse_namespace(sys_get_temp_dir() . '/namespace.php'), [
+     *     'NS1' => [
+     *         'const'    => [],
+     *         'function' => [
+     *             'SL'        => 'strlen',
+     *             'InnerFunc' => 'NS1\\InnerFunc',
+     *         ],
+     *         'alias'    => [
+     *             'AO'         => 'ArrayObject',
+     *             'InnerClass' => 'NS1\\InnerClass',
+     *         ],
+     *     ],
+     *     'NS2' => [
+     *         'const'    => [
+     *             'CR'         => 'COUNT_RECURSIVE',
+     *             'InnerConst' => 'NS2\\InnerConst',
+     *         ],
+     *         'function' => [],
+     *         'alias'    => [
+     *             'RE'         => 'RuntimeException',
+     *             'InnerClass' => 'NS2\\InnerClass',
+     *         ],
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string $filename ファイル名
+     * @return array 名前空間配列
+     */
+    function parse_namespace($filename)
+    {
+        return cache(realpath($filename), function () use ($filename) {
+            $stringify = function ($tokens) {
+                return trim(implode('', array_column(array_filter($tokens, function ($token) {
+                    return $token[0] === T_NS_SEPARATOR || $token[0] === T_STRING;
+                }), 1)), '\\');
+            };
+
+            $keys = [
+                0           => 'alias', // for use
+                T_CLASS     => 'alias',
+                T_INTERFACE => 'alias',
+                T_TRAIT     => 'alias',
+                T_STRING    => 'const', // for define
+                T_CONST     => 'const',
+                T_FUNCTION  => 'function',
+            ];
+
+            $contents = "?>" . file_get_contents($filename);
+            $namespace = '';
+            $tokens = [-1 => null];
+            $result = [];
+            while (true) {
+                $tokens = parse_php($contents, [
+                    'flags'  => TOKEN_PARSE,
+                    'begin'  => [T_NAMESPACE, T_USE, T_STRING, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
+                    'end'    => ['{', ';', '(', T_EXTENDS, T_IMPLEMENTS],
+                    'offset' => last_key($tokens) + 1,
+                ]);
+                if (!$tokens) {
+                    break;
+                }
+                $token = reset($tokens);
+                switch ($token[0]) {
+                    case T_NAMESPACE:
+                        $namespace = $stringify($tokens);
+                        $result[$namespace] = [
+                            'const'    => [],
+                            'function' => [],
+                            'alias'    => [],
+                        ];
+                        break;
+                    case T_USE:
+                        $tokenCorF = array_find($tokens, function ($token) {
+                            return ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0;
+                        }, false);
+
+                        $prefix = '';
+                        if (end($tokens)[1] === '{') {
+                            $prefix = $stringify($tokens);
+                            $tokens = parse_php($contents, [
+                                'flags'  => TOKEN_PARSE,
+                                'begin'  => ['{'],
+                                'end'    => ['}'],
+                                'offset' => last_key($tokens),
+                            ]);
+                        }
+
+                        $multi = array_explode($tokens, function ($token) { return $token[1] === ','; });
+                        foreach ($multi as $ttt) {
+                            $as = array_explode($ttt, function ($token) { return $token[0] === T_AS; });
+
+                            $alias = $stringify($as[0]);
+                            if (isset($as[1])) {
+                                $result[$namespace][$keys[$tokenCorF]][$stringify($as[1])] = concat($prefix, '\\') . $alias;
+                            }
+                            else {
+                                $result[$namespace][$keys[$tokenCorF]][namespace_split($alias)[1]] = concat($prefix, '\\') . $alias;
+                            }
+                        }
+                        break;
+                    case T_STRING:
+                        // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
+                        if (strtolower($token[1]) === 'define') {
+                            $tokens = parse_php($contents, [
+                                'flags'  => TOKEN_PARSE,
+                                'begin'  => [T_CONSTANT_ENCAPSED_STRING],
+                                'end'    => [T_CONSTANT_ENCAPSED_STRING],
+                                'offset' => last_key($tokens),
+                            ]);
+                            $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
+                            list($ns, $nm) = namespace_split($define);
+                            $result[$ns][$keys[$token[0]]][$nm] = $define;
+                        }
+                        break;
+                    case T_CONST:
+                    case T_FUNCTION:
+                    case T_CLASS:
+                    case T_INTERFACE:
+                    case T_TRAIT:
+                        $alias = $stringify($tokens);
+                        if (strlen($alias)) {
+                            $result[$namespace][$keys[$token[0]]][$alias] = concat($namespace, '\\') . $alias;
+                        }
+                        // ブロック内に興味はないので進めておく（function 内 function などはあり得るが考慮しない）
+                        if ($token[0] !== T_CONST) {
+                            $tokens = parse_php($contents, [
+                                'flags'  => TOKEN_PARSE,
+                                'begin'  => ['{'],
+                                'end'    => ['}'],
+                                'offset' => last_key($tokens),
+                            ]);
+                            break;
+                        }
+                }
+            }
+            return $result;
+        }, __FUNCTION__);
+    }
+}
+if (function_exists("parse_namespace") && !defined("parse_namespace")) {
+    define("parse_namespace", "parse_namespace");
+}
+
+if (!isset($excluded_functions["resolve_symbol"]) && (!function_exists("resolve_symbol") || (!false && (new \ReflectionFunction("resolve_symbol"))->isInternal()))) {
+    /**
+     * エイリアス名を完全修飾名に解決する
+     *
+     * 例えばあるファイルのある名前空間で `use Hoge\Fuga\Piyo;` してるときの `Piyo` を `Hoge\Fuga\Piyo` に解決する。
+     *
+     * Example:
+     * ```php
+     * // このような php ファイルがあるとして・・・
+     * file_set_contents(sys_get_temp_dir() . '/symbol.php', '
+     * <?php
+     * namespace vendor\NS;
+     *
+     * use ArrayObject as AO;
+     * use function strlen as SL;
+     *
+     * function InnerFunc(){}
+     * class InnerClass{}
+     * ');
+     * // 下記のように解決される
+     * assertSame(resolve_symbol('AO', sys_get_temp_dir() . '/symbol.php'), 'ArrayObject');
+     * assertSame(resolve_symbol('SL', sys_get_temp_dir() . '/symbol.php'), 'strlen');
+     * assertSame(resolve_symbol('InnerFunc', sys_get_temp_dir() . '/symbol.php'), 'vendor\\NS\\InnerFunc');
+     * assertSame(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'), 'vendor\\NS\\InnerClass');
+     * ```
+     *
+     * @param string $shortname エイリアス名
+     * @param string|array $nsfiles ファイル名 or [ファイル名 => 名前空間名]
+     * @param array $targets エイリアスタイプ（'const', 'function', 'alias' のいずれか）
+     * @return string|null 完全修飾名。解決できなかった場合は null
+     */
+    function resolve_symbol(string $shortname, $nsfiles, $targets = ['const', 'function', 'alias'])
+    {
+        // 既に完全修飾されている場合は何もしない
+        if (($shortname[0] ?? null) === '\\') {
+            return $shortname;
+        }
+
+        // use Inner\Space のような名前空間の use の場合を考慮する
+        $parts = explode('\\', $shortname, 2);
+        $prefix = isset($parts[1]) ? array_shift($parts) : null;
+
+        if (is_string($nsfiles)) {
+            $nsfiles = [$nsfiles => []];
+        }
+
+        $targets = (array) $targets;
+        foreach ($nsfiles as $filename => $namespaces) {
+            $namespaces = array_flip(array_map(function ($n) { return trim($n, '\\'); }, (array) $namespaces));
+            foreach (parse_namespace($filename) as $namespace => $ns) {
+                if (!$namespaces || isset($namespaces[$namespace])) {
+                    if (isset($ns['alias'][$prefix])) {
+                        return $ns['alias'][$prefix] . '\\' . implode('\\', $parts);
+                    }
+                    foreach ($targets as $target) {
+                        if (isset($ns[$target][$shortname])) {
+                            return $ns[$target][$shortname];
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+}
+if (function_exists("resolve_symbol") && !defined("resolve_symbol")) {
+    define("resolve_symbol", "resolve_symbol");
+}
+
+if (!isset($excluded_functions["parse_annotation"]) && (!function_exists("parse_annotation") || (!false && (new \ReflectionFunction("parse_annotation"))->isInternal()))) {
+    /**
+     * アノテーションっぽい文字列をそれっぽくパースして返す
+     *
+     * $annotation にはリフレクションオブジェクトも渡せる。
+     * その場合、getDocComment や getFilename, getNamespaceName などを用いてある程度よしなに名前解決する。
+     * もっとも、@Class(args) 形式を使わないのであれば特に意味はない。
+     *
+     * $schame で「どのように取得するか？」のスキーマ定義が渡せる。
+     * ただし、現実装では「そのまま文字列で返すか？」の bool 値とクロージャしか渡すことはできない。
+     *
+     * アノテーションの仕様は下記（すべて $schema が false であるとする）。
+     *
+     * - @から行末まで（1行に複数のアノテーションは含められない）
+     * - 同じアノテーションを複数見つけたときは配列化される
+     * - `@hogera`: 値なしは null を返す
+     * - `@hogera v1 "v2 v3"`: ["v1", "v2 v3"] という配列として返す
+     * - `@hogera {key: 123}`: ["key" => 123] という（連想）配列として返す
+     * - `@hogera [123, 456]`: [123, 456] という連番配列として返す
+     * - `@hogera ("2019/12/23")`: hogera で解決できるクラス名で new して返す（$filename 引数の指定が必要）
+     * - 下3つの形式はアノテーション区切りのスペースはあってもなくても良い
+     *
+     * あくまで簡易実装であり、本格的に何かをしたいなら専用のパッケージを導入したほうが良い。
+     *
+     * Example:
+     * ```php
+     * $annotations = parse_annotation('
+     * 冒頭の - に意味はない
+     * - @noval
+     * - @single this is value
+     * - @closure this is value
+     * - @array this is value
+     * - @hash {key: 123}
+     * - @list [1, 2, 3]
+     * - @ArrayObject([1, 2, 3])
+     * - @same this is same value1
+     * - @same this is same value2
+     * - @same this is same value3
+     * ', [
+     *     'single'  => true,
+     *     'closure' => function ($value) { return explode(' ', strtoupper($value)); },
+     * ]);
+     * assertEquals($annotations, [
+     *     'noval'       => null,                        // 値なしは null になる
+     *     'single'      => 'this is value',             // $schema 指定してるので文字列になる
+     *     'closure'     => ['THIS', 'IS', 'VALUE'],     // $schema 指定してそれがクロージャだとコールバックされる
+     *     'array'       => ['this', 'is', 'value'],     // $schema 指定していないので配列になる
+     *     'hash'        => ['key' => '123'],            // 連想配列になる
+     *     'list'        => [1, 2, 3],                   // 連番配列になる
+     *     'ArrayObject' => new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
+     *     'same'        => [                            // 複数あるのでそれぞれの配列になる
+     *         ['this', 'is', 'same', 'value1'],
+     *         ['this', 'is', 'same', 'value2'],
+     *         ['this', 'is', 'same', 'value3'],
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string|\Reflector $annotation アノテーション文字列
+     * @param array|mixed $schema スキーマ定義
+     * @param string|array $nsfiles ファイル名 or [ファイル名 => 名前空間名]
+     * @return array アノテーション配列
+     */
+    function parse_annotation($annotation, $schema = [], $nsfiles = [])
+    {
+        if ($annotation instanceof \Reflector) {
+            $reflector = $annotation;
+            $annotation = $reflector->getDocComment();
+
+            // クラスメンバーリフレクションは getDeclaringClass しないと名前空間が取れない
+            if (false
+                || $reflector instanceof \ReflectionClassConstant
+                || $reflector instanceof \ReflectionProperty
+                || $reflector instanceof \ReflectionMethod
+            ) {
+                $reflector = $reflector->getDeclaringClass();
+            }
+
+            // 無名クラスに名前空間という概念はない（無くはないが普通に想起される名前空間ではない）
+            $namespaces = [];
+            if (!($reflector instanceof \ReflectionClass && $reflector->isAnonymous())) {
+                $namespaces[] = $reflector->getNamespaceName();
+            }
+            $nsfiles[$reflector->getFileName()] = $nsfiles[$reflector->getFileName()] ?? $namespaces;
+        }
+
+        $result = [];
+        $multiples = [];
+
+        for ($i = 0, $l = strlen($annotation); $i < $l; $i++) {
+            $i = strpos_quoted($annotation, '@', $i);
+            if ($i === false) {
+                break;
+            }
+
+            $seppos = min(strpos_array($annotation, ["\n", " ", "\t", '[', '{', '('], $i + 1) ?: [false]);
+            $name = substr($annotation, $i + 1, $seppos - $i - 1);
+            $i += strlen($name);
+            $name = trim($name);
+
+            if ($annotation[$seppos] === "\n") {
+                $value = '';
+            }
+            else {
+                $endpos = strpos_quoted($annotation, "\n", $seppos);
+                $value = substr($annotation, $seppos, $endpos - $seppos);
+                $i += strlen($value);
+                $value = trim($value);
+            }
+
+            $rawmode = $schema;
+            if (is_array($rawmode)) {
+                $rawmode = array_key_exists($name, $rawmode) ? $rawmode[$name] : false;
+            }
+            if ($rawmode instanceof \Closure) {
+                $value = $rawmode($value);
+            }
+            elseif (!$rawmode) {
+                if ($value === '') {
+                    $value = null;
+                }
+                elseif (in_array($value[0] ?? null, ['('], true)) {
+                    $class = resolve_symbol($name, $nsfiles, 'alias') ?? $name;
+                    $value = new $class(...paml_import(trim($value, '()')));
+                }
+                elseif (in_array($value[0] ?? null, ['[', '{'], true)) {
+                    $value = (array) paml_import($value)[0];
+                }
+                else {
+                    $value = array_values(array_filter(quoteexplode([" ", "\t"], $value), "strlen"));
+                }
+            }
+
+            if (array_key_exists($name, $result)) {
+                if (!isset($multiples[$name])) {
+                    $multiples[$name] = true;
+                    $result[$name] = [$result[$name]];
+                }
+                $result[$name][] = $value;
+            }
+            else {
+                $result[$name] = $value;
+            }
+        }
+
+        return $result;
+    }
+}
+if (function_exists("parse_annotation") && !defined("parse_annotation")) {
+    define("parse_annotation", "parse_annotation");
 }
 
 if (!isset($excluded_functions["is_ansi"]) && (!function_exists("is_ansi") || (!false && (new \ReflectionFunction("is_ansi"))->isInternal()))) {
@@ -14469,10 +15757,10 @@ if (function_exists("arrayval") && !defined("arrayval")) {
 
 if (!isset($excluded_functions["arrayable_key_exists"]) && (!function_exists("arrayable_key_exists") || (!false && (new \ReflectionFunction("arrayable_key_exists"))->isInternal()))) {
     /**
-     * 配列・Arrayable にキーがあるか調べる
+     * 配列・ArrayAccess にキーがあるか調べる
      *
      * 配列が与えられた場合は array_key_exists と同じ。
-     * Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
+     * ArrayAccess は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
      *
      * Example:
      * ```php
@@ -14523,7 +15811,7 @@ if (!isset($excluded_functions["arrayable_key_exists"]) && (!function_exists("ar
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('%s is not arrayable (%s).', '$arrayable', var_type($arrayable)));
+        throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', var_type($arrayable)));
     }
 }
 if (function_exists("arrayable_key_exists") && !defined("arrayable_key_exists")) {
@@ -15226,7 +16514,7 @@ if (!isset($excluded_functions["var_export2"]) && (!function_exists("var_export2
             }
             // 文字列はダブルクオート
             elseif (is_string($value)) {
-                return '"' . addcslashes($value, "\"\0\\") . '"';
+                return '"' . addcslashes($value, "\$\"\0\\") . '"';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -15473,7 +16761,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
         };
 
         // 結果を返したり出力したり
-        $result = ($return ? '' : stacktrace(null, ['format' => "%s:%s", 'args' => false]) . "\n") . $export($value);
+        $result = ($return ? '' : implode("\n", array_reverse(stacktrace(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]))) . "\n") . $export($value);
         if ($context === 'html') {
             $result = "<pre>$result</pre>";
         }

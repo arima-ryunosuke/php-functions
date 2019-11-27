@@ -63,6 +63,16 @@
  * @method   \ChainObject  add4(...$variadic)
  * @method   \ChainObject  add5(...$variadic)
  *
+ * @see array_aggregate
+ * @method   \ChainObject  array_aggregate($columns, $key = null)
+ * @method   \ChainObject  array_aggregate1($array, $key = null)
+ * @method   \ChainObject  array_aggregate2($array, $columns)
+ *
+ * @see array_aggregate
+ * @method   \ChainObject  aggregate($columns, $key = null)
+ * @method   \ChainObject  aggregate1($array, $key = null)
+ * @method   \ChainObject  aggregate2($array, $columns)
+ *
  * @see array_all
  * @property \ChainObject $array_all
  * @method   \ChainObject  array_all($callback = null, $default = true)
@@ -2830,6 +2840,11 @@
  * @method   \ChainObject  highlight_file($return = null)
  * @method   \ChainObject  highlight_file1($file_name)
  *
+ * @see highlight_php
+ * @property \ChainObject $highlight_php
+ * @method   \ChainObject  highlight_php($options = [])
+ * @method   \ChainObject  highlight_php1($phpcode)
+ *
  * @see highlight_string
  * @property \ChainObject $highlight_string
  * @method   \ChainObject  highlight_string($return = null)
@@ -3963,6 +3978,12 @@
  * @method   \ChainObject  parameter_lengthE1($callable, $thought_variadic = false)
  * @method   \ChainObject  parameter_lengthE2($callable, $require_only = false)
  *
+ * @see parse_annotation
+ * @property \ChainObject $parse_annotation
+ * @method   \ChainObject  parse_annotation($schema = [], $nsfiles = [])
+ * @method   \ChainObject  parse_annotation1($annotation, $nsfiles = [])
+ * @method   \ChainObject  parse_annotation2($annotation, $schema = [])
+ *
  * @see parse_ini_file
  * @property \ChainObject $parse_ini_file
  * @method   \ChainObject  parse_ini_file($process_sections = null, $scanner_mode = null)
@@ -3974,6 +3995,10 @@
  * @method   \ChainObject  parse_ini_string($process_sections = null, $scanner_mode = null)
  * @method   \ChainObject  parse_ini_string1($ini_string, $scanner_mode = null)
  * @method   \ChainObject  parse_ini_string2($ini_string, $process_sections = null)
+ *
+ * @see parse_namespace
+ * @property \ChainObject $parse_namespace
+ * @method   \ChainObject  parse_namespace()
  *
  * @see parse_php
  * @property \ChainObject $parse_php
@@ -4276,6 +4301,11 @@
  * @method   \ChainObject  render_string($array)
  * @method   \ChainObject  render_string1($template)
  *
+ * @see resolve_symbol
+ * @method   \ChainObject  resolve_symbol($nsfiles, $targets = ["const", "function", "alias"])
+ * @method   \ChainObject  resolve_symbol1(string $shortname, $targets = ["const", "function", "alias"])
+ * @method   \ChainObject  resolve_symbol2(string $shortname, $nsfiles)
+ *
  * @see rewind
  * @property \ChainObject $rewind
  * @method   \ChainObject  rewind()
@@ -4523,6 +4553,11 @@
  * @method   \ChainObject  contains1($haystack, $case_insensitivity = false, $and_flag = false)
  * @method   \ChainObject  contains2($haystack, $needle, $and_flag = false)
  * @method   \ChainObject  contains3($haystack, $needle, $case_insensitivity = false)
+ *
+ * @see str_diff
+ * @method   \ChainObject  str_diff($ystring, $options = [])
+ * @method   \ChainObject  str_diff1($xstring, $options = [])
+ * @method   \ChainObject  str_diff2($xstring, $ystring)
  *
  * @see str_ellipsis
  * @method   \ChainObject  str_ellipsis($width, $trimmarker = "...", $pos = null)
@@ -4947,6 +4982,18 @@
  * @method   \ChainObject  strpos($needle, $offset = null)
  * @method   \ChainObject  strpos1($haystack, $offset = null)
  * @method   \ChainObject  strpos2($haystack, $needle)
+ *
+ * @see strpos_array
+ * @method   \ChainObject  strpos_array($needles, $offset = 0)
+ * @method   \ChainObject  strpos_array1($haystack, $offset = 0)
+ * @method   \ChainObject  strpos_array2($haystack, $needles)
+ *
+ * @see strpos_quoted
+ * @method   \ChainObject  strpos_quoted($needle, $offset = 0, $enclosure = "'\"", $escape = "\\")
+ * @method   \ChainObject  strpos_quoted1($haystack, $offset = 0, $enclosure = "'\"", $escape = "\\")
+ * @method   \ChainObject  strpos_quoted2($haystack, $needle, $enclosure = "'\"", $escape = "\\")
+ * @method   \ChainObject  strpos_quoted3($haystack, $needle, $offset = 0, $escape = "\\")
+ * @method   \ChainObject  strpos_quoted4($haystack, $needle, $offset = 0, $enclosure = "'\"")
  *
  * @see strptime
  * @method   \ChainObject  strptime($format)
