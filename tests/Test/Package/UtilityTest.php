@@ -448,6 +448,86 @@ class UtilityTest extends AbstractTestCase
         $this->assertEquals('Main\\Sub22\\D', (resolve_symbol)('D', [$multispace2 => ['vendor\\NS2']]));
     }
 
+    function test_parse_annotation()
+    {
+        $refmethod = new \ReflectionMethod(require __DIR__ . '/Utility/annotation.php', 'm');
+
+        $actual = (parse_annotation)($refmethod);
+        $this->assertEquals([
+            "single"    => ["123"],
+            "closure"   => ["123", "+", "456"],
+            "multi"     => ["a", "b", "c"],
+            "quote"     => ["\"a b c\"", "123"],
+            "noval"     => [
+                null,
+                null,
+            ],
+            "hash"      => [
+                "a" => 123,
+            ],
+            "list"      => [123, 456],
+            "hashX"     => [
+                "a" => 123,
+            ],
+            "listX"     => [123, 456],
+            "double"    => [
+                ["a"],
+                ["b"],
+                ["c"],
+            ],
+            "DateTime2" => \This\Is\Space\DateTime2::__set_state([
+                "date"          => "2019-12-23 00:00:00.000000",
+                "timezone_type" => 3,
+                "timezone"      => "Asia/Tokyo",
+            ]),
+            "param"     => [
+                ["string", "\$arg1", "引数1"],
+                ["array", "\$arg2", "this", "is", "second", "argument"],
+            ],
+            "return"    => ["null", "返り値"],
+        ], $actual, 'actual:' . (var_export2)($actual, true));
+
+        $actual = (parse_annotation)($refmethod, [
+            'single'  => true,
+            'double'  => true,
+            'closure' => function ($value) { return eval('return ' . $value . ';'); },
+        ]);
+        $this->assertEquals([
+            "single"    => "123",
+            "closure"   => 579,
+            "multi"     => ["a", "b", "c"],
+            "quote"     => ["\"a b c\"", "123"],
+            "noval"     => [
+                null,
+                null,
+            ],
+            "hash"      => [
+                "a" => 123,
+            ],
+            "list"      => [123, 456],
+            "hashX"     => [
+                "a" => 123,
+            ],
+            "listX"     => [123, 456],
+            "double"    => ["a", "b", "c"],
+            "DateTime2" => \This\Is\Space\DateTime2::__set_state([
+                "date"          => "2019-12-23 00:00:00.000000",
+                "timezone_type" => 3,
+                "timezone"      => "Asia/Tokyo",
+            ]),
+            "param"     => [
+                ["string", "\$arg1", "引数1"],
+                ["array", "\$arg2", "this", "is", "second", "argument"],
+            ],
+            "return"    => ["null", "返り値"],
+        ], $actual, 'actual:' . (var_export2)($actual, true));
+
+        $actual = (parse_annotation)(new \ReflectionMethod(\This\Is\Space\DateTime2::class, 'method'), true);
+        $this->assertEquals([
+            "message" => 'this is annotation',
+        ], $actual, 'actual:' . (var_export2)($actual, true));
+    }
+
     function test_is_ansi()
     {
         // common

@@ -425,6 +425,153 @@ class Utility
     }
 
     /**
+     * アノテーションっぽい文字列をそれっぽくパースして返す
+     *
+     * $annotation にはリフレクションオブジェクトも渡せる。
+     * その場合、getDocComment や getFilename, getNamespaceName などを用いてある程度よしなに名前解決する。
+     * もっとも、@Class(args) 形式を使わないのであれば特に意味はない。
+     *
+     * $schame で「どのように取得するか？」のスキーマ定義が渡せる。
+     * ただし、現実装では「そのまま文字列で返すか？」の bool 値とクロージャしか渡すことはできない。
+     *
+     * アノテーションの仕様は下記（すべて $schema が false であるとする）。
+     *
+     * - @から行末まで（1行に複数のアノテーションは含められない）
+     * - 同じアノテーションを複数見つけたときは配列化される
+     * - `@hogera`: 値なしは null を返す
+     * - `@hogera v1 "v2 v3"`: ["v1", "v2 v3"] という配列として返す
+     * - `@hogera {key: 123}`: ["key" => 123] という（連想）配列として返す
+     * - `@hogera [123, 456]`: [123, 456] という連番配列として返す
+     * - `@hogera ("2019/12/23")`: hogera で解決できるクラス名で new して返す（$filename 引数の指定が必要）
+     * - 下3つの形式はアノテーション区切りのスペースはあってもなくても良い
+     *
+     * あくまで簡易実装であり、本格的に何かをしたいなら専用のパッケージを導入したほうが良い。
+     *
+     * Example:
+     * ```php
+     * $annotations = parse_annotation('
+     * 冒頭の - に意味はない
+     * - @noval
+     * - @single this is value
+     * - @closure this is value
+     * - @array this is value
+     * - @hash {key: 123}
+     * - @list [1, 2, 3]
+     * - @ArrayObject([1, 2, 3])
+     * - @same this is same value1
+     * - @same this is same value2
+     * - @same this is same value3
+     * ', [
+     *     'single'  => true,
+     *     'closure' => function ($value) { return explode(' ', strtoupper($value)); },
+     * ]);
+     * assertEquals($annotations, [
+     *     'noval'       => null,                        // 値なしは null になる
+     *     'single'      => 'this is value',             // $schema 指定してるので文字列になる
+     *     'closure'     => ['THIS', 'IS', 'VALUE'],     // $schema 指定してそれがクロージャだとコールバックされる
+     *     'array'       => ['this', 'is', 'value'],     // $schema 指定していないので配列になる
+     *     'hash'        => ['key' => '123'],            // 連想配列になる
+     *     'list'        => [1, 2, 3],                   // 連番配列になる
+     *     'ArrayObject' => new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
+     *     'same'        => [                            // 複数あるのでそれぞれの配列になる
+     *         ['this', 'is', 'same', 'value1'],
+     *         ['this', 'is', 'same', 'value2'],
+     *         ['this', 'is', 'same', 'value3'],
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string|\Reflector $annotation アノテーション文字列
+     * @param array|mixed $schema スキーマ定義
+     * @param string|array $nsfiles ファイル名 or [ファイル名 => 名前空間名]
+     * @return array アノテーション配列
+     */
+    public static function parse_annotation($annotation, $schema = [], $nsfiles = [])
+    {
+        if ($annotation instanceof \Reflector) {
+            $reflector = $annotation;
+            $annotation = $reflector->getDocComment();
+
+            // クラスメンバーリフレクションは getDeclaringClass しないと名前空間が取れない
+            if (false
+                || $reflector instanceof \ReflectionClassConstant
+                || $reflector instanceof \ReflectionProperty
+                || $reflector instanceof \ReflectionMethod
+            ) {
+                $reflector = $reflector->getDeclaringClass();
+            }
+
+            // 無名クラスに名前空間という概念はない（無くはないが普通に想起される名前空間ではない）
+            $namespaces = [];
+            if (!($reflector instanceof \ReflectionClass && $reflector->isAnonymous())) {
+                $namespaces[] = $reflector->getNamespaceName();
+            }
+            $nsfiles[$reflector->getFileName()] = $nsfiles[$reflector->getFileName()] ?? $namespaces;
+        }
+
+        $result = [];
+        $multiples = [];
+
+        for ($i = 0, $l = strlen($annotation); $i < $l; $i++) {
+            $i = (strpos_quoted)($annotation, '@', $i);
+            if ($i === false) {
+                break;
+            }
+
+            $seppos = min((strpos_array)($annotation, ["\n", " ", "\t", '[', '{', '('], $i + 1) ?: [false]);
+            $name = substr($annotation, $i + 1, $seppos - $i - 1);
+            $i += strlen($name);
+            $name = trim($name);
+
+            if ($annotation[$seppos] === "\n") {
+                $value = '';
+            }
+            else {
+                $endpos = (strpos_quoted)($annotation, "\n", $seppos);
+                $value = substr($annotation, $seppos, $endpos - $seppos);
+                $i += strlen($value);
+                $value = trim($value);
+            }
+
+            $rawmode = $schema;
+            if (is_array($rawmode)) {
+                $rawmode = array_key_exists($name, $rawmode) ? $rawmode[$name] : false;
+            }
+            if ($rawmode instanceof \Closure) {
+                $value = $rawmode($value);
+            }
+            elseif (!$rawmode) {
+                if ($value === '') {
+                    $value = null;
+                }
+                elseif (in_array($value[0] ?? null, ['('], true)) {
+                    $class = (resolve_symbol)($name, $nsfiles, 'alias') ?? $name;
+                    $value = new $class(...(paml_import)(trim($value, '()')));
+                }
+                elseif (in_array($value[0] ?? null, ['[', '{'], true)) {
+                    $value = (array) (paml_import)($value)[0];
+                }
+                else {
+                    $value = array_values(array_filter((quoteexplode)([" ", "\t"], $value), "strlen"));
+                }
+            }
+
+            if (array_key_exists($name, $result)) {
+                if (!isset($multiples[$name])) {
+                    $multiples[$name] = true;
+                    $result[$name] = [$result[$name]];
+                }
+                $result[$name][] = $value;
+            }
+            else {
+                $result[$name] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * リソースが ansi color に対応しているか返す
      *
      * パイプしたりリダイレクトしていると false を返す。
