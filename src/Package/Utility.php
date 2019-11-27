@@ -198,6 +198,169 @@ class Utility
     }
 
     /**
+     * php ファイルをパースして名前空間配列を返す
+     *
+     * ファイル内で use/use const/use function していたり、シンボルを定義していたりする箇所を検出して名前空間単位で返す。
+     *
+     * Example:
+     * ```php
+     * // このような php ファイルをパースすると・・・
+     * file_set_contents(sys_get_temp_dir() . '/namespace.php', '
+     * <?php
+     * namespace NS1;
+     * use ArrayObject as AO;
+     * use function strlen as SL;
+     * function InnerFunc(){}
+     * class InnerClass{}
+     *
+     * namespace NS2;
+     * use RuntimeException as RE;
+     * use const COUNT_RECURSIVE as CR;
+     * class InnerClass{}
+     * const InnerConst = 123;
+     * ');
+     * // このような名前空間配列が得られる
+     * assertSame(parse_namespace(sys_get_temp_dir() . '/namespace.php'), [
+     *     'NS1' => [
+     *         'const'    => [],
+     *         'function' => [
+     *             'SL'        => 'strlen',
+     *             'InnerFunc' => 'NS1\\InnerFunc',
+     *         ],
+     *         'alias'    => [
+     *             'AO'         => 'ArrayObject',
+     *             'InnerClass' => 'NS1\\InnerClass',
+     *         ],
+     *     ],
+     *     'NS2' => [
+     *         'const'    => [
+     *             'CR'         => 'COUNT_RECURSIVE',
+     *             'InnerConst' => 'NS2\\InnerConst',
+     *         ],
+     *         'function' => [],
+     *         'alias'    => [
+     *             'RE'         => 'RuntimeException',
+     *             'InnerClass' => 'NS2\\InnerClass',
+     *         ],
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string $filename ファイル名
+     * @return array 名前空間配列
+     */
+    public static function parse_namespace($filename)
+    {
+        return (cache)(realpath($filename), function () use ($filename) {
+            $stringify = function ($tokens) {
+                return trim(implode('', array_column(array_filter($tokens, function ($token) {
+                    return $token[0] === T_NS_SEPARATOR || $token[0] === T_STRING;
+                }), 1)), '\\');
+            };
+
+            $keys = [
+                0           => 'alias', // for use
+                T_CLASS     => 'alias',
+                T_INTERFACE => 'alias',
+                T_TRAIT     => 'alias',
+                T_STRING    => 'const', // for define
+                T_CONST     => 'const',
+                T_FUNCTION  => 'function',
+            ];
+
+            $contents = "?>" . file_get_contents($filename);
+            $namespace = '';
+            $tokens = [-1 => null];
+            $result = [];
+            while (true) {
+                $tokens = (parse_php)($contents, [
+                    'flags'  => TOKEN_PARSE,
+                    'begin'  => [T_NAMESPACE, T_USE, T_STRING, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
+                    'end'    => ['{', ';', '(', T_EXTENDS, T_IMPLEMENTS],
+                    'offset' => (last_key)($tokens) + 1,
+                ]);
+                if (!$tokens) {
+                    break;
+                }
+                $token = reset($tokens);
+                switch ($token[0]) {
+                    case T_NAMESPACE:
+                        $namespace = $stringify($tokens);
+                        $result[$namespace] = [
+                            'const'    => [],
+                            'function' => [],
+                            'alias'    => [],
+                        ];
+                        break;
+                    case T_USE:
+                        $tokenCorF = (array_find)($tokens, function ($token) {
+                            return ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0;
+                        }, false);
+
+                        $prefix = '';
+                        if (end($tokens)[1] === '{') {
+                            $prefix = $stringify($tokens);
+                            $tokens = (parse_php)($contents, [
+                                'flags'  => TOKEN_PARSE,
+                                'begin'  => ['{'],
+                                'end'    => ['}'],
+                                'offset' => (last_key)($tokens),
+                            ]);
+                        }
+
+                        $multi = (array_explode)($tokens, function ($token) { return $token[1] === ','; });
+                        foreach ($multi as $ttt) {
+                            $as = (array_explode)($ttt, function ($token) { return $token[0] === T_AS; });
+
+                            $alias = $stringify($as[0]);
+                            if (isset($as[1])) {
+                                $result[$namespace][$keys[$tokenCorF]][$stringify($as[1])] = (concat)($prefix, '\\') . $alias;
+                            }
+                            else {
+                                $result[$namespace][$keys[$tokenCorF]][(namespace_split)($alias)[1]] = (concat)($prefix, '\\') . $alias;
+                            }
+                        }
+                        break;
+                    case T_STRING:
+                        // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
+                        if (strtolower($token[1]) === 'define') {
+                            $tokens = (parse_php)($contents, [
+                                'flags'  => TOKEN_PARSE,
+                                'begin'  => [T_CONSTANT_ENCAPSED_STRING],
+                                'end'    => [T_CONSTANT_ENCAPSED_STRING],
+                                'offset' => (last_key)($tokens),
+                            ]);
+                            $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
+                            list($ns, $nm) = (namespace_split)($define);
+                            $result[$ns][$keys[$token[0]]][$nm] = $define;
+                        }
+                        break;
+                    case T_CONST:
+                    case T_FUNCTION:
+                    case T_CLASS:
+                    case T_INTERFACE:
+                    case T_TRAIT:
+                        $alias = $stringify($tokens);
+                        if (strlen($alias)) {
+                            $result[$namespace][$keys[$token[0]]][$alias] = (concat)($namespace, '\\') . $alias;
+                        }
+                        // ブロック内に興味はないので進めておく（function 内 function などはあり得るが考慮しない）
+                        if ($token[0] !== T_CONST) {
+                            $tokens = (parse_php)($contents, [
+                                'flags'  => TOKEN_PARSE,
+                                'begin'  => ['{'],
+                                'end'    => ['}'],
+                                'offset' => (last_key)($tokens),
+                            ]);
+                            break;
+                        }
+                }
+            }
+            return $result;
+        }, __FUNCTION__);
+    }
+
+    /**
      * リソースが ansi color に対応しているか返す
      *
      * パイプしたりリダイレクトしていると false を返す。

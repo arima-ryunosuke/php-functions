@@ -240,6 +240,191 @@ class UtilityTest extends AbstractTestCase
         $this->assertFileNotExists("$tmpdir/hoge.php-cache");
     }
 
+    function test_parse_namespace()
+    {
+        $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-standard.php');
+        $this->assertEquals([
+            "vendor\\NS"   => [
+                "const"    => [
+                    "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
+                    "DS"                  => "DIRECTORY_SEPARATOR",
+                    "C1"                  => "Main\\C1",
+                    "xC2"                 => "Main\\C2",
+                    "C"                   => "Main\\Sub\\C",
+                    "xC"                  => "Main\\Sub\\C",
+                    "nsC"                 => "vendor\\NS\\nsC",
+                ],
+                "function" => [
+                    "array_chunk" => "array_chunk",
+                    "AC"          => "array_chunk",
+                    "f1"          => "Main\\f1",
+                    "xf2"         => "Main\\f2",
+                    "F"           => "Main\\Sub\\F",
+                    "xF"          => "Main\\Sub\\F",
+                    "nsF"         => "vendor\\NS\\nsF",
+                ],
+                "alias"    => [
+                    "ArrayObject" => "ArrayObject",
+                    "AO"          => "ArrayObject",
+                    "C1"          => "Main\\C1",
+                    "xC2"         => "Main\\C2",
+                    "sC"          => "Main\\Sub\\sC",
+                    "C"           => "Main\\Sub\\C",
+                    "xC"          => "Main\\Sub\\C",
+                    "Space"       => "Sub\\Space",
+                    "nsC"         => "vendor\\NS\\nsC",
+                    "nsI"         => "vendor\\NS\\nsI",
+                    "nsT"         => "vendor\\NS\\nsT",
+                ],
+            ],
+            "other\\space" => [
+                "const" => [
+                    "CONST" => "other\\space\\CONST",
+                ],
+            ],
+        ], $actual, 'actual:' . (var_export2)($actual, true));
+
+        $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-multispace1.php');
+        $this->assertEquals([
+            "vendor\\NS1" => [
+                "const"    => [
+                    "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
+                    "DS"                  => "DIRECTORY_SEPARATOR",
+                    "C1"                  => "Main\\C1",
+                    "xC2"                 => "Main\\C2",
+                    "C"                   => "Main\\Sub\\C",
+                    "xC"                  => "Main\\Sub\\C",
+                    "nsC"                 => "vendor\\NS1\\nsC",
+                ],
+                "function" => [
+                    "array_chunk" => "array_chunk",
+                    "AC"          => "array_chunk",
+                    "f1"          => "Main\\f1",
+                    "xf2"         => "Main\\f2",
+                    "F"           => "Main\\Sub\\F",
+                    "xF"          => "Main\\Sub\\F",
+                    "nsF"         => "vendor\\NS1\\nsF",
+                ],
+                "alias"    => [
+                    "ArrayObject" => "ArrayObject",
+                    "AO"          => "ArrayObject",
+                    "C1"          => "Main\\C1",
+                    "xC2"         => "Main\\C2",
+                    "sC"          => "Main\\Sub\\sC",
+                    "C"           => "Main\\Sub\\C",
+                    "xC"          => "Main\\Sub\\C",
+                    "nsC"         => "vendor\\NS1\\nsC",
+                    "nsI"         => "vendor\\NS1\\nsI",
+                    "nsT"         => "vendor\\NS1\\nsT",
+                    "D"           => "Main\\Sub11\\D",
+                ],
+            ],
+            "vendor\\NS2" => [
+                "const"    => [
+                    "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
+                    "DS"                  => "DIRECTORY_SEPARATOR",
+                    "C1"                  => "Main\\C1",
+                    "xC2"                 => "Main\\C2",
+                    "C"                   => "Main\\Sub\\C",
+                    "xC"                  => "Main\\Sub\\C",
+                    "nsC"                 => "vendor\\NS2\\nsC",
+                ],
+                "function" => [
+                    "array_chunk" => "array_chunk",
+                    "AC"          => "array_chunk",
+                    "f1"          => "Main\\f1",
+                    "xf2"         => "Main\\f2",
+                    "F"           => "Main\\Sub\\F",
+                    "xF"          => "Main\\Sub\\F",
+                    "nsF"         => "vendor\\NS2\\nsF",
+                ],
+                "alias"    => [
+                    "ArrayObject" => "ArrayObject",
+                    "AO"          => "ArrayObject",
+                    "C1"          => "Main\\C1",
+                    "xC2"         => "Main\\C2",
+                    "sC"          => "Main\\Sub\\sC",
+                    "C"           => "Main\\Sub\\C",
+                    "xC"          => "Main\\Sub\\C",
+                    "nsC"         => "vendor\\NS2\\nsC",
+                    "nsI"         => "vendor\\NS2\\nsI",
+                    "nsT"         => "vendor\\NS2\\nsT",
+                    "D"           => "Main\\Sub12\\D",
+                ],
+            ],
+        ], $actual, 'actual:' . (var_export2)($actual, true));
+
+        $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-multispace2.php');
+        $this->assertEquals([
+            "vendor\\NS1" => [
+                "const"    => [
+                    "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
+                    "DS"                  => "DIRECTORY_SEPARATOR",
+                    "C1"                  => "Main\\C1",
+                    "xC2"                 => "Main\\C2",
+                    "C"                   => "Main\\Sub\\C",
+                    "xC"                  => "Main\\Sub\\C",
+                    "nsC"                 => "vendor\\NS1\\nsC",
+                ],
+                "function" => [
+                    "array_chunk" => "array_chunk",
+                    "AC"          => "array_chunk",
+                    "f1"          => "Main\\f1",
+                    "xf2"         => "Main\\f2",
+                    "F"           => "Main\\Sub\\F",
+                    "xF"          => "Main\\Sub\\F",
+                    "nsF"         => "vendor\\NS1\\nsF",
+                ],
+                "alias"    => [
+                    "ArrayObject" => "ArrayObject",
+                    "AO"          => "ArrayObject",
+                    "C1"          => "Main\\C1",
+                    "xC2"         => "Main\\C2",
+                    "sC"          => "Main\\Sub\\sC",
+                    "C"           => "Main\\Sub\\C",
+                    "xC"          => "Main\\Sub\\C",
+                    "nsC"         => "vendor\\NS1\\nsC",
+                    "nsI"         => "vendor\\NS1\\nsI",
+                    "nsT"         => "vendor\\NS1\\nsT",
+                    "D"           => "Main\\Sub21\\D",
+                ],
+            ],
+            "vendor\\NS2" => [
+                "const"    => [
+                    "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
+                    "DS"                  => "DIRECTORY_SEPARATOR",
+                    "C1"                  => "Main\\C1",
+                    "xC2"                 => "Main\\C2",
+                    "C"                   => "Main\\Sub\\C",
+                    "xC"                  => "Main\\Sub\\C",
+                    "nsC"                 => "vendor\\NS2\\nsC",
+                ],
+                "function" => [
+                    "array_chunk" => "array_chunk",
+                    "AC"          => "array_chunk",
+                    "f1"          => "Main\\f1",
+                    "xf2"         => "Main\\f2",
+                    "F"           => "Main\\Sub\\F",
+                    "xF"          => "Main\\Sub\\F",
+                    "nsF"         => "vendor\\NS2\\nsF",
+                ],
+                "alias"    => [
+                    "ArrayObject" => "ArrayObject",
+                    "AO"          => "ArrayObject",
+                    "C1"          => "Main\\C1",
+                    "xC2"         => "Main\\C2",
+                    "sC"          => "Main\\Sub\\sC",
+                    "C"           => "Main\\Sub\\C",
+                    "xC"          => "Main\\Sub\\C",
+                    "nsC"         => "vendor\\NS2\\nsC",
+                    "nsI"         => "vendor\\NS2\\nsI",
+                    "nsT"         => "vendor\\NS2\\nsT",
+                    "D"           => "Main\\Sub22\\D",
+                ],
+            ],
+        ], $actual, 'actual:' . (var_export2)($actual, true));
+    }
+
     function test_is_ansi()
     {
         // common
