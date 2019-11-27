@@ -170,7 +170,7 @@ class Syntax
                 continue;
             }
 
-            $result[] = $token;
+            $result[$i] = $token;
 
             foreach ($end_tokens as $t) {
                 if (isset($nest_tokens[$t])) {
