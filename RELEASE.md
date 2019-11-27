@@ -10,6 +10,21 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.2
+
+- [feature][Arrays] array_aggregate を追加
+- [feature][Utility] parse_annotation を追加
+- [feature][Utility] resolve_symbol を追加
+- [feature][Utility] parse_namespace を追加
+- [feature][Strings] str_diff を追加
+- [feature][Strings] strpos_quoted を追加
+- [feature][Strings] strpos_array を追加
+- [feature][Syntax] highlight_php を追加
+- [fixbug][Syntax] parse_php で連番が崩れていた不具合を修正
+- [fixbug][Vars] var_export2 で $ がエスケープされない不具合を修正
+- [fixbug][Sql] sql_format の不具合を修正
+- [change][Vars] var_pretty のスタックトレースを逆順に変更
+
 ## 1.4.1
 
 - [change][all] 対応バージョンを php7.2 に変更
