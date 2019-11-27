@@ -915,7 +915,7 @@ class Vars
             }
             // 文字列はダブルクオート
             elseif (is_string($value)) {
-                return '"' . addcslashes($value, "\"\0\\") . '"';
+                return '"' . addcslashes($value, "\$\"\0\\") . '"';
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {

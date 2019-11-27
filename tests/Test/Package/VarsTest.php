@@ -555,16 +555,30 @@ class VarsTest extends AbstractTestCase
         $this->assertSame(<<<'EXPECTED'
 [
     "'\000\"" => 123,
+    "\$var"   => "\$var",
+    "\${var}" => "\${var}",
+    "{\$var}" => "{\$var}",
+    "
+"       => "
+",
+    "\\"      => "\\",
+    "\""      => "\"",
     "key"     => 456,
     "null"    => null,
     "nulls"   => [null],
 ]
 EXPECTED
             , (var_export2)([
-                "'\0\"" => 123,
-                'key'   => 456,
-                'null'  => null,
-                'nulls' => [null],
+                "'\0\""  => 123,
+                '$var'   => '$var',
+                '${var}' => '${var}',
+                '{$var}' => '{$var}',
+                "\n"     => "\n",
+                "\\"     => "\\",
+                '"'      => '"',
+                'key'    => 456,
+                'null'   => null,
+                'nulls'  => [null],
             ], true));
 
         $this->expectOutputRegex('#hoge#');
