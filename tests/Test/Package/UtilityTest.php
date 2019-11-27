@@ -425,6 +425,29 @@ class UtilityTest extends AbstractTestCase
         ], $actual, 'actual:' . (var_export2)($actual, true));
     }
 
+    function test_resolve_symbol()
+    {
+        $standard = __DIR__ . '/Utility/namespace-standard.php';
+        $multispace1 = __DIR__ . '/Utility/namespace-multispace1.php';
+        $multispace2 = __DIR__ . '/Utility/namespace-multispace2.php';
+
+        $this->assertEquals('\\Full\\middle\\name', (resolve_symbol)('\\Full\\middle\\name', []));
+        $this->assertEquals('Sub\\Space\\middle\\name', (resolve_symbol)('Space\\middle\\name', $standard));
+        $this->assertEquals('Main\\Sub\\C', (resolve_symbol)('xC', $standard));
+        $this->assertEquals('ArrayObject', (resolve_symbol)('ArrayObject', $standard));
+        $this->assertEquals(null, (resolve_symbol)('ArrayObject', $standard, ['function']));
+        $this->assertEquals('array_chunk', (resolve_symbol)('AC', $standard));
+        $this->assertEquals(null, (resolve_symbol)('AC', $standard, ['const']));
+        $this->assertEquals('DIRECTORY_SEPARATOR', (resolve_symbol)('DS', $standard));
+        $this->assertEquals(null, (resolve_symbol)('DS', $standard, ['alias']));
+
+        $this->assertEquals(null, (resolve_symbol)('D', $standard));
+        $this->assertEquals('Main\\Sub11\\D', (resolve_symbol)('D', [$multispace1 => ['vendor\\NS1']]));
+        $this->assertEquals('Main\\Sub12\\D', (resolve_symbol)('D', [$multispace1 => ['vendor\\NS2']]));
+        $this->assertEquals('Main\\Sub21\\D', (resolve_symbol)('D', [$multispace2 => ['vendor\\NS1']]));
+        $this->assertEquals('Main\\Sub22\\D', (resolve_symbol)('D', [$multispace2 => ['vendor\\NS2']]));
+    }
+
     function test_is_ansi()
     {
         // common
