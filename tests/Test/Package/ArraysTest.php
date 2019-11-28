@@ -1211,6 +1211,125 @@ class ArraysTest extends AbstractTestCase
         ], (array_group)([$row1, $row2, $row3], (array_of)(['group', 'id'])));
     }
 
+    function test_array_aggregate()
+    {
+        $this->assertSame([
+            'min' => 1,
+            'max' => 5,
+        ], (array_aggregate)([1, 2, 3, 4, 5], [
+            'min' => function ($v) { return min($v); },
+            'max' => function ($v) { return max($v); },
+        ]));
+
+        $row1 = ['id' => 1, 'group' => 'A', 'class' => 'H', 'score' => 2];
+        $row2 = ['id' => 2, 'group' => 'B', 'class' => 'H', 'score' => 4];
+        $row3 = ['id' => 3, 'group' => 'A', 'class' => 'L', 'score' => 3];
+        $row4 = ['id' => 4, 'group' => 'A', 'class' => 'H', 'score' => 2];
+        $array = [$row1, $row2, $row3, $row4];
+
+        $this->assertEquals([
+            'A' => [
+                'ids'    => [1, 3, 4],
+                'scores' => 7,
+            ],
+            'B' => [
+                'ids'    => [2],
+                'scores' => 4,
+            ],
+        ], (array_aggregate)($array, [
+            'ids'    => function ($rows) { return array_column($rows, 'id'); },
+            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+        ], 'group'));
+
+        $this->assertEquals([
+            'A' => [
+                'scores' => [2, 3, 2],
+                'count'  => 3,
+                'sum'    => 7,
+                'avg'    => 7 / 3,
+            ],
+            'B' => [
+                'scores' => [4],
+                'count'  => 1,
+                'sum'    => 4,
+                'avg'    => 4 / 1,
+            ],
+        ], (array_aggregate)($array, [
+            'scores' => function ($rows, $current) { return array_column($rows, 'score'); },
+            'count'  => function ($rows, $current) { return count($current['scores']); },
+            'sum'    => function ($rows, $current) { return array_sum($current['scores']); },
+            'avg'    => function ($rows, $current) { return $current['sum'] / $current['count']; },
+        ], 'group'));
+
+        $this->assertEquals([
+            'A' => [
+                'H' => [
+                    'ids'    => [1, 4],
+                    'scores' => 4,
+                ],
+                'L' => [
+                    'ids'    => [3],
+                    'scores' => 3,
+                ],
+            ],
+            'B' => [
+                'H' => [
+                    'ids'    => [2],
+                    'scores' => 4,
+                ],
+            ],
+        ], (array_aggregate)($array, [
+            'ids'    => function ($rows) { return array_column($rows, 'id'); },
+            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+        ], ['group', 'class']));
+
+        $this->assertEquals([
+            'A' => [
+                'H' => [
+                    'ids'    => [1, 4],
+                    'scores' => 4,
+                ],
+                'L' => [
+                    'ids'    => [3],
+                    'scores' => 3,
+                ],
+            ],
+            'B' => [
+                'H' => [
+                    'ids'    => [2],
+                    'scores' => 4,
+                ],
+            ],
+        ], (array_aggregate)($array, [
+            'ids'    => function ($rows) { return array_column($rows, 'id'); },
+            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+        ], ['group', 'class']));
+
+        $this->assertEquals([
+            'A/H' => [
+                'ids'    => [1, 4],
+                'scores' => 4,
+            ],
+            'B/H' => [
+                'ids'    => [2],
+                'scores' => 4,
+            ],
+            'A/L' => [
+                'ids'    => [3],
+                'scores' => 3,
+            ],
+        ], (array_aggregate)($array, [
+            'ids'    => function ($rows) { return array_column($rows, 'id'); },
+            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+        ], function ($row) { return $row['group'] . '/' . $row['class']; }));
+
+        $this->assertEquals([
+            'A/H' => 4,
+            'B/H' => 4,
+            'A/L' => 3,
+        ], (array_aggregate)($array, function ($rows) { return array_sum(array_column($rows, 'score')); }, function ($row) { return $row['group'] . '/' . $row['class']; }));
+    }
+
     function test_array_all()
     {
         $array = [
