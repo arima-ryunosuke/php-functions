@@ -12,6 +12,6 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
 
         (cachedir)(self::TMPDIR . getenv('TEST_TARGET'));
         (cache)('dummy', function () { });
-        (reflect_callable)(cache)->getStaticVariables()['cacheobject']->clear();
+        (cache)(null, null);
     }
 }

@@ -363,7 +363,7 @@ class FileSystem
      * mkdir($dirname);
      *
      * // この時点では現在日時（単純に自身の更新日時）
-     * assertSame(dirmtime($dirname), time());
+     * assertThat(time() - dirmtime($dirname), logicalOr(equalTo(0), equalTo(1)));
      * // ファイルを作って更新するとその時刻
      * touch("$dirname/tmp", time() + 10);
      * assertSame(dirmtime($dirname), time() + 10);

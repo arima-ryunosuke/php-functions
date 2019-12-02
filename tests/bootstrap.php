@@ -3,6 +3,22 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/classes.php';
 
+// sys_get_temp_dir が返すディレクトリを変更しておく
+$tmpdir = __DIR__ . DIRECTORY_SEPARATOR . 'temporary' . DIRECTORY_SEPARATOR . 'tmp';
+@mkdir($tmpdir, 0777, true);
+if (DIRECTORY_SEPARATOR === '\\') {
+    if (getenv('TMP') !== $tmpdir) {
+        \ryunosuke\Functions\Package\FileSystem::rm_rf($tmpdir, false);
+    }
+    putenv("TMP=$tmpdir");
+}
+else {
+    if (getenv('TMPDIR') !== $tmpdir) {
+        \ryunosuke\Functions\Package\FileSystem::rm_rf($tmpdir, false);
+    }
+    putenv("TMPDIR=$tmpdir");
+};
+
 // Windows 用にダミーで apache(48)/mysql(27) を固定で返す
 if (!function_exists('posix_getuid')) {
     function posix_getuid() { return 48; }

@@ -63,7 +63,7 @@ class ClassobjTest extends AbstractTestCase
     function test_class_loader()
     {
         $this->assertException('not found', function () {
-            (class_loader)(sys_get_temp_dir());
+            (class_loader)('/notfounddir');
         });
     }
 

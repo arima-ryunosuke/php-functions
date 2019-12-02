@@ -231,13 +231,12 @@ class UtilityTest extends AbstractTestCase
         (rm_rf)($tmpdir);
         (cachedir)($tmpdir);
         (cache)('key', function () use ($value) { return $value; }, 'hoge');
-        (cache)(null, null);
+        (cache)(null, 'dummy');
         $this->assertFileExists("$tmpdir/hoge.php-cache");
         $this->assertEquals($value, (cache)('key', function () { return 'dummy'; }, 'hoge'));
 
         (cache)('key', function () use ($value) { return $value; }, 'fuga');
-        /** @noinspection PhpUndefinedMethodInspection */
-        (reflect_callable)(cache)->getStaticVariables()['cacheobject']->clear();
+        (cache)(null, null);
         $this->assertFileNotExists("$tmpdir/hoge.php-cache");
     }
 

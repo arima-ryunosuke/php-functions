@@ -217,7 +217,7 @@ class Syntax
      * // __invoke は null を返す
      * assertSame(call_user_func(optional($getobject())), null);
      * // 配列アクセスは null を返す
-     * assertSame($getobject()['hoge'], null);
+     * assertSame(optional($getobject())['hoge'], null);
      * // 空イテレータを返す
      * assertSame(iterator_to_array(optional($getobject())), []);
      *

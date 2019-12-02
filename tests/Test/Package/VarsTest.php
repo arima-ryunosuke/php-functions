@@ -173,7 +173,7 @@ class VarsTest extends AbstractTestCase
         $this->assertFalse((arrayable_key_exists)('notfound', $object));
         $this->assertFalse((arrayable_key_exists)('ex', $object));
 
-        $this->assertException('is not arrayable', arrayable_key_exists, null, new \stdClass());
+        $this->assertException('must be array or ArrayAccess', arrayable_key_exists, null, new \stdClass());
     }
 
     function test_si_prefix()

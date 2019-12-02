@@ -257,7 +257,10 @@ class FileSystemTest extends AbstractTestCase
 
         // 古い方も消すと自分自身（他にエントリがなく、削除によって自身も更新されているので現在時刻になる）
         unlink("$dir/tmp1");
-        $this->assertEquals(time(), (dirmtime)($dir));
+        $this->assertThat(time() - (dirmtime)($dir), $this->logicalOr(
+            $this->equalTo(0),
+            $this->equalTo(1)
+        ));
 
         // 再帰フラグの確認
         (file_set_contents)("$dir/dir1/tmp", 'dummy');

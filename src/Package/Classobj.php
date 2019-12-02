@@ -19,7 +19,6 @@ class Classobj
     /** private を表す定数 @see \ReflectionMethod::IS_PRIVATE */
     const IS_PRIVATE = 1024;
 
-
     /**
      * 初期フィールド値を与えて stdClass を生成する
      *

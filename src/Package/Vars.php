@@ -223,10 +223,10 @@ class Vars
     }
 
     /**
-     * 配列・Arrayable にキーがあるか調べる
+     * 配列・ArrayAccess にキーがあるか調べる
      *
      * 配列が与えられた場合は array_key_exists と同じ。
-     * Arrayable は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
+     * ArrayAccess は一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
      *
      * Example:
      * ```php
@@ -277,7 +277,7 @@ class Vars
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('%s is not arrayable (%s).', '$arrayable', (var_type)($arrayable)));
+        throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', (var_type)($arrayable)));
     }
 
     /**
