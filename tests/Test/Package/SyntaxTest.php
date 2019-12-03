@@ -196,6 +196,22 @@ PHP
         $this->assertEquals('class C {function m(){if(false)return function(){};}}', implode('', array_column($tokens, 1)));
     }
 
+    function test_highlight_php()
+    {
+        $phpcode = '<?php
+// this is comment
+$var1 = "this is var";
+$var2 = "this is embed $var1";
+$var3 = function () { return \ArrayObject::class; };
+';
+        $this->assertEquals($phpcode, (highlight_php)($phpcode, ['context' => 'plain']));
+        $this->assertContains('[34;3m', (highlight_php)($phpcode, ['context' => 'cli']));
+        $this->assertContains('<span style', (highlight_php)($phpcode, ['context' => 'html']));
+        $this->assertContains('function', (highlight_php)($phpcode));
+
+        $this->assertException('is not supported', highlight_php, $phpcode, ['context' => 'hoge']);
+    }
+
     function test_optional()
     {
         $o = new \Concrete('hoge');
