@@ -603,6 +603,148 @@ class StringsTest extends AbstractTestCase
         $this->assertSame('1234567890', (str_ellipsis)('1234567890', 1000, '...', null));
     }
 
+    function test_str_diff()
+    {
+        $this->assertEquals([
+            ['=', ['e'], ['e'],],
+            ['-', [1 => 'd'], 0,],
+            ['=', [2 => 'e'], [1 => 'e'],],
+            ['+', 2, [2 => 'a'],],
+            ['=', [3 => 'e'], [3 => 'e'],],
+            ['*', [4 => 'c'], [4 => 'C'],],
+        ], (str_diff)("e\nd\ne\ne\nc", "e\ne\na\ne\nC", ['stringify' => null]));
+
+        $this->assertEquals('e
+<del>d</del>
+e
+<ins>a</ins>
+e
+<del>c</del>
+<ins>C</ins>
+&lt;b&gt;B&lt;/b&gt;', (str_diff)("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']));
+
+        $this->assertEquals('
+sameline
+diff1<ins>x</ins>
+diff2<ins>x</ins>
+<del>diff3</del>
+
+sameline
+diff4<ins>x</ins>
+diff5<ins>x</ins>
+<ins>diff6x</ins>
+
+sameline
+this is <del>a</del><ins>the</ins> pen
+
+that is <del>a</del><ins>the</ins> pen
+
+', (str_diff)("
+sameline
+diff1
+diff2
+diff3
+
+sameline
+diff4
+diff5
+
+sameline
+this is a pen
+
+that is a pen
+
+", "
+sameline
+diff1x
+diff2x
+
+sameline
+diff4x
+diff5x
+diff6x
+
+sameline
+this is the pen
+
+that is the pen
+
+", ['stringify' => 'html=perline']));
+    }
+
+    function test_str_diff_native()
+    {
+        $diff = '';
+        if (defined('DIFF')) {
+            $diff = array_filter(explode(',', DIFF), 'file_exists');
+            $diff = reset($diff);
+        }
+        if (!$diff) {
+            $this->markTestSkipped();
+        }
+
+        $shell = function ($x, $y, ...$opt) use ($diff) {
+            $expected = null;
+            $key = array_search('--nolabel', $opt);
+            unset($opt[$key]);
+            (process)($diff, array_merge($opt, [$x, $y]), '', $expected);
+            if ($key !== false) {
+                return implode("\n", array_slice(explode("\n", $expected), 2));
+            }
+            return $expected;
+        };
+
+        $x = __DIR__ . '/Strings/diff-x.txt';
+        $y = __DIR__ . '/Strings/diff-y.txt';
+
+        $expected = $shell($x, $y, '--unified=999', '--ignore-case', '--suppress-blank-empty', '--nolabel');
+        $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999', 'ignore-case' => true]);
+        $this->assertEquals($expected, $actual);
+
+        $expected = $shell($x, $y, '--unified=999', '--ignore-space-change', '--nolabel');
+        $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999', 'ignore-space-change' => true]);
+        $this->assertEquals($expected, $actual);
+
+        $expected = $shell($x, $y, '--unified=999', '--ignore-all-space', '--nolabel');
+        $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999', 'ignore-all-space' => true]);
+        $this->assertEquals($expected, $actual);
+
+        $expected = $shell($x, $y, '--unified=999', '--nolabel');
+        $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999']);
+        $this->assertEquals($expected, $actual);
+
+        $dataset = [
+            [__DIR__ . '/Strings/diff-same.txt', __DIR__ . '/Strings/diff-same.txt'],
+            [__DIR__ . '/Strings/diff-empty.txt', __DIR__ . '/Strings/diff-x.txt'],
+            [__DIR__ . '/Strings/diff-y.txt', __DIR__ . '/Strings/diff-empty.txt'],
+            [__DIR__ . '/Strings/diff-x.txt', __DIR__ . '/Strings/diff-y.txt'],
+            [__DIR__ . '/Strings/diff-even-x.txt', __DIR__ . '/Strings/diff-even-y.txt'],
+            [__DIR__ . '/Strings/diff-even-x.txt', __DIR__ . '/Strings/diff-odd-y.txt'],
+            [__DIR__ . '/Strings/diff-odd-x.txt', __DIR__ . '/Strings/diff-odd-y.txt'],
+            [__DIR__ . '/Strings/diff-odd-x.txt', __DIR__ . '/Strings/diff-even-y.txt'],
+            [__DIR__ . '/Strings/diff-very-x.txt', __DIR__ . '/Strings/diff-very-y.txt'],
+            [__DIR__ . '/Strings/diff-very-y.txt', __DIR__ . '/Strings/diff-very-x.txt'],
+        ];
+
+        foreach ($dataset as [$x, $y]) {
+            $expected = $shell($x, $y, '--normal');
+            $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'normal']);
+            $this->assertEquals($expected, $actual, "$x <=> $y:\nExpected: $expected\nActual: $actual");
+
+            for ($level = 0; $level < 5; $level++) {
+                $levelopt = "context=$level";
+                $expected = $shell($x, $y, "--$levelopt", '--nolabel');
+                $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => $levelopt]);
+                $this->assertEquals($expected, $actual, "$x <=> $y, $levelopt:\nExpected: $expected\nActual: $actual");
+
+                $levelopt = "unified=$level";
+                $expected = $shell($x, $y, "--$levelopt", '--nolabel');
+                $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => $levelopt]);
+                $this->assertEquals($expected, $actual, "$x <=> $y: $levelopt:\nExpected: $expected\nActual: $actual");
+            }
+        }
+    }
+
     function test_starts_with()
     {
         $this->assertTrue((starts_with)('abcdef', 'abc'));
