@@ -387,32 +387,41 @@ ON DUPLICATE KEY UPDATE id = VALUES(id),name = VALUES(name)
     function test_sql_format_comment()
     {
         $this->assertFormatSql("
--- this is hyphen `comment1`
+-- this is quoted `comment`
 select
-  * 
+  -- a
+  a,
+  -- b
+  b,
+  c -- c
 from
-  -- this is hyphen comment2
-  table
+  -- this is indent comment
+  (
+    -- this is inner comment
+    select
+      * -- this is trailing comment
+    from
+      table_name 
+  ) as t -- this is inner comment
+order by
+  null
 ", "
--- this is hyphen `comment1`
-select *
+-- this is quoted `comment`
+select 
+-- a
+  a,
+  -- b
+  b,
+  c -- c
+  
 from
-  -- this is hyphen comment2
-  table");
-
-        $this->assertFormatSql('
-# this is sharp comment1
-select
-  * 
-from
-  # this is sharp comment2
-  table
-', '
-# this is sharp comment1
-select *
-from
-  # this is sharp comment2
-  table');
+  -- this is indent comment
+  (
+  -- this is inner comment
+  select * -- this is trailing comment
+  from table_name) as t
+  -- this is inner comment
+  order by null");
 
         $this->assertFormatSql('
 /*
@@ -424,13 +433,24 @@ from
 select
   * 
 from
-  /**
+  /*
     this
     is
-    docblock
+    block
     comment2
   */
-  table
+  (
+    /*
+      this
+      is
+      block
+      comment3
+    */
+    select
+      * 
+    from
+      table_name 
+  )
 ', '
 /*
   this
@@ -440,13 +460,21 @@ from
 */
 select *
 from
-  /**
+  /*
     this
     is
-    docblock
+    block
     comment2
   */
-  table');
+  (
+    /*
+      this
+      is
+      block
+      comment3
+    */
+  select *
+  from table_name)');
     }
 
     function test_sql_format_options()
@@ -531,6 +559,17 @@ set
 select
   '{:RM'
 ", "select '{:RM'");
+
+        // placeholder
+        $this->assertFormatSql("
+select
+  ?,
+  ? 
+where
+  :id 
+  and :status
+", "select ?, ?
+where :id and :status");
 
         // literal
         $this->assertFormatSql("
@@ -675,7 +714,7 @@ right join
         $this->assertFormatSql('
 select
   (
-      /* comment */
+    /* comment */
     select
       a 
     from
