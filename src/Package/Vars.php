@@ -1152,7 +1152,7 @@ class Vars
         };
 
         // 結果を返したり出力したり
-        $result = ($return ? '' : (stacktrace)(null, ['format' => "%s:%s", 'args' => false]) . "\n") . $export($value);
+        $result = ($return ? '' : implode("\n", array_reverse((stacktrace)(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]))) . "\n") . $export($value);
         if ($context === 'html') {
             $result = "<pre>$result</pre>";
         }
