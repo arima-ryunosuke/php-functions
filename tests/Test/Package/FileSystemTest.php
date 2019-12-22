@@ -453,6 +453,7 @@ class FileSystemTest extends AbstractTestCase
 
         // f 系の一連の流れ
         $f = fopen($hoge, 'w+');
+        $this->assertFalse(stream_set_timeout($f, 5));
         $this->assertEquals(true, flock($f, LOCK_EX));
         $this->assertEquals(5, fwrite($f, 'Hello'));
         $this->assertEquals(6, fwrite($f, 'World!'));
@@ -506,11 +507,13 @@ class FileSystemTest extends AbstractTestCase
             $this->assertEquals(ftell($expected), ftell($actual));
             $this->assertEquals(filesize($expectedFile), filesize($actualFile));
 
-            $this->assertEquals(fwrite($expected, '12345'), fwrite($actual, '12345'));
-            rewind($expected);
-            rewind($actual);
-            $this->assertEquals(fgets($expected), fgets($actual));
-            $this->assertEquals(ftruncate($expected, '12345'), ftruncate($actual, '12345'));
+            if (strpos($mode, '+') !== false) {
+                $this->assertEquals(fwrite($expected, '12345'), fwrite($actual, '12345'));
+                rewind($expected);
+                rewind($actual);
+                $this->assertEquals(fgets($expected), fgets($actual));
+                $this->assertEquals(ftruncate($expected, '12345'), ftruncate($actual, '12345'));
+            }
         };
 
         foreach (['r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'] as $mode) {

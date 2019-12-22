@@ -2748,7 +2748,7 @@ class Arrays
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    $type = $ref->hasReturnType() ? (string) $ref->getReturnType() : gettype(reset($arg));
+                    $type = $ref->hasReturnType() ? $ref->getReturnType()->getName() : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;

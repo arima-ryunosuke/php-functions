@@ -63,6 +63,13 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
         return __METHOD__;
     }
 
+    public static function __set_state($an_array)
+    {
+        $that = new self($an_array['name']);
+        $that->value = $an_array['value'];
+        return $that;
+    }
+
     public static function staticMethod($a = null)
     {
         return __METHOD__;
@@ -129,6 +136,26 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
 class PrivateClass
 {
     private function privateMethod() { }
+}
+
+class SerialObject implements \Serializable
+{
+    private $values;
+
+    public function __construct($values = [])
+    {
+        $this->values = $values;
+    }
+
+    public function serialize()
+    {
+        return serialize($this->values);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->values = unserialize($serialized);
+    }
 }
 
 class JsonObject implements \JsonSerializable

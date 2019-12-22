@@ -777,6 +777,7 @@ class FileSystem
                 private $entry;
                 private $id;
                 private $position;
+                // compatible: 下記は php7.4 以降では標準でエラーになるようにあったため基本的に不要
                 private $readable;
                 private $writable;
                 private $appendable;
@@ -822,6 +823,11 @@ class FileSystem
                 {
                     // 対応して無くても標準では警告止まりなので例外に変える
                     throw new \DomainException("$name is not supported.");
+                }
+
+                public function stream_set_option(int $option, int $arg1, int $arg2)
+                {
+                    return false;
                 }
 
                 public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
@@ -916,9 +922,7 @@ class FileSystem
 
                 public function stream_read(int $count): string
                 {
-                    if (!$this->readable) {
-                        return '';
-                    }
+                    assert($this->readable);
                     $result = substr($this->entry->content, $this->position, $count);
                     $this->position += strlen($result);
                     return $result;
@@ -926,9 +930,7 @@ class FileSystem
 
                 public function stream_write(string $data): int
                 {
-                    if (!$this->writable) {
-                        return 0;
-                    }
+                    assert($this->writable);
                     $datalen = strlen($data);
                     $posision = $this->position;
                     // このモードは、fseek() では何の効果もありません。書き込みは、常に追記となります。
@@ -945,9 +947,7 @@ class FileSystem
 
                 public function stream_truncate(int $new_size): bool
                 {
-                    if (!$this->writable) {
-                        return false;
-                    }
+                    assert($this->writable);
                     $current = substr($this->entry->content, 0, $new_size);
                     $this->entry->content = str_pad($current, $new_size, "\0", STR_PAD_RIGHT);
                     return true;

@@ -19,7 +19,7 @@ class VarsTest extends AbstractTestCase
         $this->assertEquals('["array"]', (stringify)(['array']));
         $this->assertEquals('stdClass', (stringify)(new \stdClass()));
         $this->assertEquals('hoge', (stringify)(new \Concrete('hoge')));
-        $this->assertEquals('C:11:"ArrayObject":36:{x:i:0;a:1:{i:0;s:4:"hoge";};m:a:0:{}}', (stringify)(new \ArrayObject(['hoge'])));
+        $this->assertEquals('C:12:"SerialObject":11:{s:4:"hoge";}', (stringify)(new \SerialObject('hoge')));
         $this->assertEquals('JsonObject:["hoge"]', (stringify)(new \JsonObject(['hoge'])));
     }
 
@@ -546,7 +546,7 @@ class VarsTest extends AbstractTestCase
             'null'        => null,
             'int'         => 123,
             'string'      => 'ABC',
-            'object'      => new \DateTime(),
+            'object'      => new \Concrete('hoge'),
         ];
         $a1 = var_export($value, true);
         $a2 = (var_export2)($value, true);
@@ -681,12 +681,12 @@ VAR
         $recur['r'] = &$recur;
         $closure = function () use ($recur) { return $recur; };
         $value = [
-            new \ArrayObject([
-                'A' => new \ArrayObject([
+            (stdclass)([
+                'A' => (stdclass)([
                     'X' => new \stdClass(),
                 ]),
             ]),
-            'E' => new \DateTime('2014/12/24 12:34:56'),
+            'E' => new \Concrete('hoge'),
             'A' => ["str", 1, 2, 3, true, null],
             'H' => ['a' => 'A', 'b' => 'B'],
             'C' => $closure,
@@ -694,9 +694,9 @@ VAR
         ];
 
         $pretty = (var_pretty)($value, 'plain', true);
-        $this->assertContains("  0: ArrayObject#", $pretty);
+        $this->assertContains("  0: stdClass#", $pretty);
         $this->assertContains("      X: stdClass#", $pretty);
-        $this->assertContains("    date: '2014-12-24 12:34:56.000000'", $pretty);
+        $this->assertContains("  E: Concrete#", $pretty);
         $this->assertContains("  A: ['str', 1, 2, 3, true, null]", $pretty);
         $this->assertContains("ryunosuke\\Test\\Package\\VarsTest#", $pretty);
         $this->assertContains("    recur: {", $pretty);
@@ -706,7 +706,7 @@ VAR
         $this->assertContains("\033", (var_pretty)($value, 'cli', true));
         $this->assertContains("<span", (var_pretty)($value, 'html', true));
 
-        $this->expectOutputRegex('#ArrayObject#');
+        $this->expectOutputRegex('#Concrete#');
         (var_pretty)($value);
     }
 

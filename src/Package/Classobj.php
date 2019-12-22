@@ -10,14 +10,14 @@ class Classobj
     /** 自分自身を表す定数 */
     const IS_OWNSELF = 128;
 
-    /** public を表す定数 @see \ReflectionMethod::IS_PUBLIC */
-    const IS_PUBLIC = 256;
+    /** public を表す定数 @see \ReflectionProperty::IS_PUBLIC */
+    const IS_PUBLIC = \ReflectionProperty::IS_PUBLIC;
 
-    /** protected を表す定数 @see \ReflectionMethod::IS_PROTECTED */
-    const IS_PROTECTED = 512;
+    /** protected を表す定数 @see \ReflectionProperty::IS_PROTECTED */
+    const IS_PROTECTED = \ReflectionProperty::IS_PROTECTED;
 
-    /** private を表す定数 @see \ReflectionMethod::IS_PRIVATE */
-    const IS_PRIVATE = 1024;
+    /** private を表す定数 @see \ReflectionProperty::IS_PRIVATE */
+    const IS_PRIVATE = \ReflectionProperty::IS_PRIVATE;
 
     /**
      * 初期フィールド値を与えて stdClass を生成する
@@ -776,6 +776,10 @@ class Classobj
      */
     public static function get_object_properties($object)
     {
+        if (function_exists('get_mangled_object_vars')) {
+            get_mangled_object_vars($object); // @codeCoverageIgnore
+        }
+
         static $refs = [];
         $class = get_class($object);
         if (!isset($refs[$class])) {
