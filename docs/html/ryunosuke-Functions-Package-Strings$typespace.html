@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L3453" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L3533" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Strings</span></h2>
@@ -108,7 +108,7 @@
 					<div class="inner-item">
 						<div class="description"><p>文字列結合の関数版</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(strcat('a', 'b', 'c'), 'abc');
+<pre><code class="language-php">that(strcat('a', 'b', 'c'))-&gt;isSame('abc');
 </code></pre>
 </div>
                         	<table class="table">
@@ -161,8 +161,8 @@
 <p>「プレフィックスやサフィックスを付けたいんだけど、空文字の場合はそのままで居て欲しい」という状況はまれによくあるはず。<br />
 コードで言えば <code>strlen($string) ? 'prefix-' . $string : '';</code> のようなもの。<br />
 可変引数なので 端的に言えば mysql の CONCAT みたいな動作になる（あっちは NULL だが）。</p>
-<pre><code class="language-php">assertSame(concat('prefix-', 'middle', '-suffix'), 'prefix-middle-suffix');
-assertSame(concat('prefix-', '', '-suffix'), '');
+<pre><code class="language-php">that(concat('prefix-', 'middle', '-suffix'))-&gt;isSame('prefix-middle-suffix');
+that(concat('prefix-', '', '-suffix'))-&gt;isSame('');
 </code></pre>
 </div>
                         	<table class="table">
@@ -218,9 +218,9 @@ assertSame(concat('prefix-', '', '-suffix'), '');
 <p>$triming を指定した場合、結果配列にも影響する。<br />
 つまり「除外は trim したいが結果配列にはしたくない」はできない。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
-assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
-assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
+<pre><code class="language-php">that(split_noempty(',', 'a, b, c'))-&gt;isSame(['a', 'b', 'c']);
+that(split_noempty(',', 'a, , , b, c'))-&gt;isSame(['a', 'b', 'c']);
+that(split_noempty(',', 'a, , , b, c', false))-&gt;isSame(['a', ' ', ' ', ' b', ' c']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -286,11 +286,11 @@ assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']
 端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 配列を与えると複数文字列での分割
-assertSame(multiexplode([',', ' ', '|'], 'a,b c|d'), ['a', 'b', 'c', 'd']);
+that(multiexplode([',', ' ', '|'], 'a,b c|d'))-&gt;isSame(['a', 'b', 'c', 'd']);
 // 負数を与えると前詰め
-assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
+that(multiexplode(',', 'a,b,c,d', -2))-&gt;isSame(['a,b,c', 'd']);
 // もちろん上記2つは共存できる
-assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
+that(multiexplode([',', ' ', '|'], 'a,b c|d', -2))-&gt;isSame(['a,b c', 'd']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -355,7 +355,7 @@ assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
 <p>歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな例
-assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
+that(quoteexplode(',', 'a,b,c\\,d,"e,f"'))-&gt;isSame([
     'a', // 普通に分割される
     'b', // 普通に分割される
     'c\\,d', // \\ でエスケープしているので区切り文字とみなされない
@@ -363,14 +363,14 @@ assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
 ]);
 
 // $enclosures で囲い文字の開始・終了文字を明示できる
-assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']), [
+that(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']))-&gt;isSame([
     'a', // 普通に分割される
     'b', // 普通に分割される
     '{e,f}', // { } で囲まれているので区切り文字とみなされない
 ]);
 
 // このように第3引数に $limit 引数を差し込むことができる
-assertSame(quoteexplode(',', 'a,b,{e,f}', 2, ['{' =&gt; '}']), [
+that(quoteexplode(',', 'a,b,{e,f}', 2, ['{' =&gt; '}']))-&gt;isSame([
     'a',
     'b,{e,f}',
 ]);
@@ -454,11 +454,11 @@ strstr の動作は「文字列を前から探索して指定文字列があっ�
 <p>第3引数の意味合いもデフォルト値も逆になるので、単純に呼べばよくある「指定文字列より後ろを（指定文字列を含めないで）返す」という動作になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// パス中の最後のディレクトリを取得
-assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":"), 'path/to/3');
+that(strrstr("path/to/1:path/to/2:path/to/3", ":"))-&gt;isSame('path/to/3');
 // $after_needle を false にすると逆の動作になる
-assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":", false), 'path/to/1:path/to/2:');
+that(strrstr("path/to/1:path/to/2:path/to/3", ":", false))-&gt;isSame('path/to/1:path/to/2:');
 // （参考）strrchr と違い、文字列が使えるしその文字そのものは含まれない
-assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
+that(strrstr("A\r\nB\r\nC", "\r\n"))-&gt;isSame('C');
 </code></pre>
 </div>
                         	<table class="table">
@@ -522,12 +522,12 @@ assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
 ただし、見つからなかった文字は結果に含まれない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 見つかった位置を返す
-assertSame(strpos_array('hello world', ['hello', 'world']), [
+that(strpos_array('hello world', ['hello', 'world']))-&gt;isSame([
     0 =&gt; 0,
     1 =&gt; 6,
 ]);
 // 見つからない文字は含まれない
-assertSame(strpos_array('hello world', ['notfound', 'world']), [
+that(strpos_array('hello world', ['notfound', 'world']))-&gt;isSame([
     1 =&gt; 6,
 ]);
 </code></pre>
@@ -592,9 +592,9 @@ assertSame(strpos_array('hello world', ['notfound', 'world']), [
 						<div class="description"><p>クオートを考慮して strpos する</p>
 <p>Example:</p>
 <pre><code class="language-php">// クオート中は除外される
-assertSame(strpos_quoted('hello "this" is world', 'is'), 13);
+that(strpos_quoted('hello "this" is world', 'is'))-&gt;isSame(13);
 // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
-assertSame(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
+that(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))-&gt;isSame(20);
 </code></pre>
 </div>
                         	<table class="table">
@@ -673,11 +673,11 @@ assertSame(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
 動作的には <code>array_flip($haystack)[$needle] ?? null</code> と同じ（大文字小文字オプションはあるけど）。<br />
 ただ array_flip は巨大配列に弱いし、大文字小文字などの融通が効かないので foreach での素朴な実装になっている。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(str_anyof('b', ['a', 'b', 'c']), 1);       // 見つかったキーを返す
-assertSame(str_anyof('x', ['a', 'b', 'c']), null);    // 見つからないなら null を返す
-assertSame(str_anyof('C', ['a', 'b', 'c'], true), 2); // 大文字文字を区別しない
-assertSame(str_anyof('1', [1, 2, 3]), 0);             // 文字列の比較に徹する
-assertSame(str_anyof(2, ['1', '2', '3']), 1);         // 同上
+<pre><code class="language-php">that(str_anyof('b', ['a', 'b', 'c']))-&gt;isSame(1);       // 見つかったキーを返す
+that(str_anyof('x', ['a', 'b', 'c']))-&gt;isSame(null);    // 見つからないなら null を返す
+that(str_anyof('C', ['a', 'b', 'c'], true))-&gt;isSame(2); // 大文字文字を区別しない
+that(str_anyof('1', [1, 2, 3]))-&gt;isSame(0);             // 文字列の比較に徹する
+that(str_anyof(2, ['1', '2', '3']))-&gt;isSame(1);         // 同上
 </code></pre>
 </div>
                         	<table class="table">
@@ -740,9 +740,9 @@ assertSame(str_anyof(2, ['1', '2', '3']), 1);         // 同上
 						<div class="description"><p>文字列比較の関数版</p>
 <p>文字列以外が与えられた場合は常に false を返す。ただし __toString を実装したオブジェクトは別。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(str_equals('abc', 'abc'));
-assertTrue(str_equals('abc', 'ABC', true));
-assertTrue(str_equals('\0abc', '\0abc'));
+<pre><code class="language-php">that(str_equals('abc', 'abc'))-&gt;isTrue();
+that(str_equals('abc', 'ABC', true))-&gt;isTrue();
+that(str_equals('\0abc', '\0abc'))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -804,10 +804,10 @@ assertTrue(str_equals('\0abc', '\0abc'));
 					<div class="inner-item">
 						<div class="description"><p>指定文字列を含むか返す</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(str_contains('abc', 'b'));
-assertTrue(str_contains('abc', 'B', true));
-assertTrue(str_contains('abc', ['b', 'x'], false, false));
-assertFalse(str_contains('abc', ['b', 'x'], false, true));
+<pre><code class="language-php">that(str_contains('abc', 'b'))-&gt;isTrue();
+that(str_contains('abc', 'B', true))-&gt;isTrue();
+that(str_contains('abc', ['b', 'x'], false, false))-&gt;isTrue();
+that(str_contains('abc', ['b', 'x'], false, true))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -877,7 +877,7 @@ assertFalse(str_contains('abc', ['b', 'x'], false, true));
 <p>Example:</p>
 <pre><code class="language-php">// 文字列からパス文字列と拡張子を削ぎ落とす
 $PATH = '/path/to/something';
-assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
+that(str_chop("$PATH/hoge.php", "$PATH/", '.php'))-&gt;isSame('hoge');
 </code></pre>
 </div>
                         	<table class="table">
@@ -947,7 +947,7 @@ assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
 <p>Example:</p>
 <pre><code class="language-php">// 文字列からパス文字列を削ぎ落とす
 $PATH = '/path/to/something';
-assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
+that(str_lchop("$PATH/hoge.php", "$PATH/"))-&gt;isSame('hoge.php');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1011,7 +1011,7 @@ assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
 <p>Example:</p>
 <pre><code class="language-php">// 文字列から .php を削ぎ落とす
 $PATH = '/path/to/something';
-assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
+that(str_rchop("$PATH/hoge.php", ".php"))-&gt;isSame("$PATH/hoge");
 </code></pre>
 </div>
                         	<table class="table">
@@ -1077,16 +1077,16 @@ assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
 多次元配列（2次元のみを想定）や Traversable を与えるとループして "a,b,c\nd,e,f" のような複数行を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな1行を返す
-assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
-assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
-assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
+that(str_putcsv(['a', 'b', 'c']))-&gt;isSame("a,b,c");
+that(str_putcsv(['a', 'b', 'c'], "\t"))-&gt;isSame("a\tb\tc");
+that(str_putcsv(['a', ' b ', 'c'], " ", "'"))-&gt;isSame("a ' b ' c");
 
 // 複数行を返す
-assertSame(str_putcsv([['a', 'b', 'c'], ['d', 'e', 'f']]), "a,b,c\nd,e,f");
-assertSame(str_putcsv((function() {
+that(str_putcsv([['a', 'b', 'c'], ['d', 'e', 'f']]))-&gt;isSame("a,b,c\nd,e,f");
+that(str_putcsv((function() {
     yield ['a', 'b', 'c'];
     yield ['d', 'e', 'f'];
-})()), "a,b,c\nd,e,f");
+})()))-&gt;isSame("a,b,c\nd,e,f");
 </code></pre>
 </div>
                         	<table class="table">
@@ -1165,11 +1165,11 @@ str_replace とは「N 番目のみ置換できる」点で異なる。<br />
 ただし、文字自体が見つからない場合は投げない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 1番目（0ベースなので2番目）の x を X に置換
-assertSame(str_subreplace('xxx', 'x', [1 =&gt; 'X']), 'xXx');
+that(str_subreplace('xxx', 'x', [1 =&gt; 'X']))-&gt;isSame('xXx');
 // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
-assertSame(str_subreplace('!xxx!', 'x', [0 =&gt; 'Xa', -1 =&gt; 'Xz']), '!XaxXz!');
+that(str_subreplace('!xxx!', 'x', [0 =&gt; 'Xa', -1 =&gt; 'Xz']))-&gt;isSame('!XaxXz!');
 // 置換結果は置換対象にならない
-assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');
+that(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']))-&gt;isSame('xxxXx');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1249,7 +1249,7 @@ assertSame(str_subreplace('xxx', 'x', [0 =&gt; 'xxx', 1 =&gt; 'X']), 'xxxXx');
 ただし、文字自体が見つからない場合は投げない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// "hello, world" の l と o を置換
-assertSame(str_submap('hello, world', [
+that(str_submap('hello, world', [
     // l は0番目と2番目のみを置換（1番目は何も行われない）
     'l' =&gt; [
         0 =&gt; 'L1',
@@ -1259,7 +1259,7 @@ assertSame(str_submap('hello, world', [
     'o' =&gt; [
         -1 =&gt; 'O',
     ],
-]), 'heL1lo, wOrL3d');
+]))-&gt;isSame('heL1lo, wOrL3d');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1329,19 +1329,19 @@ to は文字列と配列を受け付ける。<br />
 $escape で「特定文字が前にある」場合を無視することができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最も単純な置換
-assertSame(str_embed('a, b, c', ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']), 'A, B, C');
+that(str_embed('a, b, c', ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']))-&gt;isSame('A, B, C');
 // 最も長いキーから置換される
-assertSame(str_embed('abc', ['a' =&gt; 'X', 'ab' =&gt; 'AB']), 'ABc');
+that(str_embed('abc', ['a' =&gt; 'X', 'ab' =&gt; 'AB']))-&gt;isSame('ABc');
 // 配列を渡すと「N番目の置換」が実現できる（文字列の場合は再利用される）
-assertSame(str_embed('a, a, b, b', [
+that(str_embed('a, a, b, b', [
     'a' =&gt; 'A',          // 全ての a が A になる
     'b' =&gt; ['B1', 'B2'], // 1番目の b が B1, 2番目の b が B2 になる
-]), 'A, A, B1, B2');
+]))-&gt;isSame('A, A, B1, B2');
 // 最も重要な性質として "' で囲まれていると対象にならない
-assertSame(str_embed('a, "a", b, "b", b', [
+that(str_embed('a, "a", b, "b", b', [
     'a' =&gt; 'A',
     'b' =&gt; ['B1', 'B2'],
-]), 'A, "a", B1, "b", B2');
+]))-&gt;isSame('A, "a", B1, "b", B2');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1417,11 +1417,11 @@ $escape で「特定文字が前にある」場合を無視することができ
 これを使用すると連続で「次の文字, 次の文字, ...」と言った動作が可能になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
-assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
-assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
-assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
+that(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n))-&gt;isSame('first');
+that(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n))-&gt;isSame('second');
+that(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n))-&gt;isSame('third');
 // ネストしている場合は最も外側を返す
-assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
+that(str_between('{nest1{nest2{nest3}}}', '{', '}'))-&gt;isSame('nest1{nest2{nest3}}');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1505,11 +1505,11 @@ $pos は負数が指定できる。負数の場合後ろから数えられる。
 省略した場合は真ん中となる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 8文字に丸める（$pos 省略なので真ん中が省略される）
-assertSame(str_ellipsis('1234567890', 8, '...'), '12...890');
+that(str_ellipsis('1234567890', 8, '...'))-&gt;isSame('12...890');
 // 8文字に丸める（$pos=1 なので1文字目から省略される）
-assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
+that(str_ellipsis('1234567890', 8, '...', 1))-&gt;isSame('1...7890');
 // 8文字に丸める（$pos=-1 なので後ろから1文字目から省略される）
-assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
+that(str_ellipsis('1234567890', 8, '...', -1))-&gt;isSame('1234...0');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1608,7 +1608,7 @@ same
 this is changed line
 ';
 // シンプルな差分テキストを返す
-assertSame(str_diff($old, $new), ' same
+that(str_diff($old, $new))-&gt;isSame(' same
 -delete
  same
 +append
@@ -1617,7 +1617,7 @@ assertSame(str_diff($old, $new), ' same
 +this is changed line
 ');
 // html で差分を返す
-assertSame(str_diff($old, $new, ['stringify' =&gt; 'html']), 'same
+that(str_diff($old, $new, ['stringify' =&gt; 'html']))-&gt;isSame('same
 &lt;del&gt;delete&lt;/del&gt;
 same
 &lt;ins&gt;append&lt;/ins&gt;
@@ -1626,7 +1626,7 @@ same
 &lt;ins&gt;this is changed line&lt;/ins&gt;
 ');
 // 行レベルの html で差分を返す
-assertSame(str_diff($old, $new, ['stringify' =&gt; 'html=perline']), 'same
+that(str_diff($old, $new, ['stringify' =&gt; 'html=perline']))-&gt;isSame('same
 &lt;del&gt;delete&lt;/del&gt;
 same
 &lt;ins&gt;append&lt;/ins&gt;
@@ -1634,7 +1634,7 @@ same
 &lt;ins&gt;this is &lt;/ins&gt;chang&lt;ins&gt;ed lin&lt;/ins&gt;e
 ');
 // raw な配列で差分を返す
-assertSame(str_diff($old, $new, ['stringify' =&gt; null]), [
+that(str_diff($old, $new, ['stringify' =&gt; null]))-&gt;isSame([
     // 等価行（'=' という記号と前後それぞれの文字列を返す（キーは行番号））
     ['=', [0 =&gt; 'same'], [0 =&gt; 'same']],
     // 削除行（'-' という記号と前の文字列を返す（キーは行番号）、後は int で行番号のみ）
@@ -1710,11 +1710,11 @@ assertSame(str_diff($old, $new, ['stringify' =&gt; null]), [
 						<div class="description"><p>指定文字列で始まるか調べる</p>
 <p>$with に配列を渡すといずれかで始まるときに true を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(starts_with('abcdef', 'abc'));
-assertTrue(starts_with('abcdef', 'ABC', true));
-assertFalse(starts_with('abcdef', 'xyz'));
-assertTrue(starts_with('abcdef', ['a', 'b', 'c']));
-assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
+<pre><code class="language-php">that(starts_with('abcdef', 'abc'))-&gt;isTrue();
+that(starts_with('abcdef', 'ABC', true))-&gt;isTrue();
+that(starts_with('abcdef', 'xyz'))-&gt;isFalse();
+that(starts_with('abcdef', ['a', 'b', 'c']))-&gt;isTrue();
+that(starts_with('abcdef', ['x', 'y', 'z']))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -1777,11 +1777,11 @@ assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
 						<div class="description"><p>指定文字列で終わるか調べる</p>
 <p>$with に配列を渡すといずれかで終わるときに true を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(ends_with('abcdef', 'def'));
-assertTrue(ends_with('abcdef', 'DEF', true));
-assertFalse(ends_with('abcdef', 'xyz'));
-assertTrue(ends_with('abcdef', ['d', 'e', 'f']));
-assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
+<pre><code class="language-php">that(ends_with('abcdef', 'def'))-&gt;isTrue();
+that(ends_with('abcdef', 'DEF', true))-&gt;isTrue();
+that(ends_with('abcdef', 'xyz'))-&gt;isFalse();
+that(ends_with('abcdef', ['d', 'e', 'f']))-&gt;isTrue();
+that(ends_with('abcdef', ['x', 'y', 'z']))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -1843,7 +1843,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 					<div class="inner-item">
 						<div class="description"><p>camelCase に変換する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
+<pre><code class="language-php">that(camel_case('this_is_a_pen'))-&gt;isSame('thisIsAPen');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1899,7 +1899,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 					<div class="inner-item">
 						<div class="description"><p>PascalCase に変換する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
+<pre><code class="language-php">that(pascal_case('this_is_a_pen'))-&gt;isSame('ThisIsAPen');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1955,7 +1955,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 					<div class="inner-item">
 						<div class="description"><p>snake_case に変換する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
+<pre><code class="language-php">that(snake_case('ThisIsAPen'))-&gt;isSame('this_is_a_pen');
 </code></pre>
 </div>
                         	<table class="table">
@@ -2011,7 +2011,7 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 					<div class="inner-item">
 						<div class="description"><p>chain-case に変換する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
+<pre><code class="language-php">that(chain_case('ThisIsAPen'))-&gt;isSame('this-is-a-pen');
 </code></pre>
 </div>
                         	<table class="table">
@@ -2079,10 +2079,10 @@ assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
 </li>
 </ul>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(namespace_split('ns\\hoge'), ['ns', 'hoge']);
-assertSame(namespace_split('hoge'), ['', 'hoge']);
-assertSame(namespace_split('ns\\'), ['ns', '']);
-assertSame(namespace_split('\\hoge'), ['', 'hoge']);
+<pre><code class="language-php">that(namespace_split('ns\\hoge'))-&gt;isSame(['ns', 'hoge']);
+that(namespace_split('hoge'))-&gt;isSame(['', 'hoge']);
+that(namespace_split('ns\\'))-&gt;isSame(['ns', '']);
+that(namespace_split('\\hoge'))-&gt;isSame(['', 'hoge']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2137,17 +2137,17 @@ assertSame(namespace_split('\\hoge'), ['', 'hoge']);
 <p>値や属性は適切に htmlspecialchars される。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 単純文字列はただのタグを生成する
-assertSame(
-    htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'),
-    '&lt;a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden&gt;&lt;/a&gt;'
+that(
+    htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'))
+    -&gt;isSame('&lt;a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden&gt;&lt;/a&gt;'
 );
 // ペア配列を与えるとコンテント文字列になる
-assertSame(
-    htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' =&gt; "this is text's content"]),
-    '&lt;a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden&gt;this is text&amp;#039;s content&lt;/a&gt;'
+that(
+    htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' =&gt; "this is text's content"]))
+    -&gt;isSame('&lt;a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden&gt;this is text&amp;#039;s content&lt;/a&gt;'
 );
 // ネストした配列を与えると再帰される
-assertSame(
+that(
     htmltag([
         'div#wrapper' =&gt; [
             'b.class1' =&gt; [
@@ -2159,8 +2159,8 @@ assertSame(
                 '&lt;plain2&gt;',
             ],
         ],
-    ]),
-    '&lt;div id="wrapper"&gt;&lt;b class="class1"&gt;&amp;lt;plain&amp;gt;&lt;/b&gt;&lt;b class="class2"&gt;&amp;lt;plain1&amp;gt;&lt;s&gt;&amp;lt;strike&amp;gt;&lt;/s&gt;&amp;lt;plain2&amp;gt;&lt;/b&gt;&lt;/div&gt;'
+    ]))
+    -&gt;isSame('&lt;div id="wrapper"&gt;&lt;b class="class1"&gt;&amp;lt;plain&amp;gt;&lt;/b&gt;&lt;b class="class2"&gt;&amp;lt;plain1&amp;gt;&lt;s&gt;&amp;lt;strike&amp;gt;&lt;/s&gt;&amp;lt;plain2&amp;gt;&lt;/b&gt;&lt;/div&gt;'
 );
 </code></pre>
 </div>
@@ -2214,7 +2214,7 @@ assertSame(
 <p>"query" パートだけは配列が許容される。その場合クエリ文字列に変換される。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 完全指定
-assertSame(build_uri([
+that(build_uri([
     'scheme'   =&gt; 'http',
     'user'     =&gt; 'user',
     'pass'     =&gt; 'pass',
@@ -2223,14 +2223,14 @@ assertSame(build_uri([
     'path'     =&gt; '/path/to/file',
     'query'    =&gt; ['id' =&gt; 1],
     'fragment' =&gt; 'hash',
-]), 'http://user:pass@localhost:80/path/to/file?id=1#hash');
+]))-&gt;isSame('http://user:pass@localhost:80/path/to/file?id=1#hash');
 // 一部だけ指定
-assertSame(build_uri([
+that(build_uri([
     'scheme'   =&gt; 'http',
     'host'     =&gt; 'localhost',
     'path'     =&gt; '/path/to/file',
     'fragment' =&gt; 'hash',
-]), 'http://localhost/path/to/file#hash');
+]))-&gt;isSame('http://localhost/path/to/file#hash');
 </code></pre>
 </div>
                         	<table class="table">
@@ -2288,7 +2288,7 @@ assertSame(build_uri([
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// 完全指定
-assertEquals(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'), [
+that(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'))-&gt;is([
     'scheme'   =&gt; 'http',
     'user'     =&gt; 'user',
     'pass'     =&gt; 'pass',
@@ -2299,12 +2299,12 @@ assertEquals(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'), 
     'fragment' =&gt; 'hash',
 ]);
 // デフォルト値つき
-assertEquals(parse_uri('localhost/path/to/file', [
+that(parse_uri('localhost/path/to/file', [
     'scheme'   =&gt; 'http', // scheme のデフォルト値
     'user'     =&gt; 'user', // user のデフォルト値
     'port'     =&gt; '8080', // port のデフォルト値
     'host'     =&gt; 'hoge', // host のデフォルト値
-]), [
+]))-&gt;is([
     'scheme'   =&gt; 'http',      // scheme はないのでデフォルト値が使われている
     'user'     =&gt; 'user',      // user はないのでデフォルト値が使われている
     'pass'     =&gt; '',
@@ -2369,7 +2369,7 @@ assertEquals(parse_uri('localhost/path/to/file', [
 					<div class="inner-item">
 						<div class="description"><p>連想配列を INI 的文字列に変換する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertEquals(ini_export(['a' =&gt; 1, 'b' =&gt; 'B', 'c' =&gt; PHP_SAPI]), 'a = 1
+<pre><code class="language-php">that(ini_export(['a' =&gt; 1, 'b' =&gt; 'B', 'c' =&gt; PHP_SAPI]))-&gt;is('a = 1
 b = "B"
 c = "cli"
 ');
@@ -2428,11 +2428,11 @@ c = "cli"
 					<div class="inner-item">
 						<div class="description"><p>INI 的文字列を連想配列に変換する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertEquals(ini_import("
+<pre><code class="language-php">that(ini_import("
 a = 1
 b = 'B'
 c = PHP_VERSION
-"), ['a' =&gt; 1, 'b' =&gt; 'B', 'c' =&gt; PHP_VERSION]);
+"))-&gt;is(['a' =&gt; 1, 'b' =&gt; 'B', 'c' =&gt; PHP_VERSION]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2502,16 +2502,16 @@ $csvarrays = [
     ['c' =&gt; 'C2', 'a' =&gt; 'A2', 'b' =&gt; 'B2'],             // 順番が入れ替わっている行
     ['c' =&gt; 'C3', 'a' =&gt; 'A3', 'b' =&gt; 'B3', 'x' =&gt; 'X'], // 余計な要素が入っている行
 ];
-assertEquals(csv_export($csvarrays), "a,b,c
+that(csv_export($csvarrays))-&gt;is("a,b,c
 A1,B1,C1
 A2,B2,C2
 A3,B3,C3
 ");
 
 // ヘッダを指定できる
-assertEquals(csv_export($csvarrays, [
+that(csv_export($csvarrays, [
     'headers' =&gt; ['a' =&gt; 'A', 'c' =&gt; 'C'], // a と c だけを出力＋ヘッダ文字変更
-]), "A,C
+]))-&gt;is("A,C
 A1,C1
 A2,C2
 A3,C3
@@ -2580,39 +2580,39 @@ A3,C3
 <p>メモリ効率は意識しない（どうせ配列を返すので意識しても無駄）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな実行例
-assertEquals(csv_import("
+that(csv_import("
 a,b,c
 A1,B1,C1
 A2,B2,C2
 A3,B3,C3
-"), [
+"))-&gt;is([
     ['a' =&gt; 'A1', 'b' =&gt; 'B1', 'c' =&gt; 'C1'],
     ['a' =&gt; 'A2', 'b' =&gt; 'B2', 'c' =&gt; 'C2'],
     ['a' =&gt; 'A3', 'b' =&gt; 'B3', 'c' =&gt; 'C3'],
 ]);
 
 // ヘッダを指定できる
-assertEquals(csv_import("
+that(csv_import("
 A1,B1,C1
 A2,B2,C2
 A3,B3,C3
 ", [
     'headers' =&gt; [0 =&gt; 'a', 2 =&gt; 'c'], // 1がないので1番目のフィールドを読み飛ばしつつ、0, 2 は "a", "c" として取り込む
-]), [
+]))-&gt;is([
     ['a' =&gt; 'A1', 'c' =&gt; 'C1'],
     ['a' =&gt; 'A2', 'c' =&gt; 'C2'],
     ['a' =&gt; 'A3', 'c' =&gt; 'C3'],
 ]);
 
 // ヘッダありで連想配列で指定するとキーの読み換えとなる（指定しなければ読み飛ばしも行える）
-assertEquals(csv_import("
+that(csv_import("
 a,b,c
 A1,B1,C1
 A2,B2,C2
 A3,B3,C3
 ", [
     'headers' =&gt; ['a' =&gt; 'hoge', 'c' =&gt; 'piyo'], // a は hoge, c は piyo で読み込む。 b は指定がないので飛ばされる
-]), [
+]))-&gt;is([
     ['hoge' =&gt; 'A1', 'piyo' =&gt; 'C1'],
     ['hoge' =&gt; 'A2', 'piyo' =&gt; 'C2'],
     ['hoge' =&gt; 'A3', 'piyo' =&gt; 'C3'],
@@ -2674,9 +2674,9 @@ A3,B3,C3
 <p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
 <p>Example:</p>
 <pre><code class="language-php">// オプションはこのように [定数 =&gt; bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
-assertEquals(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
+that(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
    JSON_PRETTY_PRINT =&gt; false,
-]), '{"a":"A","b":"B"}');
+]))-&gt;is('{"a":"A","b":"B"}');
 </code></pre>
 </div>
                         	<table class="table">
@@ -2734,9 +2734,9 @@ assertEquals(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
 <p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
 <p>Example:</p>
 <pre><code class="language-php">// オプションはこのように [定数 =&gt; bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
-assertEquals(json_import('{"a":"A","b":"B"}', [
+that(json_import('{"a":"A","b":"B"}', [
    JSON_OBJECT_AS_ARRAY =&gt; true,
-]), ['a' =&gt; 'A', 'b' =&gt; 'B']);
+]))-&gt;is(['a' =&gt; 'A', 'b' =&gt; 'B']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2793,13 +2793,13 @@ assertEquals(json_import('{"a":"A","b":"B"}', [
 						<div class="description"><p>連想配列を paml 的文字列に変換する</p>
 <p>paml で出力することはまずないのでおまけ（import との対称性のために定義している）。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(paml_export([
+<pre><code class="language-php">that(paml_export([
     'n' =&gt; null,
     'f' =&gt; false,
     'i' =&gt; 123,
     'd' =&gt; 3.14,
     's' =&gt; 'this is string',
-]), 'n: null, f: false, i: 123, d: 3.14, s: "this is string"');
+]))-&gt;isSame('n: null, f: false, i: 123, d: 3.14, s: "this is string"');
 </code></pre>
 </div>
                         	<table class="table">
@@ -2886,7 +2886,7 @@ assertEquals(json_import('{"a":"A","b":"B"}', [
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// こういったスカラー型はほとんど yaml と一緒だが、コロンの後のスペースは不要（あってもよい）
-assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
+that(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'))-&gt;isSame([
     'n' =&gt; null,
     'f' =&gt; false,
     'i' =&gt; 123,
@@ -2894,7 +2894,7 @@ assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
     's' =&gt; 'this is string',
 ]);
 // 配列が使える（キーは連番なら不要）。ネストも可能
-assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
+that(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'))-&gt;isSame([
     'a'    =&gt; [1, 2, 'x' =&gt; 'X', 3],
     'nest' =&gt; [
         'a' =&gt; [
@@ -2905,7 +2905,7 @@ assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
     ],
 ]);
 // bare 文字列で定数が使える
-assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
+that(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'))-&gt;isSame([
     'pv' =&gt; \PHP_VERSION,
     'ao' =&gt; \ArrayObject::STD_PROP_LIST,
 ]);
@@ -2972,22 +2972,22 @@ assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
 ので、この実装は互換性を維持せず変更される可能性がある。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな実行例
-assertEquals(ltsv_export([
+that(ltsv_export([
     "label1" =&gt; "value1",
     "label2" =&gt; "value2",
-]), "label1:value1	label2:value2");
+]))-&gt;is("label1:value1	label2:value2");
 
 // タブや改行文字のエスケープ
-assertEquals(ltsv_export([
+that(ltsv_export([
     "label1" =&gt; "val\tue1",
     "label2" =&gt; "val\nue2",
-]), "label1:val\\tue1	label2:val\\nue2");
+]))-&gt;is("label1:val\\tue1	label2:val\\nue2");
 
 // 配列のエンコード
-assertEquals(ltsv_export([
+that(ltsv_export([
     "label1" =&gt; "value1",
     "label2" =&gt; [1, 2, 3],
-]), "label1:value1	label2:`[1,2,3]`");
+]))-&gt;is("label1:value1	label2:`[1,2,3]`");
 </code></pre>
 </div>
                         	<table class="table">
@@ -3050,19 +3050,19 @@ assertEquals(ltsv_export([
 ので、この実装は互換性を維持せず変更される可能性がある。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな実行例
-assertEquals(ltsv_import("label1:value1	label2:value2"), [
+that(ltsv_import("label1:value1	label2:value2"))-&gt;is([
     "label1" =&gt; "value1",
     "label2" =&gt; "value2",
 ]);
 
 // タブや改行文字のエスケープ
-assertEquals(ltsv_import("label1:val\\tue1	label2:val\\nue2"), [
+that(ltsv_import("label1:val\\tue1	label2:val\\nue2"))-&gt;is([
     "label1" =&gt; "val\tue1",
     "label2" =&gt; "val\nue2",
 ]);
 
 // 配列のデコード
-assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
+that(ltsv_import("label1:value1	label2:`[1,2,3]`"))-&gt;is([
     "label1" =&gt; "value1",
     "label2" =&gt; [1, 2, 3],
 ]);
@@ -3124,11 +3124,11 @@ assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
 要素が全て数値の場合は右寄せになる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
-assertEquals("\n" . markdown_table([
+that("\n" . markdown_table([
    ['a' =&gt; 'a1', 'b' =&gt; 'b1'],
    ['b' =&gt; 'b2', 'c' =&gt; '2'],
    ['a' =&gt; 'a3', 'c' =&gt; '3'],
-]), "
+]))-&gt;is("
 | a   | b   |   c |
 | --- | --- | --: |
 | a1  | b1  |     |
@@ -3185,7 +3185,7 @@ assertEquals("\n" . markdown_table([
 						<div class="description"><p>配列を markdown リスト文字列にする</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
-assertEquals("\n" . markdown_list([
+that("\n" . markdown_list([
     'dict'        =&gt; [
         'Key1' =&gt; 'Value1',
         'Key2' =&gt; 'Value2',
@@ -3195,7 +3195,7 @@ assertEquals("\n" . markdown_list([
         'Key' =&gt; 'Value',
         ['Item1', 'Item2', 'Item3'],
     ],
-], ['separator' =&gt; ':']), "
+], ['separator' =&gt; ':']))-&gt;is("
 - dict:
     - Key1:Value1
     - Key2:Value2
@@ -3318,7 +3318,7 @@ assertEquals("\n" . markdown_list([
 						<div class="description"><p>連想配列を指定できるようにした vsprintf</p>
 <p>sprintf の順序指定構文('%1$d')にキーを指定できる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' =&gt; 'ThisIs', 'fuga' =&gt; '3.14']), 'ThisIs 3');
+<pre><code class="language-php">that(kvsprintf('%hoge$s %fuga$d', ['hoge' =&gt; 'ThisIs', 'fuga' =&gt; '3.14']))-&gt;isSame('ThisIs 3');
 </code></pre>
 </div>
                         	<table class="table">
@@ -3366,7 +3366,95 @@ assertEquals("\n" . markdown_list([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2853-L2890" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2853-L2931" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Strings::preg_matches()" tabindex="-1" class="structure-title ">
+                        preg_matches                        	<small>($pattern, $subject, $flags = 0, $offset = 0) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>複数マッチに対応した preg_match</p>
+<p>要するに preg_match_all とほぼ同義だが、下記の差異がある。</p>
+<ul>
+<li>正規表現フラグに "g" フラグが使用できる。 "g" を指定すると preg_match_all 相当の動作になる</li>
+<li>キャプチャは参照引数ではなく返り値で返す</li>
+<li>「パターン全体マッチ」を表す 0 キーは返さない</li>
+<li>上記2つの動作により「マッチしなかったら空配列を返す」という動作になる</li>
+<li>名前付きキャプチャーに対応する数値キーは伏せられる</li>
+<li>伏せられても数値キーは 0 ベースで通し連番となる</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$pattern = '#(\d{4})/(?&lt;month&gt;\d{1,2})(?:/(\d{1,2}))?#';
+// 1(month)番目は名前付きキャプチャなので 1 キーとしては含まれず month というキーで返す（2 が詰められて 1 になる）
+that(preg_matches($pattern, '2014/12/24'))-&gt;isSame([0 =&gt; '2014', 'month' =&gt; '12', 1 =&gt; '24']);
+// 一切マッチしなければ空配列が返る
+that(preg_matches($pattern, 'hoge'))-&gt;isSame([]);
+
+// g オプションを与えると preg_match_all 相当の動作になる（flags も使える）
+$pattern = '#(\d{4})/(?&lt;month&gt;\d{1,2})(?:/(\d{1,2}))?#g';
+that(preg_matches($pattern, '2013/11/23, 2014/12/24', PREG_SET_ORDER))-&gt;isSame([
+    [0 =&gt; '2013', 'month' =&gt; '11', 1 =&gt; '23'],
+    [0 =&gt; '2014', 'month' =&gt; '12', 1 =&gt; '24'],
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$pattern</td>
+				<td class="desc"><p>正規表現</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$subject</td>
+				<td class="desc"><p>対象文字列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$flags = 0</td>
+				<td class="desc"><p>PREG 定数</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$offset = 0</td>
+				<td class="desc"><p>開始位置</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>キャプチャした配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2933-L2970" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_capture()" tabindex="-1" class="structure-title ">
                         preg_capture                        	<small>($pattern, $subject, $default) : array</small>
@@ -3381,11 +3469,11 @@ $default がそのまま返ってくる。</p>
 <pre><code class="language-php">$pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
 $default = [1 =&gt; '2000', 2 =&gt; '1', 4 =&gt; '1'];
 // 完全にマッチするのでそれぞれ返ってくる
-assertSame(preg_capture($pattern, '2014/12/24', $default), [1 =&gt; '2014', 2 =&gt; '12', 4 =&gt; '24']);
+that(preg_capture($pattern, '2014/12/24', $default))-&gt;isSame([1 =&gt; '2014', 2 =&gt; '12', 4 =&gt; '24']);
 // 最後の \d{1,2} はマッチしないのでデフォルト値が使われる
-assertSame(preg_capture($pattern, '2014/12', $default), [1 =&gt; '2014', 2 =&gt; '12', 4 =&gt; '1']);
+that(preg_capture($pattern, '2014/12', $default))-&gt;isSame([1 =&gt; '2014', 2 =&gt; '12', 4 =&gt; '1']);
 // 一切マッチしないので全てデフォルト値が使われる
-assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1', 4 =&gt; '1']);
+that(preg_capture($pattern, 'hoge', $default))-&gt;isSame([1 =&gt; '2000', 2 =&gt; '1', 4 =&gt; '1']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3439,7 +3527,7 @@ assertSame(preg_capture($pattern, 'hoge', $default), [1 =&gt; '2000', 2 =&gt; '1
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2892-L2933" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2972-L3013" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_splice()" tabindex="-1" class="structure-title ">
                         preg_splice                        	<small>($pattern, $replacement, $subject, &amp;$matches = []) : string</small>
@@ -3452,16 +3540,16 @@ callable とはいっても単純文字列 callble （"strtoupper" など）は 
 配列形式の callable や クロージャのみ preg_replace_callback になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 数字を除去しつつその除去された数字を得る
-assertSame(preg_splice('#\\d+#', '', 'abc123', $m), 'abc');
-assertSame($m, ['123']);
+that(preg_splice('#\\d+#', '', 'abc123', $m))-&gt;isSame('abc');
+that($m)-&gt;isSame(['123']);
 
 // callable だと preg_replace_callback が呼ばれる
-assertSame(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m), 'ABC123');
-assertSame($m, ['abc']);
+that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))-&gt;isSame('ABC123');
+that($m)-&gt;isSame(['abc']);
 
 // ただし、 文字列 callable は文字列として扱う
-assertSame(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123');
-assertSame($m, ['abc']);
+that(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m))-&gt;isSame('strtoupper123');
+that($m)-&gt;isSame(['abc']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3521,7 +3609,7 @@ assertSame($m, ['abc']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L2935-L2998" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3015-L3078" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_replaces()" tabindex="-1" class="structure-title ">
                         preg_replaces                        	<small>($pattern, $replacements, $subject, $limit = -1, &amp;$count = null) : string</small>
@@ -3534,16 +3622,16 @@ assertSame($m, ['abc']);
 <p>$replacements に単一文字列を渡した場合、 <code>[1 =&gt; $replacements]</code> と等しくなる（第1キャプチャを置換）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// a と z に囲まれた数字を XXX に置換する
-assertSame(preg_replaces('#a(\d+)z#', [1 =&gt; 'XXX'], 'a123z'), 'aXXXz');
+that(preg_replaces('#a(\d+)z#', [1 =&gt; 'XXX'], 'a123z'))-&gt;isSame('aXXXz');
 // 名前付きキャプチャも指定できる
-assertSame(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; 'XXX'], 'a123z'), 'aXXXz');
+that(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; 'XXX'], 'a123z'))-&gt;isSame('aXXXz');
 // クロージャを渡すと元文字列を引数としてコールバックされる
-assertSame(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; function($src){return $src * 2;}], 'a123z'), 'a246z');
+that(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; function($src){return $src * 2;}], 'a123z'))-&gt;isSame('a246z');
 // 複合的なサンプル（a タグの href と target 属性を書き換える）
-assertSame(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;target&gt;.*)"&gt;#', [
+that(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;target&gt;.*)"&gt;#', [
     'href'   =&gt; function($href){return strtoupper($href);},
     'target' =&gt; function($target){return strtoupper($target);},
-], '&lt;a href="hoge" target="fuga"&gt;inner text&lt;/a&gt;'), '&lt;a href="HOGE" target="FUGA"&gt;inner text&lt;/a&gt;');
+], '&lt;a href="hoge" target="fuga"&gt;inner text&lt;/a&gt;'))-&gt;isSame('&lt;a href="HOGE" target="FUGA"&gt;inner text&lt;/a&gt;');
 </code></pre>
 </div>
                         	<table class="table">
@@ -3609,7 +3697,7 @@ assertSame(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;targ
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3000-L3075" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3080-L3155" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::damerau_levenshtein()" tabindex="-1" class="structure-title ">
                         damerau_levenshtein                        	<small>($s1, $s2, $cost_ins = 1, $cost_rep = 1, $cost_del = 1, $cost_swp = 1) : int</small>
@@ -3621,11 +3709,11 @@ assertSame(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;targ
 <p>また、マルチバイト（UTF-8 のみ）にも対応している。</p>
 <p>Example:</p>
 <pre><code class="language-php">// destroy と destory は普通にレーベンシュタイン距離を取ると 2 になるが・・・
-assertSame(levenshtein("destroy", "destory"), 2);
+that(levenshtein("destroy", "destory"))-&gt;isSame(2);
 // damerau_levenshtein だと1である
-assertSame(damerau_levenshtein("destroy", "destory"), 1);
+that(damerau_levenshtein("destroy", "destory"))-&gt;isSame(1);
 // UTF-8 でも大丈夫
-assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
+that(damerau_levenshtein("あいうえお", "あいえうお"))-&gt;isSame(1);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3697,7 +3785,7 @@ assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3077-L3107" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3157-L3187" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ngram()" tabindex="-1" class="structure-title ">
                         ngram                        	<small>($string, $N, $encoding = &quot;UTF-8&quot;) : array</small>
@@ -3707,9 +3795,9 @@ assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
 <p>素朴な実装であり特記事項はない。<br />
 末端要素や除去フィルタくらいは実装するかもしれない。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(ngram("あいうえお", 1), ["あ", "い", "う", "え", "お"]);
-assertSame(ngram("あいうえお", 2), ["あい", "いう", "うえ", "えお", "お"]);
-assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", "えお", "お"]);
+<pre><code class="language-php">that(ngram("あいうえお", 1))-&gt;isSame(["あ", "い", "う", "え", "お"]);
+that(ngram("あいうえお", 2))-&gt;isSame(["あい", "いう", "うえ", "えお", "お"]);
+that(ngram("あいうえお", 3))-&gt;isSame(["あいう", "いうえ", "うえお", "えお", "お"]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3763,7 +3851,7 @@ assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3109-L3185" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3189-L3265" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_guess()" tabindex="-1" class="structure-title ">
                         str_guess                        	<small>($string, $candidates, &amp;$percent = null) : string</small>
@@ -3774,13 +3862,13 @@ assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", 
 <p>この関数の結果（内部実装）は互換性を考慮しない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 「あいうえお」と最も近い文字列は「あいゆえに」である
-assertSame(str_guess("あいうえお", [
+that(str_guess("あいうえお", [
     'かきくけこ', // マッチ度 0%（1文字もかすらない）
     'ぎぼあいこ', // マッチ度約 13.1%（"あい"はあるが位置が異なる）
     'あいしてる', // マッチ度約 13.8%（"あい"がマッチ）
     'かとうあい', // マッチ度約 16.7%（"あい"があり"う"の位置が等しい）
     'あいゆえに', // マッチ度約 17.4%（"あい", "え"がマッチ）
-]), 'あいゆえに');
+]))-&gt;isSame('あいゆえに');
 </code></pre>
 </div>
                         	<table class="table">
@@ -3834,7 +3922,7 @@ assertSame(str_guess("あいうえお", [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3187-L3266" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3267-L3346" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_array()" tabindex="-1" class="structure-title ">
                         str_array                        	<small>($string, $delimiter, $hashmode) : array</small>
@@ -3844,22 +3932,22 @@ assertSame(str_guess("あいうえお", [
 <p>典型的には http ヘッダとか sar の結果とかを配列にする。</p>
 <p>Example:</p>
 <pre><code class="language-php">// http response header  を ":" 区切りで連想配列にする
-assertSame(str_array("
+that(str_array("
 HTTP/1.1 200 OK
 Content-Type: text/html; charset=utf-8
 Connection: Keep-Alive
-", ':', true), [
+", ':', true))-&gt;isSame([
     'HTTP/1.1 200 OK',
     'Content-Type' =&gt; 'text/html; charset=utf-8',
     'Connection'   =&gt; 'Keep-Alive',
 ]);
 
 // sar の結果を " " 区切りで連想配列の配列にする
-assertSame(str_array("
+that(str_array("
 13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
 13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
 13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
-", ' ', false), [
+", ' ', false))-&gt;isSame([
     1 =&gt; [
         '13:00:01' =&gt; '13:10:01',
         'CPU'      =&gt; 'all',
@@ -3934,7 +4022,7 @@ assertSame(str_array("
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3268-L3298" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3348-L3378" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::mb_substr_replace()" tabindex="-1" class="structure-title ">
                         mb_substr_replace                        	<small>($string, $replacement, $start, $length = null) : string</small>
@@ -3944,7 +4032,7 @@ assertSame(str_array("
 <p>本家は配列を与えたりできるが、ややこしいし使う気がしないので未対応。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 2文字目から5文字を「あいうえお」に置換する
-assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
+that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5))-&gt;isSame('０１あいうえお７８９');
 </code></pre>
 </div>
                         	<table class="table">
@@ -4004,7 +4092,7 @@ assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3300-L3314" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3380-L3394" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::mb_trim()" tabindex="-1" class="structure-title ">
                         mb_trim                        	<small>($string) : string</small>
@@ -4012,7 +4100,7 @@ assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお'
 					<div class="inner-item">
 						<div class="description"><p>マルチバイト対応 trim</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(mb_trim(' 　 あああ　 　'), 'あああ');
+<pre><code class="language-php">that(mb_trim(' 　 あああ　 　'))-&gt;isSame('あああ');
 </code></pre>
 </div>
                         	<table class="table">
@@ -4054,7 +4142,7 @@ assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3316-L3386" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3396-L3466" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_string()" tabindex="-1" class="structure-title ">
                         render_string                        	<small>($template, $array) : string</small>
@@ -4075,14 +4163,14 @@ assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお'
 また、 <code>{$_(syntax(""))}</code> のように {$_()} 構文で " も使えなくなるので \' を使用しなければならない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 数値キーが参照できる
-assertSame(render_string('${0}', ['number']), 'number');
+that(render_string('${0}', ['number']))-&gt;isSame('number');
 // クロージャは呼び出し結果が埋め込まれる
-assertSame(render_string('$c', ['c' =&gt; function($vars, $k){return $k . '-closure';}]), 'c-closure');
+that(render_string('$c', ['c' =&gt; function($vars, $k){return $k . '-closure';}]))-&gt;isSame('c-closure');
 // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
-assertSame(render_string('{$_(123 + 456)}', []), '579');
+that(render_string('{$_(123 + 456)}', []))-&gt;isSame('579');
 // 要するに '$_()' の中に php の式が書けるようになる
-assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' =&gt; ['a', 'n', 'z']]), 'a,n,z');
-assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
+that(render_string('{$_(implode(\',\', $strs))}', ['strs' =&gt; ['a', 'n', 'z']]))-&gt;isSame('a,n,z');
+that(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]))-&gt;isSame('9');
 </code></pre>
 </div>
                         	<table class="table">
@@ -4130,7 +4218,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3388-L3400" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3468-L3480" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_file()" tabindex="-1" class="structure-title ">
                         render_file                        	<small>($template_file, $array) : string</small>
@@ -4193,7 +4281,7 @@ assertSame(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]), '9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3402-L3433" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3482-L3513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ob_include()" tabindex="-1" class="structure-title ">
                         ob_include                        	<small>($include_file, $array = []) : string</small>
@@ -4208,7 +4296,7 @@ This is &lt;?= $var ?&gt;.
 This is &lt;?php echo strtoupper($var) ?&gt;.
 ');
 // このようにレンダリングできる
-assertSame(ob_include(sys_get_temp_dir() . '/template.php', ['var' =&gt; 'hoge']), '
+that(ob_include(sys_get_temp_dir() . '/template.php', ['var' =&gt; 'hoge']))-&gt;isSame('
 This is plain text.
 This is hoge.
 This is HOGE.
@@ -4260,7 +4348,7 @@ This is HOGE.
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3435-L3452" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3515-L3532" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::include_string()" tabindex="-1" class="structure-title ">
                         include_string                        	<small>($template, $array = []) : string</small>

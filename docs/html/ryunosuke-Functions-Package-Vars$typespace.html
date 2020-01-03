@@ -199,14 +199,14 @@
 <p>-記号は受け入れるが+記号は受け入れない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 配列は要素数となる
-assertSame(numberify([1, 2, 3]), 3);
+that(numberify([1, 2, 3]))-&gt;isSame(3);
 // int/float は基本的にそのまま
-assertSame(numberify(123), 123);
-assertSame(numberify(123.45), 123);
-assertSame(numberify(123.45, true), 123.45);
+that(numberify(123))-&gt;isSame(123);
+that(numberify(123.45))-&gt;isSame(123);
+that(numberify(123.45, true))-&gt;isSame(123.45);
 // 文字列は数値抽出
-assertSame(numberify('a1b2c3'), 123);
-assertSame(numberify('a1b2.c3', true), 12.3);
+that(numberify('a1b2c3'))-&gt;isSame(123);
+that(numberify('a1b2.c3', true))-&gt;isSame(12.3);
 </code></pre>
 </div>
                         	<table class="table">
@@ -265,9 +265,9 @@ assertSame(numberify('a1b2.c3', true), 12.3);
 文字列の場合、一言で言えば「.を含むなら float、含まないなら int」を返す。<br />
 int でも float でも stringable でもない場合は実装依存（ただの int キャスト）。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(numval(3.14), 3.14);   // int や float はそのまま返す
-assertSame(numval('3.14'), 3.14); // . を含む文字列は float を返す
-assertSame(numval('11', 8), 9);   // 基数が指定できる
+<pre><code class="language-php">that(numval(3.14))-&gt;isSame(3.14);   // int や float はそのまま返す
+that(numval('3.14'))-&gt;isSame(3.14); // . を含む文字列は float を返す
+that(numval('11', 8))-&gt;isSame(9);   // 基数が指定できる
 </code></pre>
 </div>
                         	<table class="table">
@@ -328,14 +328,14 @@ assertSame(numval('11', 8), 9);   // 基数が指定できる
 入れ子オブジェクトを配列化するときなどに使える。</p>
 <p>Example:</p>
 <pre><code class="language-php">// キャストなので基本的には配列化される
-assertSame(arrayval(123), [123]);
-assertSame(arrayval('str'), ['str']);
-assertSame(arrayval([123]), [123]); // 配列は配列のまま
+that(arrayval(123))-&gt;isSame([123]);
+that(arrayval('str'))-&gt;isSame(['str']);
+that(arrayval([123]))-&gt;isSame([123]); // 配列は配列のまま
 
 // $recursive = false にしない限り再帰的に適用される
 $stdclass = stdclass(['key' =&gt; 'val']);
-assertSame(arrayval([$stdclass], true), [['key' =&gt; 'val']]); // true なので中身も配列化される
-assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので中身は変わらない
+that(arrayval([$stdclass], true))-&gt;isSame([['key' =&gt; 'val']]); // true なので中身も配列化される
+that(arrayval([$stdclass], false))-&gt;isSame([$stdclass]);       // false なので中身は変わらない
 </code></pre>
 </div>
                         	<table class="table">
@@ -398,17 +398,17 @@ ArrayAccess は一旦 isset で確認した後 null の場合は実際にアク�
     'n' =&gt; null,
 ];
 // 配列は array_key_exists と同じ
-assertTrue(arrayable_key_exists('k', $array));  // もちろん存在する
-assertTrue(arrayable_key_exists('n', $array));  // isset ではないので null も true
-assertFalse(arrayable_key_exists('x', $array)); // 存在しないので false
-assertFalse(isset($array['n']));                // isset だと null が false になる（参考）
+that(arrayable_key_exists('k', $array))-&gt;isTrue();  // もちろん存在する
+that(arrayable_key_exists('n', $array))-&gt;isTrue();  // isset ではないので null も true
+that(arrayable_key_exists('x', $array))-&gt;isFalse(); // 存在しないので false
+that(isset($array['n']))-&gt;isFalse();                // isset だと null が false になる（参考）
 
 $object = new \ArrayObject($array);
 // 配列は array_key_exists と同じ
-assertTrue(arrayable_key_exists('k', $object));  // もちろん存在する
-assertTrue(arrayable_key_exists('n', $object));  // isset ではないので null も true
-assertFalse(arrayable_key_exists('x', $object)); // 存在しないので false
-assertFalse(isset($object['n']));                // isset だと null が false になる（参考）
+that(arrayable_key_exists('k', $object))-&gt;isTrue();  // もちろん存在する
+that(arrayable_key_exists('n', $object))-&gt;isTrue();  // isset ではないので null も true
+that(arrayable_key_exists('x', $object))-&gt;isFalse(); // 存在しないので false
+that(isset($object['n']))-&gt;isFalse();                // isset だと null が false になる（参考）
 </code></pre>
 </div>
                         	<table class="table">
@@ -467,22 +467,22 @@ assertFalse(isset($object['n']));                // isset だと null が false 
 ヨクト（10^24）～ヨタ（1024）まで。整数だとしても 64bit の範囲を超えるような値の精度は保証しない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルに k をつける
-assertSame(si_prefix(12345), '12.345 k');
+that(si_prefix(12345))-&gt;isSame('12.345 k');
 // シンプルに m をつける
-assertSame(si_prefix(0.012345), '12.345 m');
+that(si_prefix(0.012345))-&gt;isSame('12.345 m');
 // 書式フォーマットを指定できる
-assertSame(si_prefix(12345, 1000, '%d%s'), '12k');
-assertSame(si_prefix(0.012345, 1000, '%d%s'), '12m');
+that(si_prefix(12345, 1000, '%d%s'))-&gt;isSame('12k');
+that(si_prefix(0.012345, 1000, '%d%s'))-&gt;isSame('12m');
 // ファイルサイズを byte で表示する
-assertSame(si_prefix(12345, 1000, '%d %sbyte'), '12 kbyte');
+that(si_prefix(12345, 1000, '%d %sbyte'))-&gt;isSame('12 kbyte');
 // ファイルサイズを byte で表示する（1024）
-assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
+that(si_prefix(10240, 1024, '%.3f %sbyte'))-&gt;isSame('10.000 kbyte');
 // フォーマットに null を与えると sprintf せずに配列で返す
-assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
+that(si_prefix(12345, 1000, null))-&gt;isSame([12.345, 'k']);
 // フォーマットにクロージャを与えると実行して返す
-assertSame(si_prefix(12345, 1000, function ($v, $u){
+that(si_prefix(12345, 1000, function ($v, $u) {
     return number_format($v, 2) . $u;
-}), '12.35k');
+}))-&gt;isSame('12.35k');
 </code></pre>
 </div>
                         	<table class="table">
@@ -547,15 +547,15 @@ assertSame(si_prefix(12345, 1000, function ($v, $u){
 ただし、 ini は 1m のように小文字で指定することもあるので大文字化する必要はある。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 1k = 1000
-assertSame(si_unprefix('1k'), 1000);
+that(si_unprefix('1k'))-&gt;isSame(1000);
 // 1k = 1024
-assertSame(si_unprefix('1k', 1024), 1024);
+that(si_unprefix('1k', 1024))-&gt;isSame(1024);
 // m はメガではなくミリ
-assertSame(si_unprefix('1m'), 0.001);
+that(si_unprefix('1m'))-&gt;isSame(0.001);
 // M がメガ
-assertSame(si_unprefix('1M'), 1000000);
+that(si_unprefix('1M'))-&gt;isSame(1000000);
 // K だけは特別扱いで大文字小文字のどちらでもキロになる
-assertSame(si_unprefix('1K'), 1000);
+that(si_unprefix('1K'))-&gt;isSame(1000);
 </code></pre>
 </div>
                         	<table class="table">
@@ -626,18 +626,18 @@ assertSame(si_unprefix('1K'), 1000);
 <p>「 <code>if ($var) {}</code> で十分なんだけど "0" が…」という状況はまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// この辺は empty と全く同じ
-assertTrue(is_empty(null));
-assertTrue(is_empty(false));
-assertTrue(is_empty(0));
-assertTrue(is_empty(''));
+that(is_empty(null))-&gt;isTrue();
+that(is_empty(false))-&gt;isTrue();
+that(is_empty(0))-&gt;isTrue();
+that(is_empty(''))-&gt;isTrue();
 // この辺だけが異なる
-assertFalse(is_empty('0'));
+that(is_empty('0'))-&gt;isFalse();
 // 第2引数に true を渡すと空の stdClass も empty 判定される
 $stdclass = new \stdClass();
-assertTrue(is_empty($stdclass, true));
+that(is_empty($stdclass, true))-&gt;isTrue();
 // フィールドがあれば empty ではない
 $stdclass-&gt;hoge = 123;
-assertFalse(is_empty($stdclass, true));
+that(is_empty($stdclass, true))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -699,12 +699,12 @@ assertFalse(is_empty($stdclass, true));
 </ul>
 <p>と同義（!is_array($var) &amp;&amp; !is_object($var) とも言える）。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(is_primitive(null));
-assertTrue(is_primitive(false));
-assertTrue(is_primitive(123));
-assertTrue(is_primitive(STDIN));
-assertFalse(is_primitive(new \stdClass));
-assertFalse(is_primitive(['array']));
+<pre><code class="language-php">that(is_primitive(null))-&gt;isTrue();
+that(is_primitive(false))-&gt;isTrue();
+that(is_primitive(123))-&gt;isTrue();
+that(is_primitive(STDIN))-&gt;isTrue();
+that(is_primitive(new \stdClass))-&gt;isFalse();
+that(is_primitive(['array']))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -757,11 +757,11 @@ assertFalse(is_primitive(['array']));
 <pre><code class="language-php">// 配列の再帰
 $array = [];
 $array['recursive'] = &amp;$array;
-assertTrue(is_recursive($array));
+that(is_recursive($array))-&gt;isTrue();
 // オブジェクトの再帰
 $object = new \stdClass();
 $object-&gt;recursive = $object;
-assertTrue(is_recursive($object));
+that(is_recursive($object))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -814,14 +814,14 @@ assertTrue(is_recursive($object));
 （厳密に言えば配列は "Array" になるので文字列化できるといえるがここでは考えない）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// こいつらは true
-assertTrue(is_stringable(null));
-assertTrue(is_stringable(true));
-assertTrue(is_stringable(3.14));
-assertTrue(is_stringable(STDOUT));
-assertTrue(is_stringable(new \Exception()));
+that(is_stringable(null))-&gt;isTrue();
+that(is_stringable(true))-&gt;isTrue();
+that(is_stringable(3.14))-&gt;isTrue();
+that(is_stringable(STDOUT))-&gt;isTrue();
+that(is_stringable(new \Exception()))-&gt;isTrue();
 // こいつらは false
-assertFalse(is_stringable(new \ArrayObject()));
-assertFalse(is_stringable([1, 2, 3]));
+that(is_stringable(new \ArrayObject()))-&gt;isFalse();
+that(is_stringable([1, 2, 3]))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -871,9 +871,9 @@ assertFalse(is_stringable([1, 2, 3]));
 					<div class="inner-item">
 						<div class="description"><p>変数が配列アクセス可能か調べる</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(is_arrayable([]));
-assertTrue(is_arrayable(new \ArrayObject()));
-assertFalse(is_arrayable(new \stdClass()));
+<pre><code class="language-php">that(is_arrayable([]))-&gt;isTrue();
+that(is_arrayable(new \ArrayObject()))-&gt;isTrue();
+that(is_arrayable(new \stdClass()))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -924,11 +924,11 @@ assertFalse(is_arrayable(new \stdClass()));
 						<div class="description"><p>変数が count でカウントできるか調べる</p>
 <p>要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-countable.php' data-description='is_countable'>is_countable</tag_link> の polyfill。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(is_countable([1, 2, 3]));
-assertTrue(is_countable(new \ArrayObject()));
-assertFalse(is_countable((function () { yield 1; })()));
-assertFalse(is_countable(1));
-assertFalse(is_countable(new \stdClass()));
+<pre><code class="language-php">that(is_countable([1, 2, 3]))-&gt;isTrue();
+that(is_countable(new \ArrayObject()))-&gt;isTrue();
+that(is_countable((function () { yield 1; })()))-&gt;isFalse();
+that(is_countable(1))-&gt;isFalse();
+that(is_countable(new \stdClass()))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -981,22 +981,22 @@ assertFalse(is_countable(new \stdClass()));
 さらに追加で SORT_STRICT という厳密比較フラグを渡すことができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 'a' と 'z' なら 'z' の方が大きい
-assertTrue(varcmp('z', 'a') &gt; 0);
-assertTrue(varcmp('a', 'z') &lt; 0);
-assertTrue(varcmp('a', 'a') === 0);
+that(varcmp('z', 'a') &gt; 0)-&gt;isTrue();
+that(varcmp('a', 'z') &lt; 0)-&gt;isTrue();
+that(varcmp('a', 'a') === 0)-&gt;isTrue();
 
 // 'a' と 'Z' なら 'a' の方が大きい…が SORT_FLAG_CASE なので 'Z' のほうが大きい
-assertTrue(varcmp('Z', 'a', SORT_FLAG_CASE) &gt; 0);
-assertTrue(varcmp('a', 'Z', SORT_FLAG_CASE) &lt; 0);
-assertTrue(varcmp('a', 'A', SORT_FLAG_CASE) === 0);
+that(varcmp('Z', 'a', SORT_FLAG_CASE) &gt; 0)-&gt;isTrue();
+that(varcmp('a', 'Z', SORT_FLAG_CASE) &lt; 0)-&gt;isTrue();
+that(varcmp('a', 'A', SORT_FLAG_CASE) === 0)-&gt;isTrue();
 
 // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
-assertTrue(varcmp('12', '2', SORT_NATURAL) &gt; 0);
-assertTrue(varcmp('2', '12', SORT_NATURAL) &lt; 0);
+that(varcmp('12', '2', SORT_NATURAL) &gt; 0)-&gt;isTrue();
+that(varcmp('2', '12', SORT_NATURAL) &lt; 0)-&gt;isTrue();
 
 // SORT_STRICT 定数が使える（下記はすべて宇宙船演算子を使うと 0 になる）
-assertTrue(varcmp(['a' =&gt; 'A', 'b' =&gt; 'B'], ['b' =&gt; 'B', 'a' =&gt; 'A'], SORT_STRICT) &lt; 0);
-assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0);
+that(varcmp(['a' =&gt; 'A', 'b' =&gt; 'B'], ['b' =&gt; 'B', 'a' =&gt; 'A'], SORT_STRICT) &lt; 0)-&gt;isTrue();
+that(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0)-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -1065,18 +1065,18 @@ assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0);
 継承も実装もされていない場合は標準の get_class の結果を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// プリミティブ型は gettype と同義
-assertSame(var_type(false), 'boolean');
-assertSame(var_type(123), 'integer');
-assertSame(var_type(3.14), 'double');
-assertSame(var_type([1, 2, 3]), 'array');
+that(var_type(false))-&gt;isSame('boolean');
+that(var_type(123))-&gt;isSame('integer');
+that(var_type(3.14))-&gt;isSame('double');
+that(var_type([1, 2, 3]))-&gt;isSame('array');
 // オブジェクトは型名を返す
-assertSame(var_type(new \stdClass), '\\stdClass');
-assertSame(var_type(new \Exception()), '\\Exception');
+that(var_type(new \stdClass))-&gt;isSame('\\stdClass');
+that(var_type(new \Exception()))-&gt;isSame('\\Exception');
 // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
-assertSame(var_type(new class extends \Exception{}), '\\Exception');
-assertSame(var_type(new class implements \JsonSerializable{
+that(var_type(new class extends \Exception{}))-&gt;isSame('\\Exception');
+that(var_type(new class implements \JsonSerializable{
     public function jsonSerialize() { return ''; }
-}), '\\JsonSerializable');
+}))-&gt;isSame('\\JsonSerializable');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1136,13 +1136,13 @@ assertSame(var_type(new class implements \JsonSerializable{
 <p>「配列が与えられたら要素に適用して配列で返す、配列じゃないなら直に適用してそれを返す」という状況はまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 素の値は素の呼び出しと同じ
-assertSame(var_apply(' x ', 'trim'), 'x');
+that(var_apply(' x ', 'trim'))-&gt;isSame('x');
 // 配列は中身に適用して配列で返す（再帰）
-assertSame(var_apply([' x ', ' y ', [' z ']], 'trim'), ['x', 'y', ['z']]);
+that(var_apply([' x ', ' y ', [' z ']], 'trim'))-&gt;isSame(['x', 'y', ['z']]);
 // 第3引数以降は残り引数を意味する
-assertSame(var_apply(['!x!', '!y!'], 'trim', '!'), ['x', 'y']);
+that(var_apply(['!x!', '!y!'], 'trim', '!'))-&gt;isSame(['x', 'y']);
 // 「まれによくある」の具体例
-assertSame(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'), ['&amp;lt;x&amp;gt;', ['&amp;lt;y&amp;gt;']]);
+that(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'))-&gt;isSame(['&amp;lt;x&amp;gt;', ['&amp;lt;y&amp;gt;']]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1210,12 +1210,12 @@ assertSame(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTE
 <pre><code class="language-php">// 配列を受け取って中身を大文字化して返すクロージャ
 $upper = function($array){return array_map('strtoupper', $array);};
 // 普通はこうやって使うが・・・
-assertSame($upper(['a', 'b', 'c']), ['A', 'B', 'C']);
+that($upper(['a', 'b', 'c']))-&gt;isSame(['A', 'B', 'C']);
 // 手元に配列ではなくスカラー値しか無いときはこうせざるをえない
-assertSame($upper(['a'])[0], 'A');
+that($upper(['a'])[0])-&gt;isSame('A');
 // var_applys を使うと配列でもスカラーでも統一的に記述することができる
-assertSame(var_applys(['a', 'b', 'c'], $upper), ['A', 'B', 'C']);
-assertSame(var_applys('a', $upper), 'A');
+that(var_applys(['a', 'b', 'c'], $upper))-&gt;isSame(['A', 'B', 'C']);
+that(var_applys('a', $upper))-&gt;isSame('A');
 # 要するに「大文字化したい」だけなわけだが、$upper が配列を前提としているので、「大文字化」部分を得るには配列化しなければならなくなっている
 # 「strtoupper だけ切り出せばよいのでは？」と思うかもしれないが、「（外部ライブラリなどで）手元に配列しか受け取ってくれない処理しかない」状況がまれによくある
 </code></pre>
@@ -1290,7 +1290,7 @@ assertSame(var_applys('a', $upper), 'A');
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// 単純なエクスポート
-assertSame(var_export2(['array' =&gt; [1, 2, 3], 'hash' =&gt; ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']], true), '[
+that(var_export2(['array' =&gt; [1, 2, 3], 'hash' =&gt; ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']], true))-&gt;isSame('[
     "array" =&gt; [1, 2, 3],
     "hash"  =&gt; [
         "a" =&gt; "A",
@@ -1305,7 +1305,7 @@ $robject = new \stdClass();
 $robject-&gt;a = new \stdClass();
 $robject-&gt;a-&gt;b = new \stdClass();
 $robject-&gt;a-&gt;b-&gt;c = $robject;
-assertSame(var_export2(compact('rarray', 'robject'), true), '[
+that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
     "rarray"  =&gt; [
         "a" =&gt; [
             "b" =&gt; [
@@ -1590,7 +1590,7 @@ var_pretty([
 <p>Example:</p>
 <pre><code class="language-php">$hoge = 'HOGE';
 $fuga = 'FUGA';
-assertSame(hashvar($hoge, $fuga), ['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);
+that(hashvar($hoge, $fuga))-&gt;isSame(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);
 </code></pre>
 </div>
                         	<table class="table">

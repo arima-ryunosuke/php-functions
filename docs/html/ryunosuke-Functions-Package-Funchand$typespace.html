@@ -152,7 +152,7 @@
 						<div class="description"><p>$callable の引数を指定配列で束縛したクロージャを返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = abind('sprintf', [1 =&gt; 'a', 3 =&gt; 'c']);
-assertSame($bind('%s%s%s', 'b'), 'abc');
+that($bind('%s%s%s', 'b'))-&gt;isSame('abc');
 </code></pre>
 </div>
                         	<table class="table">
@@ -209,7 +209,7 @@ assertSame($bind('%s%s%s', 'b'), 'abc');
 						<div class="description"><p>$callable の指定位置に引数を束縛したクロージャを返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = nbind('sprintf', 2, 'X');
-assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
+that($bind('%s%s%s', 'N', 'N'))-&gt;isSame('NXN');
 </code></pre>
 </div>
                         	<table class="table">
@@ -272,7 +272,7 @@ assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
 						<div class="description"><p>$callable の最左に引数を束縛した callable を返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = lbind('sprintf', '%s%s');
-assertSame($bind('N', 'M'), 'NM');
+that($bind('N', 'M'))-&gt;isSame('NM');
 </code></pre>
 </div>
                         	<table class="table">
@@ -329,7 +329,7 @@ assertSame($bind('N', 'M'), 'NM');
 						<div class="description"><p>$callable の最右に引数を束縛した callable を返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$bind = rbind('sprintf', 'X');
-assertSame($bind('%s%s', 'N'), 'NX');
+that($bind('%s%s', 'N'))-&gt;isSame('NX');
 </code></pre>
 </div>
                         	<table class="table">
@@ -387,15 +387,15 @@ assertSame($bind('%s%s', 'N'), 'NX');
 <p>関数ベースなので <code>??</code> のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。</p>
 <p>Example:</p>
 <pre><code class="language-php">$not = ope_func('!');    // 否定演算子クロージャ
-assertSame(false, $not(true));
+that(false)-&gt;isSame($not(true));
 
 $minus = ope_func('-'); // マイナス演算子クロージャ
-assertSame(-2, $minus(2));       // 引数1つで呼ぶと1項演算子
-assertSame(3 - 2, $minus(3, 2)); // 引数2つで呼ぶと2項演算子
+that($minus(2))-&gt;isSame(-2);       // 引数1つで呼ぶと1項演算子
+that($minus(3, 2))-&gt;isSame(3 - 2); // 引数2つで呼ぶと2項演算子
 
 $cond = ope_func('?:'); // 条件演算子クロージャ
-assertSame('OK' ?: 'NG', $cond('OK', 'NG'));               // 引数2つで呼ぶと2項演算子
-assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼ぶと3項演算子
+that($cond('OK', 'NG'))-&gt;isSame('OK' ?: 'NG');               // 引数2つで呼ぶと2項演算子
+that($cond(false, 'OK', 'NG'))-&gt;isSame(false ? 'OK' : 'NG'); // 引数3つで呼ぶと3項演算子
 </code></pre>
 </div>
                         	<table class="table">
@@ -446,8 +446,8 @@ assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼�
 						<div class="description"><p>返り値の真偽値を逆転した新しいクロージャを返す</p>
 <p>Example:</p>
 <pre><code class="language-php">$not_strlen = not_func('strlen');
-assertFalse($not_strlen('hoge'));
-assertTrue($not_strlen(''));
+that($not_strlen('hoge'))-&gt;isFalse();
+that($not_strlen(''))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -500,7 +500,7 @@ assertTrue($not_strlen(''));
 参照渡しは未対応。</p>
 <p>Example:</p>
 <pre><code class="language-php">$evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
-assertSame($evalfunc(1, 2, 3), 6);
+that($evalfunc(1, 2, 3))-&gt;isSame(6);
 </code></pre>
 </div>
                         	<table class="table">
@@ -556,8 +556,8 @@ assertSame($evalfunc(1, 2, 3), 6);
 					<div class="inner-item">
 						<div class="description"><p>callable から ReflectionFunctionAbstract を生成する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
-assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
+<pre><code class="language-php">that(reflect_callable('sprintf'))-&gt;isInstanceOf(\ReflectionFunction::class);
+that(reflect_callable('\Closure::bind'))-&gt;isInstanceOf(\ReflectionMethod::class);
 </code></pre>
 </div>
                         	<table class="table">
@@ -609,13 +609,13 @@ assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
 <p>返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。</p>
 <p>Example:</p>
 <pre><code class="language-php">list($meta, $body) = callable_code(function(...$args){return true;});
-assertSame($meta, 'function(...$args)');
-assertSame($body, '{return true;}');
+that($meta)-&gt;isSame('function(...$args)');
+that($body)-&gt;isSame('{return true;}');
 
 // ReflectionFunctionAbstract を渡しても動作する
 list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
-assertSame($meta, 'function(...$args)');
-assertSame($body, '{return true;}');
+that($meta)-&gt;isSame('function(...$args)');
+that($body)-&gt;isSame('{return true;}');
 </code></pre>
 </div>
                         	<table class="table">
@@ -669,7 +669,7 @@ assertSame($body, '{return true;}');
     call_safely(function(){return $v;});
 }
 catch (\Exception $ex) {
-    assertSame($ex-&gt;getMessage(), 'Undefined variable: v');
+    that($ex-&gt;getMessage())-&gt;isSame('Undefined variable: v');
 }
 </code></pre>
 </div>
@@ -727,14 +727,14 @@ catch (\Exception $ex) {
 						<div class="description"><p>ob_start ～ ob_get_clean のブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">// コールバック内のテキストが得られる
-assertSame(ob_capture(function(){echo 123;}), '123');
+that(ob_capture(function(){echo 123;}))-&gt;isSame('123');
 // こういう事もできる
-assertSame(ob_capture(function () {
+that(ob_capture(function () {
 ?&gt;
 bare string1
 bare string2
 &lt;?php
-}), "bare string1\nbare string2\n");
+}))-&gt;isSame("bare string1\nbare string2\n");
 </code></pre>
 </div>
                         	<table class="table">
@@ -790,8 +790,8 @@ bare string2
 					<div class="inner-item">
 						<div class="description"><p>$this を bind 可能なクロージャか調べる</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(is_bindable_closure(function(){}));
-assertFalse(is_bindable_closure(static function(){}));
+<pre><code class="language-php">that(is_bindable_closure(function(){}))-&gt;isTrue();
+that(is_bindable_closure(static function(){}))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -850,8 +850,8 @@ assertFalse(is_bindable_closure(static function(){}));
     }
 }
 $counter = new CountClass();
-assertSame(count($counter), 1);
-assertSame($counter-&gt;count(), 0);
+that(count($counter))-&gt;isSame(1);
+that($counter-&gt;count())-&gt;isSame(0);
 </code></pre>
 <p>のように判定できる。</p>
 </div>
@@ -927,31 +927,31 @@ $f1 = namedcallize($f, [
     'a' =&gt; 9,
 ]);
 // 引数無しで呼ぶと↑で与えた引数が使用される（b は渡されていないのでデフォルト引数の 2 が使用される）
-assertSame($f1(), [
+that($f1())-&gt;isSame([
     'x'     =&gt; 'X',
     'a'     =&gt; 9,
     'b'     =&gt; 2,
     'other' =&gt; [],
 ]);
 // 引数付きで呼ぶとそれが優先される
-assertSame($f1([
+that($f1([
     'x'     =&gt; 'XXX',
     'a'     =&gt; 99,
     'b'     =&gt; 999,
     'other' =&gt; [1, 2, 3],
-]), [
+]))-&gt;isSame([
     'x'     =&gt; 'XXX',
     'a'     =&gt; 99,
     'b'     =&gt; 999,
     'other' =&gt; [1, 2, 3],
 ]);
 // 引数名ではなく、 n 番目指定でも同じ
-assertSame($f1([
+that($f1([
     'x' =&gt; 'XXX',
     1   =&gt; 99,
     2   =&gt; 999,
     3   =&gt; [1, 2, 3],
-]), [
+]))-&gt;isSame([
     'x'     =&gt; 'XXX',
     'a'     =&gt; 99,
     'b'     =&gt; 999,
@@ -964,7 +964,7 @@ $f2 = namedcallize($f, [
     'other' =&gt; [1, 2, 3],
 ]);
 // other は可変引数なのでマージされる
-assertSame($f2(['other' =&gt; [4, 5, 6]]), [
+that($f2(['other' =&gt; [4, 5, 6]]))-&gt;isSame([
     'x'     =&gt; 'X',
     'a'     =&gt; 1,
     'b'     =&gt; 2,
@@ -1028,9 +1028,9 @@ assertSame($f2(['other' =&gt; [4, 5, 6]]), [
 ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。</p>
 <p>Example:</p>
 <pre><code class="language-php">// trim の引数は2つ
-assertSame(parameter_length('trim'), 2);
+that(parameter_length('trim'))-&gt;isSame(2);
 // trim の必須引数は1つ
-assertSame(parameter_length('trim', true), 1);
+that(parameter_length('trim', true))-&gt;isSame(1);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1144,7 +1144,7 @@ assertSame(parameter_length('trim', true), 1);
 <p>Example:</p>
 <pre><code class="language-php">// strlen に2つの引数を渡してもエラーにならない
 $strlen = func_user_func_array('strlen');
-assertSame($strlen('abc', null), 3);
+that($strlen('abc', null))-&gt;isSame(3);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1199,9 +1199,9 @@ assertSame($strlen('abc', null), 3);
 <pre><code class="language-php">// Exception のコンストラクタを呼ぶクロージャ
 $newException = func_new(\Exception::class, 'hoge');
 // デフォルト引数を使用して Exception を作成
-assertSame($newException()-&gt;getMessage(), 'hoge');
+that($newException()-&gt;getMessage())-&gt;isSame('hoge');
 // 引数を指定して Exception を作成
-assertSame($newException('fuga')-&gt;getMessage(), 'fuga');
+that($newException('fuga')-&gt;getMessage())-&gt;isSame('fuga');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1268,16 +1268,16 @@ $object = new class()
 // hoge を呼び出すクロージャ
 $hoge = func_method('hoge');
 // ↑を使用して $object の hoge を呼び出す
-assertSame($hoge($object, 1, 2, 3), '1,2,3');
+that($hoge($object, 1, 2, 3))-&gt;isSame('1,2,3');
 
 // デフォルト値付きで hoge を呼び出すクロージャ
 $hoge789 = func_method('hoge', 7, 8, 9);
 // ↑を使用して $object の hoge を呼び出す（引数指定してるので結果は同じ）
-assertSame($hoge789($object, 1, 2, 3), '1,2,3');
+that($hoge789($object, 1, 2, 3))-&gt;isSame('1,2,3');
 // 同上（一部デフォルト値）
-assertSame($hoge789($object, 1, 2), '1,2,9');
+that($hoge789($object, 1, 2))-&gt;isSame('1,2,9');
 // 同上（全部デフォルト値）
-assertSame($hoge789($object), '7,8,9');
+that($hoge789($object))-&gt;isSame('7,8,9');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1338,7 +1338,7 @@ assertSame($hoge789($object), '7,8,9');
 <p>Example:</p>
 <pre><code class="language-php">// trim のエイリアス
 function_alias('trim', 'trim_alias');
-assertSame(trim_alias(' abc '), 'abc');
+that(trim_alias(' abc '))-&gt;isSame('abc');
 </code></pre>
 </div>
                         	<table class="table">

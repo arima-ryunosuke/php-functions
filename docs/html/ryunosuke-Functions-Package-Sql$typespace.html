@@ -711,10 +711,10 @@
 <li>それ以外は addslashes される</li>
 </ul>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(sql_quote(null), 'NULL');
-assertSame(sql_quote(123), 123);
-assertSame(sql_quote(true), 1);
-assertSame(sql_quote("hoge"), "'hoge'");
+<pre><code class="language-php">that(sql_quote(null))-&gt;isSame('NULL');
+that(sql_quote(123))-&gt;isSame(123);
+that(sql_quote(true))-&gt;isSame(1);
+that(sql_quote("hoge"))-&gt;isSame("'hoge'");
 </code></pre>
 </div>
                         	<table class="table">
@@ -767,9 +767,9 @@ assertSame(sql_quote("hoge"), "'hoge'");
 あくまでログ出力やデバッグ用途で視認性を高める目的である。</p>
 <p>プレースホルダは ? か :alnum で混在していても良い。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(sql_bind('select ?', 1), "select 1");
-assertSame(sql_bind('select :hoge', ['hoge' =&gt; 'hoge']), "select 'hoge'");
-assertSame(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']), "select 1, 'hoge'");
+<pre><code class="language-php">that(sql_bind('select ?', 1))-&gt;isSame("select 1");
+that(sql_bind('select :hoge', ['hoge' =&gt; 'hoge']))-&gt;isSame("select 'hoge'");
+that(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']))-&gt;isSame("select 1, 'hoge'");
 </code></pre>
 </div>
                         	<table class="table">

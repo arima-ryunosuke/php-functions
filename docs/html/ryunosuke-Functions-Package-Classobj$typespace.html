@@ -158,10 +158,10 @@
 <p>Example:</p>
 <pre><code class="language-php">// 基本的には object キャストと同じ
 $fields = ['a' =&gt; 'A', 'b' =&gt; 'B'];
-assertEquals(stdclass($fields), (object) $fields);
+that(stdclass($fields))-&gt;is((object) $fields);
 // ただしこういうことはキャストでは出来ない
-assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
-assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+that(array_map('stdclass', [$fields]))-&gt;is([(object) $fields]); // コールバックとして利用する
+that(property_exists(stdclass(['a', 'b']), '0'))-&gt;isTrue();     // 数値キー付きオブジェクトにする
 </code></pre>
 </div>
                         	<table class="table">
@@ -218,7 +218,7 @@ assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオ
 <pre><code class="language-php">// Example 用としてこのクラスのディレクトリを使用してみる
 $dirname = dirname(class_loader()-&gt;findFile(\ryunosuke\Functions\Package\Classobj::class));
 // "$dirname/Hoge" の名前空間を推測して返す
-assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+that(detect_namespace("$dirname/Hoge"))-&gt;isSame("ryunosuke\\Functions\\Package\\Hoge");
 </code></pre>
 </div>
                         	<table class="table">
@@ -272,7 +272,7 @@ assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Ho
 <pre><code class="language-php">trait T1{}
 trait T2{use T1;}
 trait T3{use T2;}
-assertSame(class_uses_all(new class{use T3;}), [
+that(class_uses_all(new class{use T3;}))-&gt;isSame([
     'Example\\T3', // クラスが直接 use している
     'Example\\T2', // T3 が use している
     'Example\\T1', // T2 が use している
@@ -332,7 +332,7 @@ assertSame(class_uses_all(new class{use T3;}), [
 						<div class="description"><p>composer のクラスローダを返す</p>
 <p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
+<pre><code class="language-php">that(class_loader())-&gt;isInstanceOf(\Composer\Autoload\ClassLoader::class);
 </code></pre>
 </div>
                         	<table class="table">
@@ -382,7 +382,7 @@ assertSame(class_uses_all(new class{use T3;}), [
 					<div class="inner-item">
 						<div class="description"><p>クラスの名前空間部分を取得する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
+<pre><code class="language-php">that(class_namespace('vendor\\namespace\\ClassName'))-&gt;isSame('vendor\\namespace');
 </code></pre>
 </div>
                         	<table class="table">
@@ -432,7 +432,7 @@ assertSame(class_uses_all(new class{use T3;}), [
 					<div class="inner-item">
 						<div class="description"><p>クラスの名前空間部分を除いた短い名前を取得する</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
+<pre><code class="language-php">that(class_shorten('vendor\\namespace\\ClassName'))-&gt;isSame('ClassName');
 </code></pre>
 </div>
                         	<table class="table">
@@ -508,8 +508,8 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
     };
 });
 // X1 を継承している Y1 にまで影響が出ている（X1 を完全に置換できたということ）
-assertSame((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;method(), 'this is X1d');
-assertSame((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;newmethod(), 'this is newmethod');
+that((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;method())-&gt;isSame('this is X1d');
+that((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;newmethod())-&gt;isSame('this is newmethod');
 
 // Y2 extends X2 だとしてクロージャ配列でオーバーライドする
 class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
@@ -519,8 +519,8 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
     ];
 });
 // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
-assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method(), 'this is X2d');
-assertSame((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod(), 'this is newmethod');
+that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method())-&gt;isSame('this is X2d');
+that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod())-&gt;isSame('this is newmethod');
 
 // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
 class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
@@ -528,9 +528,9 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
     'method' =&gt; function(){return 'this is X3d';},
 ]);
 // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
-assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method(), 'this is X3d');
+that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method())-&gt;isSame('this is X3d');
 // トレイトのメソッドも生えている
-assertSame((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod(), 'this is XTrait::traitMethod');
+that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod())-&gt;isSame('this is XTrait::traitMethod');
 </code></pre>
 </div>
                         	<table class="table">
@@ -601,7 +601,7 @@ $newobject = class_extends($object, [
         return $this-&gt;code . ':' . $this-&gt;message;
     },
 ]);
-assertSame($newobject-&gt;codemessage(), '123:hoge');
+that($newobject-&gt;codemessage())-&gt;isSame('123:hoge');
 
 // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
 $object = new \ArrayObject([1, 2, 3]);
@@ -611,7 +611,7 @@ $newobject = class_extends($object, [
         return parent::count() * 2;
     },
 ]);
-assertSame($newobject-&gt;count(), 6);
+that($newobject-&gt;count())-&gt;isSame(6);
 </code></pre>
 </div>
                         	<table class="table">
@@ -680,13 +680,13 @@ assertSame($newobject-&gt;count(), 6);
 <p>あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（<code>property_exists</code> と同じ）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// クラス定数が調べられる（1引数、2引数どちらでも良い）
-assertTrue(const_exists('ArrayObject::STD_PROP_LIST'));
-assertTrue(const_exists('ArrayObject', 'STD_PROP_LIST'));
-assertFalse(const_exists('ArrayObject::UNDEFINED'));
-assertFalse(const_exists('ArrayObject', 'UNDEFINED'));
+that(const_exists('ArrayObject::STD_PROP_LIST'))-&gt;isTrue();
+that(const_exists('ArrayObject', 'STD_PROP_LIST'))-&gt;isTrue();
+that(const_exists('ArrayObject::UNDEFINED'))-&gt;isFalse();
+that(const_exists('ArrayObject', 'UNDEFINED'))-&gt;isFalse();
 // グローバル（名前空間）もいける
-assertTrue(const_exists('PHP_VERSION'));
-assertFalse(const_exists('UNDEFINED'));
+that(const_exists('PHP_VERSION'))-&gt;isTrue();
+that(const_exists('UNDEFINED'))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -750,10 +750,10 @@ assertFalse(const_exists('UNDEFINED'));
         ])
     ])
 ]);
-assertSame(object_dive($class, 'a.b.c'), 'vvv');
-assertSame(object_dive($class, 'a.b.x', 9), 9);
+that(object_dive($class, 'a.b.c'))-&gt;isSame('vvv');
+that(object_dive($class, 'a.b.x', 9))-&gt;isSame(9);
 // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
-assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
+that(object_dive($class, ['a', 'b', 'c']))-&gt;isSame('vvv');
 </code></pre>
 </div>
                         	<table class="table">
@@ -830,7 +830,7 @@ assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
     public    const C_PUBLIC    = 'public';
 };
 // 普通に全定数を返す
-assertSame(get_class_constants($class), [
+that(get_class_constants($class))-&gt;isSame([
     'C_PRIVATE'      =&gt; 'private',
     'C_PROTECTED'    =&gt; 'protected',
     'C_PUBLIC'       =&gt; 'public',
@@ -838,13 +838,13 @@ assertSame(get_class_constants($class), [
     'ARRAY_AS_PROPS' =&gt; \ArrayObject::ARRAY_AS_PROPS,
 ]);
 // public のみを返す
-assertSame(get_class_constants($class, IS_PUBLIC), [
+that(get_class_constants($class, IS_PUBLIC))-&gt;isSame([
     'C_PUBLIC'       =&gt; 'public',
     'STD_PROP_LIST'  =&gt; \ArrayObject::STD_PROP_LIST,
     'ARRAY_AS_PROPS' =&gt; \ArrayObject::ARRAY_AS_PROPS,
 ]);
 // 自身定義でかつ public のみを返す
-assertSame(get_class_constants($class, IS_OWNSELF | IS_PUBLIC), [
+that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))-&gt;isSame([
     'C_PUBLIC'       =&gt; 'public',
 ]);
 </code></pre>
@@ -913,11 +913,11 @@ $object-&gt;oreore = 'oreore';
 // var_dump((array) $object);
 
 // この関数を使えば不可視プロパティも取得できる
-assertArraySubset([
+that(get_object_properties($object))-&gt;arraySubset([
     'message' =&gt; 'something',
     'code'    =&gt; 42,
     'oreore'  =&gt; 'oreore',
-], get_object_properties($object));
+]);
 </code></pre>
 </div>
                         	<table class="table">

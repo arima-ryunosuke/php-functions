@@ -4101,6 +4101,12 @@
  * @method   \ChainObject  preg_grep1($regex, $flags = null)
  * @method   \ChainObject  preg_grep2($regex, $input)
  *
+ * @see preg_matches
+ * @method   \ChainObject  preg_matches($subject, $flags = 0, $offset = 0)
+ * @method   \ChainObject  preg_matches1($pattern, $flags = 0, $offset = 0)
+ * @method   \ChainObject  preg_matches2($pattern, $subject, $offset = 0)
+ * @method   \ChainObject  preg_matches3($pattern, $subject, $flags = 0)
+ *
  * @see preg_quote
  * @property \ChainObject $preg_quote
  * @method   \ChainObject  preg_quote($delim_char = null)
@@ -5248,6 +5254,16 @@
  * @method   \ChainObject  try_null4($try, ...$variadic)
  * @method   \ChainObject  try_null5($try, ...$variadic)
  * @method   \ChainObject  try_null6($try, ...$variadic)
+ *
+ * @see try_return
+ * @property \ChainObject $try_return
+ * @method   \ChainObject  try_return(...$variadic)
+ * @method   \ChainObject  try_return1($try, ...$variadic)
+ * @method   \ChainObject  try_return2($try, ...$variadic)
+ * @method   \ChainObject  try_return3($try, ...$variadic)
+ * @method   \ChainObject  try_return4($try, ...$variadic)
+ * @method   \ChainObject  try_return5($try, ...$variadic)
+ * @method   \ChainObject  try_return6($try, ...$variadic)
  *
  * @see ucfirst
  * @property \ChainObject $ucfirst

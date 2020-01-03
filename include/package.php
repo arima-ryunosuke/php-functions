@@ -884,6 +884,7 @@ define("ryunosuke\\Functions\\Package\\markdown_table", ["ryunosuke\\Functions\\
 define("ryunosuke\\Functions\\Package\\markdown_list", ["ryunosuke\\Functions\\Package\\Strings", "markdown_list"]);
 define("ryunosuke\\Functions\\Package\\random_string", ["ryunosuke\\Functions\\Package\\Strings", "random_string"]);
 define("ryunosuke\\Functions\\Package\\kvsprintf", ["ryunosuke\\Functions\\Package\\Strings", "kvsprintf"]);
+define("ryunosuke\\Functions\\Package\\preg_matches", ["ryunosuke\\Functions\\Package\\Strings", "preg_matches"]);
 define("ryunosuke\\Functions\\Package\\preg_capture", ["ryunosuke\\Functions\\Package\\Strings", "preg_capture"]);
 define("ryunosuke\\Functions\\Package\\preg_splice", ["ryunosuke\\Functions\\Package\\Strings", "preg_splice"]);
 define("ryunosuke\\Functions\\Package\\preg_replaces", ["ryunosuke\\Functions\\Package\\Strings", "preg_replaces"]);
@@ -908,6 +909,7 @@ define("ryunosuke\\Functions\\Package\\blank_if", ["ryunosuke\\Functions\\Packag
 define("ryunosuke\\Functions\\Package\\call_if", ["ryunosuke\\Functions\\Package\\Syntax", "call_if"]);
 define("ryunosuke\\Functions\\Package\\switchs", ["ryunosuke\\Functions\\Package\\Syntax", "switchs"]);
 define("ryunosuke\\Functions\\Package\\try_null", ["ryunosuke\\Functions\\Package\\Syntax", "try_null"]);
+define("ryunosuke\\Functions\\Package\\try_return", ["ryunosuke\\Functions\\Package\\Syntax", "try_return"]);
 define("ryunosuke\\Functions\\Package\\try_catch", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch"]);
 define("ryunosuke\\Functions\\Package\\try_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_finally"]);
 define("ryunosuke\\Functions\\Package\\try_catch_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_finally"]);

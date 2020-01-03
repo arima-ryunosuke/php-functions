@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3527" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3525" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
@@ -101,7 +101,7 @@ $nkv = [];
 foreach (arrays($array) as $n =&gt; [$k, $v]) {
     $nkv[] = "$n,$k,$v";
 }
-assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
+that($nkv)-&gt;isSame(['0,a,A', '1,b,B', '2,c,C']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -154,10 +154,10 @@ assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
 連想配列は未対応。あくまで普通の配列化のみ。<br />
 iterable や Traversable は考慮せずあくまで「配列」としてチェックする。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(arrayize(1, 2, 3), [1, 2, 3]);
-assertSame(arrayize([1], [2], [3]), [1, 2, 3]);
+<pre><code class="language-php">that(arrayize(1, 2, 3))-&gt;isSame([1, 2, 3]);
+that(arrayize([1], [2], [3]))-&gt;isSame([1, 2, 3]);
 $object = new \stdClass();
-assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
+that(arrayize($object, false, [1, 2, 3]))-&gt;isSame([$object, false, 1, 2, 3]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -210,11 +210,11 @@ assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
 さらにいわゆる「連番配列」ではなく「キーが数値のみか？」で判定する。</p>
 <p>つまり、 is_hasharray とは排他的ではない。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(is_indexarray([]));
-assertTrue(is_indexarray([1, 2, 3]));
-assertFalse(is_indexarray(['x' =&gt; 'X']));
+<pre><code class="language-php">that(is_indexarray([]))-&gt;isTrue();
+that(is_indexarray([1, 2, 3]))-&gt;isTrue();
+that(is_indexarray(['x' =&gt; 'X']))-&gt;isFalse();
 // 抜け番があっても true になる（これは is_hasharray も true になる）
-assertTrue(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]));
+that(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -265,9 +265,9 @@ assertTrue(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]));
 						<div class="description"><p>配列が連想配列か調べる</p>
 <p>空の配列は普通の配列とみなす。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertFalse(is_hasharray([]));
-assertFalse(is_hasharray([1, 2, 3]));
-assertTrue(is_hasharray(['x' =&gt; 'X']));
+<pre><code class="language-php">that(is_hasharray([]))-&gt;isFalse();
+that(is_hasharray([1, 2, 3]))-&gt;isFalse();
+that(is_hasharray(['x' =&gt; 'X']))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -318,8 +318,8 @@ assertTrue(is_hasharray(['x' =&gt; 'X']));
 						<div class="description"><p>配列の最初のキーを返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(first_key(['a', 'b', 'c']), 0);
-assertSame(first_key([], 999), 999);
+<pre><code class="language-php">that(first_key(['a', 'b', 'c']))-&gt;isSame(0);
+that(first_key([], 999))-&gt;isSame(999);
 </code></pre>
 </div>
                         	<table class="table">
@@ -376,8 +376,8 @@ assertSame(first_key([], 999), 999);
 						<div class="description"><p>配列の最初の値を返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(first_value(['a', 'b', 'c']), 'a');
-assertSame(first_value([], 999), 999);
+<pre><code class="language-php">that(first_value(['a', 'b', 'c']))-&gt;isSame('a');
+that(first_value([], 999))-&gt;isSame(999);
 </code></pre>
 </div>
                         	<table class="table">
@@ -434,8 +434,8 @@ assertSame(first_value([], 999), 999);
 						<div class="description"><p>配列の最初のキー/値ペアをタプルで返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(first_keyvalue(['a', 'b', 'c']), [0, 'a']);
-assertSame(first_keyvalue([], 999), 999);
+<pre><code class="language-php">that(first_keyvalue(['a', 'b', 'c']))-&gt;isSame([0, 'a']);
+that(first_keyvalue([], 999))-&gt;isSame(999);
 </code></pre>
 </div>
                         	<table class="table">
@@ -492,8 +492,8 @@ assertSame(first_keyvalue([], 999), 999);
 						<div class="description"><p>配列の最後のキーを返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(last_key(['a', 'b', 'c']), 2);
-assertSame(last_key([], 999), 999);
+<pre><code class="language-php">that(last_key(['a', 'b', 'c']))-&gt;isSame(2);
+that(last_key([], 999))-&gt;isSame(999);
 </code></pre>
 </div>
                         	<table class="table">
@@ -550,8 +550,8 @@ assertSame(last_key([], 999), 999);
 						<div class="description"><p>配列の最後の値を返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(last_value(['a', 'b', 'c']), 'c');
-assertSame(last_value([], 999), 999);
+<pre><code class="language-php">that(last_value(['a', 'b', 'c']))-&gt;isSame('c');
+that(last_value([], 999))-&gt;isSame(999);
 </code></pre>
 </div>
                         	<table class="table">
@@ -608,8 +608,8 @@ assertSame(last_value([], 999), 999);
 						<div class="description"><p>配列の最後のキー/値ペアをタプルで返す</p>
 <p>空の場合は $default を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(last_keyvalue(['a', 'b', 'c']), [2, 'c']);
-assertSame(last_keyvalue([], 999), 999);
+<pre><code class="language-php">that(last_keyvalue(['a', 'b', 'c']))-&gt;isSame([2, 'c']);
+that(last_keyvalue([], 999))-&gt;isSame(999);
 </code></pre>
 </div>
                         	<table class="table">
@@ -669,11 +669,11 @@ $key が存在しない場合は false を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // 'b' キーの前は 'a'
-assertSame(prev_key($array, 'b'), 'a');
+that(prev_key($array, 'b'))-&gt;isSame('a');
 // 'a' キーの前は無いので null
-assertSame(prev_key($array, 'a'), null);
+that(prev_key($array, 'a'))-&gt;isSame(null);
 // 'x' キーはそもそも存在しないので false
-assertSame(prev_key($array, 'x'), false);
+that(prev_key($array, 'x'))-&gt;isSame(false);
 </code></pre>
 </div>
                         	<table class="table">
@@ -735,13 +735,13 @@ $key が未指定だと「次に生成されるキー」（$array[]='hoge' で�
 <p>Example:</p>
 <pre><code class="language-php">$array = [9 =&gt; 9, 'a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // 'b' キーの次は 'c'
-assertSame(next_key($array, 'b'), 'c');
+that(next_key($array, 'b'))-&gt;isSame('c');
 // 'c' キーの次は無いので null
-assertSame(next_key($array, 'c'), null);
+that(next_key($array, 'c'))-&gt;isSame(null);
 // 'x' キーはそもそも存在しないので false
-assertSame(next_key($array, 'x'), false);
+that(next_key($array, 'x'))-&gt;isSame(false);
 // 次に生成されるキーは 10
-assertSame(next_key($array, null), 10);
+that(next_key($array, null))-&gt;isSame(10);
 </code></pre>
 </div>
                         	<table class="table">
@@ -800,9 +800,9 @@ assertSame(next_key($array, null), 10);
 <p>$needle が非配列の場合は配列化される。<br />
 $needle が空の場合は常に false を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(in_array_and([1], [1, 2, 3]));
-assertFalse(in_array_and([9], [1, 2, 3]));
-assertFalse(in_array_and([1, 9], [1, 2, 3]));
+<pre><code class="language-php">that(in_array_and([1], [1, 2, 3]))-&gt;isTrue();
+that(in_array_and([9], [1, 2, 3]))-&gt;isFalse();
+that(in_array_and([1, 9], [1, 2, 3]))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -867,9 +867,9 @@ assertFalse(in_array_and([1, 9], [1, 2, 3]));
 <p>$needle が非配列の場合は配列化される。<br />
 $needle が空の場合は常に false を返す。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(in_array_or([1], [1, 2, 3]), true);
-assertFalse(in_array_or([9], [1, 2, 3]), false);
-assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
+<pre><code class="language-php">that(in_array_or([1], [1, 2, 3]))-&gt;isTrue();
+that(in_array_or([9], [1, 2, 3]))-&gt;isFalse();
+that(in_array_or([1, 9], [1, 2, 3]))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -947,7 +947,7 @@ assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
     'x3' =&gt; 9,
 ];
 // 普通のソート
-assertSame(kvsort($array), [
+that(kvsort($array))-&gt;isSame([
     'b'  =&gt; 1,
     'c'  =&gt; 2,
     'a'  =&gt; 3,
@@ -956,7 +956,7 @@ assertSame(kvsort($array), [
     'x3' =&gt; 9,
 ]);
 // キーを使用したソート
-assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}), [
+that(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}))-&gt;isSame([
     'x3' =&gt; 9,
     'x2' =&gt; 9,
     'x1' =&gt; 9,
@@ -1020,9 +1020,9 @@ assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}
 						<div class="description"><p>配列の+演算子の関数版</p>
 <p>Example:</p>
 <pre><code class="language-php">// ただの加算の関数版なので同じキーは上書きされない
-assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
+that(array_add(['a', 'b', 'c'], ['X']))-&gt;isSame(['a', 'b', 'c']);
 // 異なるキーは生える
-assertSame(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']), ['a', 'b', 'c', 'x' =&gt; 'X']);
+that(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']))-&gt;isSame(['a', 'b', 'c', 'x' =&gt; 'X']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1076,15 +1076,15 @@ assertSame(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']), ['a', 'b', 'c', 'x' =&gt
 <p>配列の長さが異なる場合、短い方に対しては何もしない。そのまま追加される。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 奇数配列と偶数配列をミックスして自然数配列を生成
-assertSame(array_mix([1, 3, 5], [2, 4, 6]), [1, 2, 3, 4, 5, 6]);
+that(array_mix([1, 3, 5], [2, 4, 6]))-&gt;isSame([1, 2, 3, 4, 5, 6]);
 // 長さが異なる場合はそのまま追加される（短い方の足りない分は無視される）
-assertSame(array_mix([1], [2, 3, 4]), [1, 2, 3, 4]);
-assertSame(array_mix([1, 3, 4], [2]), [1, 2, 3, 4]);
+that(array_mix([1], [2, 3, 4]))-&gt;isSame([1, 2, 3, 4]);
+that(array_mix([1, 3, 4], [2]))-&gt;isSame([1, 2, 3, 4]);
 // 可変引数なので3配列以上も可
-assertSame(array_mix([1], [2, 4], [3, 5, 6]), [1, 2, 3, 4, 5, 6]);
-assertSame(array_mix([1, 4, 6], [2, 5], [3]), [1, 2, 3, 4, 5, 6]);
+that(array_mix([1], [2, 4], [3, 5, 6]))-&gt;isSame([1, 2, 3, 4, 5, 6]);
+that(array_mix([1, 4, 6], [2, 5], [3]))-&gt;isSame([1, 2, 3, 4, 5, 6]);
 // 文字キーは維持される
-assertSame(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]), ['a' =&gt; 'A', 'b' =&gt; 'B', 1, 2, 3]);
+that(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]))-&gt;isSame(['a' =&gt; 'A', 'b' =&gt; 'B', 1, 2, 3]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1140,15 +1140,15 @@ assertSame(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]), ['a' =&gt; 'A',
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// 普通の zip
-assertEquals(array_zip(
+that(array_zip(
     [1, 2, 3],
     ['hoge', 'fuga', 'piyo']
-), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+))-&gt;is([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
 // キーが維持される
-assertEquals(array_zip(
+that(array_zip(
     ['a' =&gt; 1, 2, 3],
     ['hoge', 'b' =&gt; 'fuga', 'piyo']
-), [['a' =&gt; 1, 'hoge'], [2, 'b' =&gt; 'fuga'], [3, 'piyo']]);
+))-&gt;is([['a' =&gt; 1, 'hoge'], [2, 'b' =&gt; 'fuga'], [3, 'piyo']]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1201,15 +1201,15 @@ assertEquals(array_zip(
 ただし、文字キーが重複すると例外を投げる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 普通の直積
-assertSame(array_cross(
+that(array_cross(
     [1, 2],
     [3, 4]
-), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+))-&gt;isSame([[1, 3], [1, 4], [2, 3], [2, 4]]);
 // キーが維持される
-assertSame(array_cross(
+that(array_cross(
     ['a' =&gt; 1, 2],
     ['b' =&gt; 3, 4]
-), [['a' =&gt; 1, 'b' =&gt; 3], ['a' =&gt; 1, 4], [2, 'b' =&gt; 3], [2, 4]]);
+))-&gt;isSame([['a' =&gt; 1, 'b' =&gt; 3], ['a' =&gt; 1, 4], [2, 'b' =&gt; 3], [2, 4]]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1263,9 +1263,9 @@ assertSame(array_cross(
 <p>文字キーは保存されるが数値キーは再割り振りされる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// (配列, 要素) の呼び出し
-assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
+that(array_implode(['a', 'b', 'c'], 'X'))-&gt;isSame(['a', 'X', 'b', 'X', 'c']);
 // (要素, ...配列) の呼び出し
-assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
+that(array_implode('X', 'a', 'b', 'c'))-&gt;isSame(['a', 'X', 'b', 'X', 'c']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1328,11 +1328,11 @@ $condition で指定された要素は結果配列に含まれない。</p>
 端的に言えば「正数を与えると後詰めでその個数で返す」「負数を与えると前詰めでその（絶対値）個数で返す」という動作になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// null 要素で分割
-assertSame(array_explode(['a', null, 'b', 'c'], null), [['a'], [2 =&gt; 'b', 3 =&gt; 'c']]);
+that(array_explode(['a', null, 'b', 'c'], null))-&gt;isSame([['a'], [2 =&gt; 'b', 3 =&gt; 'c']]);
 // クロージャで分割（大文字で分割）
-assertSame(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}), [['a'], [2 =&gt; 'c'], [4 =&gt; 'e']]);
+that(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}))-&gt;isSame([['a'], [2 =&gt; 'c'], [4 =&gt; 'e']]);
 // 負数指定
-assertSame(array_explode(['a', null, 'b', null, 'c'], null, -2), [[0 =&gt; 'a', 1 =&gt; null, 2 =&gt; 'b'], [4 =&gt; 'c']]);
+that(array_explode(['a', null, 'b', null, 'c'], null, -2))-&gt;isSame([[0 =&gt; 'a', 1 =&gt; null, 2 =&gt; 'b'], [4 =&gt; 'c']]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1401,17 +1401,17 @@ callable を与えると sprintf ではなくコールバック処理になる�
 <p>Example:</p>
 <pre><code class="language-php">$array = ['key1' =&gt; 'val1', 'key2' =&gt; 'val2'];
 // key, value を利用した sprintf
-assertSame(array_sprintf($array, '%2$s=%1$s'), ['key1=val1', 'key2=val2']);
+that(array_sprintf($array, '%2$s=%1$s'))-&gt;isSame(['key1=val1', 'key2=val2']);
 // 第3引数を与えるとさらに implode される
-assertSame(array_sprintf($array, '%2$s=%1$s', ' '), 'key1=val1 key2=val2');
+that(array_sprintf($array, '%2$s=%1$s', ' '))-&gt;isSame('key1=val1 key2=val2');
 // クロージャを与えるとコールバック動作になる
 $closure = function($v, $k){return "$k=" . strtoupper($v);};
-assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
+that(array_sprintf($array, $closure, ' '))-&gt;isSame('key1=VAL1 key2=VAL2');
 // 省略すると vsprintf になる
-assertSame(array_sprintf([
+that(array_sprintf([
     'str:%s,int:%d' =&gt; ['sss', '3.14'],
     'single:%s'     =&gt; 'str',
-], null, '|'), 'str:sss,int:3|single:str');
+], null, '|'))-&gt;isSame('str:sss,int:3|single:str');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1478,9 +1478,9 @@ assertSame(array_sprintf([
 <p>Example:</p>
 <pre><code class="language-php">$array = ['key1' =&gt; 'val1', 'key2' =&gt; 'val2'];
 // キーにプレフィックス付与
-assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' =&gt; 'val1', 'prefix-key2' =&gt; 'val2']);
+that(array_strpad($array, 'prefix-'))-&gt;isSame(['prefix-key1' =&gt; 'val1', 'prefix-key2' =&gt; 'val2']);
 // 値にサフィックス付与
-assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', 'key2' =&gt; 'val2-suffix']);
+that(array_strpad($array, '', ['-suffix']))-&gt;isSame(['key1' =&gt; 'val1-suffix', 'key2' =&gt; 'val2-suffix']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1543,10 +1543,10 @@ assertSame(array_strpad($array, '', ['-suffix']), ['key1' =&gt; 'val1-suffix', '
 						<div class="description"><p>配列・連想配列を問わず「N番目(0ベース)」の要素を返す</p>
 <p>負数を与えると逆から N 番目となる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_pos([1, 2, 3], 1), 2);
-assertSame(array_pos([1, 2, 3], -1), 3);
-assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1), 'B');
-assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true), 'b');
+<pre><code class="language-php">that(array_pos([1, 2, 3], 1))-&gt;isSame(2);
+that(array_pos([1, 2, 3], -1))-&gt;isSame(3);
+that(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1))-&gt;isSame('B');
+that(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true))-&gt;isSame('b');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1608,8 +1608,8 @@ assertSame(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true), 'b
 					<div class="inner-item">
 						<div class="description"><p>配列の指定キーの位置を返す</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'c'), 2);
-assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1), -1);
+<pre><code class="language-php">that(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'c'))-&gt;isSame(2);
+that(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1))-&gt;isSame(-1);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1676,7 +1676,7 @@ assertSame(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1)
 さらに $key が配列の場合に限り、 $default を省略すると空配列として動作する。</p>
 <p>Example:</p>
 <pre><code class="language-php">$fuga_of_array = array_of('fuga');
-assertSame($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']), 'FUGA');
+that($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']))-&gt;isSame('FUGA');
 </code></pre>
 </div>
                         	<table class="table">
@@ -1739,19 +1739,19 @@ assertSame($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']), 'FUGA');
 その際、 $default が配列なら一致するものを配列で返し、配列でないなら単値で返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 単純取得
-assertSame(array_get(['a', 'b', 'c'], 1), 'b');
+that(array_get(['a', 'b', 'c'], 1))-&gt;isSame('b');
 // 単純デフォルト
-assertSame(array_get(['a', 'b', 'c'], 9, 999), 999);
+that(array_get(['a', 'b', 'c'], 9, 999))-&gt;isSame(999);
 // 配列取得
-assertSame(array_get(['a', 'b', 'c'], [0, 2]), [0 =&gt; 'a', 2 =&gt; 'c']);
+that(array_get(['a', 'b', 'c'], [0, 2]))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
 // 配列部分取得
-assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 =&gt; 'a']);
+that(array_get(['a', 'b', 'c'], [0, 9]))-&gt;isSame([0 =&gt; 'a']);
 // 配列デフォルト（null ではなく [] を返す）
-assertSame(array_get(['a', 'b', 'c'], [9]), []);
+that(array_get(['a', 'b', 'c'], [9]))-&gt;isSame([]);
 // クロージャ指定＆単値（コールバックが true を返す最初の要素）
-assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}), 'b');
+that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}))-&gt;isSame('b');
 // クロージャ指定＆配列（コールバックが true を返すもの）
-assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []), [1 =&gt; 'b', 2 =&gt; 'c']);
+that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []))-&gt;isSame([1 =&gt; 'b', 2 =&gt; 'c']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1817,15 +1817,15 @@ assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c'
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'B'];
 // 第3引数省略（最後に連番キーで設定）
-assertSame(array_set($array, 'Z'), 1);
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z']);
+that(array_set($array, 'Z'))-&gt;isSame(1);
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z']);
 // 第3引数でキーを指定
-assertSame(array_set($array, 'Z', 'z'), 'z');
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z']);
-assertSame(array_set($array, 'Z', 'z'), 'z');
+that(array_set($array, 'Z', 'z'))-&gt;isSame('z');
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z']);
+that(array_set($array, 'Z', 'z'))-&gt;isSame('z');
 // 第3引数で配列を指定
-assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
+that(array_set($array, 'Z', ['x', 'y', 'z']))-&gt;isSame('z');
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1901,18 +1901,18 @@ assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt;
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'B'];
 // 第3引数 int
-assertSame(array_put($array, 'Z', 999), 1);
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z']);
+that(array_put($array, 'Z', 999))-&gt;isSame(1);
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z']);
 // 第3引数省略（最後に連番キーで設定）
-assertSame(array_put($array, 'Z'), 2);
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z']);
+that(array_put($array, 'Z'))-&gt;isSame(2);
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'Z']);
 // 第3引数でキーを指定
-assertSame(array_put($array, 'Z', 'z'), 'z');
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z']);
-assertSame(array_put($array, 'Z', 'z'), 'z');
+that(array_put($array, 'Z', 'z'))-&gt;isSame('z');
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z']);
+that(array_put($array, 'Z', 'z'))-&gt;isSame('z');
 // 第3引数で配列を指定
-assertSame(array_put($array, 'Z', ['x', 'y', 'z']), 'z');
-assertSame($array, ['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
+that(array_put($array, 'Z', ['x', 'y', 'z']))-&gt;isSame('z');
+that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1983,24 +1983,24 @@ callable ではなくクロージャのみ対応する。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B'];
 // ない場合は $default を返す
-assertSame(array_unset($array, 'x', 'X'), 'X');
+that(array_unset($array, 'x', 'X'))-&gt;isSame('X');
 // 指定したキーを返す。そのキーは伏せられている
-assertSame(array_unset($array, 'a'), 'A');
-assertSame($array, ['b' =&gt; 'B']);
+that(array_unset($array, 'a'))-&gt;isSame('A');
+that($array)-&gt;isSame(['b' =&gt; 'B']);
 
 $array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // 配列を与えるとそれらを返す。そのキーは全て伏せられている
-assertSame(array_unset($array, ['a', 'b', 'x']), ['A', 'B']);
-assertSame($array, ['c' =&gt; 'C']);
+that(array_unset($array, ['a', 'b', 'x']))-&gt;isSame(['A', 'B']);
+that($array)-&gt;isSame(['c' =&gt; 'C']);
 
 $array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // 配列のキーは返されるキーを表す。順番も維持される
-assertSame(array_unset($array, ['x2' =&gt; 'b', 'x1' =&gt; 'a']), ['x2' =&gt; 'B', 'x1' =&gt; 'A']);
+that(array_unset($array, ['x2' =&gt; 'b', 'x1' =&gt; 'a']))-&gt;isSame(['x2' =&gt; 'B', 'x1' =&gt; 'A']);
 
 $array = ['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA', 'piyo' =&gt; 'PIYO'];
 // 値に "G" を含むものを返す。その要素は伏せられている
-assertSame(array_unset($array, function($v){return strpos($v, 'G') !== false;}), ['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);
-assertSame($array, ['piyo' =&gt; 'PIYO']);
+that(array_unset($array, function($v){return strpos($v, 'G') !== false;}))-&gt;isSame(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);
+that($array)-&gt;isSame(['piyo' =&gt; 'PIYO']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2070,10 +2070,10 @@ assertSame($array, ['piyo' =&gt; 'PIYO']);
         ]
     ]
 ];
-assertSame(array_dive($array, 'a.b.c'), 'vvv');
-assertSame(array_dive($array, 'a.b.x', 9), 9);
+that(array_dive($array, 'a.b.c'))-&gt;isSame('vvv');
+that(array_dive($array, 'a.b.x', 9))-&gt;isSame(9);
 // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
-assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
+that(array_dive($array, ['a', 'b', 'c']))-&gt;isSame('vvv');
 </code></pre>
 </div>
                         	<table class="table">
@@ -2146,11 +2146,11 @@ assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
 $keys に配列を与えるとキーで潜ってチェックする（Example 参照）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// すべて含むので true
-assertTrue(array_keys_exist(['a', 'b', 'c'], ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']));
+that(array_keys_exist(['a', 'b', 'c'], ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']))-&gt;isTrue();
 // N は含まないので false
-assertFalse(array_keys_exist(['a', 'b', 'N'], ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']));
+that(array_keys_exist(['a', 'b', 'N'], ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']))-&gt;isFalse();
 // 配列を与えると潜る（日本語で言えば「a というキーと、x というキーとその中に x1, x2 というキーがあるか？」）
-assertTrue(array_keys_exist(['a', 'x' =&gt; ['x1', 'x2']], ['a' =&gt; 'A', 'x' =&gt; ['x1' =&gt; 'X1', 'x2' =&gt; 'X2']]));
+that(array_keys_exist(['a', 'x' =&gt; ['x1', 'x2']], ['a' =&gt; 'A', 'x' =&gt; ['x1' =&gt; 'X1', 'x2' =&gt; 'X2']]))-&gt;isTrue();
 </code></pre>
 </div>
                         	<table class="table">
@@ -2211,11 +2211,11 @@ $is_key に false を与えるとコールバックの結果を返す。</p>
 <p>この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最初に見つかったキーを返す
-assertSame(array_find(['a', 'b', '9'], 'ctype_digit'), 2);
-assertSame(array_find(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
+that(array_find(['a', 'b', '9'], 'ctype_digit'))-&gt;isSame(2);
+that(array_find(['a', 'b', '9'], function($v){return $v === 'b';}))-&gt;isSame(1);
 // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
 $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
-assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
+that(array_find(['a', 'b', '9'], $ifnumeric2power, false))-&gt;isSame(81);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2280,11 +2280,11 @@ assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // a は x に c は z に置換される
-assertSame(array_rekey($array, ['a' =&gt; 'x', 'c' =&gt; 'z']), ['x' =&gt; 'A', 'b' =&gt; 'B', 'z' =&gt; 'C']);
+that(array_rekey($array, ['a' =&gt; 'x', 'c' =&gt; 'z']))-&gt;isSame(['x' =&gt; 'A', 'b' =&gt; 'B', 'z' =&gt; 'C']);
 // b は削除され c は z に置換される
-assertSame(array_rekey($array, ['b' =&gt; null, 'c' =&gt; 'z']), ['a' =&gt; 'A', 'z' =&gt; 'C']);
+that(array_rekey($array, ['b' =&gt; null, 'c' =&gt; 'z']))-&gt;isSame(['a' =&gt; 'A', 'z' =&gt; 'C']);
 // キーの交換にも使える（a ⇔ c）
-assertSame(array_rekey($array, ['a' =&gt; 'c', 'c' =&gt; 'a']), ['c' =&gt; 'A', 'b' =&gt; 'B', 'a' =&gt; 'C']);
+that(array_rekey($array, ['a' =&gt; 'c', 'c' =&gt; 'a']))-&gt;isSame(['c' =&gt; 'A', 'b' =&gt; 'B', 'a' =&gt; 'C']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2340,8 +2340,8 @@ assertSame(array_rekey($array, ['a' =&gt; 'c', 'c' =&gt; 'a']), ['c' =&gt; 'A', 
 					<div class="inner-item">
 						<div class="description"><p>キーを正規表現でフィルタする</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#'), ['a' =&gt; 'A', 'aa' =&gt; 'AA']);
-assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', true), ['b' =&gt; 'B']);
+<pre><code class="language-php">that(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#'))-&gt;isSame(['a' =&gt; 'A', 'aa' =&gt; 'AA']);
+that(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', true))-&gt;isSame(['b' =&gt; 'B']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2412,13 +2412,13 @@ assertSame(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
-assertSame(array_map_recursive([
+that(array_map_recursive([
     'k' =&gt; 'v',
     'c' =&gt; new \ArrayObject([
         'k1' =&gt; 'v1',
         'k2' =&gt; 'v2',
     ]),
-], 'strtoupper'), [
+], 'strtoupper'))-&gt;isSame([
     'k' =&gt; 'V',
     'c' =&gt; [
         'k1' =&gt; 'V1',
@@ -2427,13 +2427,13 @@ assertSame(array_map_recursive([
 ]);
 
 // ただし、その挙動は引数で変更可能
-assertSame(array_map_recursive([
+that(array_map_recursive([
     'k' =&gt; 'v',
     'c' =&gt; new \ArrayObject([
         'k1' =&gt; 'v1',
         'k2' =&gt; 'v2',
     ]),
-], 'gettype', false), [
+], 'gettype', false))-&gt;isSame([
     'k' =&gt; 'string',
     'c' =&gt; 'object',
 ]);
@@ -2499,8 +2499,8 @@ assertSame(array_map_recursive([
 						<div class="description"><p>キーをマップして変換する</p>
 <p>$callback が null を返すとその要素は取り除かれる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], 'strtoupper'), ['A' =&gt; 'A', 'B' =&gt; 'B']);
-assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
+<pre><code class="language-php">that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], 'strtoupper'))-&gt;isSame(['A' =&gt; 'A', 'B' =&gt; 'B']);
+that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}))-&gt;isSame([]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2558,8 +2558,8 @@ assertSame(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}), []);
 <p>$callback が要求するなら値も渡ってくる。 php 5.6 の array_filter の ARRAY_FILTER_USE_BOTH と思えばよい。<br />
 ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 =&gt; 'a', 2 =&gt; 'c']);
-assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 =&gt; 'a', 2 =&gt; 'c']);
+<pre><code class="language-php">that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
+that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2628,38 +2628,38 @@ $callback は絞り込み条件を渡す。null を与えると true 相当の�
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ];
 // 'flag' が true 相当のものだけ返す
-assertSame(array_where($array, 'flag'), [
+that(array_where($array, 'flag'))-&gt;isSame([
     1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
 ]);
 // 'name' に 'h' を含むものだけ返す
 $contain_h = function($name){return strpos($name, 'h') !== false;};
-assertSame(array_where($array, 'name', $contain_h), [
+that(array_where($array, 'name', $contain_h))-&gt;isSame([
     0 =&gt; ['id' =&gt; 1, 'name' =&gt; 'hoge', 'flag' =&gt; false],
 ]);
 // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
 $equal_2 = function($row, $key){return $key === 2;};
-assertSame(array_where($array, null, $equal_2), [
+that(array_where($array, null, $equal_2))-&gt;isSame([
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
 // $column に配列を渡すと共通項が渡ってくる
 $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [
+that(array_where($array, ['id', 'name'], $idname_is_2fuga))-&gt;isSame([
     1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
 ]);
 // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
-assertSame(array_where($array, ['name' =&gt; 'piyo', 'flag' =&gt; false]), [
+that(array_where($array, ['name' =&gt; 'piyo', 'flag' =&gt; false]))-&gt;isSame([
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
 // 上記において値に配列を渡すと in_array で判定される
-assertSame(array_where($array, ['id' =&gt; [2, 3]]), [
+that(array_where($array, ['id' =&gt; [2, 3]]))-&gt;isSame([
     1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
 // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
-assertSame(array_where($array, [
+that(array_where($array, [
     'id'   =&gt; function($id){return $id &gt;= 3;},                       // id が 3 以上
     'name' =&gt; function($name){return strpos($name, 'o') !== false;}, // name に o を含む
-]), [
+]))-&gt;isSame([
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
 </code></pre>
@@ -2726,8 +2726,8 @@ assertSame(array_where($array, [
 $strict に true を与えると「null でない」要素のみ返される。</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_map_filter([' a ', ' b ', ''], 'trim'), ['a', 'b']);
-assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
+<pre><code class="language-php">that(array_map_filter([' a ', ' b ', ''], 'trim'))-&gt;isSame(['a', 'b']);
+that(array_map_filter([' a ', ' b ', ''], 'trim', true))-&gt;isSame(['a', 'b', '']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2796,11 +2796,11 @@ $ignore=null とすると 何もせずそのまま要素を返す。</p>
 $exb = new \Exception('b');
 $std = new \stdClass();
 // getMessage で map される
-assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
+that(array_map_method([$exa, $exb], 'getMessage'))-&gt;isSame(['a', 'b']);
 // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
-assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), ['a', 'b']);
+that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true))-&gt;isSame(['a', 'b']);
 // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
-assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
+that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isSame(['a', 'b', $std, null]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2875,12 +2875,12 @@ assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), [
 さらに引数が不要なら <code>@method</code> とするだけで良い。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 値を3乗したあと16進表記にして大文字化する
-assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
+that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))-&gt;isSame(['1', '8', '1B', '40', '7D']);
 // キーも渡ってくる
-assertSame(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}), ['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
+that(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}))-&gt;isSame(['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
 // メソッドコールもできる（引数不要なら `@method` でも同じ）
-assertSame(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' =&gt; []]), ['a', 'b']);
-assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
+that(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' =&gt; []]))-&gt;isSame(['a', 'b']);
+that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;isSame(['a', 'b']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -2945,11 +2945,11 @@ assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage')
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// キー・値をくっつけるシンプルな例
-assertSame(array_kmap([
+that(array_kmap([
     'k1' =&gt; 'v1',
     'k2' =&gt; 'v2',
     'k3' =&gt; 'v3',
-], function($v, $k){return "$k:$v";}), [
+], function($v, $k){return "$k:$v";}))-&gt;isSame([
     'k1' =&gt; 'k1:v1',
     'k2' =&gt; 'k2:v2',
     'k3' =&gt; 'k3:v3',
@@ -3013,10 +3013,10 @@ assertSame(array_kmap([
 <p>Example:</p>
 <pre><code class="language-php">// 1番目に値を渡して map
 $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
-assertSame(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'), ['prefix-a-suffix', 'prefix-b-suffix']);
+that(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'))-&gt;isSame(['prefix-a-suffix', 'prefix-b-suffix']);
 // 1番目にキー、2番目に値を渡して map
 $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
-assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['k' =&gt; 'a k b v c']);
+that(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'))-&gt;isSame(['k' =&gt; 'a k b v c']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3085,7 +3085,7 @@ assertSame(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'), ['
 						<div class="description"><p>要素値を $callback の最左に適用して array_map する</p>
 <p>Example:</p>
 <pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
-assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
+that(array_lmap(['a', 'b'], $sprintf, '-suffix'))-&gt;isSame(['a-suffix', 'b-suffix']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3148,7 +3148,7 @@ assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']
 						<div class="description"><p>要素値を $callback の最右に適用して array_map する</p>
 <p>Example:</p>
 <pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
-assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
+that(array_rmap(['a', 'b'], $sprintf, 'prefix-'))-&gt;isSame(['prefix-a', 'prefix-b']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3202,7 +3202,7 @@ assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2032-L2111" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2032-L2109" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_each()" tabindex="-1" class="structure-title ">
                         array_each                        	<small>($array, $callback, $default = null) : mixed</small>
@@ -3226,9 +3226,9 @@ array_reduce と少し似てるが、下記の点が異なる。</p>
 （ただ、「意図していることをコードで表す」といった観点ではこの記法の方が正しいとも思う）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 全要素を文字列的に足し合わせる
-assertSame(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry .= $v;}, ''), '12345');
+that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry .= $v;}, ''))-&gt;isSame('12345');
 // 値をキーにして要素を2乗値にする
-assertSame(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry[$v] = $v * $v;}, []), [
+that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry[$v] = $v * $v;}, []))-&gt;isSame([
     1 =&gt; 1,
     2 =&gt; 4,
     3 =&gt; 9,
@@ -3236,21 +3236,19 @@ assertSame(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry[$v] = $v
     5 =&gt; 25,
 ]);
 // 上記と同じ。ただし、3 で break する
-assertSame(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v, $k){
+that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v, $k){
     if ($k === 3) return false;
     $carry[$v] = $v * $v;
-}, []), [
+}, []))-&gt;isSame([
     1 =&gt; 1,
     2 =&gt; 4,
     3 =&gt; 9,
 ]);
 
 // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-assertSame(
-    array_each([1, 2, 3], function(&amp;$carry = [], $v) {
+that(array_each([1, 2, 3], function(&amp;$carry = [], $v) {
         $carry[$v] = $v * $v;
-    }),
-    array_each([1, 2, 3], function(&amp;$carry, $v) {
+    }))-&gt;isSame(array_each([1, 2, 3], function(&amp;$carry, $v) {
         $carry[$v] = $v * $v;
     }, [])
     // 個人的に↑のようなぶら下がり引数があまり好きではない（クロージャを最後の引数にしたい）
@@ -3308,7 +3306,7 @@ assertSame(
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2113-L2156" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2111-L2154" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_depth()" tabindex="-1" class="structure-title ">
                         array_depth                        	<small>($array, $max_depth = null) : int</small>
@@ -3320,9 +3318,9 @@ assertSame(
 <p>第2引数 $max_depth を与えるとその階層になった時点で走査を打ち切る。<br />
 「1階層のみか？」などを調べるときは指定したほうが高速に動作する。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_depth([]), 1);
-assertSame(array_depth(['hoge']), 1);
-assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);
+<pre><code class="language-php">that(array_depth([]))-&gt;isSame(1);
+that(array_depth(['hoge']))-&gt;isSame(1);
+that(array_depth([['nest1' =&gt; ['nest2']]]))-&gt;isSame(3);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3370,7 +3368,7 @@ assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2158-L2188" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2156-L2186" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_insert()" tabindex="-1" class="structure-title ">
                         array_insert                        	<small>($array, $value, $position = null) : array</small>
@@ -3381,10 +3379,10 @@ assertSame(array_depth([['nest1' =&gt; ['nest2']]]), 3);
 $position に負数を与えると後ろから数えられる。<br />
 $value には配列も与えられるが、その場合数値キーは振り直される</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_insert([1, 2, 3], 'x'), [1, 2, 3, 'x']);
-assertSame(array_insert([1, 2, 3], 'x', 1), [1, 'x', 2, 3]);
-assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
-assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =&gt; 'A', 'b' =&gt; 'B', 2, 3]);
+<pre><code class="language-php">that(array_insert([1, 2, 3], 'x'))-&gt;isSame([1, 2, 3, 'x']);
+that(array_insert([1, 2, 3], 'x', 1))-&gt;isSame([1, 'x', 2, 3]);
+that(array_insert([1, 2, 3], 'x', -1))-&gt;isSame([1, 2, 'x', 3]);
+that(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1))-&gt;isSame([1, 'a' =&gt; 'A', 'b' =&gt; 'B', 2, 3]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3438,7 +3436,7 @@ assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2190-L2235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2188-L2233" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_assort()" tabindex="-1" class="structure-title ">
                         array_assort                        	<small>($array, $rules) : array</small>
@@ -3452,17 +3450,17 @@ assertSame(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1), [1, 'a' =
 <p>Example:</p>
 <pre><code class="language-php">// lt2(2より小さい)で分類
 $lt2 = function($v){return $v &lt; 2;};
-assertSame(array_assort([1, 2, 3], [
+that(array_assort([1, 2, 3], [
     'lt2' =&gt; $lt2,
-]), [
+]))-&gt;isSame([
     'lt2' =&gt; [1],
 ]);
 // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
 $lt3 = function($v){return $v &lt; 3;};
-assertSame(array_assort(['1', '2', '3'], [
+that(array_assort(['1', '2', '3'], [
     'lt3' =&gt; $lt3,
     'ctd' =&gt; 'ctype_digit',
-]), [
+]))-&gt;isSame([
     'lt3' =&gt; ['1', '2'],
     'ctd' =&gt; ['1', '2', '3'],
 ]);
@@ -3513,7 +3511,7 @@ assertSame(array_assort(['1', '2', '3'], [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2237-L2289" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2235-L2287" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_count()" tabindex="-1" class="structure-title ">
                         array_count                        	<small>($array, $callback) : int<span class="type-separator"></span><wbr>array</small>
@@ -3529,12 +3527,12 @@ assertSame(array_assort(['1', '2', '3'], [
 <p>Example:</p>
 <pre><code class="language-php">$array = ['hoge', 'fuga', 'piyo'];
 // 'o' を含むものの数（2個）
-assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}), 2);
+that(array_count($array, function($s){return strpos($s, 'o') !== false;}))-&gt;isSame(2);
 // 'a' と 'o' を含むものをそれぞれ（1個と2個）
-assertSame(array_count($array, [
+that(array_count($array, [
     'a' =&gt; function($s){return strpos($s, 'a') !== false;},
     'o' =&gt; function($s){return strpos($s, 'o') !== false;},
-]), [
+]))-&gt;isSame([
     'a' =&gt; 1,
     'o' =&gt; 2,
 ]);
@@ -3585,7 +3583,7 @@ assertSame(array_count($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2291-L2350" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2289-L2348" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_group()" tabindex="-1" class="structure-title ">
                         array_group                        	<small>($array, $callback = null, $preserve_keys = false) : array</small>
@@ -3595,10 +3593,10 @@ assertSame(array_count($array, [
 <p>コールバックを省略すると値そのもので評価する。<br />
 コールバックが配列を返すと入れ子としてグループ化する。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_group([1, 1, 1]), [
+<pre><code class="language-php">that(array_group([1, 1, 1]))-&gt;isSame([
     1 =&gt; [1, 1, 1],
 ]);
-assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [
+that(array_group([1, 2, 3], function($v){return $v % 2;}))-&gt;isSame([
     1 =&gt; [1, 3],
     0 =&gt; [2],
 ]);
@@ -3606,7 +3604,7 @@ assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [
 $row1 = ['id' =&gt; 1, 'group' =&gt; 'hoge'];
 $row2 = ['id' =&gt; 2, 'group' =&gt; 'fuga'];
 $row3 = ['id' =&gt; 3, 'group' =&gt; 'hoge'];
-assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}), [
+that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}))-&gt;isSame([
     'hoge' =&gt; [
         1 =&gt; $row1,
         3 =&gt; $row3,
@@ -3668,7 +3666,7 @@ assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2352-L2482" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2350-L2480" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_aggregate()" tabindex="-1" class="structure-title ">
                         array_aggregate                        	<small>($array, $columns, $key = null) : array</small>
@@ -3686,11 +3684,11 @@ assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group
 クロージャを与えると返り値がキーになる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 単純な配列の集計
-assertSame(array_aggregate([1, 2, 3], [
+that(array_aggregate([1, 2, 3], [
     'min' =&gt; function($elems) {return min($elems);},
     'max' =&gt; function($elems) {return max($elems);},
     'avg' =&gt; function($elems) {return array_sum($elems) / count($elems);},
-]), [
+]))-&gt;isSame([
     'min' =&gt; 1, // 最小値
     'max' =&gt; 3, // 最大値
     'avg' =&gt; 2, // 平均値
@@ -3702,10 +3700,10 @@ $row3 = ['user_id' =&gt; 'fuga', 'group' =&gt; 'A', 'score' =&gt; 5];
 $row4 = ['user_id' =&gt; 'hoge', 'group' =&gt; 'A', 'score' =&gt; 8];
 
 // user_id, group ごとの score を集計して階層配列で返す（第2引数 $current を利用している）
-assertSame(array_aggregate([$row1, $row2, $row3, $row4], [
+that(array_aggregate([$row1, $row2, $row3, $row4], [
     'scores' =&gt; function($rows) {return array_column($rows, 'score');},
     'score'  =&gt; function($rows, $current) {return array_sum($current['scores']);},
-], ['user_id', 'group']), [
+], ['user_id', 'group']))-&gt;isSame([
     'hoge' =&gt; [
         'A' =&gt; [
             'scores' =&gt; [4, 8],
@@ -3725,9 +3723,9 @@ assertSame(array_aggregate([$row1, $row2, $row3, $row4], [
 ]);
 
 // user_id ごとの score を集計して単一列で返す（キーのクロージャも利用している）
-assertSame(array_aggregate([$row1, $row2, $row3, $row4],
+that(array_aggregate([$row1, $row2, $row3, $row4],
     function($rows) {return array_sum(array_column($rows, 'score'));},
-    function($row) {return strtoupper($row['user_id']);}), [
+    function($row) {return strtoupper($row['user_id']);}))-&gt;isSame([
     'HOGE' =&gt; 12,
     'FUGA' =&gt; 11,
 ]);
@@ -3784,7 +3782,7 @@ assertSame(array_aggregate([$row1, $row2, $row3, $row4],
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2484-L2515" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2482-L2513" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_all()" tabindex="-1" class="structure-title ">
                         array_all                        	<small>($array, $callback = null, $default = true) : bool</small>
@@ -3793,9 +3791,9 @@ assertSame(array_aggregate([$row1, $row2, $row3, $row4],
 						<div class="description"><p>全要素が true になるなら true を返す（1つでも false なら false を返す）</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(array_all([true, true]));
-assertFalse(array_all([true, false]));
-assertFalse(array_all([false, false]));
+<pre><code class="language-php">that(array_all([true, true]))-&gt;isTrue();
+that(array_all([true, false]))-&gt;isFalse();
+that(array_all([false, false]))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -3849,7 +3847,7 @@ assertFalse(array_all([false, false]));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2517-L2548" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2515-L2546" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_any()" tabindex="-1" class="structure-title ">
                         array_any                        	<small>($array, $callback = null, $default = false) : bool</small>
@@ -3858,9 +3856,9 @@ assertFalse(array_all([false, false]));
 						<div class="description"><p>全要素が false になるなら false を返す（1つでも true なら true を返す）</p>
 <p>$callback が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertTrue(array_any([true, true]));
-assertTrue(array_any([true, false]));
-assertFalse(array_any([false, false]));
+<pre><code class="language-php">that(array_any([true, true]))-&gt;isTrue();
+that(array_any([true, false]))-&gt;isTrue();
+that(array_any([false, false]))-&gt;isFalse();
 </code></pre>
 </div>
                         	<table class="table">
@@ -3914,7 +3912,7 @@ assertFalse(array_any([false, false]));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2550-L2641" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2548-L2639" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_distinct()" tabindex="-1" class="structure-title ">
                         array_distinct                        	<small>($array, $comparator = null) : array</small>
@@ -3936,22 +3934,22 @@ assertFalse(array_any([false, false]));
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな重複除去
-assertSame(array_distinct([1, 2, 3, '3']), [1, 2, 3]);
+that(array_distinct([1, 2, 3, '3']))-&gt;isSame([1, 2, 3]);
 // 大文字小文字を無視した重複除去
-assertSame(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE), ['a', 'b']);
+that(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE))-&gt;isSame(['a', 'b']);
 
 $v1 = new \ArrayObject(['id' =&gt; '1', 'group' =&gt; 'aaa']);
 $v2 = new \ArrayObject(['id' =&gt; '2', 'group' =&gt; 'bbb', 'dummy' =&gt; 123]);
 $v3 = new \ArrayObject(['id' =&gt; '3', 'group' =&gt; 'aaa', 'dummy' =&gt; 456]);
 $v4 = new \ArrayObject(['id' =&gt; '4', 'group' =&gt; 'bbb', 'dummy' =&gt; 789]);
 // クロージャを指定して重複除去
-assertSame(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] &lt;=&gt; $b['group']; }), [$v1, $v2]);
+that(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] &lt;=&gt; $b['group']; }))-&gt;isSame([$v1, $v2]);
 // 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
-assertSame(array_distinct([$v1, $v2, $v3, $v4], 'group'), [$v1, $v2]);
+that(array_distinct([$v1, $v2, $v3, $v4], 'group'))-&gt;isSame([$v1, $v2]);
 // 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
-assertSame(array_distinct([$v1, $v2, $v3, $v4], ['count' =&gt; []]), [$v1, $v2]);
+that(array_distinct([$v1, $v2, $v3, $v4], ['count' =&gt; []]))-&gt;isSame([$v1, $v2]);
 // 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
-assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$v1, $v2, 2 =&gt; $v3]);
+that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]))-&gt;isSame([$v1, $v2, 2 =&gt; $v3]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -3999,7 +3997,7 @@ assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2643-L2776" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2641-L2774" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_order()" tabindex="-1" class="structure-title ">
                         array_order                        	<small>($array, $orders, $preserve_keys = false) : array</small>
@@ -4023,7 +4021,7 @@ assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]), [$
 $v2 = ['id' =&gt; '2', 'no' =&gt; 'a4',  'name' =&gt; 'yyy'];
 $v3 = ['id' =&gt; '3', 'no' =&gt; 'a12', 'name' =&gt; 'xxx'];
 // name 昇順, no 自然降順
-assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL]), [$v3, $v2, $v1]);
+that(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL]))-&gt;isSame([$v3, $v2, $v1]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -4077,7 +4075,7 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2778-L2799" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2776-L2797" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shuffle()" tabindex="-1" class="structure-title ">
                         array_shuffle                        	<small>($array) : array</small>
@@ -4085,7 +4083,7 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 					<div class="inner-item">
 						<div class="description"><p>shuffle のキーが保存される＋参照渡しではない版</p>
 <p>Example:</p>
-<pre><code class="language-php">assertEquals(array_shuffle(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']), ['b' =&gt; 'B', 'a' =&gt; 'A', 'c' =&gt; 'C']);
+<pre><code class="language-php">that(array_shuffle(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']))-&gt;is(['b' =&gt; 'B', 'a' =&gt; 'A', 'c' =&gt; 'C']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -4127,7 +4125,7 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2801-L2829" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2799-L2827" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" tabindex="-1" class="structure-title ">
                         array_shrink_key                        	<small>(...$variadic) : array</small>
@@ -4141,7 +4139,7 @@ assertSame(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NAT
 $array2 = ['c' =&gt; 'C2', 'b' =&gt; 'B2', 'a' =&gt; 'A2'];
 $array3 = ['c' =&gt; 'C3', 'dummy' =&gt; 'DUMMY'];
 // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
-assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
+that(array_shrink_key($array1, $array2, $array3))-&gt;isSame(['c' =&gt; 'C3']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -4183,7 +4181,7 @@ assertSame(array_shrink_key($array1, $array2, $array3), ['c' =&gt; 'C3']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2831-L2922" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2829-L2920" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_gap()" tabindex="-1" class="structure-title ">
                         array_fill_gap                        	<small>($array, ...$values) : array</small>
@@ -4204,7 +4202,7 @@ $array = [
     7 =&gt; 'h',
 ];
 // 抜けているところを可変引数で順次埋める（'i', 'j' は隙間というより末尾追加）
-assertSame(array_fill_gap($array, 'a', 'd', 'e', 'g', 'i', 'j'), [
+that(array_fill_gap($array, 'a', 'd', 'e', 'g', 'i', 'j'))-&gt;isSame([
     0 =&gt; 'a',
     1 =&gt; 'b',
     2 =&gt; 'c',
@@ -4227,7 +4225,7 @@ $array = [
     'z' =&gt; 'noize',
 ];
 // 文字キーはそのまま保持され、値が足りないので 6 キーはない
-assertSame(array_fill_gap($array, 'a', 'c', 'd', 'f'), [
+that(array_fill_gap($array, 'a', 'c', 'd', 'f'))-&gt;isSame([
     0   =&gt; 'a',
     1   =&gt; 'b',
     'x' =&gt; 'noize',
@@ -4286,7 +4284,7 @@ assertSame(array_fill_gap($array, 'a', 'c', 'd', 'f'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2924-L2955" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2922-L2953" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_callback()" tabindex="-1" class="structure-title ">
                         array_fill_callback                        	<small>($keys, $callback) : array</small>
@@ -4298,13 +4296,13 @@ assertSame(array_fill_gap($array, 'a', 'c', 'd', 'f'), [
 <p>Example:</p>
 <pre><code class="language-php">$abc = ['a', 'b', 'c'];
 // [a, b, c] から [a =&gt; A, b =&gt; B, c =&gt; C] を作る
-assertSame(array_fill_callback($abc, 'strtoupper'), [
+that(array_fill_callback($abc, 'strtoupper'))-&gt;isSame([
     'a' =&gt; 'A',
     'b' =&gt; 'B',
     'c' =&gt; 'C',
 ]);
 // [a, b, c] からその sha1 配列を作って大文字化する
-assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }), [
+that(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }))-&gt;isSame([
     'a' =&gt; '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
     'b' =&gt; 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
     'c' =&gt; '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -4356,7 +4354,7 @@ assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v));
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2957-L2998" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2955-L2996" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pickup()" tabindex="-1" class="structure-title ">
                         array_pickup                        	<small>($array, $keys) : array</small>
@@ -4369,11 +4367,11 @@ assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v));
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // a と c を取り出す
-assertSame(array_pickup($array, ['a', 'c']), ['a' =&gt; 'A', 'c' =&gt; 'C']);
+that(array_pickup($array, ['a', 'c']))-&gt;isSame(['a' =&gt; 'A', 'c' =&gt; 'C']);
 // 順番は $keys 基準になる
-assertSame(array_pickup($array, ['c', 'a']), ['c' =&gt; 'C', 'a' =&gt; 'A']);
+that(array_pickup($array, ['c', 'a']))-&gt;isSame(['c' =&gt; 'C', 'a' =&gt; 'A']);
 // 連想配列を渡すと読み替えて返す
-assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; 'C', 'aX' =&gt; 'A']);
+that(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']))-&gt;isSame(['cX' =&gt; 'C', 'aX' =&gt; 'A']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -4421,7 +4419,7 @@ assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; '
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3000-L3025" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2998-L3023" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_remove()" tabindex="-1" class="structure-title ">
                         array_remove                        	<small>($array, $keys) : array</small>
@@ -4434,7 +4432,7 @@ assertSame(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']), ['cX' =&gt; '
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // a と c を伏せる（b を残す）
-assertSame(array_remove($array, ['a', 'c']), ['b' =&gt; 'B']);
+that(array_remove($array, ['a', 'c']))-&gt;isSame(['b' =&gt; 'B']);
 </code></pre>
 </div>
                         	<table class="table">
@@ -4482,7 +4480,7 @@ assertSame(array_remove($array, ['a', 'c']), ['b' =&gt; 'B']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3027-L3062" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3025-L3060" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lookup()" tabindex="-1" class="structure-title ">
                         array_lookup                        	<small>($array, $column_key = null, $index_key = null) : array</small>
@@ -4497,10 +4495,10 @@ assertSame(array_remove($array, ['a', 'c']), ['b' =&gt; 'B']);
     13 =&gt; ['id' =&gt; 3, 'name' =&gt; 'name3'],
 ];
 // 第3引数を渡せば array_column と全く同じ
-assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
-assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
+that(array_lookup($array, 'name', 'id'))-&gt;isSame(array_column($array, 'name', 'id'));
+that(array_lookup($array, 'name', null))-&gt;isSame(array_column($array, 'name', null));
 // 省略すればキーが保存される
-assertSame(array_lookup($array, 'name'), [
+that(array_lookup($array, 'name'))-&gt;isSame([
     11 =&gt; 'name1',
     12 =&gt; 'name2',
     13 =&gt; 'name3',
@@ -4558,7 +4556,7 @@ assertSame(array_lookup($array, 'name'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3064-L3099" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3062-L3097" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_columns()" tabindex="-1" class="structure-title ">
                         array_columns                        	<small>($array, $column_keys = null, $index_key = null) : array</small>
@@ -4570,9 +4568,9 @@ assertSame(array_lookup($array, 'name'), [
 <pre><code class="language-php">$row1 = ['id' =&gt; 1, 'name' =&gt; 'A'];
 $row2 = ['id' =&gt; 2, 'name' =&gt; 'B'];
 $rows = [$row1, $row2];
-assertSame(array_columns($rows), ['id' =&gt; [1, 2], 'name' =&gt; ['A', 'B']]);
-assertSame(array_columns($rows, 'id'), ['id' =&gt; [1, 2]]);
-assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&gt; 'B']]);
+that(array_columns($rows))-&gt;isSame(['id' =&gt; [1, 2], 'name' =&gt; ['A', 'B']]);
+that(array_columns($rows, 'id'))-&gt;isSame(['id' =&gt; [1, 2]]);
+that(array_columns($rows, 'name', 'id'))-&gt;isSame(['name' =&gt; [1 =&gt; 'A', 2 =&gt; 'B']]);
 </code></pre>
 </div>
                         	<table class="table">
@@ -4626,7 +4624,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3101-L3143" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3099-L3141" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" tabindex="-1" class="structure-title ">
                         array_uncolumns                        	<small>($array, $template = null) : array</small>
@@ -4636,10 +4634,10 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 <p>$template を指定すると「それに含まれる配列かつ値がデフォルト」になる（要するに $default みたいなもの）。<br />
 キーがバラバラな配列を指定する場合は指定したほうが良い。が、null を指定すると最初の要素が使われるので大抵の場合は null で良い。</p>
 <p>Example:</p>
-<pre><code class="language-php">assertSame(array_uncolumns([
+<pre><code class="language-php">that(array_uncolumns([
     'id'   =&gt; [1, 2],
     'name' =&gt; ['A', 'B'],
-]), [
+]))-&gt;isSame([
     ['id' =&gt; 1, 'name' =&gt; 'A'],
     ['id' =&gt; 2, 'name' =&gt; 'B'],
 ]);
@@ -4690,7 +4688,7 @@ assertSame(array_columns($rows, 'name', 'id'), ['name' =&gt; [1 =&gt; 'A', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3145-L3268" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3143-L3266" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_convert()" tabindex="-1" class="structure-title ">
                         array_convert                        	<small>($array, $callback, $apply_array = false) : array</small>
@@ -4732,7 +4730,7 @@ $callback = function($k, &amp;$v){
     if (!is_array($v)) $v = "prefix-$v";
     return "_$k";
 };
-assertSame(array_convert($array, $callback, true), [
+that(array_convert($array, $callback, true))-&gt;isSame([
     '_k1' =&gt; 'prefix-v1',
     '_k2' =&gt; [
         'k21' =&gt; 'v21',
@@ -4792,7 +4790,7 @@ assertSame(array_convert($array, $callback, true), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3270-L3345" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3268-L3343" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_flatten()" tabindex="-1" class="structure-title ">
                         array_flatten                        	<small>($array, $delimiter = null) : array</small>
@@ -4815,7 +4813,7 @@ $delimiter = null の場合に本当の配列で返す（巷の実装と同じ�
    ],
 ];
 // 区切り文字指定なし
-assertSame(array_flatten($array), [
+that(array_flatten($array))-&gt;isSame([
    0 =&gt; 'v1',
    1 =&gt; 'v21',
    2 =&gt; 'v221',
@@ -4825,7 +4823,7 @@ assertSame(array_flatten($array), [
    6 =&gt; 3,
 ]);
 // 区切り文字指定
-assertSame(array_flatten($array, '.'), [
+that(array_flatten($array, '.'))-&gt;isSame([
    'k1'            =&gt; 'v1',
    'k2.k21'        =&gt; 'v21',
    'k2.k22.k221'   =&gt; 'v221',
@@ -4881,7 +4879,7 @@ assertSame(array_flatten($array, '.'), [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3347-L3421" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3345-L3419" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
                         array_nest                        	<small>($array, $delimiter = &quot;.&quot;) : array</small>
@@ -4902,7 +4900,7 @@ $array = [
    'k2.k22.k223.1' =&gt; 2,
    'k2.k22.k223.2' =&gt; 3,
 ];
-assertSame(array_nest($array), [
+that(array_nest($array))-&gt;isSame([
    'k1' =&gt; 'v1',
    'k2' =&gt; [
        'k21' =&gt; 'v21',
@@ -4918,7 +4916,7 @@ $array = [
    'k1.k2' =&gt; 'v1', // この時点で 'k1' は配列になるが・・・
    'k1'    =&gt; 'v2', // この時点で 'k1' は文字列として上書きされる
 ];
-assertSame(array_nest($array), [
+that(array_nest($array))-&gt;isSame([
    'k1' =&gt; 'v2',
 ]);
 // 上書きすら出来ない場合は例外が飛ぶ
@@ -4930,7 +4928,7 @@ try {
     array_nest($array);
 }
 catch (\Exception $e) {
-    assertInstanceof(\InvalidArgumentException::class, $e);
+    that($e)-&gt;isInstanceOf(\InvalidArgumentException::class);
 }
 </code></pre>
 </div>
@@ -4979,7 +4977,7 @@ catch (\Exception $e) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3423-L3526" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3421-L3524" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_difference()" tabindex="-1" class="structure-title ">
                         array_difference                        	<small>($array1, $array2, $delimiter = &quot;.&quot;) : array</small>
@@ -4997,7 +4995,7 @@ catch (\Exception $e) {
 <p>数値キーはキーの比較は行われない。値の差分のみ返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// common は 中身に差分がある。 1 に key1 はあるが、 2 にはない。2 に key2 はあるが、 1 にはない。
-assertSame(array_difference([
+that(array_difference([
     'common' =&gt; [
         'sub' =&gt; [
             'x' =&gt; 'val',
@@ -5013,7 +5011,7 @@ assertSame(array_difference([
     ],
     'key2'   =&gt; 'fuga',
     'array'  =&gt; ['c', 'd', 'e'],
-]), [
+]))-&gt;isSame([
     'common.sub.x' =&gt; ['-' =&gt; 'val', '+' =&gt; 'VAL'],
     'key1'         =&gt; ['-' =&gt; 'hoge'],
     'array'        =&gt; ['-' =&gt; ['a', 'b'], '+' =&gt; ['d', 'e']],
