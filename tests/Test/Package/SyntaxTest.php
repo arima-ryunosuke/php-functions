@@ -472,6 +472,19 @@ $var3 = function () { return \ArrayObject::class; };
         that((try_null)($try, 2))->is(2);
     }
 
+    function test_try_return()
+    {
+        $try = function ($x) {
+            if ($x) {
+                return $x;
+            }
+            throw new \Exception();
+        };
+        that((try_return)($try, 0))->isInstanceOf(\Exception::class);
+        that((try_return)($try, 1))->is(1);
+        that((try_return)($try, 2))->is(2);
+    }
+
     function test_try_catch()
     {
         $try = function () {
