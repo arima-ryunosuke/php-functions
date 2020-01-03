@@ -10,6 +10,11 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.3
+
+- [feature][Syntax] try_return を追加
+- [feature][Strings] preg_matches を追加
+
 ## 1.4.2
 
 - [feature][Arrays] array_aggregate を追加
