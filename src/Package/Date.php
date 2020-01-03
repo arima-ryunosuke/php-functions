@@ -28,14 +28,14 @@ class Date
      * Example:
      * ```php
      * // 普通の日時文字列
-     * assertSame(date_timestamp('2014/12/24 12:34:56'), strtotime('2014/12/24 12:34:56'));
+     * that(date_timestamp('2014/12/24 12:34:56'))->isSame(strtotime('2014/12/24 12:34:56'));
      * // 和暦
-     * assertSame(date_timestamp('昭和31年12月24日 12時34分56秒'), strtotime('1956/12/24 12:34:56'));
+     * that(date_timestamp('昭和31年12月24日 12時34分56秒'))->isSame(strtotime('1956/12/24 12:34:56'));
      * // 相対指定
-     * assertSame(date_timestamp('2012/01/31 +1 month'), strtotime('2012/02/29'));
-     * assertSame(date_timestamp('2012/03/31 -1 month'), strtotime('2012/02/29'));
+     * that(date_timestamp('2012/01/31 +1 month'))->isSame(strtotime('2012/02/29'));
+     * that(date_timestamp('2012/03/31 -1 month'))->isSame(strtotime('2012/02/29'));
      * // マイクロ秒
-     * assertSame(date_timestamp('2014/12/24 12:34:56.789'), 1419392096.789);
+     * that(date_timestamp('2014/12/24 12:34:56.789'))->isSame(1419392096.789);
      * ```
      *
      * @param string|int|float $datetimedata 日時データ
@@ -140,10 +140,10 @@ class Date
      * Example:
      * ```php
      * // 和暦を Y/m/d H:i:s に変換
-     * assertSame(date_convert('Y/m/d H:i:s', '昭和31年12月24日 12時34分56秒'), '1956/12/24 12:34:56');
+     * that(date_convert('Y/m/d H:i:s', '昭和31年12月24日 12時34分56秒'))->isSame('1956/12/24 12:34:56');
      * // 単純に「マイクロ秒が使える date」としても使える
      * $now = 1234567890.123; // テストがしづらいので固定時刻にする
-     * assertSame(date_convert('Y/m/d H:i:s.u', $now), '2009/02/14 08:31:30.123000');
+     * that(date_convert('Y/m/d H:i:s.u', $now))->isSame('2009/02/14 08:31:30.123000');
      * ```
      *
      * @param string $format フォーマット
@@ -225,13 +225,13 @@ class Date
      * Example:
      * ```php
      * // 書式文字列指定（%vはミリ秒）
-     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'), '02/05/18 03:25:45.678');
+     * that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'))->isSame('02/05/18 03:25:45.678');
      *
      * // 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
-     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}), '678,45,25,3,18,5,2,0');
+     * that(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}))->isSame('678,45,25,3,18,5,2,0');
      *
      * // リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
-     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'), '00/29/18 03:25:45.678');
+     * that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))->isSame('00/29/18 03:25:45.678');
      *
      * // 書式に配列を与えてリミットに数値を与えるとその範囲でオートスケールする
      * $format = [
@@ -244,14 +244,14 @@ class Date
      *     's' => '%s秒',
      * ];
      * // 数が大きいので年・月・日の3要素のみ
-     * assertSame(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3), '2年5ヶ月18日');
+     * that(date_interval(60 * 60 * 24 * 900 + 12345, $format, 3))->isSame('2年5ヶ月18日');
      * // 数がそこそこだと日・時間・分の3要素に切り替わる
-     * assertSame(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3), '20日 3時間25分');
+     * that(date_interval(60 * 60 * 24 * 20 + 12345, $format, 3))->isSame('20日 3時間25分');
      * // どんなに数が小さくても3要素以下にはならない
-     * assertSame(date_interval(1234, $format, 3), '0時間20分34秒');
+     * that(date_interval(1234, $format, 3))->isSame('0時間20分34秒');
      *
      * // 書式指定なし（DateInterval を返す）
-     * assertInstanceOf(\DateInterval::class, date_interval(123.456));
+     * that(date_interval(123.456))->isInstanceOf(\DateInterval::class);
      * ```
      *
      * @param int|float $sec タイムスタンプ

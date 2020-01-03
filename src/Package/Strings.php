@@ -15,7 +15,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(strcat('a', 'b', 'c'), 'abc');
+     * that(strcat('a', 'b', 'c'))->isSame('abc');
      * ```
      *
      * @param mixed $variadic 結合する文字列（可変引数）
@@ -36,8 +36,8 @@ class Strings
      * 可変引数なので 端的に言えば mysql の CONCAT みたいな動作になる（あっちは NULL だが）。
      *
      * ```php
-     * assertSame(concat('prefix-', 'middle', '-suffix'), 'prefix-middle-suffix');
-     * assertSame(concat('prefix-', '', '-suffix'), '');
+     * that(concat('prefix-', 'middle', '-suffix'))->isSame('prefix-middle-suffix');
+     * that(concat('prefix-', '', '-suffix'))->isSame('');
      * ```
      *
      * @param mixed $variadic 結合する文字列（可変引数）
@@ -66,9 +66,9 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(split_noempty(',', 'a, b, c'), ['a', 'b', 'c']);
-     * assertSame(split_noempty(',', 'a, , , b, c'), ['a', 'b', 'c']);
-     * assertSame(split_noempty(',', 'a, , , b, c', false), ['a', ' ', ' ', ' b', ' c']);
+     * that(split_noempty(',', 'a, b, c'))->isSame(['a', 'b', 'c']);
+     * that(split_noempty(',', 'a, , , b, c'))->isSame(['a', 'b', 'c']);
+     * that(split_noempty(',', 'a, , , b, c', false))->isSame(['a', ' ', ' ', ' b', ' c']);
      * ```
      *
      * @param string $delimiter 区切り文字
@@ -103,11 +103,11 @@ class Strings
      * Example:
      * ```php
      * // 配列を与えると複数文字列での分割
-     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d'), ['a', 'b', 'c', 'd']);
+     * that(multiexplode([',', ' ', '|'], 'a,b c|d'))->isSame(['a', 'b', 'c', 'd']);
      * // 負数を与えると前詰め
-     * assertSame(multiexplode(',', 'a,b,c,d', -2), ['a,b,c', 'd']);
+     * that(multiexplode(',', 'a,b,c,d', -2))->isSame(['a,b,c', 'd']);
      * // もちろん上記2つは共存できる
-     * assertSame(multiexplode([',', ' ', '|'], 'a,b c|d', -2), ['a,b c', 'd']);
+     * that(multiexplode([',', ' ', '|'], 'a,b c|d', -2))->isSame(['a,b c', 'd']);
      * ```
      *
      * @param string|array $delimiter 分割文字列。配列可
@@ -140,7 +140,7 @@ class Strings
      * Example:
      * ```php
      * // シンプルな例
-     * assertSame(quoteexplode(',', 'a,b,c\\,d,"e,f"'), [
+     * that(quoteexplode(',', 'a,b,c\\,d,"e,f"'))->isSame([
      *     'a', // 普通に分割される
      *     'b', // 普通に分割される
      *     'c\\,d', // \\ でエスケープしているので区切り文字とみなされない
@@ -148,14 +148,14 @@ class Strings
      * ]);
      *
      * // $enclosures で囲い文字の開始・終了文字を明示できる
-     * assertSame(quoteexplode(',', 'a,b,{e,f}', ['{' => '}']), [
+     * that(quoteexplode(',', 'a,b,{e,f}', ['{' => '}']))->isSame([
      *     'a', // 普通に分割される
      *     'b', // 普通に分割される
      *     '{e,f}', // { } で囲まれているので区切り文字とみなされない
      * ]);
      *
      * // このように第3引数に $limit 引数を差し込むことができる
-     * assertSame(quoteexplode(',', 'a,b,{e,f}', 2, ['{' => '}']), [
+     * that(quoteexplode(',', 'a,b,{e,f}', 2, ['{' => '}']))->isSame([
      *     'a',
      *     'b,{e,f}',
      * ]);
@@ -224,11 +224,11 @@ class Strings
      * Example:
      * ```php
      * // パス中の最後のディレクトリを取得
-     * assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":"), 'path/to/3');
+     * that(strrstr("path/to/1:path/to/2:path/to/3", ":"))->isSame('path/to/3');
      * // $after_needle を false にすると逆の動作になる
-     * assertSame(strrstr("path/to/1:path/to/2:path/to/3", ":", false), 'path/to/1:path/to/2:');
+     * that(strrstr("path/to/1:path/to/2:path/to/3", ":", false))->isSame('path/to/1:path/to/2:');
      * // （参考）strrchr と違い、文字列が使えるしその文字そのものは含まれない
-     * assertSame(strrstr("A\r\nB\r\nC", "\r\n"), 'C');
+     * that(strrstr("A\r\nB\r\nC", "\r\n"))->isSame('C');
      * ```
      *
      * @param string $haystack 調べる文字列
@@ -262,12 +262,12 @@ class Strings
      * Example:
      * ```php
      * // 見つかった位置を返す
-     * assertSame(strpos_array('hello world', ['hello', 'world']), [
+     * that(strpos_array('hello world', ['hello', 'world']))->isSame([
      *     0 => 0,
      *     1 => 6,
      * ]);
      * // 見つからない文字は含まれない
-     * assertSame(strpos_array('hello world', ['notfound', 'world']), [
+     * that(strpos_array('hello world', ['notfound', 'world']))->isSame([
      *     1 => 6,
      * ]);
      * ```
@@ -299,9 +299,9 @@ class Strings
      * Example:
      * ```php
      * // クオート中は除外される
-     * assertSame(strpos_quoted('hello "this" is world', 'is'), 13);
+     * that(strpos_quoted('hello "this" is world', 'is'))->isSame(13);
      * // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
-     * assertSame(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
+     * that(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))->isSame(20);
      * ```
      *
      * @param string $haystack 対象文字列
@@ -373,11 +373,11 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(str_anyof('b', ['a', 'b', 'c']), 1);       // 見つかったキーを返す
-     * assertSame(str_anyof('x', ['a', 'b', 'c']), null);    // 見つからないなら null を返す
-     * assertSame(str_anyof('C', ['a', 'b', 'c'], true), 2); // 大文字文字を区別しない
-     * assertSame(str_anyof('1', [1, 2, 3]), 0);             // 文字列の比較に徹する
-     * assertSame(str_anyof(2, ['1', '2', '3']), 1);         // 同上
+     * that(str_anyof('b', ['a', 'b', 'c']))->isSame(1);       // 見つかったキーを返す
+     * that(str_anyof('x', ['a', 'b', 'c']))->isSame(null);    // 見つからないなら null を返す
+     * that(str_anyof('C', ['a', 'b', 'c'], true))->isSame(2); // 大文字文字を区別しない
+     * that(str_anyof('1', [1, 2, 3]))->isSame(0);             // 文字列の比較に徹する
+     * that(str_anyof(2, ['1', '2', '3']))->isSame(1);         // 同上
      * ```
      *
      * @param string $needle 調べる文字列
@@ -406,9 +406,9 @@ class Strings
      *
      * Example:
      * ```php
-     * assertTrue(str_equals('abc', 'abc'));
-     * assertTrue(str_equals('abc', 'ABC', true));
-     * assertTrue(str_equals('\0abc', '\0abc'));
+     * that(str_equals('abc', 'abc'))->isTrue();
+     * that(str_equals('abc', 'ABC', true))->isTrue();
+     * that(str_equals('\0abc', '\0abc'))->isTrue();
      * ```
      *
      * @param string $str1 文字列1
@@ -443,10 +443,10 @@ class Strings
      *
      * Example:
      * ```php
-     * assertTrue(str_contains('abc', 'b'));
-     * assertTrue(str_contains('abc', 'B', true));
-     * assertTrue(str_contains('abc', ['b', 'x'], false, false));
-     * assertFalse(str_contains('abc', ['b', 'x'], false, true));
+     * that(str_contains('abc', 'b'))->isTrue();
+     * that(str_contains('abc', 'B', true))->isTrue();
+     * that(str_contains('abc', ['b', 'x'], false, false))->isTrue();
+     * that(str_contains('abc', ['b', 'x'], false, true))->isFalse();
      * ```
      *
      * @param string $haystack 対象文字列
@@ -487,7 +487,7 @@ class Strings
      * ```php
      * // 文字列からパス文字列と拡張子を削ぎ落とす
      * $PATH = '/path/to/something';
-     * assertSame(str_chop("$PATH/hoge.php", "$PATH/", '.php'), 'hoge');
+     * that(str_chop("$PATH/hoge.php", "$PATH/", '.php'))->isSame('hoge');
      * ```
      *
      * @param string $string 対象文字列
@@ -516,7 +516,7 @@ class Strings
      * ```php
      * // 文字列からパス文字列を削ぎ落とす
      * $PATH = '/path/to/something';
-     * assertSame(str_lchop("$PATH/hoge.php", "$PATH/"), 'hoge.php');
+     * that(str_lchop("$PATH/hoge.php", "$PATH/"))->isSame('hoge.php');
      * ```
      *
      * @param string $string 対象文字列
@@ -536,7 +536,7 @@ class Strings
      * ```php
      * // 文字列から .php を削ぎ落とす
      * $PATH = '/path/to/something';
-     * assertSame(str_rchop("$PATH/hoge.php", ".php"), "$PATH/hoge");
+     * that(str_rchop("$PATH/hoge.php", ".php"))->isSame("$PATH/hoge");
      * ```
      *
      * @param string $string 対象文字列
@@ -560,16 +560,16 @@ class Strings
      * Example:
      * ```php
      * // シンプルな1行を返す
-     * assertSame(str_putcsv(['a', 'b', 'c']), "a,b,c");
-     * assertSame(str_putcsv(['a', 'b', 'c'], "\t"), "a\tb\tc");
-     * assertSame(str_putcsv(['a', ' b ', 'c'], " ", "'"), "a ' b ' c");
+     * that(str_putcsv(['a', 'b', 'c']))->isSame("a,b,c");
+     * that(str_putcsv(['a', 'b', 'c'], "\t"))->isSame("a\tb\tc");
+     * that(str_putcsv(['a', ' b ', 'c'], " ", "'"))->isSame("a ' b ' c");
      *
      * // 複数行を返す
-     * assertSame(str_putcsv([['a', 'b', 'c'], ['d', 'e', 'f']]), "a,b,c\nd,e,f");
-     * assertSame(str_putcsv((function() {
+     * that(str_putcsv([['a', 'b', 'c'], ['d', 'e', 'f']]))->isSame("a,b,c\nd,e,f");
+     * that(str_putcsv((function() {
      *     yield ['a', 'b', 'c'];
      *     yield ['d', 'e', 'f'];
-     * })()), "a,b,c\nd,e,f");
+     * })()))->isSame("a,b,c\nd,e,f");
      * ```
      *
      * @param iterable $array 値の配列 or 値の配列の配列
@@ -618,11 +618,11 @@ class Strings
      * Example:
      * ```php
      * // 1番目（0ベースなので2番目）の x を X に置換
-     * assertSame(str_subreplace('xxx', 'x', [1 => 'X']), 'xXx');
+     * that(str_subreplace('xxx', 'x', [1 => 'X']))->isSame('xXx');
      * // 0番目（最前列）の x を Xa に、-1番目（最後尾）の x を Xz に置換
-     * assertSame(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']), '!XaxXz!');
+     * that(str_subreplace('!xxx!', 'x', [0 => 'Xa', -1 => 'Xz']))->isSame('!XaxXz!');
      * // 置換結果は置換対象にならない
-     * assertSame(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']), 'xxxXx');
+     * that(str_subreplace('xxx', 'x', [0 => 'xxx', 1 => 'X']))->isSame('xxxXx');
      * ```
      *
      * @param string $subject 対象文字列
@@ -696,7 +696,7 @@ class Strings
      * Example:
      * ```php
      * // "hello, world" の l と o を置換
-     * assertSame(str_submap('hello, world', [
+     * that(str_submap('hello, world', [
      *     // l は0番目と2番目のみを置換（1番目は何も行われない）
      *     'l' => [
      *         0 => 'L1',
@@ -706,7 +706,7 @@ class Strings
      *     'o' => [
      *         -1 => 'O',
      *     ],
-     * ]), 'heL1lo, wOrL3d');
+     * ]))->isSame('heL1lo, wOrL3d');
      * ```
      *
      * @param string $subject 対象文字列
@@ -792,19 +792,19 @@ class Strings
      * Example:
      * ```php
      * // 最も単純な置換
-     * assertSame(str_embed('a, b, c', ['a' => 'A', 'b' => 'B', 'c' => 'C']), 'A, B, C');
+     * that(str_embed('a, b, c', ['a' => 'A', 'b' => 'B', 'c' => 'C']))->isSame('A, B, C');
      * // 最も長いキーから置換される
-     * assertSame(str_embed('abc', ['a' => 'X', 'ab' => 'AB']), 'ABc');
+     * that(str_embed('abc', ['a' => 'X', 'ab' => 'AB']))->isSame('ABc');
      * // 配列を渡すと「N番目の置換」が実現できる（文字列の場合は再利用される）
-     * assertSame(str_embed('a, a, b, b', [
+     * that(str_embed('a, a, b, b', [
      *     'a' => 'A',          // 全ての a が A になる
      *     'b' => ['B1', 'B2'], // 1番目の b が B1, 2番目の b が B2 になる
-     * ]), 'A, A, B1, B2');
+     * ]))->isSame('A, A, B1, B2');
      * // 最も重要な性質として "' で囲まれていると対象にならない
-     * assertSame(str_embed('a, "a", b, "b", b', [
+     * that(str_embed('a, "a", b, "b", b', [
      *     'a' => 'A',
      *     'b' => ['B1', 'B2'],
-     * ]), 'A, "a", B1, "b", B2');
+     * ]))->isSame('A, "a", B1, "b", B2');
      * ```
      *
      * @param string $string 対象文字列
@@ -869,11 +869,11 @@ class Strings
      * Example:
      * ```php
      * // $position を利用して "first", "second", "third" を得る（"で囲まれた "blank" は返ってこない）。
-     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'first');
-     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'second');
-     * assertSame(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n), 'third');
+     * that(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n))->isSame('first');
+     * that(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n))->isSame('second');
+     * that(str_between('{first} and {second} and "{blank}" and {third}', '{', '}', $n))->isSame('third');
      * // ネストしている場合は最も外側を返す
-     * assertSame(str_between('{nest1{nest2{nest3}}}', '{', '}'), 'nest1{nest2{nest3}}');
+     * that(str_between('{nest1{nest2{nest3}}}', '{', '}'))->isSame('nest1{nest2{nest3}}');
      * ```
      *
      * @param string $string 対象文字列
@@ -928,11 +928,11 @@ class Strings
      * Example:
      * ```php
      * // 8文字に丸める（$pos 省略なので真ん中が省略される）
-     * assertSame(str_ellipsis('1234567890', 8, '...'), '12...890');
+     * that(str_ellipsis('1234567890', 8, '...'))->isSame('12...890');
      * // 8文字に丸める（$pos=1 なので1文字目から省略される）
-     * assertSame(str_ellipsis('1234567890', 8, '...', 1), '1...7890');
+     * that(str_ellipsis('1234567890', 8, '...', 1))->isSame('1...7890');
      * // 8文字に丸める（$pos=-1 なので後ろから1文字目から省略される）
-     * assertSame(str_ellipsis('1234567890', 8, '...', -1), '1234...0');
+     * that(str_ellipsis('1234567890', 8, '...', -1))->isSame('1234...0');
      * ```
      *
      * @param string $string 対象文字列
@@ -997,7 +997,7 @@ class Strings
      * this is changed line
      * ';
      * // シンプルな差分テキストを返す
-     * assertSame(str_diff($old, $new), ' same
+     * that(str_diff($old, $new))->isSame(' same
      * -delete
      *  same
      * +append
@@ -1006,7 +1006,7 @@ class Strings
      * +this is changed line
      * ');
      * // html で差分を返す
-     * assertSame(str_diff($old, $new, ['stringify' => 'html']), 'same
+     * that(str_diff($old, $new, ['stringify' => 'html']))->isSame('same
      * <del>delete</del>
      * same
      * <ins>append</ins>
@@ -1015,7 +1015,7 @@ class Strings
      * <ins>this is changed line</ins>
      * ');
      * // 行レベルの html で差分を返す
-     * assertSame(str_diff($old, $new, ['stringify' => 'html=perline']), 'same
+     * that(str_diff($old, $new, ['stringify' => 'html=perline']))->isSame('same
      * <del>delete</del>
      * same
      * <ins>append</ins>
@@ -1023,7 +1023,7 @@ class Strings
      * <ins>this is </ins>chang<ins>ed lin</ins>e
      * ');
      * // raw な配列で差分を返す
-     * assertSame(str_diff($old, $new, ['stringify' => null]), [
+     * that(str_diff($old, $new, ['stringify' => null]))->isSame([
      *     // 等価行（'=' という記号と前後それぞれの文字列を返す（キーは行番号））
      *     ['=', [0 => 'same'], [0 => 'same']],
      *     // 削除行（'-' という記号と前の文字列を返す（キーは行番号）、後は int で行番号のみ）
@@ -1455,11 +1455,11 @@ class Strings
      *
      * Example:
      * ```php
-     * assertTrue(starts_with('abcdef', 'abc'));
-     * assertTrue(starts_with('abcdef', 'ABC', true));
-     * assertFalse(starts_with('abcdef', 'xyz'));
-     * assertTrue(starts_with('abcdef', ['a', 'b', 'c']));
-     * assertFalse(starts_with('abcdef', ['x', 'y', 'z']));
+     * that(starts_with('abcdef', 'abc'))->isTrue();
+     * that(starts_with('abcdef', 'ABC', true))->isTrue();
+     * that(starts_with('abcdef', 'xyz'))->isFalse();
+     * that(starts_with('abcdef', ['a', 'b', 'c']))->isTrue();
+     * that(starts_with('abcdef', ['x', 'y', 'z']))->isFalse();
      * ```
      *
      * @param string $string 探される文字列
@@ -1489,11 +1489,11 @@ class Strings
      *
      * Example:
      * ```php
-     * assertTrue(ends_with('abcdef', 'def'));
-     * assertTrue(ends_with('abcdef', 'DEF', true));
-     * assertFalse(ends_with('abcdef', 'xyz'));
-     * assertTrue(ends_with('abcdef', ['d', 'e', 'f']));
-     * assertFalse(ends_with('abcdef', ['x', 'y', 'z']));
+     * that(ends_with('abcdef', 'def'))->isTrue();
+     * that(ends_with('abcdef', 'DEF', true))->isTrue();
+     * that(ends_with('abcdef', 'xyz'))->isFalse();
+     * that(ends_with('abcdef', ['d', 'e', 'f']))->isTrue();
+     * that(ends_with('abcdef', ['x', 'y', 'z']))->isFalse();
      * ```
      *
      * @param string $string 探される文字列
@@ -1521,7 +1521,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(camel_case('this_is_a_pen'), 'thisIsAPen');
+     * that(camel_case('this_is_a_pen'))->isSame('thisIsAPen');
      * ```
      *
      * @param string $string 対象文字列
@@ -1538,7 +1538,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(pascal_case('this_is_a_pen'), 'ThisIsAPen');
+     * that(pascal_case('this_is_a_pen'))->isSame('ThisIsAPen');
      * ```
      *
      * @param string $string 対象文字列
@@ -1555,7 +1555,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(snake_case('ThisIsAPen'), 'this_is_a_pen');
+     * that(snake_case('ThisIsAPen'))->isSame('this_is_a_pen');
      * ```
      *
      * @param string $string 対象文字列
@@ -1572,7 +1572,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(chain_case('ThisIsAPen'), 'this-is-a-pen');
+     * that(chain_case('ThisIsAPen'))->isSame('this-is-a-pen');
      * ```
      *
      * @param string $string 対象文字列
@@ -1597,10 +1597,10 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(namespace_split('ns\\hoge'), ['ns', 'hoge']);
-     * assertSame(namespace_split('hoge'), ['', 'hoge']);
-     * assertSame(namespace_split('ns\\'), ['ns', '']);
-     * assertSame(namespace_split('\\hoge'), ['', 'hoge']);
+     * that(namespace_split('ns\\hoge'))->isSame(['ns', 'hoge']);
+     * that(namespace_split('hoge'))->isSame(['', 'hoge']);
+     * that(namespace_split('ns\\'))->isSame(['ns', '']);
+     * that(namespace_split('\\hoge'))->isSame(['', 'hoge']);
      * ```
      *
      * @param string $string 対象文字列
@@ -1627,17 +1627,17 @@ class Strings
      * Example:
      * ```php
      * // 単純文字列はただのタグを生成する
-     * assertSame(
-     *     htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'),
-     *     '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
+     * that(
+     *     htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'))
+     *     ->isSame('<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
      * );
      * // ペア配列を与えるとコンテント文字列になる
-     * assertSame(
-     *     htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' => "this is text's content"]),
-     *     '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden>this is text&#039;s content</a>'
+     * that(
+     *     htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' => "this is text's content"]))
+     *     ->isSame('<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden>this is text&#039;s content</a>'
      * );
      * // ネストした配列を与えると再帰される
-     * assertSame(
+     * that(
      *     htmltag([
      *         'div#wrapper' => [
      *             'b.class1' => [
@@ -1649,8 +1649,8 @@ class Strings
      *                 '<plain2>',
      *             ],
      *         ],
-     *     ]),
-     *     '<div id="wrapper"><b class="class1">&lt;plain&gt;</b><b class="class2">&lt;plain1&gt;<s>&lt;strike&gt;</s>&lt;plain2&gt;</b></div>'
+     *     ]))
+     *     ->isSame('<div id="wrapper"><b class="class1">&lt;plain&gt;</b><b class="class2">&lt;plain1&gt;<s>&lt;strike&gt;</s>&lt;plain2&gt;</b></div>'
      * );
      * ```
      *
@@ -1785,7 +1785,7 @@ class Strings
      * Example:
      * ```php
      * // 完全指定
-     * assertSame(build_uri([
+     * that(build_uri([
      *     'scheme'   => 'http',
      *     'user'     => 'user',
      *     'pass'     => 'pass',
@@ -1794,14 +1794,14 @@ class Strings
      *     'path'     => '/path/to/file',
      *     'query'    => ['id' => 1],
      *     'fragment' => 'hash',
-     * ]), 'http://user:pass@localhost:80/path/to/file?id=1#hash');
+     * ]))->isSame('http://user:pass@localhost:80/path/to/file?id=1#hash');
      * // 一部だけ指定
-     * assertSame(build_uri([
+     * that(build_uri([
      *     'scheme'   => 'http',
      *     'host'     => 'localhost',
      *     'path'     => '/path/to/file',
      *     'fragment' => 'hash',
-     * ]), 'http://localhost/path/to/file#hash');
+     * ]))->isSame('http://localhost/path/to/file#hash');
      * ```
      *
      * @param array $parts URI の各パーツ配列
@@ -1847,7 +1847,7 @@ class Strings
      * Example:
      * ```php
      * // 完全指定
-     * assertEquals(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'), [
+     * that(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'))->is([
      *     'scheme'   => 'http',
      *     'user'     => 'user',
      *     'pass'     => 'pass',
@@ -1858,12 +1858,12 @@ class Strings
      *     'fragment' => 'hash',
      * ]);
      * // デフォルト値つき
-     * assertEquals(parse_uri('localhost/path/to/file', [
+     * that(parse_uri('localhost/path/to/file', [
      *     'scheme'   => 'http', // scheme のデフォルト値
      *     'user'     => 'user', // user のデフォルト値
      *     'port'     => '8080', // port のデフォルト値
      *     'host'     => 'hoge', // host のデフォルト値
-     * ]), [
+     * ]))->is([
      *     'scheme'   => 'http',      // scheme はないのでデフォルト値が使われている
      *     'user'     => 'user',      // user はないのでデフォルト値が使われている
      *     'pass'     => '',
@@ -1930,7 +1930,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertEquals(ini_export(['a' => 1, 'b' => 'B', 'c' => PHP_SAPI]), 'a = 1
+     * that(ini_export(['a' => 1, 'b' => 'B', 'c' => PHP_SAPI]))->is('a = 1
      * b = "B"
      * c = "cli"
      * ');
@@ -1975,11 +1975,11 @@ class Strings
      *
      * Example:
      * ```php
-     * assertEquals(ini_import("
+     * that(ini_import("
      * a = 1
      * b = 'B'
      * c = PHP_VERSION
-     * "), ['a' => 1, 'b' => 'B', 'c' => PHP_VERSION]);
+     * "))->is(['a' => 1, 'b' => 'B', 'c' => PHP_VERSION]);
      * ```
      *
      * @param string $inistring ini 文字列
@@ -2018,16 +2018,16 @@ class Strings
      *     ['c' => 'C2', 'a' => 'A2', 'b' => 'B2'],             // 順番が入れ替わっている行
      *     ['c' => 'C3', 'a' => 'A3', 'b' => 'B3', 'x' => 'X'], // 余計な要素が入っている行
      * ];
-     * assertEquals(csv_export($csvarrays), "a,b,c
+     * that(csv_export($csvarrays))->is("a,b,c
      * A1,B1,C1
      * A2,B2,C2
      * A3,B3,C3
      * ");
      *
      * // ヘッダを指定できる
-     * assertEquals(csv_export($csvarrays, [
+     * that(csv_export($csvarrays, [
      *     'headers' => ['a' => 'A', 'c' => 'C'], // a と c だけを出力＋ヘッダ文字変更
-     * ]), "A,C
+     * ]))->is("A,C
      * A1,C1
      * A2,C2
      * A3,C3
@@ -2121,39 +2121,39 @@ class Strings
      * Example:
      * ```php
      * // シンプルな実行例
-     * assertEquals(csv_import("
+     * that(csv_import("
      * a,b,c
      * A1,B1,C1
      * A2,B2,C2
      * A3,B3,C3
-     * "), [
+     * "))->is([
      *     ['a' => 'A1', 'b' => 'B1', 'c' => 'C1'],
      *     ['a' => 'A2', 'b' => 'B2', 'c' => 'C2'],
      *     ['a' => 'A3', 'b' => 'B3', 'c' => 'C3'],
      * ]);
      *
      * // ヘッダを指定できる
-     * assertEquals(csv_import("
+     * that(csv_import("
      * A1,B1,C1
      * A2,B2,C2
      * A3,B3,C3
      * ", [
      *     'headers' => [0 => 'a', 2 => 'c'], // 1がないので1番目のフィールドを読み飛ばしつつ、0, 2 は "a", "c" として取り込む
-     * ]), [
+     * ]))->is([
      *     ['a' => 'A1', 'c' => 'C1'],
      *     ['a' => 'A2', 'c' => 'C2'],
      *     ['a' => 'A3', 'c' => 'C3'],
      * ]);
      *
      * // ヘッダありで連想配列で指定するとキーの読み換えとなる（指定しなければ読み飛ばしも行える）
-     * assertEquals(csv_import("
+     * that(csv_import("
      * a,b,c
      * A1,B1,C1
      * A2,B2,C2
      * A3,B3,C3
      * ", [
      *     'headers' => ['a' => 'hoge', 'c' => 'piyo'], // a は hoge, c は piyo で読み込む。 b は指定がないので飛ばされる
-     * ]), [
+     * ]))->is([
      *     ['hoge' => 'A1', 'piyo' => 'C1'],
      *     ['hoge' => 'A2', 'piyo' => 'C2'],
      *     ['hoge' => 'A3', 'piyo' => 'C3'],
@@ -2236,9 +2236,9 @@ class Strings
      * Example:
      * ```php
      * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
-     * assertEquals(json_export(['a' => 'A', 'b' => 'B'], [
+     * that(json_export(['a' => 'A', 'b' => 'B'], [
      *    JSON_PRETTY_PRINT => false,
-     * ]), '{"a":"A","b":"B"}');
+     * ]))->is('{"a":"A","b":"B"}');
      * ```
      *
      * @param mixed $value encode する値
@@ -2277,9 +2277,9 @@ class Strings
      * Example:
      * ```php
      * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
-     * assertEquals(json_import('{"a":"A","b":"B"}', [
+     * that(json_import('{"a":"A","b":"B"}', [
      *    JSON_OBJECT_AS_ARRAY => true,
-     * ]), ['a' => 'A', 'b' => 'B']);
+     * ]))->is(['a' => 'A', 'b' => 'B']);
      * ```
      *
      * @param string $value JSON 文字列
@@ -2316,13 +2316,13 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(paml_export([
+     * that(paml_export([
      *     'n' => null,
      *     'f' => false,
      *     'i' => 123,
      *     'd' => 3.14,
      *     's' => 'this is string',
-     * ]), 'n: null, f: false, i: 123, d: 3.14, s: "this is string"');
+     * ]))->isSame('n: null, f: false, i: 123, d: 3.14, s: "this is string"');
      * ```
      *
      * @param array $pamlarray 配列
@@ -2402,7 +2402,7 @@ class Strings
      * Example:
      * ```php
      * // こういったスカラー型はほとんど yaml と一緒だが、コロンの後のスペースは不要（あってもよい）
-     * assertSame(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'), [
+     * that(paml_import('n:null, f:false, i:123, d:3.14, s:"this is string"'))->isSame([
      *     'n' => null,
      *     'f' => false,
      *     'i' => 123,
@@ -2410,7 +2410,7 @@ class Strings
      *     's' => 'this is string',
      * ]);
      * // 配列が使える（キーは連番なら不要）。ネストも可能
-     * assertSame(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'), [
+     * that(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'))->isSame([
      *     'a'    => [1, 2, 'x' => 'X', 3],
      *     'nest' => [
      *         'a' => [
@@ -2421,7 +2421,7 @@ class Strings
      *     ],
      * ]);
      * // bare 文字列で定数が使える
-     * assertSame(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'), [
+     * that(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'))->isSame([
      *     'pv' => \PHP_VERSION,
      *     'ao' => \ArrayObject::STD_PROP_LIST,
      * ]);
@@ -2513,22 +2513,22 @@ class Strings
      * Example:
      * ```php
      * // シンプルな実行例
-     * assertEquals(ltsv_export([
+     * that(ltsv_export([
      *     "label1" => "value1",
      *     "label2" => "value2",
-     * ]), "label1:value1	label2:value2");
+     * ]))->is("label1:value1	label2:value2");
      *
      * // タブや改行文字のエスケープ
-     * assertEquals(ltsv_export([
+     * that(ltsv_export([
      *     "label1" => "val\tue1",
      *     "label2" => "val\nue2",
-     * ]), "label1:val\\tue1	label2:val\\nue2");
+     * ]))->is("label1:val\\tue1	label2:val\\nue2");
      *
      * // 配列のエンコード
-     * assertEquals(ltsv_export([
+     * that(ltsv_export([
      *     "label1" => "value1",
      *     "label2" => [1, 2, 3],
-     * ]), "label1:value1	label2:`[1,2,3]`");
+     * ]))->is("label1:value1	label2:`[1,2,3]`");
      * ```
      *
      * @param array $ltsvarray 配列
@@ -2586,19 +2586,19 @@ class Strings
      * Example:
      * ```php
      * // シンプルな実行例
-     * assertEquals(ltsv_import("label1:value1	label2:value2"), [
+     * that(ltsv_import("label1:value1	label2:value2"))->is([
      *     "label1" => "value1",
      *     "label2" => "value2",
      * ]);
      *
      * // タブや改行文字のエスケープ
-     * assertEquals(ltsv_import("label1:val\\tue1	label2:val\\nue2"), [
+     * that(ltsv_import("label1:val\\tue1	label2:val\\nue2"))->is([
      *     "label1" => "val\tue1",
      *     "label2" => "val\nue2",
      * ]);
      *
      * // 配列のデコード
-     * assertEquals(ltsv_import("label1:value1	label2:`[1,2,3]`"), [
+     * that(ltsv_import("label1:value1	label2:`[1,2,3]`"))->is([
      *     "label1" => "value1",
      *     "label2" => [1, 2, 3],
      * ]);
@@ -2655,11 +2655,11 @@ class Strings
      * Example:
      * ```php
      * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
-     * assertEquals("\n" . markdown_table([
+     * that("\n" . markdown_table([
      *    ['a' => 'a1', 'b' => 'b1'],
      *    ['b' => 'b2', 'c' => '2'],
      *    ['a' => 'a3', 'c' => '3'],
-     * ]), "
+     * ]))->is("
      * | a   | b   |   c |
      * | --- | --- | --: |
      * | a1  | b1  |     |
@@ -2720,7 +2720,7 @@ class Strings
      * Example:
      * ```php
      * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
-     * assertEquals("\n" . markdown_list([
+     * that("\n" . markdown_list([
      *     'dict'        => [
      *         'Key1' => 'Value1',
      *         'Key2' => 'Value2',
@@ -2730,7 +2730,7 @@ class Strings
      *         'Key' => 'Value',
      *         ['Item1', 'Item2', 'Item3'],
      *     ],
-     * ], ['separator' => ':']), "
+     * ], ['separator' => ':']))->is("
      * - dict:
      *     - Key1:Value1
      *     - Key2:Value2
@@ -2821,7 +2821,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']), 'ThisIs 3');
+     * that(kvsprintf('%hoge$s %fuga$d', ['hoge' => 'ThisIs', 'fuga' => '3.14']))->isSame('ThisIs 3');
      * ```
      *
      * @param string $format フォーマット文字列
@@ -2864,11 +2864,11 @@ class Strings
      * $pattern = '#(\d{4})/(\d{1,2})(/(\d{1,2}))?#';
      * $default = [1 => '2000', 2 => '1', 4 => '1'];
      * // 完全にマッチするのでそれぞれ返ってくる
-     * assertSame(preg_capture($pattern, '2014/12/24', $default), [1 => '2014', 2 => '12', 4 => '24']);
+     * that(preg_capture($pattern, '2014/12/24', $default))->isSame([1 => '2014', 2 => '12', 4 => '24']);
      * // 最後の \d{1,2} はマッチしないのでデフォルト値が使われる
-     * assertSame(preg_capture($pattern, '2014/12', $default), [1 => '2014', 2 => '12', 4 => '1']);
+     * that(preg_capture($pattern, '2014/12', $default))->isSame([1 => '2014', 2 => '12', 4 => '1']);
      * // 一切マッチしないので全てデフォルト値が使われる
-     * assertSame(preg_capture($pattern, 'hoge', $default), [1 => '2000', 2 => '1', 4 => '1']);
+     * that(preg_capture($pattern, 'hoge', $default))->isSame([1 => '2000', 2 => '1', 4 => '1']);
      * ```
      *
      * @param string $pattern 正規表現
@@ -2901,16 +2901,16 @@ class Strings
      * Example:
      * ```php
      * // 数字を除去しつつその除去された数字を得る
-     * assertSame(preg_splice('#\\d+#', '', 'abc123', $m), 'abc');
-     * assertSame($m, ['123']);
+     * that(preg_splice('#\\d+#', '', 'abc123', $m))->isSame('abc');
+     * that($m)->isSame(['123']);
      *
      * // callable だと preg_replace_callback が呼ばれる
-     * assertSame(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m), 'ABC123');
-     * assertSame($m, ['abc']);
+     * that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))->isSame('ABC123');
+     * that($m)->isSame(['abc']);
      *
      * // ただし、 文字列 callable は文字列として扱う
-     * assertSame(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123');
-     * assertSame($m, ['abc']);
+     * that(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m))->isSame('strtoupper123');
+     * that($m)->isSame(['abc']);
      * ```
      *
      * @param string $pattern 正規表現
@@ -2944,16 +2944,16 @@ class Strings
      * Example:
      * ```php
      * // a と z に囲まれた数字を XXX に置換する
-     * assertSame(preg_replaces('#a(\d+)z#', [1 => 'XXX'], 'a123z'), 'aXXXz');
+     * that(preg_replaces('#a(\d+)z#', [1 => 'XXX'], 'a123z'))->isSame('aXXXz');
      * // 名前付きキャプチャも指定できる
-     * assertSame(preg_replaces('#a(?<digit>\d+)z#', ['digit' => 'XXX'], 'a123z'), 'aXXXz');
+     * that(preg_replaces('#a(?<digit>\d+)z#', ['digit' => 'XXX'], 'a123z'))->isSame('aXXXz');
      * // クロージャを渡すと元文字列を引数としてコールバックされる
-     * assertSame(preg_replaces('#a(?<digit>\d+)z#', ['digit' => function($src){return $src * 2;}], 'a123z'), 'a246z');
+     * that(preg_replaces('#a(?<digit>\d+)z#', ['digit' => function($src){return $src * 2;}], 'a123z'))->isSame('a246z');
      * // 複合的なサンプル（a タグの href と target 属性を書き換える）
-     * assertSame(preg_replaces('#<a\s+href="(?<href>.*)"\s+target="(?<target>.*)">#', [
+     * that(preg_replaces('#<a\s+href="(?<href>.*)"\s+target="(?<target>.*)">#', [
      *     'href'   => function($href){return strtoupper($href);},
      *     'target' => function($target){return strtoupper($target);},
-     * ], '<a href="hoge" target="fuga">inner text</a>'), '<a href="HOGE" target="FUGA">inner text</a>');
+     * ], '<a href="hoge" target="fuga">inner text</a>'))->isSame('<a href="HOGE" target="FUGA">inner text</a>');
      * ```
      *
      * @param string $pattern 正規表現
@@ -3008,11 +3008,11 @@ class Strings
      * Example:
      * ```php
      * // destroy と destory は普通にレーベンシュタイン距離を取ると 2 になるが・・・
-     * assertSame(levenshtein("destroy", "destory"), 2);
+     * that(levenshtein("destroy", "destory"))->isSame(2);
      * // damerau_levenshtein だと1である
-     * assertSame(damerau_levenshtein("destroy", "destory"), 1);
+     * that(damerau_levenshtein("destroy", "destory"))->isSame(1);
      * // UTF-8 でも大丈夫
-     * assertSame(damerau_levenshtein("あいうえお", "あいえうお"), 1);
+     * that(damerau_levenshtein("あいうえお", "あいえうお"))->isSame(1);
      * ```
      *
      * @param string $s1 対象文字列1
@@ -3082,9 +3082,9 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(ngram("あいうえお", 1), ["あ", "い", "う", "え", "お"]);
-     * assertSame(ngram("あいうえお", 2), ["あい", "いう", "うえ", "えお", "お"]);
-     * assertSame(ngram("あいうえお", 3), ["あいう", "いうえ", "うえお", "えお", "お"]);
+     * that(ngram("あいうえお", 1))->isSame(["あ", "い", "う", "え", "お"]);
+     * that(ngram("あいうえお", 2))->isSame(["あい", "いう", "うえ", "えお", "お"]);
+     * that(ngram("あいうえお", 3))->isSame(["あいう", "いうえ", "うえお", "えお", "お"]);
      * ```
      *
      * @param string $string 対象文字列
@@ -3116,13 +3116,13 @@ class Strings
      * Example:
      * ```php
      * // 「あいうえお」と最も近い文字列は「あいゆえに」である
-     * assertSame(str_guess("あいうえお", [
+     * that(str_guess("あいうえお", [
      *     'かきくけこ', // マッチ度 0%（1文字もかすらない）
      *     'ぎぼあいこ', // マッチ度約 13.1%（"あい"はあるが位置が異なる）
      *     'あいしてる', // マッチ度約 13.8%（"あい"がマッチ）
      *     'かとうあい', // マッチ度約 16.7%（"あい"があり"う"の位置が等しい）
      *     'あいゆえに', // マッチ度約 17.4%（"あい", "え"がマッチ）
-     * ]), 'あいゆえに');
+     * ]))->isSame('あいゆえに');
      * ```
      *
      * @param string $string 調べる文字列
@@ -3192,22 +3192,22 @@ class Strings
      * Example:
      * ```php
      * // http response header  を ":" 区切りで連想配列にする
-     * assertSame(str_array("
+     * that(str_array("
      * HTTP/1.1 200 OK
      * Content-Type: text/html; charset=utf-8
      * Connection: Keep-Alive
-     * ", ':', true), [
+     * ", ':', true))->isSame([
      *     'HTTP/1.1 200 OK',
      *     'Content-Type' => 'text/html; charset=utf-8',
      *     'Connection'   => 'Keep-Alive',
      * ]);
      *
      * // sar の結果を " " 区切りで連想配列の配列にする
-     * assertSame(str_array("
+     * that(str_array("
      * 13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
      * 13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
      * 13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
-     * ", ' ', false), [
+     * ", ' ', false))->isSame([
      *     1 => [
      *         '13:00:01' => '13:10:01',
      *         'CPU'      => 'all',
@@ -3273,7 +3273,7 @@ class Strings
      * Example:
      * ```php
      * // 2文字目から5文字を「あいうえお」に置換する
-     * assertSame(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5), '０１あいうえお７８９');
+     * that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5))->isSame('０１あいうえお７８９');
      * ```
      *
      * @param string $string 対象文字列
@@ -3302,7 +3302,7 @@ class Strings
      *
      * Example:
      * ```php
-     * assertSame(mb_trim(' 　 あああ　 　'), 'あああ');
+     * that(mb_trim(' 　 あああ　 　'))->isSame('あああ');
      * ```
      *
      * @param string $string 対象文字列
@@ -3333,14 +3333,14 @@ class Strings
      * Example:
      * ```php
      * // 数値キーが参照できる
-     * assertSame(render_string('${0}', ['number']), 'number');
+     * that(render_string('${0}', ['number']))->isSame('number');
      * // クロージャは呼び出し結果が埋め込まれる
-     * assertSame(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]), 'c-closure');
+     * that(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]))->isSame('c-closure');
      * // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
-     * assertSame(render_string('{$_(123 + 456)}', []), '579');
+     * that(render_string('{$_(123 + 456)}', []))->isSame('579');
      * // 要するに '$_()' の中に php の式が書けるようになる
-     * assertSame(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']]), 'a,n,z');
-     * assertSame(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]), '9');
+     * that(render_string('{$_(implode(\',\', $strs))}', ['strs' => ['a', 'n', 'z']]))->isSame('a,n,z');
+     * that(render_string('{$_(max($nums))}', ['nums' => [1, 9, 3]]))->isSame('9');
      * ```
      *
      * @param string $template レンダリング文字列
@@ -3411,7 +3411,7 @@ class Strings
      * This is <?php echo strtoupper($var) ?>.
      * ');
      * // このようにレンダリングできる
-     * assertSame(ob_include(sys_get_temp_dir() . '/template.php', ['var' => 'hoge']), '
+     * that(ob_include(sys_get_temp_dir() . '/template.php', ['var' => 'hoge']))->isSame('
      * This is plain text.
      * This is hoge.
      * This is HOGE.

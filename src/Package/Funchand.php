@@ -73,7 +73,7 @@ class Funchand
      * Example:
      * ```php
      * $bind = abind('sprintf', [1 => 'a', 3 => 'c']);
-     * assertSame($bind('%s%s%s', 'b'), 'abc');
+     * that($bind('%s%s%s', 'b'))->isSame('abc');
      * ```
      *
      * @param callable $callable 対象 callable
@@ -93,7 +93,7 @@ class Funchand
      * Example:
      * ```php
      * $bind = nbind('sprintf', 2, 'X');
-     * assertSame($bind('%s%s%s', 'N', 'N'), 'NXN');
+     * that($bind('%s%s%s', 'N', 'N'))->isSame('NXN');
      * ```
      *
      * @param callable $callable 対象 callable
@@ -114,7 +114,7 @@ class Funchand
      * Example:
      * ```php
      * $bind = lbind('sprintf', '%s%s');
-     * assertSame($bind('N', 'M'), 'NM');
+     * that($bind('N', 'M'))->isSame('NM');
      * ```
      *
      * @param callable $callable 対象 callable
@@ -132,7 +132,7 @@ class Funchand
      * Example:
      * ```php
      * $bind = rbind('sprintf', 'X');
-     * assertSame($bind('%s%s', 'N'), 'NX');
+     * that($bind('%s%s', 'N'))->isSame('NX');
      * ```
      *
      * @param callable $callable 対象 callable
@@ -152,15 +152,15 @@ class Funchand
      * Example:
      * ```php
      * $not = ope_func('!');    // 否定演算子クロージャ
-     * assertSame(false, $not(true));
+     * that(false)->isSame($not(true));
      *
      * $minus = ope_func('-'); // マイナス演算子クロージャ
-     * assertSame(-2, $minus(2));       // 引数1つで呼ぶと1項演算子
-     * assertSame(3 - 2, $minus(3, 2)); // 引数2つで呼ぶと2項演算子
+     * that($minus(2))->isSame(-2);       // 引数1つで呼ぶと1項演算子
+     * that($minus(3, 2))->isSame(3 - 2); // 引数2つで呼ぶと2項演算子
      *
      * $cond = ope_func('?:'); // 条件演算子クロージャ
-     * assertSame('OK' ?: 'NG', $cond('OK', 'NG'));               // 引数2つで呼ぶと2項演算子
-     * assertSame(false ? 'OK' : 'NG', $cond(false, 'OK', 'NG')); // 引数3つで呼ぶと3項演算子
+     * that($cond('OK', 'NG'))->isSame('OK' ?: 'NG');               // 引数2つで呼ぶと2項演算子
+     * that($cond(false, 'OK', 'NG'))->isSame(false ? 'OK' : 'NG'); // 引数3つで呼ぶと3項演算子
      * ```
      *
      * @param string $operator 演算子
@@ -216,8 +216,8 @@ class Funchand
      * Example:
      * ```php
      * $not_strlen = not_func('strlen');
-     * assertFalse($not_strlen('hoge'));
-     * assertTrue($not_strlen(''));
+     * that($not_strlen('hoge'))->isFalse();
+     * that($not_strlen(''))->isTrue();
      * ```
      *
      * @param callable $callable 対象 callable
@@ -239,7 +239,7 @@ class Funchand
      * Example:
      * ```php
      * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
-     * assertSame($evalfunc(1, 2, 3), 6);
+     * that($evalfunc(1, 2, 3))->isSame(6);
      * ```
      *
      * @param string $expression eval コード
@@ -262,8 +262,8 @@ class Funchand
      *
      * Example:
      * ```php
-     * assertInstanceof(\ReflectionFunction::class, reflect_callable('sprintf'));
-     * assertInstanceof(\ReflectionMethod::class, reflect_callable('\Closure::bind'));
+     * that(reflect_callable('sprintf'))->isInstanceOf(\ReflectionFunction::class);
+     * that(reflect_callable('\Closure::bind'))->isInstanceOf(\ReflectionMethod::class);
      * ```
      *
      * @param callable $callable 対象 callable
@@ -298,13 +298,13 @@ class Funchand
      * Example:
      * ```php
      * list($meta, $body) = callable_code(function(...$args){return true;});
-     * assertSame($meta, 'function(...$args)');
-     * assertSame($body, '{return true;}');
+     * that($meta)->isSame('function(...$args)');
+     * that($body)->isSame('{return true;}');
      *
      * // ReflectionFunctionAbstract を渡しても動作する
      * list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
-     * assertSame($meta, 'function(...$args)');
-     * assertSame($body, '{return true;}');
+     * that($meta)->isSame('function(...$args)');
+     * that($body)->isSame('{return true;}');
      * ```
      *
      * @param callable|\ReflectionFunctionAbstract $callable コードを取得する callable
@@ -342,7 +342,7 @@ class Funchand
      *     call_safely(function(){return $v;});
      * }
      * catch (\Exception $ex) {
-     *     assertSame($ex->getMessage(), 'Undefined variable: v');
+     *     that($ex->getMessage())->isSame('Undefined variable: v');
      * }
      * ```
      *
@@ -373,14 +373,14 @@ class Funchand
      * Example:
      * ```php
      * // コールバック内のテキストが得られる
-     * assertSame(ob_capture(function(){echo 123;}), '123');
+     * that(ob_capture(function(){echo 123;}))->isSame('123');
      * // こういう事もできる
-     * assertSame(ob_capture(function () {
+     * that(ob_capture(function () {
      * ?>
      * bare string1
      * bare string2
      * <?php
-     * }), "bare string1\nbare string2\n");
+     * }))->isSame("bare string1\nbare string2\n");
      * ```
      *
      * @param callable $callback 実行するコールバック
@@ -404,8 +404,8 @@ class Funchand
      *
      * Example:
      * ```php
-     * assertTrue(is_bindable_closure(function(){}));
-     * assertFalse(is_bindable_closure(static function(){}));
+     * that(is_bindable_closure(function(){}))->isTrue();
+     * that(is_bindable_closure(static function(){}))->isFalse();
      * ```
      *
      * @param \Closure $closure 調べるクロージャ
@@ -431,8 +431,8 @@ class Funchand
      *     }
      * }
      * $counter = new CountClass();
-     * assertSame(count($counter), 1);
-     * assertSame($counter->count(), 0);
+     * that(count($counter))->isSame(1);
+     * that($counter->count())->isSame(0);
      * ```
      *
      * のように判定できる。
@@ -502,31 +502,31 @@ class Funchand
      *     'a' => 9,
      * ]);
      * // 引数無しで呼ぶと↑で与えた引数が使用される（b は渡されていないのでデフォルト引数の 2 が使用される）
-     * assertSame($f1(), [
+     * that($f1())->isSame([
      *     'x'     => 'X',
      *     'a'     => 9,
      *     'b'     => 2,
      *     'other' => [],
      * ]);
      * // 引数付きで呼ぶとそれが優先される
-     * assertSame($f1([
+     * that($f1([
      *     'x'     => 'XXX',
      *     'a'     => 99,
      *     'b'     => 999,
      *     'other' => [1, 2, 3],
-     * ]), [
+     * ]))->isSame([
      *     'x'     => 'XXX',
      *     'a'     => 99,
      *     'b'     => 999,
      *     'other' => [1, 2, 3],
      * ]);
      * // 引数名ではなく、 n 番目指定でも同じ
-     * assertSame($f1([
+     * that($f1([
      *     'x' => 'XXX',
      *     1   => 99,
      *     2   => 999,
      *     3   => [1, 2, 3],
-     * ]), [
+     * ]))->isSame([
      *     'x'     => 'XXX',
      *     'a'     => 99,
      *     'b'     => 999,
@@ -539,7 +539,7 @@ class Funchand
      *     'other' => [1, 2, 3],
      * ]);
      * // other は可変引数なのでマージされる
-     * assertSame($f2(['other' => [4, 5, 6]]), [
+     * that($f2(['other' => [4, 5, 6]]))->isSame([
      *     'x'     => 'X',
      *     'a'     => 1,
      *     'b'     => 2,
@@ -625,9 +625,9 @@ class Funchand
      * Example:
      * ```php
      * // trim の引数は2つ
-     * assertSame(parameter_length('trim'), 2);
+     * that(parameter_length('trim'))->isSame(2);
      * // trim の必須引数は1つ
-     * assertSame(parameter_length('trim', true), 1);
+     * that(parameter_length('trim', true))->isSame(1);
      * ```
      *
      * @param callable $callable 対象 callable
@@ -693,7 +693,7 @@ class Funchand
      * ```php
      * // strlen に2つの引数を渡してもエラーにならない
      * $strlen = func_user_func_array('strlen');
-     * assertSame($strlen('abc', null), 3);
+     * that($strlen('abc', null))->isSame(3);
      * ```
      *
      * @param callable $callback 呼び出すクロージャ
@@ -735,9 +735,9 @@ class Funchand
      * // Exception のコンストラクタを呼ぶクロージャ
      * $newException = func_new(\Exception::class, 'hoge');
      * // デフォルト引数を使用して Exception を作成
-     * assertSame($newException()->getMessage(), 'hoge');
+     * that($newException()->getMessage())->isSame('hoge');
      * // 引数を指定して Exception を作成
-     * assertSame($newException('fuga')->getMessage(), 'fuga');
+     * that($newException('fuga')->getMessage())->isSame('fuga');
      * ```
      *
      * @param string $classname クラス名
@@ -769,16 +769,16 @@ class Funchand
      * // hoge を呼び出すクロージャ
      * $hoge = func_method('hoge');
      * // ↑を使用して $object の hoge を呼び出す
-     * assertSame($hoge($object, 1, 2, 3), '1,2,3');
+     * that($hoge($object, 1, 2, 3))->isSame('1,2,3');
      *
      * // デフォルト値付きで hoge を呼び出すクロージャ
      * $hoge789 = func_method('hoge', 7, 8, 9);
      * // ↑を使用して $object の hoge を呼び出す（引数指定してるので結果は同じ）
-     * assertSame($hoge789($object, 1, 2, 3), '1,2,3');
+     * that($hoge789($object, 1, 2, 3))->isSame('1,2,3');
      * // 同上（一部デフォルト値）
-     * assertSame($hoge789($object, 1, 2), '1,2,9');
+     * that($hoge789($object, 1, 2))->isSame('1,2,9');
      * // 同上（全部デフォルト値）
-     * assertSame($hoge789($object), '7,8,9');
+     * that($hoge789($object))->isSame('7,8,9');
      * ```
      *
      * @param string $methodname メソッド名
@@ -809,7 +809,7 @@ class Funchand
      * ```php
      * // trim のエイリアス
      * function_alias('trim', 'trim_alias');
-     * assertSame(trim_alias(' abc '), 'abc');
+     * that(trim_alias(' abc '))->isSame('abc');
      * ```
      *
      * @param callable $original 元となる関数

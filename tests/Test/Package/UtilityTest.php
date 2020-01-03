@@ -108,7 +108,7 @@ class UtilityTest extends AbstractTestCase
                 ],
             ],
         ]);
-        $this->assertSame([
+        that($actual)->isSame([
             'file1'   => [
                 'name'     => '/home/file1',
                 'type'     => 'text/plain',
@@ -190,16 +190,16 @@ class UtilityTest extends AbstractTestCase
                     ],
                 ],
             ],
-        ], $actual);
+        ]);
     }
 
     function test_cachedir()
     {
         $tmpdir = sys_get_temp_dir() . '/test';
         (rm_rf)($tmpdir);
-        $this->assertEquals((path_normalize)(self::TMPDIR . getenv('TEST_TARGET')), (cachedir)($tmpdir));
-        $this->assertEquals((path_normalize)($tmpdir), (cachedir)());
-        $this->assertEquals((path_normalize)($tmpdir), (cachedir)(sys_get_temp_dir()));
+        that((cachedir)($tmpdir))->is((path_normalize)(self::TMPDIR . getenv('TEST_TARGET')));
+        that((cachedir)())->is((path_normalize)($tmpdir));
+        that((cachedir)(sys_get_temp_dir()))->is((path_normalize)($tmpdir));
     }
 
     function test_cache()
@@ -210,16 +210,16 @@ class UtilityTest extends AbstractTestCase
 
         // 何度呼んでもキャッシュされるので一致する
         $current = (cache)('test', $provider, null, false);
-        $this->assertEquals($current, (cache)('test', $provider, null, false));
-        $this->assertEquals($current, (cache)('test', $provider, null, false));
-        $this->assertEquals($current, (cache)('test', $provider, null, false));
+        that((cache)('test', $provider, null, false))->is($current);
+        that((cache)('test', $provider, null, false))->is($current);
+        that((cache)('test', $provider, null, false))->is($current);
 
         // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
-        $this->assertNotEquals($current, (cache)('test', $provider, __FUNCTION__, false));
+        that((cache)('test', $provider, __FUNCTION__, false))->isNotEqual($current);
 
         // null を与えると削除される
-        $this->assertTrue((cache)('test', null, __FUNCTION__, false));
-        $this->assertEquals(1, (cache)('test', function () { return 1; }, __FUNCTION__, false));
+        that((cache)('test', null, __FUNCTION__, false))->isTrue();
+        that((cache)('test', function () { return 1; }, __FUNCTION__, false))->is(1);
     }
 
     function test_cache_object()
@@ -232,18 +232,18 @@ class UtilityTest extends AbstractTestCase
         (cachedir)($tmpdir);
         (cache)('key', function () use ($value) { return $value; }, 'hoge');
         (cache)(null, 'dummy');
-        $this->assertFileExists("$tmpdir/hoge.php-cache");
-        $this->assertEquals($value, (cache)('key', function () { return 'dummy'; }, 'hoge'));
+        that("$tmpdir/hoge.php-cache")->fileExists();
+        that((cache)('key', function () { return 'dummy'; }, 'hoge'))->is($value);
 
         (cache)('key', function () use ($value) { return $value; }, 'fuga');
         (cache)(null, null);
-        $this->assertFileNotExists("$tmpdir/hoge.php-cache");
+        that("$tmpdir/hoge.php-cache")->notFileExists();
     }
 
     function test_parse_namespace()
     {
         $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-standard.php');
-        $this->assertEquals([
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "vendor\\NS"   => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
@@ -282,10 +282,10 @@ class UtilityTest extends AbstractTestCase
                     "CONST" => "other\\space\\CONST",
                 ],
             ],
-        ], $actual, 'actual:' . (var_export2)($actual, true));
+        ]);
 
         $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-multispace1.php');
-        $this->assertEquals([
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "vendor\\NS1" => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
@@ -352,10 +352,10 @@ class UtilityTest extends AbstractTestCase
                     "D"           => "Main\\Sub12\\D",
                 ],
             ],
-        ], $actual, 'actual:' . (var_export2)($actual, true));
+        ]);
 
         $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-multispace2.php');
-        $this->assertEquals([
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "vendor\\NS1" => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
@@ -422,7 +422,7 @@ class UtilityTest extends AbstractTestCase
                     "D"           => "Main\\Sub22\\D",
                 ],
             ],
-        ], $actual, 'actual:' . (var_export2)($actual, true));
+        ]);
     }
 
     function test_resolve_symbol()
@@ -431,21 +431,21 @@ class UtilityTest extends AbstractTestCase
         $multispace1 = __DIR__ . '/Utility/namespace-multispace1.php';
         $multispace2 = __DIR__ . '/Utility/namespace-multispace2.php';
 
-        $this->assertEquals('\\Full\\middle\\name', (resolve_symbol)('\\Full\\middle\\name', []));
-        $this->assertEquals('Sub\\Space\\middle\\name', (resolve_symbol)('Space\\middle\\name', $standard));
-        $this->assertEquals('Main\\Sub\\C', (resolve_symbol)('xC', $standard));
-        $this->assertEquals('ArrayObject', (resolve_symbol)('ArrayObject', $standard));
-        $this->assertEquals(null, (resolve_symbol)('ArrayObject', $standard, ['function']));
-        $this->assertEquals('array_chunk', (resolve_symbol)('AC', $standard));
-        $this->assertEquals(null, (resolve_symbol)('AC', $standard, ['const']));
-        $this->assertEquals('DIRECTORY_SEPARATOR', (resolve_symbol)('DS', $standard));
-        $this->assertEquals(null, (resolve_symbol)('DS', $standard, ['alias']));
+        that((resolve_symbol)('\\Full\\middle\\name', []))->is('\\Full\\middle\\name');
+        that((resolve_symbol)('Space\\middle\\name', $standard))->is('Sub\\Space\\middle\\name');
+        that((resolve_symbol)('xC', $standard))->is('Main\\Sub\\C');
+        that((resolve_symbol)('ArrayObject', $standard))->is('ArrayObject');
+        that((resolve_symbol)('ArrayObject', $standard, ['function']))->is(null);
+        that((resolve_symbol)('AC', $standard))->is('array_chunk');
+        that((resolve_symbol)('AC', $standard, ['const']))->is(null);
+        that((resolve_symbol)('DS', $standard))->is('DIRECTORY_SEPARATOR');
+        that((resolve_symbol)('DS', $standard, ['alias']))->is(null);
 
-        $this->assertEquals(null, (resolve_symbol)('D', $standard));
-        $this->assertEquals('Main\\Sub11\\D', (resolve_symbol)('D', [$multispace1 => ['vendor\\NS1']]));
-        $this->assertEquals('Main\\Sub12\\D', (resolve_symbol)('D', [$multispace1 => ['vendor\\NS2']]));
-        $this->assertEquals('Main\\Sub21\\D', (resolve_symbol)('D', [$multispace2 => ['vendor\\NS1']]));
-        $this->assertEquals('Main\\Sub22\\D', (resolve_symbol)('D', [$multispace2 => ['vendor\\NS2']]));
+        that((resolve_symbol)('D', $standard))->is(null);
+        that((resolve_symbol)('D', [$multispace1 => ['vendor\\NS1']]))->is('Main\\Sub11\\D');
+        that((resolve_symbol)('D', [$multispace1 => ['vendor\\NS2']]))->is('Main\\Sub12\\D');
+        that((resolve_symbol)('D', [$multispace2 => ['vendor\\NS1']]))->is('Main\\Sub21\\D');
+        that((resolve_symbol)('D', [$multispace2 => ['vendor\\NS2']]))->is('Main\\Sub22\\D');
     }
 
     function test_parse_annotation()
@@ -453,7 +453,7 @@ class UtilityTest extends AbstractTestCase
         $refmethod = new \ReflectionMethod(require __DIR__ . '/Utility/annotation.php', 'm');
 
         $actual = (parse_annotation)($refmethod);
-        $this->assertEquals([
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "single"    => ["123"],
             "closure"   => ["123", "+", "456"],
             "multi"     => ["a", "b", "c"],
@@ -485,14 +485,14 @@ class UtilityTest extends AbstractTestCase
                 ["array", "\$arg2", "this", "is", "second", "argument"],
             ],
             "return"    => ["null", "返り値"],
-        ], $actual, 'actual:' . (var_export2)($actual, true));
+        ]);
 
         $actual = (parse_annotation)($refmethod, [
             'single'  => true,
             'double'  => true,
             'closure' => function ($value) { return eval('return ' . $value . ';'); },
         ]);
-        $this->assertEquals([
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "single"    => "123",
             "closure"   => 579,
             "multi"     => ["a", "b", "c"],
@@ -520,39 +520,39 @@ class UtilityTest extends AbstractTestCase
                 ["array", "\$arg2", "this", "is", "second", "argument"],
             ],
             "return"    => ["null", "返り値"],
-        ], $actual, 'actual:' . (var_export2)($actual, true));
+        ]);
 
         $actual = (parse_annotation)(new \ReflectionMethod(\This\Is\Space\DateTime2::class, 'method'), true);
-        $this->assertEquals([
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "message" => 'this is annotation',
-        ], $actual, 'actual:' . (var_export2)($actual, true));
+        ]);
     }
 
     function test_is_ansi()
     {
         // common
         putenv('TERM_PROGRAM=Hyper');
-        $this->assertTrue((is_ansi)(STDOUT));
+        that((is_ansi)(STDOUT))->isTrue();
         putenv('TERM_PROGRAM=');
 
         // windows
         if (DIRECTORY_SEPARATOR === '\\') {
             putenv('TERM=dummy');
-            $this->assertFalse((is_ansi)(STDOUT, '\\'));
+            that((is_ansi)(STDOUT, '\\'))->isFalse();
             putenv('TERM=xterm');
-            $this->assertTrue((is_ansi)(STDOUT, '\\'));
+            that((is_ansi)(STDOUT, '\\'))->isTrue();
             putenv('TERM=');
-            $this->assertFalse((is_ansi)(STDOUT, '/'));
-            $this->assertFalse((is_ansi)(tmpfile(), '/'));
+            that((is_ansi)(STDOUT, '/'))->isFalse();
+            that((is_ansi)(tmpfile(), '/'))->isFalse();
         }
     }
 
     function test_ansi_colorize()
     {
-        $this->assertSame('"\u001b[30;41mhoge\u001b[39;49m"', json_encode((ansi_colorize)('hoge', 'RED black')));
-        $this->assertSame('"\u001b[30;41;1;3mhoge\u001b[39;49;22;23m"', json_encode((ansi_colorize)('hoge', 'black+RED|bold,italic')));
-        $this->assertSame('"\u001b[mhoge\u001b[m"', json_encode((ansi_colorize)('hoge', 'foo+bar')));
-        $this->assertSame('"\u001b[41mA\u001b[34mhoge\u001b[39mZ\u001b[49m"', json_encode((ansi_colorize)('A' . (ansi_colorize)('hoge', 'blue') . 'Z', 'RED')));
+        that(json_encode((ansi_colorize)('hoge', 'RED black')))->isSame('"\u001b[30;41mhoge\u001b[39;49m"');
+        that(json_encode((ansi_colorize)('hoge', 'black+RED|bold,italic')))->isSame('"\u001b[30;41;1;3mhoge\u001b[39;49;22;23m"');
+        that(json_encode((ansi_colorize)('hoge', 'foo+bar')))->isSame('"\u001b[mhoge\u001b[m"');
+        that(json_encode((ansi_colorize)('A' . (ansi_colorize)('hoge', 'blue') . 'Z', 'RED')))->isSame('"\u001b[41mA\u001b[34mhoge\u001b[39mZ\u001b[49m"');
 
         // 視覚的に確認したいことがあるのでコピペ用に残しておく
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -610,9 +610,9 @@ class UtilityTest extends AbstractTestCase
             exit(123);
         ');
         $return = (process)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
-        $this->assertSame(123, $return);
-        $this->assertSame('STDIN!', $stdout);
-        $this->assertSame('STDERR!', $stderr);
+        that($return)->isSame(123);
+        that($stdout)->isSame('STDIN!');
+        that($stderr)->isSame('STDERR!');
 
         file_put_contents($file, '<?php
             while (!feof(STDIN)) {
@@ -630,9 +630,9 @@ class UtilityTest extends AbstractTestCase
         $return = (process)(PHP_BINARY, $file, $stdin, $stdout, $stderr);
         rewind($stdout);
         rewind($stderr);
-        $this->assertSame(123, $return);
-        $this->assertSame("firstout\nout:a\nout:b\nout:c", stream_get_contents($stdout));
-        $this->assertSame("firsterr\nerr:a\nerr:b\nerr:c", stream_get_contents($stderr));
+        that($return)->isSame(123);
+        that(stream_get_contents($stdout))->isSame("firstout\nout:a\nout:b\nout:c");
+        that(stream_get_contents($stderr))->isSame("firsterr\nerr:a\nerr:b\nerr:c");
 
         $stdout = null;
         $stderr = null;
@@ -646,146 +646,146 @@ class UtilityTest extends AbstractTestCase
             }
         ');
         $return = (process)(PHP_BINARY, $file, "STDIN!", $stdout, $stderr);
-        $this->assertSame(0, $return);
-        $this->assertSame(str_repeat("o", 100 * 1000), $stdout);
-        $this->assertSame(str_repeat("e", 100 * 1000), $stderr);
+        that($return)->isSame(0);
+        that($stdout)->isSame(str_repeat("o", 100 * 1000));
+        that($stderr)->isSame(str_repeat("e", 100 * 1000));
 
         $return = (process)(PHP_BINARY, ['-r' => "syntax error"], '', $stdout, $stderr);
-        $this->assertSame(254, $return);
-        $this->assertContains('Parse error', "$stdout $stderr");
+        that($return)->isSame(254);
+        that("$stdout $stderr")->stringContains('Parse error');
 
         $pingopt = DIRECTORY_SEPARATOR === '\\' ? '-n' : '-c';
         $return = (process)('ping', ["127.0.0.2", $pingopt => 1], '', $stdout, $stderr);
-        $this->assertSame(0, $return);
-        $this->assertContains('127.0.0.2', $stdout);
-        $this->assertSame('', $stderr);
+        that($return)->isSame(0);
+        that($stdout)->stringContains('127.0.0.2');
+        that($stderr)->isSame('');
 
         $return = (process)('ping', "unknownhost", '', $stdout, $stderr);
-        $this->assertNotSame(0, $return);
-        $this->assertContains('unknownhost', "$stdout $stderr");
+        that($return)->isNotSame(0);
+        that("$stdout $stderr")->stringContains('unknownhost');
 
         (process)(PHP_BINARY, ['-r' => "echo getcwd();"], '', $stdout, $stderr, __DIR__);
-        $this->assertSame(__DIR__, $stdout);
+        that($stdout)->isSame(__DIR__);
 
         (process)(PHP_BINARY, ['-r' => "echo getenv('HOGE');"], '', $stdout, $stderr, null, ['HOGE' => 'hoge']);
-        $this->assertSame('hoge', $stdout);
+        that($stdout)->isSame('hoge');
     }
 
     function test_arguments()
     {
         // 超シンプル
-        $this->assertSame(['arg1', 'arg2'], (arguments)([], 'arg1 arg2'));
+        that((arguments)([], 'arg1 arg2'))->isSame(['arg1', 'arg2']);
 
         // 普通のオプション＋デフォルト引数
-        $this->assertSame([
-            'opt1' => 'O1',
-            'opt2' => 'O2',
-            'arg1',
-            'arg2',
-            'def3',
-            'def4',
-        ], (arguments)([
+        that((arguments)([
             'opt1' => '',
             'opt2' => '',
             'arg1',
             'arg2',
             'def3',
             'def4',
-        ], '--opt1 O1 --opt2 O2 arg1 arg2'));
-
-        // ショートオプション
-        $this->assertSame([
+        ], '--opt1 O1 --opt2 O2 arg1 arg2'))->isSame([
             'opt1' => 'O1',
             'opt2' => 'O2',
             'arg1',
             'arg2',
-        ], (arguments)([
+            'def3',
+            'def4',
+        ]);
+
+        // ショートオプション
+        that((arguments)([
             'opt1 a' => '',
             'opt2 b' => '',
-        ], '-a O1 -b O2 arg1 arg2'));
+        ], '-a O1 -b O2 arg1 arg2'))->isSame([
+            'opt1' => 'O1',
+            'opt2' => 'O2',
+            'arg1',
+            'arg2',
+        ]);
 
         // 値なしオプション
-        $this->assertSame([
+        that((arguments)([
+            'opt1 a' => null,
+            'opt2 b' => null,
+        ], '-a arg1 arg2'))->isSame([
             'opt1' => true,
             'opt2' => false,
             'arg1',
             'arg2',
-        ], (arguments)([
-            'opt1 a' => null,
-            'opt2 b' => null,
-        ], '-a arg1 arg2'));
+        ]);
 
         // 値なしショートオプションの同時指定
-        $this->assertSame([
+        that((arguments)([
+            'opt1 a' => null,
+            'opt2 b' => null,
+            'opt3 c' => null,
+        ], '-ac arg1 arg2'))->isSame([
             'opt1' => true,
             'opt2' => false,
             'opt3' => true,
             'arg1',
             'arg2',
-        ], (arguments)([
-            'opt1 a' => null,
-            'opt2 b' => null,
-            'opt3 c' => null,
-        ], '-ac arg1 arg2'));
+        ]);
 
         // デフォルト値オプション
-        $this->assertSame([
+        that((arguments)([
+            'opt1 a' => 'def1',
+            'opt2 b' => 'def2',
+        ], '-a O1 arg1 arg2'))->isSame([
             'opt1' => 'O1',
             'opt2' => 'def2',
             'arg1',
             'arg2',
-        ], (arguments)([
-            'opt1 a' => 'def1',
-            'opt2 b' => 'def2',
-        ], '-a O1 arg1 arg2'));
+        ]);
 
         // 複数値オプション
-        $this->assertSame([
+        that((arguments)([
+            'opt1 a' => [],
+            'opt2 b' => [],
+        ], '-a O11 -a O12 -b O21 arg1 arg2'))->isSame([
             'opt1' => ['O11', 'O12'],
             'opt2' => ['O21'],
             'arg1',
             'arg2',
-        ], (arguments)([
-            'opt1 a' => [],
-            'opt2 b' => [],
-        ], '-a O11 -a O12 -b O21 arg1 arg2'));
+        ]);
 
         // クオーティング
-        $this->assertSame([
+        that((arguments)([
+            'opt' => '',
+        ], '--opt "A B" "arg1 arg2" "a\\"b"'))->isSame([
             'opt' => 'A B',
             'arg1 arg2',
             'a"b'
-        ], (arguments)([
-            'opt' => '',
-        ], '--opt "A B" "arg1 arg2" "a\\"b"'));
+        ]);
 
         // 知らんオプションが与えられた・・・が、 thrown が false である
-        $this->assertSame([
+        that((arguments)([
+            ''       => false,
+            'opt1'   => '',
+            'opt2 o' => '',
+        ], '--opt1 A --long -o B -short'))->isSame([
             'opt1' => 'A',
             'opt2' => 'B',
             '--long',
             '-short',
-        ], (arguments)([
-            ''       => false,
-            'opt1'   => '',
-            'opt2 o' => '',
-        ], '--opt1 A --long -o B -short'));
+        ]);
 
         // 知らんオプションが与えられた
-        $this->assertException('undefined option name', arguments, [], 'arg1 arg2 --hoge');
-        $this->assertException('undefined short option', arguments, [], 'arg1 arg2 -h');
-        $this->assertException('undefined short option', arguments, ['o1 a' => null, 'o2 b' => null], 'arg1 arg2 -abc');
+        that([arguments, [], 'arg1 arg2 --hoge'])->throws('undefined option name');
+        that([arguments, [], 'arg1 arg2 -h'])->throws('undefined short option');
+        that([arguments, ['o1 a' => null, 'o2 b' => null], 'arg1 arg2 -abc'])->throws('undefined short option');
 
         // ルール不正
-        $this->assertException('duplicated option name', arguments, ['opt1' => null, 'opt1 o' => null]);
-        $this->assertException('duplicated short option', arguments, ['opt1 o' => null, 'opt2 o' => null]);
+        that([arguments, ['opt1' => null, 'opt1 o' => null]])->throws('duplicated option name');
+        that([arguments, ['opt1 o' => null, 'opt2 o' => null]])->throws('duplicated short option');
 
         // 複数指定された
-        $this->assertException('specified already', arguments, ['noreq n' => null], '--noreq arg1 arg2 -n');
-        $this->assertException('specified already', arguments, ['opt a' => ''], '--opt O1 arg1 arg2 -a O2');
+        that([arguments, ['noreq n' => null], '--noreq arg1 arg2 -n'])->throws('specified already');
+        that([arguments, ['opt a' => ''], '--opt O1 arg1 arg2 -a O2'])->throws('specified already');
 
         // 値が指定されていない
-        $this->assertException('requires value', arguments, ['req' => 'hoge'], 'arg1 arg2 --req');
+        that([arguments, ['req' => 'hoge'], 'arg1 arg2 --req'])->throws('requires value');
     }
 
     function test_stacktrace()
@@ -812,12 +812,12 @@ class UtilityTest extends AbstractTestCase
 
         // stack
         $traces = explode("\n", $mock->im());
-        $this->assertContains('test_stacktrace_in', $traces[0]);
-        $this->assertContains('eval', $traces[1]);
-        $this->assertContains('{closure}', $traces[2]);
-        $this->assertContains('test_stacktrace', $traces[3]);
-        $this->assertContains('::sm', $traces[4]);
-        $this->assertContains('->im', $traces[5]);
+        that($traces[0])->stringContains('test_stacktrace_in');
+        that($traces[1])->stringContains('eval');
+        that($traces[2])->stringContains('{closure}');
+        that($traces[3])->stringContains('test_stacktrace');
+        that($traces[4])->stringContains('::sm');
+        that($traces[5])->stringContains('->im');
 
         // limit
         $traces = (stacktrace)([
@@ -837,14 +837,14 @@ class UtilityTest extends AbstractTestCase
                 ],
             ]
         ]);
-        $this->assertContains('123456789', $traces);
-        $this->assertContains('stringarg', $traces);
-        $this->assertContains('long string long...(more 19 length)', $traces);
-        $this->assertContains('Concrete{value:null, name:"fields"}', $traces);
-        $this->assertContains('["a", "b", "c"]', $traces);
-        $this->assertContains('{a:"A", b:"B", c:"C"}', $traces);
-        $this->assertContains('{n:{e:{s:{t:"X"}}}}', $traces);
-        $this->assertContains('["la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", ...(more 1 length)', $traces);
+        that($traces)->stringContains('123456789')
+            ->stringContains('stringarg')
+            ->stringContains('long string long...(more 19 length)')
+            ->stringContains('Concrete{value:null, name:"fields"}')
+            ->stringContains('["a", "b", "c"]')
+            ->stringContains('{a:"A", b:"B", c:"C"}')
+            ->stringContains('{n:{e:{s:{t:"X"}}}}')
+            ->stringContains('["la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", "la", ...(more 1 length)');
 
         // limit (specify)
         $traces = (stacktrace)([
@@ -858,7 +858,7 @@ class UtilityTest extends AbstractTestCase
                 ],
             ]
         ], 2);
-        $this->assertEquals('hoge:1 func("ab...(more 1 length)", ["a", "b", ...(more 1 length)])', $traces);
+        that($traces)->is('hoge:1 func("ab...(more 1 length)", ["a", "b", ...(more 1 length)])');
 
         // format
         $traces = (stacktrace)([
@@ -868,7 +868,7 @@ class UtilityTest extends AbstractTestCase
                 'function' => 'func',
             ]
         ], '%s');
-        $this->assertEquals('hoge', $traces);
+        that($traces)->is('hoge');
 
         // args
         $traces = (stacktrace)([
@@ -882,7 +882,7 @@ class UtilityTest extends AbstractTestCase
                 ],
             ]
         ], ['args' => false]);
-        $this->assertEquals('hoge:1 func()', $traces);
+        that($traces)->is('hoge:1 func()');
 
         // delimiter
         $traces = (stacktrace)([
@@ -896,13 +896,10 @@ class UtilityTest extends AbstractTestCase
                 ],
             ]
         ], ['delimiter' => null]);
-        $this->assertEquals(['hoge:1 func("abc", ["a", "b", "c"])'], $traces);
+        that($traces)->is(['hoge:1 func("abc", ["a", "b", "c"])']);
 
         function test_stacktrace_mask($password, $array, $config)
         {
-            assert(!!$password);
-            assert(!!$array);
-            assert(!!$config);
             return (stacktrace)();
         }
 
@@ -922,9 +919,9 @@ class UtilityTest extends AbstractTestCase
         // mask
         $actual = $class->im('XXX', ['secret' => 'XXX'], (object) ['credit' => 'XXX']);
         // XXX は塗りつぶされるので決して出現しない
-        $this->assertNotContains('XXX', $actual);
+        that($actual)->notStringContains('XXX');
         // im, sm, test_stacktrace_mask の3回呼び出してるので計9個塗りつぶされる
-        $this->assertEquals(9, substr_count($actual, '***'));
+        that(substr_count($actual, '***'))->is(9);
     }
 
     function test_backtrace()
@@ -941,67 +938,67 @@ class UtilityTest extends AbstractTestCase
         $traces = $mock->m3([
             'function' => 'm2',
         ]);
-        $this->assertSubarray([
+        that($traces[0])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
-        ], $traces[0]);
-        $this->assertSubarray([
+        ]);
+        that($traces[1])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
-        ], $traces[1]);
+        ]);
 
         $traces = $mock->m3([
             'class' => function ($v) { return (str_contains)($v, 'class@anonymous'); },
         ]);
-        $this->assertSubarray([
+        that($traces[0])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm1',
             'class'    => get_class($mock),
-        ], $traces[0]);
-        $this->assertSubarray([
+        ]);
+        that($traces[1])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
-        ], $traces[1]);
-        $this->assertSubarray([
+        ]);
+        that($traces[2])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
-        ], $traces[2]);
+        ]);
 
         $traces = $mock->m3([
             'class' => 'not found',
         ]);
-        $this->assertCount(0, $traces);
+        that($traces)->count(0);
 
         $traces = $mock->m3([
             'hoge' => 'not found',
         ]);
-        $this->assertCount(0, $traces);
+        that($traces)->count(0);
 
         $traces = $mock->m3([
             'file'   => __FILE__,
             'offset' => 1,
             'limit'  => 3,
         ]);
-        $this->assertCount(3, $traces);
-        $this->assertSubarray([
+        that($traces)->count(3);
+        that($traces[0])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm1',
             'class'    => get_class($mock),
-        ], $traces[0]);
-        $this->assertSubarray([
+        ]);
+        that($traces[1])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
-        ], $traces[1]);
-        $this->assertSubarray([
+        ]);
+        that($traces[2])->arraySubset([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
-        ], $traces[2]);
+        ]);
     }
 
     function test_error()
@@ -1014,21 +1011,21 @@ class UtilityTest extends AbstractTestCase
         (error)('message2', $t);
         rewind($t);
         $contents = stream_get_contents($t);
-        $this->assertContains('PHP Log:  message2', $contents);
-        $this->assertContains(__FILE__, $contents);
+        that($contents)->stringContains('PHP Log:  message2');
+        that($contents)->stringContains(__FILE__);
 
         $t = (tmpname)();
         (error)('message3', $t);
         $contents = file_get_contents($t);
-        $this->assertContains('PHP Log:  message3', $contents);
-        $this->assertContains(__FILE__, $contents);
+        that($contents)->stringContains('PHP Log:  message3');
+        that($contents)->stringContains(__FILE__);
 
         $persistences = (reflect_callable)((error))->getStaticVariables()['persistences'];
-        $this->assertCount(1, $persistences);
-        $this->assertArrayHasKey($t, $persistences);
-        $this->assertIsResource($persistences[$t]);
+        that($persistences)->count(1)
+            ->arrayHasKey($t)
+        [$t]->isResource();
 
-        $this->assertException('must be resource or string', error, 'int', 1);
+        that([error, 'int', 1])->throws('must be resource or string');
     }
 
     function test_add_error_handler()
@@ -1049,24 +1046,24 @@ class UtilityTest extends AbstractTestCase
         $current = (add_error_handler)($handler2);
 
         // 返り値は直前に設定していたもの
-        $this->assertEquals(["PHPUnit\\Util\\ErrorHandler", 'handleError'], $phpunit);
-        $this->assertEquals($handler1, $current);
+        that($phpunit)->isInstanceOf(\PHPUnit\Util\ErrorHandler::class);
+        that($current)->is($handler1);
 
         // @ をつけなければ handler2 が呼ばれる（receiver = handler2）
         $receiver = null;
         $dummy[] = []['hoge'];
-        $this->assertEquals('handler2', $receiver);
+        that($receiver)->is('handler2');
 
         // @ をつけると handler1 に移譲される（receiver = handler1）
         $receiver = null;
         $dummy[] = @[]['hoge'];
-        $this->assertEquals('handler1', $receiver);
+        that($receiver)->is('handler1');
 
         // さらに WARNING ならその前（phpunit のハンドラ）に移譲される（receiver が設定されない）
         $receiver = null;
         /** @noinspection PhpWrongStringConcatenationInspection */
         $dummy[] = @('hoge' + 123);
-        $this->assertEquals(null, $receiver);
+        that($receiver)->is(null);
 
         restore_error_handler();
         restore_error_handler();
@@ -1078,9 +1075,9 @@ class UtilityTest extends AbstractTestCase
             usleep(10 * 1000);
         }, 10);
         // 0.01 秒を 10 回回すので 0.1 秒は超えるはず
-        $this->assertGreaterThan(0.1, $time);
+        that($time)->greaterThan(0.1);
 
-        $this->assertException('must be greater than', timer, function () { }, 0);
+        that([timer, function () { }, 0])->throws('must be greater than');
     }
 
     function test_benchmark()
@@ -1096,36 +1093,39 @@ class UtilityTest extends AbstractTestCase
 
         // 2関数を100でベンチするので 200ms～400ms の間のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
         $t = microtime(true) - $t;
-        $this->assertGreaterThan(0.2, $t);
-        $this->assertLessThan(0.4, $t);
+        that($t)->greaterThan(0.2);
+        that($t)->lessThan(0.4);
 
         // それらしい結果が返ってきている
-        $this->assertIsString($return[0]['name']);
-        $this->assertIsInt($return[0]['called']);
-        $this->assertIsNumeric($return[0]['ratio']);
+        that($return[0]['name'])->isString();
+        that($return[0]['called'])->isInt();
+        that($return[0]['ratio'])->isNumeric();
 
         // それらしい名前が振られている
-        $this->assertContains('Concrete::getName', $output);
-        $this->assertContains(__FILE__, $output);
+        that($output)->stringContains('Concrete::getName');
+        that($output)->stringContains(__FILE__);
 
         // return 検証
         @(benchmark)(['md5', 'sha1'], ['hoge'], 10, false);
-        $this->assertContains('Results of sha1 and md5 are different', error_get_last()['message']);
+        that(error_get_last()['message'])->stringContains('Results of sha1 and md5 are different');
 
         // usleep(15000) の平均実行時間は 15ms のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
         $output = (benchmark)(['usleep'], [15000], 300, false);
-        $this->assertLessThan(15 + 7, $output[0]['mills']);
+        that($output[0]['mills'])->lessThan(15 + 7);
 
         // 参照渡しも呼べる
         (benchmark)(['reset', 'end'], [['hoge']], 10, false);
         // エラーが出なければいいので assert はナシ
 
         // 例外系
-        $this->assertException('caller is not callable', benchmark, ['notfunc']);
-        $this->assertException('benchset is empty', benchmark, []);
-        $this->assertException('duplicated benchname', benchmark, [
-            [new \Concrete('hoge'), 'getName'],
-            [new \Concrete('hoge'), 'getName'],
-        ]);
+        that([benchmark, ['notfunc']])->throws('caller is not callable');
+        that([benchmark, []])->throws('benchset is empty');
+        that([
+            benchmark,
+            [
+                [new \Concrete('hoge'), 'getName'],
+                [new \Concrete('hoge'), 'getName'],
+            ]
+        ])->throws('duplicated benchname');
     }
 }

@@ -10,13 +10,13 @@ class SyntaxTest extends AbstractTestCase
     {
         $tmpdir = self::TMPDIR . getenv('TEST_TARGET');
         (rm_rf)($tmpdir, false);
-        $this->assertEquals(1, (evaluate)('return $x * $x;', ['x' => 1]));
-        $this->assertEquals(4, (evaluate)('return $x * $x;', ['x' => 2]));
-        $this->assertEquals(9, (evaluate)('return $x * $x;', ['x' => 3]));
+        that((evaluate)('return $x * $x;', ['x' => 1]))->is(1);
+        that((evaluate)('return $x * $x;', ['x' => 2]))->is(4);
+        that((evaluate)('return $x * $x;', ['x' => 3]))->is(9);
         // 短すぎするのでキャッシュはされない
-        $this->assertCount(0, glob("$tmpdir/*.php"));
+        that(glob("$tmpdir/*.php"))->count(0);
 
-        $this->assertIsObject((evaluate)('
+        that((evaluate)('
 return new class($x)
 {
     private $var1;
@@ -38,14 +38,13 @@ return new class($x)
         return $arg;
     }
 };
-', ['x' => 3]));
+', ['x' => 3]))->isObject();
         // ある程度長ければキャッシュされる
-        $this->assertCount(1, glob("$tmpdir/*.php"));
+        that(glob("$tmpdir/*.php"))->count(1);
 
-        $this->assertException(new \ParseError(<<<ERR
-on line 14
-ERR
-        ), evaluate, '
+        that([
+            evaluate,
+            '
 return new class()
 {
     private $var1;
@@ -67,23 +66,20 @@ syntax error
         return $arg;
     }
 };
-');
+'
+        ])->throws(new \ParseError(<<<ERR
+on line 14
+ERR
+        ));
 
-        $this->assertException(new \ParseError(<<<ERR
+        that([evaluate, 'syntax error'])->throws(new \ParseError(<<<ERR
 >>> syntax error
 ERR
-        ), evaluate, 'syntax error');
+        ));
 
-        $this->assertException(new \ParseError(<<<ERR
-// 01
->>> syntax error // 02
-// 03
-// 04
-// 05
-// 06
-// 07
-ERR
-        ), evaluate, <<<PHP
+        that([
+            evaluate,
+            <<<PHP
 // 01
 syntax error // 02
 // 03
@@ -98,9 +94,20 @@ syntax error // 02
 // 12
 // 13
 PHP
-        );
+        ])->throws(new \ParseError(<<<ERR
+// 01
+>>> syntax error // 02
+// 03
+// 04
+// 05
+// 06
+// 07
+ERR
+        ));
 
-        $this->assertException(new \ParseError(<<<ERR
+        that([
+            evaluate,
+            <<<PHP
 // 07
 // 08
 // 09
@@ -108,38 +115,15 @@ PHP
 // 11
 >>> syntax error // 12
 // 13
-ERR
-        ), evaluate, <<<PHP
-// 01
-// 02
-// 03
-// 04
-// 05
-// 06
-// 07
-// 08
-// 09
-// 10
-// 11
-syntax error // 12
-// 13
 PHP
-        );
-
-        $this->assertException(new \ParseError(<<<ERR
-// 02
-// 03
-// 04
-// 05
-// 06
->>> syntax error // 07
-// 08
-// 09
-// 10
-// 11
-// 12
+        ])->throws(new \ParseError(<<<ERR
+>>> syntax error
 ERR
-        ), evaluate, <<<PHP
+        ));
+
+        that([
+            evaluate,
+            <<<PHP
 // 01
 // 02
 // 03
@@ -154,46 +138,59 @@ syntax error // 07
 // 12
 // 13
 PHP
-        );
+        ])->throws(new \ParseError(<<<ERR
+// 02
+// 03
+// 04
+// 05
+// 06
+>>> syntax error // 07
+// 08
+// 09
+// 10
+// 11
+// 12
+ERR
+        ));
     }
 
     function test_parse_php()
     {
         $code = 'a(123);';
         $tokens = (parse_php)($code, 2);
-        $this->assertEquals([
+        that($tokens)->is([
             [T_OPEN_TAG, '<?php ', 1, 'T_OPEN_TAG'],
             [T_STRING, 'a', 1, 'T_STRING'],
             [null, '(', 0],
             [T_LNUMBER, '123', 1, 'T_LNUMBER'],
             [null, ')', 0],
             [null, ';', 0],
-        ], $tokens);
+        ]);
 
         $code = 'function(...$args)use($usevar){if(false)return function(){};}';
         $tokens = (parse_php)($code, [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
-        $this->assertEquals('function(...$args)use($usevar){', implode('', array_column($tokens, 1)));
+        that(implode('', array_column($tokens, 1)))->is('function(...$args)use($usevar){');
         $tokens = (parse_php)($code, [
             'begin'  => '{',
             'end'    => '}',
             'offset' => count($tokens),
         ]);
-        $this->assertEquals('{if(false)return function(){};}', implode('', array_column($tokens, 1)));
+        that(implode('', array_column($tokens, 1)))->is('{if(false)return function(){};}');
 
         $code = 'namespace hoge\\fuga\\piyo;class C {function m(){if(false)return function(){};}}';
         $tokens = (parse_php)($code, [
             'begin' => T_NAMESPACE,
             'end'   => ';',
         ]);
-        $this->assertEquals('namespace hoge\fuga\piyo;', implode('', array_column($tokens, 1)));
+        that(implode('', array_column($tokens, 1)))->is('namespace hoge\fuga\piyo;');
         $tokens = (parse_php)($code, [
             'begin' => T_CLASS,
             'end'   => '}',
         ]);
-        $this->assertEquals('class C {function m(){if(false)return function(){};}}', implode('', array_column($tokens, 1)));
+        that(implode('', array_column($tokens, 1)))->is('class C {function m(){if(false)return function(){};}}');
     }
 
     function test_highlight_php()
@@ -204,12 +201,12 @@ $var1 = "this is var";
 $var2 = "this is embed $var1";
 $var3 = function () { return \ArrayObject::class; };
 ';
-        $this->assertEquals($phpcode, (highlight_php)($phpcode, ['context' => 'plain']));
-        $this->assertContains('[34;3m', (highlight_php)($phpcode, ['context' => 'cli']));
-        $this->assertContains('<span style', (highlight_php)($phpcode, ['context' => 'html']));
-        $this->assertContains('function', (highlight_php)($phpcode));
+        that((highlight_php)($phpcode, ['context' => 'plain']))->is($phpcode);
+        that((highlight_php)($phpcode, ['context' => 'cli']))->stringContains('[34;3m');
+        that((highlight_php)($phpcode, ['context' => 'html']))->stringContains('<span style');
+        that((highlight_php)($phpcode))->stringContains('function');
 
-        $this->assertException('is not supported', highlight_php, $phpcode, ['context' => 'hoge']);
+        that([highlight_php, $phpcode, ['context' => 'hoge']])->throws('is not supported');
     }
 
     function test_optional()
@@ -219,52 +216,52 @@ $var3 = function () { return \ArrayObject::class; };
         $o->value = 'hoge';
 
         // method
-        $this->assertSame('hoge', (optional)($o)->getName());
+        that((optional)($o)->getName())->isSame('hoge');
         // property
-        $this->assertSame('hoge', (optional)($o)->value);
+        that((optional)($o)->value)->isSame('hoge');
         // __isset
-        $this->assertSame(true, isset((optional)($o)->hoge));
+        that(isset((optional)($o)->hoge))->isSame(true);
         // __get
-        $this->assertSame('hoge', (optional)($o)->hoge);
+        that((optional)($o)->hoge)->isSame('hoge');
         // __call
-        $this->assertSame('hoge', (optional)($o)->hoge());
+        that((optional)($o)->hoge())->isSame('hoge');
         // __invoke
-        $this->assertSame('Concrete::__invoke', (optional)($o)());
+        that((optional)($o)())->isSame('Concrete::__invoke');
         // __toString
-        $this->assertSame('hoge', (string) (optional)($o));
+        that((string) (optional)($o))->isSame('hoge');
         // offsetExists
-        $this->assertSame(false, empty((optional)($o)['hoge']));
+        that(empty((optional)($o)['hoge']))->isSame(false);
         // offsetGet
-        $this->assertSame('hoge', (optional)($o)['hoge']);
+        that((optional)($o)['hoge'])->isSame('hoge');
         // iterator
-        $this->assertNotEmpty(iterator_to_array((optional)($o)));
+        that((optional)($o))->isNotEmpty();
 
         $o = null;
 
         // method
-        $this->assertSame(null, (optional)($o)->getName());
+        that((optional)($o)->getName())->isSame(null);
         // property
-        $this->assertSame(null, (optional)($o)->value);
+        that((optional)($o)->value)->isSame(null);
         // __isset
-        $this->assertSame(false, isset((optional)($o)->hoge));
+        that(isset((optional)($o)->hoge))->isSame(false);
         // __get
-        $this->assertSame(null, (optional)($o)->hoge);
+        that((optional)($o)->hoge)->isSame(null);
         // __call
-        $this->assertSame(null, (optional)($o)->hoge());
+        that((optional)($o)->hoge())->isSame(null);
         // __invoke
-        $this->assertSame(null, (optional)($o)());
+        that((optional)($o)())->isSame(null);
         // __toString
-        $this->assertSame('', (string) (optional)($o));
+        that((string) (optional)($o))->isSame('');
         // offsetExists
-        $this->assertSame(true, empty((optional)($o)['hoge']));
+        that(empty((optional)($o)['hoge']))->isSame(true);
         // offsetGet
-        $this->assertSame(null, (optional)($o)['hoge']);
+        that((optional)($o)['hoge'])->isSame(null);
         // iterator
-        $this->assertEmpty(iterator_to_array((optional)($o)));
+        that(iterator_to_array((optional)($o)))->isEmpty();
 
         // 型指定
-        $this->assertEquals(1, (optional)(new \ArrayObject([1]))->count());
-        $this->assertNull((optional)(new \ArrayObject([1]), 'stdClass')->count());
+        that((optional)(new \ArrayObject([1]))->count())->is(1);
+        that((optional)(new \ArrayObject([1]), 'stdClass')->count())->isNull();
     }
 
     function test_chain()
@@ -278,35 +275,35 @@ $var3 = function () { return \ArrayObject::class; };
 
         // funcO
         $array = [1, 2, 3, 4, 5];
-        $this->assertEquals([-1, -2, -3, -4, -5], $chain($array)->mapP(['-'])());
-        $this->assertEquals([0, 5, 5, 5, 5], $chain($array)->mapP(['-' => 1])->mapP(['?:' => [5, 0]])());
-        $this->assertEquals([2 => 8, 9, 10], $chain($array)->filterP(['>=' => 3])->mapP(['+' => 5])());
+        that($chain($array)->mapP(['-'])())->is([-1, -2, -3, -4, -5]);
+        that($chain($array)->mapP(['-' => 1])->mapP(['?:' => [5, 0]])())->is([0, 5, 5, 5, 5]);
+        that($chain($array)->filterP(['>=' => 3])->mapP(['+' => 5])())->is([2 => 8, 9, 10]);
 
         // funcE
         $array = [1, 2, 3, 4, 5];
-        $this->assertEquals([2 => 6, 8, 10], $chain($array)->mapE('*2')->filterE('>5')());
-        $this->assertEquals('1,4,9,16,25', $chain($array)->mapE('$_ * $_')->vsprintf1('%d,%d,%d,%d,%d')());
+        that($chain($array)->mapE('*2')->filterE('>5')())->is([2 => 6, 8, 10]);
+        that($chain($array)->mapE('$_ * $_')->vsprintf1('%d,%d,%d,%d,%d')())->is('1,4,9,16,25');
 
         // apply
         $string = 'a12345z';
-        $this->assertEquals('12,345.000', $chain($string)->apply('ltrim', 'a')->apply('rtrim', 'z')->apply('number_format', 3)());
-        $this->assertEquals($string, (string) $chain($string));
+        that($chain($string)->apply('ltrim', 'a')->apply('rtrim', 'z')->apply('number_format', 3)())->is('12,345.000');
+        that((string) $chain($string))->is($string);
 
         // iterator
         $hash = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], iterator_to_array($chain($hash)));
+        that(iterator_to_array($chain($hash)))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
 
         // string
         $string = 'hello';
-        $this->assertEquals('H,e,l,l,o', $chain($string)->ucfirst->str_split->implode1(',')());
-        $this->assertEquals($string, (string) $chain($string));
+        that($chain($string)->ucfirst->str_split->implode1(',')())->is('H,e,l,l,o');
+        that((string) $chain($string))->is($string);
 
         // internal
         $list = '1,2,3,4,5';
-        $this->assertEquals([6, 8, 10], $chain($list)->multiexplode1(',')->filter_keyP(['>=' => 2])->mapsE('*2')->values()());
+        that($chain($list)->multiexplode1(',')->filter_keyP(['>=' => 2])->mapsE('*2')->values()())->is([6, 8, 10]);
 
         // exception
-        $this->assertException('is not defined', [$chain(null), 'undefined_function']);
+        that([[$chain(null), 'undefined_function']])->throws('is not defined');
 
         // use case
         $rows = [
@@ -317,47 +314,47 @@ $var3 = function () { return \ArrayObject::class; };
         ];
 
         // e.g. 男性の平均給料
-        $this->assertEquals(375000, $chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()());
-        $this->assertEquals(375000, $chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows));
+        that($chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()())->is(375000);
+        that($chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows))->is(375000);
 
         // e.g. 女性の平均年齢
-        $this->assertEquals(23.5, $chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()());
-        $this->assertEquals(23.5, $chain()->whereE('sex', '=== "F"')->column('age')->mean()($rows));
+        that($chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()())->is(23.5);
+        that($chain()->whereE('sex', '=== "F"')->column('age')->mean()($rows))->is(23.5);
 
         // e.g. 30歳以上の平均給料
-        $this->assertEquals(400000, $chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()());
-        $this->assertEquals(400000, $chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows));
+        that($chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()())->is(400000);
+        that($chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows))->is(400000);
 
         // e.g. 20～30歳の平均給料
-        $this->assertEquals(295000, $chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()());
-        $this->assertEquals(295000, $chain()->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()($rows));
+        that($chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()())->is(295000);
+        that($chain()->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()($rows))->is(295000);
 
         // e.g. 男性の最小年齢
-        $this->assertEquals(21, $chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()());
-        $this->assertEquals(21, $chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows));
+        that($chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()())->is(21);
+        that($chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows))->is(21);
 
         // e.g. 女性の最大給料
-        $this->assertEquals(320000, $chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()());
-        $this->assertEquals(320000, $chain()->whereE('sex', '=== "F"')->column('salary')->max()($rows));
+        that($chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()())->is(320000);
+        that($chain()->whereE('sex', '=== "F"')->column('salary')->max()($rows))->is(320000);
 
         // e.g. 30歳以上の id => name
-        $this->assertEquals([
+        that($chain($rows)->whereP('age', ['>=' => 30])->column('name', 'id')())->is([
             3 => 'fuga',
             9 => 'hage',
-        ], $chain($rows)->whereP('age', ['>=' => 30])->column('name', 'id')());
-        $this->assertEquals([
+        ]);
+        that($chain()->whereP('age', ['>=' => 30])->column('name', 'id')($rows))->is([
             3 => 'fuga',
             9 => 'hage',
-        ], $chain()->whereP('age', ['>=' => 30])->column('name', 'id')($rows));
+        ]);
 
         // 引数遅延モード
         $chainer = $chain()->sha1->md5()->substr(0, 3)->apply('ltrim', 'abcdef');
-        $this->assertEquals('69', $chainer('hello'));
-        $this->assertEquals('880', $chainer('world'));
-        $this->assertEquals(['69', '880'], $chainer('hello', 'world'));
+        that($chainer('hello'))->is('69');
+        that($chainer('world'))->is('880');
+        that($chainer('hello', 'world'))->is(['69', '880']);
 
-        $this->assertException('nonempty stack and no parameter given', $chain());
-        $this->assertException('empty stack and parameter given > 0', $chain('hoge'), null);
+        that([$chain()])->throws('nonempty stack and no parameter given');
+        that([$chain('hoge'), null])->throws('empty stack and parameter given > 0');
     }
 
     function test_throws()
@@ -367,16 +364,17 @@ $var3 = function () { return \ArrayObject::class; };
         /*
         @mkdir(__DIR__) or throw new \Exception('mkdir fail');
         */
-        $this->assertException(new \Exception('mkdir fail'), function () {
+
+        that(function () {
             @mkdir(__DIR__) or (throws)(new \Exception('mkdir fail'));
-        });
+        })->throws(new \Exception('mkdir fail'));
     }
 
     function test_throw_if()
     {
         (throw_if)(false, new \Exception('message', 123));
-        $this->assertException(new \Exception('message', 123), throw_if, true, new \Exception('message', 123));
-        $this->assertException(new \Exception('message', 123), throw_if, true, \Exception::class, 'message', 123);
+        that([throw_if, true, new \Exception('message', 123)])->throws(new \Exception('message', 123));
+        that([throw_if, true, \Exception::class, 'message', 123])->throws(new \Exception('message', 123));
     }
 
     function test_blank_if()
@@ -387,33 +385,33 @@ $var3 = function () { return \ArrayObject::class; };
         $countableT = new \ArrayObject(['hoge']);
         $stringableT = new \SplFileInfo('hoge');
 
-        $this->assertSame('default', (blank_if)(null) ?? 'default');
-        $this->assertSame('default', (blank_if)(false) ?? 'default');
-        $this->assertSame('default', (blank_if)('') ?? 'default');
-        $this->assertSame('default', (blank_if)([]) ?? 'default');
-        $this->assertSame('default', (blank_if)($countableF) ?? 'default');
-        $this->assertSame('default', (blank_if)($stringableF) ?? 'default');
-        $this->assertSame(0, (blank_if)(0) ?? 'default');
-        $this->assertSame(0.0, (blank_if)(0.0) ?? 'default');
-        $this->assertSame('0', (blank_if)('0') ?? 'default');
-        $this->assertSame('X', (blank_if)('X') ?? 'default');
-        $this->assertSame($stdclass, (blank_if)($stdclass) ?? 'default');
-        $this->assertSame($countableT, (blank_if)($countableT) ?? 'default');
-        $this->assertSame($stringableT, (blank_if)($stringableT) ?? 'default');
+        that((blank_if)(null) ?? 'default')->isSame('default');
+        that((blank_if)(false) ?? 'default')->isSame('default');
+        that((blank_if)('') ?? 'default')->isSame('default');
+        that((blank_if)([]) ?? 'default')->isSame('default');
+        that((blank_if)($countableF) ?? 'default')->isSame('default');
+        that((blank_if)($stringableF) ?? 'default')->isSame('default');
+        that((blank_if)(0) ?? 'default')->isSame(0);
+        that((blank_if)(0.0) ?? 'default')->isSame(0.0);
+        that((blank_if)('0') ?? 'default')->isSame('0');
+        that((blank_if)('X') ?? 'default')->isSame('X');
+        that((blank_if)($stdclass) ?? 'default')->isSame($stdclass);
+        that((blank_if)($countableT) ?? 'default')->isSame($countableT);
+        that((blank_if)($stringableT) ?? 'default')->isSame($stringableT);
 
-        $this->assertSame('default', (blank_if)(null, 'default'));
-        $this->assertSame('default', (blank_if)(false, 'default'));
-        $this->assertSame('default', (blank_if)('', 'default'));
-        $this->assertSame('default', (blank_if)([], 'default'));
-        $this->assertSame('default', (blank_if)($countableF, 'default'));
-        $this->assertSame('default', (blank_if)($stringableF, 'default'));
-        $this->assertSame(0, (blank_if)(0, 'default'));
-        $this->assertSame(0.0, (blank_if)(0.0, 'default'));
-        $this->assertSame('0', (blank_if)('0', 'default'));
-        $this->assertSame('X', (blank_if)('X', 'default'));
-        $this->assertSame($stdclass, (blank_if)($stdclass, 'default'));
-        $this->assertSame($countableT, (blank_if)($countableT, 'default'));
-        $this->assertSame($stringableT, (blank_if)($stringableT, 'default'));
+        that((blank_if)(null, 'default'))->isSame('default');
+        that((blank_if)(false, 'default'))->isSame('default');
+        that((blank_if)('', 'default'))->isSame('default');
+        that((blank_if)([], 'default'))->isSame('default');
+        that((blank_if)($countableF, 'default'))->isSame('default');
+        that((blank_if)($stringableF, 'default'))->isSame('default');
+        that((blank_if)(0, 'default'))->isSame(0);
+        that((blank_if)(0.0, 'default'))->isSame(0.0);
+        that((blank_if)('0', 'default'))->isSame('0');
+        that((blank_if)('X', 'default'))->isSame('X');
+        that((blank_if)($stdclass, 'default'))->isSame($stdclass);
+        that((blank_if)($countableT, 'default'))->isSame($countableT);
+        that((blank_if)($stringableT, 'default'))->isSame($stringableT);
     }
 
     function test_call_if()
@@ -424,11 +422,11 @@ $var3 = function () { return \ArrayObject::class; };
             return $name;
         };
 
-        $this->assertEquals('true', (call_if)(true, $callback, 'true'));
-        $this->assertEquals(null, (call_if)(false, $callback, 'false'));
+        that((call_if)(true, $callback, 'true'))->is('true');
+        that((call_if)(false, $callback, 'false'))->is(null);
 
-        $this->assertEquals('closure_true', (call_if)(function () { return true; }, $callback, 'closure_true'));
-        $this->assertEquals(null, (call_if)(function () { return false; }, $callback, 'closure_false'));
+        that((call_if)(function () { return true; }, $callback, 'closure_true'))->is('closure_true');
+        that((call_if)(function () { return false; }, $callback, 'closure_false'))->is(null);
 
         for ($i = 0; $i < 5; $i++) {
             (call_if)(-2, $callback, 'number:-2');
@@ -438,7 +436,7 @@ $var3 = function () { return \ArrayObject::class; };
             (call_if)(+2, $callback, 'number:+2');
         }
 
-        $this->assertEquals([
+        that($receiver)->is([
             'true'         => 1,
             'closure_true' => 1,
             'number:-2'    => 3,
@@ -446,7 +444,7 @@ $var3 = function () { return \ArrayObject::class; };
             'number: 0'    => 5,
             'number:+1'    => 1,
             'number:+2'    => 1,
-        ], $receiver);
+        ]);
     }
 
     function test_switchs()
@@ -455,10 +453,10 @@ $var3 = function () { return \ArrayObject::class; };
             1 => 'value is 1',
             2 => function () { return 'value is 2'; },
         ];
-        $this->assertEquals('value is 1', (switchs)(1, $cases, 'undefined'));
-        $this->assertEquals('value is 2', (switchs)(2, $cases, 'undefined'));
-        $this->assertEquals('undefined', (switchs)(3, $cases, 'undefined'));
-        $this->assertException('is not defined in', switchs, 9, $cases);
+        that((switchs)(1, $cases, 'undefined'))->is('value is 1');
+        that((switchs)(2, $cases, 'undefined'))->is('value is 2');
+        that((switchs)(3, $cases, 'undefined'))->is('undefined');
+        that([switchs, 9, $cases])->throws('is not defined in');
     }
 
     function test_try_null()
@@ -469,9 +467,9 @@ $var3 = function () { return \ArrayObject::class; };
             }
             throw new \Exception();
         };
-        $this->assertEquals(null, (try_null)($try, 0));
-        $this->assertEquals(1, (try_null)($try, 1));
-        $this->assertEquals(2, (try_null)($try, 2));
+        that((try_null)($try, 0))->is(null);
+        that((try_null)($try, 1))->is(1);
+        that((try_null)($try, 2))->is(2);
     }
 
     function test_try_catch()
@@ -491,9 +489,9 @@ $var3 = function () { return \ArrayObject::class; };
         }
         */
 
-        $this->assertException(new \Exception('hoge'), function () use ($try) {
+        that(function () use ($try) {
             (try_catch)($try, function ($ex) { throw new \Exception('hoge', 0, $ex); });
-        });
+        })->throws(new \Exception('hoge'));
 
         // あるいは throw しないで単純に返り値として欲しいことがある
         // 下記は出来ない…こともないが若干冗長
@@ -506,7 +504,7 @@ $var3 = function () { return \ArrayObject::class; };
         }
         */
 
-        $this->assertInstanceOf('\RuntimeException', (try_catch)($try));
+        that((try_catch)($try))->isInstanceOf(\RuntimeException::class);
     }
 
     function test_try_finally()
@@ -544,8 +542,8 @@ $var3 = function () { return \ArrayObject::class; };
         */
 
         // 引数は渡るし返り値は正しいし $finally も呼ばれている
-        $this->assertEquals('HOGE', (try_finally)($try1, $finally, 'hoge'));
-        $this->assertEquals(1, $finally_count);
+        that((try_finally)($try1, $finally, 'hoge'))->is('HOGE');
+        that($finally_count)->is(1);
 
         // 例外が投げられるが $finally は呼ばれている
         try {
@@ -554,7 +552,7 @@ $var3 = function () { return \ArrayObject::class; };
         catch (\Exception $ex) {
             // 握りつぶし
         };
-        $this->assertEquals(2, $finally_count);
+        that($finally_count)->is(2);
     }
 
     function test_try_catch_finally()
@@ -572,7 +570,7 @@ $var3 = function () { return \ArrayObject::class; };
             (rm_rf)($workingdir);
         });
         // finally が仕事をしてディレクトリが消えているはず
-        $this->assertFalse(file_exists($workingdir));
+        that($workingdir)->notFileExists();
 
         try {
             (try_catch_finally)(function () use ($workingdir) {
@@ -591,6 +589,6 @@ $var3 = function () { return \ArrayObject::class; };
             // dummy
         }
         // finally が仕事をしてディレクトリが消えているはず
-        $this->assertFalse(file_exists($workingdir));
+        that($workingdir)->notFileExists();
     }
 }

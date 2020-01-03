@@ -7,16 +7,16 @@ class FunchandTest extends AbstractTestCase
     function test_abind()
     {
         $sprintf = (abind)('sprintf', [1 => 'a', 3 => 'c']);
-        $this->assertEquals('abcZ', $sprintf('%s%s%s%s', 'b', 'Z'));
+        that($sprintf('%s%s%s%s', 'b', 'Z'))->is('abcZ');
     }
 
     function test_nbind()
     {
         $arrayize_2X = (nbind)(arrayize, 2, 'X');
-        $this->assertEquals([1, 2, 'X', 3, 4], $arrayize_2X(1, 2, 3, 4));
+        that($arrayize_2X(1, 2, 3, 4))->is([1, 2, 'X', 3, 4]);
 
         $arrayize_3XY = (nbind)(arrayize, 3, 'X', 'Y');
-        $this->assertEquals([1, 2, 3, 'X', 'Y', 4], $arrayize_3XY(1, 2, 3, 4));
+        that($arrayize_3XY(1, 2, 3, 4))->is([1, 2, 3, 'X', 'Y', 4]);
     }
 
     function test_nbind_arity()
@@ -31,41 +31,41 @@ class FunchandTest extends AbstractTestCase
         $func1 = (nbind)($func2, 1, 'b');// 引数を1個要求するクロージャ
         $func0 = (nbind)($func1, 0, 'a');// 引数を0個要求するクロージャ
 
-        $this->assertEquals(0, (parameter_length)($func0));
-        $this->assertEquals(1, (parameter_length)($func1));
-        $this->assertEquals(2, (parameter_length)($func2));
-        $this->assertEquals(3, (parameter_length)($func3));
-        $this->assertEquals(4, (parameter_length)($func4));
-        $this->assertEquals(5, (parameter_length)($func5));
-        $this->assertEquals(6, (parameter_length)($func6));
-        $this->assertEquals(7, (parameter_length)($func7));
+        that((parameter_length)($func0))->is(0);
+        that((parameter_length)($func1))->is(1);
+        that((parameter_length)($func2))->is(2);
+        that((parameter_length)($func3))->is(3);
+        that((parameter_length)($func4))->is(4);
+        that((parameter_length)($func5))->is(5);
+        that((parameter_length)($func6))->is(6);
+        that((parameter_length)($func7))->is(7);
 
-        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f', 'g'], $func0());
-        $this->assertEquals(['A', 'b', 'c', 'd', 'e', 'f', 'g'], $func1('A'));
-        $this->assertEquals(['A', 'B', 'c', 'd', 'e', 'f', 'g'], $func2('A', 'B'));
-        $this->assertEquals(['A', 'B', 'C', 'd', 'e', 'f', 'g'], $func3('A', 'B', 'C'));
-        $this->assertEquals(['A', 'B', 'C', 'D', 'e', 'f', 'g'], $func4('A', 'B', 'C', 'D'));
-        $this->assertEquals(['A', 'B', 'C', 'D', 'E', 'f', 'g'], $func5('A', 'B', 'C', 'D', 'E'));
-        $this->assertEquals(['A', 'B', 'C', 'D', 'E', 'F', 'g'], $func6('A', 'B', 'C', 'D', 'E', 'F'));
-        $this->assertEquals(['A', 'B', 'C', 'D', 'E', 'F', 'G'], $func7('A', 'B', 'C', 'D', 'E', 'F', 'G'));
+        that($func0())->is(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
+        that($func1('A'))->is(['A', 'b', 'c', 'd', 'e', 'f', 'g']);
+        that($func2('A', 'B'))->is(['A', 'B', 'c', 'd', 'e', 'f', 'g']);
+        that($func3('A', 'B', 'C'))->is(['A', 'B', 'C', 'd', 'e', 'f', 'g']);
+        that($func4('A', 'B', 'C', 'D'))->is(['A', 'B', 'C', 'D', 'e', 'f', 'g']);
+        that($func5('A', 'B', 'C', 'D', 'E'))->is(['A', 'B', 'C', 'D', 'E', 'f', 'g']);
+        that($func6('A', 'B', 'C', 'D', 'E', 'F'))->is(['A', 'B', 'C', 'D', 'E', 'F', 'g']);
+        that($func7('A', 'B', 'C', 'D', 'E', 'F', 'G'))->is(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
     }
 
     function test_lbind()
     {
         $arrayize_lX = (lbind)(arrayize, 'X');
-        $this->assertEquals(['X', 1, 2, 3, 4], $arrayize_lX(1, 2, 3, 4));
+        that($arrayize_lX(1, 2, 3, 4))->is(['X', 1, 2, 3, 4]);
 
         $arrayize_lXY = (lbind)(arrayize, 'X', 'Y');
-        $this->assertEquals(['X', 'Y', 1, 2, 3, 4], $arrayize_lXY(1, 2, 3, 4));
+        that($arrayize_lXY(1, 2, 3, 4))->is(['X', 'Y', 1, 2, 3, 4]);
     }
 
     function test_rbind()
     {
         $arrayize_rX = (rbind)(arrayize, 'X');
-        $this->assertEquals([1, 2, 3, 4, 'X'], $arrayize_rX(1, 2, 3, 4));
+        that($arrayize_rX(1, 2, 3, 4))->is([1, 2, 3, 4, 'X']);
 
         $arrayize_rXY = (rbind)(arrayize, 'X', 'Y');
-        $this->assertEquals([1, 2, 3, 4, 'X', 'Y'], $arrayize_rXY(1, 2, 3, 4));
+        that($arrayize_rXY(1, 2, 3, 4))->is([1, 2, 3, 4, 'X', 'Y']);
     }
 
     function test_ope_func()
@@ -122,80 +122,80 @@ class FunchandTest extends AbstractTestCase
                     // 3項演算子は定型的に eval 出来ないが1つしかないので直書きする
                     $expression = "return {$ve($args[0])} ? {$ve($args[1])} : {$ve($args[2])};";
                 }
-                $this->assertSame(eval($expression), (ope_func)($op)(...$args), "$expression is failed.");
+                that((ope_func)($op)(...$args))->as("$expression is failed.")->isSame(eval($expression));
             }
         }
 
         // 一部 eval ではテスト出来ないので個別でテスト
         $x = 99;
-        $this->assertSame(100, (ope_func)('++')($x));
-        $this->assertSame(100, $x);
-        $this->assertSame(99, (ope_func)('--')($x));
-        $this->assertSame(99, $x);
-        $this->assertTrue((ope_func)('instanceof')(new \stdClass(), \stdClass::class));
-        $this->assertFalse((ope_func)('instanceof')(new \stdClass(), \Exception::class));
+        that((ope_func)('++')($x))->isSame(100);
+        that($x)->isSame(100);
+        that((ope_func)('--')($x))->isSame(99);
+        that($x)->isSame(99);
+        that((ope_func)('instanceof')(new \stdClass(), \stdClass::class))->isTrue();
+        that((ope_func)('instanceof')(new \stdClass(), \Exception::class))->isFalse();
 
         // 例外系
-        $this->assertException('is not defined', ope_func, 'hogera');
+        that([ope_func, 'hogera'])->throws('is not defined');
     }
 
     function test_not_func()
     {
         $not_strlen = (not_func)('strlen');
-        $this->assertFalse($not_strlen('hoge'));
-        $this->assertTrue($not_strlen(''));
+        that($not_strlen('hoge'))->isFalse();
+        that($not_strlen(''))->isTrue();
 
-        $this->assertEquals(1, (parameter_length)((not_func)('strlen')));
+        that((parameter_length)((not_func)('strlen')))->is(1);
     }
 
     function test_eval_func()
     {
-        $this->assertEquals(4, (eval_func)('4')());
-        $this->assertEquals(7, (eval_func)('$a + $b', 'a', 'b')(3, 4));
+        that((eval_func)('4')())->is(4);
+        that((eval_func)('$a + $b', 'a', 'b')(3, 4))->is(7);
 
         $a1 = (eval_func)('$a', 'a');
         $a2 = (eval_func)('$a', 'a');
         $x = (eval_func)('$x', 'x');
-        $this->assertSame($a1, $a2);
-        $this->assertNotSame($a1, $x);
-        $this->assertNotSame($a2, $x);
+        that($a1 === $a2)->isTrue();
+        that($a1 !== $x)->isTrue();
+        that($a2 !== $x)->isTrue();
 
-        $this->assertEquals(0, (parameter_length)((eval_func)('$v')));
-        $this->assertEquals(1, (parameter_length)((eval_func)('$v', 'a')));
-        $this->assertEquals(2, (parameter_length)((eval_func)('$v', 'a', 'b')));
+        that((parameter_length)((eval_func)('$v')))->is(0);
+        that((parameter_length)((eval_func)('$v', 'a')))->is(1);
+        that((parameter_length)((eval_func)('$v', 'a', 'b')))->is(2);
     }
 
     function test_reflect_callable()
     {
         // タイプ 0: クロージャ
-        $this->assertInstanceOf('\ReflectionFunction', (reflect_callable)(function () { }));
+        that((reflect_callable)(function () { }))->isInstanceOf('\ReflectionFunction');
 
         // タイプ 1: 単純なコールバック
-        $this->assertInstanceOf('\ReflectionFunction', (reflect_callable)('strlen'));
+        that((reflect_callable)('strlen'))->isInstanceOf('\ReflectionFunction');
 
         // タイプ 2: 静的クラスメソッドのコール
-        $this->assertInstanceOf('\ReflectionMethod', (reflect_callable)(['Concrete', 'staticMethod']));
+        that((reflect_callable)(['Concrete', 'staticMethod']))->isInstanceOf('\ReflectionMethod');
 
         // タイプ 3: オブジェクトメソッドのコール
-        $this->assertInstanceOf('\ReflectionMethod', (reflect_callable)([new \Concrete(''), 'instanceMethod']));
+        that((reflect_callable)([new \Concrete(''), 'instanceMethod']))->isInstanceOf('\ReflectionMethod');
 
         // タイプ 4: 静的クラスメソッドのコール (PHP 5.2.3 以降)
-        $this->assertInstanceOf('\ReflectionMethod', (reflect_callable)('Concrete::staticMethod'));
+        that((reflect_callable)('Concrete::staticMethod'))->isInstanceOf('\ReflectionMethod');
 
         // タイプ 5: 相対指定による静的クラスメソッドのコール (PHP 5.3.0 以降)
-        $this->assertInstanceOf('\ReflectionMethod', (reflect_callable)(['Concrete', 'parent::staticMethod']));
+        that((reflect_callable)(['Concrete', 'parent::staticMethod']))->isInstanceOf('\ReflectionMethod');
 
         // タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
-        $this->assertInstanceOf('\ReflectionMethod', (reflect_callable)(new \Concrete('')));
+        that((reflect_callable)(new \Concrete('')))->isInstanceOf('\ReflectionMethod');
 
         // タイプ X: メソッドスコープ
-        $this->assertInstanceOf('\ReflectionMethod', (reflect_callable)(['PrivateClass', 'privateMethod']));
+        that((reflect_callable)(['PrivateClass', 'privateMethod']))->isInstanceOf('\ReflectionMethod');
 
         // そんなものは存在しない
-        $this->assertException('does not exist', reflect_callable, 'hogefuga');
+        that([reflect_callable, 'hogefuga'])->throws('does not exist');
 
         // そもそも形式がおかしい
-        $this->assertException('is not callable', reflect_callable, []);
+        that([reflect_callable, []])->throws('is not callable');
     }
 
     function test_callable_code()
@@ -206,28 +206,28 @@ class FunchandTest extends AbstractTestCase
         }
 
         $code = (callable_code)(__NAMESPACE__ . "\\hoge_callable_code");
-        $this->assertEquals([
+        that($code)->is([
             'function hoge_callable_code()',
             '{
             return true;
         }',
-        ], $code);
+        ]);
 
         $code = (callable_code)([$this, 'createResult']);
-        $this->assertEquals([
+        that($code)->is([
             'function createResult(): TestResult',
             '{
         return new TestResult;
     }',
-        ], $code);
+        ]);
 
         $code = (callable_code)(new \ReflectionFunction(__NAMESPACE__ . "\\hoge_callable_code"));
-        $this->assertEquals([
+        that($code)->is([
             'function hoge_callable_code()',
             '{
             return true;
         }',
-        ], $code);
+        ]);
 
         $usevar = null;
         $code = (callable_code)(function ($arg1 = "{\n}") use ($usevar): \Closure {
@@ -237,7 +237,7 @@ class FunchandTest extends AbstractTestCase
                 };
             }
         });
-        $this->assertEquals([
+        that($code)->is([
             'function ($arg1 = "{\n}") use ($usevar): \Closure',
             '{
             if (true) {
@@ -246,7 +246,7 @@ class FunchandTest extends AbstractTestCase
                 };
             }
         }',
-        ], $code);
+        ]);
     }
 
     function test_call_safely()
@@ -255,22 +255,25 @@ class FunchandTest extends AbstractTestCase
         set_error_handler($h);
 
         // 正常なら返り値を返す
-        $this->assertEquals(999, (call_safely)(function ($v) { return $v; }, 999));
+        that((call_safely)(function ($v) { return $v; }, 999))->is(999);
 
         // エラーが出たら例外を投げる
-        $this->assertException('Undefined variable', call_safely, function () {
-            /** @noinspection PhpUndefinedVariableInspection */
-            return $v;
-        });
+        that([
+            call_safely,
+            function () {
+                /** @noinspection PhpUndefinedVariableInspection */
+                return $v;
+            }
+        ])->throws('Undefined variable');
 
         // @で抑制した場合は例外は飛ばない
-        $this->assertSame(null, (call_safely)(function () {
+        that((call_safely)(function () {
             /** @noinspection PhpUndefinedVariableInspection */
             return @$v;
-        }));
+        }))->isSame(null);
 
         // エラーハンドラが戻っている
-        $this->assertSame($h, set_error_handler(function () { }));
+        that(set_error_handler(function () { }))->isSame($h);
         restore_error_handler();
 
         restore_error_handler();
@@ -281,18 +284,22 @@ class FunchandTest extends AbstractTestCase
         $current = ob_get_level();
 
         // コールバックの出力が返される
-        $this->assertEquals('hoge', (ob_capture)(function ($v) {
+        that((ob_capture)(function ($v) {
             echo $v;
-        }, 'hoge'));
+        }, 'hoge'))->is('hoge');
         // ob レベルは変わらない
-        $this->assertEquals($current, ob_get_level());
+        that(ob_get_level())->is($current);
 
         // 処理中に飛んだ例外が飛ぶ
-        $this->assertException('inob', ob_capture, function ($v) {
-            throw new \Exception('inob');
-        }, 'hoge');
+        that([
+            ob_capture,
+            function ($v) {
+                throw new \Exception('inob');
+            },
+            'hoge'
+        ])->throws('inob');
         // ob レベルは変わらない
-        $this->assertEquals($current, ob_get_level());
+        that(ob_get_level())->is($current);
     }
 
     function test_is_bindable_closure()
@@ -312,18 +319,18 @@ class FunchandTest extends AbstractTestCase
             public static function _static_static_closure() { return static function () { return get_class($this); }; }
         };
 
-        $this->assertTrue((is_bindable_closure)(_global_nostatic_closure()));
-        $this->assertFalse((is_bindable_closure)(_global_static_closure()));
-        $this->assertTrue((is_bindable_closure)($class->_nostatic_nostatic_closure()));
-        $this->assertFalse((is_bindable_closure)($class->_nostatic_static_closure()));
-        $this->assertTrue((is_bindable_closure)($class->_static_nostatic_closure()));
-        $this->assertFalse((is_bindable_closure)($class->_static_static_closure()));
+        that((is_bindable_closure)(_global_nostatic_closure()))->isTrue();
+        that((is_bindable_closure)(_global_static_closure()))->isFalse();
+        that((is_bindable_closure)($class->_nostatic_nostatic_closure()))->isTrue();
+        that((is_bindable_closure)($class->_nostatic_static_closure()))->isFalse();
+        that((is_bindable_closure)($class->_static_nostatic_closure()))->isTrue();
+        that((is_bindable_closure)($class->_static_static_closure()))->isFalse();
 
         // true のやつらは実際に bind してみる
         $dummy = new \stdClass();
-        $this->assertEquals('stdClass', \Closure::bind(_global_nostatic_closure(), $dummy)());
-        $this->assertEquals('stdClass', \Closure::bind($class->_nostatic_nostatic_closure(), $dummy)());
-        $this->assertEquals('stdClass', \Closure::bind($class->_static_nostatic_closure(), $dummy)());
+        that(\Closure::bind(_global_nostatic_closure(), $dummy)())->is('stdClass');
+        that(\Closure::bind($class->_nostatic_nostatic_closure(), $dummy)())->is('stdClass');
+        that(\Closure::bind($class->_static_nostatic_closure(), $dummy)())->is('stdClass');
     }
 
     function test_by_builtin()
@@ -331,28 +338,28 @@ class FunchandTest extends AbstractTestCase
         $object = new \BuiltIn();
 
         $count = 'count';
-        $this->assertEquals(1, $count($object));
-        $this->assertEquals(0, $object->$count());
+        that($count($object))->is(1);
+        that($object->$count())->is(0);
 
-        $this->assertEquals(1, count($object));
-        $this->assertEquals(0, $object->count());
+        that(count($object))->is(1);
+        that($object->count())->is(0);
 
-        $this->assertEquals(1, call_user_func('count', $object));
-        $this->assertEquals(0, call_user_func([$object, 'count']));
+        that(call_user_func('count', $object))->is(1);
+        that(call_user_func([$object, 'count']))->is(0);
 
-        $this->assertEquals(1, call_user_func_array('count', [$object]));
-        $this->assertEquals(0, call_user_func_array([$object, 'count'], []));
+        that(call_user_func_array('count', [$object]))->is(1);
+        that(call_user_func_array([$object, 'count'], []))->is(0);
 
-        $this->assertEquals(1, (new \ReflectionFunction('count'))->invoke($object));
-        $this->assertEquals(0, (new \ReflectionMethod($object, 'count'))->invoke($object));
+        that((new \ReflectionFunction('count'))->invoke($object))->is(1);
+        that((new \ReflectionMethod($object, 'count'))->invoke($object))->is(0);
 
-        $this->assertEquals(1, (new \ReflectionFunction('count'))->invokeArgs([$object]));
-        $this->assertEquals(0, (new \ReflectionMethod($object, 'count'))->invokeArgs($object, []));
+        that((new \ReflectionFunction('count'))->invokeArgs([$object]))->is(1);
+        that((new \ReflectionMethod($object, 'count'))->invokeArgs($object, []))->is(0);
 
-        $this->assertEquals(1, (function () use ($object) { return count($object); })());
-        $this->assertEquals(0, (function () use ($object) { return $object->count(); })());
+        that((function () use ($object) { return count($object); })())->is(1);
+        that((function () use ($object) { return $object->count(); })())->is(0);
 
-        $this->assertException('backtrace', by_builtin, '', '');
+        that([by_builtin, '', ''])->throws('backtrace');
     }
 
     function test_namedcallize()
@@ -361,123 +368,123 @@ class FunchandTest extends AbstractTestCase
         $f2 = function ($x, ...$args) { return get_defined_vars(); };
 
         // 単純呼び出し
-        $this->assertEquals([
+        that((namedcallize)($f1)(['x' => 0]))->is([
             'x' => 0,
             'a' => 1,
-        ], (namedcallize)($f1)(['x' => 0]));
-        $this->assertEquals([
+        ]);
+        that((namedcallize)($f1)(['x' => 0, 'a' => 9]))->is([
             'x' => 0,
             'a' => 9,
-        ], (namedcallize)($f1)(['x' => 0, 'a' => 9]));
+        ]);
 
         // デフォルト
-        $this->assertEquals([
+        that((namedcallize)($f1, [
+            'x' => 0,
+        ])())->is([
             'x' => 0,
             'a' => 1,
-        ], (namedcallize)($f1, [
-            'x' => 0,
-        ])());
-        $this->assertEquals([
-            'x' => 9,
-            'a' => 8,
-        ], (namedcallize)($f1, [
+        ]);
+        that((namedcallize)($f1, [
             'x' => 0,
             'a' => 8,
-        ])(['x' => 9, 'a' => 8]));
-        $this->assertEquals([
+        ])(['x' => 9, 'a' => 8]))->is([
             'x' => 9,
             'a' => 8,
-        ], (namedcallize)($f1, [
+        ]);
+        that((namedcallize)($f1, [
             'x' => 0,
             1   => 8,
-        ])(['x' => 9,]));
-        $this->assertEquals([
+        ])(['x' => 9,]))->is([
             'x' => 9,
             'a' => 8,
-        ], (namedcallize)($f1, [
+        ]);
+        that((namedcallize)($f1, [
             'x' => 0,
-        ])(['x' => 9, 1 => 8]));
+        ])(['x' => 9, 1 => 8]))->is([
+            'x' => 9,
+            'a' => 8,
+        ]);
 
         // 可変引数
-        $this->assertEquals([
+        that((namedcallize)($f2)(['x' => 0, 'args' => [1, 2]]))->is([
             'x'    => 0,
             'args' => [1, 2],
-        ], (namedcallize)($f2)(['x' => 0, 'args' => [1, 2]]));
-        $this->assertEquals([
+        ]);
+        that((namedcallize)($f2)(['x' => 0, 1 => [1, 2]]))->is([
             'x'    => 0,
             'args' => [1, 2],
-        ], (namedcallize)($f2)(['x' => 0, 1 => [1, 2]]));
+        ]);
 
         // 例外系
         $fx = (namedcallize)($f1);
-        $this->assertException('required arguments', $fx, []);
-        $this->assertException('undefined arguments', $fx, ['x' => null, 'unknown' => null]);
+        that([$fx, []])->throws('required arguments');
+        that([$fx, ['x' => null, 'unknown' => null]])->throws('undefined arguments');
     }
 
     function test_parameter_length()
     {
         // タイプ 0: クロージャ
-        $this->assertEquals(2, (parameter_length)(function ($a, $b = null) { }));
-        $this->assertEquals(1, (parameter_length)(function ($a, $b = null) { }, true));
+        that((parameter_length)(function ($a, $b = null) { }))->is(2);
+        that((parameter_length)(function ($a, $b = null) { }, true))->is(1);
         // クロージャの呼び出し名が特殊なので変なキャッシュされていないか担保するために異なる引数でもう一回テスト
-        $this->assertEquals(3, (parameter_length)(function ($a, $b, $c = null) { }));
-        $this->assertEquals(2, (parameter_length)(function ($a, $b, $c = null) { }, true));
+        that((parameter_length)(function ($a, $b, $c = null) { }))->is(3);
+        that((parameter_length)(function ($a, $b, $c = null) { }, true))->is(2);
 
         // タイプ 1: 単純なコールバック
-        $this->assertEquals(2, (parameter_length)('trim'));
-        $this->assertEquals(1, (parameter_length)('trim', true));
+        that((parameter_length)('trim'))->is(2);
+        that((parameter_length)('trim', true))->is(1);
 
         // タイプ 2: 静的クラスメソッドのコール
-        $this->assertEquals(1, (parameter_length)(['Concrete', 'staticMethod']));
-        $this->assertEquals(0, (parameter_length)(['Concrete', 'staticMethod'], true));
+        that((parameter_length)(['Concrete', 'staticMethod']))->is(1);
+        that((parameter_length)(['Concrete', 'staticMethod'], true))->is(0);
 
         // タイプ 3: オブジェクトメソッドのコール
-        $this->assertEquals(1, (parameter_length)([new \Concrete(''), 'instanceMethod']));
-        $this->assertEquals(0, (parameter_length)([new \Concrete(''), 'instanceMethod'], true));
+        that((parameter_length)([new \Concrete(''), 'instanceMethod']))->is(1);
+        that((parameter_length)([new \Concrete(''), 'instanceMethod'], true))->is(0);
 
         // タイプ 4: 静的クラスメソッドのコール (PHP 5.2.3 以降)
-        $this->assertEquals(1, (parameter_length)('Concrete::staticMethod'));
-        $this->assertEquals(0, (parameter_length)('Concrete::staticMethod', true));
+        that((parameter_length)('Concrete::staticMethod'))->is(1);
+        that((parameter_length)('Concrete::staticMethod', true))->is(0);
 
         // タイプ 5: 相対指定による静的クラスメソッドのコール (PHP 5.3.0 以降)
-        $this->assertEquals(1, (parameter_length)(['Concrete', 'parent::staticMethod']));
-        $this->assertEquals(0, (parameter_length)(['Concrete', 'parent::staticMethod'], true));
+        that((parameter_length)(['Concrete', 'parent::staticMethod']))->is(1);
+        that((parameter_length)(['Concrete', 'parent::staticMethod'], true))->is(0);
 
         // タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
-        $this->assertEquals(1, (parameter_length)(new \Concrete('')));
-        $this->assertEquals(0, (parameter_length)(new \Concrete(''), true));
+        that((parameter_length)(new \Concrete('')))->is(1);
+        that((parameter_length)(new \Concrete(''), true))->is(0);
 
         // 可変引数
-        $this->assertEquals(INF, (parameter_length)(function (...$x) { }, false, true));
+        that((parameter_length)(function (...$x) { }, false, true))->is(INF);
     }
 
     function test_function_shorten()
     {
         require_once __DIR__ . '/Funchand/function_shorten.php';
-        $this->assertEquals('hoge', (function_shorten)('FS\\hoge'));
-        $this->assertEquals('strlen', (function_shorten)('strlen'));
+        that((function_shorten)('FS\\hoge'))->is('hoge');
+        that((function_shorten)('strlen'))->is('strlen');
     }
 
     function test_func_user_func_array()
     {
         // null
         $null = (func_user_func_array)(null);
-        $this->assertEquals('abc', $null('abc'));
+        that($null('abc'))->is('abc');
 
         // 標準関数
         $strlen = (func_user_func_array)('strlen');
-        $this->assertEquals(3, $strlen('abc', null, 'dummy'));
+        that($strlen('abc', null, 'dummy'))->is(3);
 
         // 可変引数
         $variadic = function (...$v) { return $v; };
         $vcall = (func_user_func_array)($variadic);
-        $this->assertEquals(['abc', null, 'dummy'], $vcall('abc', null, 'dummy'));
+        that($vcall('abc', null, 'dummy'))->is(['abc', null, 'dummy']);
 
         // 自前関数兼デフォルト引数
         $pascal_case = (func_user_func_array)(pascal_case);
-        $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen'));
+        that($pascal_case('this_is_a_pen'))->is('ThisIsAPen');
         // 第2引数を与えても意味を為さない
-        $this->assertEquals('ThisIsAPen', $pascal_case('this_is_a_pen', '-'));
+        that($pascal_case('this_is_a_pen', '-'))->is('ThisIsAPen');
     }
 
     function test_func_new()
@@ -485,9 +492,9 @@ class FunchandTest extends AbstractTestCase
         $newException = (func_new)(\Exception::class, 'hoge');
         /** @var \Exception $ex */
         $ex = $newException();
-        $this->assertEquals('hoge', $ex->getMessage());
+        that($ex->getMessage())->is('hoge');
         $ex = $newException('fuga');
-        $this->assertEquals('fuga', $ex->getMessage());
+        that($ex->getMessage())->is('fuga');
     }
 
     function test_func_method()
@@ -500,15 +507,15 @@ class FunchandTest extends AbstractTestCase
         };
 
         $hoge = (func_method)('hoge');
-        $this->assertEquals('x,y,z', $hoge($object, 'x', 'y', 'z'));
+        that($hoge($object, 'x', 'y', 'z'))->is('x,y,z');
 
         $hoge = (func_method)('hoge', 'X', 'Y', 'Z');
-        $this->assertEquals('X,Y,Z', $hoge($object));
-        $this->assertEquals('x,Y,Z', $hoge($object, 'x'));
-        $this->assertEquals('x,y,z', $hoge($object, 'x', 'y', 'z'));
+        that($hoge($object))->is('X,Y,Z');
+        that($hoge($object, 'x'))->is('x,Y,Z');
+        that($hoge($object, 'x', 'y', 'z'))->is('x,y,z');
 
         $fuga = (func_method)('fuga');
-        $this->assertEquals('x,y,z', $fuga(get_class($object), 'x', 'y', 'z'));
+        that($fuga(get_class($object), 'x', 'y', 'z'))->is('x,y,z');
 
         // __construct モード
         $exnames = [
@@ -518,9 +525,9 @@ class FunchandTest extends AbstractTestCase
         ];
         /** @var \Exception[] $exs */
         $exs = array_map((func_method)('__construct', 'hoge'), $exnames);
-        $this->assertEquals('hoge', $exs[0]->getMessage());
-        $this->assertEquals('hoge', $exs[1]->getMessage());
-        $this->assertEquals('hoge', $exs[2]->getMessage());
+        that($exs[0]->getMessage())->is('hoge');
+        that($exs[1]->getMessage())->is('hoge');
+        that($exs[2]->getMessage())->is('hoge');
 
         // array_maps とか array_map_method とかの模倣
         $exs = [
@@ -528,7 +535,7 @@ class FunchandTest extends AbstractTestCase
             new \Exception('fuga'),
             new \Exception('piyo'),
         ];
-        $this->assertEquals(['hoge', 'fuga', 'piyo'], array_map((func_method)('getMessage'), $exs));
+        that(array_map((func_method)('getMessage'), $exs))->is(['hoge', 'fuga', 'piyo']);
     }
 
     function test_function_alias()
@@ -538,129 +545,129 @@ class FunchandTest extends AbstractTestCase
         {
             // シンプル：組み込み関数
             (function_alias)('strtoupper', 'strtoupper2');
-            $this->assertEquals('AAA', strtoupper2('aaa'));
+            that(strtoupper2('aaa'))->is('AAA');
             // シンプル：ユーザー定義関数（グローバル）
             (function_alias)('_strtoupper', 'strtoupper3');
-            $this->assertEquals('AAA', strtoupper3('aaa'));
+            that(strtoupper3('aaa'))->is('AAA');
             // シンプル：ユーザー定義関数（名前空間）
             (function_alias)('FA\\_strtoupper', 'strtoupper4');
-            $this->assertEquals('AAA', strtoupper4('aaa'));
+            that(strtoupper4('aaa'))->is('AAA');
 
             // 参照渡し：組み込み関数
             (function_alias)('sort', 'sort2');
             $array = [3, 2, 11];
-            $this->assertTrue(sort2($array));
-            $this->assertEquals([2, 3, 11], $array);
-            $this->assertTrue(sort2($array, SORT_STRING));
-            $this->assertEquals([11, 2, 3], $array);
+            that(sort2($array))->isTrue();
+            that($array)->is([2, 3, 11]);
+            that(sort2($array, SORT_STRING))->isTrue();
+            that($array)->is([11, 2, 3]);
             // 参照渡し：ユーザー定義関数（グローバル）
             (function_alias)('_sort', 'sort3');
             $array = [3, 2, 11];
-            $this->assertTrue(sort3($array));
-            $this->assertEquals([2, 3, 11], $array);
-            $this->assertTrue(sort3($array, SORT_STRING));
-            $this->assertEquals([11, 2, 3], $array);
+            that(sort3($array))->isTrue();
+            that($array)->is([2, 3, 11]);
+            that(sort3($array, SORT_STRING))->isTrue();
+            that($array)->is([11, 2, 3]);
             // 参照渡し：ユーザー定義関数（名前空間）
             (function_alias)('FA\\_sort', 'sort4');
             $array = [3, 2, 11];
-            $this->assertTrue(sort4($array));
-            $this->assertEquals([2, 3, 11], $array);
-            $this->assertTrue(sort4($array, SORT_STRING));
-            $this->assertEquals([11, 2, 3], $array);
+            that(sort4($array))->isTrue();
+            that($array)->is([2, 3, 11]);
+            that(sort4($array, SORT_STRING))->isTrue();
+            that($array)->is([11, 2, 3]);
 
             // リファレンス返し
             (function_alias)('_ref', '_ref3');
             $vals = &_ref3();
             $vals[] = 'add';
-            $this->assertEquals(['add'], _ref3());
+            that(_ref3())->is(['add']);
 
             // デフォルト引数：組み込み関数
             (function_alias)('trim', 'trim2');
-            $this->assertEquals('aXa', trim2(' aXa '));
-            $this->assertEquals('X', trim2('aXa', 'a'));
+            that(trim2(' aXa '))->is('aXa');
+            that(trim2('aXa', 'a'))->is('X');
             // デフォルト引数：ユーザー定義関数（グローバル）
             (function_alias)('_trim', 'trim3');
-            $this->assertEquals('aXa', trim3(' aXa '));
-            $this->assertEquals('X', trim3('aXa', 'a'));
+            that(trim3(' aXa '))->is('aXa');
+            that(trim3('aXa', 'a'))->is('X');
             // デフォルト引数：ユーザー定義関数（名前空間）
             (function_alias)('FA\\_trim', 'trim4');
-            $this->assertEquals('aXa', trim4(' aXa '));
-            $this->assertEquals('X', trim4('aXa', 'a'));
+            that(trim4(' aXa '))->is('aXa');
+            that(trim4('aXa', 'a'))->is('X');
 
             // 静的メソッド
             (function_alias)('\Concrete::staticMethod', 'staticMethod2');
-            $this->assertEquals('Concrete::staticMethod', staticMethod2());
+            that(staticMethod2())->is('Concrete::staticMethod');
 
             // 名前空間への吐き出し：ユーザー定義関数（グローバル）
             (function_alias)('_trim', 'O\\trim3');
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedFunctionInspection */
-            $this->assertEquals('aXa', \O\trim3(' aXa '));
+            that(\O\trim3(' aXa '))->is('aXa');
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedFunctionInspection */
-            $this->assertEquals('X', \O\trim3('aXa', 'a'));
+            that(\O\trim3('aXa', 'a'))->is('X');
             // 名前空間への吐き出し：ユーザー定義関数（名前空間）
             (function_alias)('FA\\_trim', 'O\\trim4');
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedFunctionInspection */
-            $this->assertEquals('aXa', \O\trim4(' aXa '));
+            that(\O\trim4(' aXa '))->is('aXa');
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedFunctionInspection */
-            $this->assertEquals('X', \O\trim4('aXa', 'a'));
+            that(\O\trim4('aXa', 'a'))->is('X');
         }
 
         // 例外
-        $this->assertException('must not be object', function_alias, function () { }, 'xx');
-        $this->assertException('does not exist', function_alias, 'x', 'xx');
-        $this->assertException('non-static method', function_alias, [new \Concrete('u'), 'getName'], 'xx');
-        $this->assertException('already declared', function_alias, 'implode', 'implode');
+        that([function_alias, function () { }, 'xx'])->throws('must not be object');
+        that([function_alias, 'x', 'xx'])->throws('does not exist');
+        that([function_alias, [new \Concrete('u'), 'getName'], 'xx'])->throws('non-static method');
+        that([function_alias, 'implode', 'implode'])->throws('already declared');
     }
 
     function test_function_parameter()
     {
         // reflection
         $params = (function_parameter)((reflect_callable)(function ($a, &$b, $c = 123, &$d = 456, ...$x) { }));
-        $this->assertSame([
+        that($params)->isSame([
             '$a'  => '$a',
             '&$b' => '&$b',
             '$c'  => '$c = 123',
             '&$d' => '&$d = 456',
             '$x'  => '...$x',
-        ], $params);
+        ]);
 
         // callable
         $params = (function_parameter)(function ($a, &$b, $c = 123, &$d = 456, ...$x) { });
-        $this->assertSame([
+        that($params)->isSame([
             '$a'  => '$a',
             '&$b' => '&$b',
             '$c'  => '$c = 123',
             '&$d' => '&$d = 456',
             '$x'  => '...$x',
-        ], $params);
+        ]);
 
         // type hint
         $params = (function_parameter)(function (string $a, int $b, ?FunchandTest $c) { });
-        $this->assertSame([
+        that($params)->isSame([
             '$a' => 'string $a',
             '$b' => 'int $b',
             '$c' => '?\\' . __CLASS__ . ' $c',
-        ], $params);
+        ]);
 
         // ns\const
         $params = (function_parameter)(function ($a = PHP_SAPI) { });
-        $this->assertSame([
+        that($params)->isSame([
             '$a' => '$a = "cli"'
-        ], $params);
+        ]);
         $params = (function_parameter)(function ($a = \PHP_SAPI) { });
-        $this->assertSame([
+        that($params)->isSame([
             '$a' => '$a = PHP_SAPI'
-        ], $params);
+        ]);
 
         // internal
         $params = (function_parameter)('trim');
-        $this->assertSame([
+        that($params)->isSame([
             '$str'            => '$str',
             '$character_mask' => '$character_mask = null'
-        ], $params);
+        ]);
     }
 }

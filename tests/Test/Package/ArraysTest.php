@@ -6,181 +6,181 @@ class ArraysTest extends AbstractTestCase
 {
     function test_arrays()
     {
-        $this->assertEquals([['a', 'A'], ['b', 'B'], ['c', 'C']], iterator_to_array((arrays)(['a' => 'A', 'b' => 'B', 'c' => 'C'])));
+        that(iterator_to_array((arrays)(['a' => 'A', 'b' => 'B', 'c' => 'C'])))->is([['a', 'A'], ['b', 'B'], ['c', 'C']]);
     }
 
     function test_arrayize()
     {
-        $this->assertEquals([1, 2, 3], (arrayize)(1, 2, 3));
-        $this->assertEquals([1, 2, 3], (arrayize)([1], 2, 3));
+        that((arrayize)(1, 2, 3))->is([1, 2, 3]);
+        that((arrayize)([1], 2, 3))->is([1, 2, 3]);
     }
 
     function test_is_indexarray()
     {
-        $this->assertTrue((is_indexarray)([]));
-        $this->assertTrue((is_indexarray)([1]));
-        $this->assertTrue((is_indexarray)([0 => 1]));
-        $this->assertTrue((is_indexarray)([1 => 1]));
-        $this->assertTrue((is_indexarray)(['1' => 1]));
-        $this->assertFalse((is_indexarray)(['key' => 1]));
+        that((is_indexarray)([]))->isTrue();
+        that((is_indexarray)([1]))->isTrue();
+        that((is_indexarray)([0 => 1]))->isTrue();
+        that((is_indexarray)([1 => 1]))->isTrue();
+        that((is_indexarray)(['1' => 1]))->isTrue();
+        that((is_indexarray)(['key' => 1]))->isFalse();
     }
 
     function test_is_hasharray()
     {
-        $this->assertFalse((is_hasharray)([]));
-        $this->assertFalse((is_hasharray)([1]));
-        $this->assertFalse((is_hasharray)([0 => 1]));
-        $this->assertTrue((is_hasharray)([1 => 1]));
+        that((is_hasharray)([]))->isFalse();
+        that((is_hasharray)([1]))->isFalse();
+        that((is_hasharray)([0 => 1]))->isFalse();
+        that((is_hasharray)([1 => 1]))->isTrue();
     }
 
     function test_first_key()
     {
-        $this->assertEquals(0, (first_key)(['a', 'b', 'c']));
-        $this->assertEquals(0, (first_key)(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', (first_key)([], 'def'));
-        $this->assertEquals(null, (first_key)([]));
+        that((first_key)(['a', 'b', 'c']))->is(0);
+        that((first_key)(['a', 'b', 'c'], 'def'))->is(0);
+        that((first_key)([], 'def'))->is('def');
+        that((first_key)([]))->is(null);
     }
 
     function test_first_value()
     {
-        $this->assertEquals('a', (first_value)(['a', 'b', 'c']));
-        $this->assertEquals('a', (first_value)(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', (first_value)([], 'def'));
-        $this->assertEquals(null, (first_value)([]));
+        that((first_value)(['a', 'b', 'c']))->is('a');
+        that((first_value)(['a', 'b', 'c'], 'def'))->is('a');
+        that((first_value)([], 'def'))->is('def');
+        that((first_value)([]))->is(null);
     }
 
     function test_first_keyvalue()
     {
-        $this->assertEquals([0, 'a'], (first_keyvalue)(['a', 'b', 'c']));
-        $this->assertEquals([0, 'a'], (first_keyvalue)(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', (first_keyvalue)([], 'def'));
-        $this->assertEquals(null, (first_keyvalue)([]));
+        that((first_keyvalue)(['a', 'b', 'c']))->is([0, 'a']);
+        that((first_keyvalue)(['a', 'b', 'c'], 'def'))->is([0, 'a']);
+        that((first_keyvalue)([], 'def'))->is('def');
+        that((first_keyvalue)([]))->is(null);
 
-        $this->assertEquals([0, 1], (first_keyvalue)(new \ArrayObject([1, 2, 3])));
-        $this->assertEquals(null, (first_keyvalue)(new \ArrayObject([])));
+        that((first_keyvalue)(new \ArrayObject([1, 2, 3])))->is([0, 1]);
+        that((first_keyvalue)(new \ArrayObject([])))->is(null);
     }
 
     function test_last_key()
     {
-        $this->assertEquals(2, (last_key)(['a', 'b', 'c']));
-        $this->assertEquals(2, (last_key)(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', (last_key)([], 'def'));
-        $this->assertEquals(null, (last_key)([]));
+        that((last_key)(['a', 'b', 'c']))->is(2);
+        that((last_key)(['a', 'b', 'c'], 'def'))->is(2);
+        that((last_key)([], 'def'))->is('def');
+        that((last_key)([]))->is(null);
     }
 
     function test_last_value()
     {
-        $this->assertEquals('c', (last_value)(['a', 'b', 'c']));
-        $this->assertEquals('c', (last_value)(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', (last_value)([], 'def'));
-        $this->assertEquals(null, (last_value)([]));
+        that((last_value)(['a', 'b', 'c']))->is('c');
+        that((last_value)(['a', 'b', 'c'], 'def'))->is('c');
+        that((last_value)([], 'def'))->is('def');
+        that((last_value)([]))->is(null);
     }
 
     function test_last_keyvalue()
     {
-        $this->assertEquals([2, 'c'], (last_keyvalue)(['a', 'b', 'c']));
-        $this->assertEquals([2, 'c'], (last_keyvalue)(['a', 'b', 'c'], 'def'));
-        $this->assertEquals('def', (last_keyvalue)([], 'def'));
-        $this->assertEquals(null, (last_keyvalue)([]));
+        that((last_keyvalue)(['a', 'b', 'c']))->is([2, 'c']);
+        that((last_keyvalue)(['a', 'b', 'c'], 'def'))->is([2, 'c']);
+        that((last_keyvalue)([], 'def'))->is('def');
+        that((last_keyvalue)([]))->is(null);
 
-        $this->assertEquals([2, 3], (last_keyvalue)(new \ArrayObject([1, 2, 3])));
-        $this->assertEquals(null, (last_keyvalue)(new \ArrayObject([])));
-        $this->assertEquals(null, (last_keyvalue)(new \stdClass()));
+        that((last_keyvalue)(new \ArrayObject([1, 2, 3])))->is([2, 3]);
+        that((last_keyvalue)(new \ArrayObject([])))->is(null);
+        that((last_keyvalue)(new \stdClass()))->is(null);
     }
 
     function test_prev_key()
     {
         // 数値キーのみ
         $array = ['a', 'b', 'c'];
-        $this->assertSame(0, (prev_key)($array, 1));
-        $this->assertSame(null, (prev_key)($array, 0));
-        $this->assertSame(false, (prev_key)($array, 'xxx'));
+        that((prev_key)($array, 1))->isSame(0);
+        that((prev_key)($array, 0))->isSame(null);
+        that((prev_key)($array, 'xxx'))->isSame(false);
         // 文字キーのみ
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame('a', (prev_key)($array, 'b'));
-        $this->assertSame(null, (prev_key)($array, 'a'));
-        $this->assertSame(false, (prev_key)($array, 'xxx'));
+        that((prev_key)($array, 'b'))->isSame('a');
+        that((prev_key)($array, 'a'))->isSame(null);
+        that((prev_key)($array, 'xxx'))->isSame(false);
         // 混在キー
         $array = ['a', 'b' => 'B', 'c'];
-        $this->assertSame(0, (prev_key)($array, 'b'));
-        $this->assertSame(null, (prev_key)($array, 0));
-        $this->assertSame(false, (prev_key)($array, 'xxx'));
+        that((prev_key)($array, 'b'))->isSame(0);
+        that((prev_key)($array, 0))->isSame(null);
+        that((prev_key)($array, 'xxx'))->isSame(false);
         // 負数キー
         $array = [-4 => 'a', -3 => 'b', -2 => 'c'];
-        $this->assertSame(-4, (prev_key)($array, -3));
-        $this->assertSame(null, (prev_key)($array, -4));
-        $this->assertSame(false, (prev_key)($array, 'xxx'));
+        that((prev_key)($array, -3))->isSame(-4);
+        that((prev_key)($array, -4))->isSame(null);
+        that((prev_key)($array, 'xxx'))->isSame(false);
         // めっちゃバラバラキー
         $array = [-4 => 1, 3 => 2, 1 => 3, 2 => 4, -3 => 5, 'x' => 6];
-        $this->assertSame(1, (prev_key)($array, 2));
-        $this->assertSame(null, (prev_key)($array, -4));
-        $this->assertSame(false, (prev_key)($array, 'xxx'));
+        that((prev_key)($array, 2))->isSame(1);
+        that((prev_key)($array, -4))->isSame(null);
+        that((prev_key)($array, 'xxx'))->isSame(false);
     }
 
     function test_next_key()
     {
         // 数値キーのみ
         $array = ['a', 'b', 'c'];
-        $this->assertSame(3, (next_key)($array));
-        $this->assertSame(2, (next_key)($array, 1));
-        $this->assertSame(null, (next_key)($array, 2));
-        $this->assertSame(false, (next_key)($array, 'xxx'));
+        that((next_key)($array))->isSame(3);
+        that((next_key)($array, 1))->isSame(2);
+        that((next_key)($array, 2))->isSame(null);
+        that((next_key)($array, 'xxx'))->isSame(false);
         // 文字キーのみ
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame(0, (next_key)($array));
-        $this->assertSame('b', (next_key)($array, 'a'));
-        $this->assertSame(null, (next_key)($array, 'c'));
-        $this->assertSame(false, (next_key)($array, 'xxx'));
+        that((next_key)($array))->isSame(0);
+        that((next_key)($array, 'a'))->isSame('b');
+        that((next_key)($array, 'c'))->isSame(null);
+        that((next_key)($array, 'xxx'))->isSame(false);
         // 混在キー
         $array = ['a', 'b' => 'B', 'c'];
-        $this->assertSame(2, (next_key)($array));
-        $this->assertSame(1, (next_key)($array, 'b'));
-        $this->assertSame(null, (next_key)($array, 1));
-        $this->assertSame(false, (next_key)($array, 'xxx'));
+        that((next_key)($array))->isSame(2);
+        that((next_key)($array, 'b'))->isSame(1);
+        that((next_key)($array, 1))->isSame(null);
+        that((next_key)($array, 'xxx'))->isSame(false);
         // 負数キー
         $array = [-4 => 'a', -3 => 'b', -2 => 'c'];
-        $this->assertSame(0, (next_key)($array));
-        $this->assertSame(-2, (next_key)($array, -3));
-        $this->assertSame(null, (next_key)($array, -2));
-        $this->assertSame(false, (next_key)($array, 'xxx'));
+        that((next_key)($array))->isSame(0);
+        that((next_key)($array, -3))->isSame(-2);
+        that((next_key)($array, -2))->isSame(null);
+        that((next_key)($array, 'xxx'))->isSame(false);
         // めっちゃバラバラキー
         $array = [-4 => 1, 3 => 2, 1 => 3, 2 => 4, -3 => 5, 'x' => 6];
-        $this->assertSame(4, (next_key)($array));
-        $this->assertSame(-3, (next_key)($array, 2));
-        $this->assertSame(null, (next_key)($array, 'x'));
-        $this->assertSame(false, (next_key)($array, 'xxx'));
+        that((next_key)($array))->isSame(4);
+        that((next_key)($array, 2))->isSame(-3);
+        that((next_key)($array, 'x'))->isSame(null);
+        that((next_key)($array, 'xxx'))->isSame(false);
     }
 
     function test_in_array_and()
     {
-        $this->assertFalse((in_array_and)([], []));
-        $this->assertFalse((in_array_and)(['a'], []));
+        that((in_array_and)([], []))->isFalse();
+        that((in_array_and)(['a'], []))->isFalse();
 
-        $this->assertTrue((in_array_and)(['a'], ['a', 'b', 'c']));
-        $this->assertTrue((in_array_and)(['a', 'b'], ['a', 'b', 'c']));
-        $this->assertTrue((in_array_and)(['a', 'b', 'c'], ['a', 'b', 'c']));
-        $this->assertFalse((in_array_and)(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
-        $this->assertFalse((in_array_and)(['z'], ['a', 'b', 'c']));
+        that((in_array_and)(['a'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_and)(['a', 'b'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_and)(['a', 'b', 'c'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_and)(['a', 'b', 'c', 'z'], ['a', 'b', 'c']))->isFalse();
+        that((in_array_and)(['z'], ['a', 'b', 'c']))->isFalse();
 
-        $this->assertTrue((in_array_and)(['1', 2], [1, 2, 3], false));
-        $this->assertFalse((in_array_and)(['1', 2], [1, 2, 3], true));
-        $this->assertFalse((in_array_and)(['1', '2'], [1, 2, 3], true));
+        that((in_array_and)(['1', 2], [1, 2, 3], false))->isTrue();
+        that((in_array_and)(['1', 2], [1, 2, 3], true))->isFalse();
+        that((in_array_and)(['1', '2'], [1, 2, 3], true))->isFalse();
     }
 
     function test_in_array_or()
     {
-        $this->assertFalse((in_array_or)([], []));
-        $this->assertFalse((in_array_or)(['a'], []));
+        that((in_array_or)([], []))->isFalse();
+        that((in_array_or)(['a'], []))->isFalse();
 
-        $this->assertTrue((in_array_or)(['a'], ['a', 'b', 'c']));
-        $this->assertTrue((in_array_or)(['a', 'b'], ['a', 'b', 'c']));
-        $this->assertTrue((in_array_or)(['a', 'b', 'c'], ['a', 'b', 'c']));
-        $this->assertTrue((in_array_or)(['a', 'b', 'c', 'z'], ['a', 'b', 'c']));
-        $this->assertFalse((in_array_or)(['z'], ['a', 'b', 'c']));
+        that((in_array_or)(['a'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_or)(['a', 'b'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_or)(['a', 'b', 'c'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_or)(['a', 'b', 'c', 'z'], ['a', 'b', 'c']))->isTrue();
+        that((in_array_or)(['z'], ['a', 'b', 'c']))->isFalse();
 
-        $this->assertTrue((in_array_or)(['1', 2], [1, 2, 3], false));
-        $this->assertTrue((in_array_or)(['1', 2], [1, 2, 3], true));
-        $this->assertFalse((in_array_or)(['1', '2'], [1, 2, 3], true));
+        that((in_array_or)(['1', 2], [1, 2, 3], false))->isTrue();
+        that((in_array_or)(['1', 2], [1, 2, 3], true))->isTrue();
+        that((in_array_or)(['1', '2'], [1, 2, 3], true))->isFalse();
     }
 
     function test_kvsort()
@@ -190,125 +190,124 @@ class ArraysTest extends AbstractTestCase
         // asort は安定ソートではない
         $native = $array;
         asort($native);
-        $this->assertNotSame($array, $native);
+        that((kvsort)($array))->isNotSame($native);
 
         // kvsort は安定ソートである
-        $this->assertSame($array, (kvsort)($array));
+        that((kvsort)($array))->isSame($array);
 
         // キーでソートできる
-        $this->assertSame(array_reverse(array_keys($array)), array_keys((kvsort)($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })));
+        that(array_keys((kvsort)($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })))->isSame(array_reverse(array_keys($array)));
 
         // 配列じゃなくても Traversable ならソート可能
-        $this->assertSame([1 => 1, 0 => 2, 2 => 3], (kvsort)((function () {
+        that((kvsort)((function () {
             yield 2;
             yield 1;
             yield 3;
-        })()));
+        })()))->isSame([1 => 1, 0 => 2, 2 => 3]);
 
         // 上記は挙動のテストであってソートのテストを行っていないのでテスト
         $array = array_combine(range('a', 'z'), range('a', 'z'));
-        $this->assertSame($array, (kvsort)((array_shuffle)($array), function ($a, $b) { return strcmp($a, $b); }));
+        that((kvsort)((array_shuffle)($array), function ($a, $b) { return strcmp($a, $b); }))->isSame($array);
     }
 
     function test_array_add()
     {
-        $this->assertEquals(['a', 'b', 'c'], (array_add)(['a', 'b', 'c'], ['d']));
-        $this->assertEquals(['a', 'b', 'c', 'd'], (array_add)(['a', 'b', 'c'], [3 => 'd']));
-        $this->assertEquals(['a', 'b', 'c', 'd', 'e'], (array_add)(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']));
+        that((array_add)(['a', 'b', 'c'], ['d']))->is(['a', 'b', 'c']);
+        that((array_add)(['a', 'b', 'c'], [3 => 'd']))->is(['a', 'b', 'c', 'd']);
+        that((array_add)(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']))->is(['a', 'b', 'c', 'd', 'e']);
     }
 
     function test_array_mix()
     {
-        $this->assertEquals([], (array_mix)());
-        $this->assertEquals([], (array_mix)([], []));
-        $this->assertEquals([null], (array_mix)([], [], [null]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6], (array_mix)([1, 3, 5], [2, 4, 6]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], (array_mix)([1, 3, 5], [2, 4, 6, 7]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6, 7], (array_mix)([1, 3, 5, 7], [2, 4, 6]));
-        $this->assertEquals([1, 2, 3, 4, 5, 6], (array_mix)([1], [2, 4], [3, 5, 6]));
-        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], (array_mix)(['a' => 'A', 'c' => 'C'], ['b' => 'b']));
-        $this->assertEquals(['a' => 'A', 'b' => 'b', 'c' => 'C'], (array_mix)(['a' => 'A'], ['b' => 'b', 'c' => 'C']));
-        $this->assertEquals(['a' => '!', 'X', 'Y', 'Z'], (array_mix)(['a' => 'A', 'X', 'Z'], ['a' => '!', 'Y']));
+        that((array_mix)())->is([]);
+        that((array_mix)([], []))->is([]);
+        that((array_mix)([], [], [null]))->is([null]);
+        that((array_mix)([1, 3, 5], [2, 4, 6]))->is([1, 2, 3, 4, 5, 6]);
+        that((array_mix)([1, 3, 5], [2, 4, 6, 7]))->is([1, 2, 3, 4, 5, 6, 7]);
+        that((array_mix)([1, 3, 5, 7], [2, 4, 6]))->is([1, 2, 3, 4, 5, 6, 7]);
+        that((array_mix)([1], [2, 4], [3, 5, 6]))->is([1, 2, 3, 4, 5, 6]);
+        that((array_mix)(['a' => 'A', 'c' => 'C'], ['b' => 'b']))->is(['a' => 'A', 'b' => 'b', 'c' => 'C']);
+        that((array_mix)(['a' => 'A'], ['b' => 'b', 'c' => 'C']))->is(['a' => 'A', 'b' => 'b', 'c' => 'C']);
+        that((array_mix)(['a' => 'A', 'X', 'Z'], ['a' => '!', 'Y']))->is(['a' => '!', 'X', 'Y', 'Z']);
     }
 
     function test_array_zip()
     {
-        $this->assertEquals([[1], [2], [3]], (array_zip)([1, 2, 3]));
-        $this->assertEquals([[[1]], [[2]], [[3]]], (array_zip)([[1], [2], [3]]));
-        $this->assertEquals([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']], (array_zip)([1, 2, 3], ['hoge', 'fuga', 'piyo']));
-        $this->assertEquals([
-            [
-                'a' => 1,
-                0   => 'hoge',
-                1   => 'foo',
-            ],
-            [
-                0   => 2,
-                'b' => 'fuga',
-                1   => 'bar',
-            ],
-            [
-                0   => 3,
-                1   => 'piyo',
-                'c' => 'baz',
-            ],
-            [
-                0   => null,
-                1   => null,
-                'n' => 'null',
-            ],
-        ],
-            (array_zip)(
-                ['a' => 1, 2, 3],
-                ['hoge', 'b' => 'fuga', 'piyo'],
-                ['foo', 'bar', 'c' => 'baz', 'n' => 'null']
-            )
+        that((array_zip)([1, 2, 3]))->is([[1], [2], [3]]);
+        that((array_zip)([[1], [2], [3]]))->is([[[1]], [[2]], [[3]]]);
+        that((array_zip)([1, 2, 3], ['hoge', 'fuga', 'piyo']))->is([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+        that((array_zip)(
+            ['a' => 1, 2, 3],
+            ['hoge', 'b' => 'fuga', 'piyo'],
+            ['foo', 'bar', 'c' => 'baz', 'n' => 'null']
+        ))->is([
+                [
+                    'a' => 1,
+                    0   => 'hoge',
+                    1   => 'foo',
+                ],
+                [
+                    0   => 2,
+                    'b' => 'fuga',
+                    1   => 'bar',
+                ],
+                [
+                    0   => 3,
+                    1   => 'piyo',
+                    'c' => 'baz',
+                ],
+                [
+                    0   => null,
+                    1   => null,
+                    'n' => 'null',
+                ],
+            ]
         );
 
-        $this->assertException('$arrays is empty', array_zip);
+        that([array_zip])->throws('$arrays is empty');
     }
 
     function test_array_cross()
     {
-        $this->assertSame([], (array_cross)());
-        $this->assertSame([], (array_cross)([]));
-        $this->assertSame([], (array_cross)([], []));
+        that((array_cross)())->isSame([]);
+        that((array_cross)([]))->isSame([]);
+        that((array_cross)([], []))->isSame([]);
 
-        $this->assertSame([[1], [2]], (array_cross)([1, 2]));
-        $this->assertSame([[1, 3], [1, 4], [2, 3], [2, 4]], (array_cross)([1, 2], [3, 4]));
-        $this->assertSame([[1, 3, 5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6]], (array_cross)([1, 2], [3, 4], [5, 6]));
+        that((array_cross)([1, 2]))->isSame([[1], [2]]);
+        that((array_cross)([1, 2], [3, 4]))->isSame([[1, 3], [1, 4], [2, 3], [2, 4]]);
+        that((array_cross)([1, 2], [3, 4], [5, 6]))->isSame([[1, 3, 5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6]]);
 
-        $this->assertSame([['a' => 'A'], ['b' => 'B']], (array_cross)(['a' => 'A', 'b' => 'B']));
-        $this->assertSame([['a' => 'A', 'c' => 'C'], ['a' => 'A', 'd' => 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'd' => 'D']], (array_cross)(['a' => 'A', 'b' => 'B'], ['c' => 'C', 'd' => 'D']));
+        that((array_cross)(['a' => 'A', 'b' => 'B']))->isSame([['a' => 'A'], ['b' => 'B']]);
+        that((array_cross)(['a' => 'A', 'b' => 'B'], ['c' => 'C', 'd' => 'D']))->isSame([['a' => 'A', 'c' => 'C'], ['a' => 'A', 'd' => 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'd' => 'D']]);
 
-        $this->assertSame([['A', 'c' => 'C'], ['A', 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'D']], (array_cross)(['A', 'b' => 'B'], ['c' => 'C', 'D']));
+        that((array_cross)(['A', 'b' => 'B'], ['c' => 'C', 'D']))->isSame([['A', 'c' => 'C'], ['A', 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'D']]);
 
-        $this->assertException('duplicated key', array_cross, ['a' => 'A', 'B'], ['C', 'a' => 'D']);
+        that([array_cross, ['a' => 'A', 'B'], ['C', 'a' => 'D']])->throws('duplicated key');
     }
 
     function test_array_implode()
     {
-        $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)(['a', 'b', 'c'], ','));
-        $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)(',', 'a', 'b', 'c'));
-        $this->assertEquals(['a' => 'A', ',', 'b' => 'B', ',', 'c' => 'C'], (array_implode)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ','));
-        $this->assertEquals(['a', ',', 'b', ',', 'c'], (array_implode)([1 => 'a', 0 => 'b', 2 => 'c'], ','));
+        that((array_implode)(['a', 'b', 'c'], ','))->is(['a', ',', 'b', ',', 'c']);
+        that((array_implode)(',', 'a', 'b', 'c'))->is(['a', ',', 'b', ',', 'c']);
+        that((array_implode)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ','))->is(['a' => 'A', ',', 'b' => 'B', ',', 'c' => 'C']);
+        that((array_implode)([1 => 'a', 0 => 'b', 2 => 'c'], ','))->is(['a', ',', 'b', ',', 'c']);
     }
 
     function test_array_explode()
     {
-        $this->assertEquals([[]], (array_explode)([], '|'));
-        $this->assertEquals([['a'], [2 => 'b', 3 => 'c']], (array_explode)(['a', '|', 'b', 'c'], '|'));
-        $this->assertEquals([[], [1 => 'a'], [], []], (array_explode)(['|', 'a', '|', '|'], '|'));
+        that((array_explode)([], '|'))->is([[]]);
+        that((array_explode)(['a', '|', 'b', 'c'], '|'))->is([['a'], [2 => 'b', 3 => 'c']]);
+        that((array_explode)(['|', 'a', '|', '|'], '|'))->is([[], [1 => 'a'], [], []]);
 
-        $this->assertEquals([[], [], [2 => null, 3 => null]], (array_explode)([null, null, null, null], null, 3));
+        that((array_explode)([null, null, null, null], null, 3))->is([[], [], [2 => null, 3 => null]]);
 
-        $this->assertEquals([['a', '|', 'b', '|', 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 0));
-        $this->assertEquals([['a', '|', 'b', '|', 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 1));
-        $this->assertEquals([['a'], [2 => 'b', 3 => '|', 4 => 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 2));
-        $this->assertEquals([['a'], [2 => 'b'], [4 => 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 3));
-        $this->assertEquals([['a'], [2 => 'b'], [4 => 'c']], (array_explode)(['a', '|', 'b', '|', 'c'], '|', 4));
+        that((array_explode)(['a', '|', 'b', '|', 'c'], '|', 0))->is([['a', '|', 'b', '|', 'c']]);
+        that((array_explode)(['a', '|', 'b', '|', 'c'], '|', 1))->is([['a', '|', 'b', '|', 'c']]);
+        that((array_explode)(['a', '|', 'b', '|', 'c'], '|', 2))->is([['a'], [2 => 'b', 3 => '|', 4 => 'c']]);
+        that((array_explode)(['a', '|', 'b', '|', 'c'], '|', 3))->is([['a'], [2 => 'b'], [4 => 'c']]);
+        that((array_explode)(['a', '|', 'b', '|', 'c'], '|', 4))->is([['a'], [2 => 'b'], [4 => 'c']]);
 
-        $this->assertEquals([
+        that((array_explode)(['a', null, 'b', null, 'c'], null, 1))->is([
             [
                 0 => 'a',
                 1 => null,
@@ -316,31 +315,31 @@ class ArraysTest extends AbstractTestCase
                 3 => null,
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, 1));
-        $this->assertEquals([
+        ]);
+        that((array_explode)(['a', null, 'b', null, 'c'], null, 2))->is([
             [0 => 'a'],
             [
                 2 => 'b',
                 3 => null,
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, 2));
-        $this->assertEquals([
+        ]);
+        that((array_explode)(['a', null, 'b', null, 'c'], null, 3))->is([
             [0 => 'a'],
             [2 => 'b'],
             [
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, 3));
-        $this->assertEquals([
+        ]);
+        that((array_explode)(['a', null, 'b', null, 'c'], null, 4))->is([
             [0 => 'a'],
             [2 => 'b'],
             [
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, 4));
+        ]);
 
-        $this->assertEquals([
+        that((array_explode)(['a', null, 'b', null, 'c'], null, -1))->is([
             [
                 0 => 'a',
                 1 => null,
@@ -348,8 +347,8 @@ class ArraysTest extends AbstractTestCase
                 3 => null,
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, -1));
-        $this->assertEquals([
+        ]);
+        that((array_explode)(['a', null, 'b', null, 'c'], null, -2))->is([
             [
                 0 => 'a',
                 1 => null,
@@ -358,21 +357,21 @@ class ArraysTest extends AbstractTestCase
             [
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, -2));
-        $this->assertEquals([
+        ]);
+        that((array_explode)(['a', null, 'b', null, 'c'], null, -3))->is([
             [0 => 'a'],
             [2 => 'b'],
             [
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, -3));
-        $this->assertEquals([
+        ]);
+        that((array_explode)(['a', null, 'b', null, 'c'], null, -4))->is([
             [0 => 'a'],
             [2 => 'b'],
             [
                 4 => 'c',
             ],
-        ], (array_explode)(['a', null, 'b', null, 'c'], null, -4));
+        ]);
 
         $rows = [
             1 => $r1 = ['id' => 1, 'name' => 'A'],
@@ -380,28 +379,28 @@ class ArraysTest extends AbstractTestCase
             3 => $r3 = ['id' => 3, 'name' => 'C'],
             4 => $r4 = ['id' => 4, 'name' => 'D'],
         ];
-        $this->assertEquals([[1 => $r1, 2 => $r2], [4 => $r4]], (array_explode)($rows, function ($v, $k) {
+        that((array_explode)($rows, function ($v, $k) {
             return $k === 3 && $v['name'] === 'C';
-        }));
+        }))->is([[1 => $r1, 2 => $r2], [4 => $r4]]);
     }
 
     function test_array_sprintf()
     {
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
 
-        $this->assertEquals(['A:a', 'B:b', 'C:c'], (array_sprintf)($array, '%s:%s'));
-        $this->assertEquals('A:a,B:b,C:c', (array_sprintf)($array, '%s:%s', ','));
+        that((array_sprintf)($array, '%s:%s'))->is(['A:a', 'B:b', 'C:c']);
+        that((array_sprintf)($array, '%s:%s', ','))->is('A:a,B:b,C:c');
 
-        $this->assertEquals(['v-A', 'v-B', 'v-C'], (array_sprintf)($array, function ($v) { return "v-$v"; }));
-        $this->assertEquals('v-A,v-B,v-C', (array_sprintf)($array, function ($v) { return "v-$v"; }, ','));
+        that((array_sprintf)($array, function ($v) { return "v-$v"; }))->is(['v-A', 'v-B', 'v-C']);
+        that((array_sprintf)($array, function ($v) { return "v-$v"; }, ','))->is('v-A,v-B,v-C');
 
-        $this->assertEquals(['kv-aA', 'kv-bB', 'kv-cC'], (array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }));
-        $this->assertEquals('kv-aA,kv-bB,kv-cC', (array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }, ','));
+        that((array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }))->is(['kv-aA', 'kv-bB', 'kv-cC']);
+        that((array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }, ','))->is('kv-aA,kv-bB,kv-cC');
 
-        $this->assertEquals((array_sprintf)([
+        that((array_sprintf)([
             'str:%s,int:%d' => ['sss', '3.14'],
             'single:%s'     => 'str',
-        ], null, '|'), 'str:sss,int:3|single:str');
+        ], null, '|'))->is('str:sss,int:3|single:str');
     }
 
     function test_array_strpad()
@@ -409,86 +408,86 @@ class ArraysTest extends AbstractTestCase
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
 
         // prefix key
-        $this->assertEquals(['Ka' => 'A', 'Kb' => 'B', 'Kc' => 'C'], (array_strpad)($array, 'K'));
+        that((array_strpad)($array, 'K'))->is(['Ka' => 'A', 'Kb' => 'B', 'Kc' => 'C']);
         // prefix val
-        $this->assertEquals(['a' => 'VA', 'b' => 'VB', 'c' => 'VC'], (array_strpad)($array, '', 'V'));
+        that((array_strpad)($array, '', 'V'))->is(['a' => 'VA', 'b' => 'VB', 'c' => 'VC']);
         // prefix key-val
-        $this->assertEquals(['Ka' => 'VA', 'Kb' => 'VB', 'Kc' => 'VC'], (array_strpad)($array, 'K', 'V'));
+        that((array_strpad)($array, 'K', 'V'))->is(['Ka' => 'VA', 'Kb' => 'VB', 'Kc' => 'VC']);
 
         // suffix key
-        $this->assertEquals(['aK' => 'A', 'bK' => 'B', 'cK' => 'C'], (array_strpad)($array, ['K']));
+        that((array_strpad)($array, ['K']))->is(['aK' => 'A', 'bK' => 'B', 'cK' => 'C']);
         // suffix val
-        $this->assertEquals(['a' => 'AV', 'b' => 'BV', 'c' => 'CV'], (array_strpad)($array, '', ['V']));
+        that((array_strpad)($array, '', ['V']))->is(['a' => 'AV', 'b' => 'BV', 'c' => 'CV']);
         // suffix key-val
-        $this->assertEquals(['aK' => 'AV', 'bK' => 'BV', 'cK' => 'CV'], (array_strpad)($array, ['K'], ['V']));
+        that((array_strpad)($array, ['K'], ['V']))->is(['aK' => 'AV', 'bK' => 'BV', 'cK' => 'CV']);
 
         // prefix suffix key
-        $this->assertEquals(['KaK' => 'A', 'KbK' => 'B', 'KcK' => 'C'], (array_strpad)($array, ['K', 'K']));
+        that((array_strpad)($array, ['K', 'K']))->is(['KaK' => 'A', 'KbK' => 'B', 'KcK' => 'C']);
         // prefix suffix val
-        $this->assertEquals(['a' => 'VAV', 'b' => 'VBV', 'c' => 'VCV'], (array_strpad)($array, '', ['V', 'V']));
+        that((array_strpad)($array, '', ['V', 'V']))->is(['a' => 'VAV', 'b' => 'VBV', 'c' => 'VCV']);
         // prefix suffix key-val
-        $this->assertEquals(['KaK' => 'VAV', 'KbK' => 'VBV', 'KcK' => 'VCV'], (array_strpad)($array, ['K', 'K'], ['V', 'V']));
+        that((array_strpad)($array, ['K', 'K'], ['V', 'V']))->is(['KaK' => 'VAV', 'KbK' => 'VBV', 'KcK' => 'VCV']);
         // prefix key, suffix val
-        $this->assertEquals(['Ka' => 'AV', 'Kb' => 'BV', 'Kc' => 'CV'], (array_strpad)($array, 'K', ['V']));
+        that((array_strpad)($array, 'K', ['V']))->is(['Ka' => 'AV', 'Kb' => 'BV', 'Kc' => 'CV']);
 
         // value not string
-        $this->assertEquals(['Kx' => [1, 2, 3]], (array_strpad)(['x' => [1, 2, 3]], 'K'));
+        that((array_strpad)(['x' => [1, 2, 3]], 'K'))->is(['Kx' => [1, 2, 3]]);
     }
 
     function test_array_pos()
     {
         // 1 番目の要素を返す
-        $this->assertEquals('y', (array_pos)(['x', 'y', 'z'], 1, false));
+        that((array_pos)(['x', 'y', 'z'], 1, false))->is('y');
         // 負数は後ろから返す
-        $this->assertEquals('z', (array_pos)(['x', 'y', 'z'], -1, false));
+        that((array_pos)(['x', 'y', 'z'], -1, false))->is('z');
 
         // 上記の is_key:true 版（キーを返す）
-        $this->assertEquals(1, (array_pos)(['x', 'y', 'z'], 1, true));
-        $this->assertEquals(2, (array_pos)(['x', 'y', 'z'], -1, true));
+        that((array_pos)(['x', 'y', 'z'], 1, true))->is(1);
+        that((array_pos)(['x', 'y', 'z'], -1, true))->is(2);
 
         // 範囲外は例外が飛ぶ
-        $this->assertException('OutOfBoundsException', array_pos, ['x', 'y', 'z'], 9, true);
+        that([array_pos, ['x', 'y', 'z'], 9, true])->throws('OutOfBoundsException');
     }
 
     function test_array_pos_key()
     {
-        $this->assertEquals((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'), 2);
-        $this->assertEquals((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1), -1);
-        $this->assertException('OutOfBoundsException', array_pos_key, ['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x');
+        that((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'))->is(2);
+        that((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1))->is(-1);
+        that([array_pos_key, ['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x'])->throws('OutOfBoundsException');
     }
 
     function test_array_of()
     {
         $hoge_of = (array_of)('hoge');
-        $this->assertEquals('HOGE', $hoge_of(['hoge' => 'HOGE']));
-        $this->assertEquals(null, $hoge_of(['fuga' => 'FUGA']));
+        that($hoge_of(['hoge' => 'HOGE']))->is('HOGE');
+        that($hoge_of(['fuga' => 'FUGA']))->is(null);
 
         $hoge_of = (array_of)('hoge', 'HOGE');
-        $this->assertEquals('HOGE', $hoge_of(['fuga' => 'FUGA']));
+        that($hoge_of(['fuga' => 'FUGA']))->is('HOGE');
 
-        $this->assertEquals([0 => 'a', 2 => 'c'], (array_of)([0, 2])(['a', 'b', 'c']));
-        $this->assertEquals([0 => 'a'], (array_of)([0, 9])(['a', 'b', 'c']));
-        $this->assertEquals([], (array_of)([9])(['a', 'b', 'c']));
-        $this->assertEquals(null, (array_of)([9], null)(['a', 'b', 'c']));
+        that((array_of)([0, 2])(['a', 'b', 'c']))->is([0 => 'a', 2 => 'c']);
+        that((array_of)([0, 9])(['a', 'b', 'c']))->is([0 => 'a']);
+        that((array_of)([9])(['a', 'b', 'c']))->is([]);
+        that((array_of)([9], null)(['a', 'b', 'c']))->is(null);
     }
 
     function test_array_get()
     {
-        $this->assertEquals('b', (array_get)(['a', 'b', 'c'], 1));
-        $this->assertEquals(999, (array_get)(['a', 'b', 'c'], 9, 999));
+        that((array_get)(['a', 'b', 'c'], 1))->is('b');
+        that((array_get)(['a', 'b', 'c'], 9, 999))->is(999);
 
-        $this->assertEquals([0 => 'a', 2 => 'c'], (array_get)(['a', 'b', 'c'], [0, 2]));
-        $this->assertEquals([0 => 'a'], (array_get)(['a', 'b', 'c'], [0, 9]));
-        $this->assertEquals([], (array_get)(['a', 'b', 'c'], [9]));
-        $this->assertEquals(null, (array_get)(['a', 'b', 'c'], [9], null));
+        that((array_get)(['a', 'b', 'c'], [0, 2]))->is([0 => 'a', 2 => 'c']);
+        that((array_get)(['a', 'b', 'c'], [0, 9]))->is([0 => 'a']);
+        that((array_get)(['a', 'b', 'c'], [9]))->is([]);
+        that((array_get)(['a', 'b', 'c'], [9], null))->is(null);
 
         // 配列を与えたときの順番は指定したものを優先
-        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], (array_get)(['a', 'b', 'c'], [2, 1, 0]));
+        that((array_get)(['a', 'b', 'c'], [2, 1, 0]))->is([2 => 'c', 1 => 'b', 0 => 'a']);
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a', 'b', 'c']);
-        $this->assertEquals('b', (array_get)($ao, 1));
-        $this->assertEquals([2 => 'c', 1 => 'b', 0 => 'a'], (array_get)($ao, [2, 1, 0]));
+        that((array_get)($ao, 1))->is('b');
+        that((array_get)($ao, [2, 1, 0]))->is([2 => 'c', 1 => 'b', 0 => 'a']);
 
         $array = [
             'key1' => 'value1',
@@ -502,118 +501,114 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // キーが数値でないものを抽出
-        $extract = (array_get)($array, function ($v, $k) { return !is_int($k); }, []);
-        $this->assertEquals([
+        that((array_get)($array, function ($v, $k) { return !is_int($k); }, []))->is([
             'key1' => 'value1',
             'key2' => 'value2',
-        ], $extract);
+        ]);
 
         // キーが数値のものを抽出
-        $extract = (array_get)($array, function ($v, $k) { return is_int($k); }, []);
-        $this->assertEquals([
+        that((array_get)($array, function ($v, $k) { return is_int($k); }, []))->is([
             0   => 'first',
             1   => 'second',
             2   => 'third',
             99  => 99,
             100 => 100,
             101 => 101,
-        ], $extract);
+        ]);
 
         // 単値モード
-        $extract = (array_get)($array, function ($v, $k) { return is_int($k); });
-        $this->assertEquals('first', $extract);
+        that((array_get)($array, function ($v, $k) { return is_int($k); }))->is('first');
 
         // 値がオブジェクトのものを抽出（そんなものはない）
-        $extract = (array_get)($array, function ($v, $k) { return is_object($v); });
-        $this->assertEquals(null, $extract);
+        that((array_get)($array, function ($v, $k) { return is_object($v); }))->is(null);
     }
 
     function test_array_set()
     {
         // single
         $array = ['a' => 'A', 'B'];
-        $this->assertEquals(1, (array_set)($array, 'Z'));
-        $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
-        $this->assertEquals('z', (array_set)($array, 'Z', 'z'));
-        $this->assertEquals(['a' => 'A', 'B', 'Z', 'z' => 'Z'], $array);
-        $this->assertEquals('a', (array_set)($array, 'X', 'a'));
-        $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z'], $array);
-        $this->assertEquals(null, (array_set)($array, 'Z', null, false));
-        $this->assertEquals(['a' => 'X', 'B', 'Z', 'z' => 'Z', 'Z'], $array);
+        that((array_set)($array, 'Z'))->is(1);
+        that($array)->is(['a' => 'A', 'B', 'Z']);
+        that((array_set)($array, 'Z', 'z'))->is('z');
+        that($array)->is(['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+        that((array_set)($array, 'X', 'a'))->is('a');
+        that($array)->is(['a' => 'X', 'B', 'Z', 'z' => 'Z']);
+        that((array_set)($array, 'Z', null, false))->is(null);
+        that($array)->is(['a' => 'X', 'B', 'Z', 'z' => 'Z', 'Z']);
 
         // array
         $array = ['a' => 'A', 'b' => ['B']];
-        $this->assertEquals('x', (array_set)($array, 'X', ['x']));
-        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X'], $array);
-        $this->assertEquals('z', (array_set)($array, 'X', ['y', 'z']));
-        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals('b', (array_set)($array, 'W', ['b']));
-        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals(0, (array_set)($array, 'Y2', ['y', null]));
-        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']], $array);
-        $this->assertException('is not array', function () {
+        that((array_set)($array, 'X', ['x']))->is('x');
+        that($array)->is(['a' => 'A', 'b' => ['B'], 'x' => 'X']);
+        that((array_set)($array, 'X', ['y', 'z']))->is('z');
+        that($array)->is(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']]);
+        that((array_set)($array, 'W', ['b']))->is('b');
+        that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']]);
+        that((array_set)($array, 'Y2', ['y', null]))->is(0);
+        that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']]);
+        that(function () {
             $array = ['a' => ['b' => 's']];
             (array_set)($array, 'X', ['a', 'b', 'c']);
-        });
+        })->throws('is not array');
     }
 
     function test_array_put()
     {
         // single
         $array = ['a' => 'A', 'B'];
-        $this->assertEquals(1, (array_put)($array, 'Z'));
-        $this->assertEquals(['a' => 'A', 'B', 'Z'], $array);
-        $this->assertEquals(2, (array_put)($array, 'Z', 123));
-        $this->assertEquals(['a' => 'A', 'B', 'Z', 'Z'], $array);
-        $this->assertEquals('z', (array_put)($array, 'Z', 'z'));
-        $this->assertEquals(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z'], $array);
-        $this->assertEquals('a', (array_put)($array, 'X', 'a'));
-        $this->assertEquals(['a' => 'X', 'B', 'Z', 'Z', 'z' => 'Z'], $array);
+        that((array_put)($array, 'Z'))->is(1);
+        that($array)->is(['a' => 'A', 'B', 'Z']);
+        that((array_put)($array, 'Z', 123))->is(2);
+        that($array)->is(['a' => 'A', 'B', 'Z', 'Z']);
+        that((array_put)($array, 'Z', 'z'))->is('z');
+        that($array)->is(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z']);
+        that((array_put)($array, 'X', 'a'))->is('a');
+        that($array)->is(['a' => 'X', 'B', 'Z', 'Z', 'z' => 'Z']);
 
         // array
         $array = ['a' => 'A', 'b' => ['B']];
-        $this->assertEquals('x', (array_put)($array, 'X', ['x']));
-        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X'], $array);
-        $this->assertEquals('z', (array_put)($array, 'X', ['y', 'z']));
-        $this->assertEquals(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals('b', (array_put)($array, 'W', ['b']));
-        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']], $array);
-        $this->assertEquals(0, (array_put)($array, 'Y2', ['y', null]));
-        $this->assertEquals(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']], $array);
-        $this->assertException('is not array', function () {
+        that((array_put)($array, 'X', ['x']))->is('x');
+        that($array)->is(['a' => 'A', 'b' => ['B'], 'x' => 'X']);
+        that((array_put)($array, 'X', ['y', 'z']))->is('z');
+        that($array)->is(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']]);
+        that((array_put)($array, 'W', ['b']))->is('b');
+        that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']]);
+        that((array_put)($array, 'Y2', ['y', null]))->is(0);
+        that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']]);
+        that(function () {
             $array = ['a' => ['b' => 's']];
             (array_put)($array, 'X', ['a', 'b', 'c']);
-        });
+        })->throws('is not array');
     }
 
     function test_array_unset()
     {
         // single
         $array = ['a' => 'A', 'b' => 'B'];
-        $this->assertEquals('A', (array_unset)($array, 'a'));
-        $this->assertEquals(['b' => 'B'], $array);
-        $this->assertEquals('X', (array_unset)($array, 'x', 'X'));
-        $this->assertEquals(['b' => 'B'], $array);
+        that((array_unset)($array, 'a'))->is('A');
+        that($array)->is(['b' => 'B']);
+        that((array_unset)($array, 'x', 'X'))->is('X');
+        that($array)->is(['b' => 'B']);
 
         // array
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertEquals('X', (array_unset)($array, ['x'], 'X'));
-        $this->assertEquals(['X'], (array_unset)($array, ['x'], ['X']));
-        $this->assertEquals(['A', 'B'], (array_unset)($array, ['a', 'b', 'x']));
-        $this->assertEquals(['c' => 'C'], $array);
+        that((array_unset)($array, ['x'], 'X'))->is('X');
+        that((array_unset)($array, ['x'], ['X']))->is(['X']);
+        that((array_unset)($array, ['a', 'b', 'x']))->is(['A', 'B']);
+        that($array)->is(['c' => 'C']);
 
         // array with key
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame(['B', 'A'], (array_unset)($array, ['b', 'a']));
+        that((array_unset)($array, ['b', 'a']))->isSame(['B', 'A']);
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame([1 => 'A', 0 => 'B'], (array_unset)($array, [1 => 'a', 0 => 'b']));
+        that((array_unset)($array, [1 => 'a', 0 => 'b']))->isSame([1 => 'A', 0 => 'B']);
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertSame([], (array_unset)($array, ['XXX']));
+        that((array_unset)($array, ['XXX']))->isSame([]);
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a', 'b', 'c']);
-        $this->assertEquals('b', (array_unset)($ao, 1));
-        $this->assertEquals([0 => 'c', 2 => 'a'], (array_unset)($ao, [2, 1, 0]));
+        that((array_unset)($ao, 1))->is('b');
+        that((array_unset)($ao, [2, 1, 0]))->is([0 => 'c', 2 => 'a']);
 
         $array = [
             'key1' => 'value1',
@@ -627,76 +622,71 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // まずキーが数値でないものを抽出
-        $extract = (array_unset)($array, function ($v, $k) { return !is_int($k); });
-        $this->assertEquals([
+        that((array_unset)($array, function ($v, $k) { return !is_int($k); }))->is([
             'key1' => 'value1',
             'key2' => 'value2',
-        ], $extract);
-        $this->assertEquals([
+        ]);
+        that($array)->is([
             'first',
             'second',
             'third',
             99  => 99,
             100 => 100,
             101 => 101,
-        ], $array);
+        ]);
 
         // さらに値が100以上のものを抽出
-        $extract = (array_unset)($array, function ($v, $k) { return $v >= 100; });
-        $this->assertEquals([
+        that((array_unset)($array, function ($v, $k) { return $v >= 100; }))->is([
             100 => 100,
             101 => 101,
-        ], $extract);
-        $this->assertEquals([
+        ]);
+        that($array)->is([
             'first',
             'second',
             'third',
             99 => 99,
-        ], $array);
+        ]);
 
         // さらに値が "second" のものを抽出
-        $extract = (array_unset)($array, function ($v, $k) { return $v === 'second'; });
-        $this->assertEquals([
+        that((array_unset)($array, function ($v, $k) { return $v === 'second'; }))->is([
             1 => 'second',
-        ], $extract);
-        $this->assertEquals([
+        ]);
+        that($array)->is([
             'first',
             2  => 'third',
             99 => 99,
-        ], $array);
+        ]);
 
         // さらに値がオブジェクトのものを抽出（そんなものはない）
-        $extract = (array_unset)($array, function ($v, $k) { return is_object($v); });
-        $this->assertEquals(null, $extract);
-        $this->assertEquals([
+        that((array_unset)($array, function ($v, $k) { return is_object($v); }))->is(null);
+        that($array)->is([
             'first',
             2  => 'third',
             99 => 99,
-        ], $array);
+        ]);
 
         // さらにキー数値のものを抽出（全て）
-        $extract = (array_unset)($array, function ($v, $k) { return is_int($k); });
-        $this->assertEquals([
+        that((array_unset)($array, function ($v, $k) { return is_int($k); }))->is([
             'first',
             2  => 'third',
             99 => 99,
-        ], $extract);
-        $this->assertEquals([], $array);
+        ]);
+        that($array)->is([]);
     }
 
     function test_array_dive()
     {
         $array = ['a' => ['b' => ['c' => 'vvv']]];
-        $this->assertEquals('vvv', (array_dive)($array, 'a.b.c'));
-        $this->assertEquals(9, (array_dive)($array, 'a.b.x', 9));
-        $this->assertEquals('vvv', (array_dive)($array, ['a', 'b', 'c']));
-        $this->assertNull((array_dive)($array, 'a.b.c.x'));
+        that((array_dive)($array, 'a.b.c'))->is('vvv');
+        that((array_dive)($array, 'a.b.x', 9))->is(9);
+        that((array_dive)($array, ['a', 'b', 'c']))->is('vvv');
+        that((array_dive)($array, 'a.b.c.x'))->isNull();
 
         // Arrayable でも動作する
         $ao = new \Arrayable(['a' => ['b' => ['c' => 'vvv']]]);
-        $this->assertEquals('vvv', (array_dive)($ao, 'a.b.c'));
-        $this->assertEquals(9, (array_dive)($ao, 'a.b.x', 9));
-        $this->assertEquals('vvv', (array_dive)($ao, ['a', 'b', 'c']));
+        that((array_dive)($ao, 'a.b.c'))->is('vvv');
+        that((array_dive)($ao, 'a.b.x', 9))->is(9);
+        that((array_dive)($ao, ['a', 'b', 'c']))->is('vvv');
     }
 
     function test_array_keys_exist()
@@ -715,21 +705,21 @@ class ArraysTest extends AbstractTestCase
             ]
         ];
         // すべて含む
-        $this->assertTrue((array_keys_exist)(['a', 'b', 'c'], $array));
+        that((array_keys_exist)(['a', 'b', 'c'], $array))->isTrue();
         // 単一文字指定で含む
-        $this->assertTrue((array_keys_exist)('a', $array));
+        that((array_keys_exist)('a', $array))->isTrue();
         // 1つ含まない
-        $this->assertFalse((array_keys_exist)(['a', 'b', 'n'], $array));
+        that((array_keys_exist)(['a', 'b', 'n'], $array))->isFalse();
         // 単一文字指定で含まない
-        $this->assertFalse((array_keys_exist)('X', $array));
+        that((array_keys_exist)('X', $array))->isFalse();
         // 空は例外
-        $this->assertException('empty', array_keys_exist, [], $array);
+        that([array_keys_exist, [], $array])->throws('empty');
 
         // ネスト調査
-        $this->assertTrue((array_keys_exist)([
+        that((array_keys_exist)([
             'x' => ['x1', 'x2', 'y'],
-        ], $array));
-        $this->assertTrue((array_keys_exist)([
+        ], $array))->isTrue();
+        that((array_keys_exist)([
             'x' => [
                 'x1',
                 'x2',
@@ -738,11 +728,11 @@ class ArraysTest extends AbstractTestCase
                     'y2',
                 ],
             ]
-        ], $array));
-        $this->assertFalse((array_keys_exist)([
+        ], $array))->isTrue();
+        that((array_keys_exist)([
             'nx' => ['x1', 'x2', 'y'],
-        ], $array));
-        $this->assertFalse((array_keys_exist)([
+        ], $array))->isFalse();
+        that((array_keys_exist)([
             'x' => [
                 'x1',
                 'x2',
@@ -751,65 +741,65 @@ class ArraysTest extends AbstractTestCase
                     'y9',
                 ],
             ],
-        ], $array));
+        ], $array))->isFalse();
 
         // \ArrayAccess
         $array = new \Arrayable([]);
         $array['x'] = ['y' => 'z'];
         $array['null'] = null;
-        $this->assertTrue((array_keys_exist)('null', $array));
-        $this->assertTrue((array_keys_exist)(['x' => ['y']], $array));
-        $this->assertTrue((array_keys_exist)(['x' => ['y']], $array));
-        $this->assertFalse((array_keys_exist)(['nx'], $array));
-        $this->assertFalse((array_keys_exist)(['nx' => ['y']], $array));
+        that((array_keys_exist)('null', $array))->isTrue();
+        that((array_keys_exist)(['x' => ['y']], $array))->isTrue();
+        that((array_keys_exist)(['x' => ['y']], $array))->isTrue();
+        that((array_keys_exist)(['nx'], $array))->isFalse();
+        that((array_keys_exist)(['nx' => ['y']], $array))->isFalse();
     }
 
     function test_array_find()
     {
-        $this->assertEquals(2, (array_find)(['a', 'b', '9'], 'ctype_digit'));
-        $this->assertEquals('b', (array_find)(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }));
-        $this->assertSame(0, (array_find)(['9', 'b', 'c'], 'ctype_digit'));
-        $this->assertSame(false, (array_find)(['a', 'b', 'c'], function ($v) { }));
+        that((array_find)(['a', 'b', '9'], 'ctype_digit'))->is(2);
+        that((array_find)(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }))->is('b');
+        that((array_find)(['9', 'b', 'c'], 'ctype_digit'))->isSame(0);
+        that((array_find)(['a', 'b', 'c'], function ($v) { }))->isSame(false);
 
-        $this->assertEquals('A', (array_find)(['a', 'b', '9'], function ($v) {
+        that((array_find)(['a', 'b', '9'], function ($v) {
             return ctype_digit($v) ? false : strtoupper($v);
-        }, false));
-        $this->assertEquals('B', (array_find)(['9', 'b', 'c'], function ($v) {
+        }, false))->is('A');
+        that((array_find)(['9', 'b', 'c'], function ($v) {
             return ctype_digit($v) ? false : strtoupper($v);
-        }, false));
-        $this->assertEquals(5, (array_find)([1, 2, 3, 4, -5, -6], function ($v) {
+        }, false))->is('B');
+        that((array_find)([1, 2, 3, 4, -5, -6], function ($v) {
             return $v < 0 ? abs($v) : false;
-        }, false));
+        }, false))->is(5);
     }
 
     function test_array_rekey()
     {
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
-        $this->assertEquals(['x' => 'A', 'b' => 'B', 'z' => 'C'], (array_rekey)($array, ['a' => 'x', 'c' => 'z']));
-        $this->assertEquals(['x' => 'A', 'b' => 'B', 'z' => 'C'], (array_rekey)($array, ['c' => 'z', 'a' => 'x']));
-        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_rekey)($array, ['x' => 'X', 'y' => 'Y', 'z' => 'Z']));
-        $this->assertEquals(['c' => 'A', 'b' => 'B', 'a' => 'C'], (array_rekey)($array, ['a' => 'c', 'c' => 'a']));
-        $this->assertEquals(['c' => 'A', 'b' => 'B', 'a' => 'C'], (array_rekey)($array, ['c' => 'a', 'a' => 'c']));
-        $this->assertEquals(['a' => 'A', 'c' => 'C'], (array_rekey)($array, ['b' => null]));
-        $this->assertEquals([], (array_rekey)($array, ['a' => null, 'b' => null, 'c' => null]));
+        that((array_rekey)($array, ['a' => 'x', 'c' => 'z']))->is(['x' => 'A', 'b' => 'B', 'z' => 'C']);
+        that((array_rekey)($array, ['c' => 'z', 'a' => 'x']))->is(['x' => 'A', 'b' => 'B', 'z' => 'C']);
+        that((array_rekey)($array, ['x' => 'X', 'y' => 'Y', 'z' => 'Z']))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that((array_rekey)($array, ['a' => 'c', 'c' => 'a']))->is(['c' => 'A', 'b' => 'B', 'a' => 'C']);
+        that((array_rekey)($array, ['c' => 'a', 'a' => 'c']))->is(['c' => 'A', 'b' => 'B', 'a' => 'C']);
+        that((array_rekey)($array, ['b' => null]))->is(['a' => 'A', 'c' => 'C']);
+        that((array_rekey)($array, ['a' => null, 'b' => null, 'c' => null]))->is([]);
     }
 
     function test_array_grep_key()
     {
-        $this->assertEquals(['a', 'b', 'c'], (array_grep_key)(['a', 'b', 'c'], '#\d#'));
-        $this->assertEquals(['hoge' => 'HOGE'], (array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#'));
-        $this->assertEquals(['fuga' => 'FUGA'], (array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#', true));
+        that((array_grep_key)(['a', 'b', 'c'], '#\d#'))->is(['a', 'b', 'c']);
+        that((array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#'))->is(['hoge' => 'HOGE']);
+        that((array_grep_key)(['hoge' => 'HOGE', 'fuga' => 'FUGA'], '#^h#', true))->is(['fuga' => 'FUGA']);
     }
 
     function test_array_map_recursive()
     {
-        $this->assertSame((array_map_recursive)([
+        that((array_map_recursive)([
             'k' => 'v',
             'c' => new \ArrayObject([
                 'k1' => 'v1',
                 'k2' => 'v2',
             ]),
-        ], 'strtoupper'), [
+        ], 'strtoupper'))->isSame([
             'k' => 'V',
             'c' => [
                 'k1' => 'V1',
@@ -817,13 +807,13 @@ class ArraysTest extends AbstractTestCase
             ],
         ]);
 
-        $this->assertSame((array_map_recursive)([
+        that((array_map_recursive)([
             'k' => 'v',
             'c' => new \ArrayObject([
                 'k1' => 'v1',
                 'k2' => 'v2',
             ]),
-        ], 'gettype', false), [
+        ], 'gettype', false))->isSame([
             'k' => 'string',
             'c' => 'object',
         ]);
@@ -831,22 +821,22 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_map_key()
     {
-        $this->assertEquals(['a' => 'A', 'b' => 'B'], (array_map_key)([' a ' => 'A', ' b ' => 'B'], 'trim'));
-        $this->assertEquals(['A' => 'A', 'B' => 'B'], (array_map_key)(['a' => 'A', 'b' => 'B'], 'strtoupper'));
-        $this->assertEquals(['A' => 'A'], (array_map_key)(['a' => 'A', 'b' => 'B'], function ($k) {
+        that((array_map_key)([' a ' => 'A', ' b ' => 'B'], 'trim'))->is(['a' => 'A', 'b' => 'B']);
+        that((array_map_key)(['a' => 'A', 'b' => 'B'], 'strtoupper'))->is(['A' => 'A', 'B' => 'B']);
+        that((array_map_key)(['a' => 'A', 'b' => 'B'], function ($k) {
             return $k === 'b' ? null : strtoupper($k);
-        }));
-        $this->assertEquals(['A' => 'A'], (array_map_key)(['a' => 'A', 'b' => 'B'], function ($k, $v) {
+        }))->is(['A' => 'A']);
+        that((array_map_key)(['a' => 'A', 'b' => 'B'], function ($k, $v) {
             return $v === 'B' ? null : strtoupper($k);
-        }));
+        }))->is(['A' => 'A']);
     }
 
     function test_array_filter_key()
     {
-        $this->assertEquals(['a' => 'A', 'b' => 'B'], (array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], 'ctype_alpha'));
-        $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }));
-        $this->assertEquals([1 => 'b'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }));
-        $this->assertEquals(['a', 2 => 'c'], (array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }));
+        that((array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], 'ctype_alpha'))->is(['a' => 'A', 'b' => 'B']);
+        that((array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }))->is([1 => 'b']);
+        that((array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }))->is([1 => 'b']);
+        that((array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }))->is(['a', 2 => 'c']);
     }
 
     function test_array_where()
@@ -858,74 +848,74 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // 省略すればそのまま
-        $this->assertEquals($array, (array_where)($array));
+        that((array_where)($array))->is($array);
 
         // flag 値で true フィルタ
-        $this->assertEquals([
+        that((array_where)($array, 'flag'))->is([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
-        ], (array_where)($array, 'flag'));
+        ]);
 
         // name 値でクロージャフィルタ（'o' を含む）
-        $this->assertEquals([
+        that((array_where)($array, 'name', function ($name) {
+            return strpos($name, 'o') !== false;
+        }))->is([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], (array_where)($array, 'name', function ($name) {
-            return strpos($name, 'o') !== false;
-        }));
+        ]);
 
         // id, name 値でクロージャフィルタ（id === 3 && 'o' を含む）
-        $this->assertEquals([
-            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], (array_where)($array, ['id', 'name'], function ($id_name) {
+        that((array_where)($array, ['id', 'name'], function ($id_name) {
             return $id_name['id'] === 3 && strpos($id_name['name'], 'o') !== false;
-        }));
+        }))->is([
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ]);
 
         // キーでクロージャフィルタ（key === 2）
-        $this->assertEquals([
-            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], (array_where)($array, null, function ($name, $key) {
+        that((array_where)($array, null, function ($name, $key) {
             return $key === 2;
-        }));
+        }))->is([
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ]);
 
         // 連想配列
-        $this->assertEquals([
+        that((array_where)($array, ['flag' => 1], false))->is([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
-        ], (array_where)($array, ['flag' => 1], false));
-        $this->assertEquals([
+        ]);
+        that((array_where)($array, ['id' => [2, 3]], false))->is([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
-        ], (array_where)($array, ['id' => [2, 3]], false));
-        $this->assertEquals([
+        ]);
+        that((array_where)($array, ['flag' => true], true))->is([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
-        ], (array_where)($array, ['flag' => true], true));
-        $this->assertEquals([
+        ]);
+        that((array_where)($array, ['name' => 'hoge', 'flag' => false]))->is([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
-        ], (array_where)($array, ['name' => 'hoge', 'flag' => false]));
-        $this->assertEquals([], (array_where)($array, ['flag' => 1], true));
-        $this->assertEquals([
+        ]);
+        that((array_where)($array, ['flag' => 1], true))->is([]);
+        that((array_where)($array, ['name' => function ($name) { return $name === 'hoge'; }, 'flag' => function ($flag) { return !$flag; }]))->is([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
-        ], (array_where)($array, ['name' => function ($name) { return $name === 'hoge'; }, 'flag' => function ($flag) { return !$flag; }]));
+        ]);
 
         // 例外
-        $this->assertException('must be bool', array_where, $array, ['flag' => 1], function () { });
+        that([array_where, $array, ['flag' => 1], function () { }])->throws('must be bool');
     }
 
     function test_array_map_filter()
     {
         // strict:false なので 0 が除外される
-        $this->assertEquals([-2, -1, '3' => 1, 2], (array_map_filter)([1, 2, 3, 4, 5], function ($v) {
+        that((array_map_filter)([1, 2, 3, 4, 5], function ($v) {
             return $v - 3;
-        }, false));
+        }, false))->is([-2, -1, '3' => 1, 2]);
 
         // strict:true なので全て返ってくる
-        $this->assertEquals([-2, -1, 0, 1, 2], (array_map_filter)([1, 2, 3, 4, 5], function ($v) {
+        that((array_map_filter)([1, 2, 3, 4, 5], function ($v) {
             return $v - 3;
-        }, true));
+        }, true))->is([-2, -1, 0, 1, 2]);
 
         // strict:true は null がフィルタされる
-        $this->assertEquals([-2, -1, '3' => 1, 2], (array_map_filter)([1, 2, 3, 4, 5], function ($v) {
+        that((array_map_filter)([1, 2, 3, 4, 5], function ($v) {
             return $v === 3 ? null : $v - 3;
-        }, true));
+        }, true))->is([-2, -1, '3' => 1, 2]);
     }
 
     function test_array_map_method()
@@ -935,37 +925,37 @@ class ArraysTest extends AbstractTestCase
         $o3 = new \Concrete('c');
 
         // きちんと呼ばれるし引数も渡る
-        $this->assertEquals(['a', 'b', 'c'], (array_map_method)([$o1, $o2, $o3], 'getName'));
-        $this->assertEquals(['_A', '_B', '_C'], (array_map_method)([$o1, $o2, $o3], 'getName', ['_', true]));
+        that((array_map_method)([$o1, $o2, $o3], 'getName'))->is(['a', 'b', 'c']);
+        that((array_map_method)([$o1, $o2, $o3], 'getName', ['_', true]))->is(['_A', '_B', '_C']);
 
         // $ignore=true すると filter される
-        $this->assertEquals(['a'], (array_map_method)([$o1, null, 123], 'getName', [], true));
+        that((array_map_method)([$o1, null, 123], 'getName', [], true))->is(['a']);
 
         // $ignore=null するとそのまま返す
-        $this->assertEquals(['a', null, 123], (array_map_method)([$o1, null, 123], 'getName', [], null));
+        that((array_map_method)([$o1, null, 123], 'getName', [], null))->is(['a', null, 123]);
 
         // iterable
-        $this->assertEquals(['a', null, 123], (array_map_method)(new \ArrayObject([$o1, null, 123]), 'getName', [], null));
+        that((array_map_method)(new \ArrayObject([$o1, null, 123]), 'getName', [], null))->is(['a', null, 123]);
     }
 
     function test_array_maps()
     {
-        $this->assertEquals(['_A0', '_B1', '_C2'], (array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')));
-        $this->assertEquals(['_-A0', '_-B1', '_-C2'], (array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_', '-')));
+        that((array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')))->is(['_A0', '_B1', '_C2']);
+        that((array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_', '-')))->is(['_-A0', '_-B1', '_-C2']);
 
-        $this->assertEquals(['a' => 'Aaa', 'b' => 'Bbb'], (array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat));
+        that((array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat))->is(['a' => 'Aaa', 'b' => 'Bbb']);
 
         // メソッドモード
         $ex = new \Exception('msg1', 1, new \Exception('msg2', 2, new \Exception('msg3', 3)));
-        $this->assertEquals(['msg1', 'msg1', 'msg1'], (array_maps)([$ex, $ex, $ex], '@getMessage'));
-        $this->assertEquals([2, 2, 2], (array_maps)([$ex, $ex, $ex], '@getPrevious', '@getCode'));
-        $this->assertEquals([3, 3, 3], (array_maps)([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'));
+        that((array_maps)([$ex, $ex, $ex], '@getMessage'))->is(['msg1', 'msg1', 'msg1']);
+        that((array_maps)([$ex, $ex, $ex], '@getPrevious', '@getCode'))->is([2, 2, 2]);
+        that((array_maps)([$ex, $ex, $ex], '@getPrevious', '@getPrevious', '@getCode'))->is([3, 3, 3]);
 
         $objs = [new \Concrete('a'), new \Concrete('b'), new \Concrete('c')];
-        $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
+        that((array_maps)($objs, ['getName' => ['p-', true]]))->is(['P-A', 'P-B', 'P-C']);
 
         $objs = new \ArrayObject([new \Concrete('a'), new \Concrete('b'), new \Concrete('c')]);
-        $this->assertEquals(['P-A', 'P-B', 'P-C'], (array_maps)($objs, ['getName' => ['p-', true]]));
+        that((array_maps)($objs, ['getName' => ['p-', true]]))->is(['P-A', 'P-B', 'P-C']);
     }
 
     function test_array_kmap()
@@ -975,49 +965,49 @@ class ArraysTest extends AbstractTestCase
             'k2' => 'v2',
             'k3' => 'v3',
         ];
-        $this->assertEquals([
+        that((array_kmap)($array, function ($v, $k, $n) { return "$n:$k-$v"; }))->is([
             'k1' => '0:k1-v1',
             'k2' => '1:k2-v2',
             'k3' => '2:k3-v3',
-        ], (array_kmap)($array, function ($v, $k, $n) { return "$n:$k-$v"; }));
+        ]);
     }
 
     function test_array_nmap()
     {
         // それぞれ N 番目に適用される
-        $this->assertEquals(['1a--z', '2a--z'], (array_nmap)([1, 2], strcat, 0, 'a-', '-z'));
-        $this->assertEquals(['a-1-z', 'a-2-z'], (array_nmap)([1, 2], strcat, 1, 'a-', '-z'));
-        $this->assertEquals(['a--z1', 'a--z2'], (array_nmap)([1, 2], strcat, 2, 'a-', '-z'));
+        that((array_nmap)([1, 2], strcat, 0, 'a-', '-z'))->is(['1a--z', '2a--z']);
+        that((array_nmap)([1, 2], strcat, 1, 'a-', '-z'))->is(['a-1-z', 'a-2-z']);
+        that((array_nmap)([1, 2], strcat, 2, 'a-', '-z'))->is(['a--z1', 'a--z2']);
 
         /// $n に配列を渡すとキー・値の両方が渡ってくる
         // キーを1番目、値を2番目に渡す
-        $this->assertEquals(['k' => ' a k b v c '], (array_nmap)(['k' => 'v'], strcat, [1 => 2], ' a ', ' b ', ' c '));
+        that((array_nmap)(['k' => 'v'], strcat, [1 => 2], ' a ', ' b ', ' c '))->is(['k' => ' a k b v c ']);
         // キーを2番目、値を1番目に渡す
-        $this->assertEquals(['k' => ' a v b k c '], (array_nmap)(['k' => 'v'], strcat, [2 => 1], ' a ', ' b ', ' c '));
+        that((array_nmap)(['k' => 'v'], strcat, [2 => 1], ' a ', ' b ', ' c '))->is(['k' => ' a v b k c ']);
         // キーを1番目、値を1番目に渡す（キーが優先される）
-        $this->assertEquals(['k' => ' a kv b  c '], (array_nmap)(['k' => 'v'], strcat, [1 => 1], ' a ', ' b ', ' c '));
+        that((array_nmap)(['k' => 'v'], strcat, [1 => 1], ' a ', ' b ', ' c '))->is(['k' => ' a kv b  c ']);
 
-        $this->assertException('empty', array_nmap, [], strcat, []);
-        $this->assertException('positive', array_nmap, [], strcat, [1 => -1]);
-        $this->assertException('positive', array_nmap, [], strcat, [-1 => 1]);
+        that([array_nmap, [], strcat, []])->throws('empty');
+        that([array_nmap, [], strcat, [1 => -1]])->throws('positive');
+        that([array_nmap, [], strcat, [-1 => 1]])->throws('positive');
     }
 
     function test_array_lmap()
     {
         // 最左に適用される
-        $this->assertEquals(['1a--z', '2a--z'], (array_lmap)([1, 2], strcat, 'a-', '-z'));
+        that((array_lmap)([1, 2], strcat, 'a-', '-z'))->is(['1a--z', '2a--z']);
     }
 
     function test_array_rmap()
     {
         // 最右に適用される
-        $this->assertEquals(['a--z1', 'a--z2'], (array_rmap)([1, 2], strcat, 'a-', '-z'));
+        that((array_rmap)([1, 2], strcat, 'a-', '-z'))->is(['a--z1', 'a--z2']);
     }
 
     function test_array_each()
     {
-        $this->assertSame((array_each)([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''), '12345');
-        $this->assertSame((array_each)([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []), [
+        that((array_each)([1, 2, 3, 4, 5], function (&$carry, $v) { $carry .= $v; }, ''))->isSame('12345');
+        that((array_each)([1, 2, 3, 4, 5], function (&$carry, $v) { $carry[$v] = $v * $v; }, []))->isSame([
             1 => 1,
             2 => 4,
             3 => 9,
@@ -1025,104 +1015,104 @@ class ArraysTest extends AbstractTestCase
             5 => 25,
         ]);
         $receiver = [];
-        $this->assertSame((array_each)([1, 2, 3, 4, 5], function (&$carry, $v, $k, $n) use (&$receiver) {
+        that((array_each)([1, 2, 3, 4, 5], function (&$carry, $v, $k, $n) use (&$receiver) {
             $receiver[] = $n;
             if ($k === 3) {
                 return false;
             }
             $carry[$v] = $v * $v;
-        }, []), [
+        }, []))->isSame([
             1 => 1,
             2 => 4,
             3 => 9,
         ]);
-        $this->assertEquals([0, 1, 2, 3], $receiver);
+        that($receiver)->is([0, 1, 2, 3]);
 
         // こういう使い方（オブジェクトの配列からメソッド由来の連想配列を作成）を想定しているのでテスト
         $ex_a = new \Exception('a');
         $ex_b = new \Exception('b');
         $ex_c = new \Exception('c');
-        $this->assertSame(['a' => $ex_a, 'b' => $ex_b, 'c' => $ex_c], (array_each)([$ex_a, $ex_b, $ex_c], function (&$carry, \Exception $ex) {
+        that((array_each)([$ex_a, $ex_b, $ex_c], function (&$carry, \Exception $ex) {
             $carry[$ex->getMessage()] = $ex;
-        }));
+        }))->isSame(['a' => $ex_a, 'b' => $ex_b, 'c' => $ex_c]);
 
         // 推奨しないが見た目が気に入っている使い方
-        $this->assertSame('start123', (array_each)([1, 2, 3], function (&$carry = 'start', $v = null) { $carry .= $v; }));
-        $this->assertSame('start', (array_each)([], function (&$carry = 'start', $v = null) { $carry .= $v; }));
-        $this->assertSame(null, (array_each)([], function (&$carry, $v) { $carry .= $v; }));
+        that((array_each)([1, 2, 3], function (&$carry = 'start', $v = null) { $carry .= $v; }))->isSame('start123');
+        that((array_each)([], function (&$carry = 'start', $v = null) { $carry .= $v; }))->isSame('start');
+        that((array_each)([], function (&$carry, $v) { $carry .= $v; }))->isSame(null);
     }
 
     function test_array_depth()
     {
         // シンプル
-        $this->assertEquals(1, (array_depth)([]));
-        $this->assertEquals(1, (array_depth)(['X']));
-        $this->assertEquals(2, (array_depth)([['X']]));
-        $this->assertEquals(3, (array_depth)([[['X']]]));
+        that((array_depth)([]))->is(1);
+        that((array_depth)(['X']))->is(1);
+        that((array_depth)([['X']]))->is(2);
+        that((array_depth)([[['X']]]))->is(3);
 
         // 最大が得られるか？
-        $this->assertEquals(2, (array_depth)(['X', 'y' => ['Y']]));
-        $this->assertEquals(2, (array_depth)(['x' => ['X'], 'Y']));
-        $this->assertEquals(3, (array_depth)(['x' => ['X'], 'y' => ['Y'], 'z' => ['z' => ['Z']]]));
+        that((array_depth)(['X', 'y' => ['Y']]))->is(2);
+        that((array_depth)(['x' => ['X'], 'Y']))->is(2);
+        that((array_depth)(['x' => ['X'], 'y' => ['Y'], 'z' => ['z' => ['Z']]]))->is(3);
 
         // $max_depth 指定
-        $this->assertEquals(1, (array_depth)([[[[['X']]]]], 1));
-        $this->assertEquals(2, (array_depth)([[[[['X']]]]], 2));
-        $this->assertEquals(3, (array_depth)([[[[['X']]]]], 3));
-        $this->assertEquals(4, (array_depth)([[[[['X']]]]], 4));
-        $this->assertEquals(5, (array_depth)([[[[['X']]]]], 5));
-        $this->assertEquals(5, (array_depth)([[[[['X']]]]], 6));
-        $this->assertEquals(3, (array_depth)([
+        that((array_depth)([[[[['X']]]]], 1))->is(1);
+        that((array_depth)([[[[['X']]]]], 2))->is(2);
+        that((array_depth)([[[[['X']]]]], 3))->is(3);
+        that((array_depth)([[[[['X']]]]], 4))->is(4);
+        that((array_depth)([[[[['X']]]]], 5))->is(5);
+        that((array_depth)([[[[['X']]]]], 6))->is(5);
+        that((array_depth)([
             ['X'],
             [['X']],
             [[['X']]],
             [[[['X']]]],
             [[[[['X']]]]],
             [[[[[['X']]]]]],
-        ], 3));
+        ], 3))->is(3);
     }
 
     function test_array_insert()
     {
         // 第3引数を省略すると最後に挿入される
-        $this->assertEquals([1, 2, 3, 'x'], (array_insert)([1, 2, 3], 'x'));
+        that((array_insert)([1, 2, 3], 'x'))->is([1, 2, 3, 'x']);
 
         // 第3引数を指定するとその位置に挿入される
-        $this->assertEquals([1, 'x', 2, 3], (array_insert)([1, 2, 3], 'x', 1));
+        that((array_insert)([1, 2, 3], 'x', 1))->is([1, 'x', 2, 3]);
 
         // 配列を指定するとその位置にマージされる
-        $this->assertEquals([1, 'x1', 'x2', 2, 3], (array_insert)([1, 2, 3], ['x1', 'x2'], 1));
+        that((array_insert)([1, 2, 3], ['x1', 'x2'], 1))->is([1, 'x1', 'x2', 2, 3]);
 
         // 負数を指定すると後ろから数えて挿入される
-        $this->assertEquals([1, 2, 'x1', 'x2', 3], (array_insert)([1, 2, 3], ['x1', 'x2'], -1));
+        that((array_insert)([1, 2, 3], ['x1', 'x2'], -1))->is([1, 2, 'x1', 'x2', 3]);
 
         // 連想配列もOK
-        $this->assertEquals(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z'], (array_insert)(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1));
+        that((array_insert)(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1))->is(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z']);
     }
 
     function test_array_assort()
     {
         // 普通に使う
-        $this->assertEquals([
-            'none'  => [],
-            'char1' => [0 => 'a'],
-            'char2' => [1 => 'bb'],
-            'char3' => [2 => 'ccc'],
-        ], (array_assort)(['a', 'bb', 'ccc'], [
+        that((array_assort)(['a', 'bb', 'ccc'], [
             'none'  => function ($v) { return strlen($v) === 0; },
             'char1' => function ($v) { return strlen($v) === 1; },
             'char2' => function ($v) { return strlen($v) === 2; },
             'char3' => function ($v) { return strlen($v) === 3; },
-        ]));
+        ]))->is([
+            'none'  => [],
+            'char1' => [0 => 'a'],
+            'char2' => [1 => 'bb'],
+            'char3' => [2 => 'ccc'],
+        ]);
 
         // 複数条件にマッチ
-        $this->assertEquals([
-            'rule1' => ['a', 'bb', 'ccc'],
-            'rule2' => ['a', 'bb', 'ccc'],
-        ], (array_assort)(['a', 'bb', 'ccc'], [
+        that((array_assort)(['a', 'bb', 'ccc'], [
             'rule1' => function () { return true; },
             'rule2' => function () { return true; },
-        ]));
+        ]))->is([
+            'rule1' => ['a', 'bb', 'ccc'],
+            'rule2' => ['a', 'bb', 'ccc'],
+        ]);
     }
 
     function test_array_count()
@@ -1131,7 +1121,7 @@ class ArraysTest extends AbstractTestCase
 
         // 普通に使う分には count(array_filter()) と同じ
         $eq_b = function ($v) { return $v === 'b'; };
-        $this->assertEquals(count(array_filter($array, $eq_b)), (array_count)($array, $eq_b));
+        that((array_count)($array, $eq_b))->is(count(array_filter($array, $eq_b)));
 
         $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
         $row2 = ['id' => 2, 'group' => 'B', 'flag' => true];
@@ -1143,38 +1133,38 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // flag をカウント
-        $this->assertEquals(1, (array_count)($array, (array_of)('flag')));
-        $this->assertEquals(2, (array_count)($array, (not_func)((array_of)('flag'))));
+        that((array_count)($array, (array_of)('flag')))->is(1);
+        that((array_count)($array, (not_func)((array_of)('flag'))))->is(2);
 
         // group: 'B' をカウント。ただし、数値キーの場合のみ
-        $this->assertEquals(1, (array_count)($array, function ($v, $k) {
+        that((array_count)($array, function ($v, $k) {
             return is_int($k) && $v['group'] === 'B';
-        }));
+        }))->is(1);
 
         // group: 'A', 'B' をそれぞれカウント
-        $this->assertEquals([
-            'A' => 1,
-            'B' => 2,
-        ], (array_count)($array, [
+        that((array_count)($array, [
             'A' => function ($v) { return $v['group'] === 'A'; },
             'B' => function ($v) { return $v['group'] === 'B'; },
-        ]));
+        ]))->is([
+            'A' => 1,
+            'B' => 2,
+        ]);
     }
 
     function test_array_group()
     {
-        $this->assertEquals([
+        that((array_group)([1, 2, 3, 4, 5]))->is([
             1 => [1],
             2 => [2],
             3 => [3],
             4 => [4],
             5 => [5],
-        ], (array_group)([1, 2, 3, 4, 5]));
+        ]);
 
-        $this->assertEquals([
+        that((array_group)([1, 2, 3, 4, 5], function ($v) { return $v % 2; }))->is([
             0 => [2, 4],
             1 => [1, 3, 5],
-        ], (array_group)([1, 2, 3, 4, 5], function ($v) { return $v % 2; }));
+        ]);
 
         $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
         $row2 = ['id' => 2, 'group' => 'B', 'flag' => true];
@@ -1185,10 +1175,10 @@ class ArraysTest extends AbstractTestCase
             3    => $row3,
         ];
 
-        $this->assertEquals(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]], (array_group)($array, (array_of)('group')));
-        $this->assertEquals(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]], (array_group)($array, (array_of)('group'), true));
+        that((array_group)($array, (array_of)('group')))->is(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]]);
+        that((array_group)($array, (array_of)('group'), true))->is(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]]);
 
-        $this->assertEquals([
+        that((array_group)([$row1, $row2, $row3], (array_of)(['group', 'id'])))->is([
             'A' => [
                 1 => [
                     'id'    => 1,
@@ -1208,18 +1198,18 @@ class ArraysTest extends AbstractTestCase
                     'flag'  => true,
                 ],
             ],
-        ], (array_group)([$row1, $row2, $row3], (array_of)(['group', 'id'])));
+        ]);
     }
 
     function test_array_aggregate()
     {
-        $this->assertSame([
-            'min' => 1,
-            'max' => 5,
-        ], (array_aggregate)([1, 2, 3, 4, 5], [
+        that((array_aggregate)([1, 2, 3, 4, 5], [
             'min' => function ($v) { return min($v); },
             'max' => function ($v) { return max($v); },
-        ]));
+        ]))->isSame([
+            'min' => 1,
+            'max' => 5,
+        ]);
 
         $row1 = ['id' => 1, 'group' => 'A', 'class' => 'H', 'score' => 2];
         $row2 = ['id' => 2, 'group' => 'B', 'class' => 'H', 'score' => 4];
@@ -1227,7 +1217,10 @@ class ArraysTest extends AbstractTestCase
         $row4 = ['id' => 4, 'group' => 'A', 'class' => 'H', 'score' => 2];
         $array = [$row1, $row2, $row3, $row4];
 
-        $this->assertEquals([
+        that((array_aggregate)($array, [
+            'ids'    => function ($rows) { return array_column($rows, 'id'); },
+            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+        ], 'group'))->is([
             'A' => [
                 'ids'    => [1, 3, 4],
                 'scores' => 7,
@@ -1236,12 +1229,14 @@ class ArraysTest extends AbstractTestCase
                 'ids'    => [2],
                 'scores' => 4,
             ],
-        ], (array_aggregate)($array, [
-            'ids'    => function ($rows) { return array_column($rows, 'id'); },
-            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
-        ], 'group'));
+        ]);
 
-        $this->assertEquals([
+        that((array_aggregate)($array, [
+            'scores' => function ($rows, $current) { return array_column($rows, 'score'); },
+            'count'  => function ($rows, $current) { return count($current['scores']); },
+            'sum'    => function ($rows, $current) { return array_sum($current['scores']); },
+            'avg'    => function ($rows, $current) { return $current['sum'] / $current['count']; },
+        ], 'group'))->is([
             'A' => [
                 'scores' => [2, 3, 2],
                 'count'  => 3,
@@ -1254,14 +1249,12 @@ class ArraysTest extends AbstractTestCase
                 'sum'    => 4,
                 'avg'    => 4 / 1,
             ],
-        ], (array_aggregate)($array, [
-            'scores' => function ($rows, $current) { return array_column($rows, 'score'); },
-            'count'  => function ($rows, $current) { return count($current['scores']); },
-            'sum'    => function ($rows, $current) { return array_sum($current['scores']); },
-            'avg'    => function ($rows, $current) { return $current['sum'] / $current['count']; },
-        ], 'group'));
+        ]);
 
-        $this->assertEquals([
+        that((array_aggregate)($array, [
+            'ids'    => function ($rows) { return array_column($rows, 'id'); },
+            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+        ], ['group', 'class']))->is([
             'A' => [
                 'H' => [
                     'ids'    => [1, 4],
@@ -1278,12 +1271,12 @@ class ArraysTest extends AbstractTestCase
                     'scores' => 4,
                 ],
             ],
-        ], (array_aggregate)($array, [
+        ]);
+
+        that((array_aggregate)($array, [
             'ids'    => function ($rows) { return array_column($rows, 'id'); },
             'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
-        ], ['group', 'class']));
-
-        $this->assertEquals([
+        ], ['group', 'class']))->is([
             'A' => [
                 'H' => [
                     'ids'    => [1, 4],
@@ -1300,12 +1293,12 @@ class ArraysTest extends AbstractTestCase
                     'scores' => 4,
                 ],
             ],
-        ], (array_aggregate)($array, [
+        ]);
+
+        that((array_aggregate)($array, [
             'ids'    => function ($rows) { return array_column($rows, 'id'); },
             'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
-        ], ['group', 'class']));
-
-        $this->assertEquals([
+        ], function ($row) { return $row['group'] . '/' . $row['class']; }))->is([
             'A/H' => [
                 'ids'    => [1, 4],
                 'scores' => 4,
@@ -1318,16 +1311,13 @@ class ArraysTest extends AbstractTestCase
                 'ids'    => [3],
                 'scores' => 3,
             ],
-        ], (array_aggregate)($array, [
-            'ids'    => function ($rows) { return array_column($rows, 'id'); },
-            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
-        ], function ($row) { return $row['group'] . '/' . $row['class']; }));
+        ]);
 
-        $this->assertEquals([
+        that((array_aggregate)($array, function ($rows) { return array_sum(array_column($rows, 'score')); }, function ($row) { return $row['group'] . '/' . $row['class']; }))->is([
             'A/H' => 4,
             'B/H' => 4,
             'A/L' => 3,
-        ], (array_aggregate)($array, function ($rows) { return array_sum(array_column($rows, 'score')); }, function ($row) { return $row['group'] . '/' . $row['class']; }));
+        ]);
     }
 
     function test_array_all()
@@ -1338,17 +1328,17 @@ class ArraysTest extends AbstractTestCase
             2 => ['id' => 3, 'name' => '', 'flag' => false],
         ];
 
-        $this->assertTrue((array_all)([], null));
-        $this->assertFalse((array_all)([], null, false));
+        that((array_all)([], null))->isTrue();
+        that((array_all)([], null, false))->isFalse();
 
-        $this->assertTrue((array_all)([true, true]));
-        $this->assertFalse((array_all)([true, false]));
-        $this->assertFalse((array_all)([false, false]));
+        that((array_all)([true, true]))->isTrue();
+        that((array_all)([true, false]))->isFalse();
+        that((array_all)([false, false]))->isFalse();
 
-        $this->assertTrue((array_all)($array, function ($v) { return $v['id']; }));
-        $this->assertFalse((array_all)($array, function ($v) { return $v['flag']; }));
-        $this->assertFalse((array_all)($array, function ($v) { return $v['name']; }));
-        $this->assertFalse((array_all)($array, function ($v, $k) { return $k && $v['flag']; }));
+        that((array_all)($array, function ($v) { return $v['id']; }))->isTrue();
+        that((array_all)($array, function ($v) { return $v['flag']; }))->isFalse();
+        that((array_all)($array, function ($v) { return $v['name']; }))->isFalse();
+        that((array_all)($array, function ($v, $k) { return $k && $v['flag']; }))->isFalse();
     }
 
     function test_array_any()
@@ -1359,33 +1349,33 @@ class ArraysTest extends AbstractTestCase
             2 => ['id' => 3, 'name' => '', 'flag' => false],
         ];
 
-        $this->assertFalse((array_any)([], null));
-        $this->assertTrue((array_any)([], null, true));
+        that((array_any)([], null))->isFalse();
+        that((array_any)([], null, true))->isTrue();
 
-        $this->assertTrue((array_any)([true, true]));
-        $this->assertTrue((array_any)([true, false]));
-        $this->assertFalse((array_any)([false, false]));
+        that((array_any)([true, true]))->isTrue();
+        that((array_any)([true, false]))->isTrue();
+        that((array_any)([false, false]))->isFalse();
 
-        $this->assertTrue((array_any)($array, function ($v) { return $v['id']; }));
-        $this->assertTrue((array_any)($array, function ($v) { return $v['flag']; }));
-        $this->assertFalse((array_any)($array, function ($v) { return $v['name']; }));
-        $this->assertTrue((array_any)($array, function ($v, $k) { return $k && $v['flag']; }));
+        that((array_any)($array, function ($v) { return $v['id']; }))->isTrue();
+        that((array_any)($array, function ($v) { return $v['flag']; }))->isTrue();
+        that((array_any)($array, function ($v) { return $v['name']; }))->isFalse();
+        that((array_any)($array, function ($v, $k) { return $k && $v['flag']; }))->isTrue();
     }
 
     function test_array_distinct()
     {
         // シンプルなもの
-        $this->assertSame([], (array_distinct)([]));
-        $this->assertSame([1], (array_distinct)([1]));
-        $this->assertSame([1, '2', 3 => 3], (array_distinct)([1, '2', 2, 3, '3']));
-        $this->assertSame([1, 2, 3 => 3], (array_distinct)([1, 2, 2, 3, 3, 3], SORT_NUMERIC));
-        $this->assertSame(['a', 'A'], (array_distinct)(['a', 'A'], SORT_STRING));
-        $this->assertSame(['a'], (array_distinct)(['a', 'A'], SORT_STRING | SORT_FLAG_CASE));
+        that((array_distinct)([]))->isSame([]);
+        that((array_distinct)([1]))->isSame([1]);
+        that((array_distinct)([1, '2', 2, 3, '3']))->isSame([1, '2', 3 => 3]);
+        that((array_distinct)([1, 2, 2, 3, 3, 3], SORT_NUMERIC))->isSame([1, 2, 3 => 3]);
+        that((array_distinct)(['a', 'A'], SORT_STRING))->isSame(['a', 'A']);
+        that((array_distinct)(['a', 'A'], SORT_STRING | SORT_FLAG_CASE))->isSame(['a']);
 
         // クロージャを与える
-        $this->assertEquals([1, 2, 3 => 3], (array_distinct)([1, 2, -2, 3, -3], function ($a, $b) {
+        that((array_distinct)([1, 2, -2, 3, -3], function ($a, $b) {
             return abs($a) <=> abs($b);
-        }));
+        }))->is([1, 2, 3 => 3]);
 
         // 配列の配列
         $rows = [
@@ -1394,15 +1384,15 @@ class ArraysTest extends AbstractTestCase
             13 => $r3 = ['id' => 3, 'group1' => 'groupA', 'group2' => 'groupB'],
             14 => $r4 = ['id' => 4, 'group1' => 'groupA', 'group2' => 'groupB'],
         ];
-        $this->assertEquals([
+        that((array_distinct)($rows, 'group1'))->is([
             11 => $r1,
             12 => $r2,
-        ], (array_distinct)($rows, 'group1'));
-        $this->assertEquals([
+        ]);
+        that((array_distinct)($rows, ['group1', 'group2']))->is([
             11 => $r1,
             12 => $r2,
             13 => $r3,
-        ], (array_distinct)($rows, ['group1', 'group2']));
+        ]);
 
         $objects = [
             11 => $e1 = new \Exception('a', 1),
@@ -1410,22 +1400,22 @@ class ArraysTest extends AbstractTestCase
             13 => $e3 = new \Exception('b', 3),
             14 => $e4 = new \Exception('b', 3),
         ];
-        $this->assertEquals([
+        that((array_distinct)($objects, ['getMessage' => []]))->is([
             11 => $e1,
             12 => $e2,
-        ], (array_distinct)($objects, ['getMessage' => []]));
-        $this->assertEquals([
+        ]);
+        that((array_distinct)($objects, ['getMessage' => [], 'getCode' => []]))->is([
             11 => $e1,
             12 => $e2,
             13 => $e3,
-        ], (array_distinct)($objects, ['getMessage' => [], 'getCode' => []]));
+        ]);
     }
 
     function test_array_order()
     {
-        $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9], (array_order)([2, 4, 5, 1, 8, 6, 9, 3, 7], true));
-        $this->assertEquals(['g', 'f', 'e', 'd', 'c', 'b', 'a'], (array_order)(['b', 'd', 'g', 'a', 'f', 'e', 'c'], false));
-        $this->assertEquals(['a', 'a', 'b', 'b', 'c', 'c', 'z'], (array_order)(['b', 'c', 'z', 'b', 'a', 'c', 'a'], ['a', 'b', 'c']));
+        that((array_order)([2, 4, 5, 1, 8, 6, 9, 3, 7], true))->is([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        that((array_order)(['b', 'd', 'g', 'a', 'f', 'e', 'c'], false))->is(['g', 'f', 'e', 'd', 'c', 'b', 'a']);
+        that((array_order)(['b', 'c', 'z', 'b', 'a', 'c', 'a'], ['a', 'b', 'c']))->is(['a', 'a', 'b', 'b', 'c', 'c', 'z']);
     }
 
     function test_array_order_list()
@@ -1440,8 +1430,7 @@ class ArraysTest extends AbstractTestCase
             6 => '1',
         ];
 
-        $actual = (array_order)($data, true, true);
-        $this->assertSame([
+        that((array_order)($data, true, true))->isSame([
             2 => '011',
             1 => '1',
             4 => '1',
@@ -1449,10 +1438,9 @@ class ArraysTest extends AbstractTestCase
             5 => '11',
             0 => '111',
             3 => '111',
-        ], $actual);
+        ]);
 
-        $actual = (array_order)($data, -SORT_NATURAL, true);
-        $this->assertSame([
+        that((array_order)($data, -SORT_NATURAL, true))->isSame([
             0 => '111',
             3 => '111',
             2 => '011',
@@ -1460,7 +1448,7 @@ class ArraysTest extends AbstractTestCase
             1 => '1',
             4 => '1',
             6 => '1',
-        ], $actual);
+        ]);
     }
 
     function test_array_order_hash()
@@ -1475,8 +1463,7 @@ class ArraysTest extends AbstractTestCase
             'g' => '1',
         ];
 
-        $actual = (array_order)($data, true, true);
-        $this->assertSame([
+        that((array_order)($data, true, true))->isSame([
             'c' => '011',
             'b' => '1',
             'e' => '1',
@@ -1484,10 +1471,9 @@ class ArraysTest extends AbstractTestCase
             'f' => '11',
             'a' => '111',
             'd' => '111',
-        ], $actual);
+        ]);
 
-        $actual = (array_order)($data, -SORT_NATURAL, true);
-        $this->assertSame([
+        that((array_order)($data, -SORT_NATURAL, true))->isSame([
             'a' => '111',
             'd' => '111',
             'c' => '011',
@@ -1495,7 +1481,7 @@ class ArraysTest extends AbstractTestCase
             'b' => '1',
             'e' => '1',
             'g' => '1',
-        ], $actual);
+        ]);
     }
 
     function test_array_order_bool()
@@ -1511,11 +1497,10 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // 文字降順・数値昇順
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string'  => false,
             'integer' => true,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             4 => ['string' => 'dd', 'integer' => 2],
             1 => ['string' => 'cc', 'integer' => 1],
             6 => ['string' => 'cc', 'integer' => 2],
@@ -1523,14 +1508,13 @@ class ArraysTest extends AbstractTestCase
             3 => ['string' => 'bb', 'integer' => 6],
             2 => ['string' => 'aa', 'integer' => 2],
             0 => ['string' => 'aa', 'integer' => 7],
-        ], $actual);
+        ]);
 
         // 文字昇順・数値降順
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string'  => true,
             'integer' => false,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             0 => ['string' => 'aa', 'integer' => 7],
             2 => ['string' => 'aa', 'integer' => 2],
             3 => ['string' => 'bb', 'integer' => 6],
@@ -1538,14 +1522,13 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
             1 => ['string' => 'cc', 'integer' => 1],
             4 => ['string' => 'dd', 'integer' => 2],
-        ], $actual);
+        ]);
 
         // 数値降順・文字昇順
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'integer' => false,
             'string'  => true,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             0 => ['string' => 'aa', 'integer' => 7],
             3 => ['string' => 'bb', 'integer' => 6],
             5 => ['string' => 'cc', 'integer' => 6],
@@ -1553,14 +1536,13 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
             4 => ['string' => 'dd', 'integer' => 2],
             1 => ['string' => 'cc', 'integer' => 1],
-        ], $actual);
+        ]);
 
         // 数値昇順・文字降順
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'integer' => true,
             'string'  => false,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             1 => ['string' => 'cc', 'integer' => 1],
             4 => ['string' => 'dd', 'integer' => 2],
             6 => ['string' => 'cc', 'integer' => 2],
@@ -1568,7 +1550,7 @@ class ArraysTest extends AbstractTestCase
             5 => ['string' => 'cc', 'integer' => 6],
             3 => ['string' => 'bb', 'integer' => 6],
             0 => ['string' => 'aa', 'integer' => 7],
-        ], $actual);
+        ]);
     }
 
     function test_array_order_int()
@@ -1584,11 +1566,10 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // 文字自然降順・数値昇順
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string'  => SORT_NATURAL,
             'integer' => SORT_NUMERIC,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             1 => ['string' => '1', 'integer' => '1g'],
             6 => ['string' => '1', 'integer' => '2i'],
             4 => ['string' => '1', 'integer' => '2r'],
@@ -1596,14 +1577,13 @@ class ArraysTest extends AbstractTestCase
             5 => ['string' => '11', 'integer' => '6t'],
             3 => ['string' => '111', 'integer' => '6u'],
             0 => ['string' => '111', 'integer' => '7a'],
-        ], $actual);
+        ]);
 
         // 文字自然昇順・数値降順
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string'  => -SORT_NATURAL,
             'integer' => -SORT_NUMERIC,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             0 => ['string' => '111', 'integer' => '7a'],
             3 => ['string' => '111', 'integer' => '6u'],
             5 => ['string' => '11', 'integer' => '6t'],
@@ -1611,7 +1591,7 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => '1', 'integer' => '2i'],
             4 => ['string' => '1', 'integer' => '2r'],
             1 => ['string' => '1', 'integer' => '1g'],
-        ], $actual);
+        ]);
     }
 
     function test_array_order_array()
@@ -1626,11 +1606,10 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
         ];
 
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string'  => ['bb', 'aa', 'dd', 'cc'],
             'integer' => [2, 6, 7],
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             3 => ['string' => 'bb', 'integer' => 6],
             2 => ['string' => 'aa', 'integer' => 2],
             0 => ['string' => 'aa', 'integer' => 7],
@@ -1638,7 +1617,7 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
             5 => ['string' => 'cc', 'integer' => 6],
             1 => ['string' => 'cc', 'integer' => 1],
-        ], $actual);
+        ]);
     }
 
     function test_array_order_closure1()
@@ -1653,7 +1632,7 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
         ];
 
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'integer' => function ($v) {
                 // 6は0とみなす
                 return $v === 6 ? 0 : $v;
@@ -1662,8 +1641,7 @@ class ArraysTest extends AbstractTestCase
                 // "aa"は"zz"とみなす
                 return $v === 'aa' ? 'zz' : $v;
             },
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             3 => ['string' => 'bb', 'integer' => 6],
             5 => ['string' => 'cc', 'integer' => 6],
             1 => ['string' => 'cc', 'integer' => 1],
@@ -1671,13 +1649,12 @@ class ArraysTest extends AbstractTestCase
             4 => ['string' => 'dd', 'integer' => 2],
             2 => ['string' => 'aa', 'integer' => 2],
             0 => ['string' => 'aa', 'integer' => 7],
-        ], $actual);
+        ]);
 
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string' => SORT_STRING,
             ''       => SORT_NUMERIC,
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             0 => ['string' => 'aa', 'integer' => 7],
             2 => ['string' => 'aa', 'integer' => 2],
             3 => ['string' => 'bb', 'integer' => 6],
@@ -1685,7 +1662,7 @@ class ArraysTest extends AbstractTestCase
             5 => ['string' => 'cc', 'integer' => 6],
             6 => ['string' => 'cc', 'integer' => 2],
             4 => ['string' => 'dd', 'integer' => 2],
-        ], $actual);
+        ]);
     }
 
     function test_array_order_closure2()
@@ -1700,11 +1677,10 @@ class ArraysTest extends AbstractTestCase
             6 => ['string' => 'cc', 'array' => [2, 2]],
         ];
 
-        $actual = (array_order)($data, [
+        that((array_order)($data, [
             'string' => function ($a, $b) { return strcmp($a, $b); },
             'array'  => function ($a, $b) { return array_sum($b) - array_sum($a); },
-        ], true);
-        $this->assertSame([
+        ], true))->isSame([
             0 => ['string' => 'aa', 'array' => [7, 3]],
             2 => ['string' => 'aa', 'array' => [2, 2]],
             3 => ['string' => 'bb', 'array' => [6, 3]],
@@ -1712,7 +1688,7 @@ class ArraysTest extends AbstractTestCase
             1 => ['string' => 'cc', 'array' => [1, 5]],
             6 => ['string' => 'cc', 'array' => [2, 2]],
             4 => ['string' => 'dd', 'array' => [2, 1]],
-        ], $actual);
+        ]);
     }
 
     function test_array_order_closure3()
@@ -1728,37 +1704,35 @@ class ArraysTest extends AbstractTestCase
 
         // returnType が int なら数値的にソートされる
         $cb = eval('return function ($v): int { return $v; };');
-        $actual = (array_order)($data, $cb);
-        $this->assertSame([
+        that((array_order)($data, $cb))->isSame([
             '11',
             '22',
             '33',
             '111',
             '222',
             '333',
-        ], $actual);
+        ]);
 
         // returnType が string なら文字的にソートされる
         $cb = eval('return function ($v): string { return $v; };');
-        $actual = (array_order)($data, $cb);
-        $this->assertSame([
+        that((array_order)($data, $cb))->isSame([
             '11',
             '111',
             '22',
             '222',
             '33',
             '333',
-        ], $actual);
+        ]);
     }
 
     function test_array_order_ex()
     {
-        $this->assertEquals([], (array_order)([], [[]]));
-        $this->assertEquals([1], (array_order)([1], [[]]));
+        that((array_order)([], [[]]))->is([]);
+        that((array_order)([1], [[]]))->is([1]);
 
-        $this->assertException(new \InvalidArgumentException('x is undefined'), array_order, [['a' => 1], ['a' => 2]], ['x' => true]);
+        that([array_order, [['a' => 1], ['a' => 2]], ['x' => true]])->throws(new \InvalidArgumentException('x is undefined'));
 
-        $this->assertException(new \DomainException('$order is invalid'), array_order, [['a' => 1], ['a' => 2]], ['a' => new \stdClass()]);
+        that([array_order, [['a' => 1], ['a' => 2]], ['a' => new \stdClass()]])->throws(new \DomainException('$order is invalid'));
     }
 
     function test_array_order_misc()
@@ -1774,15 +1748,15 @@ class ArraysTest extends AbstractTestCase
             'e' => function ($a, $b) { return strcmp($a, $b); },
         ]);
         $t = microtime(true) - $t;
-        $this->assertLessThan(1.0, $t, "$t milliseconds is too slow.");
+        that($t)->as("$t milliseconds is too slow.")->lessThan(1.0);
     }
 
     function test_array_shuffle()
     {
         srand(123);
         mt_srand(123);
-        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']));
-        $this->assertNotSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']));
+        that((array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that((array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']))->isNotSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
     }
 
     function test_array_shrink_key()
@@ -1793,63 +1767,63 @@ class ArraysTest extends AbstractTestCase
         $array3 = ['b' => 'B3', 'a' => 'A3', 'c' => 'C3', 'y' => 'Y2', 100 => 'end'];
 
         // array_intersect_key は左方優先だが・・・
-        $this->assertSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], array_intersect_key($array, $array1, $array2, $array3));
+        that(array_intersect_key($array, $array1, $array2, $array3))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
         // array_shrink_key は右方優先
-        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], (array_shrink_key)($array, $array1, $array2, $array3));
+        that((array_shrink_key)($array, $array1, $array2, $array3))->isSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3']);
 
         // オブジェクトも渡せる
         $object = (stdclass)($array);
         $object1 = (stdclass)($array1);
         $object2 = (stdclass)($array2);
         $object3 = (stdclass)($array3);
-        $this->assertSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3'], (array_shrink_key)($object, $object1, $object2, $object3));
+        that((array_shrink_key)($object, $object1, $object2, $object3))->isSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3']);
     }
 
     function test_array_fill_gap()
     {
-        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)(['a', 'b', 'c'], 'd', 'e'));
-        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)(['a', 'b', 3 => 'd'], 'c', 'e'));
-        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)([1 => 'b', 3 => 'd'], 'a', 'c', 'e'));
-        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)([], 'a', 'b', 'c', 'd', 'e'));
-        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)(['a', 'b', 'c', 'd', 'e']));
-        $this->assertSame(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 'c', 'd', 'z' => 'Noise', 'e'], (array_fill_gap)(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 3 => 'd', 'z' => 'Noise'], 'c', 'e'));
-        $this->assertSame(['a', 'b', 'c', 4 => 'e'], (array_fill_gap)(['a', 4 => 'e'], 'b', 'c'));
-        $this->assertSame(['a', 'b', 'c', 'd', 'e'], (array_fill_gap)((array_fill_gap)(['a', 4 => 'e'], 'b', 'c'), 'd'));
+        that((array_fill_gap)(['a', 'b', 'c'], 'd', 'e'))->isSame(['a', 'b', 'c', 'd', 'e']);
+        that((array_fill_gap)(['a', 'b', 3 => 'd'], 'c', 'e'))->isSame(['a', 'b', 'c', 'd', 'e']);
+        that((array_fill_gap)([1 => 'b', 3 => 'd'], 'a', 'c', 'e'))->isSame(['a', 'b', 'c', 'd', 'e']);
+        that((array_fill_gap)([], 'a', 'b', 'c', 'd', 'e'))->isSame(['a', 'b', 'c', 'd', 'e']);
+        that((array_fill_gap)(['a', 'b', 'c', 'd', 'e']))->isSame(['a', 'b', 'c', 'd', 'e']);
+        that((array_fill_gap)(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 3 => 'd', 'z' => 'Noise'], 'c', 'e'))->isSame(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 'c', 'd', 'z' => 'Noise', 'e']);
+        that((array_fill_gap)(['a', 4 => 'e'], 'b', 'c'))->isSame(['a', 'b', 'c', 4 => 'e']);
+        that((array_fill_gap)((array_fill_gap)(['a', 4 => 'e'], 'b', 'c'), 'd'))->isSame(['a', 'b', 'c', 'd', 'e']);
     }
 
     function test_array_fill_callback()
     {
-        $this->assertSame(array_combine($keys = ['a', 'b', 'c'], array_map('strtoupper', $keys)), (array_fill_callback)(['a', 'b', 'c'], 'strtoupper'));
+        that((array_fill_callback)(['a', 'b', 'c'], 'strtoupper'))->isSame(array_combine($keys = ['a', 'b', 'c'], array_map('strtoupper', $keys)));
     }
 
     function test_array_pickup()
     {
-        $this->assertSame(['a' => 'A'], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a']));
-        $this->assertSame(['b' => ['b' => 'B']], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b']));
+        that((array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a']))->isSame(['a' => 'A']);
+        that((array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b']))->isSame(['b' => ['b' => 'B']]);
 
-        $this->assertSame(['a' => 'A', 'c' => 'C'], (array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']));
-        $this->assertSame(['c' => 'C', 'a' => 'A'], (array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']));
+        that((array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']))->isSame(['a' => 'A', 'c' => 'C']);
+        that((array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
 
-        $this->assertSame(['a' => 'A', 'c' => 'C'], (array_pickup)((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
-        $this->assertSame(['c' => 'C', 'a' => 'A'], (array_pickup)((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
+        that((array_pickup)((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']))->isSame(['a' => 'A', 'c' => 'C']);
+        that((array_pickup)((stdclass)(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
 
-        $this->assertSame(['AAA' => 'A'], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']));
-        $this->assertSame(['BBB' => ['b' => 'B']], (array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']));
+        that((array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']))->isSame(['AAA' => 'A']);
+        that((array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']))->isSame(['BBB' => ['b' => 'B']]);
     }
 
     function test_array_remove()
     {
-        $this->assertSame(['a' => 'A', 'c' => 'C'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'b'));
-        $this->assertSame(['a' => 'A', 'b' => 'B', 'c' => 'C'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x'));
+        that((array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'b'))->isSame(['a' => 'A', 'c' => 'C']);
+        that((array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x'))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
 
-        $this->assertSame(['a' => 'A'], (array_remove)(['a' => 'A', 'b' => ['b' => 'B']], ['b']));
-        $this->assertSame(['b' => ['b' => 'B']], (array_remove)(['a' => 'A', 'b' => ['b' => 'B']], ['a']));
+        that((array_remove)(['a' => 'A', 'b' => ['b' => 'B']], ['b']))->isSame(['a' => 'A']);
+        that((array_remove)(['a' => 'A', 'b' => ['b' => 'B']], ['a']))->isSame(['b' => ['b' => 'B']]);
 
-        $this->assertSame(['b' => 'B'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']));
-        $this->assertSame(['b' => 'B'], (array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']));
+        that((array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']))->isSame(['b' => 'B']);
+        that((array_remove)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']))->isSame(['b' => 'B']);
 
-        $this->assertEquals(new \ArrayObject(['b' => 'B']), (array_remove)(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']));
-        $this->assertEquals(new \ArrayObject(['b' => 'B']), (array_remove)(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']));
+        that((array_remove)(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']))->is(new \ArrayObject(['b' => 'B']));
+        that((array_remove)(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']))->is(new \ArrayObject(['b' => 'B']));
     }
 
     function test_array_lookup()
@@ -1863,13 +1837,13 @@ class ArraysTest extends AbstractTestCase
         $objects = array_map(stdclass, $arrays);
 
         // 第3引数を与えれば array_column と全く同じ
-        $this->assertSame(array_column($arrays, 'name', 'id'), (array_lookup)($arrays, 'name', 'id'));
-        $this->assertSame(array_column($arrays, null, 'id'), (array_lookup)($arrays, null, 'id'));
+        that((array_lookup)($arrays, 'name', 'id'))->isSame(array_column($arrays, 'name', 'id'));
+        that((array_lookup)($arrays, null, 'id'))->isSame(array_column($arrays, null, 'id'));
         // 与えなければキーが保存される array_column のような動作になる
-        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], (array_lookup)($arrays, 'name'));
-        $this->assertSame($arrays, (array_lookup)($arrays, null));
+        that((array_lookup)($arrays, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
+        that((array_lookup)($arrays, null))->isSame($arrays);
         // オブジェクトもOK
-        $this->assertSame([11 => 'name1', 12 => 'name2', 13 => 'name3'], (array_lookup)($objects, 'name'));
+        that((array_lookup)($objects, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
     }
 
     function test_array_columns()
@@ -1880,71 +1854,71 @@ class ArraysTest extends AbstractTestCase
             ['id' => 3, 'name' => 'C'],
         ];
 
-        $this->assertEquals([
+        that((array_columns)($array))->is([
             'id'   => [1, 2, 3],
             'name' => ['A', 'B', 'C'],
-        ], (array_columns)($array));
+        ]);
 
-        $this->assertEquals([
+        that((array_columns)($array, 'name', 'id'))->is([
             'name' => [1 => 'A', 2 => 'B', 3 => 'C'],
-        ], (array_columns)($array, 'name', 'id'));
+        ]);
 
-        $this->assertException('InvalidArgumentException', array_columns, []);
+        that([array_columns, []])->throws('InvalidArgumentException');
     }
 
     function test_array_uncolumns()
     {
         // 普通の配列
-        $this->assertEquals([
+        that((array_uncolumns)([
+            'id'   => [1, 2, 3],
+            'name' => ['A', 'B', 'C'],
+        ]))->is([
             ['id' => 1, 'name' => 'A'],
             ['id' => 2, 'name' => 'B'],
             ['id' => 3, 'name' => 'C'],
-        ], (array_uncolumns)([
-            'id'   => [1, 2, 3],
-            'name' => ['A', 'B', 'C'],
-        ]));
+        ]);
 
         // キーも活きる
-        $this->assertEquals([
+        that((array_uncolumns)([
+            'id'   => ['x' => 1, 'y' => 2, 'z' => 3],
+            'name' => ['x' => 'A', 'y' => 'B', 'z' => 'C'],
+        ]))->is([
             'x' => ['id' => 1, 'name' => 'A'],
             'y' => ['id' => 2, 'name' => 'B'],
             'z' => ['id' => 3, 'name' => 'C'],
-        ], (array_uncolumns)([
-            'id'   => ['x' => 1, 'y' => 2, 'z' => 3],
-            'name' => ['x' => 'A', 'y' => 'B', 'z' => 'C'],
-        ]));
+        ]);
 
         // バラバラな配列を与えるとバラバラになる
-        $this->assertEquals([
+        that((array_uncolumns)([
+            'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
+            'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
+        ]))->is([
             'x'  => ['id' => 1, 'name' => 'A'],
             'ya' => ['id' => 2],
             'z'  => ['id' => 3],
             'y'  => ['name' => 'B'],
             'az' => ['name' => 'C'],
-        ], (array_uncolumns)([
-            'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
-            'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
-        ]));
+        ]);
 
         // null を与えると最初のキーで compat される
-        $this->assertEquals([
+        that((array_uncolumns)([
+            'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
+            'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
+        ], null))->is([
             'x'  => ['id' => 1, 'name' => 'A'],
             'ya' => ['id' => 2, 'name' => null],
             'z'  => ['id' => 3, 'name' => null],
-        ], (array_uncolumns)([
-            'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
-            'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
-        ], null));
+        ]);
 
         // [デフォルト] を与えるとその値で compat される
-        $this->assertEquals([
+        that((array_uncolumns)([
+            'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
+            'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
+        ], ['x' => null, 'y' => null, 'zzz' => 999]))->is([
             'x'   => ['id' => 1, 'name' => 'A'],
             'y'   => ['id' => null, 'name' => 'B'],
             'zzz' => ['id' => 999, 'name' => 999],
-        ], (array_uncolumns)([
-            'id'   => ['x' => 1, 'ya' => 2, 'z' => 3],
-            'name' => ['x' => 'A', 'y' => 'B', 'az' => 'C'],
-        ], ['x' => null, 'y' => null, 'zzz' => 999]));
+        ]);
     }
 
     function test_array_convert()
@@ -1961,7 +1935,12 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // 全要素に 'prefix-' を付与する。キーには '_' をつける
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, &$v) {
+            if (!is_array($v)) {
+                $v = "prefix-$v";
+            }
+            return "_$k";
+        }, true))->is([
             '_k1' => 'prefix-v1',
             '_k2' => [
                 '_k21' => 'prefix-v21',
@@ -1970,47 +1949,46 @@ class ArraysTest extends AbstractTestCase
                     '_k222' => 'prefix-v222',
                 ],
             ],
-        ], (array_convert)($array, function ($k, &$v) {
-            if (!is_array($v)) {
-                $v = "prefix-$v";
-            }
-            return "_$k";
-        }, true));
+        ]);
 
         // キー 'k21', 'k222' を取り除く
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, $v) {
+            return in_array($k, ['k21', 'k222']) ? false : null;
+        }))->is([
             'k1' => 'v1',
             'k2' => [
                 'k22' => [
                     'k221' => 'v221',
                 ],
             ],
-        ], (array_convert)($array, function ($k, $v) {
-            return in_array($k, ['k21', 'k222']) ? false : null;
-        }));
+        ]);
 
         // キー 'k21', 'k221', 'k222' を取り除く
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, $v) {
+            return in_array($k, ['k21', 'k221', 'k222']) ? false : null;
+        }))->is([
             'k1' => 'v1',
             'k2' => [
                 'k22' => [],
             ],
-        ], (array_convert)($array, function ($k, $v) {
-            return in_array($k, ['k21', 'k221', 'k222']) ? false : null;
-        }));
+        ]);
 
         // キー 'k22' を取り除く
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, $v) {
+            return in_array($k, ['k22']) ? false : null;
+        }, true))->is([
             'k1' => 'v1',
             'k2' => [
                 'k21' => 'v21',
             ],
-        ], (array_convert)($array, function ($k, $v) {
-            return in_array($k, ['k22']) ? false : null;
-        }, true));
+        ]);
 
         // キー 'k22' に要素を生やす
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, &$v) {
+            if ($k === 'k22') {
+                $v = array_merge($v, ['new1' => 'new1val', 'new2' => 'new2val']);
+            }
+        }, true))->is([
             'k1' => 'v1',
             'k2' => [
                 'k21' => 'v21',
@@ -2021,14 +1999,13 @@ class ArraysTest extends AbstractTestCase
                     'new2' => 'new2val',
                 ],
             ],
-        ], (array_convert)($array, function ($k, &$v) {
-            if ($k === 'k22') {
-                $v = array_merge($v, ['new1' => 'new1val', 'new2' => 'new2val']);
-            }
-        }, true));
+        ]);
 
         // 常に null を返せば実質的に array_walk_recursive と同じ
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, &$v) {
+            $v = "prefix-$v";
+            return null;
+        }))->is([
             'k1' => 'prefix-v1',
             'k2' => [
                 'k21' => 'prefix-v21',
@@ -2037,10 +2014,7 @@ class ArraysTest extends AbstractTestCase
                     'k222' => 'prefix-v222',
                 ],
             ],
-        ], (array_convert)($array, function ($k, &$v) {
-            $v = "prefix-$v";
-            return null;
-        }));
+        ]);
     }
 
     function test_array_convert_seq()
@@ -2055,32 +2029,32 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // キー 'k1' を数値連番にする
-        $this->assertEquals([
+        that((array_convert)($array, function ($k) {
+            if ($k === 'k1') {
+                return true;
+            }
+        }))->is([
             'k2' => [
                 'v21',
                 'k22' => ['v221', 'v222'],
             ],
             9    => 'v2',
             10   => 'v1',
-        ], (array_convert)($array, function ($k) {
-            if ($k === 'k1') {
-                return true;
-            }
-        }));
+        ]);
 
         // 値 v221 を数値連番にする
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, $v) {
+            if ($v === 'v221') {
+                return true;
+            }
+        }))->is([
             'k1' => 'v1',
             'k2' => [
                 'v21',
                 'k22' => [1 => 'v222', 2 => 'v221',],
             ],
             9    => 'v2',
-        ], (array_convert)($array, function ($k, $v) {
-            if ($v === 'v221') {
-                return true;
-            }
-        }));
+        ]);
 
         // 常に true を返せば実質的に array_values(再帰的) と同じ
         $array = [
@@ -2093,7 +2067,9 @@ class ArraysTest extends AbstractTestCase
             ],
             9 => 3,
         ];
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, $v) {
+            return true;
+        }, true))->is([
             0 => 1,
             1 => 2,
             2 => [
@@ -2102,9 +2078,7 @@ class ArraysTest extends AbstractTestCase
                 2 => 31,
             ],
             3 => 3,
-        ], (array_convert)($array, function ($k, $v) {
-            return true;
-        }, true));
+        ]);
     }
 
     function test_array_convert_array()
@@ -2116,7 +2090,11 @@ class ArraysTest extends AbstractTestCase
                 'k22' => 123,
             ],
         ];
-        $this->assertEquals([
+        that((array_convert)($array, function ($k, $v) {
+            if ($k === 'k22') {
+                return [1, 2, 3];
+            }
+        }))->is([
             'k1' => 'v1',
             'k2' => [
                 'k21' => 'v21',
@@ -2124,11 +2102,7 @@ class ArraysTest extends AbstractTestCase
                 2,
                 3,
             ],
-        ], (array_convert)($array, function ($k, $v) {
-            if ($k === 'k22') {
-                return [1, 2, 3];
-            }
-        }));
+        ]);
     }
 
     function test_array_convert_arg()
@@ -2151,7 +2125,7 @@ class ArraysTest extends AbstractTestCase
                 ['k2', 'k22'],
                 ['k2', 'k22'],
             ];
-            $this->assertEquals($expected[$n++], $history);
+            that($history)->is($expected[$n++]);
         });
     }
 
@@ -2169,7 +2143,7 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // 区切り文字指定なし
-        $this->assertSame([
+        that((array_flatten)($array))->isSame([
             'v1',
             'v21',
             123,
@@ -2177,10 +2151,10 @@ class ArraysTest extends AbstractTestCase
             2,
             3,
             $o,
-        ], (array_flatten)($array));
+        ]);
 
         // 区切り文字指定
-        $this->assertSame([
+        that((array_flatten)($array, '.'))->isSame([
             'k1'       => 'v1',
             'k2.k21'   => 'v21',
             'k2.k22'   => 123,
@@ -2188,17 +2162,10 @@ class ArraysTest extends AbstractTestCase
             'k2.k23.1' => 2,
             'k2.k23.2' => 3,
             'o'        => $o,
-        ], (array_flatten)($array, '.'));
+        ]);
 
         // Generator
-        $this->assertSame([
-            '1'        => 1,
-            '2.10'     => 10,
-            '2.11.100' => 100,
-            '2.11.200' => 200,
-            '2.20'     => 20,
-            '2'        => 2,
-        ], (array_flatten)((function () {
+        that((array_flatten)((function () {
             yield 1 => 1;
             yield (function () {
                 yield 10 => 10;
@@ -2209,42 +2176,49 @@ class ArraysTest extends AbstractTestCase
                 yield 20 => 20;
             })();
             yield 2 => 2;
-        })(), '.'));
+        })(), '.'))->isSame([
+            '1'        => 1,
+            '2.10'     => 10,
+            '2.11.100' => 100,
+            '2.11.200' => 200,
+            '2.20'     => 20,
+            '2'        => 2,
+        ]);
     }
 
     function test_array_nest()
     {
-        $this->assertEquals([
+        that((array_nest)([
+            'k1.k2' => 'v1',
+            'k1'    => 'v2',
+        ]))->is([
             'k1' => 'v2'
-        ], (array_nest)([
-                'k1.k2' => 'v1',
-                'k1'    => 'v2',
-            ])
-        );
-        $this->assertEquals([
-            'k1' => [
-                0    => 'v1',
-                'k2' => 'v2',
-            ]
-        ], (array_nest)([
-                'k1'    => ['v1'],
-                'k1.k2' => 'v2',
-            ])
-        );
-        $this->assertEquals([
-            'k1' => [
-                0    => 'v1',
-                'k2' => 'v2',
-            ]
-        ], (array_nest)([
-                'k1.0'  => 'v1',
-                'k1.k2' => 'v2',
-            ])
-        );
-        $this->assertException('already exists', (array_nest), [
-            'k1'    => 'v1',
-            'k1.k2' => 'v2',
         ]);
+        that((array_nest)([
+            'k1'    => ['v1'],
+            'k1.k2' => 'v2',
+        ]))->is([
+            'k1' => [
+                0    => 'v1',
+                'k2' => 'v2',
+            ]
+        ]);
+        that((array_nest)([
+            'k1.0'  => 'v1',
+            'k1.k2' => 'v2',
+        ]))->is([
+            'k1' => [
+                0    => 'v1',
+                'k2' => 'v2',
+            ]
+        ]);
+        that([
+            array_nest,
+            [
+                'k1'    => 'v1',
+                'k1.k2' => 'v2',
+            ]
+        ])->throws('already exists');
     }
 
     function test_array_difference()
@@ -2322,7 +2296,7 @@ class ArraysTest extends AbstractTestCase
         ];
 
         //(var_export2)((array_difference)($a1, $a2));
-        $this->assertEquals([
+        that((array_difference)($a1, $a2))->is([
             // common は共通しているので結果に出ない
             // 'common' => [],
             // diff.only1 は 1 にしかないので '-' のみ
@@ -2456,6 +2430,6 @@ class ArraysTest extends AbstractTestCase
                     [1, 2, 3],
                 ],
             ],
-        ], (array_difference)($a1, $a2));
+        ]);
     }
 }

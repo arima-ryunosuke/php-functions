@@ -9,28 +9,21 @@ class ClassobjTest extends AbstractTestCase
     function test_stdclass()
     {
         $fields = ['a', 'b'];
-        $stdclass = (stdclass)($fields);
-        $this->assertInstanceOf('stdClass', $stdclass);
-        // $this->assertEquals($fields, get_object_vars((stdclass))); php7 から OK になっている？
-        $this->assertTrue(property_exists($stdclass, '0'));
-        $this->assertEquals('a', $stdclass->{'0'});
-
-        // キャストでもいいが、こういうことはできん
-        $stdclass = (object) $fields;
-        $this->assertInstanceOf('stdClass', $stdclass);
-        // $this->assertEquals([], get_object_vars((stdclass))); php7 から OK になっている？
-        // $this->assertFalse(property_exists((stdclass), '0')); php7.2 から OK になっている？
+        that((stdclass)($fields))
+            ->isInstanceOf(stdClass::class)
+            ->{0}->is('a')
+            ->{1}->is('b');
     }
 
     function test_detect_namespace()
     {
-        $this->assertEquals('ryunosuke\\Test\\Package', (detect_namespace)(__DIR__));
-        $this->assertEquals('ryunosuke\\Test\\Package\\Classobj', (detect_namespace)(__DIR__ . '/Classobj'));
-        $this->assertEquals('ryunosuke\\Test\\Package\\Classobj\\NS', (detect_namespace)(__DIR__ . '/Classobj/NS'));
-        $this->assertEquals('A\\B\\C', (detect_namespace)(__DIR__ . '/Classobj/NS/Valid'));
-        $this->assertEquals('A\\B\\C\\Hoge', (detect_namespace)(__DIR__ . '/Classobj/NS/Valid/Hoge.php'));
-        $this->assertEquals('ryunosuke\\Functions\\Package', (detect_namespace)(__DIR__ . '/../../../src/Package'));
-        $this->assertException('can not detect namespace', detect_namespace, '/a/b/c/d/e/f/g/h/i/j/k/l/m/n');
+        that((detect_namespace)(__DIR__))->is('ryunosuke\\Test\\Package');
+        that((detect_namespace)(__DIR__ . '/Classobj'))->is('ryunosuke\\Test\\Package\\Classobj');
+        that((detect_namespace)(__DIR__ . '/Classobj/NS'))->is('ryunosuke\\Test\\Package\\Classobj\\NS');
+        that((detect_namespace)(__DIR__ . '/Classobj/NS/Valid'))->is('A\\B\\C');
+        that((detect_namespace)(__DIR__ . '/Classobj/NS/Valid/Hoge.php'))->is('A\\B\\C\\Hoge');
+        that((detect_namespace)(__DIR__ . '/../../../src/Package'))->is('ryunosuke\\Functions\\Package');
+        that([detect_namespace, '/a/b/c/d/e/f/g/h/i/j/k/l/m/n'])->throws('can not detect namespace');
     }
 
     function test_class_uses_all()
@@ -38,62 +31,58 @@ class ClassobjTest extends AbstractTestCase
         eval('trait T1{}');
         eval('trait T2{use T1;}');
         eval('trait T3{use T2;}');
-        $this->assertEquals(['T1'], (class_uses_all)(new class
+        that((class_uses_all)(new class
         {
             use /** @noinspection PhpUndefinedClassInspection */ \T1;
-        }));
-        $this->assertEquals(['T2', 'T1'], (class_uses_all)(new class
+        }))->is(['T1']);
+        that((class_uses_all)(new class
         {
             use /** @noinspection PhpUndefinedClassInspection */ \T2;
-        }));
-        $this->assertEquals(['T3', 'T2', 'T1'], (class_uses_all)(new class
+        }))->is(['T2', 'T1']);
+        that((class_uses_all)(new class
         {
             use /** @noinspection PhpUndefinedClassInspection */ \T3;
-        }));
-        $this->assertEquals(['T1', 'T2', 'T3'], (class_uses_all)(get_class(new class
+        }))->is(['T3', 'T2', 'T1']);
+        that((class_uses_all)(get_class(new class
         {
             use /** @noinspection PhpUndefinedClassInspection */ \T1;
             use /** @noinspection PhpUndefinedClassInspection */ \T2;
             use /** @noinspection PhpUndefinedClassInspection */ \T3;
-        })));
+        })))->is(['T1', 'T2', 'T3']);
 
-        $this->assertEquals([], (class_uses_all)(new stdClass()));
+        that((class_uses_all)(new stdClass()))->is([]);
     }
 
     function test_class_loader()
     {
-        $this->assertException('not found', function () {
-            (class_loader)('/notfounddir');
-        });
+        that([class_loader, '/notfounddir'])->throws('not found');
     }
 
     function test_class_namespace()
     {
-        $this->assertEquals('', (class_namespace)(new \stdClass()));
-        $this->assertEquals('', (class_namespace)('\PHPUnit_Framework_TestCase'));
+        that((class_namespace)(new \stdClass()))->is('');
+        that((class_namespace)('\PHPUnit_Framework_TestCase'))->is('');
         // php の名前空間・クラス名は \\ 無しに統一されていたはず
-        $this->assertEquals('vendor\\namespace', (class_namespace)('vendor\\namespace\\ClassName'));
-        $this->assertEquals('vendor\\namespace', (class_namespace)('\\vendor\\namespace\\ClassName'));
+        that((class_namespace)('vendor\\namespace\\ClassName'))->is('vendor\\namespace');
+        that((class_namespace)('\\vendor\\namespace\\ClassName'))->is('vendor\\namespace');
     }
 
     function test_class_shorten()
     {
-        $this->assertEquals('stdClass', (class_shorten)(new \stdClass()));
-        $this->assertEquals('PHPUnit_Framework_TestCase', (class_shorten)('\PHPUnit_Framework_TestCase'));
-        $this->assertEquals('ClassName', (class_shorten)('vendor\\namespace\\ClassName'));
-        $this->assertEquals('ClassName', (class_shorten)('\\vendor\\namespace\\ClassName'));
+        that((class_shorten)(new \stdClass()))->is('stdClass');
+        that((class_shorten)('\PHPUnit_Framework_TestCase'))->is('PHPUnit_Framework_TestCase');
+        that((class_shorten)('vendor\\namespace\\ClassName'))->is('ClassName');
+        that((class_shorten)('\\vendor\\namespace\\ClassName'))->is('ClassName');
     }
 
     function test_class_replace()
     {
-        $this->assertException('already declared', function () {
-            (class_replace)(__CLASS__, function () { });
-        });
-        $this->assertException('multi classes', function () {
-            (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\A', function () {
-                require_once __DIR__ . '/Classobj/_.php';
-            });
-        });
+        that([class_replace, __CLASS__, function () { }])->throws('already declared');
+        that([
+            class_replace,
+            '\\ryunosuke\\Test\\package\\Classobj\\A',
+            function () { require_once __DIR__ . '/Classobj/_.php'; }
+        ])->throws('multi classes');
 
         (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\A', function () {
             require_once __DIR__ . '/Classobj/A_.php';
@@ -119,35 +108,35 @@ class ClassobjTest extends AbstractTestCase
             },
         ]);
 
-        $this->assertEquals([
+        that((new \ryunosuke\Test\package\Classobj\B())->f())->is([
             'this is exA',
             'this is exB',
-        ], (new \ryunosuke\Test\package\Classobj\B())->f());
+        ]);
 
         /** @var \Traitable $classC */
         $classC = new \ryunosuke\Test\package\Classobj\C();
-        $this->assertEquals('Traitable', $classC->publicField);
-        $this->assertEquals('Traitable', $classC->traitMethod());
+        that($classC->publicField)->is('Traitable');
+        that($classC->traitMethod())->is('Traitable');
         /** @noinspection PhpUndefinedMethodInspection */
         {
-            $this->assertEquals([
+            that($classC->f())->is([
                 'this is exA',
                 'this is exB',
                 'this is C',
-            ], $classC->f());
-            $this->assertEquals(['string', true, new \ArrayObject([3])], $classC->g('string', true, new \ArrayObject([3])));
-            $this->assertEquals('this is C__', $classC->newMethod());
+            ]);
+            that($classC->g('string', true, new \ArrayObject([3])))->is(['string', true, new \ArrayObject([3])]);
+            that($classC->newMethod())->is('this is C__');
         }
 
         $classD = new \ryunosuke\Test\package\Classobj\D();
-        $this->assertEquals([
+        that($classD->f())->is([
             'this is exA',
             'this is exB',
             'this is C',
             'this is D',
-        ], $classD->f());
+        ]);
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->assertEquals('this is D', $classD->newMethod());
+        that($classD->newMethod())->is('this is D');
     }
 
     function test_class_extends()
@@ -183,50 +172,50 @@ class ClassobjTest extends AbstractTestCase
             'fuga' => 'dummy',
         ]);
 
-        $this->assertEquals('dummy', $object->fuga);
+        that($object->fuga)->is('dummy');
         $object->fuga = 'dummy2';
-        $this->assertEquals('dummy2', $object->fuga);
+        that($object->fuga)->is('dummy2');
         /** @noinspection PhpUndefinedFieldInspection */
         {
             $object->piyo = 'dummy3';
-            $this->assertEquals('dummy3', $object->piyo);
-            $this->assertEquals('dummy3', $original->piyo);
+            that($object->piyo)->is('dummy3');
+            that($original->piyo)->is('dummy3');
             $original->piyo = 'dummy4';
-            $this->assertEquals('dummy4', $object->piyo);
-            $this->assertEquals('dummy4', $original->piyo);
+            that($object->piyo)->is('dummy4');
+            that($original->piyo)->is('dummy4');
         }
 
         $object->setFields('a', 'b', 'c', 'd');
         $result = $object->hoge(9);
-        $this->assertInstanceOf(\ryunosuke\Test\Package\Classobj\ClassExtends::class, $result['this']);
-        $this->assertEquals('private:a', $result['method']);
-        $this->assertEquals(9, $result['arg']);
+        that($result['this'])->isInstanceOf(\ryunosuke\Test\Package\Classobj\ClassExtends::class);
+        that($result['method'])->is('private:a');
+        that($result['arg'])->is(9);
 
         $object->setFields('A1', 'B', 'C', 'D');
-        $this->assertEquals('public:A1', $original->publicMethod());
+        that($original->publicMethod())->is('public:A1');
         $original->setFields('A2', 'B', 'C', 'D');
-        $this->assertEquals('public:A2', $object->publicMethod());
+        that($object->publicMethod())->is('public:A2');
 
         $object::$staticfield = 'foo';
-        $this->assertEquals('static:foo', $object::staticMethod());
+        that($object::staticMethod())->is('static:foo');
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->assertEquals([
+        that($object::staticHoge(123))->is([
             'self'   => 'ryunosuke\Test\Package\Classobj\ClassExtends',
             'method' => 'static:foo',
             'arg'    => 123,
-        ], $object::staticHoge(123));
+        ]);
 
         $original::$staticfield = 'bar';
-        $this->assertEquals('static:bar', $object::staticMethod());
+        that($object::staticMethod())->is('static:bar');
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->assertEquals([
+        that($object::staticHoge(123))->is([
             'self'   => 'ryunosuke\Test\Package\Classobj\ClassExtends',
             'method' => 'static:bar',
             'arg'    => 123,
-        ], $object::staticHoge(123));
+        ]);
 
-        $this->assertEquals('A-overrideMethod1:XX-Z', $object->overrideMethod1('XX'));
-        $this->assertEquals('overrideMethod2:--A-overrideMethod1:++-Z', $object->overrideMethod2('--'));
+        that($object->overrideMethod1('XX'))->is('A-overrideMethod1:XX-Z');
+        that($object->overrideMethod2('--'))->is('overrideMethod2:--A-overrideMethod1:++-Z');
 
         // internal
         $e = (class_extends)(new \Exception('message', 123), [
@@ -236,7 +225,7 @@ class ClassobjTest extends AbstractTestCase
             },
         ]);
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->assertEquals('123:message', $e->codemessage());
+        that($e->codemessage())->is('123:message');
     }
 
     function test_const_exists()
@@ -250,20 +239,20 @@ class ClassobjTest extends AbstractTestCase
         });
 
         // クラス定数（2引数）
-        $this->assertTrue((const_exists)($class, "PRIVATE_CONST"));
-        $this->assertTrue((const_exists)($class, "PROTECTED_CONST"));
-        $this->assertTrue((const_exists)($class, "PUBLIC_CONST"));
-        $this->assertFalse((const_exists)($class, "UNDEFINED"));
+        that((const_exists)($class, "PRIVATE_CONST"))->isTrue();
+        that((const_exists)($class, "PROTECTED_CONST"))->isTrue();
+        that((const_exists)($class, "PUBLIC_CONST"))->isTrue();
+        that((const_exists)($class, "UNDEFINED"))->isFalse();
 
         // クラス定数（1引数）
-        $this->assertTrue((const_exists)("$class::PRIVATE_CONST"));
-        $this->assertTrue((const_exists)("$class::PROTECTED_CONST"));
-        $this->assertTrue((const_exists)("$class::PUBLIC_CONST"));
-        $this->assertFalse((const_exists)("$class::UNDEFINED"));
+        that((const_exists)("$class::PRIVATE_CONST"))->isTrue();
+        that((const_exists)("$class::PROTECTED_CONST"))->isTrue();
+        that((const_exists)("$class::PUBLIC_CONST"))->isTrue();
+        that((const_exists)("$class::UNDEFINED"))->isFalse();
 
         // グローバル定数
-        $this->assertTrue((const_exists)("PHP_VERSION"));
-        $this->assertFalse((const_exists)("UNDEFINED"));
+        that((const_exists)("PHP_VERSION"))->isTrue();
+        that((const_exists)("UNDEFINED"))->isFalse();
     }
 
     function test_object_dive()
@@ -275,9 +264,9 @@ class ClassobjTest extends AbstractTestCase
                 ])
             ])
         ]);
-        $this->assertEquals('abc', (object_dive)($class, 'a.b.c'));
-        $this->assertEquals('none', (object_dive)($class, 'a.b.c.x', 'none'));
-        $this->assertEquals('none', (object_dive)($class, 'a.b.X', 'none'));
+        that((object_dive)($class, 'a.b.c'))->is('abc');
+        that((object_dive)($class, 'a.b.c.x', 'none'))->is('none');
+        that((object_dive)($class, 'a.b.X', 'none'))->is('none');
     }
 
     function test_get_class_constants()
@@ -291,36 +280,36 @@ class ClassobjTest extends AbstractTestCase
             function dummy() { assert(self::PPP); }
         };
 
-        $this->assertEquals([
+        that((get_class_constants)($concrete))->is([
             'PROTECTED_CONST' => null,
             'PUBLIC_CONST'    => null,
             'PPP'             => 0,
             'PP'              => 1,
             'P'               => 2,
-        ], (get_class_constants)($concrete));
+        ]);
 
         /** @var \ryunosuke\Functions\Package\Classobj $class */
         $class = \ryunosuke\Functions\Package\Classobj::class;
 
-        $this->assertEquals([
+        that((get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED | $class::IS_PRIVATE))->is([
             'PPP' => 0,
             'PP'  => 1,
             'P'   => 2,
-        ], (get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED | $class::IS_PRIVATE));
+        ]);
 
-        $this->assertEquals([
+        that((get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED))->is([
             'PP' => 1,
             'P'  => 2,
-        ], (get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED));
+        ]);
 
-        $this->assertEquals([
+        that((get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC))->is([
             'P' => 2,
-        ], (get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC));
+        ]);
 
-        $this->assertEquals([
+        that((get_class_constants)($concrete, $class::IS_PUBLIC))->is([
             'P'            => 2,
             'PUBLIC_CONST' => null,
-        ], (get_class_constants)($concrete, $class::IS_PUBLIC));
+        ]);
     }
 
     function test_get_object_properties()
@@ -329,20 +318,20 @@ class ClassobjTest extends AbstractTestCase
         $concrete->value = 'value';
         /** @noinspection PhpUndefinedFieldInspection */
         $concrete->oreore = 'oreore';
-        $this->assertEquals([
+        that((get_object_properties)($concrete))->is([
             'value'  => 'value',
             'name'   => 'name',
             'oreore' => 'oreore',
-        ], (get_object_properties)($concrete));
+        ]);
 
         // 標準の var_export が親優先になっているのを変更しているテスト
         $object = new \Nest3();
         $object->set(999);
 
         // 復元したのに 999 になっていない（どうも同じキーの配列で __set_state されている模様）
-        $this->assertSame(1, (eval('return ' . var_export($object, true) . ';'))->get());
+        that((eval('return ' . var_export($object, true) . ';'))->get())->isSame(1);
 
         // get_object_properties はそのようなことにはならない
-        $this->assertSame(999, (eval('return ' . (var_export2)($object, true) . ';'))->get());
+        that((eval('return ' . (var_export2)($object, true) . ';'))->get())->isSame(999);
     }
 }

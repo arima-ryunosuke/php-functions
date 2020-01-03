@@ -9,38 +9,38 @@ class StringsTest extends AbstractTestCase
     function test_strcat()
     {
         // 単なる結合演算子の関数版
-        $this->assertEquals('abc', (strcat)('a', 'b', 'c'));
+        that((strcat)('a', 'b', 'c'))->is('abc');
 
         // __toString() も活きるはず（implode してるだけだが念のため）
         $e = new \Exception();
-        $this->assertEquals("a{$e}z", (strcat)('a', $e, 'z'));
+        that((strcat)('a', $e, 'z'))->is("a{$e}z");
     }
 
     function test_concat()
     {
-        $this->assertSame((concat)('prefix-', 'middle', '-suffix'), 'prefix-middle-suffix');
-        $this->assertSame((concat)('', 'middle', '-suffix'), '');
-        $this->assertSame((concat)('prefix-', '', '-suffix'), '');
-        $this->assertSame((concat)('prefix-', 'middle', ''), '');
+        that((concat)('prefix-', 'middle', '-suffix'))->isSame('prefix-middle-suffix');
+        that((concat)('', 'middle', '-suffix'))->isSame('');
+        that((concat)('prefix-', '', '-suffix'))->isSame('');
+        that((concat)('prefix-', 'middle', ''))->isSame('');
     }
 
     function test_split_noempty()
     {
         // 空文字は空配列と規定している
-        $this->assertEquals([], (split_noempty)('hoge', ''));
-        $this->assertEquals([], (split_noempty)(',', ',, ,'));
+        that((split_noempty)('hoge', ''))->is([]);
+        that((split_noempty)(',', ',, ,'))->is([]);
 
         // 両サイド
-        $this->assertEquals(['a'], (split_noempty)(',', ' a '));
+        that((split_noempty)(',', ' a '))->is(['a']);
 
         // trim しない
-        $this->assertEquals([' A', ' ', ' B ', 'C '], (split_noempty)(',', " A,, , B ,C ", false));
+        that((split_noempty)(',', " A,, , B ,C ", false))->is([' A', ' ', ' B ', 'C ']);
 
         // trim 文字が与えられる
-        $this->assertEquals([' A', 'B '], (split_noempty)(',', " A,\tB ", "\t"));
+        that((split_noempty)(',', " A,\tB ", "\t"))->is([' A', 'B ']);
 
         // 結果はただの配列になる
-        $this->assertEquals(['A', 'B', 'C'], (split_noempty)(',', 'A,,B,,,C'));
+        that((split_noempty)(',', 'A,,B,,,C'))->is(['A', 'B', 'C']);
     }
 
     function test_multiexplode()
@@ -48,303 +48,303 @@ class StringsTest extends AbstractTestCase
         $target = 'one|two|three|four';
 
         // 配列だと複数文字列で分割
-        $this->assertEquals(['one', 'two', 'three', 'four'], (multiexplode)(['|'], $target));
-        $this->assertEquals(['', 'ne|tw', '|three|f', 'ur'], (multiexplode)(['o'], $target));
-        $this->assertEquals(['', 'ne', 'tw', '', 'three', 'f', 'ur',], (multiexplode)(['|', 'o'], $target));
+        that((multiexplode)(['|'], $target))->is(['one', 'two', 'three', 'four']);
+        that((multiexplode)(['o'], $target))->is(['', 'ne|tw', '|three|f', 'ur']);
+        that((multiexplode)(['|', 'o'], $target))->is(['', 'ne', 'tw', '', 'three', 'f', 'ur',]);
 
         // 負数は前詰めで返す
-        $this->assertEquals(['one|two|three|four'], (multiexplode)('|', $target, -0));
-        $this->assertEquals(['one|two|three|four'], (multiexplode)('|', $target, -1));
-        $this->assertEquals(['one|two|three', 'four'], (multiexplode)('|', $target, -2));
-        $this->assertEquals(['one|two', 'three', 'four'], (multiexplode)('|', $target, -3));
-        $this->assertEquals(['one', 'two', 'three', 'four'], (multiexplode)('|', $target, -999));
+        that((multiexplode)('|', $target, -0))->is(['one|two|three|four']);
+        that((multiexplode)('|', $target, -1))->is(['one|two|three|four']);
+        that((multiexplode)('|', $target, -2))->is(['one|two|three', 'four']);
+        that((multiexplode)('|', $target, -3))->is(['one|two', 'three', 'four']);
+        that((multiexplode)('|', $target, -999))->is(['one', 'two', 'three', 'four']);
 
         // ただの文字列・正数の挙動は素の explode と変わらない
-        $this->assertEquals(['one|two|three|four'], (multiexplode)('|', $target, 0));
-        $this->assertEquals(['one|two|three|four'], (multiexplode)('|', $target, 1));
-        $this->assertEquals(['one', 'two|three|four'], (multiexplode)('|', $target, 2));
-        $this->assertEquals(['one', 'two', 'three|four'], (multiexplode)('|', $target, 3));
-        $this->assertEquals(['one', 'two', 'three', 'four'], (multiexplode)('|', $target, 999));
+        that((multiexplode)('|', $target, 0))->is(['one|two|three|four']);
+        that((multiexplode)('|', $target, 1))->is(['one|two|three|four']);
+        that((multiexplode)('|', $target, 2))->is(['one', 'two|three|four']);
+        that((multiexplode)('|', $target, 3))->is(['one', 'two', 'three|four']);
+        that((multiexplode)('|', $target, 999))->is(['one', 'two', 'three', 'four']);
 
         // 上記の複合
-        $this->assertEquals(['a,b c|d'], (multiexplode)([',', ' ', '|'], 'a,b c|d', -1));
-        $this->assertEquals(['a,b c', 'd'], (multiexplode)([',', ' ', '|'], 'a,b c|d', -2));
-        $this->assertEquals(['a,b', 'c', 'd'], (multiexplode)([',', ' ', '|'], 'a,b c|d', -3));
-        $this->assertEquals(['a', 'b', 'c', 'd'], (multiexplode)([',', ' ', '|'], 'a,b c|d', -4));
+        that((multiexplode)([',', ' ', '|'], 'a,b c|d', -1))->is(['a,b c|d']);
+        that((multiexplode)([',', ' ', '|'], 'a,b c|d', -2))->is(['a,b c', 'd']);
+        that((multiexplode)([',', ' ', '|'], 'a,b c|d', -3))->is(['a,b', 'c', 'd']);
+        that((multiexplode)([',', ' ', '|'], 'a,b c|d', -4))->is(['a', 'b', 'c', 'd']);
     }
 
     function test_quoteexplode()
     {
-        $this->assertEquals(['', '', '', 'a', '', '', 'z', '', '', ''], (quoteexplode)(',', ',,,a,,,z,,,'));
-        $this->assertEquals(['', 'A', '', 'A', ''], (quoteexplode)('zzz', 'zzzAzzzzzzAzzz'));
+        that((quoteexplode)(',', ',,,a,,,z,,,'))->is(['', '', '', 'a', '', '', 'z', '', '', '']);
+        that((quoteexplode)('zzz', 'zzzAzzzzzzAzzz'))->is(['', 'A', '', 'A', '']);
 
-        $this->assertEquals([
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 1, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a,"x,y",["y", "z"],c\\,d,\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 1, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
-        $this->assertEquals([
+        ]);
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 2, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y",["y", "z"],c\\,d,\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 2, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
-        $this->assertEquals([
+        ]);
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 3, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y"',
             '["y", "z"],c\\,d,\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 3, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
-        $this->assertEquals([
+        ]);
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 4, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y"',
             '["y", "z"]',
             'c\\,d,\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 4, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
-        $this->assertEquals([
+        ]);
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 5, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y"',
             '["y", "z"]',
             'c\,d',
             '\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 5, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
-        $this->assertEquals([
+        ]);
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 6, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y"',
             '["y", "z"]',
             'c\,d',
             '\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', 6, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
-        $this->assertEquals([
+        ]);
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', null, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y"',
             '["y", "z"]',
             'c\,d',
             '\'e,f\'',
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', null, ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        ]);
 
-        $this->assertEquals([
+        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x,y"',
             '["y", "z"]',
             'c\,d',
             "'e,f'"
-        ], (quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        ]);
 
-        $this->assertEquals([
+        that((quoteexplode)([" ", "\t"], "a b\tc 'd e\tf'"))->is([
             'a',
             'b',
             'c',
             "'d e\tf'"
-        ], (quoteexplode)([" ", "\t"], "a b\tc 'd e\tf'"));
+        ]);
 
-        $this->assertEquals((quoteexplode)(',', 'a,b,{e,f}', ['{' => '}']), [
+        that((quoteexplode)(',', 'a,b,{e,f}', ['{' => '}']))->is([
             'a',
             'b',
             '{e,f}',
         ]);
 
-        $this->assertEquals([
+        that((quoteexplode)('---', 'a---"x---y"---["y" --- "z"]---c\\---d---\'e---f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x---y"',
             '["y" --- "z"]',
             'c\---d',
             "'e---f'"
-        ], (quoteexplode)('---', 'a---"x---y"---["y" --- "z"]---c\\---d---\'e---f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'));
+        ]);
 
-        $this->assertEquals([
+        that((quoteexplode)(' ', 'a "b c" \'d e\'', '"\''))->is([
             'a',
             '"b c"',
             "'d e'"
-        ], (quoteexplode)(' ', 'a "b c" \'d e\'', '"\''));
+        ]);
 
-        $this->assertEquals([
+        that((quoteexplode)(' ', 'a"bc"', '"'))->is([
             'a"bc"',
-        ], (quoteexplode)(' ', 'a"bc"', '"'));
+        ]);
 
-        $this->assertEquals([
+        that((quoteexplode)(' ', 'a"bc " ', '"'))->is([
             'a"bc "',
             '',
-        ], (quoteexplode)(' ', 'a"bc " ', '"'));
+        ]);
     }
 
     function test_strrstr()
     {
-        $this->assertSame(false, (strrstr)('/a/b/c', 'not', true));
-        $this->assertSame(false, (strrstr)('/a/b/c', 'not', false));
+        that((strrstr)('/a/b/c', 'not', true))->isSame(false);
+        that((strrstr)('/a/b/c', 'not', false))->isSame(false);
 
-        $this->assertSame('c', (strrstr)('/a/b/c', '/'));
-        $this->assertSame('c', (strrstr)('//a//b//c', '//'));
+        that((strrstr)('/a/b/c', '/'))->isSame('c');
+        that((strrstr)('//a//b//c', '//'))->isSame('c');
 
-        $this->assertSame('c', (strrstr)('/a/b/c', '/', true));
-        $this->assertSame('c', (strrstr)('//a//b//c', '//', true));
+        that((strrstr)('/a/b/c', '/', true))->isSame('c');
+        that((strrstr)('//a//b//c', '//', true))->isSame('c');
 
-        $this->assertSame('/a/b/', (strrstr)('/a/b/c', '/', false));
-        $this->assertSame('//a//b//', (strrstr)('//a//b//c', '//', false));
+        that((strrstr)('/a/b/c', '/', false))->isSame('/a/b/');
+        that((strrstr)('//a//b//c', '//', false))->isSame('//a//b//');
 
-        $this->assertSame('う', (strrstr)('あ＿＿い＿＿う', '＿＿', true));
-        $this->assertSame('あ＿＿い＿＿', (strrstr)('あ＿＿い＿＿う', '＿＿', false));
+        that((strrstr)('あ＿＿い＿＿う', '＿＿', true))->isSame('う');
+        that((strrstr)('あ＿＿い＿＿う', '＿＿', false))->isSame('あ＿＿い＿＿');
     }
 
     function test_strpos_array()
     {
-        $this->assertSame([], (strpos_array)('hogera', []));
-        $this->assertSame([
+        that((strpos_array)('hogera', []))->isSame([]);
+        that((strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word']))->isSame([
             0    => 11,
             'is' => 2,
             2    => 19,
-        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word']));
+        ]);
 
-        $this->assertSame([], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], -4));
-        $this->assertSame([
+        that((strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], -4))->isSame([]);
+        that((strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], -5))->isSame([
             2 => 19,
-        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], -5));
-        $this->assertSame([
+        ]);
+        that((strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 12))->isSame([
             2 => 19,
-        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 12));
-        $this->assertSame([
+        ]);
+        that((strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 10))->isSame([
             0 => 11,
             2 => 19,
-        ], (strpos_array)('this is a "special word"', ['special', 'is' => 'is', 'notfound', 'word'], 10));
+        ]);
     }
 
     function test_strpos_quoted()
     {
-        $this->assertSame(false, (strpos_quoted)("this is a 'special word' that special word", ['notfound']));
-        $this->assertSame(30, (strpos_quoted)('this is a "special word" that special word', 'special'));
-        $this->assertSame(38, (strpos_quoted)("this is a 'special word' that special word", 'word'));
-        $this->assertSame(20, (strpos_quoted)("this is a \\'special word' that special word", 'word'));
+        that((strpos_quoted)("this is a 'special word' that special word", ['notfound']))->isSame(false);
+        that((strpos_quoted)('this is a "special word" that special word', 'special'))->isSame(30);
+        that((strpos_quoted)("this is a 'special word' that special word", 'word'))->isSame(38);
+        that((strpos_quoted)("this is a \\'special word' that special word", 'word'))->isSame(20);
 
-        $this->assertSame(30, (strpos_quoted)('this is a "special word" that special word', 'special', 30));
-        $this->assertSame(false, (strpos_quoted)('this is a "special word" that special word', 'special', 31));
+        that((strpos_quoted)('this is a "special word" that special word', 'special', 30))->isSame(30);
+        that((strpos_quoted)('this is a "special word" that special word', 'special', 31))->isSame(false);
 
-        $this->assertSame(38, (strpos_quoted)('this is a "special word" that special word', 'word', -4));
-        $this->assertSame(false, (strpos_quoted)('this is a "special word" that special word', 'word', -3));
+        that((strpos_quoted)('this is a "special word" that special word', 'word', -4))->isSame(38);
+        that((strpos_quoted)('this is a "special word" that special word', 'word', -3))->isSame(false);
 
-        $this->assertSame(30, (strpos_quoted)("this is a 'special word' that special word", ['word', 'special']));
-        $this->assertSame(false, (strpos_quoted)("this is a 'special word' that special word", ['hoge', 'hoga']));
+        that((strpos_quoted)("this is a 'special word' that special word", ['word', 'special']))->isSame(30);
+        that((strpos_quoted)("this is a 'special word' that special word", ['hoge', 'hoga']))->isSame(false);
 
-        $this->assertSame((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'), 20);
-        $this->assertSame((strpos_quoted)('1:hoge, 2:\\*hoge*, 3:hoge', 'hoge', 5, '*'), 12);
+        that((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))->isSame(20);
+        that((strpos_quoted)('1:hoge, 2:\\*hoge*, 3:hoge', 'hoge', 5, '*'))->isSame(12);
 
-        $this->assertSame((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '', ''), 11);
+        that((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '', ''))->isSame(11);
     }
 
     function test_str_anyof()
     {
-        $this->assertSame((str_anyof)('a', ['a', 'b', 'c']), 0);
-        $this->assertSame((str_anyof)('b', ['a', 'b', 'c']), 1);
-        $this->assertSame((str_anyof)('c', ['a', 'b', 'c']), 2);
-        $this->assertSame((str_anyof)('x', ['a', 'b', 'c']), null);
-        $this->assertSame((str_anyof)('A', ['a', 'b', 'c'], true), 0);
-        $this->assertSame((str_anyof)('B', ['a', 'b', 'c'], true), 1);
-        $this->assertSame((str_anyof)('C', ['a', 'b', 'c'], true), 2);
-        $this->assertSame((str_anyof)('', ['a', 'b', 'c']), null);
-        $this->assertSame((str_anyof)(false, ['a', 'b', 'c']), null);
-        $this->assertSame((str_anyof)(null, ['a', 'b', 'c']), null);
-        $this->assertSame((str_anyof)('', ['', 'a', 'b', 'c']), 0);
-        $this->assertSame((str_anyof)(false, ['', 'a', 'b', 'c']), 0);
-        $this->assertSame((str_anyof)(null, ['', 'a', 'b', 'c']), 0);
-        $this->assertSame((str_anyof)('a', [new Concrete('a'), new Concrete('b'), new Concrete('c')]), 0);
-        $this->assertSame((str_anyof)('x', [new Concrete('a'), new Concrete('b'), new Concrete('c')]), null);
-        $this->assertSame((str_anyof)('A', [new Concrete('a'), new Concrete('b'), new Concrete('c')], true), 0);
-        $this->assertSame((str_anyof)('1', [1, 2, 3]), 0);
-        $this->assertSame((str_anyof)('2', [1, 2, 3]), 1);
-        $this->assertSame((str_anyof)('3', [1, 2, 3]), 2);
-        $this->assertSame((str_anyof)('9', [1, 2, 3]), null);
-        $this->assertSame((str_anyof)(1, ['1', '2', '3']), 0);
-        $this->assertSame((str_anyof)(2, ['1', '2', '3']), 1);
-        $this->assertSame((str_anyof)(3, ['1', '2', '3']), 2);
-        $this->assertSame((str_anyof)(9, ['1', '2', '3']), null);
+        that((str_anyof)('a', ['a', 'b', 'c']))->isSame(0);
+        that((str_anyof)('b', ['a', 'b', 'c']))->isSame(1);
+        that((str_anyof)('c', ['a', 'b', 'c']))->isSame(2);
+        that((str_anyof)('x', ['a', 'b', 'c']))->isSame(null);
+        that((str_anyof)('A', ['a', 'b', 'c'], true))->isSame(0);
+        that((str_anyof)('B', ['a', 'b', 'c'], true))->isSame(1);
+        that((str_anyof)('C', ['a', 'b', 'c'], true))->isSame(2);
+        that((str_anyof)('', ['a', 'b', 'c']))->isSame(null);
+        that((str_anyof)(false, ['a', 'b', 'c']))->isSame(null);
+        that((str_anyof)(null, ['a', 'b', 'c']))->isSame(null);
+        that((str_anyof)('', ['', 'a', 'b', 'c']))->isSame(0);
+        that((str_anyof)(false, ['', 'a', 'b', 'c']))->isSame(0);
+        that((str_anyof)(null, ['', 'a', 'b', 'c']))->isSame(0);
+        that((str_anyof)('a', [new Concrete('a'), new Concrete('b'), new Concrete('c')]))->isSame(0);
+        that((str_anyof)('x', [new Concrete('a'), new Concrete('b'), new Concrete('c')]))->isSame(null);
+        that((str_anyof)('A', [new Concrete('a'), new Concrete('b'), new Concrete('c')], true))->isSame(0);
+        that((str_anyof)('1', [1, 2, 3]))->isSame(0);
+        that((str_anyof)('2', [1, 2, 3]))->isSame(1);
+        that((str_anyof)('3', [1, 2, 3]))->isSame(2);
+        that((str_anyof)('9', [1, 2, 3]))->isSame(null);
+        that((str_anyof)(1, ['1', '2', '3']))->isSame(0);
+        that((str_anyof)(2, ['1', '2', '3']))->isSame(1);
+        that((str_anyof)(3, ['1', '2', '3']))->isSame(2);
+        that((str_anyof)(9, ['1', '2', '3']))->isSame(null);
     }
 
     function test_str_equals()
     {
-        $this->assertTrue((str_equals)('abcdef', 'abcdef'));
-        $this->assertTrue((str_equals)('abcdef', 'ABCDEF', true));
+        that((str_equals)('abcdef', 'abcdef'))->isTrue();
+        that((str_equals)('abcdef', 'ABCDEF', true))->isTrue();
 
         // unmatch type
-        $this->assertFalse((str_equals)("123", 123));
-        $this->assertFalse((str_equals)("", null));
+        that((str_equals)("123", 123))->isFalse();
+        that((str_equals)("", null))->isFalse();
 
         // null byte
-        $this->assertTrue((str_equals)("abc\0def", "abc\0def"));
-        $this->assertFalse((str_equals)("abc\0def", "abc\0xyz"));
-        $this->assertFalse((str_equals)("abc\0def", "abc\0xyz", true));
+        that((str_equals)("abc\0def", "abc\0def"))->isTrue();
+        that((str_equals)("abc\0def", "abc\0xyz"))->isFalse();
+        that((str_equals)("abc\0def", "abc\0xyz", true))->isFalse();
 
         // stringable object
         $ex = new \Exception('hoge');
-        $this->assertTrue((str_equals)($ex, $ex));
+        that((str_equals)($ex, $ex))->isTrue();
     }
 
     function test_str_contains()
     {
         // single
-        $this->assertTrue((str_contains)('abcdef', 'cd'));
-        $this->assertFalse((str_contains)('abcdef', 'xx'));
+        that((str_contains)('abcdef', 'cd'))->isTrue();
+        that((str_contains)('abcdef', 'xx'))->isFalse();
 
         // single int
-        $this->assertTrue((str_contains)('12345', 5));
-        $this->assertFalse((str_contains)('12345', 9));
+        that((str_contains)('12345', 5))->isTrue();
+        that((str_contains)('12345', 9))->isFalse();
 
         // empty
-        $this->assertFalse((str_contains)('', ''));
-        $this->assertFalse((str_contains)('abcdef', ''));
+        that((str_contains)('', ''))->isFalse();
+        that((str_contains)('abcdef', ''))->isFalse();
 
         // single case_insensitivity
-        $this->assertTrue((str_contains)('abcdef', 'CD', true));
-        $this->assertFalse((str_contains)('abcdef', 'XX', true));
+        that((str_contains)('abcdef', 'CD', true))->isTrue();
+        that((str_contains)('abcdef', 'XX', true))->isFalse();
 
         // multi or
-        $this->assertTrue((str_contains)('abcdef', ['cd', 'XX'], false, false));
-        $this->assertFalse((str_contains)('abcdef', ['XX', 'YY'], false, false));
+        that((str_contains)('abcdef', ['cd', 'XX'], false, false))->isTrue();
+        that((str_contains)('abcdef', ['XX', 'YY'], false, false))->isFalse();
 
         // multi and
-        $this->assertTrue((str_contains)('abcdef', ['cd', 'ef'], false, true));
-        $this->assertFalse((str_contains)('abcdef', ['cd', 'XX'], false, true));
+        that((str_contains)('abcdef', ['cd', 'ef'], false, true))->isTrue();
+        that((str_contains)('abcdef', ['cd', 'XX'], false, true))->isFalse();
 
         // multi case_insensitivity
-        $this->assertTrue((str_contains)('abcdef', ['CD', 'XX'], true, false));
-        $this->assertFalse((str_contains)('abcdef', ['XX', 'YY'], true, false));
-        $this->assertTrue((str_contains)('abcdef', ['CD', 'EF'], true, true));
-        $this->assertFalse((str_contains)('abcdef', ['CD', 'XX'], true, true));
+        that((str_contains)('abcdef', ['CD', 'XX'], true, false))->isTrue();
+        that((str_contains)('abcdef', ['XX', 'YY'], true, false))->isFalse();
+        that((str_contains)('abcdef', ['CD', 'EF'], true, true))->isTrue();
+        that((str_contains)('abcdef', ['CD', 'XX'], true, true))->isFalse();
 
         // stringable object
-        $this->assertTrue((str_contains)(new \Concrete('abcdef'), new \Concrete('cd')));
-        $this->assertFalse((str_contains)(new \Concrete('abcdef'), new \Concrete('xx')));
-        $this->assertTrue((str_contains)(new \Concrete('abcdef'), new \Concrete('CD'), true, false));
-        $this->assertFalse((str_contains)(new \Concrete('abcdef'), new \Concrete('XX'), true));
+        that((str_contains)(new \Concrete('abcdef'), new \Concrete('cd')))->isTrue();
+        that((str_contains)(new \Concrete('abcdef'), new \Concrete('xx')))->isFalse();
+        that((str_contains)(new \Concrete('abcdef'), new \Concrete('CD'), true, false))->isTrue();
+        that((str_contains)(new \Concrete('abcdef'), new \Concrete('XX'), true))->isFalse();
     }
 
     function test_str_chop()
     {
-        $this->assertEquals("MMMzzz", (str_chop)('aaaMMMzzz', 'aaa'));
-        $this->assertEquals("aaaMMM", (str_chop)('aaaMMMzzz', null, 'zzz'));
-        $this->assertEquals("MMM", (str_chop)('aaaMMMzzz', 'aaa', 'zzz'));
-        $this->assertEquals("aaaMMMzzz", (str_chop)('aaaMMMzzz', 'aaaa', 'zzzz'));
-        $this->assertEquals(" aaaMMMzzz ", (str_chop)(' aaaMMMzzz ', 'aaa', 'zzz'));
-        $this->assertEquals("aaaMMMzzz", (str_chop)('aaaMMMzzz', 'AAA', 'ZZZ'));
-        $this->assertEquals("MMM", (str_chop)('aaaMMMzzz', 'AAA', 'ZZZ', true));
-        $this->assertEquals("\naaazzz", (str_chop)("\naaazzz", 'aaa'));
-        $this->assertEquals("aaazzz\n", (str_chop)("aaazzz\n", null, 'zzz'));
-        $this->assertEquals("aaazzz", (str_chop)("\naaazzz\n", "\n", "\n"));
-        $this->assertEquals('#^.\\$', (str_chop)('[#^.\\$]', "[", "]"));
+        that((str_chop)('aaaMMMzzz', 'aaa'))->is("MMMzzz");
+        that((str_chop)('aaaMMMzzz', null, 'zzz'))->is("aaaMMM");
+        that((str_chop)('aaaMMMzzz', 'aaa', 'zzz'))->is("MMM");
+        that((str_chop)('aaaMMMzzz', 'aaaa', 'zzzz'))->is("aaaMMMzzz");
+        that((str_chop)(' aaaMMMzzz ', 'aaa', 'zzz'))->is(" aaaMMMzzz ");
+        that((str_chop)('aaaMMMzzz', 'AAA', 'ZZZ'))->is("aaaMMMzzz");
+        that((str_chop)('aaaMMMzzz', 'AAA', 'ZZZ', true))->is("MMM");
+        that((str_chop)("\naaazzz", 'aaa'))->is("\naaazzz");
+        that((str_chop)("aaazzz\n", null, 'zzz'))->is("aaazzz\n");
+        that((str_chop)("\naaazzz\n", "\n", "\n"))->is("aaazzz");
+        that((str_chop)('[#^.\\$]', "[", "]"))->is('#^.\\$');
 
-        $this->assertEquals("MMMzzz", (str_lchop)('aaaMMMzzz', 'aaa'));
-        $this->assertEquals("aaaMMM", (str_rchop)('aaaMMMzzz', 'zzz'));
+        that((str_lchop)('aaaMMMzzz', 'aaa'))->is("MMMzzz");
+        that((str_rchop)('aaaMMMzzz', 'zzz'))->is("aaaMMM");
     }
 
     function test_str_putcsv()
     {
         // シンプル
-        $this->assertEquals("1,2,3", (str_putcsv)([1, 2, 3]));
-        $this->assertEquals("1\t2\t3", (str_putcsv)([1, 2, 3], "\t"));
-        $this->assertEquals("1,`,`,3", (str_putcsv)([1, ",", 3], ",", '`'));
-        $this->assertEquals("1,`\t`,`@``", (str_putcsv)([1, "\t", '@`'], ",", '`', "@"));
+        that((str_putcsv)([1, 2, 3]))->is("1,2,3");
+        that((str_putcsv)([1, 2, 3], "\t"))->is("1\t2\t3");
+        that((str_putcsv)([1, ",", 3], ",", '`'))->is("1,`,`,3");
+        that((str_putcsv)([1, "\t", '@`'], ",", '`', "@"))->is("1,`\t`,`@``");
         // コンプレックス
-        $this->assertEquals("1,2,3\n4,5,6", (str_putcsv)([[1, 2, 3], [4, 5, 6]]));
-        $this->assertEquals("1,2,3\n4,5,6", (str_putcsv)(new \ArrayIterator([[1, 2, 3], [4, 5, 6]])));
-        $this->assertEquals("1,2,3\n4,5,6", (str_putcsv)((function () {
+        that((str_putcsv)([[1, 2, 3], [4, 5, 6]]))->is("1,2,3\n4,5,6");
+        that((str_putcsv)(new \ArrayIterator([[1, 2, 3], [4, 5, 6]])))->is("1,2,3\n4,5,6");
+        that((str_putcsv)((function () {
             yield [1, 2, 3];
             yield [4, 5, 6];
-        })()));
+        })()))->is("1,2,3\n4,5,6");
 
-        $this->assertException('single character', str_putcsv, [], 'aa');
+        that([str_putcsv, [], 'aa'])->throws('single character');
     }
 
     function test_str_subreplace()
@@ -352,33 +352,33 @@ class StringsTest extends AbstractTestCase
         $string = 'xxxxx';
 
         // empty
-        $this->assertEquals('xxxxx', (str_subreplace)($string, 'x', []));
+        that((str_subreplace)($string, 'x', []))->is('xxxxx');
         // string
-        $this->assertEquals('Xxxxx', (str_subreplace)($string, 'x', 'X'));
+        that((str_subreplace)($string, 'x', 'X'))->is('Xxxxx');
         // all
-        $this->assertEquals('X1X2X3X4X5', (str_subreplace)($string, 'x', ['X1', 'X2', 'X3', 'X4', 'X5']));
+        that((str_subreplace)($string, 'x', ['X1', 'X2', 'X3', 'X4', 'X5']))->is('X1X2X3X4X5');
         // 3rd
-        $this->assertEquals('xxX3xx', (str_subreplace)($string, 'x', [2 => 'X3']));
+        that((str_subreplace)($string, 'x', [2 => 'X3']))->is('xxX3xx');
         // 1st, 4th
-        $this->assertEquals('X1xX3xx', (str_subreplace)($string, 'x', [0 => 'X1', 2 => 'X3']));
-        $this->assertEquals('X1xX3xx', (str_subreplace)($string, 'x', [2 => 'X3', 0 => 'X1']));
+        that((str_subreplace)($string, 'x', [0 => 'X1', 2 => 'X3']))->is('X1xX3xx');
+        that((str_subreplace)($string, 'x', [2 => 'X3', 0 => 'X1']))->is('X1xX3xx');
         // overlap
-        $this->assertEquals('xxxZxxx', (str_subreplace)($string, 'x', [0 => 'xxx', 1 => 'Z']));
+        that((str_subreplace)($string, 'x', [0 => 'xxx', 1 => 'Z']))->is('xxxZxxx');
         // negative
-        $this->assertEquals('xxxxZ', (str_subreplace)($string, 'x', [-1 => 'Z']));
-        $this->assertEquals('Zxxxx', (str_subreplace)($string, 'x', [-5 => 'Z']));
+        that((str_subreplace)($string, 'x', [-1 => 'Z']))->is('xxxxZ');
+        that((str_subreplace)($string, 'x', [-5 => 'Z']))->is('Zxxxx');
         // notfound
-        $this->assertEquals('xxxxx', (str_subreplace)($string, 'z', ['Z']));
+        that((str_subreplace)($string, 'z', ['Z']))->is('xxxxx');
         // case insensitivity
-        $this->assertEquals('i1xxxx', (str_subreplace)($string, 'X', ['i1'], true));
-        $this->assertEquals('xxxxi5', (str_subreplace)($string, 'X', [-1 => 'i5'], true));
+        that((str_subreplace)($string, 'X', ['i1'], true))->is('i1xxxx');
+        that((str_subreplace)($string, 'X', [-1 => 'i5'], true))->is('xxxxi5');
         // multibyte
-        $this->assertEquals('ああかああ', (str_subreplace)('あああああ', 'あ', [2 => 'か']));
+        that((str_subreplace)('あああああ', 'あ', [2 => 'か']))->is('ああかああ');
         // no number
-        $this->assertException("key must be integer", str_subreplace, $string, 'x', ['s' => '']);
+        that([str_subreplace, $string, 'x', ['s' => '']])->throws("key must be integer");
         // out od range
-        $this->assertException("'x' of 5th.", str_subreplace, $string, 'x', [5 => 'nodef']);
-        $this->assertException("'x' of -6th.", str_subreplace, $string, 'x', [-6 => 'nodef']);
+        that([str_subreplace, $string, 'x', [5 => 'nodef']])->throws("'x' of 5th.");
+        that([str_subreplace, $string, 'x', [-6 => 'nodef']])->throws("'x' of -6th.");
     }
 
     function test_str_submap()
@@ -386,15 +386,15 @@ class StringsTest extends AbstractTestCase
         $string = 'hello, world';
 
         // empty
-        $this->assertEquals('hello, world', (str_submap)($string, []));
+        that((str_submap)($string, []))->is('hello, world');
         // only 1
-        $this->assertEquals('helLo, world', (str_submap)($string, [
+        that((str_submap)($string, [
             'l' => [
                 1 => 'L',
             ],
-        ]));
+        ]))->is('helLo, world');
         // multiple
-        $this->assertEquals('helLo1, wo2rld', (str_submap)($string, [
+        that((str_submap)($string, [
             'l' => [
                 1 => 'L',
             ],
@@ -402,34 +402,34 @@ class StringsTest extends AbstractTestCase
                 'o1',
                 'o2',
             ],
-        ]));
+        ]))->is('helLo1, wo2rld');
         // overlap
-        $this->assertEquals('world, WORLD', (str_submap)($string, [
+        that((str_submap)($string, [
             'hello' => 'world',
             'world' => 'WORLD',
-        ]));
+        ]))->is('world, WORLD');
         // negative
-        $this->assertEquals('helLo, wOrld', (str_submap)($string, [
+        that((str_submap)($string, [
             'l' => [
                 -2 => 'L',
             ],
             'o' => [
                 -1 => 'O',
             ],
-        ]));
+        ]))->is('helLo, wOrld');
         // notfound
-        $this->assertEquals('hello, world', (str_submap)($string, ['xxx' => 'XXX']));
+        that((str_submap)($string, ['xxx' => 'XXX']))->is('hello, world');
         // case insensitivity
-        $this->assertEquals('H, world', (str_submap)($string, [
+        that((str_submap)($string, [
             'HELLO' => 'H',
-        ], true));
+        ], true))->is('H, world');
         // multibyte
-        $this->assertEquals('へろーわ棒るど', (str_submap)('へろーわーるど', ['ー' => [1 => '棒']]));
+        that((str_submap)('へろーわーるど', ['ー' => [1 => '棒']]))->is('へろーわ棒るど');
         // no number
-        $this->assertException("key must be integer", str_submap, $string, ['w' => ['' => '']]);
+        that([str_submap, $string, ['w' => ['' => '']]])->throws("key must be integer");
         // out od range
-        $this->assertException("'l' of 3th.", str_submap, $string, ['l' => [3 => 'nodef']]);
-        $this->assertException("'l' of -4th.", str_submap, $string, ['l' => [-4 => 'nodef']]);
+        that([str_submap, $string, ['l' => [3 => 'nodef']]])->throws("'l' of 3th.");
+        that([str_submap, $string, ['l' => [-4 => 'nodef']]])->throws("'l' of -4th.");
     }
 
     function test_str_embed()
@@ -437,72 +437,72 @@ class StringsTest extends AbstractTestCase
         $string = 'hello, world and "hello", \'world\' and \\"hello, \\\'world';
 
         // 単純な置換
-        $this->assertEquals('HELLO, WORLD and "hello", \'world\' and \\"HELLO, \\\'WORLD', (str_embed)($string, [
+        that((str_embed)($string, [
             'hello' => 'HELLO',
             'world' => 'WORLD',
-        ]));
-        $this->assertEquals('hello1, world1 and "hello", \'world\' and \\"hello2, \\\'world2', (str_embed)($string, [
+        ]))->is('HELLO, WORLD and "hello", \'world\' and \\"HELLO, \\\'WORLD');
+        that((str_embed)($string, [
             'hello' => ['hello1', 'hello2'],
             'world' => ['world1', 'world2'],
-        ]));
+        ]))->is('hello1, world1 and "hello", \'world\' and \\"hello2, \\\'world2');
 
         // 隣り合う境界
-        $this->assertEquals('AAAAA', (str_embed)('aaaaa', [
+        that((str_embed)('aaaaa', [
             'a' => 'A',
-        ]));
-        $this->assertEquals('12345', (str_embed)('aaaaa', [
+        ]))->is('AAAAA');
+        that((str_embed)('aaaaa', [
             'a' => ['1', '2', 3, 4, new Concrete(5)],
-        ]));
-        $this->assertEquals('12"a"34', (str_embed)('aa"a"aa', [
+        ]))->is('12345');
+        that((str_embed)('aa"a"aa', [
             'a' => ['1', '2', 3, 4],
-        ]));
+        ]))->is('12"a"34');
 
         // 長いものから置換される
-        $this->assertEquals('A3A2', (str_embed)('aaaaa', [
+        that((str_embed)('aaaaa', [
             'aaa' => 'A3',
             'aa'  => 'A2',
-        ]));
-        $this->assertEquals('A3A2', (str_embed)('aaaaa', [
+        ]))->is('A3A2');
+        that((str_embed)('aaaaa', [
             'aa'  => 'A2',
             'aaa' => 'A3',
-        ]));
+        ]))->is('A3A2');
 
         // 置換後の文字列は置換対象にならない
-        $this->assertEquals('xyzYYYz', (str_embed)('xyz', [
+        that((str_embed)('xyz', [
             'x' => 'xyz',
             'y' => 'YYY',
-        ]));
-        $this->assertEquals('xyzYYYz', (str_embed)('xyz', [
+        ]))->is('xyzYYYz');
+        that((str_embed)('xyz', [
             'y' => 'YYY',
             'x' => 'xyz',
-        ]));
+        ]))->is('xyzYYYz');
 
         // 空文字
-        $this->assertEquals('X', (str_embed)('xyz', [
+        that((str_embed)('xyz', [
             'y' => '',
             'z' => '',
             'x' => 'X',
-        ]));
+        ]))->is('X');
 
         // enclosure 指定
-        $this->assertEquals('X{x}X', (str_embed)('x{x}x', [
+        that((str_embed)('x{x}x', [
             'x' => 'X',
             '{' => '[',
             '}' => ']',
-        ], ['{' => '}']));
-        $this->assertEquals('X[X]X{{x}}', (str_embed)('x{x}x{{x}}', [
+        ], ['{' => '}']))->is('X{x}X');
+        that((str_embed)('x{x}x{{x}}', [
             'x' => 'X',
             '{' => '[',
             '}' => ']',
-        ], ['{{' => '}}']));
+        ], ['{{' => '}}']))->is('X[X]X{{x}}');
 
         // 見つからない場合はスルー
-        $this->assertEquals('xyz', (str_embed)('xyz', [
+        that((str_embed)('xyz', [
             'notfound' => 'notfound',
-        ]));
+        ]))->is('xyz');
 
-        $this->assertException("src length is 0", str_embed, 'hoge', ['' => 'empty']);
-        $this->assertException("'h' of 0th.", str_embed, 'hoge', ['h' => [3 => 'nodef']]);
+        that([str_embed, 'hoge', ['' => 'empty']])->throws("src length is 0");
+        that([str_embed, 'hoge', ['h' => [3 => 'nodef']]])->throws("'h' of 0th.");
     }
 
     function test_str_between()
@@ -510,136 +510,121 @@ class StringsTest extends AbstractTestCase
         ////////// 0123456789A1234567891B23456789C123456789D
         $string = '{simple}, "{enclose}", \\{{escape\\}}';
         $n = 0;
-        $this->assertSame('simple', (str_between)($string, '{', '}', $n));
-        $this->assertSame(8, $n);
-        $this->assertSame('escape\\}', (str_between)($string, '{', '}', $n));
-        $this->assertSame(35, $n);
-        $this->assertSame(false, (str_between)($string, '{', '}', $n));
-        $this->assertSame(35, $n);
+        that((str_between)($string, '{', '}', $n))->isSame('simple');
+        that($n)->isSame(8);
+        that((str_between)($string, '{', '}', $n))->isSame('escape\\}');
+        that($n)->isSame(35);
+        that((str_between)($string, '{', '}', $n))->isSame(false);
+        that($n)->isSame(35);
 
         // ずっとエスケープ中なので見つからない
         $string = '"{a}{b}{c}{d}{e}{f}{g}"';
         $n = 0;
-        $this->assertSame(false, (str_between)($string, '{', '}', $n));
+        that((str_between)($string, '{', '}', $n))->isSame(false);
 
         // from to が複数文字の場合
         $string = '{{name}}, {{hobby}}';
         $n = 0;
-        $this->assertSame('name', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame('hobby', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame(false, (str_between)($string, '{{', '}}', $n));
+        that((str_between)($string, '{{', '}}', $n))->isSame('name');
+        that((str_between)($string, '{{', '}}', $n))->isSame('hobby');
+        that((str_between)($string, '{{', '}}', $n))->isSame(false);
 
         // 中身が空の場合
         $string = '{{}} {{}} {{}}';
         $n = 0;
-        $this->assertSame('', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame('', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame('', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame(false, (str_between)($string, '{{', '}}', $n));
+        that((str_between)($string, '{{', '}}', $n))->isSame('');
+        that((str_between)($string, '{{', '}}', $n))->isSame('');
+        that((str_between)($string, '{{', '}}', $n))->isSame('');
+        that((str_between)($string, '{{', '}}', $n))->isSame(false);
 
         // くっついている場合
         $string = '{{first}}{{second}}{{third}}';
         $n = 0;
-        $this->assertSame('first', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame('second', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame('third', (str_between)($string, '{{', '}}', $n));
-        $this->assertSame(false, (str_between)($string, '{{', '}}', $n));
+        that((str_between)($string, '{{', '}}', $n))->isSame('first');
+        that((str_between)($string, '{{', '}}', $n))->isSame('second');
+        that((str_between)($string, '{{', '}}', $n))->isSame('third');
+        that((str_between)($string, '{{', '}}', $n))->isSame(false);
 
         // 開始終了が一致していない場合
         $string = '{first}}}}}} and {second}';
         $n = 0;
-        $this->assertSame('first', (str_between)($string, '{', '}', $n));
-        $this->assertSame('second', (str_between)($string, '{', '}', $n));
-        $this->assertSame(false, (str_between)($string, '{', '}', $n));
+        that((str_between)($string, '{', '}', $n))->isSame('first');
+        that((str_between)($string, '{', '}', $n))->isSame('second');
+        that((str_between)($string, '{', '}', $n))->isSame(false);
 
         // 開始終了に包含関係がある場合
-        $this->assertSame('first', (str_between)('!first!!', '!', '!!'));
-        $this->assertSame('first', (str_between)('!!first!', '!!', '!'));
-        $this->assertSame('first', (str_between)('!!first!!', '!!', '!!'));
+        that((str_between)('!first!!', '!', '!!'))->isSame('first');
+        that((str_between)('!!first!', '!!', '!'))->isSame('first');
+        that((str_between)('!!first!!', '!!', '!!'))->isSame('first');
 
         // enclosure も escape もしない単純な場合
         $n = 0;
-        $this->assertSame('first', (str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null));
-        $this->assertSame('second', (str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null));
-        $this->assertSame('third\\', (str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null));
+        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null))->isSame('first');
+        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null))->isSame('second');
+        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null))->isSame('third\\');
 
         // ネストしている場合
-        $this->assertSame('nest1{nest2{nest3}}', (str_between)('{nest1{nest2{nest3}}}', '{', '}'));
+        that((str_between)('{nest1{nest2{nest3}}}', '{', '}'))->isSame('nest1{nest2{nest3}}');
     }
 
     function test_str_ellipsis()
     {
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', 0));
-        $this->assertSame('1...7890', (str_ellipsis)('1234567890', 8, '...', 1));
-        $this->assertSame('12...890', (str_ellipsis)('1234567890', 8, '...', 2));
-        $this->assertSame('123...90', (str_ellipsis)('1234567890', 8, '...', 3));
-        $this->assertSame('1234...0', (str_ellipsis)('1234567890', 8, '...', 4));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 5));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 6));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 7));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 8));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 9));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 10));
-        $this->assertSame('12345...', (str_ellipsis)('1234567890', 8, '...', 11));
-        $this->assertSame('1234...0', (str_ellipsis)('1234567890', 8, '...', -1));
-        $this->assertSame('123...90', (str_ellipsis)('1234567890', 8, '...', -2));
-        $this->assertSame('12...890', (str_ellipsis)('1234567890', 8, '...', -3));
-        $this->assertSame('1...7890', (str_ellipsis)('1234567890', 8, '...', -4));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -5));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -6));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -7));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -8));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -9));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -10));
-        $this->assertSame('...67890', (str_ellipsis)('1234567890', 8, '...', -11));
+        that((str_ellipsis)('1234567890', 8, '...', 0))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', 1))->isSame('1...7890');
+        that((str_ellipsis)('1234567890', 8, '...', 2))->isSame('12...890');
+        that((str_ellipsis)('1234567890', 8, '...', 3))->isSame('123...90');
+        that((str_ellipsis)('1234567890', 8, '...', 4))->isSame('1234...0');
+        that((str_ellipsis)('1234567890', 8, '...', 5))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', 6))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', 7))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', 8))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', 9))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', 10))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', 11))->isSame('12345...');
+        that((str_ellipsis)('1234567890', 8, '...', -1))->isSame('1234...0');
+        that((str_ellipsis)('1234567890', 8, '...', -2))->isSame('123...90');
+        that((str_ellipsis)('1234567890', 8, '...', -3))->isSame('12...890');
+        that((str_ellipsis)('1234567890', 8, '...', -4))->isSame('1...7890');
+        that((str_ellipsis)('1234567890', 8, '...', -5))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', -6))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', -7))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', -8))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', -9))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', -10))->isSame('...67890');
+        that((str_ellipsis)('1234567890', 8, '...', -11))->isSame('...67890');
 
-        $this->assertSame('12...890', (str_ellipsis)('1234567890', 8, '...', null));
-        $this->assertSame('12...90', (str_ellipsis)('1234567890', 7, '...', null));
+        that((str_ellipsis)('1234567890', 8, '...', null))->isSame('12...890');
+        that((str_ellipsis)('1234567890', 7, '...', null))->isSame('12...90');
 
-        $this->assertSame('１２・・・８９０', (str_ellipsis)('１２３４５６７８９０', 8, '・・・', null));
-        $this->assertSame('１２・・・９０', (str_ellipsis)('１２３４５６７８９０', 7, '・・・', null));
+        that((str_ellipsis)('１２３４５６７８９０', 8, '・・・', null))->isSame('１２・・・８９０');
+        that((str_ellipsis)('１２３４５６７８９０', 7, '・・・', null))->isSame('１２・・・９０');
 
-        $this->assertSame('...', (str_ellipsis)('1234567890', 1, '...', null));
-        $this->assertSame('1234567890', (str_ellipsis)('1234567890', 1000, '...', null));
+        that((str_ellipsis)('1234567890', 1, '...', null))->isSame('...');
+        that((str_ellipsis)('1234567890', 1000, '...', null))->isSame('1234567890');
     }
 
     function test_str_diff()
     {
-        $this->assertEquals([
-            ['=', ['e'], ['e'],],
-            ['-', [1 => 'd'], 0,],
-            ['=', [2 => 'e'], [1 => 'e'],],
-            ['+', 2, [2 => 'a'],],
-            ['=', [3 => 'e'], [3 => 'e'],],
-            ['*', [4 => 'c'], [4 => 'C'],],
-        ], (str_diff)("e\nd\ne\ne\nc", "e\ne\na\ne\nC", ['stringify' => null]));
+        that((str_diff)("e\nd\ne\ne\nc", "e\ne\na\ne\nC", ['stringify' => null]))->is(
+            [
+                ['=', ['e'], ['e'],],
+                ['-', [1 => 'd'], 0,],
+                ['=', [2 => 'e'], [1 => 'e'],],
+                ['+', 2, [2 => 'a'],],
+                ['=', [3 => 'e'], [3 => 'e'],],
+                ['*', [4 => 'c'], [4 => 'C'],],
+            ]);
 
-        $this->assertEquals('e
+        that((str_diff)("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']))->is('e
 <del>d</del>
 e
 <ins>a</ins>
 e
 <del>c</del>
 <ins>C</ins>
-&lt;b&gt;B&lt;/b&gt;', (str_diff)("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']));
+&lt;b&gt;B&lt;/b&gt;');
 
-        $this->assertEquals('
-sameline
-diff1<ins>x</ins>
-diff2<ins>x</ins>
-<del>diff3</del>
-
-sameline
-diff4<ins>x</ins>
-diff5<ins>x</ins>
-<ins>diff6x</ins>
-
-sameline
-this is <del>a</del><ins>the</ins> pen
-
-that is <del>a</del><ins>the</ins> pen
-
-', (str_diff)("
+        that((str_diff)("
 sameline
 diff1
 diff2
@@ -669,7 +654,23 @@ this is the pen
 
 that is the pen
 
-", ['stringify' => 'html=perline']));
+", ['stringify' => 'html=perline']))->is('
+sameline
+diff1<ins>x</ins>
+diff2<ins>x</ins>
+<del>diff3</del>
+
+sameline
+diff4<ins>x</ins>
+diff5<ins>x</ins>
+<ins>diff6x</ins>
+
+sameline
+this is <del>a</del><ins>the</ins> pen
+
+that is <del>a</del><ins>the</ins> pen
+
+');
     }
 
     function test_str_diff_native()
@@ -699,19 +700,19 @@ that is the pen
 
         $expected = $shell($x, $y, '--unified=999', '--ignore-case', '--suppress-blank-empty', '--nolabel');
         $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999', 'ignore-case' => true]);
-        $this->assertEquals($expected, $actual);
+        that($actual)->is($expected);
 
         $expected = $shell($x, $y, '--unified=999', '--ignore-space-change', '--nolabel');
         $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999', 'ignore-space-change' => true]);
-        $this->assertEquals($expected, $actual);
+        that($actual)->is($expected);
 
         $expected = $shell($x, $y, '--unified=999', '--ignore-all-space', '--nolabel');
         $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999', 'ignore-all-space' => true]);
-        $this->assertEquals($expected, $actual);
+        that($actual)->is($expected);
 
         $expected = $shell($x, $y, '--unified=999', '--nolabel');
         $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=999']);
-        $this->assertEquals($expected, $actual);
+        that($actual)->is($expected);
 
         $dataset = [
             [__DIR__ . '/Strings/diff-same.txt', __DIR__ . '/Strings/diff-same.txt'],
@@ -729,153 +730,148 @@ that is the pen
         foreach ($dataset as [$x, $y]) {
             $expected = $shell($x, $y, '--normal');
             $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'normal']);
-            $this->assertEquals($expected, $actual, "$x <=> $y:\nExpected: $expected\nActual: $actual");
+            that($actual)->as("$x <=> $y:\nExpected: $expected\nActual: $actual")->is($expected);
 
             for ($level = 0; $level < 5; $level++) {
                 $levelopt = "context=$level";
                 $expected = $shell($x, $y, "--$levelopt", '--nolabel');
                 $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => $levelopt]);
-                $this->assertEquals($expected, $actual, "$x <=> $y, $levelopt:\nExpected: $expected\nActual: $actual");
+                that($actual)->as("$x <=> $y, $levelopt:\nExpected: $expected\nActual: $actual")->is($expected);
 
                 $levelopt = "unified=$level";
                 $expected = $shell($x, $y, "--$levelopt", '--nolabel');
                 $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => $levelopt]);
-                $this->assertEquals($expected, $actual, "$x <=> $y: $levelopt:\nExpected: $expected\nActual: $actual");
+                that($actual)->as("$x <=> $y: $levelopt:\nExpected: $expected\nActual: $actual")->is($expected);
             }
         }
     }
 
     function test_starts_with()
     {
-        $this->assertTrue((starts_with)('abcdef', 'abc'));
-        $this->assertFalse((starts_with)('abcdef', 'ABC'));
-        $this->assertFalse((starts_with)('abcdef', 'xbc'));
+        that((starts_with)('abcdef', 'abc'))->isTrue();
+        that((starts_with)('abcdef', 'ABC'))->isFalse();
+        that((starts_with)('abcdef', 'xbc'))->isFalse();
 
-        $this->assertTrue((starts_with)('abcdef', 'abc', true));
-        $this->assertTrue((starts_with)('abcdef', 'ABC', true));
-        $this->assertFalse((starts_with)('abcdef', 'xbc', true));
+        that((starts_with)('abcdef', 'abc', true))->isTrue();
+        that((starts_with)('abcdef', 'ABC', true))->isTrue();
+        that((starts_with)('abcdef', 'xbc', true))->isFalse();
 
-        $this->assertTrue((starts_with)('abcdef', ['a', 'X']));
-        $this->assertTrue((starts_with)('abcdef', ['abc', 'XXX']));
-        $this->assertFalse((starts_with)('abcdef', ['XXX']));
-        $this->assertFalse((starts_with)('abcdef', []));
+        that((starts_with)('abcdef', ['a', 'X']))->isTrue();
+        that((starts_with)('abcdef', ['abc', 'XXX']))->isTrue();
+        that((starts_with)('abcdef', ['XXX']))->isFalse();
+        that((starts_with)('abcdef', []))->isFalse();
 
-        $this->assertFalse((starts_with)('', 's'));
+        that((starts_with)('', 's'))->isFalse();
     }
 
     function test_ends_with()
     {
-        $this->assertTrue((ends_with)('abcdef', 'def'));
-        $this->assertFalse((ends_with)('abcdef', 'DEF'));
-        $this->assertFalse((ends_with)('abcdef', 'xef'));
+        that((ends_with)('abcdef', 'def'))->isTrue();
+        that((ends_with)('abcdef', 'DEF'))->isFalse();
+        that((ends_with)('abcdef', 'xef'))->isFalse();
 
-        $this->assertTrue((ends_with)('abcdef', 'def', true));
-        $this->assertTrue((ends_with)('abcdef', 'DEF', true));
-        $this->assertFalse((ends_with)('abcdef', 'xef', true));
+        that((ends_with)('abcdef', 'def', true))->isTrue();
+        that((ends_with)('abcdef', 'DEF', true))->isTrue();
+        that((ends_with)('abcdef', 'xef', true))->isFalse();
 
-        $this->assertTrue((ends_with)('abcdef', ['f', 'X']));
-        $this->assertTrue((ends_with)('abcdef', ['def', 'XXX']));
-        $this->assertFalse((ends_with)('abcdef', ['XXX']));
-        $this->assertFalse((ends_with)('abcdef', []));
+        that((ends_with)('abcdef', ['f', 'X']))->isTrue();
+        that((ends_with)('abcdef', ['def', 'XXX']))->isTrue();
+        that((ends_with)('abcdef', ['XXX']))->isFalse();
+        that((ends_with)('abcdef', []))->isFalse();
 
-        $this->assertFalse((ends_with)('', 's'));
+        that((ends_with)('', 's'))->isFalse();
     }
 
     function test_camel_case()
     {
-        $this->assertEquals('', (camel_case)(''));
-        $this->assertEquals('thisIsAPen', (camel_case)('this-is-a-pen', '-'));
-        $this->assertEquals('thisIsAPen', (camel_case)('this_is_a_pen'));
-        $this->assertEquals('thisIsAPen', (camel_case)('_this_is_a_pen_'));
+        that((camel_case)(''))->is('');
+        that((camel_case)('this-is-a-pen', '-'))->is('thisIsAPen');
+        that((camel_case)('this_is_a_pen'))->is('thisIsAPen');
+        that((camel_case)('_this_is_a_pen_'))->is('thisIsAPen');
     }
 
     function test_pascal_case()
     {
-        $this->assertEquals('', (pascal_case)(''));
-        $this->assertEquals('ThisIsAPen', (pascal_case)('this-is-a-pen', '-'));
-        $this->assertEquals('ThisIsAPen', (pascal_case)('this_is_a_pen'));
-        $this->assertEquals('ThisIsAPen', (pascal_case)('_this_is_a_pen_'));
+        that((pascal_case)(''))->is('');
+        that((pascal_case)('this-is-a-pen', '-'))->is('ThisIsAPen');
+        that((pascal_case)('this_is_a_pen'))->is('ThisIsAPen');
+        that((pascal_case)('_this_is_a_pen_'))->is('ThisIsAPen');
     }
 
     function test_snake_case()
     {
-        $this->assertEquals('', (snake_case)(''));
-        $this->assertEquals('this-is-a-pen', (snake_case)('ThisIsAPen', '-'));
-        $this->assertEquals('this_is_a_pen', (snake_case)('ThisIsAPen'));
-        $this->assertEquals('a_b_c', (snake_case)('ABC'));
-        $this->assertEquals('a_b_c_', (snake_case)('_ABC_'));
+        that((snake_case)(''))->is('');
+        that((snake_case)('ThisIsAPen', '-'))->is('this-is-a-pen');
+        that((snake_case)('ThisIsAPen'))->is('this_is_a_pen');
+        that((snake_case)('ABC'))->is('a_b_c');
+        that((snake_case)('_ABC_'))->is('a_b_c_');
     }
 
     function test_chain_case()
     {
-        $this->assertEquals('', (chain_case)(''));
-        $this->assertEquals('this_is_a_pen', (chain_case)('ThisIsAPen', '_'));
-        $this->assertEquals('this-is-a-pen', (chain_case)('ThisIsAPen'));
-        $this->assertEquals('a-b-c', (chain_case)('ABC'));
-        $this->assertEquals('a-b-c-', (chain_case)('-ABC-'));
+        that((chain_case)(''))->is('');
+        that((chain_case)('ThisIsAPen', '_'))->is('this_is_a_pen');
+        that((chain_case)('ThisIsAPen'))->is('this-is-a-pen');
+        that((chain_case)('ABC'))->is('a-b-c');
+        that((chain_case)('-ABC-'))->is('a-b-c-');
     }
 
     function test_namespace_split()
     {
-        $this->assertEquals(['ns', 'hoge'], (namespace_split)('ns\\hoge'));
-        $this->assertEquals(['\\ns', 'hoge'], (namespace_split)('\\ns\\hoge'));
-        $this->assertEquals(['\\ns', ''], (namespace_split)('\\ns\\'));
-        $this->assertEquals(['', 'hoge'], (namespace_split)('hoge'));
-        $this->assertEquals(['', 'hoge'], (namespace_split)('\\hoge'));
-        $this->assertEquals(['aaa', 'bbb'], (namespace_split)(new \Concrete('aaa\bbb')));
+        that((namespace_split)('ns\\hoge'))->is(['ns', 'hoge']);
+        that((namespace_split)('\\ns\\hoge'))->is(['\\ns', 'hoge']);
+        that((namespace_split)('\\ns\\'))->is(['\\ns', '']);
+        that((namespace_split)('hoge'))->is(['', 'hoge']);
+        that((namespace_split)('\\hoge'))->is(['', 'hoge']);
+        that((namespace_split)(new \Concrete('aaa\bbb')))->is(['aaa', 'bbb']);
     }
 
     function test_htmltag()
     {
-        $this->assertEquals(
-            '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>',
-            (htmltag)('a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]')
+        that((htmltag)('a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]'))->is(
+            '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
         );
-        $this->assertEquals(
-            '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>',
-            (htmltag)(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>'])
+        that((htmltag)(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>']))->is(
+            '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>'
         );
-        $this->assertEquals(
-            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;bold&gt;</b></a>',
-            (htmltag)([
-                'a.c1#hoge.c2[href="http://hoge"]' => [
-                    'b' => '<bold>',
+        that((htmltag)([
+            'a.c1#hoge.c2[href="http://hoge"]' => [
+                'b' => '<bold>',
+            ],
+        ]))->is(
+            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;bold&gt;</b></a>'
+        );
+        that((htmltag)([
+            'a.c1#hoge.c2[href="http://hoge"]' => [
+                'b' => [
+                    '<plain1>',
+                    't' => '<thin>',
+                    '<plain2>',
                 ],
-            ])
-        );
-        $this->assertEquals(
-            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;plain1&gt;<t>&lt;thin&gt;</t>&lt;plain2&gt;</b></a>',
-            (htmltag)([
-                'a.c1#hoge.c2[href="http://hoge"]' => [
-                    'b' => [
-                        '<plain1>',
-                        't' => '<thin>',
-                        '<plain2>',
-                    ],
-                ],
-            ])
+            ],
+        ]))->is(
+            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;plain1&gt;<t>&lt;thin&gt;</t>&lt;plain2&gt;</b></a>'
         );
 
-        $this->assertEquals(
+        that((htmltag)([
+            "\ndiv\n#hoge" => [
+                "\n  b"   => 'plain1',
+                "\n  b\n" => 'plain2',
+            ],
+            "span"         => 'plain',
+        ]))->is(
             '
 <div id="hoge">
   <b>plain1</b>
   <b>plain2</b>
 </div>
-<span>plain</span>',
-            (htmltag)([
-                "\ndiv\n#hoge" => [
-                    "\n  b"   => 'plain1',
-                    "\n  b\n" => 'plain2',
-                ],
-                "span"         => 'plain',
-            ])
+<span>plain</span>'
         );
 
-        $this->assertException('tagname is empty', htmltag, '#id.class');
-        $this->assertException('#id is multiple', htmltag, 'a#id#id');
-        $this->assertException('[a] is dumplicated', htmltag, 'a[a=1][a=2]');
-        $this->assertException('[id] is dumplicated', htmltag, 'a#id[id=id]');
+        that([htmltag, '#id.class'])->throws('tagname is empty');
+        that([htmltag, 'a#id#id'])->throws('#id is multiple');
+        that([htmltag, 'a[a=1][a=2]'])->throws('[a] is dumplicated');
+        that([htmltag, 'a#id[id=id]'])->throws('[id] is dumplicated');
     }
 
     function provideUri()
@@ -950,27 +946,18 @@ that is the pen
     function test_build_uri()
     {
         foreach ($this->provideUri() as $title => $data) {
-            $this->assertEquals($data['uri'], (build_uri)($data['parts']), $title);
+            that((build_uri)($data['parts']))->as($title)->is($data['uri']);
         }
     }
 
     function test_parse_uri()
     {
         foreach ($this->provideUri() as $title => $data) {
-            $this->assertEquals($data['parts'], (parse_uri)($data['uri']), $title);
+            that((parse_uri)($data['uri']))->as($title)->is($data['parts']);
         }
 
         // default array
-        $this->assertEquals([
-            'scheme'   => 'defscheme',
-            'user'     => 'defuser',
-            'pass'     => 'defpass',
-            'host'     => 'defhost',
-            'port'     => '12345',
-            'path'     => '/defpath',
-            'query'    => ['defquery' => ''],
-            'fragment' => 'deffragment',
-        ], (parse_uri)('', [
+        that((parse_uri)('', [
             'scheme'   => 'defscheme',
             'user'     => 'defuser',
             'pass'     => 'defpass',
@@ -979,10 +966,7 @@ that is the pen
             'path'     => 'defpath',
             'query'    => 'defquery',
             'fragment' => 'deffragment',
-        ]));
-
-        // default string
-        $this->assertEquals([
+        ]))->is([
             'scheme'   => 'defscheme',
             'user'     => 'defuser',
             'pass'     => 'defpass',
@@ -991,13 +975,25 @@ that is the pen
             'path'     => '/defpath',
             'query'    => ['defquery' => ''],
             'fragment' => 'deffragment',
-        ], (parse_uri)('', 'defscheme://defuser:defpass@defhost:12345/defpath?defquery#deffragment'));
+        ]);
+
+        // default string
+        that((parse_uri)('', 'defscheme://defuser:defpass@defhost:12345/defpath?defquery#deffragment'))->is([
+            'scheme'   => 'defscheme',
+            'user'     => 'defuser',
+            'pass'     => 'defpass',
+            'host'     => 'defhost',
+            'port'     => '12345',
+            'path'     => '/defpath',
+            'query'    => ['defquery' => ''],
+            'fragment' => 'deffragment',
+        ]);
     }
 
     function test_parse_uri_special()
     {
         // double slash
-        $this->assertEquals([
+        that((parse_uri)('//user:pass@host/path/to/hoge?op1=1&op2=2#hash'))->is([
             'scheme'   => '',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -1006,10 +1002,10 @@ that is the pen
             'path'     => '/path/to/hoge',
             'query'    => ['op1' => 1, 'op2' => 2],
             'fragment' => 'hash',
-        ], (parse_uri)('//user:pass@host/path/to/hoge?op1=1&op2=2#hash'));
+        ]);
 
         // tripple slash
-        $this->assertEquals([
+        that((parse_uri)('///path/to/hoge?op1=1&op2=2#hash'))->is([
             'scheme'   => '',
             'user'     => '',
             'pass'     => '',
@@ -1018,10 +1014,10 @@ that is the pen
             'path'     => '/path/to/hoge',
             'query'    => ['op1' => 1, 'op2' => 2],
             'fragment' => 'hash',
-        ], (parse_uri)('///path/to/hoge?op1=1&op2=2#hash'));
+        ]);
 
         // no port value
-        $this->assertEquals([
+        that((parse_uri)('scheme://user:pass@host:/path/to/hoge?op1=1&op2=2#hash'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -1030,10 +1026,10 @@ that is the pen
             'path'     => '/path/to/hoge',
             'query'    => ['op1' => 1, 'op2' => 2],
             'fragment' => 'hash',
-        ], (parse_uri)('scheme://user:pass@host:/path/to/hoge?op1=1&op2=2#hash'));
+        ]);
 
         // no path value
-        $this->assertEquals([
+        that((parse_uri)('scheme://user:pass@host?op1=1&op2=2#hash'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -1042,10 +1038,10 @@ that is the pen
             'path'     => '',
             'query'    => ['op1' => 1, 'op2' => 2],
             'fragment' => 'hash',
-        ], (parse_uri)('scheme://user:pass@host?op1=1&op2=2#hash'));
+        ]);
 
         // no query value
-        $this->assertEquals([
+        that((parse_uri)('scheme://user:pass@host/path/to/hoge?#hash'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -1054,10 +1050,10 @@ that is the pen
             'path'     => '/path/to/hoge',
             'query'    => [],
             'fragment' => 'hash',
-        ], (parse_uri)('scheme://user:pass@host/path/to/hoge?#hash'));
+        ]);
 
         // no fragment value
-        $this->assertEquals([
+        that((parse_uri)('scheme://user:pass@host/path/to/hoge?#'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -1066,7 +1062,7 @@ that is the pen
             'path'     => '/path/to/hoge',
             'query'    => [],
             'fragment' => '',
-        ], (parse_uri)('scheme://user:pass@host/path/to/hoge?#'));
+        ]);
     }
 
     function test_ini_export()
@@ -1088,7 +1084,7 @@ that is the pen
             ],
         ];
 
-        $this->assertEquals('simple[a] = "A"
+        that((ini_export)($iniarray, ['process_sections' => false]))->is('simple[a] = "A"
 simple[b] = "B"
 simple[quote] = "\"\000\\\\\'"
 x[] = "A"
@@ -1096,9 +1092,9 @@ x[] = "B"
 x[] = "C"
 y[a] = "A"
 y[b] = "B"
-', (ini_export)($iniarray, ['process_sections' => false]));
+');
 
-        $this->assertEquals('[simple]
+        that((ini_export)($iniarray, ['process_sections' => true]))->is('[simple]
 a = "A"
 b = "B"
 quote = "\"\000\\\\\'"
@@ -1111,12 +1107,20 @@ x[] = "C"
 [hasharray]
 y[a] = "A"
 y[b] = "B"
-', (ini_export)($iniarray, ['process_sections' => true]));
+');
     }
 
     function test_ini_import()
     {
-        $this->assertEquals([
+        that((ini_import)('a = "A"
+b = "B"
+quote = "\"\000\\\\\'"
+x[] = "A"
+x[] = "B"
+x[] = "C"
+y[a] = "A"
+y[b] = "B"
+', ['process_sections' => false]))->is([
             'a'     => 'A',
             'b'     => 'B',
             'quote' => '"\000\\\'',
@@ -1125,17 +1129,22 @@ y[b] = "B"
                 'a' => 'A',
                 'b' => 'B',
             ],
-        ], (ini_import)('a = "A"
+        ]);
+
+        that((ini_import)('[simple]
+a = "A"
 b = "B"
 quote = "\"\000\\\\\'"
+
+[array]
 x[] = "A"
 x[] = "B"
 x[] = "C"
+
+[hasharray]
 y[a] = "A"
 y[b] = "B"
-', ['process_sections' => false]));
-
-        $this->assertEquals([
+', ['process_sections' => true]))->is([
             'simple'    => [
                 'a'     => 'A',
                 'b'     => 'B',
@@ -1150,20 +1159,7 @@ y[b] = "B"
                     'b' => 'B',
                 ],
             ],
-        ], (ini_import)('[simple]
-a = "A"
-b = "B"
-quote = "\"\000\\\\\'"
-
-[array]
-x[] = "A"
-x[] = "B"
-x[] = "C"
-
-[hasharray]
-y[a] = "A"
-y[b] = "B"
-', ['process_sections' => true]));
+        ]);
     }
 
     function test_csv_encoding()
@@ -1178,10 +1174,10 @@ y[b] = "B"
         $sjisstring12345 = require "$DATADIR/sjisstring12345.php";
         $sjisstringnohead = require "$DATADIR/sjisstringnohead.php";
 
-        $this->assertEquals($sjisstring, (csv_export)($utf8array, ['encoding' => 'SJIS']));
-        $this->assertEquals($utf8array, (csv_import)($sjisstring, ['encoding' => 'SJIS']));
+        that((csv_export)($utf8array, ['encoding' => 'SJIS']))->is($sjisstring);
+        that((csv_import)($sjisstring, ['encoding' => 'SJIS']))->is($utf8array);
 
-        $this->assertEquals($sjisstring12345, (csv_export)($utf8array, [
+        that((csv_export)($utf8array, [
             'encoding' => 'SJIS',
             'headers'  => [
                 'Ａ' => '１',
@@ -1190,8 +1186,8 @@ y[b] = "B"
                 'Ｄ' => '４',
                 'Ｅ' => '５',
             ],
-        ]));
-        $this->assertEquals($utf8array, (csv_import)($sjisstringnohead, [
+        ]))->is($sjisstring12345);
+        that((csv_import)($sjisstringnohead, [
             'encoding' => 'SJIS',
             'headers'  => [
                 'Ａ',
@@ -1200,7 +1196,7 @@ y[b] = "B"
                 'Ｄ',
                 'Ｅ',
             ],
-        ]));
+        ]))->is($utf8array);
     }
 
     function test_csv_export()
@@ -1214,72 +1210,72 @@ y[b] = "B"
             ['c' => 'c3', 'b' => 'b3', 'a' => 'a3', 'x' => 'X'],
         ];
 
-        $this->assertEquals("a,b,c
+        that((csv_export)($csvarrays))->is("a,b,c
 a1,b1,c1
 a2,b2,c2
 a3,b3,c3
-", (csv_export)($csvarrays));
+");
 
         // headers 指定
-        $this->assertEquals("A,C
+        that((csv_export)($csvarrays, ['headers' => ['a' => 'A', 'c' => 'C']]))->is("A,C
 a1,c1
 a2,c2
 a3,c3
-", (csv_export)($csvarrays, ['headers' => ['a' => 'A', 'c' => 'C']]));
+");
 
         // callback 指定
-        $this->assertEquals("a,b,c
-a1,B1,c1
-a3,B3,c3
-", (csv_export)($csvarrays, [
+        that((csv_export)($csvarrays, [
             'callback' => function (&$row, $n) {
                 $row['b'] = strtoupper($row['b']);
                 return $n !== 1;
             }
-        ]));
+        ]))->is("a,b,c
+a1,B1,c1
+a3,B3,c3
+");
 
         // output 指定
         $receiver = fopen('php://memory', 'r+b');
-        $this->assertEquals(33, (csv_export)($csvarrays, ['output' => $receiver]));
+        that((csv_export)($csvarrays, ['output' => $receiver]))->is(33);
         rewind($receiver);
-        $this->assertEquals("a,b,c
+        that(stream_get_contents($receiver))->is("a,b,c
 a1,b1,c1
 a2,b2,c2
 a3,b3,c3
-", stream_get_contents($receiver));
+");
 
         // fputcsv 引数
         $csvarrays[0]['c'] = " c\n";
-        $this->assertEquals("a b c
+        that((csv_export)($csvarrays, ['delimiter' => ' ', 'enclosure' => "'"]))->is("a b c
 a1 b1 ' c
 '
 a2 b2 c2
 a3 b3 c3
-", (csv_export)($csvarrays, ['delimiter' => ' ', 'enclosure' => "'"]));
+");
     }
 
     function test_csv_import()
     {
-        $this->assertEquals([
-            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
-            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
-            ['a' => 'a3', 'b' => 'b3', 'c' => 'c3'],
-        ], (csv_import)('a,b,c
+        that((csv_import)('a,b,c
 a1,b1,c1
 a2,b2,c2
 a3,b3,c3
-'));
+'))->is([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
+            ['a' => 'a3', 'b' => 'b3', 'c' => 'c3'],
+        ]);
 
         // 空行とクオート
-        $this->assertEquals([
-            ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
-            ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
-        ], (csv_import)('a,b,c
+        that((csv_import)('a,b,c
 "a1,x",b1,c1
 
 a3,b3,"c3
 x"
-'));
+'))->is([
+            ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
+        ]);
 
         // ファイルポインタ
         file_put_contents(sys_get_temp_dir() . '/test.csv', 'a,b,c
@@ -1288,35 +1284,32 @@ x"
 a3,b3,"c3
 x"
 ');
-        $this->assertEquals([
+        that((csv_import)(fopen(sys_get_temp_dir() . '/test.csv', 'r')))->is([
             ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
             ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
-        ], (csv_import)(fopen(sys_get_temp_dir() . '/test.csv', 'r')));
+        ]);
 
         // headers 指定（数値）
-        $this->assertEquals([
-            ['A' => 'a1', 'C' => 'c1'],
-            ['A' => 'a2', 'C' => 'c2'],
-        ], (csv_import)('
+        that((csv_import)('
 a1,b1,c1
 a2,b2,c2
-', ['headers' => ['A', 2 => 'C']]));
+', ['headers' => ['A', 2 => 'C']]))->is([
+            ['A' => 'a1', 'C' => 'c1'],
+            ['A' => 'a2', 'C' => 'c2'],
+        ]);
 
         // headers 指定（キーマップ）
-        $this->assertEquals([
-            ['xA' => 'a1', 'xC' => 'c1'],
-            ['xA' => 'a2', 'xC' => 'c2'],
-        ], (csv_import)('
+        that((csv_import)('
 A,B,C
 a1,b1,c1
 a2,b2,c2
-', ['headers' => ['C' => 'xC', 'A' => 'xA', 'unknown' => 'x']]));
+', ['headers' => ['C' => 'xC', 'A' => 'xA', 'unknown' => 'x']]))->is([
+            ['xA' => 'a1', 'xC' => 'c1'],
+            ['xA' => 'a2', 'xC' => 'c2'],
+        ]);
 
         // コールバック指定
-        $this->assertEquals([
-            ['a' => 'a1', 'b' => 'B1', 'c' => 'c1'],
-            ['a' => 'a3', 'b' => 'B3', 'c' => 'c3'],
-        ], (csv_import)('a,b,c
+        that((csv_import)('a,b,c
 a1,b1,c1
 a2,b2,c2
 a3,b3,c3
@@ -1325,10 +1318,13 @@ a3,b3,c3
                 $row['b'] = strtoupper($row['b']);
                 return $n !== 1;
             }
-        ]));
+        ]))->is([
+            ['a' => 'a1', 'b' => 'B1', 'c' => 'c1'],
+            ['a' => 'a3', 'b' => 'B3', 'c' => 'c3'],
+        ]);
 
         // 要素数が合わないと例外
-        $this->assertException('array_combine', csv_import, "a,b,c\nhoge");
+        that([csv_import, "a,b,c\nhoge"])->throws('array_combine');
     }
 
     function test_json_export()
@@ -1337,22 +1333,39 @@ a3,b3,c3
         json_decode('aaa');
 
         // デフォルトオプション
-        $this->assertEquals('[123.0,"あ"]', (json_export)([123.0, 'あ']));
+        that((json_export)([123.0, 'あ']))->is('[123.0,"あ"]');
 
         // オプション指定（上書き）
-        $this->assertEquals("[\n    123,\n    \"\u3042\"\n]", (json_export)([123.0, 'あ'], [
+        that((json_export)([123.0, 'あ'], [
             JSON_UNESCAPED_UNICODE      => false,
             JSON_PRESERVE_ZERO_FRACTION => false,
             JSON_PRETTY_PRINT           => true,
-        ]));
+        ]))->is("[\n    123,\n    \"\u3042\"\n]");
 
         // depth
-        $this->assertException('Maximum stack depth exceeded', json_export, [[[[[[]]]]]], [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]);
+        that([json_export, [[[[[[]]]]]], [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]])->throws('Maximum stack depth exceeded');
+    }
+
+    function test_json_import()
+    {
+        // エラー情報を突っ込んでおく
+        json_decode('aaa');
+
+        // デフォルトオプション
+        that((json_import)('[123.0,"あ"]'))->is([123.0, "あ"]);
+
+        // オプション指定（上書き）
+        that((json_import)('{"a":123.0,"b":"あ"}', [
+            JSON_OBJECT_AS_ARRAY => false,
+        ]))->is((object) ['a' => 123.0, 'b' => "あ"]);
+
+        // depth
+        that([json_import, '[[[[[[]]]]]]', [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]])->throws('Maximum stack depth exceeded');
     }
 
     function test_paml_export()
     {
-        $this->assertSame('null: null, bool1: false, bool2: true, int: 123, double: 3.14, string1: "xyz", string2: "[x, \\"y\\", z]"', (paml_export)([
+        that((paml_export)([
             "null"    => null,
             "bool1"   => false,
             "bool2"   => true,
@@ -1360,9 +1373,9 @@ a3,b3,c3
             "double"  => 3.14,
             "string1" => "xyz",
             "string2" => '[x, "y", z]',
-        ]));
+        ]))->isSame('null: null, bool1: false, bool2: true, int: 123, double: 3.14, string1: "xyz", string2: "[x, \\"y\\", z]"');
 
-        $this->assertSame('array:[1,2,"3",],nest:{a:{b:{c:["X",],},},},', (paml_export)([
+        that((paml_export)([
             "array" => [1, 2, "3"],
             "nest"  => [
                 "a" => [
@@ -1374,12 +1387,12 @@ a3,b3,c3
         ], [
             'trailing-comma' => true,
             'pretty-space'   => false,
-        ]));
+        ]))->isSame('array:[1,2,"3",],nest:{a:{b:{c:["X",],},},},');
     }
 
     function test_paml_import()
     {
-        $this->assertSame([
+        that((paml_import)('null:null,bool1: false, bool2:true , int: 123, double: 3.14, string1:xyz,string2:"[x, \"y\", \'z\']"'))->isSame([
             "null"    => null,
             "bool1"   => false,
             "bool2"   => true,
@@ -1387,23 +1400,23 @@ a3,b3,c3
             "double"  => 3.14,
             "string1" => "xyz",
             "string2" => '[x, "y", \'z\']',
-        ], (paml_import)('null:null,bool1: false, bool2:true , int: 123, double: 3.14, string1:xyz,string2:"[x, \"y\", \'z\']"'));
+        ]);
 
-        $this->assertSame([
+        that((paml_import)("hash:[1,2,'a,b,', \"c,d,\",x:'X','y:Y',\"z:Z\", 4]"))->isSame([
             "hash" => [1, 2, 'a,b,', 'c,d,', 'x' => 'X', 'y:Y', 'z:Z', 4],
-        ], (paml_import)("hash:[1,2,'a,b,', \"c,d,\",x:'X','y:Y',\"z:Z\", 4]"));
+        ]);
 
-        $this->assertSame([
+        that((paml_import)('d:\'a\\nz\', s:"a\\\\nz"'))->isSame([
             'd' => 'a\\nz',
             's' => "a\\nz",
-        ], (paml_import)('d:\'a\\nz\', s:"a\\\\nz"'));
+        ]);
 
-        $this->assertSame([
+        that((paml_import)('e: E_ERROR, ao: ArrayObject::STD_PROP_LIST'))->isSame([
             "e"  => E_ERROR,
             "ao" => \ArrayObject::STD_PROP_LIST,
-        ], (paml_import)('e: E_ERROR, ao: ArrayObject::STD_PROP_LIST'));
+        ]);
 
-        $this->assertSame([
+        that((paml_import)('array:[1,2,"3"], nest:[a: [b: [c: [X]]]]'))->isSame([
             "array" => [1, 2, "3"],
             "nest"  => [
                 "a" => [
@@ -1412,44 +1425,44 @@ a3,b3,c3
                     ],
                 ],
             ],
-        ], (paml_import)('array:[1,2,"3"], nest:[a: [b: [c: [X]]]]'));
+        ]);
 
-        $this->assertEquals([
+        that((paml_import)("a:A,\nb:B,array:[1,\n2,\n\"3\\n4\",\n],object:{1,\n2,\n\"3\\n4\",\n}"))->is([
             'a'      => 'A',
             'b'      => 'B',
             "array"  => [1, 2, "3\n4"],
             "object" => (object) [1, 2, "3\n4"],
-        ], (paml_import)("a:A,\nb:B,array:[1,\n2,\n\"3\\n4\",\n],object:{1,\n2,\n\"3\\n4\",\n}"));
+        ]);
 
-        $this->assertEquals([
+        that((paml_import)('empty_array1:[], empty_array2:{}, empty_string1:,empty_string2:""'))->is([
             "empty_array1"  => [],
             "empty_array2"  => (object) [],
             "empty_string1" => '',
             "empty_string2" => '',
-        ], (paml_import)('empty_array1:[], empty_array2:{}, empty_string1:,empty_string2:""'));
+        ]);
 
-        $this->assertSame([], (paml_import)('  '));
-        $this->assertSame(['xxx'], (paml_import)(' xxx '));
-        $this->assertSame(['', ''], (paml_import)(',,'));
-        $this->assertSame([
-            "array" => [1, 2, "3"],
-        ], (paml_import)('array:[1,2,"3",]', [
+        that((paml_import)('  '))->isSame([]);
+        that((paml_import)(' xxx '))->isSame(['xxx']);
+        that((paml_import)(',,'))->isSame(['', '']);
+        that((paml_import)('array:[1,2,"3",]', [
             'trailing-comma' => true,
             'cache'          => false,
-        ]));
-        $this->assertSame([
-            "array" => [1, 2, "3", ""],
-        ], (paml_import)('array:[1,2,"3",]', [
+        ]))->isSame([
+            "array" => [1, 2, "3"],
+        ]);
+        that((paml_import)('array:[1,2,"3",]', [
             'trailing-comma' => false,
             'cache'          => false,
-        ]));
+        ]))->isSame([
+            "array" => [1, 2, "3", ""],
+        ]);
     }
 
     function test_paml_transport()
     {
         $string = file_get_contents(__DIR__ . '/Strings/text.paml');
         $array = (paml_import)($string);
-        $this->assertEquals([
+        that($array)->isSame([
             'text'   => 'this is raw string',
             'break'  => 'this
 is
@@ -1458,137 +1471,120 @@ string',
             'quote1' => 'a
 z',
             'quote2' => 'a\nz',
-        ], $array);
-        $this->assertEquals('text: "this is raw string", break: "this
+        ]);
+        that((paml_export)($array))->isSame('text: "this is raw string", break: "this
 is
 break
 string", quote1: "a
-z", quote2: "a\\\\nz"', (paml_export)($array));
-    }
-
-    function test_json_import()
-    {
-        // エラー情報を突っ込んでおく
-        json_decode('aaa');
-
-        // デフォルトオプション
-        $this->assertEquals([123.0, "あ"], (json_import)('[123.0,"あ"]'));
-
-        // オプション指定（上書き）
-        $this->assertEquals((object) ['a' => 123.0, 'b' => "あ"], (json_import)('{"a":123.0,"b":"あ"}', [
-            JSON_OBJECT_AS_ARRAY => false,
-        ]));
-
-        // depth
-        $this->assertException('Maximum stack depth exceeded', json_import, '[[[[[[]]]]]]', [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3]);
+z", quote2: "a\\\\nz"');
     }
 
     function test_ltsv_import()
     {
-        $this->assertEquals(['a' => 'A', 'b' => 'B', 'c' => 'C'], (ltsv_import)("a:A	b:B	c:C"));
-        $this->assertEquals(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C'], (ltsv_import)('a\ta:a	b:b\tb	c\\\\t:C\\\\C'));
+        that((ltsv_import)("a:A	b:B	c:C"))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that((ltsv_import)('a\ta:a	b:b\tb	c\\\\t:C\\\\C'))->is(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C']);
 
-        $this->assertEquals(['a' => ['x', 'y'], 'b' => 'B'], (ltsv_import)('a:`["x","y"]`	b:B'));
-        $this->assertEquals(['a' => '`xyz`', 'b' => 'B'], (ltsv_import)('a:`xyz`	b:B'));
+        that((ltsv_import)('a:`["x","y"]`	b:B'))->is(['a' => ['x', 'y'], 'b' => 'B']);
+        that((ltsv_import)('a:`xyz`	b:B'))->is(['a' => '`xyz`', 'b' => 'B']);
     }
 
     function test_ltsv_export()
     {
-        $this->assertEquals("a:A	b:B	c:C", (ltsv_export)(['a' => 'A', 'b' => 'B', 'c' => 'C']));
-        $this->assertEquals('a\ta:a	b:b\tb	c\\\\t:C\\\\C', (ltsv_export)(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C']));
-        $this->assertEquals("a%ta:a	b:b%tb", (ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => '%']));
-        $this->assertEquals("a	a:a	b:b	b", (ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => null]));
+        that((ltsv_export)(['a' => 'A', 'b' => 'B', 'c' => 'C']))->is("a:A	b:B	c:C");
+        that((ltsv_export)(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C']))->is('a\ta:a	b:b\tb	c\\\\t:C\\\\C');
+        that((ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => '%']))->is("a%ta:a	b:b%tb");
+        that((ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => null]))->is("a	a:a	b:b	b");
 
-        $this->assertEquals('a:`["x","y"]`	b:B', (ltsv_export)(['a' => ['x', 'y'], 'b' => 'B']));
-        $this->assertEquals('a:hoge	b:B', (ltsv_export)(['a' => new Concrete('hoge'), 'b' => 'B']));
+        that((ltsv_export)(['a' => ['x', 'y'], 'b' => 'B']))->is('a:`["x","y"]`	b:B');
+        that((ltsv_export)(['a' => new Concrete('hoge'), 'b' => 'B']))->is('a:hoge	b:B');
 
-        $this->assertException('label contains ":"', ltsv_export, ['a:a' => 'A']);
+        that([ltsv_export, ['a:a' => 'A']])->throws('label contains ":"');
     }
 
     function test_markdown_table()
     {
-        $this->assertEquals("
+        that("\n" . (markdown_table)([['a' => 'xx']]))->is("
 | a   |
 | --- |
 | xx  |
-", "\n" . (markdown_table)([['a' => 'xx']]));
+");
 
-        $this->assertEquals("
+        that("\n" . (markdown_table)([['a' => '99']]))->is("
 |   a |
 | --: |
 |  99 |
-", "\n" . (markdown_table)([['a' => '99']]));
+");
 
-        $this->assertEquals("
+        that("\n" . (markdown_table)([['a' => 'aa'], ['b' => "b\nb"]]))->is("
 | a   | b      |
 | --- | ------ |
 | aa  |        |
 |     | b<br>b |
-", "\n" . (markdown_table)([['a' => 'aa'], ['b' => "b\nb"]]));
+");
 
-        $this->assertEquals("
+        that("\n" . (markdown_table)([['a' => 'あ'], ['b' => 'い']]))->is("
 | a   | b   |
 | --- | --- |
 | あ  |     |
 |     | い  |
-", "\n" . (markdown_table)([['a' => 'あ'], ['b' => 'い']]));
+");
 
-        $this->assertException('must be array of hasharray', markdown_table, '');
+        that([markdown_table, ''])->throws('must be array of hasharray');
     }
 
     function test_markdown_list()
     {
-        $this->assertEquals("
+        that("\n" . (markdown_list)(['A', 'B', 'C' => [1, 2, 3]]))->is("
 - A
 - B
 - C: 
     - 1
     - 2
     - 3
-", "\n" . (markdown_list)(['A', 'B', 'C' => [1, 2, 3]]));
+");
 
-        $this->assertEquals("
+        that("\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => [1, 2, 3]]))->is("
 - a: A
 - b: B
 - ls: 
     - 1
     - 2
     - 3
-", "\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => [1, 2, 3]]));
+");
 
-        $this->assertEquals("
+        that("\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]]))->is("
 - a: A
 - b: B
 - ls: LS
     - 1
     - 2
     - 3
-", "\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]]));
+");
 
-        $this->assertEquals("
+        that("\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]], [
+                'indent'    => "\t",
+                'separator' => ' = ',
+                'liststyle' => '*',
+                'ordered'   => true,
+            ]))->is("
 * a = A
 * b = B
 * ls = LS
 	1. 1
 	2. 2
 	3. 3
-", "\n" . (markdown_list)(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]], [
-                'indent'    => "\t",
-                'separator' => ' = ',
-                'liststyle' => '*',
-                'ordered'   => true,
-            ])
+"
         );
     }
 
     function test_random_string()
     {
         $actual = (random_string)(256, 'abc');
-        $this->assertEquals(256, strlen($actual)); // 256文字のはず
-        $this->assertRegExp('#abc#', $actual); // 大抵の場合含まれるはず（極稀にコケる）
+        that(strlen($actual))->is(256); // 256文字のはず
+        that($actual)->matches('#abc#'); // 大抵の場合含まれるはず（極稀にコケる）
 
-        $this->assertException('positive number', random_string, 0, 'x');
-        $this->assertException('empty', random_string, 256, '');
+        that([random_string, 0, 'x'])->throws('positive number');
+        that([random_string, 256, ''])->throws('empty');
     }
 
     public function test_kvsprintf()
@@ -1601,184 +1597,184 @@ z", quote2: "a\\\\nz"', (paml_export)($array));
 
         // 普通の変換
         $result = (kvsprintf)('int:%int$d float:%float$F string:%string$s', $args);
-        $this->assertEquals('int:12345 float:3.141592 string:mojiretu', $result);
+        that($result)->is('int:12345 float:3.141592 string:mojiretu');
 
         // 文字詰め(シンプル)
         $result = (kvsprintf)('int:%int$07d float:%float$010F string:%string$10s', $args);
-        $this->assertEquals('int:0012345 float:003.141592 string:  mojiretu', $result);
+        that($result)->is('int:0012345 float:003.141592 string:  mojiretu');
 
         // 文字詰め(右。dで0埋めは効かない)
         $result = (kvsprintf)('int:%int$-07d float:%float$-010F string:%string$-10s', $args);
-        $this->assertEquals('int:12345   float:3.14159200 string:mojiretu  ', $result);
+        that($result)->is('int:12345   float:3.14159200 string:mojiretu  ');
 
         // 配列の順番は問わない
         $result = (kvsprintf)('int:%int$d float:%float$F string:%string$s', array_reverse($args));
-        $this->assertEquals('int:12345 float:3.141592 string:mojiretu', $result);
+        that($result)->is('int:12345 float:3.141592 string:mojiretu');
 
         // 同じキーが出現
         $result = (kvsprintf)('int:%int$d int:%int$d int:%int$d', $args);
-        $this->assertEquals('int:12345 int:12345 int:12345', $result);
+        that($result)->is('int:12345 int:12345 int:12345');
 
         // %エスケープ
         $result = (kvsprintf)('int:%%int$d float:%%float$F string:%%string$s', $args);
-        $this->assertEquals('int:%int$d float:%float$F string:%string$s', $result);
+        that($result)->is('int:%int$d float:%float$F string:%string$s');
 
         // 先頭が書式指定子
         $result = (kvsprintf)('%hoge$d', ['hoge' => 123]);
-        $this->assertEquals('123', $result);
+        that($result)->is('123');
 
         // "%%" の後に書式指定子
         $result = (kvsprintf)('%%%hoge$d', ['hoge' => 123]);
-        $this->assertEquals('%123', $result);
+        that($result)->is('%123');
 
         // キーが他のキーを含む
         $result = (kvsprintf)('%a$s_%aa$s_%aaa$s', ['a' => 'A', 'aa' => 'AA', 'aaa' => 'AAA']);
-        $this->assertEquals('A_AA_AAA', $result);
+        that($result)->is('A_AA_AAA');
         $result = (kvsprintf)('%aaa$s_%aa$s_%a$s', ['a' => 'A', 'aa' => 'AA', 'aaa' => 'AAA']);
-        $this->assertEquals('AAA_AA_A', $result);
+        that($result)->is('AAA_AA_A');
 
         // キー自体に%を含む
         $result = (kvsprintf)('%ho%ge$s', ['ho%ge' => 123]);
-        $this->assertEquals('123', $result);
+        that($result)->is('123');
 
         // 存在しないキーを参照
-        $this->assertException(new \OutOfBoundsException('Undefined index'), kvsprintf, '%aaaaa$d %bbbbb$d', ['hoge' => 123]);
+        that([kvsprintf, '%aaaaa$d %bbbbb$d', ['hoge' => 123]])->throws(new \OutOfBoundsException('Undefined index'));
     }
 
     public function test_preg_capture()
     {
-        $this->assertEquals([], (preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', []));
-        $this->assertEquals([1 => 'a'], (preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', [1 => '']));
-        $this->assertEquals([4 => ''], (preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', [4 => '']));
+        that((preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', []))->is([]);
+        that((preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', [1 => '']))->is([1 => 'a']);
+        that((preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', [4 => '']))->is([4 => '']);
 
-        $this->assertEquals([], (preg_capture)('#([a-z])([0-9])([A-Z]?)#', 'a0', []));
-        $this->assertEquals([3 => ''], (preg_capture)('#([a-z])([0-9])([A-Z]?)#', 'a0', [3 => '']));
-        $this->assertEquals([3 => 'Z'], (preg_capture)('#([a-z])([0-9])([A-Z]?)#', 'a0Z', [3 => '']));
+        that((preg_capture)('#([a-z])([0-9])([A-Z]?)#', 'a0', []))->is([]);
+        that((preg_capture)('#([a-z])([0-9])([A-Z]?)#', 'a0', [3 => '']))->is([3 => '']);
+        that((preg_capture)('#([a-z])([0-9])([A-Z]?)#', 'a0Z', [3 => '']))->is([3 => 'Z']);
 
-        $this->assertEquals([
+        that((preg_capture)('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0Z', [
+            'one' => 'ONE',
+            'two' => 'TWO',
+            'thr' => 'THR',
+        ]))->is([
             'one' => 'a',
             'two' => '0',
             'thr' => 'Z',
-        ], (preg_capture)('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0Z', [
+        ]);
+        that((preg_capture)('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0', [
             'one' => 'ONE',
             'two' => 'TWO',
             'thr' => 'THR',
-        ]));
-        $this->assertEquals([
+        ]))->is([
             'one' => 'a',
             'two' => '0',
             'thr' => 'THR',
-        ], (preg_capture)('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0', [
-            'one' => 'ONE',
-            'two' => 'TWO',
-            'thr' => 'THR',
-        ]));
+        ]);
     }
 
     public function test_preg_splice()
     {
         $m = [];
-        $this->assertEquals("abc", (preg_splice)('#\d+#', '', 'abc123', $m));
-        $this->assertEquals(['123'], $m);
-        $this->assertEquals("ABC123", (preg_splice)('#([a-z]+)#', function ($m) { return strtoupper($m[1]); }, 'abc123', $m));
-        $this->assertEquals(['abc', 'abc'], $m);
-        $this->assertEquals((preg_splice)('#[a-z]+#', 'strtoupper', 'abc123', $m), 'strtoupper123');
-        $this->assertEquals($m, ['abc']);
+        that((preg_splice)('#\d+#', '', 'abc123', $m))->is("abc");
+        that($m)->is(['123']);
+        that((preg_splice)('#([a-z]+)#', function ($m) { return strtoupper($m[1]); }, 'abc123', $m))->is("ABC123");
+        that($m)->is(['abc', 'abc']);
+        that((preg_splice)('#[a-z]+#', 'strtoupper', 'abc123', $m))->is('strtoupper123');
+        that($m)->is(['abc']);
     }
 
     public function test_preg_replaces()
     {
         // simple
-        $this->assertEquals('aaa99999zzz, aaa99999zzz', (preg_replaces)('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz'));
-        $this->assertEquals('aaa99,999zzz', (preg_replaces)('#aaa(\d\d\d),(\d\d\d)zzz#', [1 => 99, 2 => 999], 'aaa123,456zzz'));
+        that((preg_replaces)('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz'))->is('aaa99999zzz, aaa99999zzz');
+        that((preg_replaces)('#aaa(\d\d\d),(\d\d\d)zzz#', [1 => 99, 2 => 999], 'aaa123,456zzz'))->is('aaa99,999zzz');
 
         // named
-        $this->assertEquals('aaa99999zzz, aaa99999zzz', (preg_replaces)('#aaa(?<digit>\d\d\d)zzz#', ['digit' => 99999], 'aaa123zzz, aaa456zzz'));
+        that((preg_replaces)('#aaa(?<digit>\d\d\d)zzz#', ['digit' => 99999], 'aaa123zzz, aaa456zzz'))->is('aaa99999zzz, aaa99999zzz');
 
         // multibyte
-        $this->assertEquals('あxい|うxえxお', (preg_replaces)('#い(x)う#u', '|', 'あxいxうxえxお'));
+        that((preg_replaces)('#い(x)う#u', '|', 'あxいxうxえxお'))->is('あxい|うxえxお');
 
         // limit, count
         $count = 0;
-        $this->assertEquals('aaa99999zzz, aaa456zzz', (preg_replaces)('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz', 1, $count));
-        $this->assertEquals(1, $count);
-        $this->assertEquals('aaa99999zzz, aaa99999zzz', (preg_replaces)('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz', 9, $count));
-        $this->assertEquals(2, $count);
+        that((preg_replaces)('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz', 1, $count))->is('aaa99999zzz, aaa456zzz');
+        that($count)->is(1);
+        that((preg_replaces)('#aaa(\d\d\d)zzz#', [1 => 99999], 'aaa123zzz, aaa456zzz', 9, $count))->is('aaa99999zzz, aaa99999zzz');
+        that($count)->is(2);
 
         // misc
-        $this->assertEquals('aaa99999zzz', (preg_replaces)('#aaa(\d\d\d)zzz#', 99999, 'aaa123zzz'));
-        $this->assertEquals('aaa246zzz', (preg_replaces)('#aaa(\d\d\d)zzz#', function ($v) { return $v * 2; }, 'aaa123zzz'));
+        that((preg_replaces)('#aaa(\d\d\d)zzz#', 99999, 'aaa123zzz'))->is('aaa99999zzz');
+        that((preg_replaces)('#aaa(\d\d\d)zzz#', function ($v) { return $v * 2; }, 'aaa123zzz'))->is('aaa246zzz');
     }
 
     public function test_damerau_levenshtein()
     {
-        $this->assertSame(0, (damerau_levenshtein)("12345", "12345"));
-        $this->assertSame(3, (damerau_levenshtein)("", "xzy"));
-        $this->assertSame(3, (damerau_levenshtein)("xzy", ""));
-        $this->assertSame(0, (damerau_levenshtein)("", ""));
-        $this->assertSame(1, (damerau_levenshtein)("1", "2"));
-        $this->assertSame(1, (damerau_levenshtein)("12", "21"));
-        $this->assertSame(2, (damerau_levenshtein)("2121", "11", 2, 1, 1));
-        $this->assertSame(10, (damerau_levenshtein)("2121", "11", 2, 1, 5));
-        $this->assertSame(2, (damerau_levenshtein)("11", "2121", 1, 1, 1));
-        $this->assertSame(10, (damerau_levenshtein)("11", "2121", 5, 1, 1));
-        $this->assertSame(3, (damerau_levenshtein)("111", "121", 2, 3, 2));
-        $this->assertSame(4, (damerau_levenshtein)("111", "121", 2, 9, 2));
-        $this->assertSame(2, (damerau_levenshtein)("13458", "12345"));
-        $this->assertSame(2, (damerau_levenshtein)("1345", "1234"));
-        $this->assertSame(1, (damerau_levenshtein)("debugg", "debug"));
-        $this->assertSame(1, (damerau_levenshtein)("ddebug", "debug"));
-        $this->assertSame(2, (damerau_levenshtein)("debbbug", "debug"));
-        $this->assertSame(1, (damerau_levenshtein)("debugging", "debuging"));
-        $this->assertSame(2, (damerau_levenshtein)("a", "bc"));
-        $this->assertSame(2, (damerau_levenshtein)("xa", "xbc"));
-        $this->assertSame(2, (damerau_levenshtein)("xax", "xbcx"));
-        $this->assertSame(2, (damerau_levenshtein)("ax", "bcx"));
+        that((damerau_levenshtein)("12345", "12345"))->isSame(0);
+        that((damerau_levenshtein)("", "xzy"))->isSame(3);
+        that((damerau_levenshtein)("xzy", ""))->isSame(3);
+        that((damerau_levenshtein)("", ""))->isSame(0);
+        that((damerau_levenshtein)("1", "2"))->isSame(1);
+        that((damerau_levenshtein)("12", "21"))->isSame(1);
+        that((damerau_levenshtein)("2121", "11", 2, 1, 1))->isSame(2);
+        that((damerau_levenshtein)("2121", "11", 2, 1, 5))->isSame(10);
+        that((damerau_levenshtein)("11", "2121", 1, 1, 1))->isSame(2);
+        that((damerau_levenshtein)("11", "2121", 5, 1, 1))->isSame(10);
+        that((damerau_levenshtein)("111", "121", 2, 3, 2))->isSame(3);
+        that((damerau_levenshtein)("111", "121", 2, 9, 2))->isSame(4);
+        that((damerau_levenshtein)("13458", "12345"))->isSame(2);
+        that((damerau_levenshtein)("1345", "1234"))->isSame(2);
+        that((damerau_levenshtein)("debugg", "debug"))->isSame(1);
+        that((damerau_levenshtein)("ddebug", "debug"))->isSame(1);
+        that((damerau_levenshtein)("debbbug", "debug"))->isSame(2);
+        that((damerau_levenshtein)("debugging", "debuging"))->isSame(1);
+        that((damerau_levenshtein)("a", "bc"))->isSame(2);
+        that((damerau_levenshtein)("xa", "xbc"))->isSame(2);
+        that((damerau_levenshtein)("xax", "xbcx"))->isSame(2);
+        that((damerau_levenshtein)("ax", "bcx"))->isSame(2);
 
-        $this->assertSame(1, (damerau_levenshtein)("abc", "bac"));
-        $this->assertSame(2, (damerau_levenshtein)("bare", "bear"));
-        $this->assertSame(2, (damerau_levenshtein)("12", "21", 1, 1, 1, 0));
-        $this->assertSame(2, (damerau_levenshtein)("destroy", "destory", 1, 1, 1, 2));
+        that((damerau_levenshtein)("abc", "bac"))->isSame(1);
+        that((damerau_levenshtein)("bare", "bear"))->isSame(2);
+        that((damerau_levenshtein)("12", "21", 1, 1, 1, 0))->isSame(2);
+        that((damerau_levenshtein)("destroy", "destory", 1, 1, 1, 2))->isSame(2);
 
-        $this->assertSame(3, (damerau_levenshtein)("あいうえお", "xあういえおx"));
+        that((damerau_levenshtein)("あいうえお", "xあういえおx"))->isSame(3);
     }
 
     public function test_ngram()
     {
-        $this->assertSame(["あ", "い", "う", "え", "お"], (ngram)("あいうえお", 1));
-        $this->assertSame(["あい", "いう", "うえ", "えお", "お"], (ngram)("あいうえお", 2));
-        $this->assertSame(["あいう", "いうえ", "うえお", "えお", "お"], (ngram)("あいうえお", 3));
+        that((ngram)("あいうえお", 1))->isSame(["あ", "い", "う", "え", "お"]);
+        that((ngram)("あいうえお", 2))->isSame(["あい", "いう", "うえ", "えお", "お"]);
+        that((ngram)("あいうえお", 3))->isSame(["あいう", "いうえ", "うえお", "えお", "お"]);
     }
 
     public function test_str_guess()
     {
         $percent = 0;
-        $this->assertEquals("12345", (str_guess)("12345", [
+        that((str_guess)("12345", [
             "12345",
-        ], $percent));
-        $this->assertEquals(100, $percent);
+        ], $percent))->isSame("12345");
+        that($percent)->is(100);
 
-        $this->assertSame("1234", (str_guess)("12345", [
+        that((str_guess)("12345", [
             "1",
             "12",
             "123",
             "1234",
-        ], $percent));
-        $this->assertEquals(53.77049180327869, $percent);
+        ], $percent))->isSame("1234");
+        that($percent)->is(53.77049180327869);
 
-        $this->assertSame("x12345x", (str_guess)("12345", [
+        that((str_guess)("12345", [
             "x12345x",
             "xx12345xx",
-        ], $percent));
-        $this->assertEquals(52.69320843091335, $percent);
+        ], $percent))->isSame("x12345x");
+        that($percent)->is(52.69320843091335);
 
-        $this->assertSame("xx12345xx", (str_guess)("notfound", [
+        that((str_guess)("notfound", [
             "x12345x",
             "xx12345xx",
-        ], $percent));
-        $this->assertEquals(0, $percent);
+        ], $percent))->isSame("xx12345xx");
+        that($percent)->is(0);
 
-        $this->assertException('is empty', str_guess, '', []);
+        that([str_guess, '', []])->throws('is empty');
     }
 
     function test_mb_substr_replace()
@@ -1795,28 +1791,28 @@ z", quote2: "a\\\\nz"', (paml_export)($array));
             ['0123456789', 'X', -999, 999],
         ];
         foreach ($params as $param) {
-            $this->assertEquals(substr_replace(...$param), (mb_substr_replace)(...$param), implode(', ', $param));
+            that((mb_substr_replace)(...$param))->as(implode(', ', $param))->is(substr_replace(...$param));
         }
 
         // もちろんマルチバイトでも動作する
-        $this->assertEquals('０１X２３４５６７８９', (mb_substr_replace)('０１２３４５６７８９', 'X', 2, null));
-        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', 2, 6));
-        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', 2, -2));
-        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', -8, 6));
-        $this->assertEquals('０１X８９', (mb_substr_replace)('０１２３４５６７８９', 'X', -8, -2));
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, null))->is('０１X２３４５６７８９');
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, 6))->is('０１X８９');
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, -2))->is('０１X８９');
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', -8, 6))->is('０１X８９');
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', -8, -2))->is('０１X８９');
     }
 
     function test_mb_trim()
     {
-        $this->assertEquals('', (mb_trim)(' 　 　 　'));
-        $this->assertEquals('あああ', (mb_trim)(' 　 あああ　 　'));
-        $this->assertEquals('あああ　 　
- 　 いいい
- 　 ううう', (mb_trim)(' 　
+        that((mb_trim)(' 　 　 　'))->is('');
+        that((mb_trim)(' 　 あああ　 　'))->is('あああ');
+        that((mb_trim)(' 　
 あああ　 　
  　 いいい
  　 ううう　 　
-'));
+'))->is(('あああ　 　
+ 　 いいい
+ 　 ううう'));
     }
 
     public function test_str_array()
@@ -1827,11 +1823,11 @@ HTTP/1.1 200 OK
 Content-Type: text/html; charset=utf-8
 Connection: Keep-Alive
 TEXT;
-        $this->assertEquals([
+        that((str_array)($string, ':', true))->is([
             'HTTP/1.1 200 OK',
             'Content-Type' => 'text/html; charset=utf-8',
             'Connection'   => 'Keep-Alive',
-        ], (str_array)($string, ':', true));
+        ]);
 
         // sar
         $string = <<<TEXT
@@ -1839,42 +1835,43 @@ TEXT;
 13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
 13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
 TEXT;
-        $this->assertEquals([
-            1 => [
-                '13:00:01' => '13:10:01',
-                'CPU'      => 'all',
-                '%user'    => '0.99',
-                '%nice'    => '0.10',
-                '%system'  => '0.71',
-                '%iowait'  => '0.00',
-                '%steal'   => '0.00',
-                '%idle'    => '98.19',
-            ],
-            2 => [
-                '13:00:01' => '13:20:01',
-                'CPU'      => 'all',
-                '%user'    => '0.60',
-                '%nice'    => '0.10',
-                '%system'  => '0.56',
-                '%iowait'  => '0.00',
-                '%steal'   => '0.00',
-                '%idle'    => '98.74',
-            ],
-        ], (str_array)($string, ' ', false));
+        that((str_array)($string, ' ', false))->is(
+            [
+                1 => [
+                    '13:00:01' => '13:10:01',
+                    'CPU'      => 'all',
+                    '%user'    => '0.99',
+                    '%nice'    => '0.10',
+                    '%system'  => '0.71',
+                    '%iowait'  => '0.00',
+                    '%steal'   => '0.00',
+                    '%idle'    => '98.19',
+                ],
+                2 => [
+                    '13:00:01' => '13:20:01',
+                    'CPU'      => 'all',
+                    '%user'    => '0.60',
+                    '%nice'    => '0.10',
+                    '%system'  => '0.56',
+                    '%iowait'  => '0.00',
+                    '%steal'   => '0.00',
+                    '%idle'    => '98.74',
+                ],
+            ]);
 
         // misc
-        $this->assertEquals([
+        that((str_array)("a=A\n\nb=B\n \nc", '=', true))->is([
             'a' => 'A',
             'b' => 'B',
             2   => '',
             3   => 'c',
-        ], (str_array)("a=A\n\nb=B\n \nc", '=', true));
-        $this->assertEquals([
+        ]);
+        that((str_array)("a+b+c\n1+2+3\n\n4+5+6\n \n7+8+9", '+', false))->is([
             1 => ['a' => '1', 'b' => '2', 'c' => '3'],
             2 => ['a' => '4', 'b' => '5', 'c' => '6'],
             3 => null,
             4 => ['a' => '7', 'b' => '8', 'c' => '9'],
-        ], (str_array)("a+b+c\n1+2+3\n\n4+5+6\n \n7+8+9", '+', false));
+        ]);
     }
 
     public function test_render_string()
@@ -1885,40 +1882,40 @@ TEXT;
             'float'  => 3.141592,
             'string' => 'mojiretu',
         ]);
-        $this->assertEquals("int is 12345\nfloat is 3.141592\nstring is mojiretu", $actual);
+        that($actual)->is("int is 12345\nfloat is 3.141592\nstring is mojiretu");
 
         // double
         $actual = (render_string)("1\n2\n3{\$val} 4", ['val' => "\n"]);
-        $this->assertEquals("1\n2\n3\n 4", $actual);
+        that($actual)->is("1\n2\n3\n 4");
 
         // numeric
         $actual = (render_string)('aaa ${0} ${1} $k $v zzz', ['8', 9, 'k' => 'v', 'v' => 'V']);
-        $this->assertEquals("aaa 8 9 v V zzz", $actual);
+        that($actual)->is("aaa 8 9 v V zzz");
 
         // stringable
         $actual = (render_string)('aaa $val zzz', ['val' => new \Concrete('XXX')]);
-        $this->assertEquals("aaa XXX zzz", $actual);
+        that($actual)->is("aaa XXX zzz");
 
         // closure
         $actual = (render_string)('aaa $val zzz', ['val' => function () { return 'XXX'; }]);
-        $this->assertEquals("aaa XXX zzz", $actual);
+        that($actual)->is("aaa XXX zzz");
         $actual = (render_string)('aaa $v1 $v2 zzz', ['v1' => 9, 'v2' => function ($vars, $k) { return $vars['v1'] . $k; }]);
-        $this->assertEquals("aaa 9 9v2 zzz", $actual);
+        that($actual)->is("aaa 9 9v2 zzz");
 
         // _
         $actual = (render_string)('aaa {$_(123+456)} zzz', []);
-        $this->assertEquals("aaa 579 zzz", $actual);
+        that($actual)->is("aaa 579 zzz");
         $actual = (render_string)('aaa {$_(implode(\',\', $a))} zzz', ['a' => ['a', 'b', 'c']]);
-        $this->assertEquals("aaa a,b,c zzz", $actual);
+        that($actual)->is("aaa a,b,c zzz");
         $actual = (render_string)('aaa $_ zzz', ['_' => 'XXX']);
-        $this->assertEquals("aaa XXX zzz", $actual);
+        that($actual)->is("aaa XXX zzz");
 
         // quoting
         $actual = (render_string)('\'"\\$val', ['val' => '\'"\\']);
-        $this->assertEquals('\'"\\\'"\\', $actual);
+        that($actual)->is('\'"\\\'"\\');
 
         // error
-        @$this->assertException('failed to eval code', render_string, '$${}', []);
+        @that([render_string, '$${}', []])->throws('failed to eval code');
     }
 
     public function test_render_file()
@@ -1928,12 +1925,12 @@ TEXT;
             'string'  => 'string',
             'closure' => function () { return 'closure'; },
         ]);
-        $this->assertEquals("string is string.
+        that($actual)->is("string is string.
 closure is closure.
 zero is index 0.
 123456 is expression.
 579 is expression.
-", $actual);
+");
     }
 
     public function test_ob_include()
@@ -1941,10 +1938,10 @@ zero is index 0.
         $actual = (ob_include)(__DIR__ . '/Strings/template.php', [
             'variable' => 'variable',
         ]);
-        $this->assertEquals("This is plain text.
+        that($actual)->is("This is plain text.
 This is variable.
 This is VARIABLE.
-", $actual);
+");
     }
 
     public function test_include_string()
@@ -1955,9 +1952,9 @@ This is <?php echo strtoupper($variable) ?>.
 ', [
             'variable' => 'variable',
         ]);
-        $this->assertEquals("This is plain text.
+        that($actual)->is("This is plain text.
 This is variable.
 This is VARIABLE.
-", $actual);
+");
     }
 }

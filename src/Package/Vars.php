@@ -82,14 +82,14 @@ class Vars
      * Example:
      * ```php
      * // 配列は要素数となる
-     * assertSame(numberify([1, 2, 3]), 3);
+     * that(numberify([1, 2, 3]))->isSame(3);
      * // int/float は基本的にそのまま
-     * assertSame(numberify(123), 123);
-     * assertSame(numberify(123.45), 123);
-     * assertSame(numberify(123.45, true), 123.45);
+     * that(numberify(123))->isSame(123);
+     * that(numberify(123.45))->isSame(123);
+     * that(numberify(123.45, true))->isSame(123.45);
      * // 文字列は数値抽出
-     * assertSame(numberify('a1b2c3'), 123);
-     * assertSame(numberify('a1b2.c3', true), 12.3);
+     * that(numberify('a1b2c3'))->isSame(123);
+     * that(numberify('a1b2.c3', true))->isSame(12.3);
      * ```
      *
      * @param string $var 対象の値
@@ -150,9 +150,9 @@ class Vars
      *
      * Example:
      * ```php
-     * assertSame(numval(3.14), 3.14);   // int や float はそのまま返す
-     * assertSame(numval('3.14'), 3.14); // . を含む文字列は float を返す
-     * assertSame(numval('11', 8), 9);   // 基数が指定できる
+     * that(numval(3.14))->isSame(3.14);   // int や float はそのまま返す
+     * that(numval('3.14'))->isSame(3.14); // . を含む文字列は float を返す
+     * that(numval('11', 8))->isSame(9);   // 基数が指定できる
      * ```
      *
      * @param mixed $var 数値化する値
@@ -185,14 +185,14 @@ class Vars
      * Example:
      * ```php
      * // キャストなので基本的には配列化される
-     * assertSame(arrayval(123), [123]);
-     * assertSame(arrayval('str'), ['str']);
-     * assertSame(arrayval([123]), [123]); // 配列は配列のまま
+     * that(arrayval(123))->isSame([123]);
+     * that(arrayval('str'))->isSame(['str']);
+     * that(arrayval([123]))->isSame([123]); // 配列は配列のまま
      *
      * // $recursive = false にしない限り再帰的に適用される
      * $stdclass = stdclass(['key' => 'val']);
-     * assertSame(arrayval([$stdclass], true), [['key' => 'val']]); // true なので中身も配列化される
-     * assertSame(arrayval([$stdclass], false), [$stdclass]);       // false なので中身は変わらない
+     * that(arrayval([$stdclass], true))->isSame([['key' => 'val']]); // true なので中身も配列化される
+     * that(arrayval([$stdclass], false))->isSame([$stdclass]);       // false なので中身は変わらない
      * ```
      *
      * @param mixed $var array 化する値
@@ -235,17 +235,17 @@ class Vars
      *     'n' => null,
      * ];
      * // 配列は array_key_exists と同じ
-     * assertTrue(arrayable_key_exists('k', $array));  // もちろん存在する
-     * assertTrue(arrayable_key_exists('n', $array));  // isset ではないので null も true
-     * assertFalse(arrayable_key_exists('x', $array)); // 存在しないので false
-     * assertFalse(isset($array['n']));                // isset だと null が false になる（参考）
+     * that(arrayable_key_exists('k', $array))->isTrue();  // もちろん存在する
+     * that(arrayable_key_exists('n', $array))->isTrue();  // isset ではないので null も true
+     * that(arrayable_key_exists('x', $array))->isFalse(); // 存在しないので false
+     * that(isset($array['n']))->isFalse();                // isset だと null が false になる（参考）
      *
      * $object = new \ArrayObject($array);
      * // 配列は array_key_exists と同じ
-     * assertTrue(arrayable_key_exists('k', $object));  // もちろん存在する
-     * assertTrue(arrayable_key_exists('n', $object));  // isset ではないので null も true
-     * assertFalse(arrayable_key_exists('x', $object)); // 存在しないので false
-     * assertFalse(isset($object['n']));                // isset だと null が false になる（参考）
+     * that(arrayable_key_exists('k', $object))->isTrue();  // もちろん存在する
+     * that(arrayable_key_exists('n', $object))->isTrue();  // isset ではないので null も true
+     * that(arrayable_key_exists('x', $object))->isFalse(); // 存在しないので false
+     * that(isset($object['n']))->isFalse();                // isset だと null が false になる（参考）
      * ```
      *
      * @param string|int $key キー
@@ -289,22 +289,22 @@ class Vars
      * Example:
      * ```php
      * // シンプルに k をつける
-     * assertSame(si_prefix(12345), '12.345 k');
+     * that(si_prefix(12345))->isSame('12.345 k');
      * // シンプルに m をつける
-     * assertSame(si_prefix(0.012345), '12.345 m');
+     * that(si_prefix(0.012345))->isSame('12.345 m');
      * // 書式フォーマットを指定できる
-     * assertSame(si_prefix(12345, 1000, '%d%s'), '12k');
-     * assertSame(si_prefix(0.012345, 1000, '%d%s'), '12m');
+     * that(si_prefix(12345, 1000, '%d%s'))->isSame('12k');
+     * that(si_prefix(0.012345, 1000, '%d%s'))->isSame('12m');
      * // ファイルサイズを byte で表示する
-     * assertSame(si_prefix(12345, 1000, '%d %sbyte'), '12 kbyte');
+     * that(si_prefix(12345, 1000, '%d %sbyte'))->isSame('12 kbyte');
      * // ファイルサイズを byte で表示する（1024）
-     * assertSame(si_prefix(10240, 1024, '%.3f %sbyte'), '10.000 kbyte');
+     * that(si_prefix(10240, 1024, '%.3f %sbyte'))->isSame('10.000 kbyte');
      * // フォーマットに null を与えると sprintf せずに配列で返す
-     * assertSame(si_prefix(12345, 1000, null), [12.345, 'k']);
+     * that(si_prefix(12345, 1000, null))->isSame([12.345, 'k']);
      * // フォーマットにクロージャを与えると実行して返す
-     * assertSame(si_prefix(12345, 1000, function ($v, $u){
+     * that(si_prefix(12345, 1000, function ($v, $u) {
      *     return number_format($v, 2) . $u;
-     * }), '12.35k');
+     * }))->isSame('12.35k');
      * ```
      *
      * @param mixed $var 丸める値
@@ -358,15 +358,15 @@ class Vars
      * Example:
      * ```php
      * // 1k = 1000
-     * assertSame(si_unprefix('1k'), 1000);
+     * that(si_unprefix('1k'))->isSame(1000);
      * // 1k = 1024
-     * assertSame(si_unprefix('1k', 1024), 1024);
+     * that(si_unprefix('1k', 1024))->isSame(1024);
      * // m はメガではなくミリ
-     * assertSame(si_unprefix('1m'), 0.001);
+     * that(si_unprefix('1m'))->isSame(0.001);
      * // M がメガ
-     * assertSame(si_unprefix('1M'), 1000000);
+     * that(si_unprefix('1M'))->isSame(1000000);
      * // K だけは特別扱いで大文字小文字のどちらでもキロになる
-     * assertSame(si_unprefix('1K'), 1000);
+     * that(si_unprefix('1K'))->isSame(1000);
      * ```
      *
      * @param mixed $var 数値化する値
@@ -413,18 +413,18 @@ class Vars
      * Example:
      * ```php
      * // この辺は empty と全く同じ
-     * assertTrue(is_empty(null));
-     * assertTrue(is_empty(false));
-     * assertTrue(is_empty(0));
-     * assertTrue(is_empty(''));
+     * that(is_empty(null))->isTrue();
+     * that(is_empty(false))->isTrue();
+     * that(is_empty(0))->isTrue();
+     * that(is_empty(''))->isTrue();
      * // この辺だけが異なる
-     * assertFalse(is_empty('0'));
+     * that(is_empty('0'))->isFalse();
      * // 第2引数に true を渡すと空の stdClass も empty 判定される
      * $stdclass = new \stdClass();
-     * assertTrue(is_empty($stdclass, true));
+     * that(is_empty($stdclass, true))->isTrue();
      * // フィールドがあれば empty ではない
      * $stdclass->hoge = 123;
-     * assertFalse(is_empty($stdclass, true));
+     * that(is_empty($stdclass, true))->isFalse();
      * ```
      *
      * @param mixed $var 判定する値
@@ -466,12 +466,12 @@ class Vars
      *
      * Example:
      * ```php
-     * assertTrue(is_primitive(null));
-     * assertTrue(is_primitive(false));
-     * assertTrue(is_primitive(123));
-     * assertTrue(is_primitive(STDIN));
-     * assertFalse(is_primitive(new \stdClass));
-     * assertFalse(is_primitive(['array']));
+     * that(is_primitive(null))->isTrue();
+     * that(is_primitive(false))->isTrue();
+     * that(is_primitive(123))->isTrue();
+     * that(is_primitive(STDIN))->isTrue();
+     * that(is_primitive(new \stdClass))->isFalse();
+     * that(is_primitive(['array']))->isFalse();
      * ```
      *
      * @param mixed $var 調べる値
@@ -490,11 +490,11 @@ class Vars
      * // 配列の再帰
      * $array = [];
      * $array['recursive'] = &$array;
-     * assertTrue(is_recursive($array));
+     * that(is_recursive($array))->isTrue();
      * // オブジェクトの再帰
      * $object = new \stdClass();
      * $object->recursive = $object;
-     * assertTrue(is_recursive($object));
+     * that(is_recursive($object))->isTrue();
      * ```
      *
      * @param mixed $var 調べる値
@@ -539,14 +539,14 @@ class Vars
      * Example:
      * ```php
      * // こいつらは true
-     * assertTrue(is_stringable(null));
-     * assertTrue(is_stringable(true));
-     * assertTrue(is_stringable(3.14));
-     * assertTrue(is_stringable(STDOUT));
-     * assertTrue(is_stringable(new \Exception()));
+     * that(is_stringable(null))->isTrue();
+     * that(is_stringable(true))->isTrue();
+     * that(is_stringable(3.14))->isTrue();
+     * that(is_stringable(STDOUT))->isTrue();
+     * that(is_stringable(new \Exception()))->isTrue();
      * // こいつらは false
-     * assertFalse(is_stringable(new \ArrayObject()));
-     * assertFalse(is_stringable([1, 2, 3]));
+     * that(is_stringable(new \ArrayObject()))->isFalse();
+     * that(is_stringable([1, 2, 3]))->isFalse();
      * ```
      *
      * @param mixed $var 調べる値
@@ -568,9 +568,9 @@ class Vars
      *
      * Example:
      * ```php
-     * assertTrue(is_arrayable([]));
-     * assertTrue(is_arrayable(new \ArrayObject()));
-     * assertFalse(is_arrayable(new \stdClass()));
+     * that(is_arrayable([]))->isTrue();
+     * that(is_arrayable(new \ArrayObject()))->isTrue();
+     * that(is_arrayable(new \stdClass()))->isFalse();
      * ```
      *
      * @param array $var 調べる値
@@ -588,11 +588,11 @@ class Vars
      *
      * Example:
      * ```php
-     * assertTrue(is_countable([1, 2, 3]));
-     * assertTrue(is_countable(new \ArrayObject()));
-     * assertFalse(is_countable((function () { yield 1; })()));
-     * assertFalse(is_countable(1));
-     * assertFalse(is_countable(new \stdClass()));
+     * that(is_countable([1, 2, 3]))->isTrue();
+     * that(is_countable(new \ArrayObject()))->isTrue();
+     * that(is_countable((function () { yield 1; })()))->isFalse();
+     * that(is_countable(1))->isFalse();
+     * that(is_countable(new \stdClass()))->isFalse();
      * ```
      *
      * @polyfill
@@ -614,22 +614,22 @@ class Vars
      * Example:
      * ```php
      * // 'a' と 'z' なら 'z' の方が大きい
-     * assertTrue(varcmp('z', 'a') > 0);
-     * assertTrue(varcmp('a', 'z') < 0);
-     * assertTrue(varcmp('a', 'a') === 0);
+     * that(varcmp('z', 'a') > 0)->isTrue();
+     * that(varcmp('a', 'z') < 0)->isTrue();
+     * that(varcmp('a', 'a') === 0)->isTrue();
      *
      * // 'a' と 'Z' なら 'a' の方が大きい…が SORT_FLAG_CASE なので 'Z' のほうが大きい
-     * assertTrue(varcmp('Z', 'a', SORT_FLAG_CASE) > 0);
-     * assertTrue(varcmp('a', 'Z', SORT_FLAG_CASE) < 0);
-     * assertTrue(varcmp('a', 'A', SORT_FLAG_CASE) === 0);
+     * that(varcmp('Z', 'a', SORT_FLAG_CASE) > 0)->isTrue();
+     * that(varcmp('a', 'Z', SORT_FLAG_CASE) < 0)->isTrue();
+     * that(varcmp('a', 'A', SORT_FLAG_CASE) === 0)->isTrue();
      *
      * // '2' と '12' なら '2' の方が大きい…が SORT_NATURAL なので '12' のほうが大きい
-     * assertTrue(varcmp('12', '2', SORT_NATURAL) > 0);
-     * assertTrue(varcmp('2', '12', SORT_NATURAL) < 0);
+     * that(varcmp('12', '2', SORT_NATURAL) > 0)->isTrue();
+     * that(varcmp('2', '12', SORT_NATURAL) < 0)->isTrue();
      *
      * // SORT_STRICT 定数が使える（下記はすべて宇宙船演算子を使うと 0 になる）
-     * assertTrue(varcmp(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT) < 0);
-     * assertTrue(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) < 0);
+     * that(varcmp(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT) < 0)->isTrue();
+     * that(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) < 0)->isTrue();
      * ```
      *
      * @param mixed $a 比較する値1
@@ -689,18 +689,18 @@ class Vars
      * Example:
      * ```php
      * // プリミティブ型は gettype と同義
-     * assertSame(var_type(false), 'boolean');
-     * assertSame(var_type(123), 'integer');
-     * assertSame(var_type(3.14), 'double');
-     * assertSame(var_type([1, 2, 3]), 'array');
+     * that(var_type(false))->isSame('boolean');
+     * that(var_type(123))->isSame('integer');
+     * that(var_type(3.14))->isSame('double');
+     * that(var_type([1, 2, 3]))->isSame('array');
      * // オブジェクトは型名を返す
-     * assertSame(var_type(new \stdClass), '\\stdClass');
-     * assertSame(var_type(new \Exception()), '\\Exception');
+     * that(var_type(new \stdClass))->isSame('\\stdClass');
+     * that(var_type(new \Exception()))->isSame('\\Exception');
      * // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
-     * assertSame(var_type(new class extends \Exception{}), '\\Exception');
-     * assertSame(var_type(new class implements \JsonSerializable{
+     * that(var_type(new class extends \Exception{}))->isSame('\\Exception');
+     * that(var_type(new class implements \JsonSerializable{
      *     public function jsonSerialize() { return ''; }
-     * }), '\\JsonSerializable');
+     * }))->isSame('\\JsonSerializable');
      * ```
      *
      * @param mixed $var 型を取得する値
@@ -750,13 +750,13 @@ class Vars
      * Example:
      * ```php
      * // 素の値は素の呼び出しと同じ
-     * assertSame(var_apply(' x ', 'trim'), 'x');
+     * that(var_apply(' x ', 'trim'))->isSame('x');
      * // 配列は中身に適用して配列で返す（再帰）
-     * assertSame(var_apply([' x ', ' y ', [' z ']], 'trim'), ['x', 'y', ['z']]);
+     * that(var_apply([' x ', ' y ', [' z ']], 'trim'))->isSame(['x', 'y', ['z']]);
      * // 第3引数以降は残り引数を意味する
-     * assertSame(var_apply(['!x!', '!y!'], 'trim', '!'), ['x', 'y']);
+     * that(var_apply(['!x!', '!y!'], 'trim', '!'))->isSame(['x', 'y']);
      * // 「まれによくある」の具体例
-     * assertSame(var_apply(['<x>', ['<y>']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'), ['&lt;x&gt;', ['&lt;y&gt;']]);
+     * that(var_apply(['<x>', ['<y>']], 'htmlspecialchars', ENT_QUOTES, 'utf-8'))->isSame(['&lt;x&gt;', ['&lt;y&gt;']]);
      * ```
      *
      * @param mixed $var $callback を適用する値
@@ -791,12 +791,12 @@ class Vars
      * // 配列を受け取って中身を大文字化して返すクロージャ
      * $upper = function($array){return array_map('strtoupper', $array);};
      * // 普通はこうやって使うが・・・
-     * assertSame($upper(['a', 'b', 'c']), ['A', 'B', 'C']);
+     * that($upper(['a', 'b', 'c']))->isSame(['A', 'B', 'C']);
      * // 手元に配列ではなくスカラー値しか無いときはこうせざるをえない
-     * assertSame($upper(['a'])[0], 'A');
+     * that($upper(['a'])[0])->isSame('A');
      * // var_applys を使うと配列でもスカラーでも統一的に記述することができる
-     * assertSame(var_applys(['a', 'b', 'c'], $upper), ['A', 'B', 'C']);
-     * assertSame(var_applys('a', $upper), 'A');
+     * that(var_applys(['a', 'b', 'c'], $upper))->isSame(['A', 'B', 'C']);
+     * that(var_applys('a', $upper))->isSame('A');
      * # 要するに「大文字化したい」だけなわけだが、$upper が配列を前提としているので、「大文字化」部分を得るには配列化しなければならなくなっている
      * # 「strtoupper だけ切り出せばよいのでは？」と思うかもしれないが、「（外部ライブラリなどで）手元に配列しか受け取ってくれない処理しかない」状況がまれによくある
      * ```
@@ -832,7 +832,7 @@ class Vars
      * Example:
      * ```php
      * // 単純なエクスポート
-     * assertSame(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true), '[
+     * that(var_export2(['array' => [1, 2, 3], 'hash' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], true))->isSame('[
      *     "array" => [1, 2, 3],
      *     "hash"  => [
      *         "a" => "A",
@@ -847,7 +847,7 @@ class Vars
      * $robject->a = new \stdClass();
      * $robject->a->b = new \stdClass();
      * $robject->a->b->c = $robject;
-     * assertSame(var_export2(compact('rarray', 'robject'), true), '[
+     * that(var_export2(compact('rarray', 'robject'), true))->isSame('[
      *     "rarray"  => [
      *         "a" => [
      *             "b" => [
@@ -1211,7 +1211,7 @@ class Vars
      * ```php
      * $hoge = 'HOGE';
      * $fuga = 'FUGA';
-     * assertSame(hashvar($hoge, $fuga), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * that(hashvar($hoge, $fuga))->isSame(['hoge' => 'HOGE', 'fuga' => 'FUGA']);
      * ```
      *
      * @param mixed $vars 変数（可変引数）

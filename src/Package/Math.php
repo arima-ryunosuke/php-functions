@@ -15,7 +15,7 @@ class Math
      *
      * Example:
      * ```php
-     * assertSame(minimum(-1, 0, 1), -1);
+     * that(minimum(-1, 0, 1))->isSame(-1);
      * ```
      *
      * @param mixed $variadic 対象の変数・配列・リスト
@@ -35,7 +35,7 @@ class Math
      *
      * Example:
      * ```php
-     * assertSame(maximum(-1, 0, 1), 1);
+     * that(maximum(-1, 0, 1))->isSame(1);
      * ```
      *
      * @param mixed $variadic 対象の変数・配列・リスト
@@ -57,7 +57,7 @@ class Math
      *
      * Example:
      * ```php
-     * assertSame(mode(0, 1, 2, 2, 3, 3, 3), 3);
+     * that(mode(0, 1, 2, 2, 3, 3, 3))->isSame(3);
      * ```
      *
      * @param mixed $variadic 対象の変数・配列・リスト
@@ -93,8 +93,8 @@ class Math
      *
      * Example:
      * ```php
-     * assertSame(mean(1, 2, 3, 4, 5, 6), 3.5);
-     * assertSame(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6), 3.5);
+     * that(mean(1, 2, 3, 4, 5, 6))->isSame(3.5);
+     * that(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6))->isSame(3.5);
      * ```
      *
      * @param mixed $variadic 対象の変数・配列・リスト
@@ -117,11 +117,11 @@ class Math
      * Example:
      * ```php
      * // 偶数個なので中2つの平均
-     * assertSame(median(1, 2, 3, 4, 5, 6), 3.5);
+     * that(median(1, 2, 3, 4, 5, 6))->isSame(3.5);
      * // 奇数個なのでど真ん中
-     * assertSame(median(1, 2, 3, 4, 5), 3);
+     * that(median(1, 2, 3, 4, 5))->isSame(3);
      * // 偶数個だが文字列なので中2つの後
-     * assertSame(median('a', 'b', 'c', 'd'), 'c');
+     * that(median('a', 'b', 'c', 'd'))->isSame('c');
      * ```
      *
      * @param mixed $variadic 対象の変数・配列・リスト
@@ -170,7 +170,7 @@ class Math
      *
      * Example:
      * ```php
-     * assertSame(sum(1, 2, 3, 4, 5, 6), 21);
+     * that(sum(1, 2, 3, 4, 5, 6))->isSame(21);
      * ```
      *
      * @param mixed $variadic 対象の変数・配列・リスト
@@ -192,22 +192,22 @@ class Math
      * Example:
      * ```php
      * // 5～9 に収める
-     * assertSame(clamp(4, 5, 9), 5); // 4 は [5～9] の範囲外なので 5 に切り上げられる
-     * assertSame(clamp(5, 5, 9), 5); // 範囲内なのでそのまま
-     * assertSame(clamp(6, 5, 9), 6); // 範囲内なのでそのまま
-     * assertSame(clamp(7, 5, 9), 7); // 範囲内なのでそのまま
-     * assertSame(clamp(8, 5, 9), 8); // 範囲内なのでそのまま
-     * assertSame(clamp(9, 5, 9), 9); // 範囲内なのでそのまま
-     * assertSame(clamp(10, 5, 9), 9); // 10 は [5～9] の範囲外なので 9 に切り下げられる
+     * that(clamp(4, 5, 9))->isSame(5); // 4 は [5～9] の範囲外なので 5 に切り上げられる
+     * that(clamp(5, 5, 9))->isSame(5); // 範囲内なのでそのまま
+     * that(clamp(6, 5, 9))->isSame(6); // 範囲内なのでそのまま
+     * that(clamp(7, 5, 9))->isSame(7); // 範囲内なのでそのまま
+     * that(clamp(8, 5, 9))->isSame(8); // 範囲内なのでそのまま
+     * that(clamp(9, 5, 9))->isSame(9); // 範囲内なのでそのまま
+     * that(clamp(10, 5, 9))->isSame(9); // 10 は [5～9] の範囲外なので 9 に切り下げられる
      *
      * // 5～9 に収まるように循環する
-     * assertSame(clamp(4, 5, 9, true), 9); // 4 は [5～9] の範囲外なので循環して 9 になる
-     * assertSame(clamp(5, 5, 9, true), 5); // 範囲内なのでそのまま
-     * assertSame(clamp(6, 5, 9, true), 6); // 範囲内なのでそのまま
-     * assertSame(clamp(7, 5, 9, true), 7); // 範囲内なのでそのまま
-     * assertSame(clamp(8, 5, 9, true), 8); // 範囲内なのでそのまま
-     * assertSame(clamp(9, 5, 9, true), 9); // 範囲内なのでそのまま
-     * assertSame(clamp(10, 5, 9, true), 5); // 10 は [5～9] の範囲外なので循環して 5 になる
+     * that(clamp(4, 5, 9, true))->isSame(9); // 4 は [5～9] の範囲外なので循環して 9 になる
+     * that(clamp(5, 5, 9, true))->isSame(5); // 範囲内なのでそのまま
+     * that(clamp(6, 5, 9, true))->isSame(6); // 範囲内なのでそのまま
+     * that(clamp(7, 5, 9, true))->isSame(7); // 範囲内なのでそのまま
+     * that(clamp(8, 5, 9, true))->isSame(8); // 範囲内なのでそのまま
+     * that(clamp(9, 5, 9, true))->isSame(9); // 範囲内なのでそのまま
+     * that(clamp(10, 5, 9, true))->isSame(5); // 10 は [5～9] の範囲外なので循環して 5 になる
      * ```
      *
      * @param int|mixed $value 対象の値
@@ -239,7 +239,7 @@ class Math
      * Example:
      * ```php
      * // 1 ～ 6 のどれかを返す
-     * assertContains(random_at(1, 2, 3, 4, 5, 6), [1, 2, 3, 4, 5, 6]);
+     * that(random_at(1, 2, 3, 4, 5, 6))->isAny([1, 2, 3, 4, 5, 6]);
      * ```
      *
      * @param array $args 候補
@@ -295,12 +295,12 @@ class Math
      * mt_srand(4); // テストがコケるので種固定
      *
      * // 平均 100, 標準偏差 10 の正規乱数を得る
-     * assertSame(normal_rand(100, 10), 101.16879645296162);
-     * assertSame(normal_rand(100, 10), 96.49615862542069);
-     * assertSame(normal_rand(100, 10), 87.74557282679618);
-     * assertSame(normal_rand(100, 10), 117.93697951557125);
-     * assertSame(normal_rand(100, 10), 99.1917453115627);
-     * assertSame(normal_rand(100, 10), 96.74688207698713);
+     * that(normal_rand(100, 10))->isSame(101.16879645296162);
+     * that(normal_rand(100, 10))->isSame(96.49615862542069);
+     * that(normal_rand(100, 10))->isSame(87.74557282679618);
+     * that(normal_rand(100, 10))->isSame(117.93697951557125);
+     * that(normal_rand(100, 10))->isSame(99.1917453115627);
+     * that(normal_rand(100, 10))->isSame(96.74688207698713);
      * ```
      *
      * @param float $average 平均

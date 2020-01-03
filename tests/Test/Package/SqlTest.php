@@ -6,48 +6,41 @@ class SqlTest extends AbstractTestCase
 {
     function test_sql_quote()
     {
-        $this->assertEquals('NULL', (sql_quote)(null));
-        $this->assertEquals('0', (sql_quote)(false));
-        $this->assertEquals('1', (sql_quote)(true));
-        $this->assertEquals('123', (sql_quote)(123));
-        $this->assertEquals('1.23', (sql_quote)(1.23));
-        $this->assertEquals('123', (sql_quote)('123'));
-        $this->assertEquals('1.23', (sql_quote)('1.23'));
-        $this->assertEquals("'hoge'", (sql_quote)('hoge'));
-        $this->assertEquals("'ho\'ge'", (sql_quote)("ho'ge"));
-        $this->assertEquals("'ho\\\"ge'", (sql_quote)('ho"ge'));
+        that((sql_quote)(null))->is('NULL');
+        that((sql_quote)(false))->is('0');
+        that((sql_quote)(true))->is('1');
+        that((sql_quote)(123))->is('123');
+        that((sql_quote)(1.23))->is('1.23');
+        that((sql_quote)('123'))->is('123');
+        that((sql_quote)('1.23'))->is('1.23');
+        that((sql_quote)('hoge'))->is("'hoge'");
+        that((sql_quote)("ho'ge"))->is("'ho\'ge'");
+        that((sql_quote)('ho"ge'))->is("'ho\\\"ge'");
     }
 
     function test_sql_bind()
     {
-        $this->assertEquals('select 1', (sql_bind)('select ?', 1));
-        $this->assertEquals('select 1, 2', (sql_bind)('select ?, ?', [1, 2]));
-        $this->assertEquals('select 1', (sql_bind)('select :name', ['name' => 1]));
-        $this->assertEquals('select ":name", 1, 1', (sql_bind)('select ":name", :name, :name', ['name' => 1]));
-        $this->assertEquals('select 1, 3, 2, 4', (sql_bind)('select ?, :hoge, ?, :fuga', [1, 2, 'hoge' => 3, 'fuga' => 4]));
-        $this->assertEquals("select 'a', 'c', 'b', 'd'", (sql_bind)('select ?, :hoge, ?, :fuga', ['a', 'b', 'hoge' => 'c', 'fuga' => 'd']));
-        $this->assertEquals("select /* this is comment? */ '?'
--- this is :comment
-'a', 'b'
-", (sql_bind)("select /* this is comment? */ '?'
+        that((sql_bind)('select ?', 1))->is('select 1');
+        that((sql_bind)('select ?, ?', [1, 2]))->is('select 1, 2');
+        that((sql_bind)('select :name', ['name' => 1]))->is('select 1');
+        that((sql_bind)('select ":name", :name, :name', ['name' => 1]))->is('select ":name", 1, 1');
+        that((sql_bind)('select ?, :hoge, ?, :fuga', [1, 2, 'hoge' => 3, 'fuga' => 4]))->is('select 1, 3, 2, 4');
+        that((sql_bind)('select ?, :hoge, ?, :fuga', ['a', 'b', 'hoge' => 'c', 'fuga' => 'd']))->is("select 'a', 'c', 'b', 'd'");
+        that((sql_bind)("select /* this is comment? */ '?'
 -- this is :comment
 ?, :comment
-", ['a', 'comment' => 'b']));
+", ['a', 'comment' => 'b']))->is("select /* this is comment? */ '?'
+-- this is :comment
+'a', 'b'
+");
     }
 
     function test_sql_format_create()
     {
-        $this->assertFormatSql('
+        that((sql_format)('
 CREATE TABLE t_table (
-  id INT(10) UNSIGNED NOT NULL COMMENT "primary",
-  name VARCHAR(32) NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
-  PRIMARY KEY(id),
-  INDEX idx_name(name),
-  CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE CASCADE 
-) COMMENT = "TableComment" COLLATE = "utf8_bin" ENGINE = InnoDB ROW_FORMAT = DYNAMIC
-', 'CREATE TABLE t_table (
-  id INT(10) UNSIGNED NOT NULL COMMENT "primary",
-  name VARCHAR(32) NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
+  id   INT(10) UNSIGNED NOT NULL COMMENT "primary",
+  name VARCHAR(32)      NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
   PRIMARY KEY (id),
   INDEX idx_name (name),
   CONSTRAINT fk_name FOREIGN KEY (name) REFERENCES t_other (other_name) ON UPDATE CASCADE ON DELETE CASCADE
@@ -56,33 +49,48 @@ COMMENT="TableComment"
 COLLATE="utf8_bin"
 ENGINE=InnoDB
 ROW_FORMAT=DYNAMIC
+'))->IsEqualTrimming('
+CREATE TABLE t_table (
+  id INT(10) UNSIGNED NOT NULL COMMENT "primary",
+  name VARCHAR(32) NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
+  PRIMARY KEY(id),
+  INDEX idx_name(name),
+  CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE CASCADE 
+) COMMENT = "TableComment" COLLATE = "utf8_bin" ENGINE = InnoDB ROW_FORMAT = DYNAMIC
 ');
 
-        $this->assertFormatSql('
+        that((sql_format)('CREATE TABLE IF NOT EXISTS t_table (id INT(10) UNSIGNED NOT NULL COMMENT "primary")'))->IsEqualTrimming('
 CREATE TABLE IF NOT EXISTS t_table(
   id INT(10) UNSIGNED NOT NULL COMMENT "primary" 
 )
-', 'CREATE TABLE IF NOT EXISTS t_table (id INT(10) UNSIGNED NOT NULL COMMENT "primary")');
+');
 
-        $this->assertFormatSql('
+        that((sql_format)('CREATE INDEX part_of_name ON customer (name, id)'))->IsEqualTrimming('
 CREATE INDEX part_of_name ON customer(name, id)
-', 'CREATE INDEX part_of_name ON customer (name, id)');
+');
     }
 
     function test_sql_format_drop()
     {
-        $this->assertFormatSql('
+        that((sql_format)('drop table tbl'))->IsEqualTrimming('
 drop table tbl
-', 'drop table tbl');
+');
 
-        $this->assertFormatSql('
+        that((sql_format)('drop table IF EXISTS  tbl'))->IsEqualTrimming('
 drop table IF EXISTS tbl
-', 'drop table IF EXISTS  tbl');
+');
     }
 
     function test_sql_format_alter()
     {
-        $this->assertFormatSql('
+        that((sql_format)('ALTER TABLE TABLE_NAME
+  ADD COLUMN colA INT(11)  NULL DEFAULT NULL COMMENT "comment1" AFTER hoge,
+  ADD COLUMN colB DATETIME NULL DEFAULT NULL COMMENT "comment2" AFTER fuga,
+  DROP COLUMN colC,
+  CHANGE COLUMN colD colD TINYINT(1) DEFAULT 0 NOT NULL COMMENT "comment4",
+  ADD INDEX idx_name(name),
+  add CONSTRAINT fk_name FOREIGN KEY (name) REFERENCES t_other (other_name) ON UPDATE CASCADE ON DELETE CASCADE
+'))->IsEqualTrimming('
 ALTER TABLE TABLE_NAME 
   ADD COLUMN colA INT(11) NULL DEFAULT NULL COMMENT "comment1" AFTER hoge,
   ADD COLUMN colB DATETIME NULL DEFAULT NULL COMMENT "comment2" AFTER fuga,
@@ -90,20 +98,22 @@ ALTER TABLE TABLE_NAME
   CHANGE COLUMN colD colD TINYINT(1) DEFAULT 0 NOT NULL COMMENT "comment4",
   ADD INDEX idx_name(name),
   add CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE CASCADE
-', 'ALTER TABLE TABLE_NAME
-  ADD COLUMN colA INT(11)  NULL DEFAULT NULL COMMENT "comment1" AFTER hoge,
-  ADD COLUMN colB DATETIME NULL DEFAULT NULL COMMENT "comment2" AFTER fuga,
-  DROP COLUMN colC,
-  CHANGE COLUMN colD colD TINYINT(1) DEFAULT 0 NOT NULL COMMENT "comment4",
-  ADD INDEX idx_name(name),
-  add CONSTRAINT fk_name FOREIGN KEY (name) REFERENCES t_other (other_name) ON UPDATE CASCADE ON DELETE CASCADE
 ');
     }
 
     function test_sql_format_select()
     {
         // select
-        $this->assertFormatSql('
+        that((sql_format)('select
+    T.*,
+    exists(select * from t_sub S where (S.id = T.id)) as e,
+    greatest(ifnull(a, 9), ifnull(b, 9)) as g
+  from (select * from t_table where (status = "active")) T
+  left outer join t_join1 on t_join1.id = t_table.id
+  right join t_join2 on t_join2.id = (select max(id) from t_sub where (A and B))
+  inner join t_join3 using (id)
+  where (a and (b and (c and (d in (1,2,3)))))
+  group by id having count(misc) > 10 order by id desc limit 10 offset 5'))->IsEqualTrimming('
 select
   T.*,
   exists(
@@ -161,68 +171,59 @@ limit
   10 
 offset
   5
-', 'select
-    T.*,
-    exists(select * from t_sub S where (S.id = T.id)) as e,
-    greatest(ifnull(a, 9), ifnull(b, 9)) as g
-  from (select * from t_table where (status = "active")) T
-  left outer join t_join1 on t_join1.id = t_table.id
-  right join t_join2 on t_join2.id = (select max(id) from t_sub where (A and B))
-  inner join t_join3 using (id)
-  where (a and (b and (c and (d in (1,2,3)))))
-  group by id having count(misc) > 10 order by id desc limit 10 offset 5');
+');
 
         // for update
-        $this->assertFormatSql('
+        that((sql_format)('select * from t_table for update'))->IsEqualTrimming('
 select
   * 
 from
   t_table 
 for update
-', 'select * from t_table for update');
+');
 
         // lock in share mode
-        $this->assertFormatSql('
+        that((sql_format)('select * from t_table lock in share mode'))->IsEqualTrimming('
 select
   * 
 from
   t_table 
 lock in share mode
-', 'select * from t_table lock in share mode');
+');
 
         // select option
-        $this->assertFormatSql('
+        that((sql_format)('select distinct straight_join t.a, t.b from table t'))->IsEqualTrimming('
 select distinct straight_join 
   t.a,
   t.b 
 from
   table t
-', 'select distinct straight_join t.a, t.b from table t');
+');
     }
 
     function test_sql_format_insert()
     {
         // insert
-        $this->assertFormatSql('
+        that((sql_format)('insert into t_table (a,b,c) values (1,2,3), (4,5,6)'))->IsEqualTrimming('
 insert into
   t_table(a, b, c)
 values
   (1, 2, 3),
   (4, 5, 6)
-', 'insert into t_table (a,b,c) values (1,2,3), (4,5,6)');
+');
 
         // insert set
-        $this->assertFormatSql('
+        that((sql_format)('insert into t_table set a=1, b=2, c=3'))->IsEqualTrimming('
 insert into
   t_table 
 set
   a = 1,
   b = 2,
   c = 3
-', 'insert into t_table set a=1, b=2, c=3');
+');
 
         // insert select
-        $this->assertFormatSql('
+        that((sql_format)('insert into t_table (a,b,c) select a,b,c from t_table2 T2'))->IsEqualTrimming('
 insert into
   t_table(a, b, c)
 select
@@ -231,10 +232,10 @@ select
   c 
 from
   t_table2 T2
-', 'insert into t_table (a,b,c) select a,b,c from t_table2 T2');
+');
 
         // insert duplicate key
-        $this->assertFormatSql('
+        that((sql_format)('insert OPTIONS into t_table set a=1, b=2, c=3 on duplicate key update x=values(a)'))->IsEqualTrimming('
 insert OPTIONS into
   t_table 
 set
@@ -243,32 +244,32 @@ set
   c = 3 
 on duplicate key update
   x = values(a)
-', 'insert OPTIONS into t_table set a=1, b=2, c=3 on duplicate key update x=values(a)');
+');
     }
 
     function test_sql_format_replace()
     {
         // insert
-        $this->assertFormatSql('
+        that((sql_format)('replace into t_table (a,b,c) values (1,2,3), (4,5,6)'))->IsEqualTrimming('
 replace into
   t_table(a, b, c)
 values
   (1, 2, 3),
   (4, 5, 6)
-', 'replace into t_table (a,b,c) values (1,2,3), (4,5,6)');
+');
 
         // insert set
-        $this->assertFormatSql('
+        that((sql_format)('replace into t_table set a=1, b=2, c=3'))->IsEqualTrimming('
 replace into
   t_table 
 set
   a = 1,
   b = 2,
   c = 3
-', 'replace into t_table set a=1, b=2, c=3');
+');
 
         // insert select
-        $this->assertFormatSql('
+        that((sql_format)('replace into t_table (a,b,c) select a,b,c from t_table2 T2'))->IsEqualTrimming('
 replace into
   t_table(a, b, c)
 select
@@ -277,10 +278,10 @@ select
   c 
 from
   t_table2 T2
-', 'replace into t_table (a,b,c) select a,b,c from t_table2 T2');
+');
 
         // insert duplicate key
-        $this->assertFormatSql('
+        that((sql_format)('replace DELAYED into t_table set a=1, b=2, c=3 on duplicate key update x=values(a)'))->IsEqualTrimming('
 replace DELAYED into
   t_table 
 set
@@ -289,13 +290,13 @@ set
   c = 3 
 on duplicate key update
   x = values(a)
-', 'replace DELAYED into t_table set a=1, b=2, c=3 on duplicate key update x=values(a)');
+');
     }
 
     function test_sql_format_update()
     {
         // update
-        $this->assertFormatSql('
+        that((sql_format)('update t_table set a=1, b=2, c=3 where x IN (1,2,3)'))->IsEqualTrimming('
 update
   t_table 
 set
@@ -304,10 +305,10 @@ set
   c = 3 
 where
   x IN(1, 2, 3)
-', 'update t_table set a=1, b=2, c=3 where x IN (1,2,3)');
+');
 
         // update multi1
-        $this->assertFormatSql('
+        that((sql_format)('update t1, t2 as D set t1.a=D.a, t1.b=D.b where t1.id=D.id'))->IsEqualTrimming('
 update
   t1,
   t2 as D 
@@ -316,10 +317,10 @@ set
   t1.b = D.b 
 where
   t1.id = D.id
-', 'update t1, t2 as D set t1.a=D.a, t1.b=D.b where t1.id=D.id');
+');
 
         // update multi2
-        $this->assertFormatSql('
+        that((sql_format)('update t_table T join t_join J using(id) set T.v = J.v where A and B'))->IsEqualTrimming('
 update
   t_table T 
 join
@@ -329,22 +330,22 @@ set
 where
   A 
   and B
-', 'update t_table T join t_join J using(id) set T.v = J.v where A and B');
+');
     }
 
     function test_sql_format_delete()
     {
         // delete
-        $this->assertFormatSql('
+        that((sql_format)('delete from t_table where x IN (1,2,3)'))->IsEqualTrimming('
 delete
 from
   t_table 
 where
   x IN(1, 2, 3)
-', 'delete from t_table where x IN (1,2,3)');
+');
 
         // delete multi
-        $this->assertFormatSql('
+        that((sql_format)('DELETE t1, t2 FROM t1 INNER JOIN t2 INNER JOIN t3 WHERE t1.id=t2.id AND t2.id=t3.id'))->IsEqualTrimming('
 DELETE
   t1,
   t2 
@@ -357,13 +358,16 @@ INNER JOIN
 WHERE
   t1.id = t2.id 
   AND t2.id = t3.id
-', 'DELETE t1, t2 FROM t1 INNER JOIN t2 INNER JOIN t3 WHERE t1.id=t2.id AND t2.id=t3.id');
+');
     }
 
     function test_sql_format_modify()
     {
         // delete multi
-        $this->assertFormatSql('
+        that((sql_format)('INSERT INTO test(id, name)
+SELECT 100,"aaa" FROM dual WHERE (NOT EXISTS(SELECT * FROM test WHERE id = 100))
+ON DUPLICATE KEY UPDATE id = VALUES(id),name = VALUES(name)
+'))->IsEqualTrimming('
 INSERT INTO
   test(id, name)
 SELECT
@@ -378,15 +382,28 @@ WHERE
 ON DUPLICATE KEY UPDATE
   id = VALUES(id),
   name = VALUES(name)
-', 'INSERT INTO test(id, name)
-SELECT 100,"aaa" FROM dual WHERE (NOT EXISTS(SELECT * FROM test WHERE id = 100))
-ON DUPLICATE KEY UPDATE id = VALUES(id),name = VALUES(name)
 ');
     }
 
     function test_sql_format_comment()
     {
-        $this->assertFormatSql("
+        that((sql_format)("
+-- this is quoted `comment`
+select 
+-- a
+  a,
+  -- b
+  b,
+  c -- c
+  
+from
+  -- this is indent comment
+  (
+  -- this is inner comment
+  select * -- this is trailing comment
+  from table_name) as t
+  -- this is inner comment
+  order by null"))->IsEqualTrimming("
 -- this is quoted `comment`
 select
   -- a
@@ -405,25 +422,32 @@ from
   ) as t -- this is inner comment
 order by
   null
-", "
--- this is quoted `comment`
-select 
--- a
-  a,
-  -- b
-  b,
-  c -- c
-  
-from
-  -- this is indent comment
-  (
-  -- this is inner comment
-  select * -- this is trailing comment
-  from table_name) as t
-  -- this is inner comment
-  order by null");
+");
 
-        $this->assertFormatSql('
+        that((sql_format)('
+/*
+  this
+  is
+  block
+  comment1
+*/
+select *
+from
+  /*
+    this
+    is
+    block
+    comment2
+  */
+  (
+    /*
+      this
+      is
+      block
+      comment3
+    */
+  select *
+  from table_name)'))->IsEqualTrimming('
 /*
   this
   is
@@ -451,45 +475,22 @@ from
     from
       table_name 
   )
-', '
-/*
-  this
-  is
-  block
-  comment1
-*/
-select *
-from
-  /*
-    this
-    is
-    block
-    comment2
-  */
-  (
-    /*
-      this
-      is
-      block
-      comment3
-    */
-  select *
-  from table_name)');
+');
     }
 
     function test_sql_format_options()
     {
         // misc
-        $this->assertFormatSql("
+        that((sql_format)("select (A and (B and (C and (D and (E)))))", ['indent' => "\t", 'nestlevel' => 4]))->IsEqualTrimming("
 select
 	(
 		A 
 		and (B and (C and (D and (E))))
 	)
-", "select (A and (B and (C and (D and (E)))))", ['indent' => "\t", 'nestlevel' => 4]);
+");
 
         // case
-        $this->assertFormatSql("
+        that((sql_format)("/* comment */select 'abc' str, 123 as num, t.xxx from t_table t", ['case' => true]))->IsEqualTrimming("
 /* comment */
 SELECT
   'abc' str,
@@ -497,8 +498,8 @@ SELECT
   t.xxx 
 FROM
   t_table t
-", "/* comment */select 'abc' str, 123 as num, t.xxx from t_table t", ['case' => true]);
-        $this->assertFormatSql("
+");
+        that((sql_format)("/* comment */SELECT 'abc' str, 123 as num, t.xxx FROM t_table t", ['case' => false]))->IsEqualTrimming("
 /* comment */
 select
   'abc' str,
@@ -506,10 +507,10 @@ select
   t.xxx 
 from
   t_table t
-", "/* comment */SELECT 'abc' str, 123 as num, t.xxx FROM t_table t", ['case' => false]);
+");
 
         // highlight auto
-        $this->assertFormatSql("
+        that((sql_format)("/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => true, 'case' => 'ucfirst']))->IsEqualTrimming("
 \e[33m/* comment */\e[m
 \e[1mSelect\e[m
   \e[31m'<abc>'\e[m str,
@@ -517,10 +518,10 @@ from
   t.xxx 
 \e[1mFrom\e[m
   t_table t
-", "/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => true, 'case' => 'ucfirst']);
+");
 
         // highlight cli
-        $this->assertFormatSql("
+        that((sql_format)("/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => 'cli']))->IsEqualTrimming("
 \e[33m/* comment */\e[m
 \e[1mselect\e[m
   \e[31m'<abc>'\e[m str,
@@ -528,10 +529,10 @@ from
   t.xxx 
 \e[1mfrom\e[m
   t_table t
-", "/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => 'cli']);
+");
 
         // highlight html
-        $this->assertFormatSql("
+        that((sql_format)("/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => 'html']))->IsEqualTrimming("
 <span style='color:#FF8000;'>/* comment */</span>
 <span style='font-weight:bold;'>select</span>
   <span style='color:#DD0000;'>'&lt;abc&gt;'</span> str,
@@ -539,49 +540,49 @@ from
   t.xxx 
 <span style='font-weight:bold;'>from</span>
   t_table t
-", "/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => 'html']);
+");
 
         // highlight exception
-        $this->assertException('highlight must be', sql_format, "", ['highlight' => 'hoge']);
+        that([sql_format, "", ['highlight' => 'hoge']])->throws('highlight must be');
     }
 
     function test_sql_format_other()
     {
         // mysql set variable
-        $this->assertFormatSql("
+        that((sql_format)("set @hoge=123,@fuga=456"))->IsEqualTrimming("
 set
   @hoge = 123,
   @fuga = 456
-", "set @hoge=123,@fuga=456");
+");
 
         // contain tag
-        $this->assertFormatSql("
+        that((sql_format)("select '{:RM'"))->IsEqualTrimming("
 select
   '{:RM'
-", "select '{:RM'");
+");
 
         // placeholder
-        $this->assertFormatSql("
+        that((sql_format)("select ?, ?
+where :id and :status"))->IsEqualTrimming("
 select
   ?,
   ? 
 where
   :id 
   and :status
-", "select ?, ?
-where :id and :status");
+");
 
         // literal
-        $this->assertFormatSql("
+        that((sql_format)("select '\n ' from `dual`"))->IsEqualTrimming("
 select
   '
  ' 
 from
   `dual`
-", "select '\n ' from `dual`");
+");
 
         // between
-        $this->assertFormatSql('
+        that((sql_format)('select (id between A and B) as bw from t_table where status or id between A and B'))->IsEqualTrimming('
 select
   (id between A and B) as bw 
 from
@@ -589,10 +590,16 @@ from
 where
   status 
   or id between A and B
-', 'select (id between A and B) as bw from t_table where status or id between A and B');
+');
 
         // case when end
-        $this->assertFormatSql('
+        that((sql_format)('select
+case a when 1 then 10 when 2 then 20 end as x,
+case when a=1 then 10 when a=2 then 20 else null end as y,
+case when count(ifnull(a, 1)) end z
+from t_table
+where exists(select * from T where case a when 1 then 10 when 2 then 20 end = 99 and (other_cond))
+'))->IsEqualTrimming('
 select
   case a 
     when 1 then 10 
@@ -623,34 +630,28 @@ where
       end = 99 
       and (other_cond)
   )
-', 'select
-case a when 1 then 10 when 2 then 20 end as x,
-case when a=1 then 10 when a=2 then 20 else null end as y,
-case when count(ifnull(a, 1)) end z
-from t_table
-where exists(select * from T where case a when 1 then 10 when 2 then 20 end = 99 and (other_cond))
 ');
 
         // semicoron
-        $this->assertFormatSql('
+        that((sql_format)('select 1; select 2;'))->IsEqualTrimming('
 select
   1 
 ;
 select
   2 
 ;
-', 'select 1; select 2;');
+');
 
         // union
-        $this->assertFormatSql('
+        that((sql_format)('select 1 union all select 2'))->IsEqualTrimming('
 select
   1 
 union all
 select
   2
-', 'select 1 union all select 2');
+');
 
-        $this->assertFormatSql('
+        that((sql_format)('select * from ((select *  from T1) union (select *  from T2)) as T'))->IsEqualTrimming('
 select
   * 
 from
@@ -659,16 +660,23 @@ from
   union 
     (select * from T2)
   ) as T
-', 'select * from ((select *  from T1) union (select *  from T2)) as T');
+');
 
         // for mysql load data
-        $this->assertFormatSql('
+        that((sql_format)('LOAD DATA INFILE "/tmp/test.txt" INTO TABLE test FIELDS TERMINATED BY ","  LINES STARTING BY "xxx"'))->IsEqualTrimming('
 LOAD DATA INFILE "/tmp/test.txt" INTO TABLE test 
   FIELDS TERMINATED BY "," LINES STARTING BY "xxx"
-', 'LOAD DATA INFILE "/tmp/test.txt" INTO TABLE test FIELDS TERMINATED BY ","  LINES STARTING BY "xxx"');
+');
 
         // with
-        $this->assertFormatSql('
+        that((sql_format)('
+WITH RECURSIVE cte AS
+(
+  SELECT * from t_something1 where (A and B)
+  UNION ALL
+  SELECT * from t_something2 where (C and D)
+)
+SELECT * FROM cte'))->IsEqualTrimming('
 WITH RECURSIVE cte AS(
   SELECT
     * 
@@ -688,17 +696,10 @@ SELECT
   * 
 FROM
   cte
-', '
-WITH RECURSIVE cte AS
-(
-  SELECT * from t_something1 where (A and B)
-  UNION ALL
-  SELECT * from t_something2 where (C and D)
-)
-SELECT * FROM cte');
+');
 
         // keyword function
-        $this->assertFormatSql('
+        that((sql_format)('select left(a, 1), right(b, 1) from t_from left join t_left on 1 right join t_right using(x)'))->IsEqualTrimming('
 select
   left(a, 1),
   right(b, 1)
@@ -708,10 +709,10 @@ left join
   t_left on 1 
 right join
   t_right using(x)
-', 'select left(a, 1), right(b, 1) from t_from left join t_left on 1 right join t_right using(x)');
+');
 
         // nest comment select
-        $this->assertFormatSql('
+        that((sql_format)('select (/* comment */select a from tt where A and (B and C)) as x'))->IsEqualTrimming('
 select
   (
     /* comment */
@@ -723,12 +724,6 @@ select
       A 
       and (B and C)
   ) as x
-', 'select (/* comment */select a from tt where A and (B and C)) as x');
-    }
-
-    private function assertFormatSql($expected, $actual, $options = [])
-    {
-        $actual = (sql_format)($actual, $options);
-        $this->assertEquals(trim($expected), $actual, "actual:\n$actual\n");
+');
     }
 }

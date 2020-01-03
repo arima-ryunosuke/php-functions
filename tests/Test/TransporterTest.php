@@ -17,14 +17,14 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         }
 
         // この時点では undefined
-        $this->assertFalse(function_exists("arrayize"));
-        $this->assertFalse(function_exists("strcat"));
+        that(function_exists("arrayize"))->isFalse();
+        that(function_exists("strcat"))->isFalse();
 
         @Transporter::importAsGlobal(['arrayize']);
 
         // arrayize だけ undefined なはず
-        $this->assertFalse(function_exists("arrayize"));
-        $this->assertTrue(function_exists("strcat"));
+        that(function_exists("arrayize"))->isFalse();
+        that(function_exists("strcat"))->isTrue();
     }
 
     /**
@@ -43,7 +43,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         @Transporter::importAsGlobal();
 
         // 独自定義が使われるはず
-        $this->assertEquals('this is arrayize', \arrayize());
+        that(\arrayize())->isEqual('this is arrayize');
     }
 
     /**
@@ -57,14 +57,14 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         }
 
         // この時点では undefined
-        $this->assertFalse(function_exists("ryunosuke\\Functions\\arrayize"));
-        $this->assertFalse(function_exists("ryunosuke\\Functions\\strcat"));
+        that(function_exists("ryunosuke\\Functions\\arrayize"))->isFalse();
+        that(function_exists("ryunosuke\\Functions\\strcat"))->isFalse();
 
         Transporter::importAsNamespace(['arrayize']);
 
         // arrayize だけ undefined なはず
-        $this->assertFalse(function_exists("ryunosuke\\Functions\\arrayize"));
-        $this->assertTrue(function_exists("ryunosuke\\Functions\\strcat"));
+        that(function_exists("ryunosuke\\Functions\\arrayize"))->isFalse();
+        that(function_exists("ryunosuke\\Functions\\strcat"))->isTrue();
     }
 
     /**
@@ -78,12 +78,12 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         }
 
         // この時点では undefined
-        $this->assertFalse(defined("ryunosuke\\Functions\\Package\\arrayize"));
+        that(defined("ryunosuke\\Functions\\Package\\arrayize"))->isFalse();
 
         Transporter::importAsClass();
 
         // 定義されたはず
-        $this->assertTrue(defined("ryunosuke\\Functions\\Package\\arrayize"));
+        that(defined("ryunosuke\\Functions\\Package\\arrayize"))->isTrue();
     }
 
     /**
@@ -101,16 +101,16 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         (mkdir_p)($dir);
 
         // この時点では noexists
-        $this->assertFileNotExists("$dir/global.php");
-        $this->assertFileNotExists("$dir/namespace.php");
-        $this->assertFileNotExists("$dir/package.php");
+        that("$dir/global.php")->notFileExists();
+        that("$dir/namespace.php")->notFileExists();
+        that("$dir/package.php")->notFileExists();
 
         Transporter::exportAll($dir);
 
         // 配置されてるはず
-        $this->assertFileExists("$dir/global.php");
-        $this->assertFileExists("$dir/namespace.php");
-        $this->assertFileExists("$dir/package.php");
+        that("$dir/global.php")->fileExists();
+        that("$dir/namespace.php")->fileExists();
+        that("$dir/package.php")->fileExists();
     }
 
     /**
@@ -134,13 +134,12 @@ class DUMMY
 DUMMY
         );
 
-        $contents = Transporter::exportNamespace('test\hoge');
-
         unlink(__DIR__ . '/../../src/Package/Dummy.php');
 
-        $this->assertContains('namespace test\hoge;', $contents);
-        $this->assertContains('define("test\\\\hoge\\\\arrayize"', $contents);
-        $this->assertContains('function arrayize', $contents);
+        that(Transporter::exportNamespace('test\hoge'))
+            ->stringContains('namespace test\hoge;')
+            ->stringContains('define("test\\\\hoge\\\\arrayize"')
+            ->stringContains('function arrayize');
     }
 
     /**
@@ -153,13 +152,13 @@ DUMMY
             return;
         }
 
-        $contents = Transporter::exportNamespace('test\hoge', false, [
+        that(Transporter::exportNamespace('test\hoge', false, [
             'callable_code',
-        ]);
-
-        $this->assertContains('callable_code', $contents);    // 自分自身が含まれている
-        $this->assertContains('TOKEN_NAME', $contents);       // 依存している定数が含まれている
-        $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
+        ]))
+            ->stringContains('callable_code')    // 自分自身が含まれている
+            ->stringContains('TOKEN_NAME')       // 依存している定数が含まれている
+            ->stringContains('reflect_callable') // 依存している関数が含まれている
+        ;
     }
 
     /**
@@ -172,21 +171,21 @@ DUMMY
             return;
         }
 
-        $contents = Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/');
+        that(Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/'))
+            ->stringContains('parse_uri')    // file1 が含まれている
+            ->stringContains('sql_format')   // file2 が含まれている
+            ->stringContains('KEYWORDS')     // file2 に依存している定数が含まれている
+            ->stringContains('preg_capture') // file1 に依存している関数が含まれている
+            ->stringContains('throws')       // file2 に依存している関数が含まれている
+        ;
 
-        $this->assertContains('parse_uri', $contents);    // file1 が含まれている
-        $this->assertContains('sql_format', $contents);   // file2 が含まれている
-        $this->assertContains('KEYWORDS', $contents);     // file2 に依存している定数が含まれている
-        $this->assertContains('preg_capture', $contents); // file1 に依存している関数が含まれている
-        $this->assertContains('throws', $contents);       // file2 に依存している関数が含まれている
-
-        $contents = Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/parse_uri.php');
-
-        $this->assertContains('parse_uri', $contents);     // file1 が含まれている
-        $this->assertNotContains('sql_format', $contents); // file2 は含まれていない
-        $this->assertNotContains('KEYWORDS', $contents);   // file2 に依存している定数が含まれていない
-        $this->assertContains('preg_capture', $contents);  // file1 に依存している関数が含まれている
-        $this->assertNotContains('throws', $contents);     // file2 に依存している関数が含まれている
+        that(Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/parse_uri.php'))
+            ->stringContains('parse_uri')     // file1 が含まれている
+            ->notStringContains('sql_format') // file2 は含まれていない
+            ->notStringContains('KEYWORDS')   // file2 に依存している定数が含まれていない
+            ->stringContains('preg_capture')  // file1 に依存している関数が含まれている
+            ->notStringContains('throws')     // file2 に依存している関数が含まれている
+        ;
     }
 
     /**
@@ -199,12 +198,12 @@ DUMMY
             return;
         }
 
-        $contents = Transporter::exportNamespace('test\hoge', false, 'arrayize callable_code');
-
-        $this->assertContains('arrayize', $contents);         // 指定したものが含まれている
-        $this->assertContains('callable_code', $contents);    // 指定したものが含まれている
-        $this->assertContains('TOKEN_NAME', $contents);       // 依存している定数が含まれている
-        $this->assertContains('reflect_callable', $contents); // 依存している関数が含まれている
+        that(Transporter::exportNamespace('test\hoge', false, 'arrayize callable_code'))
+            ->stringContains('arrayize')         // 指定したものが含まれている
+            ->stringContains('callable_code')    // 指定したものが含まれている
+            ->stringContains('TOKEN_NAME')       // 依存している定数が含まれている
+            ->stringContains('reflect_callable') // 依存している関数が含まれている
+        ;
     }
 
     /**
@@ -217,12 +216,12 @@ DUMMY
             return;
         }
 
-        $contents = Transporter::exportClass('ns\Utils');
-
-        $this->assertContains('const JP_ERA', $contents);                    // 定数が含まれている
-        $this->assertContains('const arrayize', $contents);                  // メソッド定数が含まれている
-        $this->assertContains('["\\\\ns\\\\Utils", "arrayize"]', $contents); // メソッド定数の値が含まれている
-        $this->assertContains('public static function arrayize', $contents); // メソッド定義が含まれている
+        that(Transporter::exportClass('ns\Utils'))
+            ->stringContains('const JP_ERA')                    // 定数が含まれている
+            ->stringContains('const arrayize')                  // メソッド定数が含まれている
+            ->stringContains('["\\\\ns\\\\Utils", "arrayize"]') // メソッド定数の値が含まれている
+            ->stringContains('public static function arrayize') // メソッド定義が含まれている
+        ;
     }
 
     /**
@@ -235,12 +234,12 @@ DUMMY
             return;
         }
 
-        $contents = Transporter::exportClass('ns\Utils', ['callable_code']);
-
-        $this->assertContains('const TOKEN_NAME', $contents);                 // 依存している定数が含まれている
-        $this->assertContains('const parse_php', $contents);                  // 依存しているメソッド定数が含まれている
-        $this->assertContains('["\\\\ns\\\\Utils", "parse_php"]', $contents); // 依存しているメソッド定数の値が含まれている
-        $this->assertContains('public static function parse_php', $contents); // 依存しているメソッド定義が含まれている
+        that(Transporter::exportClass('ns\Utils', ['callable_code']))
+            ->stringContains('const TOKEN_NAME')                 // 依存している定数が含まれている
+            ->stringContains('const parse_php')                  // 依存しているメソッド定数が含まれている
+            ->stringContains('["\\\\ns\\\\Utils", "parse_php"]') // 依存しているメソッド定数の値が含まれている
+            ->stringContains('public static function parse_php') // 依存しているメソッド定義が含まれている
+        ;
     }
 
     function test_parseSymbol()
@@ -248,12 +247,10 @@ DUMMY
         $refmethod = new \ReflectionMethod(Transporter::class, 'parseSymbol');
         $refmethod->setAccessible(true);
 
-        $symbols = $refmethod->invoke(null, true);
-        $this->assertEquals([
-            'constant',
-            'function',
-            'phpblock',
-        ], array_keys($symbols));
+        that($refmethod->invoke(null, true))
+            ->arrayHasKey('constant')
+            ->arrayHasKey('function')
+            ->arrayHasKey('phpblock');
     }
 
     function test_exportVar()
@@ -261,14 +258,14 @@ DUMMY
         $refmethod = new \ReflectionMethod(Transporter::class, 'exportVar');
         $refmethod->setAccessible(true);
 
-        $this->assertEquals('123', $refmethod->invoke(null, 123));
-        $this->assertEquals('"hoge"', $refmethod->invoke(null, 'hoge'));
-        $this->assertEquals('["a"]', $refmethod->invoke(null, ['a']));
-        $this->assertEquals('[
+        that($refmethod->invoke(null, 123))->is('123');
+        that($refmethod->invoke(null, 'hoge'))->is('"hoge"');
+        that($refmethod->invoke(null, ['a']))->is('["a"]');
+        that($refmethod->invoke(null, [['a']]))->is('[
     ["a"],
-]', $refmethod->invoke(null, [['a']]));
-        $this->assertEquals('[
+]');
+        that($refmethod->invoke(null, ['a' => 'A']))->is('[
     "a" => "A",
-]', $refmethod->invoke(null, ['a' => 'A']));
+]');
     }
 }

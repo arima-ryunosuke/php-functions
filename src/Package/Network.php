@@ -15,9 +15,9 @@ class Network
      * Example:
      * ```php
      * // 何らかの IP アドレスが返ってくる
-     * assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', getipaddress());
+     * that(getipaddress())->matches('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#');
      * // 自分への接続元は自分なので 127.0.0.1 を返す
-     * assertSame(getipaddress('127.0.0.9'), '127.0.0.1');
+     * that(getipaddress('127.0.0.9'))->isSame('127.0.0.1');
      * ```
      *
      * @param string $target 接続先。基本的に指定することはない
@@ -48,13 +48,13 @@ class Network
      * Example:
      * ```php
      * // 範囲内なので true
-     * assertTrue(incidr('192.168.1.1', '192.168.1.0/24'));
+     * that(incidr('192.168.1.1', '192.168.1.0/24'))->isTrue();
      * // 範囲外なので false
-     * assertFalse(incidr('192.168.1.1', '192.168.2.0/24'));
+     * that(incidr('192.168.1.1', '192.168.2.0/24'))->isFalse();
      * // 1つでも範囲内なら true
-     * assertTrue(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']));
+     * that(incidr('192.168.1.1', ['192.168.1.0/24', '192.168.2.0/24']))->isTrue();
      * // 全部範囲外なら false
-     * assertFalse(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']));
+     * that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))->isFalse();
      * ```
      *
      * @param string $ipaddr 調べられる IP アドレス
@@ -97,10 +97,10 @@ class Network
      * Example:
      * ```php
      * // 自身へ ICMP ping を打つ（正常終了なら float を返し、失敗なら false を返す）
-     * assertInternalType('float', ping('127.0.0.1'));
+     * that(ping('127.0.0.1'))->isFloat();
      * // 自身の tcp:1234 が開いているか（開いていれば float を返し、開いていなければ false を返す）
-     * assertFalse(ping('tcp://127.0.0.1', 1234));
-     * assertFalse(ping('127.0.0.1', 1234)); // tcp はスキームを省略できる
+     * that(ping('tcp://127.0.0.1', 1234))->isFalse();
+     * that(ping('127.0.0.1', 1234))->isFalse(); // tcp はスキームを省略できる
      * ```
      *
      * @param string $host ホスト名（プロトコルも指定できる）

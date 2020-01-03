@@ -31,10 +31,10 @@ class Classobj
      * ```php
      * // 基本的には object キャストと同じ
      * $fields = ['a' => 'A', 'b' => 'B'];
-     * assertEquals(stdclass($fields), (object) $fields);
+     * that(stdclass($fields))->is((object) $fields);
      * // ただしこういうことはキャストでは出来ない
-     * assertEquals(array_map('stdclass', [$fields]), [(object) $fields]); // コールバックとして利用する
-     * assertTrue(property_exists(stdclass(['a', 'b']), '0')); // 数値キー付きオブジェクトにする
+     * that(array_map('stdclass', [$fields]))->is([(object) $fields]); // コールバックとして利用する
+     * that(property_exists(stdclass(['a', 'b']), '0'))->isTrue();     // 数値キー付きオブジェクトにする
      * ```
      *
      * @param iterable $fields フィールド配列
@@ -63,7 +63,7 @@ class Classobj
      * // Example 用としてこのクラスのディレクトリを使用してみる
      * $dirname = dirname(class_loader()->findFile(\ryunosuke\Functions\Package\Classobj::class));
      * // "$dirname/Hoge" の名前空間を推測して返す
-     * assertSame(detect_namespace("$dirname/Hoge"), "ryunosuke\\Functions\\Package\\Hoge");
+     * that(detect_namespace("$dirname/Hoge"))->isSame("ryunosuke\\Functions\\Package\\Hoge");
      * ```
      *
      * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
@@ -119,7 +119,7 @@ class Classobj
      * trait T1{}
      * trait T2{use T1;}
      * trait T3{use T2;}
-     * assertSame(class_uses_all(new class{use T3;}), [
+     * that(class_uses_all(new class{use T3;}))->isSame([
      *     'Example\\T3', // クラスが直接 use している
      *     'Example\\T2', // T3 が use している
      *     'Example\\T1', // T2 が use している
@@ -164,7 +164,7 @@ class Classobj
      *
      * Example:
      * ```php
-     * assertInstanceof(\Composer\Autoload\ClassLoader::class, class_loader());
+     * that(class_loader())->isInstanceOf(\Composer\Autoload\ClassLoader::class);
      * ```
      *
      * @param string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
@@ -191,7 +191,7 @@ class Classobj
      *
      * Example:
      * ```php
-     * assertSame(class_namespace('vendor\\namespace\\ClassName'), 'vendor\\namespace');
+     * that(class_namespace('vendor\\namespace\\ClassName'))->isSame('vendor\\namespace');
      * ```
      *
      * @param string|object $class 対象クラス・オブジェクト
@@ -213,7 +213,7 @@ class Classobj
      *
      * Example:
      * ```php
-     * assertSame(class_shorten('vendor\\namespace\\ClassName'), 'ClassName');
+     * that(class_shorten('vendor\\namespace\\ClassName'))->isSame('ClassName');
      * ```
      *
      * @param string|object $class 対象クラス・オブジェクト
@@ -267,8 +267,8 @@ class Classobj
      *     };
      * });
      * // X1 を継承している Y1 にまで影響が出ている（X1 を完全に置換できたということ）
-     * assertSame((new \ryunosuke\Test\Package\Classobj\Y1())->method(), 'this is X1d');
-     * assertSame((new \ryunosuke\Test\Package\Classobj\Y1())->newmethod(), 'this is newmethod');
+     * that((new \ryunosuke\Test\Package\Classobj\Y1())->method())->isSame('this is X1d');
+     * that((new \ryunosuke\Test\Package\Classobj\Y1())->newmethod())->isSame('this is newmethod');
      *
      * // Y2 extends X2 だとしてクロージャ配列でオーバーライドする
      * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
@@ -278,8 +278,8 @@ class Classobj
      *     ];
      * });
      * // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
-     * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->method(), 'this is X2d');
-     * assertSame((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod(), 'this is newmethod');
+     * that((new \ryunosuke\Test\Package\Classobj\Y2())->method())->isSame('this is X2d');
+     * that((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod())->isSame('this is newmethod');
      *
      * // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
      * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
@@ -287,9 +287,9 @@ class Classobj
      *     'method' => function(){return 'this is X3d';},
      * ]);
      * // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
-     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->method(), 'this is X3d');
+     * that((new \ryunosuke\Test\Package\Classobj\Y3())->method())->isSame('this is X3d');
      * // トレイトのメソッドも生えている
-     * assertSame((new \ryunosuke\Test\Package\Classobj\Y3())->traitMethod(), 'this is XTrait::traitMethod');
+     * that((new \ryunosuke\Test\Package\Classobj\Y3())->traitMethod())->isSame('this is XTrait::traitMethod');
      * ```
      *
      * @param string $class 対象クラス名
@@ -416,7 +416,7 @@ class Classobj
      *         return $this->code . ':' . $this->message;
      *     },
      * ]);
-     * assertSame($newobject->codemessage(), '123:hoge');
+     * that($newobject->codemessage())->isSame('123:hoge');
      *
      * // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
      * $object = new \ArrayObject([1, 2, 3]);
@@ -426,7 +426,7 @@ class Classobj
      *         return parent::count() * 2;
      *     },
      * ]);
-     * assertSame($newobject->count(), 6);
+     * that($newobject->count())->isSame(6);
      * ```
      *
      * @param string $object 対象オブジェクト
@@ -626,13 +626,13 @@ class Classobj
      * Example:
      * ```php
      * // クラス定数が調べられる（1引数、2引数どちらでも良い）
-     * assertTrue(const_exists('ArrayObject::STD_PROP_LIST'));
-     * assertTrue(const_exists('ArrayObject', 'STD_PROP_LIST'));
-     * assertFalse(const_exists('ArrayObject::UNDEFINED'));
-     * assertFalse(const_exists('ArrayObject', 'UNDEFINED'));
+     * that(const_exists('ArrayObject::STD_PROP_LIST'))->isTrue();
+     * that(const_exists('ArrayObject', 'STD_PROP_LIST'))->isTrue();
+     * that(const_exists('ArrayObject::UNDEFINED'))->isFalse();
+     * that(const_exists('ArrayObject', 'UNDEFINED'))->isFalse();
      * // グローバル（名前空間）もいける
-     * assertTrue(const_exists('PHP_VERSION'));
-     * assertFalse(const_exists('UNDEFINED'));
+     * that(const_exists('PHP_VERSION'))->isTrue();
+     * that(const_exists('UNDEFINED'))->isFalse();
      * ```
      *
      * @param string|object $classname 調べるクラス
@@ -667,10 +667,10 @@ class Classobj
      *         ])
      *     ])
      * ]);
-     * assertSame(object_dive($class, 'a.b.c'), 'vvv');
-     * assertSame(object_dive($class, 'a.b.x', 9), 9);
+     * that(object_dive($class, 'a.b.c'))->isSame('vvv');
+     * that(object_dive($class, 'a.b.x', 9))->isSame(9);
      * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
-     * assertSame(object_dive($class, ['a', 'b', 'c']), 'vvv');
+     * that(object_dive($class, ['a', 'b', 'c']))->isSame('vvv');
      * ```
      *
      * @param object $object 調べるオブジェクト
@@ -706,7 +706,7 @@ class Classobj
      *     public    const C_PUBLIC    = 'public';
      * };
      * // 普通に全定数を返す
-     * assertSame(get_class_constants($class), [
+     * that(get_class_constants($class))->isSame([
      *     'C_PRIVATE'      => 'private',
      *     'C_PROTECTED'    => 'protected',
      *     'C_PUBLIC'       => 'public',
@@ -714,13 +714,13 @@ class Classobj
      *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
      * ]);
      * // public のみを返す
-     * assertSame(get_class_constants($class, IS_PUBLIC), [
+     * that(get_class_constants($class, IS_PUBLIC))->isSame([
      *     'C_PUBLIC'       => 'public',
      *     'STD_PROP_LIST'  => \ArrayObject::STD_PROP_LIST,
      *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
      * ]);
      * // 自身定義でかつ public のみを返す
-     * assertSame(get_class_constants($class, IS_OWNSELF | IS_PUBLIC), [
+     * that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))->isSame([
      *     'C_PUBLIC'       => 'public',
      * ]);
      * ```
@@ -764,11 +764,11 @@ class Classobj
      * // var_dump((array) $object);
      *
      * // この関数を使えば不可視プロパティも取得できる
-     * assertArraySubset([
+     * that(get_object_properties($object))->arraySubset([
      *     'message' => 'something',
      *     'code'    => 42,
      *     'oreore'  => 'oreore',
-     * ], get_object_properties($object));
+     * ]);
      * ```
      *
      * @param object $object オブジェクト

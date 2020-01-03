@@ -32,10 +32,10 @@ class Sql
      *
      * Example:
      * ```php
-     * assertSame(sql_quote(null), 'NULL');
-     * assertSame(sql_quote(123), 123);
-     * assertSame(sql_quote(true), 1);
-     * assertSame(sql_quote("hoge"), "'hoge'");
+     * that(sql_quote(null))->isSame('NULL');
+     * that(sql_quote(123))->isSame(123);
+     * that(sql_quote(true))->isSame(1);
+     * that(sql_quote("hoge"))->isSame("'hoge'");
      * ```
      *
      * @param mixed $value クオートする値
@@ -65,9 +65,9 @@ class Sql
      *
      * Example:
      * ```php
-     * assertSame(sql_bind('select ?', 1), "select 1");
-     * assertSame(sql_bind('select :hoge', ['hoge' => 'hoge']), "select 'hoge'");
-     * assertSame(sql_bind('select ?, :hoge', [1, 'hoge' => 'hoge']), "select 1, 'hoge'");
+     * that(sql_bind('select ?', 1))->isSame("select 1");
+     * that(sql_bind('select :hoge', ['hoge' => 'hoge']))->isSame("select 'hoge'");
+     * that(sql_bind('select ?, :hoge', [1, 'hoge' => 'hoge']))->isSame("select 1, 'hoge'");
      * ```
      *
      * @param string $sql 値を埋め込む SQL
