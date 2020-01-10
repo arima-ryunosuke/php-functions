@@ -6,7 +6,7 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
 {
     const TMPDIR = __DIR__ . '/../../temporary/';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

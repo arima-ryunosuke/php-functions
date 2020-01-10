@@ -72,11 +72,11 @@ class Utility
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
      * $rand1 = cache('rand', $provider);
      * $rand2 = cache('rand', $provider);
-     * assertSame($rand1, $rand2);
+     * that($rand1)->isSame($rand2);
      * // $provider に null を与えると削除される
      * cache('rand', null);
      * $rand3 = cache('rand', $provider);
-     * assertNotSame($rand1, $rand3);
+     * that($rand1)->isNotSame($rand3);
      * ```
      *
      * @param string $key キャッシュのキー
@@ -220,7 +220,7 @@ class Utility
      * const InnerConst = 123;
      * ');
      * // このような名前空間配列が得られる
-     * assertSame(parse_namespace(sys_get_temp_dir() . '/namespace.php'), [
+     * that(parse_namespace(sys_get_temp_dir() . '/namespace.php'))->isSame([
      *     'NS1' => [
      *         'const'    => [],
      *         'function' => [
@@ -379,10 +379,10 @@ class Utility
      * class InnerClass{}
      * ');
      * // 下記のように解決される
-     * assertSame(resolve_symbol('AO', sys_get_temp_dir() . '/symbol.php'), 'ArrayObject');
-     * assertSame(resolve_symbol('SL', sys_get_temp_dir() . '/symbol.php'), 'strlen');
-     * assertSame(resolve_symbol('InnerFunc', sys_get_temp_dir() . '/symbol.php'), 'vendor\\NS\\InnerFunc');
-     * assertSame(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'), 'vendor\\NS\\InnerClass');
+     * that(resolve_symbol('AO', sys_get_temp_dir() . '/symbol.php'))->isSame('ArrayObject');
+     * that(resolve_symbol('SL', sys_get_temp_dir() . '/symbol.php'))->isSame('strlen');
+     * that(resolve_symbol('InnerFunc', sys_get_temp_dir() . '/symbol.php'))->isSame('vendor\\NS\\InnerFunc');
+     * that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))->isSame('vendor\\NS\\InnerClass');
      * ```
      *
      * @param string $shortname エイリアス名
@@ -465,7 +465,7 @@ class Utility
      *     'single'  => true,
      *     'closure' => function ($value) { return explode(' ', strtoupper($value)); },
      * ]);
-     * assertEquals($annotations, [
+     * that($annotations)->is([
      *     'noval'       => null,                        // 値なしは null になる
      *     'single'      => 'this is value',             // $schema 指定してるので文字列になる
      *     'closure'     => ['THIS', 'IS', 'VALUE'],     // $schema 指定してそれがクロージャだとコールバックされる
@@ -686,9 +686,9 @@ class Utility
      *     '-d' => 'max_file_uploads=123',
      *     $phpfile,
      * ], 'out', $stdout, $stderr);
-     * assertSame($rc, 123); // -d で与えた max_file_uploads で exit してるので 123
-     * assertSame($stdout, 'out'); // 標準出力に標準入力を書き込んでいるので "out" が格納される
-     * assertSame($stderr, 'err'); // 標準エラーに書き込んでいるので "err" が格納される
+     * that($rc)->isSame(123); // -d で与えた max_file_uploads で exit してるので 123
+     * that($stdout)->isSame('out'); // 標準出力に標準入力を書き込んでいるので "out" が格納される
+     * that($stderr)->isSame('err'); // 標準エラーに書き込んでいるので "err" が格納される
      * ```
      *
      * @param string $command 実行コマンド。escapeshellcmd される
@@ -809,7 +809,7 @@ class Utility
      *     'longopt l' => '',       // スペース区切りで「ショート名」を意味する
      *     1           => 'defarg', // 数値キーは「引数」を意味する
      * ];
-     * assertSame(arguments($rule, '--opt optval arg1 -l longval'), [
+     * that(arguments($rule, '--opt optval arg1 -l longval'))->isSame([
      *     'opt'     => 'optval',  // optval と指定している
      *     'longopt' => 'longval', // ショート名指定でも本来の名前で返ってくる
      *     'arg1',   // いわゆるコマンドライン引数（optval は opt に飲まれるので含まれない）
@@ -823,7 +823,7 @@ class Utility
      *     'noval3 n'  => null, // 同上
      *     'opts o' => [],      // 配列を与えると「複数値オプション」を表す
      * ];
-     * assertSame(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'), [
+     * that(arguments($rule, '--opts o1 -ln arg1 -o o2 arg2 --opts o3'))->isSame([
      *     'noval1' => true,  // -ln で同時指定されているので true
      *     'noval2' => false, // -ln で同時指定されてないので false
      *     'noval3' => true,  // -ln の同時指定されているので true
@@ -836,7 +836,7 @@ class Utility
      * $rule = [
      *     ''  => false, // 定義されていないオプションが来ても例外を投げずに引数として処理する
      * ];
-     * assertSame(arguments($rule, '--long A -short B'), [
+     * that(arguments($rule, '--long A -short B'))->isSame([
      *     '--long', // 明らかにオプション指定に見えるが、 long というオプションは定義されていないので引数として解釈される
      *     'A',      // 同上。long のオプション値に見えるが、ただの引数
      *     '-short', // 同上。short というオプションは定義されていない
@@ -1107,14 +1107,14 @@ class Utility
      * function f003 () {return f002();}
      * $traces = f003();
      * // limit 指定してるので2個
-     * assertCount(2, $traces);
+     * that($traces)->count(2);
      * // 「function が f002 以降」を返す
-     * assertArraySubset([
+     * that($traces[0])->arraySubset([
      *     'function' => __NAMESPACE__ . '\\f002'
-     * ], $traces[0]);
-     * assertArraySubset([
+     * ]);
+     * that($traces[1])->arraySubset([
      *     'function' => __NAMESPACE__ . '\\f003'
-     * ], $traces[1]);
+     * ]);
      * ```
      *
      * @param int $flags debug_backtrace の引数
@@ -1260,7 +1260,7 @@ class Utility
      * Example:
      * ```php
      * // 0.01 秒を 10 回回すので 0.1 秒は超える
-     * assertGreaterThan(0.1, timer(function(){usleep(10 * 1000);}, 10));
+     * that(timer(function(){usleep(10 * 1000);}, 10))->greaterThan(0.1);
      * ```
      *
      * @param callable $callable 処理クロージャ

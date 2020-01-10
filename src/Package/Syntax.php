@@ -30,7 +30,7 @@ class Syntax
      * $c = $a + $b;
      * return $c * 3;
      * ';
-     * assertSame(evaluate($phpcode, get_defined_vars()), 9);
+     * that(evaluate($phpcode, get_defined_vars()))->isSame(9);
      * ```
      *
      * @param string $phpcode 実行する php コード
@@ -97,14 +97,14 @@ class Syntax
      *     'begin' => T_NAMESPACE,
      *     'end'   => ';',
      * ]);
-     * assertSame(implode('', array_column($part, 1)), 'namespace Hogera;');
+     * that(implode('', array_column($part, 1)))->isSame('namespace Hogera;');
      *
      * // class ～ { を取得
      * $part = parse_php($phpcode, [
      *     'begin' => T_CLASS,
      *     'end'   => '{',
      * ]);
-     * assertSame(implode('', array_column($part, 1)), "class Example\n{");
+     * that(implode('', array_column($part, 1)))->isSame("class Example\n{");
      * ```
      *
      * @param string $phpcode パースする php コード
@@ -381,24 +381,24 @@ class Syntax
      * // null を返すかもしれないステートメント
      * $getobject = function () {return null;};
      * // メソッド呼び出しは null を返す
-     * assertSame(optional($getobject())->method(), null);
+     * that(optional($getobject())->method())->isSame(null);
      * // プロパティアクセスは null を返す
-     * assertSame(optional($getobject())->property, null);
+     * that(optional($getobject())->property)->isSame(null);
      * // empty は true を返す
-     * assertSame(empty(optional($getobject())->nothing), true);
+     * that(empty(optional($getobject())->nothing))->isSame(true);
      * // __isset は false を返す
-     * assertSame(isset(optional($getobject())->nothing), false);
+     * that(isset(optional($getobject())->nothing))->isSame(false);
      * // __toString は '' を返す
-     * assertSame(strval(optional($getobject())), '');
+     * that(strval(optional($getobject())))->isSame('');
      * // __invoke は null を返す
-     * assertSame(call_user_func(optional($getobject())), null);
+     * that(call_user_func(optional($getobject())))->isSame(null);
      * // 配列アクセスは null を返す
-     * assertSame(optional($getobject())['hoge'], null);
+     * that(optional($getobject())['hoge'])->isSame(null);
      * // 空イテレータを返す
-     * assertSame(iterator_to_array(optional($getobject())), []);
+     * that(iterator_to_array(optional($getobject())))->isSame([]);
      *
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
-     * assertSame(optional(new \ArrayObject([1]), 'stdClass')->count(), null);
+     * that(optional(new \ArrayObject([1]), 'stdClass')->count())->isSame(null);
      * ```
      *
      * @param object|null $object オブジェクト
@@ -478,20 +478,20 @@ class Syntax
      * # 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
      * $n1_9 = range(1, 9);
      * // 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
-     * assertSame(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v <= 5; }))), 30);
+     * that(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v <= 5; }))))->isSame(30);
      * // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
-     * assertSame(chain($n1_9)->filter(function ($v) { return $v <= 5; })->map(function ($v) { return $v * 2; })->sum()(), 30);
+     * that(chain($n1_9)->filter(function ($v) { return $v <= 5; })->map(function ($v) { return $v * 2; })->sum()())->isSame(30);
      * // funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
-     * assertSame(chain($n1_9)->filterP(['<=' => 5])->mapP(['*' => 2])->sum()(), 30);
+     * that(chain($n1_9)->filterP(['<=' => 5])->mapP(['*' => 2])->sum()())->isSame(30);
      * // funcE を介したもの。かなり直感的だが eval なので少し不安
-     * assertSame(chain($n1_9)->filterE('<= 5')->mapE('* 2')->sum()(), 30);
+     * that(chain($n1_9)->filterE('<= 5')->mapE('* 2')->sum()())->isSame(30);
      *
      * # "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
      * $string = 'hello   world';
      * // 素の php で処理したもの。もはやなにがなんだか分からない
-     * assertSame(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filter(explode(' ', $string))))))), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+     * that(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filter(explode(' ', $string))))))))->isSame('10AF4DAF67D0D666FCEA0A8C6EF57EE7');
      * // chain だとかなりそれっぽくできる。 explode/implode の第1引数は区切り文字なので func1 構文を使用している。また、 rot13 以降は引数がないので () を省略している
-     * assertSame(chain($string)->explode1(' ')->filter()->map('ucfirst')->implode1('/')->rot13->md5->strtoupper()(), '10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+     * that(chain($string)->explode1(' ')->filter()->map('ucfirst')->implode1('/')->rot13->md5->strtoupper()())->isSame('10AF4DAF67D0D666FCEA0A8C6EF57EE7');
      *
      *  # よくある DB レコードをあれこれするシチュエーション
      * $rows = [
@@ -501,22 +501,22 @@ class Syntax
      *     ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
      * ];
      * // e.g. 男性の平均給料
-     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()(), 375000);
+     * that(chain($rows)->whereP('sex', ['===' => 'M'])->column('salary')->mean()())->isSame(375000);
      * // e.g. 女性の平均年齢
-     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()(), 23.5);
+     * that(chain($rows)->whereE('sex', '=== "F"')->column('age')->mean()())->isSame(23.5);
      * // e.g. 30歳以上の平均給料
-     * assertSame(chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()(), 400000);
+     * that(chain($rows)->whereP('age', ['>=' => 30])->column('salary')->mean()())->isSame(400000);
      * // e.g. 20～30歳の平均給料
-     * assertSame(chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()(), 295000);
+     * that(chain($rows)->whereP('age', ['>=' => 20])->whereE('age', '<= 30')->column('salary')->mean()())->isSame(295000);
      * // e.g. 男性の最小年齢
-     * assertSame(chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()(), 21);
+     * that(chain($rows)->whereP('sex', ['===' => 'M'])->column('age')->min()())->isSame(21);
      * // e.g. 女性の最大給料
-     * assertSame(chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()(), 320000);
+     * that(chain($rows)->whereE('sex', '=== "F"')->column('salary')->max()())->isSame(320000);
      *
      * # 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
-     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows), 375000);
-     * assertSame(chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows), 400000);
-     * assertSame(chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows), 21);
+     * that(chain()->whereP('sex', ['===' => 'M'])->column('salary')->mean()($rows))->isSame(375000);
+     * that(chain()->whereP('age', ['>=' => 30])->column('salary')->mean()($rows))->isSame(400000);
+     * that(chain()->whereP('sex', ['===' => 'M'])->column('age')->min()($rows))->isSame(21);
      * ```
      *
      * @param mixed $source 元データ
@@ -686,7 +686,7 @@ class Syntax
      *     throws(new \Exception('throws'));
      * }
      * catch (\Exception $ex) {
-     *     assertSame($ex->getMessage(), 'throws');
+     *     that($ex->getMessage())->isSame('throws');
      * }
      * ```
      *
@@ -748,56 +748,56 @@ class Syntax
      * Example:
      * ```php
      * // falsy な値は null を返すので null 合体演算子でデフォルト値が得られる
-     * assertSame(blank_if(null) ?? 'default', 'default');
-     * assertSame(blank_if('')   ?? 'default', 'default');
+     * that(blank_if(null) ?? 'default')->isSame('default');
+     * that(blank_if('')   ?? 'default')->isSame('default');
      * // falsy じゃない値の場合は引数をそのまま返すので null 合体演算子には反応しない
-     * assertSame(blank_if(0)   ?? 'default', 0);   // 0 は空ではない
-     * assertSame(blank_if('0') ?? 'default', '0'); // "0" は空ではない
-     * assertSame(blank_if(1)   ?? 'default', 1);
-     * assertSame(blank_if('X') ?? 'default', 'X');
+     * that(blank_if(0)   ?? 'default')->isSame(0);   // 0 は空ではない
+     * that(blank_if('0') ?? 'default')->isSame('0'); // "0" は空ではない
+     * that(blank_if(1)   ?? 'default')->isSame(1);
+     * that(blank_if('X') ?? 'default')->isSame('X');
      * // 第2引数で返る値を指定できるので下記も等価となる。ただし、php の仕様上第2引数が必ず評価されるため、関数呼び出しなどだと無駄な処理となる
-     * assertSame(blank_if(null, 'default'), 'default');
-     * assertSame(blank_if('',   'default'), 'default');
-     * assertSame(blank_if(0,    'default'), 0);
-     * assertSame(blank_if('0',  'default'), '0');
-     * assertSame(blank_if(1,    'default'), 1);
-     * assertSame(blank_if('X',  'default'), 'X');
+     * that(blank_if(null, 'default'))->isSame('default');
+     * that(blank_if('',   'default'))->isSame('default');
+     * that(blank_if(0,    'default'))->isSame(0);
+     * that(blank_if('0',  'default'))->isSame('0');
+     * that(blank_if(1,    'default'))->isSame(1);
+     * that(blank_if('X',  'default'))->isSame('X');
      * // 第2引数の用途は少し短く書けることと演算子の優先順位のつらみの回避程度（`??` は結構優先順位が低い。下記を参照）
-     * assertFalse(0 < blank_if(null) ?? 1);  // (0 < null) ?? 1 となるので false
-     * assertTrue(0 < blank_if(null, 1));     // 0 < 1 となるので true
-     * assertTrue(0 < (blank_if(null) ?? 1)); // ?? で同じことしたいならこのように括弧が必要
+     * that(0 < blank_if(null) ?? 1)->isFalse();  // (0 < null) ?? 1 となるので false
+     * that(0 < blank_if(null, 1))->isTrue();     // 0 < 1 となるので true
+     * that(0 < (blank_if(null) ?? 1))->isTrue(); // ?? で同じことしたいならこのように括弧が必要
      *
      * # ここから下は既存言語機構との比較（愚痴っぽいので読まなくてもよい）
      *
      * // エルビス演算子は "0" にも反応するので正直言って使いづらい（php における falsy の定義は広すぎる）
-     * assertSame(null ?: 'default', 'default');
-     * assertSame(''   ?: 'default', 'default');
-     * assertSame(1    ?: 'default', 1);
-     * assertSame('0'  ?: 'default', 'default'); // こいつが反応してしまう
-     * assertSame('X'  ?: 'default', 'X');
+     * that(null ?: 'default')->isSame('default');
+     * that(''   ?: 'default')->isSame('default');
+     * that(1    ?: 'default')->isSame(1);
+     * that('0'  ?: 'default')->isSame('default'); // こいつが反応してしまう
+     * that('X'  ?: 'default')->isSame('X');
      * // 逆に null 合体演算子は null にしか反応しないので微妙に使い勝手が悪い（php の標準関数が false を返したりするし）
-     * assertSame(null ?? 'default', 'default'); // こいつしか反応しない
-     * assertSame(''   ?? 'default', '');
-     * assertSame(1    ?? 'default', 1);
-     * assertSame('0'  ?? 'default', '0');
-     * assertSame('X'  ?? 'default', 'X');
+     * that(null ?? 'default')->isSame('default'); // こいつしか反応しない
+     * that(''   ?? 'default')->isSame('');
+     * that(1    ?? 'default')->isSame(1);
+     * that('0'  ?? 'default')->isSame('0');
+     * that('X'  ?? 'default')->isSame('X');
      * // 恣意的な例だが、 substr は false も '0' も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
-     * assertSame(substr('000', 1, 1) ?: 'default', 'default'); // '0' を返すので 'default' になる
-     * assertSame(substr('xxx', 9, 1) ?: 'default', 'default'); // （文字数が足りなくて）false を返すので 'default' になる
-     * assertSame(substr('000', 1, 1) ?? 'default', '0');   // substr が null を返すことはないので 'default' になることはない
-     * assertSame(substr('xxx', 9, 1) ?? 'default', false); // substr が null を返すことはないので 'default' になることはない
+     * that(substr('000', 1, 1) ?: 'default')->isSame('default'); // '0' を返すので 'default' になる
+     * that(substr('xxx', 9, 1) ?: 'default')->isSame('default'); // （文字数が足りなくて）false を返すので 'default' になる
+     * that(substr('000', 1, 1) ?? 'default')->isSame('0');   // substr が null を返すことはないので 'default' になることはない
+     * that(substr('xxx', 9, 1) ?? 'default')->isSame(false); // substr が null を返すことはないので 'default' になることはない
      * // 要するに単に「false が返ってきた場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
-     * assertSame(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1), 'default'); // 3項演算子で2回呼ぶ
-     * assertSame(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp, 'default');       // 一時変数を使用する（あるいは if 文）
+     * that(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1))->isSame('default'); // 3項演算子で2回呼ぶ
+     * that(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp)->isSame('default');       // 一時変数を使用する（あるいは if 文）
      * // このように書きたかった
-     * assertSame(blank_if(substr('xxx', 9, 1)) ?? 'default', 'default'); // null 合体演算子版
-     * assertSame(blank_if(substr('xxx', 9, 1), 'default'), 'default');   // 第2引数版
+     * that(blank_if(substr('xxx', 9, 1)) ?? 'default')->isSame('default'); // null 合体演算子版
+     * that(blank_if(substr('xxx', 9, 1), 'default'))->isSame('default');   // 第2引数版
      *
      * // 恣意的な例その2。 0 は空ではないので array_search などにも応用できる（見つからない場合に false を返すので ?? はできないし、 false 相当を返し得るので ?: もできない）
-     * assertSame(array_search('x', ['a', 'b', 'c']) ?? 'default', false);     // 見つからないので 'default' としたいが false になってしまう
-     * assertSame(array_search('a', ['a', 'b', 'c']) ?: 'default', 'default'); // 見つかったのに 0 に反応するので 'default' になってしまう
-     * assertSame(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default', 'default'); // このように書きたかった
-     * assertSame(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default', 0);         // このように書きたかった
+     * that(array_search('x', ['a', 'b', 'c']) ?? 'default')->isSame(false);     // 見つからないので 'default' としたいが false になってしまう
+     * that(array_search('a', ['a', 'b', 'c']) ?: 'default')->isSame('default'); // 見つかったのに 0 に反応するので 'default' になってしまう
+     * that(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default')->isSame('default'); // このように書きたかった
+     * that(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default')->isSame(0);         // このように書きたかった
      * ```
      *
      * @param mixed $var 判定する値
@@ -846,7 +846,7 @@ class Syntax
      *     call_if(2, $debug_print, '2回呼ばれた');
      *     call_if(-2, $debug_print, '2回以上呼ばれた');
      * }
-     * assertSame($output, [
+     * that($output)->isSame([
      *     '$i == 1のとき呼ばれた',
      *     '2回呼ばれた',
      *     '2回以上呼ばれた',
@@ -901,9 +901,9 @@ class Syntax
      *     1 => 'value is 1',
      *     2 => function(){return 'value is 2';},
      * ];
-     * assertSame(switchs(1, $cases), 'value is 1');
-     * assertSame(switchs(2, $cases), 'value is 2');
-     * assertSame(switchs(3, $cases, 'undefined'), 'undefined');
+     * that(switchs(1, $cases))->isSame('value is 1');
+     * that(switchs(2, $cases))->isSame('value is 2');
+     * that(switchs(3, $cases, 'undefined'))->isSame('undefined');
      * ```
      *
      * @param mixed $value 調べる値
@@ -936,10 +936,10 @@ class Syntax
      * ```php
      * // 例外が飛ばない場合は平和極まりない
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assertSame(try_null($try, 1, 2, 3), [1, 2, 3]);
+     * that(try_null($try, 1, 2, 3))->isSame([1, 2, 3]);
      * // 例外が飛ぶ場合は null が返ってくる
      * $try = function(){throw new \Exception('tried');};
-     * assertSame(try_null($try), null);
+     * that(try_null($try))->isSame(null);
      * ```
      *
      * @param callable $try try ブロッククロージャ
@@ -965,10 +965,10 @@ class Syntax
      * ```php
      * // 例外が飛ばない場合は平和極まりない
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assertSame(try_catch($try, null, 1, 2, 3), [1, 2, 3]);
+     * that(try_catch($try, null, 1, 2, 3))->isSame([1, 2, 3]);
      * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
      * $try = function(){throw new \Exception('tried');};
-     * assertSame(try_catch($try)->getMessage(), 'tried');
+     * that(try_catch($try)->getMessage())->isSame('tried');
      * ```
      *
      * @param callable $try try ブロッククロージャ
@@ -992,12 +992,12 @@ class Syntax
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assertSame(try_finally($try, $finally, 1, 2, 3), [1, 2, 3]);
-     * assertSame($finally_count, 1); // 呼ばれている
+     * that(try_finally($try, $finally, 1, 2, 3))->isSame([1, 2, 3]);
+     * that($finally_count)->isSame(1); // 呼ばれている
      * // 例外は投げっぱなすが、 $finally は実行される
      * $try = function(){throw new \Exception('tried');};
      * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
-     * assertSame($finally_count, 2); // 呼ばれている
+     * that($finally_count)->isSame(2); // 呼ばれている
      * ```
      *
      * @param callable $try try ブロッククロージャ
@@ -1021,12 +1021,12 @@ class Syntax
      * $finally = function()use(&$finally_count){$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
      * $try = function($a, $b, $c){return [$a, $b, $c];};
-     * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3), [1, 2, 3]);
-     * assertSame($finally_count, 1); // 呼ばれている
+     * that(try_catch_finally($try, null, $finally, 1, 2, 3))->isSame([1, 2, 3]);
+     * that($finally_count)->isSame(1); // 呼ばれている
      * // 例外を投げるが、 $catch で握りつぶす
      * $try = function(){throw new \Exception('tried');};
-     * assertSame(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage(), 'tried');
-     * assertSame($finally_count, 2); // 呼ばれている
+     * that(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage())->isSame('tried');
+     * that($finally_count)->isSame(2); // 呼ばれている
      * ```
      *
      * @param callable $try try ブロッククロージャ

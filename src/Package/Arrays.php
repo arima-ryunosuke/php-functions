@@ -24,7 +24,7 @@ class Arrays
      * foreach (arrays($array) as $n => [$k, $v]) {
      *     $nkv[] = "$n,$k,$v";
      * }
-     * assertSame($nkv, ['0,a,A', '1,b,B', '2,c,C']);
+     * that($nkv)->isSame(['0,a,A', '1,b,B', '2,c,C']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -47,10 +47,10 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(arrayize(1, 2, 3), [1, 2, 3]);
-     * assertSame(arrayize([1], [2], [3]), [1, 2, 3]);
+     * that(arrayize(1, 2, 3))->isSame([1, 2, 3]);
+     * that(arrayize([1], [2], [3]))->isSame([1, 2, 3]);
      * $object = new \stdClass();
-     * assertSame(arrayize($object, false, [1, 2, 3]), [$object, false, 1, 2, 3]);
+     * that(arrayize($object, false, [1, 2, 3]))->isSame([$object, false, 1, 2, 3]);
      * ```
      *
      * @param mixed $variadic 生成する要素（可変引数）
@@ -78,11 +78,11 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertTrue(is_indexarray([]));
-     * assertTrue(is_indexarray([1, 2, 3]));
-     * assertFalse(is_indexarray(['x' => 'X']));
+     * that(is_indexarray([]))->isTrue();
+     * that(is_indexarray([1, 2, 3]))->isTrue();
+     * that(is_indexarray(['x' => 'X']))->isFalse();
      * // 抜け番があっても true になる（これは is_hasharray も true になる）
-     * assertTrue(is_indexarray([1 => 1, 2 => 2, 3 => 3]));
+     * that(is_indexarray([1 => 1, 2 => 2, 3 => 3]))->isTrue();
      * ```
      *
      * @param array $array 調べる配列
@@ -105,9 +105,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertFalse(is_hasharray([]));
-     * assertFalse(is_hasharray([1, 2, 3]));
-     * assertTrue(is_hasharray(['x' => 'X']));
+     * that(is_hasharray([]))->isFalse();
+     * that(is_hasharray([1, 2, 3]))->isFalse();
+     * that(is_hasharray(['x' => 'X']))->isTrue();
      * ```
      *
      * @param array $array 調べる配列
@@ -131,8 +131,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(first_key(['a', 'b', 'c']), 0);
-     * assertSame(first_key([], 999), 999);
+     * that(first_key(['a', 'b', 'c']))->isSame(0);
+     * that(first_key([], 999))->isSame(999);
      * ```
      *
      * @param iterable $array 対象配列
@@ -156,8 +156,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(first_value(['a', 'b', 'c']), 'a');
-     * assertSame(first_value([], 999), 999);
+     * that(first_value(['a', 'b', 'c']))->isSame('a');
+     * that(first_value([], 999))->isSame(999);
      * ```
      *
      * @param iterable $array 対象配列
@@ -181,8 +181,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(first_keyvalue(['a', 'b', 'c']), [0, 'a']);
-     * assertSame(first_keyvalue([], 999), 999);
+     * that(first_keyvalue(['a', 'b', 'c']))->isSame([0, 'a']);
+     * that(first_keyvalue([], 999))->isSame(999);
      * ```
      *
      * @param iterable $array 対象配列
@@ -204,8 +204,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(last_key(['a', 'b', 'c']), 2);
-     * assertSame(last_key([], 999), 999);
+     * that(last_key(['a', 'b', 'c']))->isSame(2);
+     * that(last_key([], 999))->isSame(999);
      * ```
      *
      * @param iterable $array 対象配列
@@ -229,8 +229,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(last_value(['a', 'b', 'c']), 'c');
-     * assertSame(last_value([], 999), 999);
+     * that(last_value(['a', 'b', 'c']))->isSame('c');
+     * that(last_value([], 999))->isSame(999);
      * ```
      *
      * @param iterable $array 対象配列
@@ -254,8 +254,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(last_keyvalue(['a', 'b', 'c']), [2, 'c']);
-     * assertSame(last_keyvalue([], 999), 999);
+     * that(last_keyvalue(['a', 'b', 'c']))->isSame([2, 'c']);
+     * that(last_keyvalue([], 999))->isSame(999);
      * ```
      *
      * @param iterable $array 対象配列
@@ -294,11 +294,11 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの前は 'a'
-     * assertSame(prev_key($array, 'b'), 'a');
+     * that(prev_key($array, 'b'))->isSame('a');
      * // 'a' キーの前は無いので null
-     * assertSame(prev_key($array, 'a'), null);
+     * that(prev_key($array, 'a'))->isSame(null);
      * // 'x' キーはそもそも存在しないので false
-     * assertSame(prev_key($array, 'x'), false);
+     * that(prev_key($array, 'x'))->isSame(false);
      * ```
      *
      * @param array $array 対象配列
@@ -331,13 +331,13 @@ class Arrays
      * ```php
      * $array = [9 => 9, 'a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 'b' キーの次は 'c'
-     * assertSame(next_key($array, 'b'), 'c');
+     * that(next_key($array, 'b'))->isSame('c');
      * // 'c' キーの次は無いので null
-     * assertSame(next_key($array, 'c'), null);
+     * that(next_key($array, 'c'))->isSame(null);
      * // 'x' キーはそもそも存在しないので false
-     * assertSame(next_key($array, 'x'), false);
+     * that(next_key($array, 'x'))->isSame(false);
      * // 次に生成されるキーは 10
-     * assertSame(next_key($array, null), 10);
+     * that(next_key($array, null))->isSame(10);
      * ```
      *
      * @param array $array 対象配列
@@ -380,9 +380,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertTrue(in_array_and([1], [1, 2, 3]));
-     * assertFalse(in_array_and([9], [1, 2, 3]));
-     * assertFalse(in_array_and([1, 9], [1, 2, 3]));
+     * that(in_array_and([1], [1, 2, 3]))->isTrue();
+     * that(in_array_and([9], [1, 2, 3]))->isFalse();
+     * that(in_array_and([1, 9], [1, 2, 3]))->isFalse();
      * ```
      *
      * @param array|mixed $needle 調べる値
@@ -415,9 +415,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertTrue(in_array_or([1], [1, 2, 3]), true);
-     * assertFalse(in_array_or([9], [1, 2, 3]), false);
-     * assertTrue(in_array_or([1, 9], [1, 2, 3]), true);
+     * that(in_array_or([1], [1, 2, 3]))->isTrue();
+     * that(in_array_or([9], [1, 2, 3]))->isFalse();
+     * that(in_array_or([1, 9], [1, 2, 3]))->isTrue();
      * ```
      *
      * @param array|mixed $needle 調べる値
@@ -464,7 +464,7 @@ class Arrays
      *     'x3' => 9,
      * ];
      * // 普通のソート
-     * assertSame(kvsort($array), [
+     * that(kvsort($array))->isSame([
      *     'b'  => 1,
      *     'c'  => 2,
      *     'a'  => 3,
@@ -473,7 +473,7 @@ class Arrays
      *     'x3' => 9,
      * ]);
      * // キーを使用したソート
-     * assertSame(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}), [
+     * that(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}))->isSame([
      *     'x3' => 9,
      *     'x2' => 9,
      *     'x1' => 9,
@@ -519,9 +519,9 @@ class Arrays
      * Example:
      * ```php
      * // ただの加算の関数版なので同じキーは上書きされない
-     * assertSame(array_add(['a', 'b', 'c'], ['X']), ['a', 'b', 'c']);
+     * that(array_add(['a', 'b', 'c'], ['X']))->isSame(['a', 'b', 'c']);
      * // 異なるキーは生える
-     * assertSame(array_add(['a', 'b', 'c'], ['x' => 'X']), ['a', 'b', 'c', 'x' => 'X']);
+     * that(array_add(['a', 'b', 'c'], ['x' => 'X']))->isSame(['a', 'b', 'c', 'x' => 'X']);
      * ```
      *
      * @param array $variadic 足す配列（可変引数）
@@ -547,15 +547,15 @@ class Arrays
      * Example:
      * ```php
      * // 奇数配列と偶数配列をミックスして自然数配列を生成
-     * assertSame(array_mix([1, 3, 5], [2, 4, 6]), [1, 2, 3, 4, 5, 6]);
+     * that(array_mix([1, 3, 5], [2, 4, 6]))->isSame([1, 2, 3, 4, 5, 6]);
      * // 長さが異なる場合はそのまま追加される（短い方の足りない分は無視される）
-     * assertSame(array_mix([1], [2, 3, 4]), [1, 2, 3, 4]);
-     * assertSame(array_mix([1, 3, 4], [2]), [1, 2, 3, 4]);
+     * that(array_mix([1], [2, 3, 4]))->isSame([1, 2, 3, 4]);
+     * that(array_mix([1, 3, 4], [2]))->isSame([1, 2, 3, 4]);
      * // 可変引数なので3配列以上も可
-     * assertSame(array_mix([1], [2, 4], [3, 5, 6]), [1, 2, 3, 4, 5, 6]);
-     * assertSame(array_mix([1, 4, 6], [2, 5], [3]), [1, 2, 3, 4, 5, 6]);
+     * that(array_mix([1], [2, 4], [3, 5, 6]))->isSame([1, 2, 3, 4, 5, 6]);
+     * that(array_mix([1, 4, 6], [2, 5], [3]))->isSame([1, 2, 3, 4, 5, 6]);
      * // 文字キーは維持される
-     * assertSame(array_mix(['a' => 'A', 1, 3], ['b' => 'B', 2]), ['a' => 'A', 'b' => 'B', 1, 2, 3]);
+     * that(array_mix(['a' => 'A', 1, 3], ['b' => 'B', 2]))->isSame(['a' => 'A', 'b' => 'B', 1, 2, 3]);
      * ```
      *
      * @param array $variadic 対象配列（可変引数）
@@ -601,15 +601,15 @@ class Arrays
      * Example:
      * ```php
      * // 普通の zip
-     * assertEquals(array_zip(
+     * that(array_zip(
      *     [1, 2, 3],
      *     ['hoge', 'fuga', 'piyo']
-     * ), [[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
+     * ))->is([[1, 'hoge'], [2, 'fuga'], [3, 'piyo']]);
      * // キーが維持される
-     * assertEquals(array_zip(
+     * that(array_zip(
      *     ['a' => 1, 2, 3],
      *     ['hoge', 'b' => 'fuga', 'piyo']
-     * ), [['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
+     * ))->is([['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
      * ```
      *
      * @param array $arrays 対象配列（可変引数）
@@ -674,15 +674,15 @@ class Arrays
      * Example:
      * ```php
      * // 普通の直積
-     * assertSame(array_cross(
+     * that(array_cross(
      *     [1, 2],
      *     [3, 4]
-     * ), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+     * ))->isSame([[1, 3], [1, 4], [2, 3], [2, 4]]);
      * // キーが維持される
-     * assertSame(array_cross(
+     * that(array_cross(
      *     ['a' => 1, 2],
      *     ['b' => 3, 4]
-     * ), [['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
+     * ))->isSame([['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
      * ```
      *
      * @param array $arrays 対象配列（可変引数）
@@ -721,9 +721,9 @@ class Arrays
      * Example:
      * ```php
      * // (配列, 要素) の呼び出し
-     * assertSame(array_implode(['a', 'b', 'c'], 'X'), ['a', 'X', 'b', 'X', 'c']);
+     * that(array_implode(['a', 'b', 'c'], 'X'))->isSame(['a', 'X', 'b', 'X', 'c']);
      * // (要素, ...配列) の呼び出し
-     * assertSame(array_implode('X', 'a', 'b', 'c'), ['a', 'X', 'b', 'X', 'c']);
+     * that(array_implode('X', 'a', 'b', 'c'))->isSame(['a', 'X', 'b', 'X', 'c']);
      * ```
      *
      * @param iterable|string $array 対象配列
@@ -766,11 +766,11 @@ class Arrays
      * Example:
      * ```php
      * // null 要素で分割
-     * assertSame(array_explode(['a', null, 'b', 'c'], null), [['a'], [2 => 'b', 3 => 'c']]);
+     * that(array_explode(['a', null, 'b', 'c'], null))->isSame([['a'], [2 => 'b', 3 => 'c']]);
      * // クロージャで分割（大文字で分割）
-     * assertSame(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}), [['a'], [2 => 'c'], [4 => 'e']]);
+     * that(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}))->isSame([['a'], [2 => 'c'], [4 => 'e']]);
      * // 負数指定
-     * assertSame(array_explode(['a', null, 'b', null, 'c'], null, -2), [[0 => 'a', 1 => null, 2 => 'b'], [4 => 'c']]);
+     * that(array_explode(['a', null, 'b', null, 'c'], null, -2))->isSame([[0 => 'a', 1 => null, 2 => 'b'], [4 => 'c']]);
      * ```
      *
      * @param iterable $array 対象配列
@@ -839,17 +839,17 @@ class Arrays
      * ```php
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // key, value を利用した sprintf
-     * assertSame(array_sprintf($array, '%2$s=%1$s'), ['key1=val1', 'key2=val2']);
+     * that(array_sprintf($array, '%2$s=%1$s'))->isSame(['key1=val1', 'key2=val2']);
      * // 第3引数を与えるとさらに implode される
-     * assertSame(array_sprintf($array, '%2$s=%1$s', ' '), 'key1=val1 key2=val2');
+     * that(array_sprintf($array, '%2$s=%1$s', ' '))->isSame('key1=val1 key2=val2');
      * // クロージャを与えるとコールバック動作になる
      * $closure = function($v, $k){return "$k=" . strtoupper($v);};
-     * assertSame(array_sprintf($array, $closure, ' '), 'key1=VAL1 key2=VAL2');
+     * that(array_sprintf($array, $closure, ' '))->isSame('key1=VAL1 key2=VAL2');
      * // 省略すると vsprintf になる
-     * assertSame(array_sprintf([
+     * that(array_sprintf([
      *     'str:%s,int:%d' => ['sss', '3.14'],
      *     'single:%s'     => 'str',
-     * ], null, '|'), 'str:sss,int:3|single:str');
+     * ], null, '|'))->isSame('str:sss,int:3|single:str');
      * ```
      *
      * @param iterable $array 対象配列
@@ -892,9 +892,9 @@ class Arrays
      * ```php
      * $array = ['key1' => 'val1', 'key2' => 'val2'];
      * // キーにプレフィックス付与
-     * assertSame(array_strpad($array, 'prefix-'), ['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
+     * that(array_strpad($array, 'prefix-'))->isSame(['prefix-key1' => 'val1', 'prefix-key2' => 'val2']);
      * // 値にサフィックス付与
-     * assertSame(array_strpad($array, '', ['-suffix']), ['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
+     * that(array_strpad($array, '', ['-suffix']))->isSame(['key1' => 'val1-suffix', 'key2' => 'val2-suffix']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -936,10 +936,10 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_pos([1, 2, 3], 1), 2);
-     * assertSame(array_pos([1, 2, 3], -1), 3);
-     * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1), 'B');
-     * assertSame(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true), 'b');
+     * that(array_pos([1, 2, 3], 1))->isSame(2);
+     * that(array_pos([1, 2, 3], -1))->isSame(3);
+     * that(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1))->isSame('B');
+     * that(array_pos(['a' => 'A', 'b' => 'B', 'c' => 'C'], 1, true))->isSame('b');
      * ```
      *
      * @param array $array 対象配列
@@ -976,8 +976,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'), 2);
-     * assertSame(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1), -1);
+     * that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'))->isSame(2);
+     * that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1))->isSame(-1);
      * ```
      *
      * @param array $array 対象配列
@@ -1016,7 +1016,7 @@ class Arrays
      * Example:
      * ```php
      * $fuga_of_array = array_of('fuga');
-     * assertSame($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']), 'FUGA');
+     * that($fuga_of_array(['hoge' => 'HOGE', 'fuga' => 'FUGA']))->isSame('FUGA');
      * ```
      *
      * @param string|int|array $key 取得したいキー
@@ -1052,19 +1052,19 @@ class Arrays
      * Example:
      * ```php
      * // 単純取得
-     * assertSame(array_get(['a', 'b', 'c'], 1), 'b');
+     * that(array_get(['a', 'b', 'c'], 1))->isSame('b');
      * // 単純デフォルト
-     * assertSame(array_get(['a', 'b', 'c'], 9, 999), 999);
+     * that(array_get(['a', 'b', 'c'], 9, 999))->isSame(999);
      * // 配列取得
-     * assertSame(array_get(['a', 'b', 'c'], [0, 2]), [0 => 'a', 2 => 'c']);
+     * that(array_get(['a', 'b', 'c'], [0, 2]))->isSame([0 => 'a', 2 => 'c']);
      * // 配列部分取得
-     * assertSame(array_get(['a', 'b', 'c'], [0, 9]), [0 => 'a']);
+     * that(array_get(['a', 'b', 'c'], [0, 9]))->isSame([0 => 'a']);
      * // 配列デフォルト（null ではなく [] を返す）
-     * assertSame(array_get(['a', 'b', 'c'], [9]), []);
+     * that(array_get(['a', 'b', 'c'], [9]))->isSame([]);
      * // クロージャ指定＆単値（コールバックが true を返す最初の要素）
-     * assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}), 'b');
+     * that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}))->isSame('b');
      * // クロージャ指定＆配列（コールバックが true を返すもの）
-     * assertSame(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []), [1 => 'b', 2 => 'c']);
+     * that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []))->isSame([1 => 'b', 2 => 'c']);
      * ```
      *
      * @param array $array 配列
@@ -1124,15 +1124,15 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'B'];
      * // 第3引数省略（最後に連番キーで設定）
-     * assertSame(array_set($array, 'Z'), 1);
-     * assertSame($array, ['a' => 'A', 'B', 'Z']);
+     * that(array_set($array, 'Z'))->isSame(1);
+     * that($array)->isSame(['a' => 'A', 'B', 'Z']);
      * // 第3引数でキーを指定
-     * assertSame(array_set($array, 'Z', 'z'), 'z');
-     * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z']);
-     * assertSame(array_set($array, 'Z', 'z'), 'z');
+     * that(array_set($array, 'Z', 'z'))->isSame('z');
+     * that($array)->isSame(['a' => 'A', 'B', 'Z', 'z' => 'Z']);
+     * that(array_set($array, 'Z', 'z'))->isSame('z');
      * // 第3引数で配列を指定
-     * assertSame(array_set($array, 'Z', ['x', 'y', 'z']), 'z');
-     * assertSame($array, ['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
+     * that(array_set($array, 'Z', ['x', 'y', 'z']))->isSame('z');
+     * that($array)->isSame(['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * ```
      *
      * @param array $array 配列
@@ -1183,18 +1183,18 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'B'];
      * // 第3引数 int
-     * assertSame(array_put($array, 'Z', 999), 1);
-     * assertSame($array, ['a' => 'A', 'B', 'Z']);
+     * that(array_put($array, 'Z', 999))->isSame(1);
+     * that($array)->isSame(['a' => 'A', 'B', 'Z']);
      * // 第3引数省略（最後に連番キーで設定）
-     * assertSame(array_put($array, 'Z'), 2);
-     * assertSame($array, ['a' => 'A', 'B', 'Z', 'Z']);
+     * that(array_put($array, 'Z'))->isSame(2);
+     * that($array)->isSame(['a' => 'A', 'B', 'Z', 'Z']);
      * // 第3引数でキーを指定
-     * assertSame(array_put($array, 'Z', 'z'), 'z');
-     * assertSame($array, ['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z']);
-     * assertSame(array_put($array, 'Z', 'z'), 'z');
+     * that(array_put($array, 'Z', 'z'))->isSame('z');
+     * that($array)->isSame(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z']);
+     * that(array_put($array, 'Z', 'z'))->isSame('z');
      * // 第3引数で配列を指定
-     * assertSame(array_put($array, 'Z', ['x', 'y', 'z']), 'z');
-     * assertSame($array, ['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
+     * that(array_put($array, 'Z', ['x', 'y', 'z']))->isSame('z');
+     * that($array)->isSame(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * ```
      *
      * @param array $array 配列
@@ -1247,24 +1247,24 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'b' => 'B'];
      * // ない場合は $default を返す
-     * assertSame(array_unset($array, 'x', 'X'), 'X');
+     * that(array_unset($array, 'x', 'X'))->isSame('X');
      * // 指定したキーを返す。そのキーは伏せられている
-     * assertSame(array_unset($array, 'a'), 'A');
-     * assertSame($array, ['b' => 'B']);
+     * that(array_unset($array, 'a'))->isSame('A');
+     * that($array)->isSame(['b' => 'B']);
      *
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列を与えるとそれらを返す。そのキーは全て伏せられている
-     * assertSame(array_unset($array, ['a', 'b', 'x']), ['A', 'B']);
-     * assertSame($array, ['c' => 'C']);
+     * that(array_unset($array, ['a', 'b', 'x']))->isSame(['A', 'B']);
+     * that($array)->isSame(['c' => 'C']);
      *
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // 配列のキーは返されるキーを表す。順番も維持される
-     * assertSame(array_unset($array, ['x2' => 'b', 'x1' => 'a']), ['x2' => 'B', 'x1' => 'A']);
+     * that(array_unset($array, ['x2' => 'b', 'x1' => 'a']))->isSame(['x2' => 'B', 'x1' => 'A']);
      *
      * $array = ['hoge' => 'HOGE', 'fuga' => 'FUGA', 'piyo' => 'PIYO'];
      * // 値に "G" を含むものを返す。その要素は伏せられている
-     * assertSame(array_unset($array, function($v){return strpos($v, 'G') !== false;}), ['hoge' => 'HOGE', 'fuga' => 'FUGA']);
-     * assertSame($array, ['piyo' => 'PIYO']);
+     * that(array_unset($array, function($v){return strpos($v, 'G') !== false;}))->isSame(['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * that($array)->isSame(['piyo' => 'PIYO']);
      * ```
      *
      * @param array $array 配列
@@ -1328,10 +1328,10 @@ class Arrays
      *         ]
      *     ]
      * ];
-     * assertSame(array_dive($array, 'a.b.c'), 'vvv');
-     * assertSame(array_dive($array, 'a.b.x', 9), 9);
+     * that(array_dive($array, 'a.b.c'))->isSame('vvv');
+     * that(array_dive($array, 'a.b.x', 9))->isSame(9);
      * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない
-     * assertSame(array_dive($array, ['a', 'b', 'c']), 'vvv');
+     * that(array_dive($array, ['a', 'b', 'c']))->isSame('vvv');
      * ```
      *
      * @param array $array 調べる配列
@@ -1367,11 +1367,11 @@ class Arrays
      * Example:
      * ```php
      * // すべて含むので true
-     * assertTrue(array_keys_exist(['a', 'b', 'c'], ['a' => 'A', 'b' => 'B', 'c' => 'C']));
+     * that(array_keys_exist(['a', 'b', 'c'], ['a' => 'A', 'b' => 'B', 'c' => 'C']))->isTrue();
      * // N は含まないので false
-     * assertFalse(array_keys_exist(['a', 'b', 'N'], ['a' => 'A', 'b' => 'B', 'c' => 'C']));
+     * that(array_keys_exist(['a', 'b', 'N'], ['a' => 'A', 'b' => 'B', 'c' => 'C']))->isFalse();
      * // 配列を与えると潜る（日本語で言えば「a というキーと、x というキーとその中に x1, x2 というキーがあるか？」）
-     * assertTrue(array_keys_exist(['a', 'x' => ['x1', 'x2']], ['a' => 'A', 'x' => ['x1' => 'X1', 'x2' => 'X2']]));
+     * that(array_keys_exist(['a', 'x' => ['x1', 'x2']], ['a' => 'A', 'x' => ['x1' => 'X1', 'x2' => 'X2']]))->isTrue();
      * ```
      *
      * @param array|string $keys 調べるキー
@@ -1422,11 +1422,11 @@ class Arrays
      * Example:
      * ```php
      * // 最初に見つかったキーを返す
-     * assertSame(array_find(['a', 'b', '9'], 'ctype_digit'), 2);
-     * assertSame(array_find(['a', 'b', '9'], function($v){return $v === 'b';}), 1);
+     * that(array_find(['a', 'b', '9'], 'ctype_digit'))->isSame(2);
+     * that(array_find(['a', 'b', '9'], function($v){return $v === 'b';}))->isSame(1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
      * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
-     * assertSame(array_find(['a', 'b', '9'], $ifnumeric2power, false), 81);
+     * that(array_find(['a', 'b', '9'], $ifnumeric2power, false))->isSame(81);
      * ```
      *
      * @param iterable $array 調べる配列
@@ -1459,11 +1459,11 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // a は x に c は z に置換される
-     * assertSame(array_rekey($array, ['a' => 'x', 'c' => 'z']), ['x' => 'A', 'b' => 'B', 'z' => 'C']);
+     * that(array_rekey($array, ['a' => 'x', 'c' => 'z']))->isSame(['x' => 'A', 'b' => 'B', 'z' => 'C']);
      * // b は削除され c は z に置換される
-     * assertSame(array_rekey($array, ['b' => null, 'c' => 'z']), ['a' => 'A', 'z' => 'C']);
+     * that(array_rekey($array, ['b' => null, 'c' => 'z']))->isSame(['a' => 'A', 'z' => 'C']);
      * // キーの交換にも使える（a ⇔ c）
-     * assertSame(array_rekey($array, ['a' => 'c', 'c' => 'a']), ['c' => 'A', 'b' => 'B', 'a' => 'C']);
+     * that(array_rekey($array, ['a' => 'c', 'c' => 'a']))->isSame(['c' => 'A', 'b' => 'B', 'a' => 'C']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1492,8 +1492,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#'), ['a' => 'A', 'aa' => 'AA']);
-     * assertSame(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true), ['b' => 'B']);
+     * that(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#'))->isSame(['a' => 'A', 'aa' => 'AA']);
+     * that(array_grep_key(['a' => 'A', 'aa' => 'AA', 'b' => 'B'], '#^a#', true))->isSame(['b' => 'B']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1525,13 +1525,13 @@ class Arrays
      * Example:
      * ```php
      * // array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
-     * assertSame(array_map_recursive([
+     * that(array_map_recursive([
      *     'k' => 'v',
      *     'c' => new \ArrayObject([
      *         'k1' => 'v1',
      *         'k2' => 'v2',
      *     ]),
-     * ], 'strtoupper'), [
+     * ], 'strtoupper'))->isSame([
      *     'k' => 'V',
      *     'c' => [
      *         'k1' => 'V1',
@@ -1540,13 +1540,13 @@ class Arrays
      * ]);
      *
      * // ただし、その挙動は引数で変更可能
-     * assertSame(array_map_recursive([
+     * that(array_map_recursive([
      *     'k' => 'v',
      *     'c' => new \ArrayObject([
      *         'k1' => 'v1',
      *         'k2' => 'v2',
      *     ]),
-     * ], 'gettype', false), [
+     * ], 'gettype', false))->isSame([
      *     'k' => 'string',
      *     'c' => 'object',
      * ]);
@@ -1585,8 +1585,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'), ['A' => 'A', 'B' => 'B']);
-     * assertSame(array_map_key(['a' => 'A', 'b' => 'B'], function(){}), []);
+     * that(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'))->isSame(['A' => 'A', 'B' => 'B']);
+     * that(array_map_key(['a' => 'A', 'b' => 'B'], function(){}))->isSame([]);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1614,8 +1614,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }), [0 => 'a', 2 => 'c']);
-     * assertSame(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }), [0 => 'a', 2 => 'c']);
+     * that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }))->isSame([0 => 'a', 2 => 'c']);
+     * that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }))->isSame([0 => 'a', 2 => 'c']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1656,38 +1656,38 @@ class Arrays
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ];
      * // 'flag' が true 相当のものだけ返す
-     * assertSame(array_where($array, 'flag'), [
+     * that(array_where($array, 'flag'))->isSame([
      *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
      * ]);
      * // 'name' に 'h' を含むものだけ返す
      * $contain_h = function($name){return strpos($name, 'h') !== false;};
-     * assertSame(array_where($array, 'name', $contain_h), [
+     * that(array_where($array, 'name', $contain_h))->isSame([
      *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
      * ]);
      * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
      * $equal_2 = function($row, $key){return $key === 2;};
-     * assertSame(array_where($array, null, $equal_2), [
+     * that(array_where($array, null, $equal_2))->isSame([
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
      * // $column に配列を渡すと共通項が渡ってくる
      * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
-     * assertSame(array_where($array, ['id', 'name'], $idname_is_2fuga), [
+     * that(array_where($array, ['id', 'name'], $idname_is_2fuga))->isSame([
      *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
      * ]);
      * // $column に連想配列を渡すと「キーのカラム == 値」で filter する（要するに「name が piyo かつ flag が false」で filter）
-     * assertSame(array_where($array, ['name' => 'piyo', 'flag' => false]), [
+     * that(array_where($array, ['name' => 'piyo', 'flag' => false]))->isSame([
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
      * // 上記において値に配列を渡すと in_array で判定される
-     * assertSame(array_where($array, ['id' => [2, 3]]), [
+     * that(array_where($array, ['id' => [2, 3]]))->isSame([
      *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
-     * assertSame(array_where($array, [
+     * that(array_where($array, [
      *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
      *     'name' => function($name){return strpos($name, 'o') !== false;}, // name に o を含む
-     * ]), [
+     * ]))->isSame([
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
      * ```
@@ -1761,8 +1761,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_map_filter([' a ', ' b ', ''], 'trim'), ['a', 'b']);
-     * assertSame(array_map_filter([' a ', ' b ', ''], 'trim', true), ['a', 'b', '']);
+     * that(array_map_filter([' a ', ' b ', ''], 'trim'))->isSame(['a', 'b']);
+     * that(array_map_filter([' a ', ' b ', ''], 'trim', true))->isSame(['a', 'b', '']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1796,11 +1796,11 @@ class Arrays
      * $exb = new \Exception('b');
      * $std = new \stdClass();
      * // getMessage で map される
-     * assertSame(array_map_method([$exa, $exb], 'getMessage'), ['a', 'b']);
+     * that(array_map_method([$exa, $exb], 'getMessage'))->isSame(['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合は取り除かれる
-     * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true), ['a', 'b']);
+     * that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], true))->isSame(['a', 'b']);
      * // getMessage で map されるが、メソッドが存在しない場合はそのまま返す
-     * assertSame(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null), ['a', 'b', $std, null]);
+     * that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))->isSame(['a', 'b', $std, null]);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1838,12 +1838,12 @@ class Arrays
      * Example:
      * ```php
      * // 値を3乗したあと16進表記にして大文字化する
-     * assertSame(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'), ['1', '8', '1B', '40', '7D']);
+     * that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))->isSame(['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
-     * assertSame(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}), ['a' => 'a:A', 'b' => 'b:B']);
+     * that(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}))->isSame(['a' => 'a:A', 'b' => 'b:B']);
      * // メソッドコールもできる（引数不要なら `@method` でも同じ）
-     * assertSame(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' => []]), ['a', 'b']);
-     * assertSame(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'), ['a', 'b']);
+     * that(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' => []]))->isSame(['a', 'b']);
+     * that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))->isSame(['a', 'b']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1892,11 +1892,11 @@ class Arrays
      * Example:
      * ```php
      * // キー・値をくっつけるシンプルな例
-     * assertSame(array_kmap([
+     * that(array_kmap([
      *     'k1' => 'v1',
      *     'k2' => 'v2',
      *     'k3' => 'v3',
-     * ], function($v, $k){return "$k:$v";}), [
+     * ], function($v, $k){return "$k:$v";}))->isSame([
      *     'k1' => 'k1:v1',
      *     'k2' => 'k2:v2',
      *     'k3' => 'k3:v3',
@@ -1929,10 +1929,10 @@ class Arrays
      * ```php
      * // 1番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
-     * assertSame(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'), ['prefix-a-suffix', 'prefix-b-suffix']);
+     * that(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'))->isSame(['prefix-a-suffix', 'prefix-b-suffix']);
      * // 1番目にキー、2番目に値を渡して map
      * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
-     * assertSame(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'), ['k' => 'a k b v c']);
+     * that(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'))->isSame(['k' => 'a k b v c']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1997,7 +1997,7 @@ class Arrays
      * Example:
      * ```php
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
-     * assertSame(array_lmap(['a', 'b'], $sprintf, '-suffix'), ['a-suffix', 'b-suffix']);
+     * that(array_lmap(['a', 'b'], $sprintf, '-suffix'))->isSame(['a-suffix', 'b-suffix']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -2016,7 +2016,7 @@ class Arrays
      * Example:
      * ```php
      * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
-     * assertSame(array_rmap(['a', 'b'], $sprintf, 'prefix-'), ['prefix-a', 'prefix-b']);
+     * that(array_rmap(['a', 'b'], $sprintf, 'prefix-'))->isSame(['prefix-a', 'prefix-b']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -2053,9 +2053,9 @@ class Arrays
      * Example:
      * ```php
      * // 全要素を文字列的に足し合わせる
-     * assertSame(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry .= $v;}, ''), '12345');
+     * that(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry .= $v;}, ''))->isSame('12345');
      * // 値をキーにして要素を2乗値にする
-     * assertSame(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry[$v] = $v * $v;}, []), [
+     * that(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry[$v] = $v * $v;}, []))->isSame([
      *     1 => 1,
      *     2 => 4,
      *     3 => 9,
@@ -2063,21 +2063,19 @@ class Arrays
      *     5 => 25,
      * ]);
      * // 上記と同じ。ただし、3 で break する
-     * assertSame(array_each([1, 2, 3, 4, 5], function(&$carry, $v, $k){
+     * that(array_each([1, 2, 3, 4, 5], function(&$carry, $v, $k){
      *     if ($k === 3) return false;
      *     $carry[$v] = $v * $v;
-     * }, []), [
+     * }, []))->isSame([
      *     1 => 1,
      *     2 => 4,
      *     3 => 9,
      * ]);
      *
      * // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-     * assertSame(
-     *     array_each([1, 2, 3], function(&$carry = [], $v) {
+     * that(array_each([1, 2, 3], function(&$carry = [], $v) {
      *         $carry[$v] = $v * $v;
-     *     }),
-     *     array_each([1, 2, 3], function(&$carry, $v) {
+     *     }))->isSame(array_each([1, 2, 3], function(&$carry, $v) {
      *         $carry[$v] = $v * $v;
      *     }, [])
      *     // 個人的に↑のようなぶら下がり引数があまり好きではない（クロージャを最後の引数にしたい）
@@ -2121,9 +2119,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_depth([]), 1);
-     * assertSame(array_depth(['hoge']), 1);
-     * assertSame(array_depth([['nest1' => ['nest2']]]), 3);
+     * that(array_depth([]))->isSame(1);
+     * that(array_depth(['hoge']))->isSame(1);
+     * that(array_depth([['nest1' => ['nest2']]]))->isSame(3);
      * ```
      *
      * @param array $array 調べる配列
@@ -2164,10 +2162,10 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_insert([1, 2, 3], 'x'), [1, 2, 3, 'x']);
-     * assertSame(array_insert([1, 2, 3], 'x', 1), [1, 'x', 2, 3]);
-     * assertSame(array_insert([1, 2, 3], 'x', -1), [1, 2, 'x', 3]);
-     * assertSame(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1), [1, 'a' => 'A', 'b' => 'B', 2, 3]);
+     * that(array_insert([1, 2, 3], 'x'))->isSame([1, 2, 3, 'x']);
+     * that(array_insert([1, 2, 3], 'x', 1))->isSame([1, 'x', 2, 3]);
+     * that(array_insert([1, 2, 3], 'x', -1))->isSame([1, 2, 'x', 3]);
+     * that(array_insert([1, 2, 3], ['a' => 'A', 'b' => 'B'], 1))->isSame([1, 'a' => 'A', 'b' => 'B', 2, 3]);
      * ```
      *
      * @param array $array 対象配列
@@ -2200,17 +2198,17 @@ class Arrays
      * ```php
      * // lt2(2より小さい)で分類
      * $lt2 = function($v){return $v < 2;};
-     * assertSame(array_assort([1, 2, 3], [
+     * that(array_assort([1, 2, 3], [
      *     'lt2' => $lt2,
-     * ]), [
+     * ]))->isSame([
      *     'lt2' => [1],
      * ]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
      * $lt3 = function($v){return $v < 3;};
-     * assertSame(array_assort(['1', '2', '3'], [
+     * that(array_assort(['1', '2', '3'], [
      *     'lt3' => $lt3,
      *     'ctd' => 'ctype_digit',
-     * ]), [
+     * ]))->isSame([
      *     'lt3' => ['1', '2'],
      *     'ctd' => ['1', '2', '3'],
      * ]);
@@ -2247,12 +2245,12 @@ class Arrays
      * ```php
      * $array = ['hoge', 'fuga', 'piyo'];
      * // 'o' を含むものの数（2個）
-     * assertSame(array_count($array, function($s){return strpos($s, 'o') !== false;}), 2);
+     * that(array_count($array, function($s){return strpos($s, 'o') !== false;}))->isSame(2);
      * // 'a' と 'o' を含むものをそれぞれ（1個と2個）
-     * assertSame(array_count($array, [
+     * that(array_count($array, [
      *     'a' => function($s){return strpos($s, 'a') !== false;},
      *     'o' => function($s){return strpos($s, 'o') !== false;},
-     * ]), [
+     * ]))->isSame([
      *     'a' => 1,
      *     'o' => 2,
      * ]);
@@ -2296,10 +2294,10 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_group([1, 1, 1]), [
+     * that(array_group([1, 1, 1]))->isSame([
      *     1 => [1, 1, 1],
      * ]);
-     * assertSame(array_group([1, 2, 3], function($v){return $v % 2;}), [
+     * that(array_group([1, 2, 3], function($v){return $v % 2;}))->isSame([
      *     1 => [1, 3],
      *     0 => [2],
      * ]);
@@ -2307,7 +2305,7 @@ class Arrays
      * $row1 = ['id' => 1, 'group' => 'hoge'];
      * $row2 = ['id' => 2, 'group' => 'fuga'];
      * $row3 = ['id' => 3, 'group' => 'hoge'];
-     * assertSame(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}), [
+     * that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}))->isSame([
      *     'hoge' => [
      *         1 => $row1,
      *         3 => $row3,
@@ -2366,11 +2364,11 @@ class Arrays
      * Example:
      * ```php
      * // 単純な配列の集計
-     * assertSame(array_aggregate([1, 2, 3], [
+     * that(array_aggregate([1, 2, 3], [
      *     'min' => function($elems) {return min($elems);},
      *     'max' => function($elems) {return max($elems);},
      *     'avg' => function($elems) {return array_sum($elems) / count($elems);},
-     * ]), [
+     * ]))->isSame([
      *     'min' => 1, // 最小値
      *     'max' => 3, // 最大値
      *     'avg' => 2, // 平均値
@@ -2382,10 +2380,10 @@ class Arrays
      * $row4 = ['user_id' => 'hoge', 'group' => 'A', 'score' => 8];
      *
      * // user_id, group ごとの score を集計して階層配列で返す（第2引数 $current を利用している）
-     * assertSame(array_aggregate([$row1, $row2, $row3, $row4], [
+     * that(array_aggregate([$row1, $row2, $row3, $row4], [
      *     'scores' => function($rows) {return array_column($rows, 'score');},
      *     'score'  => function($rows, $current) {return array_sum($current['scores']);},
-     * ], ['user_id', 'group']), [
+     * ], ['user_id', 'group']))->isSame([
      *     'hoge' => [
      *         'A' => [
      *             'scores' => [4, 8],
@@ -2405,9 +2403,9 @@ class Arrays
      * ]);
      *
      * // user_id ごとの score を集計して単一列で返す（キーのクロージャも利用している）
-     * assertSame(array_aggregate([$row1, $row2, $row3, $row4],
+     * that(array_aggregate([$row1, $row2, $row3, $row4],
      *     function($rows) {return array_sum(array_column($rows, 'score'));},
-     *     function($row) {return strtoupper($row['user_id']);}), [
+     *     function($row) {return strtoupper($row['user_id']);}))->isSame([
      *     'HOGE' => 12,
      *     'FUGA' => 11,
      * ]);
@@ -2488,9 +2486,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertTrue(array_all([true, true]));
-     * assertFalse(array_all([true, false]));
-     * assertFalse(array_all([false, false]));
+     * that(array_all([true, true]))->isTrue();
+     * that(array_all([true, false]))->isFalse();
+     * that(array_all([false, false]))->isFalse();
      * ```
      *
      * @param iterable $array 対象配列
@@ -2521,9 +2519,9 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertTrue(array_any([true, true]));
-     * assertTrue(array_any([true, false]));
-     * assertFalse(array_any([false, false]));
+     * that(array_any([true, true]))->isTrue();
+     * that(array_any([true, false]))->isTrue();
+     * that(array_any([false, false]))->isFalse();
      * ```
      *
      * @param iterable $array 対象配列
@@ -2562,22 +2560,22 @@ class Arrays
      * Example:
      * ```php
      * // シンプルな重複除去
-     * assertSame(array_distinct([1, 2, 3, '3']), [1, 2, 3]);
+     * that(array_distinct([1, 2, 3, '3']))->isSame([1, 2, 3]);
      * // 大文字小文字を無視した重複除去
-     * assertSame(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE), ['a', 'b']);
+     * that(array_distinct(['a', 'b', 'A', 'B'], SORT_STRING|SORT_FLAG_CASE))->isSame(['a', 'b']);
      *
      * $v1 = new \ArrayObject(['id' => '1', 'group' => 'aaa']);
      * $v2 = new \ArrayObject(['id' => '2', 'group' => 'bbb', 'dummy' => 123]);
      * $v3 = new \ArrayObject(['id' => '3', 'group' => 'aaa', 'dummy' => 456]);
      * $v4 = new \ArrayObject(['id' => '4', 'group' => 'bbb', 'dummy' => 789]);
      * // クロージャを指定して重複除去
-     * assertSame(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] <=> $b['group']; }), [$v1, $v2]);
+     * that(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] <=> $b['group']; }))->isSame([$v1, $v2]);
      * // 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
-     * assertSame(array_distinct([$v1, $v2, $v3, $v4], 'group'), [$v1, $v2]);
+     * that(array_distinct([$v1, $v2, $v3, $v4], 'group'))->isSame([$v1, $v2]);
      * // 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
-     * assertSame(array_distinct([$v1, $v2, $v3, $v4], ['count' => []]), [$v1, $v2]);
+     * that(array_distinct([$v1, $v2, $v3, $v4], ['count' => []]))->isSame([$v1, $v2]);
      * // 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
-     * assertSame(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' => []]), [$v1, $v2, 2 => $v3]);
+     * that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' => []]))->isSame([$v1, $v2, 2 => $v3]);
      * ```
      *
      * @param iterable $array 対象配列
@@ -2665,7 +2663,7 @@ class Arrays
      * $v2 = ['id' => '2', 'no' => 'a4',  'name' => 'yyy'];
      * $v3 = ['id' => '3', 'no' => 'a12', 'name' => 'xxx'];
      * // name 昇順, no 自然降順
-     * assertSame(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]), [$v3, $v2, $v1]);
+     * that(array_order([$v1, $v2, $v3], ['name' => true, 'no' => -SORT_NATURAL]))->isSame([$v3, $v2, $v1]);
      * ```
      *
      * @param array $array 対象配列
@@ -2780,7 +2778,7 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertEquals(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['b' => 'B', 'a' => 'A', 'c' => 'C']);
+     * that(array_shuffle(['a' => 'A', 'b' => 'B', 'c' => 'C']))->is(['b' => 'B', 'a' => 'A', 'c' => 'C']);
      * ```
      *
      * @param array $array 対象配列
@@ -2810,7 +2808,7 @@ class Arrays
      * $array2 = ['c' => 'C2', 'b' => 'B2', 'a' => 'A2'];
      * $array3 = ['c' => 'C3', 'dummy' => 'DUMMY'];
      * // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
-     * assertSame(array_shrink_key($array1, $array2, $array3), ['c' => 'C3']);
+     * that(array_shrink_key($array1, $array2, $array3))->isSame(['c' => 'C3']);
      * ```
      *
      * @param iterable[] $variadic 共通項を取る配列（可変引数）
@@ -2849,7 +2847,7 @@ class Arrays
      *     7 => 'h',
      * ];
      * // 抜けているところを可変引数で順次埋める（'i', 'j' は隙間というより末尾追加）
-     * assertSame(array_fill_gap($array, 'a', 'd', 'e', 'g', 'i', 'j'), [
+     * that(array_fill_gap($array, 'a', 'd', 'e', 'g', 'i', 'j'))->isSame([
      *     0 => 'a',
      *     1 => 'b',
      *     2 => 'c',
@@ -2872,7 +2870,7 @@ class Arrays
      *     'z' => 'noize',
      * ];
      * // 文字キーはそのまま保持され、値が足りないので 6 キーはない
-     * assertSame(array_fill_gap($array, 'a', 'c', 'd', 'f'), [
+     * that(array_fill_gap($array, 'a', 'c', 'd', 'f'))->isSame([
      *     0   => 'a',
      *     1   => 'b',
      *     'x' => 'noize',
@@ -2931,13 +2929,13 @@ class Arrays
      * ```php
      * $abc = ['a', 'b', 'c'];
      * // [a, b, c] から [a => A, b => B, c => C] を作る
-     * assertSame(array_fill_callback($abc, 'strtoupper'), [
+     * that(array_fill_callback($abc, 'strtoupper'))->isSame([
      *     'a' => 'A',
      *     'b' => 'B',
      *     'c' => 'C',
      * ]);
      * // [a, b, c] からその sha1 配列を作って大文字化する
-     * assertSame(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }), [
+     * that(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }))->isSame([
      *     'a' => '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
      *     'b' => 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
      *     'c' => '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -2966,11 +2964,11 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // a と c を取り出す
-     * assertSame(array_pickup($array, ['a', 'c']), ['a' => 'A', 'c' => 'C']);
+     * that(array_pickup($array, ['a', 'c']))->isSame(['a' => 'A', 'c' => 'C']);
      * // 順番は $keys 基準になる
-     * assertSame(array_pickup($array, ['c', 'a']), ['c' => 'C', 'a' => 'A']);
+     * that(array_pickup($array, ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
      * // 連想配列を渡すと読み替えて返す
-     * assertSame(array_pickup($array, ['c' => 'cX', 'a' => 'aX']), ['cX' => 'C', 'aX' => 'A']);
+     * that(array_pickup($array, ['c' => 'cX', 'a' => 'aX']))->isSame(['cX' => 'C', 'aX' => 'A']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -3009,7 +3007,7 @@ class Arrays
      * ```php
      * $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
      * // a と c を伏せる（b を残す）
-     * assertSame(array_remove($array, ['a', 'c']), ['b' => 'B']);
+     * that(array_remove($array, ['a', 'c']))->isSame(['b' => 'B']);
      * ```
      *
      * @param array|\Traversable $array 対象配列
@@ -3037,10 +3035,10 @@ class Arrays
      *     13 => ['id' => 3, 'name' => 'name3'],
      * ];
      * // 第3引数を渡せば array_column と全く同じ
-     * assertSame(array_lookup($array, 'name', 'id'), array_column($array, 'name', 'id'));
-     * assertSame(array_lookup($array, 'name', null), array_column($array, 'name', null));
+     * that(array_lookup($array, 'name', 'id'))->isSame(array_column($array, 'name', 'id'));
+     * that(array_lookup($array, 'name', null))->isSame(array_column($array, 'name', null));
      * // 省略すればキーが保存される
-     * assertSame(array_lookup($array, 'name'), [
+     * that(array_lookup($array, 'name'))->isSame([
      *     11 => 'name1',
      *     12 => 'name2',
      *     13 => 'name3',
@@ -3071,9 +3069,9 @@ class Arrays
      * $row1 = ['id' => 1, 'name' => 'A'];
      * $row2 = ['id' => 2, 'name' => 'B'];
      * $rows = [$row1, $row2];
-     * assertSame(array_columns($rows), ['id' => [1, 2], 'name' => ['A', 'B']]);
-     * assertSame(array_columns($rows, 'id'), ['id' => [1, 2]]);
-     * assertSame(array_columns($rows, 'name', 'id'), ['name' => [1 => 'A', 2 => 'B']]);
+     * that(array_columns($rows))->isSame(['id' => [1, 2], 'name' => ['A', 'B']]);
+     * that(array_columns($rows, 'id'))->isSame(['id' => [1, 2]]);
+     * that(array_columns($rows, 'name', 'id'))->isSame(['name' => [1 => 'A', 2 => 'B']]);
      * ```
      *
      * @param array $array 対象配列
@@ -3106,10 +3104,10 @@ class Arrays
      *
      * Example:
      * ```php
-     * assertSame(array_uncolumns([
+     * that(array_uncolumns([
      *     'id'   => [1, 2],
      *     'name' => ['A', 'B'],
-     * ]), [
+     * ]))->isSame([
      *     ['id' => 1, 'name' => 'A'],
      *     ['id' => 2, 'name' => 'B'],
      * ]);
@@ -3185,7 +3183,7 @@ class Arrays
      *     if (!is_array($v)) $v = "prefix-$v";
      *     return "_$k";
      * };
-     * assertSame(array_convert($array, $callback, true), [
+     * that(array_convert($array, $callback, true))->isSame([
      *     '_k1' => 'prefix-v1',
      *     '_k2' => [
      *         'k21' => 'v21',
@@ -3288,7 +3286,7 @@ class Arrays
      *    ],
      * ];
      * // 区切り文字指定なし
-     * assertSame(array_flatten($array), [
+     * that(array_flatten($array))->isSame([
      *    0 => 'v1',
      *    1 => 'v21',
      *    2 => 'v221',
@@ -3298,7 +3296,7 @@ class Arrays
      *    6 => 3,
      * ]);
      * // 区切り文字指定
-     * assertSame(array_flatten($array, '.'), [
+     * that(array_flatten($array, '.'))->isSame([
      *    'k1'            => 'v1',
      *    'k2.k21'        => 'v21',
      *    'k2.k22.k221'   => 'v221',
@@ -3364,7 +3362,7 @@ class Arrays
      *    'k2.k22.k223.1' => 2,
      *    'k2.k22.k223.2' => 3,
      * ];
-     * assertSame(array_nest($array), [
+     * that(array_nest($array))->isSame([
      *    'k1' => 'v1',
      *    'k2' => [
      *        'k21' => 'v21',
@@ -3380,7 +3378,7 @@ class Arrays
      *    'k1.k2' => 'v1', // この時点で 'k1' は配列になるが・・・
      *    'k1'    => 'v2', // この時点で 'k1' は文字列として上書きされる
      * ];
-     * assertSame(array_nest($array), [
+     * that(array_nest($array))->isSame([
      *    'k1' => 'v2',
      * ]);
      * // 上書きすら出来ない場合は例外が飛ぶ
@@ -3392,7 +3390,7 @@ class Arrays
      *     array_nest($array);
      * }
      * catch (\Exception $e) {
-     *     assertInstanceof(\InvalidArgumentException::class, $e);
+     *     that($e)->isInstanceOf(\InvalidArgumentException::class);
      * }
      * ```
      *
@@ -3437,7 +3435,7 @@ class Arrays
      * Example:
      * ```php
      * // common は 中身に差分がある。 1 に key1 はあるが、 2 にはない。2 に key2 はあるが、 1 にはない。
-     * assertSame(array_difference([
+     * that(array_difference([
      *     'common' => [
      *         'sub' => [
      *             'x' => 'val',
@@ -3453,7 +3451,7 @@ class Arrays
      *     ],
      *     'key2'   => 'fuga',
      *     'array'  => ['c', 'd', 'e'],
-     * ]), [
+     * ]))->isSame([
      *     'common.sub.x' => ['-' => 'val', '+' => 'VAL'],
      *     'key1'         => ['-' => 'hoge'],
      *     'array'        => ['-' => ['a', 'b'], '+' => ['d', 'e']],

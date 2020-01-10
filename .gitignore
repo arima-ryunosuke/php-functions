@@ -1,6 +1,8 @@
 /composer.lock
 /vendor
 /tests/coverage
+/tests/.phpunit.result.cache
+/tests/annotation.php
 /tests/examples/*
 !/tests/examples/.gitkeep
 /tests/temporary/*

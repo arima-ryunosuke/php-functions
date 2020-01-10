@@ -20,11 +20,11 @@ class FileSystem
      * file_set_contents("$tmp/dir/b.txt", 'b');
      * file_set_contents("$tmp/dir/dir/c.txt", 'c');
      * // ファイル一覧が取得できる
-     * assertEquals(file_list($tmp), [
+     * that(file_list($tmp))->equalsCanonicalizing([
      *     "$tmp{$DS}a.txt",
      *     "$tmp{$DS}dir{$DS}b.txt",
      *     "$tmp{$DS}dir{$DS}dir{$DS}c.txt",
-     * ], '', 0, 10, true);
+     * ]);
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
@@ -65,7 +65,7 @@ class FileSystem
      * file_set_contents("$tmp/dir/b.txt", 'b');
      * file_set_contents("$tmp/dir/dir/c.txt", 'c');
      * // ファイルツリーが取得できる
-     * assertEquals(file_tree($tmp), [
+     * that(file_tree($tmp))->is([
      *     'file_tree' => [
      *         'a.txt' => "$tmp{$DS}a.txt",
      *         'dir'   => [
@@ -126,8 +126,8 @@ class FileSystem
      *
      * Example:
      * ```php
-     * assertSame(file_suffix('filename.ext', '-min'), 'filename-min.ext');
-     * assertSame(file_suffix('filename.ext1.ext2', '-min'), 'filename-min.ext1.ext2');
+     * that(file_suffix('filename.ext', '-min'))->isSame('filename-min.ext');
+     * that(file_suffix('filename.ext1.ext2', '-min'))->isSame('filename-min.ext1.ext2');
      * ```
      *
      * @param string $filename パス・ファイル名
@@ -161,9 +161,9 @@ class FileSystem
      *
      * Example:
      * ```php
-     * assertSame(file_extension('filename.ext'), 'ext');
-     * assertSame(file_extension('filename.ext', 'txt'), 'filename.txt');
-     * assertSame(file_extension('filename.ext', ''), 'filename');
+     * that(file_extension('filename.ext'))->isSame('ext');
+     * that(file_extension('filename.ext', 'txt'))->isSame('filename.txt');
+     * that(file_extension('filename.ext', ''))->isSame('filename');
      * ```
      *
      * @param string $filename 調べるファイル名
@@ -198,7 +198,7 @@ class FileSystem
      * Example:
      * ```php
      * file_set_contents(sys_get_temp_dir() . '/not/filename.ext', 'hoge');
-     * assertSame(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'), 'hoge');
+     * that(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'))->isSame('hoge');
      * ```
      *
      * @param string $filename 書き込むファイル名
@@ -241,7 +241,7 @@ class FileSystem
      * file_put_contents($testpath, 'hoge');
      * // 前後に 'pre-', '-fix' を付与する
      * file_rewrite_contents($testpath, function($contents, $fp){ return "pre-$contents-fix"; });
-     * assertStringEqualsFile($testpath, 'pre-hoge-fix');
+     * that($testpath)->fileEquals('pre-hoge-fix');
      * ```
      *
      * @param string $filename 読み書きするファイル名
@@ -326,7 +326,7 @@ class FileSystem
      * file_set_contents("$tmp/a/b/file.txt", 'hoge');
      * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
      * $callback = function($path){return realpath("$path/file.txt");};
-     * assertSame(dirname_r("$tmp/a/b/c/d/e/f", $callback), realpath("$tmp/a/b/file.txt"));
+     * that(dirname_r("$tmp/a/b/c/d/e/f", $callback))->isSame(realpath("$tmp/a/b/file.txt"));
      * ```
      *
      * @param string $path パス名
@@ -363,10 +363,10 @@ class FileSystem
      * mkdir($dirname);
      *
      * // この時点では現在日時（単純に自身の更新日時）
-     * assertThat(time() - dirmtime($dirname), logicalOr(equalTo(0), equalTo(1)));
+     * that(dirmtime($dirname))->isBetween(time() - 1, time());
      * // ファイルを作って更新するとその時刻
      * touch("$dirname/tmp", time() + 10);
-     * assertSame(dirmtime($dirname), time() + 10);
+     * that(dirmtime($dirname))->isSame(time() + 10);
      * ```
      *
      * @param string $dirname ディレクトリ名
@@ -403,9 +403,9 @@ class FileSystem
      * Example:
      * ```php
      * // すべてにマッチするので true
-     * assertTrue(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'));
+     * that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'))->isTrue();
      * // aaa にはマッチするが bbb にはマッチしないので false
-     * assertFalse(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'));
+     * that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'))->isFalse();
      * ```
      *
      * @param array|string $patterns パターン配列（単一文字列可）
@@ -437,9 +437,9 @@ class FileSystem
      * Example:
      * ```php
      * // aaa にマッチするので true
-     * assertTrue(fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'));
+     * that(fnmatch_or(['*aaa*', '*bbb*'], 'aaaX'))->isTrue();
      * // どれともマッチしないので false
-     * assertFalse(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'));
+     * that(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'))->isFalse();
      * ```
      *
      * @param array|string $patterns パターン配列（単一文字列可）
@@ -467,12 +467,12 @@ class FileSystem
      *
      * Example:
      * ```php
-     * assertTrue(path_is_absolute('/absolute/path'));
-     * assertFalse(path_is_absolute('relative/path'));
+     * that(path_is_absolute('/absolute/path'))->isTrue();
+     * that(path_is_absolute('relative/path'))->isFalse();
      * // Windows 環境では下記も true になる
      * if (DIRECTORY_SEPARATOR === '\\') {
-     *     assertTrue(path_is_absolute('\\absolute\\path'));
-     *     assertTrue(path_is_absolute('C:\\absolute\\path'));
+     *     that(path_is_absolute('\\absolute\\path'))->isTrue();
+     *     that(path_is_absolute('C:\\absolute\\path'))->isTrue();
      * }
      * ```
      *
@@ -512,9 +512,9 @@ class FileSystem
      * Example:
      * ```php
      * $DS = DIRECTORY_SEPARATOR;
-     * assertSame(path_resolve('/absolute/path'), "{$DS}absolute{$DS}path");
-     * assertSame(path_resolve('absolute/path'), getcwd() . "{$DS}absolute{$DS}path");
-     * assertSame(path_resolve('/absolute/path/through', '../current/./path'), "{$DS}absolute{$DS}path{$DS}current{$DS}path");
+     * that(path_resolve('/absolute/path'))->isSame("{$DS}absolute{$DS}path");
+     * that(path_resolve('absolute/path'))->isSame(getcwd() . "{$DS}absolute{$DS}path");
+     * that(path_resolve('/absolute/path/through', '../current/./path'))->isSame("{$DS}absolute{$DS}path{$DS}current{$DS}path");
      * ```
      *
      * @param array $paths パス文字列（可変引数）
@@ -542,9 +542,9 @@ class FileSystem
      * Example:
      * ```php
      * $DS = DIRECTORY_SEPARATOR;
-     * assertSame(path_normalize('/path/to/something'), "{$DS}path{$DS}to{$DS}something");
-     * assertSame(path_normalize('/path/through/../something'), "{$DS}path{$DS}something");
-     * assertSame(path_normalize('./path/current/./through/../something'), "path{$DS}current{$DS}something");
+     * that(path_normalize('/path/to/something'))->isSame("{$DS}path{$DS}to{$DS}something");
+     * that(path_normalize('/path/through/../something'))->isSame("{$DS}path{$DS}something");
+     * that(path_normalize('./path/current/./through/../something'))->isSame("path{$DS}current{$DS}something");
      * ```
      *
      * @param string $path パス文字列
@@ -593,19 +593,19 @@ class FileSystem
      *
      * // "/" を付けないと中身コピー
      * cp_rf("$tmp/src", "$tmp/dst1");
-     * assertStringEqualsFile("$tmp/dst1/hoge.txt", 'hoge');
-     * assertStringEqualsFile("$tmp/dst1/dir/fuga.txt", 'fuga');
+     * that("$tmp/dst1/hoge.txt")->fileEquals('hoge');
+     * that("$tmp/dst1/dir/fuga.txt")->fileEquals('fuga');
      * // "/" を付けると自身コピー
      * cp_rf("$tmp/src", "$tmp/dst2/");
-     * assertStringEqualsFile("$tmp/dst2/src/hoge.txt", 'hoge');
-     * assertStringEqualsFile("$tmp/dst2/src/dir/fuga.txt", 'fuga');
+     * that("$tmp/dst2/src/hoge.txt")->fileEquals('hoge');
+     * that("$tmp/dst2/src/dir/fuga.txt")->fileEquals('fuga');
      *
      * // $src はファイルでもいい（$dst に "/" を付けるとそのディレクトリにコピーする）
      * cp_rf("$tmp/src/hoge.txt", "$tmp/dst3/");
-     * assertStringEqualsFile("$tmp/dst3/hoge.txt", 'hoge');
+     * that("$tmp/dst3/hoge.txt")->fileEquals('hoge');
      * // $dst に "/" を付けないとそのパスとしてコピー（copy と完全に同じ）
      * cp_rf("$tmp/src/hoge.txt", "$tmp/dst4");
-     * assertStringEqualsFile("$tmp/dst4", 'hoge');
+     * that("$tmp/dst4")->fileEquals('hoge');
      * ```
      *
      * @param string $src コピー元パス
@@ -653,7 +653,7 @@ class FileSystem
      * ```php
      * mkdir(sys_get_temp_dir() . '/new/make/dir', 0777, true);
      * rm_rf(sys_get_temp_dir() . '/new');
-     * assertSame(file_exists(sys_get_temp_dir() . '/new'), false);
+     * that(file_exists(sys_get_temp_dir() . '/new'))->isSame(false);
      * ```
      *
      * @param string $dirname 削除するディレクトリ名
@@ -744,17 +744,17 @@ class FileSystem
      * // ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
      * $memory_path = memory_path('filename.txt');
      * // 呼んだだけでは何もしないので存在しない
-     * assertSame(file_exists($memory_path), false);
+     * that(file_exists($memory_path))->isSame(false);
      * // file_put_contents が使える
-     * assertSame(file_put_contents($memory_path, 'Hello, World'), 12);
+     * that(file_put_contents($memory_path, 'Hello, World'))->isSame(12);
      * // file_get_contents が使える
-     * assertSame(file_get_contents($memory_path), 'Hello, World');
+     * that(file_get_contents($memory_path))->isSame('Hello, World');
      * // 上記の操作で実体が存在している
-     * assertSame(file_exists($memory_path), true);
+     * that(file_exists($memory_path))->isSame(true);
      * // unlink が使える
-     * assertSame(unlink($memory_path), true);
+     * that(unlink($memory_path))->isSame(true);
      * // unlink したので存在しない
-     * assertSame(file_exists($memory_path), false);
+     * that(file_exists($memory_path))->isSame(false);
      * ```
      *
      * @param string $path パス名（実質的に一意なファイル名）

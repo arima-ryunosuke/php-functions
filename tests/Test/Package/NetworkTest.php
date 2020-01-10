@@ -6,9 +6,9 @@ class NetworkTest extends AbstractTestCase
 {
     function test_getipaddress()
     {
-        $this->assertRegExp('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#', (getipaddress)());
+        that((getipaddress)())->matches('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#');
 
-        @$this->assertException('php_network_getaddresses', getipaddress, '256.256.256.256');
+        @that([getipaddress, '256.256.256.256'])->throws('php_network_getaddresses');
     }
 
     function test_incidr()
@@ -25,7 +25,7 @@ class NetworkTest extends AbstractTestCase
             [true, '1.2.3.4', '192.168.1.0/0'],
         ];
         foreach ($validdata as $v) {
-            $this->assertSame($v[0], (incidr)($v[1], $v[2]), json_encode($v));
+            that((incidr)($v[1], $v[2]))->isSame($v[0]);
         }
 
         $invaliddata = [
@@ -34,7 +34,7 @@ class NetworkTest extends AbstractTestCase
             ['ipaddr', 'an_invalid_ip', '192.168.1.0/24'],
         ];
         foreach ($invaliddata as $v) {
-            $this->assertException($v[0], incidr, $v[1], $v[2]);
+            that([incidr, $v[1], $v[2]])->throws($v[0]);
         }
     }
 
@@ -46,23 +46,22 @@ class NetworkTest extends AbstractTestCase
         $server = TESTPINGSERVER;
         $err = null;
 
-        $this->assertIsFloat((ping)($server, 80, 1, $err));
-        $this->assertEmpty($err);
+        that((ping)($server, 80, 1, $err))->isFloat();
+        that($err)->isEmpty();
 
-        $this->assertFalse((ping)($server, 888, 1, $err));
-        $this->assertNotEmpty($err);
+        that((ping)($server, 888, 1, $err))->isFalse();
+        that($err)->isNotEmpty();
 
-        $this->assertIsFloat((ping)($server, null, 1, $err));
-        $this->assertEmpty($err);
+        that((ping)($server, null, 1, $err))->isFloat();
+        that($err)->isEmpty();
 
-        $this->assertIsFloat((ping)("udp://128.0.0.1", 1234, 1, $err));
-        $this->assertEmpty($err);
+        that((ping)("udp://128.0.0.1", 1234, 1, $err))->isFloat();
+        that($err)->isEmpty();
 
-        $this->assertFalse((ping)("unknown-host", null, 1, $err));
-        $this->assertNotEmpty('lookup', $err);
+        that((ping)("unknown-host", null, 1, $err))->isFalse();
+        that($err)->isNotEmpty();
 
-        $this->assertException('is not supported', ping, "http://hostname");
-
+        that([ping, "http://hostname"])->throws('is not supported');
     }
 
     function test_http_requests()
@@ -86,8 +85,8 @@ class NetworkTest extends AbstractTestCase
         $time = microtime(true) - $time;
 
         // 普通に投げると(3+4+3)秒かかるがそんなにかかっていないはず
-        $this->assertLessThan(7, $time);
+        that($time)->lessThan(7);
 
-        $this->assertEquals($responses['to'], CURLE_OPERATION_TIMEOUTED);
+        that($responses['to'])->is(CURLE_OPERATION_TIMEOUTED);
     }
 }

@@ -19,6 +19,32 @@ else {
     putenv("TMPDIR=$tmpdir");
 };
 
+// actualThat を定義
+\ryunosuke\PHPUnit\Actual::$compatibleVersion = 2;
+\ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite
+{
+    public function __construct($value, bool $ignoreCase = false)
+    {
+        parent::__construct(new \PHPUnit\Framework\Constraint\IsEqual($this->filter($value), 0.0, 10, false, $ignoreCase));
+    }
+
+    protected function filter($other)
+    {
+        return trim($other);
+    }
+};
+if (!function_exists('that')) {
+    function that($value)
+    {
+        return new \ryunosuke\PHPUnit\Actual($value, true);
+    }
+}
+file_put_contents(__DIR__ . '/annotation.php', "<?php
+namespace ryunosuke\\PHPUnit;
+" . \ryunosuke\PHPUnit\Actual::generateAnnotation() . "
+trait Annotation{}
+");
+
 // Windows 用にダミーで apache(48)/mysql(27) を固定で返す
 if (!function_exists('posix_getuid')) {
     function posix_getuid() { return 48; }
