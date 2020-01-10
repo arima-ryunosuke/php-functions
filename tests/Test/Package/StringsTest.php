@@ -1641,6 +1641,92 @@ z", quote2: "a\\\\nz"');
         that([kvsprintf, '%aaaaa$d %bbbbb$d', ['hoge' => 123]])->throws(new \OutOfBoundsException('Undefined index'));
     }
 
+    public function test_preg_matches()
+    {
+        that((preg_matches)('#unmatch#', 'HelloWorld'))->isSame([]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#u', 'HelloWorld'))->isSame([
+            'letter' => 'H',
+            0        => 'ello',
+        ]);
+
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#u', 'HelloWorld', PREG_OFFSET_CAPTURE))->isSame([
+            'letter' => ['H', 0],
+            0        => ['ello', 1],
+        ]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#u', 'HelloWorld', PREG_OFFSET_CAPTURE, 5))->isSame([
+            'letter' => ['W', 5],
+            0        => ['orld', 6],
+        ]);
+
+        that((preg_matches)('#unmatch#g', 'HelloWorld', PREG_PATTERN_ORDER))->isSame([]);
+        that((preg_matches)('#unmatch#g', 'HelloWorld', PREG_SET_ORDER))->isSame([]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_PATTERN_ORDER))->isSame([
+            'letter' => ['H', 'W'],
+            0        => ['ello', 'orld'],
+        ]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_SET_ORDER))->isSame([
+            [
+                'letter' => 'H',
+                0        => 'ello',
+            ],
+            [
+                'letter' => 'W',
+                0        => 'orld',
+            ],
+        ]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE))->isSame([
+            'letter' => [['H', 0], ['W', 5]],
+            0        => [['ello', 1], ['orld', 6]],
+        ]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_SET_ORDER | PREG_OFFSET_CAPTURE))->isSame([
+            [
+                'letter' => ['H', 0],
+                0        => ['ello', 1],
+            ],
+            [
+                'letter' => ['W', 5],
+                0        => ['orld', 6],
+            ],
+        ]);
+        that( (preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_SET_ORDER | PREG_OFFSET_CAPTURE, 5))->isSame([
+            [
+                'letter' => ['W', 5],
+                0        => ['orld', 6],
+            ],
+        ]);
+
+        that((preg_matches)('#(?<letter>[A-Z])([a-z])(?<second>[a-z])([a-z])(?<rest>[a-z]+)#ug', 'HelloUnitTestingWorld', PREG_PATTERN_ORDER))->isSame([
+            'letter' => ['H', 'T', 'W'],
+            0        => ['e', 'e', 'o',],
+            'second' => ['l', 's', 'r',],
+            1        => ['l', 't', 'l',],
+            'rest'   => ['o', 'ing', 'd',],
+        ]);
+        that((preg_matches)('#(?<letter>[A-Z])([a-z])(?<second>[a-z])([a-z])(?<rest>[a-z]+)#ug', 'HelloUnitTestingWorld', PREG_SET_ORDER))->isSame([
+            [
+                'letter' => 'H',
+                0        => 'e',
+                'second' => 'l',
+                1        => 'l',
+                'rest'   => 'o',
+            ],
+            [
+                'letter' => 'T',
+                0        => 'e',
+                'second' => 's',
+                1        => 't',
+                'rest'   => 'ing',
+            ],
+            [
+                'letter' => 'W',
+                0        => 'o',
+                'second' => 'r',
+                1        => 'l',
+                'rest'   => 'd',
+            ],
+        ]);
+    }
+
     public function test_preg_capture()
     {
         that((preg_capture)('#([a-z])([0-9])([A-Z])#', 'a0Z', []))->is([]);
