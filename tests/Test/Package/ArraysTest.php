@@ -900,6 +900,60 @@ class ArraysTest extends AbstractTestCase
         that([array_where, $array, ['flag' => 1], function () { }])->throws('must be bool');
     }
 
+    function test_array_kvmap()
+    {
+        that((array_kvmap)(['a' => 'A', 'b' => 'B', 'c' => 'C'], function ($k, $v) {
+            if ($k === 'a') {
+                return null;
+            }
+            if ($k === 'b') {
+                return [];
+            }
+            if ($k === 'c') {
+                return ["{$k}1" => "{$v}1", "{$k}2" => "{$v}2"];
+            }
+        }))->is([
+            'a'  => 'A',
+            'c1' => 'C1',
+            'c2' => 'C2',
+        ]);
+
+        that((array_kvmap)(['a', 'b', 'c'], function ($k, $v) {
+            if ($v === 'a') {
+                return [];
+            }
+            if ($v === 'b') {
+                return ['B'];
+            }
+            if ($v === 'c') {
+                return 'C';
+            }
+        }))->is(['B', 'C']);
+
+        that((array_kvmap)([
+            'x' => [
+                'X',
+                'y' => [
+                    'Y',
+                    'z' => ['Z'],
+                ],
+            ],
+        ], function ($k, $v, $callback) {
+            return ["_$k" => is_array($v) ? (array_kvmap)($v, $callback) : "prefix-$v"];
+        }))->is([
+                "_x" => [
+                    "_0" => "prefix-X",
+                    "_y" => [
+                        "_0" => "prefix-Y",
+                        "_z" => [
+                            "_0" => "prefix-Z",
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
+
     function test_array_map_filter()
     {
         // strict:false なので 0 が除外される
