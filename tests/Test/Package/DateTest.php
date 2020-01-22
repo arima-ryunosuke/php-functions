@@ -113,6 +113,27 @@ class DateTest extends AbstractTestCase
         that([date_convert, 'JY/m/d H:i:s.u', '1200/12/23'])->throws('notfound JP_ERA');
     }
 
+    function test_date_fromto()
+    {
+        that((date_fromto)('Y/m/d H:i:s', '1999'))->is(['1999/01/01 00:00:00', '2000/01/01 00:00:00']);
+        that((date_fromto)('Y/m/d H:i:s', '1999/9'))->is(['1999/09/01 00:00:00', '1999/10/01 00:00:00']);
+        that((date_fromto)('Y/m/d H:i:s', '1999/9/10'))->is(['1999/09/10 00:00:00', '1999/09/11 00:00:00']);
+        that((date_fromto)('Y/m/d H:i:s', '1999/9/10 11'))->is(['1999/09/10 11:00:00', '1999/09/10 12:00:00']);
+        that((date_fromto)('Y/m/d H:i:s', '1999/9/10 11:22'))->is(['1999/09/10 11:22:00', '1999/09/10 11:23:00']);
+        that((date_fromto)('Y/m/d H:i:s', '1999/9/10 11:22:33'))->is(['1999/09/10 11:22:33', '1999/09/10 11:22:34']);
+
+        that((date_fromto)('Y/m/d H:i:s', '2000/2'))->is(['2000/02/01 00:00:00', '2000/03/01 00:00:00']);
+        that((date_fromto)('Y/m/d H:i:s', '9/10'))->is([idate('Y') . '/09/10 00:00:00', idate('Y') . '/09/11 00:00:00']);
+        that((date_fromto)('Y/m/d H:i:s', '999/12/23 123456'))->is(['0999/12/23 12:34:56', '0999/12/23 12:34:57']);
+
+        that((date_fromto)('Y-m-d', '2000/2'))->is(['2000-02-01', '2000-03-01']);
+        that((date_fromto)(null, '2000/2'))->is([949330800, 951836400]);
+
+        that((date_fromto)('Y/m/d H:i:s', 'hogehoge'))->is(null);
+        that((date_fromto)('Y/m/d H:i:s', '/h/o/g/e/'))->is(null);
+        that((date_fromto)('Y/m/d H:i:s', '2012/23/56'))->is(null);
+    }
+
     function test_date_interval()
     {
         $HOUR_1 = 60 * 60;

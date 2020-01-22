@@ -200,6 +200,68 @@ class Date
     }
 
     /**
+     * 日時っぽい文字列とフォーマットを与えると取りうる範囲を返す
+     *
+     * 与えられた日時の最大の切り捨て日時と最小の切り上げ日時の配列を返す。
+     * 日付文字列はある程度よしなに補完される（例えば "2014/12" は"2014年12月01日" と解釈されるし "12/24" は "今年12月24日" と解釈される）。
+     *
+     * Example:
+     * ```php
+     * that(date_fromto('Y/m/d H:i:s', '2010/11'))->isSame(["2010/11/01 00:00:00", "2010/12/01 00:00:00"]);
+     * that(date_fromto('Y/m/d H:i:s', '2010/11/24'))->isSame(["2010/11/24 00:00:00", "2010/11/25 00:00:00"]);
+     * that(date_fromto('Y/m/d H:i:s', '2010/11/24 13'))->isSame(["2010/11/24 13:00:00", "2010/11/24 14:00:00"]);
+     * that(date_fromto('Y/m/d H:i:s', '2010/11/24 13:24'))->isSame(["2010/11/24 13:24:00", "2010/11/24 13:25:00"]);
+     * ```
+     *
+     * @param string $format フォーマット。 null を与えるとタイムスタンプで返す
+     * @param string $datetimestring 日時データ
+     * @return array|null [from ～ to] な配列。解釈できない場合は null
+     */
+    public static function date_fromto($format, $datetimestring)
+    {
+        $parsed = date_parse($datetimestring);
+        if (true
+            && $parsed['year'] === false
+            && $parsed['month'] === false
+            && $parsed['day'] === false
+            && $parsed['hour'] === false
+            && $parsed['minute'] === false
+            && $parsed['second'] === false) {
+            return null;
+        }
+
+        list($date, $time) = preg_split('#[T\s　]#u', $datetimestring, -1, PREG_SPLIT_NO_EMPTY) + [0 => '', 1 => ''];
+        list($y, $m, $d) = preg_split('#[^\d]+#u', $date, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
+        list($h, $i, $s) = preg_split('#[^\d]+#u', $time, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
+
+        // "2014/12" と "12/24" の区別はつかないので字数で判断
+        if (strlen($y) <= 2) {
+            list($y, $m, $d) = [null, $y, $m];
+        }
+        // 時刻区切りなし
+        if (strlen($h) > 2) {
+            list($h, $i, $s) = str_split($h, 2) + [0 => null, 1 => null, 2 => null];
+        }
+
+        // 文字列表現で妥当性を検証
+        $strtime = sprintf('%04d-%02d-%02d %02d:%02d:%02d', $y ?? 1000, $m ?? 1, $d ?? 1, $h ?? 1, $i ?? 1, $s ?? 1);
+        $datetime = date_create_from_format('Y-m-d H:i:s', $strtime);
+        if (!$datetime || $datetime->format('Y-m-d H:i:s') !== $strtime) {
+            return null;
+        }
+
+        $y = $y ?? idate('Y');
+        $ld = $d ?? idate('t', mktime(0, 0, 0, $m ?? 12, 1, $y));
+
+        $min = mktime($h ?? 0, $i ?? 0, $s ?? 0, $m ?? 1, $d ?? 1, $y);
+        $max = mktime($h ?? 23, $i ?? 59, $s ?? 59, $m ?? 12, $d ?? $ld, $y) + 1;
+        if ($format === null) {
+            return [$min, $max];
+        }
+        return [date($format, $min), date($format, $max)];
+    }
+
+    /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
      *
      * 例えば `60 * 60 * 24 * 900 + 12345.678` （約900日12345秒）は・・・
