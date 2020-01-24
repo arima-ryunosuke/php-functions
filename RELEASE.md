@@ -10,6 +10,13 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.4
+
+- [feature][Arrays] array_kvmap を追加
+- [feature][Date] date_fromto を追加
+- [feature][Syntax] indent_php を追加
+- [feature][Utility] parse_annotation の複数行対応
+
 ## 1.4.3
 
 - [feature][Syntax] try_return を追加
