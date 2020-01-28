@@ -437,6 +437,8 @@ class Utility
      * アノテーションの仕様は下記（すべて $schema が false であるとする）。
      *
      * - @から行末まで（1行に複数のアノテーションは含められない）
+     *     - ただし行末が `({[` のいずれかであれば次の `]})` までブロックを記載する機会が与えられる
+     *     - ブロックを見つけたときは本来値となるべき値がキーに、ブロックが値となり、結果は必ず配列化される
      * - 同じアノテーションを複数見つけたときは配列化される
      * - `@hogera`: 値なしは null を返す
      * - `@hogera v1 "v2 v3"`: ["v1", "v2 v3"] という配列として返す
@@ -445,6 +447,7 @@ class Utility
      * - `@hogera ("2019/12/23")`: hogera で解決できるクラス名で new して返す（$filename 引数の指定が必要）
      * - 下3つの形式はアノテーション区切りのスペースはあってもなくても良い
      *
+     * $schema が true だと上記のような変換は一切行わず、素朴な文字列で返す。
      * あくまで簡易実装であり、本格的に何かをしたいなら専用のパッケージを導入したほうが良い。
      *
      * Example:
@@ -458,6 +461,10 @@ class Utility
      * - @hash {key: 123}
      * - @list [1, 2, 3]
      * - @ArrayObject([1, 2, 3])
+     * - @block message {
+     *       this is message1
+     *       this is message2
+     *   }
      * - @same this is same value1
      * - @same this is same value2
      * - @same this is same value3
@@ -473,6 +480,9 @@ class Utility
      *     'hash'        => ['key' => '123'],            // 連想配列になる
      *     'list'        => [1, 2, 3],                   // 連番配列になる
      *     'ArrayObject' => new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
+     *     "block"       => [                            // ブロックはブロック外をキーとした連想配列になる（複数指定でキーは指定できるイメージ）
+     *         "message" => ["this is message1\n      this is message2"],
+     *     ],
      *     'same'        => [                            // 複数あるのでそれぞれの配列になる
      *         ['this', 'is', 'same', 'value1'],
      *         ['this', 'is', 'same', 'value2'],
@@ -507,6 +517,9 @@ class Utility
                 $namespaces[] = $reflector->getNamespaceName();
             }
             $nsfiles[$reflector->getFileName()] = $nsfiles[$reflector->getFileName()] ?? $namespaces;
+
+            // doccomment 特有のインデントを削除する
+            $annotation = preg_replace('#(\\R)\\s+\\*\s#ui', '$1', $annotation);
         }
 
         $result = [];
@@ -518,19 +531,34 @@ class Utility
                 break;
             }
 
-            $seppos = min((strpos_array)($annotation, ["\n", " ", "\t", '[', '{', '('], $i + 1) ?: [false]);
+            $seppos = min((strpos_array)($annotation, [" ", "\t", "\n", '[', '{', '('], $i + 1) ?: [false]);
             $name = substr($annotation, $i + 1, $seppos - $i - 1);
             $i += strlen($name);
             $name = trim($name);
 
-            if ($annotation[$seppos] === "\n") {
-                $value = '';
-            }
-            else {
+            $key = null;
+            $value = '';
+            if ($annotation[$seppos] !== "\n") {
                 $endpos = (strpos_quoted)($annotation, "\n", $seppos);
-                $value = substr($annotation, $seppos, $endpos - $seppos);
-                $i += strlen($value);
-                $value = trim($value);
+                $prev = $endpos - 1;
+                $brace = [
+                    '(' => ')',
+                    '{' => '}',
+                    '[' => ']',
+                ];
+                if (isset($brace[$annotation[$prev]])) {
+                    $s = $annotation[$prev];
+                    $e = $brace[$s];
+                    $endpos--;
+                    $key = trim(substr($annotation, $seppos, $endpos - $seppos));
+                    $value = $s . (str_between)($annotation, $s, $e, $endpos) . $e;
+                    $i = $endpos;
+                }
+                else {
+                    $value = substr($annotation, $seppos, $endpos - $seppos);
+                    $i += strlen($value);
+                    $value = trim($value);
+                }
             }
 
             $rawmode = $schema;
@@ -538,29 +566,38 @@ class Utility
                 $rawmode = array_key_exists($name, $rawmode) ? $rawmode[$name] : false;
             }
             if ($rawmode instanceof \Closure) {
-                $value = $rawmode($value);
+                $value = $rawmode($value, $key);
             }
-            elseif (!$rawmode) {
+            elseif ($rawmode) {
+                if (is_string($key)) {
+                    $value = substr($value, 1, -1);
+                }
+            }
+            else {
                 if ($value === '') {
                     $value = null;
                 }
                 elseif (in_array($value[0] ?? null, ['('], true)) {
                     $class = (resolve_symbol)($name, $nsfiles, 'alias') ?? $name;
-                    $value = new $class(...(paml_import)(trim($value, '()')));
+                    $value = new $class(...(paml_import)(substr($value, 1, -1)));
                 }
-                elseif (in_array($value[0] ?? null, ['[', '{'], true)) {
+                elseif (in_array($value[0] ?? null, ['{', '['], true)) {
                     $value = (array) (paml_import)($value)[0];
                 }
                 else {
-                    $value = array_values(array_filter((quoteexplode)([" ", "\t"], $value), "strlen"));
+                    $value = array_values(array_filter((quoteexplode)([" ", "\t", "\n"], $value), "strlen"));
                 }
             }
 
-            if (array_key_exists($name, $result)) {
-                if (!isset($multiples[$name])) {
-                    $multiples[$name] = true;
-                    $result[$name] = [$result[$name]];
-                }
+            if (array_key_exists($name, $result) && !isset($multiples[$name])) {
+                $multiples[$name] = true;
+                $result[$name] = [$result[$name]];
+            }
+            if (strlen($key)) {
+                $multiples[$name] = true;
+                $result[$name][$key] = $value;
+            }
+            elseif (isset($multiples[$name])) {
                 $result[$name][] = $value;
             }
             else {

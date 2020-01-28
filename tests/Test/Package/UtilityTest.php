@@ -470,6 +470,13 @@ class UtilityTest extends AbstractTestCase
                 "a" => 123,
             ],
             "listX"     => [123, 456],
+            "block"     => [
+                "message" => ["this is message1\n    this is message2"],
+            ],
+            "blockX"    => [
+                "message1" => ["this is message1"],
+                "message2" => ["this is message2"],
+            ],
             "double"    => [
                 ["a"],
                 ["b"],
@@ -490,6 +497,8 @@ class UtilityTest extends AbstractTestCase
         $actual = (parse_annotation)($refmethod, [
             'single'  => true,
             'double'  => true,
+            'block'   => true,
+            'blockX'  => true,
             'closure' => function ($value) { return eval('return ' . $value . ';'); },
         ]);
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
@@ -509,6 +518,20 @@ class UtilityTest extends AbstractTestCase
                 "a" => 123,
             ],
             "listX"     => [123, 456],
+            "block"     => [
+                "message" => "
+    this is message1
+    this is message2
+",
+            ],
+            "blockX"    => [
+                "message1" => "
+    this is message1
+",
+                "message2" => "
+    this is message2
+",
+            ],
             "double"    => ["a", "b", "c"],
             "DateTime2" => \This\Is\Space\DateTime2::__set_state([
                 "date"          => "2019-12-23 00:00:00.000000",
@@ -525,6 +548,94 @@ class UtilityTest extends AbstractTestCase
         $actual = (parse_annotation)(new \ReflectionMethod(\This\Is\Space\DateTime2::class, 'method'), true);
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "message" => 'this is annotation',
+        ]);
+
+        $annotation = '
+@hoge{a: 123}
+
+@fuga {
+    fuga1
+    fuga2
+}
+
+@piyo dummy {
+    piyo1: 1,
+    piyo2: 2
+}';
+        $actual = (parse_annotation)($annotation);
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
+            "hoge" => ['a' => 123],
+            "fuga" => ["fuga1\n    fuga2"],
+            "piyo" => [
+                "dummy" => [
+                    "piyo1" => 1,
+                    "piyo2" => 2,
+                ],
+            ],
+        ]);
+
+        $actual = (parse_annotation)($annotation, true);
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
+            "hoge" => "{a: 123}",
+            "fuga" => "
+    fuga1
+    fuga2
+",
+            "piyo" => [
+                "dummy" => "
+    piyo1: 1,
+    piyo2: 2
+",
+            ],
+        ]);
+
+        $actual = (parse_annotation)('
+@mix type1{
+    hoge1
+    hoge2
+}
+@mix type2 {
+    fuga1
+    fuga2
+}', true);
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
+            "mix" => [
+                "type1" => "
+    hoge1
+    hoge2
+",
+                "type2" => "
+    fuga1
+    fuga2
+",
+            ],
+        ]);
+
+        $actual = (parse_annotation)('
+@mix hoge
+@mix type {
+    fuga1
+    fuga2
+}');
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
+            "mix" => [
+                0      => ["hoge"],
+                "type" => ["fuga1\n    fuga2"],
+            ],
+        ]);
+
+        $actual = (parse_annotation)('
+@mix type{
+    hoge1
+    hoge2
+}
+@mix fuga
+}');
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
+            "mix" => [
+                "type" => ["hoge1\n    hoge2"],
+                0      => ["fuga"],
+            ],
         ]);
     }
 

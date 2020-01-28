@@ -26,6 +26,16 @@ return new class
      * @DateTime2("2019/12/23")
      * @hashX{a: 123}
      * @listX[123, 456]
+     * @block message {
+     *     this is message1
+     *     this is message2
+     * }
+     * @blockX message1 {
+     *     this is message1
+     * }
+     * @blockX message2 {
+     *     this is message2
+     * }
      * @double a
      * @double b
      * @double c
