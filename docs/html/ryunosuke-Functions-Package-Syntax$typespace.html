@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L1090" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L1233" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -250,7 +250,99 @@ that(implode('', array_column($part, 1)))-&gt;isSame("class Example\n{");
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L194-L368" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L194-L338" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Syntax::indent_php()" tabindex="-1" class="structure-title ">
+                        indent_php                        	<small>($phpcode, $options = []) : string</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>php のコードのインデントを調整する</p>
+<p>インデントの基準はコードの最初の行になる。<br />
+その基準インデントを削除した後、指定したインデントレベルでインデントするようなイメージ。</p>
+<p>Example:</p>
+<pre><code class="language-php">$phpcode = '
+    echo 123;
+
+    if (true) {
+        echo 456;
+    }
+';
+// 数値指定は空白換算
+that(indent_php($phpcode, 8))-&gt;isSame('
+        echo 123;
+
+        if (true) {
+            echo 456;
+        }
+');
+// 文字列を指定すればそれが使用される
+that(indent_php($phpcode, "\t"))-&gt;isSame('
+	echo 123;
+
+	if (true) {
+	    echo 456;
+	}
+');
+// オプション指定
+that(indent_php($phpcode, [
+    'indent'    =&gt; 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
+    'trimempty' =&gt; true, // 空行を trim するか
+    'heredoc'   =&gt; true, // php7.3 の Flexible Heredoc もインデントするか
+]))-&gt;isSame('
+    echo 123;
+
+    if (true) {
+        echo 456;
+    }
+');
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$phpcode</td>
+				<td class="desc"><p>インデントする php コード</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>string</td>
+				<td class="rest">$options = []</td>
+				<td class="desc"><p>オプション</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string</td>
+			<td class="desc"><p>インデントされた php コード</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L340-L514" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::highlight_php()" tabindex="-1" class="structure-title ">
                         highlight_php                        	<small>($phpcode, $options = []) : string</small>
@@ -305,7 +397,7 @@ highlight_string の CLI 対応版とも言える。</p>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L370-L437" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L516-L582" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::optional()" tabindex="-1" class="structure-title ">
                         optional                        	<small>($object, $expected = null) : mixed</small>
@@ -385,10 +477,10 @@ that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;isSame(null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L439-L676" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L584-L819" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::chain()" tabindex="-1" class="structure-title ">
-                        chain                        	<small>($source = null) : <a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></small>
+                        chain                        	<small>($source = null) : <a href="ChainObject$typespace.html#ChainObject" class="fqsen ">ChainObject</a></small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
@@ -489,7 +581,7 @@ that(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()($r
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type"><a href="http://php.net/manual/ja/class.chainobject.php" class="fqsen" target="_blank">\ChainObject</a></td>
+			<td class="type"><a href="ChainObject$typespace.html#ChainObject" class="fqsen ">ChainObject</a></td>
 			<td class="desc"></td>
 			<td class="rest"></td>
 		</tr>
@@ -512,7 +604,7 @@ that(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()($r
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L678-L699" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L821-L842" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
                         throws                        	<small>($ex) : mixed</small>
@@ -568,7 +660,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L701-L728" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L844-L871" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throw_if()" tabindex="-1" class="structure-title ">
                         throw_if                        	<small>($flag, $ex, ...$ex_args) : void</small>
@@ -635,7 +727,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L730-L828" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L873-L971" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::blank_if()" tabindex="-1" class="structure-title ">
                         blank_if                        	<small>($var, $default = null) : mixed</small>
@@ -753,7 +845,7 @@ that(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default')-&gt;isSame(0);  
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L830-L888" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L973-L1031" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::call_if()" tabindex="-1" class="structure-title ">
                         call_if                        	<small>($condition, $callable, ...$arguments) : mixed</small>
@@ -832,7 +924,7 @@ that($output)-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L890-L928" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1033-L1071" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::switchs()" tabindex="-1" class="structure-title ">
                         switchs                        	<small>($value, $cases, $default = null) : mixed</small>
@@ -902,7 +994,7 @@ that(switchs(3, $cases, 'undefined'))-&gt;isSame('undefined');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L930-L957" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1073-L1100" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_null()" tabindex="-1" class="structure-title ">
                         try_null                        	<small>($try, ...$variadic) : mixed</small>
@@ -964,7 +1056,7 @@ that(try_null($try))-&gt;isSame(null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L959-L986" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1102-L1129" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_return()" tabindex="-1" class="structure-title ">
                         try_return                        	<small>($try, ...$variadic) : mixed</small>
@@ -1026,7 +1118,7 @@ that(try_return($try))-&gt;IsInstanceOf(\Exception::class);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L988-L1011" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1131-L1154" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch                        	<small>($try, $catch = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1094,7 +1186,7 @@ that(try_catch($try)-&gt;getMessage())-&gt;isSame('tried');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1013-L1040" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1156-L1183" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally                        	<small>($try, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1166,7 +1258,7 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1042-L1089" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1185-L1232" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally                        	<small>($try, $catch = null, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>

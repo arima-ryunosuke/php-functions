@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L1089" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L5-L1087" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\FileSystem</span></h2>
@@ -606,7 +606,7 @@ rm_rf($dirname);
 mkdir($dirname);
 
 // この時点では現在日時（単純に自身の更新日時）
-that(dirmtime($dirname))-&gt;isBetween(time() - 1, time());
+that(dirmtime($dirname))-&gt;isBetween(time() - 2, time());
 // ファイルを作って更新するとその時刻
 touch("$dirname/tmp", time() + 10);
 that(dirmtime($dirname))-&gt;isSame(time() + 10);
@@ -1092,7 +1092,7 @@ that(file_exists(sys_get_temp_dir() . '/new'))-&gt;isSame(false);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L686-L731" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L686-L730" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::tmpname()" tabindex="-1" class="structure-title ">
                         tmpname                        	<small>($prefix = &quot;rft&quot;, $dir = null) : string</small>
@@ -1151,7 +1151,7 @@ that(file_exists(sys_get_temp_dir() . '/new'))-&gt;isSame(false);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L733-L1088" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/FileSystem.php#L732-L1086" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\FileSystem::memory_path()" tabindex="-1" class="structure-title ">
                         memory_path                        	<small>($path) : string</small>

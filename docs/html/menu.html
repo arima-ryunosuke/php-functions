@@ -36,13 +36,71 @@
     </head>
 <body class="menu">
 <h1 class="fixed">
+	<span class="glyphicon glyphicon-menu-hamburger switch-config"></span>
 	Namespace
 	<input type="search" id="search" class="form-control" autocomplete="off" placeholder="search">
-	<small><a href="fqsens.html" class="all-fqsen" target="main">all</a></small>
 </h1>
+<div class="config display-none">
+	<fieldset>
+		<legend>Manage</legend>
+
+		<h5>Document</h5>
+		<ul class="has-indent">
+			<li><a href="fqsens.html" class="all-fqsen exit-config" target="main">All FQSEN</a></li>
+		</ul>
+
+		<h5>Holding</h5>
+		<ul class="has-indent">
+			<li><a href="javascript:void(0)" class="open-only-namespaces exit-config">Open Only Namespaces</a></li>
+			<li><a href="javascript:void(0)" class="close-only-typespaces exit-config">Close Only Typespaces</a></li>
+			<li><a href="javascript:void(0)" class="open-all-holdings exit-config">Open All</a></li>
+			<li><a href="javascript:void(0)" class="close-all-holdings exit-config">Close All</a></li>
+		</ul>
+
+		<h5>Filter</h5>
+		<ul class="has-indent">
+			<li><label><input type="checkbox" data-filter-target="private">Filter Private</li>
+			<li><label><input type="checkbox" data-filter-target="protected">Filter Protected</li>
+			<li><label><input type="checkbox" data-filter-target="public">Filter Public</li>
+		</ul>
+	</fieldset>
+
+	<fieldset>
+		<legend>Legend</legend>
+
+		<h5>FQSEN</h5>
+		<ul class="has-indent">
+			<li><span class="label label-icon label-namespace">N</span> Namespace</li>
+			<li><span class="label label-icon label-constant">C</span> Constant</li>
+			<li><span class="label label-icon label-function">F</span> Function</li>
+			<li><span class="label label-icon label-class">C</span> Class</li>
+			<li><span class="label label-icon label-interface">I</span> Interface</li>
+			<li><span class="label label-icon label-trait">T</span> Trait</li>
+			<li><span class="label label-icon label-class-constant">C</span> Class Constant</li>
+			<li><span class="label label-icon label-property">p</span> Property</li>
+			<li><span class="label label-icon label-property">P</span> Static Property</li>
+			<li><span class="label label-icon label-method">m</span> Method</li>
+			<li><span class="label label-icon label-method">M</span> Static Method</li>
+		</ul>
+
+		<h5>Accessible</h5>
+		<ul class="has-indent">
+			<li><span class="glyphicon glyphicon-accessible glyphicon-private"></span> Private</li>
+			<li><span class="glyphicon glyphicon-accessible glyphicon-protected"></span> Protected</li>
+			<li><span class="glyphicon glyphicon-accessible glyphicon-public"></span> Public</li>
+			<li><span class="glyphicon glyphicon-accessible glyphicon-magic"></span> Magic Property/Method</li>
+		</ul>
+
+		<h5>Status</h5>
+		<ul class="has-indent">
+			<li><span class="faint">This is Inherit Parent</span></li>
+			<li><span class="strike">This is Deprecated</span></li>
+		</ul>
+	</fieldset>
+</div>
 <div class="main-wrapper">
     	<ul class="namespaces">
-                            	<li class="text-nowrap holding-wrapper ">
+                            	<li class="text-nowrap holding-wrapper  holding-namespace">
 		<div class="nheader ellipsis">
 			<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-namespace">N</span>
 			<a id="ryunosuke\" href="ryunosuke-$namespace.html#ryunosuke\" class="bold" target="main">
@@ -53,7 +111,7 @@
 			<small class="ellipsis-text"></small>
 		</div>
 		<ul class="has-indent holding">
-                            	<li class="text-nowrap holding-wrapper indent">
+                            	<li class="text-nowrap holding-wrapper indent holding-namespace">
 		<div class="nheader ellipsis">
 			<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-namespace">N</span>
 			<a id="ryunosuke\Functions\" href="ryunosuke-Functions-$namespace.html#ryunosuke\Functions\" class="bold" target="main">
@@ -63,7 +121,7 @@
 			<small class="ellipsis-text"></small>
 		</div>
 		<ul class="has-indent holding">
-                            	<li class="text-nowrap holding-wrapper indent">
+                            	<li class="text-nowrap holding-wrapper indent holding-namespace">
 		<div class="nheader ellipsis">
 			<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-namespace">N</span>
 			<a id="ryunosuke\Functions\Package\" href="ryunosuke-Functions-Package-$namespace.html#ryunosuke\Functions\Package\" class="bold" target="main">
@@ -73,15 +131,15 @@
 			<small class="ellipsis-text"></small>
 		</div>
 		<ul class="has-indent holding">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        					<li class="indent text-nowrap holding-wrapper holding-class">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Arrays" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays" class="bold " target="main">Arrays</a>
-							<span>(70)</span>
+							<span>(71)</span>
 							<small class="ellipsis-text">配列関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -89,7 +147,7 @@
 										<small class="ellipsis-text">配列をシーケンシャルに走査するジェネレータを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -97,7 +155,7 @@
 										<small class="ellipsis-text">引数の配列を生成する。</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -105,7 +163,7 @@
 										<small class="ellipsis-text">配列が数値配列か調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -113,7 +171,7 @@
 										<small class="ellipsis-text">配列が連想配列か調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -121,7 +179,7 @@
 										<small class="ellipsis-text">配列の最初のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -129,7 +187,7 @@
 										<small class="ellipsis-text">配列の最初の値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -137,7 +195,7 @@
 										<small class="ellipsis-text">配列の最初のキー/値ペアをタプルで返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -145,7 +203,7 @@
 										<small class="ellipsis-text">配列の最後のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -153,7 +211,7 @@
 										<small class="ellipsis-text">配列の最後の値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -161,7 +219,7 @@
 										<small class="ellipsis-text">配列の最後のキー/値ペアをタプルで返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -169,7 +227,7 @@
 										<small class="ellipsis-text">配列の指定キーの前のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -177,7 +235,7 @@
 										<small class="ellipsis-text">配列の指定キーの次のキーを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -185,7 +243,7 @@
 										<small class="ellipsis-text">in_array の複数版（AND）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -193,7 +251,7 @@
 										<small class="ellipsis-text">in_array の複数版（OR）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -201,7 +259,7 @@
 										<small class="ellipsis-text">比較関数にキーも渡ってくる安定ソート</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -209,7 +267,7 @@
 										<small class="ellipsis-text">配列の+演算子の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -217,7 +275,7 @@
 										<small class="ellipsis-text">配列を交互に追加する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -225,7 +283,7 @@
 										<small class="ellipsis-text">配列の各要素値で順番に配列を作る</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -233,7 +291,7 @@
 										<small class="ellipsis-text">配列の直積を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -241,7 +299,7 @@
 										<small class="ellipsis-text">配列の各要素の間に要素を差し込む</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -249,7 +307,7 @@
 										<small class="ellipsis-text">配列を指定条件で分割する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -257,7 +315,7 @@
 										<small class="ellipsis-text">キーと値で sprintf する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -265,7 +323,7 @@
 										<small class="ellipsis-text">配列のキー・要素に文字列を付加する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -273,7 +331,7 @@
 										<small class="ellipsis-text">配列・連想配列を問わず「N番目(0ベース)」の要素を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -281,7 +339,7 @@
 										<small class="ellipsis-text">配列の指定キーの位置を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -289,7 +347,7 @@
 										<small class="ellipsis-text">配列を与えると指定キーの値を返すクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -297,7 +355,7 @@
 										<small class="ellipsis-text">デフォルト値付きの配列値取得</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -305,7 +363,7 @@
 										<small class="ellipsis-text">キー指定の配列値設定</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -313,7 +371,7 @@
 										<small class="ellipsis-text">キー指定の配列値設定</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -321,7 +379,7 @@
 										<small class="ellipsis-text">伏せると同時にその値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -329,7 +387,7 @@
 										<small class="ellipsis-text">パス形式で配列値を取得</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -337,7 +395,7 @@
 										<small class="ellipsis-text">array_key_exists の複数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -345,7 +403,7 @@
 										<small class="ellipsis-text">array_search のクロージャ版のようなもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -353,7 +411,7 @@
 										<small class="ellipsis-text">キーをマップ配列で置換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -361,7 +419,7 @@
 										<small class="ellipsis-text">キーを正規表現でフィルタする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -369,7 +427,7 @@
 										<small class="ellipsis-text">array_map の再帰版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -377,7 +435,7 @@
 										<small class="ellipsis-text">キーをマップして変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -385,7 +443,7 @@
 										<small class="ellipsis-text">キーを主軸とした array_filter</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -393,7 +451,7 @@
 										<small class="ellipsis-text">指定キーの要素で array_filter する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -401,7 +459,7 @@
 										<small class="ellipsis-text">array_map + array_filter する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -409,7 +467,7 @@
 										<small class="ellipsis-text">メソッドを指定できるようにした array_map</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -417,7 +475,15 @@
 										<small class="ellipsis-text">複数コールバックを指定できる array_map</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Arrays::array_kvmap()" href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_kvmap()" class="" target="main">array_kvmap</a>
+										<small class="ellipsis-text">配列の各キー・値にコールバックを適用する</small>
+									</div>
+								</li>
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -425,7 +491,7 @@
 										<small class="ellipsis-text">キーも渡ってくる array_map</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -433,7 +499,7 @@
 										<small class="ellipsis-text">要素値を $callback の n 番目(0ベース)に適用して array_map する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -441,7 +507,7 @@
 										<small class="ellipsis-text">要素値を $callback の最左に適用して array_map する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -449,7 +515,7 @@
 										<small class="ellipsis-text">要素値を $callback の最右に適用して array_map する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -457,7 +523,7 @@
 										<small class="ellipsis-text">array_reduce の参照版（のようなもの）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -465,7 +531,7 @@
 										<small class="ellipsis-text">配列の次元数を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -473,7 +539,7 @@
 										<small class="ellipsis-text">配列・連想配列を問わず任意の位置に値を挿入する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -481,7 +547,7 @@
 										<small class="ellipsis-text">配列をコールバックに従って分類する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -489,7 +555,7 @@
 										<small class="ellipsis-text">配列をコールバックに従ってカウントする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -497,7 +563,7 @@
 										<small class="ellipsis-text">配列をコールバックの返り値でグループ化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -505,7 +571,7 @@
 										<small class="ellipsis-text">配列をコールバックの返り値で集計する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -513,7 +579,7 @@
 										<small class="ellipsis-text">全要素が true になるなら true を返す（1つでも false なら false を返す）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -521,7 +587,7 @@
 										<small class="ellipsis-text">全要素が false になるなら false を返す（1つでも true なら true を返す）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -529,7 +595,7 @@
 										<small class="ellipsis-text">比較関数が渡せる array_unique</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -537,7 +603,7 @@
 										<small class="ellipsis-text">配列を $orders に従って並べ替える</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -545,7 +611,7 @@
 										<small class="ellipsis-text">shuffle のキーが保存される＋参照渡しではない版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -553,7 +619,7 @@
 										<small class="ellipsis-text">値の優先順位を逆にした array_intersect_key</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -561,7 +627,7 @@
 										<small class="ellipsis-text">配列の隙間を埋める</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -569,7 +635,7 @@
 										<small class="ellipsis-text">array_fill_keys のコールバック版のようなもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -577,7 +643,7 @@
 										<small class="ellipsis-text">キーを指定してそれだけの配列にする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -585,7 +651,7 @@
 										<small class="ellipsis-text">キーを指定してそれらを除いた配列にする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -593,7 +659,7 @@
 										<small class="ellipsis-text">キー保存可能な array_column</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -601,7 +667,7 @@
 										<small class="ellipsis-text">全要素に対して array_column する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -609,7 +675,7 @@
 										<small class="ellipsis-text">array_columns のほぼ逆で [キー =&gt; [要素]] 配列から連想配列の配列を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -617,7 +683,7 @@
 										<small class="ellipsis-text">配列の各要素に再帰的にコールバックを適用して変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -625,7 +691,7 @@
 										<small class="ellipsis-text">多階層配列をフラットに展開する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -633,7 +699,7 @@
 										<small class="ellipsis-text">シンプルな [キー =&gt; 値] な配列から階層配列を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -651,39 +717,39 @@
 							<small class="ellipsis-text">クラス・オブジェクト関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                            								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Classobj::IS_OWNSELF" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_OWNSELF" class="" target="main">IS_OWNSELF</a>
 										<small class="ellipsis-text">自分自身を表す定数</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Classobj::IS_PUBLIC" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PUBLIC" class="" target="main">IS_PUBLIC</a>
 										<small class="ellipsis-text">public を表す定数 @see \ReflectionProperty::IS_PUBLIC</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Classobj::IS_PROTECTED" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PROTECTED" class="" target="main">IS_PROTECTED</a>
 										<small class="ellipsis-text">protected を表す定数 @see \ReflectionProperty::IS_PROTECTED</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Classobj::IS_PRIVATE" href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PRIVATE" class="" target="main">IS_PRIVATE</a>
 										<small class="ellipsis-text">private を表す定数 @see \ReflectionProperty::IS_PRIVATE</small>
 									</div>
 								</li>
-                                                                                    								<li class="indent ">
+                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -691,7 +757,7 @@
 										<small class="ellipsis-text">初期フィールド値を与えて stdClass を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -699,7 +765,7 @@
 										<small class="ellipsis-text">ディレクトリ構造から名前空間を推測して返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -707,7 +773,7 @@
 										<small class="ellipsis-text">クラスが use しているトレイトを再帰的に取得する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -715,7 +781,7 @@
 										<small class="ellipsis-text">composer のクラスローダを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -723,7 +789,7 @@
 										<small class="ellipsis-text">クラスの名前空間部分を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -731,7 +797,7 @@
 										<small class="ellipsis-text">クラスの名前空間部分を除いた短い名前を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -739,7 +805,7 @@
 										<small class="ellipsis-text">既存（未読み込みに限る）クラスを強制的に置換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -747,7 +813,7 @@
 										<small class="ellipsis-text">インスタンスを動的に拡張する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -755,7 +821,7 @@
 										<small class="ellipsis-text">クラス定数が存在するか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -763,7 +829,7 @@
 										<small class="ellipsis-text">パス形式でプロパティ値を取得</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -771,7 +837,7 @@
 										<small class="ellipsis-text">クラス定数を配列で返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -781,23 +847,23 @@
 								</li>
                                                         -->						</ul>
 					</li>
-                                                                                                                                                                                                                                                                                					<li class="indent text-nowrap holding-wrapper holding-class">
+                                                                                                                                                                                                                                                                                                                            					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Date" href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date" class="bold " target="main">Date</a>
-							<span>(4)</span>
+							<span>(5)</span>
 							<small class="ellipsis-text">日付・時刻関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                            								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Date::JP_ERA" href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::JP_ERA" class="" target="main">JP_ERA</a>
 										<small class="ellipsis-text">和暦</small>
 									</div>
 								</li>
-                                                                                    								<li class="indent ">
+                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -805,7 +871,7 @@
 										<small class="ellipsis-text">日時文字列をよしなにタイムスタンプに変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -813,7 +879,15 @@
 										<small class="ellipsis-text">日時文字列をよしなに別のフォーマットに変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Date::date_fromto()" href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_fromto()" class="" target="main">date_fromto</a>
+										<small class="ellipsis-text">日時っぽい文字列とフォーマットを与えると取りうる範囲を返す</small>
+									</div>
+								</li>
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -831,7 +905,7 @@
 							<small class="ellipsis-text">ファイルシステム関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -839,7 +913,7 @@
 										<small class="ellipsis-text">ファイル一覧を配列で返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -847,7 +921,7 @@
 										<small class="ellipsis-text">ディレクトリ階層をツリー構造で返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -855,7 +929,7 @@
 										<small class="ellipsis-text">ファイル名にサフィックスを付与する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -863,7 +937,7 @@
 										<small class="ellipsis-text">ファイルの拡張子を変更する。引数を省略すると拡張子を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -871,7 +945,7 @@
 										<small class="ellipsis-text">ディレクトリも掘る file_put_contents</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -879,7 +953,7 @@
 										<small class="ellipsis-text">ファイルを読み込んで内容をコールバックに渡して書き込む</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -887,7 +961,7 @@
 										<small class="ellipsis-text">ディレクトリを再帰的に掘る</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -895,7 +969,7 @@
 										<small class="ellipsis-text">コールバックが true 相当を返すまで親ディレクトリを辿り続ける</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -903,7 +977,7 @@
 										<small class="ellipsis-text">ディレクトリの最終更新日時を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -911,7 +985,7 @@
 										<small class="ellipsis-text">fnmatch の AND 版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -919,7 +993,7 @@
 										<small class="ellipsis-text">fnmatch の OR 版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -927,7 +1001,7 @@
 										<small class="ellipsis-text">パスが絶対パスか判定する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -935,7 +1009,7 @@
 										<small class="ellipsis-text">パスを絶対パスに変換して正規化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -943,7 +1017,7 @@
 										<small class="ellipsis-text">パスを正規化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -951,7 +1025,7 @@
 										<small class="ellipsis-text">ディレクトリのコピー</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -959,7 +1033,7 @@
 										<small class="ellipsis-text">中身があっても消せる rmdir</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -967,7 +1041,7 @@
 										<small class="ellipsis-text">終了時に削除される一時ファイル名を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -985,7 +1059,7 @@
 							<small class="ellipsis-text">callable 関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -993,7 +1067,7 @@
 										<small class="ellipsis-text">指定 callable を指定クロージャで実行するクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1001,7 +1075,7 @@
 										<small class="ellipsis-text">$callable の引数を指定配列で束縛したクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1009,7 +1083,7 @@
 										<small class="ellipsis-text">$callable の指定位置に引数を束縛したクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1017,7 +1091,7 @@
 										<small class="ellipsis-text">$callable の最左に引数を束縛した callable を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1025,7 +1099,7 @@
 										<small class="ellipsis-text">$callable の最右に引数を束縛した callable を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1033,7 +1107,7 @@
 										<small class="ellipsis-text">演算子のクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1041,7 +1115,7 @@
 										<small class="ellipsis-text">返り値の真偽値を逆転した新しいクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1049,7 +1123,7 @@
 										<small class="ellipsis-text">指定コードで eval するクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1057,7 +1131,7 @@
 										<small class="ellipsis-text">callable から ReflectionFunctionAbstract を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1065,7 +1139,7 @@
 										<small class="ellipsis-text">callable のコードブロックを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1073,7 +1147,7 @@
 										<small class="ellipsis-text">エラーを例外に変換するブロックでコールバックを実行する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1081,7 +1155,7 @@
 										<small class="ellipsis-text">ob_start ～ ob_get_clean のブロックでコールバックを実行する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1089,7 +1163,7 @@
 										<small class="ellipsis-text">$this を bind 可能なクロージャか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1097,7 +1171,7 @@
 										<small class="ellipsis-text">Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1105,7 +1179,7 @@
 										<small class="ellipsis-text">callable を名前付き引数で呼べるようにしたクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1113,7 +1187,7 @@
 										<small class="ellipsis-text">callable の引数の数を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1121,7 +1195,7 @@
 										<small class="ellipsis-text">関数の名前空間部分を除いた短い名前を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1129,7 +1203,7 @@
 										<small class="ellipsis-text">パラメータ定義数に応じて呼び出し引数を可変にしてコールする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1137,7 +1211,7 @@
 										<small class="ellipsis-text">指定クラスのコンストラクタを呼び出すクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1145,7 +1219,7 @@
 										<small class="ellipsis-text">指定メソッドを呼び出すクロージャを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1153,7 +1227,7 @@
 										<small class="ellipsis-text">関数のエイリアスを作成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1171,7 +1245,7 @@
 							<small class="ellipsis-text">数学関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1179,7 +1253,7 @@
 										<small class="ellipsis-text">引数の最小値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1187,7 +1261,7 @@
 										<small class="ellipsis-text">引数の最大値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1195,7 +1269,7 @@
 										<small class="ellipsis-text">引数の最頻値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1203,7 +1277,7 @@
 										<small class="ellipsis-text">引数の相加平均値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1211,7 +1285,7 @@
 										<small class="ellipsis-text">引数の中央値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1219,7 +1293,7 @@
 										<small class="ellipsis-text">引数の意味平均値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1227,7 +1301,7 @@
 										<small class="ellipsis-text">引数の合計値を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1235,7 +1309,7 @@
 										<small class="ellipsis-text">値を一定範囲に収める</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1243,7 +1317,7 @@
 										<small class="ellipsis-text">引数をランダムで返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1251,7 +1325,7 @@
 										<small class="ellipsis-text">一定確率で true を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1269,7 +1343,7 @@
 							<small class="ellipsis-text">ネットワーク関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1277,7 +1351,7 @@
 										<small class="ellipsis-text">接続元となる IP を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1285,7 +1359,7 @@
 										<small class="ellipsis-text">ipv4 の cidr チェック</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1293,7 +1367,7 @@
 										<small class="ellipsis-text">ネットワーク疎通を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1311,15 +1385,15 @@
 							<small class="ellipsis-text">Sql 関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                            								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Sql::KEYWORDS" href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql::KEYWORDS" class="" target="main">KEYWORDS</a>
 										<small class="ellipsis-text">SQL キーワード（全 RDBMS ごちゃまぜ）</small>
 									</div>
 								</li>
-                                                                                    								<li class="indent ">
+                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1327,7 +1401,7 @@
 										<small class="ellipsis-text">ものすごく雑に値をクオートする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1335,7 +1409,7 @@
 										<small class="ellipsis-text">ものすごく雑に SQL に値を埋め込む</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1353,15 +1427,15 @@
 							<small class="ellipsis-text">文字列関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                            								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH" href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH" class="" target="main">JSON_MAX_DEPTH</a>
 										<small class="ellipsis-text">json_*** 関数で $depth 引数を表す定数</small>
 									</div>
 								</li>
-                                                                                    								<li class="indent ">
+                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1369,7 +1443,7 @@
 										<small class="ellipsis-text">文字列結合の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1377,7 +1451,7 @@
 										<small class="ellipsis-text">strcat の空文字回避版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1385,7 +1459,7 @@
 										<small class="ellipsis-text">空文字を除外する文字列分割</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1393,7 +1467,7 @@
 										<small class="ellipsis-text">explode の配列対応と $limit の挙動を変えたもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1401,7 +1475,7 @@
 										<small class="ellipsis-text">エスケープやクオートに対応した explode</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1409,7 +1483,7 @@
 										<small class="ellipsis-text">文字列が最後に現れる位置以前を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1417,7 +1491,7 @@
 										<small class="ellipsis-text">複数の文字列で strpos する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1425,7 +1499,7 @@
 										<small class="ellipsis-text">クオートを考慮して strpos する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1433,7 +1507,7 @@
 										<small class="ellipsis-text">文字列が候補の中にあるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1441,7 +1515,7 @@
 										<small class="ellipsis-text">文字列比較の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1449,7 +1523,7 @@
 										<small class="ellipsis-text">指定文字列を含むか返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1457,7 +1531,7 @@
 										<small class="ellipsis-text">先頭・末尾の指定文字列を削ぎ落とす</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1465,7 +1539,7 @@
 										<small class="ellipsis-text">先頭の指定文字列を削ぎ落とす</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1473,7 +1547,7 @@
 										<small class="ellipsis-text">末尾の指定文字列を削ぎ落とす</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1481,7 +1555,7 @@
 										<small class="ellipsis-text">fputcsv の文字列版（str_getcsv の put 版）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1489,7 +1563,7 @@
 										<small class="ellipsis-text">指定文字列を置換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1497,7 +1571,7 @@
 										<small class="ellipsis-text">指定文字列を置換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1505,7 +1579,7 @@
 										<small class="ellipsis-text">エスケープ付きで文字列を置換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1513,7 +1587,7 @@
 										<small class="ellipsis-text">指定文字で囲まれた文字列を取得する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1521,7 +1595,7 @@
 										<small class="ellipsis-text">文字列を指定幅に丸める</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1529,7 +1603,7 @@
 										<small class="ellipsis-text">テキストの diff を得る</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1537,7 +1611,7 @@
 										<small class="ellipsis-text">指定文字列で始まるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1545,7 +1619,7 @@
 										<small class="ellipsis-text">指定文字列で終わるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1553,7 +1627,7 @@
 										<small class="ellipsis-text">camelCase に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1561,7 +1635,7 @@
 										<small class="ellipsis-text">PascalCase に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1569,7 +1643,7 @@
 										<small class="ellipsis-text">snake_case に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1577,7 +1651,7 @@
 										<small class="ellipsis-text">chain-case に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1585,7 +1659,7 @@
 										<small class="ellipsis-text">文字列を名前空間とローカル名に区切ってタプルで返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1593,7 +1667,7 @@
 										<small class="ellipsis-text">css セレクタから html 文字列を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1601,7 +1675,7 @@
 										<small class="ellipsis-text">parse_uri の逆</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1609,7 +1683,7 @@
 										<small class="ellipsis-text">parse_url の仕様を少しいじったもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1617,7 +1691,7 @@
 										<small class="ellipsis-text">連想配列を INI 的文字列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1625,7 +1699,7 @@
 										<small class="ellipsis-text">INI 的文字列を連想配列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1633,7 +1707,7 @@
 										<small class="ellipsis-text">連想配列の配列を CSV 的文字列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1641,7 +1715,7 @@
 										<small class="ellipsis-text">CSV 的文字列を連想配列の配列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1649,7 +1723,7 @@
 										<small class="ellipsis-text">json_encode のプロキシ関数</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1657,7 +1731,7 @@
 										<small class="ellipsis-text">json_decode のプロキシ関数</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1665,7 +1739,7 @@
 										<small class="ellipsis-text">連想配列を paml 的文字列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1673,7 +1747,7 @@
 										<small class="ellipsis-text">paml 的文字列をパースする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1681,7 +1755,7 @@
 										<small class="ellipsis-text">配列を LTSV 的文字列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1689,7 +1763,7 @@
 										<small class="ellipsis-text">LTSV 的文字列を配列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1697,7 +1771,7 @@
 										<small class="ellipsis-text">連想配列の配列を markdown テーブル文字列にする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1705,7 +1779,7 @@
 										<small class="ellipsis-text">配列を markdown リスト文字列にする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1713,7 +1787,7 @@
 										<small class="ellipsis-text">安全な乱数文字列を生成する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1721,7 +1795,7 @@
 										<small class="ellipsis-text">連想配列を指定できるようにした vsprintf</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1729,7 +1803,7 @@
 										<small class="ellipsis-text">複数マッチに対応した preg_match</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1737,7 +1811,7 @@
 										<small class="ellipsis-text">キャプチャを主軸においた preg_match</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1745,7 +1819,7 @@
 										<small class="ellipsis-text">キャプチャも行える preg_replace</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1753,7 +1827,7 @@
 										<small class="ellipsis-text">パターン番号を指定して preg_replace する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1761,7 +1835,7 @@
 										<small class="ellipsis-text">Damerau–Levenshtein 距離を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1769,7 +1843,7 @@
 										<small class="ellipsis-text">N-gram 化して配列で返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1777,7 +1851,7 @@
 										<small class="ellipsis-text">$string に最も近い文字列を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1785,7 +1859,7 @@
 										<small class="ellipsis-text">文字列を区切り文字で区切って配列に変換する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1793,7 +1867,7 @@
 										<small class="ellipsis-text">マルチバイト対応 substr_replace</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1801,7 +1875,7 @@
 										<small class="ellipsis-text">マルチバイト対応 trim</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1809,7 +1883,7 @@
 										<small class="ellipsis-text">&quot;hoge {$hoge}&quot; 形式のレンダリング</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1817,7 +1891,7 @@
 										<small class="ellipsis-text">&quot;hoge {$hoge}&quot; 形式のレンダリングのファイル版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1825,7 +1899,7 @@
 										<small class="ellipsis-text">変数を extract して include する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1835,23 +1909,23 @@
 								</li>
                                                         -->						</ul>
 					</li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                					<li class="indent text-nowrap holding-wrapper holding-class">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            					<li class="indent text-nowrap holding-wrapper holding-class">
 						<div class="nheader ellipsis">
 							<span class="glyphicon glyphicon-plus switch-holding"></span><span class="label label-icon label-class">C</span>
 							<a id="ryunosuke\Functions\Package\Syntax" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax" class="bold " target="main">Syntax</a>
-							<span>(16)</span>
+							<span>(17)</span>
 							<small class="ellipsis-text">構文関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                            								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Syntax::TOKEN_NAME" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::TOKEN_NAME" class="" target="main">TOKEN_NAME</a>
 										<small class="ellipsis-text">parse_php 関数でトークン名変換をするか</small>
 									</div>
 								</li>
-                                                                                    								<li class="indent ">
+                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1859,7 +1933,7 @@
 										<small class="ellipsis-text">eval のプロキシ関数</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1867,7 +1941,15 @@
 										<small class="ellipsis-text">php のコード断片をパースする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
+									<div class="ellipsis">
+										<span class="label label-icon label-method">M</span
+										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
+										><a id="ryunosuke\Functions\Package\Syntax::indent_php()" href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::indent_php()" class="" target="main">indent_php</a>
+										<small class="ellipsis-text">php のコードのインデントを調整する</small>
+									</div>
+								</li>
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1875,7 +1957,7 @@
 										<small class="ellipsis-text">php のコードをハイライトする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1883,7 +1965,7 @@
 										<small class="ellipsis-text">オブジェクトならそれを、オブジェクトでないなら NullObject を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1891,7 +1973,7 @@
 										<small class="ellipsis-text">関数をメソッドチェーンできるオブジェクトを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1899,7 +1981,7 @@
 										<small class="ellipsis-text">throw の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1907,7 +1989,7 @@
 										<small class="ellipsis-text">条件付き throw</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1915,7 +1997,7 @@
 										<small class="ellipsis-text">値が空なら null を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1923,7 +2005,7 @@
 										<small class="ellipsis-text">条件を満たしたときにコールバックを実行する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1931,7 +2013,7 @@
 										<small class="ellipsis-text">switch 構文の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1939,7 +2021,7 @@
 										<small class="ellipsis-text">例外を握りつぶす try 構文</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1947,7 +2029,7 @@
 										<small class="ellipsis-text">例外が飛んだら例外オブジェクトを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1955,7 +2037,7 @@
 										<small class="ellipsis-text">try ～ catch 構文の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1963,7 +2045,7 @@
 										<small class="ellipsis-text">try ～ finally 構文の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1981,7 +2063,7 @@
 							<small class="ellipsis-text">汎用的なユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1989,7 +2071,7 @@
 										<small class="ellipsis-text">$_FILES の構造を組み替えて $_POST などと同じにする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -1997,7 +2079,7 @@
 										<small class="ellipsis-text">本ライブラリで使用するキャッシュディレクトリを設定する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2005,7 +2087,7 @@
 										<small class="ellipsis-text">シンプルにキャッシュする</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2013,7 +2095,7 @@
 										<small class="ellipsis-text">php ファイルをパースして名前空間配列を返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2021,7 +2103,7 @@
 										<small class="ellipsis-text">エイリアス名を完全修飾名に解決する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2029,7 +2111,7 @@
 										<small class="ellipsis-text">アノテーションっぽい文字列をそれっぽくパースして返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2037,7 +2119,7 @@
 										<small class="ellipsis-text">リソースが ansi color に対応しているか返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2045,7 +2127,7 @@
 										<small class="ellipsis-text">文字列に ANSI Color エスケープシーケンスを埋め込む</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2053,7 +2135,7 @@
 										<small class="ellipsis-text">proc_open ～ proc_close の一連の処理を行う</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2061,7 +2143,7 @@
 										<small class="ellipsis-text">コマンドライン引数をパースして引数とオプションを返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2069,7 +2151,7 @@
 										<small class="ellipsis-text">スタックトレースを文字列で返す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2077,7 +2159,7 @@
 										<small class="ellipsis-text">特定条件までのバックトレースを取得する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2085,7 +2167,7 @@
 										<small class="ellipsis-text">エラー出力する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2093,7 +2175,7 @@
 										<small class="ellipsis-text">エラーハンドラを追加する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2101,7 +2183,7 @@
 										<small class="ellipsis-text">処理時間を計測する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2119,23 +2201,23 @@
 							<small class="ellipsis-text">変数関連のユーティリティ</small>
 						</div>
 						<!-- for lazy load -->
-						<ul class="has-indent holding class-member"><!--                            								<li class="indent ">
+						<ul class="has-indent holding class-member"><!--                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Vars::SI_UNITS" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SI_UNITS" class="" target="main">SI_UNITS</a>
 										<small class="ellipsis-text">SI 接頭辞</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
-										<span class="label label-icon label-constant">C</span
+										<span class="label label-icon label-class-constant">C</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public"></span
 										><a id="ryunosuke\Functions\Package\Vars::SORT_STRICT" href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::SORT_STRICT" class="" target="main">SORT_STRICT</a>
 										<small class="ellipsis-text">SORT_XXX 定数の厳密版</small>
 									</div>
 								</li>
-                                                                                    								<li class="indent ">
+                                                                                    								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2143,7 +2225,7 @@
 										<small class="ellipsis-text">値を何とかして文字列化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2151,7 +2233,7 @@
 										<small class="ellipsis-text">値を何とかして数値化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2159,7 +2241,7 @@
 										<small class="ellipsis-text">値を数値化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2167,7 +2249,7 @@
 										<small class="ellipsis-text">array キャストの関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2175,7 +2257,7 @@
 										<small class="ellipsis-text">配列・ArrayAccess にキーがあるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2183,7 +2265,7 @@
 										<small class="ellipsis-text">数値に SI 接頭辞を付与する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2191,7 +2273,7 @@
 										<small class="ellipsis-text">SI 接頭辞が付与された文字列を数値化する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2199,7 +2281,7 @@
 										<small class="ellipsis-text">値が空か検査する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2207,7 +2289,7 @@
 										<small class="ellipsis-text">値が複合型でないか検査する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2215,7 +2297,7 @@
 										<small class="ellipsis-text">変数が再帰参照を含むか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2223,7 +2305,7 @@
 										<small class="ellipsis-text">変数が文字列化できるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2231,7 +2313,7 @@
 										<small class="ellipsis-text">変数が配列アクセス可能か調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2239,7 +2321,7 @@
 										<small class="ellipsis-text">変数が count でカウントできるか調べる</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2247,7 +2329,7 @@
 										<small class="ellipsis-text">php7 の `` の関数版</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2255,7 +2337,7 @@
 										<small class="ellipsis-text">値の型を取得する（gettype + get_class）</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2263,7 +2345,7 @@
 										<small class="ellipsis-text">値にコールバックを適用する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2271,7 +2353,7 @@
 										<small class="ellipsis-text">配列にコールバックを適用する</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2279,7 +2361,7 @@
 										<small class="ellipsis-text">組み込みの var_export をいい感じにしたもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2287,7 +2369,7 @@
 										<small class="ellipsis-text">var_export2 を html コンテキストに特化させたようなもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2295,7 +2377,7 @@
 										<small class="ellipsis-text">var_dump の出力を見やすくしたもの</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2303,7 +2385,7 @@
 										<small class="ellipsis-text">js の console に値を吐き出す</small>
 									</div>
 								</li>
-                            								<li class="indent ">
+                            								<li class="indent accessible-public ">
 									<div class="ellipsis">
 										<span class="label label-icon label-method">M</span
 										><span class="glyphicon glyphicon-accessible glyphicon-public "></span
@@ -2321,7 +2403,7 @@
 	</li>
             	</ul>
 	<script>
-        $('#search').data('source', ["ryunosuke\\Functions\\Package\\Arrays","ryunosuke\\Functions\\Package\\Arrays::arrays()","ryunosuke\\Functions\\Package\\Arrays::arrayize()","ryunosuke\\Functions\\Package\\Arrays::is_indexarray()","ryunosuke\\Functions\\Package\\Arrays::is_hasharray()","ryunosuke\\Functions\\Package\\Arrays::first_key()","ryunosuke\\Functions\\Package\\Arrays::first_value()","ryunosuke\\Functions\\Package\\Arrays::first_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::last_key()","ryunosuke\\Functions\\Package\\Arrays::last_value()","ryunosuke\\Functions\\Package\\Arrays::last_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::prev_key()","ryunosuke\\Functions\\Package\\Arrays::next_key()","ryunosuke\\Functions\\Package\\Arrays::in_array_and()","ryunosuke\\Functions\\Package\\Arrays::in_array_or()","ryunosuke\\Functions\\Package\\Arrays::kvsort()","ryunosuke\\Functions\\Package\\Arrays::array_add()","ryunosuke\\Functions\\Package\\Arrays::array_mix()","ryunosuke\\Functions\\Package\\Arrays::array_zip()","ryunosuke\\Functions\\Package\\Arrays::array_cross()","ryunosuke\\Functions\\Package\\Arrays::array_implode()","ryunosuke\\Functions\\Package\\Arrays::array_explode()","ryunosuke\\Functions\\Package\\Arrays::array_sprintf()","ryunosuke\\Functions\\Package\\Arrays::array_strpad()","ryunosuke\\Functions\\Package\\Arrays::array_pos()","ryunosuke\\Functions\\Package\\Arrays::array_pos_key()","ryunosuke\\Functions\\Package\\Arrays::array_of()","ryunosuke\\Functions\\Package\\Arrays::array_get()","ryunosuke\\Functions\\Package\\Arrays::array_set()","ryunosuke\\Functions\\Package\\Arrays::array_put()","ryunosuke\\Functions\\Package\\Arrays::array_unset()","ryunosuke\\Functions\\Package\\Arrays::array_dive()","ryunosuke\\Functions\\Package\\Arrays::array_keys_exist()","ryunosuke\\Functions\\Package\\Arrays::array_find()","ryunosuke\\Functions\\Package\\Arrays::array_rekey()","ryunosuke\\Functions\\Package\\Arrays::array_grep_key()","ryunosuke\\Functions\\Package\\Arrays::array_map_recursive()","ryunosuke\\Functions\\Package\\Arrays::array_map_key()","ryunosuke\\Functions\\Package\\Arrays::array_filter_key()","ryunosuke\\Functions\\Package\\Arrays::array_where()","ryunosuke\\Functions\\Package\\Arrays::array_map_filter()","ryunosuke\\Functions\\Package\\Arrays::array_map_method()","ryunosuke\\Functions\\Package\\Arrays::array_maps()","ryunosuke\\Functions\\Package\\Arrays::array_kmap()","ryunosuke\\Functions\\Package\\Arrays::array_nmap()","ryunosuke\\Functions\\Package\\Arrays::array_lmap()","ryunosuke\\Functions\\Package\\Arrays::array_rmap()","ryunosuke\\Functions\\Package\\Arrays::array_each()","ryunosuke\\Functions\\Package\\Arrays::array_depth()","ryunosuke\\Functions\\Package\\Arrays::array_insert()","ryunosuke\\Functions\\Package\\Arrays::array_assort()","ryunosuke\\Functions\\Package\\Arrays::array_count()","ryunosuke\\Functions\\Package\\Arrays::array_group()","ryunosuke\\Functions\\Package\\Arrays::array_aggregate()","ryunosuke\\Functions\\Package\\Arrays::array_all()","ryunosuke\\Functions\\Package\\Arrays::array_any()","ryunosuke\\Functions\\Package\\Arrays::array_distinct()","ryunosuke\\Functions\\Package\\Arrays::array_order()","ryunosuke\\Functions\\Package\\Arrays::array_shuffle()","ryunosuke\\Functions\\Package\\Arrays::array_shrink_key()","ryunosuke\\Functions\\Package\\Arrays::array_fill_gap()","ryunosuke\\Functions\\Package\\Arrays::array_fill_callback()","ryunosuke\\Functions\\Package\\Arrays::array_pickup()","ryunosuke\\Functions\\Package\\Arrays::array_remove()","ryunosuke\\Functions\\Package\\Arrays::array_lookup()","ryunosuke\\Functions\\Package\\Arrays::array_columns()","ryunosuke\\Functions\\Package\\Arrays::array_uncolumns()","ryunosuke\\Functions\\Package\\Arrays::array_convert()","ryunosuke\\Functions\\Package\\Arrays::array_flatten()","ryunosuke\\Functions\\Package\\Arrays::array_nest()","ryunosuke\\Functions\\Package\\Arrays::array_difference()","ryunosuke\\Functions\\Package\\Classobj","ryunosuke\\Functions\\Package\\Classobj::IS_OWNSELF","ryunosuke\\Functions\\Package\\Classobj::IS_PUBLIC","ryunosuke\\Functions\\Package\\Classobj::IS_PROTECTED","ryunosuke\\Functions\\Package\\Classobj::IS_PRIVATE","ryunosuke\\Functions\\Package\\Classobj::stdclass()","ryunosuke\\Functions\\Package\\Classobj::detect_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_uses_all()","ryunosuke\\Functions\\Package\\Classobj::class_loader()","ryunosuke\\Functions\\Package\\Classobj::class_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_shorten()","ryunosuke\\Functions\\Package\\Classobj::class_replace()","ryunosuke\\Functions\\Package\\Classobj::class_extends()","ryunosuke\\Functions\\Package\\Classobj::const_exists()","ryunosuke\\Functions\\Package\\Classobj::object_dive()","ryunosuke\\Functions\\Package\\Classobj::get_class_constants()","ryunosuke\\Functions\\Package\\Classobj::get_object_properties()","ryunosuke\\Functions\\Package\\Date","ryunosuke\\Functions\\Package\\Date::JP_ERA","ryunosuke\\Functions\\Package\\Date::date_timestamp()","ryunosuke\\Functions\\Package\\Date::date_convert()","ryunosuke\\Functions\\Package\\Date::date_interval()","ryunosuke\\Functions\\Package\\FileSystem","ryunosuke\\Functions\\Package\\FileSystem::file_list()","ryunosuke\\Functions\\Package\\FileSystem::file_tree()","ryunosuke\\Functions\\Package\\FileSystem::file_suffix()","ryunosuke\\Functions\\Package\\FileSystem::file_extension()","ryunosuke\\Functions\\Package\\FileSystem::file_set_contents()","ryunosuke\\Functions\\Package\\FileSystem::file_rewrite_contents()","ryunosuke\\Functions\\Package\\FileSystem::mkdir_p()","ryunosuke\\Functions\\Package\\FileSystem::dirname_r()","ryunosuke\\Functions\\Package\\FileSystem::dirmtime()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_and()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_or()","ryunosuke\\Functions\\Package\\FileSystem::path_is_absolute()","ryunosuke\\Functions\\Package\\FileSystem::path_resolve()","ryunosuke\\Functions\\Package\\FileSystem::path_normalize()","ryunosuke\\Functions\\Package\\FileSystem::cp_rf()","ryunosuke\\Functions\\Package\\FileSystem::rm_rf()","ryunosuke\\Functions\\Package\\FileSystem::tmpname()","ryunosuke\\Functions\\Package\\FileSystem::memory_path()","ryunosuke\\Functions\\Package\\Funchand","ryunosuke\\Functions\\Package\\Funchand::delegate()","ryunosuke\\Functions\\Package\\Funchand::abind()","ryunosuke\\Functions\\Package\\Funchand::nbind()","ryunosuke\\Functions\\Package\\Funchand::lbind()","ryunosuke\\Functions\\Package\\Funchand::rbind()","ryunosuke\\Functions\\Package\\Funchand::ope_func()","ryunosuke\\Functions\\Package\\Funchand::not_func()","ryunosuke\\Functions\\Package\\Funchand::eval_func()","ryunosuke\\Functions\\Package\\Funchand::reflect_callable()","ryunosuke\\Functions\\Package\\Funchand::callable_code()","ryunosuke\\Functions\\Package\\Funchand::call_safely()","ryunosuke\\Functions\\Package\\Funchand::ob_capture()","ryunosuke\\Functions\\Package\\Funchand::is_bindable_closure()","ryunosuke\\Functions\\Package\\Funchand::by_builtin()","ryunosuke\\Functions\\Package\\Funchand::namedcallize()","ryunosuke\\Functions\\Package\\Funchand::parameter_length()","ryunosuke\\Functions\\Package\\Funchand::function_shorten()","ryunosuke\\Functions\\Package\\Funchand::func_user_func_array()","ryunosuke\\Functions\\Package\\Funchand::func_new()","ryunosuke\\Functions\\Package\\Funchand::func_method()","ryunosuke\\Functions\\Package\\Funchand::function_alias()","ryunosuke\\Functions\\Package\\Funchand::function_parameter()","ryunosuke\\Functions\\Package\\Math","ryunosuke\\Functions\\Package\\Math::minimum()","ryunosuke\\Functions\\Package\\Math::maximum()","ryunosuke\\Functions\\Package\\Math::mode()","ryunosuke\\Functions\\Package\\Math::mean()","ryunosuke\\Functions\\Package\\Math::median()","ryunosuke\\Functions\\Package\\Math::average()","ryunosuke\\Functions\\Package\\Math::sum()","ryunosuke\\Functions\\Package\\Math::clamp()","ryunosuke\\Functions\\Package\\Math::random_at()","ryunosuke\\Functions\\Package\\Math::probability()","ryunosuke\\Functions\\Package\\Math::normal_rand()","ryunosuke\\Functions\\Package\\Network","ryunosuke\\Functions\\Package\\Network::getipaddress()","ryunosuke\\Functions\\Package\\Network::incidr()","ryunosuke\\Functions\\Package\\Network::ping()","ryunosuke\\Functions\\Package\\Network::http_requests()","ryunosuke\\Functions\\Package\\Sql","ryunosuke\\Functions\\Package\\Sql::KEYWORDS","ryunosuke\\Functions\\Package\\Sql::sql_quote()","ryunosuke\\Functions\\Package\\Sql::sql_bind()","ryunosuke\\Functions\\Package\\Sql::sql_format()","ryunosuke\\Functions\\Package\\Strings","ryunosuke\\Functions\\Package\\Strings::JSON_MAX_DEPTH","ryunosuke\\Functions\\Package\\Strings::strcat()","ryunosuke\\Functions\\Package\\Strings::concat()","ryunosuke\\Functions\\Package\\Strings::split_noempty()","ryunosuke\\Functions\\Package\\Strings::multiexplode()","ryunosuke\\Functions\\Package\\Strings::quoteexplode()","ryunosuke\\Functions\\Package\\Strings::strrstr()","ryunosuke\\Functions\\Package\\Strings::strpos_array()","ryunosuke\\Functions\\Package\\Strings::strpos_quoted()","ryunosuke\\Functions\\Package\\Strings::str_anyof()","ryunosuke\\Functions\\Package\\Strings::str_equals()","ryunosuke\\Functions\\Package\\Strings::str_contains()","ryunosuke\\Functions\\Package\\Strings::str_chop()","ryunosuke\\Functions\\Package\\Strings::str_lchop()","ryunosuke\\Functions\\Package\\Strings::str_rchop()","ryunosuke\\Functions\\Package\\Strings::str_putcsv()","ryunosuke\\Functions\\Package\\Strings::str_subreplace()","ryunosuke\\Functions\\Package\\Strings::str_submap()","ryunosuke\\Functions\\Package\\Strings::str_embed()","ryunosuke\\Functions\\Package\\Strings::str_between()","ryunosuke\\Functions\\Package\\Strings::str_ellipsis()","ryunosuke\\Functions\\Package\\Strings::str_diff()","ryunosuke\\Functions\\Package\\Strings::starts_with()","ryunosuke\\Functions\\Package\\Strings::ends_with()","ryunosuke\\Functions\\Package\\Strings::camel_case()","ryunosuke\\Functions\\Package\\Strings::pascal_case()","ryunosuke\\Functions\\Package\\Strings::snake_case()","ryunosuke\\Functions\\Package\\Strings::chain_case()","ryunosuke\\Functions\\Package\\Strings::namespace_split()","ryunosuke\\Functions\\Package\\Strings::htmltag()","ryunosuke\\Functions\\Package\\Strings::build_uri()","ryunosuke\\Functions\\Package\\Strings::parse_uri()","ryunosuke\\Functions\\Package\\Strings::ini_export()","ryunosuke\\Functions\\Package\\Strings::ini_import()","ryunosuke\\Functions\\Package\\Strings::csv_export()","ryunosuke\\Functions\\Package\\Strings::csv_import()","ryunosuke\\Functions\\Package\\Strings::json_export()","ryunosuke\\Functions\\Package\\Strings::json_import()","ryunosuke\\Functions\\Package\\Strings::paml_export()","ryunosuke\\Functions\\Package\\Strings::paml_import()","ryunosuke\\Functions\\Package\\Strings::ltsv_export()","ryunosuke\\Functions\\Package\\Strings::ltsv_import()","ryunosuke\\Functions\\Package\\Strings::markdown_table()","ryunosuke\\Functions\\Package\\Strings::markdown_list()","ryunosuke\\Functions\\Package\\Strings::random_string()","ryunosuke\\Functions\\Package\\Strings::kvsprintf()","ryunosuke\\Functions\\Package\\Strings::preg_matches()","ryunosuke\\Functions\\Package\\Strings::preg_capture()","ryunosuke\\Functions\\Package\\Strings::preg_splice()","ryunosuke\\Functions\\Package\\Strings::preg_replaces()","ryunosuke\\Functions\\Package\\Strings::damerau_levenshtein()","ryunosuke\\Functions\\Package\\Strings::ngram()","ryunosuke\\Functions\\Package\\Strings::str_guess()","ryunosuke\\Functions\\Package\\Strings::str_array()","ryunosuke\\Functions\\Package\\Strings::mb_substr_replace()","ryunosuke\\Functions\\Package\\Strings::mb_trim()","ryunosuke\\Functions\\Package\\Strings::render_string()","ryunosuke\\Functions\\Package\\Strings::render_file()","ryunosuke\\Functions\\Package\\Strings::ob_include()","ryunosuke\\Functions\\Package\\Strings::include_string()","ryunosuke\\Functions\\Package\\Syntax","ryunosuke\\Functions\\Package\\Syntax::TOKEN_NAME","ryunosuke\\Functions\\Package\\Syntax::evaluate()","ryunosuke\\Functions\\Package\\Syntax::parse_php()","ryunosuke\\Functions\\Package\\Syntax::highlight_php()","ryunosuke\\Functions\\Package\\Syntax::optional()","ryunosuke\\Functions\\Package\\Syntax::chain()","ryunosuke\\Functions\\Package\\Syntax::throws()","ryunosuke\\Functions\\Package\\Syntax::throw_if()","ryunosuke\\Functions\\Package\\Syntax::blank_if()","ryunosuke\\Functions\\Package\\Syntax::call_if()","ryunosuke\\Functions\\Package\\Syntax::switchs()","ryunosuke\\Functions\\Package\\Syntax::try_null()","ryunosuke\\Functions\\Package\\Syntax::try_return()","ryunosuke\\Functions\\Package\\Syntax::try_catch()","ryunosuke\\Functions\\Package\\Syntax::try_finally()","ryunosuke\\Functions\\Package\\Syntax::try_catch_finally()","ryunosuke\\Functions\\Package\\Utility","ryunosuke\\Functions\\Package\\Utility::get_uploaded_files()","ryunosuke\\Functions\\Package\\Utility::cachedir()","ryunosuke\\Functions\\Package\\Utility::cache()","ryunosuke\\Functions\\Package\\Utility::parse_namespace()","ryunosuke\\Functions\\Package\\Utility::resolve_symbol()","ryunosuke\\Functions\\Package\\Utility::parse_annotation()","ryunosuke\\Functions\\Package\\Utility::is_ansi()","ryunosuke\\Functions\\Package\\Utility::ansi_colorize()","ryunosuke\\Functions\\Package\\Utility::process()","ryunosuke\\Functions\\Package\\Utility::arguments()","ryunosuke\\Functions\\Package\\Utility::stacktrace()","ryunosuke\\Functions\\Package\\Utility::backtrace()","ryunosuke\\Functions\\Package\\Utility::error()","ryunosuke\\Functions\\Package\\Utility::add_error_handler()","ryunosuke\\Functions\\Package\\Utility::timer()","ryunosuke\\Functions\\Package\\Utility::benchmark()","ryunosuke\\Functions\\Package\\Vars","ryunosuke\\Functions\\Package\\Vars::SI_UNITS","ryunosuke\\Functions\\Package\\Vars::SORT_STRICT","ryunosuke\\Functions\\Package\\Vars::stringify()","ryunosuke\\Functions\\Package\\Vars::numberify()","ryunosuke\\Functions\\Package\\Vars::numval()","ryunosuke\\Functions\\Package\\Vars::arrayval()","ryunosuke\\Functions\\Package\\Vars::arrayable_key_exists()","ryunosuke\\Functions\\Package\\Vars::si_prefix()","ryunosuke\\Functions\\Package\\Vars::si_unprefix()","ryunosuke\\Functions\\Package\\Vars::is_empty()","ryunosuke\\Functions\\Package\\Vars::is_primitive()","ryunosuke\\Functions\\Package\\Vars::is_recursive()","ryunosuke\\Functions\\Package\\Vars::is_stringable()","ryunosuke\\Functions\\Package\\Vars::is_arrayable()","ryunosuke\\Functions\\Package\\Vars::is_countable()","ryunosuke\\Functions\\Package\\Vars::varcmp()","ryunosuke\\Functions\\Package\\Vars::var_type()","ryunosuke\\Functions\\Package\\Vars::var_apply()","ryunosuke\\Functions\\Package\\Vars::var_applys()","ryunosuke\\Functions\\Package\\Vars::var_export2()","ryunosuke\\Functions\\Package\\Vars::var_html()","ryunosuke\\Functions\\Package\\Vars::var_pretty()","ryunosuke\\Functions\\Package\\Vars::console_log()","ryunosuke\\Functions\\Package\\Vars::hashvar()"]);
+        $('#search').data('source', ["ryunosuke\\Functions\\Package\\Arrays","ryunosuke\\Functions\\Package\\Arrays::arrays()","ryunosuke\\Functions\\Package\\Arrays::arrayize()","ryunosuke\\Functions\\Package\\Arrays::is_indexarray()","ryunosuke\\Functions\\Package\\Arrays::is_hasharray()","ryunosuke\\Functions\\Package\\Arrays::first_key()","ryunosuke\\Functions\\Package\\Arrays::first_value()","ryunosuke\\Functions\\Package\\Arrays::first_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::last_key()","ryunosuke\\Functions\\Package\\Arrays::last_value()","ryunosuke\\Functions\\Package\\Arrays::last_keyvalue()","ryunosuke\\Functions\\Package\\Arrays::prev_key()","ryunosuke\\Functions\\Package\\Arrays::next_key()","ryunosuke\\Functions\\Package\\Arrays::in_array_and()","ryunosuke\\Functions\\Package\\Arrays::in_array_or()","ryunosuke\\Functions\\Package\\Arrays::kvsort()","ryunosuke\\Functions\\Package\\Arrays::array_add()","ryunosuke\\Functions\\Package\\Arrays::array_mix()","ryunosuke\\Functions\\Package\\Arrays::array_zip()","ryunosuke\\Functions\\Package\\Arrays::array_cross()","ryunosuke\\Functions\\Package\\Arrays::array_implode()","ryunosuke\\Functions\\Package\\Arrays::array_explode()","ryunosuke\\Functions\\Package\\Arrays::array_sprintf()","ryunosuke\\Functions\\Package\\Arrays::array_strpad()","ryunosuke\\Functions\\Package\\Arrays::array_pos()","ryunosuke\\Functions\\Package\\Arrays::array_pos_key()","ryunosuke\\Functions\\Package\\Arrays::array_of()","ryunosuke\\Functions\\Package\\Arrays::array_get()","ryunosuke\\Functions\\Package\\Arrays::array_set()","ryunosuke\\Functions\\Package\\Arrays::array_put()","ryunosuke\\Functions\\Package\\Arrays::array_unset()","ryunosuke\\Functions\\Package\\Arrays::array_dive()","ryunosuke\\Functions\\Package\\Arrays::array_keys_exist()","ryunosuke\\Functions\\Package\\Arrays::array_find()","ryunosuke\\Functions\\Package\\Arrays::array_rekey()","ryunosuke\\Functions\\Package\\Arrays::array_grep_key()","ryunosuke\\Functions\\Package\\Arrays::array_map_recursive()","ryunosuke\\Functions\\Package\\Arrays::array_map_key()","ryunosuke\\Functions\\Package\\Arrays::array_filter_key()","ryunosuke\\Functions\\Package\\Arrays::array_where()","ryunosuke\\Functions\\Package\\Arrays::array_map_filter()","ryunosuke\\Functions\\Package\\Arrays::array_map_method()","ryunosuke\\Functions\\Package\\Arrays::array_maps()","ryunosuke\\Functions\\Package\\Arrays::array_kvmap()","ryunosuke\\Functions\\Package\\Arrays::array_kmap()","ryunosuke\\Functions\\Package\\Arrays::array_nmap()","ryunosuke\\Functions\\Package\\Arrays::array_lmap()","ryunosuke\\Functions\\Package\\Arrays::array_rmap()","ryunosuke\\Functions\\Package\\Arrays::array_each()","ryunosuke\\Functions\\Package\\Arrays::array_depth()","ryunosuke\\Functions\\Package\\Arrays::array_insert()","ryunosuke\\Functions\\Package\\Arrays::array_assort()","ryunosuke\\Functions\\Package\\Arrays::array_count()","ryunosuke\\Functions\\Package\\Arrays::array_group()","ryunosuke\\Functions\\Package\\Arrays::array_aggregate()","ryunosuke\\Functions\\Package\\Arrays::array_all()","ryunosuke\\Functions\\Package\\Arrays::array_any()","ryunosuke\\Functions\\Package\\Arrays::array_distinct()","ryunosuke\\Functions\\Package\\Arrays::array_order()","ryunosuke\\Functions\\Package\\Arrays::array_shuffle()","ryunosuke\\Functions\\Package\\Arrays::array_shrink_key()","ryunosuke\\Functions\\Package\\Arrays::array_fill_gap()","ryunosuke\\Functions\\Package\\Arrays::array_fill_callback()","ryunosuke\\Functions\\Package\\Arrays::array_pickup()","ryunosuke\\Functions\\Package\\Arrays::array_remove()","ryunosuke\\Functions\\Package\\Arrays::array_lookup()","ryunosuke\\Functions\\Package\\Arrays::array_columns()","ryunosuke\\Functions\\Package\\Arrays::array_uncolumns()","ryunosuke\\Functions\\Package\\Arrays::array_convert()","ryunosuke\\Functions\\Package\\Arrays::array_flatten()","ryunosuke\\Functions\\Package\\Arrays::array_nest()","ryunosuke\\Functions\\Package\\Arrays::array_difference()","ryunosuke\\Functions\\Package\\Classobj","ryunosuke\\Functions\\Package\\Classobj::IS_OWNSELF","ryunosuke\\Functions\\Package\\Classobj::IS_PUBLIC","ryunosuke\\Functions\\Package\\Classobj::IS_PROTECTED","ryunosuke\\Functions\\Package\\Classobj::IS_PRIVATE","ryunosuke\\Functions\\Package\\Classobj::stdclass()","ryunosuke\\Functions\\Package\\Classobj::detect_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_uses_all()","ryunosuke\\Functions\\Package\\Classobj::class_loader()","ryunosuke\\Functions\\Package\\Classobj::class_namespace()","ryunosuke\\Functions\\Package\\Classobj::class_shorten()","ryunosuke\\Functions\\Package\\Classobj::class_replace()","ryunosuke\\Functions\\Package\\Classobj::class_extends()","ryunosuke\\Functions\\Package\\Classobj::const_exists()","ryunosuke\\Functions\\Package\\Classobj::object_dive()","ryunosuke\\Functions\\Package\\Classobj::get_class_constants()","ryunosuke\\Functions\\Package\\Classobj::get_object_properties()","ryunosuke\\Functions\\Package\\Date","ryunosuke\\Functions\\Package\\Date::JP_ERA","ryunosuke\\Functions\\Package\\Date::date_timestamp()","ryunosuke\\Functions\\Package\\Date::date_convert()","ryunosuke\\Functions\\Package\\Date::date_fromto()","ryunosuke\\Functions\\Package\\Date::date_interval()","ryunosuke\\Functions\\Package\\FileSystem","ryunosuke\\Functions\\Package\\FileSystem::file_list()","ryunosuke\\Functions\\Package\\FileSystem::file_tree()","ryunosuke\\Functions\\Package\\FileSystem::file_suffix()","ryunosuke\\Functions\\Package\\FileSystem::file_extension()","ryunosuke\\Functions\\Package\\FileSystem::file_set_contents()","ryunosuke\\Functions\\Package\\FileSystem::file_rewrite_contents()","ryunosuke\\Functions\\Package\\FileSystem::mkdir_p()","ryunosuke\\Functions\\Package\\FileSystem::dirname_r()","ryunosuke\\Functions\\Package\\FileSystem::dirmtime()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_and()","ryunosuke\\Functions\\Package\\FileSystem::fnmatch_or()","ryunosuke\\Functions\\Package\\FileSystem::path_is_absolute()","ryunosuke\\Functions\\Package\\FileSystem::path_resolve()","ryunosuke\\Functions\\Package\\FileSystem::path_normalize()","ryunosuke\\Functions\\Package\\FileSystem::cp_rf()","ryunosuke\\Functions\\Package\\FileSystem::rm_rf()","ryunosuke\\Functions\\Package\\FileSystem::tmpname()","ryunosuke\\Functions\\Package\\FileSystem::memory_path()","ryunosuke\\Functions\\Package\\Funchand","ryunosuke\\Functions\\Package\\Funchand::delegate()","ryunosuke\\Functions\\Package\\Funchand::abind()","ryunosuke\\Functions\\Package\\Funchand::nbind()","ryunosuke\\Functions\\Package\\Funchand::lbind()","ryunosuke\\Functions\\Package\\Funchand::rbind()","ryunosuke\\Functions\\Package\\Funchand::ope_func()","ryunosuke\\Functions\\Package\\Funchand::not_func()","ryunosuke\\Functions\\Package\\Funchand::eval_func()","ryunosuke\\Functions\\Package\\Funchand::reflect_callable()","ryunosuke\\Functions\\Package\\Funchand::callable_code()","ryunosuke\\Functions\\Package\\Funchand::call_safely()","ryunosuke\\Functions\\Package\\Funchand::ob_capture()","ryunosuke\\Functions\\Package\\Funchand::is_bindable_closure()","ryunosuke\\Functions\\Package\\Funchand::by_builtin()","ryunosuke\\Functions\\Package\\Funchand::namedcallize()","ryunosuke\\Functions\\Package\\Funchand::parameter_length()","ryunosuke\\Functions\\Package\\Funchand::function_shorten()","ryunosuke\\Functions\\Package\\Funchand::func_user_func_array()","ryunosuke\\Functions\\Package\\Funchand::func_new()","ryunosuke\\Functions\\Package\\Funchand::func_method()","ryunosuke\\Functions\\Package\\Funchand::function_alias()","ryunosuke\\Functions\\Package\\Funchand::function_parameter()","ryunosuke\\Functions\\Package\\Math","ryunosuke\\Functions\\Package\\Math::minimum()","ryunosuke\\Functions\\Package\\Math::maximum()","ryunosuke\\Functions\\Package\\Math::mode()","ryunosuke\\Functions\\Package\\Math::mean()","ryunosuke\\Functions\\Package\\Math::median()","ryunosuke\\Functions\\Package\\Math::average()","ryunosuke\\Functions\\Package\\Math::sum()","ryunosuke\\Functions\\Package\\Math::clamp()","ryunosuke\\Functions\\Package\\Math::random_at()","ryunosuke\\Functions\\Package\\Math::probability()","ryunosuke\\Functions\\Package\\Math::normal_rand()","ryunosuke\\Functions\\Package\\Network","ryunosuke\\Functions\\Package\\Network::getipaddress()","ryunosuke\\Functions\\Package\\Network::incidr()","ryunosuke\\Functions\\Package\\Network::ping()","ryunosuke\\Functions\\Package\\Network::http_requests()","ryunosuke\\Functions\\Package\\Sql","ryunosuke\\Functions\\Package\\Sql::KEYWORDS","ryunosuke\\Functions\\Package\\Sql::sql_quote()","ryunosuke\\Functions\\Package\\Sql::sql_bind()","ryunosuke\\Functions\\Package\\Sql::sql_format()","ryunosuke\\Functions\\Package\\Strings","ryunosuke\\Functions\\Package\\Strings::JSON_MAX_DEPTH","ryunosuke\\Functions\\Package\\Strings::strcat()","ryunosuke\\Functions\\Package\\Strings::concat()","ryunosuke\\Functions\\Package\\Strings::split_noempty()","ryunosuke\\Functions\\Package\\Strings::multiexplode()","ryunosuke\\Functions\\Package\\Strings::quoteexplode()","ryunosuke\\Functions\\Package\\Strings::strrstr()","ryunosuke\\Functions\\Package\\Strings::strpos_array()","ryunosuke\\Functions\\Package\\Strings::strpos_quoted()","ryunosuke\\Functions\\Package\\Strings::str_anyof()","ryunosuke\\Functions\\Package\\Strings::str_equals()","ryunosuke\\Functions\\Package\\Strings::str_contains()","ryunosuke\\Functions\\Package\\Strings::str_chop()","ryunosuke\\Functions\\Package\\Strings::str_lchop()","ryunosuke\\Functions\\Package\\Strings::str_rchop()","ryunosuke\\Functions\\Package\\Strings::str_putcsv()","ryunosuke\\Functions\\Package\\Strings::str_subreplace()","ryunosuke\\Functions\\Package\\Strings::str_submap()","ryunosuke\\Functions\\Package\\Strings::str_embed()","ryunosuke\\Functions\\Package\\Strings::str_between()","ryunosuke\\Functions\\Package\\Strings::str_ellipsis()","ryunosuke\\Functions\\Package\\Strings::str_diff()","ryunosuke\\Functions\\Package\\Strings::starts_with()","ryunosuke\\Functions\\Package\\Strings::ends_with()","ryunosuke\\Functions\\Package\\Strings::camel_case()","ryunosuke\\Functions\\Package\\Strings::pascal_case()","ryunosuke\\Functions\\Package\\Strings::snake_case()","ryunosuke\\Functions\\Package\\Strings::chain_case()","ryunosuke\\Functions\\Package\\Strings::namespace_split()","ryunosuke\\Functions\\Package\\Strings::htmltag()","ryunosuke\\Functions\\Package\\Strings::build_uri()","ryunosuke\\Functions\\Package\\Strings::parse_uri()","ryunosuke\\Functions\\Package\\Strings::ini_export()","ryunosuke\\Functions\\Package\\Strings::ini_import()","ryunosuke\\Functions\\Package\\Strings::csv_export()","ryunosuke\\Functions\\Package\\Strings::csv_import()","ryunosuke\\Functions\\Package\\Strings::json_export()","ryunosuke\\Functions\\Package\\Strings::json_import()","ryunosuke\\Functions\\Package\\Strings::paml_export()","ryunosuke\\Functions\\Package\\Strings::paml_import()","ryunosuke\\Functions\\Package\\Strings::ltsv_export()","ryunosuke\\Functions\\Package\\Strings::ltsv_import()","ryunosuke\\Functions\\Package\\Strings::markdown_table()","ryunosuke\\Functions\\Package\\Strings::markdown_list()","ryunosuke\\Functions\\Package\\Strings::random_string()","ryunosuke\\Functions\\Package\\Strings::kvsprintf()","ryunosuke\\Functions\\Package\\Strings::preg_matches()","ryunosuke\\Functions\\Package\\Strings::preg_capture()","ryunosuke\\Functions\\Package\\Strings::preg_splice()","ryunosuke\\Functions\\Package\\Strings::preg_replaces()","ryunosuke\\Functions\\Package\\Strings::damerau_levenshtein()","ryunosuke\\Functions\\Package\\Strings::ngram()","ryunosuke\\Functions\\Package\\Strings::str_guess()","ryunosuke\\Functions\\Package\\Strings::str_array()","ryunosuke\\Functions\\Package\\Strings::mb_substr_replace()","ryunosuke\\Functions\\Package\\Strings::mb_trim()","ryunosuke\\Functions\\Package\\Strings::render_string()","ryunosuke\\Functions\\Package\\Strings::render_file()","ryunosuke\\Functions\\Package\\Strings::ob_include()","ryunosuke\\Functions\\Package\\Strings::include_string()","ryunosuke\\Functions\\Package\\Syntax","ryunosuke\\Functions\\Package\\Syntax::TOKEN_NAME","ryunosuke\\Functions\\Package\\Syntax::evaluate()","ryunosuke\\Functions\\Package\\Syntax::parse_php()","ryunosuke\\Functions\\Package\\Syntax::indent_php()","ryunosuke\\Functions\\Package\\Syntax::highlight_php()","ryunosuke\\Functions\\Package\\Syntax::optional()","ryunosuke\\Functions\\Package\\Syntax::chain()","ryunosuke\\Functions\\Package\\Syntax::throws()","ryunosuke\\Functions\\Package\\Syntax::throw_if()","ryunosuke\\Functions\\Package\\Syntax::blank_if()","ryunosuke\\Functions\\Package\\Syntax::call_if()","ryunosuke\\Functions\\Package\\Syntax::switchs()","ryunosuke\\Functions\\Package\\Syntax::try_null()","ryunosuke\\Functions\\Package\\Syntax::try_return()","ryunosuke\\Functions\\Package\\Syntax::try_catch()","ryunosuke\\Functions\\Package\\Syntax::try_finally()","ryunosuke\\Functions\\Package\\Syntax::try_catch_finally()","ryunosuke\\Functions\\Package\\Utility","ryunosuke\\Functions\\Package\\Utility::get_uploaded_files()","ryunosuke\\Functions\\Package\\Utility::cachedir()","ryunosuke\\Functions\\Package\\Utility::cache()","ryunosuke\\Functions\\Package\\Utility::parse_namespace()","ryunosuke\\Functions\\Package\\Utility::resolve_symbol()","ryunosuke\\Functions\\Package\\Utility::parse_annotation()","ryunosuke\\Functions\\Package\\Utility::is_ansi()","ryunosuke\\Functions\\Package\\Utility::ansi_colorize()","ryunosuke\\Functions\\Package\\Utility::process()","ryunosuke\\Functions\\Package\\Utility::arguments()","ryunosuke\\Functions\\Package\\Utility::stacktrace()","ryunosuke\\Functions\\Package\\Utility::backtrace()","ryunosuke\\Functions\\Package\\Utility::error()","ryunosuke\\Functions\\Package\\Utility::add_error_handler()","ryunosuke\\Functions\\Package\\Utility::timer()","ryunosuke\\Functions\\Package\\Utility::benchmark()","ryunosuke\\Functions\\Package\\Vars","ryunosuke\\Functions\\Package\\Vars::SI_UNITS","ryunosuke\\Functions\\Package\\Vars::SORT_STRICT","ryunosuke\\Functions\\Package\\Vars::stringify()","ryunosuke\\Functions\\Package\\Vars::numberify()","ryunosuke\\Functions\\Package\\Vars::numval()","ryunosuke\\Functions\\Package\\Vars::arrayval()","ryunosuke\\Functions\\Package\\Vars::arrayable_key_exists()","ryunosuke\\Functions\\Package\\Vars::si_prefix()","ryunosuke\\Functions\\Package\\Vars::si_unprefix()","ryunosuke\\Functions\\Package\\Vars::is_empty()","ryunosuke\\Functions\\Package\\Vars::is_primitive()","ryunosuke\\Functions\\Package\\Vars::is_recursive()","ryunosuke\\Functions\\Package\\Vars::is_stringable()","ryunosuke\\Functions\\Package\\Vars::is_arrayable()","ryunosuke\\Functions\\Package\\Vars::is_countable()","ryunosuke\\Functions\\Package\\Vars::varcmp()","ryunosuke\\Functions\\Package\\Vars::var_type()","ryunosuke\\Functions\\Package\\Vars::var_apply()","ryunosuke\\Functions\\Package\\Vars::var_applys()","ryunosuke\\Functions\\Package\\Vars::var_export2()","ryunosuke\\Functions\\Package\\Vars::var_html()","ryunosuke\\Functions\\Package\\Vars::var_pretty()","ryunosuke\\Functions\\Package\\Vars::console_log()","ryunosuke\\Functions\\Package\\Vars::hashvar()"]);
 	</script>
 </div>
 </body>

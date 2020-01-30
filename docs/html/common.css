@@ -100,6 +100,10 @@ h6 {
     margin: 2px 0;
 }
 
+legend {
+    margin-bottom: 12px;
+}
+
 hr {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -112,6 +116,10 @@ pre {
 small {
     font-size: 81% !important;
     color: #555;
+}
+
+label {
+    margin-bottom: 0;
 }
 
 var {
@@ -163,7 +171,8 @@ ul > li {
     display: none;
 }
 
-.switch-holding {
+.switch-holding,
+.switch-config {
     cursor: pointer;
 }
 
@@ -235,9 +244,20 @@ ul > li {
 
 /* usecase */
 
+.config {
+    position: fixed;
+    top: 40px;
+    background: #eee;
+    width: 100%;
+    height: calc(100% - 40px);
+    padding: 0.7em;
+    z-index: 9992;
+}
+
 .main-wrapper {
     padding: 0 0.7em;
     margin-top: 46px;
+    height: calc(100% - 100px);
 }
 
 #search {
@@ -254,6 +274,18 @@ ul > li {
     left: 0 !important;
     width: 100%;
     overflow-x: scroll;
+}
+
+.filter-private .accessible-private {
+    display:none;
+}
+
+.filter-protected .accessible-protected {
+    display:none;
+}
+
+.filter-public .accessible-public {
+    display:none;
 }
 
 .hierarchy {
@@ -482,11 +514,11 @@ a:focus {
 }
 
 .label-constant {
-    background-color: #808080;
+    background-color: #5cb85c;
 }
 
 .label-function {
-    background-color: #5cb85c;
+    background-color: #048060;
 }
 
 .label-interface {
@@ -499,6 +531,10 @@ a:focus {
 
 .label-class {
     background-color: #337ab7;
+}
+
+.label-class-constant {
+    background-color: #808080;
 }
 
 .label-property {

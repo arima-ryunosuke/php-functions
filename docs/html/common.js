@@ -45,19 +45,22 @@ $.fn.uncomment = function () {
 };
 // open/close holding
 $.fn.collapse = function (mode, animation) {
-    var $this = $(this);
-    var holding = $this.find('.holding:eq(0)');
-    var switcher = $this.find('.switch-holding:eq(0)');
-    if (mode === null) {
-        mode = !switcher.hasClass('glyphicon-minus');
-    }
-    if (animation) {
-        var slideToggle = mode ? 'slideDown' : 'slideUp';
-        holding[slideToggle](133);
-    } else {
-        holding.toggle(mode);
-    }
-    switcher.toggleClass('glyphicon-minus', mode);
+    return this.each(function () {
+        var $this = $(this);
+        var holding = $this.find('.holding:eq(0)');
+        var switcher = $this.find('.switch-holding:eq(0)');
+        if (mode === null) {
+            mode = !switcher.hasClass('glyphicon-minus');
+        }
+        if (animation) {
+            var slideToggle = mode ? 'slideDown' : 'slideUp';
+            holding[slideToggle](133);
+        } else {
+            holding.toggle(mode);
+        }
+        holding.find('.class-member').uncomment();
+        switcher.toggleClass('glyphicon-minus', mode);
+    });
 };
 
 /* initialize */
@@ -86,6 +89,28 @@ if (window.name === 'main') {
 
 var $document = $(document);
 
+// config
+$document.on('click', '.switch-config', function () {
+    $('.config').slideToggle(133);
+});
+$document.on('click', '.exit-config', function () {
+    $('.config').slideUp(133);
+});
+$document.on('click', '.open-only-namespaces', function () {
+    $('.holding-wrapper.holding-namespace').collapse(true, true);
+});
+$document.on('click', '.close-only-typespaces', function () {
+    $('.holding-wrapper.holding-class').collapse(false, true);
+});
+$document.on('click', '.open-all-holdings', function () {
+    $('.holding-wrapper').collapse(true, true);
+});
+$document.on('click', '.close-all-holdings', function () {
+    $('.holding-wrapper').collapse(false, true);
+});
+$document.on('change', '[data-filter-target]', function () {
+    $('.main-wrapper').toggleClass('filter-' + this.dataset.filterTarget, this.checked);
+});
 // holding
 $document.on('click', '.switch-holding', function () {
     $(this).closest('.holding-wrapper').collapse(null, true);

@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L6-L404" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L6-L466" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Date</span></h2>
@@ -249,7 +249,68 @@ that(date_convert('Y/m/d H:i:s.u', $now))-&gt;isSame('2009/02/14 08:31:30.123000
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L202-L403" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L202-L262" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Date::date_fromto()" tabindex="-1" class="structure-title ">
+                        date_fromto                        	<small>($format, $datetimestring) : array<span class="type-separator"></span><wbr>null</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>日時っぽい文字列とフォーマットを与えると取りうる範囲を返す</p>
+<p>与えられた日時の最大の切り捨て日時と最小の切り上げ日時の配列を返す。<br />
+日付文字列はある程度よしなに補完される（例えば "2014/12" は"2014年12月01日" と解釈されるし "12/24" は "今年12月24日" と解釈される）。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(date_fromto('Y/m/d H:i:s', '2010/11'))-&gt;isSame(["2010/11/01 00:00:00", "2010/12/01 00:00:00"]);
+that(date_fromto('Y/m/d H:i:s', '2010/11/24'))-&gt;isSame(["2010/11/24 00:00:00", "2010/11/25 00:00:00"]);
+that(date_fromto('Y/m/d H:i:s', '2010/11/24 13'))-&gt;isSame(["2010/11/24 13:00:00", "2010/11/24 14:00:00"]);
+that(date_fromto('Y/m/d H:i:s', '2010/11/24 13:24'))-&gt;isSame(["2010/11/24 13:24:00", "2010/11/24 13:25:00"]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$format</td>
+				<td class="desc"><p>フォーマット。 null を与えるとタイムスタンプで返す</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$datetimestring</td>
+				<td class="desc"><p>日時データ</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array<span class="type-separator"></span><wbr>null</td>
+			<td class="desc"><p>[from ～ to] な配列。解釈できない場合は null</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L264-L465" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_interval()" tabindex="-1" class="structure-title ">
                         date_interval                        	<small>($sec, $format = null, $limit_type = &quot;y&quot;) : string<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.dateinterval.php" class="fqsen" target="_blank">\DateInterval</a></small>

@@ -730,6 +730,22 @@
  * @method   \ChainObject  kmapE($callback)
  * @method   \ChainObject  kmapE1($array)
  *
+ * @see array_kvmap
+ * @method   \ChainObject  array_kvmap($callback)
+ * @method   \ChainObject  array_kvmap1($array)
+ * @method   \ChainObject  array_kvmapP($callback)
+ * @method   \ChainObject  array_kvmapP1($array)
+ * @method   \ChainObject  array_kvmapE($callback)
+ * @method   \ChainObject  array_kvmapE1($array)
+ *
+ * @see array_kvmap
+ * @method   \ChainObject  kvmap($callback)
+ * @method   \ChainObject  kvmap1($array)
+ * @method   \ChainObject  kvmapP($callback)
+ * @method   \ChainObject  kvmapP1($array)
+ * @method   \ChainObject  kvmapE($callback)
+ * @method   \ChainObject  kvmapE1($array)
+ *
  * @see array_lmap
  * @method   \ChainObject  array_lmap($callback, ...$variadic)
  * @method   \ChainObject  array_lmap1($array, ...$variadic)
@@ -2025,6 +2041,10 @@
  * @method   \ChainObject  date_format($format)
  * @method   \ChainObject  date_format1($object)
  *
+ * @see date_fromto
+ * @method   \ChainObject  date_fromto($datetimestring)
+ * @method   \ChainObject  date_fromto1($format)
+ *
  * @see date_interval
  * @property \ChainObject $date_interval
  * @method   \ChainObject  date_interval($format = null, $limit_type = "y")
@@ -2942,6 +2962,11 @@
  * @property \ChainObject $include_string
  * @method   \ChainObject  include_string($array = [])
  * @method   \ChainObject  include_string1($template)
+ *
+ * @see indent_php
+ * @property \ChainObject $indent_php
+ * @method   \ChainObject  indent_php($options = [])
+ * @method   \ChainObject  indent_php1($phpcode)
  *
  * @see inet_ntop
  * @property \ChainObject $inet_ntop

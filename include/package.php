@@ -738,6 +738,7 @@ define("ryunosuke\\Functions\\Package\\array_where", ["ryunosuke\\Functions\\Pac
 define("ryunosuke\\Functions\\Package\\array_map_filter", ["ryunosuke\\Functions\\Package\\Arrays", "array_map_filter"]);
 define("ryunosuke\\Functions\\Package\\array_map_method", ["ryunosuke\\Functions\\Package\\Arrays", "array_map_method"]);
 define("ryunosuke\\Functions\\Package\\array_maps", ["ryunosuke\\Functions\\Package\\Arrays", "array_maps"]);
+define("ryunosuke\\Functions\\Package\\array_kvmap", ["ryunosuke\\Functions\\Package\\Arrays", "array_kvmap"]);
 define("ryunosuke\\Functions\\Package\\array_kmap", ["ryunosuke\\Functions\\Package\\Arrays", "array_kmap"]);
 define("ryunosuke\\Functions\\Package\\array_nmap", ["ryunosuke\\Functions\\Package\\Arrays", "array_nmap"]);
 define("ryunosuke\\Functions\\Package\\array_lmap", ["ryunosuke\\Functions\\Package\\Arrays", "array_lmap"]);
@@ -780,6 +781,7 @@ define("ryunosuke\\Functions\\Package\\get_class_constants", ["ryunosuke\\Functi
 define("ryunosuke\\Functions\\Package\\get_object_properties", ["ryunosuke\\Functions\\Package\\Classobj", "get_object_properties"]);
 define("ryunosuke\\Functions\\Package\\date_timestamp", ["ryunosuke\\Functions\\Package\\Date", "date_timestamp"]);
 define("ryunosuke\\Functions\\Package\\date_convert", ["ryunosuke\\Functions\\Package\\Date", "date_convert"]);
+define("ryunosuke\\Functions\\Package\\date_fromto", ["ryunosuke\\Functions\\Package\\Date", "date_fromto"]);
 define("ryunosuke\\Functions\\Package\\date_interval", ["ryunosuke\\Functions\\Package\\Date", "date_interval"]);
 define("ryunosuke\\Functions\\Package\\file_list", ["ryunosuke\\Functions\\Package\\FileSystem", "file_list"]);
 define("ryunosuke\\Functions\\Package\\file_tree", ["ryunosuke\\Functions\\Package\\FileSystem", "file_tree"]);
@@ -900,6 +902,7 @@ define("ryunosuke\\Functions\\Package\\ob_include", ["ryunosuke\\Functions\\Pack
 define("ryunosuke\\Functions\\Package\\include_string", ["ryunosuke\\Functions\\Package\\Strings", "include_string"]);
 define("ryunosuke\\Functions\\Package\\evaluate", ["ryunosuke\\Functions\\Package\\Syntax", "evaluate"]);
 define("ryunosuke\\Functions\\Package\\parse_php", ["ryunosuke\\Functions\\Package\\Syntax", "parse_php"]);
+define("ryunosuke\\Functions\\Package\\indent_php", ["ryunosuke\\Functions\\Package\\Syntax", "indent_php"]);
 define("ryunosuke\\Functions\\Package\\highlight_php", ["ryunosuke\\Functions\\Package\\Syntax", "highlight_php"]);
 define("ryunosuke\\Functions\\Package\\optional", ["ryunosuke\\Functions\\Package\\Syntax", "optional"]);
 define("ryunosuke\\Functions\\Package\\chain", ["ryunosuke\\Functions\\Package\\Syntax", "chain"]);
