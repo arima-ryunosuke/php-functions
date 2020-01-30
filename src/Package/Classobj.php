@@ -332,7 +332,6 @@ class Classobj
         }
         // php7.0 から無名クラスが使えるのでそのクラス名でエイリアスする
         if (is_object($newclass)) {
-            /** @noinspection PhpUnusedLocalVariableInspection */
             $newclass = get_class($newclass);
         }
         // 配列はメソッド定義のクロージャ配列とする
@@ -363,7 +362,7 @@ class Classobj
                     }
                 }
                 else {
-                    list($declare, $codeblock) = (callable_code)($member);
+                    [$declare, $codeblock] = (callable_code)($member);
                     $parentclass = new \ReflectionClass("\\$origspace\\$origclass");
                     // 元クラスに定義されているならオーバーライドとして特殊な処理を行う
                     if ($parentclass->hasMethod($name)) {
@@ -376,6 +375,7 @@ class Classobj
                         }
                         // 同上。返り値版
                         if (!$refmember->hasReturnType() && $refmethod->hasReturnType()) {
+                            /** @var \ReflectionNamedType $rtype */
                             $rtype = $refmethod->getReturnType();
                             $declare .= ':' . ($rtype->allowsNull() ? '?' : '') . ($rtype->isBuiltin() ? '' : '\\') . $rtype->getName();
                         }
@@ -440,9 +440,7 @@ class Classobj
         if (!isset($template_source)) {
             // コード補完やフォーマッタを効かせたいので文字列 eval ではなく直に new する（1回だけだし）
             // @codeCoverageIgnoreStart
-            $template_reflection = new \ReflectionClass(
-                new class()
-                {
+            $template_reflection = new \ReflectionClass(new class() {
                     private static $__originalClass;
                     private        $__original;
                     private        $__fields;
@@ -538,12 +536,13 @@ class Classobj
                     $args = implode(', ', array_keys($params));
                     $rtype = '';
                     if ($method->hasReturnType()) {
+                        /** @var \ReflectionNamedType $rt */
                         $rt = $method->getReturnType();
                         $rtype = ':' . ($rt->allowsNull() ? '?' : '') . ($rt->isBuiltin() ? '' : '\\') . $rt->getName();
                     }
                     $declares .= "$modifier function $ref$name($prms)$rtype { \$return = $ref$receiver$name(...[$args]);return \$return; }\n";
                 }
-                $traitcode = "trait X{$classalias}Trait\n$template_source$declares}";
+                $traitcode = "trait X{$classalias}Trait\n{{$template_source}{$declares}}";
                 file_put_contents("$cachefile-trait.php", "<?php\n" . $traitcode, LOCK_EX);
 
                 $classcode = "class X{$classalias}Class extends $classname\n{use X{$classalias}Trait;}";
@@ -568,7 +567,7 @@ class Classobj
                 $receiver = $method->isStatic() ? 'self::$__originalClass::' : '$this->__original->';
                 $modifier = implode(' ', \Reflection::getModifierNames($method->getModifiers()));
 
-                list(, $codeblock) = (callable_code)($override);
+                [, $codeblock] = (callable_code)($override);
                 /** @var \ReflectionFunctionAbstract $refmember */
                 $refmember = (reflect_callable)($override);
                 // 指定クロージャに引数が無くて、元メソッドに有るなら継承

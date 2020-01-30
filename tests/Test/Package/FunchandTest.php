@@ -308,8 +308,7 @@ class FunchandTest extends AbstractTestCase
 
         function _global_static_closure() { return static function () { return get_class($this); }; }
 
-        $class = new class
-        {
+        $class = new class {
             public function _nostatic_nostatic_closure() { return function () { return get_class($this); }; }
 
             public function _nostatic_static_closure() { return static function () { return get_class($this); }; }
@@ -499,8 +498,7 @@ class FunchandTest extends AbstractTestCase
 
     function test_func_method()
     {
-        $object = new class()
-        {
+        $object = new class() {
             static function fuga(...$args) { return implode(',', $args); }
 
             function hoge(...$args) { return implode(',', $args); }

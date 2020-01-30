@@ -49,8 +49,7 @@ $closure = function () {
 
 };
 
-$object = new class() extends AO
-{
+$object = new class() extends AO {
 };
 
 define("other\\space\\CONST", 'dummy');

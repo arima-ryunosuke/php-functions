@@ -28,23 +28,22 @@ class ClassobjTest extends AbstractTestCase
 
     function test_class_uses_all()
     {
-        eval('trait T1{}');
-        eval('trait T2{use T1;}');
-        eval('trait T3{use T2;}');
-        that((class_uses_all)(new class
+        /** @noinspection PhpUndefinedClassInspection */
         {
+            eval('trait T1{}');
+            eval('trait T2{use T1;}');
+            eval('trait T3{use T2;}');
+        }
+        that((class_uses_all)(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T1;
         }))->is(['T1']);
-        that((class_uses_all)(new class
-        {
+        that((class_uses_all)(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T2;
         }))->is(['T2', 'T1']);
-        that((class_uses_all)(new class
-        {
+        that((class_uses_all)(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T3;
         }))->is(['T3', 'T2', 'T1']);
-        that((class_uses_all)(get_class(new class
-        {
+        that((class_uses_all)(get_class(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T1;
             use /** @noinspection PhpUndefinedClassInspection */ \T2;
             use /** @noinspection PhpUndefinedClassInspection */ \T3;
@@ -230,8 +229,7 @@ class ClassobjTest extends AbstractTestCase
 
     function test_const_exists()
     {
-        $class = get_class(new class
-        {
+        $class = get_class(new class {
             private const   /** @noinspection PhpUnusedPrivateFieldInspection */
                             PRIVATE_CONST   = null;
             protected const PROTECTED_CONST = null;
@@ -271,13 +269,10 @@ class ClassobjTest extends AbstractTestCase
 
     function test_get_class_constants()
     {
-        $concrete = new class('hoge') extends \Concrete
-        {
-            private const   PPP = 0;
-            protected const PP  = 1;
-            public const    P   = 2;
-
-            function dummy() { assert(self::PPP); }
+        $concrete = new class('hoge') extends \Concrete {
+            private const /** @noinspection PhpUnusedPrivateFieldInspection */ PPP = 0;
+            protected const                                                    PP  = 1;
+            public const                                                       P   = 2;
         };
 
         that((get_class_constants)($concrete))->is([
@@ -316,7 +311,6 @@ class ClassobjTest extends AbstractTestCase
     {
         $concrete = new \Concrete('name');
         $concrete->value = 'value';
-        /** @noinspection PhpUndefinedFieldInspection */
         $concrete->oreore = 'oreore';
         that((get_object_properties)($concrete))->is([
             'value'  => 'value',
@@ -329,9 +323,9 @@ class ClassobjTest extends AbstractTestCase
         $object->set(999);
 
         // 復元したのに 999 になっていない（どうも同じキーの配列で __set_state されている模様）
-        that((eval('return ' . var_export($object, true) . ';'))->get())->isSame(1);
+        that((eval($code = 'return ' . var_export($object, true) . ';'))->get())->isSame(1);
 
         // get_object_properties はそのようなことにはならない
-        that((eval('return ' . (var_export2)($object, true) . ';'))->get())->isSame(999);
+        that((eval($code = 'return ' . (var_export2)($object, true) . ';'))->get())->isSame(999);
     }
 }

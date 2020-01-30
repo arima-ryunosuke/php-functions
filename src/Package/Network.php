@@ -69,7 +69,7 @@ class Network
         $iplong = ip2long($ipaddr);
 
         foreach ((arrayize)($cidr) as $cidr) {
-            list($subnet, $length) = explode('/', $cidr, 2) + [1 => '32'];
+            [$subnet, $length] = explode('/', $cidr, 2) + [1 => '32'];
 
             if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 throw new \InvalidArgumentException("subnet addr '$subnet' is invalid.");

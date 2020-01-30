@@ -145,7 +145,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (first_keyvalue)($array);
+        [$k, $v] = (first_keyvalue)($array);
         return $k;
     }
 
@@ -170,7 +170,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (first_keyvalue)($array);
+        [$k, $v] = (first_keyvalue)($array);
         return $v;
     }
 
@@ -218,7 +218,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (last_keyvalue)($array);
+        [$k, $v] = (last_keyvalue)($array);
         return $k;
     }
 
@@ -243,7 +243,7 @@ class Arrays
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($k, $v) = (last_keyvalue)($array);
+        [$k, $v] = (last_keyvalue)($array);
         return $v;
     }
 
@@ -906,11 +906,11 @@ class Arrays
     {
         $key_suffix = '';
         if (is_array($key_prefix)) {
-            list($key_suffix, $key_prefix) = $key_prefix + [1 => ''];
+            [$key_suffix, $key_prefix] = $key_prefix + [1 => ''];
         }
         $val_suffix = '';
         if (is_array($val_prefix)) {
-            list($val_suffix, $val_prefix) = $val_prefix + [1 => ''];
+            [$val_suffix, $val_prefix] = $val_prefix + [1 => ''];
         }
 
         $enable_key = strlen($key_prefix) || strlen($key_suffix);
@@ -2054,7 +2054,7 @@ class Arrays
             if (empty($n)) {
                 throw new \InvalidArgumentException('array $n is empty.');
             }
-            list($kn, $vn) = (first_keyvalue)($n);
+            [$kn, $vn] = (first_keyvalue)($n);
 
             // array_insert は負数も受け入れられるが、それを考慮しだすともう収拾がつかない
             if ($kn < 0 || $vn < 0) {
@@ -2846,7 +2846,9 @@ class Arrays
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    $type = $ref->hasReturnType() ? $ref->getReturnType()->getName() : gettype(reset($arg));
+                    /** @var \ReflectionNamedType $rtype */
+                    $rtype = $ref->getReturnType();
+                    $type = $rtype ? $rtype->getName() : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;

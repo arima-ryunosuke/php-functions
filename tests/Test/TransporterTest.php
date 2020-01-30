@@ -101,9 +101,9 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         (mkdir_p)($dir);
 
         // この時点では noexists
-        that("$dir/global.php")->notFileExists();
-        that("$dir/namespace.php")->notFileExists();
-        that("$dir/package.php")->notFileExists();
+        that("$dir/global.php")->fileNotExists();
+        that("$dir/namespace.php")->fileNotExists();
+        that("$dir/package.php")->fileNotExists();
 
         Transporter::exportAll($dir);
 
@@ -181,10 +181,10 @@ DUMMY
 
         that(Transporter::exportNamespace('test\hoge', false, __DIR__ . '/Transporter/parse_uri.php'))
             ->stringContains('parse_uri')     // file1 が含まれている
-            ->notStringContains('sql_format') // file2 は含まれていない
-            ->notStringContains('KEYWORDS')   // file2 に依存している定数が含まれていない
+            ->stringNotContains('sql_format') // file2 は含まれていない
+            ->stringNotContains('KEYWORDS')   // file2 に依存している定数が含まれていない
             ->stringContains('preg_capture')  // file1 に依存している関数が含まれている
-            ->notStringContains('throws')     // file2 に依存している関数が含まれている
+            ->stringNotContains('throws')     // file2 に依存している関数が含まれている
         ;
     }
 

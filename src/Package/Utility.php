@@ -87,8 +87,7 @@ class Utility
     public static function cache($key, $provider, $namespace = null)
     {
         static $cacheobject;
-        $cacheobject = $cacheobject ?? new class((cachedir)())
-            {
+        $cacheobject = $cacheobject ?? new class((cachedir)()) {
                 const CACHE_EXT = '.php-cache';
 
                 /** @var string キャッシュディレクトリ */
@@ -331,7 +330,7 @@ class Utility
                                 'offset' => (last_key)($tokens),
                             ]);
                             $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
-                            list($ns, $nm) = (namespace_split)($define);
+                            [$ns, $nm] = (namespace_split)($define);
                             $result[$ns][$keys[$token[0]]][$nm] = $define;
                         }
                         break;
@@ -912,7 +911,7 @@ class Utility
                 $argsdefaults[$name] = $default;
                 continue;
             }
-            list($longname, $shortname) = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
+            [$longname, $shortname] = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
             if ($shortname !== null) {
                 if (array_key_exists($shortname, $shortmap)) {
                     throw new \InvalidArgumentException("duplicated short option name '$shortname'");

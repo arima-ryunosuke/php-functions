@@ -828,8 +828,8 @@ that is <del>a</del><ins>the</ins> pen
 
     function test_htmltag()
     {
-        that((htmltag)('a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]'))->is(
-            '<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
+        that((htmltag)('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden]'))->is(
+            '<a id="hoge" class="c1 c2" target="hoge[]" href="http://hoge" hidden></a>'
         );
         that((htmltag)(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>']))->is(
             '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>'
@@ -1688,7 +1688,7 @@ z", quote2: "a\\\\nz"');
                 0        => ['orld', 6],
             ],
         ]);
-        that( (preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_SET_ORDER | PREG_OFFSET_CAPTURE, 5))->isSame([
+        that((preg_matches)('#(?<letter>[A-Z])([a-z]+)#ug', 'HelloWorld', PREG_SET_ORDER | PREG_OFFSET_CAPTURE, 5))->isSame([
             [
                 'letter' => ['W', 5],
                 0        => ['orld', 6],

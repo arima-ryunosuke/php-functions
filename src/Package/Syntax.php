@@ -561,8 +561,7 @@ class Syntax
 
         static $nullobject = null;
         if ($nullobject === null) {
-            $nullobject = new class implements \ArrayAccess, \IteratorAggregate
-            {
+            $nullobject = new class implements \ArrayAccess, \IteratorAggregate {
                 // @formatter:off
                 public function __isset($name) { return false; }
                 public function __get($name) { return null; }
@@ -670,8 +669,7 @@ class Syntax
      */
     public static function chain($source = null)
     {
-        return new class(...func_get_args()) implements \IteratorAggregate
-        {
+        return new class(...func_get_args()) implements \IteratorAggregate {
             private $data;
             private $stack;
 
@@ -775,7 +773,6 @@ class Syntax
 
                 // 特別扱い1: map は非常によく呼ぶので引数を補正する
                 if ($name === 'map') {
-                    /** @noinspection PhpUndefinedMethodInspection */
                     return $this->array_map1(...$arguments);
                 }
 

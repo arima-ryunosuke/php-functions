@@ -12,7 +12,7 @@ class DateTest extends AbstractTestCase
             if ($timestamp === null) {
                 return null;
             }
-            list($second, $micro) = explode('.', $timestamp) + [1 => '000000'];
+            [$second, $micro] = explode('.', $timestamp) + [1 => '000000'];
             return date('Y/m/d H:i:s', $second) . ".$micro";
         };
 

@@ -142,8 +142,7 @@ class VarsTest extends AbstractTestCase
         that((arrayable_key_exists)('false', $array))->isTrue();
         that((arrayable_key_exists)('notfound', $array))->isFalse();
 
-        $object = new class implements \ArrayAccess
-        {
+        $object = new class implements \ArrayAccess {
             private $holder = [
                 'ok'    => 'OK',
                 'null'  => null,
@@ -266,8 +265,7 @@ class VarsTest extends AbstractTestCase
 
         /// stdClass だけは引数で分岐できる
         $stdclass = new \stdClass();
-        $stdClassEx = new class extends stdClass
-        {
+        $stdClassEx = new class extends stdClass {
         };
 
         // 空 stdClass は空
@@ -472,19 +470,15 @@ class VarsTest extends AbstractTestCase
         that((var_type)(new \stdClass()))->is('\\' . \stdClass::class);
         that((var_type)(new \Concrete('hoge')))->is('\\' . \Concrete::class);
 
-        that((var_type)(new class extends \stdClass implements \JsonSerializable
-        {
+        that((var_type)(new class extends \stdClass implements \JsonSerializable {
             public function jsonSerialize() { return ''; }
         }))->is('\stdClass');
-        that((var_type)(new class implements \JsonSerializable
-        {
+        that((var_type)(new class implements \JsonSerializable {
             public function jsonSerialize() { return ''; }
         }))->is('\JsonSerializable');
-        that((var_type)(new class extends \stdClass
-        {
+        that((var_type)(new class extends \stdClass {
         }))->is('\stdClass');
-        that((var_type)(new class
-        {
+        that((var_type)(new class {
         }))->stringContains('anonymous');
     }
 
@@ -550,7 +544,7 @@ class VarsTest extends AbstractTestCase
         ];
         $a1 = var_export($value, true);
         $a2 = (var_export2)($value, true);
-        that(eval("return $a2;"))->is(eval("return $a1;"));
+        that(eval($code = "return $a2;"))->is(eval($code = "return $a1;"));
 
         that((var_export2)([
             "'\0\""  => 123,

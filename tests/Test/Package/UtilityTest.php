@@ -237,7 +237,7 @@ class UtilityTest extends AbstractTestCase
 
         (cache)('key', function () use ($value) { return $value; }, 'fuga');
         (cache)(null, null);
-        that("$tmpdir/hoge.php-cache")->notFileExists();
+        that("$tmpdir/hoge.php-cache")->fileNotExists();
     }
 
     function test_parse_namespace()
@@ -499,7 +499,7 @@ class UtilityTest extends AbstractTestCase
             'double'  => true,
             'block'   => true,
             'blockX'  => true,
-            'closure' => function ($value) { return eval('return ' . $value . ';'); },
+            'closure' => function ($value) { return eval($code = 'return ' . $value . ';'); },
         ]);
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "single"    => "123",
@@ -909,13 +909,12 @@ class UtilityTest extends AbstractTestCase
         function test_stacktrace()
         {
             $c = function () {
-                return eval('return \ryunosuke\\Test\\Package\\test_stacktrace_in();');
+                return eval($code = 'return \ryunosuke\\Test\\Package\\test_stacktrace_in();');
             };
             return $c();
         }
 
-        $mock = new class()
-        {
+        $mock = new class() {
             static function sm() { return test_stacktrace(); }
 
             function im() { return $this::sm(); }
@@ -1014,8 +1013,7 @@ class UtilityTest extends AbstractTestCase
             return (stacktrace)();
         }
 
-        $class = new class()
-        {
+        $class = new class() {
             static function sm($password, $array, $config)
             {
                 return test_stacktrace_mask($password, $array, $config);
@@ -1030,15 +1028,14 @@ class UtilityTest extends AbstractTestCase
         // mask
         $actual = $class->im('XXX', ['secret' => 'XXX'], (object) ['credit' => 'XXX']);
         // XXX は塗りつぶされるので決して出現しない
-        that($actual)->notStringContains('XXX');
+        that($actual)->stringNotContains('XXX');
         // im, sm, test_stacktrace_mask の3回呼び出してるので計9個塗りつぶされる
         that(substr_count($actual, '***'))->is(9);
     }
 
     function test_backtrace()
     {
-        $mock = new class()
-        {
+        $mock = new class() {
             function m1($options) { return (backtrace)(0, $options); }
 
             function m2($options) { return $this->m1($options); }

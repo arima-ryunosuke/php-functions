@@ -251,7 +251,7 @@ class FileSystemTest extends AbstractTestCase
 
         // 古い方も消すと自分自身（他にエントリがなく、削除によって自身も更新されているので現在時刻になる）
         unlink("$dir/tmp1");
-        that((dirmtime)($dir))->isBetween(time() - 1, time());
+        that((dirmtime)($dir))->isBetween(time() - 2, time());
 
         // 再帰フラグの確認
         (file_set_contents)("$dir/dir1/tmp", 'dummy');
@@ -404,14 +404,14 @@ class FileSystemTest extends AbstractTestCase
 
         (file_set_contents)("$dir/a.txt", '');
         (rm_rf)($dir2);
-        that($dir2)->notFileExists();       // 自身は消える
+        that($dir2)->fileNotExists();       // 自身は消える
         that(dirname($dir2))->fileExists(); // 親は残る
         that((rm_rf)($dir))->isFalse(); // 存在しないと false を返す
 
         (file_set_contents)("$dir/a.txt", '');
         (rm_rf)($dir1, false);
         that($dir1)->fileExists();    // 自身は残る
-        that($dir2)->notFileExists(); // 子は消える
+        that($dir2)->fileNotExists(); // 子は消える
     }
 
     function test_tmpname()
@@ -432,7 +432,7 @@ class FileSystemTest extends AbstractTestCase
         foreach ($files as $name => $file) {
             that($name)->fileExists();
             $file();
-            that($name)->notFileExists();
+            that($name)->fileNotExists();
         }
     }
 

@@ -363,7 +363,7 @@ class FileSystem
      * mkdir($dirname);
      *
      * // この時点では現在日時（単純に自身の更新日時）
-     * that(dirmtime($dirname))->isBetween(time() - 1, time());
+     * that(dirmtime($dirname))->isBetween(time() - 2, time());
      * // ファイルを作って更新するとその時刻
      * touch("$dirname/tmp", time() + 10);
      * that(dirmtime($dirname))->isSame(time() + 10);
@@ -709,8 +709,7 @@ class FileSystem
 
         // 生成したファイルを覚えておいて最後に消す
         static $files = [];
-        $files[$tempfile] = new class($tempfile)
-        {
+        $files[$tempfile] = new class($tempfile) {
             private $tempfile;
 
             public function __construct($tempfile) { $this->tempfile = $tempfile; }
@@ -770,8 +769,7 @@ class FileSystem
             }
 
             $registered = true;
-            stream_wrapper_register($STREAM_NAME, get_class(new class()
-            {
+            stream_wrapper_register($STREAM_NAME, get_class(new class() {
                 private static $entries = [];
 
                 private $entry;

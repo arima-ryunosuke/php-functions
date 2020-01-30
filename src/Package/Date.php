@@ -50,7 +50,7 @@ class Date
         // 和暦を西暦に置換
         $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
         $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
-            list(, $era, $year) = $matches;
+            [, $era, $year] = $matches;
             $eratime = (array_find)(JP_ERA, function ($v) use ($era) {
                 if (in_array($era, [$v['name'], $v['abbr']], true)) {
                     return $v['since'];
@@ -192,7 +192,7 @@ class Date
         $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', $timestamp)]);
 
         if (is_float($timestamp)) {
-            list($second, $micro) = explode('.', $timestamp) + [1 => '000000'];
+            [$second, $micro] = explode('.', $timestamp) + [1 => '000000'];
             $datetime = \DateTime::createFromFormat('Y/m/d H:i:s.u', date('Y/m/d H:i:s.', $second) . $micro);
             return $datetime->format($format);
         }
@@ -230,17 +230,17 @@ class Date
             return null;
         }
 
-        list($date, $time) = preg_split('#[T\s　]#u', $datetimestring, -1, PREG_SPLIT_NO_EMPTY) + [0 => '', 1 => ''];
-        list($y, $m, $d) = preg_split('#[^\d]+#u', $date, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
-        list($h, $i, $s) = preg_split('#[^\d]+#u', $time, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
+        [$date, $time] = preg_split('#[T\s　]#u', $datetimestring, -1, PREG_SPLIT_NO_EMPTY) + [0 => '', 1 => ''];
+        [$y, $m, $d] = preg_split('#[^\d]+#u', $date, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
+        [$h, $i, $s] = preg_split('#[^\d]+#u', $time, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
 
         // "2014/12" と "12/24" の区別はつかないので字数で判断
         if (strlen($y) <= 2) {
-            list($y, $m, $d) = [null, $y, $m];
+            [$y, $m, $d] = [null, $y, $m];
         }
         // 時刻区切りなし
         if (strlen($h) > 2) {
-            list($h, $i, $s) = str_split($h, 2) + [0 => null, 1 => null, 2 => null];
+            [$h, $i, $s] = str_split($h, 2) + [0 => null, 1 => null, 2 => null];
         }
 
         // 文字列表現で妥当性を検証

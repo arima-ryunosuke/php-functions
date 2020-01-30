@@ -848,7 +848,7 @@ $var3 = function () { return \ArrayObject::class; };
         }
         catch (\Exception $ex) {
             // 握りつぶし
-        };
+        }
         that($finally_count)->is(2);
     }
 
@@ -867,7 +867,7 @@ $var3 = function () { return \ArrayObject::class; };
             (rm_rf)($workingdir);
         });
         // finally が仕事をしてディレクトリが消えているはず
-        that($workingdir)->notFileExists();
+        that($workingdir)->fileNotExists();
 
         try {
             (try_catch_finally)(function () use ($workingdir) {
@@ -886,6 +886,6 @@ $var3 = function () { return \ArrayObject::class; };
             // dummy
         }
         // finally が仕事をしてディレクトリが消えているはず
-        that($workingdir)->notFileExists();
+        that($workingdir)->fileNotExists();
     }
 }

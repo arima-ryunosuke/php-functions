@@ -1332,7 +1332,7 @@ class Strings
             $options['stringify'] = function ($diffs) use ($prefixjoin, $minmaxlen) {
                 $result = ["***************"];
 
-                list($xmin, $xmax, , $ymin, $ymax,) = $minmaxlen($diffs);
+                [$xmin, $xmax, , $ymin, $ymax,] = $minmaxlen($diffs);
                 $xheader = $xmin === $xmax ? "$xmin" : "$xmin,$xmax";
                 $yheader = $ymin === $ymax ? "$ymin" : "$ymin,$ymax";
 
@@ -1370,7 +1370,7 @@ class Strings
                 $result = [];
 
                 if ($block_size !== null) {
-                    list($xmin, , $xlen, $ymin, , $ylen) = $minmaxlen($diffs);
+                    [$xmin, , $xlen, $ymin, , $ylen] = $minmaxlen($diffs);
                     $xheader = $xlen === 1 ? "$xmin" : "$xmin,$xlen";
                     $yheader = $ylen === 1 ? "$ymin" : "$ymin,$ylen";
                     $result[] = "@@ -{$xheader} +{$yheader} @@";
@@ -1738,7 +1738,7 @@ class Strings
                 $attrkv['class'] = implode(' ', $classes);
             }
             foreach ($attrs as $attr) {
-                list($k, $v) = explode('=', $attr, 2) + [1 => null];
+                [$k, $v] = explode('=', $attr, 2) + [1 => null];
                 if (array_key_exists($k, $attrkv)) {
                     throw new \InvalidArgumentException("[$k] is dumplicated.");
                 }
@@ -1752,7 +1752,7 @@ class Strings
             }
 
             preg_match('#(\s*)(.+)(\s*)#u', $tag, $m);
-            list(, $prefix, $tag, $suffix) = $m;
+            [, $prefix, $tag, $suffix] = $m;
             $tag_attr = $html($tag) . (concat)(' ', implode(' ', $attrs));
             $content = ($escape ? $html($content) : $content);
 
@@ -2455,7 +2455,7 @@ class Strings
             $key = null;
             $kv = array_map('trim', (quoteexplode)(':', $value, 2, $escapers));
             if (count($kv) === 2) {
-                list($key, $value) = $kv;
+                [$key, $value] = $kv;
             }
 
             $prefix = $value[0] ?? null;
@@ -2626,7 +2626,7 @@ class Strings
 
         $result = [];
         foreach (explode("\t", $ltsvstring) as $part) {
-            list($label, $value) = explode(':', $part, 2);
+            [$label, $value] = explode(':', $part, 2);
             $should_decode = substr($value, 0, 1) === '`' && substr($value, -1, 1) === '`';
             if ($map) {
                 $label = strtr($label, $map);
@@ -2762,7 +2762,7 @@ class Strings
         $f = function ($array, $nest) use (&$f, $option) {
             $spacer = str_repeat($option['indent'], $nest);
             $result = [];
-            foreach ((arrays)($array) as $n => list($k, $v)) {
+            foreach ((arrays)($array) as $n => [$k, $v]) {
                 if (is_iterable($v)) {
                     if (!is_int($k)) {
                         $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];

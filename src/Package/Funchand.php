@@ -63,7 +63,8 @@ class Funchand
                 return function (...$_) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
             default:
                 $args = implode(',', array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null))));
-                return eval('return function (' . $args . ') use ($invoker, $callable) { return $invoker($callable, func_get_args()); };');
+                $stmt = 'return function (' . $args . ') use ($invoker, $callable) { return $invoker($callable, func_get_args()); };';
+                return eval($stmt);
         }
     }
 
@@ -280,10 +281,10 @@ class Funchand
             return new \ReflectionFunction($callable);
         }
         else {
-            list($class, $method) = explode('::', $call_name, 2);
+            [$class, $method] = explode('::', $call_name, 2);
             // for タイプ 5: 相対指定による静的クラスメソッドのコール (PHP 5.3.0 以降)
             if (strpos($method, 'parent::') === 0) {
-                list(, $method) = explode('::', $method);
+                [, $method] = explode('::', $method);
                 return (new \ReflectionClass($class))->getParentClass()->getMethod($method);
             }
             return new \ReflectionMethod($class, $method);
@@ -883,6 +884,7 @@ CODE;
             $declare = '';
 
             if ($parameter->hasType()) {
+                /** @var \ReflectionNamedType $type */
                 $type = $parameter->getType();
                 $declare .= ($type->allowsNull() ? '?' : '') . ($type->isBuiltin() ? '' : '\\') . $type->getName() . ' ';
             }

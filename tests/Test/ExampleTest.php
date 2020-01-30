@@ -45,6 +45,6 @@ EVAL;
             ob_start();
             include $exfile;
             ob_end_clean();
-        };
+        }
     }
 }
