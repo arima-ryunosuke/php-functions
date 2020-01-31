@@ -193,6 +193,290 @@ ERR
         that(implode('', array_column($tokens, 1)))->is('class C {function m(){if(false)return function(){};}}');
     }
 
+    function test_indent_php()
+    {
+        $phpcode = '
+// this is line comment1
+// this is line comment1
+echo 123;
+# this is line comment2
+echo 123;
+/* this is block comment1 */
+echo 123;
+/*
+ * this is block comment2
+ */
+echo 123;
+/** this is doccomment1 */
+/**
+ * this is doccomment2
+ */
+echo 123;
+// this is multiline
+$multiline = "
+1
+2
+3
+";
+
+// empty line below and above
+
+if (true) {
+    echo 123; // this is trailing comment
+    if (true) {
+        /* this is starting comment */echo 123;
+    }
+}
+';
+        $phpcode = (indent_php)($phpcode, [
+            'indent'    => 4,
+            'trimempty' => false,
+        ]);
+
+        that($phpcode)->is('
+    // this is line comment1
+    // this is line comment1
+    echo 123;
+    # this is line comment2
+    echo 123;
+    /* this is block comment1 */
+    echo 123;
+    /*
+     * this is block comment2
+     */
+    echo 123;
+    /** this is doccomment1 */
+    /**
+     * this is doccomment2
+     */
+    echo 123;
+    // this is multiline
+    $multiline = "
+1
+2
+3
+";
+    
+    // empty line below and above
+    
+    if (true) {
+        echo 123; // this is trailing comment
+        if (true) {
+            /* this is starting comment */echo 123;
+        }
+    }
+    ');
+
+        $phpcode = (indent_php)($phpcode, "\t\t");
+
+        that($phpcode)->is('
+		// this is line comment1
+		// this is line comment1
+		echo 123;
+		# this is line comment2
+		echo 123;
+		/* this is block comment1 */
+		echo 123;
+		/*
+		 * this is block comment2
+		 */
+		echo 123;
+		/** this is doccomment1 */
+		/**
+		 * this is doccomment2
+		 */
+		echo 123;
+		// this is multiline
+		$multiline = "
+1
+2
+3
+";
+
+		// empty line below and above
+
+		if (true) {
+		    echo 123; // this is trailing comment
+		    if (true) {
+		        /* this is starting comment */echo 123;
+		    }
+		}
+		');
+
+        $phpcode = (indent_php)($phpcode, [
+            'indent'    => "",
+            'trimempty' => false,
+        ]);
+
+        that($phpcode)->is('
+// this is line comment1
+// this is line comment1
+echo 123;
+# this is line comment2
+echo 123;
+/* this is block comment1 */
+echo 123;
+/*
+ * this is block comment2
+ */
+echo 123;
+/** this is doccomment1 */
+/**
+ * this is doccomment2
+ */
+echo 123;
+// this is multiline
+$multiline = "
+1
+2
+3
+";
+
+// empty line below and above
+
+if (true) {
+    echo 123; // this is trailing comment
+    if (true) {
+        /* this is starting comment */echo 123;
+    }
+}
+');
+    }
+
+    function test_indent_php_heredoc()
+    {
+        that((indent_php)('
+$heredoc = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+', [
+            'indent'  => '    ',
+            'heredoc' => false,
+        ]))->is('
+    $heredoc = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+    ');
+        $phpcode = '
+$nowdoc = <<<\'HERE\'
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+$heredoc1 = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+    HERE;
+$heredoc2 = <<<HERE
+$colA
+        {$colB},
+        ${colB}
+
+    HERE;
+';
+
+        $phpcode = (indent_php)($phpcode, [
+            'indent'  => "    ",
+            'heredoc' => true,
+        ]);
+
+        that($phpcode)->is('
+    $nowdoc = <<<\'HERE\'
+        SELECT
+            $colA
+            {$colB},
+            ${colB}
+        FROM
+            table_name
+        WHERE 1
+            AND cd = ${substr($id, 2)}
+            AND id = ${"id$i"}
+    HERE;
+    $heredoc1 = <<<HERE
+        SELECT
+            $colA
+            {$colB},
+            ${colB}
+        FROM
+            table_name
+        WHERE 1
+            AND cd = ${substr($id, 2)}
+            AND id = ${"id$i"}
+        HERE;
+    $heredoc2 = <<<HERE
+    $colA
+            {$colB},
+            ${colB}
+    
+        HERE;
+    ');
+
+        $phpcode = (indent_php)($phpcode, [
+            'indent'  => "",
+            'heredoc' => true,
+        ]);
+
+        that($phpcode)->is('
+$nowdoc = <<<\'HERE\'
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+$heredoc1 = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+    HERE;
+$heredoc2 = <<<HERE
+$colA
+        {$colB},
+        ${colB}
+
+    HERE;
+');
+    }
+
     function test_highlight_php()
     {
         $phpcode = '<?php
