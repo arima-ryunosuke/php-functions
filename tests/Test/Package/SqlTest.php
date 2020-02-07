@@ -15,7 +15,8 @@ class SqlTest extends AbstractTestCase
         that((sql_quote)('1.23'))->is('1.23');
         that((sql_quote)('hoge'))->is("'hoge'");
         that((sql_quote)("ho'ge"))->is("'ho\'ge'");
-        that((sql_quote)('ho"ge'))->is("'ho\\\"ge'");
+        that((sql_quote)('ho"ge'))->is("'ho\"ge'");
+        that((sql_quote)("ho\r\n\tge"))->is("'ho\\r\\n\\tge'");
     }
 
     function test_sql_bind()

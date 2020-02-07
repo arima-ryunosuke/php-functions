@@ -28,7 +28,7 @@ class Sql
      * - null は NULL になる
      * - 数字はそのまま数字になる
      * - bool は 0 or 1 になる
-     * - それ以外は addslashes される
+     * - それ以外は addcslashes される
      *
      * Example:
      * ```php
@@ -52,7 +52,7 @@ class Sql
         if (is_bool($value)) {
             return (int) $value;
         }
-        return "'" . addslashes("$value") . "'";
+        return "'" . addcslashes((string) $value, "\0\e\f\n\r\t\v'\\") . "'";
     }
 
     /**
