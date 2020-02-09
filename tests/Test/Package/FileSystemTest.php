@@ -202,6 +202,47 @@ class FileSystemTest extends AbstractTestCase
         }
     }
 
+    function test_file_pos()
+    {
+        $tmpfile = sys_get_temp_dir() . '/posfile.txt';
+        file_put_contents($tmpfile, str_repeat('x', 100) . "abc");
+
+        that((file_pos)($tmpfile, 'x'))->is(0);
+        that((file_pos)($tmpfile, 'x', 1))->is(1);
+        that((file_pos)($tmpfile, 'x', 2))->is(2);
+        that((file_pos)($tmpfile, 'x', 99))->is(99);
+        that((file_pos)($tmpfile, 'x', 100))->is(false);
+
+        that((file_pos)($tmpfile, 'abc'))->is(100);
+        that((file_pos)($tmpfile, 'abc', -1))->is(false);
+        that((file_pos)($tmpfile, 'abc', -2))->is(false);
+        that((file_pos)($tmpfile, 'abc', -3))->is(100);
+
+        that((file_pos)($tmpfile, 'abc', 1, 10, 4))->is(false);
+        that((file_pos)($tmpfile, 'abc', 1, 100))->is(false);
+        that((file_pos)($tmpfile, 'abc', 1, 101))->is(false);
+        that((file_pos)($tmpfile, 'abc', 1, 102))->is(false);
+        that((file_pos)($tmpfile, 'abc', 1, 103))->is(100);
+        that((file_pos)($tmpfile, 'abc', 101))->is(false);
+
+        that((file_pos)($tmpfile, 'abc', 100, 101))->is(false);
+        that((file_pos)($tmpfile, 'abc', 100, 102))->is(false);
+        that((file_pos)($tmpfile, 'abc', 100, 103))->is(100);
+
+        that((file_pos)($tmpfile, 'abc', null, null, 3))->is(100);
+        that((file_pos)($tmpfile, 'abc', null, null, 4))->is(100);
+        that((file_pos)($tmpfile, 'abc', null, null, 5))->is(100);
+
+        file_put_contents($tmpfile, str_repeat('ん', 100) . "あ");
+
+        that((file_pos)($tmpfile, 'あ'))->is(300);
+        that((file_pos)($tmpfile, 'あ', 299))->is(300);
+        that((file_pos)($tmpfile, 'あ', 300))->is(300);
+        that((file_pos)($tmpfile, 'あ', 301))->is(false);
+
+        that([file_pos, 'not found', 'hoge'])->throws('is not found');
+    }
+
     function test_dirname_r()
     {
         // composer.json が見つかるまで親を辿って見つかったらそのパスを返す

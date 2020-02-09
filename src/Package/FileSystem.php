@@ -293,6 +293,73 @@ class FileSystem
     }
 
     /**
+     * 範囲指定でファイルを読んで位置を返す
+     *
+     * Example:
+     * ```php
+     * // 適当にファイルを用意
+     * $testpath = sys_get_temp_dir() . '/file_pos.txt';
+     * file_put_contents($testpath, "hoge\nfuga\npiyo\nfuga");
+     * // fuga の位置を返す
+     * that(file_pos($testpath, 'fuga'))->is(5);
+     * // 2つ目の fuga の位置を返す
+     * that(file_pos($testpath, 'fuga', 6))->is(15);
+     * // 見つからない場合は false を返す
+     * that(file_pos($testpath, 'hogera'))->is(false);
+     * ```
+     *
+     * @param string $filename ファイル名
+     * @param string $needle 探す文字列
+     * @param int $offset 読み込み位置
+     * @param int|null $length 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
+     * @param int|null $chunksize 読み込みチャンクサイズ。省略時は 4096 の倍数に正規化
+     * @return int|false $needle の位置。見つからなかった場合は false
+     */
+    public static function file_pos($filename, $needle, $offset = 0, $length = null, $chunksize = null)
+    {
+        if (!is_file($filename)) {
+            throw new \InvalidArgumentException("'$filename' is not found.");
+        }
+
+        if ($offset < 0) {
+            $offset += $filesize ?? $filesize = filesize($filename);
+        }
+        if ($length === null) {
+            $length = $filesize ?? $filesize = filesize($filename);
+        }
+        if ($chunksize === null) {
+            $chunksize = 4096 * (strlen($needle) % 4096 + 1);
+        }
+
+        assert($chunksize >= strlen($needle));
+
+        $fp = fopen($filename, 'rb');
+        try {
+            fseek($fp, $offset);
+            while (!feof($fp)) {
+                if ($offset > $length) {
+                    break;
+                }
+                $last = $part ?? '';
+                $part = fread($fp, $chunksize);
+                if (($p = strpos($part, $needle)) !== false) {
+                    $result = $offset + $p;
+                    return $result + strlen($needle) > $length ? false : $result;
+                }
+                if (($p = strpos($last . $part, $needle)) !== false) {
+                    $result = $offset + $p - strlen($last);
+                    return $result + strlen($needle) > $length ? false : $result;
+                }
+                $offset += strlen($part);
+            }
+            return false;
+        }
+        finally {
+            fclose($fp);
+        }
+    }
+
+    /**
      * ディレクトリを再帰的に掘る
      *
      * 既に存在する場合は何もしない（エラーも出さない）。
