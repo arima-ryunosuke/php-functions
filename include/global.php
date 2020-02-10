@@ -184,474 +184,498 @@ if (!defined("KEYWORDS")) {
         122 => "IS",
         123 => "ISOLATION",
         124 => "JOIN",
-        125 => "KEY",
-        126 => "KEYS",
-        127 => "KILL",
-        128 => "LAST_INSERT_ID",
-        129 => "LEADING",
-        130 => "LEFT",
-        131 => "LEVEL",
-        132 => "LIKE",
-        133 => "LIMIT",
-        134 => "LINEAR",
-        135 => "LINES",
-        136 => "LOAD",
-        137 => "LOCAL",
-        138 => "LOCK",
-        139 => "LOCKS",
-        140 => "LOGS",
-        141 => "LOW_PRIORITY",
-        142 => "MARIA",
-        143 => "MASTER",
-        144 => "MASTER_CONNECT_RETRY",
-        145 => "MASTER_HOST",
-        146 => "MASTER_LOG_FILE",
-        147 => "MATCH",
-        148 => "MAX_CONNECTIONS_PER_HOUR",
-        149 => "MAX_QUERIES_PER_HOUR",
-        150 => "MAX_ROWS",
-        151 => "MAX_UPDATES_PER_HOUR",
-        152 => "MAX_USER_CONNECTIONS",
-        153 => "MEDIUM",
-        154 => "MERGE",
-        155 => "MINUTE",
-        156 => "MINUTE_SECOND",
-        157 => "MIN_ROWS",
-        158 => "MODE",
-        159 => "MODIFY",
-        160 => "MONTH",
-        161 => "MRG_MYISAM",
-        162 => "MYISAM",
-        163 => "NAMES",
-        164 => "NATURAL",
-        165 => "NOT",
-        166 => "NOW()",
-        167 => "NULL",
-        168 => "OFFSET",
-        169 => "ON",
-        170 => "ON DELETE",
-        171 => "ON UPDATE",
-        172 => "OPEN",
-        173 => "OPTIMIZE",
-        174 => "OPTION",
-        175 => "OPTIONALLY",
-        176 => "OR",
-        177 => "ORDER",
-        178 => "BY",
-        179 => "OUTER",
-        180 => "OUTFILE",
-        181 => "PACK_KEYS",
-        182 => "PAGE",
-        183 => "PARTIAL",
-        184 => "PARTITION",
-        185 => "PARTITIONS",
-        186 => "PASSWORD",
-        187 => "PRIMARY",
-        188 => "PRIVILEGES",
-        189 => "PROCEDURE",
-        190 => "PROCESS",
-        191 => "PROCESSLIST",
-        192 => "PURGE",
-        193 => "QUICK",
-        194 => "RAID0",
-        195 => "RAID_CHUNKS",
-        196 => "RAID_CHUNKSIZE",
-        197 => "RAID_TYPE",
-        198 => "RANGE",
-        199 => "READ",
-        200 => "READ_ONLY",
-        201 => "READ_WRITE",
-        202 => "REFERENCES",
-        203 => "REGEXP",
-        204 => "RELOAD",
-        205 => "RENAME",
-        206 => "REPAIR",
-        207 => "REPEATABLE",
-        208 => "REPLACE",
-        209 => "REPLICATION",
-        210 => "RESET",
-        211 => "RESTORE",
-        212 => "RESTRICT",
-        213 => "RETURN",
-        214 => "RETURNS",
-        215 => "REVOKE",
-        216 => "RIGHT",
-        217 => "RLIKE",
-        218 => "ROLLBACK",
-        219 => "ROW",
-        220 => "ROWS",
-        221 => "ROW_FORMAT",
-        222 => "SECOND",
-        223 => "SECURITY",
-        224 => "SELECT",
-        225 => "SEPARATOR",
-        226 => "SERIALIZABLE",
-        227 => "SESSION",
-        228 => "SET",
-        229 => "SHARE",
-        230 => "SHOW",
-        231 => "SHUTDOWN",
-        232 => "SLAVE",
-        233 => "SONAME",
-        234 => "SOUNDS",
-        235 => "SQL",
-        236 => "SQL_AUTO_IS_NULL",
-        237 => "SQL_BIG_RESULT",
-        238 => "SQL_BIG_SELECTS",
-        239 => "SQL_BIG_TABLES",
-        240 => "SQL_BUFFER_RESULT",
-        241 => "SQL_CACHE",
-        242 => "SQL_CALC_FOUND_ROWS",
-        243 => "SQL_LOG_BIN",
-        244 => "SQL_LOG_OFF",
-        245 => "SQL_LOG_UPDATE",
-        246 => "SQL_LOW_PRIORITY_UPDATES",
-        247 => "SQL_MAX_JOIN_SIZE",
-        248 => "SQL_NO_CACHE",
-        249 => "SQL_QUOTE_SHOW_CREATE",
-        250 => "SQL_SAFE_UPDATES",
-        251 => "SQL_SELECT_LIMIT",
-        252 => "SQL_SLAVE_SKIP_COUNTER",
-        253 => "SQL_SMALL_RESULT",
-        254 => "SQL_WARNINGS",
-        255 => "START",
-        256 => "STARTING",
-        257 => "STATUS",
-        258 => "STOP",
-        259 => "STORAGE",
-        260 => "STRAIGHT_JOIN",
-        261 => "STRING",
-        262 => "STRIPED",
-        263 => "SUPER",
-        264 => "TABLE",
-        265 => "TABLES",
-        266 => "TEMPORARY",
-        267 => "TERMINATED",
-        268 => "THEN",
-        269 => "TO",
-        270 => "TRAILING",
-        271 => "TRANSACTIONAL",
-        272 => "TRUE",
-        273 => "TRUNCATE",
-        274 => "TYPE",
-        275 => "TYPES",
-        276 => "UNCOMMITTED",
-        277 => "UNION",
-        278 => "UNION ALL",
-        279 => "UNIQUE",
-        280 => "UNLOCK",
-        281 => "UNSIGNED",
-        282 => "UPDATE",
-        283 => "USAGE",
-        284 => "USE",
-        285 => "USING",
-        286 => "VALUES",
-        287 => "VARIABLES",
-        288 => "VIEW",
-        289 => "WHEN",
-        290 => "WHERE",
-        291 => "WITH",
-        292 => "WORK",
-        293 => "WRITE",
-        294 => "XOR",
-        295 => "YEAR_MONTH",
-        296 => "ABS",
-        297 => "ACOS",
-        298 => "ADDDATE",
-        299 => "ADDTIME",
-        300 => "AES_DECRYPT",
-        301 => "AES_ENCRYPT",
-        302 => "AREA",
-        303 => "ASBINARY",
-        304 => "ASCII",
-        305 => "ASIN",
-        306 => "ASTEXT",
-        307 => "ATAN",
-        308 => "ATAN2",
-        309 => "AVG",
-        310 => "BDMPOLYFROMTEXT",
-        311 => "BDMPOLYFROMWKB",
-        312 => "BDPOLYFROMTEXT",
-        313 => "BDPOLYFROMWKB",
-        314 => "BENCHMARK",
-        315 => "BIN",
-        316 => "BIT_AND",
-        317 => "BIT_COUNT",
-        318 => "BIT_LENGTH",
-        319 => "BIT_OR",
-        320 => "BIT_XOR",
-        321 => "BOUNDARY",
-        322 => "BUFFER",
-        323 => "CAST",
-        324 => "CEIL",
-        325 => "CEILING",
-        326 => "CENTROID",
-        327 => "CHAR",
-        328 => "CHARACTER_LENGTH",
-        329 => "CHARSET",
-        330 => "CHAR_LENGTH",
-        331 => "COALESCE",
-        332 => "COERCIBILITY",
-        333 => "COLLATION",
-        334 => "COMPRESS",
-        335 => "CONCAT",
-        336 => "CONCAT_WS",
-        337 => "CONNECTION_ID",
-        338 => "CONTAINS",
-        339 => "CONV",
-        340 => "CONVERT",
-        341 => "CONVERT_TZ",
-        342 => "CONVEXHULL",
-        343 => "COS",
-        344 => "COT",
-        345 => "COUNT",
-        346 => "CRC32",
-        347 => "CROSSES",
-        348 => "CURDATE",
-        349 => "CURRENT_DATE",
-        350 => "CURRENT_TIME",
-        351 => "CURRENT_TIMESTAMP",
-        352 => "CURRENT_USER",
-        353 => "CURTIME",
-        354 => "DATABASE",
-        355 => "DATE",
-        356 => "DATEDIFF",
-        357 => "DATE_ADD",
-        358 => "DATE_DIFF",
-        359 => "DATE_FORMAT",
-        360 => "DATE_SUB",
-        361 => "DAY",
-        362 => "DAYNAME",
-        363 => "DAYOFMONTH",
-        364 => "DAYOFWEEK",
-        365 => "DAYOFYEAR",
-        366 => "DECODE",
-        367 => "DEFAULT",
-        368 => "DEGREES",
-        369 => "DES_DECRYPT",
-        370 => "DES_ENCRYPT",
-        371 => "DIFFERENCE",
-        372 => "DIMENSION",
-        373 => "DISJOINT",
-        374 => "DISTANCE",
-        375 => "ELT",
-        376 => "ENCODE",
-        377 => "ENCRYPT",
-        378 => "ENDPOINT",
-        379 => "ENVELOPE",
-        380 => "EQUALS",
-        381 => "EXP",
-        382 => "EXPORT_SET",
-        383 => "EXTERIORRING",
-        384 => "EXTRACT",
-        385 => "EXTRACTVALUE",
-        386 => "FIELD",
-        387 => "FIND_IN_SET",
-        388 => "FLOOR",
-        389 => "FORMAT",
-        390 => "FOUND_ROWS",
-        391 => "FROM_DAYS",
-        392 => "FROM_UNIXTIME",
-        393 => "GEOMCOLLFROMTEXT",
-        394 => "GEOMCOLLFROMWKB",
-        395 => "GEOMETRYCOLLECTION",
-        396 => "GEOMETRYCOLLECTIONFROMTEXT",
-        397 => "GEOMETRYCOLLECTIONFROMWKB",
-        398 => "GEOMETRYFROMTEXT",
-        399 => "GEOMETRYFROMWKB",
-        400 => "GEOMETRYN",
-        401 => "GEOMETRYTYPE",
-        402 => "GEOMFROMTEXT",
-        403 => "GEOMFROMWKB",
-        404 => "GET_FORMAT",
-        405 => "GET_LOCK",
-        406 => "GLENGTH",
-        407 => "GREATEST",
-        408 => "GROUP_CONCAT",
-        409 => "GROUP_UNIQUE_USERS",
-        410 => "HEX",
-        411 => "HOUR",
-        412 => "IF",
-        413 => "IFNULL",
-        414 => "INET_ATON",
-        415 => "INET_NTOA",
-        416 => "INSERT",
-        417 => "INSTR",
-        418 => "INTERIORRINGN",
-        419 => "INTERSECTION",
-        420 => "INTERSECTS",
-        421 => "INTERVAL",
-        422 => "ISCLOSED",
-        423 => "ISEMPTY",
-        424 => "ISNULL",
-        425 => "ISRING",
-        426 => "ISSIMPLE",
-        427 => "IS_FREE_LOCK",
-        428 => "IS_USED_LOCK",
-        429 => "LAST_DAY",
-        430 => "LAST_INSERT_ID",
-        431 => "LCASE",
-        432 => "LEAST",
-        433 => "LEFT",
-        434 => "LENGTH",
-        435 => "LINEFROMTEXT",
-        436 => "LINEFROMWKB",
-        437 => "LINESTRING",
-        438 => "LINESTRINGFROMTEXT",
-        439 => "LINESTRINGFROMWKB",
-        440 => "LN",
-        441 => "LOAD_FILE",
-        442 => "LOCALTIME",
-        443 => "LOCALTIMESTAMP",
-        444 => "LOCATE",
-        445 => "LOG",
-        446 => "LOG10",
-        447 => "LOG2",
-        448 => "LOWER",
-        449 => "LPAD",
-        450 => "LTRIM",
-        451 => "MAKEDATE",
-        452 => "MAKETIME",
-        453 => "MAKE_SET",
-        454 => "MASTER_POS_WAIT",
-        455 => "MAX",
-        456 => "MBRCONTAINS",
-        457 => "MBRDISJOINT",
-        458 => "MBREQUAL",
-        459 => "MBRINTERSECTS",
-        460 => "MBROVERLAPS",
-        461 => "MBRTOUCHES",
-        462 => "MBRWITHIN",
-        463 => "MD5",
-        464 => "MICROSECOND",
-        465 => "MID",
-        466 => "MIN",
-        467 => "MINUTE",
-        468 => "MLINEFROMTEXT",
-        469 => "MLINEFROMWKB",
-        470 => "MOD",
-        471 => "MONTH",
-        472 => "MONTHNAME",
-        473 => "MPOINTFROMTEXT",
-        474 => "MPOINTFROMWKB",
-        475 => "MPOLYFROMTEXT",
-        476 => "MPOLYFROMWKB",
-        477 => "MULTILINESTRING",
-        478 => "MULTILINESTRINGFROMTEXT",
-        479 => "MULTILINESTRINGFROMWKB",
-        480 => "MULTIPOINT",
-        481 => "MULTIPOINTFROMTEXT",
-        482 => "MULTIPOINTFROMWKB",
-        483 => "MULTIPOLYGON",
-        484 => "MULTIPOLYGONFROMTEXT",
-        485 => "MULTIPOLYGONFROMWKB",
-        486 => "NAME_CONST",
-        487 => "NULLIF",
-        488 => "NUMGEOMETRIES",
-        489 => "NUMINTERIORRINGS",
-        490 => "NUMPOINTS",
-        491 => "OCT",
-        492 => "OCTET_LENGTH",
-        493 => "OLD_PASSWORD",
-        494 => "ORD",
-        495 => "OVERLAPS",
-        496 => "PASSWORD",
-        497 => "PERIOD_ADD",
-        498 => "PERIOD_DIFF",
-        499 => "PI",
-        500 => "POINT",
-        501 => "POINTFROMTEXT",
-        502 => "POINTFROMWKB",
-        503 => "POINTN",
-        504 => "POINTONSURFACE",
-        505 => "POLYFROMTEXT",
-        506 => "POLYFROMWKB",
-        507 => "POLYGON",
-        508 => "POLYGONFROMTEXT",
-        509 => "POLYGONFROMWKB",
-        510 => "POSITION",
-        511 => "POW",
-        512 => "POWER",
-        513 => "QUARTER",
-        514 => "QUOTE",
-        515 => "RADIANS",
-        516 => "RAND",
-        517 => "RELATED",
-        518 => "RELEASE_LOCK",
-        519 => "REPEAT",
-        520 => "REPLACE",
-        521 => "REVERSE",
-        522 => "RIGHT",
-        523 => "ROUND",
-        524 => "ROW_COUNT",
-        525 => "RPAD",
-        526 => "RTRIM",
-        527 => "SCHEMA",
-        528 => "SECOND",
-        529 => "SEC_TO_TIME",
-        530 => "SESSION_USER",
-        531 => "SHA",
-        532 => "SHA1",
-        533 => "SIGN",
-        534 => "SIN",
-        535 => "SLEEP",
-        536 => "SOUNDEX",
-        537 => "SPACE",
-        538 => "SQRT",
-        539 => "SRID",
-        540 => "STARTPOINT",
-        541 => "STD",
-        542 => "STDDEV",
-        543 => "STDDEV_POP",
-        544 => "STDDEV_SAMP",
-        545 => "STRCMP",
-        546 => "STR_TO_DATE",
-        547 => "SUBDATE",
-        548 => "SUBSTR",
-        549 => "SUBSTRING",
-        550 => "SUBSTRING_INDEX",
-        551 => "SUBTIME",
-        552 => "SUM",
-        553 => "SYMDIFFERENCE",
-        554 => "SYSDATE",
-        555 => "SYSTEM_USER",
-        556 => "TAN",
-        557 => "TIME",
-        558 => "TIMEDIFF",
-        559 => "TIMESTAMP",
-        560 => "TIMESTAMPADD",
-        561 => "TIMESTAMPDIFF",
-        562 => "TIME_FORMAT",
-        563 => "TIME_TO_SEC",
-        564 => "TOUCHES",
-        565 => "TO_DAYS",
-        566 => "TRIM",
-        567 => "TRUNCATE",
-        568 => "UCASE",
-        569 => "UNCOMPRESS",
-        570 => "UNCOMPRESSED_LENGTH",
-        571 => "UNHEX",
-        572 => "UNIQUE_USERS",
-        573 => "UNIX_TIMESTAMP",
-        574 => "UPDATEXML",
-        575 => "UPPER",
-        576 => "USER",
-        577 => "UTC_DATE",
-        578 => "UTC_TIME",
-        579 => "UTC_TIMESTAMP",
-        580 => "UUID",
-        581 => "VARIANCE",
-        582 => "VAR_POP",
-        583 => "VAR_SAMP",
-        584 => "VERSION",
-        585 => "WEEK",
-        586 => "WEEKDAY",
-        587 => "WEEKOFYEAR",
-        588 => "WITHIN",
-        589 => "X",
-        590 => "Y",
-        591 => "YEAR",
-        592 => "YEARWEEK",
+        125 => "JSON_ARRAY",
+        126 => "JSON_ARRAY_APPEND",
+        127 => "JSON_ARRAY_INSERT",
+        128 => "JSON_CONTAINS",
+        129 => "JSON_CONTAINS_PATH",
+        130 => "JSON_DEPTH",
+        131 => "JSON_EXTRACT",
+        132 => "JSON_INSERT",
+        133 => "JSON_KEYS",
+        134 => "JSON_LENGTH",
+        135 => "JSON_MERGE_PATCH",
+        136 => "JSON_MERGE_PRESERVE",
+        137 => "JSON_OBJECT",
+        138 => "JSON_PRETTY",
+        139 => "JSON_QUOTE",
+        140 => "JSON_REMOVE",
+        141 => "JSON_REPLACE",
+        142 => "JSON_SEARCH",
+        143 => "JSON_SET",
+        144 => "JSON_STORAGE_SIZE",
+        145 => "JSON_TYPE",
+        146 => "JSON_UNQUOTE",
+        147 => "JSON_VALID",
+        148 => "KEY",
+        149 => "KEYS",
+        150 => "KILL",
+        151 => "LAST_INSERT_ID",
+        152 => "LEADING",
+        153 => "LEFT",
+        154 => "LEVEL",
+        155 => "LIKE",
+        156 => "LIMIT",
+        157 => "LINEAR",
+        158 => "LINES",
+        159 => "LOAD",
+        160 => "LOCAL",
+        161 => "LOCK",
+        162 => "LOCKS",
+        163 => "LOGS",
+        164 => "LOW_PRIORITY",
+        165 => "MARIA",
+        166 => "MASTER",
+        167 => "MASTER_CONNECT_RETRY",
+        168 => "MASTER_HOST",
+        169 => "MASTER_LOG_FILE",
+        170 => "MATCH",
+        171 => "MAX_CONNECTIONS_PER_HOUR",
+        172 => "MAX_QUERIES_PER_HOUR",
+        173 => "MAX_ROWS",
+        174 => "MAX_UPDATES_PER_HOUR",
+        175 => "MAX_USER_CONNECTIONS",
+        176 => "MEDIUM",
+        177 => "MERGE",
+        178 => "MINUTE",
+        179 => "MINUTE_SECOND",
+        180 => "MIN_ROWS",
+        181 => "MODE",
+        182 => "MODIFY",
+        183 => "MONTH",
+        184 => "MRG_MYISAM",
+        185 => "MYISAM",
+        186 => "NAMES",
+        187 => "NATURAL",
+        188 => "NOT",
+        189 => "NOW()",
+        190 => "NULL",
+        191 => "OFFSET",
+        192 => "ON",
+        193 => "ON DELETE",
+        194 => "ON UPDATE",
+        195 => "OPEN",
+        196 => "OPTIMIZE",
+        197 => "OPTION",
+        198 => "OPTIONALLY",
+        199 => "OR",
+        200 => "ORDER",
+        201 => "BY",
+        202 => "OUTER",
+        203 => "OUTFILE",
+        204 => "PACK_KEYS",
+        205 => "PAGE",
+        206 => "PARTIAL",
+        207 => "PARTITION",
+        208 => "PARTITIONS",
+        209 => "PASSWORD",
+        210 => "PRIMARY",
+        211 => "PRIVILEGES",
+        212 => "PROCEDURE",
+        213 => "PROCESS",
+        214 => "PROCESSLIST",
+        215 => "PURGE",
+        216 => "QUICK",
+        217 => "RAID0",
+        218 => "RAID_CHUNKS",
+        219 => "RAID_CHUNKSIZE",
+        220 => "RAID_TYPE",
+        221 => "RANGE",
+        222 => "READ",
+        223 => "READ_ONLY",
+        224 => "READ_WRITE",
+        225 => "REFERENCES",
+        226 => "REGEXP",
+        227 => "RELOAD",
+        228 => "RENAME",
+        229 => "REPAIR",
+        230 => "REPEATABLE",
+        231 => "REPLACE",
+        232 => "REPLICATION",
+        233 => "RESET",
+        234 => "RESTORE",
+        235 => "RESTRICT",
+        236 => "RETURN",
+        237 => "RETURNS",
+        238 => "REVOKE",
+        239 => "RIGHT",
+        240 => "RLIKE",
+        241 => "ROLLBACK",
+        242 => "ROLLUP",
+        243 => "ROW",
+        244 => "ROWS",
+        245 => "ROW_FORMAT",
+        246 => "SECOND",
+        247 => "SECURITY",
+        248 => "SELECT",
+        249 => "SEPARATOR",
+        250 => "SERIALIZABLE",
+        251 => "SESSION",
+        252 => "SET",
+        253 => "SHARE",
+        254 => "SHOW",
+        255 => "SHUTDOWN",
+        256 => "SLAVE",
+        257 => "SONAME",
+        258 => "SOUNDS",
+        259 => "SQL",
+        260 => "SQL_AUTO_IS_NULL",
+        261 => "SQL_BIG_RESULT",
+        262 => "SQL_BIG_SELECTS",
+        263 => "SQL_BIG_TABLES",
+        264 => "SQL_BUFFER_RESULT",
+        265 => "SQL_CACHE",
+        266 => "SQL_CALC_FOUND_ROWS",
+        267 => "SQL_LOG_BIN",
+        268 => "SQL_LOG_OFF",
+        269 => "SQL_LOG_UPDATE",
+        270 => "SQL_LOW_PRIORITY_UPDATES",
+        271 => "SQL_MAX_JOIN_SIZE",
+        272 => "SQL_NO_CACHE",
+        273 => "SQL_QUOTE_SHOW_CREATE",
+        274 => "SQL_SAFE_UPDATES",
+        275 => "SQL_SELECT_LIMIT",
+        276 => "SQL_SLAVE_SKIP_COUNTER",
+        277 => "SQL_SMALL_RESULT",
+        278 => "SQL_WARNINGS",
+        279 => "START",
+        280 => "STARTING",
+        281 => "STATUS",
+        282 => "STOP",
+        283 => "STORAGE",
+        284 => "STRAIGHT_JOIN",
+        285 => "STRING",
+        286 => "STRIPED",
+        287 => "SUPER",
+        288 => "TABLE",
+        289 => "TABLES",
+        290 => "TEMPORARY",
+        291 => "TERMINATED",
+        292 => "THEN",
+        293 => "TO",
+        294 => "TRAILING",
+        295 => "TRANSACTIONAL",
+        296 => "TRUE",
+        297 => "TRUNCATE",
+        298 => "TYPE",
+        299 => "TYPES",
+        300 => "UNCOMMITTED",
+        301 => "UNION",
+        302 => "UNION ALL",
+        303 => "UNIQUE",
+        304 => "UNLOCK",
+        305 => "UNSIGNED",
+        306 => "UPDATE",
+        307 => "USAGE",
+        308 => "USE",
+        309 => "USING",
+        310 => "VALUES",
+        311 => "VARIABLES",
+        312 => "VIEW",
+        313 => "WHEN",
+        314 => "WHERE",
+        315 => "WITH",
+        316 => "WORK",
+        317 => "WRITE",
+        318 => "XOR",
+        319 => "YEAR_MONTH",
+        320 => "ABS",
+        321 => "ACOS",
+        322 => "ADDDATE",
+        323 => "ADDTIME",
+        324 => "AES_DECRYPT",
+        325 => "AES_ENCRYPT",
+        326 => "AREA",
+        327 => "ASBINARY",
+        328 => "ASCII",
+        329 => "ASIN",
+        330 => "ASTEXT",
+        331 => "ATAN",
+        332 => "ATAN2",
+        333 => "AVG",
+        334 => "BDMPOLYFROMTEXT",
+        335 => "BDMPOLYFROMWKB",
+        336 => "BDPOLYFROMTEXT",
+        337 => "BDPOLYFROMWKB",
+        338 => "BENCHMARK",
+        339 => "BIN",
+        340 => "BIT_AND",
+        341 => "BIT_COUNT",
+        342 => "BIT_LENGTH",
+        343 => "BIT_OR",
+        344 => "BIT_XOR",
+        345 => "BOUNDARY",
+        346 => "BUFFER",
+        347 => "CAST",
+        348 => "CEIL",
+        349 => "CEILING",
+        350 => "CENTROID",
+        351 => "CHAR",
+        352 => "CHARACTER_LENGTH",
+        353 => "CHARSET",
+        354 => "CHAR_LENGTH",
+        355 => "COALESCE",
+        356 => "COERCIBILITY",
+        357 => "COLLATION",
+        358 => "COMPRESS",
+        359 => "CONCAT",
+        360 => "CONCAT_WS",
+        361 => "CONNECTION_ID",
+        362 => "CONTAINS",
+        363 => "CONV",
+        364 => "CONVERT",
+        365 => "CONVERT_TZ",
+        366 => "CONVEXHULL",
+        367 => "COS",
+        368 => "COT",
+        369 => "COUNT",
+        370 => "CRC32",
+        371 => "CROSSES",
+        372 => "CURDATE",
+        373 => "CURRENT_DATE",
+        374 => "CURRENT_TIME",
+        375 => "CURRENT_TIMESTAMP",
+        376 => "CURRENT_USER",
+        377 => "CURTIME",
+        378 => "DATABASE",
+        379 => "DATE",
+        380 => "DATEDIFF",
+        381 => "DATE_ADD",
+        382 => "DATE_DIFF",
+        383 => "DATE_FORMAT",
+        384 => "DATE_SUB",
+        385 => "DAY",
+        386 => "DAYNAME",
+        387 => "DAYOFMONTH",
+        388 => "DAYOFWEEK",
+        389 => "DAYOFYEAR",
+        390 => "DECODE",
+        391 => "DEFAULT",
+        392 => "DEGREES",
+        393 => "DES_DECRYPT",
+        394 => "DES_ENCRYPT",
+        395 => "DIFFERENCE",
+        396 => "DIMENSION",
+        397 => "DISJOINT",
+        398 => "DISTANCE",
+        399 => "ELT",
+        400 => "ENCODE",
+        401 => "ENCRYPT",
+        402 => "ENDPOINT",
+        403 => "ENVELOPE",
+        404 => "EQUALS",
+        405 => "EXP",
+        406 => "EXPORT_SET",
+        407 => "EXTERIORRING",
+        408 => "EXTRACT",
+        409 => "EXTRACTVALUE",
+        410 => "FIELD",
+        411 => "FIND_IN_SET",
+        412 => "FLOOR",
+        413 => "FORMAT",
+        414 => "FOUND_ROWS",
+        415 => "FROM_DAYS",
+        416 => "FROM_UNIXTIME",
+        417 => "GEOMCOLLFROMTEXT",
+        418 => "GEOMCOLLFROMWKB",
+        419 => "GEOMETRYCOLLECTION",
+        420 => "GEOMETRYCOLLECTIONFROMTEXT",
+        421 => "GEOMETRYCOLLECTIONFROMWKB",
+        422 => "GEOMETRYFROMTEXT",
+        423 => "GEOMETRYFROMWKB",
+        424 => "GEOMETRYN",
+        425 => "GEOMETRYTYPE",
+        426 => "GEOMFROMTEXT",
+        427 => "GEOMFROMWKB",
+        428 => "GET_FORMAT",
+        429 => "GET_LOCK",
+        430 => "GLENGTH",
+        431 => "GREATEST",
+        432 => "GROUP_CONCAT",
+        433 => "GROUP_UNIQUE_USERS",
+        434 => "HEX",
+        435 => "HOUR",
+        436 => "IF",
+        437 => "IFNULL",
+        438 => "INET_ATON",
+        439 => "INET_NTOA",
+        440 => "INSERT",
+        441 => "INSTR",
+        442 => "INTERIORRINGN",
+        443 => "INTERSECTION",
+        444 => "INTERSECTS",
+        445 => "INTERVAL",
+        446 => "ISCLOSED",
+        447 => "ISEMPTY",
+        448 => "ISNULL",
+        449 => "ISRING",
+        450 => "ISSIMPLE",
+        451 => "IS_FREE_LOCK",
+        452 => "IS_USED_LOCK",
+        453 => "LAST_DAY",
+        454 => "LAST_INSERT_ID",
+        455 => "LCASE",
+        456 => "LEAST",
+        457 => "LEFT",
+        458 => "LENGTH",
+        459 => "LINEFROMTEXT",
+        460 => "LINEFROMWKB",
+        461 => "LINESTRING",
+        462 => "LINESTRINGFROMTEXT",
+        463 => "LINESTRINGFROMWKB",
+        464 => "LN",
+        465 => "LOAD_FILE",
+        466 => "LOCALTIME",
+        467 => "LOCALTIMESTAMP",
+        468 => "LOCATE",
+        469 => "LOG",
+        470 => "LOG10",
+        471 => "LOG2",
+        472 => "LOWER",
+        473 => "LPAD",
+        474 => "LTRIM",
+        475 => "MAKEDATE",
+        476 => "MAKETIME",
+        477 => "MAKE_SET",
+        478 => "MASTER_POS_WAIT",
+        479 => "MAX",
+        480 => "MBRCONTAINS",
+        481 => "MBRDISJOINT",
+        482 => "MBREQUAL",
+        483 => "MBRINTERSECTS",
+        484 => "MBROVERLAPS",
+        485 => "MBRTOUCHES",
+        486 => "MBRWITHIN",
+        487 => "MD5",
+        488 => "MICROSECOND",
+        489 => "MID",
+        490 => "MIN",
+        491 => "MINUTE",
+        492 => "MLINEFROMTEXT",
+        493 => "MLINEFROMWKB",
+        494 => "MOD",
+        495 => "MONTH",
+        496 => "MONTHNAME",
+        497 => "MPOINTFROMTEXT",
+        498 => "MPOINTFROMWKB",
+        499 => "MPOLYFROMTEXT",
+        500 => "MPOLYFROMWKB",
+        501 => "MULTILINESTRING",
+        502 => "MULTILINESTRINGFROMTEXT",
+        503 => "MULTILINESTRINGFROMWKB",
+        504 => "MULTIPOINT",
+        505 => "MULTIPOINTFROMTEXT",
+        506 => "MULTIPOINTFROMWKB",
+        507 => "MULTIPOLYGON",
+        508 => "MULTIPOLYGONFROMTEXT",
+        509 => "MULTIPOLYGONFROMWKB",
+        510 => "NAME_CONST",
+        511 => "NULLIF",
+        512 => "NUMGEOMETRIES",
+        513 => "NUMINTERIORRINGS",
+        514 => "NUMPOINTS",
+        515 => "OCT",
+        516 => "OCTET_LENGTH",
+        517 => "OLD_PASSWORD",
+        518 => "ORD",
+        519 => "OVERLAPS",
+        520 => "PASSWORD",
+        521 => "PERIOD_ADD",
+        522 => "PERIOD_DIFF",
+        523 => "PI",
+        524 => "POINT",
+        525 => "POINTFROMTEXT",
+        526 => "POINTFROMWKB",
+        527 => "POINTN",
+        528 => "POINTONSURFACE",
+        529 => "POLYFROMTEXT",
+        530 => "POLYFROMWKB",
+        531 => "POLYGON",
+        532 => "POLYGONFROMTEXT",
+        533 => "POLYGONFROMWKB",
+        534 => "POSITION",
+        535 => "POW",
+        536 => "POWER",
+        537 => "QUARTER",
+        538 => "QUOTE",
+        539 => "RADIANS",
+        540 => "RAND",
+        541 => "RELATED",
+        542 => "RELEASE_LOCK",
+        543 => "REPEAT",
+        544 => "REPLACE",
+        545 => "REVERSE",
+        546 => "RIGHT",
+        547 => "ROUND",
+        548 => "ROW_COUNT",
+        549 => "RPAD",
+        550 => "RTRIM",
+        551 => "SCHEMA",
+        552 => "SECOND",
+        553 => "SEC_TO_TIME",
+        554 => "SESSION_USER",
+        555 => "SHA",
+        556 => "SHA1",
+        557 => "SIGN",
+        558 => "SIN",
+        559 => "SLEEP",
+        560 => "SOUNDEX",
+        561 => "SPACE",
+        562 => "SQRT",
+        563 => "SRID",
+        564 => "STARTPOINT",
+        565 => "STD",
+        566 => "STDDEV",
+        567 => "STDDEV_POP",
+        568 => "STDDEV_SAMP",
+        569 => "STRCMP",
+        570 => "STR_TO_DATE",
+        571 => "SUBDATE",
+        572 => "SUBSTR",
+        573 => "SUBSTRING",
+        574 => "SUBSTRING_INDEX",
+        575 => "SUBTIME",
+        576 => "SUM",
+        577 => "SYMDIFFERENCE",
+        578 => "SYSDATE",
+        579 => "SYSTEM_USER",
+        580 => "TAN",
+        581 => "TIME",
+        582 => "TIMEDIFF",
+        583 => "TIMESTAMP",
+        584 => "TIMESTAMPADD",
+        585 => "TIMESTAMPDIFF",
+        586 => "TIME_FORMAT",
+        587 => "TIME_TO_SEC",
+        588 => "TOUCHES",
+        589 => "TO_DAYS",
+        590 => "TRIM",
+        591 => "TRUNCATE",
+        592 => "UCASE",
+        593 => "UNCOMPRESS",
+        594 => "UNCOMPRESSED_LENGTH",
+        595 => "UNHEX",
+        596 => "UNIQUE_USERS",
+        597 => "UNIX_TIMESTAMP",
+        598 => "UPDATEXML",
+        599 => "UPPER",
+        600 => "USER",
+        601 => "UTC_DATE",
+        602 => "UTC_TIME",
+        603 => "UTC_TIMESTAMP",
+        604 => "UUID",
+        605 => "VARIANCE",
+        606 => "VAR_POP",
+        607 => "VAR_SAMP",
+        608 => "VERSION",
+        609 => "WEEK",
+        610 => "WEEKDAY",
+        611 => "WEEKOFYEAR",
+        612 => "WITHIN",
+        613 => "X",
+        614 => "Y",
+        615 => "YEAR",
+        616 => "YEARWEEK",
     ]);
 }
 
@@ -4438,38 +4462,35 @@ if (!isset($excluded_functions["array_flatten"]) && (!function_exists("array_fla
      * ```
      *
      * @param iterable $array 対象配列
-     * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
+     * @param string|\Closure|null $delimiter キーの区切り文字。 null を与えると連番になる
      * @return array フラット化された配列
      */
     function array_flatten($array, $delimiter = null)
     {
-        // 要素追加について、 array_set だと目に見えて速度低下したのでベタに if else で分岐する
-        $core = function ($array, $delimiter) use (&$core) {
-            $result = [];
+        $result = [];
+        $core = function ($array, $delimiter, $parents) use (&$core, &$result) {
             foreach ($array as $k => $v) {
+                $keys = $parents;
+                $keys[] = $k;
                 if (is_iterable($v)) {
-                    foreach ($core($v, $delimiter) as $ik => $iv) {
-                        if ($delimiter === null) {
-                            $result[] = $iv;
-                        }
-                        else {
-                            $result[$k . $delimiter . $ik] = $iv;
-                        }
-                    }
+                    $core($v, $delimiter, $keys);
                 }
                 else {
                     if ($delimiter === null) {
                         $result[] = $v;
                     }
+                    elseif ($delimiter instanceof \Closure) {
+                        $result[$delimiter($keys)] = $v;
+                    }
                     else {
-                        $result[$k] = $v;
+                        $result[implode($delimiter, $keys)] = $v;
                     }
                 }
             }
-            return $result;
         };
 
-        return $core($array, $delimiter);
+        $core($array, $delimiter, []);
+        return $result;
     }
 }
 if (function_exists("array_flatten") && !defined("array_flatten")) {
@@ -6291,6 +6312,78 @@ if (!isset($excluded_functions["file_rewrite_contents"]) && (!function_exists("f
 }
 if (function_exists("file_rewrite_contents") && !defined("file_rewrite_contents")) {
     define("file_rewrite_contents", "file_rewrite_contents");
+}
+
+if (!isset($excluded_functions["file_pos"]) && (!function_exists("file_pos") || (!false && (new \ReflectionFunction("file_pos"))->isInternal()))) {
+    /**
+     * 範囲指定でファイルを読んで位置を返す
+     *
+     * Example:
+     * ```php
+     * // 適当にファイルを用意
+     * $testpath = sys_get_temp_dir() . '/file_pos.txt';
+     * file_put_contents($testpath, "hoge\nfuga\npiyo\nfuga");
+     * // fuga の位置を返す
+     * that(file_pos($testpath, 'fuga'))->is(5);
+     * // 2つ目の fuga の位置を返す
+     * that(file_pos($testpath, 'fuga', 6))->is(15);
+     * // 見つからない場合は false を返す
+     * that(file_pos($testpath, 'hogera'))->is(false);
+     * ```
+     *
+     * @param string $filename ファイル名
+     * @param string $needle 探す文字列
+     * @param int $offset 読み込み位置
+     * @param int|null $length 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
+     * @param int|null $chunksize 読み込みチャンクサイズ。省略時は 4096 の倍数に正規化
+     * @return int|false $needle の位置。見つからなかった場合は false
+     */
+    function file_pos($filename, $needle, $offset = 0, $length = null, $chunksize = null)
+    {
+        if (!is_file($filename)) {
+            throw new \InvalidArgumentException("'$filename' is not found.");
+        }
+
+        if ($offset < 0) {
+            $offset += $filesize ?? $filesize = filesize($filename);
+        }
+        if ($length === null) {
+            $length = $filesize ?? $filesize = filesize($filename);
+        }
+        if ($chunksize === null) {
+            $chunksize = 4096 * (strlen($needle) % 4096 + 1);
+        }
+
+        assert($chunksize >= strlen($needle));
+
+        $fp = fopen($filename, 'rb');
+        try {
+            fseek($fp, $offset);
+            while (!feof($fp)) {
+                if ($offset > $length) {
+                    break;
+                }
+                $last = $part ?? '';
+                $part = fread($fp, $chunksize);
+                if (($p = strpos($part, $needle)) !== false) {
+                    $result = $offset + $p;
+                    return $result + strlen($needle) > $length ? false : $result;
+                }
+                if (($p = strpos($last . $part, $needle)) !== false) {
+                    $result = $offset + $p - strlen($last);
+                    return $result + strlen($needle) > $length ? false : $result;
+                }
+                $offset += strlen($part);
+            }
+            return false;
+        }
+        finally {
+            fclose($fp);
+        }
+    }
+}
+if (function_exists("file_pos") && !defined("file_pos")) {
+    define("file_pos", "file_pos");
 }
 
 if (!isset($excluded_functions["mkdir_p"]) && (!function_exists("mkdir_p") || (!false && (new \ReflectionFunction("mkdir_p"))->isInternal()))) {
@@ -8793,18 +8886,16 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
     function http_requests($urls, $default_options = [])
     {
         // 固定オプション（必ずこの値が使用される）
-        $default1 = [
+        $default = [
+            'raw'                  => true,
+            'throw'                => false,
+            CURLOPT_FAILONERROR    => false,
             CURLOPT_RETURNTRANSFER => true, // 戻り値として返す
             CURLOPT_HEADER         => true, // ヘッダを含める
             CURLOPT_SAFE_UPLOAD    => true, // @付きフィールドをファイルと見なさない
         ];
 
-        // 可変オプション（指定がない場合のみ使用される）
-        $default_options += [
-            CURLOPT_FOLLOWLOCATION => true, // リダイレクトをたどる
-            CURLOPT_MAXREDIRS      => 16,   // リダイレクトをたどる回数
-        ];
-
+        $responses = [];
         $resultmap = [];
         $mh = curl_multi_init();
         foreach ($urls as $key => $opt) {
@@ -8815,15 +8906,20 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
                 ];
             }
 
-            $ch = curl_init();
-            curl_setopt_array($ch, $default1 + $opt + $default_options);
-            curl_multi_add_handle($mh, $ch);
+            $rheader = null;
+            $info = null;
+            $res = http_request($default + $opt + $default_options, $rheader, $info);
+            if (is_array($res) && isset($res[0]) && is_resource($res[0])) {
+                curl_multi_add_handle($mh, $res[0]);
 
-            // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-            $resultmap["$ch"] = $key;
+                // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
+                $resultmap[(string) $res[0]] = [$key, $res[1]];
+            }
+            else {
+                $responses[$key] = [$res, $rheader, $info];
+            }
         }
 
-        $responses = [];
         do {
             do {
                 $mrc = curl_multi_exec($mh, $active);
@@ -8842,14 +8938,13 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
                 $handle = $minfo['handle'];
 
                 if ($minfo['result'] !== CURLE_OK) {
-                    $responses[$resultmap["$handle"]] = $minfo['result'];
+                    $responses[$resultmap[(string) $handle][0]] = $minfo['result'];
                 }
                 else {
                     $info = curl_getinfo($handle);
                     $response = curl_multi_getcontent($handle);
-                    $headers = str_array(substr($response, 0, $info['header_size']), ':', true);
-                    $body = substr($response, $info['header_size']);
-                    $responses[$resultmap["$handle"]] = [$body, $headers, $info];
+                    [$info, $headers, $body] = $resultmap[(string) $handle][1]($response, $info);
+                    $responses[$resultmap[(string) $handle][0]] = [$body, $headers, $info];
                 }
 
                 curl_multi_remove_handle($mh, $handle);
@@ -8866,6 +8961,433 @@ if (function_exists("http_requests") && !defined("http_requests")) {
     define("http_requests", "http_requests");
 }
 
+if (!isset($excluded_functions["http_request"]) && (!function_exists("http_request") || (!false && (new \ReflectionFunction("http_request"))->isInternal()))) {
+    /**
+     * curl のラッパー関数
+     *
+     * curl は高機能だけど、低レベルで設定が細かすぎる上に似たようなものが大量にあるので素で書くのが割とつらい。
+     * のでデフォルトをスタンダードな設定に寄せつつ、多少便利になるようにラップしている。
+     * まぁ現在では guzzle みたいなクライアントも整ってるし、使い捨てスクリプトでサクッとリクエストを投げたい時用。
+     *
+     * 生 curl との差異は下記。
+     *
+     * - `CURLOPT_HTTPHEADER` は連想配列指定が可能
+     * - `CURLOPT_POSTFIELDS` は連想配列・多次元配列指定が可能
+     * - 単一ファイル指定は単一アップロードになる
+     *
+     * さらに独自のオプションとして下記がある。
+     *
+     * - `raw` (bool): curl インスタンスと変換クロージャを返すだけになる
+     *     - ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず
+     * - `throw` (bool): ステータスコードが 400 以上のときに例外を投げる
+     *     - `CURLOPT_FAILONERROR` は原則使わないほうがいいと思う
+     * - `atfile` (bool): キーに @ があるフィールドをファイルアップロードとみなす
+     *     - 悪しき `CURLOPT_SAFE_UPLOAD` の代替。ただし値ではなくキーで判別する
+     *     - 値が配列のフィールドのキーに @ をつけると連番要素のみアップロードになる
+     * - `cachedir` (string): GET のときにクライアントキャッシュや 304 キャッシュが効くようになる
+     *     - Cache-Control の private, public は見ないので一応注意
+     * - `parser` (array): Content-Type に基づいて body をパースする
+     *     - 今のところ application/json のみ
+     *
+     * また、頻出するオプションは下記の定数のエイリアスがあり、単純に読み替えられる。
+     *
+     * - `url`: `CURLOPT_URL`
+     * - `method`: `CURLOPT_CUSTOMREQUEST`
+     * - `cookie`: `CURLOPT_COOKIE`
+     * - `header`: `CURLOPT_HTTPHEADER`
+     * - `body`: `CURLOPT_POSTFIELDS`
+     * - `cookie_file`: `CURLOPT_COOKIEJAR`, `CURLOPT_COOKIEFILE`
+     *
+     * Example:
+     * ```php
+     * $response = http_request([
+     *     'url'    => 'http://httpbin.org/post?name=value',
+     *     'method' => 'POST',
+     *     'body'   => ['k1' => 'v1', 'k2' => 'v2'],
+     * ]);
+     * that($response['args'])->is([
+     *     'name' => 'value',
+     * ]);
+     * that($response['form'])->is([
+     *     'k1' => 'v1',
+     *     'k2' => 'v2',
+     * ]);
+     * ```
+     *
+     * @param array $options curl_setopt_array に渡される
+     * @param array $response_header レスポンスヘッダが連想配列で格納される
+     * @param array $info curl_getinfo が格納される
+     * @return mixed レスポンスボディ
+     */
+    function http_request($options = [], &$response_header = [], &$info = [])
+    {
+        $options += [
+            // curl options
+            CURLOPT_CUSTOMREQUEST  => 'GET', // リクエストメソッド
+            CURLINFO_HEADER_OUT    => true,  // リクエストヘッダを含める
+            CURLOPT_HTTPHEADER     => [],    // リクエストヘッダ
+            CURLOPT_COOKIE         => null,  // リクエストクッキー
+            CURLOPT_POSTFIELDS     => null,  // リクエストボディ
+            CURLOPT_NOBODY         => false, // HEAD 用
+            CURLOPT_ENCODING       => "",    // Accept-Encoding 兼自動展開
+            CURLOPT_SAFE_UPLOAD    => true,  // @付きフィールドをファイルと見なさない
+            CURLOPT_FOLLOWLOCATION => true,  // リダイレクトをたどる
+            CURLOPT_MAXREDIRS      => 16,    // リダイレクトをたどる回数
+            CURLOPT_RETURNTRANSFER => true,  // 戻り値として返す
+            CURLOPT_HEADER         => true,  // レスポンスヘッダを含める
+            CURLOPT_CONNECTTIMEOUT => 60,    // timeout on connect
+            CURLOPT_TIMEOUT        => 60,    // timeout on response
+
+            // alias option
+            'url'                  => null,
+            'method'               => null,
+            'cookie'               => null,
+            'header'               => null,
+            'body'                 => null,
+            'cookie_file'          => null,
+
+            // custom options
+            'raw'                  => false,
+            'throw'                => true,
+            'atfile'               => true,
+            'cachedir'             => null,
+            'parser'               => [
+                'application/json' => [
+                    'request'  => json_export,
+                    'response' => json_import,
+                ],
+            ],
+        ];
+
+        // 利便性用の定数エイリアス
+        $options[CURLOPT_URL] = $options['url'] ?? $options[CURLOPT_URL];
+        $options[CURLOPT_CUSTOMREQUEST] = $options['method'] ?? $options[CURLOPT_CUSTOMREQUEST];
+        $options[CURLOPT_COOKIE] = $options['cookie'] ?? $options[CURLOPT_COOKIE];
+        $options[CURLOPT_HTTPHEADER] = $options['header'] ?? $options[CURLOPT_HTTPHEADER];
+        $options[CURLOPT_POSTFIELDS] = $options['body'] ?? $options[CURLOPT_POSTFIELDS];
+        if (isset($options['cookie_file'])) {
+            $options[CURLOPT_COOKIEJAR] = $options['cookie_file'];
+            $options[CURLOPT_COOKIEFILE] = $options['cookie_file'];
+        }
+
+        // ヘッダは後段の判定に頻出するので正規化して取得しておく
+        $request_header = array_kvmap($options[CURLOPT_HTTPHEADER], function ($k, $v) {
+            if (is_int($k)) {
+                [$k, $v] = explode(':', $v, 2);
+            }
+            return [strtolower(trim($k)) => trim($v)];
+        });
+
+        // request body 変換
+        if ($convert = ($options['parser'][$request_header['content-type'] ?? null]['request'] ?? null)) {
+            $options[CURLOPT_POSTFIELDS] = $convert($options[CURLOPT_POSTFIELDS]);
+        }
+
+        // response クロージャ
+        $response_parse = function ($response, $info) use ($options) {
+            [$head, $body] = str_chunk($response, $info['header_size']);
+
+            $head = str_array($head, ':', true);
+            $info['no_request'] = false;
+            $info['response_size'] = strlen($response);
+            $info['content_type'] = $info['content_type'] ?? null;
+            $info['cache_control'] = $head['Cache-Control'] ?? null;
+            $info['last_modified'] = $head['Last-Modified'] ?? null;
+            $info['etag'] = $head['ETag'] ?? null;
+            if (isset($info['request_header']) && is_string($info['request_header'])) {
+                $info['request_header'] = str_array($info['request_header'], ':', true);
+            }
+
+            if (!($options[CURLOPT_NOBODY] ?? false)) {
+                if ($convert = ($options['parser'][$info['content_type']]['response'] ?? null)) {
+                    $body = $convert($body);
+                }
+            }
+
+            return [$info, $head, $body];
+        };
+
+        // キャッシュのキー
+        $filekey = null;
+        if ($options[CURLOPT_CUSTOMREQUEST] === 'GET' && isset($options['cachedir'])) {
+            [$url, $query] = explode('?', $options[CURLOPT_URL]) + [1 => ''];
+            $filekey = $options['cachedir'] . DIRECTORY_SEPARATOR . urlencode($url) . sha1($query);
+        }
+
+        // http cache
+        if (isset($filekey)) {
+            if (file_exists($filekey)) {
+                $fp = fopen($filekey, 'r');
+                try {
+                    $info = json_decode(fgets($fp), true);
+                    if (stripos($info['cache_control'], 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'], $matches)) {
+                        clearstatcache(true, $filekey);
+                        if (time() - filemtime($filekey) < $matches[1]) {
+                            $info['no_request'] = true;
+                            $response = stream_get_contents($fp);
+                            [, $response_header, $body] = $response_parse($response, $info);
+                            return $body;
+                        }
+                    }
+
+                    if ($info['last_modified']) {
+                        $options[CURLOPT_HTTPHEADER]['if-modified-since'] = $info['last_modified'];
+                    }
+                    if ($info['etag']) {
+                        $options[CURLOPT_HTTPHEADER]['if-none-match'] = $info['etag'];
+                    }
+                }
+                finally {
+                    fclose($fp);
+                }
+            }
+        }
+
+        // http cache クロージャ
+        $cache = function ($response, $info) use ($filekey, $response_parse) {
+            if (isset($filekey)) {
+                if ($info['http_code'] === 200 && stripos($info['cache_control'], 'no-store') === false) {
+                    file_set_contents($filekey, json_encode($info, JSON_UNESCAPED_SLASHES) . "\n" . $response);
+                }
+                if ($info['http_code'] === 304 && file_exists($filekey)) {
+                    touch($filekey);
+                    [$info2, $response] = explode("\n", file_get_contents($filekey), 2);
+                    return $response_parse($response, json_decode($info2, true))[2];
+                }
+            }
+        };
+
+        // CURLOPT_POSTFIELDS は配列を渡せば万事 OK ・・・と思いきや多次元には対応していないのでフラットにする
+        if (is_array($options[CURLOPT_POSTFIELDS])) {
+            // の、前に @ 付きキーを CURLFile に変換
+            if ($options['atfile']) {
+                $options[CURLOPT_POSTFIELDS] = array_kvmap($options[CURLOPT_POSTFIELDS], function ($k, $v, $callback) {
+                    $atfile = ($k[0] ?? null) === '@';
+                    if ($atfile) {
+                        $k = substr($k, 1);
+                        if (is_array($v)) {
+                            $v = array_kvmap($v, function ($k, $v) { return [is_int($k) ? "@$k" : $k => $v]; });
+                        }
+                        else {
+                            $v = new \CURLFile($v);
+                        }
+                    }
+                    if (is_array($v)) {
+                        $v = array_kvmap($v, $callback);
+                    }
+                    return [$k => $v];
+                });
+            }
+            // CURLFile が含まれているかもしれないので http_build_query は使えない
+            $options[CURLOPT_POSTFIELDS] = array_flatten($options[CURLOPT_POSTFIELDS], function ($keys) {
+                return array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : '');
+            });
+        }
+
+        // 単一ファイルは単一アップロードとする
+        if ($options[CURLOPT_POSTFIELDS] instanceof \CURLFile) {
+            $file = $options[CURLOPT_POSTFIELDS];
+            unset($options[CURLOPT_POSTFIELDS]);
+            if (!isset($request_header['content-type'])) {
+                $options[CURLOPT_HTTPHEADER]['content-type'] = $file->getMimeType() ?: mime_content_type($file->getFilename());
+            }
+            $options[CURLOPT_INFILE] = fopen($file->getFilename(), 'r');
+            $options[CURLOPT_INFILESIZE] = filesize($file->getFilename());
+            $options[CURLOPT_PUT] = true;
+        }
+
+        // CURLOPT_HTTPHEADER は素の配列しか受け入れてくれないので連想配列を k: v 形式に変換
+        $options[CURLOPT_HTTPHEADER] = array_sprintf($options[CURLOPT_HTTPHEADER], function ($v, $k) {
+            return is_int($k) ? $v : "$k: $v";
+        });
+
+        // 同上： CURLOPT_COOKIE
+        if ($options[CURLOPT_COOKIE] && is_array($options[CURLOPT_COOKIE])) {
+            $options[CURLOPT_COOKIE] = array_sprintf($options[CURLOPT_COOKIE], function ($v, $k) {
+                return is_int($k) ? $v : rawurlencode($k) . "=" . rawurlencode($v);
+            }, '; ');
+        }
+
+        $responser = function ($response, $info) use ($response_parse, $cache) {
+            [$info, $head, $body] = $response_parse($response, $info);
+            return [$info, $head, $cache($response, $info) ?? $body];
+        };
+
+        $ch = curl_init();
+        curl_setopt_array($ch, array_filter($options, 'is_int', ARRAY_FILTER_USE_KEY));
+        if ($options['raw']) {
+            return [$ch, $responser];
+        }
+
+        try {
+            $response = curl_exec($ch);
+            $info = curl_getinfo($ch);
+
+            if ($response === false) {
+                throw new \RuntimeException(curl_error($ch), curl_errno($ch));
+            }
+        }
+        finally {
+            curl_close($ch);
+        }
+
+        if ($options['throw'] && $info['http_code'] >= 400) {
+            throw new \UnexpectedValueException("status is {$info['http_code']}.");
+        }
+
+        [$info, $response_header, $body] = $responser($response, $info);
+        return $body;
+    }
+}
+if (function_exists("http_request") && !defined("http_request")) {
+    define("http_request", "http_request");
+}
+
+if (!isset($excluded_functions["http_head"]) && (!function_exists("http_head") || (!false && (new \ReflectionFunction("http_head"))->isInternal()))) {
+    /**
+     * {@link http_request() http_request} の HEAD 特化版
+     *
+     * @inheritdoc http_request()
+     *
+     * @param string $url 対象 URL
+     * @param mixed $data パラメータ
+     * @return mixed レスポンスボディ
+     */
+    function http_head($url, $data = [], $options = [], &$response_header = [], &$info = [])
+    {
+        $default = [
+            'method'       => 'HEAD',
+            CURLOPT_NOBODY => true,
+        ];
+        return http_get($url, $data, $options + $default, $response_header, $info);
+    }
+}
+if (function_exists("http_head") && !defined("http_head")) {
+    define("http_head", "http_head");
+}
+
+if (!isset($excluded_functions["http_get"]) && (!function_exists("http_get") || (!false && (new \ReflectionFunction("http_get"))->isInternal()))) {
+    /**
+     * {@link http_request() http_request} の GET 特化版
+     *
+     * @inheritdoc http_request()
+     *
+     * @param string $url 対象 URL
+     * @param mixed $data パラメータ
+     * @return mixed レスポンスボディ
+     */
+    function http_get($url, $data = [], $options = [], &$response_header = [], &$info = [])
+    {
+        if (!is_empty($data, true)) {
+            $url .= (strrpos($url, '?') === false ? '?' : '&') . (is_array($data) || is_object($data) ? http_build_query($data) : $data);
+        }
+        $default = [
+            'url'    => $url,
+            'method' => 'GET',
+        ];
+        return http_request($options + $default, $response_header, $info);
+    }
+}
+if (function_exists("http_get") && !defined("http_get")) {
+    define("http_get", "http_get");
+}
+
+if (!isset($excluded_functions["http_post"]) && (!function_exists("http_post") || (!false && (new \ReflectionFunction("http_post"))->isInternal()))) {
+    /**
+     * {@link http_request() http_request} の POST 特化版
+     *
+     * @inheritdoc http_request()
+     *
+     * @param string $url 対象 URL
+     * @param mixed $data パラメータ
+     * @return mixed レスポンスボディ
+     */
+    function http_post($url, $data = [], $options = [], &$response_header = [], &$info = [])
+    {
+        $default = [
+            'url'    => $url,
+            'method' => 'POST',
+            'body'   => $data,
+        ];
+        return http_request($options + $default, $response_header, $info);
+    }
+}
+if (function_exists("http_post") && !defined("http_post")) {
+    define("http_post", "http_post");
+}
+
+if (!isset($excluded_functions["http_put"]) && (!function_exists("http_put") || (!false && (new \ReflectionFunction("http_put"))->isInternal()))) {
+    /**
+     * {@link http_request() http_request} の PUT 特化版
+     *
+     * @inheritdoc http_request()
+     *
+     * @param string $url 対象 URL
+     * @param mixed $data パラメータ
+     * @return mixed レスポンスボディ
+     */
+    function http_put($url, $data = [], $options = [], &$response_header = [], &$info = [])
+    {
+        $default = [
+            'url'    => $url,
+            'method' => 'PUT',
+            'body'   => $data,
+        ];
+        return http_request($options + $default, $response_header, $info);
+    }
+}
+if (function_exists("http_put") && !defined("http_put")) {
+    define("http_put", "http_put");
+}
+
+if (!isset($excluded_functions["http_patch"]) && (!function_exists("http_patch") || (!false && (new \ReflectionFunction("http_patch"))->isInternal()))) {
+    /**
+     * {@link http_request() http_request} の PATCH 特化版
+     *
+     * @inheritdoc http_request()
+     *
+     * @param string $url 対象 URL
+     * @param mixed $data パラメータ
+     * @return mixed レスポンスボディ
+     */
+    function http_patch($url, $data = [], $options = [], &$response_header = [], &$info = [])
+    {
+        $default = [
+            'url'    => $url,
+            'method' => 'PATCH',
+            'body'   => $data,
+        ];
+        return http_request($options + $default, $response_header, $info);
+    }
+}
+if (function_exists("http_patch") && !defined("http_patch")) {
+    define("http_patch", "http_patch");
+}
+
+if (!isset($excluded_functions["http_delete"]) && (!function_exists("http_delete") || (!false && (new \ReflectionFunction("http_delete"))->isInternal()))) {
+    /**
+     * {@link http_request() http_request} の DELETE 特化版
+     *
+     * @inheritdoc http_request()
+     *
+     * @param string $url 対象 URL
+     * @param mixed $data パラメータ
+     * @return mixed レスポンスボディ
+     */
+    function http_delete($url, $data = [], $options = [], &$response_header = [], &$info = [])
+    {
+        $default = [
+            'url'    => $url,
+            'method' => 'DELETE',
+            'body'   => $data,
+        ];
+        return http_request($options + $default, $response_header, $info);
+    }
+}
+if (function_exists("http_delete") && !defined("http_delete")) {
+    define("http_delete", "http_delete");
+}
+
 if (!isset($excluded_functions["sql_quote"]) && (!function_exists("sql_quote") || (!false && (new \ReflectionFunction("sql_quote"))->isInternal()))) {
     /**
      * ものすごく雑に値をクオートする
@@ -8876,7 +9398,7 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("sql_quote") |
      * - null は NULL になる
      * - 数字はそのまま数字になる
      * - bool は 0 or 1 になる
-     * - それ以外は addslashes される
+     * - それ以外は addcslashes される
      *
      * Example:
      * ```php
@@ -8900,7 +9422,7 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("sql_quote") |
         if (is_bool($value)) {
             return (int) $value;
         }
-        return "'" . addslashes("$value") . "'";
+        return "'" . addcslashes((string) $value, "\0\e\f\n\r\t\v'\\") . "'";
     }
 }
 if (function_exists("sql_quote") && !defined("sql_quote")) {
@@ -9787,6 +10309,48 @@ if (!isset($excluded_functions["strpos_quoted"]) && (!function_exists("strpos_qu
 }
 if (function_exists("strpos_quoted") && !defined("strpos_quoted")) {
     define("strpos_quoted", "strpos_quoted");
+}
+
+if (!isset($excluded_functions["str_chunk"]) && (!function_exists("str_chunk") || (!false && (new \ReflectionFunction("str_chunk"))->isInternal()))) {
+    /**
+     * 文字列を可変引数の数で分割する
+     *
+     * str_split の $length を個別に指定できるイメージ。
+     * 長さ以上を指定したりしても最後の要素は必ずついてくる（指定数で分割した後のあまり文字が最後の要素になる）。
+     * これは最後が空文字でも同様で、 list での代入を想定しているため。
+     *
+     * Example:
+     * ```php
+     * // 1, 2, 3 文字に分割（ぴったりなので変わったことはない）
+     * that(str_chunk('abcdef', 1, 2, 3))->isSame(['a', 'bc', 'def', '']);
+     * // 2, 3 文字に分割（余った f も最後の要素として含まれてくる）
+     * that(str_chunk('abcdef', 2, 3))->isSame(['ab', 'cde', 'f']);
+     * // 1, 10 文字に分割
+     * that(str_chunk('abcdef', 1, 10))->isSame(['a', 'bcdef', '']);
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param int[] ...$chunks 分割の各文字数（可変引数）
+     * @return string[] 分割された文字列配列
+     */
+    function str_chunk($string, ...$chunks)
+    {
+        $offset = 0;
+        $length = strlen($string);
+        $result = [];
+        foreach ($chunks as $chunk) {
+            if ($offset >= $length) {
+                break;
+            }
+            $result[] = substr($string, $offset, $chunk);
+            $offset += $chunk;
+        }
+        $result[] = (string) substr($string, $offset);
+        return $result;
+    }
+}
+if (function_exists("str_chunk") && !defined("str_chunk")) {
+    define("str_chunk", "str_chunk");
 }
 
 if (!isset($excluded_functions["str_anyof"]) && (!function_exists("str_anyof") || (!false && (new \ReflectionFunction("str_anyof"))->isInternal()))) {
@@ -15754,6 +16318,268 @@ if (!isset($excluded_functions["backtrace"]) && (!function_exists("backtrace") |
 }
 if (function_exists("backtrace") && !defined("backtrace")) {
     define("backtrace", "backtrace");
+}
+
+if (!isset($excluded_functions["profiler"]) && (!function_exists("profiler") || (!false && (new \ReflectionFunction("profiler"))->isInternal()))) {
+    /**
+     * 外部ツールに頼らない pure php なプロファイラを返す
+     *
+     * file プロトコル上書きと ticks と debug_backtrace によるかなり無理のある実装なので動かない環境・コードは多い。
+     * その分お手軽だが下記の注意点がある。
+     *
+     * - file プロトコルを上書きするので、既に読み込み済みのファイルは計上されない
+     * - tick されないステートメントは計上されない
+     *     - 1行メソッドなどでありがち
+     * - A->B->C という呼び出しで C が 3秒、B が 2秒、A が1秒かかった場合、 A は 6 秒、B は 5秒、C は 3 秒といて計上される
+     *     - つまり、配下の呼び出しも重複して計上される
+     *
+     * この関数を呼んだ時点で計測は始まる。
+     * 返り値としてイテレータを返すので、foreach で回せばコールスタック・回数・時間などが取得できる。
+     * 配列で欲しい場合は直に呼べば良い。
+     *
+     * @param array $options オプション配列
+     * @return \Traversable|callable プロファイライテレータ
+     */
+    function profiler($options = [])
+    {
+        $declareProtocol = new
+        /**
+         * @method opendir($path, $context = null)
+         * @method touch($filename, $time = null, $atime = null)
+         * @method chmod($filename, $mode)
+         * @method chown($filename, $user)
+         * @method chgrp($filename, $group)
+         * @method fopen($filename, $mode, $use_include_path = false, $context = null)
+         */
+        class {
+            /** @var int https://github.com/php/php-src/blob/php-7.2.11/main/php_streams.h#L528-L529 */
+            private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
+
+            /** @var resource https://www.php.net/manual/class.streamwrapper.php */
+            public $context;
+
+            private $require;
+            private $handle;
+
+            public function __call($name, $arguments)
+            {
+                $fname = preg_replace(['#^dir_#', '#^stream_#'], ['', 'f'], $name, 1, $count);
+                if ($count) {
+                    // flock は特別扱い（file_put_contents (LOCK_EX) を呼ぶと 0 で来ることがある）
+                    // __call で特別扱いもおかしいけど、個別に定義するほうが逆にわかりにくい
+                    if ($fname === 'flock' && ($arguments[0] ?? null) === 0) {
+                        return true;
+                    }
+                    return $fname($this->handle, ...$arguments);
+                }
+
+                stream_wrapper_restore('file');
+                try {
+                    switch ($name) {
+                        default:
+                            // mkdir, rename, unlink, ...
+                            return $name(...$arguments);
+                        case 'rmdir':
+                            [$path, $options] = $arguments + [1 => 0];
+                            assert(isset($options)); // @todo It is used?
+                            return rmdir($path, $this->context);
+                        case 'url_stat':
+                            [$path, $flags] = $arguments + [1 => 0];
+                            if ($flags & STREAM_URL_STAT_LINK) {
+                                $func = 'lstat';
+                            }
+                            else {
+                                $func = 'stat';
+                            }
+                            if ($flags & STREAM_URL_STAT_QUIET) {
+                                return @$func($path);
+                            }
+                            else {
+                                return $func($path);
+                            }
+                    }
+                }
+                finally {
+                    stream_wrapper_unregister('file');
+                    stream_wrapper_register('file', get_class($this));
+                }
+            }
+
+            public function dir_opendir($path, $options)
+            {
+                return !!$this->handle = $this->opendir(...$this->context ? [$path, $this->context] : [$path]);
+            }
+
+            public function stream_open($path, $mode, $options, &$opened_path)
+            {
+                $use_path = $options & STREAM_USE_PATH;
+                $this->require = $options & self::STREAM_OPEN_FOR_INCLUDE;
+                if ($options & STREAM_REPORT_ERRORS) {
+                    $this->handle = $this->fopen($path, $mode, $use_path); // @codeCoverageIgnore
+                }
+                else {
+                    $this->handle = @$this->fopen($path, $mode, $use_path);
+                }
+                if ($use_path && $this->handle) {
+                    $opened_path = stream_get_meta_data($this->handle)['uri']; // @codeCoverageIgnore
+                }
+                return !!$this->handle;
+            }
+
+            public function stream_read($count)
+            {
+                $DECLARE = "<?php declare(ticks=1) ?>";
+
+                $pos = ftell($this->handle);
+                $return = fread($this->handle, $count - strlen($DECLARE));
+                if ($return === false) {
+                    return false; // @codeCoverageIgnore
+                }
+
+                $prefix = '';
+                if ($pos === 0 && $this->require) {
+                    $prefix = $DECLARE;
+                }
+                return $prefix . $return;
+            }
+
+            public function stream_set_option($option, $arg1, $arg2)
+            {
+                // Windows の file スキームでは呼ばれない？（確かにブロッキングやタイムアウトは無縁そう）
+                // @codeCoverageIgnoreStart
+                switch ($option) {
+                    default:
+                        throw new \Exception();
+                    case STREAM_OPTION_BLOCKING:
+                        return stream_set_blocking($this->handle, $arg1);
+                    case STREAM_OPTION_READ_TIMEOUT:
+                        return stream_set_timeout($this->handle, $arg1, $arg2);
+                    case STREAM_OPTION_WRITE_BUFFER:
+                        return stream_set_write_buffer($this->handle, $arg2); // @todo $arg1 is used?
+                }
+                // @codeCoverageIgnoreEnd
+            }
+
+            public function stream_metadata($path, $option, $value)
+            {
+                switch ($option) {
+                    default:
+                        throw new \Exception(); // @codeCoverageIgnore
+                    case STREAM_META_TOUCH:
+                        return $this->touch($path, ...$value);
+                    case STREAM_META_ACCESS:
+                        return $this->chmod($path, $value);
+                    case STREAM_META_OWNER_NAME:
+                    case STREAM_META_OWNER:
+                        return $this->chown($path, $value);
+                    case STREAM_META_GROUP_NAME:
+                    case STREAM_META_GROUP:
+                        return $this->chgrp($path, $value);
+                }
+            }
+
+            public function stream_cast($cast_as) { /* @todo I'm not sure */ }
+        };
+
+        $profiler = new class(get_class($declareProtocol), $options) implements \IteratorAggregate {
+            private $wrapper;
+            private $options;
+            private $last_trace;
+            private $result;
+
+            public function __construct($wrapper, $options = [])
+            {
+                $this->wrapper = $wrapper;
+                $this->options = array_replace([
+                    'callee'   => null,
+                    'location' => null,
+                ], $options);
+
+                $this->last_trace = [];
+                $this->result = [];
+
+                stream_wrapper_unregister('file');
+                stream_wrapper_register('file', $this->wrapper);
+
+                register_tick_function([$this, 'tick']);
+                opcache_reset();
+            }
+
+            public function __destruct()
+            {
+                unregister_tick_function([$this, 'tick']);
+
+                stream_wrapper_restore('file');
+            }
+
+            public function __invoke()
+            {
+                return $this->result;
+            }
+
+            public function getIterator()
+            {
+                return yield from $this->result;
+            }
+
+            public function tick()
+            {
+                $now = microtime(true);
+                $traces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+                $last_count = count($this->last_trace);
+                $current_count = count($traces);
+
+                // スタック数が変わってない（=同じメソッドを処理している？）
+                if ($current_count === $last_count) {
+                    // dummy
+                    assert($current_count === $last_count);
+                }
+                // スタック数が増えた（=新しいメソッドが開始された？）
+                elseif ($current_count > $last_count) {
+                    foreach (array_slice($traces, 1, $current_count - $last_count) as $last) {
+                        $last['time'] = $now;
+                        $last['callee'] = (isset($last['class'], $last['type']) ? $last['class'] . $last['type'] : '') . $last['function'];
+                        $last['location'] = isset($last['file'], $last['line']) ? $last['file'] . '#' . $last['line'] : null;
+                        array_unshift($this->last_trace, $last);
+                    }
+                }
+                // スタック数が減った（=処理してたメソッドを抜けた？）
+                elseif ($current_count < $last_count) {
+                    $prev = null; // array_map などの内部関数はスタックが一気に2つ増減する
+                    foreach (array_splice($this->last_trace, 0, $last_count - $current_count) as $last) {
+                        $time = $now - $last['time'];
+                        $callee = $last['callee'];
+                        $location = $last['location'] ?? ($prev['file'] ?? '') . '#' . ($prev['line'] ?? '');
+                        $prev = $last;
+
+                        foreach (['callee', 'location'] as $key) {
+                            $condition = $this->options[$key];
+                            $value = $$key;
+                            if ($condition !== null) {
+                                if ($condition instanceof \Closure) {
+                                    if (!$condition($value)) {
+                                        continue 2;
+                                    }
+                                }
+                                else {
+                                    if (preg_match($condition, $value) === false) {
+                                        continue 2;
+                                    }
+                                }
+                            }
+                        }
+                        $this->result[$callee][$location][] = $time;
+                    }
+                }
+            }
+        };
+
+        return $profiler;
+    }
+}
+if (function_exists("profiler") && !defined("profiler")) {
+    define("profiler", "profiler");
 }
 
 if (!isset($excluded_functions["error"]) && (!function_exists("error") || (!false && (new \ReflectionFunction("error"))->isInternal()))) {

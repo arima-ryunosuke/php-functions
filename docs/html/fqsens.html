@@ -2187,6 +2187,23 @@ that($testpath)-&gt;fileEquals('pre-hoge-fix');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_pos()">
+                                    ryunosuke\Functions\Package\FileSystem::file_pos		</a>	<small>($filename, $needle, $offset = 0, $length = null, $chunksize = null) : int<span class="type-separator"></span><wbr>false</small>
+		</h4>
+	<div class="description"><p>範囲指定でファイルを読んで位置を返す</p>
+<p>Example:</p>
+<pre><code class="language-php">// 適当にファイルを用意
+$testpath = sys_get_temp_dir() . '/file_pos.txt';
+file_put_contents($testpath, "hoge\nfuga\npiyo\nfuga");
+// fuga の位置を返す
+that(file_pos($testpath, 'fuga'))-&gt;is(5);
+// 2つ目の fuga の位置を返す
+that(file_pos($testpath, 'fuga', 6))-&gt;is(15);
+// 見つからない場合は false を返す
+that(file_pos($testpath, 'hogera'))-&gt;is(false);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::mkdir_p()">
                                     ryunosuke\Functions\Package\FileSystem::mkdir_p		</a>	<small>($dirname, $umask = 2) : bool</small>
 		</h4>
@@ -3005,6 +3022,104 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 ];
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_request()">
+                                    ryunosuke\Functions\Package\Network::http_request		</a>	<small>($options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p>curl のラッパー関数</p>
+<p>curl は高機能だけど、低レベルで設定が細かすぎる上に似たようなものが大量にあるので素で書くのが割とつらい。<br />
+のでデフォルトをスタンダードな設定に寄せつつ、多少便利になるようにラップしている。<br />
+まぁ現在では guzzle みたいなクライアントも整ってるし、使い捨てスクリプトでサクッとリクエストを投げたい時用。</p>
+<p>生 curl との差異は下記。</p>
+<ul>
+<li><code>CURLOPT_HTTPHEADER</code> は連想配列指定が可能</li>
+<li><code>CURLOPT_POSTFIELDS</code> は連想配列・多次元配列指定が可能</li>
+<li>単一ファイル指定は単一アップロードになる</li>
+</ul>
+<p>さらに独自のオプションとして下記がある。</p>
+<ul>
+<li><code>raw</code> (bool): curl インスタンスと変換クロージャを返すだけになる<ul>
+<li>ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず</li>
+</ul>
+</li>
+<li><code>throw</code> (bool): ステータスコードが 400 以上のときに例外を投げる<ul>
+<li><code>CURLOPT_FAILONERROR</code> は原則使わないほうがいいと思う</li>
+</ul>
+</li>
+<li><code>atfile</code> (bool): キーに @ があるフィールドをファイルアップロードとみなす<ul>
+<li>悪しき <code>CURLOPT_SAFE_UPLOAD</code> の代替。ただし値ではなくキーで判別する</li>
+<li>値が配列のフィールドのキーに @ をつけると連番要素のみアップロードになる</li>
+</ul>
+</li>
+<li><code>cachedir</code> (string): GET のときにクライアントキャッシュや 304 キャッシュが効くようになる<ul>
+<li>Cache-Control の private, public は見ないので一応注意</li>
+</ul>
+</li>
+<li><code>parser</code> (array): Content-Type に基づいて body をパースする<ul>
+<li>今のところ application/json のみ</li>
+</ul>
+</li>
+</ul>
+<p>また、頻出するオプションは下記の定数のエイリアスがあり、単純に読み替えられる。</p>
+<ul>
+<li><code>url</code>: <code>CURLOPT_URL</code></li>
+<li><code>method</code>: <code>CURLOPT_CUSTOMREQUEST</code></li>
+<li><code>cookie</code>: <code>CURLOPT_COOKIE</code></li>
+<li><code>header</code>: <code>CURLOPT_HTTPHEADER</code></li>
+<li><code>body</code>: <code>CURLOPT_POSTFIELDS</code></li>
+<li><code>cookie_file</code>: <code>CURLOPT_COOKIEJAR</code>, <code>CURLOPT_COOKIEFILE</code></li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$response = http_request([
+    'url'    =&gt; 'http://httpbin.org/post?name=value',
+    'method' =&gt; 'POST',
+    'body'   =&gt; ['k1' =&gt; 'v1', 'k2' =&gt; 'v2'],
+]);
+that($response['args'])-&gt;is([
+    'name' =&gt; 'value',
+]);
+that($response['form'])-&gt;is([
+    'k1' =&gt; 'v1',
+    'k2' =&gt; 'v2',
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_head()">
+                                    ryunosuke\Functions\Package\Network::http_head		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の HEAD 特化版</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_get()">
+                                    ryunosuke\Functions\Package\Network::http_get		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の GET 特化版</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_post()">
+                                    ryunosuke\Functions\Package\Network::http_post		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の POST 特化版</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_put()">
+                                    ryunosuke\Functions\Package\Network::http_put		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の PUT 特化版</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_patch()">
+                                    ryunosuke\Functions\Package\Network::http_patch		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の PATCH 特化版</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_delete()">
+                                    ryunosuke\Functions\Package\Network::http_delete		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+		</h4>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の DELETE 特化版</p>
+</div>
             	<h4 class="fqsen-title">class		<small></small>
 		<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql">
                                     ryunosuke\Functions\Package::Sql		</a>	</h4>
@@ -3026,7 +3141,7 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 <li>null は NULL になる</li>
 <li>数字はそのまま数字になる</li>
 <li>bool は 0 or 1 になる</li>
-<li>それ以外は addslashes される</li>
+<li>それ以外は addcslashes される</li>
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">that(sql_quote(null))-&gt;isSame('NULL');
@@ -3204,6 +3319,23 @@ that(strpos_array('hello world', ['notfound', 'world']))-&gt;isSame([
 that(strpos_quoted('hello "this" is world', 'is'))-&gt;isSame(13);
 // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
 that(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))-&gt;isSame(20);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_chunk()">
+                                    ryunosuke\Functions\Package\Strings::str_chunk		</a>	<small>($string, ...$chunks) : string[]</small>
+		</h4>
+	<div class="description"><p>文字列を可変引数の数で分割する</p>
+<p>str_split の $length を個別に指定できるイメージ。<br />
+長さ以上を指定したりしても最後の要素は必ずついてくる（指定数で分割した後のあまり文字が最後の要素になる）。<br />
+これは最後が空文字でも同様で、 list での代入を想定しているため。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 1, 2, 3 文字に分割（ぴったりなので変わったことはない）
+that(str_chunk('abcdef', 1, 2, 3))-&gt;isSame(['a', 'bc', 'def', '']);
+// 2, 3 文字に分割（余った f も最後の要素として含まれてくる）
+that(str_chunk('abcdef', 2, 3))-&gt;isSame(['ab', 'cde', 'f']);
+// 1, 10 文字に分割
+that(str_chunk('abcdef', 1, 10))-&gt;isSame(['a', 'bcdef', '']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5126,6 +5258,28 @@ that($traces[1])-&gt;arraySubset([
     'function' =&gt; __NAMESPACE__ . '\\f003'
 ]);
 </code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::profiler()">
+                                    ryunosuke\Functions\Package\Utility::profiler		</a>	<small>($options = []) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr>callable</small>
+		</h4>
+	<div class="description"><p>外部ツールに頼らない pure php なプロファイラを返す</p>
+<p>file プロトコル上書きと ticks と debug_backtrace によるかなり無理のある実装なので動かない環境・コードは多い。<br />
+その分お手軽だが下記の注意点がある。</p>
+<ul>
+<li>file プロトコルを上書きするので、既に読み込み済みのファイルは計上されない</li>
+<li>tick されないステートメントは計上されない<ul>
+<li>1行メソッドなどでありがち</li>
+</ul>
+</li>
+<li>A-&gt;B-&gt;C という呼び出しで C が 3秒、B が 2秒、A が1秒かかった場合、 A は 6 秒、B は 5秒、C は 3 秒といて計上される<ul>
+<li>つまり、配下の呼び出しも重複して計上される</li>
+</ul>
+</li>
+</ul>
+<p>この関数を呼んだ時点で計測は始まる。<br />
+返り値としてイテレータを返すので、foreach で回せばコールスタック・回数・時間などが取得できる。<br />
+配列で欲しい場合は直に呼べば良い。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::error()">

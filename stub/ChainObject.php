@@ -2368,6 +2368,13 @@
  * @method   \ChainObject  file_list($filter_condition = null)
  * @method   \ChainObject  file_list1($dirname)
  *
+ * @see file_pos
+ * @method   \ChainObject  file_pos($needle, $offset = 0, $length = null, $chunksize = null)
+ * @method   \ChainObject  file_pos1($filename, $offset = 0, $length = null, $chunksize = null)
+ * @method   \ChainObject  file_pos2($filename, $needle, $length = null, $chunksize = null)
+ * @method   \ChainObject  file_pos3($filename, $needle, $offset = 0, $chunksize = null)
+ * @method   \ChainObject  file_pos4($filename, $needle, $offset = 0, $length = null)
+ *
  * @see file_put_contents
  * @method   \ChainObject  file_put_contents($data, $flags = null, $context = null)
  * @method   \ChainObject  file_put_contents1($filename, $flags = null, $context = null)
@@ -4184,6 +4191,9 @@
  * @method   \ChainObject  proc_terminate($signal = null)
  * @method   \ChainObject  proc_terminate1($process)
  *
+ * @see profiler
+ * @method   \ChainObject  profiler()
+ *
  * @see property_exists
  * @method   \ChainObject  property_exists($property_name)
  * @method   \ChainObject  property_exists1($object_or_class)
@@ -4572,6 +4582,16 @@
  * @method   \ChainObject  str_chop1($string, $suffix = null, $case_insensitivity = false)
  * @method   \ChainObject  str_chop2($string, $prefix = null, $case_insensitivity = false)
  * @method   \ChainObject  str_chop3($string, $prefix = null, $suffix = null)
+ *
+ * @see str_chunk
+ * @property \ChainObject $str_chunk
+ * @method   \ChainObject  str_chunk(...$chunks)
+ * @method   \ChainObject  str_chunk1($string, ...$chunks)
+ * @method   \ChainObject  str_chunk2($string, ...$chunks)
+ * @method   \ChainObject  str_chunk3($string, ...$chunks)
+ * @method   \ChainObject  str_chunk4($string, ...$chunks)
+ * @method   \ChainObject  str_chunk5($string, ...$chunks)
+ * @method   \ChainObject  str_chunk6($string, ...$chunks)
  *
  * @see str_contains
  * @method   \ChainObject  str_contains($needle, $case_insensitivity = false, $and_flag = false)
