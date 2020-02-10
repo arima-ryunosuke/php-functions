@@ -1,0 +1,123 @@
+#!/usr/bin/env php
+<?php
+
+function buildChild(\DOMElement $parent, $xpathes)
+{
+    $xpath = new \DOMXPath($parent->ownerDocument);
+    foreach (explode('/', $xpathes) as $path) {
+        $child = $xpath->query($path, $parent)[0] ?? null;
+        if ($child === null) {
+            $attrs = [];
+            if (preg_match('#(.+?)\\[(.+)]#', $path, $m)) {
+                $path = $m[1];
+                [$name, $value] = explode('=', substr($m[2], 1));
+                $attrs[$name] = json_decode($value);
+            }
+            $child = appendChild($parent, $path, $attrs);
+        }
+        $parent = $child;
+    }
+    return $parent;
+}
+
+function appendChild(\DOMElement $parent, $tag, $attrs = [])
+{
+    $child = $parent->ownerDocument->createElement($tag);
+    foreach ($attrs as $name => $value) {
+        $child->setAttribute($name, $value);
+    }
+    return $parent->appendChild($child);
+}
+
+function removeChildren(\DOMElement $element, $attr)
+{
+    $result = [];
+    foreach (iterator_to_array($element->childNodes) as $child) {
+        /** @var \DOMElement $child */
+        $result[] = $child->getAttribute($attr);
+        $element->removeChild($child);
+    }
+    return $result;
+}
+
+function each_files($dirname, $callback)
+{
+    $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_SELF);
+    $rii = new \RecursiveIteratorIterator($rdi);
+    $cfi = new \CallbackFilterIterator($rii, $callback);
+
+    foreach ($cfi as $it) {
+        /** @var \RecursiveDirectoryIterator $it */
+        yield $it->getRealPath() => str_replace('\\', '/', $it->getSubPathname());
+    }
+}
+
+$BASEDIR = realpath(__DIR__ . '/../../../../');
+if (!$BASEDIR || !file_exists("$BASEDIR/vendor/autoload.php")) {
+    echo("failed to detect basedir.\n");
+    exit(1);
+}
+
+$miscXml = realpath("$BASEDIR/.idea/misc.xml");
+$workXml = realpath("$BASEDIR/.idea/workspace.xml");
+if (!$miscXml || !$workXml) {
+    echo("failed to detect .idea.\n");
+    exit(2);
+}
+
+$composer = json_decode(file_get_contents("$BASEDIR/composer.json"), true);
+$devMode = !isset($composer['require']['ryunosuke/functions']);
+
+$dom = new \DOMDocument();
+$dom->preserveWhiteSpace = false;
+$dom->formatOutput = true;
+
+(function ($filename) use ($dom, $BASEDIR, $devMode) {
+    $dom->load($filename);
+    $node = buildChild($dom->documentElement, 'component[@name="ProjectPlainTextFileTypeManager"]');
+
+    $targets = array_fill_keys(removeChildren($node, 'url'), true);
+    $pathes = each_files("$BASEDIR/vendor/ryunosuke", function (\RecursiveDirectoryIterator $it) use ($devMode) {
+        if ($it->getExtension() !== 'php') {
+            return false;
+        }
+        if (strpos(file_get_contents($it->getRealPath(), false, null, 0, 256), "# Don't touch this code. This is auto generated.") === false) {
+            return false;
+        }
+        if (!$devMode && str_replace('\\', '/', $it->getSubPathname()) === 'functions/include/global.php') {
+            return false;
+        }
+        return true;
+    });
+    foreach ($pathes as $fullpath => $subpath) {
+        $value = "file://\$PROJECT_DIR$/vendor/ryunosuke/$subpath";
+        echo "$fullpath was mark as text (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        $targets[$value] = true;
+    }
+    foreach ($targets as $target => $true) {
+        appendChild($node, 'file', ['url' => $target]);
+    }
+    $dom->save($filename);
+})($miscXml);
+
+(function ($filename) use ($dom, $BASEDIR) {
+    $dom->load($filename);
+    $node = buildChild($dom->documentElement, 'component[@name="ExcludedPharFiles"]/excludedPaths');
+
+    $targets = array_fill_keys(removeChildren($node, 'value'), true);
+    $pathes = each_files("$BASEDIR/vendor/ryunosuke", function (\RecursiveDirectoryIterator $it) {
+        if ($it->getExtension() !== 'phar') {
+            return false;
+        }
+        return true;
+    });
+    foreach ($pathes as $fullpath => $subpath) {
+        $value = "\$PROJECT_DIR$/vendor/ryunosuke/$subpath/";
+        echo "$fullpath was excluded (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        $targets[$value] = true;
+    }
+    foreach ($targets as $target => $true) {
+        appendChild($node, 'path', ['value' => $target]);
+    }
+    $dom->save($filename);
+})($workXml);

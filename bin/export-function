@@ -1,0 +1,62 @@
+#!/usr/bin/env php
+<?php
+
+function array_find($array, $condition)
+{
+    foreach ($array as $k => $v) {
+        if ($u = $condition($v)) {
+            return $u;
+        }
+    }
+    return null;
+}
+
+$BASEDIR = realpath(__DIR__ . '/../../../../');
+if (!$BASEDIR || !file_exists("$BASEDIR/vendor/autoload.php")) {
+    echo("failed to detect basedir.\n");
+    exit(1);
+}
+
+$composer = json_decode(file_get_contents("$BASEDIR/composer.json"), true);
+$psr4 = (array) ($composer['autoload']['psr-4'] ?? []);
+$psr0 = (array) ($composer['autoload']['psr-0'] ?? []);
+$srcfiles = (array) ($composer['autoload']['files'] ?? []);
+$devfiles = (array) ($composer['autoload-dev']['files'] ?? []);
+
+$psr40 = $psr4 + $psr0;
+reset($psr40);
+$namespace = key($psr40);
+if (!$namespace) {
+    echo("failed to detect namespace.\n");
+    exit(2);
+}
+
+$detect = function ($file) use ($BASEDIR) {
+    if (!file_exists($file) || filesize($file) === 0) {
+        return "$BASEDIR/$file";
+    }
+    if (strpos(file_get_contents($file, false, null, 0, 256), "# Don't touch this code. This is auto generated.") !== false) {
+        return "$BASEDIR/$file";
+    }
+    return null;
+};
+$srcfile = array_find($srcfiles, $detect);
+$devfile = array_find($devfiles, $detect);
+
+if ($srcfile) {
+    file_put_contents($srcfile, '');
+}
+if ($devfile) {
+    file_put_contents($devfile, '');
+}
+
+require_once "$BASEDIR/vendor/autoload.php";
+
+if ($srcfile) {
+    echo("$srcfile was written.\n");
+    file_put_contents($srcfile, \ryunosuke\Functions\Transporter::exportNamespace($namespace, false, dirname($srcfile)));
+}
+if ($devfile) {
+    echo("$devfile was written.\n");
+    file_put_contents($devfile, \ryunosuke\Functions\Transporter::exportNamespace($namespace));
+}

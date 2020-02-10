@@ -30,6 +30,10 @@
     "phpunit/phpunit": "8.*",
     "ryunosuke/phpunit-extension": "1.*"
   },
+  "bin": [
+    "bin/export-function",
+    "bin/exclude-internal"
+  ],
   "scripts": {
     "build": [
       "@export",
