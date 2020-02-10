@@ -10,6 +10,16 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.5
+
+- [feature][composer] export-function と exclude-internal コマンドを用意
+- [feature][Strings] str_chunk を追加
+- [feature][Utility] profiler を追加
+- [feature][Arrays] array_flatten のクロージャ対応
+- [feature][Network] http_request を追加
+- [feature][FileSystem] file_pos を追加
+- [fixbug][Sql] sql_quote でエスケープシーケンスの扱いがおかしかった不具合を修正
+
 ## 1.4.4
 
 - [feature][Arrays] array_kvmap を追加

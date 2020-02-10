@@ -91,6 +91,15 @@ file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::expo
 依存関係も解決するので、例えば `funcA` や `funcB` が `funcC` に依存していれば `funcC` も吐き出されます。
 用途はちょろっとしたコード片のコピペ用です（全体は要らんけど特定のやつだけ吐き出したい用途が個人的にあった）。
 
+上記は `composer.json` の `autoload` をよしなに読んで自動で吐き出すコマンドが用意されています。
+
+```
+vendor/bin/export-function
+# composer exec export-function
+```
+
+ただし、ほとんど内部用です。
+
 一応、上記の関数版ではなくクラス版もあります。
 
 ```php
