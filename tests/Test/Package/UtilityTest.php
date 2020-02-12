@@ -1109,6 +1109,60 @@ class UtilityTest extends AbstractTestCase
         ]);
     }
 
+    function test_profiler()
+    {
+        $profiler = (profiler)([
+            'callee'   => function ($callee) { return $callee !== 'X'; },
+            'location' => '#profile#',
+        ]);
+        require_once __DIR__ . '/Utility/profile.php';
+        $result = iterator_to_array($profiler);
+        that($result)->is($profiler());
+        that($result['A'])->count(3);
+        that($result['B'])->count(2);
+        that($result['C'])->count(1);
+
+        $result = require_once __DIR__ . '/Utility/fake.php';
+        that($result['scandir'])->is(array_merge(scandir(__DIR__ . '/Utility'), scandir(__DIR__ . '/Utility'), scandir(__DIR__ . '/Utility')));
+        if (DIRECTORY_SEPARATOR === '/') {
+            that($result['meta'])->is([
+                'touch' => 1234,
+                'chmod' => 33279,
+                'chown' => 0,
+                'chgrp' => 0,
+            ]);
+            that($result['option'])->is([
+                'blocking' => true,
+                'timeout'  => false,
+                'buffer'   => -1,
+            ]);
+        }
+        that($result['dir'])->is([
+            'mkdir' => true,
+            'rmdir' => true,
+        ]);
+        that($result['misc'])->is([
+            'flock'       => 4,
+            'file_exists' => true,
+            'stat'        => stat(__DIR__ . '/Utility/fake.php'),
+            'lstat'       => lstat(__DIR__ . '/Utility/fake.php'),
+        ]);
+
+        @file_get_contents(__DIR__ . '/Utility/notfound.php');
+        that(error_get_last()['message'])->containsAll(['notfound.php', 'failed to open stream']);
+
+        set_include_path(__DIR__);
+        that(file_get_contents(basename(__FILE__), true))->equalsFile(__FILE__);
+        restore_include_path();
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $profiler->__destruct();
+        unset($profiler);
+        unset($result);
+
+        gc_collect_cycles();
+    }
+
     function test_error()
     {
         ini_set('error_log', 'syslog');
