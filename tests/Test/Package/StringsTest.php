@@ -225,6 +225,22 @@ class StringsTest extends AbstractTestCase
         that((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '', ''))->isSame(11);
     }
 
+    function test_str_chunk()
+    {
+        that((str_chunk)('abc', 1))->isSame(['a', 'bc']);
+        that((str_chunk)('abc', 1, 1))->isSame(['a', 'b', 'c']);
+        that((str_chunk)('abc', 1, 1, 1))->isSame(['a', 'b', 'c', '']);
+        that((str_chunk)('abc', 1, 1, 1, 1))->isSame(['a', 'b', 'c', '']);
+
+        that((str_chunk)('abc'))->isSame(['abc']);
+        that((str_chunk)('abc', 0))->isSame(['', 'abc']);
+        that((str_chunk)('abc', 1))->isSame(['a', 'bc']);
+        that((str_chunk)('abc', 2))->isSame(['ab', 'c']);
+        that((str_chunk)('abc', 3))->isSame(['abc', '']);
+        that((str_chunk)('abc', 4))->isSame(['abc', '']);
+        that((str_chunk)('abc', 9))->isSame(['abc', '']);
+    }
+
     function test_str_anyof()
     {
         that((str_anyof)('a', ['a', 'b', 'c']))->isSame(0);
