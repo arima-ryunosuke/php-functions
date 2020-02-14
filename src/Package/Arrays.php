@@ -3410,38 +3410,35 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param string|null $delimiter キーの区切り文字。 null を与えると連番になる
+     * @param string|\Closure|null $delimiter キーの区切り文字。 null を与えると連番になる
      * @return array フラット化された配列
      */
     public static function array_flatten($array, $delimiter = null)
     {
-        // 要素追加について、 array_set だと目に見えて速度低下したのでベタに if else で分岐する
-        $core = function ($array, $delimiter) use (&$core) {
-            $result = [];
+        $result = [];
+        $core = function ($array, $delimiter, $parents) use (&$core, &$result) {
             foreach ($array as $k => $v) {
+                $keys = $parents;
+                $keys[] = $k;
                 if (is_iterable($v)) {
-                    foreach ($core($v, $delimiter) as $ik => $iv) {
-                        if ($delimiter === null) {
-                            $result[] = $iv;
-                        }
-                        else {
-                            $result[$k . $delimiter . $ik] = $iv;
-                        }
-                    }
+                    $core($v, $delimiter, $keys);
                 }
                 else {
                     if ($delimiter === null) {
                         $result[] = $v;
                     }
+                    elseif ($delimiter instanceof \Closure) {
+                        $result[$delimiter($keys)] = $v;
+                    }
                     else {
-                        $result[$k] = $v;
+                        $result[implode($delimiter, $keys)] = $v;
                     }
                 }
             }
-            return $result;
         };
 
-        return $core($array, $delimiter);
+        $core($array, $delimiter, []);
+        return $result;
     }
 
     /**

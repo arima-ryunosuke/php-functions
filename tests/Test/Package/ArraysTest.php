@@ -2218,6 +2218,30 @@ class ArraysTest extends AbstractTestCase
             'o'        => $o,
         ]);
 
+        // クロージャ指定
+        that((array_flatten)($array, function ($keys) {
+            return implode('.', $keys);
+        }))->isSame([
+            'k1'       => 'v1',
+            'k2.k21'   => 'v21',
+            'k2.k22'   => 123,
+            'k2.k23.0' => 1,
+            'k2.k23.1' => 2,
+            'k2.k23.2' => 3,
+            'o'        => $o,
+        ]);
+        that((array_flatten)($array, function ($keys) {
+            return array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : '');
+        }))->isSame([
+            'k1'         => 'v1',
+            'k2[k21]'    => 'v21',
+            'k2[k22]'    => 123,
+            'k2[k23][0]' => 1,
+            'k2[k23][1]' => 2,
+            'k2[k23][2]' => 3,
+            'o'          => $o,
+        ]);
+
         // Generator
         that((array_flatten)((function () {
             yield 1 => 1;
