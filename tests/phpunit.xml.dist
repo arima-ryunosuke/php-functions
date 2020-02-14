@@ -10,7 +10,7 @@
     </testsuites>
 
     <php>
-        <!--><const name="TESTWEBSERVER" value="http://localhost"/><-->
+        <!--><const name="TESTWEBSERVER" value="http://httpbin.org"/><-->
         <!--><const name="TESTPINGSERVER" value="http://localhost"/><-->
         <const name="DIFF" value="/usr/bin/diff"/>
     </php>
