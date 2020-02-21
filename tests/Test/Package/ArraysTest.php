@@ -850,6 +850,14 @@ class ArraysTest extends AbstractTestCase
         // 省略すればそのまま
         that((array_where)($array))->is($array);
 
+        // シンプルクロージャフィルタ（key === 0 || p を含む）
+        that((array_where)($array, function ($row, $key) {
+            return $key === 0 || strpos($row['name'], 'p') !== false;
+        }))->is([
+            0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
+            2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
+        ]);
+
         // flag 値で true フィルタ
         that((array_where)($array, 'flag'))->is([
             1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],

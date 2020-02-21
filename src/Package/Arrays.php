@@ -1699,6 +1699,11 @@ class Arrays
      */
     public static function array_where($array, $column = null, $callback = null)
     {
+        if ($column instanceof \Closure) {
+            $callback = $column;
+            $column = null;
+        }
+
         $is_array = is_array($column);
         if ($is_array) {
             if ((is_hasharray)($column)) {
@@ -1716,7 +1721,7 @@ class Arrays
                         return function ($v) use ($c) { return is_array($c) ? in_array($v, $c) : $v == $c; };
                     }
                 }, $column);
-                $callback = function ($vv, $k) use ($callbacks) {
+                $callback = function ($vv, $k, $v) use ($callbacks) {
                     foreach ($callbacks as $c => $callback) {
                         if (!$callback($vv[$c], $k)) {
                             return false;
@@ -1744,7 +1749,7 @@ class Arrays
                 $vv = $v[$column];
             }
 
-            if ($callback($vv, $k)) {
+            if ($callback($vv, $k, $v)) {
                 $result[$k] = $v;
             }
         }
