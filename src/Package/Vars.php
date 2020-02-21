@@ -254,30 +254,114 @@ class Vars
      */
     public static function arrayable_key_exists($key, $arrayable)
     {
-        if (is_array($arrayable)) {
-            // see https://www.php.net/manual/function.array-key-exists.php#107786
-            return isset($arrayable[$key]) || array_key_exists($key, $arrayable);
+        if (is_array($arrayable) || $arrayable instanceof \ArrayAccess) {
+            return (attr_exists)($key, $arrayable);
         }
 
-        if ($arrayable instanceof \ArrayAccess) {
+        throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', (var_type)($arrayable)));
+    }
+
+    /**
+     * 配列・オブジェクトを問わずキーやプロパティの存在を確認する
+     *
+     * 配列が与えられた場合は array_key_exists と同じ。
+     * オブジェクトは一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'k' => 'v',
+     *     'n' => null,
+     * ];
+     * // 配列は array_key_exists と同じ
+     * that(attr_exists('k', $array))->isTrue();  // もちろん存在する
+     * that(attr_exists('n', $array))->isTrue();  // isset ではないので null も true
+     * that(attr_exists('x', $array))->isFalse(); // 存在しないので false
+     *
+     * $object = (object) $array;
+     * // オブジェクトでも使える
+     * that(attr_exists('k', $object))->isTrue();  // もちろん存在する
+     * that(attr_exists('n', $object))->isTrue();  // isset ではないので null も true
+     * that(attr_exists('x', $object))->isFalse(); // 存在しないので false
+     * ```
+     *
+     * @param int|string $key 調べるキー
+     * @param array|object $value 調べられる配列・オブジェクト
+     * @return bool $key が存在するなら true
+     */
+    public static function attr_exists($key, $value)
+    {
+        return (attr_get)($key, $value, $dummy = new \stdClass()) !== $dummy;
+    }
+
+    /**
+     * 配列・オブジェクトを問わずキーやプロパティの値を取得する
+     *
+     * 配列が与えられた場合は array_key_exists でチェック。
+     * オブジェクトは一旦 isset で確認した後 null の場合は実際にアクセスして取得する。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'k' => 'v',
+     *     'n' => null,
+     * ];
+     * that(attr_get('k', $array))->isSame('v');                  // もちろん存在する
+     * that(attr_get('n', $array))->isSame(null);                 // isset ではないので null も true
+     * that(attr_get('x', $array, 'default'))->isSame('default'); // 存在しないのでデフォルト値
+     *
+     * $object = (object) $array;
+     * // オブジェクトでも使える
+     * that(attr_get('k', $object))->isSame('v');                  // もちろん存在する
+     * that(attr_get('n', $object))->isSame(null);                 // isset ではないので null も true
+     * that(attr_get('x', $object, 'default'))->isSame('default'); // 存在しないのでデフォルト値
+     * ```
+     *
+     * @param int|string $key 取得するキー
+     * @param array|object $value 取得される配列・オブジェクト
+     * @param mixed $default なかった場合のデフォルト値
+     * @return mixed $key の値
+     */
+    public static function attr_get($key, $value, $default = null)
+    {
+        if (is_array($value)) {
+            // see https://www.php.net/manual/function.array-key-exists.php#107786
+            return isset($value[$key]) || array_key_exists($key, $value) ? $value[$key] : $default;
+        }
+
+        if ($value instanceof \ArrayAccess) {
             // あるならあるでよい
-            if (isset($arrayable[$key])) {
-                return true;
+            if (isset($value[$key])) {
+                return $value[$key];
             }
             // 問題は「ない場合」と「あるが null だった場合」の区別で、ArrayAccess の実装次第なので一元的に確定するのは不可能
             // ここでは「ない場合はなんらかのエラー・例外が出るはず」という前提で実際に値を取得して確認する
             try {
                 error_clear_last();
-                /** @noinspection PhpUnusedLocalVariableInspection */
-                $dummy = @$arrayable[$key];
-                return !error_get_last();
+                $result = @$value[$key];
+                return error_get_last() ? $default : $result;
             }
             catch (\Throwable $t) {
-                return false;
+                return $default;
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', (var_type)($arrayable)));
+        // 上記のプロパティ版
+        if (is_object($value)) {
+            if (isset($value->$key)) {
+                return $value->$key;
+            }
+            try {
+                error_clear_last();
+                $result = @$value->$key;
+                return error_get_last() ? $default : $result;
+            }
+            catch (\Throwable $t) {
+                return $default;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('%s must be array or object (%s).', '$value', (var_type)($value)));
     }
 
     /**

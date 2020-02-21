@@ -175,6 +175,78 @@ class VarsTest extends AbstractTestCase
         that([arrayable_key_exists, null, new \stdClass()])->throws('must be array or ArrayAccess');
     }
 
+    function test_attr_get()
+    {
+        $array = [
+            'ok'    => 'OK',
+            'null'  => null,
+            'false' => false,
+        ];
+        that((attr_get)('ok', $array))->isSame('OK');
+        that((attr_get)('null', $array))->isSame(null);
+        that((attr_get)('false', $array))->isSame(false);
+        that((attr_get)('notfound', $array, 'default'))->isSame('default');
+
+        $object = (object) $array;
+        that((attr_get)('ok', $object))->isSame('OK');
+        that((attr_get)('null', $object))->isSame(null);
+        that((attr_get)('false', $object))->isSame(false);
+        that((attr_get)('notfound', $object, 'default'))->isSame('default');
+
+        $object = new class implements \ArrayAccess {
+            private $holder = [
+                'ok'    => 'OK',
+                'null'  => null,
+                'false' => false,
+            ];
+
+            public function offsetExists($offset)
+            {
+                return isset($this->holder[$offset]);
+            }
+
+            public function offsetGet($offset)
+            {
+                if ($offset === 'ex') {
+                    throw new \OutOfBoundsException();
+                }
+                return $this->holder[$offset];
+            }
+
+            public function offsetSet($offset, $value) { }
+
+            public function offsetUnset($offset) { }
+        };
+        that((attr_get)('ok', $object))->isSame('OK');
+        that((attr_get)('null', $object))->isSame(null);
+        that((attr_get)('false', $object))->isSame(false);
+        that((attr_get)('notfound', $object, 'default'))->isSame('default');
+        that((attr_get)('ex', $object, 'default'))->isSame('default');
+
+        $object = new class {
+            private $holder = [
+                'ok'    => 'OK',
+                'null'  => null,
+                'false' => false,
+            ];
+
+            public function __get($offset)
+            {
+                if ($offset === 'ex') {
+                    throw new \OutOfBoundsException();
+                }
+                return $this->holder[$offset];
+            }
+        };
+        that((attr_get)('ok', $object))->isSame('OK');
+        that((attr_get)('null', $object))->isSame(null);
+        that((attr_get)('false', $object))->isSame(false);
+        that((attr_get)('notfound', $object, 'default'))->isSame('default');
+        that((attr_get)('ex', $object, 'default'))->isSame('default');
+
+        that([attr_get, null, 'dummy'])->throws('must be array or object');
+    }
+
     function test_si_prefix()
     {
         foreach (Vars::SI_UNITS as $exp => $units) {
