@@ -241,7 +241,7 @@ class Vars
      * that(isset($array['n']))->isFalse();                // isset だと null が false になる（参考）
      *
      * $object = new \ArrayObject($array);
-     * // 配列は array_key_exists と同じ
+     * // ArrayAccess は isset + 実際に取得を試みる
      * that(arrayable_key_exists('k', $object))->isTrue();  // もちろん存在する
      * that(arrayable_key_exists('n', $object))->isTrue();  // isset ではないので null も true
      * that(arrayable_key_exists('x', $object))->isFalse(); // 存在しないので false

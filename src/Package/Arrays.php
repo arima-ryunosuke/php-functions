@@ -1467,7 +1467,7 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param array $keymap 正規表現
+     * @param array $keymap マップ配列
      * @return array キーが置換された配列
      */
     public static function array_rekey($array, $keymap)
@@ -1953,7 +1953,7 @@ class Arrays
      * ]);
      * ```
      *
-     * @param array $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 適用するコールバック
      * @return array 変換された配列
      */
