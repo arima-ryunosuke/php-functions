@@ -1121,6 +1121,7 @@ class UtilityTest extends AbstractTestCase
         that($result['A'])->count(3);
         that($result['B'])->count(2);
         that($result['C'])->count(1);
+        that($result)->notHasKey('X');
 
         $result = require_once __DIR__ . '/Utility/fake.php';
         that($result['scandir'])->is(array_merge(scandir(__DIR__ . '/Utility'), scandir(__DIR__ . '/Utility'), scandir(__DIR__ . '/Utility')));

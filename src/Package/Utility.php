@@ -1430,7 +1430,7 @@ class Utility
                                     }
                                 }
                                 else {
-                                    if (preg_match($condition, $value) === false) {
+                                    if (!preg_match($condition, $value)) {
                                         continue 2;
                                     }
                                 }
