@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L922" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L980" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Funchand</span></h2>
@@ -1084,7 +1084,70 @@ that(parameter_length('trim', true))-&gt;isSame(1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L672-L682" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L672-L728" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::parameter_default()" tabindex="-1" class="structure-title ">
+                        parameter_default                        	<small>($callable, $arguments = []) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>callable のデフォルト引数を返す</p>
+<p>オプションで指定もできる。<br />
+負数を指定した場合「最後の引数から数えた位置」になる。</p>
+<p>内部関数には使用できない（リフレクションが対応していない）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$f = function ($a, $b = 'b') {};
+// デフォルト引数である b を返す
+that(parameter_default($f))-&gt;isSame([1 =&gt; 'b']);
+// 引数で与えるとそれが優先される
+that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc"><p>対象 callable</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">iterable<span class="type-separator"></span><wbr>array</td>
+				<td class="rest">$arguments = []</td>
+				<td class="desc"><p>デフォルト引数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>デフォルト引数</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L730-L740" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_shorten()" tabindex="-1" class="structure-title ">
                         function_shorten                        	<small>($function) : string</small>
@@ -1131,7 +1194,7 @@ that(parameter_length('trim', true))-&gt;isSame(1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L684-L725" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L742-L783" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" tabindex="-1" class="structure-title ">
                         func_user_func_array                        	<small>($callback) : callable</small>
@@ -1186,7 +1249,7 @@ that($strlen('abc', null))-&gt;isSame(3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L727-L753" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L785-L811" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_new()" tabindex="-1" class="structure-title ">
                         func_new                        	<small>($classname, ...$defaultargs) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
@@ -1249,7 +1312,7 @@ that($newException('fuga')-&gt;getMessage())-&gt;isSame('fuga');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L755-L799" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L813-L857" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_method()" tabindex="-1" class="structure-title ">
                         func_method                        	<small>($methodname, ...$defaultargs) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
@@ -1325,7 +1388,7 @@ that($hoge789($object))-&gt;isSame('7,8,9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L801-L866" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L859-L924" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_alias()" tabindex="-1" class="structure-title ">
                         function_alias                        	<small>($original, $alias) : void</small>
@@ -1385,7 +1448,7 @@ that(trim_alias(' abc '))-&gt;isSame('abc');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L868-L921" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L926-L979" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_parameter()" tabindex="-1" class="structure-title ">
                         function_parameter                        	<small>($eitherReffuncOrCallable) : array</small>

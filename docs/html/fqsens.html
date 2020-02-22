@@ -311,6 +311,26 @@ that(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']))-&gt;isSame(['a', 'b', 'c', 'x'
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_merge2()">
+                                    ryunosuke\Functions\Package\Arrays::array_merge2		</a>	<small>(...$arrays) : array</small>
+		</h4>
+	<div class="description"><p>配列をマージして通常配列＋αで返す</p>
+<p>キー・値が維持される点で array_merge とは異なる（振り直しをせず数値配列で返す）。<br />
+きちんと0からの連番で構成される点で配列の加算とは異なる。<br />
+要するに「できるだけキーが自然数（の並び）になるように」マージする。</p>
+<p>歯抜けはそのまま維持され、文字キーは後ろに追加される（負数キーも同様）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// キーが入り乱れているがよく見ると通し番号が振られている配列をマージ
+that(array_merge2([4 =&gt; 4, 1 =&gt; 1], [0 =&gt; 0], [5 =&gt; 5, 2 =&gt; 2, 3 =&gt; 3]))-&gt;isSame([0, 1, 2, 3, 4, 5]);
+// 歯抜けの配列をマージ
+that(array_merge2([4 =&gt; 4, 1 =&gt; 1], [0 =&gt; 0], [5 =&gt; 5, 3 =&gt; 3]))-&gt;isSame([0, 1, 3 =&gt; 3, 4 =&gt; 4, 5 =&gt; 5]);
+// 負数や文字キーは後ろに追いやられる
+that(array_merge2(['a' =&gt; 'A', 1 =&gt; 1], [0 =&gt; 0], [-1 =&gt; 'X', 2 =&gt; 2, 3 =&gt; 3]))-&gt;isSame([0, 1, 2, 3, -1 =&gt; 'X', 'a' =&gt; 'A']);
+// 同じキーは後ろ優先
+that(array_merge2([0, 'a' =&gt; 'A0'], [1, 'a' =&gt; 'A1'], [2, 'a' =&gt; 'A2']))-&gt;isSame([2, 'a' =&gt; 'A2']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_mix()">
                                     ryunosuke\Functions\Package\Arrays::array_mix		</a>	<small>(...$variadic) : array</small>
 		</h4>
@@ -539,13 +559,16 @@ that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' 
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_put()">
-                                    ryunosuke\Functions\Package\Arrays::array_put		</a>	<small>(&amp;$array, $value, $key = null) : string<span class="type-separator"></span><wbr>int</small>
+                                    ryunosuke\Functions\Package\Arrays::array_put		</a>	<small>(&amp;$array, $value, $key = null, $condition = null) : string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>false</small>
 		</h4>
 	<div class="description"><p>キー指定の配列値設定</p>
 <p>array_set とほとんど同じ。<br />
 第3引数を省略すると（null を与えると）言語機構を使用して配列の最後に設定する（$array[] = $value）。<br />
 また、<strong>int を与えても同様の動作</strong>となる。<br />
 第3引数に配列を指定すると潜って設定する。</p>
+<p>第4引数で追加する条件クロージャを指定できる。<br />
+クロージャには <code>(追加する要素, 追加するキー, 追加される元配列)</code> が渡ってくる。<br />
+このクロージャが false 相当を返した時は追加されないようになる。</p>
 <p>array_set における $require_return は廃止している。<br />
 これはもともと end や last_key が遅かったのでオプショナルにしていたが、もう改善しているし、7.3 から array_key_last があるので、呼び元で適宜使えば良い。</p>
 <p>Example:</p>
@@ -563,6 +586,10 @@ that(array_put($array, 'Z', 'z'))-&gt;isSame('z');
 // 第3引数で配列を指定
 that(array_put($array, 'Z', ['x', 'y', 'z']))-&gt;isSame('z');
 that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
+// 第4引数で条件を指定（キーが存在するなら追加しない）
+that(array_put($array, 'Z', 'z', function ($v, $k, $array){return !isset($array[$k]);}))-&gt;isSame(false);
+// 第4引数で条件を指定（値が存在するなら追加しない）
+that(array_put($array, 'Z', null, function ($v, $k, $array){return !in_array($v, $array);}))-&gt;isSame(false);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -660,8 +687,9 @@ that(array_find(['a', 'b', '9'], $ifnumeric2power, false))-&gt;isSame(81);
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rekey()">
                                     ryunosuke\Functions\Package\Arrays::array_rekey		</a>	<small>($array, $keymap) : array</small>
 		</h4>
-	<div class="description"><p>キーをマップ配列で置換する</p>
-<p>変換先が null だとその要素は取り除かれる。</p>
+	<div class="description"><p>キーをマップ配列・callable で置換する</p>
+<p>変換先・返り値が null だとその要素は取り除かれる。<br />
+callable 指定時の引数は <code>(キー, 値, 連番インデックス, 対象配列そのもの)</code> が渡ってくる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // a は x に c は z に置換される
@@ -670,6 +698,8 @@ that(array_rekey($array, ['a' =&gt; 'x', 'c' =&gt; 'z']))-&gt;isSame(['x' =&gt; 
 that(array_rekey($array, ['b' =&gt; null, 'c' =&gt; 'z']))-&gt;isSame(['a' =&gt; 'A', 'z' =&gt; 'C']);
 // キーの交換にも使える（a ⇔ c）
 that(array_rekey($array, ['a' =&gt; 'c', 'c' =&gt; 'a']))-&gt;isSame(['c' =&gt; 'A', 'b' =&gt; 'B', 'a' =&gt; 'C']);
+// callable
+that(array_rekey($array, 'strtoupper'))-&gt;isSame(['A' =&gt; 'A', 'B' =&gt; 'B', 'C' =&gt; 'C']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -1461,6 +1491,43 @@ that(array_lookup($array, 'name'))-&gt;isSame([
     11 =&gt; 'name1',
     12 =&gt; 'name2',
     13 =&gt; 'name3',
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_select()">
+                                    ryunosuke\Functions\Package\Arrays::array_select		</a>	<small>($array, $columns, $index = null) : array</small>
+		</h4>
+	<div class="description"><p>指定キーの要素で抽出する</p>
+<p>$columns に単純な値を渡すとそのキーの値を選択する。<br />
+キー付きで値を渡すと読み替えて選択する。<br />
+キー付きでクロージャを渡すと <code>(キーの値, 行自体, 現在行のキー)</code> を引数としてコールバックして選択する。<br />
+単一のクロージャを渡すと <code>(行自体, 現在行のキー)</code> を引数としてコールバックして選択する（array_map とほぼ同じ）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+    11 =&gt; ['id' =&gt; 1, 'name' =&gt; 'name1'],
+    12 =&gt; ['id' =&gt; 2, 'name' =&gt; 'name2'],
+    13 =&gt; ['id' =&gt; 3, 'name' =&gt; 'name3'],
+];
+
+that(array_select($array, [
+    'id',              // id を単純取得
+    'alias' =&gt; 'name', // name を alias として取得
+]))-&gt;isSame([
+    11 =&gt; ['id' =&gt; 1, 'alias' =&gt; 'name1'],
+    12 =&gt; ['id' =&gt; 2, 'alias' =&gt; 'name2'],
+    13 =&gt; ['id' =&gt; 3, 'alias' =&gt; 'name3'],
+]);
+
+that(array_select($array, [
+    // id の 10 倍を取得
+    'id'     =&gt; function ($id) {return $id * 10;},
+    // id と name の結合を取得
+    'idname' =&gt; function ($null, $row, $index) {return $row['id'] . $row['name'];},
+]))-&gt;isSame([
+    11 =&gt; ['id' =&gt; 10, 'idname' =&gt; '1name1'],
+    12 =&gt; ['id' =&gt; 20, 'idname' =&gt; '2name2'],
+    13 =&gt; ['id' =&gt; 30, 'idname' =&gt; '3name3'],
 ]);
 </code></pre>
 </div>
@@ -2663,6 +2730,22 @@ that($f2(['other' =&gt; [4, 5, 6]]))-&gt;isSame([
 that(parameter_length('trim'))-&gt;isSame(2);
 // trim の必須引数は1つ
 that(parameter_length('trim', true))-&gt;isSame(1);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::parameter_default()">
+                                    ryunosuke\Functions\Package\Funchand::parameter_default		</a>	<small>($callable, $arguments = []) : array</small>
+		</h4>
+	<div class="description"><p>callable のデフォルト引数を返す</p>
+<p>オプションで指定もできる。<br />
+負数を指定した場合「最後の引数から数えた位置」になる。</p>
+<p>内部関数には使用できない（リフレクションが対応していない）。</p>
+<p>Example:</p>
+<pre><code class="language-php">$f = function ($a, $b = 'b') {};
+// デフォルト引数である b を返す
+that(parameter_default($f))-&gt;isSame([1 =&gt; 'b']);
+// 引数で与えるとそれが優先される
+that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5443,11 +5526,58 @@ that(arrayable_key_exists('x', $array))-&gt;isFalse(); // 存在しないので 
 that(isset($array['n']))-&gt;isFalse();                // isset だと null が false になる（参考）
 
 $object = new \ArrayObject($array);
-// 配列は array_key_exists と同じ
+// ArrayAccess は isset + 実際に取得を試みる
 that(arrayable_key_exists('k', $object))-&gt;isTrue();  // もちろん存在する
 that(arrayable_key_exists('n', $object))-&gt;isTrue();  // isset ではないので null も true
 that(arrayable_key_exists('x', $object))-&gt;isFalse(); // 存在しないので false
 that(isset($object['n']))-&gt;isFalse();                // isset だと null が false になる（参考）
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::attr_exists()">
+                                    ryunosuke\Functions\Package\Vars::attr_exists		</a>	<small>($key, $value) : bool</small>
+		</h4>
+	<div class="description"><p>配列・オブジェクトを問わずキーやプロパティの存在を確認する</p>
+<p>配列が与えられた場合は array_key_exists と同じ。<br />
+オブジェクトは一旦 isset で確認した後 null の場合は実際にアクセスして試みる。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+    'k' =&gt; 'v',
+    'n' =&gt; null,
+];
+// 配列は array_key_exists と同じ
+that(attr_exists('k', $array))-&gt;isTrue();  // もちろん存在する
+that(attr_exists('n', $array))-&gt;isTrue();  // isset ではないので null も true
+that(attr_exists('x', $array))-&gt;isFalse(); // 存在しないので false
+
+$object = (object) $array;
+// オブジェクトでも使える
+that(attr_exists('k', $object))-&gt;isTrue();  // もちろん存在する
+that(attr_exists('n', $object))-&gt;isTrue();  // isset ではないので null も true
+that(attr_exists('x', $object))-&gt;isFalse(); // 存在しないので false
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::attr_get()">
+                                    ryunosuke\Functions\Package\Vars::attr_get		</a>	<small>($key, $value, $default = null) : mixed</small>
+		</h4>
+	<div class="description"><p>配列・オブジェクトを問わずキーやプロパティの値を取得する</p>
+<p>配列が与えられた場合は array_key_exists でチェック。<br />
+オブジェクトは一旦 isset で確認した後 null の場合は実際にアクセスして取得する。</p>
+<p>Example:</p>
+<pre><code class="language-php">$array = [
+    'k' =&gt; 'v',
+    'n' =&gt; null,
+];
+that(attr_get('k', $array))-&gt;isSame('v');                  // もちろん存在する
+that(attr_get('n', $array))-&gt;isSame(null);                 // isset ではないので null も true
+that(attr_get('x', $array, 'default'))-&gt;isSame('default'); // 存在しないのでデフォルト値
+
+$object = (object) $array;
+// オブジェクトでも使える
+that(attr_get('k', $object))-&gt;isSame('v');                  // もちろん存在する
+that(attr_get('n', $object))-&gt;isSame(null);                 // isset ではないので null も true
+that(attr_get('x', $object, 'default'))-&gt;isSame('default'); // 存在しないのでデフォルト値
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>

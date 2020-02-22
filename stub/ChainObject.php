@@ -996,6 +996,22 @@
  * @method   \ChainObject  merge5($arr1, ...$arrays)
  * @method   \ChainObject  merge6($arr1, ...$arrays)
  *
+ * @see array_merge2
+ * @method   \ChainObject  array_merge2(...$arrays)
+ * @method   \ChainObject  array_merge21(...$arrays)
+ * @method   \ChainObject  array_merge22(...$arrays)
+ * @method   \ChainObject  array_merge23(...$arrays)
+ * @method   \ChainObject  array_merge24(...$arrays)
+ * @method   \ChainObject  array_merge25(...$arrays)
+ *
+ * @see array_merge2
+ * @method   \ChainObject  merge2(...$arrays)
+ * @method   \ChainObject  merge21(...$arrays)
+ * @method   \ChainObject  merge22(...$arrays)
+ * @method   \ChainObject  merge23(...$arrays)
+ * @method   \ChainObject  merge24(...$arrays)
+ * @method   \ChainObject  merge25(...$arrays)
+ *
  * @see array_merge_recursive
  * @property \ChainObject $array_merge_recursive
  * @method   \ChainObject  array_merge_recursive(...$arrays)
@@ -1311,6 +1327,16 @@
  * @method   \ChainObject  search1($needle, $strict = null)
  * @method   \ChainObject  search2($needle, $haystack)
  *
+ * @see array_select
+ * @method   \ChainObject  array_select($columns, $index = null)
+ * @method   \ChainObject  array_select1($array, $index = null)
+ * @method   \ChainObject  array_select2($array, $columns)
+ *
+ * @see array_select
+ * @method   \ChainObject  select($columns, $index = null)
+ * @method   \ChainObject  select1($array, $index = null)
+ * @method   \ChainObject  select2($array, $columns)
+ *
  * @see array_shrink_key
  * @method   \ChainObject  array_shrink_key(...$variadic)
  * @method   \ChainObject  array_shrink_key1(...$variadic)
@@ -1625,6 +1651,15 @@
  * @see atanh
  * @property \ChainObject $atanh
  * @method   \ChainObject  atanh()
+ *
+ * @see attr_exists
+ * @method   \ChainObject  attr_exists($value)
+ * @method   \ChainObject  attr_exists1($key)
+ *
+ * @see attr_get
+ * @method   \ChainObject  attr_get($value, $default = null)
+ * @method   \ChainObject  attr_get1($key, $default = null)
+ * @method   \ChainObject  attr_get2($key, $value)
  *
  * @see average
  * @method   \ChainObject  average(...$variadic)
@@ -3997,6 +4032,15 @@
  * @property \ChainObject $paml_import
  * @method   \ChainObject  paml_import($options = [])
  * @method   \ChainObject  paml_import1($pamlstring)
+ *
+ * @see parameter_default
+ * @property \ChainObject $parameter_default
+ * @method   \ChainObject  parameter_default($arguments = [])
+ * @method   \ChainObject  parameter_default1(callable $callable)
+ * @method   \ChainObject  parameter_defaultP($arguments = [])
+ * @method   \ChainObject  parameter_defaultP1(callable $callable)
+ * @method   \ChainObject  parameter_defaultE($arguments = [])
+ * @method   \ChainObject  parameter_defaultE1(callable $callable)
  *
  * @see parameter_length
  * @property \ChainObject $parameter_length

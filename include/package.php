@@ -736,6 +736,7 @@ define("ryunosuke\\Functions\\Package\\in_array_and", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\in_array_or", ["ryunosuke\\Functions\\Package\\Arrays", "in_array_or"]);
 define("ryunosuke\\Functions\\Package\\kvsort", ["ryunosuke\\Functions\\Package\\Arrays", "kvsort"]);
 define("ryunosuke\\Functions\\Package\\array_add", ["ryunosuke\\Functions\\Package\\Arrays", "array_add"]);
+define("ryunosuke\\Functions\\Package\\array_merge2", ["ryunosuke\\Functions\\Package\\Arrays", "array_merge2"]);
 define("ryunosuke\\Functions\\Package\\array_mix", ["ryunosuke\\Functions\\Package\\Arrays", "array_mix"]);
 define("ryunosuke\\Functions\\Package\\array_zip", ["ryunosuke\\Functions\\Package\\Arrays", "array_zip"]);
 define("ryunosuke\\Functions\\Package\\array_cross", ["ryunosuke\\Functions\\Package\\Arrays", "array_cross"]);
@@ -785,6 +786,7 @@ define("ryunosuke\\Functions\\Package\\array_fill_callback", ["ryunosuke\\Functi
 define("ryunosuke\\Functions\\Package\\array_pickup", ["ryunosuke\\Functions\\Package\\Arrays", "array_pickup"]);
 define("ryunosuke\\Functions\\Package\\array_remove", ["ryunosuke\\Functions\\Package\\Arrays", "array_remove"]);
 define("ryunosuke\\Functions\\Package\\array_lookup", ["ryunosuke\\Functions\\Package\\Arrays", "array_lookup"]);
+define("ryunosuke\\Functions\\Package\\array_select", ["ryunosuke\\Functions\\Package\\Arrays", "array_select"]);
 define("ryunosuke\\Functions\\Package\\array_columns", ["ryunosuke\\Functions\\Package\\Arrays", "array_columns"]);
 define("ryunosuke\\Functions\\Package\\array_uncolumns", ["ryunosuke\\Functions\\Package\\Arrays", "array_uncolumns"]);
 define("ryunosuke\\Functions\\Package\\array_convert", ["ryunosuke\\Functions\\Package\\Arrays", "array_convert"]);
@@ -842,6 +844,7 @@ define("ryunosuke\\Functions\\Package\\is_bindable_closure", ["ryunosuke\\Functi
 define("ryunosuke\\Functions\\Package\\by_builtin", ["ryunosuke\\Functions\\Package\\Funchand", "by_builtin"]);
 define("ryunosuke\\Functions\\Package\\namedcallize", ["ryunosuke\\Functions\\Package\\Funchand", "namedcallize"]);
 define("ryunosuke\\Functions\\Package\\parameter_length", ["ryunosuke\\Functions\\Package\\Funchand", "parameter_length"]);
+define("ryunosuke\\Functions\\Package\\parameter_default", ["ryunosuke\\Functions\\Package\\Funchand", "parameter_default"]);
 define("ryunosuke\\Functions\\Package\\function_shorten", ["ryunosuke\\Functions\\Package\\Funchand", "function_shorten"]);
 define("ryunosuke\\Functions\\Package\\func_user_func_array", ["ryunosuke\\Functions\\Package\\Funchand", "func_user_func_array"]);
 define("ryunosuke\\Functions\\Package\\func_new", ["ryunosuke\\Functions\\Package\\Funchand", "func_new"]);
@@ -971,6 +974,8 @@ define("ryunosuke\\Functions\\Package\\numberify", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\numval", ["ryunosuke\\Functions\\Package\\Vars", "numval"]);
 define("ryunosuke\\Functions\\Package\\arrayval", ["ryunosuke\\Functions\\Package\\Vars", "arrayval"]);
 define("ryunosuke\\Functions\\Package\\arrayable_key_exists", ["ryunosuke\\Functions\\Package\\Vars", "arrayable_key_exists"]);
+define("ryunosuke\\Functions\\Package\\attr_exists", ["ryunosuke\\Functions\\Package\\Vars", "attr_exists"]);
+define("ryunosuke\\Functions\\Package\\attr_get", ["ryunosuke\\Functions\\Package\\Vars", "attr_get"]);
 define("ryunosuke\\Functions\\Package\\si_prefix", ["ryunosuke\\Functions\\Package\\Vars", "si_prefix"]);
 define("ryunosuke\\Functions\\Package\\si_unprefix", ["ryunosuke\\Functions\\Package\\Vars", "si_unprefix"]);
 define("ryunosuke\\Functions\\Package\\is_empty", ["ryunosuke\\Functions\\Package\\Vars", "is_empty"]);

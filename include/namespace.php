@@ -780,9 +780,14 @@ if (!isset($excluded_functions["arrayize"]) && (!function_exists("ryunosuke\\Fun
         $result = [];
         foreach ($variadic as $arg) {
             if (!is_array($arg)) {
-                $arg = [$arg];
+                $result[] = $arg;
             }
-            $result = array_merge($result, $arg);
+            elseif (!is_hasharray($arg)) {
+                $result = array_merge($result, $arg);
+            }
+            else {
+                $result += $arg;
+            }
         }
         return $result;
     }
@@ -1327,6 +1332,69 @@ if (!isset($excluded_functions["array_add"]) && (!function_exists("ryunosuke\\Fu
 }
 if (function_exists("ryunosuke\\Functions\\array_add") && !defined("ryunosuke\\Functions\\array_add")) {
     define("ryunosuke\\Functions\\array_add", "ryunosuke\\Functions\\array_add");
+}
+
+if (!isset($excluded_functions["array_merge2"]) && (!function_exists("ryunosuke\\Functions\\array_merge2") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_merge2"))->isInternal()))) {
+    /**
+     * 配列をマージして通常配列＋αで返す
+     *
+     * キー・値が維持される点で array_merge とは異なる（振り直しをせず数値配列で返す）。
+     * きちんと0からの連番で構成される点で配列の加算とは異なる。
+     * 要するに「できるだけキーが自然数（の並び）になるように」マージする。
+     *
+     * 歯抜けはそのまま維持され、文字キーは後ろに追加される（負数キーも同様）。
+     *
+     * Example:
+     * ```php
+     * // キーが入り乱れているがよく見ると通し番号が振られている配列をマージ
+     * that(array_merge2([4 => 4, 1 => 1], [0 => 0], [5 => 5, 2 => 2, 3 => 3]))->isSame([0, 1, 2, 3, 4, 5]);
+     * // 歯抜けの配列をマージ
+     * that(array_merge2([4 => 4, 1 => 1], [0 => 0], [5 => 5, 3 => 3]))->isSame([0, 1, 3 => 3, 4 => 4, 5 => 5]);
+     * // 負数や文字キーは後ろに追いやられる
+     * that(array_merge2(['a' => 'A', 1 => 1], [0 => 0], [-1 => 'X', 2 => 2, 3 => 3]))->isSame([0, 1, 2, 3, -1 => 'X', 'a' => 'A']);
+     * // 同じキーは後ろ優先
+     * that(array_merge2([0, 'a' => 'A0'], [1, 'a' => 'A1'], [2, 'a' => 'A2']))->isSame([2, 'a' => 'A2']);
+     * ```
+     *
+     * @param array $arrays マージする配列
+     * @return array マージされた配列
+     */
+    function array_merge2(...$arrays)
+    {
+        // array_merge を模倣するため前方優先
+        $arrays = array_reverse($arrays);
+
+        // 最大値の導出（負数は考慮せず文字キーとして扱う）
+        $max = -1;
+        foreach ($arrays as $array) {
+            foreach ($array as $k => $v) {
+                if (is_int($k) && $k > $max) {
+                    $max = $k;
+                }
+            }
+        }
+
+        // 最大値までを埋める
+        $result = [];
+        for ($i = 0; $i <= $max; $i++) {
+            foreach ($arrays as $array) {
+                if (isset($array[$i]) && array_key_exists($i, $array)) {
+                    $result[$i] = $array[$i];
+                    break;
+                }
+            }
+        }
+
+        // 上記は数値キーだけなので負数や文字キーを補完する
+        foreach ($arrays as $arg) {
+            $result += $arg;
+        }
+
+        return $result;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\array_merge2") && !defined("ryunosuke\\Functions\\array_merge2")) {
+    define("ryunosuke\\Functions\\array_merge2", "ryunosuke\\Functions\\array_merge2");
 }
 
 if (!isset($excluded_functions["array_mix"]) && (!function_exists("ryunosuke\\Functions\\array_mix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_mix"))->isInternal()))) {
@@ -2029,6 +2097,10 @@ if (!isset($excluded_functions["array_put"]) && (!function_exists("ryunosuke\\Fu
      * また、**int を与えても同様の動作**となる。
      * 第3引数に配列を指定すると潜って設定する。
      *
+     * 第4引数で追加する条件クロージャを指定できる。
+     * クロージャには `(追加する要素, 追加するキー, 追加される元配列)` が渡ってくる。
+     * このクロージャが false 相当を返した時は追加されないようになる。
+     *
      * array_set における $require_return は廃止している。
      * これはもともと end や last_key が遅かったのでオプショナルにしていたが、もう改善しているし、7.3 から array_key_last があるので、呼び元で適宜使えば良い。
      *
@@ -2048,14 +2120,19 @@ if (!isset($excluded_functions["array_put"]) && (!function_exists("ryunosuke\\Fu
      * // 第3引数で配列を指定
      * that(array_put($array, 'Z', ['x', 'y', 'z']))->isSame('z');
      * that($array)->isSame(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
+     * // 第4引数で条件を指定（キーが存在するなら追加しない）
+     * that(array_put($array, 'Z', 'z', function ($v, $k, $array){return !isset($array[$k]);}))->isSame(false);
+     * // 第4引数で条件を指定（値が存在するなら追加しない）
+     * that(array_put($array, 'Z', null, function ($v, $k, $array){return !in_array($v, $array);}))->isSame(false);
      * ```
      *
      * @param array $array 配列
      * @param mixed $value 設定する値
      * @param array|string|int|null $key 設定するキー
-     * @return string|int 設定したキー
+     * @param callable|null $condition 追加する条件
+     * @return string|int|false 設定したキー
      */
-    function array_put(&$array, $value, $key = null)
+    function array_put(&$array, $value, $key = null, $condition = null)
     {
         if (is_array($key)) {
             $k = array_shift($key);
@@ -2063,10 +2140,16 @@ if (!isset($excluded_functions["array_put"]) && (!function_exists("ryunosuke\\Fu
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return array_put(...[&$array[$k], $value, $key]);
+                return array_put(...[&$array[$k], $value, $key, $condition]);
             }
             else {
-                return array_put(...[&$array, $value, $k]);
+                return array_put(...[&$array, $value, $k, $condition]);
+            }
+        }
+
+        if ($condition !== null) {
+            if (!$condition($value, $key, $array)) {
+                return false;
             }
         }
 
@@ -2329,9 +2412,10 @@ if (function_exists("ryunosuke\\Functions\\array_find") && !defined("ryunosuke\\
 
 if (!isset($excluded_functions["array_rekey"]) && (!function_exists("ryunosuke\\Functions\\array_rekey") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_rekey"))->isInternal()))) {
     /**
-     * キーをマップ配列で置換する
+     * キーをマップ配列・callable で置換する
      *
-     * 変換先が null だとその要素は取り除かれる。
+     * 変換先・返り値が null だとその要素は取り除かれる。
+     * callable 指定時の引数は `(キー, 値, 連番インデックス, 対象配列そのもの)` が渡ってくる。
      *
      * Example:
      * ```php
@@ -2342,17 +2426,33 @@ if (!isset($excluded_functions["array_rekey"]) && (!function_exists("ryunosuke\\
      * that(array_rekey($array, ['b' => null, 'c' => 'z']))->isSame(['a' => 'A', 'z' => 'C']);
      * // キーの交換にも使える（a ⇔ c）
      * that(array_rekey($array, ['a' => 'c', 'c' => 'a']))->isSame(['c' => 'A', 'b' => 'B', 'a' => 'C']);
+     * // callable
+     * that(array_rekey($array, 'strtoupper'))->isSame(['A' => 'A', 'B' => 'B', 'C' => 'C']);
      * ```
      *
      * @param iterable $array 対象配列
-     * @param array $keymap 正規表現
+     * @param array|callable $keymap マップ配列かキーを返すクロージャ
      * @return array キーが置換された配列
      */
     function array_rekey($array, $keymap)
     {
+        // 互換性のため callable は配列以外に限定する
+        $callable = ($keymap instanceof \Closure) || (!is_array($keymap) && is_callable($keymap));
+        if ($callable) {
+            $keymap = func_user_func_array($keymap);
+        }
+
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
-            if (array_key_exists($k, $keymap)) {
+            if ($callable) {
+                $k = $keymap($k, $v, $n, $array);
+                // null は突っ込まない（除去）
+                if ($k !== null) {
+                    $result[$k] = $v;
+                }
+            }
+            elseif (array_key_exists($k, $keymap)) {
                 // null は突っ込まない（除去）
                 if ($keymap[$k] !== null) {
                     $result[$keymap[$k]] = $v;
@@ -2361,6 +2461,7 @@ if (!isset($excluded_functions["array_rekey"]) && (!function_exists("ryunosuke\\
             else {
                 $result[$k] = $v;
             }
+            $n++;
         }
         return $result;
     }
@@ -2602,6 +2703,11 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
      */
     function array_where($array, $column = null, $callback = null)
     {
+        if ($column instanceof \Closure) {
+            $callback = $column;
+            $column = null;
+        }
+
         $is_array = is_array($column);
         if ($is_array) {
             if (is_hasharray($column)) {
@@ -2619,7 +2725,7 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
                         return function ($v) use ($c) { return is_array($c) ? in_array($v, $c) : $v == $c; };
                     }
                 }, $column);
-                $callback = function ($vv, $k) use ($callbacks) {
+                $callback = function ($vv, $k, $v) use ($callbacks) {
                     foreach ($callbacks as $c => $callback) {
                         if (!$callback($vv[$c], $k)) {
                             return false;
@@ -2647,7 +2753,7 @@ if (!isset($excluded_functions["array_where"]) && (!function_exists("ryunosuke\\
                 $vv = $v[$column];
             }
 
-            if ($callback($vv, $k)) {
+            if ($callback($vv, $k, $v)) {
                 $result[$k] = $v;
             }
         }
@@ -2876,7 +2982,7 @@ if (!isset($excluded_functions["array_kvmap"]) && (!function_exists("ryunosuke\\
      * ]);
      * ```
      *
-     * @param array $array 対象配列
+     * @param iterable $array 対象配列
      * @param callable $callback 適用するコールバック
      * @return array 変換された配列
      */
@@ -4196,6 +4302,115 @@ if (!isset($excluded_functions["array_lookup"]) && (!function_exists("ryunosuke\
 }
 if (function_exists("ryunosuke\\Functions\\array_lookup") && !defined("ryunosuke\\Functions\\array_lookup")) {
     define("ryunosuke\\Functions\\array_lookup", "ryunosuke\\Functions\\array_lookup");
+}
+
+if (!isset($excluded_functions["array_select"]) && (!function_exists("ryunosuke\\Functions\\array_select") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_select"))->isInternal()))) {
+    /**
+     * 指定キーの要素で抽出する
+     *
+     * $columns に単純な値を渡すとそのキーの値を選択する。
+     * キー付きで値を渡すと読み替えて選択する。
+     * キー付きでクロージャを渡すと `(キーの値, 行自体, 現在行のキー)` を引数としてコールバックして選択する。
+     * 単一のクロージャを渡すと `(行自体, 現在行のキー)` を引数としてコールバックして選択する（array_map とほぼ同じ）。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     11 => ['id' => 1, 'name' => 'name1'],
+     *     12 => ['id' => 2, 'name' => 'name2'],
+     *     13 => ['id' => 3, 'name' => 'name3'],
+     * ];
+     *
+     * that(array_select($array, [
+     *     'id',              // id を単純取得
+     *     'alias' => 'name', // name を alias として取得
+     * ]))->isSame([
+     *     11 => ['id' => 1, 'alias' => 'name1'],
+     *     12 => ['id' => 2, 'alias' => 'name2'],
+     *     13 => ['id' => 3, 'alias' => 'name3'],
+     * ]);
+     *
+     * that(array_select($array, [
+     *     // id の 10 倍を取得
+     *     'id'     => function ($id) {return $id * 10;},
+     *     // id と name の結合を取得
+     *     'idname' => function ($null, $row, $index) {return $row['id'] . $row['name'];},
+     * ]))->isSame([
+     *     11 => ['id' => 10, 'idname' => '1name1'],
+     *     12 => ['id' => 20, 'idname' => '2name2'],
+     *     13 => ['id' => 30, 'idname' => '3name3'],
+     * ]);
+     * ```
+     *
+     * @param iterable $array 対象配列
+     * @param string|iterable|\Closure $columns 抽出項目
+     * @param int|string|null $index キーとなるキー
+     * @return array 新しい配列
+     */
+    function array_select($array, $columns, $index = null)
+    {
+        if (!is_iterable($columns) && !$columns instanceof \Closure) {
+            return array_lookup(...func_get_args());
+        }
+
+        if ($columns instanceof \Closure) {
+            $callbacks = $columns;
+        }
+        else {
+            $callbacks = [];
+            foreach ($columns as $alias => $column) {
+                if ($column instanceof \Closure) {
+                    $callbacks[$alias] = func_user_func_array($column);
+                }
+            }
+        }
+
+        $argcount = func_num_args();
+        $result = [];
+        foreach ($array as $k => $v) {
+            if ($callbacks instanceof \Closure) {
+                $row = $callbacks($v, $k);
+            }
+            else {
+                $row = [];
+                foreach ($columns as $alias => $column) {
+                    if (is_int($alias)) {
+                        $alias = $column;
+                    }
+
+                    if (isset($callbacks[$alias])) {
+                        $row[$alias] = $callbacks[$alias](attr_get($alias, $v, null), $v, $k);
+                    }
+                    elseif (attr_exists($column, $v)) {
+                        $row[$alias] = attr_get($column, $v);
+                    }
+                    else {
+                        throw new \InvalidArgumentException("$column is not exists.");
+                    }
+                }
+            }
+
+            if ($argcount === 2) {
+                $result[$k] = $row;
+            }
+            elseif ($index === null) {
+                $result[] = $row;
+            }
+            elseif (array_key_exists($index, $row)) {
+                $result[$row[$index]] = $row;
+            }
+            elseif (attr_exists($index, $v)) {
+                $result[attr_get($index, $v)] = $row;
+            }
+            else {
+                throw new \InvalidArgumentException("$index is not exists.");
+            }
+        }
+        return $result;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\array_select") && !defined("ryunosuke\\Functions\\array_select")) {
+    define("ryunosuke\\Functions\\array_select", "ryunosuke\\Functions\\array_select");
 }
 
 if (!isset($excluded_functions["array_columns"]) && (!function_exists("ryunosuke\\Functions\\array_columns") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_columns"))->isInternal()))) {
@@ -7980,6 +8195,69 @@ if (!isset($excluded_functions["parameter_length"]) && (!function_exists("ryunos
 }
 if (function_exists("ryunosuke\\Functions\\parameter_length") && !defined("ryunosuke\\Functions\\parameter_length")) {
     define("ryunosuke\\Functions\\parameter_length", "ryunosuke\\Functions\\parameter_length");
+}
+
+if (!isset($excluded_functions["parameter_default"]) && (!function_exists("ryunosuke\\Functions\\parameter_default") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\parameter_default"))->isInternal()))) {
+    /**
+     * callable のデフォルト引数を返す
+     *
+     * オプションで指定もできる。
+     * 負数を指定した場合「最後の引数から数えた位置」になる。
+     *
+     * 内部関数には使用できない（リフレクションが対応していない）。
+     *
+     * Example:
+     * ```php
+     * $f = function ($a, $b = 'b') {};
+     * // デフォルト引数である b を返す
+     * that(parameter_default($f))->isSame([1 => 'b']);
+     * // 引数で与えるとそれが優先される
+     * that(parameter_default($f, ['A', 'B']))->isSame(['A', 'B']);
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param iterable|array $arguments デフォルト引数
+     * @return array デフォルト引数
+     */
+    function parameter_default(callable $callable, $arguments = [])
+    {
+        static $cache = [];
+
+        // $call_name でキャッシュ。しかしクロージャはすべて「Closure::__invoke」になるのでキャッシュできない
+        is_callable($callable, true, $call_name);
+        if (!isset($cache[$call_name]) || $callable instanceof \Closure) {
+            /** @var \ReflectionFunctionAbstract $refunc */
+            $refunc = reflect_callable($callable);
+            assert($refunc->isUserDefined(), 'no support internal callable.');
+            $cache[$call_name] = [
+                'length'  => $refunc->getNumberOfParameters(),
+                'default' => [],
+            ];
+            foreach ($refunc->getParameters() as $n => $param) {
+                if ($param->isDefaultValueAvailable()) {
+                    $cache[$call_name]['default'][$n] = $param->getDefaultValue();
+                }
+            }
+        }
+
+        // 指定されていないならそのまま返せば良い（高速化）
+        if (is_array($arguments) && !$arguments) {
+            return $cache[$call_name]['default'];
+        }
+
+        $args2 = [];
+        foreach ($arguments as $n => $arg) {
+            if ($n < 0) {
+                $n += $cache[$call_name]['length'];
+            }
+            $args2[$n] = $arg;
+        }
+
+        return array_merge2($cache[$call_name]['default'], $args2);
+    }
+}
+if (function_exists("ryunosuke\\Functions\\parameter_default") && !defined("ryunosuke\\Functions\\parameter_default")) {
+    define("ryunosuke\\Functions\\parameter_default", "ryunosuke\\Functions\\parameter_default");
 }
 
 if (!isset($excluded_functions["function_shorten"]) && (!function_exists("ryunosuke\\Functions\\function_shorten") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\function_shorten"))->isInternal()))) {
@@ -16564,7 +16842,7 @@ if (!isset($excluded_functions["profiler"]) && (!function_exists("ryunosuke\\Fun
                                     }
                                 }
                                 else {
-                                    if (preg_match($condition, $value) === false) {
+                                    if (!preg_match($condition, $value)) {
                                         continue 2;
                                     }
                                 }
@@ -17076,7 +17354,7 @@ if (!isset($excluded_functions["arrayable_key_exists"]) && (!function_exists("ry
      * that(isset($array['n']))->isFalse();                // isset だと null が false になる（参考）
      *
      * $object = new \ArrayObject($array);
-     * // 配列は array_key_exists と同じ
+     * // ArrayAccess は isset + 実際に取得を試みる
      * that(arrayable_key_exists('k', $object))->isTrue();  // もちろん存在する
      * that(arrayable_key_exists('n', $object))->isTrue();  // isset ではないので null も true
      * that(arrayable_key_exists('x', $object))->isFalse(); // 存在しないので false
@@ -17089,27 +17367,8 @@ if (!isset($excluded_functions["arrayable_key_exists"]) && (!function_exists("ry
      */
     function arrayable_key_exists($key, $arrayable)
     {
-        if (is_array($arrayable)) {
-            // see https://www.php.net/manual/function.array-key-exists.php#107786
-            return isset($arrayable[$key]) || array_key_exists($key, $arrayable);
-        }
-
-        if ($arrayable instanceof \ArrayAccess) {
-            // あるならあるでよい
-            if (isset($arrayable[$key])) {
-                return true;
-            }
-            // 問題は「ない場合」と「あるが null だった場合」の区別で、ArrayAccess の実装次第なので一元的に確定するのは不可能
-            // ここでは「ない場合はなんらかのエラー・例外が出るはず」という前提で実際に値を取得して確認する
-            try {
-                error_clear_last();
-                /** @noinspection PhpUnusedLocalVariableInspection */
-                $dummy = @$arrayable[$key];
-                return !error_get_last();
-            }
-            catch (\Throwable $t) {
-                return false;
-            }
+        if (is_array($arrayable) || $arrayable instanceof \ArrayAccess) {
+            return attr_exists($key, $arrayable);
         }
 
         throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', var_type($arrayable)));
@@ -17117,6 +17376,119 @@ if (!isset($excluded_functions["arrayable_key_exists"]) && (!function_exists("ry
 }
 if (function_exists("ryunosuke\\Functions\\arrayable_key_exists") && !defined("ryunosuke\\Functions\\arrayable_key_exists")) {
     define("ryunosuke\\Functions\\arrayable_key_exists", "ryunosuke\\Functions\\arrayable_key_exists");
+}
+
+if (!isset($excluded_functions["attr_exists"]) && (!function_exists("ryunosuke\\Functions\\attr_exists") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\attr_exists"))->isInternal()))) {
+    /**
+     * 配列・オブジェクトを問わずキーやプロパティの存在を確認する
+     *
+     * 配列が与えられた場合は array_key_exists と同じ。
+     * オブジェクトは一旦 isset で確認した後 null の場合は実際にアクセスして試みる。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'k' => 'v',
+     *     'n' => null,
+     * ];
+     * // 配列は array_key_exists と同じ
+     * that(attr_exists('k', $array))->isTrue();  // もちろん存在する
+     * that(attr_exists('n', $array))->isTrue();  // isset ではないので null も true
+     * that(attr_exists('x', $array))->isFalse(); // 存在しないので false
+     *
+     * $object = (object) $array;
+     * // オブジェクトでも使える
+     * that(attr_exists('k', $object))->isTrue();  // もちろん存在する
+     * that(attr_exists('n', $object))->isTrue();  // isset ではないので null も true
+     * that(attr_exists('x', $object))->isFalse(); // 存在しないので false
+     * ```
+     *
+     * @param int|string $key 調べるキー
+     * @param array|object $value 調べられる配列・オブジェクト
+     * @return bool $key が存在するなら true
+     */
+    function attr_exists($key, $value)
+    {
+        return attr_get($key, $value, $dummy = new \stdClass()) !== $dummy;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\attr_exists") && !defined("ryunosuke\\Functions\\attr_exists")) {
+    define("ryunosuke\\Functions\\attr_exists", "ryunosuke\\Functions\\attr_exists");
+}
+
+if (!isset($excluded_functions["attr_get"]) && (!function_exists("ryunosuke\\Functions\\attr_get") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\attr_get"))->isInternal()))) {
+    /**
+     * 配列・オブジェクトを問わずキーやプロパティの値を取得する
+     *
+     * 配列が与えられた場合は array_key_exists でチェック。
+     * オブジェクトは一旦 isset で確認した後 null の場合は実際にアクセスして取得する。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'k' => 'v',
+     *     'n' => null,
+     * ];
+     * that(attr_get('k', $array))->isSame('v');                  // もちろん存在する
+     * that(attr_get('n', $array))->isSame(null);                 // isset ではないので null も true
+     * that(attr_get('x', $array, 'default'))->isSame('default'); // 存在しないのでデフォルト値
+     *
+     * $object = (object) $array;
+     * // オブジェクトでも使える
+     * that(attr_get('k', $object))->isSame('v');                  // もちろん存在する
+     * that(attr_get('n', $object))->isSame(null);                 // isset ではないので null も true
+     * that(attr_get('x', $object, 'default'))->isSame('default'); // 存在しないのでデフォルト値
+     * ```
+     *
+     * @param int|string $key 取得するキー
+     * @param array|object $value 取得される配列・オブジェクト
+     * @param mixed $default なかった場合のデフォルト値
+     * @return mixed $key の値
+     */
+    function attr_get($key, $value, $default = null)
+    {
+        if (is_array($value)) {
+            // see https://www.php.net/manual/function.array-key-exists.php#107786
+            return isset($value[$key]) || array_key_exists($key, $value) ? $value[$key] : $default;
+        }
+
+        if ($value instanceof \ArrayAccess) {
+            // あるならあるでよい
+            if (isset($value[$key])) {
+                return $value[$key];
+            }
+            // 問題は「ない場合」と「あるが null だった場合」の区別で、ArrayAccess の実装次第なので一元的に確定するのは不可能
+            // ここでは「ない場合はなんらかのエラー・例外が出るはず」という前提で実際に値を取得して確認する
+            try {
+                error_clear_last();
+                $result = @$value[$key];
+                return error_get_last() ? $default : $result;
+            }
+            catch (\Throwable $t) {
+                return $default;
+            }
+        }
+
+        // 上記のプロパティ版
+        if (is_object($value)) {
+            if (isset($value->$key)) {
+                return $value->$key;
+            }
+            try {
+                error_clear_last();
+                $result = @$value->$key;
+                return error_get_last() ? $default : $result;
+            }
+            catch (\Throwable $t) {
+                return $default;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('%s must be array or object (%s).', '$value', var_type($value)));
+    }
+}
+if (function_exists("ryunosuke\\Functions\\attr_get") && !defined("ryunosuke\\Functions\\attr_get")) {
+    define("ryunosuke\\Functions\\attr_get", "ryunosuke\\Functions\\attr_get");
 }
 
 if (!isset($excluded_functions["si_prefix"]) && (!function_exists("ryunosuke\\Functions\\si_prefix") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\si_prefix"))->isInternal()))) {
