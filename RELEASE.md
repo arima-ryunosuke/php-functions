@@ -10,6 +10,18 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.6
+
+- [feature][Funchand] parameter_default を追加
+- [feature][Vars] attr_exists/attr_get を追加
+- [feature][Arrays] array_select を追加
+- [feature][Arrays] array_rekey のコールバック対応
+- [feature][Arrays] array_where のシンプルクロージャの対応と自身引数の追加
+- [feature][Arrays] array_merge2 を追加
+- [feature][Arrays] array_put に追加条件引数を追加
+- [fixbug][Utility] profiler で正規表現フィルタが働いていない不具合を修正
+- [fixbug][Arrays] arrayize で連番キーが死んでしまう不具合を修正
+
 ## 1.4.5
 
 - [feature][composer] export-function と exclude-internal コマンドを用意
