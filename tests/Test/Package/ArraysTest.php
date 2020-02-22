@@ -1896,8 +1896,6 @@ class ArraysTest extends AbstractTestCase
             13 => ['id' => 3, 'name' => 'name3'],
         ];
 
-        $objects = array_map(stdclass, $arrays);
-
         // 第3引数を与えれば array_column と全く同じ
         that((array_lookup)($arrays, 'name', 'id'))->isSame(array_column($arrays, 'name', 'id'));
         that((array_lookup)($arrays, null, 'id'))->isSame(array_column($arrays, null, 'id'));
@@ -1905,7 +1903,78 @@ class ArraysTest extends AbstractTestCase
         that((array_lookup)($arrays, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
         that((array_lookup)($arrays, null))->isSame($arrays);
         // オブジェクトもOK
+        $objects = array_map(stdclass, $arrays);
         that((array_lookup)($objects, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
+    }
+
+    function test_array_select()
+    {
+        $arrays = [
+            11 => ['id' => 1, 'name' => 'name1'],
+            12 => (object) ['id' => 2, 'name' => 'name2'],
+            13 => new \ArrayObject(['id' => 3, 'name' => 'name3']),
+        ];
+
+        that((array_select)($arrays, 'name', null))->isSame((array_lookup)($arrays, 'name', null));
+
+        that((array_select)($arrays, function ($row) {
+            return [
+                'hoge' => (attr_get)('id', $row),
+                'fuga' => (attr_get)('name', $row),
+                'piyo' => 123,
+            ];
+        }))->isSame([
+            11 => ['hoge' => 1, 'fuga' => 'name1', 'piyo' => 123],
+            12 => ['hoge' => 2, 'fuga' => 'name2', 'piyo' => 123],
+            13 => ['hoge' => 3, 'fuga' => 'name3', 'piyo' => 123],
+        ]);
+        that((array_select)($arrays, [
+            'name' => function ($name) { return strtoupper($name); },
+        ], null))->isSame([
+            ['name' => 'NAME1'],
+            ['name' => 'NAME2'],
+            ['name' => 'NAME3'],
+        ]);
+        that((array_select)($arrays, [
+            'id' => function ($id, $row) { return (attr_get)('id', $row) * 10; },
+        ], 'id'))->isSame([
+            10 => ['id' => 10],
+            20 => ['id' => 20],
+            30 => ['id' => 30],
+        ]);
+        that((array_select)($arrays, [
+            'id10' => function ($id, $row) { return (attr_get)('id', $row) * 10; },
+        ], 'id'))->isSame([
+            1 => ['id10' => 10],
+            2 => ['id10' => 20],
+            3 => ['id10' => 30],
+        ]);
+        that((array_select)($arrays, [
+            'id'     => function ($id, $row) { return (attr_get)('id', $row) * 10; },
+            'name',
+            'idname' => function ($val, $row) { return (attr_get)('id', $row) . ':' . (attr_get)('name', $row); },
+        ]))->isSame([
+            11 => ['id' => 10, 'name' => 'name1', 'idname' => '1:name1'],
+            12 => ['id' => 20, 'name' => 'name2', 'idname' => '2:name2'],
+            13 => ['id' => 30, 'name' => 'name3', 'idname' => '3:name3'],
+        ]);
+
+        that([
+            array_select,
+            $arrays,
+            [
+                'undefined',
+            ]
+        ])->throws('is not exists');
+
+        that([
+            array_select,
+            $arrays,
+            [
+                'name',
+            ],
+            'undefined'
+        ])->throws('is not exists');
     }
 
     function test_array_columns()
