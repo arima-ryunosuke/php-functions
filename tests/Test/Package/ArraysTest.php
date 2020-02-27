@@ -11,8 +11,11 @@ class ArraysTest extends AbstractTestCase
 
     function test_arrayize()
     {
-        that((arrayize)(1, 2, 3))->is([1, 2, 3]);
-        that((arrayize)([1], 2, 3))->is([1, 2, 3]);
+        that((arrayize)(1, 2, 3))->isSame([1, 2, 3]);
+        that((arrayize)([1], 2, 3))->isSame([1, 2, 3]);
+        that((arrayize)(['a' => 1], 2, 3))->isSame(['a' => 1, 2, 3]);
+        that((arrayize)([1 => 1], [2 => 2], [3 => 3]))->isSame([1 => 1, 2 => 2, 3 => 3]);
+        that((arrayize)([1 => 1], ['b' => 2], [3 => 3]))->isSame([1 => 1, 'b' => 2, 3 => 3]);
     }
 
     function test_is_indexarray()
