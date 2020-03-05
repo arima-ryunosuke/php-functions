@@ -785,6 +785,18 @@ class ArraysTest extends AbstractTestCase
         that((array_rekey)($array, ['c' => 'a', 'a' => 'c']))->is(['c' => 'A', 'b' => 'B', 'a' => 'C']);
         that((array_rekey)($array, ['b' => null]))->is(['a' => 'A', 'c' => 'C']);
         that((array_rekey)($array, ['a' => null, 'b' => null, 'c' => null]))->is([]);
+        that((array_rekey)($array, 'strtoupper'))->is(['A' => 'A', 'B' => 'B', 'C' => 'C']);
+        that((array_rekey)($array, function ($k, $v, $n, $array) {
+            if ($k === 'a') {
+                return 'A' . $n;
+            }
+            if ($k === 'b') {
+                return $v . $n;
+            }
+            if ($k === 'c') {
+                return $array['c'] . $n;
+            }
+        }))->is(['A0' => 'A', 'B1' => 'B', 'C2' => 'C']);
     }
 
     function test_array_grep_key()
