@@ -220,6 +220,44 @@ class ArraysTest extends AbstractTestCase
         that((array_add)(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']))->is(['a', 'b', 'c', 'd', 'e']);
     }
 
+    function test_array_merge2()
+    {
+        that((array_merge2)())->is([]);
+        that((array_merge2)(['a' => 'A', 2 => 2, 1 => 1, 0 => 0]))->is([0, 1, 2, 'a' => 'A']);
+        that((array_merge2)(...[
+            [
+                -1  => -1,
+                1   => 1,
+                4   => 4,
+                8   => 8,
+                'a' => 'A'
+            ],
+            [
+                0   => 0,
+                'b' => 'B',
+                3   => 3
+            ],
+            [
+                -2  => -2,
+                5   => 5,
+                'a' => 'X',
+                2   => 2
+            ],
+        ]))->isSame([
+            0   => 0,
+            1   => 1,
+            2   => 2,
+            3   => 3,
+            4   => 4,
+            5   => 5,
+            8   => 8,
+            -2  => -2,
+            'a' => 'X',
+            'b' => 'B',
+            -1  => -1,
+        ]);
+    }
+
     function test_array_mix()
     {
         that((array_mix)())->is([]);
