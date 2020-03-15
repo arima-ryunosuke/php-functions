@@ -568,6 +568,17 @@ class ArraysTest extends AbstractTestCase
         that((array_put)($array, 'X', 'a'))->is('a');
         that($array)->is(['a' => 'X', 'B', 'Z', 'Z', 'z' => 'Z']);
 
+        // condition
+        $array = ['a' => 'A', 'B'];
+        that((array_put)($array, 'Z', null, function ($v, $k, $array) {
+            return !in_array($v, $array);
+        }))->is(1);
+        that($array)->is(['a' => 'A', 'B', 'Z']);
+        that((array_put)($array, 'Z', null, function ($v, $k, $array) {
+            return !in_array($v, $array);
+        }))->is(false);
+        that($array)->is(['a' => 'A', 'B', 'Z']);
+
         // array
         $array = ['a' => 'A', 'b' => ['B']];
         that((array_put)($array, 'X', ['x']))->is('x');
