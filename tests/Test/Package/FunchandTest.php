@@ -457,6 +457,22 @@ class FunchandTest extends AbstractTestCase
         that((parameter_length)(function (...$x) { }, false, true))->is(INF);
     }
 
+    function test_parameter_default()
+    {
+        $f = function ($a, $b = 'b') { };
+        that((parameter_default)($f))->isSame([1 => 'b']);
+        that((parameter_default)($f, ['A', 'B']))->isSame(['A', 'B']);
+        that((parameter_default)($f, [-1 => 'B']))->isSame([1 => 'B']);
+        that((parameter_default)($f, [-2 => 'A', -1 => 'B']))->isSame(['A', 'B']);
+
+        $f = function ($a, ...$x) { };
+        that((parameter_default)($f))->isSame([]);
+        that((parameter_default)($f, [1 => 'x']))->isSame([1 => 'x']);
+        that((parameter_default)($f, [1 => 'x', 2 => 'y']))->isSame([1 => 'x', 2 => 'y']);
+        that((parameter_default)($f, [1 => 'x', 3 => 'z']))->isSame([1 => 'x', 3 => 'z']);
+        that((parameter_default)($f, ['a', -9 => 'x', -8 => 'y']))->isSame(['a', -7 => 'x', -6 => 'y']);
+    }
+
     function test_function_shorten()
     {
         require_once __DIR__ . '/Funchand/function_shorten.php';
