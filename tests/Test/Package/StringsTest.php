@@ -1850,12 +1850,13 @@ z", quote2: "a\\\\nz"');
 
     public function test_str_guess()
     {
-        $percent = 0;
+        $percent = null;
         that((str_guess)("12345", [
             "12345",
         ], $percent))->isSame("12345");
         that($percent)->is(100);
 
+        $percent = null;
         that((str_guess)("12345", [
             "1",
             "12",
@@ -1864,17 +1865,37 @@ z", quote2: "a\\\\nz"');
         ], $percent))->isSame("1234");
         that($percent)->is(53.77049180327869);
 
+        $percent = null;
         that((str_guess)("12345", [
             "x12345x",
             "xx12345xx",
         ], $percent))->isSame("x12345x");
         that($percent)->is(52.69320843091335);
 
+        $percent = null;
         that((str_guess)("notfound", [
             "x12345x",
             "xx12345xx",
-        ], $percent))->isSame("xx12345xx");
+        ], $percent))->isSame("x12345x");
         that($percent)->is(0);
+
+        $percent = 50;
+        that((str_guess)("1234", [
+            "12",
+            "123",
+            "1234",
+            "12345",
+            "123456",
+        ], $percent))->isSame(["1234", "12345"]);
+
+        $percent = 100;
+        that((str_guess)("notfound", [
+            "12",
+            "123",
+            "1234",
+            "12345",
+            "123456",
+        ], $percent))->isSame([]);
 
         that([str_guess, '', []])->throws('is empty');
     }
