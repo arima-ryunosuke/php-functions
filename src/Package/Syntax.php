@@ -215,12 +215,12 @@ class Syntax
      *         }
      * ');
      * // 文字列を指定すればそれが使用される
-     * that(indent_php($phpcode, "\t"))->isSame('
-     * 	echo 123;
+     * that(indent_php($phpcode, "  "))->isSame('
+     *   echo 123;
      *
-     * 	if (true) {
-     * 	    echo 456;
-     * 	}
+     *   if (true) {
+     *       echo 456;
+     *   }
      * ');
      * // オプション指定
      * that(indent_php($phpcode, [
