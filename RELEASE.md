@@ -10,6 +10,12 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 
+## 1.4.7
+
+- [feature][Strings] str_guess の配列返し対応
+- [feature][Syntax] chain で型に応じて呼ぶ関数を分岐するように変更
+- [feature][Funchand] parameter_wiring/func_wiring を追加
+
 ## 1.4.6
 
 - [feature][Funchand] parameter_default を追加
