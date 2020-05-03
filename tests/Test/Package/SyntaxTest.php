@@ -639,6 +639,12 @@ $var3 = function () { return \ArrayObject::class; };
 
         that([$chain()])->throws('nonempty stack and no parameter given');
         that([$chain('hoge'), null])->throws('empty stack and parameter given > 0');
+
+        // for compatible
+        if (get_cfg_var('rfunc.chain_overload')) {
+            that($chain('hello')->replace2('l', 'L')())->is('heLLo');
+            that($chain([1, 2, 3])->replace([7, 8])())->is([7, 8, 3]);
+        }
     }
 
     function test_throws()

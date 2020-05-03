@@ -591,7 +591,8 @@ class Syntax
      * 下記の特殊ルールにより、特殊な呼び出し方ができる。
      *
      * - array_XXX, str_XXX は省略して XXX で呼び出せる
-     *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない
+     *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない（array_優先でコールされる）
+     *   - ini に 'rfunc.chain_overload' 定義されていれば型で分岐させることができる
      * - funcE で eval される文字列のクロージャを呼べる
      *   - 変数名は `$_` 固定だが、 `$_` が無いときに限り 最左に自動付与される
      * - funcP で配列指定オペレータのクロージャを呼べる
@@ -741,22 +742,24 @@ class Syntax
 
             private function _resolve($name)
             {
+                $overload = get_cfg_var('rfunc.chain_overload') ?: false; // for compatible
+                $isiterable = !$overload || is_iterable($this->data);
                 if (false
                     // for global
-                    || function_exists($fname = $name)
-                    || function_exists($fname = "array_$name")
-                    || function_exists($fname = "str_$name")
+                    || (function_exists($fname = $name))
+                    || ($isiterable && function_exists($fname = "array_$name"))
+                    || (function_exists($fname = "str_$name"))
                     // for package
                     || (defined($cname = $name) && is_callable($fname = constant($cname)))
-                    || (defined($cname = "array_$name") && is_callable($fname = constant($cname)))
+                    || ($isiterable && defined($cname = "array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
                     // for namespace
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
+                    || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
                     // for class
                     || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
+                    || ($isiterable && defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */
