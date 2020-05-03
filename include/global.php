@@ -8259,6 +8259,104 @@ if (function_exists("parameter_default") && !defined("parameter_default")) {
     define("parameter_default", "parameter_default");
 }
 
+if (!isset($excluded_functions["parameter_wiring"]) && (!function_exists("parameter_wiring") || (!false && (new \ReflectionFunction("parameter_wiring"))->isInternal()))) {
+    /**
+     * callable の引数の型情報に基づいてワイヤリングした引数配列を返す
+     *
+     * ワイヤリングは下記のルールに基づいて行われる。
+     *
+     * - 引数の型とキーが完全一致
+     * - 引数の型とキーが継承・実装関係
+     *   - 複数一致した場合は解決されない
+     * - 引数名とキーが完全一致
+     *   - 可変引数は追加
+     * - 引数のデフォルト値
+     * - 得られた値がクロージャの場合は再帰的に解決
+     *   - $this は $dependency になるが FromCallable 経由の場合は元のまま
+     *
+     * Example:
+     * ```php
+     * $closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, ...$misc) { return get_defined_vars(); };
+     * $params = (parameter_wiring)($closure, [
+     *     \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
+     *     \RuntimeException::class => $t = new \RuntimeException('hoge'),
+     *     '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
+     *     '$misc'                  => ['x', 'y', 'z'],
+     * ]);
+     * that($params)->isSame([
+     *     0 => $ao,       // 0番目はクラス名が完全一致
+     *     1 => $t,        // 1番目はインターフェース実装
+     *     2 => [1, 2, 3], // 2番目はクロージャをコール
+     *                     // 3番目の引数は解決されない
+     *     4 => 'x',       // 可変引数なのでフラットに展開
+     *     5 => 'y',
+     *     6 => 'z',
+     * ]);
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param array|\ArrayAccess $dependency 引数候補配列
+     * @return array 引数配列
+     */
+    function parameter_wiring($callable, $dependency)
+    {
+        /** @var \ReflectionFunctionAbstract $ref */
+        $ref = reflect_callable($callable);
+        $result = [];
+
+        foreach ($ref->getParameters() as $n => $parameter) {
+            if ($type = $parameter->getClass()) {
+                if (isset($dependency[$pname = $type->getName()])) {
+                    $result[$n] = $dependency[$pname];
+                }
+                else {
+                    foreach ($dependency as $key => $value) {
+                        if (is_subclass_of(ltrim($key, '\\'), $type->getName(), true)) {
+                            if (array_key_exists($n, $result)) {
+                                unset($result[$n]);
+                                break;
+                            }
+                            $result[$n] = $value;
+                        }
+                    }
+                }
+            }
+            elseif (isset($dependency[$pname = '$' . $parameter->getName()])) {
+                if ($parameter->isVariadic()) {
+                    foreach (array_values(arrayize($dependency[$pname])) as $i => $v) {
+                        $result[$n + $i] = $v;
+                    }
+                }
+                else {
+                    $result[$n] = $dependency[$pname];
+                }
+            }
+            elseif ($parameter->isDefaultValueAvailable()) {
+                $result[$n] = $parameter->getDefaultValue();
+            }
+        }
+
+        // $this bind するのでオブジェクト化しておく
+        if (!is_object($dependency)) {
+            $dependency = new \ArrayObject($dependency);
+        }
+
+        // recurse for closure
+        return array_map(function ($arg) use ($dependency) {
+            if ($arg instanceof \Closure) {
+                if ((new \ReflectionFunction($arg))->getShortName() === '{closure}') {
+                    $arg = $arg->bindTo($dependency);
+                }
+                return $arg(...parameter_wiring($arg, $dependency));
+            }
+            return $arg;
+        }, $result);
+    }
+}
+if (function_exists("parameter_wiring") && !defined("parameter_wiring")) {
+    define("parameter_wiring", "parameter_wiring");
+}
+
 if (!isset($excluded_functions["function_shorten"]) && (!function_exists("function_shorten") || (!false && (new \ReflectionFunction("function_shorten"))->isInternal()))) {
     /**
      * 関数の名前空間部分を除いた短い名前を取得する
@@ -8322,6 +8420,45 @@ if (!isset($excluded_functions["func_user_func_array"]) && (!function_exists("fu
 }
 if (function_exists("func_user_func_array") && !defined("func_user_func_array")) {
     define("func_user_func_array", "func_user_func_array");
+}
+
+if (!isset($excluded_functions["func_wiring"]) && (!function_exists("func_wiring") || (!false && (new \ReflectionFunction("func_wiring"))->isInternal()))) {
+    /**
+     * 引数の型情報に基づいてワイヤリングしたクロージャを返す
+     *
+     * $dependency に数値キーの配列を混ぜるとデフォルト値として使用される。
+     * 得られたクロージャの呼び出し時に引数を与える事ができる。
+     *
+     * parameter_wiring も参照。
+     *
+     * Example:
+     * ```php
+     * $closure = function ($a, $b) { return func_get_args(); };
+     * $new_closure = func_wiring($closure, [
+     *     '$a' => 'a',
+     *     '$b' => 'b',
+     *     1    => 'B',
+     * ]);
+     * that($new_closure())->isSame(['a', 'B']);    // 同時指定の場合は数値キー優先
+     * that($new_closure('A'))->isSame(['A', 'B']); // 呼び出し時の引数優先
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param array|\ArrayAccess $dependency 引数候補配列
+     * @return \Closure 引数を確定したクロージャ
+     */
+    function func_wiring($callable, $dependency)
+    {
+        $params1 = parameter_wiring($callable, $dependency);
+        $params2 = array_filter($dependency, 'is_int', ARRAY_FILTER_USE_KEY);
+        $params = array_merge2($params1, $params2);
+        return function (...$args) use ($callable, $params) {
+            return $callable(...$args + $params);
+        };
+    }
+}
+if (function_exists("func_wiring") && !defined("func_wiring")) {
+    define("func_wiring", "func_wiring");
 }
 
 if (!isset($excluded_functions["func_new"]) && (!function_exists("func_new") || (!false && (new \ReflectionFunction("func_new"))->isInternal()))) {
@@ -13676,6 +13813,8 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") |
      * $string に最も近い文字列を返す
      *
      * N-gram 化して類似度の高い結果を返す。
+     * $percent で一致度を受けられる。
+     * 予め値が入った変数を渡すとその一致度以上の候補を高い順で配列で返す。
      *
      * この関数の結果（内部実装）は互換性を考慮しない。
      *
@@ -13689,12 +13828,26 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") |
      *     'かとうあい', // マッチ度約 16.7%（"あい"があり"う"の位置が等しい）
      *     'あいゆえに', // マッチ度約 17.4%（"あい", "え"がマッチ）
      * ]))->isSame('あいゆえに');
+     *
+     * // マッチ度30%以上を高い順に配列で返す
+     * $percent = 30;
+     * that(str_guess("destory", [
+     *     'describe',
+     *     'destroy',
+     *     'destruct',
+     *     'destiny',
+     *     'destinate',
+     * ], $percent))->isSame([
+     *     'destroy',
+     *     'destiny',
+     *     'destruct',
+     * ]);
      * ```
      *
      * @param string $string 調べる文字列
      * @param array $candidates 候補文字列配列
      * @param float $percent マッチ度（％）を受ける変数
-     * @return string 候補の中で最も近い文字列
+     * @return string|array 候補の中で最も近い文字列
      */
     function str_guess($string, $candidates, &$percent = null)
     {
@@ -13714,9 +13867,8 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") |
 
         $sngram = $ngramer($string);
 
-        $result = null;
-        $percent = 0;
-        foreach ($candidates as $i => $candidate) {
+        $result = array_fill_keys($candidates, null);
+        foreach ($candidates as $candidate) {
             $cngram = $ngramer($candidate);
 
             // uni, bi, tri で重み付けスコア（var_dump したいことが多いので配列に入れる）
@@ -13732,22 +13884,20 @@ if (!isset($excluded_functions["str_guess"]) && (!function_exists("str_guess") |
             // 10(uni) + 20(bi) + 30(tri) + 1(levenshtein) で最大は 61
             $score = $score / 61 * 100;
 
-            /*
-            echo "$string <=> $candidate:
-  score1     : $scores[1]
-  score2     : $scores[2]
-  score3     : $scores[3]
-  score      : $score
-";
-            */
-
-            if ($percent <= $score) {
-                $percent = $score;
-                $result = $i;
-            }
+            $result[$candidate] = $score;
         }
 
-        return $candidates[$result];
+        arsort($result);
+        if ($percent === null) {
+            $percent = reset($result);
+        }
+        else {
+            return array_map('strval', array_keys(array_filter($result, function ($score) use ($percent) {
+                return $score >= $percent;
+            })));
+        }
+
+        return (string) key($result);
     }
 }
 if (function_exists("str_guess") && !defined("str_guess")) {
@@ -14272,12 +14422,12 @@ if (!isset($excluded_functions["indent_php"]) && (!function_exists("indent_php")
      *         }
      * ');
      * // 文字列を指定すればそれが使用される
-     * that(indent_php($phpcode, "\t"))->isSame('
-     * 	echo 123;
+     * that(indent_php($phpcode, "  "))->isSame('
+     *   echo 123;
      *
-     * 	if (true) {
-     * 	    echo 456;
-     * 	}
+     *   if (true) {
+     *       echo 456;
+     *   }
      * ');
      * // オプション指定
      * that(indent_php($phpcode, [
@@ -14616,7 +14766,7 @@ if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || 
      *
      * @param object|null $object オブジェクト
      * @param string $expected 期待するクラス名。指定した場合は is_a される
-     * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
+     * @return object $object がオブジェクトならそのまま返し、違うなら NullObject を返す
      */
     function optional($object, $expected = null)
     {
@@ -14645,6 +14795,7 @@ if (!isset($excluded_functions["optional"]) && (!function_exists("optional") || 
                 // @formatter:on
             };
         }
+        /** @var object $nullobject */
         return $nullobject;
     }
 }
@@ -14663,7 +14814,8 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
      * 下記の特殊ルールにより、特殊な呼び出し方ができる。
      *
      * - array_XXX, str_XXX は省略して XXX で呼び出せる
-     *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない
+     *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない（array_優先でコールされる）
+     *   - ini に 'rfunc.chain_overload' 定義されていれば型で分岐させることができる
      * - funcE で eval される文字列のクロージャを呼べる
      *   - 変数名は `$_` 固定だが、 `$_` が無いときに限り 最左に自動付与される
      * - funcP で配列指定オペレータのクロージャを呼べる
@@ -14813,22 +14965,24 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("chain") || (!fals
 
             private function _resolve($name)
             {
+                $overload = get_cfg_var('rfunc.chain_overload') ?: false; // for compatible
+                $isiterable = !$overload || is_iterable($this->data);
                 if (false
                     // for global
-                    || function_exists($fname = $name)
-                    || function_exists($fname = "array_$name")
-                    || function_exists($fname = "str_$name")
+                    || (function_exists($fname = $name))
+                    || ($isiterable && function_exists($fname = "array_$name"))
+                    || (function_exists($fname = "str_$name"))
                     // for package
                     || (defined($cname = $name) && is_callable($fname = constant($cname)))
-                    || (defined($cname = "array_$name") && is_callable($fname = constant($cname)))
+                    || ($isiterable && defined($cname = "array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
                     // for namespace
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
+                    || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
                     // for class
                     || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
+                    || ($isiterable && defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     /** @noinspection PhpUndefinedVariableInspection */

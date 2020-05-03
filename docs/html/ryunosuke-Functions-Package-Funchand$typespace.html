@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L980" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L5-L1107" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Funchand</span></h2>
@@ -1147,7 +1147,95 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L730-L740" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L730-L821" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::parameter_wiring()" tabindex="-1" class="structure-title ">
+                        parameter_wiring                        	<small>($callable, $dependency) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>callable の引数の型情報に基づいてワイヤリングした引数配列を返す</p>
+<p>ワイヤリングは下記のルールに基づいて行われる。</p>
+<ul>
+<li>引数の型とキーが完全一致</li>
+<li>引数の型とキーが継承・実装関係<ul>
+<li>複数一致した場合は解決されない</li>
+</ul>
+</li>
+<li>引数名とキーが完全一致<ul>
+<li>可変引数は追加</li>
+</ul>
+</li>
+<li>引数のデフォルト値</li>
+<li>得られた値がクロージャの場合は再帰的に解決<ul>
+<li>$this は $dependency になるが FromCallable 経由の場合は元のまま</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, ...$misc) { return get_defined_vars(); };
+$params = (parameter_wiring)($closure, [
+    \ArrayObject::class      =&gt; $ao = new \ArrayObject([1, 2, 3]),
+    \RuntimeException::class =&gt; $t = new \RuntimeException('hoge'),
+    '$array'                 =&gt; function (\ArrayObject $ao) { return (array) $ao; },
+    '$misc'                  =&gt; ['x', 'y', 'z'],
+]);
+that($params)-&gt;isSame([
+    0 =&gt; $ao,       // 0番目はクラス名が完全一致
+    1 =&gt; $t,        // 1番目はインターフェース実装
+    2 =&gt; [1, 2, 3], // 2番目はクロージャをコール
+                    // 3番目の引数は解決されない
+    4 =&gt; 'x',       // 可変引数なのでフラットに展開
+    5 =&gt; 'y',
+    6 =&gt; 'z',
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc"><p>対象 callable</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a></td>
+				<td class="rest">$dependency</td>
+				<td class="desc"><p>引数候補配列</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>引数配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L823-L833" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_shorten()" tabindex="-1" class="structure-title ">
                         function_shorten                        	<small>($function) : string</small>
@@ -1194,7 +1282,7 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L742-L783" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L835-L876" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_user_func_array()" tabindex="-1" class="structure-title ">
                         func_user_func_array                        	<small>($callback) : callable</small>
@@ -1249,7 +1337,73 @@ that($strlen('abc', null))-&gt;isSame(3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L785-L811" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L878-L910" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Funchand::func_wiring()" tabindex="-1" class="structure-title ">
+                        func_wiring                        	<small>($callable, $dependency) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>引数の型情報に基づいてワイヤリングしたクロージャを返す</p>
+<p>$dependency に数値キーの配列を混ぜるとデフォルト値として使用される。<br />
+得られたクロージャの呼び出し時に引数を与える事ができる。</p>
+<p>parameter_wiring も参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">$closure = function ($a, $b) { return func_get_args(); };
+$new_closure = func_wiring($closure, [
+    '$a' =&gt; 'a',
+    '$b' =&gt; 'b',
+    1    =&gt; 'B',
+]);
+that($new_closure())-&gt;isSame(['a', 'B']);    // 同時指定の場合は数値キー優先
+that($new_closure('A'))-&gt;isSame(['A', 'B']); // 呼び出し時の引数優先
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">callable</td>
+				<td class="rest">$callable</td>
+				<td class="desc"><p>対象 callable</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a></td>
+				<td class="rest">$dependency</td>
+				<td class="desc"><p>引数候補配列</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
+			<td class="desc"><p>引数を確定したクロージャ</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L912-L938" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_new()" tabindex="-1" class="structure-title ">
                         func_new                        	<small>($classname, ...$defaultargs) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
@@ -1312,7 +1466,7 @@ that($newException('fuga')-&gt;getMessage())-&gt;isSame('fuga');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L813-L857" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L940-L984" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::func_method()" tabindex="-1" class="structure-title ">
                         func_method                        	<small>($methodname, ...$defaultargs) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
@@ -1388,7 +1542,7 @@ that($hoge789($object))-&gt;isSame('7,8,9');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L859-L924" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L986-L1051" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_alias()" tabindex="-1" class="structure-title ">
                         function_alias                        	<small>($original, $alias) : void</small>
@@ -1448,7 +1602,7 @@ that(trim_alias(' abc '))-&gt;isSame('abc');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L926-L979" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Funchand.php#L1053-L1106" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Funchand::function_parameter()" tabindex="-1" class="structure-title ">
                         function_parameter                        	<small>($eitherReffuncOrCallable) : array</small>

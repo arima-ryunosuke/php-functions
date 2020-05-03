@@ -845,8 +845,10 @@ define("ryunosuke\\Functions\\Package\\by_builtin", ["ryunosuke\\Functions\\Pack
 define("ryunosuke\\Functions\\Package\\namedcallize", ["ryunosuke\\Functions\\Package\\Funchand", "namedcallize"]);
 define("ryunosuke\\Functions\\Package\\parameter_length", ["ryunosuke\\Functions\\Package\\Funchand", "parameter_length"]);
 define("ryunosuke\\Functions\\Package\\parameter_default", ["ryunosuke\\Functions\\Package\\Funchand", "parameter_default"]);
+define("ryunosuke\\Functions\\Package\\parameter_wiring", ["ryunosuke\\Functions\\Package\\Funchand", "parameter_wiring"]);
 define("ryunosuke\\Functions\\Package\\function_shorten", ["ryunosuke\\Functions\\Package\\Funchand", "function_shorten"]);
 define("ryunosuke\\Functions\\Package\\func_user_func_array", ["ryunosuke\\Functions\\Package\\Funchand", "func_user_func_array"]);
+define("ryunosuke\\Functions\\Package\\func_wiring", ["ryunosuke\\Functions\\Package\\Funchand", "func_wiring"]);
 define("ryunosuke\\Functions\\Package\\func_new", ["ryunosuke\\Functions\\Package\\Funchand", "func_new"]);
 define("ryunosuke\\Functions\\Package\\func_method", ["ryunosuke\\Functions\\Package\\Funchand", "func_method"]);
 define("ryunosuke\\Functions\\Package\\function_alias", ["ryunosuke\\Functions\\Package\\Funchand", "function_alias"]);

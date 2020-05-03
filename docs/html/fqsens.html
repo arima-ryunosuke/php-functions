@@ -2749,6 +2749,47 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::parameter_wiring()">
+                                    ryunosuke\Functions\Package\Funchand::parameter_wiring		</a>	<small>($callable, $dependency) : array</small>
+		</h4>
+	<div class="description"><p>callable の引数の型情報に基づいてワイヤリングした引数配列を返す</p>
+<p>ワイヤリングは下記のルールに基づいて行われる。</p>
+<ul>
+<li>引数の型とキーが完全一致</li>
+<li>引数の型とキーが継承・実装関係<ul>
+<li>複数一致した場合は解決されない</li>
+</ul>
+</li>
+<li>引数名とキーが完全一致<ul>
+<li>可変引数は追加</li>
+</ul>
+</li>
+<li>引数のデフォルト値</li>
+<li>得られた値がクロージャの場合は再帰的に解決<ul>
+<li>$this は $dependency になるが FromCallable 経由の場合は元のまま</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, ...$misc) { return get_defined_vars(); };
+$params = (parameter_wiring)($closure, [
+    \ArrayObject::class      =&gt; $ao = new \ArrayObject([1, 2, 3]),
+    \RuntimeException::class =&gt; $t = new \RuntimeException('hoge'),
+    '$array'                 =&gt; function (\ArrayObject $ao) { return (array) $ao; },
+    '$misc'                  =&gt; ['x', 'y', 'z'],
+]);
+that($params)-&gt;isSame([
+    0 =&gt; $ao,       // 0番目はクラス名が完全一致
+    1 =&gt; $t,        // 1番目はインターフェース実装
+    2 =&gt; [1, 2, 3], // 2番目はクロージャをコール
+                    // 3番目の引数は解決されない
+    4 =&gt; 'x',       // 可変引数なのでフラットに展開
+    5 =&gt; 'y',
+    6 =&gt; 'z',
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::function_shorten()">
                                     ryunosuke\Functions\Package\Funchand::function_shorten		</a>	<small>($function) : string</small>
 		</h4>
@@ -2766,6 +2807,25 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 <pre><code class="language-php">// strlen に2つの引数を渡してもエラーにならない
 $strlen = func_user_func_array('strlen');
 that($strlen('abc', null))-&gt;isSame(3);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::func_wiring()">
+                                    ryunosuke\Functions\Package\Funchand::func_wiring		</a>	<small>($callable, $dependency) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+		</h4>
+	<div class="description"><p>引数の型情報に基づいてワイヤリングしたクロージャを返す</p>
+<p>$dependency に数値キーの配列を混ぜるとデフォルト値として使用される。<br />
+得られたクロージャの呼び出し時に引数を与える事ができる。</p>
+<p>parameter_wiring も参照。</p>
+<p>Example:</p>
+<pre><code class="language-php">$closure = function ($a, $b) { return func_get_args(); };
+$new_closure = func_wiring($closure, [
+    '$a' =&gt; 'a',
+    '$b' =&gt; 'b',
+    1    =&gt; 'B',
+]);
+that($new_closure())-&gt;isSame(['a', 'B']);    // 同時指定の場合は数値キー優先
+that($new_closure('A'))-&gt;isSame(['A', 'B']); // 呼び出し時の引数優先
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4396,10 +4456,12 @@ that(ngram("あいうえお", 3))-&gt;isSame(["あいう", "いうえ", "うえ�
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_guess()">
-                                    ryunosuke\Functions\Package\Strings::str_guess		</a>	<small>($string, $candidates, &amp;$percent = null) : string</small>
+                                    ryunosuke\Functions\Package\Strings::str_guess		</a>	<small>($string, $candidates, &amp;$percent = null) : string<span class="type-separator"></span><wbr>array</small>
 		</h4>
 	<div class="description"><p>$string に最も近い文字列を返す</p>
-<p>N-gram 化して類似度の高い結果を返す。</p>
+<p>N-gram 化して類似度の高い結果を返す。<br />
+$percent で一致度を受けられる。<br />
+予め値が入った変数を渡すとその一致度以上の候補を高い順で配列で返す。</p>
 <p>この関数の結果（内部実装）は互換性を考慮しない。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 「あいうえお」と最も近い文字列は「あいゆえに」である
@@ -4410,6 +4472,20 @@ that(str_guess("あいうえお", [
     'かとうあい', // マッチ度約 16.7%（"あい"があり"う"の位置が等しい）
     'あいゆえに', // マッチ度約 17.4%（"あい", "え"がマッチ）
 ]))-&gt;isSame('あいゆえに');
+
+// マッチ度30%以上を高い順に配列で返す
+$percent = 30;
+that(str_guess("destory", [
+    'describe',
+    'destroy',
+    'destruct',
+    'destiny',
+    'destinate',
+], $percent))-&gt;isSame([
+    'destroy',
+    'destiny',
+    'destruct',
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4624,12 +4700,12 @@ that(indent_php($phpcode, 8))-&gt;isSame('
         }
 ');
 // 文字列を指定すればそれが使用される
-that(indent_php($phpcode, "\t"))-&gt;isSame('
-	echo 123;
+that(indent_php($phpcode, "  "))-&gt;isSame('
+  echo 123;
 
-	if (true) {
-	    echo 456;
-	}
+  if (true) {
+      echo 456;
+  }
 ');
 // オプション指定
 that(indent_php($phpcode, [
@@ -4655,7 +4731,7 @@ highlight_string の CLI 対応版とも言える。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()">
-                                    ryunosuke\Functions\Package\Syntax::optional		</a>	<small>($object, $expected = null) : mixed</small>
+                                    ryunosuke\Functions\Package\Syntax::optional		</a>	<small>($object, $expected = null) : object</small>
 		</h4>
 	<div class="description"><p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
 <p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。</p>
@@ -4697,7 +4773,8 @@ ChainObject は大抵のグローバル関数がアノテーションされて�
 <p>下記の特殊ルールにより、特殊な呼び出し方ができる。</p>
 <ul>
 <li>array_XXX, str_XXX は省略して XXX で呼び出せる<ul>
-<li>省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない</li>
+<li>省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない（array_優先でコールされる）</li>
+<li>ini に 'rfunc.chain_overload' 定義されていれば型で分岐させることができる</li>
 </ul>
 </li>
 <li>funcE で eval される文字列のクロージャを呼べる<ul>
