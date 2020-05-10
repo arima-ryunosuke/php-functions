@@ -473,6 +473,29 @@ class FunchandTest extends AbstractTestCase
         that((parameter_default)($f, ['a', -9 => 'x', -8 => 'y']))->isSame(['a', -7 => 'x', -6 => 'y']);
     }
 
+    function test_parameter_wiring()
+    {
+        $closure = function (\ArrayObject $ao, \Throwable $t, $array, $method, $closure, $none, ...$misc) { return get_defined_vars(); };
+        $params = (parameter_wiring)($closure, $that = [
+            \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
+            \RuntimeException::class => $t = new \RuntimeException('hoge'),
+            '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
+            '$method'                => \Closure::fromCallable([$ao, 'getArrayCopy']),
+            '$closure'               => function () { return (array) $this; },
+            '$misc'                  => ['x', 'y', 'z'],
+        ]);
+        that($params)->isSame([
+            0 => $ao,
+            1 => $t,
+            2 => [1, 2, 3],
+            3 => [1, 2, 3],
+            4 => $that,
+            6 => 'x',
+            7 => 'y',
+            8 => 'z',
+        ]);
+    }
+
     function test_function_shorten()
     {
         require_once __DIR__ . '/Funchand/function_shorten.php';
@@ -500,6 +523,21 @@ class FunchandTest extends AbstractTestCase
         that($pascal_case('this_is_a_pen'))->is('ThisIsAPen');
         // 第2引数を与えても意味を為さない
         that($pascal_case('this_is_a_pen', '-'))->is('ThisIsAPen');
+    }
+
+    function test_func_wiring()
+    {
+        $closure = function ($a, $b, \Exception $c = null) { return func_get_args(); };
+        $new_closure = (func_wiring)($closure, [
+            \LogicException::class  => null,
+            \DomainException::class => null,
+            '$a'                    => 'a',
+            '$b'                    => 'b',
+            1                       => 'B',
+            2                       => $c = new \Exception(),
+        ]);
+        that($new_closure())->isSame(['a', 'B', $c]);
+        that($new_closure('A'))->isSame(['A', 'B', $c]);
     }
 
     function test_func_new()

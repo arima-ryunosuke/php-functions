@@ -728,6 +728,99 @@ class Funchand
     }
 
     /**
+     * callable の引数の型情報に基づいてワイヤリングした引数配列を返す
+     *
+     * ワイヤリングは下記のルールに基づいて行われる。
+     *
+     * - 引数の型とキーが完全一致
+     * - 引数の型とキーが継承・実装関係
+     *   - 複数一致した場合は解決されない
+     * - 引数名とキーが完全一致
+     *   - 可変引数は追加
+     * - 引数のデフォルト値
+     * - 得られた値がクロージャの場合は再帰的に解決
+     *   - $this は $dependency になるが FromCallable 経由の場合は元のまま
+     *
+     * Example:
+     * ```php
+     * $closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, ...$misc) { return get_defined_vars(); };
+     * $params = (parameter_wiring)($closure, [
+     *     \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
+     *     \RuntimeException::class => $t = new \RuntimeException('hoge'),
+     *     '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
+     *     '$misc'                  => ['x', 'y', 'z'],
+     * ]);
+     * that($params)->isSame([
+     *     0 => $ao,       // 0番目はクラス名が完全一致
+     *     1 => $t,        // 1番目はインターフェース実装
+     *     2 => [1, 2, 3], // 2番目はクロージャをコール
+     *                     // 3番目の引数は解決されない
+     *     4 => 'x',       // 可変引数なのでフラットに展開
+     *     5 => 'y',
+     *     6 => 'z',
+     * ]);
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param array|\ArrayAccess $dependency 引数候補配列
+     * @return array 引数配列
+     */
+    public static function parameter_wiring($callable, $dependency)
+    {
+        /** @var \ReflectionFunctionAbstract $ref */
+        $ref = (reflect_callable)($callable);
+        $result = [];
+
+        foreach ($ref->getParameters() as $n => $parameter) {
+            if ($type = $parameter->getClass()) {
+                if (isset($dependency[$pname = $type->getName()])) {
+                    $result[$n] = $dependency[$pname];
+                }
+                else {
+                    foreach ($dependency as $key => $value) {
+                        if (is_subclass_of(ltrim($key, '\\'), $type->getName(), true)) {
+                            if (array_key_exists($n, $result)) {
+                                unset($result[$n]);
+                                break;
+                            }
+                            $result[$n] = $value;
+                        }
+                    }
+                }
+            }
+            elseif (isset($dependency[$pname = '$' . $parameter->getName()])) {
+                if ($parameter->isVariadic()) {
+                    foreach (array_values((arrayize)($dependency[$pname])) as $i => $v) {
+                        $result[$n + $i] = $v;
+                    }
+                }
+                else {
+                    $result[$n] = $dependency[$pname];
+                }
+            }
+            elseif ($parameter->isDefaultValueAvailable()) {
+                $result[$n] = $parameter->getDefaultValue();
+            }
+        }
+
+        // $this bind するのでオブジェクト化しておく
+        if (!is_object($dependency)) {
+            $dependency = new \ArrayObject($dependency);
+        }
+
+        // recurse for closure
+        return array_map(function ($arg) use ($dependency) {
+            if ($arg instanceof \Closure) {
+                if ((new \ReflectionFunction($arg))->getShortName() === '{closure}') {
+                    $arg = $arg->bindTo($dependency);
+                }
+                return $arg(...(parameter_wiring)($arg, $dependency));
+            }
+            return $arg;
+        }, $result);
+    }
+
+    /**
      * 関数の名前空間部分を除いた短い名前を取得する
      *
      * @param string $function 短くする関数名
@@ -780,6 +873,40 @@ class Funchand
             }
             return $callback(...array_slice($args, 0, $plength));
         }, $callback, $plength);
+    }
+
+    /**
+     * 引数の型情報に基づいてワイヤリングしたクロージャを返す
+     *
+     * $dependency に数値キーの配列を混ぜるとデフォルト値として使用される。
+     * 得られたクロージャの呼び出し時に引数を与える事ができる。
+     *
+     * parameter_wiring も参照。
+     *
+     * Example:
+     * ```php
+     * $closure = function ($a, $b) { return func_get_args(); };
+     * $new_closure = func_wiring($closure, [
+     *     '$a' => 'a',
+     *     '$b' => 'b',
+     *     1    => 'B',
+     * ]);
+     * that($new_closure())->isSame(['a', 'B']);    // 同時指定の場合は数値キー優先
+     * that($new_closure('A'))->isSame(['A', 'B']); // 呼び出し時の引数優先
+     * ```
+     *
+     * @param callable $callable 対象 callable
+     * @param array|\ArrayAccess $dependency 引数候補配列
+     * @return \Closure 引数を確定したクロージャ
+     */
+    public static function func_wiring($callable, $dependency)
+    {
+        $params1 = (parameter_wiring)($callable, $dependency);
+        $params2 = array_filter($dependency, 'is_int', ARRAY_FILTER_USE_KEY);
+        $params = (array_merge2)($params1, $params2);
+        return function (...$args) use ($callable, $params) {
+            return $callable(...$args + $params);
+        };
     }
 
     /**
