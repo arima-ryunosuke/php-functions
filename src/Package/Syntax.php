@@ -549,7 +549,7 @@ class Syntax
      *
      * @param object|null $object オブジェクト
      * @param string $expected 期待するクラス名。指定した場合は is_a される
-     * @return mixed $object がオブジェクトならそのまま返し、違うなら NullObject を返す
+     * @return object $object がオブジェクトならそのまま返し、違うなら NullObject を返す
      */
     public static function optional($object, $expected = null)
     {
@@ -578,6 +578,7 @@ class Syntax
                 // @formatter:on
             };
         }
+        /** @var object $nullobject */
         return $nullobject;
     }
 
