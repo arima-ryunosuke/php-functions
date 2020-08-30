@@ -4017,7 +4017,13 @@
  *
  * @see ope_func
  * @property \ChainObject $ope_func
- * @method   \ChainObject  ope_func()
+ * @method   \ChainObject  ope_func(...$operands)
+ * @method   \ChainObject  ope_func1($operator, ...$operands)
+ * @method   \ChainObject  ope_func2($operator, ...$operands)
+ * @method   \ChainObject  ope_func3($operator, ...$operands)
+ * @method   \ChainObject  ope_func4($operator, ...$operands)
+ * @method   \ChainObject  ope_func5($operator, ...$operands)
+ * @method   \ChainObject  ope_func6($operator, ...$operands)
  *
  * @see opendir
  * @property \ChainObject $opendir

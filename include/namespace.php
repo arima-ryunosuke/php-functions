@@ -7623,6 +7623,7 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Fun
      * 演算子のクロージャを返す
      *
      * 関数ベースなので `??` のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。
+     * 2つ目以降の引数でオペランドを指定できる。
      *
      * Example:
      * ```php
@@ -7636,12 +7637,16 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Fun
      * $cond = ope_func('?:'); // 条件演算子クロージャ
      * that($cond('OK', 'NG'))->isSame('OK' ?: 'NG');               // 引数2つで呼ぶと2項演算子
      * that($cond(false, 'OK', 'NG'))->isSame(false ? 'OK' : 'NG'); // 引数3つで呼ぶと3項演算子
+     *
+     * $gt5 = ope_func('<=', 5); // 5以下を判定するクロージャ
+     * that(array_filter([1, 2, 3, 4, 5, 6, 7, 8, 9], $gt5))->isSame([1, 2, 3, 4, 5]);
      * ```
      *
      * @param string $operator 演算子
+     * @param mixed $operands 右オペランド
      * @return \Closure 演算子のクロージャ
      */
-    function ope_func($operator)
+    function ope_func($operator, ...$operands)
     {
         static $operators = null;
         $operators = $operators ?: [
@@ -7682,7 +7687,15 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Fun
             'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
         ];
 
-        return $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
+        $opefunc = $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
+
+        if ($operands) {
+            return static function ($v1) use ($opefunc, $operands) {
+                return $opefunc($v1, ...$operands);
+            };
+        }
+
+        return $opefunc;
     }
 }
 if (function_exists("ryunosuke\\Functions\\ope_func") && !defined("ryunosuke\\Functions\\ope_func")) {
@@ -12536,7 +12549,8 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
      * CSV ヘッダ行は全連想配列のキーの共通項となる。
      * 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。
      * ただし、オプションで headers が与えられた場合はそれを使用する。
-     * この headers オプションはヘッダ文字列変換も兼ねる（[key => header] で「key を header で吐き出し」となる）。
+     * この headers オプションに連想配列を与えるとヘッダ文字列変換になる（[key => header] で「key を header で吐き出し」となる）。
+     * 数値配列を与えると単純に順序指定での出力指定になるが、ヘッダ行が出力されなくなる。
      *
      * callback オプションが渡された場合は「あらゆる処理の最初」にコールされる。
      * つまりヘッダの読み換えや文字エンコーディングの変換が行われる前の状態でコールされる。
@@ -12566,6 +12580,14 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
      * A2,C2
      * A3,C3
      * ");
+     *
+     * // ヘッダ行を出さない
+     * that(csv_export($csvarrays, [
+     *     'headers' => ['a', 'c'], // a と c だけを出力＋ヘッダ行なし
+     * ]))->is("A1,C1
+     * A2,C2
+     * A3,C3
+     * ");
      * ```
      *
      * @param array $csvarrays 連想配列の配列
@@ -12579,7 +12601,7 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
             'enclosure' => '"',
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
-            'headers'   => [],
+            'headers'   => null,
             'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
             'output'    => null,
         ];
@@ -12597,18 +12619,22 @@ if (!isset($excluded_functions["csv_export"]) && (!function_exists("ryunosuke\\F
                 $size = 0;
                 $mb_internal_encoding = mb_internal_encoding();
                 if (!$headers) {
+                    $tmp = [];
                     foreach ($csvarrays as $array) {
-                        $headers = $headers ? array_intersect_key($headers, $array) : $array;
+                        $tmp = $tmp ? array_intersect_key($tmp, $array) : $array;
                     }
-                    $headers = array_keys($headers);
+                    $keys = array_keys($tmp);
+                    $headers = is_array($headers) ? $keys : array_combine($keys, $keys);
                 }
                 if (!is_hasharray($headers)) {
                     $headers = array_combine($headers, $headers);
                 }
-                if ($encoding !== $mb_internal_encoding) {
-                    mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                else {
+                    if ($encoding !== $mb_internal_encoding) {
+                        mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                    }
+                    $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
                 }
-                $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
                 $default = array_fill_keys(array_keys($headers), '');
 
                 foreach ($csvarrays as $n => $array) {

@@ -2517,10 +2517,11 @@ that($bind('%s%s', 'N'))-&gt;isSame('NX');
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::ope_func()">
-                                    ryunosuke\Functions\Package\Funchand::ope_func		</a>	<small>($operator) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+                                    ryunosuke\Functions\Package\Funchand::ope_func		</a>	<small>($operator, ...$operands) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
 		</h4>
 	<div class="description"><p>演算子のクロージャを返す</p>
-<p>関数ベースなので <code>??</code> のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。</p>
+<p>関数ベースなので <code>??</code> のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。<br />
+2つ目以降の引数でオペランドを指定できる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$not = ope_func('!');    // 否定演算子クロージャ
 that(false)-&gt;isSame($not(true));
@@ -2532,6 +2533,9 @@ that($minus(3, 2))-&gt;isSame(3 - 2); // 引数2つで呼ぶと2項演算子
 $cond = ope_func('?:'); // 条件演算子クロージャ
 that($cond('OK', 'NG'))-&gt;isSame('OK' ?: 'NG');               // 引数2つで呼ぶと2項演算子
 that($cond(false, 'OK', 'NG'))-&gt;isSame(false ? 'OK' : 'NG'); // 引数3つで呼ぶと3項演算子
+
+$gt5 = ope_func('&lt;=', 5); // 5以下を判定するクロージャ
+that(array_filter([1, 2, 3, 4, 5, 6, 7, 8, 9], $gt5))-&gt;isSame([1, 2, 3, 4, 5]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4009,7 +4013,8 @@ c = PHP_VERSION
 <p>CSV ヘッダ行は全連想配列のキーの共通項となる。<br />
 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。<br />
 ただし、オプションで headers が与えられた場合はそれを使用する。<br />
-この headers オプションはヘッダ文字列変換も兼ねる（[key =&gt; header] で「key を header で吐き出し」となる）。</p>
+この headers オプションに連想配列を与えるとヘッダ文字列変換になる（[key =&gt; header] で「key を header で吐き出し」となる）。<br />
+数値配列を与えると単純に順序指定での出力指定になるが、ヘッダ行が出力されなくなる。</p>
 <p>callback オプションが渡された場合は「あらゆる処理の最初」にコールされる。<br />
 つまりヘッダの読み換えや文字エンコーディングの変換が行われる前の状態でコールされる。<br />
 また、 false を返すとその要素はスルーされる。</p>
@@ -4032,6 +4037,14 @@ that(csv_export($csvarrays, [
     'headers' =&gt; ['a' =&gt; 'A', 'c' =&gt; 'C'], // a と c だけを出力＋ヘッダ文字変更
 ]))-&gt;is("A,C
 A1,C1
+A2,C2
+A3,C3
+");
+
+// ヘッダ行を出さない
+that(csv_export($csvarrays, [
+    'headers' =&gt; ['a', 'c'], // a と c だけを出力＋ヘッダ行なし
+]))-&gt;is("A1,C1
 A2,C2
 A3,C3
 ");
