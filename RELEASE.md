@@ -9,6 +9,12 @@
 ## x.y.z
 
 - Utility が増えてきたから然るべき場所へ移動する
+- 使わん関数が多すぎるので整理する（次のメジャーアップ）
+
+## 1.4.8
+
+- [feature][Strings] csv_export のヘッダなしに対応
+- [feature][Funchand] ope_func にオペランド引数を追加
 
 ## 1.4.7
 
