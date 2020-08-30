@@ -149,6 +149,7 @@ class Funchand
      * 演算子のクロージャを返す
      *
      * 関数ベースなので `??` のような言語組み込みの特殊な演算子は若干希望通りにならない（Notice が出る）。
+     * 2つ目以降の引数でオペランドを指定できる。
      *
      * Example:
      * ```php
@@ -162,12 +163,16 @@ class Funchand
      * $cond = ope_func('?:'); // 条件演算子クロージャ
      * that($cond('OK', 'NG'))->isSame('OK' ?: 'NG');               // 引数2つで呼ぶと2項演算子
      * that($cond(false, 'OK', 'NG'))->isSame(false ? 'OK' : 'NG'); // 引数3つで呼ぶと3項演算子
+     *
+     * $gt5 = ope_func('<=', 5); // 5以下を判定するクロージャ
+     * that(array_filter([1, 2, 3, 4, 5, 6, 7, 8, 9], $gt5))->isSame([1, 2, 3, 4, 5]);
      * ```
      *
      * @param string $operator 演算子
+     * @param mixed $operands 右オペランド
      * @return \Closure 演算子のクロージャ
      */
-    public static function ope_func($operator)
+    public static function ope_func($operator, ...$operands)
     {
         static $operators = null;
         $operators = $operators ?: [
@@ -208,7 +213,15 @@ class Funchand
             'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
         ];
 
-        return $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));
+        $opefunc = $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));
+
+        if ($operands) {
+            return static function ($v1) use ($opefunc, $operands) {
+                return $opefunc($v1, ...$operands);
+            };
+        }
+
+        return $opefunc;
     }
 
     /**

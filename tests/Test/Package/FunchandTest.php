@@ -135,6 +135,9 @@ class FunchandTest extends AbstractTestCase
         that((ope_func)('instanceof')(new \stdClass(), \stdClass::class))->isTrue();
         that((ope_func)('instanceof')(new \stdClass(), \Exception::class))->isFalse();
 
+        $p = [1, 1, 2, 4, 5, 6, 1, 3, 8, 4];
+        that(array_filter($p, (ope_func)('==', 5)))->isSame([4 => 5]);
+
         // 例外系
         that([ope_func, 'hogera'])->throws('is not defined');
     }
