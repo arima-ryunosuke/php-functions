@@ -2039,7 +2039,8 @@ class Strings
      * CSV ヘッダ行は全連想配列のキーの共通項となる。
      * 順番には依存しないが、余計な要素があってもそのキーはヘッダには追加されないし、データ行にも含まれない。
      * ただし、オプションで headers が与えられた場合はそれを使用する。
-     * この headers オプションはヘッダ文字列変換も兼ねる（[key => header] で「key を header で吐き出し」となる）。
+     * この headers オプションに連想配列を与えるとヘッダ文字列変換になる（[key => header] で「key を header で吐き出し」となる）。
+     * 数値配列を与えると単純に順序指定での出力指定になるが、ヘッダ行が出力されなくなる。
      *
      * callback オプションが渡された場合は「あらゆる処理の最初」にコールされる。
      * つまりヘッダの読み換えや文字エンコーディングの変換が行われる前の状態でコールされる。
@@ -2069,6 +2070,14 @@ class Strings
      * A2,C2
      * A3,C3
      * ");
+     *
+     * // ヘッダ行を出さない
+     * that(csv_export($csvarrays, [
+     *     'headers' => ['a', 'c'], // a と c だけを出力＋ヘッダ行なし
+     * ]))->is("A1,C1
+     * A2,C2
+     * A3,C3
+     * ");
      * ```
      *
      * @param array $csvarrays 連想配列の配列
@@ -2082,7 +2091,7 @@ class Strings
             'enclosure' => '"',
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
-            'headers'   => [],
+            'headers'   => null,
             'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
             'output'    => null,
         ];
@@ -2100,18 +2109,22 @@ class Strings
                 $size = 0;
                 $mb_internal_encoding = mb_internal_encoding();
                 if (!$headers) {
+                    $tmp = [];
                     foreach ($csvarrays as $array) {
-                        $headers = $headers ? array_intersect_key($headers, $array) : $array;
+                        $tmp = $tmp ? array_intersect_key($tmp, $array) : $array;
                     }
-                    $headers = array_keys($headers);
+                    $keys = array_keys($tmp);
+                    $headers = is_array($headers) ? $keys : array_combine($keys, $keys);
                 }
                 if (!(is_hasharray)($headers)) {
                     $headers = array_combine($headers, $headers);
                 }
-                if ($encoding !== $mb_internal_encoding) {
-                    mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                else {
+                    if ($encoding !== $mb_internal_encoding) {
+                        mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                    }
+                    $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
                 }
-                $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
                 $default = array_fill_keys(array_keys($headers), '');
 
                 foreach ($csvarrays as $n => $array) {

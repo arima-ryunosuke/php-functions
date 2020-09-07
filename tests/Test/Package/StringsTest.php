@@ -1239,6 +1239,18 @@ a2,c2
 a3,c3
 ");
 
+        // headers 指定（数値）
+        that((csv_export)($csvarrays, ['headers' => ['a', 'c']]))->is("a1,c1
+a2,c2
+a3,c3
+");
+
+        // headers 指定（空）
+        that((csv_export)($csvarrays, ['headers' => []]))->is("a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+");
+
         // callback 指定
         that((csv_export)($csvarrays, [
             'callback' => function (&$row, $n) {
