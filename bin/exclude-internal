@@ -33,9 +33,10 @@ function removeChildren(\DOMElement $element, $attr)
 {
     $result = [];
     foreach (iterator_to_array($element->childNodes) as $child) {
-        /** @var \DOMElement $child */
-        $result[] = $child->getAttribute($attr);
-        $element->removeChild($child);
+        if ($child instanceof \DOMElement) {
+            $result[] = $child->getAttribute($attr);
+            $element->removeChild($child);
+        }
     }
     return $result;
 }
@@ -58,13 +59,6 @@ if (!$BASEDIR || !file_exists("$BASEDIR/vendor/autoload.php")) {
     exit(1);
 }
 
-$miscXml = realpath("$BASEDIR/.idea/misc.xml");
-$workXml = realpath("$BASEDIR/.idea/workspace.xml");
-if (!$miscXml || !$workXml) {
-    echo("failed to detect .idea.\n");
-    exit(2);
-}
-
 $composer = json_decode(file_get_contents("$BASEDIR/composer.json"), true);
 $devMode = !isset($composer['require']['ryunosuke/functions']);
 
@@ -72,6 +66,45 @@ $dom = new \DOMDocument();
 $dom->preserveWhiteSpace = false;
 $dom->formatOutput = true;
 
+$workXml = "$BASEDIR/.idea/workspace.xml";
+if (!file_exists($workXml)) {
+    echo("failed to detect .idea.\n");
+    exit(0);
+}
+$version = (function ($filename) use ($dom, $BASEDIR) {
+    $dom->load($filename);
+    $node = buildChild($dom->documentElement, 'component[@name="ExcludedPharFiles"]/excludedPaths');
+
+    $targets = array_fill_keys(removeChildren($node, 'value'), true);
+    $pathes = each_files("$BASEDIR/vendor/ryunosuke", function (\RecursiveDirectoryIterator $it) {
+        if ($it->getExtension() !== 'phar') {
+            return false;
+        }
+        return true;
+    });
+    foreach ($pathes as $fullpath => $subpath) {
+        $value = "\$PROJECT_DIR$/vendor/ryunosuke/$subpath/";
+        echo "$fullpath was excluded (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        $targets[$value] = true;
+    }
+    foreach ($targets as $target => $true) {
+        appendChild($node, 'path', ['value' => $target]);
+    }
+    $dom->save($filename);
+
+    return $dom->documentElement->getAttribute('version');
+})($workXml);
+
+$miscXml = "$BASEDIR/.idea/misc.xml";
+if (!file_exists($miscXml)) {
+    file_put_contents($miscXml, <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="$version">
+  <component name="ProjectPlainTextFileTypeManager"></component>
+</project>
+XML
+    );
+}
 (function ($filename) use ($dom, $BASEDIR, $devMode) {
     $dom->load($filename);
     $node = buildChild($dom->documentElement, 'component[@name="ProjectPlainTextFileTypeManager"]');
@@ -98,26 +131,6 @@ $dom->formatOutput = true;
         appendChild($node, 'file', ['url' => $target]);
     }
     $dom->save($filename);
+
+    return $dom->documentElement->getAttribute('version');
 })($miscXml);
-
-(function ($filename) use ($dom, $BASEDIR) {
-    $dom->load($filename);
-    $node = buildChild($dom->documentElement, 'component[@name="ExcludedPharFiles"]/excludedPaths');
-
-    $targets = array_fill_keys(removeChildren($node, 'value'), true);
-    $pathes = each_files("$BASEDIR/vendor/ryunosuke", function (\RecursiveDirectoryIterator $it) {
-        if ($it->getExtension() !== 'phar') {
-            return false;
-        }
-        return true;
-    });
-    foreach ($pathes as $fullpath => $subpath) {
-        $value = "\$PROJECT_DIR$/vendor/ryunosuke/$subpath/";
-        echo "$fullpath was excluded (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
-        $targets[$value] = true;
-    }
-    foreach ($targets as $target => $true) {
-        appendChild($node, 'path', ['value' => $target]);
-    }
-    $dom->save($filename);
-})($workXml);
