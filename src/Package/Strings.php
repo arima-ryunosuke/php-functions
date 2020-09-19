@@ -2432,7 +2432,7 @@ class Strings
      * - ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要
      * - yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応
      * - 配列を前提にしているので、トップレベルの `[]` `{}` は不要
-     * - 配列・連想配列の区別はなし。 `[]` でいわゆる php の配列、 `{}` で stdClass を表す
+     * - `[]` でいわゆる php の配列、 `{}` で stdClass を表す（オプション指定可能）
      * - bare string で php の定数を表す
      *
      * 簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。
@@ -2486,11 +2486,13 @@ class Strings
         $options += [
             'cache'          => true,
             'trailing-comma' => true,
+            'stdclass'       => true,
         ];
 
         static $caches = [];
         if ($options['cache']) {
-            return $caches[$pamlstring] = $caches[$pamlstring] ?? (paml_import)($pamlstring, ['cache' => false] + $options);
+            $key = $pamlstring . json_encode($options);
+            return $caches[$key] = $caches[$key] ?? (paml_import)($pamlstring, ['cache' => false] + $options);
         }
 
         $escapers = ['"' => '"', "'" => "'", '[' => ']', '{' => '}'];
@@ -2511,11 +2513,9 @@ class Strings
             $prefix = $value[0] ?? null;
             $suffix = $value[-1] ?? null;
 
-            if ($prefix === '[' && $suffix === ']') {
-                $value = (array) (paml_import)(substr($value, 1, -1), $options);
-            }
-            elseif ($prefix === '{' && $suffix === '}') {
-                $value = (object) (paml_import)(substr($value, 1, -1), $options);
+            if (($prefix === '[' && $suffix === ']') || ($prefix === '{' && $suffix === '}')) {
+                $value = (paml_import)(substr($value, 1, -1), $options);
+                $value = ($prefix === '[' || !$options['stdclass']) ? (array) $value : (object) $value;
             }
             elseif ($prefix === '"' && $suffix === '"') {
                 //$value = stripslashes(substr($value, 1, -1));

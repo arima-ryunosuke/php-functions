@@ -1462,6 +1462,15 @@ a3,b3,c3
             "object" => (object) [1, 2, "3\n4"],
         ]);
 
+        that((paml_import)("a:A,\nb:B,array:[1,\n2,\n\"3\\n4\",\n],object:{1,\n2,\n\"3\\n4\",\n}", [
+            'stdclass' => false,
+        ]))->is([
+            'a'      => 'A',
+            'b'      => 'B',
+            "array"  => [1, 2, "3\n4"],
+            "object" => [1, 2, "3\n4"],
+        ]);
+
         that((paml_import)('empty_array1:[], empty_array2:{}, empty_string1:,empty_string2:""'))->is([
             "empty_array1"  => [],
             "empty_array2"  => (object) [],
@@ -1474,13 +1483,11 @@ a3,b3,c3
         that((paml_import)(',,'))->isSame(['', '']);
         that((paml_import)('array:[1,2,"3",]', [
             'trailing-comma' => true,
-            'cache'          => false,
         ]))->isSame([
             "array" => [1, 2, "3"],
         ]);
         that((paml_import)('array:[1,2,"3",]', [
             'trailing-comma' => false,
-            'cache'          => false,
         ]))->isSame([
             "array" => [1, 2, "3", ""],
         ]);
