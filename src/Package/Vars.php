@@ -1139,26 +1139,42 @@ class Vars
      * ```
      *
      * @param mixed $value 出力する値
-     * @param string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
+     * @param array|string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
      * @param bool $return 出力するのではなく値を返すなら true
      * @return string $return: true なら値の出力結果
      */
     public static function var_pretty($value, $context = null, $return = false)
     {
-        // インデントの空白数
-        $INDENT = 2;
+        $options = [
+            'indent'    => 2,     // インデントの空白数
+            'context'   => null,  // html なコンテキストか cli なコンテキスト化
+            'return'    => false, // 値を戻すか出力するか
+            'trace'     => false, // スタックトレースの表示
+            'maxcount'  => null,  // 複合型の要素の数
+            'maxdepth'  => null,  // 階層構造の深さ
+            'maxlength' => null,  // 最終出力の文字数
+        ];
 
-        if ($context === null) {
-            $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
+        // for compatible
+        if (!is_array($context)) {
+            $context = [
+                'context' => $context,
+                'return'  => $return,
+            ];
+        }
+        $options = array_replace($options, $context);
+
+        if ($options['context'] === null) {
+            $options['context'] = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
             if (PHP_SAPI === 'cli') {
-                $context = (is_ansi)(STDOUT) && !$return ? 'cli' : 'plain';
+                $options['context'] = (is_ansi)(STDOUT) && !$options['return'] ? 'cli' : 'plain';
             }
         }
 
-        $colorAdapter = static function ($value, $style) use ($context) {
-            switch ($context) {
+        $colorAdapter = static function ($value, $style) use ($options) {
+            switch ($options['context']) {
                 default:
-                    throw new \InvalidArgumentException("'$context' is not supported.");
+                    throw new \InvalidArgumentException("'{$options['context']}' is not supported.");
                 case 'plain':
                     return $value;
                 case 'cli':
@@ -1170,77 +1186,169 @@ class Vars
             }
         };
 
-        $colorKey = static function ($value) use ($colorAdapter) {
-            if (is_int($value)) {
-                return $colorAdapter($value, 'bold');
-            }
-            return $colorAdapter($value, 'red');
-        };
-        $colorVal = static function ($value) use ($colorAdapter) {
-            switch (true) {
-                case is_null($value):
-                    return $colorAdapter('null', 'bold');
-                case is_object($value):
-                    return $colorAdapter(get_class($value), 'green') . "#" . spl_object_id($value);
-                case is_bool($value):
-                    return $colorAdapter(var_export($value, true), 'bold');
-                case is_int($value) || is_float($value) || is_string($value):
-                    return $colorAdapter(var_export($value, true), 'magenta');
-                case is_resource($value):
-                    return $colorAdapter(sprintf('%s of type (%s)', $value, get_resource_type($value)), 'bold');
+        $output = '';
+        $length = 0;
+        $appender = function (...$tokens) use (&$output, &$length, $colorAdapter, $options) {
+            foreach ($tokens as $token) {
+                $mode = $token[0];
+                $value = $token[1];
+                switch ($mode) {
+                    case 'plain':
+                        $string = $value;
+                        $result = $value;
+                        break;
+                    case 'index':
+                        $string = $value;
+                        switch (true) {
+                            case is_int($value):
+                                $result = $colorAdapter($value, 'bold');
+                                break;
+                            case is_string($value):
+                                $result = $colorAdapter($value, 'red');
+                                break;
+                            default:
+                                throw new \DomainException(); // @codeCoverageIgnore
+                        }
+                        break;
+                    case 'value':
+                        switch (true) {
+                            case is_null($value):
+                                $string = 'null';
+                                $result = $colorAdapter($string, 'bold');
+                                break;
+                            case is_object($value):
+                                $string = get_class($value) . "#" . spl_object_id($value);
+                                $result = $colorAdapter($string, 'green');
+                                break;
+                            case is_bool($value):
+                                $string = var_export($value, true);
+                                $result = $colorAdapter($string, 'bold');
+                                break;
+                            case is_scalar($value):
+                                $string = var_export($value, true);
+                                $result = $colorAdapter($string, 'magenta');
+                                break;
+                            case is_resource($value):
+                                $string = sprintf('%s of type (%s)', $value, get_resource_type($value));
+                                $result = $colorAdapter($string, 'bold');
+                                break;
+                            default:
+                                throw new \DomainException(); // @codeCoverageIgnore
+                        }
+                        break;
+                    default:
+                        throw new \DomainException(); // @codeCoverageIgnore
+                }
+                if ($options['maxlength'] && $options['maxlength'] < $length += strlen($string)) {
+                    throw new \LengthException();
+                }
+                $output .= $result;
             }
         };
 
         // 再帰用クロージャ
-        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT, $colorKey, $colorVal) {
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $appender, $options) {
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
-                    return $export('*RECURSION*');
+                    return $appender(['plain', '*RECURSION*']);
                 }
             }
+
             if (is_array($value)) {
+                $parents[] = $value;
+
+                if ($options['maxdepth'] && $nest + 1 > $options['maxdepth']) {
+                    $appender(['plain', '(too deep)']);
+                    return;
+                }
+
+                $omitted = false;
+                if ($options['maxcount'] && ($omitted = count($value) - $options['maxcount']) > 0) {
+                    $value = array_slice($value, 0, $options['maxcount'], true);
+                }
+
                 // スカラー値のみで構成されているならシンプルな再帰
                 if (!(is_hasharray)($value) && (array_all)($value, is_primitive)) {
-                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                    $last = array_pop($value);
+                    $appender(['plain', '[']);
+                    foreach ($value as $v) {
+                        $appender(['value', $v], ['plain', ', ']);
+                    }
+                    $appender(['value', $last]);
+                    if ($omitted > 0) {
+                        $appender(['plain', " (more $omitted elements)"]);
+                    }
+                    $appender(['plain', ']']);
                 }
+                else {
+                    $spacer1 = str_repeat(' ', ($nest + 1) * $options['indent']);
+                    $spacer2 = str_repeat(' ', $nest * $options['indent']);
 
-                $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
-                $spacer2 = str_repeat(' ', $nest * $INDENT);
-
-                $kvl = '';
-                $parents[] = $value;
-                foreach ($value as $k => $v) {
-                    $keystr = $colorKey($k) . ': ';
-                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                    $appender(['plain', "{\n"]);
+                    foreach ($value as $k => $v) {
+                        $appender(['plain', $spacer1], ['index', $k], ['plain', ': ']);
+                        $export($v, $nest + 1, $parents);
+                        $appender(['plain', ",\n"]);
+                    }
+                    if ($omitted > 0) {
+                        $appender(['plain', $spacer1]);
+                        $appender(['plain', "(more $omitted elements)\n"]);
+                    }
+                    $appender(['plain', "{$spacer2}}"]);
                 }
-                return "{\n{$kvl}{$spacer2}}";
             }
             elseif ($value instanceof \Closure) {
                 /** @var \ReflectionFunctionAbstract $ref */
                 $ref = (reflect_callable)($value);
                 $that = $ref->getClosureThis();
-                $thatT = $that ? $colorVal($that) : 'static';
                 $properties = $ref->getStaticVariables();
-                $propT = $properties ? $export($properties, $nest, $parents) : '{}';
-                return $colorVal($value) . "($thatT) use $propT";
+
+                $appender(['value', $value], ['plain', "("], $that ? ['value', $that] : ['plain', 'static'], ['plain', ') use ']);
+                if ($properties) {
+                    $export($properties, $nest, $parents);
+                }
+                else {
+                    $appender(['plain', '{}']);
+                }
             }
             elseif (is_object($value)) {
                 $parents[] = $value;
                 $properties = (get_object_properties)($value);
-                return $colorVal($value) . ' ' . ($properties ? $export($properties, $nest, $parents) : '{}');
+
+                $appender(['value', $value], ['plain', " "]);
+                if ($properties) {
+                    $export($properties, $nest, $parents);
+                }
+                else {
+                    $appender(['plain', '{}']);
+                }
             }
             else {
-                return $colorVal($value);
+                $appender(['value', $value]);
             }
         };
 
+        try {
+            $export($value);
+        }
+        catch (\LengthException $ex) {
+            $output .= '(...omitted)';
+        }
+
         // 結果を返したり出力したり
-        $result = ($return ? '' : implode("\n", array_reverse((stacktrace)(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]))) . "\n") . $export($value);
-        if ($context === 'html') {
+        $traces = [];
+        if ($options['trace']) {
+            $traces = (stacktrace)(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]);
+            $traces = array_reverse(array_slice($traces, 0, $options['trace'] === true ? null : $options['trace']));
+            $traces[] = '';
+        }
+        $result = implode("\n", $traces) . $output;
+
+        if ($options['context'] === 'html') {
             $result = "<pre>$result</pre>";
         }
-        if ($return) {
+        if ($options['return']) {
             return $result;
         }
         echo $result, "\n";

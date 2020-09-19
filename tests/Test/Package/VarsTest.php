@@ -752,22 +752,41 @@ VAR
                     'X' => new \stdClass(),
                 ]),
             ]),
-            'E' => new \Concrete('hoge'),
-            'A' => ["str", 1, 2, 3, true, null],
-            'H' => ['a' => 'A', 'b' => 'B'],
-            'C' => $closure,
-            'R' => STDOUT,
+            'E'     => new \Concrete('hoge'),
+            'A'     => ["str", 1, 2, 3, true, null],
+            'H'     => ['a' => 'A', 'b' => 'B'],
+            'C'     => $closure,
+            'R'     => STDOUT,
+            'deep'  => [[[[[[[[['X']]]]]]]]],
+            'more1' => range(1, 20),
+            'more2' => array_combine(range(1, 20), range(1, 20)),
         ];
 
-        that((var_pretty)($value, 'plain', true))
+        that((var_pretty)($value, [
+            'context'  => 'plain',
+            'return'   => true,
+            'maxdepth' => 5,
+            'maxcount' => 10,
+            'trace'    => 3,
+        ]))
+            ->stringContains(__FILE__)
             ->stringContains("  0: stdClass#")
             ->stringContains("      X: stdClass#")
             ->stringContains("  E: Concrete#")
             ->stringContains("  A: ['str', 1, 2, 3, true, null]")
             ->stringContains("ryunosuke\\Test\\Package\\VarsTest#")
             ->stringContains("    recur: {")
-            ->stringContains("      r: '*RECURSION*'")
-            ->stringContains("  R: Resource id #2 of type (stream)");
+            ->stringContains("  R: Resource id #2 of type (stream)")
+            ->stringContains("          0: (too deep)")
+            ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (more 10 elements)]")
+            ->stringContains("    (more 10 elements)");
+
+        that((var_pretty)($value, [
+            'context'   => 'plain',
+            'return'    => true,
+            'maxlength' => 64,
+        ]))
+            ->stringContains("      X: (...omitted)");
 
         that((var_pretty)($value, 'cli', true))->stringContains("\033");
         that((var_pretty)($value, 'html', true))->stringContains("<span");
