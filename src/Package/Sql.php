@@ -351,6 +351,11 @@ class Sql
                         }
                     case "OR":
                     case "XOR":
+                        // WHEN の条件はカッコがない限り改行しない
+                        if ($subcontext === 'WHEN') {
+                            $result[] = $MARK_SP . $virttoken . $MARK_SP;
+                            break;
+                        }
                         $result[] = $MARK_SP . $MARK_BR . $MARK_NT . $virttoken . $MARK_SP;
                         break;
                     case "UNION":
@@ -446,9 +451,15 @@ class Sql
                             $context = $uppertoken;
                         }
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "WHEN":
+                        $subcontext = $uppertoken;
                     case "ELSE":
                         $result[] = $MARK_BR . $MARK_NT . $virttoken . $MARK_SP;
+                        break;
+                    case "THEN":
+                        $subcontext = '';
+                        $result[] = $MARK_SP . $virttoken;
                         break;
                     case "CASE":
                         $parts = $interpret($index);

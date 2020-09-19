@@ -597,7 +597,8 @@ where
         that((sql_format)('select
 case a when 1 then 10 when 2 then 20 end as x,
 case when a=1 then 10 when a=2 then 20 else null end as y,
-case when count(ifnull(a, 1)) end z
+case when count(ifnull(a, 1)) end z,
+case when a=1 and b=2 and c=3 then 123 when ((a=4) and (b=5) and (c=6)) then 456 else 789 end as mul
 from t_table
 where exists(select * from T where case a when 1 then 10 when 2 then 20 end = 99 and (other_cond))
 '))->IsEqualTrimming('
@@ -615,7 +616,16 @@ select
     when count(
       ifnull(a, 1)
     )
-  end z 
+  end z,
+  case 
+    when a = 1 and b = 2 and c = 3 then 123 
+    when (
+      (a = 4) 
+      and (b = 5) 
+      and (c = 6)
+    ) then 456 
+    else 789 
+  end as mul 
 from
   t_table 
 where
