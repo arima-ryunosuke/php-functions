@@ -3910,6 +3910,33 @@ that(
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::css_selector()">
+                                    ryunosuke\Functions\Package\Strings::css_selector		</a>	<small>($selector) : array</small>
+		</h4>
+	<div class="description"><p>CSS セレクタ文字をパースして配列で返す</p>
+<p>包含などではない属性セレクタを与えると属性として認識する。<br />
+独自仕様として・・・</p>
+<ul>
+<li>[!attr]: 否定属性として false を返す</li>
+<li>{styles}: style 属性とみなす</li>
+</ul>
+<p>がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(css_selector('#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;height:456px}'))-&gt;is([
+    'id'       =&gt; 'hoge',
+    'class'    =&gt; ['c1', 'c2'],
+    'name'     =&gt; 'hoge[]',
+    'href'     =&gt; 'http://hoge',
+    'hidden'   =&gt; true,
+    'readonly' =&gt; false,
+    'style'    =&gt; [
+        'width'  =&gt; '123px',
+        'height' =&gt; '456px',
+    ],
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::build_uri()">
                                     ryunosuke\Functions\Package\Strings::build_uri		</a>	<small>($parts) : string</small>
 		</h4>
@@ -4157,7 +4184,7 @@ that(json_import('{"a":"A","b":"B"}', [
 <li>ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要</li>
 <li>yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応</li>
 <li>配列を前提にしているので、トップレベルの <code>[]</code> <code>{}</code> は不要</li>
-<li>配列・連想配列の区別はなし。 <code>[]</code> でいわゆる php の配列、 <code>{}</code> で stdClass を表す</li>
+<li><code>[]</code> でいわゆる php の配列、 <code>{}</code> で stdClass を表す（オプション指定可能）</li>
 <li>bare string で php の定数を表す</li>
 </ul>
 <p>簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。<br />

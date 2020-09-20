@@ -2019,6 +2019,10 @@
  * @method   \ChainObject  crypt($salt = null)
  * @method   \ChainObject  crypt1($str)
  *
+ * @see css_selector
+ * @property \ChainObject $css_selector
+ * @method   \ChainObject  css_selector()
+ *
  * @see csv_export
  * @property \ChainObject $csv_export
  * @method   \ChainObject  csv_export($options = [])

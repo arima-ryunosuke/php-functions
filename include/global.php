@@ -10159,6 +10159,11 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         }
                     case "OR":
                     case "XOR":
+                        // WHEN の条件はカッコがない限り改行しない
+                        if ($subcontext === 'WHEN') {
+                            $result[] = $MARK_SP . $virttoken . $MARK_SP;
+                            break;
+                        }
                         $result[] = $MARK_SP . $MARK_BR . $MARK_NT . $virttoken . $MARK_SP;
                         break;
                     case "UNION":
@@ -10254,9 +10259,15 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                             $context = $uppertoken;
                         }
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "WHEN":
+                        $subcontext = $uppertoken;
                     case "ELSE":
                         $result[] = $MARK_BR . $MARK_NT . $virttoken . $MARK_SP;
+                        break;
+                    case "THEN":
+                        $subcontext = '';
+                        $result[] = $MARK_SP . $virttoken;
                         break;
                     case "CASE":
                         $parts = $interpret($index);
@@ -12189,87 +12200,32 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!
         };
 
         $build = static function ($selector, $content, $escape) use ($html) {
-            $tag = '';
-            $id = '';
-            $classes = [];
-            $attrs = [];
-
-            $context = null;
-            $escaping = null;
-            $chars = preg_split('##u', $selector, -1, PREG_SPLIT_NO_EMPTY);
-            for ($i = 0, $l = count($chars); $i < $l; $i++) {
-                $char = $chars[$i];
-                if ($char === '"' || $char === "'") {
-                    $escaping = $escaping === $char ? null : $char;
-                }
-
-                if (!$escaping && $char === '#') {
-                    if (strlen($id)) {
-                        throw new \InvalidArgumentException('#id is multiple.');
-                    }
-                    $context = $char;
-                    continue;
-                }
-                if (!$escaping && $char === '.') {
-                    $context = $char;
-                    $classes[] = '';
-                    continue;
-                }
-                if (!$escaping && $char === '[') {
-                    $context = $char;
-                    $attrs[] = '';
-                    continue;
-                }
-                if (!$escaping && $char === ']') {
-                    $context = null;
-                    continue;
-                }
-
-                if ($char === '\\') {
-                    $char = $chars[++$i];
-                }
-
-                if ($context === null) {
-                    $tag .= $char;
-                    continue;
-                }
-                if ($context === '#') {
-                    $id .= $char;
-                    continue;
-                }
-                if ($context === '.') {
-                    $classes[count($classes) - 1] .= $char;
-                    continue;
-                }
-                if ($context === '[') {
-                    $attrs[count($attrs) - 1] .= $char;
-                    continue;
-                }
-            }
-
+            $p = min(strpos_array($selector, ['#', '.', '[', '{']) ?: [strlen($selector)]);
+            $tag = substr($selector, 0, $p);
             if (!strlen($tag)) {
                 throw new \InvalidArgumentException('tagname is empty.');
             }
-
-            $attrkv = [];
-            if (strlen($id)) {
-                $attrkv['id'] = $id;
+            $attrs = css_selector(substr($selector, $p));
+            if (isset($attrs['class'])) {
+                $attrs['class'] = implode(' ', $attrs['class']);
             }
-            if ($classes) {
-                $attrkv['class'] = implode(' ', $classes);
-            }
-            foreach ($attrs as $attr) {
-                [$k, $v] = explode('=', $attr, 2) + [1 => null];
-                if (array_key_exists($k, $attrkv)) {
-                    throw new \InvalidArgumentException("[$k] is dumplicated.");
+            foreach ($attrs as $k => $v) {
+                if ($v === false) {
+                    unset($attrs[$k]);
+                    continue;
                 }
-                $attrkv[$k] = $v;
-            }
-            $attrs = [];
-            foreach ($attrkv as $k => $v) {
-                $attrs[] = $v === null
-                    ? $html($k)
-                    : sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
+                elseif ($v === true) {
+                    $v = $html($k);
+                }
+                elseif (is_array($v)) {
+                    $v = 'style="' . array_sprintf($v, function ($style, $key) {
+                            return is_int($key) ? $style : "$key:$style";
+                        }, ';') . '"';
+                }
+                else {
+                    $v = sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
+                }
+                $attrs[$k] = $v;
             }
 
             preg_match('#(\s*)(.+)(\s*)#u', $tag, $m);
@@ -12297,6 +12253,146 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!
 }
 if (function_exists("htmltag") && !defined("htmltag")) {
     define("htmltag", "htmltag");
+}
+
+if (!isset($excluded_functions["css_selector"]) && (!function_exists("css_selector") || (!false && (new \ReflectionFunction("css_selector"))->isInternal()))) {
+    /**
+     * CSS セレクタ文字をパースして配列で返す
+     *
+     * 包含などではない属性セレクタを与えると属性として認識する。
+     * 独自仕様として・・・
+     *
+     * - [!attr]: 否定属性として false を返す
+     * - {styles}: style 属性とみなす
+     *
+     * がある。
+     *
+     * Example:
+     * ```php
+     * that(css_selector('#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;height:456px}'))->is([
+     *     'id'       => 'hoge',
+     *     'class'    => ['c1', 'c2'],
+     *     'name'     => 'hoge[]',
+     *     'href'     => 'http://hoge',
+     *     'hidden'   => true,
+     *     'readonly' => false,
+     *     'style'    => [
+     *         'width'  => '123px',
+     *         'height' => '456px',
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string $selector CSS セレクタ
+     * @return array 属性配列
+     */
+    function css_selector($selector)
+    {
+        $id = '';
+        $classes = [];
+        $styles = [];
+        $attrs = [];
+
+        $context = null;
+        $escaping = null;
+        $chars = preg_split('##u', $selector, -1, PREG_SPLIT_NO_EMPTY);
+        for ($i = 0, $l = count($chars); $i < $l; $i++) {
+            $char = $chars[$i];
+            if ($char === '"' || $char === "'") {
+                $escaping = $escaping === $char ? null : $char;
+            }
+
+            if (!$escaping && $char === '#') {
+                if (strlen($id)) {
+                    throw new \InvalidArgumentException('#id is multiple.');
+                }
+                $context = $char;
+                continue;
+            }
+            if (!$escaping && $char === '.') {
+                $context = $char;
+                $classes[] = '';
+                continue;
+            }
+            if (!$escaping && $char === '{') {
+                $context = $char;
+                $styles[] = '';
+                continue;
+            }
+            if (!$escaping && $char === ';') {
+                $styles[] = '';
+                continue;
+            }
+            if (!$escaping && $char === '}') {
+                $context = null;
+                continue;
+            }
+            if (!$escaping && $char === '[') {
+                $context = $char;
+                $attrs[] = '';
+                continue;
+            }
+            if (!$escaping && $char === ']') {
+                $context = null;
+                continue;
+            }
+
+            if ($char === '\\') {
+                $char = $chars[++$i];
+            }
+
+            if ($context === '#') {
+                $id .= $char;
+                continue;
+            }
+            if ($context === '.') {
+                $classes[count($classes) - 1] .= $char;
+                continue;
+            }
+            if ($context === '{') {
+                $styles[count($styles) - 1] .= $char;
+                continue;
+            }
+            if ($context === '[') {
+                $attrs[count($attrs) - 1] .= $char;
+                continue;
+            }
+        }
+
+        $attrkv = [];
+        if (strlen($id)) {
+            $attrkv['id'] = $id;
+        }
+        if ($classes) {
+            $attrkv['class'] = $classes;
+        }
+        foreach ($styles as $style) {
+            $declares = array_filter(array_map('trim', explode(';', $style)), 'strlen');
+            foreach ($declares as $declare) {
+                [$k, $v] = array_map('trim', explode(':', $declare, 2)) + [1 => null];
+                if ($v === null) {
+                    throw new \InvalidArgumentException("[$k] is empty.");
+                }
+                $attrkv['style'][$k] = $v;
+            }
+        }
+        foreach ($attrs as $attr) {
+            [$k, $v] = explode('=', $attr, 2) + [1 => true];
+            if (array_key_exists($k, $attrkv)) {
+                throw new \InvalidArgumentException("[$k] is dumplicated.");
+            }
+            if ($k[0] === '!') {
+                $k = substr($k, 1);
+                $v = false;
+            }
+            $attrkv[$k] = is_string($v) ? json_decode($v) ?? $v : $v;
+        }
+
+        return $attrkv;
+    }
+}
+if (function_exists("css_selector") && !defined("css_selector")) {
+    define("css_selector", "css_selector");
 }
 
 if (!isset($excluded_functions["build_uri"]) && (!function_exists("build_uri") || (!false && (new \ReflectionFunction("build_uri"))->isInternal()))) {
@@ -12966,7 +13062,7 @@ if (!isset($excluded_functions["paml_import"]) && (!function_exists("paml_import
      * - ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要
      * - yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応
      * - 配列を前提にしているので、トップレベルの `[]` `{}` は不要
-     * - 配列・連想配列の区別はなし。 `[]` でいわゆる php の配列、 `{}` で stdClass を表す
+     * - `[]` でいわゆる php の配列、 `{}` で stdClass を表す（オプション指定可能）
      * - bare string で php の定数を表す
      *
      * 簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。
@@ -13020,11 +13116,13 @@ if (!isset($excluded_functions["paml_import"]) && (!function_exists("paml_import
         $options += [
             'cache'          => true,
             'trailing-comma' => true,
+            'stdclass'       => true,
         ];
 
         static $caches = [];
         if ($options['cache']) {
-            return $caches[$pamlstring] = $caches[$pamlstring] ?? paml_import($pamlstring, ['cache' => false] + $options);
+            $key = $pamlstring . json_encode($options);
+            return $caches[$key] = $caches[$key] ?? paml_import($pamlstring, ['cache' => false] + $options);
         }
 
         $escapers = ['"' => '"', "'" => "'", '[' => ']', '{' => '}'];
@@ -13045,11 +13143,9 @@ if (!isset($excluded_functions["paml_import"]) && (!function_exists("paml_import
             $prefix = $value[0] ?? null;
             $suffix = $value[-1] ?? null;
 
-            if ($prefix === '[' && $suffix === ']') {
-                $value = (array) paml_import(substr($value, 1, -1), $options);
-            }
-            elseif ($prefix === '{' && $suffix === '}') {
-                $value = (object) paml_import(substr($value, 1, -1), $options);
+            if (($prefix === '[' && $suffix === ']') || ($prefix === '{' && $suffix === '}')) {
+                $value = paml_import(substr($value, 1, -1), $options);
+                $value = ($prefix === '[' || !$options['stdclass']) ? (array) $value : (object) $value;
             }
             elseif ($prefix === '"' && $suffix === '"') {
                 //$value = stripslashes(substr($value, 1, -1));
@@ -18516,26 +18612,42 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
      * ```
      *
      * @param mixed $value 出力する値
-     * @param string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
+     * @param array|string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
      * @param bool $return 出力するのではなく値を返すなら true
      * @return string $return: true なら値の出力結果
      */
     function var_pretty($value, $context = null, $return = false)
     {
-        // インデントの空白数
-        $INDENT = 2;
+        $options = [
+            'indent'    => 2,     // インデントの空白数
+            'context'   => null,  // html なコンテキストか cli なコンテキスト化
+            'return'    => false, // 値を戻すか出力するか
+            'trace'     => false, // スタックトレースの表示
+            'maxcount'  => null,  // 複合型の要素の数
+            'maxdepth'  => null,  // 階層構造の深さ
+            'maxlength' => null,  // 最終出力の文字数
+        ];
 
-        if ($context === null) {
-            $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
+        // for compatible
+        if (!is_array($context)) {
+            $context = [
+                'context' => $context,
+                'return'  => $return,
+            ];
+        }
+        $options = array_replace($options, $context);
+
+        if ($options['context'] === null) {
+            $options['context'] = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
             if (PHP_SAPI === 'cli') {
-                $context = is_ansi(STDOUT) && !$return ? 'cli' : 'plain';
+                $options['context'] = is_ansi(STDOUT) && !$options['return'] ? 'cli' : 'plain';
             }
         }
 
-        $colorAdapter = static function ($value, $style) use ($context) {
-            switch ($context) {
+        $colorAdapter = static function ($value, $style) use ($options) {
+            switch ($options['context']) {
                 default:
-                    throw new \InvalidArgumentException("'$context' is not supported.");
+                    throw new \InvalidArgumentException("'{$options['context']}' is not supported.");
                 case 'plain':
                     return $value;
                 case 'cli':
@@ -18547,77 +18659,169 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
             }
         };
 
-        $colorKey = static function ($value) use ($colorAdapter) {
-            if (is_int($value)) {
-                return $colorAdapter($value, 'bold');
-            }
-            return $colorAdapter($value, 'red');
-        };
-        $colorVal = static function ($value) use ($colorAdapter) {
-            switch (true) {
-                case is_null($value):
-                    return $colorAdapter('null', 'bold');
-                case is_object($value):
-                    return $colorAdapter(get_class($value), 'green') . "#" . spl_object_id($value);
-                case is_bool($value):
-                    return $colorAdapter(var_export($value, true), 'bold');
-                case is_int($value) || is_float($value) || is_string($value):
-                    return $colorAdapter(var_export($value, true), 'magenta');
-                case is_resource($value):
-                    return $colorAdapter(sprintf('%s of type (%s)', $value, get_resource_type($value)), 'bold');
+        $output = '';
+        $length = 0;
+        $appender = function (...$tokens) use (&$output, &$length, $colorAdapter, $options) {
+            foreach ($tokens as $token) {
+                $mode = $token[0];
+                $value = $token[1];
+                switch ($mode) {
+                    case 'plain':
+                        $string = $value;
+                        $result = $value;
+                        break;
+                    case 'index':
+                        $string = $value;
+                        switch (true) {
+                            case is_int($value):
+                                $result = $colorAdapter($value, 'bold');
+                                break;
+                            case is_string($value):
+                                $result = $colorAdapter($value, 'red');
+                                break;
+                            default:
+                                throw new \DomainException(); // @codeCoverageIgnore
+                        }
+                        break;
+                    case 'value':
+                        switch (true) {
+                            case is_null($value):
+                                $string = 'null';
+                                $result = $colorAdapter($string, 'bold');
+                                break;
+                            case is_object($value):
+                                $string = get_class($value) . "#" . spl_object_id($value);
+                                $result = $colorAdapter($string, 'green');
+                                break;
+                            case is_bool($value):
+                                $string = var_export($value, true);
+                                $result = $colorAdapter($string, 'bold');
+                                break;
+                            case is_scalar($value):
+                                $string = var_export($value, true);
+                                $result = $colorAdapter($string, 'magenta');
+                                break;
+                            case is_resource($value):
+                                $string = sprintf('%s of type (%s)', $value, get_resource_type($value));
+                                $result = $colorAdapter($string, 'bold');
+                                break;
+                            default:
+                                throw new \DomainException(); // @codeCoverageIgnore
+                        }
+                        break;
+                    default:
+                        throw new \DomainException(); // @codeCoverageIgnore
+                }
+                if ($options['maxlength'] && $options['maxlength'] < $length += strlen($string)) {
+                    throw new \LengthException();
+                }
+                $output .= $result;
             }
         };
 
         // 再帰用クロージャ
-        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT, $colorKey, $colorVal) {
+        $export = function ($value, $nest = 0, $parents = []) use (&$export, $appender, $options) {
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
-                    return $export('*RECURSION*');
+                    return $appender(['plain', '*RECURSION*']);
                 }
             }
+
             if (is_array($value)) {
+                $parents[] = $value;
+
+                if ($options['maxdepth'] && $nest + 1 > $options['maxdepth']) {
+                    $appender(['plain', '(too deep)']);
+                    return;
+                }
+
+                $omitted = false;
+                if ($options['maxcount'] && ($omitted = count($value) - $options['maxcount']) > 0) {
+                    $value = array_slice($value, 0, $options['maxcount'], true);
+                }
+
                 // スカラー値のみで構成されているならシンプルな再帰
                 if (!is_hasharray($value) && array_all($value, is_primitive)) {
-                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                    $last = array_pop($value);
+                    $appender(['plain', '[']);
+                    foreach ($value as $v) {
+                        $appender(['value', $v], ['plain', ', ']);
+                    }
+                    $appender(['value', $last]);
+                    if ($omitted > 0) {
+                        $appender(['plain', " (more $omitted elements)"]);
+                    }
+                    $appender(['plain', ']']);
                 }
+                else {
+                    $spacer1 = str_repeat(' ', ($nest + 1) * $options['indent']);
+                    $spacer2 = str_repeat(' ', $nest * $options['indent']);
 
-                $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
-                $spacer2 = str_repeat(' ', $nest * $INDENT);
-
-                $kvl = '';
-                $parents[] = $value;
-                foreach ($value as $k => $v) {
-                    $keystr = $colorKey($k) . ': ';
-                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                    $appender(['plain', "{\n"]);
+                    foreach ($value as $k => $v) {
+                        $appender(['plain', $spacer1], ['index', $k], ['plain', ': ']);
+                        $export($v, $nest + 1, $parents);
+                        $appender(['plain', ",\n"]);
+                    }
+                    if ($omitted > 0) {
+                        $appender(['plain', $spacer1]);
+                        $appender(['plain', "(more $omitted elements)\n"]);
+                    }
+                    $appender(['plain', "{$spacer2}}"]);
                 }
-                return "{\n{$kvl}{$spacer2}}";
             }
             elseif ($value instanceof \Closure) {
                 /** @var \ReflectionFunctionAbstract $ref */
                 $ref = reflect_callable($value);
                 $that = $ref->getClosureThis();
-                $thatT = $that ? $colorVal($that) : 'static';
                 $properties = $ref->getStaticVariables();
-                $propT = $properties ? $export($properties, $nest, $parents) : '{}';
-                return $colorVal($value) . "($thatT) use $propT";
+
+                $appender(['value', $value], ['plain', "("], $that ? ['value', $that] : ['plain', 'static'], ['plain', ') use ']);
+                if ($properties) {
+                    $export($properties, $nest, $parents);
+                }
+                else {
+                    $appender(['plain', '{}']);
+                }
             }
             elseif (is_object($value)) {
                 $parents[] = $value;
                 $properties = get_object_properties($value);
-                return $colorVal($value) . ' ' . ($properties ? $export($properties, $nest, $parents) : '{}');
+
+                $appender(['value', $value], ['plain', " "]);
+                if ($properties) {
+                    $export($properties, $nest, $parents);
+                }
+                else {
+                    $appender(['plain', '{}']);
+                }
             }
             else {
-                return $colorVal($value);
+                $appender(['value', $value]);
             }
         };
 
+        try {
+            $export($value);
+        }
+        catch (\LengthException $ex) {
+            $output .= '(...omitted)';
+        }
+
         // 結果を返したり出力したり
-        $result = ($return ? '' : implode("\n", array_reverse(stacktrace(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]))) . "\n") . $export($value);
-        if ($context === 'html') {
+        $traces = [];
+        if ($options['trace']) {
+            $traces = stacktrace(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]);
+            $traces = array_reverse(array_slice($traces, 0, $options['trace'] === true ? null : $options['trace']));
+            $traces[] = '';
+        }
+        $result = implode("\n", $traces) . $output;
+
+        if ($options['context'] === 'html') {
             $result = "<pre>$result</pre>";
         }
-        if ($return) {
+        if ($options['return']) {
             return $result;
         }
         echo $result, "\n";
