@@ -844,8 +844,8 @@ that is <del>a</del><ins>the</ins> pen
 
     function test_htmltag()
     {
-        that((htmltag)('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden]'))->is(
-            '<a id="hoge" class="c1 c2" target="hoge[]" href="http://hoge" hidden></a>'
+        that((htmltag)('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;;;height:456px}'))->is(
+            '<a id="hoge" class="c1 c2" style="width:123px;height:456px" target="hoge[]" href="http://hoge" hidden></a>'
         );
         that((htmltag)(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>']))->is(
             '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>'
@@ -885,9 +885,27 @@ that is <del>a</del><ins>the</ins> pen
         );
 
         that([htmltag, '#id.class'])->throws('tagname is empty');
-        that([htmltag, 'a#id#id'])->throws('#id is multiple');
-        that([htmltag, 'a[a=1][a=2]'])->throws('[a] is dumplicated');
-        that([htmltag, 'a#id[id=id]'])->throws('[id] is dumplicated');
+    }
+
+    function test_css_selector()
+    {
+        that((css_selector)('.c1#hoge.c2[target=hoge\[\]][href="http://hoge[]"][hidden][!readonly]{width:123px!important;height:456px;}'))->is([
+            'id'       => 'hoge',
+            'class'    => ['c1', 'c2'],
+            'href'     => 'http://hoge[]',
+            'target'   => 'hoge[]',
+            'hidden'   => true,
+            'readonly' => false,
+            'style'    => [
+                'width'  => '123px!important',
+                'height' => '456px',
+            ],
+        ]);
+
+        that([css_selector, 'a#id#id'])->throws('#id is multiple');
+        that([css_selector, '[a=1][a=2]'])->throws('[a] is dumplicated');
+        that([css_selector, '#id[id=id]'])->throws('[id] is dumplicated');
+        that([css_selector, '{width}'])->throws('[width] is empty');
     }
 
     function provideUri()

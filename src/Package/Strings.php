@@ -1705,87 +1705,32 @@ class Strings
         };
 
         $build = static function ($selector, $content, $escape) use ($html) {
-            $tag = '';
-            $id = '';
-            $classes = [];
-            $attrs = [];
-
-            $context = null;
-            $escaping = null;
-            $chars = preg_split('##u', $selector, -1, PREG_SPLIT_NO_EMPTY);
-            for ($i = 0, $l = count($chars); $i < $l; $i++) {
-                $char = $chars[$i];
-                if ($char === '"' || $char === "'") {
-                    $escaping = $escaping === $char ? null : $char;
-                }
-
-                if (!$escaping && $char === '#') {
-                    if (strlen($id)) {
-                        throw new \InvalidArgumentException('#id is multiple.');
-                    }
-                    $context = $char;
-                    continue;
-                }
-                if (!$escaping && $char === '.') {
-                    $context = $char;
-                    $classes[] = '';
-                    continue;
-                }
-                if (!$escaping && $char === '[') {
-                    $context = $char;
-                    $attrs[] = '';
-                    continue;
-                }
-                if (!$escaping && $char === ']') {
-                    $context = null;
-                    continue;
-                }
-
-                if ($char === '\\') {
-                    $char = $chars[++$i];
-                }
-
-                if ($context === null) {
-                    $tag .= $char;
-                    continue;
-                }
-                if ($context === '#') {
-                    $id .= $char;
-                    continue;
-                }
-                if ($context === '.') {
-                    $classes[count($classes) - 1] .= $char;
-                    continue;
-                }
-                if ($context === '[') {
-                    $attrs[count($attrs) - 1] .= $char;
-                    continue;
-                }
-            }
-
+            $p = min((strpos_array)($selector, ['#', '.', '[', '{']) ?: [strlen($selector)]);
+            $tag = substr($selector, 0, $p);
             if (!strlen($tag)) {
                 throw new \InvalidArgumentException('tagname is empty.');
             }
-
-            $attrkv = [];
-            if (strlen($id)) {
-                $attrkv['id'] = $id;
+            $attrs = (css_selector)(substr($selector, $p));
+            if (isset($attrs['class'])) {
+                $attrs['class'] = implode(' ', $attrs['class']);
             }
-            if ($classes) {
-                $attrkv['class'] = implode(' ', $classes);
-            }
-            foreach ($attrs as $attr) {
-                [$k, $v] = explode('=', $attr, 2) + [1 => null];
-                if (array_key_exists($k, $attrkv)) {
-                    throw new \InvalidArgumentException("[$k] is dumplicated.");
+            foreach ($attrs as $k => $v) {
+                if ($v === false) {
+                    unset($attrs[$k]);
+                    continue;
                 }
-                $attrkv[$k] = $v;
-            }
-            $attrs = [];
-            foreach ($attrkv as $k => $v) {
-                $attrs[] = $v === null
-                    ? $html($k)
-                    : sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
+                elseif ($v === true) {
+                    $v = $html($k);
+                }
+                elseif (is_array($v)) {
+                    $v = 'style="' . (array_sprintf)($v, function ($style, $key) {
+                            return is_int($key) ? $style : "$key:$style";
+                        }, ';') . '"';
+                }
+                else {
+                    $v = sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
+                }
+                $attrs[$k] = $v;
             }
 
             preg_match('#(\s*)(.+)(\s*)#u', $tag, $m);
@@ -1809,6 +1754,141 @@ class Strings
             }
         }
         return $result;
+    }
+
+    /**
+     * CSS セレクタ文字をパースして配列で返す
+     *
+     * 包含などではない属性セレクタを与えると属性として認識する。
+     * 独自仕様として・・・
+     *
+     * - [!attr]: 否定属性として false を返す
+     * - {styles}: style 属性とみなす
+     *
+     * がある。
+     *
+     * Example:
+     * ```php
+     * that(css_selector('#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;height:456px}'))->is([
+     *     'id'       => 'hoge',
+     *     'class'    => ['c1', 'c2'],
+     *     'name'     => 'hoge[]',
+     *     'href'     => 'http://hoge',
+     *     'hidden'   => true,
+     *     'readonly' => false,
+     *     'style'    => [
+     *         'width'  => '123px',
+     *         'height' => '456px',
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param string $selector CSS セレクタ
+     * @return array 属性配列
+     */
+    public static function css_selector($selector)
+    {
+        $id = '';
+        $classes = [];
+        $styles = [];
+        $attrs = [];
+
+        $context = null;
+        $escaping = null;
+        $chars = preg_split('##u', $selector, -1, PREG_SPLIT_NO_EMPTY);
+        for ($i = 0, $l = count($chars); $i < $l; $i++) {
+            $char = $chars[$i];
+            if ($char === '"' || $char === "'") {
+                $escaping = $escaping === $char ? null : $char;
+            }
+
+            if (!$escaping && $char === '#') {
+                if (strlen($id)) {
+                    throw new \InvalidArgumentException('#id is multiple.');
+                }
+                $context = $char;
+                continue;
+            }
+            if (!$escaping && $char === '.') {
+                $context = $char;
+                $classes[] = '';
+                continue;
+            }
+            if (!$escaping && $char === '{') {
+                $context = $char;
+                $styles[] = '';
+                continue;
+            }
+            if (!$escaping && $char === ';') {
+                $styles[] = '';
+                continue;
+            }
+            if (!$escaping && $char === '}') {
+                $context = null;
+                continue;
+            }
+            if (!$escaping && $char === '[') {
+                $context = $char;
+                $attrs[] = '';
+                continue;
+            }
+            if (!$escaping && $char === ']') {
+                $context = null;
+                continue;
+            }
+
+            if ($char === '\\') {
+                $char = $chars[++$i];
+            }
+
+            if ($context === '#') {
+                $id .= $char;
+                continue;
+            }
+            if ($context === '.') {
+                $classes[count($classes) - 1] .= $char;
+                continue;
+            }
+            if ($context === '{') {
+                $styles[count($styles) - 1] .= $char;
+                continue;
+            }
+            if ($context === '[') {
+                $attrs[count($attrs) - 1] .= $char;
+                continue;
+            }
+        }
+
+        $attrkv = [];
+        if (strlen($id)) {
+            $attrkv['id'] = $id;
+        }
+        if ($classes) {
+            $attrkv['class'] = $classes;
+        }
+        foreach ($styles as $style) {
+            $declares = array_filter(array_map('trim', explode(';', $style)), 'strlen');
+            foreach ($declares as $declare) {
+                [$k, $v] = array_map('trim', explode(':', $declare, 2)) + [1 => null];
+                if ($v === null) {
+                    throw new \InvalidArgumentException("[$k] is empty.");
+                }
+                $attrkv['style'][$k] = $v;
+            }
+        }
+        foreach ($attrs as $attr) {
+            [$k, $v] = explode('=', $attr, 2) + [1 => true];
+            if (array_key_exists($k, $attrkv)) {
+                throw new \InvalidArgumentException("[$k] is dumplicated.");
+            }
+            if ($k[0] === '!') {
+                $k = substr($k, 1);
+                $v = false;
+            }
+            $attrkv[$k] = is_string($v) ? json_decode($v) ?? $v : $v;
+        }
+
+        return $attrkv;
     }
 
     /**
