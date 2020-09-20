@@ -11,6 +11,13 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.9
+
+- [feature][Strings] css_selector を追加
+- [feature][Sql] sql_format で when ～ then の複合条件が見づらかったのを修正
+- [feature][Strings] paml_import に {} を配列とみなすオプションを追加
+- [feature][Vars] var_pretty のオプション化と最大制限を追加
+
 ## 1.4.8
 
 - [feature][Strings] csv_export のヘッダなしに対応
