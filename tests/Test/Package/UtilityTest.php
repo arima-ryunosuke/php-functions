@@ -1152,9 +1152,9 @@ class UtilityTest extends AbstractTestCase
         @file_get_contents(__DIR__ . '/Utility/notfound.php');
         that(error_get_last()['message'])->containsAll(['notfound.php', 'failed to open stream']);
 
-        set_include_path(__DIR__);
+        $backup = set_include_path(__DIR__);
         that(file_get_contents(basename(__FILE__), true))->equalsFile(__FILE__);
-        restore_include_path();
+        set_include_path($backup);
 
         /** @noinspection PhpUndefinedMethodInspection */
         $profiler->__destruct();

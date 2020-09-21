@@ -1219,6 +1219,8 @@ class Utility
          * @method fopen($filename, $mode, $use_include_path = false, $context = null)
          */
         class {
+            const DECLARE_TICKS = "<?php declare(ticks=1) ?>";
+
             /** @var int https://github.com/php/php-src/blob/php-7.2.11/main/php_streams.h#L528-L529 */
             private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
@@ -1295,19 +1297,24 @@ class Utility
 
             public function stream_read($count)
             {
-                $DECLARE = "<?php declare(ticks=1) ?>";
-
                 $pos = ftell($this->handle);
-                $return = fread($this->handle, $count - strlen($DECLARE));
+                $return = fread($this->handle, $count);
                 if ($return === false) {
                     return false; // @codeCoverageIgnore
                 }
 
                 $prefix = '';
                 if ($pos === 0 && $this->require) {
-                    $prefix = $DECLARE;
+                    $prefix = self::DECLARE_TICKS;
                 }
                 return $prefix . $return;
+            }
+
+            public function stream_stat()
+            {
+                $stat = fstat($this->handle);
+                $stat['size'] += strlen(self::DECLARE_TICKS);
+                return $stat;
             }
 
             public function stream_set_option($option, $arg1, $arg2)
@@ -1321,8 +1328,10 @@ class Utility
                         return stream_set_blocking($this->handle, $arg1);
                     case STREAM_OPTION_READ_TIMEOUT:
                         return stream_set_timeout($this->handle, $arg1, $arg2);
+                    case STREAM_OPTION_READ_BUFFER:
+                        return stream_set_read_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
                     case STREAM_OPTION_WRITE_BUFFER:
-                        return stream_set_write_buffer($this->handle, $arg2); // @todo $arg1 is used?
+                        return stream_set_write_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
                 }
                 // @codeCoverageIgnoreEnd
             }
