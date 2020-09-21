@@ -727,8 +727,8 @@ class Utility
      * that($stderr)->isSame('err'); // 標準エラーに書き込んでいるので "err" が格納される
      * ```
      *
-     * @param string $command 実行コマンド。escapeshellcmd される
-     * @param array|string $args コマンドライン引数。文字列はそのまま結合される。配列は escapeshellarg された上でキーと結合される
+     * @param string $command 実行コマンド。php7.4 未満では escapeshellcmd される
+     * @param array|string $args コマンドライン引数。php7.4 未満では文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される
      * @param string|resource $stdin 標準入力（string を渡すと単純に読み取れられる。resource を渡すと fread される）
      * @param string|resource $stdout 標準出力（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
@@ -738,16 +738,28 @@ class Utility
      */
     public static function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
     {
-        $ecommand = escapeshellcmd($command);
-
-        if (is_array($args)) {
-            $args = (array_sprintf)($args, function ($v, $k) {
-                $ev = escapeshellarg($v);
-                return is_int($k) ? $ev : "$k $ev";
-            }, ' ');
+        if (version_compare(PHP_VERSION, '7.4.0') >= 0 && is_array($args)) {
+            // @codeCoverageIgnoreStart
+            $statement = [$command];
+            foreach ($args as $k => $v) {
+                if (!is_int($k)) {
+                    $statement[] = $k;
+                }
+                $statement[] = $v;
+            }
+            // @codeCoverageIgnoreEnd
+        }
+        else {
+            if (is_array($args)) {
+                $args = (array_sprintf)($args, function ($v, $k) {
+                    $ev = escapeshellarg($v);
+                    return is_int($k) ? $ev : "$k $ev";
+                }, ' ');
+            }
+            $statement = escapeshellcmd($command) . " $args";
         }
 
-        $proc = proc_open("$ecommand $args", [
+        $proc = proc_open($statement, [
             0 => is_resource($stdin) ? $stdin : ['pipe', 'r'],
             1 => ['pipe', 'w'],
             2 => ['pipe', 'w'],
