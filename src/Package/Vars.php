@@ -1263,13 +1263,17 @@ class Vars
                     return;
                 }
 
+                $count = count($value);
                 $omitted = false;
-                if ($options['maxcount'] && ($omitted = count($value) - $options['maxcount']) > 0) {
+                if ($options['maxcount'] && ($omitted = $count - $options['maxcount']) > 0) {
                     $value = array_slice($value, 0, $options['maxcount'], true);
                 }
 
+                if ($count === 0){
+                    $appender(['plain', '['], ['plain', ']']);
+                }
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (!(is_hasharray)($value) && (array_all)($value, is_primitive)) {
+                elseif (!(is_hasharray)($value) && (array_all)($value, is_primitive)) {
                     $last = array_pop($value);
                     $appender(['plain', '[']);
                     foreach ($value as $v) {
@@ -1281,6 +1285,7 @@ class Vars
                     }
                     $appender(['plain', ']']);
                 }
+                // 連想配列だったり階層を持っていたりするなら改行＋桁合わせ
                 else {
                     $spacer1 = str_repeat(' ', ($nest + 1) * $options['indent']);
                     $spacer2 = str_repeat(' ', $nest * $options['indent']);

@@ -760,6 +760,7 @@ VAR
             'deep'  => [[[[[[[[['X']]]]]]]]],
             'more1' => range(1, 20),
             'more2' => array_combine(range(1, 20), range(1, 20)),
+            'empty' => [],
         ];
 
         that((var_pretty)($value, [
@@ -779,7 +780,8 @@ VAR
             ->stringContains("  R: Resource id #2 of type (stream)")
             ->stringContains("          0: (too deep)")
             ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (more 10 elements)]")
-            ->stringContains("    (more 10 elements)");
+            ->stringContains("    (more 10 elements)")
+            ->stringContains("  empty: []");
 
         that((var_pretty)($value, [
             'context'   => 'plain',
