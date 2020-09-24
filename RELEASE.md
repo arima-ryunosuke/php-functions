@@ -11,6 +11,13 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.10
+
+- [feature][FileSystem] path_relative を追加
+- [fixbug][Vars] var_pretty で空配列が [null] になる不具合を修正
+- [feature][Utility] process の proc_open の配列対応
+- [fixbug][Utility] php7.4 で profiler が動かなかったので修正
+
 ## 1.4.9
 
 - [feature][Strings] css_selector を追加
