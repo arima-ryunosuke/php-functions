@@ -352,6 +352,45 @@ class FileSystemTest extends AbstractTestCase
         }
     }
 
+    function test_path_relative()
+    {
+        $dataset = [
+            ['/a/b/c', '/a/b/c/d', 'd'],
+            ['/a/b/c/d', '/a/b/c', '../'],
+            ['/a/b/c/d', '/a/b/c/e', '../e'],
+            ['/a/b/c/d', '/x/y/z', '../../../../x/y/z'],
+            ['/x/y/z', '/a/b/c/d', '../../../a/b/c/d'],
+            ['/////a/b/c////', '/a/b/c/d', 'd'],
+            ['/c/c/c', '/c/c/c/c', 'c'],
+            ['/a/b/c/S', '/a/b/c/S', ''],
+            ['a/b/c/x', 'a/b/c/y', '../y'],
+        ];
+
+        foreach ($dataset as $data) {
+            $data[0] = strtr($data[0], '/', DIRECTORY_SEPARATOR);
+            $data[1] = strtr($data[1], '/', DIRECTORY_SEPARATOR);
+            $data[2] = strtr($data[2], '/', DIRECTORY_SEPARATOR);
+
+            that((path_relative)($data[0], $data[1]))->as((var_pretty)([
+                'args'   => [$data[0], $data[1]],
+                'return' => $data[2],
+            ], ['return' => true]
+            ))->is($data[2]);
+
+            if (DIRECTORY_SEPARATOR === '\\') {
+                $data[0] = strtolower('C:' . $data[0]);
+                $data[1] = strtoupper('C:' . $data[1]);
+                $data[2] = strtoupper($data[2]);
+
+                that((path_relative)($data[0], $data[1]))->as((var_pretty)([
+                    'args'   => [$data[0], $data[1]],
+                    'return' => $data[2],
+                ], ['return' => true]
+                ))->is($data[2]);
+            }
+        }
+    }
+
     function test_path_normalize()
     {
         $DS = DIRECTORY_SEPARATOR;
