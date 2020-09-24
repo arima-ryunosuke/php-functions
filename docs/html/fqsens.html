@@ -2371,6 +2371,19 @@ that(path_resolve('/absolute/path/through', '../current/./path'))-&gt;isSame("{$
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_relative()">
+                                    ryunosuke\Functions\Package\FileSystem::path_relative		</a>	<small>($from, $to) : string</small>
+		</h4>
+	<div class="description"><p>パスを相対パスに変換して正規化する</p>
+<p>$from から $to への相対パスを返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">$DS = DIRECTORY_SEPARATOR;
+that(path_relative('/a/b/c/X', '/a/b/c/d/X'))-&gt;isSame("..{$DS}d{$DS}X");
+that(path_relative('/a/b/c/d/X', '/a/b/c/X'))-&gt;isSame("..{$DS}..{$DS}X");
+that(path_relative('/a/b/c/X', '/a/b/c/X'))-&gt;isSame("");
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_normalize()">
                                     ryunosuke\Functions\Package\FileSystem::path_normalize		</a>	<small>($path) : string</small>
 		</h4>
