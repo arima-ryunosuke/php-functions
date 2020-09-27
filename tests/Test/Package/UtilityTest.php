@@ -1149,6 +1149,12 @@ class UtilityTest extends AbstractTestCase
             'lstat'       => lstat(__DIR__ . '/Utility/fake.php'),
         ]);
 
+        $fp = fopen(__DIR__ . '/Utility/fake.php', 'r');
+        $fstat = fstat($fp);
+        fclose($fp);
+        that($fstat[7])->is(filesize(__DIR__ . '/Utility/fake.php'));
+        that($fstat['size'])->is(filesize(__DIR__ . '/Utility/fake.php'));
+
         @file_get_contents(__DIR__ . '/Utility/notfound.php');
         that(error_get_last()['message'])->containsAll(['notfound.php', 'failed to open stream']);
 

@@ -1240,6 +1240,7 @@ class Utility
             public $context;
 
             private $require;
+            private $prepend;
             private $handle;
 
             public function __call($name, $arguments)
@@ -1293,8 +1294,9 @@ class Utility
 
             public function stream_open($path, $mode, $options, &$opened_path)
             {
-                $use_path = $options & STREAM_USE_PATH;
                 $this->require = $options & self::STREAM_OPEN_FOR_INCLUDE;
+                $this->prepend = false;
+                $use_path = $options & STREAM_USE_PATH;
                 if ($options & STREAM_REPORT_ERRORS) {
                     $this->handle = $this->fopen($path, $mode, $use_path); // @codeCoverageIgnore
                 }
@@ -1309,23 +1311,21 @@ class Utility
 
             public function stream_read($count)
             {
-                $pos = ftell($this->handle);
-                $return = fread($this->handle, $count);
-                if ($return === false) {
-                    return false; // @codeCoverageIgnore
+                if (!$this->prepend && $this->require && ftell($this->handle) === 0) {
+                    $this->prepend = true;
+                    return self::DECLARE_TICKS;
                 }
-
-                $prefix = '';
-                if ($pos === 0 && $this->require) {
-                    $prefix = self::DECLARE_TICKS;
-                }
-                return $prefix . $return;
+                return fread($this->handle, $count);
             }
 
             public function stream_stat()
             {
                 $stat = fstat($this->handle);
-                $stat['size'] += strlen(self::DECLARE_TICKS);
+                if ($this->require) {
+                    $decsize = strlen(self::DECLARE_TICKS);
+                    $stat[7] += $decsize;
+                    $stat['size'] += $decsize;
+                }
                 return $stat;
             }
 
