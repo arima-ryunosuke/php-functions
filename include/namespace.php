@@ -5893,7 +5893,7 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("ryunosuke\
         if ($datetimedata === null) {
             $timestamp = microtime(true);
         }
-        elseif ($datetimedata instanceof \DateTime) {
+        elseif ($datetimedata instanceof \DateTimeInterface) {
             // @fixme DateTime オブジェクトって timestamp を float で得られないの？
             $timestamp = (float) $datetimedata->format('U.u');
         }
@@ -5929,9 +5929,10 @@ if (!isset($excluded_functions["date_convert"]) && (!function_exists("ryunosuke\
         $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', $timestamp)]);
 
         if (is_float($timestamp)) {
-            [$second, $micro] = explode('.', $timestamp) + [1 => '000000'];
-            $datetime = \DateTime::createFromFormat('Y/m/d H:i:s.u', date('Y/m/d H:i:s.', $second) . $micro);
-            return $datetime->format($format);
+            // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
+            static $dtz = null;
+            $dtz = $dtz ?? new \DateTimeZone(date_default_timezone_get());
+            return \DateTime::createFromFormat('U.u', $timestamp)->setTimezone($dtz)->format($format);
         }
         return date($format, $timestamp);
     }
@@ -16966,6 +16967,7 @@ if (!isset($excluded_functions["profiler"]) && (!function_exists("ryunosuke\\Fun
             public $context;
 
             private $require;
+            private $prepend;
             private $handle;
 
             public function __call($name, $arguments)
@@ -17019,8 +17021,9 @@ if (!isset($excluded_functions["profiler"]) && (!function_exists("ryunosuke\\Fun
 
             public function stream_open($path, $mode, $options, &$opened_path)
             {
-                $use_path = $options & STREAM_USE_PATH;
                 $this->require = $options & self::STREAM_OPEN_FOR_INCLUDE;
+                $this->prepend = false;
+                $use_path = $options & STREAM_USE_PATH;
                 if ($options & STREAM_REPORT_ERRORS) {
                     $this->handle = $this->fopen($path, $mode, $use_path); // @codeCoverageIgnore
                 }
@@ -17035,23 +17038,21 @@ if (!isset($excluded_functions["profiler"]) && (!function_exists("ryunosuke\\Fun
 
             public function stream_read($count)
             {
-                $pos = ftell($this->handle);
-                $return = fread($this->handle, $count);
-                if ($return === false) {
-                    return false; // @codeCoverageIgnore
+                if (!$this->prepend && $this->require && ftell($this->handle) === 0) {
+                    $this->prepend = true;
+                    return self::DECLARE_TICKS;
                 }
-
-                $prefix = '';
-                if ($pos === 0 && $this->require) {
-                    $prefix = self::DECLARE_TICKS;
-                }
-                return $prefix . $return;
+                return fread($this->handle, $count);
             }
 
             public function stream_stat()
             {
                 $stat = fstat($this->handle);
-                $stat['size'] += strlen(self::DECLARE_TICKS);
+                if ($this->require) {
+                    $decsize = strlen(self::DECLARE_TICKS);
+                    $stat[7] += $decsize;
+                    $stat['size'] += $decsize;
+                }
                 return $stat;
             }
 
