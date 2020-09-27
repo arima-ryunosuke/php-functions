@@ -11,6 +11,11 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.11
+
+- [fixbug][Date] date_convert で DateTimeInterface の対応が漏れていたので修正
+- [fixbug][Utility] profiler が誤作動する不具合を修正
+
 ## 1.4.10
 
 - [feature][FileSystem] path_relative を追加
