@@ -98,6 +98,7 @@ class DateTest extends AbstractTestCase
         that((date_convert)('Y/m/d H:i:s.u', '2014/12/24 12:34:56.123'))->is('2014/12/24 12:34:56.123000');
         that((date_convert)('Y/m/d H:i:s.u', '令和元年12月24日 12時34分56.123秒'))->is('2019/12/24 12:34:56.123000');
         that((date_convert)('Y/m/d H:i:s.u', \DateTime::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.123000');
+        that((date_convert)('Y/m/d H:i:s.u', \DateTimeImmutable::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.123000');
 
         that((date_convert)('Y/m/d H:i:s'))->is(date('Y/m/d H:i:s')); // microtime はテストがつらすぎるので u を付けない
 
@@ -107,6 +108,8 @@ class DateTest extends AbstractTestCase
         that((date_convert)('JK年m月d日', '1989/12/24'))->is('平成元年12月24日');
         that((date_convert)('bK年m月d日', '2019/12/24'))->is('R元年12月24日');
         that((date_convert)('Jk年m月d日（x曜日）', '2019/12/24'))->is('令和1年12月24日（火曜日）');
+        that((date_convert)('x曜日', '2019/12/24 00:00:00'))->is('火曜日');
+        that((date_convert)('x曜日', '2019/12/24 00:00:00 -1 second'))->is('月曜日');
         that((date_convert)('\\Y\\J\\K\\k\\b\\x', '2019/12/24'))->is('YJKkbx');
 
         that([date_convert, 'Y/m/d H:i:s.u', 'hogera'])->throws('parse failed');

@@ -156,7 +156,7 @@ class Date
         if ($datetimedata === null) {
             $timestamp = microtime(true);
         }
-        elseif ($datetimedata instanceof \DateTime) {
+        elseif ($datetimedata instanceof \DateTimeInterface) {
             // @fixme DateTime オブジェクトって timestamp を float で得られないの？
             $timestamp = (float) $datetimedata->format('U.u');
         }
@@ -192,9 +192,10 @@ class Date
         $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', $timestamp)]);
 
         if (is_float($timestamp)) {
-            [$second, $micro] = explode('.', $timestamp) + [1 => '000000'];
-            $datetime = \DateTime::createFromFormat('Y/m/d H:i:s.u', date('Y/m/d H:i:s.', $second) . $micro);
-            return $datetime->format($format);
+            // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
+            static $dtz = null;
+            $dtz = $dtz ?? new \DateTimeZone(date_default_timezone_get());
+            return \DateTime::createFromFormat('U.u', $timestamp)->setTimezone($dtz)->format($format);
         }
         return date($format, $timestamp);
     }
