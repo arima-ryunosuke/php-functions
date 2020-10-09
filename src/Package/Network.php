@@ -595,7 +595,7 @@ class Network
      *
      * @param string $url 対象 URL
      * @param mixed $data パラメータ
-     * @return mixed レスポンスボディ
+     * @return array レスポンスヘッダ
      */
     public static function http_head($url, $data = [], $options = [], &$response_header = [], &$info = [])
     {
@@ -603,7 +603,8 @@ class Network
             'method'       => 'HEAD',
             CURLOPT_NOBODY => true,
         ];
-        return (http_get)($url, $data, $options + $default, $response_header, $info);
+        (http_get)($url, $data, $options + $default, $response_header, $info);
+        return $response_header;
     }
 
     /**

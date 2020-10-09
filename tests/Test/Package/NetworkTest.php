@@ -165,7 +165,10 @@ class NetworkTest extends AbstractTestCase
         $file = __DIR__ . '/Network/test.png';
 
         $response = (http_head)("$server/get", ['k' => 'v']);
-        that($response)->is('');
+        that($response)->arraySubset([
+            'HTTP/1.1 200 OK',
+            'Content-Type' => 'application/json',
+        ]);
 
         $response = (http_get)("$server/get?k1=v1", [
             'k2' => 'v2',
