@@ -243,6 +243,21 @@ class FileSystemTest extends AbstractTestCase
         that([file_pos, 'not found', 'hoge'])->throws('is not found');
     }
 
+    function test_file_mimetype()
+    {
+        that((file_mimetype)(__FILE__))->is('text/x-php');
+        that(@(file_mimetype)('notfound'))->isNull();
+        that(error_get_last()['message'])->contains('mime_content_type(notfound)');
+
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+        that((file_mimetype)("$server/get"))->is('application/json');
+        @that((file_mimetype)("$server/not"))->isNull();
+        that(error_get_last()['message'])->contains('404');
+    }
+
     function test_dirname_r()
     {
         // composer.json が見つかるまで親を辿って見つかったらそのパスを返す
