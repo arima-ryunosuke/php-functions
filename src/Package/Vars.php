@@ -1150,9 +1150,12 @@ class Vars
             'context'   => null,  // html なコンテキストか cli なコンテキスト化
             'return'    => false, // 値を戻すか出力するか
             'trace'     => false, // スタックトレースの表示
+            'callback'  => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
+            'debuginfo' => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
             'maxcount'  => null,  // 複合型の要素の数
-            'maxdepth'  => null,  // 階層構造の深さ
-            'maxlength' => null,  // 最終出力の文字数
+            'maxdepth'  => null,  // 複合型の深さ
+            'maxlength' => null,  // スカラー・非複合配列の文字数
+            'limit'     => null,  // 最終出力の文字数
         ];
 
         // for compatible
@@ -1171,174 +1174,288 @@ class Vars
             }
         }
 
-        $colorAdapter = static function ($value, $style) use ($options) {
-            switch ($options['context']) {
-                default:
-                    throw new \InvalidArgumentException("'{$options['context']}' is not supported.");
-                case 'plain':
-                    return $value;
-                case 'cli':
-                    return (ansi_colorize)($value, $style);
-                case 'html':
+        $appender = new class($options) {
+            private $options;
+            private $objects;
+            private $content;
+            private $length;
+
+            public function __construct($options)
+            {
+                $this->options = $options;
+                $this->objects = [];
+                $this->content = [];
+                $this->length = 0;
+            }
+
+            private function _append($value, $style = null, $data = [])
+            {
+                if ($this->options['limit'] && $this->options['limit'] < $this->length += strlen($value)) {
+                    throw new \LengthException(implode('', $this->content));
+                }
+
+                $current = count($this->content) - 1;
+                if ($style === null || $this->options['context'] === 'plain') {
+                    $this->content[$current] .= $value;
+                }
+                elseif ($this->options['context'] === 'cli') {
+                    $this->content[$current] .= (ansi_colorize)($value, $style);
+                }
+                elseif ($this->options['context'] === 'html') {
                     // 今のところ bold しか使っていないのでこれでよい
                     $style = $style === 'bold' ? 'font-weight:bold' : "color:$style";
-                    return "<span style='$style'>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+                    $dataattr = (array_sprintf)($data, 'data-%2$s="%1$s"', ' ');
+                    $this->content[$current] .= "<span style='$style' $dataattr>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+                }
+                else {
+                    throw new \InvalidArgumentException("'{$this->options['context']}' is not supported.");
+                }
+                return $this;
             }
-        };
 
-        $output = '';
-        $length = 0;
-        $appender = function (...$tokens) use (&$output, &$length, $colorAdapter, $options) {
-            foreach ($tokens as $token) {
-                $mode = $token[0];
-                $value = $token[1];
-                switch ($mode) {
-                    case 'plain':
-                        $string = $value;
-                        $result = $value;
-                        break;
-                    case 'index':
-                        $string = $value;
-                        switch (true) {
-                            case is_int($value):
-                                $result = $colorAdapter($value, 'bold');
-                                break;
-                            case is_string($value):
-                                $result = $colorAdapter($value, 'red');
-                                break;
-                            default:
-                                throw new \DomainException(); // @codeCoverageIgnore
+            public function plain($token)
+            {
+                return $this->_append($token);
+            }
+
+            public function index($token)
+            {
+                if (is_int($token)) {
+                    return $this->_append($token, 'bold');
+                }
+                elseif (is_string($token)) {
+                    return $this->_append($token, 'red');
+                }
+                elseif (is_object($token)) {
+                    return $this->_append($this->string($token), 'green', ['type' => 'object-index', 'id' => spl_object_id($token)]);
+                }
+                else {
+                    throw new \DomainException(); // @codeCoverageIgnore
+                }
+            }
+
+            public function value($token)
+            {
+                if (is_null($token)) {
+                    return $this->_append($this->string($token), 'bold', ['type' => 'null']);
+                }
+                elseif (is_object($token)) {
+                    return $this->_append($this->string($token), 'green', ['type' => 'object', 'id' => spl_object_id($token)]);
+                }
+                elseif (is_resource($token)) {
+                    return $this->_append($this->string($token), 'bold', ['type' => 'resource']);
+                }
+                elseif (is_string($token)) {
+                    return $this->_append($this->string($token), 'magenta', ['type' => 'scalar']);
+                }
+                elseif (is_bool($token)) {
+                    return $this->_append($this->string($token), 'bold', ['type' => 'bool']);
+                }
+                elseif (is_scalar($token)) {
+                    return $this->_append($this->string($token), 'magenta', ['type' => 'scalar']);
+                }
+                else {
+                    throw new \DomainException(); // @codeCoverageIgnore
+                }
+            }
+
+            public function string($token)
+            {
+                if (is_null($token)) {
+                    return 'null';
+                }
+                elseif (is_object($token)) {
+                    return get_class($token) . "#" . spl_object_id($token);
+                }
+                elseif (is_resource($token)) {
+                    return sprintf('%s of type (%s)', $token, get_resource_type($token));
+                }
+                elseif (is_string($token)) {
+                    if ($this->options['maxlength']) {
+                        $token = (str_ellipsis)($token, $this->options['maxlength'], '...(too length)...');
+                    }
+                    return var_export($token, true);
+                }
+                elseif (is_scalar($token)) {
+                    return var_export($token, true);
+                }
+                else {
+                    throw new \DomainException(gettype($token)); // @codeCoverageIgnore
+                }
+            }
+
+            public function export($value, $nest, $parents, $callback)
+            {
+                $this->content[] = '';
+
+                // オブジェクトは一度処理してれば無駄なので参照表示
+                if (is_object($value)) {
+                    $id = spl_object_id($value);
+                    if (isset($this->objects[$id])) {
+                        $this->index($value);
+                        return array_pop($this->content);
+                    }
+                    $this->objects[$id] = $value;
+                }
+
+                // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
+                foreach ($parents as $parent) {
+                    if ($parent === $value) {
+                        $this->plain('*RECURSION*');
+                        return array_pop($this->content);
+                    }
+                }
+
+                if (is_array($value)) {
+                    if ($this->options['maxdepth'] && $nest + 1 > $this->options['maxdepth']) {
+                        $this->plain('(too deep)');
+                        return array_pop($this->content);
+                    }
+
+                    $parents[] = $value;
+
+                    $count = count($value);
+                    $omitted = false;
+                    if ($this->options['maxcount'] && ($omitted = $count - $this->options['maxcount']) > 0) {
+                        $value = array_slice($value, 0, $this->options['maxcount'], true);
+                    }
+
+                    $is_hasharray = (is_hasharray)($value);
+                    $primitive_only = (array_all)($value, is_primitive);
+                    $assoc = $is_hasharray || !$primitive_only;
+
+                    $spacer1 = str_repeat(' ', ($nest + 1) * $this->options['indent']);
+                    $spacer2 = str_repeat(' ', ($nest + 0) * $this->options['indent']);
+
+                    $key = null;
+                    if ($primitive_only && $this->options['maxlength']) {
+                        $lengths = [];
+                        foreach ($value as $k => $v) {
+                            if ($assoc) {
+                                $lengths[] = strlen($this->string($spacer1)) + strlen($this->string($k)) + strlen($this->string($v)) + 4;
+                            }
+                            else {
+                                $lengths[] = strlen($this->string($v)) + 2;
+                            }
                         }
-                        break;
-                    case 'value':
-                        switch (true) {
-                            case is_null($value):
-                                $string = 'null';
-                                $result = $colorAdapter($string, 'bold');
-                                break;
-                            case is_object($value):
-                                $string = get_class($value) . "#" . spl_object_id($value);
-                                $result = $colorAdapter($string, 'green');
-                                break;
-                            case is_bool($value):
-                                $string = var_export($value, true);
-                                $result = $colorAdapter($string, 'bold');
-                                break;
-                            case is_scalar($value):
-                                $string = var_export($value, true);
-                                $result = $colorAdapter($string, 'magenta');
-                                break;
-                            case is_resource($value):
-                                $string = sprintf('%s of type (%s)', $value, get_resource_type($value));
-                                $result = $colorAdapter($string, 'bold');
-                                break;
-                            default:
-                                throw new \DomainException(); // @codeCoverageIgnore
+                        while (count($lengths) > 0 && array_sum($lengths) > $this->options['maxlength']) {
+                            $middle = (int) (count($lengths) / 2);
+                            $unpos = function ($v, $k, $n) use ($middle) { return $n === $middle; };
+                            (array_unset)($value, $unpos);
+                            (array_unset)($lengths, $unpos);
+                            $key = (int) (count($lengths) / 2);
                         }
-                        break;
-                    default:
-                        throw new \DomainException(); // @codeCoverageIgnore
-                }
-                if ($options['maxlength'] && $options['maxlength'] < $length += strlen($string)) {
-                    throw new \LengthException();
-                }
-                $output .= $result;
-            }
-        };
-
-        // 再帰用クロージャ
-        $export = function ($value, $nest = 0, $parents = []) use (&$export, $appender, $options) {
-            // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
-            foreach ($parents as $parent) {
-                if ($parent === $value) {
-                    return $appender(['plain', '*RECURSION*']);
-                }
-            }
-
-            if (is_array($value)) {
-                $parents[] = $value;
-
-                if ($options['maxdepth'] && $nest + 1 > $options['maxdepth']) {
-                    $appender(['plain', '(too deep)']);
-                    return;
-                }
-
-                $count = count($value);
-                $omitted = false;
-                if ($options['maxcount'] && ($omitted = $count - $options['maxcount']) > 0) {
-                    $value = array_slice($value, 0, $options['maxcount'], true);
-                }
-
-                if ($count === 0){
-                    $appender(['plain', '['], ['plain', ']']);
-                }
-                // スカラー値のみで構成されているならシンプルな再帰
-                elseif (!(is_hasharray)($value) && (array_all)($value, is_primitive)) {
-                    $last = array_pop($value);
-                    $appender(['plain', '[']);
-                    foreach ($value as $v) {
-                        $appender(['value', $v], ['plain', ', ']);
                     }
-                    $appender(['value', $last]);
-                    if ($omitted > 0) {
-                        $appender(['plain', " (more $omitted elements)"]);
+
+                    if ($count === 0) {
+                        $this->plain('[]');
                     }
-                    $appender(['plain', ']']);
+                    elseif ($assoc) {
+                        $n = 0;
+                        $this->plain("{\n");
+                        if (!$value) {
+                            $this->plain($spacer1)->plain('...(too length)...')->plain(",\n");
+                        }
+                        foreach ($value as $k => $v) {
+                            if ($key === $n++) {
+                                $this->plain($spacer1)->plain('...(too length)...')->plain(",\n");
+                            }
+                            $this->plain($spacer1)->index($k)->plain(': ');
+                            $this->plain($this->export($v, $nest + 1, $parents, true));
+                            $this->plain(",\n");
+                        }
+                        if ($omitted > 0) {
+                            $this->plain("$spacer1(more $omitted elements)\n");
+                        }
+                        $this->plain("{$spacer2}}");
+                    }
+                    else {
+                        $lastkey = (last_key)($value);
+                        $n = 0;
+                        $this->plain('[');
+                        if (!$value) {
+                            $this->plain('...(too length)...')->plain(', ');
+                        }
+                        foreach ($value as $k => $v) {
+                            if ($key === $n++) {
+                                $this->plain('...(too length)...')->plain(', ');
+                            }
+                            $this->plain($this->export($v, $nest, $parents, true));
+                            if ($k !== $lastkey) {
+                                $this->plain(', ');
+                            }
+                        }
+                        if ($omitted > 0) {
+                            $this->plain(" (more $omitted elements)");
+                        }
+                        $this->plain(']');
+                    }
                 }
-                // 連想配列だったり階層を持っていたりするなら改行＋桁合わせ
+                elseif ($value instanceof \Closure) {
+                    /** @var \ReflectionFunctionAbstract $ref */
+                    $ref = (reflect_callable)($value);
+                    $that = $ref->getClosureThis();
+                    $properties = $ref->getStaticVariables();
+
+                    $this->value($value)->plain("(");
+                    if ($that) {
+                        $this->index($that);
+                    }
+                    else {
+                        $this->plain("static");
+                    }
+                    $this->plain(') use ');
+                    if ($properties) {
+                        $this->plain($this->export($properties, $nest, $parents, false));
+                    }
+                    else {
+                        $this->plain('{}');
+                    }
+                }
+                elseif (is_object($value)) {
+                    if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
+                        $properties = [];
+                        foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
+                            $p = strrpos($k, "\0");
+                            if ($p !== false) {
+                                $k = substr($k, $p + 1);
+                            }
+                            $properties[$k] = $v;
+                        }
+                    }
+                    else {
+                        $properties = (get_object_properties)($value);
+                    }
+
+                    $this->value($value)->plain(" ");
+                    if ($properties) {
+                        $this->plain($this->export($properties, $nest, $parents, false));
+                    }
+                    else {
+                        $this->plain('{}');
+                    }
+                }
                 else {
-                    $spacer1 = str_repeat(' ', ($nest + 1) * $options['indent']);
-                    $spacer2 = str_repeat(' ', $nest * $options['indent']);
+                    $this->value($value);
+                }
 
-                    $appender(['plain', "{\n"]);
-                    foreach ($value as $k => $v) {
-                        $appender(['plain', $spacer1], ['index', $k], ['plain', ': ']);
-                        $export($v, $nest + 1, $parents);
-                        $appender(['plain', ",\n"]);
-                    }
-                    if ($omitted > 0) {
-                        $appender(['plain', $spacer1]);
-                        $appender(['plain', "(more $omitted elements)\n"]);
-                    }
-                    $appender(['plain', "{$spacer2}}"]);
+                $content = array_pop($this->content);
+                if ($callback && $this->options['callback']) {
+                    ($this->options['callback'])($content, $value, $nest);
                 }
-            }
-            elseif ($value instanceof \Closure) {
-                /** @var \ReflectionFunctionAbstract $ref */
-                $ref = (reflect_callable)($value);
-                $that = $ref->getClosureThis();
-                $properties = $ref->getStaticVariables();
-
-                $appender(['value', $value], ['plain', "("], $that ? ['value', $that] : ['plain', 'static'], ['plain', ') use ']);
-                if ($properties) {
-                    $export($properties, $nest, $parents);
-                }
-                else {
-                    $appender(['plain', '{}']);
-                }
-            }
-            elseif (is_object($value)) {
-                $parents[] = $value;
-                $properties = (get_object_properties)($value);
-
-                $appender(['value', $value], ['plain', " "]);
-                if ($properties) {
-                    $export($properties, $nest, $parents);
-                }
-                else {
-                    $appender(['plain', '{}']);
-                }
-            }
-            else {
-                $appender(['value', $value]);
+                return $content;
             }
         };
 
         try {
-            $export($value);
+            $content = $appender->export($value, 0, [], false);
         }
         catch (\LengthException $ex) {
-            $output .= '(...omitted)';
+            $content = $ex->getMessage() . '(...omitted)';
+        }
+
+        if ($options['callback']) {
+            ($options['callback'])($content, $value, 0);
         }
 
         // 結果を返したり出力したり
@@ -1348,10 +1465,10 @@ class Vars
             $traces = array_reverse(array_slice($traces, 0, $options['trace'] === true ? null : $options['trace']));
             $traces[] = '';
         }
-        $result = implode("\n", $traces) . $output;
+        $result = implode("\n", $traces) . $content;
 
         if ($options['context'] === 'html') {
-            $result = "<pre>$result</pre>";
+            $result = "<pre class='var_pretty'>$result</pre>";
         }
         if ($options['return']) {
             return $result;

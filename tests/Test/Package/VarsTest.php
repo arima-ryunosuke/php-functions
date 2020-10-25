@@ -746,6 +746,7 @@ VAR
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
         $closure = function () use ($recur) { return $recur; };
+        $sclosure = static function () use ($recur) { return $recur; };
         $value = [
             (stdclass)([
                 'A' => (stdclass)([
@@ -756,39 +757,62 @@ VAR
             'A'     => ["str", 1, 2, 3, true, null],
             'H'     => ['a' => 'A', 'b' => 'B'],
             'C'     => $closure,
+            'c1'    => [$sclosure, $sclosure],
             'R'     => STDOUT,
             'deep'  => [[[[[[[[['X']]]]]]]]],
             'more1' => range(1, 20),
             'more2' => array_combine(range(1, 20), range(1, 20)),
+            'more3' => array_fill_keys(range(0, 19), 'ssssssssss'),
+            'more4' => str_repeat('ssssssssss', 32),
+            'more5' => [str_repeat('long-string', 64)],
+            'more6' => ['x' => str_repeat('long-string', 64)],
             'empty' => [],
         ];
-
         that((var_pretty)($value, [
-            'context'  => 'plain',
-            'return'   => true,
-            'maxdepth' => 5,
-            'maxcount' => 10,
-            'trace'    => 3,
+            'context'   => 'plain',
+            'return'    => true,
+            'maxdepth'  => 5,
+            'maxcount'  => 16,
+            'maxlength' => 128,
+            'trace'     => 3,
         ]))
             ->stringContains(__FILE__)
             ->stringContains("  0: stdClass#")
             ->stringContains("      X: stdClass#")
             ->stringContains("  E: Concrete#")
+            ->stringContains("    info: 'this is __debugInfo'")
             ->stringContains("  A: ['str', 1, 2, 3, true, null]")
             ->stringContains("ryunosuke\\Test\\Package\\VarsTest#")
             ->stringContains("    recur: {")
+            ->stringContains("    0: Closure#")
+            ->stringContains("    1: Closure#")
             ->stringContains("  R: Resource id #2 of type (stream)")
             ->stringContains("          0: (too deep)")
-            ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (more 10 elements)]")
-            ->stringContains("    (more 10 elements)")
+            ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 (more 4 elements)]")
+            ->stringContains("    (more 4 elements)")
+            ->stringContains(", ...(too length)..., ")
+            ->stringContains("s...(too length)...s")
+            ->stringContains("  more5: [...(too length)..., ]")
+            ->stringContains("  more6: {\n    ...")
             ->stringContains("  empty: []");
 
         that((var_pretty)($value, [
-            'context'   => 'plain',
-            'return'    => true,
-            'maxlength' => 64,
+            'context' => 'plain',
+            'return'  => true,
+            'limit'   => 64,
         ]))
             ->stringContains("      X: (...omitted)");
+
+        that((var_pretty)($value, [
+            'context'  => 'plain',
+            'return'   => true,
+            'callback' => function (&$string, $var, $nest) {
+                if (is_resource($var)) {
+                    $string = "this is custom resource($nest)";
+                }
+            },
+        ]))
+            ->stringContains("R: this is custom resource(1)");
 
         that((var_pretty)($value, 'cli', true))->stringContains("\033");
         that((var_pretty)($value, 'html', true))->stringContains("<span");

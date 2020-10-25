@@ -63,6 +63,11 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
         return __METHOD__;
     }
 
+    public function __debugInfo()
+    {
+        return ['info' => 'this is __debugInfo'] + (array) $this;
+    }
+
     public static function __set_state($an_array)
     {
         $that = new self($an_array['name']);
