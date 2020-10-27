@@ -1066,10 +1066,10 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_maps()
     {
-        that((array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')))->is(['_A0', '_B1', '_C2']);
-        that((array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_', '-')))->is(['_-A0', '_-B1', '_-C2']);
+        that((array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_')))->is(['_A00', '_B11', '_C22']);
+        that((array_maps)(['a', 'b', 'c'], 'strtoupper', (lbind)(strcat, '_', '-')))->is(['_-A00', '_-B11', '_-C22']);
 
-        that((array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat))->is(['a' => 'Aaa', 'b' => 'Bbb']);
+        that((array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat))->is(['a' => 'Aa0a0', 'b' => 'Bb1b1']);
 
         // メソッドモード
         $ex = new \Exception('msg1', 1, new \Exception('msg2', 2, new \Exception('msg3', 3)));

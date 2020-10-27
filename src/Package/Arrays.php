@@ -859,16 +859,17 @@ class Arrays
 
         $result = [];
         $chunk = [];
-        $n = 0;
+        $n = -1;
         foreach ($array as $k => $v) {
+            $n++;
+
             if ($limit === 1) {
                 $chunk = array_slice($array, $n, null, true);
                 break;
             }
 
-            $n++;
             if ($condition instanceof \Closure) {
-                $match = $condition($v, $k);
+                $match = $condition($v, $k, $n);
             }
             else {
                 $match = $condition === $v;
@@ -926,15 +927,16 @@ class Arrays
             $callback = (func_user_func_array)($format);
         }
         elseif ($format === null) {
-            $callback = function ($v, $k) { return vsprintf($k, is_array($v) ? $v : [$v]); };
+            $callback = function ($v, $k, $n) { return vsprintf($k, is_array($v) ? $v : [$v]); };
         }
         else {
-            $callback = function ($v, $k) use ($format) { return sprintf($format, $v, $k); };
+            $callback = function ($v, $k, $n) use ($format) { return sprintf($format, $v, $k); };
         }
 
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
-            $result[] = $callback($v, $k);
+            $result[] = $callback($v, $k, $n++);
         }
 
         if ($glue !== null) {
@@ -1157,8 +1159,9 @@ class Arrays
 
         if ($key instanceof \Closure) {
             $result = [];
+            $n = 0;
             foreach ($array as $k => $v) {
-                if ($key($v, $k)) {
+                if ($key($v, $k, $n++)) {
                     if (func_num_args() === 2) {
                         return $v;
                     }
@@ -1372,8 +1375,9 @@ class Arrays
 
         if ($key instanceof \Closure) {
             $result = [];
+            $n = 0;
             foreach ($array as $k => $v) {
-                if ($key($v, $k)) {
+                if ($key($v, $k, $n++)) {
                     $result[$k] = $v;
                     unset($array[$k]);
                 }
@@ -1516,8 +1520,9 @@ class Arrays
     {
         $callback = (func_user_func_array)($callback);
 
+        $n = 0;
         foreach ($array as $k => $v) {
-            $result = $callback($v, $k);
+            $result = $callback($v, $k, $n++);
             if ($result) {
                 if ($is_key) {
                     return $k;
@@ -1660,12 +1665,13 @@ class Arrays
         // ↑の変換を再帰ごとにやるのは現実的ではないのでクロージャに閉じ込めて再帰する
         $main = static function ($array) use (&$main, $callback, $iterable) {
             $result = [];
+            $n = 0;
             foreach ($array as $k => $v) {
                 if (($iterable && is_iterable($v)) || (!$iterable && is_array($v))) {
                     $result[$k] = $main($v);
                 }
                 else {
-                    $result[$k] = $callback($v, $k);
+                    $result[$k] = $callback($v, $k, $n++);
                 }
             }
             return $result;
@@ -1693,8 +1699,9 @@ class Arrays
     {
         $callback = (func_user_func_array)($callback);
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
-            $k2 = $callback($k, $v);
+            $k2 = $callback($k, $v, $n++);
             if ($k2 !== null) {
                 $result[$k2] = $v;
             }
@@ -1722,8 +1729,9 @@ class Arrays
     {
         $callback = (func_user_func_array)($callback);
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
-            if ($callback($k, $v)) {
+            if ($callback($k, $v, $n++)) {
                 $result[$k] = $v;
             }
         }
@@ -1875,8 +1883,9 @@ class Arrays
     {
         $callback = (func_user_func_array)($callback);
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
-            $vv = $callback($v, $k);
+            $vv = $callback($v, $k, $n++);
             if (($strict && $vv !== null) || (!$strict && $vv)) {
                 $result[$k] = $vv;
             }
@@ -1967,12 +1976,13 @@ class Arrays
                 $margs = null;
                 $callback = (func_user_func_array)($callback);
             }
+            $n = 0;
             foreach ($result as $k => $v) {
                 if (isset($margs)) {
                     $result[$k] = ([$v, $callback])(...$margs);
                 }
                 else {
-                    $result[$k] = $callback($v, $k);
+                    $result[$k] = $callback($v, $k, $n++);
                 }
             }
         }
@@ -2424,8 +2434,9 @@ class Arrays
         $result = array_fill_keys(array_keys($rules), []);
         foreach ($rules as $name => $rule) {
             $rule = (func_user_func_array)($rule);
+            $n = 0;
             foreach ($array as $k => $v) {
-                if ($rule($v, $k)) {
+                if ($rule($v, $k, $n++)) {
                     $result[$name][$k] = $v;
                 }
             }
@@ -2468,8 +2479,9 @@ class Arrays
             $result = array_fill_keys(array_keys($callback), 0);
             foreach ($callback as $name => $rule) {
                 $rule = (func_user_func_array)($rule);
+                $n = 0;
                 foreach ($array as $k => $v) {
-                    if ($rule($v, $k)) {
+                    if ($rule($v, $k, $n++)) {
                         $result[$name]++;
                     }
                 }
@@ -2479,8 +2491,9 @@ class Arrays
 
         $callback = (func_user_func_array)($callback);
         $result = 0;
+        $n = 0;
         foreach ($array as $k => $v) {
-            if ($callback($v, $k)) {
+            if ($callback($v, $k, $n++)) {
                 $result++;
             }
         }
@@ -2527,8 +2540,9 @@ class Arrays
         $callback = (func_user_func_array)($callback);
 
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
-            $vv = $callback($v, $k);
+            $vv = $callback($v, $k, $n++);
             // 配列は潜る
             if (is_array($vv)) {
                 $tmp = &$result;
@@ -2639,8 +2653,9 @@ class Arrays
         }
         else {
             $group = [];
+            $n = 0;
             foreach ($array as $k => $v) {
-                $vv = $key($v, $k);
+                $vv = $key($v, $k, $n++);
 
                 if (is_array($vv)) {
                     $tmp = &$group;
@@ -2705,8 +2720,9 @@ class Arrays
 
         $callback = (func_user_func_array)($callback);
 
+        $n = 0;
         foreach ($array as $k => $v) {
-            if (!$callback($v, $k)) {
+            if (!$callback($v, $k, $n++)) {
                 return false;
             }
         }
@@ -2738,8 +2754,9 @@ class Arrays
 
         $callback = (func_user_func_array)($callback);
 
+        $n = 0;
         foreach ($array as $k => $v) {
-            if ($callback($v, $k)) {
+            if ($callback($v, $k, $n++)) {
                 return true;
             }
         }
@@ -3324,9 +3341,10 @@ class Arrays
 
         $argcount = func_num_args();
         $result = [];
+        $n = 0;
         foreach ($array as $k => $v) {
             if ($callbacks instanceof \Closure) {
-                $row = $callbacks($v, $k);
+                $row = $callbacks($v, $k, $n++);
             }
             else {
                 $row = [];
