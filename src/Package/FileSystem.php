@@ -793,31 +793,38 @@ class FileSystem
      * that(file_exists(sys_get_temp_dir() . '/new'))->isSame(false);
      * ```
      *
-     * @param string $dirname 削除するディレクトリ名
+     * @param string $dirname 削除するディレクトリ名。glob パターンが使える
      * @param bool $self 自分自身も含めるか。false を与えると中身だけを消す
      * @return bool 成功した場合に TRUE を、失敗した場合に FALSE を返します
      */
     public static function rm_rf($dirname, $self = true)
     {
-        if (!file_exists($dirname)) {
-            return false;
-        }
-
-        $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS);
-        $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
-
-        foreach ($rii as $it) {
-            if ($it->isDir()) {
-                rmdir($it->getPathname());
+        $main = static function ($dirname, $self) {
+            if (!file_exists($dirname)) {
+                return false;
             }
-            else {
-                unlink($it->getPathname());
-            }
-        }
 
-        if ($self) {
-            return rmdir($dirname);
+            $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS);
+            $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+
+            foreach ($rii as $it) {
+                if ($it->isDir()) {
+                    rmdir($it->getPathname());
+                }
+                else {
+                    unlink($it->getPathname());
+                }
+            }
+
+            return $self ? rmdir($dirname) : true;
+        };
+
+        $result = true;
+        $targets = glob($dirname, GLOB_BRACE | GLOB_NOCHECK | ($self ? 0 : GLOB_ONLYDIR));
+        foreach ($targets as $target) {
+            $result = $main($target, $self) && $result;
         }
+        return $result;
     }
 
     /**
