@@ -816,6 +816,7 @@ define("ryunosuke\\Functions\\Package\\file_extension", ["ryunosuke\\Functions\\
 define("ryunosuke\\Functions\\Package\\file_set_contents", ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_contents"]);
 define("ryunosuke\\Functions\\Package\\file_rewrite_contents", ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"]);
 define("ryunosuke\\Functions\\Package\\file_pos", ["ryunosuke\\Functions\\Package\\FileSystem", "file_pos"]);
+define("ryunosuke\\Functions\\Package\\file_mimetype", ["ryunosuke\\Functions\\Package\\FileSystem", "file_mimetype"]);
 define("ryunosuke\\Functions\\Package\\mkdir_p", ["ryunosuke\\Functions\\Package\\FileSystem", "mkdir_p"]);
 define("ryunosuke\\Functions\\Package\\dirname_r", ["ryunosuke\\Functions\\Package\\FileSystem", "dirname_r"]);
 define("ryunosuke\\Functions\\Package\\dirmtime", ["ryunosuke\\Functions\\Package\\FileSystem", "dirmtime"]);

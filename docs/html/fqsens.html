@@ -2271,6 +2271,22 @@ that(file_pos($testpath, 'hogera'))-&gt;is(false);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_mimetype()">
+                                    ryunosuke\Functions\Package\FileSystem::file_mimetype		</a>	<small>($filename) : string<span class="type-separator"></span><wbr>null</small>
+		</h4>
+	<div class="description"><p>ファイルの mimetype を返す</p>
+<p>mime_content_type の http 対応版。<br />
+変更点は下記。</p>
+<ul>
+<li>http(s) に対応（HEAD メソッドで取得する）</li>
+<li>失敗時に false ではなく null を返す</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">that(file_mimetype(__FILE__))-&gt;is('text/x-php');
+that(file_mimetype('http://httpbin.org/get?name=value'))-&gt;is('application/json');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::mkdir_p()">
                                     ryunosuke\Functions\Package\FileSystem::mkdir_p		</a>	<small>($dirname, $umask = 2) : bool</small>
 		</h4>
@@ -3246,7 +3262,7 @@ that($response['form'])-&gt;is([
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_head()">
-                                    ryunosuke\Functions\Package\Network::http_head		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
+                                    ryunosuke\Functions\Package\Network::http_head		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : array</small>
 		</h4>
 	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の HEAD 特化版</p>
 </div>
@@ -4433,7 +4449,7 @@ that(preg_capture($pattern, 'hoge', $default))-&gt;isSame([1 =&gt; '2000', 2 =&g
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_splice()">
-                                    ryunosuke\Functions\Package\Strings::preg_splice		</a>	<small>($pattern, $replacement, $subject, &amp;$matches = []) : string</small>
+                                    ryunosuke\Functions\Package\Strings::preg_splice		</a>	<small>($pattern, $replacement, $subject, &amp;$matches = [], $limit = PHP_INT_MAX) : string</small>
 		</h4>
 	<div class="description"><p>キャプチャも行える preg_replace</p>
 <p>「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。</p>
@@ -4444,6 +4460,10 @@ callable とはいっても単純文字列 callble （"strtoupper" など）は 
 <pre><code class="language-php">// 数字を除去しつつその除去された数字を得る
 that(preg_splice('#\\d+#', '', 'abc123', $m))-&gt;isSame('abc');
 that($m)-&gt;isSame(['123']);
+
+// limit も指定できる
+that(preg_splice('#\\d+#', '', '123abc456def789', $m, 2))-&gt;isSame('abcdef789');
+that($m)-&gt;isSame([0 =&gt; ['123', '456']]);
 
 // callable だと preg_replace_callback が呼ばれる
 that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))-&gt;isSame('ABC123');

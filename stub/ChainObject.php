@@ -2423,6 +2423,10 @@
  * @method   \ChainObject  file_list($filter_condition = null)
  * @method   \ChainObject  file_list1($dirname)
  *
+ * @see file_mimetype
+ * @property \ChainObject $file_mimetype
+ * @method   \ChainObject  file_mimetype()
+ *
  * @see file_pos
  * @method   \ChainObject  file_pos($needle, $offset = 0, $length = null, $chunksize = null)
  * @method   \ChainObject  file_pos1($filename, $offset = 0, $length = null, $chunksize = null)
