@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.12
+
+- [change][Vars] var_pretty の仕様変更
+- [fixbug][FileSystem] rm_rf に glob を渡せるように変更
+- [fixbug][FileSystem] file_mimetype を追加
+- [change][Network] http_head の返り値をヘッダに変更
+- [change][Strings] preg_splice の limit 対応
+- [change][Arrays] コールバック関数に連番が渡ってくるように変更
+
 ## 1.4.11
 
 - [fixbug][Date] date_convert で DateTimeInterface の対応が漏れていたので修正
