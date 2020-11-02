@@ -1076,6 +1076,9 @@ class ArraysTest extends AbstractTestCase
 
         that((array_maps)(['a' => 'A', 'b' => 'B'], strcat, strcat))->is(['a' => 'Aa0a0', 'b' => 'Bb1b1']);
 
+        // 可変引数モード
+        that((array_maps)([[1, 3], [1, 5, 2]], '...range'))->isSame([[1, 2, 3], [1, 3, 5]]);
+
         // メソッドモード
         $ex = new \Exception('msg1', 1, new \Exception('msg2', 2, new \Exception('msg3', 3)));
         that((array_maps)([$ex, $ex, $ex], '@getMessage'))->is(['msg1', 'msg1', 'msg1']);
