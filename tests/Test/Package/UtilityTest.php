@@ -193,6 +193,30 @@ class UtilityTest extends AbstractTestCase
         ]);
     }
 
+    function test_number_serial()
+    {
+        $numbers = [1, 2, 3, 5, 7, 8, 9];
+        that((number_serial)($numbers, 1, '~'))->is(['1~3', 5, '7~9']);
+        that((number_serial)($numbers, 1, null))->is([[1, 3], [5, 5], [7, 9]]);
+        that((number_serial)($numbers, 1, function ($from, $to) { return "$from~$to"; }))->is(['1~3', '5~5', '7~9']);
+        that((number_serial)($numbers, -1, null))->is([[9, 7], [5, 5], [3, 1]]);
+
+        $numbers = [0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9];
+        that((number_serial)($numbers, 0.1, '~'))->is(['0.1~0.3', 0.5, '0.7~0.9']);
+        that((number_serial)($numbers, -0.1, '~'))->is(['0.9~0.7', 0.5, '0.3~0.1']);
+
+        that((number_serial)([]))->is([]);
+        that((number_serial)([0]))->is([[0, 0]]);
+        that((number_serial)([-1, 0, 1], 1, '~'))->is(['-1~1']);
+        that((number_serial)([-1, 0.0, 1], 1, '~'))->is(['-1~1']);
+        that((number_serial)([-0.1, 0.0, 0, 0.1], 0.1, '~'))->is(['-0.1~0', '0~0.1']);
+        that((number_serial)([-0.2, 0.0, 0.2], 0.1, '~'))->isSame([-0.2, 0.0, 0.2]);
+
+        // null は要するに range で復元できる形式となる
+        $array = [-9, -5, -4, -3, -1, 1, 3, 4, 5, 9];
+        that((array_flatten)((array_maps)((number_serial)($array), '...range')))->is($array);
+    }
+
     function test_cachedir()
     {
         $tmpdir = sys_get_temp_dir() . '/test';
