@@ -454,6 +454,7 @@ class VarsTest extends AbstractTestCase
         that((varcmp)(1.1, 1))->greaterThan(0);
         that((varcmp)(1, 1.1))->lessThan(0);
         that((varcmp)(1.1, 1.1))->is(0);
+        that((varcmp)(0.1 + 0.2, 0.3, SORT_NUMERIC, 11))->isSame(0);
 
         // regular string
         that((varcmp)('1.1', '1'))->greaterThan(0);
@@ -465,6 +466,12 @@ class VarsTest extends AbstractTestCase
         that((varcmp)('0', '1', SORT_NUMERIC))->lessThan(0);
         that((varcmp)('0', '0', SORT_NUMERIC))->is(0);
         that((varcmp)('1', '1', SORT_NUMERIC))->is(0);
+
+        // string int(reverse)
+        that((varcmp)('1', '0', -SORT_NUMERIC))->lessThan(0);
+        that((varcmp)('0', '1', -SORT_NUMERIC))->greaterThan(0);
+        that((varcmp)('0', '0', -SORT_NUMERIC))->is(0);
+        that((varcmp)('1', '1', -SORT_NUMERIC))->is(0);
 
         // string float
         that((varcmp)('1.1', '1', SORT_NUMERIC))->greaterThan(0);
@@ -496,7 +503,7 @@ class VarsTest extends AbstractTestCase
         that((varcmp)('a1', 'A2', SORT_FLAG_CASE))->lessThan(0);
         that((varcmp)('ABC', 'abc', SORT_FLAG_CASE))->is(0);
 
-        // string(transitive )
+        // string(transitive)
         $a = '1f1';
         $b = '1E1';
         $c = '9';

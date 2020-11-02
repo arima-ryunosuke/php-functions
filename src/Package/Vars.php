@@ -719,10 +719,18 @@ class Vars
      * @param mixed $a 比較する値1
      * @param mixed $b 比較する値2
      * @param int $mode 比較モード（SORT_XXX）。省略すると型でよしなに選択
+     * @param int $precision 小数比較の際の誤差桁
      * @return int 等しいなら 0、 $a のほうが大きいなら > 0、 $bのほうが大きいなら < 0
      */
-    public static function varcmp($a, $b, $mode = null)
+    public static function varcmp($a, $b, $mode = null, $precision = null)
     {
+        // 負数は逆順とみなす
+        $reverse = 1;
+        if ($mode < 0) {
+            $reverse = -1;
+            $mode = -$mode;
+        }
+
         // null が来たらよしなにする（なるべく型に寄せるが SORT_REGULAR はキモいので避ける）
         if ($mode === null || $mode === SORT_FLAG_CASE) {
             if ((is_int($a) || is_float($a)) && (is_int($b) || is_float($b))) {
@@ -737,26 +745,30 @@ class Vars
         $mode = $mode & ~SORT_FLAG_CASE;
 
         if ($mode === SORT_NUMERIC) {
-            return $a - $b;
+            $delta = $a - $b;
+            if ($precision > 0 && abs($delta) < pow(10, -$precision)) {
+                return 0;
+            }
+            return $reverse * (0 < $delta ? 1 : ($delta < 0 ? -1 : 0));
         }
         if ($mode === SORT_STRING) {
             if ($flag_case) {
-                return strcasecmp($a, $b);
+                return $reverse * strcasecmp($a, $b);
             }
-            return strcmp($a, $b);
+            return $reverse * strcmp($a, $b);
         }
         if ($mode === SORT_NATURAL) {
             if ($flag_case) {
-                return strnatcasecmp($a, $b);
+                return $reverse * strnatcasecmp($a, $b);
             }
-            return strnatcmp($a, $b);
+            return $reverse * strnatcmp($a, $b);
         }
         if ($mode === SORT_STRICT) {
-            return $a === $b ? 0 : ($a > $b ? 1 : -1);
+            return $reverse * ($a === $b ? 0 : ($a > $b ? 1 : -1));
         }
 
         // for SORT_REGULAR
-        return $a == $b ? 0 : ($a > $b ? 1 : -1);
+        return $reverse * ($a == $b ? 0 : ($a > $b ? 1 : -1));
     }
 
     /**

@@ -201,6 +201,11 @@ class ArraysTest extends AbstractTestCase
         // キーでソートできる
         that(array_keys((kvsort)($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })))->isSame(array_reverse(array_keys($array)));
 
+        // 負数定数でリバースソートになる
+        that((kvsort)([1, 2, 3, 4, 5], -SORT_NUMERIC))->isSame(array_reverse([1, 2, 3, 4, 5], true));
+        that((kvsort)([0.1, 0.2, 0.3], -SORT_NUMERIC))->isSame(array_reverse([0.1, 0.2, 0.3], true));
+        that((kvsort)(['a', 'b', 'c'], -SORT_STRING))->isSame(array_reverse(['a', 'b', 'c'], true));
+
         // 配列じゃなくても Traversable ならソート可能
         that((kvsort)((function () {
             yield 2;
