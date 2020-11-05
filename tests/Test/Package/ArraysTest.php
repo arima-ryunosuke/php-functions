@@ -2659,4 +2659,179 @@ class ArraysTest extends AbstractTestCase
             ],
         ]);
     }
+
+    function test_array_schema_ok()
+    {
+        that((array_schema)(['type' => 'number', 'filter' => FILTER_VALIDATE_INT], 123))->isSame(123);
+        that((array_schema)(['type' => 'number', 'default' => 123]))->isSame(123);
+
+        that((array_schema)(['type' => \ArrayAccess::class], new \ArrayObject()))->isInstanceOf(\ArrayObject::class);
+        that((array_schema)(['type' => 'int|string'], 123))->isSame(123);
+        that((array_schema)(['type' => ['int', 'string']], '123'))->isSame('123');
+
+        that((array_schema)(['type' => 'number'], 123.45))->isSame(123.45);
+        that((array_schema)(['type' => 'int', 'closure' => function ($v) { return $v * 10; }], 123))->isSame(1230);
+        that((array_schema)(['type' => 'list', 'unique' => null], [1, 1, 2, 2, 3, 3]))->isSame([1, 2, 3]);
+        that((array_schema)(['type' => 'int', 'min' => 1], 1))->isSame(1);
+        that((array_schema)(['type' => 'int', 'max' => 9], 5))->isSame(5);
+        that((array_schema)(['type' => 'string', 'min' => 1], 'X'))->isSame('X');
+        that((array_schema)(['type' => 'string', 'max' => 9], 'X'))->isSame('X');
+        that((array_schema)(['type' => 'list', 'min' => 1], ['X']))->isSame(['X']);
+        that((array_schema)(['type' => 'list', 'max' => 9], ['X']))->isSame(['X']);
+        that((array_schema)(['type' => 'float', 'precision' => 3], 1.234))->isSame(1.234);
+        that((array_schema)(['type' => 'int', 'enum' => [1, 2, 3]], 2))->isSame(2);
+        that((array_schema)(['type' => 'string', 'match' => '#[1-9]#'], '123'))->isSame('123');
+        that((array_schema)(['type' => 'string', 'unmatch' => '#[1-9]#'], 'abc'))->isSame('abc');
+        that((array_schema)(['type' => 'string', 'include' => 'b'], 'abc'))->isSame('abc');
+        that((array_schema)(['type' => 'string', 'exclude' => 'X'], 'abc'))->isSame('abc');
+        that((array_schema)(['type' => 'list', 'include' => 'b'], ['a', 'b']))->isSame(['a', 'b']);
+        that((array_schema)(['type' => 'list', 'exclude' => 'X'], ['a', 'b']))->isSame(['a', 'b']);
+    }
+
+    function test_array_schema_ng()
+    {
+        that([array_schema, ['type' => 'number', 'filter' => FILTER_VALIDATE_INT], 'hoge'])->throws('hoge must be filter_var int([])');
+        that([array_schema, ['type' => 'int|string'], true])->throws('true must be int or string');
+        that([array_schema, ['type' => ['int', 'string']], true])->throws('true must be int or string');
+
+        that([array_schema, ['type' => 'string'], 123])->throws("123 must be string");
+        that([array_schema, ['type' => 'number'], "123"])->throws("123 must be number");
+        that([array_schema, ['type' => 'numeric'], "12..45"])->throws("12..45 must be numeric");
+        that([array_schema, ['type' => 'list'], "hoge"])->throws("hoge must be list");
+        that([array_schema, ['type' => \ArrayObject::class], "hoge"])->throws("hoge must be ArrayObject");
+
+        that([array_schema, ['type' => 'int', 'min' => 1], 0])->throws("0 must be >= 1");
+        that([array_schema, ['type' => 'int', 'max' => 1], 3])->throws("3 must be <= 1");
+        that([array_schema, ['type' => 'string', 'min' => 1], ''])->throws("must be strlen >= 1");
+        that([array_schema, ['type' => 'string', 'max' => 1], 'abc'])->throws("abc must be strlen <= 1");
+        that([array_schema, ['type' => 'list', 'min' => 1], []])->throws("[] must be count >= 1");
+        that([array_schema, ['type' => 'list', 'max' => 1], [1, 2, 3]])->throws("[1, 2, 3] must be count <= 1");
+
+        that([array_schema, ['type' => 'float', 'precision' => 3], 1.2345])->throws("1.2345 must be precision 3");
+
+        that([array_schema, ['type' => 'int', 'enum' => [1, 2, 3]], 4])->throws("4 must be any of [1,2,3]");
+
+        that([array_schema, ['type' => 'string', 'match' => '#[1-9]#'], 'abc'])->throws("must be match #[1-9]#");
+        that([array_schema, ['type' => 'string', 'unmatch' => '#[1-9]#'], '123'])->throws("must be unmatch #[1-9]#");
+
+        that([array_schema, ['type' => 'string', 'include' => 'X'], 'abc'])->throws("abc must be include X");
+        that([array_schema, ['type' => 'list', 'include' => 'X'], [1, 2, 3]])->throws("[1, 2, 3] must be include X");
+
+        that([array_schema, ['type' => 'string', 'exclude' => 'X'], 'X'])->throws("X must be exclude X");
+        that([array_schema, ['type' => 'list', 'exclude' => 'X'], [1, 'X', 3]])->throws("[1, \"X\", 3] must be exclude X");
+
+        that([array_schema, ['type' => 'hash', '#key' => []], ['key' => 'val']])->throws('not have type key');
+        that([array_schema, ['type' => 'number']])->throws('has no value');
+    }
+
+    function test_array_schema_misc()
+    {
+        that((array_schema)([
+            'type'     => 'hash',
+            '#string'  => 'type:string',
+            '#hash'    => [
+                'type'    => 'hash',
+                '#bucket' => 'type:string',
+                '#expire' => 'type:int',
+            ],
+            '#list'    => 'type:list',
+            '#objects' => [
+                'type'    => 'list@hash',
+                '@#name'  => 'type:string',
+                '@#age'   => 'type:int',
+                '@#items' => 'type:list@string',
+            ],
+        ], [
+            'string'  => 'abc',
+            'hash'    => [
+                'bucket' => 'awsbucket',
+                'expire' => 60 * 60 * 24,
+            ],
+            'list'    => [1],
+            'objects' => [
+                [
+                    'name'  => 'hoge',
+                    'age'   => 12,
+                    'items' => ['x'],
+                ],
+            ]
+        ], [
+            'string'  => 'def',
+            'hash'    => [
+                'bucket' => 'mybucket',
+            ],
+            'list'    => [2],
+            'objects' => [
+                [
+                    'name'  => 'fuga',
+                    'age'   => 18,
+                    'items' => ['y'],
+                ],
+            ]
+        ], [
+            'string'  => 'xyz',
+            'hash'    => [
+                'expire' => 60,
+            ],
+            'list'    => [3],
+            'objects' => [
+                [
+                    'name'  => 'piyo',
+                    'age'   => 24,
+                    'items' => ['z'],
+                ],
+            ]
+        ]))->isSame([
+            'string'  => 'xyz',
+            'hash'    => [
+                'bucket' => 'mybucket',
+                'expire' => 60,
+            ],
+            'list'    => [1, 2, 3],
+            'objects' => [
+                [
+                    'name'  => 'hoge',
+                    'age'   => 12,
+                    'items' => ['x'],
+                ],
+                [
+                    'name'  => 'fuga',
+                    'age'   => 18,
+                    'items' => ['y'],
+                ],
+                [
+                    'name'  => 'piyo',
+                    'age'   => 24,
+                    'items' => ['z'],
+                ],
+            ]
+        ]);
+
+        $schema = [
+            'type'   => 'list@hash',
+            'max'    => 1,
+            '@#name' => [
+                'type' => 'string',
+                'max'  => 2,
+            ],
+        ];
+        that((array_schema)($schema, [['name' => 'XY']]))->isSame([['name' => 'XY']]);
+        that([
+            array_schema,
+            $schema,
+            [
+                ['name' => 'X']
+            ],
+            [
+                ['name' => 'Y']
+            ],
+        ])->throws("must be count <= 1");
+        that([
+            array_schema,
+            $schema,
+            [
+                ['name' => 'XYZ']
+            ],
+        ])->throws("must be strlen <= 2");
+    }
 }
