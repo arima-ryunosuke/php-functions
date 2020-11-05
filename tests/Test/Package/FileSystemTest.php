@@ -545,7 +545,6 @@ class FileSystemTest extends AbstractTestCase
             (tmpname)(null, $wd),
             (tmpname)(null, $wd),
         ];
-        /** @noinspection PhpUndefinedMethodInspection */
         $files = ((reflect_callable)(tmpname))->getStaticVariables()['files'];
         that(array_keys($files))->is($list);
 

@@ -223,7 +223,6 @@ class ClassobjTest extends AbstractTestCase
                 return $this->code . ':' . $this->message;
             },
         ]);
-        /** @noinspection PhpUndefinedMethodInspection */
         that($e->codemessage())->is('123:message');
     }
 

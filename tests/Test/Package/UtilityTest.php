@@ -1186,7 +1186,6 @@ class UtilityTest extends AbstractTestCase
         that(file_get_contents(basename(__FILE__), true))->equalsFile(__FILE__);
         set_include_path($backup);
 
-        /** @noinspection PhpUndefinedMethodInspection */
         $profiler->__destruct();
         unset($profiler);
         unset($result);

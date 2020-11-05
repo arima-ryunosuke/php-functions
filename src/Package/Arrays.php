@@ -488,8 +488,8 @@ class Arrays
      * ]);
      * ```
      *
-     * @param iterable|string $array 対象配列
-     * @param callable|int $comparator 比較関数。SORT_XXX も使える
+     * @param iterable|array $array 対象配列
+     * @param callable|int|null $comparator 比較関数。SORT_XXX も使える
      * @return array ソートされた配列
      */
     public static function kvsort($array, $comparator = null)
@@ -688,7 +688,6 @@ class Arrays
         // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
         foreach ($arrays as $a) {
             if ((is_hasharray)($a)) {
-                /** @var \Generator[] $yielders */
                 $yielders = array_map(function ($array) { yield from $array; }, $arrays);
 
                 $result = [];
@@ -917,8 +916,8 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param string|callable $format 書式文字列あるいはクロージャ
-     * @param string $glue 結合文字列。未指定時は implode しない
+     * @param string|callable|null $format 書式文字列あるいはクロージャ
+     * @param ?string $glue 結合文字列。未指定時は implode しない
      * @return array|string sprintf された配列
      */
     public static function array_sprintf($array, $format = null, $glue = null)
@@ -1798,7 +1797,7 @@ class Arrays
      *
      * @param iterable $array 対象配列
      * @param string|array|null $column キー名
-     * @param callable $callback 評価クロージャ
+     * @param ?callable $callback 評価クロージャ
      * @return array $where が真を返した新しい配列
      */
     public static function array_where($array, $column = null, $callback = null)
@@ -2545,7 +2544,7 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
      */
@@ -2722,7 +2721,7 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が true なら true
      */
@@ -2756,7 +2755,7 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param callable $callback 評価クロージャ。 null なら値そのもので評価
+     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が false なら false
      */
@@ -2811,7 +2810,7 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param callable|int|string $comparator 比較関数
+     * @param callable|int|string|null $comparator 比較関数
      * @return array 重複が除去された配列
      */
     public static function array_distinct($array, $comparator = null)
@@ -3414,7 +3413,7 @@ class Arrays
      * ```
      *
      * @param array $array 対象配列
-     * @param string|array $column_keys 引っ張ってくるキー名
+     * @param string|array|null $column_keys 引っ張ってくるキー名
      * @param mixed $index_key 新しい配列のキーとなるキー名
      * @return array 新しい配列
      */
@@ -3453,7 +3452,7 @@ class Arrays
      * ```
      *
      * @param array $array 対象配列
-     * @param array $template 抽出要素とそのデフォルト値
+     * @param ?array $template 抽出要素とそのデフォルト値
      * @return array 新しい配列
      */
     public static function array_uncolumns($array, $template = null)

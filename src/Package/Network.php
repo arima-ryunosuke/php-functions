@@ -246,7 +246,6 @@ class Network
             CURLOPT_FAILONERROR    => false,
             CURLOPT_RETURNTRANSFER => true, // 戻り値として返す
             CURLOPT_HEADER         => true, // ヘッダを含める
-            CURLOPT_SAFE_UPLOAD    => true, // @付きフィールドをファイルと見なさない
         ];
 
         $responses = [];
@@ -379,7 +378,6 @@ class Network
             CURLOPT_POSTFIELDS     => null,  // リクエストボディ
             CURLOPT_NOBODY         => false, // HEAD 用
             CURLOPT_ENCODING       => "",    // Accept-Encoding 兼自動展開
-            CURLOPT_SAFE_UPLOAD    => true,  // @付きフィールドをファイルと見なさない
             CURLOPT_FOLLOWLOCATION => true,  // リダイレクトをたどる
             CURLOPT_MAXREDIRS      => 16,    // リダイレクトをたどる回数
             CURLOPT_RETURNTRANSFER => true,  // 戻り値として返す

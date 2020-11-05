@@ -708,6 +708,7 @@ that is <del>a</del><ins>the</ins> pen
             if ($key !== false) {
                 return implode("\n", array_slice(explode("\n", $expected), 2));
             }
+            /** @noinspection PhpExpressionAlwaysNullInspection */
             return $expected;
         };
 
@@ -744,6 +745,7 @@ that is <del>a</del><ins>the</ins> pen
         ];
 
         foreach ($dataset as [$x, $y]) {
+            /** @var string $y */
             $expected = $shell($x, $y, '--normal');
             $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'normal']);
             that($actual)->as("$x <=> $y:\nExpected: $expected\nActual: $actual")->is($expected);

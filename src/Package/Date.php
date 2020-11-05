@@ -147,7 +147,7 @@ class Date
      * ```
      *
      * @param string $format フォーマット
-     * @param string|int|float|\DateTime $datetimedata 日時データ。省略時は microtime
+     * @param string|int|float|\DateTime|null $datetimedata 日時データ。省略時は microtime
      * @return string 日時文字列
      */
     public static function date_convert($format, $datetimedata = null)
@@ -318,7 +318,7 @@ class Date
      * ```
      *
      * @param int|float $sec タイムスタンプ
-     * @param string|array $format 時刻フォーマット
+     * @param string|array|null $format 時刻フォーマット
      * @param string|int $limit_type どこまで換算するか（[c|y|m|d|h|i|s]）
      * @return string|\DateInterval 時間差文字列 or DateInterval オブジェクト
      */
@@ -368,7 +368,6 @@ class Date
 
         // クロージャはコールバックする
         if ($format instanceof \Closure) {
-            /** @noinspection PhpUndefinedFieldInspection */
             return $format($interval->v, $interval->s, $interval->i, $interval->h, $interval->d, $interval->m, $interval->y, $interval->c);
         }
 
@@ -457,7 +456,6 @@ class Date
             $format = implode('', $tmp2);
         }
 
-        /** @noinspection PhpUndefinedFieldInspection */
         {
             $format = preg_replace('#(^|[^%])%c#u', '${1}' . $interval->c, $format);
             $format = preg_replace('#(^|[^%])%v#u', '${1}' . $interval->v, $format);

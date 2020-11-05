@@ -28,7 +28,7 @@ class FileSystem
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
-     * @param \Closure|array $filter_condition フィルタ条件
+     * @param \Closure|array|null $filter_condition フィルタ条件
      * @return array|false ファイルの配列
      */
     public static function file_list($dirname, $filter_condition = null)
@@ -79,7 +79,7 @@ class FileSystem
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
-     * @param \Closure|array $filter_condition フィルタ条件
+     * @param \Closure|array|null $filter_condition フィルタ条件
      * @return array|false ツリー構造の配列
      */
     public static function file_tree($dirname, $filter_condition = null)
@@ -837,7 +837,7 @@ class FileSystem
      * - 失敗時に false を返すのではなく例外を投げる
      *
      * @param string $prefix ファイル名プレフィックス
-     * @param string $dir 生成ディレクトリ。省略時は sys_get_temp_dir()
+     * @param ?string $dir 生成ディレクトリ。省略時は sys_get_temp_dir()
      * @return string 一時ファイル名
      */
     public static function tmpname($prefix = 'rft', $dir = null)

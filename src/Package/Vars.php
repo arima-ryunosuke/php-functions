@@ -718,8 +718,8 @@ class Vars
      *
      * @param mixed $a 比較する値1
      * @param mixed $b 比較する値2
-     * @param int $mode 比較モード（SORT_XXX）。省略すると型でよしなに選択
-     * @param int $precision 小数比較の際の誤差桁
+     * @param ?int $mode 比較モード（SORT_XXX）。省略すると型でよしなに選択
+     * @param ?int $precision 小数比較の際の誤差桁
      * @return int 等しいなら 0、 $a のほうが大きいなら > 0、 $bのほうが大きいなら < 0
      */
     public static function varcmp($a, $b, $mode = null, $precision = null)
@@ -998,7 +998,6 @@ class Vars
                 $kvl = '';
                 $parents[] = $value;
                 foreach ($value as $k => $v) {
-                    /** @noinspection PhpUndefinedVariableInspection */
                     $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
                     $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
                 }

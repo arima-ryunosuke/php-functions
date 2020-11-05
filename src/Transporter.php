@@ -41,7 +41,7 @@ class Transporter
      *
      * test, composer 用で、明示的には呼ばれない
      *
-     * @param string $dir エクスポートするディレクトリ
+     * @param ?string $dir エクスポートするディレクトリ
      */
     public static function exportAll($dir = null)
     {
@@ -57,7 +57,7 @@ class Transporter
      *
      * @param string $namespace 吐き出す名前空間
      * @param bool $classmode メソッドモード（内部用）
-     * @param array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
     public static function exportNamespace($namespace, $classmode = false, $funcname = null)
@@ -154,7 +154,7 @@ CONTENTS;
      * 単一の静的クラスにエクスポートする
      *
      * @param string $classname 吐き出すクラス名（完全修飾名）
-     * @param array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
     public static function exportClass($classname, $funcname = null)
@@ -406,7 +406,6 @@ CONTENTS;
             }
             $kvl = '';
             foreach ($value as $k => $v) {
-                /** @noinspection PhpUndefinedVariableInspection */
                 $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
                 $kvl .= $spacer1 . $keystr . self::exportVar($v, $nest + 1) . ",\n";
             }

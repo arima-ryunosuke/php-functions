@@ -15,7 +15,7 @@ class Utility
      *
      * サンプルを書くと長くなるので例は{@source \ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files() テストファイル}を参照。
      *
-     * @param array $files $_FILES の同じ構造の配列。省略時は $_FILES
+     * @param ?array $files $_FILES の同じ構造の配列。省略時は $_FILES
      * @return array $_FILES を $_POST などと同じ構造にした配列
      */
     public static function get_uploaded_files($files = null)
@@ -151,7 +151,7 @@ class Utility
      *
      * @param string $key キャッシュのキー
      * @param callable $provider キャッシュがない場合にコールされる callable
-     * @param string $namespace 名前空間
+     * @param ?string $namespace 名前空間
      * @return mixed キャッシュ
      */
     public static function cache($key, $provider, $namespace = null)
@@ -569,6 +569,7 @@ class Utility
     {
         if ($annotation instanceof \Reflector) {
             $reflector = $annotation;
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $annotation = $reflector->getDocComment();
 
             // クラスメンバーリフレクションは getDeclaringClass しないと名前空間が取れない
@@ -802,8 +803,8 @@ class Utility
      * @param string|resource $stdin 標準入力（string を渡すと単純に読み取れられる。resource を渡すと fread される）
      * @param string|resource $stdout 標準出力（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
-     * @param string $cwd 作業ディレクトリ
-     * @param array $env 環境変数
+     * @param ?string $cwd 作業ディレクトリ
+     * @param ?array $env 環境変数
      * @return int リターンコード
      */
     public static function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
@@ -1083,7 +1084,7 @@ class Utility
      * 情報量が増える分、機密も含まれる可能性があるため、 mask オプションで塗りつぶすキーや引数名を指定できる（クロージャの引数までは手出ししないため留意）。
      * limit と format は比較的指定頻度が高いかつ互換性維持のため配列オプションではなく直に渡すことが可能になっている。
      *
-     * @param array $traces debug_backtrace 的な配列
+     * @param ?array $traces debug_backtrace 的な配列
      * @param int|string|array $option オプション
      * @return string|array トレース文字列（delimiter オプションに null を渡すと配列で返す）
      */

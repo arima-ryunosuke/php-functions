@@ -50,13 +50,13 @@ class Syntax
 
         try {
             if ($cachefile) {
-                return (static function () {
+                return ($dummy = static function () {
                     extract(func_get_arg(1));
                     return require func_get_arg(0);
                 })($cachefile, $contextvars);
             }
             else {
-                return (static function () {
+                return ($dummy = static function () {
                     extract(func_get_arg(1));
                     return eval(func_get_arg(0));
                 })($phpcode, $contextvars);
@@ -548,7 +548,7 @@ class Syntax
      * ```
      *
      * @param object|null $object オブジェクト
-     * @param string $expected 期待するクラス名。指定した場合は is_a される
+     * @param ?string $expected 期待するクラス名。指定した場合は is_a される
      * @return object $object がオブジェクトならそのまま返し、違うなら NullObject を返す
      */
     public static function optional($object, $expected = null)
@@ -763,7 +763,6 @@ class Syntax
                     || ($isiterable && defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
                     || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
-                    /** @noinspection PhpUndefinedVariableInspection */
                     return $fname;
                 }
             }
@@ -777,7 +776,7 @@ class Syntax
 
                 // 特別扱い1: map は非常によく呼ぶので引数を補正する
                 if ($name === 'map') {
-                    return $this->array_map1(...$arguments);
+                    return $this->_apply('array_map1', $arguments);
                 }
 
                 // 実際の呼び出し1: 存在する関数はそのまま移譲する
@@ -1148,7 +1147,7 @@ class Syntax
      * ```
      *
      * @param callable $try try ブロッククロージャ
-     * @param callable $catch catch ブロッククロージャ
+     * @param ?callable $catch catch ブロッククロージャ
      * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
@@ -1177,7 +1176,7 @@ class Syntax
      * ```
      *
      * @param callable $try try ブロッククロージャ
-     * @param callable $finally finally ブロッククロージャ
+     * @param ?callable $finally finally ブロッククロージャ
      * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
@@ -1206,8 +1205,8 @@ class Syntax
      * ```
      *
      * @param callable $try try ブロッククロージャ
-     * @param callable $catch catch ブロッククロージャ
-     * @param callable $finally finally ブロッククロージャ
+     * @param ?callable $catch catch ブロッククロージャ
+     * @param ?callable $finally finally ブロッククロージャ
      * @param array $variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */

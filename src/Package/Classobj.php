@@ -167,7 +167,7 @@ class Classobj
      * that(class_loader())->isInstanceOf(\Composer\Autoload\ClassLoader::class);
      * ```
      *
-     * @param string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
+     * @param ?string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
      * @return \Composer\Autoload\ClassLoader クラスローダ
      */
     public static function class_loader($startdir = null)
@@ -635,7 +635,7 @@ class Classobj
      * ```
      *
      * @param string|object $classname 調べるクラス
-     * @param string $constname 調べるクラス定数
+     * @param ?string $constname 調べるクラス定数
      * @return bool 定数が存在するなら true
      */
     public static function const_exists($classname, $constname = null)
@@ -725,7 +725,7 @@ class Classobj
      * ```
      *
      * @param string|object $class クラス名 or オブジェクト
-     * @param int $filter アクセスレベル定数
+     * @param ?int $filter アクセスレベル定数
      * @return array クラス定数の配列
      */
     public static function get_class_constants($class, $filter = null)

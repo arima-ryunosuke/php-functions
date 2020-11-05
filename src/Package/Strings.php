@@ -163,7 +163,7 @@ class Strings
      *
      * @param string|array $delimiter 分割文字列
      * @param string $string 対象文字列
-     * @param int $limit 分割数。負数未対応
+     * @param ?int $limit 分割数。負数未対応
      * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
      * @param string $escape エスケープ文字
      * @return array 分割された配列
@@ -528,8 +528,8 @@ class Strings
      * ```
      *
      * @param string $string 対象文字列
-     * @param string $prefix 削ぎ落とす先頭文字列
-     * @param string $suffix 削ぎ落とす末尾文字列
+     * @param ?string $prefix 削ぎ落とす先頭文字列
+     * @param ?string $suffix 削ぎ落とす末尾文字列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
@@ -577,7 +577,7 @@ class Strings
      * ```
      *
      * @param string $string 対象文字列
-     * @param string $suffix 削ぎ落とす末尾文字列
+     * @param ?string $suffix 削ぎ落とす末尾文字列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
@@ -1309,7 +1309,7 @@ class Strings
                             $result2 = [];
                             foreach ($diffs2 as $diff2) {
                                 foreach ($rule[$diff2[0]] as $n => $tag) {
-                                    $content = $taging($tag, implode("", $htmlescape($diff2[$n])));
+                                    $content = $taging($tag, implode("", (array) $htmlescape($diff2[$n])));
                                     if (strlen($content)) {
                                         $result2[] = $content;
                                     }
@@ -1319,7 +1319,7 @@ class Strings
                         }
                     }
                     foreach ($rule[$diff[0]] as $n => $tag) {
-                        $content = $taging($tag, implode("\n", $htmlescape($diff[$n])));
+                        $content = $taging($tag, implode("\n", (array) $htmlescape($diff[$n])));
                         if ($diff[0] === '=' && !strlen($content)) {
                             $result[] = "";
                         }
@@ -3370,7 +3370,7 @@ class Strings
      *
      * @param string $string 調べる文字列
      * @param array $candidates 候補文字列配列
-     * @param float $percent マッチ度（％）を受ける変数
+     * @param ?float $percent マッチ度（％）を受ける変数
      * @return string|array 候補の中で最も近い文字列
      */
     public static function str_guess($string, $candidates, &$percent = null)
@@ -3519,7 +3519,7 @@ class Strings
      * @param string $string 対象文字列
      * @param string $replacement 置換文字列
      * @param int $start 開始位置
-     * @param int $length 置換長
+     * @param ?int $length 置換長
      * @return string 置換した文字列
      */
     public static function mb_substr_replace($string, $replacement, $start, $length = null)
@@ -3607,7 +3607,7 @@ class Strings
         }
 
         try {
-            return (function () {
+            return ($dummy = function () {
                 // extract は数値キーを展開してくれないので自前ループで展開
                 foreach (func_get_arg(1) as $k => $v) {
                     $$k = $v;
@@ -3664,7 +3664,7 @@ class Strings
      */
     public static function ob_include($include_file, $array = [])
     {
-        return (static function () {
+        return ($dummy = static function () {
             ob_start();
             extract(func_get_arg(1));
             include func_get_arg(0);
