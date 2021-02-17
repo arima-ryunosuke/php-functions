@@ -1333,6 +1333,26 @@
  * @method   \ChainObject  rmapE6($array, $callback, ...$variadic)
  * @method   \ChainObject  rmapE7($array, $callback, ...$variadic)
  *
+ * @see array_schema
+ * @property \ChainObject $array_schema
+ * @method   \ChainObject  array_schema(...$arrays)
+ * @method   \ChainObject  array_schema1($schema, ...$arrays)
+ * @method   \ChainObject  array_schema2($schema, ...$arrays)
+ * @method   \ChainObject  array_schema3($schema, ...$arrays)
+ * @method   \ChainObject  array_schema4($schema, ...$arrays)
+ * @method   \ChainObject  array_schema5($schema, ...$arrays)
+ * @method   \ChainObject  array_schema6($schema, ...$arrays)
+ *
+ * @see array_schema
+ * @property \ChainObject $schema
+ * @method   \ChainObject  schema(...$arrays)
+ * @method   \ChainObject  schema1($schema, ...$arrays)
+ * @method   \ChainObject  schema2($schema, ...$arrays)
+ * @method   \ChainObject  schema3($schema, ...$arrays)
+ * @method   \ChainObject  schema4($schema, ...$arrays)
+ * @method   \ChainObject  schema5($schema, ...$arrays)
+ * @method   \ChainObject  schema6($schema, ...$arrays)
+ *
  * @see array_search
  * @method   \ChainObject  array_search($haystack, $strict = null)
  * @method   \ChainObject  array_search1($needle, $strict = null)
@@ -3963,6 +3983,13 @@
  * @method   \ChainObject  number_format2($number, $num_decimal_places = null, $thousands_separator = null)
  * @method   \ChainObject  number_format3($number, $num_decimal_places = null, $dec_separator = null)
  *
+ * @see number_serial
+ * @property \ChainObject $number_serial
+ * @method   \ChainObject  number_serial($step = 1, $separator = null, $doSort = true)
+ * @method   \ChainObject  number_serial1($numbers, $separator = null, $doSort = true)
+ * @method   \ChainObject  number_serial2($numbers, $step = 1, $doSort = true)
+ * @method   \ChainObject  number_serial3($numbers, $step = 1, $separator = null)
+ *
  * @see numberify
  * @property \ChainObject $numberify
  * @method   \ChainObject  numberify($decimal = false)
@@ -5555,9 +5582,10 @@
  * @method   \ChainObject  var_type1($var)
  *
  * @see varcmp
- * @method   \ChainObject  varcmp($b, $mode = null)
- * @method   \ChainObject  varcmp1($a, $mode = null)
- * @method   \ChainObject  varcmp2($a, $b)
+ * @method   \ChainObject  varcmp($b, $mode = null, $precision = null)
+ * @method   \ChainObject  varcmp1($a, $mode = null, $precision = null)
+ * @method   \ChainObject  varcmp2($a, $b, $precision = null)
+ * @method   \ChainObject  varcmp3($a, $b, $mode = null)
  *
  * @see version_compare
  * @method   \ChainObject  version_compare($ver2, $oper = null)

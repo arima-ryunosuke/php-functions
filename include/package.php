@@ -7,22 +7,22 @@ namespace ryunosuke\Functions\Package;
 # constants
 if (!defined("ryunosuke\\Functions\\Package\\IS_OWNSELF")) {
     /** 自分自身を表す定数 */
-    define("ryunosuke\\Functions\\Package\\IS_OWNSELF", 128);
+    define("ryunosuke\\Functions\\Package\\IS_OWNSELF", 2);
 }
 
 if (!defined("ryunosuke\\Functions\\Package\\IS_PUBLIC")) {
-    /** public を表す定数 @see \ReflectionProperty::IS_PUBLIC */
-    define("ryunosuke\\Functions\\Package\\IS_PUBLIC", 256);
+    /** public を表す定数 */
+    define("ryunosuke\\Functions\\Package\\IS_PUBLIC", 4);
 }
 
 if (!defined("ryunosuke\\Functions\\Package\\IS_PROTECTED")) {
-    /** protected を表す定数 @see \ReflectionProperty::IS_PROTECTED */
-    define("ryunosuke\\Functions\\Package\\IS_PROTECTED", 512);
+    /** protected を表す定数 */
+    define("ryunosuke\\Functions\\Package\\IS_PROTECTED", 8);
 }
 
 if (!defined("ryunosuke\\Functions\\Package\\IS_PRIVATE")) {
-    /** private を表す定数 @see \ReflectionProperty::IS_PRIVATE */
-    define("ryunosuke\\Functions\\Package\\IS_PRIVATE", 1024);
+    /** private を表す定数 */
+    define("ryunosuke\\Functions\\Package\\IS_PRIVATE", 16);
 }
 
 if (!defined("ryunosuke\\Functions\\Package\\JP_ERA")) {
@@ -793,6 +793,7 @@ define("ryunosuke\\Functions\\Package\\array_convert", ["ryunosuke\\Functions\\P
 define("ryunosuke\\Functions\\Package\\array_flatten", ["ryunosuke\\Functions\\Package\\Arrays", "array_flatten"]);
 define("ryunosuke\\Functions\\Package\\array_nest", ["ryunosuke\\Functions\\Package\\Arrays", "array_nest"]);
 define("ryunosuke\\Functions\\Package\\array_difference", ["ryunosuke\\Functions\\Package\\Arrays", "array_difference"]);
+define("ryunosuke\\Functions\\Package\\array_schema", ["ryunosuke\\Functions\\Package\\Arrays", "array_schema"]);
 define("ryunosuke\\Functions\\Package\\stdclass", ["ryunosuke\\Functions\\Package\\Classobj", "stdclass"]);
 define("ryunosuke\\Functions\\Package\\detect_namespace", ["ryunosuke\\Functions\\Package\\Classobj", "detect_namespace"]);
 define("ryunosuke\\Functions\\Package\\class_uses_all", ["ryunosuke\\Functions\\Package\\Classobj", "class_uses_all"]);
@@ -958,6 +959,7 @@ define("ryunosuke\\Functions\\Package\\try_catch", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\try_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_finally"]);
 define("ryunosuke\\Functions\\Package\\try_catch_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_finally"]);
 define("ryunosuke\\Functions\\Package\\get_uploaded_files", ["ryunosuke\\Functions\\Package\\Utility", "get_uploaded_files"]);
+define("ryunosuke\\Functions\\Package\\number_serial", ["ryunosuke\\Functions\\Package\\Utility", "number_serial"]);
 define("ryunosuke\\Functions\\Package\\cachedir", ["ryunosuke\\Functions\\Package\\Utility", "cachedir"]);
 define("ryunosuke\\Functions\\Package\\cache", ["ryunosuke\\Functions\\Package\\Utility", "cache"]);
 define("ryunosuke\\Functions\\Package\\parse_namespace", ["ryunosuke\\Functions\\Package\\Utility", "parse_namespace"]);

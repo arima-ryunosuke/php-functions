@@ -872,7 +872,8 @@ that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isS
 	<div class="description"><p>複数コールバックを指定できる array_map</p>
 <p>指定したコールバックで複数回回してマップする。<br />
 <code>array_maps($array, $f, $g)</code> は <code>array_map($g, array_map($f, $array))</code> とほぼ等しい。<br />
-ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。</p>
+ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。<br />
+さらに文字列関数で "..." から始まっているなら可変引数としてコールする。</p>
 <p>少し変わった仕様として、コールバックに [$method =&gt; $args] を付けるとそれはメソッド呼び出しになる。<br />
 つまり各要素 $v に対して <code>$v-&gt;$method(...$args)</code> がマップ結果になる。<br />
 さらに引数が不要なら <code>@method</code> とするだけで良い。</p>
@@ -881,6 +882,8 @@ that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isS
 that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))-&gt;isSame(['1', '8', '1B', '40', '7D']);
 // キーも渡ってくる
 that(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}))-&gt;isSame(['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
+// ... で可変引数コール
+that(array_maps([[1, 3], [1, 5, 2]], '...range'))-&gt;isSame([[1, 2, 3], [1, 3, 5]]);
 // メソッドコールもできる（引数不要なら `@method` でも同じ）
 that(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' =&gt; []]))-&gt;isSame(['a', 'b']);
 that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;isSame(['a', 'b']);
@@ -1745,6 +1748,71 @@ that(array_difference([
 ]);
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_schema()">
+                                    ryunosuke\Functions\Package\Arrays::array_schema		</a>	<small>($schema, ...$arrays) : array</small>
+		</h4>
+	<div class="description"><p>配列のスキーマを定義して配列を正規化する</p>
+<ul>
+<li>type: 値の型を指定する<ul>
+<li>is_XXX の XXX 部分: 左記で検証</li>
+<li>number: is_int or is_float で検証</li>
+<li>class 名: instanceof で検証</li>
+<li>list: 値がマージされて通常配列になる<ul>
+<li>list@string のようにすると配列の中身の型を指定できる</li>
+</ul>
+</li>
+<li>hash: 連想配列になる</li>
+<li>string|int: string or int</li>
+<li></li>
+</ul>
+</li>
+<li>closure: 指定クロージャで検証・フィルタ<ul>
+<li>all: 値を引数に取り、返り値が新しい値となる</li>
+</ul>
+</li>
+<li>unique: 重複を除去する<ul>
+<li>list: 重複除去（パラメータがソートアルゴリズムになる）</li>
+</ul>
+</li>
+<li>enum: 値が指定値のいずれかであるか検証する<ul>
+<li>all: in_array で検証する</li>
+</ul>
+</li>
+<li>min: 値が指定値以上であるか検証する<ul>
+<li>string: strlen で検証</li>
+<li>list: count で検証</li>
+<li>all: その値で検証</li>
+</ul>
+</li>
+<li>max: 値が指定値以下であるか検証する<ul>
+<li>min の逆</li>
+</ul>
+</li>
+<li>match: 値が正規表現にマッチするか検証する<ul>
+<li>all: preg_match で検証する</li>
+</ul>
+</li>
+<li>unmatch: 値が正規表現にマッチしないか検証する<ul>
+<li>match の逆</li>
+</ul>
+</li>
+<li>include: 値が指定値を含むか検証する<ul>
+<li>string: strpos で検証</li>
+<li>list: in_array で検証</li>
+</ul>
+</li>
+<li>exclude: 値が指定値を含まないか検証する<ul>
+<li>include の逆</li>
+</ul>
+</li>
+</ul>
+<p>検証・フィルタは原則として型を見ない（指定されていればすべて実行される）。<br />
+のでおかしな型におかしな検証・フィルタを与えると型エラーが出ることがある。</p>
+<p>検証は途中経過を問わない。<br />
+後ろの配列で上書きされた値や unique で減った配列などは以下に違反していても valid と判断される。</p>
+<p>素直に json schema を使えという内なる声が聞こえなくもない。</p>
+</div>
             	<h4 class="fqsen-title">class		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj">
                                     ryunosuke\Functions\Package::Classobj		</a>	</h4>
@@ -1758,17 +1826,17 @@ that(array_difference([
     	<h4 class="fqsen-title">classconstant		<small>integer</small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PUBLIC">
                                     ryunosuke\Functions\Package\Classobj::IS_PUBLIC		</a>	</h4>
-	<div class="description"><p>public を表す定数 @see \ReflectionProperty::IS_PUBLIC</p>
+	<div class="description"><p>public を表す定数</p>
 </div>
     	<h4 class="fqsen-title">classconstant		<small>integer</small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PROTECTED">
                                     ryunosuke\Functions\Package\Classobj::IS_PROTECTED		</a>	</h4>
-	<div class="description"><p>protected を表す定数 @see \ReflectionProperty::IS_PROTECTED</p>
+	<div class="description"><p>protected を表す定数</p>
 </div>
     	<h4 class="fqsen-title">classconstant		<small>integer</small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::IS_PRIVATE">
                                     ryunosuke\Functions\Package\Classobj::IS_PRIVATE		</a>	</h4>
-	<div class="description"><p>private を表す定数 @see \ReflectionProperty::IS_PRIVATE</p>
+	<div class="description"><p>private を表す定数</p>
 </div>
             	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::stdclass()">
@@ -5166,6 +5234,23 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 <p>サンプルを書くと長くなるので例は<tag_source data-fqsen='ryunosuke\Test\Package\UtilityTest::test_get_uploaded_files()' data-description='テストファイル'>テストファイル</tag_source>を参照。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::number_serial()">
+                                    ryunosuke\Functions\Package\Utility::number_serial		</a>	<small>($numbers, $step = 1, $separator = null, $doSort = true) : array</small>
+		</h4>
+	<div class="description"><p>連続した数値の配列を縮めて返す</p>
+<p>例えば <code>[1, 2, 4, 6, 7, 9]</code> が <code>['1~2', 4, '6~7', 9]</code> になる。<br />
+結合法則は指定可能（上記は "~" を指定したもの）。<br />
+null を与えると配列の配列で返すことも可能。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 単純に文字列指定
+that(number_serial([1, 2, 4, 6, 7, 9], 1, '~'))-&gt;is(['1~2', 4, '6~7', 9]);
+// null を与えると from, to の配列で返す
+that(number_serial([1, 2, 4, 6, 7, 9], 1, null))-&gt;is([[1, 2], [4, 4], [6, 7], [9, 9]]);
+// $step は負数・小数・逆順も対応している（正負でよしなにソートされる）
+that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9, 0.5, '0.2~0', '-0.2~-0.3', -9]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()">
                                     ryunosuke\Functions\Package\Utility::cachedir		</a>	<small>($dirname = null) : string</small>
 		</h4>
@@ -5894,7 +5979,7 @@ that(is_countable(new \stdClass()))-&gt;isFalse();
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()">
-                                    ryunosuke\Functions\Package\Vars::varcmp		</a>	<small>($a, $b, $mode = null) : int</small>
+                                    ryunosuke\Functions\Package\Vars::varcmp		</a>	<small>($a, $b, $mode = null, $precision = null) : int</small>
 		</h4>
 	<div class="description"><p>php7 の <code>&lt;=&gt;</code> の関数版</p>
 <p>引数で大文字小文字とか自然順とか型モードとかが指定できる。<br />

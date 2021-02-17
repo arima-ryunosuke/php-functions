@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L3847" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L4087" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
@@ -970,13 +970,13 @@ that(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}))-&gt
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">iterable<span class="type-separator"></span><wbr>string</td>
+				<td class="type">iterable<span class="type-separator"></span><wbr>array</td>
 				<td class="rest">$array</td>
 				<td class="desc"><p>対象配列</p>
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable<span class="type-separator"></span><wbr>int</td>
+				<td class="type">callable<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$comparator = null</td>
 				<td class="desc"><p>比較関数。SORT_XXX も使える</p>
 </td>
@@ -1187,7 +1187,7 @@ that(array_mix(['a' =&gt; 'A', 1, 3], ['b' =&gt; 'B', 2]))-&gt;isSame(['a' =&gt;
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L656-L729" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L656-L728" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_zip()" tabindex="-1" class="structure-title ">
                         array_zip                        	<small>(...$arrays) : array</small>
@@ -1251,7 +1251,7 @@ that(array_zip(
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L731-L774" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L730-L773" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_cross()" tabindex="-1" class="structure-title ">
                         array_cross                        	<small>(...$arrays) : array</small>
@@ -1312,7 +1312,7 @@ that(array_cross(
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L776-L815" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L775-L814" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_implode()" tabindex="-1" class="structure-title ">
                         array_implode                        	<small>($array, $glue) : array</small>
@@ -1374,7 +1374,7 @@ that(array_implode('X', 'a', 'b', 'c'))-&gt;isSame(['a', 'X', 'b', 'X', 'c']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L817-L889" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L816-L888" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_explode()" tabindex="-1" class="structure-title ">
                         array_explode                        	<small>($array, $condition, $limit = PHP_INT_MAX) : array</small>
@@ -1447,7 +1447,7 @@ that(array_explode(['a', null, 'b', null, 'c'], null, -2))-&gt;isSame([[0 =&gt; 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L892-L947" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L891-L946" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_sprintf()" tabindex="-1" class="structure-title ">
                         array_sprintf                        	<small>($array, $format = null, $glue = null) : array<span class="type-separator"></span><wbr>string</small>
@@ -1485,13 +1485,13 @@ that(array_sprintf([
 </td>
 			</tr>
         			<tr>
-				<td class="type">string<span class="type-separator"></span><wbr>callable</td>
+				<td class="type">string<span class="type-separator"></span><wbr>callable<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$format = null</td>
 				<td class="desc"><p>書式文字列あるいはクロージャ</p>
 </td>
 			</tr>
         			<tr>
-				<td class="type">string</td>
+				<td class="type"><a href="?string$typespace.html#?string" class="fqsen ">?string</a></td>
 				<td class="rest">$glue = null</td>
 				<td class="desc"><p>結合文字列。未指定時は implode しない</p>
 </td>
@@ -1526,7 +1526,7 @@ that(array_sprintf([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L949-L995" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L948-L994" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_strpad()" tabindex="-1" class="structure-title ">
                         array_strpad                        	<small>($array, $key_prefix, $val_prefix = &quot;&quot;) : array</small>
@@ -1595,7 +1595,7 @@ that(array_strpad($array, '', ['-suffix']))-&gt;isSame(['key1' =&gt; 'val1-suffi
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L997-L1037" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L996-L1036" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pos()" tabindex="-1" class="structure-title ">
                         array_pos                        	<small>($array, $position, $return_key = false) : mixed</small>
@@ -1661,7 +1661,7 @@ that(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true))-&gt;isSa
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1039-L1070" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1038-L1069" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pos_key()" tabindex="-1" class="structure-title ">
                         array_pos_key                        	<small>($array, $key, $default = null) : mixed</small>
@@ -1724,7 +1724,7 @@ that(array_pos_key(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 'x', -1))-&gt;
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1072-L1102" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1071-L1101" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_of()" tabindex="-1" class="structure-title ">
                         array_of                        	<small>($key, $default = null) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
@@ -1785,7 +1785,7 @@ that($fuga_of_array(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']))-&gt;isSame('FUG
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1104-L1181" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1103-L1180" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_get()" tabindex="-1" class="structure-title ">
                         array_get                        	<small>($array, $key, $default = null) : mixed</small>
@@ -1866,7 +1866,7 @@ that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1183-L1235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1182-L1234" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_set()" tabindex="-1" class="structure-title ">
                         array_set                        	<small>(&amp;$array, $value, $key = null, $require_return = true) : string<span class="type-separator"></span><wbr>int</small>
@@ -1946,7 +1946,7 @@ that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1237-L1311" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1236-L1310" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_put()" tabindex="-1" class="structure-title ">
                         array_put                        	<small>(&amp;$array, $value, $key = null, $condition = null) : string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>false</small>
@@ -2040,7 +2040,7 @@ that(array_put($array, 'Z', null, function ($v, $k, $array){return !in_array($v,
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1313-L1397" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1312-L1396" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_unset()" tabindex="-1" class="structure-title ">
                         array_unset                        	<small>(&amp;$array, $key, $default = null) : mixed</small>
@@ -2128,7 +2128,7 @@ that($array)-&gt;isSame(['piyo' =&gt; 'PIYO']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1399-L1438" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1398-L1437" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_dive()" tabindex="-1" class="structure-title ">
                         array_dive                        	<small>($array, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
@@ -2207,7 +2207,7 @@ that(array_dive($array, ['a', 'b', 'c']))-&gt;isSame('vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1440-L1493" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1439-L1492" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_keys_exist()" tabindex="-1" class="structure-title ">
                         array_keys_exist                        	<small>($keys, $array) : bool</small>
@@ -2272,7 +2272,7 @@ that(array_keys_exist(['a', 'x' =&gt; ['x1', 'x2']], ['a' =&gt; 'A', 'x' =&gt; [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1495-L1534" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1494-L1533" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_find()" tabindex="-1" class="structure-title ">
                         array_find                        	<small>($array, $callback, $is_key = true) : mixed</small>
@@ -2343,7 +2343,7 @@ that(array_find(['a', 'b', '9'], $ifnumeric2power, false))-&gt;isSame(81);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1536-L1589" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1535-L1588" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_rekey()" tabindex="-1" class="structure-title ">
                         array_rekey                        	<small>($array, $keymap) : array</small>
@@ -2409,7 +2409,7 @@ that(array_rekey($array, 'strtoupper'))-&gt;isSame(['A' =&gt; 'A', 'B' =&gt; 'B'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1591-L1615" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1590-L1614" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_grep_key()" tabindex="-1" class="structure-title ">
                         array_grep_key                        	<small>($array, $regex, $not = false) : array</small>
@@ -2472,7 +2472,7 @@ that(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', tru
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1617-L1681" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1616-L1680" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_recursive()" tabindex="-1" class="structure-title ">
                         array_map_recursive                        	<small>($array, $callback, $iterable = true) : array</small>
@@ -2567,7 +2567,7 @@ that(array_map_recursive([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1683-L1710" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1682-L1709" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_key()" tabindex="-1" class="structure-title ">
                         array_map_key                        	<small>($array, $callback) : array</small>
@@ -2625,7 +2625,7 @@ that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}))-&gt;isSame([])
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1712-L1739" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1711-L1738" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_filter_key()" tabindex="-1" class="structure-title ">
                         array_filter_key                        	<small>($array, $callback) : array</small>
@@ -2684,7 +2684,7 @@ that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; })
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1741-L1861" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1740-L1860" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_where()" tabindex="-1" class="structure-title ">
                         array_where                        	<small>($array, $column = null, $callback = null) : array</small>
@@ -2757,7 +2757,7 @@ that(array_where($array, [
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable</td>
+				<td class="type"><a href="?callable$typespace.html#?callable" class="fqsen ">?callable</a></td>
 				<td class="rest">$callback = null</td>
 				<td class="desc"><p>評価クロージャ</p>
 </td>
@@ -2792,7 +2792,7 @@ that(array_where($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1863-L1894" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1862-L1893" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_filter()" tabindex="-1" class="structure-title ">
                         array_map_filter                        	<small>($array, $callback, $strict = false) : array</small>
@@ -2858,7 +2858,7 @@ that(array_map_filter([' a ', ' b ', ''], 'trim', true))-&gt;isSame(['a', 'b', '
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1896-L1935" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1895-L1934" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_map_method()" tabindex="-1" class="structure-title ">
                         array_map_method                        	<small>($array, $method, $args = [], $ignore = false) : array</small>
@@ -2937,7 +2937,7 @@ that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isS
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1937-L1990" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1936-L2003" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_maps()" tabindex="-1" class="structure-title ">
                         array_maps                        	<small>($array, ...$callbacks) : array</small>
@@ -2946,7 +2946,8 @@ that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isS
 						<div class="description"><p>複数コールバックを指定できる array_map</p>
 <p>指定したコールバックで複数回回してマップする。<br />
 <code>array_maps($array, $f, $g)</code> は <code>array_map($g, array_map($f, $array))</code> とほぼ等しい。<br />
-ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。</p>
+ただし、引数は順番が違う（可変引数のため）し、コールバックが要求するならキーも渡ってくる。<br />
+さらに文字列関数で "..." から始まっているなら可変引数としてコールする。</p>
 <p>少し変わった仕様として、コールバックに [$method =&gt; $args] を付けるとそれはメソッド呼び出しになる。<br />
 つまり各要素 $v に対して <code>$v-&gt;$method(...$args)</code> がマップ結果になる。<br />
 さらに引数が不要なら <code>@method</code> とするだけで良い。</p>
@@ -2955,6 +2956,8 @@ that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isS
 that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))-&gt;isSame(['1', '8', '1B', '40', '7D']);
 // キーも渡ってくる
 that(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}))-&gt;isSame(['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
+// ... で可変引数コール
+that(array_maps([[1, 3], [1, 5, 2]], '...range'))-&gt;isSame([[1, 2, 3], [1, 3, 5]]);
 // メソッドコールもできる（引数不要なら `@method` でも同じ）
 that(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' =&gt; []]))-&gt;isSame(['a', 'b']);
 that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;isSame(['a', 'b']);
@@ -3005,7 +3008,7 @@ that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L1992-L2090" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2005-L2103" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_kvmap()" tabindex="-1" class="structure-title ">
                         array_kvmap                        	<small>($array, $callback) : array</small>
@@ -3126,7 +3129,7 @@ that(array_kvmap([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2092-L2131" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2105-L2144" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_kmap()" tabindex="-1" class="structure-title ">
                         array_kmap                        	<small>($array, $callback) : array</small>
@@ -3199,7 +3202,7 @@ that(array_kmap([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2133-L2203" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2146-L2216" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nmap()" tabindex="-1" class="structure-title ">
                         array_nmap                        	<small>($array, $callback, $n, ...$variadic) : array</small>
@@ -3274,7 +3277,7 @@ that(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'))-&gt;isSa
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2205-L2222" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2218-L2235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lmap()" tabindex="-1" class="structure-title ">
                         array_lmap                        	<small>($array, $callback, ...$variadic) : array</small>
@@ -3337,7 +3340,7 @@ that(array_lmap(['a', 'b'], $sprintf, '-suffix'))-&gt;isSame(['a-suffix', 'b-suf
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2224-L2241" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2237-L2254" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_rmap()" tabindex="-1" class="structure-title ">
                         array_rmap                        	<small>($array, $callback, ...$variadic) : array</small>
@@ -3400,7 +3403,7 @@ that(array_rmap(['a', 'b'], $sprintf, 'prefix-'))-&gt;isSame(['prefix-a', 'prefi
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2243-L2320" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2256-L2333" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_each()" tabindex="-1" class="structure-title ">
                         array_each                        	<small>($array, $callback, $default = null) : mixed</small>
@@ -3504,7 +3507,7 @@ that(array_each([1, 2, 3], function(&amp;$carry = [], $v) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2322-L2365" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2335-L2378" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_depth()" tabindex="-1" class="structure-title ">
                         array_depth                        	<small>($array, $max_depth = null) : int</small>
@@ -3566,7 +3569,7 @@ that(array_depth([['nest1' =&gt; ['nest2']]]))-&gt;isSame(3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2367-L2397" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2380-L2410" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_insert()" tabindex="-1" class="structure-title ">
                         array_insert                        	<small>($array, $value, $position = null) : array</small>
@@ -3634,7 +3637,7 @@ that(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1))-&gt;isSame([1, 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2399-L2445" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2412-L2458" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_assort()" tabindex="-1" class="structure-title ">
                         array_assort                        	<small>($array, $rules) : array</small>
@@ -3709,7 +3712,7 @@ that(array_assort(['1', '2', '3'], [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2447-L2501" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2460-L2514" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_count()" tabindex="-1" class="structure-title ">
                         array_count                        	<small>($array, $callback) : int<span class="type-separator"></span><wbr>array</small>
@@ -3781,7 +3784,7 @@ that(array_count($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2503-L2563" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2516-L2576" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_group()" tabindex="-1" class="structure-title ">
                         array_group                        	<small>($array, $callback = null, $preserve_keys = false) : array</small>
@@ -3823,7 +3826,7 @@ that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $r
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable</td>
+				<td class="type"><a href="?callable$typespace.html#?callable" class="fqsen ">?callable</a></td>
 				<td class="rest">$callback = null</td>
 				<td class="desc"><p>評価クロージャ。 null なら値そのもので評価</p>
 </td>
@@ -3864,7 +3867,7 @@ that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $r
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2565-L2696" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2578-L2709" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_aggregate()" tabindex="-1" class="structure-title ">
                         array_aggregate                        	<small>($array, $columns, $key = null) : array</small>
@@ -3980,7 +3983,7 @@ that(array_aggregate([$row1, $row2, $row3, $row4],
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2698-L2730" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2711-L2743" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_all()" tabindex="-1" class="structure-title ">
                         array_all                        	<small>($array, $callback = null, $default = true) : bool</small>
@@ -4004,7 +4007,7 @@ that(array_all([false, false]))-&gt;isFalse();
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable</td>
+				<td class="type"><a href="?callable$typespace.html#?callable" class="fqsen ">?callable</a></td>
 				<td class="rest">$callback = null</td>
 				<td class="desc"><p>評価クロージャ。 null なら値そのもので評価</p>
 </td>
@@ -4045,7 +4048,7 @@ that(array_all([false, false]))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2732-L2764" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2745-L2777" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_any()" tabindex="-1" class="structure-title ">
                         array_any                        	<small>($array, $callback = null, $default = false) : bool</small>
@@ -4069,7 +4072,7 @@ that(array_any([false, false]))-&gt;isFalse();
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable</td>
+				<td class="type"><a href="?callable$typespace.html#?callable" class="fqsen ">?callable</a></td>
 				<td class="rest">$callback = null</td>
 				<td class="desc"><p>評価クロージャ。 null なら値そのもので評価</p>
 </td>
@@ -4110,7 +4113,7 @@ that(array_any([false, false]))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2766-L2857" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2779-L2870" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_distinct()" tabindex="-1" class="structure-title ">
                         array_distinct                        	<small>($array, $comparator = null) : array</small>
@@ -4160,7 +4163,7 @@ that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]))-&gt;isSa
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>string</td>
+				<td class="type">callable<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$comparator = null</td>
 				<td class="desc"><p>比較関数</p>
 </td>
@@ -4195,7 +4198,7 @@ that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]))-&gt;isSa
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2859-L2994" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2872-L3007" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_order()" tabindex="-1" class="structure-title ">
                         array_order                        	<small>($array, $orders, $preserve_keys = false) : array</small>
@@ -4273,7 +4276,7 @@ that(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL])
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L2996-L3017" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3009-L3030" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shuffle()" tabindex="-1" class="structure-title ">
                         array_shuffle                        	<small>($array) : array</small>
@@ -4323,7 +4326,7 @@ that(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL])
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3019-L3047" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3032-L3060" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_shrink_key()" tabindex="-1" class="structure-title ">
                         array_shrink_key                        	<small>(...$variadic) : array</small>
@@ -4379,7 +4382,7 @@ that(array_shrink_key($array1, $array2, $array3))-&gt;isSame(['c' =&gt; 'C3']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3049-L3140" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3062-L3153" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_gap()" tabindex="-1" class="structure-title ">
                         array_fill_gap                        	<small>($array, ...$values) : array</small>
@@ -4482,7 +4485,7 @@ that(array_fill_gap($array, 'a', 'c', 'd', 'f'))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3142-L3173" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3155-L3186" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_fill_callback()" tabindex="-1" class="structure-title ">
                         array_fill_callback                        	<small>($keys, $callback) : array</small>
@@ -4552,7 +4555,7 @@ that(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }))-&
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3175-L3216" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3188-L3229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_pickup()" tabindex="-1" class="structure-title ">
                         array_pickup                        	<small>($array, $keys) : array</small>
@@ -4617,7 +4620,7 @@ that(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']))-&gt;isSame(['cX' =&
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3218-L3243" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3231-L3256" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_remove()" tabindex="-1" class="structure-title ">
                         array_remove                        	<small>($array, $keys) : array</small>
@@ -4678,7 +4681,7 @@ that(array_remove($array, ['a', 'c']))-&gt;isSame(['b' =&gt; 'B']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3245-L3280" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3258-L3293" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_lookup()" tabindex="-1" class="structure-title ">
                         array_lookup                        	<small>($array, $column_key = null, $index_key = null) : array</small>
@@ -4754,7 +4757,7 @@ that(array_lookup($array, 'name'))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3282-L3385" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3295-L3398" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_select()" tabindex="-1" class="structure-title ">
                         array_select                        	<small>($array, $columns, $index = null) : array</small>
@@ -4844,7 +4847,7 @@ that(array_select($array, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3387-L3422" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3400-L3435" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_columns()" tabindex="-1" class="structure-title ">
                         array_columns                        	<small>($array, $column_keys = null, $index_key = null) : array</small>
@@ -4871,7 +4874,7 @@ that(array_columns($rows, 'name', 'id'))-&gt;isSame(['name' =&gt; [1 =&gt; 'A', 
 </td>
 			</tr>
         			<tr>
-				<td class="type">string<span class="type-separator"></span><wbr>array</td>
+				<td class="type">string<span class="type-separator"></span><wbr>array<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$column_keys = null</td>
 				<td class="desc"><p>引っ張ってくるキー名</p>
 </td>
@@ -4912,7 +4915,7 @@ that(array_columns($rows, 'name', 'id'))-&gt;isSame(['name' =&gt; [1 =&gt; 'A', 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3424-L3466" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3437-L3479" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_uncolumns()" tabindex="-1" class="structure-title ">
                         array_uncolumns                        	<small>($array, $template = null) : array</small>
@@ -4941,7 +4944,7 @@ that(array_columns($rows, 'name', 'id'))-&gt;isSame(['name' =&gt; [1 =&gt; 'A', 
 </td>
 			</tr>
         			<tr>
-				<td class="type">array</td>
+				<td class="type"><a href="?array$typespace.html#?array" class="fqsen ">?array</a></td>
 				<td class="rest">$template = null</td>
 				<td class="desc"><p>抽出要素とそのデフォルト値</p>
 </td>
@@ -4976,7 +4979,7 @@ that(array_columns($rows, 'name', 'id'))-&gt;isSame(['name' =&gt; [1 =&gt; 'A', 
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3468-L3591" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3481-L3604" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_convert()" tabindex="-1" class="structure-title ">
                         array_convert                        	<small>($array, $callback, $apply_array = false) : array</small>
@@ -5078,7 +5081,7 @@ that(array_convert($array, $callback, true))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3593-L3665" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3606-L3678" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_flatten()" tabindex="-1" class="structure-title ">
                         array_flatten                        	<small>($array, $delimiter = null) : array</small>
@@ -5167,7 +5170,7 @@ that(array_flatten($array, '.'))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3667-L3741" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3680-L3754" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_nest()" tabindex="-1" class="structure-title ">
                         array_nest                        	<small>($array, $delimiter = &quot;.&quot;) : array</small>
@@ -5265,7 +5268,7 @@ catch (\Exception $e) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3743-L3846" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3756-L3859" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Arrays::array_difference()" tabindex="-1" class="structure-title ">
                         array_difference                        	<small>($array1, $array2, $delimiter = &quot;.&quot;) : array</small>
@@ -5336,6 +5339,118 @@ that(array_difference([
 		<tr>
 			<td class="type">array</td>
 			<td class="desc"><p>差分を表す配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L3862-L4086" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::array_schema()" tabindex="-1" class="structure-title ">
+                        array_schema                        	<small>($schema, ...$arrays) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>配列のスキーマを定義して配列を正規化する</p>
+<ul>
+<li>type: 値の型を指定する<ul>
+<li>is_XXX の XXX 部分: 左記で検証</li>
+<li>number: is_int or is_float で検証</li>
+<li>class 名: instanceof で検証</li>
+<li>list: 値がマージされて通常配列になる<ul>
+<li>list@string のようにすると配列の中身の型を指定できる</li>
+</ul>
+</li>
+<li>hash: 連想配列になる</li>
+<li>string|int: string or int</li>
+<li></li>
+</ul>
+</li>
+<li>closure: 指定クロージャで検証・フィルタ<ul>
+<li>all: 値を引数に取り、返り値が新しい値となる</li>
+</ul>
+</li>
+<li>unique: 重複を除去する<ul>
+<li>list: 重複除去（パラメータがソートアルゴリズムになる）</li>
+</ul>
+</li>
+<li>enum: 値が指定値のいずれかであるか検証する<ul>
+<li>all: in_array で検証する</li>
+</ul>
+</li>
+<li>min: 値が指定値以上であるか検証する<ul>
+<li>string: strlen で検証</li>
+<li>list: count で検証</li>
+<li>all: その値で検証</li>
+</ul>
+</li>
+<li>max: 値が指定値以下であるか検証する<ul>
+<li>min の逆</li>
+</ul>
+</li>
+<li>match: 値が正規表現にマッチするか検証する<ul>
+<li>all: preg_match で検証する</li>
+</ul>
+</li>
+<li>unmatch: 値が正規表現にマッチしないか検証する<ul>
+<li>match の逆</li>
+</ul>
+</li>
+<li>include: 値が指定値を含むか検証する<ul>
+<li>string: strpos で検証</li>
+<li>list: in_array で検証</li>
+</ul>
+</li>
+<li>exclude: 値が指定値を含まないか検証する<ul>
+<li>include の逆</li>
+</ul>
+</li>
+</ul>
+<p>検証・フィルタは原則として型を見ない（指定されていればすべて実行される）。<br />
+のでおかしな型におかしな検証・フィルタを与えると型エラーが出ることがある。</p>
+<p>検証は途中経過を問わない。<br />
+後ろの配列で上書きされた値や unique で減った配列などは以下に違反していても valid と判断される。</p>
+<p>素直に json schema を使えという内なる声が聞こえなくもない。</p>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$schema</td>
+				<td class="desc"><p>スキーマ配列</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">...$arrays</td>
+				<td class="desc"><p>検証する配列（可変引数。マージされる）</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>正規化された配列</p>
 </td>
 			<td class="rest"></td>
 		</tr>

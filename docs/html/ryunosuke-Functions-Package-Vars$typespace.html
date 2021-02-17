@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L1605" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L1616" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Vars</span></h2>
@@ -1117,10 +1117,10 @@ that(is_countable(new \stdClass()))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L692-L760" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L692-L772" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::varcmp()" tabindex="-1" class="structure-title ">
-                        varcmp                        	<small>($a, $b, $mode = null) : int</small>
+                        varcmp                        	<small>($a, $b, $mode = null, $precision = null) : int</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>php7 の <code>&lt;=&gt;</code> の関数版</p>
@@ -1162,9 +1162,15 @@ that(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0)-&gt;isTrue();
 </td>
 			</tr>
         			<tr>
-				<td class="type">int</td>
+				<td class="type"><a href="?int$typespace.html#?int" class="fqsen ">?int</a></td>
 				<td class="rest">$mode = null</td>
 				<td class="desc"><p>比較モード（SORT_XXX）。省略すると型でよしなに選択</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type"><a href="?int$typespace.html#?int" class="fqsen ">?int</a></td>
+				<td class="rest">$precision = null</td>
+				<td class="desc"><p>小数比較の際の誤差桁</p>
 </td>
 			</tr>
         		</tbody>
@@ -1197,7 +1203,7 @@ that(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0)-&gt;isTrue();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L762-L824" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L774-L836" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_type()" tabindex="-1" class="structure-title ">
                         var_type                        	<small>($var, $valid_name = false) : string</small>
@@ -1271,7 +1277,7 @@ that(var_type(new class implements \JsonSerializable{
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L826-L863" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L838-L875" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_apply()" tabindex="-1" class="structure-title ">
                         var_apply                        	<small>($var, $callback, ...$args) : mixed<span class="type-separator"></span><wbr>array</small>
@@ -1343,7 +1349,7 @@ that(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'ut
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L865-L901" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L877-L913" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_applys()" tabindex="-1" class="structure-title ">
                         var_applys                        	<small>($var, $callback, ...$args) : mixed<span class="type-separator"></span><wbr>array</small>
@@ -1418,7 +1424,7 @@ that(var_applys('a', $upper))-&gt;isSame('A');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L903-L1020" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L915-L1031" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_export2()" tabindex="-1" class="structure-title ">
                         var_export2                        	<small>($value, $return = false) : string<span class="type-separator"></span><wbr>null</small>
@@ -1515,7 +1521,7 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1022-L1092" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1033-L1103" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_html()" tabindex="-1" class="structure-title ">
                         var_html                        	<small>($value) : void</small>
@@ -1568,7 +1574,7 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1094-L1477" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1105-L1488" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_pretty()" tabindex="-1" class="structure-title ">
                         var_pretty                        	<small>($value, $context = null, $return = false) : string</small>
@@ -1667,7 +1673,7 @@ var_pretty([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1479-L1517" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1490-L1528" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::console_log()" tabindex="-1" class="structure-title ">
                         console_log                        	<small>(...$values) : void</small>
@@ -1726,7 +1732,7 @@ var_pretty([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1519-L1604" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1530-L1615" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::hashvar()" tabindex="-1" class="structure-title ">
                         hashvar                        	<small>(...$vars) : array</small>
