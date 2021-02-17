@@ -8,16 +8,16 @@ namespace ryunosuke\Functions\Package;
 class Classobj
 {
     /** 自分自身を表す定数 */
-    const IS_OWNSELF = 128;
+    const IS_OWNSELF = 1 << 1;
 
-    /** public を表す定数 @see \ReflectionProperty::IS_PUBLIC */
-    const IS_PUBLIC = \ReflectionProperty::IS_PUBLIC;
+    /** public を表す定数 */
+    const IS_PUBLIC = 1 << 2;
 
-    /** protected を表す定数 @see \ReflectionProperty::IS_PROTECTED */
-    const IS_PROTECTED = \ReflectionProperty::IS_PROTECTED;
+    /** protected を表す定数 */
+    const IS_PROTECTED = 1 << 3;
 
-    /** private を表す定数 @see \ReflectionProperty::IS_PRIVATE */
-    const IS_PRIVATE = \ReflectionProperty::IS_PRIVATE;
+    /** private を表す定数 */
+    const IS_PRIVATE = 1 << 4;
 
     /**
      * 初期フィールド値を与えて stdClass を生成する
@@ -735,11 +735,15 @@ class Classobj
 
         $result = [];
         foreach ((new \ReflectionClass($class))->getReflectionConstants() as $constant) {
-            if (($filter & IS_OWNSELF) === IS_OWNSELF && $constant->getDeclaringClass()->name !== $class) {
+            if (($filter & IS_OWNSELF) && $constant->getDeclaringClass()->name !== $class) {
                 continue;
             }
             $modifiers = $constant->getModifiers();
-            if (($modifiers & $filter) === $modifiers) {
+            $modifiers2 = 0;
+            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PUBLIC) ? IS_PUBLIC : 0;
+            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PROTECTED) ? IS_PROTECTED : 0;
+            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PRIVATE) ? IS_PRIVATE : 0;
+            if ($modifiers2 & $filter) {
                 $result[$constant->name] = $constant->getValue();
             }
         }
