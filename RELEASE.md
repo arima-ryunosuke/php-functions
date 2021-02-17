@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.13
+
+- [feature][Utility] number_serial を追加
+- [fixbug][Classobj] get_class_constants が php 7.4 で動かなかったので修正
+- [feature][Arrays] array_schema を追加
+- [feature][Arrays] array_maps の可変引数呼び出し対応
+- [fixbug][Vars] varcmp の不具合修正と新機能
+
 ## 1.4.12
 
 - [change][Vars] var_pretty の仕様変更
