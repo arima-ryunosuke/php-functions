@@ -1162,7 +1162,8 @@ class FileSystem
 
                         /** @noinspection PhpMissingBreakStatementInspection */
                         case STREAM_META_OWNER_NAME:
-                            $var = function_exists('posix_getpwnam') ? posix_getpwnam($var)['uid'] : 0;
+                            $nam = function_exists('posix_getpwnam') ? posix_getpwnam($var) : [];
+                            $var = $nam['uid'] ?? 0;
                         case STREAM_META_OWNER:
                             if (!isset(self::$entries[$id])) {
                                 return false;

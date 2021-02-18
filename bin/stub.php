@@ -83,8 +83,8 @@ foreach ($reffuncs as $funcname => $reffunc) {
     // 仮引数文字列を構築
     $hasCallback = array_find($reffunc->getParameters(), function (\ReflectionParameter $p) {
         if ($p->hasType()) {
-            $type = (string) $p->getType();
-            if (strpos($type, 'callable') !== false || strpos($type, 'Closure') !== false) {
+            $type = $p->getType();
+            if ($type instanceof \ReflectionNamedType && (strpos($type->getName(), 'callable') !== false || strpos($type->getName(), 'Closure') !== false)) {
                 return true;
             }
         }
