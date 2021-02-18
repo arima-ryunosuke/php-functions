@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L3693" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L5-L3676" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Strings</span></h2>
@@ -3668,10 +3668,10 @@ that(preg_capture($pattern, 'hoge', $default))-&gt;isSame([1 =&gt; '2000', 2 =&g
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3102-L3160" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3102-L3143" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_splice()" tabindex="-1" class="structure-title ">
-                        preg_splice                        	<small>($pattern, $replacement, $subject, &amp;$matches = [], $limit = PHP_INT_MAX) : string</small>
+                        preg_splice                        	<small>($pattern, $replacement, $subject, &amp;$matches = []) : string</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>キャプチャも行える preg_replace</p>
@@ -3683,10 +3683,6 @@ callable とはいっても単純文字列 callble （"strtoupper" など）は 
 <pre><code class="language-php">// 数字を除去しつつその除去された数字を得る
 that(preg_splice('#\\d+#', '', 'abc123', $m))-&gt;isSame('abc');
 that($m)-&gt;isSame(['123']);
-
-// limit も指定できる
-that(preg_splice('#\\d+#', '', '123abc456def789', $m, 2))-&gt;isSame('abcdef789');
-that($m)-&gt;isSame([0 =&gt; ['123', '456']]);
 
 // callable だと preg_replace_callback が呼ばれる
 that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))-&gt;isSame('ABC123');
@@ -3724,12 +3720,6 @@ that($m)-&gt;isSame(['abc']);
 				<td class="desc"><p>キャプチャ配列が格納される</p>
 </td>
 			</tr>
-        			<tr>
-				<td class="type">int</td>
-				<td class="rest">$limit = PHP_INT_MAX</td>
-				<td class="desc"><p>置換回数</p>
-</td>
-			</tr>
         		</tbody>
 	</table>
                             	<table class="table">
@@ -3760,7 +3750,7 @@ that($m)-&gt;isSame(['abc']);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3162-L3225" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3145-L3208" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::preg_replaces()" tabindex="-1" class="structure-title ">
                         preg_replaces                        	<small>($pattern, $replacements, $subject, $limit = -1, &amp;$count = null) : string</small>
@@ -3848,7 +3838,7 @@ that(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;target&gt;
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3227-L3302" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3210-L3285" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::damerau_levenshtein()" tabindex="-1" class="structure-title ">
                         damerau_levenshtein                        	<small>($s1, $s2, $cost_ins = 1, $cost_rep = 1, $cost_del = 1, $cost_swp = 1) : int</small>
@@ -3936,7 +3926,7 @@ that(damerau_levenshtein("あいうえお", "あいえうお"))-&gt;isSame(1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3304-L3334" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3287-L3317" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ngram()" tabindex="-1" class="structure-title ">
                         ngram                        	<small>($string, $N, $encoding = &quot;UTF-8&quot;) : array</small>
@@ -4002,7 +3992,7 @@ that(ngram("あいうえお", 3))-&gt;isSame(["あいう", "いうえ", "うえ�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3336-L3425" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3319-L3408" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_guess()" tabindex="-1" class="structure-title ">
                         str_guess                        	<small>($string, $candidates, &amp;$percent = null) : string<span class="type-separator"></span><wbr>array</small>
@@ -4089,7 +4079,7 @@ that(str_guess("destory", [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3427-L3506" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3410-L3489" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::str_array()" tabindex="-1" class="structure-title ">
                         str_array                        	<small>($string, $delimiter, $hashmode) : array</small>
@@ -4189,7 +4179,7 @@ that(str_array("
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3508-L3538" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3491-L3521" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::mb_substr_replace()" tabindex="-1" class="structure-title ">
                         mb_substr_replace                        	<small>($string, $replacement, $start, $length = null) : string</small>
@@ -4259,7 +4249,7 @@ that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3540-L3554" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3523-L3537" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::mb_trim()" tabindex="-1" class="structure-title ">
                         mb_trim                        	<small>($string) : string</small>
@@ -4309,7 +4299,7 @@ that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3556-L3626" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3539-L3609" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_string()" tabindex="-1" class="structure-title ">
                         render_string                        	<small>($template, $array) : string</small>
@@ -4385,7 +4375,7 @@ that(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]))-&gt;isSame('9'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3628-L3640" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3611-L3623" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::render_file()" tabindex="-1" class="structure-title ">
                         render_file                        	<small>($template_file, $array) : string</small>
@@ -4448,7 +4438,7 @@ that(render_string('{$_(max($nums))}', ['nums' =&gt; [1, 9, 3]]))-&gt;isSame('9'
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3642-L3673" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3625-L3656" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::ob_include()" tabindex="-1" class="structure-title ">
                         ob_include                        	<small>($include_file, $array = []) : string</small>
@@ -4515,7 +4505,7 @@ This is HOGE.
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3675-L3692" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Strings.php#L3658-L3675" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Strings::include_string()" tabindex="-1" class="structure-title ">
                         include_string                        	<small>($template, $array = []) : string</small>

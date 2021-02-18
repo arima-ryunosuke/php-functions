@@ -4517,7 +4517,7 @@ that(preg_capture($pattern, 'hoge', $default))-&gt;isSame([1 =&gt; '2000', 2 =&g
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::preg_splice()">
-                                    ryunosuke\Functions\Package\Strings::preg_splice		</a>	<small>($pattern, $replacement, $subject, &amp;$matches = [], $limit = PHP_INT_MAX) : string</small>
+                                    ryunosuke\Functions\Package\Strings::preg_splice		</a>	<small>($pattern, $replacement, $subject, &amp;$matches = []) : string</small>
 		</h4>
 	<div class="description"><p>キャプチャも行える preg_replace</p>
 <p>「置換を行いつつ、キャプチャ文字列が欲しい」状況はまれによくあるはず。</p>
@@ -4528,10 +4528,6 @@ callable とはいっても単純文字列 callble （"strtoupper" など）は 
 <pre><code class="language-php">// 数字を除去しつつその除去された数字を得る
 that(preg_splice('#\\d+#', '', 'abc123', $m))-&gt;isSame('abc');
 that($m)-&gt;isSame(['123']);
-
-// limit も指定できる
-that(preg_splice('#\\d+#', '', '123abc456def789', $m, 2))-&gt;isSame('abcdef789');
-that($m)-&gt;isSame([0 =&gt; ['123', '456']]);
 
 // callable だと preg_replace_callback が呼ばれる
 that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))-&gt;isSame('ABC123');

@@ -7735,7 +7735,8 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("memory_path
 
                         /** @noinspection PhpMissingBreakStatementInspection */
                         case STREAM_META_OWNER_NAME:
-                            $var = function_exists('posix_getpwnam') ? posix_getpwnam($var)['uid'] : 0;
+                            $nam = function_exists('posix_getpwnam') ? posix_getpwnam($var) : [];
+                            $var = $nam['uid'] ?? 0;
                         case STREAM_META_OWNER:
                             if (!isset(self::$entries[$id])) {
                                 return false;
@@ -14060,10 +14061,6 @@ if (!isset($excluded_functions["preg_splice"]) && (!function_exists("preg_splice
      * that(preg_splice('#\\d+#', '', 'abc123', $m))->isSame('abc');
      * that($m)->isSame(['123']);
      *
-     * // limit も指定できる
-     * that(preg_splice('#\\d+#', '', '123abc456def789', $m, 2))->isSame('abcdef789');
-     * that($m)->isSame([0 => ['123', '456']]);
-     *
      * // callable だと preg_replace_callback が呼ばれる
      * that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))->isSame('ABC123');
      * that($m)->isSame(['abc']);
@@ -14077,31 +14074,18 @@ if (!isset($excluded_functions["preg_splice"]) && (!function_exists("preg_splice
      * @param string|callable $replacement 置換文字列
      * @param string $subject 対象文字列
      * @param array $matches キャプチャ配列が格納される
-     * @param int $limit 置換回数
      * @return string 置換された文字列
      */
-    function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = \PHP_INT_MAX)
+    function preg_splice($pattern, $replacement, $subject, &$matches = [])
     {
-        if (preg_match_all($pattern, $subject, $matches)) {
+        if (preg_match($pattern, $subject, $matches)) {
             if (!is_string($replacement) && is_callable($replacement)) {
-                $subject = preg_replace_callback($pattern, $replacement, $subject, $limit);
+                $subject = preg_replace_callback($pattern, $replacement, $subject);
             }
             else {
-                $subject = preg_replace($pattern, $replacement, $subject, $limit);
+                $subject = preg_replace($pattern, $replacement, $subject);
             }
         }
-
-        $matches = array_map(function ($m) use ($limit) {
-            return array_slice($m, 0, $limit, true);
-        }, $matches);
-
-        // for compatible
-        if (func_num_args() < 5) {
-            $matches = array_map(function ($m) {
-                return $m[0] ?? '';
-            }, $matches);
-        }
-
         return $subject;
     }
 }

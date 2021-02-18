@@ -993,24 +993,20 @@
  * @method   \ChainObject  mapsE6($array, ...$callbacks)
  *
  * @see array_merge
- * @property \ChainObject $array_merge
  * @method   \ChainObject  array_merge(...$arrays)
- * @method   \ChainObject  array_merge1($arr1, ...$arrays)
- * @method   \ChainObject  array_merge2($arr1, ...$arrays)
- * @method   \ChainObject  array_merge3($arr1, ...$arrays)
- * @method   \ChainObject  array_merge4($arr1, ...$arrays)
- * @method   \ChainObject  array_merge5($arr1, ...$arrays)
- * @method   \ChainObject  array_merge6($arr1, ...$arrays)
+ * @method   \ChainObject  array_merge1(...$arrays)
+ * @method   \ChainObject  array_merge2(...$arrays)
+ * @method   \ChainObject  array_merge3(...$arrays)
+ * @method   \ChainObject  array_merge4(...$arrays)
+ * @method   \ChainObject  array_merge5(...$arrays)
  *
  * @see array_merge
- * @property \ChainObject $merge
  * @method   \ChainObject  merge(...$arrays)
- * @method   \ChainObject  merge1($arr1, ...$arrays)
- * @method   \ChainObject  merge2($arr1, ...$arrays)
- * @method   \ChainObject  merge3($arr1, ...$arrays)
- * @method   \ChainObject  merge4($arr1, ...$arrays)
- * @method   \ChainObject  merge5($arr1, ...$arrays)
- * @method   \ChainObject  merge6($arr1, ...$arrays)
+ * @method   \ChainObject  merge1(...$arrays)
+ * @method   \ChainObject  merge2(...$arrays)
+ * @method   \ChainObject  merge3(...$arrays)
+ * @method   \ChainObject  merge4(...$arrays)
+ * @method   \ChainObject  merge5(...$arrays)
  *
  * @see array_merge2
  * @method   \ChainObject  array_merge2(...$arrays)
@@ -1029,24 +1025,20 @@
  * @method   \ChainObject  merge25(...$arrays)
  *
  * @see array_merge_recursive
- * @property \ChainObject $array_merge_recursive
  * @method   \ChainObject  array_merge_recursive(...$arrays)
- * @method   \ChainObject  array_merge_recursive1($arr1, ...$arrays)
- * @method   \ChainObject  array_merge_recursive2($arr1, ...$arrays)
- * @method   \ChainObject  array_merge_recursive3($arr1, ...$arrays)
- * @method   \ChainObject  array_merge_recursive4($arr1, ...$arrays)
- * @method   \ChainObject  array_merge_recursive5($arr1, ...$arrays)
- * @method   \ChainObject  array_merge_recursive6($arr1, ...$arrays)
+ * @method   \ChainObject  array_merge_recursive1(...$arrays)
+ * @method   \ChainObject  array_merge_recursive2(...$arrays)
+ * @method   \ChainObject  array_merge_recursive3(...$arrays)
+ * @method   \ChainObject  array_merge_recursive4(...$arrays)
+ * @method   \ChainObject  array_merge_recursive5(...$arrays)
  *
  * @see array_merge_recursive
- * @property \ChainObject $merge_recursive
  * @method   \ChainObject  merge_recursive(...$arrays)
- * @method   \ChainObject  merge_recursive1($arr1, ...$arrays)
- * @method   \ChainObject  merge_recursive2($arr1, ...$arrays)
- * @method   \ChainObject  merge_recursive3($arr1, ...$arrays)
- * @method   \ChainObject  merge_recursive4($arr1, ...$arrays)
- * @method   \ChainObject  merge_recursive5($arr1, ...$arrays)
- * @method   \ChainObject  merge_recursive6($arr1, ...$arrays)
+ * @method   \ChainObject  merge_recursive1(...$arrays)
+ * @method   \ChainObject  merge_recursive2(...$arrays)
+ * @method   \ChainObject  merge_recursive3(...$arrays)
+ * @method   \ChainObject  merge_recursive4(...$arrays)
+ * @method   \ChainObject  merge_recursive5(...$arrays)
  *
  * @see array_mix
  * @method   \ChainObject  array_mix(...$variadic)
@@ -2741,6 +2733,10 @@
  * @see get_loaded_extensions
  * @method   \ChainObject  get_loaded_extensions()
  *
+ * @see get_mangled_object_vars
+ * @property \ChainObject $get_mangled_object_vars
+ * @method   \ChainObject  get_mangled_object_vars()
+ *
  * @see get_meta_tags
  * @property \ChainObject $get_meta_tags
  * @method   \ChainObject  get_meta_tags($use_include_path = null)
@@ -3488,9 +3484,10 @@
  * @method   \ChainObject  mb_decode_mimeheader()
  *
  * @see mb_decode_numericentity
- * @method   \ChainObject  mb_decode_numericentity($convmap, $encoding = null)
- * @method   \ChainObject  mb_decode_numericentity1($string, $encoding = null)
- * @method   \ChainObject  mb_decode_numericentity2($string, $convmap)
+ * @method   \ChainObject  mb_decode_numericentity($convmap, $encoding = null, $is_hex = null)
+ * @method   \ChainObject  mb_decode_numericentity1($string, $encoding = null, $is_hex = null)
+ * @method   \ChainObject  mb_decode_numericentity2($string, $convmap, $is_hex = null)
+ * @method   \ChainObject  mb_decode_numericentity3($string, $convmap, $encoding = null)
  *
  * @see mb_detect_encoding
  * @property \ChainObject $mb_detect_encoding
@@ -3622,6 +3619,12 @@
  * @method   \ChainObject  mb_split($string, $limit = null)
  * @method   \ChainObject  mb_split1($pattern, $limit = null)
  * @method   \ChainObject  mb_split2($pattern, $string)
+ *
+ * @see mb_str_split
+ * @property \ChainObject $mb_str_split
+ * @method   \ChainObject  mb_str_split($split_length = null, $encoding = null)
+ * @method   \ChainObject  mb_str_split1($str, $encoding = null)
+ * @method   \ChainObject  mb_str_split2($str, $split_length = null)
  *
  * @see mb_strcut
  * @method   \ChainObject  mb_strcut($start, $length = null, $encoding = null)
@@ -4084,6 +4087,7 @@
  * @method   \ChainObject  output_add_rewrite_var1($name)
  *
  * @see pack
+ * @property \ChainObject $pack
  * @method   \ChainObject  pack(...$args)
  * @method   \ChainObject  pack1($format, ...$args)
  * @method   \ChainObject  pack2($format, ...$args)
@@ -4966,10 +4970,10 @@
  * @method   \ChainObject  stream_context_set_default()
  *
  * @see stream_context_set_option
- * @method   \ChainObject  stream_context_set_option($wrappername, $optionname, $value)
- * @method   \ChainObject  stream_context_set_option1($stream_or_context, $optionname, $value)
- * @method   \ChainObject  stream_context_set_option2($stream_or_context, $wrappername, $value)
- * @method   \ChainObject  stream_context_set_option3($stream_or_context, $wrappername, $optionname)
+ * @method   \ChainObject  stream_context_set_option($wrappername, $optionname = null, $value = null)
+ * @method   \ChainObject  stream_context_set_option1($stream_or_context, $optionname = null, $value = null)
+ * @method   \ChainObject  stream_context_set_option2($stream_or_context, $wrappername, $value = null)
+ * @method   \ChainObject  stream_context_set_option3($stream_or_context, $wrappername, $optionname = null)
  *
  * @see stream_context_set_params
  * @method   \ChainObject  stream_context_set_params($options)
