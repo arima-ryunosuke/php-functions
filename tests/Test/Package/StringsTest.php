@@ -1817,8 +1817,6 @@ z", quote2: "a\\\\nz"');
         $m = [];
         that((preg_splice)('#\d+#', '', 'abc123', $m))->is("abc");
         that($m)->is(['123']);
-        that((preg_splice)('#([0-9]+)|([a-z]+)#', '', '123abc456def789', $m, 3))->is('def789');
-        that($m)->is([['123', 'abc', '456'], ['123', '', '456'], ['', 'abc', '']]);
         that((preg_splice)('#([a-z]+)#', function ($m) { return strtoupper($m[1]); }, 'abc123', $m))->is("ABC123");
         that($m)->is(['abc', 'abc']);
         that((preg_splice)('#[a-z]+#', 'strtoupper', 'abc123', $m))->is('strtoupper123');
