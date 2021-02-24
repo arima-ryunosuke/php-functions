@@ -11,6 +11,11 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.14
+
+- support php7.4
+- [fixbug] Revert "[Strings] preg_splice の limit 対応"
+
 ## 1.4.13
 
 - [feature][Utility] number_serial を追加
