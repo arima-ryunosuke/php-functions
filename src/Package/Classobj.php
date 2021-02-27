@@ -648,8 +648,13 @@ class Classobj
             $constname = substr($classname, $colonp + 2);
             $classname = substr($classname, 0, $colonp);
         }
-        $refclass = new \ReflectionClass($classname);
-        return $refclass->hasConstant($constname);
+
+        try {
+            $refclass = new \ReflectionClassConstant($classname, $constname);
+        }
+        finally {
+            return isset($refclass);
+        }
     }
 
     /**

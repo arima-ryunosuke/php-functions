@@ -4,6 +4,8 @@ namespace ryunosuke\Test\Package;
 
 use stdClass;
 
+const PI = M_PI;
+
 class ClassobjTest extends AbstractTestCase
 {
     function test_stdclass()
@@ -239,17 +241,22 @@ class ClassobjTest extends AbstractTestCase
         that((const_exists)($class, "PRIVATE_CONST"))->isTrue();
         that((const_exists)($class, "PROTECTED_CONST"))->isTrue();
         that((const_exists)($class, "PUBLIC_CONST"))->isTrue();
-        that((const_exists)($class, "UNDEFINED"))->isFalse();
 
         // クラス定数（1引数）
         that((const_exists)("$class::PRIVATE_CONST"))->isTrue();
         that((const_exists)("$class::PROTECTED_CONST"))->isTrue();
         that((const_exists)("$class::PUBLIC_CONST"))->isTrue();
-        that((const_exists)("$class::UNDEFINED"))->isFalse();
 
         // グローバル定数
         that((const_exists)("PHP_VERSION"))->isTrue();
+        that((const_exists)('\ryunosuke\Test\Package\PI'))->isTrue();
+
+        // 非存在
         that((const_exists)("UNDEFINED"))->isFalse();
+        that((const_exists)($class, "UNDEFINED"))->isFalse();
+        that((const_exists)("$class::UNDEFINED"))->isFalse();
+        that((const_exists)("UNDEFINED", "UNDEFINED"))->isFalse();
+        that((const_exists)("UNDEFINED::UNDEFINED"))->isFalse();
     }
 
     function test_object_dive()
