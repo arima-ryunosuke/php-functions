@@ -326,5 +326,16 @@ class ClassobjTest extends AbstractTestCase
 
         // get_object_properties はそのようなことにはならない
         that((eval($code = 'return ' . (var_export2)($object, true) . ';'))->get())->isSame(999);
+
+        // DateTime や ArrayObject はかなり特殊で、プロパティが標準の手段では取れない
+        that((get_object_properties)(new \Datetime('2014/12/24 12:34:56', new \DateTimeZone('Asia/Tokyo'))))->isSame([
+            'date'          => '2014-12-24 12:34:56.000000',
+            'timezone_type' => 3,
+            'timezone'      => 'Asia/Tokyo',
+        ]);
+        that((get_object_properties)(new \ArrayObject(['a' => 'A', 'b' => 'B'])))->isSame([
+            'a' => 'A',
+            'b' => 'B',
+        ]);
     }
 }

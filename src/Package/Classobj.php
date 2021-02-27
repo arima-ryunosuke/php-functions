@@ -779,31 +779,15 @@ class Classobj
      */
     public static function get_object_properties($object)
     {
-        if (function_exists('get_mangled_object_vars')) {
-            get_mangled_object_vars($object); // @codeCoverageIgnore
+        $fields = [];
+        foreach ((array) $object as $name => $field) {
+            if (preg_match('#\A\\000(.+?)\\000(.+)#usm', $name, $m)) {
+                $name = $m[2];
+            }
+            if (!array_key_exists($name, $fields)) {
+                $fields[$name] = $field;
+            }
         }
-
-        static $refs = [];
-        $class = get_class($object);
-        if (!isset($refs[$class])) {
-            // var_export や var_dump で得られるものは「親が優先」となっているが、不具合的動作だと思うので「子を優先」とする
-            $refs[$class] = [];
-            $ref = new \ReflectionClass($class);
-            do {
-                $refs[$ref->name] = (array_each)($ref->getProperties(), function (&$carry, \ReflectionProperty $rp) {
-                    if (!$rp->isStatic()) {
-                        $rp->setAccessible(true);
-                        $carry[$rp->getName()] = $rp;
-                    }
-                }, []);
-                $refs[$class] += $refs[$ref->name];
-            } while ($ref = $ref->getParentClass());
-        }
-
-        // 配列キャストだと private で ヌル文字が出たり static が含まれたりするのでリフレクションで取得して勝手プロパティで埋める
-        $vars = (array_map_method)($refs[$class], 'getValue', [$object]);
-        $vars += get_object_vars($object);
-
-        return $vars;
+        return $fields;
     }
 }
