@@ -690,6 +690,85 @@ class Vars
     }
 
     /**
+     * 指定されたパスワードとアルゴリズムで暗号化する
+     *
+     * データは json を経由して base64（URL セーフ） して返す。
+     * $tag を与えると認証タグが設定される。
+     *
+     * Example:
+     * ```php
+     * $plaindata = ['a', 'b', 'c'];
+     * $encrypted = encrypt($plaindata, 'password');
+     * $decrypted = decrypt($encrypted, 'password');
+     * // 暗号化されて base64 の文字列になる
+     * that($encrypted)->isString();
+     * // 復号化されて元の配列になる
+     * that($decrypted)->isSame(['a', 'b', 'c']);
+     * // password が異なれば失敗して null を返す
+     * that(decrypt($encrypted, 'invalid'))->isSame(null);
+     *
+     * $encrypted = encrypt($plaindata, 'password', 'aes-256-gcm', $tag);
+     * // タグが設定される
+     * that($tag)->isString();
+     * // タグが正しければ復号化されて元の配列になる
+     * that(decrypt($encrypted, 'password', 'aes-256-gcm', $tag))->isSame(['a', 'b', 'c']);
+     * // タグが不正なら失敗して null を返す
+     * that(decrypt($encrypted, 'password', 'aes-256-gcm', 'invalid'))->isSame(null);
+     * ```
+     *
+     * @param mixed $plaindata 暗号化するデータ
+     * @param string $password パスワード
+     * @param string $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
+     * @param string $tag 認証タグ
+     * @return string 暗号化された文字列
+     */
+    public static function encrypt($plaindata, $password, $cipher = 'aes-256-cbc', &$tag = '')
+    {
+        $jsondata = json_encode($plaindata, JSON_UNESCAPED_UNICODE);
+
+        $ivlen = openssl_cipher_iv_length($cipher);
+        $iv = $ivlen ? random_bytes($ivlen) : '';
+        $payload = openssl_encrypt($jsondata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...func_num_args() < 4 ? [] : [&$tag]);
+
+        return rtrim(strtr(base64_encode($iv . $payload), ['+' => '-', '/' => '_']), '=');
+    }
+
+    /**
+     * 指定されたパスワードとアルゴリズムで復号化する
+     *
+     * $cipher は配列で複数与えることができる。
+     * 複数与えた場合、順に試みて複合できた段階でその値を返す。
+     *
+     * 復号に失敗すると null を返す。
+     * 単体で使うことはないと思うので詳細は encrypt を参照。
+     *
+     * @param string $cipherdata 復号化するデータ
+     * @param string $password パスワード
+     * @param string|array $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
+     * @param string $tag 認証タグ
+     * @return mixed 復号化されたデータ
+     */
+    public static function decrypt($cipherdata, $password, $cipher = 'aes-256-cbc', $tag = '')
+    {
+        $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
+
+        foreach ((array) $cipher as $c) {
+            $ivlen = openssl_cipher_iv_length($c);
+            if (strlen($cipherdata) <= $ivlen) {
+                continue;
+            }
+            $iv = substr($cipherdata, 0, $ivlen);
+            $payload = substr($cipherdata, $ivlen);
+
+            $jsondata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
+            if ($jsondata !== false) {
+                return json_decode($jsondata, true);
+            }
+        }
+        return null;
+    }
+
+    /**
      * php7 の `<=>` の関数版
      *
      * 引数で大文字小文字とか自然順とか型モードとかが指定できる。

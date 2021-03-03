@@ -437,6 +437,43 @@ class VarsTest extends AbstractTestCase
         that((is_countable)(new \stdClass()))->isFalse();
     }
 
+    function test_encrypt_decrypt()
+    {
+        $data = [
+            'user_id' => 12345,
+            'time'    => time(),
+            'data'    => [
+                'a' => 'あああ',
+                'c' => 'ううう',
+            ],
+        ];
+
+        $encrypted = (encrypt)($data, 'secret', 'aes-128-ecb');
+        that((decrypt)($encrypted, 'secret', 'aes-128-ecb'))->isSame($data);    // password が同じなら復号できる
+        that((decrypt)($encrypted, 'invalid', 'aes-128-ecb'))->isNull();        // password が異なれば複合できない
+        that((decrypt)('this is invalid', 'secret', 'aes-128-ecb'))->isNull();  // data が不正なら複合できない
+        that((encrypt)($data, 'secret', 'aes-128-ecb'))->isSame($encrypted);    // ecb なので同じ暗号文が生成される
+
+        $encrypted = (encrypt)($data, 'secret', 'aes-256-cbc');
+        that((decrypt)($encrypted, 'secret', 'aes-256-cbc'))->isSame($data);    // password が同じなら復号できる
+        that((decrypt)($encrypted, 'invalid', 'aes-256-cbc'))->isNull();        // password が異なれば複合できない
+        that((decrypt)('this is invalid', 'secret', 'aes-256-cbc'))->isNull();  // data が不正なら複合できない
+        that((encrypt)($data, 'secret', 'aes-256-cbc'))->isNotSame($encrypted); // cbc なので異なる暗号文が生成される
+
+        $tag = $dummy = null;
+        $encrypted = (encrypt)($data, 'secret', 'aes-256-ccm', $tag);
+        that($tag)->isNotNull();
+        that((decrypt)($encrypted, 'secret', 'aes-256-ccm', $tag))->isSame($data);    // password,tag が同じなら復号できる
+        that((decrypt)($encrypted, 'invalid', 'aes-256-ccm', $tag))->isNull();        // password が異なれば複合できない
+        that((decrypt)($encrypted, 'secret', 'aes-256-ccm', 'hoge'))->isNull();       // tag が異なれば複合できない
+        that((decrypt)('this is invalid', 'secret', 'aes-256-ccm', $tag))->isNull();  // data が不正なら複合できない
+        that((encrypt)($data, 'secret', 'aes-256-ccm', $dummy))->isNotSame($encrypted); // ccm なので異なる暗号文が生成される
+
+        // 順に試みて複合される
+        that(@(decrypt)($encrypted, 'secret', ['aes-128-ecb', 'aes-256-cbc', 'aes-256-ccm'], $tag))->isSame($data);
+        that((decrypt)($encrypted, 'secret', ['aes-128-ecb', 'aes-256-cbc']))->isNull();
+    }
+
     function test_varcmp()
     {
         // strict
