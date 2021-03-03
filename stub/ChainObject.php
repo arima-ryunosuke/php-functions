@@ -2184,7 +2184,8 @@
  *
  * @see date_timestamp
  * @property \ChainObject $date_timestamp
- * @method   \ChainObject  date_timestamp()
+ * @method   \ChainObject  date_timestamp($baseTimestamp = null)
+ * @method   \ChainObject  date_timestamp1($datetimedata)
  *
  * @see date_timestamp_get
  * @property \ChainObject $date_timestamp_get
@@ -2227,9 +2228,21 @@
  * @property \ChainObject $dechex
  * @method   \ChainObject  dechex()
  *
+ * @see decimal
+ * @property \ChainObject $decimal
+ * @method   \ChainObject  decimal($precision = 0, $mode = 0)
+ * @method   \ChainObject  decimal1($value, $mode = 0)
+ * @method   \ChainObject  decimal2($value, $precision = 0)
+ *
  * @see decoct
  * @property \ChainObject $decoct
  * @method   \ChainObject  decoct()
+ *
+ * @see decrypt
+ * @method   \ChainObject  decrypt($password, $cipher = "aes-256-cbc", $tag = "")
+ * @method   \ChainObject  decrypt1($cipherdata, $cipher = "aes-256-cbc", $tag = "")
+ * @method   \ChainObject  decrypt2($cipherdata, $password, $tag = "")
+ * @method   \ChainObject  decrypt3($cipherdata, $password, $cipher = "aes-256-cbc")
  *
  * @see define
  * @method   \ChainObject  define($value, $case_insensitive = null)
@@ -2432,8 +2445,12 @@
  *
  * @see file_list
  * @property \ChainObject $file_list
- * @method   \ChainObject  file_list($filter_condition = null)
+ * @method   \ChainObject  file_list($filter_condition = [])
  * @method   \ChainObject  file_list1($dirname)
+ *
+ * @see file_matcher
+ * @property \ChainObject $file_matcher
+ * @method   \ChainObject  file_matcher()
  *
  * @see file_mimetype
  * @property \ChainObject $file_mimetype
@@ -2474,7 +2491,7 @@
  *
  * @see file_tree
  * @property \ChainObject $file_tree
- * @method   \ChainObject  file_tree($filter_condition = null)
+ * @method   \ChainObject  file_tree($filter_condition = [])
  * @method   \ChainObject  file_tree1($dirname)
  *
  * @see fileatime
@@ -5569,6 +5586,11 @@
  * @property \ChainObject $var_export2
  * @method   \ChainObject  var_export2($return = false)
  * @method   \ChainObject  var_export21($value)
+ *
+ * @see var_export3
+ * @property \ChainObject $var_export3
+ * @method   \ChainObject  var_export3($return = false)
+ * @method   \ChainObject  var_export31($value)
  *
  * @see var_html
  * @property \ChainObject $var_html

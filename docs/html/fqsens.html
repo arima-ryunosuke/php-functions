@@ -2120,7 +2120,7 @@ that(get_object_properties($object))-&gt;arraySubset([
 </div>
             	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_timestamp()">
-                                    ryunosuke\Functions\Package\Date::date_timestamp		</a>	<small>($datetimedata) : int<span class="type-separator"></span><wbr>float<span class="type-separator"></span><wbr>null</small>
+                                    ryunosuke\Functions\Package\Date::date_timestamp		</a>	<small>($datetimedata, $baseTimestamp = null) : int<span class="type-separator"></span><wbr>float<span class="type-separator"></span><wbr>null</small>
 		</h4>
 	<div class="description"><p>日時文字列をよしなにタイムスタンプに変換する</p>
 <p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
@@ -2226,8 +2226,15 @@ that(date_interval(123.456))-&gt;isInstanceOf(\DateInterval::class);
 	<div class="description"><p>ファイルシステム関連のユーティリティ</p>
 </div>
                 	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_matcher()">
+                                    ryunosuke\Functions\Package\FileSystem::file_matcher		</a>	<small>($filter_condition) : <a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></small>
+		</h4>
+	<div class="description"><p>各種属性を指定してファイルのマッチングを行うクロージャを返す</p>
+<p>※ 内部向け</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_list()">
-                                    ryunosuke\Functions\Package\FileSystem::file_list		</a>	<small>($dirname, $filter_condition = null) : array<span class="type-separator"></span><wbr>false</small>
+                                    ryunosuke\Functions\Package\FileSystem::file_list		</a>	<small>($dirname, $filter_condition = []) : array<span class="type-separator"></span><wbr>false</small>
 		</h4>
 	<div class="description"><p>ファイル一覧を配列で返す</p>
 <p>Example:</p>
@@ -2248,7 +2255,7 @@ that(file_list($tmp))-&gt;equalsCanonicalizing([
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_tree()">
-                                    ryunosuke\Functions\Package\FileSystem::file_tree		</a>	<small>($dirname, $filter_condition = null) : array<span class="type-separator"></span><wbr>false</small>
+                                    ryunosuke\Functions\Package\FileSystem::file_tree		</a>	<small>($dirname, $filter_condition = []) : array<span class="type-separator"></span><wbr>false</small>
 		</h4>
 	<div class="description"><p>ディレクトリ階層をツリー構造で返す</p>
 <p>Example:</p>
@@ -2872,21 +2879,24 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 </li>
 </ul>
 <p>Example:</p>
-<pre><code class="language-php">$closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, ...$misc) { return get_defined_vars(); };
+<pre><code class="language-php">$closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, $default1, $default2 = 'default2', ...$misc) { return get_defined_vars(); };
 $params = (parameter_wiring)($closure, [
     \ArrayObject::class      =&gt; $ao = new \ArrayObject([1, 2, 3]),
     \RuntimeException::class =&gt; $t = new \RuntimeException('hoge'),
     '$array'                 =&gt; function (\ArrayObject $ao) { return (array) $ao; },
+    4                        =&gt; 'default1',
     '$misc'                  =&gt; ['x', 'y', 'z'],
 ]);
 that($params)-&gt;isSame([
-    0 =&gt; $ao,       // 0番目はクラス名が完全一致
-    1 =&gt; $t,        // 1番目はインターフェース実装
-    2 =&gt; [1, 2, 3], // 2番目はクロージャをコール
-                    // 3番目の引数は解決されない
-    4 =&gt; 'x',       // 可変引数なのでフラットに展開
-    5 =&gt; 'y',
-    6 =&gt; 'z',
+    0 =&gt; $ao,        // 0番目はクラス名が完全一致
+    1 =&gt; $t,         // 1番目はインターフェース実装
+    2 =&gt; [1, 2, 3],  // 2番目はクロージャをコール
+                     // 3番目は解決されない
+    4 =&gt; 'default1', // 4番目は順番指定のデフォルト値
+    5 =&gt; 'default2', // 5番目は引数定義のデフォルト値
+    6 =&gt; 'x',        // 可変引数なのでフラットに展開
+    7 =&gt; 'y',
+    8 =&gt; 'z',
 ]);
 </code></pre>
 </div>
@@ -3128,6 +3138,32 @@ that(clamp(10, 5, 9, true))-&gt;isSame(5); // 10 は [5～9] の範囲外なの�
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::decimal()">
+                                    ryunosuke\Functions\Package\Math::decimal		</a>	<small>($value, $precision = 0, $mode = 0) : float</small>
+		</h4>
+	<div class="description"><p>数値を指定桁数に丸める</p>
+<p>感覚的には「桁数指定できる ceil/floor」に近い。<br />
+ただし、正の方向(ceil)、負の方向(floor)以外にも0の方向、無限大の方向も実装されている（さらに四捨五入もできる）。</p>
+<ul>
+<li>0   : 0 に近づく方向： 絶対値が必ず減る</li>
+<li>null: 0 から離れる方向： 絶対値が必ず増える</li>
+<li>-INF: 負の無限大の方向： 数値として必ず減る</li>
+<li>+INF : 正の無限大の方向： 数値として必ず増える</li>
+</ul>
+<p>のように「持っていきたい方向（の数値）」を指定すれば良い（正負自動だけ null で特殊だが）。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(decimal(-3.14, 1, 0))-&gt;isSame(-3.1);    // 0 に近づく方向
+that(decimal(-3.14, 1, null))-&gt;isSame(-3.2); // 0 から離れる方向
+that(decimal(-3.14, 1, -INF))-&gt;isSame(-3.2); // 負の無限大の方向
+that(decimal(-3.14, 1, +INF))-&gt;isSame(-3.1); // 正の無限大の方向
+
+that(decimal(3.14, 1, 0))-&gt;isSame(3.1);    // 0 に近づく方向
+that(decimal(3.14, 1, null))-&gt;isSame(3.2); // 0 から離れる方向
+that(decimal(3.14, 1, -INF))-&gt;isSame(3.1); // 負の無限大の方向
+that(decimal(3.14, 1, +INF))-&gt;isSame(3.2); // 正の無限大の方向
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::random_at()">
                                     ryunosuke\Functions\Package\Math::random_at		</a>	<small>(...$args) : mixed</small>
 		</h4>
@@ -3332,37 +3368,37 @@ that($response['form'])-&gt;is([
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_head()">
                                     ryunosuke\Functions\Package\Network::http_head		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : array</small>
 		</h4>
-	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の HEAD 特化版</p>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-type-nullable='' data-description='http_request'>http_request</tag_link> の HEAD 特化版</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_get()">
                                     ryunosuke\Functions\Package\Network::http_get		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
 		</h4>
-	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の GET 特化版</p>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-type-nullable='' data-description='http_request'>http_request</tag_link> の GET 特化版</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_post()">
                                     ryunosuke\Functions\Package\Network::http_post		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
 		</h4>
-	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の POST 特化版</p>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-type-nullable='' data-description='http_request'>http_request</tag_link> の POST 特化版</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_put()">
                                     ryunosuke\Functions\Package\Network::http_put		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
 		</h4>
-	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の PUT 特化版</p>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-type-nullable='' data-description='http_request'>http_request</tag_link> の PUT 特化版</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_patch()">
                                     ryunosuke\Functions\Package\Network::http_patch		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
 		</h4>
-	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の PATCH 特化版</p>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-type-nullable='' data-description='http_request'>http_request</tag_link> の PATCH 特化版</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_delete()">
                                     ryunosuke\Functions\Package\Network::http_delete		</a>	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
 		</h4>
-	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-description='http_request'>http_request</tag_link> の DELETE 特化版</p>
+	<div class="description"><p><tag_link data-kind='fqsen' data-type-category='method' data-type-fqsen='ryunosuke\Functions\Package\Network::http_request()' data-type-array='0' data-type-nullable='' data-description='http_request'>http_request</tag_link> の DELETE 特化版</p>
 </div>
             	<h4 class="fqsen-title">class		<small></small>
 		<a href="ryunosuke-Functions-Package-Sql$typespace.html#ryunosuke\Functions\Package\Sql">
@@ -4790,7 +4826,7 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 		</h4>
 	<div class="description"><p>php のコード断片をパースする</p>
 <p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
-つまり必ず <code>[TOKENID, TOKEN, LINE]</code> で返す。</p>
+つまり必ず <code>[TOKENID, TOKEN, LINE, POS]</code> で返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">$phpcode = 'namespace Hogera;
 class Example
@@ -4818,7 +4854,7 @@ that(implode('', array_column($part, 1)))-&gt;isSame("class Example\n{");
                                     ryunosuke\Functions\Package\Syntax::indent_php		</a>	<small>($phpcode, $options = []) : string</small>
 		</h4>
 	<div class="description"><p>php のコードのインデントを調整する</p>
-<p>インデントの基準はコードの最初の行になる。<br />
+<p>baseline で基準インデント位置を指定する。<br />
 その基準インデントを削除した後、指定したインデントレベルでインデントするようなイメージ。</p>
 <p>Example:</p>
 <pre><code class="language-php">$phpcode = '
@@ -4846,6 +4882,7 @@ that(indent_php($phpcode, "  "))-&gt;isSame('
 ');
 // オプション指定
 that(indent_php($phpcode, [
+    'baseline'  =&gt; 1,    // 基準インデントの行番号（負数で下からの指定になる）
     'indent'    =&gt; 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
     'trimempty' =&gt; true, // 空行を trim するか
     'heredoc'   =&gt; true, // php7.3 の Flexible Heredoc もインデントするか
@@ -5974,6 +6011,43 @@ that(is_countable(new \stdClass()))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::encrypt()">
+                                    ryunosuke\Functions\Package\Vars::encrypt		</a>	<small>($plaindata, $password, $cipher = &quot;aes-256-cbc&quot;, &amp;$tag = &quot;&quot;) : string</small>
+		</h4>
+	<div class="description"><p>指定されたパスワードとアルゴリズムで暗号化する</p>
+<p>データは json を経由して base64（URL セーフ） して返す。<br />
+$tag を与えると認証タグが設定される。</p>
+<p>Example:</p>
+<pre><code class="language-php">$plaindata = ['a', 'b', 'c'];
+$encrypted = encrypt($plaindata, 'password');
+$decrypted = decrypt($encrypted, 'password');
+// 暗号化されて base64 の文字列になる
+that($encrypted)-&gt;isString();
+// 復号化されて元の配列になる
+that($decrypted)-&gt;isSame(['a', 'b', 'c']);
+// password が異なれば失敗して null を返す
+that(decrypt($encrypted, 'invalid'))-&gt;isSame(null);
+
+$encrypted = encrypt($plaindata, 'password', 'aes-256-gcm', $tag);
+// タグが設定される
+that($tag)-&gt;isString();
+// タグが正しければ復号化されて元の配列になる
+that(decrypt($encrypted, 'password', 'aes-256-gcm', $tag))-&gt;isSame(['a', 'b', 'c']);
+// タグが不正なら失敗して null を返す
+that(decrypt($encrypted, 'password', 'aes-256-gcm', 'invalid'))-&gt;isSame(null);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::decrypt()">
+                                    ryunosuke\Functions\Package\Vars::decrypt		</a>	<small>($cipherdata, $password, $cipher = &quot;aes-256-cbc&quot;, $tag = &quot;&quot;) : mixed</small>
+		</h4>
+	<div class="description"><p>指定されたパスワードとアルゴリズムで復号化する</p>
+<p>$cipher は配列で複数与えることができる。<br />
+複数与えた場合、順に試みて複合できた段階でその値を返す。</p>
+<p>復号に失敗すると null を返す。<br />
+単体で使うことはないと思うので詳細は encrypt を参照。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()">
                                     ryunosuke\Functions\Package\Vars::varcmp		</a>	<small>($a, $b, $mode = null, $precision = null) : int</small>
 		</h4>
@@ -6117,6 +6191,31 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
     ]),
 ]');
 </code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_export3()">
+                                    ryunosuke\Functions\Package\Vars::var_export3		</a>	<small>($value, $return = false) : string</small>
+		</h4>
+	<div class="description"><p>var_export を色々と出力できるようにしたもの</p>
+<p>php のコードに落とし込むことで serialize と比較してかなり高速に動作する。ただし、要 php7.4.</p>
+<p>各種オブジェクトやクロージャ、循環参照を含む配列など様々なものが出力できる。<br />
+ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。</p>
+<ul>
+<li>無名クラス</li>
+<li>Generator クラス</li>
+<li>特定の内部クラス（PDO など）</li>
+<li>リソース</li>
+<li>php7.4 以降のアロー関数によるクロージャ</li>
+</ul>
+<p>オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。<br />
+のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。<br />
+sleep, wakeup, Serializable などが実装されているとそれはそのまま機能する。<br />
+set_state だけは呼ばれないので注意。</p>
+<p>クロージャはコード自体を引っ張ってきて普通に function (){} として埋め込む。<br />
+クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。</p>
+<p>軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。<br />
+オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。<br />
+大体 var_export:var_export3:serialize が 1:5:1000 くらい。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_html()">

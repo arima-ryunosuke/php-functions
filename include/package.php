@@ -810,6 +810,7 @@ define("ryunosuke\\Functions\\Package\\date_timestamp", ["ryunosuke\\Functions\\
 define("ryunosuke\\Functions\\Package\\date_convert", ["ryunosuke\\Functions\\Package\\Date", "date_convert"]);
 define("ryunosuke\\Functions\\Package\\date_fromto", ["ryunosuke\\Functions\\Package\\Date", "date_fromto"]);
 define("ryunosuke\\Functions\\Package\\date_interval", ["ryunosuke\\Functions\\Package\\Date", "date_interval"]);
+define("ryunosuke\\Functions\\Package\\file_matcher", ["ryunosuke\\Functions\\Package\\FileSystem", "file_matcher"]);
 define("ryunosuke\\Functions\\Package\\file_list", ["ryunosuke\\Functions\\Package\\FileSystem", "file_list"]);
 define("ryunosuke\\Functions\\Package\\file_tree", ["ryunosuke\\Functions\\Package\\FileSystem", "file_tree"]);
 define("ryunosuke\\Functions\\Package\\file_suffix", ["ryunosuke\\Functions\\Package\\FileSystem", "file_suffix"]);
@@ -864,6 +865,7 @@ define("ryunosuke\\Functions\\Package\\median", ["ryunosuke\\Functions\\Package\
 define("ryunosuke\\Functions\\Package\\average", ["ryunosuke\\Functions\\Package\\Math", "average"]);
 define("ryunosuke\\Functions\\Package\\sum", ["ryunosuke\\Functions\\Package\\Math", "sum"]);
 define("ryunosuke\\Functions\\Package\\clamp", ["ryunosuke\\Functions\\Package\\Math", "clamp"]);
+define("ryunosuke\\Functions\\Package\\decimal", ["ryunosuke\\Functions\\Package\\Math", "decimal"]);
 define("ryunosuke\\Functions\\Package\\random_at", ["ryunosuke\\Functions\\Package\\Math", "random_at"]);
 define("ryunosuke\\Functions\\Package\\probability", ["ryunosuke\\Functions\\Package\\Math", "probability"]);
 define("ryunosuke\\Functions\\Package\\normal_rand", ["ryunosuke\\Functions\\Package\\Math", "normal_rand"]);
@@ -991,11 +993,14 @@ define("ryunosuke\\Functions\\Package\\is_recursive", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\is_stringable", ["ryunosuke\\Functions\\Package\\Vars", "is_stringable"]);
 define("ryunosuke\\Functions\\Package\\is_arrayable", ["ryunosuke\\Functions\\Package\\Vars", "is_arrayable"]);
 define("ryunosuke\\Functions\\Package\\is_countable", ["ryunosuke\\Functions\\Package\\Vars", "is_countable"]);
+define("ryunosuke\\Functions\\Package\\encrypt", ["ryunosuke\\Functions\\Package\\Vars", "encrypt"]);
+define("ryunosuke\\Functions\\Package\\decrypt", ["ryunosuke\\Functions\\Package\\Vars", "decrypt"]);
 define("ryunosuke\\Functions\\Package\\varcmp", ["ryunosuke\\Functions\\Package\\Vars", "varcmp"]);
 define("ryunosuke\\Functions\\Package\\var_type", ["ryunosuke\\Functions\\Package\\Vars", "var_type"]);
 define("ryunosuke\\Functions\\Package\\var_apply", ["ryunosuke\\Functions\\Package\\Vars", "var_apply"]);
 define("ryunosuke\\Functions\\Package\\var_applys", ["ryunosuke\\Functions\\Package\\Vars", "var_applys"]);
 define("ryunosuke\\Functions\\Package\\var_export2", ["ryunosuke\\Functions\\Package\\Vars", "var_export2"]);
+define("ryunosuke\\Functions\\Package\\var_export3", ["ryunosuke\\Functions\\Package\\Vars", "var_export3"]);
 define("ryunosuke\\Functions\\Package\\var_html", ["ryunosuke\\Functions\\Package\\Vars", "var_html"]);
 define("ryunosuke\\Functions\\Package\\var_pretty", ["ryunosuke\\Functions\\Package\\Vars", "var_pretty"]);
 define("ryunosuke\\Functions\\Package\\console_log", ["ryunosuke\\Functions\\Package\\Vars", "console_log"]);
