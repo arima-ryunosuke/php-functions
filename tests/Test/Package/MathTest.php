@@ -248,6 +248,194 @@ class MathTest extends AbstractTestCase
         }
     }
 
+    function test_decimal()
+    {
+        $decimal = function (...$args) { return that((decimal)(...$args)); };
+
+        $compatible_round = [
+            [-115, -1, PHP_ROUND_HALF_UP],
+            [-115, -1, PHP_ROUND_HALF_DOWN],
+            [-115, -1, PHP_ROUND_HALF_EVEN],
+            [-115, -1, PHP_ROUND_HALF_ODD],
+
+            [115, -1, PHP_ROUND_HALF_UP],
+            [115, -1, PHP_ROUND_HALF_DOWN],
+            [115, -1, PHP_ROUND_HALF_EVEN],
+            [115, -1, PHP_ROUND_HALF_ODD],
+
+            [-1.5, 0, PHP_ROUND_HALF_UP],
+            [-1.5, 0, PHP_ROUND_HALF_DOWN],
+            [-1.5, 0, PHP_ROUND_HALF_EVEN],
+            [-1.5, 0, PHP_ROUND_HALF_ODD],
+
+            [1.5, 0, PHP_ROUND_HALF_UP],
+            [1.5, 0, PHP_ROUND_HALF_DOWN],
+            [1.5, 0, PHP_ROUND_HALF_EVEN],
+            [1.5, 0, PHP_ROUND_HALF_ODD],
+
+            [-1.15, 1, PHP_ROUND_HALF_UP],
+            [-1.15, 1, PHP_ROUND_HALF_DOWN],
+            [-1.15, 1, PHP_ROUND_HALF_EVEN],
+            [-1.15, 1, PHP_ROUND_HALF_ODD],
+
+            [1.15, 1, PHP_ROUND_HALF_UP],
+            [1.15, 1, PHP_ROUND_HALF_DOWN],
+            [1.15, 1, PHP_ROUND_HALF_EVEN],
+            [1.15, 1, PHP_ROUND_HALF_ODD],
+        ];
+        foreach ($compatible_round as [$number, $precision, $mode]) {
+            $actual = (decimal)($number, $precision, $mode);
+            $expected = round($number, $precision, $mode);
+            that($actual)->as("round($number, $precision, $mode)")->isSame($expected);
+        }
+
+        $ZERO = 0;    // 0 方向
+        $PINF = +INF;  // 正の無限大
+        $NINF = -INF; // 負の無限大
+        $AUTO = null; // 正負で自動
+
+        $decimal(-110, -1, $NINF)->isSame(-110.0);
+        $decimal(-114, -1, $NINF)->isSame(-120.0);
+        $decimal(-115, -1, $NINF)->isSame(-120.0);
+        $decimal(-116, -1, $NINF)->isSame(-120.0);
+        $decimal(-110, -1, $PINF)->isSame(-110.0);
+        $decimal(-114, -1, $PINF)->isSame(-110.0);
+        $decimal(-115, -1, $PINF)->isSame(-110.0);
+        $decimal(-116, -1, $PINF)->isSame(-110.0);
+        $decimal(-110, -1, $ZERO)->isSame(-110.0);
+        $decimal(-114, -1, $ZERO)->isSame(-110.0);
+        $decimal(-115, -1, $ZERO)->isSame(-110.0);
+        $decimal(-116, -1, $ZERO)->isSame(-110.0);
+        $decimal(-110, -1, $AUTO)->isSame(-110.0);
+        $decimal(-114, -1, $AUTO)->isSame(-120.0);
+        $decimal(-115, -1, $AUTO)->isSame(-120.0);
+        $decimal(-116, -1, $AUTO)->isSame(-120.0);
+
+        $decimal(110, -1, $NINF)->isSame(110.0);
+        $decimal(114, -1, $NINF)->isSame(110.0);
+        $decimal(115, -1, $NINF)->isSame(110.0);
+        $decimal(116, -1, $NINF)->isSame(110.0);
+        $decimal(110, -1, $PINF)->isSame(110.0);
+        $decimal(114, -1, $PINF)->isSame(120.0);
+        $decimal(115, -1, $PINF)->isSame(120.0);
+        $decimal(116, -1, $PINF)->isSame(120.0);
+        $decimal(110, -1, $ZERO)->isSame(110.0);
+        $decimal(114, -1, $ZERO)->isSame(110.0);
+        $decimal(115, -1, $ZERO)->isSame(110.0);
+        $decimal(116, -1, $ZERO)->isSame(110.0);
+        $decimal(110, -1, $AUTO)->isSame(110.0);
+        $decimal(114, -1, $AUTO)->isSame(120.0);
+        $decimal(115, -1, $AUTO)->isSame(120.0);
+        $decimal(116, -1, $AUTO)->isSame(120.0);
+
+        $decimal(-11.0, 0, $NINF)->isSame(-11.0);
+        $decimal(-11.4, 0, $NINF)->isSame(-12.0);
+        $decimal(-11.5, 0, $NINF)->isSame(-12.0);
+        $decimal(-11.6, 0, $NINF)->isSame(-12.0);
+        $decimal(-11.0, 0, $PINF)->isSame(-11.0);
+        $decimal(-11.4, 0, $PINF)->isSame(-11.0);
+        $decimal(-11.5, 0, $PINF)->isSame(-11.0);
+        $decimal(-11.6, 0, $PINF)->isSame(-11.0);
+        $decimal(-11.0, 0, $ZERO)->isSame(-11.0);
+        $decimal(-11.4, 0, $ZERO)->isSame(-11.0);
+        $decimal(-11.5, 0, $ZERO)->isSame(-11.0);
+        $decimal(-11.6, 0, $ZERO)->isSame(-11.0);
+        $decimal(-11.0, 0, $AUTO)->isSame(-11.0);
+        $decimal(-11.4, 0, $AUTO)->isSame(-12.0);
+        $decimal(-11.5, 0, $AUTO)->isSame(-12.0);
+        $decimal(-11.6, 0, $AUTO)->isSame(-12.0);
+
+        $decimal(11.0, 0, $NINF)->isSame(11.0);
+        $decimal(11.4, 0, $NINF)->isSame(11.0);
+        $decimal(11.5, 0, $NINF)->isSame(11.0);
+        $decimal(11.6, 0, $NINF)->isSame(11.0);
+        $decimal(11.0, 0, $PINF)->isSame(11.0);
+        $decimal(11.4, 0, $PINF)->isSame(12.0);
+        $decimal(11.5, 0, $PINF)->isSame(12.0);
+        $decimal(11.6, 0, $PINF)->isSame(12.0);
+        $decimal(11.0, 0, $ZERO)->isSame(11.0);
+        $decimal(11.4, 0, $ZERO)->isSame(11.0);
+        $decimal(11.5, 0, $ZERO)->isSame(11.0);
+        $decimal(11.6, 0, $ZERO)->isSame(11.0);
+        $decimal(11.0, 0, $AUTO)->isSame(11.0);
+        $decimal(11.4, 0, $AUTO)->isSame(12.0);
+        $decimal(11.5, 0, $AUTO)->isSame(12.0);
+        $decimal(11.6, 0, $AUTO)->isSame(12.0);
+
+        $decimal(-1.10, 1, $NINF)->isSame(-1.1);
+        $decimal(-1.14, 1, $NINF)->isSame(-1.2);
+        $decimal(-1.15, 1, $NINF)->isSame(-1.2);
+        $decimal(-1.16, 1, $NINF)->isSame(-1.2);
+        $decimal(-1.10, 1, $PINF)->isSame(-1.1);
+        $decimal(-1.14, 1, $PINF)->isSame(-1.1);
+        $decimal(-1.15, 1, $PINF)->isSame(-1.1);
+        $decimal(-1.16, 1, $PINF)->isSame(-1.1);
+        $decimal(-1.10, 1, $ZERO)->isSame(-1.1);
+        $decimal(-1.14, 1, $ZERO)->isSame(-1.1);
+        $decimal(-1.15, 1, $ZERO)->isSame(-1.1);
+        $decimal(-1.16, 1, $ZERO)->isSame(-1.1);
+        $decimal(-1.10, 1, $AUTO)->isSame(-1.1);
+        $decimal(-1.14, 1, $AUTO)->isSame(-1.2);
+        $decimal(-1.15, 1, $AUTO)->isSame(-1.2);
+        $decimal(-1.16, 1, $AUTO)->isSame(-1.2);
+
+        $decimal(1.10, 1, $NINF)->isSame(1.1);
+        $decimal(1.14, 1, $NINF)->isSame(1.1);
+        $decimal(1.15, 1, $NINF)->isSame(1.1);
+        $decimal(1.16, 1, $NINF)->isSame(1.1);
+        $decimal(1.10, 1, $PINF)->isSame(1.1);
+        $decimal(1.14, 1, $PINF)->isSame(1.2);
+        $decimal(1.15, 1, $PINF)->isSame(1.2);
+        $decimal(1.16, 1, $PINF)->isSame(1.2);
+        $decimal(1.10, 1, $ZERO)->isSame(1.1);
+        $decimal(1.14, 1, $ZERO)->isSame(1.1);
+        $decimal(1.15, 1, $ZERO)->isSame(1.1);
+        $decimal(1.16, 1, $ZERO)->isSame(1.1);
+        $decimal(1.10, 1, $AUTO)->isSame(1.1);
+        $decimal(1.14, 1, $AUTO)->isSame(1.2);
+        $decimal(1.15, 1, $AUTO)->isSame(1.2);
+        $decimal(1.16, 1, $AUTO)->isSame(1.2);
+
+        $decimal(-0.4999999999999999445, -1, $NINF)->isSame(-10.0);
+        $decimal(-0.4999999999999999445, -1, $PINF)->isSame(-0.0);
+        $decimal(-0.4999999999999999445, -1, $AUTO)->isSame(-10.0);
+        $decimal(-0.4999999999999999445, -1, $ZERO)->isSame(-0.0);
+        $decimal(-0.4999999999999999445, 0, $NINF)->isSame(-1.0);
+        $decimal(-0.4999999999999999445, 0, $PINF)->isSame(-0.0);
+        $decimal(-0.4999999999999999445, 0, $AUTO)->isSame(-1.0);
+        $decimal(-0.4999999999999999445, 0, $ZERO)->isSame(-0.0);
+        $decimal(-0.4999999999999999445, 1, $NINF)->isSame(-0.5);
+        $decimal(-0.4999999999999999445, 1, $PINF)->isSame(-0.4);
+        $decimal(-0.4999999999999999445, 1, $AUTO)->isSame(-0.5);
+        $decimal(-0.4999999999999999445, 1, $ZERO)->isSame(-0.4);
+
+        $decimal(0.4999999999999999445, -1, $NINF)->isSame(0.0);
+        $decimal(0.4999999999999999445, -1, $PINF)->isSame(10.0);
+        $decimal(0.4999999999999999445, -1, $AUTO)->isSame(10.0);
+        $decimal(0.4999999999999999445, -1, $ZERO)->isSame(0.0);
+        $decimal(0.4999999999999999445, 0, $NINF)->isSame(0.0);
+        $decimal(0.4999999999999999445, 0, $PINF)->isSame(1.0);
+        $decimal(0.4999999999999999445, 0, $AUTO)->isSame(1.0);
+        $decimal(0.4999999999999999445, 0, $ZERO)->isSame(0.0);
+        $decimal(0.4999999999999999445, 1, $NINF)->isSame(0.4);
+        $decimal(0.4999999999999999445, 1, $PINF)->isSame(0.5);
+        $decimal(0.4999999999999999445, 1, $AUTO)->isSame(0.5);
+        $decimal(0.4999999999999999445, 1, $ZERO)->isSame(0.4);
+
+        $decimal(-9007199254740991.0, -1, $NINF)->isSame(-9007199254741000.0);
+        $decimal(-9007199254740991.0, -1, $PINF)->isSame(-9007199254740990.0);
+        $decimal(-9007199254740991.0, -1, $AUTO)->isSame(-9007199254741000.0);
+        $decimal(-9007199254740991.0, -1, $ZERO)->isSame(-9007199254740990.0);
+
+        $decimal(9007199254740991.0, -1, $NINF)->isSame(9007199254740990.0);
+        $decimal(9007199254740991.0, -1, $PINF)->isSame(9007199254741000.0);
+        $decimal(9007199254740991.0, -1, $AUTO)->isSame(9007199254741000.0);
+        $decimal(9007199254740991.0, -1, $ZERO)->isSame(9007199254740990.0);
+
+        that([decimal, 1, 1, 'hoge'])->throws('$precision must be either');
+        that([decimal, 9007199254740991.0, 1, $NINF])->throws('it exceeds the valid values');
+    }
+
     function test_random_at()
     {
         mt_srand(123); // 時々変えた方がいい
