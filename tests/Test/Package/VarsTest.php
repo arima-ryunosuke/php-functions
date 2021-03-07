@@ -2,8 +2,14 @@
 
 namespace ryunosuke\Test\Package;
 
+use Concrete;
+use Exception as Ex;
 use ryunosuke\Functions\Package\Vars;
+use SerialMethod;
+use SleepWakeupMethod;
 use stdClass;
+use function gettype as gt;
+use const SORT_REGULAR as SR;
 
 class VarsTest extends AbstractTestCase
 {
@@ -748,6 +754,192 @@ stdClass::__set_state([
 VAR
         );
 
+    }
+
+    function test_var_export3()
+    {
+        $values = [
+            'array'       => [1, 2, 3,],
+            'hash'        => [
+                'a' => 'A',
+                'b' => 'B',
+            ],
+            'empty'       => [],
+            'emptyempty'  => [[]],
+            'emptyempty1' => [[[1]]],
+            'nest'        => [
+                'hash'  => [
+                    'a'    => 'A',
+                    'b'    => 'B',
+                    'hash' => [
+                        'x' => 'X',
+                    ],
+                ],
+                'array' => [
+                    [1, 2, 3, ['X']]
+                ],
+            ],
+            'null'        => null,
+            'int'         => 123,
+            'string'      => 'ABC',
+            'object'      => new \DateTime(),
+        ];
+        $exported = (var_export3)($values, ['outmode' => 'eval']);
+        that(serialize(eval($exported)))->isSame(serialize($values));
+    }
+
+    function test_var_export3_array()
+    {
+        $values = [
+            'hash'  => [
+                'a' => 'A',
+                'b' => 'B',
+            ],
+            'recur' => &$values,
+        ];
+        $exported = (var_export3)($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+        $values2['recur']['recur']['recur']['hash']['a'] = 'X';
+        that($values2['recur']['recur']['recur']['hash']['a'])->is('X');
+        that($values2['hash']['a'])->is('A');
+
+        $recur = [1, 2, 3];
+        $vvv = ['X'];
+        $values = [
+            'y'      => $vvv,
+            'vvv'    => &$vvv,
+            'recur1' => &$recur,
+            'recur2' => &$recur,
+        ];
+        $exported = (var_export3)($values, ['outmode' => 'eval']);
+        that(serialize($values2 = eval($exported)))->isSame(serialize($values));
+        $values2['recur1'][1] = 9;
+        that($values2['recur1'][1])->is(9);
+        that($values2['recur1'][1])->is(9);
+    }
+
+    function test_var_export3_closure()
+    {
+        $object = new \DateTime('2014/12/24 12:34:56');
+        $closures = [
+            'object'    => $object,
+            'simple'    => static function () {
+                return 123;
+            },
+            'declare'   => static function (?Ex $e = null, $c = SR): Ex { return $e; },
+            'alias'     => static function () { return [SR, Ex::class, gt(123)]; },
+            'use'       => static function () use ($object) { return $object; },
+            'bind'      => \Closure::bind(function () { return $this; }, $object),
+            'internal1' => \Closure::fromCallable('strlen'),
+            'internal2' => \Closure::fromCallable('Closure::fromCallable'),
+            'internal3' => (new \ReflectionClass($object))->getMethod('format')->getClosure($object),
+            'internal4' => (new \ReflectionClass($object))->getMethod('format')->getClosure(new \DateTime('2012/12/24 12:34:56')),
+        ];
+        $exported = (var_export3)($closures, ['outmode' => 'eval']);
+        $closures = eval($exported);
+        that($closures['simple']())->is(123);
+        that($closures['declare'](new \Exception('yyy')))->is(new \Exception('yyy'));
+        that($closures['alias']())->is([SR, Ex::class, 'integer']);
+        that($closures['use']())->is($object);
+        that($closures['bind']())->is($object);
+        that($closures['internal1']('hoge'))->is(4);
+        that($closures['internal2']('strlen')('fuga'))->is(4);
+        that($closures['internal3']('Ymd'))->is('20141224');
+        that($closures['internal4']('Ymd'))->is('20121224');
+
+        $fibonacci = (function ($n) use (&$fibonacci) {
+            if ($n < 2) {
+                return $n;
+            }
+            static $memo = [];
+            return $memo[$n] = $memo[$n] ?? $fibonacci($n - 2) + $fibonacci($n - 1);
+        })->bindTo(new \stdClass());
+        that($fibonacci(10))->is(55);
+        $exported = (var_export3)($fibonacci, ['outmode' => 'eval']);
+        that($exported)->contains('static $memo = [];');
+        $fibonacci2 = eval($exported);
+        that($fibonacci2(10))->is(55);
+    }
+
+    function test_var_export3_object()
+    {
+        $recursive = new \stdClass();
+        $recursive->recur = $recursive;
+        $setstate = new Concrete('setstate');
+        $setstate->value = $setstate;
+        $objects = [
+            'sleepwakeup' => new SleepWakeupMethod('sqlite::memory:'),
+            'serial'      => new SerialMethod(),
+        ];
+        $exported = (var_export3)($objects, ['outmode' => 'eval']);
+        $objects2 = eval($exported);
+        that($objects2['sleepwakeup']->getPdo())->isInstanceOf(\PDO::class);
+
+        // __serialize/__unserialize は 7.4 から
+        if (version_compare(PHP_VERSION, '7.4.0') >= 0) {
+            that(serialize($objects2))->isSame(serialize(unserialize(serialize($objects))));
+        }
+    }
+
+    function test_var_export3_reference()
+    {
+        $array1 = [1, 2, 3];
+        $array2 = [1, 2, 3];
+        $string = 'string';
+        $object = (object) ['a' => 'A', 'b' => 'B'];
+        $values = [
+            'array1'  => &$array1,
+            'array2'  => &$array2,
+            'string1' => &$string,
+            'string2' => &$string,
+            'folder1' => [
+                'filder2' => [
+                    'string3' => &$string,
+                ],
+            ],
+            'object1' => &$object,
+            'object2' => &$object,
+            'actual1' => ['a' => 'A', 'b' => 'B'],
+            'actual2' => (object) ['a' => 'A', 'b' => 'B'],
+            'self1'   => &$values,
+            'self2'   => &$values,
+        ];
+        $exported = (var_export3)($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+
+        $values2['array1'][] = 9;
+        that($values2['array1'])->isSame([1, 2, 3, 9]);
+        that($values2['array2'])->isSame([1, 2, 3]);
+
+        $values2['string1'] = 'changed!';
+        that($values2['string1'])->isSame('changed!');
+        that($values2['string2'])->isSame('changed!');
+
+        $values2['object1']->field = 'changed!';
+        that($values2['object1']->field)->isSame('changed!');
+        that($values2['object2']->field)->isSame('changed!');
+
+        $values2['self1']['new'] = 'new!';
+        //that($values2['new'])->isSame('new!'); // eval で参照返しなんてできない
+        that($values2['self1']['new'])->isSame('new!');
+        that($values2['self2']['new'])->isSame('new!');
+    }
+
+    function test_var_export3_misc()
+    {
+        that((var_export3)([1, 2, 3], ['outmode' => 'file', 'return' => true]))->stringStartsWith('<?php return (function () {');
+        that((var_export3)([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function () {');
+        that((var_export3)([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
+
+        that([var_export3, (function () { yield 1; })()])->throws('is not support');
+        that([
+            var_export3,
+            new class() {
+            }
+        ])->throws('is not support');
+
+        $this->expectOutputRegex('#new class()#');
+        (var_export3)([1, 2, 3]);
     }
 
     function test_var_html()

@@ -1110,6 +1110,336 @@ class Vars
     }
 
     /**
+     * var_export を色々と出力できるようにしたもの
+     *
+     * php のコードに落とし込むことで serialize と比較してかなり高速に動作する。ただし、要 php7.4.
+     *
+     * 各種オブジェクトやクロージャ、循環参照を含む配列など様々なものが出力できる。
+     * ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。
+     *
+     * - 無名クラス
+     * - Generator クラス
+     * - 特定の内部クラス（PDO など）
+     * - リソース
+     * - php7.4 以降のアロー関数によるクロージャ
+     *
+     * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
+     * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
+     * sleep, wakeup, Serializable などが実装されているとそれはそのまま機能する。
+     * set_state だけは呼ばれないので注意。
+     *
+     * クロージャはコード自体を引っ張ってきて普通に function (){} として埋め込む。
+     * クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。
+     *
+     * 軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。
+     * オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。
+     * 大体 var_export:var_export3:serialize が 1:5:1000 くらい。
+     *
+     * @param mixed $value エクスポートする値
+     * @param bool|array $return 返り値として返すなら true. 配列を与えるとオプションになる
+     * @return string エクスポートされた文字列
+     */
+    public static function var_export3($value, $return = false)
+    {
+        // 原則として var_export に合わせたいのでデフォルトでは bool: false で単に出力するのみとする
+        if (is_bool($return)) {
+            $return = [
+                'return' => $return,
+            ];
+        }
+        $options = $return;
+        $options += [
+            'format'  => 'pretty', // pretty or minify
+            'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
+        ];
+        $options['return'] = $options['return'] ?? !!$options['outmode'];
+
+        $var_manager = new class() {
+            private $vars = [];
+            private $refs = [];
+
+            private function arrayHasReference($array)
+            {
+                foreach ($array as $k => $v) {
+                    $ref = \ReflectionReference::fromArrayElement($array, $k);
+                    if ($ref) {
+                        return true;
+                    }
+                    if (is_array($v) && $this->arrayHasReference($v)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public function varId($var)
+            {
+                // オブジェクトは明確な ID が取れる（closure/object の区分けに処理的な意味はない）
+                if (is_object($var)) {
+                    $id = ($var instanceof \Closure ? 'closure' : 'object') . (spl_object_id($var) + 1);
+                    $this->vars[$id] = $var;
+                    return $id;
+                }
+                // 配列は明確な ID が存在しないので、貯めて検索して ID を振る（参照さえ含まなければ ID に意味はないので参照込みのみ）
+                if (is_array($var) && $this->arrayHasReference($var)) {
+                    $id = array_search($var, $this->vars, true);
+                    if (!$id) {
+                        $id = 'array' . (count($this->vars) + 1);
+                    }
+                    $this->vars[$id] = $var;
+                    return $id;
+                }
+            }
+
+            public function refId($array, $k)
+            {
+                static $ids = [];
+                $ref = \ReflectionReference::fromArrayElement($array, $k);
+                if ($ref) {
+                    $refid = $ref->getId();
+                    $ids[$refid] = ($ids[$refid] ?? count($ids) + 1);
+                    $id = 'reference' . $ids[$refid];
+                    $this->refs[$id] = $array[$k];
+                    return $id;
+                }
+            }
+
+            public function orphan()
+            {
+                foreach ($this->refs as $rid => $var) {
+                    $vid = array_search($var, $this->vars, true);
+                    yield $rid => [!!$vid, $vid, $var];
+                }
+            }
+        };
+
+        // 再帰用クロージャ
+        $vars = [];
+        $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
+            $var_export = function ($v) { return var_export($v, true); };
+            $spacer0 = str_repeat(" ", 4 * ($nest + 0));
+            $spacer1 = str_repeat(" ", 4 * ($nest + 1));
+
+            $vid = $var_manager->varId($value);
+            if ($vid) {
+                if (isset($vars[$vid])) {
+                    return "\$this->$vid";
+                }
+                $vars[$vid] = $value;
+            }
+
+            if (is_array($value)) {
+                $hashed = (is_hasharray)($value);
+                if (!$hashed && (array_all)($value, is_primitive)) {
+                    [$begin, $middle, $end] = ["", ", ", ""];
+                }
+                else {
+                    [$begin, $middle, $end] = ["\n{$spacer1}", ",\n{$spacer1}", ",\n{$spacer0}"];
+                }
+
+                $keys = array_map($var_export, array_combine($keys = array_keys($value), $keys));
+                $maxlen = max(array_map('strlen', $keys ?: ['']));
+                $kvl = [];
+                foreach ($value as $k => $v) {
+                    $refid = $var_manager->refId($value, $k);
+                    $keystr = $hashed ? $keys[$k] . str_repeat(" ", $maxlen - strlen($keys[$k])) . " => " : '';
+                    $valstr = $refid ? "&\$this->$refid" : $export($v, $nest + 1);
+                    $kvl[] = $keystr . $valstr;
+                }
+                $kvl = implode($middle, $kvl);
+                $declare = $vid ? "\$this->$vid = " : "";
+                return "{$declare}[$begin{$kvl}$end]";
+            }
+            if ($value instanceof \Closure) {
+                $ref = new \ReflectionFunction($value);
+                $bind = $ref->getClosureThis();
+                $class = $ref->getClosureScopeClass() ? $ref->getClosureScopeClass()->getName() : null;
+                $statics = $ref->getStaticVariables();
+
+                // 内部由来はきちんと fromCallable しないと差異が出てしまう
+                if ($ref->isInternal()) {
+                    $receiver = $bind ?? $class;
+                    $callee = $receiver ? [$receiver, $ref->getName()] : $ref->getName();
+                    return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
+                }
+
+                $tokens = array_slice((parse_php)(implode(' ', (callable_code)($value)) . ';', TOKEN_PARSE), 1, -1);
+                $uses = "";
+                $context = [
+                    'use' => false,
+                ];
+                $neighborToken = function ($n, $d) use ($tokens) {
+                    for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
+                        if ($tokens[$i][0] !== T_WHITESPACE) {
+                            return $tokens[$i];
+                        }
+                    }
+                };
+                foreach ($tokens as $n => $token) {
+                    $prev = $neighborToken($n, -1) ?? [null, null, null];
+                    $next = $neighborToken($n, +1) ?? [null, null, null];
+
+                    // use 変数の導出
+                    if ($prev[1] === ')' && $token[0] === T_USE) {
+                        $context['use'] = true;
+                    }
+                    if ($context['use'] && $token[0] === T_VARIABLE) {
+                        $varname = substr($token[1], 1);
+                        $recurself = $statics[$varname] === $value ? '&' : '';
+                        $uses .= "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                    }
+                    if ($context['use'] && $token[1] === ')') {
+                        $context['use'] = false;
+                    }
+
+                    // クラスや関数・定数の use 解決
+                    if ($token[0] === T_STRING) {
+                        if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
+                            $token[1] = (resolve_symbol)($token[1], $ref->getFileName(), 'alias') ?? $token[1];
+                        }
+                        elseif ($next[1] === '(') {
+                            $token[1] = (resolve_symbol)($token[1], $ref->getFileName(), 'function') ?? $token[1];
+                        }
+                        else {
+                            $token[1] = (resolve_symbol)($token[1], $ref->getFileName(), 'const') ?? $token[1];
+                        }
+                    }
+                    $tokens[$n] = $token;
+                }
+
+                $code = (indent_php)(implode('', array_column($tokens, 1)), [
+                    'indent'   => $spacer1,
+                    'baseline' => -1,
+                ]);
+                if ($bind) {
+                    $scope = $var_export($class === 'Closure' ? 'static' : $class);
+                    $code = "\Closure::bind($code, {$export($bind, $nest + 1)}, $scope)";
+                }
+
+                return "\$this->$vid = (function () {\n{$uses}{$spacer1}return $code;\n$spacer0})->call(\$this)";
+            }
+            if (is_object($value)) {
+                $ref = new \ReflectionObject($value);
+                $classname = get_class($value);
+
+                // ジェネレータはどう頑張っても無理
+                if ($value instanceof \Generator) {
+                    throw new \DomainException('Generator Class is not support.');
+                }
+
+                // 無名クラスもほぼ不可能
+                // コード自体を持ってくれば行けそうだけど、コンストラクタ引数を考えるとちょっと複雑すぎる
+                // `new class(new class(){}, new class(){}, new class(){}){};` みたいのもあり得るわけでパースが難しい
+                // `new class($localVar){};` みたいのも $localVar が得られない（コンストラクタに与えてるんだから property で取れなくもないが…）
+                if ($ref->isAnonymous()) {
+                    throw new \DomainException('Anonymous Class is not support yet.');
+                }
+
+                // __serialize があるならそれに従う
+                if (method_exists($value, '__serialize')) {
+                    $fields = $value->__serialize();
+                }
+                // __sleep があるならそれをプロパティとする
+                elseif (method_exists($value, '__sleep')) {
+                    $fields = array_intersect_key((get_object_properties)($value), array_flip($value->__sleep()));
+                }
+                // それ以外は適当に漁る
+                else {
+                    $fields = (get_object_properties)($value);
+                }
+
+                return "\$this->new(\$this->$vid, \\$classname::class, (function () {\n{$spacer1}return {$export($fields, $nest + 1)};\n{$spacer0}}))";
+            }
+
+            return is_null($value) || is_resource($value) ? 'null' : $var_export($value);
+        };
+
+        $exported = $export($value, 1);
+        $others = "";
+        $vars = [];
+        foreach ($var_manager->orphan() as $rid => [$isref, $vid, $var]) {
+            $declare = $isref ? "&\$this->$vid" : $export($var, 1);
+            $others .= "    \$this->$rid = $declare;\n";
+        }
+        $result = "(function () {
+{$others}    return $exported;
+" . '})->call(new class() {
+    public function new(&$object, $class, $provider)
+    {
+        $reflection = $this->reflect($class);
+        $object = $reflection["self"]->newInstanceWithoutConstructor();
+        $fields = $provider();
+
+        if ($reflection["unserialize"]) {
+            $object->__unserialize($fields);
+            return $object;
+        }
+
+        foreach ($reflection["parents"] as $parent) {
+            foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
+                if (isset($fields[$name]) || array_key_exists($name, $fields)) {
+                    $property->setValue($object, $fields[$name]);
+                    unset($fields[$name]);
+                }
+            }
+        }
+        foreach ($fields as $name => $value) {
+            $object->$name = $value;
+        }
+
+        if ($reflection["wakeup"]) {
+            $object->__wakeup();
+        }
+
+        return $object;
+    }
+
+    private function reflect($class)
+    {
+        static $cache = [];
+        if (!isset($cache[$class])) {
+            $refclass = new \ReflectionClass($class);
+            $cache[$class] = [
+                "self"        => $refclass,
+                "parents"     => [],
+                "properties"  => [],
+                "unserialize" => $refclass->hasMethod("__unserialize"),
+                "wakeup"      => $refclass->hasMethod("__wakeup"),
+            ];
+            for ($current = $refclass; $current; $current = $current->getParentClass()) {
+                $cache[$class]["parents"][$current->name] = $current;
+            }
+            foreach ($refclass->getProperties() as $property) {
+                if (!$property->isStatic()) {
+                    $property->setAccessible(true);
+                    $cache[$class]["properties"][$property->name] = $property;
+                }
+            }
+        }
+        return $cache[$class];
+    }
+})';
+
+        if ($options['format'] === 'minify') {
+            $tmp = (memory_path)('var_export3.php');
+            file_put_contents($tmp, "<?php $result;");
+            $result = substr(php_strip_whitespace($tmp), 6, -1);
+        }
+
+        if ($options['outmode'] === 'eval') {
+            $result = "return $result;";
+        }
+        if ($options['outmode'] === 'file') {
+            $result = "<?php return $result;\n";
+        }
+
+        if (!$options['return']) {
+            echo $result;
+        }
+        return $result;
+    }
+
+    /**
      * var_export2 を html コンテキストに特化させたようなもの
      *
      * 下記のような出力になる。

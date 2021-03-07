@@ -1,5 +1,78 @@
 <?php
 
+if (!class_exists(\ReflectionReference::class)) {
+    /**
+     * php7.4 の ReflectionReference polyfill
+     *
+     * それっぽく動くようにしてるのでパッケージ化してもいいけど、ほぼテストしていないので据え置き。
+     */
+    class ReflectionReference
+    {
+        /** @var array 今まで見つけたすべての参照 */
+        private static $allrefs = [];
+
+        /** @var string getId で得られる ID */
+        private $id;
+
+        public static function fromArrayElement(array $array, $key): ?self
+        {
+            // これだと float や stringable でもコケてしまうが元実装では正しいようだ（7.4 時点）
+            if (!(is_int($key) || is_string($key))) {
+                throw new \TypeError('Key must be array or string'); // array or string?
+            }
+            // 無い場合は ReflectionException を投げるようだ
+            if (!array_key_exists($key, $array)) {
+                throw new \ReflectionException('Array key not found');
+            }
+
+            // 値を保持しておいて異なる配列変数に値を入れてみる
+            $backup = $array[$key];
+            $referable = $array;
+            $referable[$key] = new \stdClass();
+
+            // なぜか $array[$key] も変わっているならそれは参照である
+            if ($array[$key] === $referable[$key]) {
+                // 参照は参照でも「新しい参照」と「既存の参照」は区別しなければならない（ID が同じになるため）
+                $id = null;
+                foreach (self::$allrefs as $oldid => [$oldarray, $oldkey]) {
+                    // なぜか貯めておいたこれまでの参照まで変わっているなら「既存の参照」と判断できる
+                    if ($oldarray[$oldkey] === $referable[$key]) {
+                        $id = $oldid;
+                        break;
+                    }
+                }
+                // 見つからなかったら「新しい参照」なのでまるごと保存しておく
+                if ($id === null) {
+                    $id = count(self::$allrefs);
+                    self::$allrefs[$id] = [$array, $key];
+                }
+
+                // 値を復元してインスタンスを返す
+                $array[$key] = $backup;
+                return new self($id);
+            }
+            return null;
+        }
+
+        private function __construct($id)
+        {
+            // 元実装では20文字のバイナリを返すようなのでできるだけ真似る
+            $this->id = sha1((string) $id, true);
+        }
+
+        public function __clone()
+        {
+            // ドキュメントに記載があるわけではないが、リフレクションで調べたところ clone は禁止らしい
+            throw new \Error("Trying to clone an uncloneable object of class ReflectionReference");
+        }
+
+        public function getId(): string
+        {
+            return $this->id;
+        }
+    }
+}
+
 abstract class AbstractConcrete
 {
     public static function staticMethod($a = null)
@@ -205,6 +278,49 @@ class Arrayable implements \ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->array[$offset]);
+    }
+}
+
+class SerialMethod
+{
+    private $field = 123;
+
+    public function __serialize(): array
+    {
+        return ['field' => $this->field, 'dummy' => null];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $k => $v) {
+            $this->$k = $v;
+        }
+    }
+}
+
+class SleepWakeupMethod
+{
+    private $dsn;
+    private $pdo;
+
+    public function __construct($dsn)
+    {
+        $this->dsn = $dsn;
+    }
+
+    public function __sleep()
+    {
+        return ['dsn'];
+    }
+
+    public function __wakeup()
+    {
+        $this->pdo = new \PDO($this->dsn);
+    }
+
+    public function getPdo()
+    {
+        return $this->pdo;
     }
 }
 
