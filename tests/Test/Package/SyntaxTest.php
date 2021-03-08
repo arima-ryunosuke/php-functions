@@ -159,13 +159,57 @@ ERR
         $code = 'a(123);';
         $tokens = (parse_php)($code, 2);
         that($tokens)->is([
-            [T_OPEN_TAG, '<?php ', 1, 'T_OPEN_TAG'],
-            [T_STRING, 'a', 1, 'T_STRING'],
-            [null, '(', 0],
-            [T_LNUMBER, '123', 1, 'T_LNUMBER'],
-            [null, ')', 0],
-            [null, ';', 0],
+            [T_OPEN_TAG, '<?php ', 1, -6, 'T_OPEN_TAG'],
+            [T_STRING, 'a', 1, 0, 'T_STRING'],
+            [ord('('), '(', 1, 1, 'UNKNOWN'],
+            [T_LNUMBER, '123', 1, 2, 'T_LNUMBER'],
+            [ord(')'), ')', 1, 5, 'UNKNOWN'],
+            [ord(';'), ';', 1, 6, 'UNKNOWN'],
         ]);
+
+        $code = '$c = function ($a = null) use ($x) {
+    return $a + $x;
+};';
+        $tokens = (parse_php)($code, 4);
+        // @formatter:off
+        that($tokens)->is([
+            #ID, TOKEN,       L, C
+            [T_OPEN_TAG,   "<?php ",   1, -6],
+            [T_VARIABLE,   "\$c",      1, 0],
+            [T_WHITESPACE, " ",        1, 2],
+            [ord('='),     "=",        1, 3],
+            [T_WHITESPACE, " ",        1, 4],
+            [T_FUNCTION,   "function", 1, 5],
+            [T_WHITESPACE, " ",        1, 13],
+            [ord("("),     "(",        1, 14],
+            [T_VARIABLE,   "\$a",      1, 15],
+            [T_WHITESPACE, " ",        1, 17],
+            [ord('='),     "=",        1, 18],
+            [T_WHITESPACE, " ",        1, 19],
+            [T_STRING,     "null",     1, 20],
+            [ord(')'),     ")",        1, 24],
+            [T_WHITESPACE, " ",        1, 25],
+            [T_USE,        "use",      1, 26],
+            [T_WHITESPACE, " ",        1, 29],
+            [ord('('),     "(",        1, 30],
+            [T_VARIABLE,   "\$x",      1, 31],
+            [ord(')'),     ")",        1, 33],
+            [T_WHITESPACE, " ",        1, 34],
+            [ord('{'),     "{",        1, 35],
+            [T_WHITESPACE, "\n    ",   1, 36],
+            [T_RETURN,     "return",   2, 41],
+            [T_WHITESPACE, " ",        2, 47],
+            [T_VARIABLE,   "\$a",      2, 48],
+            [T_WHITESPACE, " ",        2, 50],
+            [ord('+'),     "+",        2, 51],
+            [T_WHITESPACE, " ",        2, 52],
+            [T_VARIABLE,   "\$x",      2, 53],
+            [ord(';'),     ";",        2, 55],
+            [T_WHITESPACE, "\n",       2, 56],
+            [ord('}'),     "}",        3, 57],
+            [ord(';'),     ";",        3, 58],
+        ]);
+        // @formatter:on
 
         $code = 'function(...$args)use($usevar){if(false)return function(){};}';
         $tokens = (parse_php)($code, [

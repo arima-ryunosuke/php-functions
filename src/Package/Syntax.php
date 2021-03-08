@@ -82,7 +82,7 @@ class Syntax
      * php のコード断片をパースする
      *
      * 結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。
-     * つまり必ず `[TOKENID, TOKEN, LINE]` で返す。
+     * つまり必ず `[TOKENID, TOKEN, LINE, POS]` で返す。
      *
      * Example:
      * ```php
@@ -131,24 +131,27 @@ class Syntax
         ];
         $option += $default;
 
+        $flags = $option['flags'];
         static $cache = [];
-        $tokens = $cache[$phpcode] ?? array_map(function ($token) use ($option) {
+        if (!($option['cache'] && isset($cache[$phpcode][$flags]))) {
+            $position = -6;
+            $tokens = token_get_all("<?php $phpcode", $flags);
+            $last = [null, 1, 0];
+            foreach ($tokens as $n => $token) {
                 // token_get_all の結果は微妙に扱いづらいので少し調整する（string/array だったり、名前変換の必要があったり）
-                if (is_array($token)) {
-                    // for debug
-                    if ($option['flags'] & TOKEN_NAME) {
-                        $token[] = token_name($token[0]);
-                    }
-                    return $token;
+                if (!is_array($token)) {
+                    $token = [ord($token), $token, $last[2] + preg_match_all('/(?:\r\n|\r|\n)/', $last[1])];
                 }
-                else {
-                    // string -> [TOKEN, CHAR, LINE]
-                    return [null, $token, 0];
+                $token[] = $position;
+                if ($flags & TOKEN_NAME) {
+                    $token[] = token_name($token[0]);
                 }
-            }, token_get_all("<?php $phpcode", $option['flags']));
-        if ($option['cache']) {
-            $cache[$phpcode] = $tokens;
+                $position += strlen($token[1]);
+                $tokens[$n] = $last = $token;
+            }
+            $cache[$phpcode][$flags] = $tokens;
         }
+        $tokens = $cache[$phpcode][$flags];
 
         $begin_tokens = (array) $option['begin'];
         $end_tokens = (array) $option['end'];
