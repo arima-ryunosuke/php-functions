@@ -197,7 +197,7 @@ class Syntax
     /**
      * php のコードのインデントを調整する
      *
-     * インデントの基準はコードの最初の行になる。
+     * baseline で基準インデント位置を指定する。
      * その基準インデントを削除した後、指定したインデントレベルでインデントするようなイメージ。
      *
      * Example:
@@ -227,6 +227,7 @@ class Syntax
      * ');
      * // オプション指定
      * that(indent_php($phpcode, [
+     *     'baseline'  => 1,    // 基準インデントの行番号（負数で下からの指定になる）
      *     'indent'    => 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
      *     'trimempty' => true, // 空行を trim するか
      *     'heredoc'   => true, // php7.3 の Flexible Heredoc もインデントするか
@@ -249,6 +250,7 @@ class Syntax
             $options = ['indent' => $options];
         }
         $options += [
+            'baseline'  => 1,
             'indent'    => 0,
             'trimempty' => true,
             'heredoc'   => version_compare(PHP_VERSION, '7.3.0') < 0,
@@ -256,6 +258,14 @@ class Syntax
         if (is_int($options['indent'])) {
             $options['indent'] = str_repeat(' ', $options['indent']);
         }
+
+        $lines = preg_split('#\\R#u', $phpcode);
+        $baseline = $options['baseline'];
+        if ($baseline < 0) {
+            $baseline = count($lines) + $baseline;
+        }
+        preg_match('@^[ \t]*@u', $lines[$baseline] ?? '', $matches);
+        $indent = $matches[0] ?? '';
 
         $tmp = token_get_all("<?php $phpcode");
         array_shift($tmp);
@@ -299,20 +309,6 @@ class Syntax
             }
 
             $tokens[] = $tmp[$i] + [3 => token_name($tmp[$i][0])];
-        }
-
-        // 最初のトークンでインデントレベルを導出
-        $indent = '';
-        $first = $tokens[0];
-        if ($first[0] === T_WHITESPACE) {
-            preg_match_all('@^[ \t]*$@um', $first[1], $matches);
-            $max = '';
-            foreach ($matches[0] as $match) {
-                if ($max < strlen($match)) {
-                    $max = $match;
-                }
-            }
-            $indent = $max;
         }
 
         // 改行を置換してインデント
