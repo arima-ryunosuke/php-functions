@@ -11,6 +11,18 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.15
+- [feature][FileSystem] file_matcher の追加と file_(list|tree) の修正
+- [feature][Date] date_timestamp のベースなし相対表記に対応
+- [feature][Funchand] parameter_wiring の数値指定と順番の規約
+- [feature][Vars] var_export3 を追加
+- [feature][Vars] encrypt/decrypt を追加
+- [feature][Syntax] indent_php で基準行の指定に対応
+- [feature][Syntax] parse_php で行と桁に対応
+- [fixbug][Classobj] const_exists で存在しないクラスを指定すると死ぬ不具合を修正
+- [fixbug][Classobj] get_object_properties で内部クラスのプロパティが取れない不具合を修正
+- [feature][Math] decimal を追加
+
 ## 1.4.14
 
 - support php7.4
