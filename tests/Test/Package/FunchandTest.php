@@ -478,24 +478,37 @@ class FunchandTest extends AbstractTestCase
 
     function test_parameter_wiring()
     {
-        $closure = function (\ArrayObject $ao, \Throwable $t, $array, $method, $closure, $none, ...$misc) { return get_defined_vars(); };
+        $closure = function (\ArrayObject $ao, \Throwable $t, $array, $method, $closure, $none, $default1, $default2 = 'default2', ...$misc) { return get_defined_vars(); };
+
         $params = (parameter_wiring)($closure, $that = [
             \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
             \RuntimeException::class => $t = new \RuntimeException('hoge'),
             '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
             '$method'                => \Closure::fromCallable([$ao, 'getArrayCopy']),
             '$closure'               => function () { return (array) $this; },
+            6                        => 'default1',
             '$misc'                  => ['x', 'y', 'z'],
         ]);
         that($params)->isSame([
-            0 => $ao,
-            1 => $t,
-            2 => [1, 2, 3],
-            3 => [1, 2, 3],
-            4 => $that,
-            6 => 'x',
-            7 => 'y',
-            8 => 'z',
+            0  => $ao,
+            1  => $t,
+            2  => [1, 2, 3],
+            3  => [1, 2, 3],
+            4  => $that,
+            // 5  => undefined,
+            6  => 'default1',
+            7  => 'default2',
+            8  => 'x',
+            9  => 'y',
+            10 => 'z',
+        ]);
+
+        $params = (parameter_wiring)($closure, $that = [
+            '$ao' => $ao = new \ArrayObject([1, 2, 3]),
+        ]);
+        that($params)->isSame([
+            0  => $ao,
+            7  => 'default2',
         ]);
     }
 

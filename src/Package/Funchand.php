@@ -756,21 +756,24 @@ class Funchand
      *
      * Example:
      * ```php
-     * $closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, ...$misc) { return get_defined_vars(); };
+     * $closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, $default1, $default2 = 'default2', ...$misc) { return get_defined_vars(); };
      * $params = (parameter_wiring)($closure, [
      *     \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
      *     \RuntimeException::class => $t = new \RuntimeException('hoge'),
      *     '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
+     *     4                        => 'default1',
      *     '$misc'                  => ['x', 'y', 'z'],
      * ]);
      * that($params)->isSame([
-     *     0 => $ao,       // 0番目はクラス名が完全一致
-     *     1 => $t,        // 1番目はインターフェース実装
-     *     2 => [1, 2, 3], // 2番目はクロージャをコール
-     *                     // 3番目の引数は解決されない
-     *     4 => 'x',       // 可変引数なのでフラットに展開
-     *     5 => 'y',
-     *     6 => 'z',
+     *     0 => $ao,        // 0番目はクラス名が完全一致
+     *     1 => $t,         // 1番目はインターフェース実装
+     *     2 => [1, 2, 3],  // 2番目はクロージャをコール
+     *                      // 3番目は解決されない
+     *     4 => 'default1', // 4番目は順番指定のデフォルト値
+     *     5 => 'default2', // 5番目は引数定義のデフォルト値
+     *     6 => 'x',        // 可変引数なのでフラットに展開
+     *     7 => 'y',
+     *     8 => 'z',
      * ]);
      * ```
      *
@@ -785,9 +788,25 @@ class Funchand
         $result = [];
 
         foreach ($ref->getParameters() as $n => $parameter) {
-            if ($type = $parameter->getClass()) {
-                if (isset($dependency[$pname = $type->getName()])) {
+            if (isset($dependency[$n])) {
+                $result[$n] = $dependency[$n];
+            }
+            elseif (isset($dependency[$pname = '$' . $parameter->getName()])) {
+                if ($parameter->isVariadic()) {
+                    foreach (array_values((arrayize)($dependency[$pname])) as $i => $v) {
+                        $result[$n + $i] = $v;
+                    }
+                }
+                else {
                     $result[$n] = $dependency[$pname];
+                }
+            }
+            elseif (isset($dependency[$n])) {
+                $result[$n] = $dependency[$n];
+            }
+            elseif (($type = $parameter->getType()) && $type instanceof \ReflectionNamedType) {
+                if (isset($dependency[$type->getName()])) {
+                    $result[$n] = $dependency[$type->getName()];
                 }
                 else {
                     foreach ($dependency as $key => $value) {
@@ -799,16 +818,6 @@ class Funchand
                             $result[$n] = $value;
                         }
                     }
-                }
-            }
-            elseif (isset($dependency[$pname = '$' . $parameter->getName()])) {
-                if ($parameter->isVariadic()) {
-                    foreach (array_values((arrayize)($dependency[$pname])) as $i => $v) {
-                        $result[$n + $i] = $v;
-                    }
-                }
-                else {
-                    $result[$n] = $dependency[$pname];
                 }
             }
             elseif ($parameter->isDefaultValueAvailable()) {
@@ -914,9 +923,7 @@ class Funchand
      */
     public static function func_wiring($callable, $dependency)
     {
-        $params1 = (parameter_wiring)($callable, $dependency);
-        $params2 = array_filter($dependency, 'is_int', ARRAY_FILTER_USE_KEY);
-        $params = (array_merge2)($params1, $params2);
+        $params = (parameter_wiring)($callable, $dependency);
         return function (...$args) use ($callable, $params) {
             return $callable(...$args + $params);
         };
