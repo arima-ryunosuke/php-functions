@@ -8,7 +8,7 @@ class SyntaxTest extends AbstractTestCase
 {
     function test_evaluate()
     {
-        $tmpdir = self::TMPDIR . getenv('TEST_TARGET');
+        $tmpdir = self::$TMPDIR . getenv('TEST_TARGET');
         (rm_rf)($tmpdir, false);
         that((evaluate)('return $x * $x;', ['x' => 1]))->is(1);
         that((evaluate)('return $x * $x;', ['x' => 2]))->is(4);

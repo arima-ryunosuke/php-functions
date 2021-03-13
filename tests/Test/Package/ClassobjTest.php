@@ -142,7 +142,7 @@ class ClassobjTest extends AbstractTestCase
 
     function test_class_extends()
     {
-        (rm_rf)(self::TMPDIR . getenv('TEST_TARGET'), false);
+        (rm_rf)(self::$TMPDIR . getenv('TEST_TARGET'), false);
         require_once __DIR__ . '/Classobj/extends.php';
         $original = new \ryunosuke\Test\Package\Classobj\ClassExtends();
         /** @var \ryunosuke\Test\Package\Classobj\ClassExtends $object */

@@ -221,7 +221,7 @@ class UtilityTest extends AbstractTestCase
     {
         $tmpdir = sys_get_temp_dir() . '/test';
         (rm_rf)($tmpdir);
-        that((cachedir)($tmpdir))->is((path_normalize)(self::TMPDIR . getenv('TEST_TARGET')));
+        that((cachedir)($tmpdir))->is((path_normalize)(self::$TMPDIR . getenv('TEST_TARGET')));
         that((cachedir)())->is((path_normalize)($tmpdir));
         that((cachedir)(sys_get_temp_dir()))->is((path_normalize)($tmpdir));
     }
@@ -251,7 +251,7 @@ class UtilityTest extends AbstractTestCase
         (cache)(null, null);
         $value = sha1(uniqid(mt_rand(), true));
 
-        $tmpdir = self::TMPDIR . '/cache_object';
+        $tmpdir = self::$TMPDIR . '/cache_object';
         (rm_rf)($tmpdir);
         (cachedir)($tmpdir);
         (cache)('key', function () use ($value) { return $value; }, 'hoge');
@@ -1153,8 +1153,8 @@ class UtilityTest extends AbstractTestCase
             that($result['meta'])->is([
                 'touch' => 1234,
                 'chmod' => 33279,
-                'chown' => 0,
-                'chgrp' => 0,
+                'chown' => 48,
+                'chgrp' => 27,
             ]);
             that($result['option'])->is([
                 'blocking' => true,
@@ -1303,7 +1303,7 @@ class UtilityTest extends AbstractTestCase
 
         // usleep(15000) の平均実行時間は 15ms のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
         $output = (benchmark)(['usleep'], [15000], 300, false);
-        that($output[0]['mills'])->lessThan(15 + 7);
+        that($output[0]['mills'])->lessThan(15 + 10);
 
         // 参照渡しも呼べる
         (benchmark)(['reset', 'end'], [['hoge']], 10, false);

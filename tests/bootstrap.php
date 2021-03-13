@@ -12,12 +12,6 @@ if (DIRECTORY_SEPARATOR === '\\') {
     }
     putenv("TMP=$tmpdir");
 }
-else {
-    if (getenv('TMPDIR') !== $tmpdir) {
-        \ryunosuke\Functions\Package\FileSystem::rm_rf($tmpdir, false);
-    }
-    putenv("TMPDIR=$tmpdir");
-};
 
 // actualThat を定義
 \ryunosuke\PHPUnit\Actual::$compatibleVersion = 2;
