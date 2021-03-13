@@ -5,6 +5,106 @@ namespace ryunosuke\Test\Package;
 
 class FileSystemTest extends AbstractTestCase
 {
+    function test_file_matcher()
+    {
+        $base = sys_get_temp_dir() . '/tree';
+        (file_set_contents)($base . '/a/a1.txt', 'xxx');
+        (file_set_contents)($base . '/a/a2.txt', str_repeat("y\n", 30000));
+
+        chmod($base . '/a/a1.txt', 0666);
+        touch($base . '/a/a1.txt', strtotime('2000/12/24 12:34:56'));
+        touch($base . '/a/a2.txt', strtotime('-1 week'));
+
+        that((file_matcher)([])('hoge'))->isTrue();
+
+        that((file_matcher)(['dotfile' => true])('/a/b/c/.file'))->isTrue();
+        that((file_matcher)(['dotfile' => true])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['dotfile' => false])('/a/b/c/.file'))->isFalse();
+        that((file_matcher)(['dotfile' => false])('/a/b/c/file'))->isTrue();
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            that((file_matcher)(['unixpath' => true, 'dir' => '/a/b/c'])('\\a\\b\\c\\file'))->isTrue();
+            that((file_matcher)(['unixpath' => false, 'dir' => '/a/b/c'])('\\a\\b\\c\\file'))->isFalse();
+        }
+
+        that((file_matcher)(['casefold' => true, 'name' => 'FILE'])('/a/b/c/file'))->isTrue();
+        that((file_matcher)(['casefold' => false, 'name' => 'FILE'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['casefold' => true, 'extension' => 'TXT'])('/a/b/c/file.txt'))->isTrue();
+        that((file_matcher)(['casefold' => false, 'extension' => 'TXT'])('/a/b/c/file.txt'))->isFalse();
+
+        that((file_matcher)(['type' => 'file'])($base . '/a/a1.txt'))->isTrue();
+        that((file_matcher)(['type' => 'link'])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!type' => 'file'])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!type' => 'link'])($base . '/a/a1.txt'))->isTrue();
+
+        that((file_matcher)(['perms' => 0400])($base . '/a/a1.txt'))->isTrue();
+        that((file_matcher)(['!perms' => 0400])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['perms' => 0100])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!perms' => 0100])($base . '/a/a1.txt'))->isTrue();
+
+        that((file_matcher)(['mtime' => strtotime('2000/12/24 12:34:56')])($base . '/a/a1.txt'))->isTrue();
+        that((file_matcher)(['!mtime' => strtotime('2000/12/24 12:34:56')])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['mtime' => strtotime('1999/12/24 12:34:56')])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!mtime' => strtotime('1999/12/24 12:34:56')])($base . '/a/a1.txt'))->isTrue();
+
+        that((file_matcher)(['mtime' => ['-1 month']])($base . '/a/a2.txt'))->isTrue();
+        that((file_matcher)(['!mtime' => ['-1 month']])($base . '/a/a2.txt'))->isFalse();
+        that((file_matcher)(['mtime' => ['-1 month', '-2 week']])($base . '/a/a2.txt'))->isFalse();
+        that((file_matcher)(['!mtime' => ['-1 month', '-2 week']])($base . '/a/a2.txt'))->isTrue();
+
+        that((file_matcher)(['size' => 3])($base . '/a/a1.txt'))->isTrue();
+        that((file_matcher)(['!size' => 3])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['size' => 9])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!size' => 9])($base . '/a/a1.txt'))->isTrue();
+
+        that((file_matcher)(['size' => ['10k', '70k']])($base . '/a/a2.txt'))->isTrue();
+        that((file_matcher)(['!size' => ['10k', '70k']])($base . '/a/a2.txt'))->isFalse();
+        that((file_matcher)(['size' => ['70k', '99k']])($base . '/a/a2.txt'))->isFalse();
+        that((file_matcher)(['!size' => ['70k', '99k']])($base . '/a/a2.txt'))->isTrue();
+
+        that((file_matcher)(['path' => '#a/b/c/f#i'])('/a/b/c/file'))->isTrue();
+        that((file_matcher)(['!path' => '#a/b/c/f#i'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['path' => '#a/b/c/X#i'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['!path' => '#a/b/c/X#i'])('/a/b/c/file'))->isTrue();
+
+        that((file_matcher)(['path' => '/a/*.txt'])('/a/b/c/file.txt'))->isTrue();
+        that((file_matcher)(['!path' => '/a/*.txt'])('/a/b/c/file.txt'))->isFalse();
+        that((file_matcher)(['path' => '/a/*.not'])('/a/b/c/file.txt'))->isFalse();
+        that((file_matcher)(['!path' => '/a/*.not'])('/a/b/c/file.txt'))->isTrue();
+
+        that((file_matcher)(['path' => '{a.*\.TXT}i'])('/a/b/c/file.txt'))->isTrue();
+        that((file_matcher)(['!path' => '{a.*\.TXT}i'])('/a/b/c/file.txt'))->isFalse();
+        that((file_matcher)(['path' => '{a.*\.NOT}i'])('/a/b/c/file.txt'))->isFalse();
+        that((file_matcher)(['!path' => '{a.*\.NOT}i'])('/a/b/c/file.txt'))->isTrue();
+
+        that((file_matcher)(['dir' => '#a/b/c#i'])('/a/b/c/file'))->isTrue();
+        that((file_matcher)(['!dir' => '#a/b/c#i'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['dir' => '#a/b/c/f#i'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['!dir' => '#a/b/c/f#i'])('/a/b/c/file'))->isTrue();
+
+        that((file_matcher)(['name' => '#file#i'])('/a/b/c/file'))->isTrue();
+        that((file_matcher)(['!name' => '#file#i'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['name' => '#fail#i'])('/a/b/c/file'))->isFalse();
+        that((file_matcher)(['!name' => '#fail#i'])('/a/b/c/file'))->isTrue();
+
+        that((file_matcher)(['extension' => 'ext'])('/a/b/c/file.ext'))->isTrue();
+        that((file_matcher)(['!extension' => 'ext'])('/a/b/c/file.ext'))->isFalse();
+        that((file_matcher)(['extension' => 'not'])('/a/b/c/file.ext'))->isFalse();
+        that((file_matcher)(['!extension' => 'not'])('/a/b/c/file.ext'))->isTrue();
+
+        that((file_matcher)(['contains' => 'xx'])($base . '/a/a1.txt'))->isTrue();
+        that((file_matcher)(['!contains' => 'xx'])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['contains' => 'zz'])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!contains' => 'zz'])($base . '/a/a1.txt'))->isTrue();
+
+        $filter = function ($file) { return mime_content_type($file->getPathname()) === 'text/plain'; };
+        that((file_matcher)(['filter' => $filter])($base . '/a/a1.txt'))->isTrue();
+        that((file_matcher)(['!filter' => $filter])($base . '/a/a1.txt'))->isFalse();
+        $filter = function ($file) { return mime_content_type($file->getPathname()) === 'text/html'; };
+        that((file_matcher)(['filter' => $filter])($base . '/a/a1.txt'))->isFalse();
+        that((file_matcher)(['!filter' => $filter])($base . '/a/a1.txt'))->isTrue();
+    }
+
     function test_file_list()
     {
         $base = sys_get_temp_dir() . '/tree';

@@ -8,6 +8,182 @@ namespace ryunosuke\Functions\Package;
 class FileSystem
 {
     /**
+     * 各種属性を指定してファイルのマッチングを行うクロージャを返す
+     *
+     * ※ 内部向け
+     *
+     * @param array $filter_condition マッチャーコンディション配列（ソースを参照）
+     * @return \Closure ファイルマッチャー
+     */
+    public static function file_matcher(array $filter_condition)
+    {
+        $filter_condition += [
+            // common
+            'dotfile'    => null,  // switch startWith "."
+            'unixpath'   => true,  // convert "\\" -> "/"
+            'casefold'   => false, // ignore case
+            // by getType (string or [string])
+            'type'       => null,
+            '!type'      => null,
+            // by getPerms (int)
+            'perms'      => null,
+            '!perms'     => null,
+            // by getMTime (int or [int, int])
+            'mtime'      => null,
+            '!mtime'     => null,
+            // by getSize (int or [int, int])
+            'size'       => null,
+            '!size'      => null,
+            // by getPathname (glob or regex)
+            'path'       => null,
+            '!path'      => null,
+            // by getPath or getSubpath (glob or regex)
+            'dir'        => null,
+            '!dir'       => null,
+            // by getFilename (glob or regex)
+            'name'       => null,
+            '!name'      => null,
+            // by getExtension (string or [string])
+            'extension'  => null,
+            '!extension' => null,
+            // by contents (string)
+            'contains'   => null,
+            '!contains'  => null,
+            // by custom condition (callable)
+            'filter'     => null,
+            '!filter'    => null,
+        ];
+
+        foreach ([
+            'mtime'  => date_timestamp,
+            '!mtime' => date_timestamp,
+            'size'   => si_unprefix,
+            '!size'  => si_unprefix,
+        ] as $key => $map) {
+            if (isset($filter_condition[$key])) {
+                $range = $filter_condition[$key];
+                if (!is_array($range)) {
+                    $range = array_fill_keys([0, 1], $range);
+                }
+                $range = array_map($map, $range);
+                $filter_condition[$key] = static function ($value) use ($range) {
+                    return (!isset($range[0]) || $value >= $range[0]) && (!isset($range[1]) || $value <= $range[1]);
+                };
+            }
+        }
+
+        foreach ([
+            'type'       => null,
+            '!type'      => null,
+            'extension'  => null,
+            '!extension' => null,
+        ] as $key => $map) {
+            if (isset($filter_condition[$key])) {
+                $array = array_flip((array) $filter_condition[$key]);
+                if ($filter_condition['casefold']) {
+                    $array = array_change_key_case($array, CASE_LOWER);
+                }
+                $filter_condition[$key] = static function ($value) use ($array) {
+                    return isset($array[$value]);
+                };
+            }
+        }
+
+        foreach ([
+            'path'  => null,
+            '!path' => null,
+            'dir'   => null,
+            '!dir'  => null,
+            'name'  => null,
+            '!name' => null,
+        ] as $key => $convert) {
+            if (isset($filter_condition[$key])) {
+                $pattern = $filter_condition[$key];
+                preg_match('##', ''); // clear preg_last_error
+                @preg_match($pattern, '');
+                if (preg_last_error() === PREG_NO_ERROR) {
+                    $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
+                        $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
+                        return !!preg_match($pattern, $string);
+                    };
+                }
+                else {
+                    $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
+                        $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
+                        $flags = 0;
+                        $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
+                        return fnmatch($pattern, $string, $flags);
+                    };
+                }
+            }
+        }
+
+        return function ($file) use ($filter_condition) {
+            if (!$file instanceof \SplFileInfo) {
+                $file = new \SplFileInfo($file);
+            }
+
+            if (isset($filter_condition['dotfile']) && !$filter_condition['dotfile'] === (strpos($file->getFilename(), '.') === 0)) {
+                return false;
+            }
+
+            foreach (['type' => false, '!type' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === $filter_condition[$key]($file->getType()))) {
+                    return false;
+                }
+            }
+            foreach (['perms' => false, '!perms' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === !!($filter_condition[$key] & $file->getPerms()))) {
+                    return false;
+                }
+            }
+            foreach (['mtime' => false, '!mtime' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === $filter_condition[$key]($file->getMTime()))) {
+                    return false;
+                }
+            }
+            foreach (['size' => false, '!size' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === $filter_condition[$key]($file->getSize()))) {
+                    return false;
+                }
+            }
+            foreach (['path' => false, '!path' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getPathname())) {
+                    return false;
+                }
+            }
+            foreach (['dir' => false, '!dir' => true] as $key => $cond) {
+                $dirname = $file instanceof \RecursiveDirectoryIterator ? $file->getSubPath() : $file->getPath();
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($dirname)) {
+                    return false;
+                }
+            }
+            foreach (['name' => false, '!name' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getFilename())) {
+                    return false;
+                }
+            }
+            foreach (['extension' => false, '!extension' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getExtension())) {
+                    return false;
+                }
+            }
+            foreach (['filter' => false, '!filter' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && $cond === !!$filter_condition[$key]($file)) {
+                    return false;
+                }
+            }
+            foreach (['contains' => false, '!contains' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === ((file_pos)($file->getPathname(), $filter_condition[$key]) !== false))) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+    }
+
+    /**
      * ファイル一覧を配列で返す
      *
      * Example:
@@ -28,26 +204,39 @@ class FileSystem
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
-     * @param \Closure|array|null $filter_condition フィルタ条件
+     * @param callable|array $filter_condition フィルタ条件
      * @return array|false ファイルの配列
      */
-    public static function file_list($dirname, $filter_condition = null)
+    public static function file_list($dirname, $filter_condition = [])
     {
         $dirname = realpath($dirname);
         if (!file_exists($dirname)) {
             return false;
         }
 
-        $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS);
+        // for compatible
+        if (is_callable($filter_condition)) {
+            $filter_condition = [
+                'filter' => function (\SplFileInfo $file) use ($filter_condition) {
+                    return $filter_condition($file->getPathname());
+                },
+            ];
+        }
+        $filter_condition += [
+            '!type' => 'dir',
+        ];
+        $match = (file_matcher)($filter_condition);
+
+        $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
         $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
 
         $result = [];
-        foreach ($rii as $it) {
-            if (!$it->isDir()) {
-                if ($filter_condition === null || $filter_condition($it->getPathname())) {
-                    $result[] = $it->getPathname();
-                }
+        foreach ($rii as $fullpath => $it) {
+            if (!$match($it)) {
+                continue;
             }
+
+            $result[] = $fullpath;
         }
         return $result;
     }
@@ -79,20 +268,33 @@ class FileSystem
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
-     * @param \Closure|array|null $filter_condition フィルタ条件
+     * @param callable|array $filter_condition フィルタ条件
      * @return array|false ツリー構造の配列
      */
-    public static function file_tree($dirname, $filter_condition = null)
+    public static function file_tree($dirname, $filter_condition = [])
     {
         $dirname = realpath($dirname);
         if (!file_exists($dirname)) {
             return false;
         }
 
+        // for compatible
+        if (is_callable($filter_condition)) {
+            $filter_condition = [
+                'filter' => function (\SplFileInfo $file) use ($filter_condition) {
+                    return $filter_condition($file->getPathname());
+                },
+            ];
+        }
+        $filter_condition += [
+            '!type' => 'dir',
+        ];
+        $match = (file_matcher)($filter_condition);
+
         $basedir = basename($dirname);
 
         $result = [];
-        $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS));
+        $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS || \FilesystemIterator::CURRENT_AS_SELF));
         usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
             if ($a->isDir() xor $b->isDir()) {
                 return $a->isDir() - $b->isDir();
@@ -107,7 +309,7 @@ class FileSystem
                 $result[$basedir] += (file_tree)($item->getPathname(), $filter_condition);
             }
             else {
-                if ($filter_condition === null || $filter_condition($item->getPathname())) {
+                if ($match($item)) {
                     $result[$basedir][$item->getBasename()] = $item->getPathname();
                 }
             }
