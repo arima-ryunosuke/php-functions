@@ -39,9 +39,10 @@ class Date
      * ```
      *
      * @param string|int|float $datetimedata 日時データ
+     * @param int|null $baseTimestamp 日時データ
      * @return int|float|null タイムスタンプ。パース失敗時は null
      */
-    public static function date_timestamp($datetimedata)
+    public static function date_timestamp($datetimedata, $baseTimestamp = null)
     {
         // 全角を含めた trim
         $chars = "[\\x0-\x20\x7f\xc2\xa0\xe3\x80\x80]";
@@ -63,14 +64,14 @@ class Date
         $datetimedata = strtr($datetimedata, [
             '　'  => ' ',
             '西暦' => '',
-            '年'  => '-',
-            '月'  => '-',
+            '年'  => '/',
+            '月'  => '/',
             '日'  => ' ',
             '時'  => ':',
             '分'  => ':',
             '秒'  => '',
         ]);
-        $datetimedata = trim($datetimedata, " \t\n\r\0\x0B:-");
+        $datetimedata = trim($datetimedata, " \t\n\r\0\x0B:/");
 
         // 数値4桁は年と解釈されるように
         if (preg_match('/^[0-9]{4}$/', $datetimedata)) {
@@ -96,7 +97,13 @@ class Date
         }
 
         if (!checkdate($parts['month'], $parts['day'], $parts['year'])) {
-            return null;
+            if (!isset($parts['relative'])) {
+                return null;
+            }
+            $baseTimestamp = $baseTimestamp ?? time();
+            $parts['year'] = idate('Y', $baseTimestamp);
+            $parts['month'] = idate('m', $baseTimestamp);
+            $parts['day'] = idate('d', $baseTimestamp);
         }
 
         if (isset($parts['relative'])) {

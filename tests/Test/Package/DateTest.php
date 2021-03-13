@@ -7,8 +7,8 @@ class DateTest extends AbstractTestCase
     function test_date_timestamp()
     {
         // テストがコケてタイムスタンプが出力されても分かりにくすぎるので文字列化してテストする
-        $test = function ($val) {
-            $timestamp = (date_timestamp)($val);
+        $test = function ($val, $base = null) {
+            $timestamp = (date_timestamp)($val, $base);
             if ($timestamp === null) {
                 return null;
             }
@@ -44,6 +44,12 @@ class DateTest extends AbstractTestCase
         that($test('1234567890.789'))->is('2009/02/14 08:31:30.789');
         that($test('2014/12/24 12:34:56.789'))->is('2014/12/24 12:34:56.789');
         that($test('昭和31年12月24日 12時34分56.789秒'))->is('1956/12/24 12:34:56.789');
+        // 相対指定（ベース指定）
+        that($test('+1 month'))->is($test('+1 month', time()));
+        that($test('+1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/29 00:00:00.000000');
+        that($test('+1 month', strtotime('2012/02/28 12:34:56.000000')))->is('2012/03/28 00:00:00.000000');
+        that($test('-1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2011/12/31 00:00:00.000000');
+        that($test('-1 month', strtotime('2012/02/28 12:34:56.000000')))->is('2012/01/28 00:00:00.000000');
         // 相対指定
         that($test('2012/01/28 12:34:56 +1 month'))->is('2012/02/28 12:34:56.000000');
         that($test('2012/01/29 12:34:56 +1 month'))->is('2012/02/29 12:34:56.000000');
