@@ -368,6 +368,12 @@ class FunchandTest extends AbstractTestCase
             'a' => 9,
         ]);
 
+        // コンストラクタ
+        $arrayobject = (namedcallize)('\\ArrayObject::__construct')([[1, 2, 3], 'iterator_class' => 'Iterator', \ArrayObject::ARRAY_AS_PROPS]);
+        that($arrayobject)->getArrayCopy()->is([1, 2, 3]);
+        that($arrayobject)->getIteratorClass()->is('Iterator');
+        that($arrayobject)->getFlags()->is(\ArrayObject::ARRAY_AS_PROPS);
+
         // デフォルト
         that((namedcallize)($f1, [
             'x' => 0,

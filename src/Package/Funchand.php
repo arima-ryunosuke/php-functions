@@ -567,14 +567,12 @@ class Funchand
      */
     public static function namedcallize($callable, $defaults = [])
     {
-        // @formatter:off
         static $dummy_arg;
-        $dummy_arg = $dummy_arg ?? new class{};
-        $dummy_class = get_class($dummy_arg);
-        // @formatter:on
+        $dummy_arg = $dummy_arg ?? new \stdClass();
 
-        /** @var \ReflectionParameter[] $refparams */
-        $refparams = (reflect_callable)($callable)->getParameters();
+        /** @var \ReflectionFunctionAbstract $reffunc */
+        $reffunc = (reflect_callable)($callable);
+        $refparams = $reffunc->getParameters();
 
         $defargs = [];
         $argnames = [];
@@ -606,13 +604,16 @@ class Funchand
             }
         }
 
-        return function ($params = []) use ($callable, $defargs, $argnames, $variadicname, $dummy_class) {
+        return function ($params = []) use ($reffunc, $defargs, $argnames, $variadicname, $dummy_arg) {
             $params = (array_map_key)($params, function ($k) use ($argnames) { return is_int($k) ? $argnames[$k] : $k; });
             $params = array_replace($defargs, $params);
 
             // 勝手に突っ込んだ $dummy_class がいるのはおかしい。指定されていないと思われる
-            if ($dummyargs = array_filter($params, function ($v) use ($dummy_class) { return $v instanceof $dummy_class; })) {
-                throw new \InvalidArgumentException('missing required arguments(' . implode(', ', array_keys($dummyargs)) . ').');
+            if ($dummyargs = array_filter($params, function ($v) use ($dummy_arg) { return $v === $dummy_arg; })) {
+                // が、php8 未満では組み込みのデフォルト値は取れないので、除外
+                if (!$reffunc->isInternal()) {
+                    throw new \InvalidArgumentException('missing required arguments(' . implode(', ', array_keys($dummyargs)) . ').');
+                }
             }
             // diff って余りが出るのはおかしい。余計なものがあると思われる
             if ($diffargs = array_diff_key($params, $defargs)) {
@@ -625,7 +626,12 @@ class Funchand
                 unset($params[$variadicname]);
             }
 
-            return $callable(...array_values($params));
+            if ($reffunc instanceof \ReflectionMethod && $reffunc->isConstructor()) {
+                $object = $reffunc->getDeclaringClass()->newInstanceWithoutConstructor();
+                $reffunc->invoke($object, ...array_values($params));
+                return $object;
+            }
+            return $reffunc->invoke(...array_values($params));
         };
     }
 
