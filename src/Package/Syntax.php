@@ -84,6 +84,9 @@ class Syntax
      * 結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。
      * つまり必ず `[TOKENID, TOKEN, LINE, POS]` で返す。
      *
+     * @todo 現在の仕様では php タグが自動で付与されるが、標準と異なり直感的ではないのでその仕様は除去する
+     * @todo そもそも何がしたいのかよくわからない関数になってきたので動作の洗い出しが必要
+     *
      * Example:
      * ```php
      * $phpcode = 'namespace Hogera;
@@ -118,6 +121,8 @@ class Syntax
         }
 
         $default = [
+            'line'       => [],   // 行の範囲（以上以下）
+            'position'   => [],   // 文字位置の範囲（以上以下）
             'begin'      => [],   // 開始トークン
             'end'        => [],   // 終了トークン
             'offset'     => 0,    // 開始トークン位置
@@ -153,6 +158,8 @@ class Syntax
         }
         $tokens = $cache[$phpcode][$flags];
 
+        $lines = $option['line'] + [-PHP_INT_MAX, PHP_INT_MAX];
+        $positions = $option['position'] + [-PHP_INT_MAX, PHP_INT_MAX];
         $begin_tokens = (array) $option['begin'];
         $end_tokens = (array) $option['end'];
         $nest_tokens = $option['nest_token'];
@@ -160,8 +167,24 @@ class Syntax
         $result = [];
         $starting = !$begin_tokens;
         $nesting = 0;
-        for ($i = $option['offset'], $l = count($tokens); $i < $l; $i++) {
+        $offset = is_array($option['offset']) ? ($option['offset'][0] ?? 0) : $option['offset'];
+        $endset = is_array($option['offset']) ? ($option['offset'][1] ?? count($tokens)) : count($tokens);
+
+        for ($i = $offset; $i < $endset; $i++) {
             $token = $tokens[$i];
+
+            if ($lines[0] > $token[2]) {
+                continue;
+            }
+            if ($lines[1] < $token[2]) {
+                continue;
+            }
+            if ($positions[0] > $token[3]) {
+                continue;
+            }
+            if ($positions[1] < $token[3]) {
+                continue;
+            }
 
             foreach ($begin_tokens as $t) {
                 if ($t === $token[0] || $t === $token[1]) {

@@ -161,6 +161,15 @@ ERR
         $code = '$c = function ($a = null) use ($x) {
     return $a + $x;
 };';
+        $tokens = (parse_php)($code, [
+            'line' => [2, 2],
+        ]);
+        that(implode('', array_column($tokens, 1)))->is('return $a + $x;' . "\n");
+        $tokens = (parse_php)($code, [
+            'position' => [37, 56],
+        ]);
+        that(implode('', array_column($tokens, 1)))->is('return $a + $x;' . "\n");
+
         $tokens = (parse_php)($code, 4);
         // @formatter:off
         that($tokens)->is([
