@@ -288,43 +288,43 @@ class StringsTest extends AbstractTestCase
         that((str_equals)($ex, $ex))->isTrue();
     }
 
-    function test_str_contains()
+    function test_str_exists()
     {
         // single
-        that((str_contains)('abcdef', 'cd'))->isTrue();
-        that((str_contains)('abcdef', 'xx'))->isFalse();
+        that((str_exists)('abcdef', 'cd'))->isTrue();
+        that((str_exists)('abcdef', 'xx'))->isFalse();
 
         // single int
-        that((str_contains)('12345', 5))->isTrue();
-        that((str_contains)('12345', 9))->isFalse();
+        that((str_exists)('12345', 5))->isTrue();
+        that((str_exists)('12345', 9))->isFalse();
 
         // empty
-        that((str_contains)('', ''))->isFalse();
-        that((str_contains)('abcdef', ''))->isFalse();
+        that((str_exists)('', ''))->isFalse();
+        that((str_exists)('abcdef', ''))->isFalse();
 
         // single case_insensitivity
-        that((str_contains)('abcdef', 'CD', true))->isTrue();
-        that((str_contains)('abcdef', 'XX', true))->isFalse();
+        that((str_exists)('abcdef', 'CD', true))->isTrue();
+        that((str_exists)('abcdef', 'XX', true))->isFalse();
 
         // multi or
-        that((str_contains)('abcdef', ['cd', 'XX'], false, false))->isTrue();
-        that((str_contains)('abcdef', ['XX', 'YY'], false, false))->isFalse();
+        that((str_exists)('abcdef', ['cd', 'XX'], false, false))->isTrue();
+        that((str_exists)('abcdef', ['XX', 'YY'], false, false))->isFalse();
 
         // multi and
-        that((str_contains)('abcdef', ['cd', 'ef'], false, true))->isTrue();
-        that((str_contains)('abcdef', ['cd', 'XX'], false, true))->isFalse();
+        that((str_exists)('abcdef', ['cd', 'ef'], false, true))->isTrue();
+        that((str_exists)('abcdef', ['cd', 'XX'], false, true))->isFalse();
 
         // multi case_insensitivity
-        that((str_contains)('abcdef', ['CD', 'XX'], true, false))->isTrue();
-        that((str_contains)('abcdef', ['XX', 'YY'], true, false))->isFalse();
-        that((str_contains)('abcdef', ['CD', 'EF'], true, true))->isTrue();
-        that((str_contains)('abcdef', ['CD', 'XX'], true, true))->isFalse();
+        that((str_exists)('abcdef', ['CD', 'XX'], true, false))->isTrue();
+        that((str_exists)('abcdef', ['XX', 'YY'], true, false))->isFalse();
+        that((str_exists)('abcdef', ['CD', 'EF'], true, true))->isTrue();
+        that((str_exists)('abcdef', ['CD', 'XX'], true, true))->isFalse();
 
         // stringable object
-        that((str_contains)(new \Concrete('abcdef'), new \Concrete('cd')))->isTrue();
-        that((str_contains)(new \Concrete('abcdef'), new \Concrete('xx')))->isFalse();
-        that((str_contains)(new \Concrete('abcdef'), new \Concrete('CD'), true, false))->isTrue();
-        that((str_contains)(new \Concrete('abcdef'), new \Concrete('XX'), true))->isFalse();
+        that((str_exists)(new \Concrete('abcdef'), new \Concrete('cd')))->isTrue();
+        that((str_exists)(new \Concrete('abcdef'), new \Concrete('xx')))->isFalse();
+        that((str_exists)(new \Concrete('abcdef'), new \Concrete('CD'), true, false))->isTrue();
+        that((str_exists)(new \Concrete('abcdef'), new \Concrete('XX'), true))->isFalse();
     }
 
     function test_str_chop()

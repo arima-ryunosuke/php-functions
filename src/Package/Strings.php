@@ -478,13 +478,11 @@ class Strings
     /**
      * 指定文字列を含むか返す
      *
-     * Example:
-     * ```php
-     * that(str_contains('abc', 'b'))->isTrue();
-     * that(str_contains('abc', 'B', true))->isTrue();
-     * that(str_contains('abc', ['b', 'x'], false, false))->isTrue();
-     * that(str_contains('abc', ['b', 'x'], false, true))->isFalse();
-     * ```
+     * @see str_exists
+     *
+     * @polyfill
+     * @deprecated
+     * @codeCoverageIgnore
      *
      * @param string $haystack 対象文字列
      * @param string|array $needle 調べる文字列
@@ -493,6 +491,29 @@ class Strings
      * @return bool $needle を含むなら true
      */
     public static function str_contains($haystack, $needle, $case_insensitivity = false, $and_flag = false)
+    {
+        trigger_error('this function(' . __FUNCTION__ . ') is deprecated, use str_exists', E_USER_DEPRECATED);
+        return (str_exists)($haystack, $needle, $case_insensitivity, $and_flag);
+    }
+
+    /**
+     * 指定文字列を含むか返す
+     *
+     * Example:
+     * ```php
+     * that(str_exists('abc', 'b'))->isTrue();
+     * that(str_exists('abc', 'B', true))->isTrue();
+     * that(str_exists('abc', ['b', 'x'], false, false))->isTrue();
+     * that(str_exists('abc', ['b', 'x'], false, true))->isFalse();
+     * ```
+     *
+     * @param string $haystack 対象文字列
+     * @param string|array $needle 調べる文字列
+     * @param bool $case_insensitivity 大文字小文字を無視するか
+     * @param bool $and_flag すべて含む場合に true を返すか
+     * @return bool $needle を含むなら true
+     */
+    public static function str_exists($haystack, $needle, $case_insensitivity = false, $and_flag = false)
     {
         if (!is_array($needle)) {
             $needle = [$needle];

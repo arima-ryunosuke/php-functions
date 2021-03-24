@@ -1083,7 +1083,7 @@ class UtilityTest extends AbstractTestCase
         ]);
 
         $traces = $mock->m3([
-            'class' => function ($v) { return (str_contains)($v, 'class@anonymous'); },
+            'class' => function ($v) { return (str_exists)($v, 'class@anonymous'); },
         ]);
         that($traces[0])->arraySubset([
             'file'     => __FILE__,
