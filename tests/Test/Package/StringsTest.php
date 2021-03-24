@@ -1464,6 +1464,21 @@ a3,b3,c3
             "ao" => \ArrayObject::STD_PROP_LIST,
         ]);
 
+        that((paml_import)('E_ERROR, \\ArrayObject::STD_PROP_LIST'))->isSame([
+            0 => E_ERROR,
+            1 => \ArrayObject::STD_PROP_LIST,
+        ]);
+
+        that((paml_import)('"E_ERROR", "ArrayObject::STD_PROP_LIST"'))->isSame([
+            0 => 'E_ERROR',
+            1 => 'ArrayObject::STD_PROP_LIST',
+        ]);
+
+        that((paml_import)('ArrayObject::class, class:\\ArrayObject::CLASS'))->isSame([
+            0       => 'ArrayObject',
+            'class' => 'ArrayObject',
+        ]);
+
         that((paml_import)('array:[1,2,"3"], nest:[a: [b: [c: [X]]]]'))->isSame([
             "array" => [1, 2, "3"],
             "nest"  => [
@@ -1496,6 +1511,26 @@ a3,b3,c3
             "empty_array2"  => (object) [],
             "empty_string1" => '',
             "empty_string2" => '',
+        ]);
+
+        that((paml_import)('`1 | 2 | 4 | 8`, x: `1 * 2 * 4 * 8`', [
+            'expression' => false,
+        ]))->is([
+            0   => '`1 | 2 | 4 | 8`',
+            'x' => '`1 * 2 * 4 * 8`',
+        ]);
+
+        that((paml_import)('`1 | 2 | 4 | 8`, x: `1 * 2 * 4 * 8`', [
+            'expression' => true,
+        ]))->is([
+            0   => 15,
+            'x' => 64,
+        ]);
+
+        that((paml_import)('ReflectionProperty::IS_PRIVATE | ReflectionProperty::IS_PUBLIC', [
+            'expression' => true,
+        ]))->is([
+            0 => \ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_PUBLIC,
         ]);
 
         that((paml_import)('  '))->isSame([]);

@@ -2527,14 +2527,14 @@ class Strings
     /**
      * paml 的文字列をパースする
      *
-     * paml とは yaml を簡易化したような独自フォーマットを指す。
+     * paml とは yaml を簡易化したような独自フォーマットを指す（Php Array Markup Language）。
      * ざっくりと下記のような特徴がある。
      *
      * - ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要
      * - yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応
      * - 配列を前提にしているので、トップレベルの `[]` `{}` は不要
      * - `[]` でいわゆる php の配列、 `{}` で stdClass を表す（オプション指定可能）
-     * - bare string で php の定数を表す
+     * - bare string で php の定数を表す（クラス定数も完全修飾すれば使用可能）
      *
      * 簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。
      * なお、かなり緩くパースしてるので基本的にエラーにはならない。
@@ -2571,10 +2571,11 @@ class Strings
      *         ],
      *     ],
      * ]);
-     * // bare 文字列で定数が使える
-     * that(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'))->isSame([
-     *     'pv' => \PHP_VERSION,
-     *     'ao' => \ArrayObject::STD_PROP_LIST,
+     * // bare 文字列で定数が使える。::class も特別扱いで定数とみなす
+     * that(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST, class:ArrayObject::class'))->isSame([
+     *     'pv'    => \PHP_VERSION,
+     *     'ao'    => \ArrayObject::STD_PROP_LIST,
+     *     'class' => \ArrayObject::class,
      * ]);
      * ```
      *
@@ -2588,6 +2589,8 @@ class Strings
             'cache'          => true,
             'trailing-comma' => true,
             'stdclass'       => true,
+            'expression'     => false,
+            'escapers'       => ['"' => '"', "'" => "'", '[' => ']', '{' => '}'],
         ];
 
         static $caches = [];
@@ -2596,9 +2599,65 @@ class Strings
             return $caches[$key] = $caches[$key] ?? (paml_import)($pamlstring, ['cache' => false] + $options);
         }
 
-        $escapers = ['"' => '"', "'" => "'", '[' => ']', '{' => '}'];
+        $resolve = function (&$value) use ($options) {
+            $prefix = $value[0] ?? null;
+            $suffix = $value[-1] ?? null;
 
-        $values = array_map('trim', (quoteexplode)(',', $pamlstring, null, $escapers));
+            if (($prefix === '[' && $suffix === ']') || ($prefix === '{' && $suffix === '}')) {
+                $values = (paml_import)(substr($value, 1, -1), $options);
+                $value = ($prefix === '[' || !$options['stdclass']) ? (array) $values : (object) $values;
+                return true;
+            }
+
+            if ($prefix === '"' && $suffix === '"') {
+                //$element = stripslashes(substr($element, 1, -1));
+                $value = json_decode($value);
+                return true;
+            }
+            if ($prefix === "'" && $suffix === "'") {
+                $value = substr($value, 1, -1);
+                return true;
+            }
+
+            if (ctype_digit(ltrim($value, '+-'))) {
+                $value = (int) $value;
+                return true;
+            }
+            if (is_numeric($value)) {
+                $value = (double) $value;
+                return true;
+            }
+
+            if (defined($value)) {
+                $value = constant($value);
+                return true;
+            }
+            [$class, $cname] = explode('::', $value, 2) + [1 => null];
+            if (class_exists($class) && strtolower($cname) === 'class') {
+                $value = ltrim($class, '\\');
+                return true;
+            }
+
+            if ($options['expression']) {
+                if ($prefix === '`' && $suffix === '`') {
+                    $value = eval("return " . substr($value, 1, -1) . ";");
+                    return true;
+                }
+                try {
+                    $evalue = @eval("return $value;");
+                    if ($value !== $evalue) {
+                        $value = $evalue;
+                        return true;
+                    }
+                }
+                catch (\ParseError $e) {
+                }
+            }
+
+            return false;
+        };
+
+        $values = array_map('trim', (quoteexplode)(',', $pamlstring, null, $options['escapers']));
         if ($options['trailing-comma'] && end($values) === '') {
             array_pop($values);
         }
@@ -2606,43 +2665,15 @@ class Strings
         $result = [];
         foreach ($values as $value) {
             $key = null;
-            $kv = array_map('trim', (quoteexplode)(':', $value, 2, $escapers));
-            if (count($kv) === 2) {
-                [$key, $value] = $kv;
-            }
-
-            $prefix = $value[0] ?? null;
-            $suffix = $value[-1] ?? null;
-
-            if (($prefix === '[' && $suffix === ']') || ($prefix === '{' && $suffix === '}')) {
-                $value = (paml_import)(substr($value, 1, -1), $options);
-                $value = ($prefix === '[' || !$options['stdclass']) ? (array) $value : (object) $value;
-            }
-            elseif ($prefix === '"' && $suffix === '"') {
-                //$value = stripslashes(substr($value, 1, -1));
-                $value = json_decode($value);
-            }
-            elseif ($prefix === "'" && $suffix === "'") {
-                $value = substr($value, 1, -1);
-            }
-            elseif (defined($value)) {
-                $value = constant($value);
-            }
-            elseif (is_numeric($value)) {
-                if (ctype_digit(ltrim($value, '+-'))) {
-                    $value = (int) $value;
-                }
-                else {
-                    $value = (double) $value;
+            if (!$resolve($value)) {
+                $kv = array_map('trim', (quoteexplode)(':', $value, 2, $options['escapers']));
+                if (count($kv) === 2) {
+                    [$key, $value] = $kv;
+                    $resolve($value);
                 }
             }
 
-            if ($key === null) {
-                $result[] = $value;
-            }
-            else {
-                $result[$key] = $value;
-            }
+            (array_put)($result, $value, $key);
         }
         return $result;
     }
