@@ -103,6 +103,147 @@ class Utility
     }
 
     /**
+     * psr-16 を実装したキャッシュオブジェクトを返す
+     *
+     * このオブジェクトはあくまで「他のパッケージに依存したくない」場合のデフォルト実装としての使用を想定している。
+     *
+     * - キャッシュはファイルシステムに保存される
+     * - キャッシュキーの . はディレクトリ区切りとして使用される
+     * - TTL を指定しなかったときのデフォルト値は約100年（実質無期限だろう）
+     * - clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない
+     *
+     * psr-16 は依存に含めていないので別途 composer require psr/simple-cache が必要。
+     *
+     * @param string $directory キャッシュ保存ディレクトリ
+     * @return \Psr\SimpleCache\CacheInterface psr-16 実装オブジェクト
+     */
+    public static function cacheobject($directory)
+    {
+        return new class($directory) implements \Psr\SimpleCache\CacheInterface {
+            private $directory;
+            private $entries = [];
+
+            public function __construct(string $directory)
+            {
+                assert(strlen($directory));
+                $this->directory = $directory;
+            }
+
+            private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
+            {
+                return new class($message, $code, $previous) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException {
+                };
+            }
+
+            private function _validateKey(string $key): void
+            {
+                if ($key === '') {
+                    throw $this->_exception("\$key is empty string");
+                }
+                if (strpbrk($key, '{}()/\\@:') !== false) {
+                    throw $this->_exception("\$key contains reserved character({}()/\\@:)");
+                }
+            }
+
+            private function _normalizeTtl($ttl): int
+            {
+                if ($ttl === null) {
+                    return 60 * 60 * 24 * 365 * 100;
+                }
+                if (is_int($ttl)) {
+                    return $ttl;
+                }
+                if ($ttl instanceof \DateInterval) {
+                    return (new \DateTime())->setTimestamp(0)->add($ttl)->getTimestamp();
+                }
+                throw $this->_exception("\$ttl must be null|int|DateInterval(" . gettype($ttl) . ")");
+            }
+
+            private function _getFilename(string $key): string
+            {
+                return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php";
+            }
+
+            /** @inheritdoc */
+            public function get($key, $default = null)
+            {
+                $this->_validateKey($key);
+
+                error_clear_last();
+                $entry = $this->entries[$key] ?? @include $this->_getFilename($key);
+                if (error_get_last() !== null || $entry[0] < time()) {
+                    $this->delete($key);
+                    return $default;
+                }
+
+                $this->entries[$key] = $entry;
+                return $entry[1];
+            }
+
+            /** @inheritdoc */
+            public function set($key, $value, $ttl = null)
+            {
+                $this->_validateKey($key);
+                $ttl = $this->_normalizeTtl($ttl);
+
+                if ($ttl <= 0) {
+                    return $this->delete($key);
+                }
+
+                $this->entries[$key] = [time() + $ttl, $value];
+                $code = (var_export3)($this->entries[$key], ['outmode' => 'file']);
+                return !!(file_set_contents)($this->_getFilename($key), $code);
+            }
+
+            /** @inheritdoc */
+            public function delete($key)
+            {
+                $this->_validateKey($key);
+
+                unset($this->entries[$key]);
+                return @unlink($this->_getFilename($key));
+            }
+
+            /** @inheritdoc */
+            public function clear()
+            {
+                $this->entries = [];
+                return (rm_rf)($this->directory, false);
+            }
+
+            /** @inheritdoc */
+            public function getMultiple($keys, $default = null)
+            {
+                return (array_each)($keys, function (&$result, $v) use ($default) {
+                    $result[$v] = $this->get($v, $default);
+                }, []);
+            }
+
+            /** @inheritdoc */
+            public function setMultiple($values, $ttl = null)
+            {
+                return (array_each)($values, function (&$result, $v, $k) use ($ttl) {
+                    $result = $this->set($k, $v, $ttl) && $result;
+                }, true);
+            }
+
+            /** @inheritdoc */
+            public function deleteMultiple($keys)
+            {
+                return (array_each)($keys, function (&$result, $v) {
+                    $result = $this->delete($v) && $result;
+                }, true);
+            }
+
+            /** @inheritdoc */
+            public function has($key)
+            {
+                return $this->get($key) !== null;
+            }
+        };
+    }
+
+    /**
      * 本ライブラリで使用するキャッシュディレクトリを設定する
      *
      * @param string|null $dirname キャッシュディレクトリ。省略時は返すのみ

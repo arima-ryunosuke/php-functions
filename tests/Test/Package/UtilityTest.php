@@ -217,6 +217,93 @@ class UtilityTest extends AbstractTestCase
         that((array_flatten)((array_maps)((number_serial)($array), '...range')))->is($array);
     }
 
+    function test_cacheobject()
+    {
+        /** @var \Psr\SimpleCache\CacheInterface $cache */
+        $tmpdir = sys_get_temp_dir() . '/cacheobject';
+        (rm_rf)($tmpdir);
+        $cache = (cacheobject)($tmpdir);
+
+        /// single
+
+        that($cache->get('hoge', 'notfound'))->isSame('notfound');
+        that($cache->set('hoge', 'value'))->isTrue();
+        that($cache->has('hoge'))->isTrue();
+        that($cache->get('hoge'))->isSame('value');
+
+        that($cache->delete('hoge'))->isTrue();
+        that($cache->get('hoge'))->isNull();
+        that($cache->delete('hoge'))->isFalse();
+
+        that($cache->get('fuga'))->isNull();
+        that($cache->set('fuga', 'value', 1))->isTrue();
+        that($cache->has('fuga'))->isTrue();
+        that($cache->get('fuga'))->isSame('value');
+        sleep(2);
+        that($cache->has('fuga'))->isFalse();
+        that($cache->get('fuga'))->isNull();
+
+        that($cache->get('piyo'))->isNull();
+        that($cache->set('piyo', 'value', 1))->isTrue();
+        that($cache->set('piyo', 'value', 0))->isTrue();
+        that($cache->has('piyo'))->isFalse();
+        that($cache->get('piyo'))->isNull();
+
+        that($cache->clear())->isTrue();
+
+        /// multiple
+
+        that($cache->setMultiple([
+            'hoge' => 'HOGE',
+            'fuga' => 'FUGA',
+        ]))->isTrue();
+        that($cache->getMultiple(['hoge', 'fuga']))->isSame([
+            'hoge' => 'HOGE',
+            'fuga' => 'FUGA',
+        ]);
+
+        that($cache->deleteMultiple(['hoge']))->isTrue();
+        that($cache->deleteMultiple(['hoge']))->isFalse();
+
+        that($cache->getMultiple(['hoge', 'fuga'], 'default'))->isSame([
+            'hoge' => 'default',
+            'fuga' => 'FUGA',
+        ]);
+
+        that($cache->setMultiple(['fuga' => 'new'], 0))->isTrue();
+
+        that($cache->getMultiple(['hoge', 'fuga'], 'default'))->isSame([
+            'hoge' => 'default',
+            'fuga' => 'default',
+        ]);
+
+        that($cache->setMultiple(['hoge' => 'new'], 1))->isTrue();
+
+        that($cache->getMultiple(['hoge', 'fuga'], 'default'))->isSame([
+            'hoge' => 'new',
+            'fuga' => 'default',
+        ]);
+        sleep(2);
+        that($cache->getMultiple(['hoge', 'fuga'], 'default'))->isSame([
+            'hoge' => 'default',
+            'fuga' => 'default',
+        ]);
+
+        /// misc
+
+        that($cache->set('path.to.dir', 'value'))->isTrue();
+        that($cache->set('ttl', 'value', new \DateInterval('PT15S')))->isTrue();
+        that($cache->get('hoge'))->isNull();
+        that($cache->set('hoge', false))->isTrue();
+        that($cache->has('hoge'))->isTrue();
+        that($cache->get('hoge'))->isFalse();
+
+        that($cache)->try('get', '')->wasThrown('empty string');
+        that($cache)->try('get', '{dummy}')->wasThrown('reserved character');
+        that($cache)->try('getMultiple', new \ArrayObject(['']))->wasThrown('empty string');
+        that($cache)->try('set', 'ttl', 'value', 'hoge')->wasThrown('ttl must be');
+    }
+
     function test_cachedir()
     {
         $tmpdir = sys_get_temp_dir() . '/test';
