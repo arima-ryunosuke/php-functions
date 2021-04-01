@@ -907,20 +907,20 @@ class UtilityTest extends AbstractTestCase
         ]);
 
         // 知らんオプションが与えられた
-        that([arguments, [], 'arg1 arg2 --hoge'])->throws('undefined option name');
-        that([arguments, [], 'arg1 arg2 -h'])->throws('undefined short option');
-        that([arguments, ['o1 a' => null, 'o2 b' => null], 'arg1 arg2 -abc'])->throws('undefined short option');
+        that(arguments)->try([], 'arg1 arg2 --hoge')->wasThrown('undefined option name');
+        that(arguments)->try([], 'arg1 arg2 -h')->wasThrown('undefined short option');
+        that(arguments)->try(['o1 a' => null, 'o2 b' => null], 'arg1 arg2 -abc')->wasThrown('undefined short option');
 
         // ルール不正
-        that([arguments, ['opt1' => null, 'opt1 o' => null]])->throws('duplicated option name');
-        that([arguments, ['opt1 o' => null, 'opt2 o' => null]])->throws('duplicated short option');
+        that(arguments)->try(['opt1' => null, 'opt1 o' => null])->wasThrown('duplicated option name');
+        that(arguments)->try(['opt1 o' => null, 'opt2 o' => null])->wasThrown('duplicated short option');
 
         // 複数指定された
-        that([arguments, ['noreq n' => null], '--noreq arg1 arg2 -n'])->throws('specified already');
-        that([arguments, ['opt a' => ''], '--opt O1 arg1 arg2 -a O2'])->throws('specified already');
+        that(arguments)->try(['noreq n' => null], '--noreq arg1 arg2 -n')->wasThrown('specified already');
+        that(arguments)->try(['opt a' => ''], '--opt O1 arg1 arg2 -a O2')->wasThrown('specified already');
 
         // 値が指定されていない
-        that([arguments, ['req' => 'hoge'], 'arg1 arg2 --req'])->throws('requires value');
+        that(arguments)->try(['req' => 'hoge'], 'arg1 arg2 --req')->wasThrown('requires value');
     }
 
     function test_stacktrace()
@@ -1217,7 +1217,7 @@ class UtilityTest extends AbstractTestCase
             ->arrayHasKey($t)
         [$t]->isResource();
 
-        that([error, 'int', 1])->throws('must be resource or string');
+        that(error)->try('int', 1)->wasThrown('must be resource or string');
     }
 
     function test_add_error_handler()
@@ -1269,7 +1269,7 @@ class UtilityTest extends AbstractTestCase
         // 0.01 秒を 10 回回すので 0.1 秒は超えるはず
         that($time)->greaterThan(0.1);
 
-        that([timer, function () { }, 0])->throws('must be greater than');
+        that(timer)->try(function () { }, 0)->wasThrown('must be greater than');
     }
 
     function test_benchmark()
@@ -1310,14 +1310,11 @@ class UtilityTest extends AbstractTestCase
         // エラーが出なければいいので assert はナシ
 
         // 例外系
-        that([benchmark, ['notfunc']])->throws('caller is not callable');
-        that([benchmark, []])->throws('benchset is empty');
-        that([
-            benchmark,
-            [
-                [new \Concrete('hoge'), 'getName'],
-                [new \Concrete('hoge'), 'getName'],
-            ]
-        ])->throws('duplicated benchname');
+        that(benchmark)->try(['notfunc'])->wasThrown('caller is not callable');
+        that(benchmark)->try([])->wasThrown('benchset is empty');
+        that(benchmark)->try([
+            [new \Concrete('hoge'), 'getName'],
+            [new \Concrete('hoge'), 'getName'],
+        ])->wasThrown('duplicated benchname');
     }
 }

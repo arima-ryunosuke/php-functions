@@ -89,16 +89,16 @@ class MathTest extends AbstractTestCase
         that((mean)($data['int_odd']))->is(0.5555555555555555);
         that((mean)($data['float_evn']))->is(0.7333333333333333);
         that((mean)($data['float_odd']))->is(0.6600000000000000);
-        that([mean, $data['string_evn']])->throws('must be contain');
-        that([mean, $data['string_odd']])->throws('must be contain');
-        that([mean, $data['datetime_evn']])->throws('must be contain');
-        that([mean, $data['datetime_odd']])->throws('must be contain');
+        that(mean)->try($data['string_evn'])->wasThrown('must be contain');
+        that(mean)->try($data['string_odd'])->wasThrown('must be contain');
+        that(mean)->try($data['datetime_evn'])->wasThrown('must be contain');
+        that(mean)->try($data['datetime_odd'])->wasThrown('must be contain');
         that((mean)('1', 2, 3.5, 5.5, 'x'))->is(3.0);
     }
 
     function test_average()
     {
-        that(average)->throws('not implement yet');
+        that(average)->try()->wasThrown('not implement yet');
     }
 
     function test_sum()
@@ -108,10 +108,10 @@ class MathTest extends AbstractTestCase
         that((sum)($data['int_odd']))->is(5);
         that((sum)($data['float_evn']))->is(4.4);
         that((sum)($data['float_odd']))->is(3.3);
-        that([sum, $data['string_evn']])->throws('must be contain');
-        that([sum, $data['string_odd']])->throws('must be contain');
-        that([sum, $data['datetime_evn']])->throws('must be contain');
-        that([sum, $data['datetime_odd']])->throws('must be contain');
+        that(sum)->try($data['string_evn'])->wasThrown('must be contain');
+        that(sum)->try($data['string_odd'])->wasThrown('must be contain');
+        that(sum)->try($data['datetime_evn'])->wasThrown('must be contain');
+        that(sum)->try($data['datetime_odd'])->wasThrown('must be contain');
         that((sum)('1', 2, 3.5, 'x'))->is(6.5);
     }
 
@@ -432,8 +432,8 @@ class MathTest extends AbstractTestCase
         $decimal(9007199254740991.0, -1, $AUTO)->isSame(9007199254741000.0);
         $decimal(9007199254740991.0, -1, $ZERO)->isSame(9007199254740990.0);
 
-        that([decimal, 1, 1, 'hoge'])->throws('$precision must be either');
-        that([decimal, 9007199254740991.0, 1, $NINF])->throws('it exceeds the valid values');
+        that(decimal)->try(1, 1, 'hoge')->wasThrown('$precision must be either');
+        that(decimal)->try(9007199254740991.0, 1, $NINF)->wasThrown('it exceeds the valid values');
     }
 
     function test_random_at()
@@ -490,8 +490,8 @@ class MathTest extends AbstractTestCase
         that(array_filter($result))->is($result);
 
         // 負数は NG
-        that([probability, -1, 1])->throws('probability must be positive number');
-        that([probability, 1, -1])->throws('divisor must be positive number');
+        that(probability)->try(-1, 1)->wasThrown('probability must be positive number');
+        that(probability)->try(1, -1)->wasThrown('divisor must be positive number');
     }
 
     function test_normal_rand()

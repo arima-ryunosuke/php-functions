@@ -11,10 +11,10 @@ class ClassobjTest extends AbstractTestCase
     function test_stdclass()
     {
         $fields = ['a', 'b'];
-        that((stdclass)($fields))
-            ->isInstanceOf(stdClass::class)
-            ->{0}->is('a')
-            ->{1}->is('b');
+        $stdclass = (stdclass)($fields);
+        that($stdclass)->isInstanceOf(stdClass::class);
+        that($stdclass)->{0}->is('a');
+        that($stdclass)->{1}->is('b');
     }
 
     function test_detect_namespace()
@@ -25,7 +25,7 @@ class ClassobjTest extends AbstractTestCase
         that((detect_namespace)(__DIR__ . '/Classobj/NS/Valid'))->is('A\\B\\C');
         that((detect_namespace)(__DIR__ . '/Classobj/NS/Valid/Hoge.php'))->is('A\\B\\C\\Hoge');
         that((detect_namespace)(__DIR__ . '/../../../src/Package'))->is('ryunosuke\\Functions\\Package');
-        that([detect_namespace, '/a/b/c/d/e/f/g/h/i/j/k/l/m/n'])->throws('can not detect namespace');
+        that(detect_namespace)->try('/a/b/c/d/e/f/g/h/i/j/k/l/m/n')->wasThrown('can not detect namespace');
     }
 
     function test_class_uses_all()
@@ -56,7 +56,7 @@ class ClassobjTest extends AbstractTestCase
 
     function test_class_loader()
     {
-        that([class_loader, '/notfounddir'])->throws('not found');
+        that(class_loader)->try('/notfounddir')->wasThrown('not found');
     }
 
     function test_class_namespace()
@@ -78,12 +78,8 @@ class ClassobjTest extends AbstractTestCase
 
     function test_class_replace()
     {
-        that([class_replace, __CLASS__, function () { }])->throws('already declared');
-        that([
-            class_replace,
-            '\\ryunosuke\\Test\\package\\Classobj\\A',
-            function () { require_once __DIR__ . '/Classobj/_.php'; }
-        ])->throws('multi classes');
+        that(class_replace)->try(__CLASS__, function () { })->wasThrown('already declared');
+        that(class_replace)->try('\\ryunosuke\\Test\\package\\Classobj\\A', function () { require_once __DIR__ . '/Classobj/_.php'; })->wasThrown('multi classes');
 
         (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\A', function () {
             require_once __DIR__ . '/Classobj/A_.php';

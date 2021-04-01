@@ -30,7 +30,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 if (!function_exists('that')) {
     function that($value)
     {
-        return new \ryunosuke\PHPUnit\Actual($value, true);
+        return new \ryunosuke\PHPUnit\Actual($value);
     }
 }
 file_put_contents(__DIR__ . '/annotation.php', "<?php

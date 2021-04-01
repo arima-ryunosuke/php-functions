@@ -118,8 +118,8 @@ class DateTest extends AbstractTestCase
         that((date_convert)('x曜日', '2019/12/24 00:00:00 -1 second'))->is('月曜日');
         that((date_convert)('\\Y\\J\\K\\k\\b\\x', '2019/12/24'))->is('YJKkbx');
 
-        that([date_convert, 'Y/m/d H:i:s.u', 'hogera'])->throws('parse failed');
-        that([date_convert, 'JY/m/d H:i:s.u', '1200/12/23'])->throws('notfound JP_ERA');
+        that(date_convert)->try('Y/m/d H:i:s.u', 'hogera')->wasThrown('parse failed');
+        that(date_convert)->try('JY/m/d H:i:s.u', '1200/12/23')->wasThrown('notfound JP_ERA');
     }
 
     function test_date_fromto()
@@ -233,7 +233,7 @@ class DateTest extends AbstractTestCase
 
         that((date_interval)(123.456))->isInstanceOf(\DateInterval::class);
 
-        that([date_interval, 0, '', 2])->throws('$format must be array');
-        that([date_interval, 1, [], 2])->throws('$format is empty');
+        that(date_interval)->try(0, '', 2)->wasThrown('$format must be array');
+        that(date_interval)->try(1, [], 2)->wasThrown('$format is empty');
     }
 }

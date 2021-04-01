@@ -60,9 +60,9 @@ class VarsTest extends AbstractTestCase
         that((numberify)('a1b2.c3', true))->isSame(12.3);
         that((numberify)('-a1b2c.3', true))->isSame(-12.3);
 
-        that([numberify, 'aaa'])->throws('is not numeric');
-        that([numberify, 'a.a'])->throws('is not numeric');
-        that([numberify, '1.2.3', true])->throws('is not numeric');
+        that(numberify)->try('aaa')->wasThrown('is not numeric');
+        that(numberify)->try('a.a')->wasThrown('is not numeric');
+        that(numberify)->try('1.2.3', true)->wasThrown('is not numeric');
     }
 
     function test_numval()
@@ -178,7 +178,7 @@ class VarsTest extends AbstractTestCase
         that((arrayable_key_exists)('notfound', $object))->isFalse();
         that((arrayable_key_exists)('ex', $object))->isFalse();
 
-        that([arrayable_key_exists, null, new \stdClass()])->throws('must be array or ArrayAccess');
+        that(arrayable_key_exists)->try(null, new \stdClass())->wasThrown('must be array or ArrayAccess');
     }
 
     function test_attr_get()
@@ -250,7 +250,7 @@ class VarsTest extends AbstractTestCase
         that((attr_get)('notfound', $object, 'default'))->isSame('default');
         that((attr_get)('ex', $object, 'default'))->isSame('default');
 
-        that([attr_get, null, 'dummy'])->throws('must be array or object');
+        that(attr_get)->try(null, 'dummy')->wasThrown('must be array or object');
     }
 
     function test_si_prefix()
@@ -290,7 +290,7 @@ class VarsTest extends AbstractTestCase
             return number_format($v, 2) . $u;
         }))->is('12.35k');
 
-        that([si_prefix, pow(10, 30)])->throws('too large or small');
+        that(si_prefix)->try(pow(10, 30))->wasThrown('too large or small');
     }
 
     function test_si_unprefix()
@@ -356,7 +356,6 @@ class VarsTest extends AbstractTestCase
         // 自明だが継承して空でなければ空ではない
         $stdClassEx->hoge = 123;
         that((is_empty)($stdClassEx, true))->isFalse();
-
     }
 
     function test_is_primitive()
@@ -931,12 +930,9 @@ VAR
         that((var_export3)([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function () {');
         that((var_export3)([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
-        that([var_export3, (function () { yield 1; })()])->throws('is not support');
-        that([
-            var_export3,
-            new class() {
-            }
-        ])->throws('is not support');
+        that(var_export3)->try((function () { yield 1; })())->wasThrown('is not support');
+        that(var_export3)->try(new class() {
+        })->wasThrown('is not support');
 
         $this->expectOutputRegex('#new class()#');
         (var_export3)([1, 2, 3]);
@@ -977,7 +973,7 @@ VAR
 
     function test_var_pretty()
     {
-        that([var_pretty, null, 'hoge'])->throws('is not supported');
+        that(var_pretty)->try(null, 'hoge')->wasThrown('is not supported');
 
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
@@ -1096,13 +1092,13 @@ VAR
         that(function () {
             $hoge = 1;
             (hashvar)($hoge, 1);
-        })->throws(new \UnexpectedValueException('variable'));
+        })->try()->wasThrown(new \UnexpectedValueException('variable'));
 
         // 同一行に同じ引数2つだと区別出来ない
         that(function () {
             $hoge = 1;
             $fuga = 2;
             [(hashvar)($hoge), (hashvar)($fuga)];
-        })->throws(new \UnexpectedValueException('ambiguous'));
+        })->try()->wasThrown(new \UnexpectedValueException('ambiguous'));
     }
 }

@@ -139,7 +139,7 @@ class FunchandTest extends AbstractTestCase
         that(array_filter($p, (ope_func)('==', 5)))->isSame([4 => 5]);
 
         // 例外系
-        that([ope_func, 'hogera'])->throws('is not defined');
+        that(ope_func)->try('hogera')->wasThrown('is not defined');
     }
 
     function test_not_func()
@@ -195,10 +195,10 @@ class FunchandTest extends AbstractTestCase
         that((reflect_callable)(['PrivateClass', 'privateMethod']))->isInstanceOf('\ReflectionMethod');
 
         // そんなものは存在しない
-        that([reflect_callable, 'hogefuga'])->throws('does not exist');
+        that(reflect_callable)->try('hogefuga')->wasThrown('does not exist');
 
         // そもそも形式がおかしい
-        that([reflect_callable, []])->throws('is not callable');
+        that(reflect_callable)->try([])->wasThrown('is not callable');
     }
 
     function test_callable_code()
@@ -261,13 +261,7 @@ class FunchandTest extends AbstractTestCase
         that((call_safely)(function ($v) { return $v; }, 999))->is(999);
 
         // エラーが出たら例外を投げる
-        that([
-            call_safely,
-            function () {
-                /** @noinspection PhpUndefinedVariableInspection */
-                return $v;
-            }
-        ])->throws('Undefined variable');
+        that(call_safely)->try(function () { return (string) []; })->wasThrown('Array to string conversion');
 
         // @で抑制した場合は例外は飛ばない
         that((call_safely)(function () {
@@ -294,13 +288,8 @@ class FunchandTest extends AbstractTestCase
         that(ob_get_level())->is($current);
 
         // 処理中に飛んだ例外が飛ぶ
-        that([
-            ob_capture,
-            function ($v) {
-                throw new \Exception('inob');
-            },
-            'hoge'
-        ])->throws('inob');
+        that(ob_capture)->try(function ($v) { throw new \Exception('inob'); },
+            'hoge')->wasThrown('inob');
         // ob レベルは変わらない
         that(ob_get_level())->is($current);
     }
@@ -361,7 +350,7 @@ class FunchandTest extends AbstractTestCase
         that((function () use ($object) { return count($object); })())->is(1);
         that((function () use ($object) { return $object->count(); })())->is(0);
 
-        that([by_builtin, '', ''])->throws('backtrace');
+        that(by_builtin)->try('', '')->wasThrown('backtrace');
     }
 
     function test_namedcallize()
@@ -419,8 +408,8 @@ class FunchandTest extends AbstractTestCase
 
         // 例外系
         $fx = (namedcallize)($f1);
-        that([$fx, []])->throws('required arguments');
-        that([$fx, ['x' => null, 'unknown' => null]])->throws('undefined arguments');
+        that($fx)->try([])->wasThrown('required arguments');
+        that($fx)->try(['x' => null, 'unknown' => null])->wasThrown('undefined arguments');
     }
 
     function test_parameter_length()
@@ -507,8 +496,8 @@ class FunchandTest extends AbstractTestCase
             '$ao' => $ao = new \ArrayObject([1, 2, 3]),
         ]);
         that($params)->isSame([
-            0  => $ao,
-            7  => 'default2',
+            0 => $ao,
+            7 => 'default2',
         ]);
     }
 
@@ -685,10 +674,10 @@ class FunchandTest extends AbstractTestCase
         }
 
         // 例外
-        that([function_alias, function () { }, 'xx'])->throws('must not be object');
-        that([function_alias, 'x', 'xx'])->throws('does not exist');
-        that([function_alias, [new \Concrete('u'), 'getName'], 'xx'])->throws('non-static method');
-        that([function_alias, 'implode', 'implode'])->throws('already declared');
+        that(function_alias)->try(function () { }, 'xx')->wasThrown('must not be object');
+        that(function_alias)->try('x', 'xx')->wasThrown('does not exist');
+        that(function_alias)->try([new \Concrete('u'), 'getName'], 'xx')->wasThrown('non-static method');
+        that(function_alias)->try('implode', 'implode')->wasThrown('already declared');
     }
 
     function test_function_parameter()

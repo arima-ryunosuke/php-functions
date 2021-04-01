@@ -8,7 +8,7 @@ class NetworkTest extends AbstractTestCase
     {
         that((getipaddress)())->matches('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#');
 
-        @that([getipaddress, '256.256.256.256'])->throws('php_network_getaddresses');
+        @that(getipaddress)->try('256.256.256.256')->wasThrown('php_network_getaddresses');
     }
 
     function test_incidr()
@@ -34,7 +34,7 @@ class NetworkTest extends AbstractTestCase
             ['ipaddr', 'an_invalid_ip', '192.168.1.0/24'],
         ];
         foreach ($invaliddata as $v) {
-            that([incidr, $v[1], $v[2]])->throws($v[0]);
+            that(incidr)->try($v[1], $v[2])->wasThrown($v[0]);
         }
     }
 
@@ -61,7 +61,7 @@ class NetworkTest extends AbstractTestCase
         that((ping)("unknown-host", null, 1, $err))->isFalse();
         that($err)->isNotEmpty();
 
-        that([ping, "http://hostname"])->throws('is not supported');
+        that(ping)->try("http://hostname")->wasThrown('is not supported');
     }
 
     function test_http_requests()
@@ -140,20 +140,14 @@ class NetworkTest extends AbstractTestCase
         ]);
         that($response['gzipped'])->isTrue();
 
-        that([
-            http_request,
-            [
-                CURLOPT_URL => "$server/status/404",
-                'throw'     => true,
-            ]
-        ])->throws('404');
+        that(http_request)->try([
+            CURLOPT_URL => "$server/status/404",
+            'throw'     => true,
+        ])->wasThrown('404');
 
-        that([
-            http_request,
-            [
-                CURLOPT_URL => "http://0.0.0.0:801",
-            ]
-        ])->throws('Failed to connect');
+        that(http_request)->try([
+            CURLOPT_URL => "http://0.0.0.0:801",
+        ])->wasThrown('Failed to connect');
     }
 
     function test_http_method()
