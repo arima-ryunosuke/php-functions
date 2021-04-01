@@ -273,9 +273,15 @@ class Arrays
             return $default;
         }
         if (is_array($array)) {
+            if (function_exists('array_key_last')) {
+                $k = array_key_last($array);
+                return [$k, $array[$k]];
+            }
+            // @codeCoverageIgnoreStart
             $v = end($array);
             $k = key($array);
             return [$k, $v];
+            // @codeCoverageIgnoreEnd
         }
         /** @noinspection PhpStatementHasEmptyBodyInspection */
         foreach ($array as $k => $v) {
