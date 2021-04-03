@@ -895,6 +895,7 @@ define("ryunosuke\\Functions\\Package\\str_chunk", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\str_anyof", ["ryunosuke\\Functions\\Package\\Strings", "str_anyof"]);
 define("ryunosuke\\Functions\\Package\\str_equals", ["ryunosuke\\Functions\\Package\\Strings", "str_equals"]);
 define("ryunosuke\\Functions\\Package\\str_contains", ["ryunosuke\\Functions\\Package\\Strings", "str_contains"]);
+define("ryunosuke\\Functions\\Package\\str_exists", ["ryunosuke\\Functions\\Package\\Strings", "str_exists"]);
 define("ryunosuke\\Functions\\Package\\str_chop", ["ryunosuke\\Functions\\Package\\Strings", "str_chop"]);
 define("ryunosuke\\Functions\\Package\\str_lchop", ["ryunosuke\\Functions\\Package\\Strings", "str_lchop"]);
 define("ryunosuke\\Functions\\Package\\str_rchop", ["ryunosuke\\Functions\\Package\\Strings", "str_rchop"]);
@@ -962,6 +963,7 @@ define("ryunosuke\\Functions\\Package\\try_finally", ["ryunosuke\\Functions\\Pac
 define("ryunosuke\\Functions\\Package\\try_catch_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_finally"]);
 define("ryunosuke\\Functions\\Package\\get_uploaded_files", ["ryunosuke\\Functions\\Package\\Utility", "get_uploaded_files"]);
 define("ryunosuke\\Functions\\Package\\number_serial", ["ryunosuke\\Functions\\Package\\Utility", "number_serial"]);
+define("ryunosuke\\Functions\\Package\\cacheobject", ["ryunosuke\\Functions\\Package\\Utility", "cacheobject"]);
 define("ryunosuke\\Functions\\Package\\cachedir", ["ryunosuke\\Functions\\Package\\Utility", "cachedir"]);
 define("ryunosuke\\Functions\\Package\\cache", ["ryunosuke\\Functions\\Package\\Utility", "cache"]);
 define("ryunosuke\\Functions\\Package\\parse_namespace", ["ryunosuke\\Functions\\Package\\Utility", "parse_namespace"]);

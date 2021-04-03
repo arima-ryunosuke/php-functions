@@ -1760,6 +1760,10 @@
  * @see cachedir
  * @method   \ChainObject  cachedir()
  *
+ * @see cacheobject
+ * @property \ChainObject $cacheobject
+ * @method   \ChainObject  cacheobject()
+ *
  * @see call_if
  * @method   \ChainObject  call_if($callable, ...$arguments)
  * @method   \ChainObject  call_if1($condition, ...$arguments)
@@ -4789,6 +4793,18 @@
  * @method   \ChainObject  equals($str2, $case_insensitivity = false)
  * @method   \ChainObject  equals1($str1, $case_insensitivity = false)
  * @method   \ChainObject  equals2($str1, $str2)
+ *
+ * @see str_exists
+ * @method   \ChainObject  str_exists($needle, $case_insensitivity = false, $and_flag = false)
+ * @method   \ChainObject  str_exists1($haystack, $case_insensitivity = false, $and_flag = false)
+ * @method   \ChainObject  str_exists2($haystack, $needle, $and_flag = false)
+ * @method   \ChainObject  str_exists3($haystack, $needle, $case_insensitivity = false)
+ *
+ * @see str_exists
+ * @method   \ChainObject  exists($needle, $case_insensitivity = false, $and_flag = false)
+ * @method   \ChainObject  exists1($haystack, $case_insensitivity = false, $and_flag = false)
+ * @method   \ChainObject  exists2($haystack, $needle, $and_flag = false)
+ * @method   \ChainObject  exists3($haystack, $needle, $case_insensitivity = false)
  *
  * @see str_getcsv
  * @property \ChainObject $str_getcsv

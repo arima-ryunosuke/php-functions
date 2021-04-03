@@ -1479,7 +1479,8 @@ that(array_remove($array, ['a', 'c']))-&gt;isSame(['b' =&gt; 'B']);
                                     ryunosuke\Functions\Package\Arrays::array_lookup		</a>	<small>($array, $column_key = null, $index_key = null) : array</small>
 		</h4>
 	<div class="description"><p>キー保存可能な array_column</p>
-<p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。</p>
+<p>array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。<br />
+逆に第3引数にクロージャを与えるとその結果をキーにすることが出来る。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = [
     11 =&gt; ['id' =&gt; 1, 'name' =&gt; 'name1'],
@@ -1494,6 +1495,12 @@ that(array_lookup($array, 'name'))-&gt;isSame([
     11 =&gt; 'name1',
     12 =&gt; 'name2',
     13 =&gt; 'name3',
+]);
+// クロージャを指定すればキーが生成される
+that(array_lookup($array, 'name', function ($v, $k) {return $k * 2;}))-&gt;isSame([
+    22 =&gt; 'name1',
+    24 =&gt; 'name2',
+    26 =&gt; 'name3',
 ]);
 </code></pre>
 </div>
@@ -2017,6 +2024,7 @@ that($newobject-&gt;count())-&gt;isSame(6);
 <ul>
 <li>defined は単一引数しか与えられないが、この関数は2つの引数も受け入れる</li>
 <li>defined は private const で即死するが、この関数はきちんと調べることができる</li>
+<li>ClassName::class は常に true を返す</li>
 </ul>
 <p>あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（<code>property_exists</code> と同じ）。</p>
 <p>Example:</p>
@@ -3653,11 +3661,17 @@ that(str_equals('\0abc', '\0abc'))-&gt;isTrue();
                                     ryunosuke\Functions\Package\Strings::str_contains		</a>	<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false) : bool</small>
 		</h4>
 	<div class="description"><p>指定文字列を含むか返す</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_exists()">
+                                    ryunosuke\Functions\Package\Strings::str_exists		</a>	<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false) : bool</small>
+		</h4>
+	<div class="description"><p>指定文字列を含むか返す</p>
 <p>Example:</p>
-<pre><code class="language-php">that(str_contains('abc', 'b'))-&gt;isTrue();
-that(str_contains('abc', 'B', true))-&gt;isTrue();
-that(str_contains('abc', ['b', 'x'], false, false))-&gt;isTrue();
-that(str_contains('abc', ['b', 'x'], false, true))-&gt;isFalse();
+<pre><code class="language-php">that(str_exists('abc', 'b'))-&gt;isTrue();
+that(str_exists('abc', 'B', true))-&gt;isTrue();
+that(str_exists('abc', ['b', 'x'], false, false))-&gt;isTrue();
+that(str_exists('abc', ['b', 'x'], false, true))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4311,14 +4325,14 @@ that(json_import('{"a":"A","b":"B"}', [
                                     ryunosuke\Functions\Package\Strings::paml_import		</a>	<small>($pamlstring, $options = []) : array</small>
 		</h4>
 	<div class="description"><p>paml 的文字列をパースする</p>
-<p>paml とは yaml を簡易化したような独自フォーマットを指す。<br />
+<p>paml とは yaml を簡易化したような独自フォーマットを指す（Php Array Markup Language）。<br />
 ざっくりと下記のような特徴がある。</p>
 <ul>
 <li>ほとんど yaml と同じだがフロースタイルのみでキーコロンの後のスペースは不要</li>
 <li>yaml のアンカーや複数ドキュメントのようなややこしい仕様はすべて未対応</li>
 <li>配列を前提にしているので、トップレベルの <code>[]</code> <code>{}</code> は不要</li>
 <li><code>[]</code> でいわゆる php の配列、 <code>{}</code> で stdClass を表す（オプション指定可能）</li>
-<li>bare string で php の定数を表す</li>
+<li>bare string で php の定数を表す（クラス定数も完全修飾すれば使用可能）</li>
 </ul>
 <p>簡易的な設定の注入に使える（yaml は標準で対応していないし、json や php 配列はクオートの必要やケツカンマ問題がある）。<br />
 なお、かなり緩くパースしてるので基本的にエラーにはならない。</p>
@@ -4361,10 +4375,11 @@ that(paml_import('a:[1,2,x:X,3], nest:[a:[b:[c:[X]]]]'))-&gt;isSame([
         ],
     ],
 ]);
-// bare 文字列で定数が使える
-that(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST'))-&gt;isSame([
-    'pv' =&gt; \PHP_VERSION,
-    'ao' =&gt; \ArrayObject::STD_PROP_LIST,
+// bare 文字列で定数が使える。::class も特別扱いで定数とみなす
+that(paml_import('pv:PHP_VERSION, ao:ArrayObject::STD_PROP_LIST, class:ArrayObject::class'))-&gt;isSame([
+    'pv'    =&gt; \PHP_VERSION,
+    'ao'    =&gt; \ArrayObject::STD_PROP_LIST,
+    'class' =&gt; \ArrayObject::class,
 ]);
 </code></pre>
 </div>
@@ -4827,27 +4842,6 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 	<div class="description"><p>php のコード断片をパースする</p>
 <p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
 つまり必ず <code>[TOKENID, TOKEN, LINE, POS]</code> で返す。</p>
-<p>Example:</p>
-<pre><code class="language-php">$phpcode = 'namespace Hogera;
-class Example
-{
-    // something
-}';
-
-// namespace ～ ; を取得
-$part = parse_php($phpcode, [
-    'begin' =&gt; T_NAMESPACE,
-    'end'   =&gt; ';',
-]);
-that(implode('', array_column($part, 1)))-&gt;isSame('namespace Hogera;');
-
-// class ～ { を取得
-$part = parse_php($phpcode, [
-    'begin' =&gt; T_CLASS,
-    'end'   =&gt; '{',
-]);
-that(implode('', array_column($part, 1)))-&gt;isSame("class Example\n{");
-</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::indent_php()">
@@ -5282,6 +5276,20 @@ that(number_serial([1, 2, 4, 6, 7, 9], 1, null))-&gt;is([[1, 2], [4, 4], [6, 7],
 // $step は負数・小数・逆順も対応している（正負でよしなにソートされる）
 that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9, 0.5, '0.2~0', '-0.2~-0.3', -9]);
 </code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cacheobject()">
+                                    ryunosuke\Functions\Package\Utility::cacheobject		</a>	<small>($directory) : <a href="Psr-SimpleCache-CacheInterface$typespace.html#Psr\SimpleCache\CacheInterface" class="fqsen "><small>Psr\SimpleCache\</small><wbr>CacheInterface</a></small>
+		</h4>
+	<div class="description"><p>psr-16 を実装したキャッシュオブジェクトを返す</p>
+<p>このオブジェクトはあくまで「他のパッケージに依存したくない」場合のデフォルト実装としての使用を想定している。</p>
+<ul>
+<li>キャッシュはファイルシステムに保存される</li>
+<li>キャッシュキーの . はディレクトリ区切りとして使用される</li>
+<li>TTL を指定しなかったときのデフォルト値は約100年（実質無期限だろう）</li>
+<li>clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない</li>
+</ul>
+<p>psr-16 は依存に含めていないので別途 composer require psr/simple-cache が必要。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()">
