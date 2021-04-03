@@ -471,7 +471,8 @@ class FunchandTest extends AbstractTestCase
 
         $params = (parameter_wiring)($closure, $that = [
             \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
-            \RuntimeException::class => $t = new \RuntimeException('hoge'),
+            \Exception::class        => new \Exception('hoge'),
+            \RuntimeException::class => new \RuntimeException('hoge'),
             '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
             '$method'                => \Closure::fromCallable([$ao, 'getArrayCopy']),
             '$closure'               => function () { return (array) $this; },
@@ -480,7 +481,7 @@ class FunchandTest extends AbstractTestCase
         ]);
         that($params)->isSame([
             0  => $ao,
-            1  => $t,
+            // 1  => null, ambiguous
             2  => [1, 2, 3],
             3  => [1, 2, 3],
             4  => $that,

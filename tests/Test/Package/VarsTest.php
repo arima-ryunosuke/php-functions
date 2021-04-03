@@ -940,6 +940,8 @@ VAR
 
     function test_var_html()
     {
+        $recur = ['a' => 'A'];
+        $recur['r'] = &$recur;
         $value = [
             'array'       => [1, 2, 3,],
             'hash'        => [
@@ -966,6 +968,7 @@ VAR
             'string'      => 'ABC',
             'object'      => new \DateTime(),
             'resource'    => STDOUT,
+            'recur'       => $recur,
         ];
         $this->expectOutputRegex('#<pre class=\'var_html\'>#');
         (var_html)($value);

@@ -187,7 +187,7 @@ class Utility
                         if (file_put_contents($temppath, $content) !== false) {
                             @chmod($temppath, 0644);
                             if (!@rename($temppath, $filepath)) {
-                                @unlink($temppath);
+                                @unlink($temppath); // @codeCoverageIgnore
                             }
                         }
                     }
@@ -810,7 +810,6 @@ class Utility
     public static function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
     {
         if (version_compare(PHP_VERSION, '7.4.0') >= 0 && is_array($args)) {
-            // @codeCoverageIgnoreStart
             $statement = [$command];
             foreach ($args as $k => $v) {
                 if (!is_int($k)) {
@@ -818,9 +817,9 @@ class Utility
                 }
                 $statement[] = $v;
             }
-            // @codeCoverageIgnoreEnd
         }
         else {
+            // @codeCoverageIgnoreStart
             if (is_array($args)) {
                 $args = (array_sprintf)($args, function ($v, $k) {
                     $ev = escapeshellarg($v);
@@ -828,6 +827,7 @@ class Utility
                 }, ' ');
             }
             $statement = escapeshellcmd($command) . " $args";
+            // @codeCoverageIgnoreEnd
         }
 
         $proc = proc_open($statement, [

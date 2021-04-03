@@ -930,18 +930,19 @@ class UtilityTest extends AbstractTestCase
             return (stacktrace)();
         }
 
-        function test_stacktrace()
+        function test_stacktrace($that)
         {
-            $c = function () {
+            $that->that = $that;
+            $c = function ($that) {
                 return eval($code = 'return \ryunosuke\\Test\\Package\\test_stacktrace_in();');
             };
-            return $c();
+            return $c($that);
         }
 
         $mock = new class() {
-            static function sm() { return test_stacktrace(); }
+            static function sm($that) { return test_stacktrace($that); }
 
-            function im() { return $this::sm(); }
+            function im() { return $this::sm($this); }
         };
 
         // stack

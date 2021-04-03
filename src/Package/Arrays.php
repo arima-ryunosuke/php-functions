@@ -4060,7 +4060,7 @@ class Arrays
             if ($maintype === 'list') {
                 $result = array_merge(...(array_lmap)($arrays, $validate, $schema, $path));
                 if (isset($subtype)) {
-                    $subschema = ['type' => $subtype] + (array_map_key)($schema, function ($k) { return $k[0] === '@' ? substr($k, 1) : null; }, []);
+                    $subschema = ['type' => $subtype] + (array_map_key)($schema, function ($k) { return $k[0] === '@' ? substr($k, 1) : null; });
                     foreach ($result as $k => $v) {
                         $result[$k] = $main($subschema, "$path/$k", $v);
                     }

@@ -801,9 +801,6 @@ class Funchand
                     $result[$n] = $dependency[$pname];
                 }
             }
-            elseif (isset($dependency[$n])) {
-                $result[$n] = $dependency[$n];
-            }
             elseif (($type = $parameter->getType()) && $type instanceof \ReflectionNamedType) {
                 if (isset($dependency[$type->getName()])) {
                     $result[$n] = $dependency[$type->getName()];
