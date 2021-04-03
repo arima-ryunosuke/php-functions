@@ -619,6 +619,7 @@ class Classobj
      *
      * - defined は単一引数しか与えられないが、この関数は2つの引数も受け入れる
      * - defined は private const で即死するが、この関数はきちんと調べることができる
+     * - ClassName::class は常に true を返す
      *
      * あくまで存在を調べるだけで実際にアクセスできるかは分からないので注意（`property_exists` と同じ）。
      *
@@ -650,10 +651,14 @@ class Classobj
         }
 
         try {
-            $refclass = new \ReflectionClassConstant($classname, $constname);
+            $refclass = new \ReflectionClass($classname);
+            if (strcasecmp($constname, 'class') === 0) {
+                return true;
+            }
+            return $refclass->hasConstant($constname);
         }
-        finally {
-            return isset($refclass);
+        catch (\Throwable $t) {
+            return false;
         }
     }
 

@@ -243,6 +243,12 @@ class ClassobjTest extends AbstractTestCase
         that((const_exists)("$class::PROTECTED_CONST"))->isTrue();
         that((const_exists)("$class::PUBLIC_CONST"))->isTrue();
 
+        // マジック定数
+        that((const_exists)("$class::class"))->isTrue();
+        that((const_exists)($class, "class"))->isTrue();
+        that((const_exists)("$class::CLASS"))->isTrue();
+        that((const_exists)($class, "CLASS"))->isTrue();
+
         // グローバル定数
         that((const_exists)("PHP_VERSION"))->isTrue();
         that((const_exists)('\ryunosuke\Test\Package\PI'))->isTrue();
