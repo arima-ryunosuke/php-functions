@@ -1971,6 +1971,8 @@ class ArraysTest extends AbstractTestCase
         // オブジェクトもOK
         $objects = array_map(stdclass, $arrays);
         that((array_lookup)($objects, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
+        // クロージャもOK
+        that((array_lookup)($objects, 'name', function ($v, $k) { return "$k-{$v->name}"; }))->isSame(["11-name1" => 'name1', "12-name2" => 'name2', "13-name3" => 'name3']);
     }
 
     function test_array_select()
