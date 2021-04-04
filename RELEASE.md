@@ -11,7 +11,20 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.16
+
+- [feature][Arrays] array_lookup のクロージャ対応
+- [refactor][Arrays] last_keyvalue を高速化
+- [feature][Utility] cacheobject を追加
+- [feature][Syntax] 行や桁の範囲を指定するオプションを実装
+- [feature][Funchand] namedcallize の内部クラスとコンストラクタ対応
+- [feature][Strings] paml の不具合修正と機能改善
+- [feature][Classobj] const_exists の class 対応
+- [fixbug][Classobj] class_extends の参照渡しに対応
+- [change][Strings] php8 の標準関数と被ったので str_contains を str_exists にリネーム
+
 ## 1.4.15
+
 - [feature][FileSystem] file_matcher の追加と file_(list|tree) の修正
 - [feature][Date] date_timestamp のベースなし相対表記に対応
 - [feature][Funchand] parameter_wiring の数値指定と順番の規約
