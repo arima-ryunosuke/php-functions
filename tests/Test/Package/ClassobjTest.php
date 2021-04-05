@@ -159,6 +159,9 @@ class ClassobjTest extends AbstractTestCase
                     'arg'    => $arg,
                 ];
             },
+            'passByReference' => function (string &$arg1) {
+                $arg1 .= '-suffix';
+            },
             'overrideMethod1' => function (string $oreorearg) {
                 return 'A-' . parent::{__FUNCTION__}($oreorearg) . '-Z';
             },
@@ -213,6 +216,11 @@ class ClassobjTest extends AbstractTestCase
 
         that($object->overrideMethod1('XX'))->is('A-overrideMethod1:XX-Z');
         that($object->overrideMethod2('--'))->is('overrideMethod2:--A-overrideMethod1:++-Z');
+
+        $string = 'hoge';
+        /** @noinspection PhpUndefinedMethodInspection */
+        $object->passByReference($string);
+        that($string)->is('hoge-suffix');
 
         // internal
         $e = (class_extends)(new \Exception('message', 123), [
