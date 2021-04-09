@@ -85,9 +85,7 @@ switch ($env) {
         require_once(__DIR__ . '/temporary/Klass.php');
         assert(constant("$classname::arrayize") === [$classname, 'arrayize']);
         foreach ((new \ReflectionClass($classname))->getConstants() as $name => $value) {
-            if (is_array($value) && isset($value[0]) && $value[0] === $classname) {
-                define($name, $value);
-            }
+            define($name, $value);
         }
         break;
 }

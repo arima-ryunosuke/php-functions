@@ -170,7 +170,7 @@ class FileSystemTest extends AbstractTestCase
                         'c'       => [
                             'abc1.log' => realpath($base . '/a/b/c/abc1.log'),
                             'abc2.log' => realpath($base . '/a/b/c/abc2.log'),
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -186,7 +186,7 @@ class FileSystemTest extends AbstractTestCase
                         'ab1.txt' => realpath($base . '/a/b/ab1.txt'),
                     ],
                 ],
-            ]
+            ],
         ]);
 
         // ファイルサイズでフィルタ
@@ -198,7 +198,7 @@ class FileSystemTest extends AbstractTestCase
                         'c'       => [
                             'abc1.log' => realpath($base . '/a/b/c/abc1.log'),
                             'abc2.log' => realpath($base . '/a/b/c/abc2.log'),
-                        ]
+                        ],
                     ],
                 ],
             ],

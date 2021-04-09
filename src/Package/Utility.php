@@ -106,7 +106,7 @@ class Utility
         };
 
         $result = [];
-        foreach ($numbers as $k => $number) {
+        foreach ($numbers as $number) {
             $number = $number + 0;
             if (!isset($from, $to)) {
                 $from = $to = $number;
@@ -345,6 +345,7 @@ class Utility
                     // 変更されているもののみ保存
                     foreach ($this->changed as $namespace => $dummy) {
                         $filepath = $this->cachedir . '/' . rawurlencode($namespace) . self::CACHE_EXT;
+                        /** @noinspection PhpUnreachableStatementInspection */
                         $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
 
                         $temppath = tempnam(sys_get_temp_dir(), 'cache');
@@ -642,6 +643,7 @@ class Utility
         foreach ($nsfiles as $filename => $namespaces) {
             $namespaces = array_flip(array_map(function ($n) { return trim($n, '\\'); }, (array) $namespaces));
             foreach ((parse_namespace)($filename) as $namespace => $ns) {
+                /** @noinspection PhpIllegalArrayKeyTypeInspection */
                 if (!$namespaces || isset($namespaces[$namespace])) {
                     if (isset($ns['alias'][$prefix])) {
                         return $ns['alias'][$prefix] . '\\' . implode('\\', $parts);
@@ -1522,6 +1524,7 @@ class Utility
                 }
             }
 
+            /** @noinspection PhpUnusedParameterInspection */
             public function dir_opendir($path, $options)
             {
                 return !!$this->handle = $this->opendir(...$this->context ? [$path, $this->context] : [$path]);

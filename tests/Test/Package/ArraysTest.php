@@ -235,18 +235,18 @@ class ArraysTest extends AbstractTestCase
                 1   => 1,
                 4   => 4,
                 8   => 8,
-                'a' => 'A'
+                'a' => 'A',
             ],
             [
                 0   => 0,
                 'b' => 'B',
-                3   => 3
+                3   => 3,
             ],
             [
                 -2  => -2,
                 5   => 5,
                 'a' => 'X',
-                2   => 2
+                2   => 2,
             ],
         ]))->isSame([
             0   => 0,
@@ -753,7 +753,7 @@ class ArraysTest extends AbstractTestCase
                     'y1' => 'Y1',
                     'y2' => 'Y2',
                 ],
-            ]
+            ],
         ];
         // すべて含む
         that((array_keys_exist)(['a', 'b', 'c'], $array))->isTrue();
@@ -778,7 +778,7 @@ class ArraysTest extends AbstractTestCase
                     'y1',
                     'y2',
                 ],
-            ]
+            ],
         ], $array))->isTrue();
         that((array_keys_exist)([
             'nx' => ['x1', 'x2', 'y'],
@@ -2406,7 +2406,7 @@ class ArraysTest extends AbstractTestCase
             'k1.k2' => 'v1',
             'k1'    => 'v2',
         ]))->is([
-            'k1' => 'v2'
+            'k1' => 'v2',
         ]);
         that((array_nest)([
             'k1'    => ['v1'],
@@ -2415,7 +2415,7 @@ class ArraysTest extends AbstractTestCase
             'k1' => [
                 0    => 'v1',
                 'k2' => 'v2',
-            ]
+            ],
         ]);
         that((array_nest)([
             'k1.0'  => 'v1',
@@ -2424,7 +2424,7 @@ class ArraysTest extends AbstractTestCase
             'k1' => [
                 0    => 'v1',
                 'k2' => 'v2',
-            ]
+            ],
         ]);
         that(array_nest)->try([
             'k1'    => 'v1',
@@ -2738,7 +2738,7 @@ class ArraysTest extends AbstractTestCase
                     'age'   => 12,
                     'items' => ['x'],
                 ],
-            ]
+            ],
         ], [
             'string'  => 'def',
             'hash'    => [
@@ -2751,7 +2751,7 @@ class ArraysTest extends AbstractTestCase
                     'age'   => 18,
                     'items' => ['y'],
                 ],
-            ]
+            ],
         ], [
             'string'  => 'xyz',
             'hash'    => [
@@ -2764,7 +2764,7 @@ class ArraysTest extends AbstractTestCase
                     'age'   => 24,
                     'items' => ['z'],
                 ],
-            ]
+            ],
         ]))->isSame([
             'string'  => 'xyz',
             'hash'    => [
@@ -2788,7 +2788,7 @@ class ArraysTest extends AbstractTestCase
                     'age'   => 24,
                     'items' => ['z'],
                 ],
-            ]
+            ],
         ]);
 
         $schema = [
@@ -2801,12 +2801,12 @@ class ArraysTest extends AbstractTestCase
         ];
         that((array_schema)($schema, [['name' => 'XY']]))->isSame([['name' => 'XY']]);
         that(array_schema)->try($schema, [
-            ['name' => 'X']
+            ['name' => 'X'],
         ], [
-            ['name' => 'Y']
+            ['name' => 'Y'],
         ])->wasThrown("must be count <= 1");
         that(array_schema)->try($schema, [
-            ['name' => 'XYZ']
+            ['name' => 'XYZ'],
         ])->wasThrown("must be strlen <= 2");
     }
 }

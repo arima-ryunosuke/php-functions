@@ -356,8 +356,8 @@ class ClassobjTest extends AbstractTestCase
             'a' => (stdclass)([
                 'b' => (stdclass)([
                     'c' => 'abc',
-                ])
-            ])
+                ]),
+            ]),
         ]);
         that((object_dive)($class, 'a.b.c'))->is('abc');
         that((object_dive)($class, 'a.b.c.x', 'none'))->is('none');
@@ -420,10 +420,10 @@ class ClassobjTest extends AbstractTestCase
         $object->set(999);
 
         // 復元したのに 999 になっていない（どうも同じキーの配列で __set_state されている模様）
-        that((eval($code = 'return ' . var_export($object, true) . ';'))->get())->isSame(1);
+        that(((phpval)(var_export($object, true)))->get())->isSame(1);
 
         // get_object_properties はそのようなことにはならない
-        that((eval($code = 'return ' . (var_export2)($object, true) . ';'))->get())->isSame(999);
+        that(((phpval)((var_export2)($object, true)))->get())->isSame(999);
 
         // DateTime や ArrayObject はかなり特殊で、プロパティが標準の手段では取れない
         that((get_object_properties)(new \Datetime('2014/12/24 12:34:56', new \DateTimeZone('Asia/Tokyo'))))->isSame([

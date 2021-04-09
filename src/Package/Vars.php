@@ -92,7 +92,7 @@ class Vars
      * that(numberify('a1b2.c3', true))->isSame(12.3);
      * ```
      *
-     * @param string $var 対象の値
+     * @param mixed $var 対象の値
      * @param bool $decimal 小数として扱うか
      * @return int|float 数値化した値
      */
@@ -648,7 +648,7 @@ class Vars
 
             // 全要素を再帰的にチェック
             $parents[] = $var;
-            foreach ($var as $k => $v) {
+            foreach ($var as $v) {
                 if ($core($v, $parents)) {
                     return true;
                 }
@@ -701,7 +701,7 @@ class Vars
      * that(is_arrayable(new \stdClass()))->isFalse();
      * ```
      *
-     * @param array $var 調べる値
+     * @param array|object $var 調べる値
      * @return bool 配列アクセス可能なら true
      */
     public static function is_arrayable($var)
@@ -980,7 +980,7 @@ class Vars
      *
      * @param mixed $var $callback を適用する値
      * @param callable $callback 値変換コールバック
-     * @param array $args $callback の残り引数（可変引数）
+     * @param mixed ...$args $callback の残り引数（可変引数）
      * @return mixed|array $callback が適用された値。元が配列なら配列で返す
      */
     public static function var_apply($var, $callback, ...$args)
@@ -1022,7 +1022,7 @@ class Vars
      *
      * @param mixed $var $callback を適用する値
      * @param callable $callback 値変換コールバック
-     * @param array $args $callback の残り引数（可変引数）
+     * @param mixed ...$args $callback の残り引数（可変引数）
      * @return mixed|array $callback が適用された値。元が配列なら配列で返す
      */
     public static function var_applys($var, $callback, ...$args)
@@ -1474,6 +1474,7 @@ class Vars
             $result = "return $result;";
         }
         if ($options['outmode'] === 'file') {
+            /** @noinspection PhpUnreachableStatementInspection */
             $result = "<?php return $result;\n";
         }
 
@@ -1948,7 +1949,7 @@ class Vars
      *
      * @see https://craig.is/writing/chrome-logger/techspecs
      *
-     * @param mixed $values 出力する値（可変引数）
+     * @param mixed ...$values 出力する値（可変引数）
      */
     public static function console_log(...$values)
     {
@@ -1992,7 +1993,7 @@ class Vars
      * that(hashvar($hoge, $fuga))->isSame(['hoge' => 'HOGE', 'fuga' => 'FUGA']);
      * ```
      *
-     * @param mixed $vars 変数（可変引数）
+     * @param mixed ...$vars 変数（可変引数）
      * @return array 引数の変数を変数名で compact した配列
      */
     public static function hashvar(...$vars)

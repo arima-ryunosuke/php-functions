@@ -118,7 +118,7 @@ class VarsTest extends AbstractTestCase
         ]);
         $stdclass = (stdclass)([
             'key'   => 'inner-scalar1',
-            'inner' => $inner
+            'inner' => $inner,
         ]);
 
         that((arrayval)($stdclass, true))->isSame([
@@ -126,14 +126,14 @@ class VarsTest extends AbstractTestCase
             'inner' => [
                 'inner-scalar2',
                 [
-                    'lastleaf'
-                ]
-            ]
+                    'lastleaf',
+                ],
+            ],
         ]);
 
         that((arrayval)($stdclass, false))->isSame([
             'key'   => 'inner-scalar1',
-            'inner' => $inner
+            'inner' => $inner,
         ]);
     }
 
@@ -376,8 +376,7 @@ class VarsTest extends AbstractTestCase
 
         /// stdClass だけは引数で分岐できる
         $stdclass = new \stdClass();
-        $stdClassEx = new class extends stdClass {
-        };
+        $stdClassEx = new class extends stdClass { };
 
         // 空 stdClass は空
         that((is_empty)($stdclass, true))->isTrue();
@@ -425,9 +424,9 @@ class VarsTest extends AbstractTestCase
         $rnestarray = [
             'parent' => [
                 'child' => [
-                    'grand' => &$rnestarray
-                ]
-            ]
+                    'grand' => &$rnestarray,
+                ],
+            ],
         ];
         that((is_recursive)($rnestarray))->isTrue();
 
@@ -630,10 +629,8 @@ class VarsTest extends AbstractTestCase
         that((var_type)(new class implements \JsonSerializable {
             public function jsonSerialize() { return ''; }
         }))->is('\JsonSerializable');
-        that((var_type)(new class extends \stdClass {
-        }))->is('\stdClass');
-        that((var_type)(new class {
-        }))->stringContains('anonymous');
+        that((var_type)(new class extends \stdClass { }))->is('\stdClass');
+        that((var_type)(new class { }))->stringContains('anonymous');
     }
 
     function test_var_type_valid()
@@ -688,7 +685,7 @@ class VarsTest extends AbstractTestCase
                     ],
                 ],
                 'array' => [
-                    [1, 2, 3, ['X']]
+                    [1, 2, 3, ['X']],
                 ],
             ],
             'null'        => null,
@@ -698,7 +695,7 @@ class VarsTest extends AbstractTestCase
         ];
         $a1 = var_export($value, true);
         $a2 = (var_export2)($value, true);
-        that(eval($code = "return $a2;"))->is(eval($code = "return $a1;"));
+        that((phpval)($a2))->is((phpval)($a1));
 
         that((var_export2)([
             "'\0\""  => 123,
@@ -808,7 +805,7 @@ VAR
                     ],
                 ],
                 'array' => [
-                    [1, 2, 3, ['X']]
+                    [1, 2, 3, ['X']],
                 ],
             ],
             'null'        => null,
@@ -964,8 +961,7 @@ VAR
         that((var_export3)([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
         that(var_export3)->try((function () { yield 1; })())->wasThrown('is not support');
-        that(var_export3)->try(new class() {
-        })->wasThrown('is not support');
+        that(var_export3)->try(new class ( ) { })->wasThrown('is not support');
 
         $this->expectOutputRegex('#new class()#');
         (var_export3)([1, 2, 3]);
@@ -993,7 +989,7 @@ VAR
                     ],
                 ],
                 'array' => [
-                    [1, 2, 3, ['X']]
+                    [1, 2, 3, ['X']],
                 ],
             ],
             'null'        => null,
@@ -1134,6 +1130,7 @@ VAR
         that(function () {
             $hoge = 1;
             $fuga = 2;
+            /** @noinspection PhpExpressionResultUnusedInspection */
             [(hashvar)($hoge), (hashvar)($fuga)];
         })->try()->wasThrown(new \UnexpectedValueException('ambiguous'));
     }

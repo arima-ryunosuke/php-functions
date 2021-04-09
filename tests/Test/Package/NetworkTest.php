@@ -110,7 +110,7 @@ class NetworkTest extends AbstractTestCase
                 'name3' => '=va;ue3=',
             ],
             'body'   => [
-                'x' => ['y' => ['z' => [1, 2, 3]]]
+                'x' => ['y' => ['z' => [1, 2, 3]]],
             ],
         ]);
         that($response['headers']['Content-Type'])->is('application/json');

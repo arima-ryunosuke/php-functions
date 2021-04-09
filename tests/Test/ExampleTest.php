@@ -13,6 +13,8 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
             return;
         }
 
+        /** @noinspection PhpUndefinedNamespaceInspection */
+        /** @noinspection PhpUndefinedClassInspection */
         $header = <<<EVAL
 <?php
 namespace Example;

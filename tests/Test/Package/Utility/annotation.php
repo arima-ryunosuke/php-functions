@@ -11,8 +11,7 @@ class DateTime2 extends \DateTime
 }
 
 // @formatter:off
-return new class
-{
+return new class {
     /**
      * this is \@escape
      * @single 123

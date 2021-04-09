@@ -29,13 +29,15 @@ return (static function () {
         $tmpname = tempnam(sys_get_temp_dir(), 'meta');
         touch($tmpname, 1234, 5678);
         chmod($tmpname, 0777);
-        chown($tmpname, 48);
-        chgrp($tmpname, 27);
+        if (DIRECTORY_SEPARATOR === '\\') {
+            chown($tmpname, 48);
+            chgrp($tmpname, 27);
+        }
 
         $result['touch'] = filemtime($tmpname);
         $result['chmod'] = fileperms($tmpname);
-        $result['chown'] = fileowner($tmpname);
-        $result['chgrp'] = filegroup($tmpname);
+        //$result['chown'] = fileowner($tmpname);
+        //$result['chgrp'] = filegroup($tmpname);
 
         return $result;
     })();

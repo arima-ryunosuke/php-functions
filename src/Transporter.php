@@ -136,6 +136,7 @@ CONSTANT;
         }
 
         // 完全な php コードを返す
+        /** @noinspection PhpExpressionResultUnusedInspection */
         return <<<CONTENTS
 <?php
 
@@ -218,6 +219,7 @@ FUNCTION;
         }
 
         // 完全な php コードを返す
+        /** @noinspection PhpExpressionResultUnusedInspection */
         return <<<CONTENTS
 <?php
 

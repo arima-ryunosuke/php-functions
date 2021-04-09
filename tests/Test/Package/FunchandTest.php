@@ -236,7 +236,7 @@ class FunchandTest extends AbstractTestCase
         $code = (callable_code)(function ($arg1 = "{\n}") use ($usevar): \Closure {
             if (true) {
                 return function () use ($usevar) {
-
+                    return $usevar;
                 };
             }
         });
@@ -245,7 +245,7 @@ class FunchandTest extends AbstractTestCase
             '{
             if (true) {
                 return function () use ($usevar) {
-
+                    return $usevar;
                 };
             }
         }',
@@ -499,7 +499,7 @@ class FunchandTest extends AbstractTestCase
             10 => 'z',
         ]);
 
-        $params = (parameter_wiring)($closure, $that = [
+        $params = (parameter_wiring)($closure, [
             '$ao' => $ao = new \ArrayObject([1, 2, 3]),
         ]);
         that($params)->isSame([
@@ -720,18 +720,18 @@ class FunchandTest extends AbstractTestCase
         // ns\const
         $params = (function_parameter)(function ($a = PHP_SAPI) { });
         that($params)->isSame([
-            '$a' => '$a = "cli"'
+            '$a' => '$a = "cli"',
         ]);
         $params = (function_parameter)(function ($a = \PHP_SAPI) { });
         that($params)->isSame([
-            '$a' => '$a = PHP_SAPI'
+            '$a' => '$a = PHP_SAPI',
         ]);
 
         // internal
         $params = (function_parameter)('trim');
         that($params)->isSame([
             '$str'            => '$str',
-            '$character_mask' => '$character_mask = null'
+            '$character_mask' => '$character_mask = null',
         ]);
     }
 }

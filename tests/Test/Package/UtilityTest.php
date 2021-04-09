@@ -630,7 +630,7 @@ class UtilityTest extends AbstractTestCase
             'double'  => true,
             'block'   => true,
             'blockX'  => true,
-            'closure' => function ($value) { return eval($code = 'return ' . $value . ';'); },
+            'closure' => function ($value) { return (phpval)($value); },
         ]);
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "single"    => "123",
@@ -998,7 +998,7 @@ class UtilityTest extends AbstractTestCase
         ], '--opt "A B" "arg1 arg2" "a\\"b"'))->isSame([
             'opt' => 'A B',
             'arg1 arg2',
-            'a"b'
+            'a"b',
         ]);
 
         // 知らんオプションが与えられた・・・が、 thrown が false である
@@ -1041,7 +1041,7 @@ class UtilityTest extends AbstractTestCase
         {
             $that->that = $that;
             $c = function ($that) {
-                return eval($code = 'return \ryunosuke\\Test\\Package\\test_stacktrace_in();');
+                return (phpval)('\\ryunosuke\\Test\\Package\\test_stacktrace_in()');
             };
             return $c($that);
         }
@@ -1057,9 +1057,12 @@ class UtilityTest extends AbstractTestCase
         that($traces[0])->stringContains('test_stacktrace_in');
         that($traces[1])->stringContains('eval');
         that($traces[2])->stringContains('{closure}');
-        that($traces[3])->stringContains('test_stacktrace');
-        that($traces[4])->stringContains('::sm');
-        that($traces[5])->stringContains('->im');
+        that($traces[3])->stringContains('evaluate');
+        that($traces[4])->stringContains('phpval');
+        that($traces[5])->stringContains('{closure}');
+        that($traces[6])->stringContains('test_stacktrace');
+        that($traces[7])->stringContains('::sm');
+        that($traces[8])->stringContains('->im');
 
         // limit
         $traces = (stacktrace)([
@@ -1077,7 +1080,7 @@ class UtilityTest extends AbstractTestCase
                     ['n' => ['e' => ['s' => ['t' => 'X']]]],
                     ['la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la', 'la'],
                 ],
-            ]
+            ],
         ]);
         that($traces)->stringContains('123456789')
             ->stringContains('stringarg')
@@ -1098,7 +1101,7 @@ class UtilityTest extends AbstractTestCase
                     'abc',
                     ['a', 'b', 'c'],
                 ],
-            ]
+            ],
         ], 2);
         that($traces)->is('hoge:1 func("ab...(more 1 length)", ["a", "b", ...(more 1 length)])');
 
@@ -1108,7 +1111,7 @@ class UtilityTest extends AbstractTestCase
                 'file'     => 'hoge',
                 'line'     => 1,
                 'function' => 'func',
-            ]
+            ],
         ], '%s');
         that($traces)->is('hoge');
 
@@ -1122,7 +1125,7 @@ class UtilityTest extends AbstractTestCase
                     'abc',
                     ['a', 'b', 'c'],
                 ],
-            ]
+            ],
         ], ['args' => false]);
         that($traces)->is('hoge:1 func()');
 
@@ -1136,10 +1139,11 @@ class UtilityTest extends AbstractTestCase
                     'abc',
                     ['a', 'b', 'c'],
                 ],
-            ]
+            ],
         ], ['delimiter' => null]);
         that($traces)->is(['hoge:1 func("abc", ["a", "b", "c"])']);
 
+        /** @noinspection PhpUnusedParameterInspection */
         function test_stacktrace_mask($password, $array, $config)
         {
             return (stacktrace)();
@@ -1261,8 +1265,6 @@ class UtilityTest extends AbstractTestCase
             that($result['meta'])->is([
                 'touch' => 1234,
                 'chmod' => 33279,
-                'chown' => 48,
-                'chgrp' => 27,
             ]);
             that($result['option'])->is([
                 'blocking' => true,

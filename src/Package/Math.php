@@ -18,7 +18,7 @@ class Math
      * that(minimum(-1, 0, 1))->isSame(-1);
      * ```
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return mixed 最小値
      */
     public static function minimum(...$variadic)
@@ -38,7 +38,7 @@ class Math
      * that(maximum(-1, 0, 1))->isSame(1);
      * ```
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return mixed 最大値
      */
     public static function maximum(...$variadic)
@@ -60,7 +60,7 @@ class Math
      * that(mode(0, 1, 2, 2, 3, 3, 3))->isSame(3);
      * ```
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return mixed 最頻値
      */
     public static function mode(...$variadic)
@@ -97,7 +97,7 @@ class Math
      * that(mean(1, '2', 3, 'noize', 4, 5, 'noize', 6))->isSame(3.5);
      * ```
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return int|float 相加平均値
      */
     public static function mean(...$variadic)
@@ -124,7 +124,7 @@ class Math
      * that(median('a', 'b', 'c', 'd'))->isSame('c');
      * ```
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return mixed 中央値
      */
     public static function median(...$variadic)
@@ -150,7 +150,7 @@ class Math
      * - 配列は個数ではなくフラット展開した要素を対象にする
      * - 候補がない場合はエラーではなく例外を投げる
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return mixed 意味平均値
      */
     public static function average(...$variadic)
@@ -173,7 +173,7 @@ class Math
      * that(sum(1, 2, 3, 4, 5, 6))->isSame(21);
      * ```
      *
-     * @param mixed $variadic 対象の変数・配列・リスト
+     * @param mixed ...$variadic 対象の変数・配列・リスト
      * @return mixed 合計値
      */
     public static function sum(...$variadic)
@@ -304,7 +304,7 @@ class Math
      * that(random_at(1, 2, 3, 4, 5, 6))->isAny([1, 2, 3, 4, 5, 6]);
      * ```
      *
-     * @param array $args 候補
+     * @param mixed ...$args 候補
      * @return mixed 引数のうちどれか
      */
     public static function random_at(...$args)

@@ -99,7 +99,7 @@ class Funchand
      *
      * @param callable $callable 対象 callable
      * @param int $n 挿入する引数位置
-     * @param mixed $variadic 本来の引数（可変引数）
+     * @param mixed ...$variadic 本来の引数（可変引数）
      * @return callable 束縛したクロージャ
      */
     public static function nbind($callable, $n, ...$variadic)
@@ -119,7 +119,7 @@ class Funchand
      * ```
      *
      * @param callable $callable 対象 callable
-     * @param mixed $variadic 本来の引数（可変引数）
+     * @param mixed ...$variadic 本来の引数（可変引数）
      * @return callable 束縛したクロージャ
      */
     public static function lbind($callable, ...$variadic)
@@ -137,7 +137,7 @@ class Funchand
      * ```
      *
      * @param callable $callable 対象 callable
-     * @param mixed $variadic 本来の引数（可変引数）
+     * @param mixed ...$variadic 本来の引数（可変引数）
      * @return callable 束縛したクロージャ
      */
     public static function rbind($callable, ...$variadic)
@@ -169,7 +169,7 @@ class Funchand
      * ```
      *
      * @param string $operator 演算子
-     * @param mixed $operands 右オペランド
+     * @param mixed ...$operands 右オペランド
      * @return \Closure 演算子のクロージャ
      */
     public static function ope_func($operator, ...$operands)
@@ -257,7 +257,7 @@ class Funchand
      * ```
      *
      * @param string $expression eval コード
-     * @param mixed $variadic 引数名（可変引数）
+     * @param mixed ...$variadic 引数名（可変引数）
      * @return \Closure 新しいクロージャ
      */
     public static function eval_func($expression, ...$variadic)
@@ -361,7 +361,7 @@ class Funchand
      * ```
      *
      * @param callable $callback 実行するコールバック
-     * @param mixed $variadic $callback に渡される引数（可変引数）
+     * @param mixed ...$variadic $callback に渡される引数（可変引数）
      * @return mixed $callback の返り値
      */
     public static function call_safely($callback, ...$variadic)
@@ -398,7 +398,7 @@ class Funchand
      * ```
      *
      * @param callable $callback 実行するコールバック
-     * @param mixed $variadic $callback に渡される引数（可変引数）
+     * @param mixed ...$variadic $callback に渡される引数（可変引数）
      * @return string オフスリーンバッファの文字列
      */
     public static function ob_capture($callback, ...$variadic)
@@ -950,7 +950,7 @@ class Funchand
      * ```
      *
      * @param string $classname クラス名
-     * @param array $defaultargs コンストラクタのデフォルト引数
+     * @param mixed ...$defaultargs コンストラクタのデフォルト引数
      * @return \Closure コンストラクタを呼び出すクロージャ
      */
     public static function func_new($classname, ...$defaultargs)
@@ -991,7 +991,7 @@ class Funchand
      * ```
      *
      * @param string $methodname メソッド名
-     * @param array $defaultargs メソッドのデフォルト引数
+     * @param mixed ...$defaultargs メソッドのデフォルト引数
      * @return \Closure メソッドを呼び出すクロージャ
      */
     public static function func_method($methodname, ...$defaultargs)

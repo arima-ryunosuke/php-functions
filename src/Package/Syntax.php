@@ -50,13 +50,15 @@ class Syntax
 
         try {
             if ($cachefile) {
-                return ($dummy = static function () {
+                /** @noinspection PhpMethodParametersCountMismatchInspection */
+                return (static function () {
                     extract(func_get_arg(1));
                     return require func_get_arg(0);
                 })($cachefile, $contextvars);
             }
             else {
-                return ($dummy = static function () {
+                /** @noinspection PhpMethodParametersCountMismatchInspection */
+                return (static function () {
                     extract(func_get_arg(1));
                     return eval(func_get_arg(0));
                 })($phpcode, $contextvars);
@@ -1154,7 +1156,7 @@ class Syntax
      *
      * @param mixed $condition 呼ばれる条件
      * @param callable $callable 呼ばれる処理
-     * @param array $arguments $callable の引数（可変引数）
+     * @param mixed ...$arguments $callable の引数（可変引数）
      * @return mixed 呼ばれた場合は $callable の返り値
      */
     public static function call_if($condition, $callable, ...$arguments)
@@ -1241,7 +1243,7 @@ class Syntax
      * ```
      *
      * @param callable $try try ブロッククロージャ
-     * @param array $variadic $try に渡る引数
+     * @param mixed ...$variadic $try に渡る引数
      * @return mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら null
      */
     public static function try_null($try, ...$variadic)
@@ -1270,7 +1272,7 @@ class Syntax
      * ```
      *
      * @param callable $try try ブロッククロージャ
-     * @param array $variadic $try に渡る引数
+     * @param mixed ...$variadic $try に渡る引数
      * @return mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら null
      */
     public static function try_return($try, ...$variadic)
@@ -1300,7 +1302,7 @@ class Syntax
      *
      * @param callable $try try ブロッククロージャ
      * @param ?callable $catch catch ブロッククロージャ
-     * @param array $variadic $try に渡る引数
+     * @param mixed ...$variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
     public static function try_catch($try, $catch = null, ...$variadic)
@@ -1323,13 +1325,13 @@ class Syntax
      * that($finally_count)->isSame(1); // 呼ばれている
      * // 例外は投げっぱなすが、 $finally は実行される
      * $try = function(){throw new \Exception('tried');};
-     * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
+     * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){}
      * that($finally_count)->isSame(2); // 呼ばれている
      * ```
      *
      * @param callable $try try ブロッククロージャ
      * @param ?callable $finally finally ブロッククロージャ
-     * @param array $variadic $try に渡る引数
+     * @param mixed ...$variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
     public static function try_finally($try, $finally = null, ...$variadic)
@@ -1359,7 +1361,7 @@ class Syntax
      * @param callable $try try ブロッククロージャ
      * @param ?callable $catch catch ブロッククロージャ
      * @param ?callable $finally finally ブロッククロージャ
-     * @param array $variadic $try に渡る引数
+     * @param mixed ...$variadic $try に渡る引数
      * @return \Exception|mixed 例外が飛ばなかったら $try ブロックの返り値、飛んだなら $catch の返り値（デフォルトで例外オブジェクト）
      */
     public static function try_catch_finally($try, $catch = null, $finally = null, ...$variadic)

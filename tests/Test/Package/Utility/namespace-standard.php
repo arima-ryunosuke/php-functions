@@ -45,12 +45,9 @@ echo C1;
 echo xC2;
 echo Space\C;
 
-$closure = function () {
+$closure = function () { };
 
-};
-
-$object = new class() extends AO {
-};
+$object = new class ( ) extends AO { };
 
 define("other\\space\\CONST", 'dummy');
 const nsC = 123;

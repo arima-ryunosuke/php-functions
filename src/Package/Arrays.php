@@ -53,7 +53,7 @@ class Arrays
      * that(arrayize($object, false, [1, 2, 3]))->isSame([$object, false, 1, 2, 3]);
      * ```
      *
-     * @param mixed $variadic 生成する要素（可変引数）
+     * @param mixed ...$variadic 生成する要素（可変引数）
      * @return array 引数を配列化したもの
      */
     public static function arrayize(...$variadic)
@@ -535,7 +535,7 @@ class Arrays
      * that(array_add(['a', 'b', 'c'], ['x' => 'X']))->isSame(['a', 'b', 'c', 'x' => 'X']);
      * ```
      *
-     * @param array $variadic 足す配列（可変引数）
+     * @param array ...$variadic 足す配列（可変引数）
      * @return array 足された配列
      */
     public static function array_add(...$variadic)
@@ -568,7 +568,7 @@ class Arrays
      * that(array_merge2([0, 'a' => 'A0'], [1, 'a' => 'A1'], [2, 'a' => 'A2']))->isSame([2, 'a' => 'A2']);
      * ```
      *
-     * @param array $arrays マージする配列
+     * @param array ...$arrays マージする配列
      * @return array マージされた配列
      */
     public static function array_merge2(...$arrays)
@@ -627,7 +627,7 @@ class Arrays
      * that(array_mix(['a' => 'A', 1, 3], ['b' => 'B', 2]))->isSame(['a' => 'A', 'b' => 'B', 1, 2, 3]);
      * ```
      *
-     * @param array $variadic 対象配列（可変引数）
+     * @param array ...$variadic 対象配列（可変引数）
      * @return array 引数配列が交互に追加された配列
      */
     public static function array_mix(...$variadic)
@@ -681,7 +681,7 @@ class Arrays
      * ))->is([['a' => 1, 'hoge'], [2, 'b' => 'fuga'], [3, 'piyo']]);
      * ```
      *
-     * @param array $arrays 対象配列（可変引数）
+     * @param array ...$arrays 対象配列（可変引数）
      * @return array 各要素値の配列
      */
     public static function array_zip(...$arrays)
@@ -753,7 +753,7 @@ class Arrays
      * ))->isSame([['a' => 1, 'b' => 3], ['a' => 1, 4], [2, 'b' => 3], [2, 4]]);
      * ```
      *
-     * @param array $arrays 対象配列（可変引数）
+     * @param array ...$arrays 対象配列（可変引数）
      * @return array 各配列値の直積
      */
     public static function array_cross(...$arrays)
@@ -1138,7 +1138,7 @@ class Arrays
      * ```
      *
      * @param array $array 配列
-     * @param string|int|array $key 取得したいキー。配列を与えると全て返す。クロージャの場合は true 相当を返す
+     * @param string|int|array|\Closure $key 取得したいキー。配列を与えると全て返す。クロージャの場合は true 相当を返す
      * @param mixed $default 無かった場合のデフォルト値
      * @return mixed 指定したキーの値
      */
@@ -1965,7 +1965,7 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param callable[] $callbacks 評価クロージャ配列
+     * @param callable ...$callbacks 評価クロージャ配列
      * @return array 評価クロージャを通した新しい配列
      */
     public static function array_maps($array, ...$callbacks)
@@ -2168,7 +2168,7 @@ class Arrays
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param int|array $n 要素値を入れる引数番目。配列を渡すとキー・値の両方を指定でき、両方が渡ってくる
-     * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
+     * @param mixed ...$variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
     public static function array_nmap($array, $callback, $n, ...$variadic)
@@ -2232,7 +2232,7 @@ class Arrays
      *
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
-     * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
+     * @param mixed ...$variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
     public static function array_lmap($array, $callback, ...$variadic)
@@ -2251,7 +2251,7 @@ class Arrays
      *
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
-     * @param mixed $variadic $callback に渡され、改変される引数（可変引数）
+     * @param mixed ...$variadic $callback に渡され、改変される引数（可変引数）
      * @return array 評価クロージャを通した新しい配列
      */
     public static function array_rmap($array, $callback, ...$variadic)
@@ -3050,7 +3050,7 @@ class Arrays
      * that(array_shrink_key($array1, $array2, $array3))->isSame(['c' => 'C3']);
      * ```
      *
-     * @param iterable[] $variadic 共通項を取る配列（可変引数）
+     * @param iterable|array ...$variadic 共通項を取る配列（可変引数）
      * @return array 新しい配列
      */
     public static function array_shrink_key(...$variadic)
@@ -3124,7 +3124,7 @@ class Arrays
      * ```
      *
      * @param array $array 対象配列
-     * @param mixed $values 詰める値（可変引数）
+     * @param mixed ...$values 詰める値（可変引数）
      * @return array 隙間が詰められた配列
      */
     public static function array_fill_gap($array, ...$values)

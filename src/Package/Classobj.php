@@ -429,7 +429,7 @@ class Classobj
      * that($newobject->count())->isSame(6);
      * ```
      *
-     * @param string $object 対象オブジェクト
+     * @param object $object 対象オブジェクト
      * @param \Closure[] $methods 注入するメソッド
      * @param array $fields 注入するフィールド
      * @return object $object を拡張した object
@@ -441,7 +441,7 @@ class Classobj
         // こうするとコード補完が活きやすくなる
         if (false) {
             /** @noinspection PhpUnreachableStatementInspection */
-            return $object;
+            return $object; // @codeCoverageIgnore
         }
 
         static $template_source, $template_reflection;

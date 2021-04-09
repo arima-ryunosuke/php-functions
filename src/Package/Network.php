@@ -128,7 +128,7 @@ class Network
         // icmp で linux かつ非 root は SOCK_RAW が使えないので ping コマンドへフォールバック
         if ($protocol === 'icmp' && DIRECTORY_SEPARATOR === '/' && !is_readable('/root')) {
             // @codeCoverageIgnoreStart
-            /** @noinspection PhpUndefinedVariableInspection */
+            $stdout = null;
             (process)('ping -c 1 -W ' . escapeshellarg($timeout), escapeshellarg($host), null, $stdout, $errstr);
             // min/avg/max/mdev = 0.026/0.026/0.026/0.000
             if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {

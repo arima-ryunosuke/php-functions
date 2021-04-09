@@ -24,7 +24,7 @@ class Strings
      * that(strcat('a', 'b', 'c'))->isSame('abc');
      * ```
      *
-     * @param mixed $variadic 結合する文字列（可変引数）
+     * @param mixed ...$variadic 結合する文字列（可変引数）
      * @return string 結合した文字列
      */
     public static function strcat(...$variadic)
@@ -46,7 +46,7 @@ class Strings
      * that(concat('prefix-', '', '-suffix'))->isSame('');
      * ```
      *
-     * @param mixed $variadic 結合する文字列（可変引数）
+     * @param mixed ...$variadic 結合する文字列（可変引数）
      * @return string 結合した文字列
      */
     public static function concat(...$variadic)
@@ -385,7 +385,7 @@ class Strings
      * ```
      *
      * @param string $string 対象文字列
-     * @param int[] ...$chunks 分割の各文字数（可変引数）
+     * @param int ...$chunks 分割の各文字数（可変引数）
      * @return string[] 分割された文字列配列
      */
     public static function str_chunk($string, ...$chunks)
@@ -1527,7 +1527,7 @@ class Strings
      * ```
      *
      * @param string $string 探される文字列
-     * @param string|array $with 探す文字列
+     * @param string|string[] $with 探す文字列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 指定文字列で始まるなら true を返す
      */
@@ -1561,7 +1561,7 @@ class Strings
      * ```
      *
      * @param string $string 探される文字列
-     * @param string $with 探す文字列
+     * @param string|string[] $with 探す文字列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 対象文字列で終わるなら true
      */
@@ -3284,12 +3284,13 @@ class Strings
             }
 
             if ($options['expression']) {
+                $semicolon = ';';
                 if ($prefix === '`' && $suffix === '`') {
-                    $value = eval("return " . substr($value, 1, -1) . ";");
+                    $value = eval("return " . substr($value, 1, -1) . $semicolon);
                     return true;
                 }
                 try {
-                    $evalue = @eval("return $value;");
+                    $evalue = @eval("return $value$semicolon");
                     if ($value !== $evalue) {
                         $value = $evalue;
                         return true;
@@ -4436,7 +4437,8 @@ class Strings
         }
 
         try {
-            return ($dummy = function () {
+            /** @noinspection PhpMethodParametersCountMismatchInspection */
+            return (function () {
                 // extract は数値キーを展開してくれないので自前ループで展開
                 foreach (func_get_arg(1) as $k => $v) {
                     $$k = $v;
@@ -4493,7 +4495,8 @@ class Strings
      */
     public static function ob_include($include_file, $array = [])
     {
-        return ($dummy = static function () {
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
+        return (static function () {
             ob_start();
             extract(func_get_arg(1));
             include func_get_arg(0);

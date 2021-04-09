@@ -123,14 +123,14 @@ class StringsTest extends AbstractTestCase
             '"x,y"',
             '["y", "z"]',
             'c\,d',
-            "'e,f'"
+            "'e,f'",
         ]);
 
         that((quoteexplode)([" ", "\t"], "a b\tc 'd e\tf'"))->is([
             'a',
             'b',
             'c',
-            "'d e\tf'"
+            "'d e\tf'",
         ]);
 
         that((quoteexplode)(',', 'a,b,{e,f}', ['{' => '}']))->is([
@@ -144,13 +144,13 @@ class StringsTest extends AbstractTestCase
             '"x---y"',
             '["y" --- "z"]',
             'c\---d',
-            "'e---f'"
+            "'e---f'",
         ]);
 
         that((quoteexplode)(' ', 'a "b c" \'d e\'', '"\''))->is([
             'a',
             '"b c"',
-            "'d e'"
+            "'d e'",
         ]);
 
         that((quoteexplode)(' ', 'a"bc"', '"'))->is([
@@ -745,7 +745,6 @@ that is <del>a</del><ins>the</ins> pen
         ];
 
         foreach ($dataset as [$x, $y]) {
-            /** @var string $y */
             $expected = $shell($x, $y, '--normal');
             $actual = (str_diff)(file_get_contents($x), file_get_contents($y), ['stringify' => 'normal']);
             that($actual)->as("$x <=> $y:\nExpected: $expected\nActual: $actual")->is($expected);
@@ -1448,7 +1447,7 @@ a3,b3,c3
             'callback' => function (&$row, $n) {
                 $row['b'] = strtoupper($row['b']);
                 return $n !== 1;
-            }
+            },
         ]))->is("a,b,c
 a1,B1,c1
 a3,B3,c3
@@ -1537,7 +1536,7 @@ a3,b3,c3
             'callback' => function (&$row, $n) {
                 $row['b'] = strtoupper($row['b']);
                 return $n !== 1;
-            }
+            },
         ]))->is([
             ['a' => 'a1', 'b' => 'B1', 'c' => 'c1'],
             ['a' => 'a3', 'b' => 'B3', 'c' => 'c3'],

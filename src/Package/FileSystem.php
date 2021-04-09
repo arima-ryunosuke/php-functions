@@ -536,6 +536,7 @@ class FileSystem
             $chunksize = 4096 * (strlen($needle) % 4096 + 1);
         }
 
+        assert(isset($filesize) || !isset($filesize));
         assert($chunksize >= strlen($needle));
 
         $fp = fopen($filename, 'rb');
@@ -826,7 +827,7 @@ class FileSystem
      * that(path_resolve('/absolute/path/through', '../current/./path'))->isSame("{$DS}absolute{$DS}path{$DS}current{$DS}path");
      * ```
      *
-     * @param array $paths パス文字列（可変引数）
+     * @param string ...$paths パス文字列（可変引数）
      * @return string 絶対パス
      */
     public static function path_resolve(...$paths)
@@ -1021,7 +1022,7 @@ class FileSystem
                 }
             }
 
-            return $self ? rmdir($dirname) : true;
+            return !$self || rmdir($dirname);
         };
 
         $result = true;
@@ -1172,6 +1173,7 @@ class FileSystem
                     throw new \DomainException("$name is not supported.");
                 }
 
+                /** @noinspection PhpUnusedParameterInspection */
                 public function stream_set_option(int $option, int $arg1, int $arg2)
                 {
                     return false;
