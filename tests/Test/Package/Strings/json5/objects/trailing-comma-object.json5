@@ -1,0 +1,7 @@
+{
+    "foo": "bar",
+}
+////////// EXPECTED OUTPUT: //////////
+O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}
+////////// EXPECTED OUTPUT: //////////
+a:1:{s:3:"foo";s:3:"bar";}

@@ -1,0 +1,9 @@
+{
+    // An invalid form feed character (\x0c) has been entered before this comment.
+    // Be careful not to delete it.
+  "a": true
+}
+////////// EXPECTED OUTPUT: //////////
+O:8:"stdClass":1:{s:1:"a";b:1;}
+////////// EXPECTED OUTPUT: //////////
+a:1:{s:1:"a";b:1;}

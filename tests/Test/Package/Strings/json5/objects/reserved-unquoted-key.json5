@@ -1,0 +1,7 @@
+{
+    while: true
+}
+////////// EXPECTED OUTPUT: //////////
+O:8:"stdClass":1:{s:5:"while";b:1;}
+////////// EXPECTED OUTPUT: //////////
+a:1:{s:5:"while";b:1;}

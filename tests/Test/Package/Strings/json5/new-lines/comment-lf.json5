@@ -1,0 +1,7 @@
+{
+    // This comment is terminated with `\n`.
+}
+////////// EXPECTED OUTPUT: //////////
+O:8:"stdClass":0:{}
+////////// EXPECTED OUTPUT: //////////
+a:0:{}

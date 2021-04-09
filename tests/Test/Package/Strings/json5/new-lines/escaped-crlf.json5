@@ -1,0 +1,9 @@
+{
+    // the following string contains an escaped `\r\n`
+    a: 'line 1 \
+line 2'
+}
+////////// EXPECTED OUTPUT: //////////
+O:8:"stdClass":1:{s:1:"a";s:13:"line 1 line 2";}
+////////// EXPECTED OUTPUT: //////////
+a:1:{s:1:"a";s:13:"line 1 line 2";}

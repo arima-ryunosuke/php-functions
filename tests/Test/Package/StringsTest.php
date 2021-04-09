@@ -1377,9 +1377,6 @@ a3,b3,c3
 
     function test_json_export()
     {
-        // エラー情報を突っ込んでおく
-        json_decode('aaa');
-
         // デフォルトオプション
         that((json_export)([123.0, 'あ']))->is('[123.0,"あ"]');
 
@@ -1396,9 +1393,6 @@ a3,b3,c3
 
     function test_json_import()
     {
-        // エラー情報を突っ込んでおく
-        json_decode('aaa');
-
         // デフォルトオプション
         that((json_import)('[123.0,"あ"]'))->is([123.0, "あ"]);
 
@@ -1407,8 +1401,105 @@ a3,b3,c3
             JSON_OBJECT_AS_ARRAY => false,
         ]))->is((object) ['a' => 123.0, 'b' => "あ"]);
 
+        // デフォルトでは json5 も試行する
+        that((json_import)('{a: 123.0, b: "あ",}', []))->is(['a' => 123.0, 'b' => "あ"]);
+
+        // 試行しないモードだとコケる
+        that(json_import)->try('{a: 123.0, b: "あ",}', [
+            JSON_ES5 => false,
+        ])->wasThrown('Syntax error');
+
         // depth
         that(json_import)->try('[[[[[[]]]]]]', [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3])->wasThrown('Maximum stack depth exceeded');
+    }
+
+    function test_json_import5()
+    {
+        that((json_import)('[0]', [JSON_ES5 => true]))->isSame([0]);
+        that((json_import)('{"foo": true}', [JSON_ES5 => true, JSON_OBJECT_AS_ARRAY => false]))->is((object) ['foo' => true]);
+
+        that((json_import)('123456789', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isInt();
+        that((json_import)('-123456789', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isInt();
+        that((json_import)('123456789', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => false]))->isInt();
+        that((json_import)('-123456789', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => false]))->isInt();
+
+        that((json_import)('123456789', [JSON_ES5 => true, JSON_INT_AS_STRING => true]))->isString();
+        that((json_import)('-123456789', [JSON_ES5 => true, JSON_INT_AS_STRING => true]))->isString();
+        that((json_import)('1234.56789', [JSON_ES5 => true, JSON_INT_AS_STRING => true]))->isFloat();
+        that((json_import)('-1234.56789', [JSON_ES5 => true, JSON_INT_AS_STRING => true]))->isFloat();
+
+        that((json_import)('123456789', [JSON_ES5 => true, JSON_FLOAT_AS_STRING => true]))->isInt();
+        that((json_import)('-123456789', [JSON_ES5 => true, JSON_FLOAT_AS_STRING => true]))->isInt();
+        that((json_import)('1234.56789', [JSON_ES5 => true, JSON_FLOAT_AS_STRING => true]))->isString();
+        that((json_import)('-1234.56789', [JSON_ES5 => true, JSON_FLOAT_AS_STRING => true]))->isString();
+
+        that((json_import)('12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => false]))->isFloat();
+        that((json_import)('-12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => false]))->isFloat();
+
+        that((json_import)('12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
+        that((json_import)('-12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
+
+        that((json_import)(chr(0xC2) . chr(0xA0) . ' 3 ', [JSON_ES5 => true]))->isSame(3);
+        that((json_import)(chr(0xA0) . ' 3 ', [JSON_ES5 => true]))->isSame(3);
+        that((json_import)('0xff', [JSON_ES5 => true]))->isSame(255);
+        that((json_import)('+NaN', [JSON_ES5 => true]))->isNan();
+    }
+
+    function test_json_import5_error()
+    {
+        that(json_import)->try('{')->wasThrown('Invalid object');
+        that(json_import)->try('[')->wasThrown('Invalid array');
+        that(json_import)->try('[1] dummy')->wasThrown("Syntax error");
+        that(json_import)->try('[1')->wasThrown("Expected ']'");
+        that(json_import)->try('[,]')->wasThrown("Missing array");
+
+        that(json_import)->try('/* ccc')->wasThrown("Unterminated block comment");
+        that(json_import)->try('/# ccc')->wasThrown("Unrecognized comment");
+        that(json_import)->try('{123 : 456}')->wasThrown("Bad identifier");
+
+        that(json_import)->try("'a\nb'")->wasThrown("Bad string");
+        that(json_import)->try('08')->wasThrown("Octal literal");
+        that(json_import)->try('0xxxx')->wasThrown("Bad hex number");
+        that(json_import)->try('+true')->wasThrown("Bad number");
+        that(json_import)->try('hoge')->wasThrown("Unexpected 'h'");
+        that(json_import)->try('+Indigo')->wasThrown("Expected 'f'");
+        that(json_import)->try('NotANumber')->wasThrown("Expected 'a'");
+
+        that(json_import)->try('[[1]]', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
+        that(json_import)->try('{"foo": {"bar": "baz"}}', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
+    }
+
+    function test_json_import5_misc()
+    {
+        $files = (file_list)(__DIR__ . '/Strings/json5', ['extension' => 'json5']);
+        foreach ($files as $file) {
+            $data = explode('////////// EXPECTED OUTPUT: //////////', file_get_contents($file));
+            $json = $data[0];
+            $expected1 = trim($data[1] ?? '');
+            $expected2 = trim($data[2] ?? '');
+
+            try {
+                if ($expected1) {
+                    $message = <<<MESSAGE
+file: $file
+json: $json
+expected: $expected1
+MESSAGE;
+                    that(serialize((json_import)($json, [JSON_ES5 => true, JSON_OBJECT_AS_ARRAY => false])))->as($message)->isSame($expected1);
+                }
+                if ($expected2) {
+                    $message = <<<MESSAGE
+file: $file
+json: $json
+expected: $expected2
+MESSAGE;
+                    that(serialize((json_import)($json, [JSON_ES5 => true, JSON_OBJECT_AS_ARRAY => true])))->as($message)->isSame($expected2);
+                }
+            }
+            catch (\Throwable $t) {
+                $this->fail($message . "\n$t");
+            }
+        }
     }
 
     function test_paml_export()

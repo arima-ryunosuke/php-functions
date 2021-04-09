@@ -9,6 +9,12 @@ class Strings
 {
     /** json_*** 関数で $depth 引数を表す定数 */
     const JSON_MAX_DEPTH = -1;
+    /** json_*** 関数で json5 を取り扱うかの定数 */
+    const JSON_ES5 = -100;
+    /** json_*** 関数で整数を常に文字列で返すかの定数 */
+    const JSON_INT_AS_STRING = -101;
+    /** json_*** 関数で小数を常に文字列で返すかの定数 */
+    const JSON_FLOAT_AS_STRING = -102;
 
     /**
      * 文字列結合の関数版
@@ -2405,11 +2411,6 @@ class Strings
         $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
         $option = array_sum(array_keys(array_filter($options)));
 
-        // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
-        if (json_last_error()) {
-            json_encode(null);
-        }
-
         $result = json_encode($value, $option, $depth);
 
         // エラーが出ていたら例外に変換
@@ -2425,39 +2426,491 @@ class Strings
      *
      * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
      *
+     * JSON_ES5 に null か true を渡すと json5 としてでデコードする（null はまず json_decode で試みる、true は json5 のみ）。
+     * その場合拡張オプションとして下記がある。
+     *
+     * - JSON_INT_AS_STRING: 常に整数を文字列で返す
+     * - JSON_FLOAT_AS_STRING: 常に小数を文字列で返す
+     *
      * Example:
      * ```php
      * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
      * that(json_import('{"a":"A","b":"B"}', [
      *    JSON_OBJECT_AS_ARRAY => true,
      * ]))->is(['a' => 'A', 'b' => 'B']);
+     *
+     * // json5 が使える
+     * that(json_import('{a: "A", b: "B", }'))->is(['a' => 'A', 'b' => 'B']);
      * ```
      *
+     * @license MIT https://github.com/colinodell/json5
+     * @copyright Copyright (c) 2017-2019 Colin O'Dell colinodell@gmail.com. Based on https://github.com/json5/json5; Copyright (c) 2012-2016 Aseem Kishore, and others.
+     *
      * @param string $value JSON 文字列
-     * @param array $options JSON_*** をキーにした連想配列。 値が false は指定されていないとみなされる
+     * @param array $options JSON_*** をキーにした連想配列。値が false は指定されていないとみなされる
      * @return mixed decode された値
      */
     public static function json_import($value, $options = [])
     {
-        $options += [
+        $specials = [
             JSON_OBJECT_AS_ARRAY => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+            JSON_MAX_DEPTH       => 512,
+            JSON_ES5             => null,
+            JSON_INT_AS_STRING   => false,
+            JSON_FLOAT_AS_STRING => false,
         ];
-        $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
-        $option = array_sum(array_keys(array_filter($options)));
-
-        // エラークリア関数が存在しないので null エンコードしてエラーを消しておく（分岐は不要かもしれない。ただ呼んだほうが速い？）
-        if (json_last_error()) {
-            json_encode(null);
+        foreach ($specials as $key => $default) {
+            $specials[$key] = $options[$key] ?? $default;
+            unset($options[$key]);
+        }
+        $specials[JSON_BIGINT_AS_STRING] = $options[JSON_BIGINT_AS_STRING] ?? false;
+        if ($specials[JSON_INT_AS_STRING] || $specials[JSON_FLOAT_AS_STRING]) {
+            $specials[JSON_ES5] = true;
         }
 
-        $result = json_decode($value, $options[JSON_OBJECT_AS_ARRAY], $depth, $option);
+        // true でないならまず json_decode で試行（json が来るならその方が遥かに速い）
+        if ($specials[JSON_ES5] === false || $specials[JSON_ES5] === null) {
+            $option = array_sum(array_keys(array_filter($options)));
+            $result = json_decode($value, $specials[JSON_OBJECT_AS_ARRAY], $specials[JSON_MAX_DEPTH], $option);
 
-        // エラーが出ていたら例外に変換
-        if (json_last_error()) {
-            throw new \ErrorException(json_last_error_msg(), json_last_error());
+            // エラーが出なかったらもうその時点で返せば良い
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $result;
+            }
+            // json5 を試行しないモードならこの時点で例外
+            if ($specials[JSON_ES5] === false) {
+                throw new \ErrorException(json_last_error_msg(), json_last_error());
+            }
         }
 
-        return $result;
+        // 上記を通り抜けたら json5 で試行
+        $json5_decoder = new class() {
+            private $json;
+            private $associative;
+            private $maxDepth;
+            private $bigIntToString;
+            private $intToString;
+            private $floatToString;
+
+            private $currentByte;
+            private $lineNumber          = 1;
+            private $currentLineStartsAt = 0;
+            private $at                  = 0;
+            private $depth               = 1;
+
+            public function __invoke($json, $options)
+            {
+                $this->json = $json;
+                $this->associative = !!$options[JSON_OBJECT_AS_ARRAY];
+                $this->maxDepth = (int) $options[JSON_MAX_DEPTH];
+                $this->bigIntToString = !!$options[JSON_BIGINT_AS_STRING];
+                $this->intToString = !!$options[JSON_INT_AS_STRING];
+                $this->floatToString = !!$options[JSON_FLOAT_AS_STRING];
+
+                $this->currentByte = $this->json[0] ?? null;
+
+                $result = $this->value();
+                $this->white();
+                if ($this->currentByte) {
+                    throw $this->exception('Syntax error');
+                }
+                return $result;
+            }
+
+            private function next()
+            {
+                // Get the next character. When there are no more characters, return the empty string.
+                if ($this->peek("\n") || $this->peek("\r", "\n")) {
+                    $this->lineNumber++;
+                    $this->currentLineStartsAt = $this->at + 1;
+                }
+
+                return $this->currentByte = $this->json[++$this->at] ?? null;
+            }
+
+            private function nextOrFail(...$chars)
+            {
+                foreach ($chars as $char) {
+                    $char = is_int($char) ? chr($char) : $char;
+                    if ($char !== $this->currentByte) {
+                        throw $this->exception(sprintf('Expected %s instead of %s', $this->renderChar($char), $this->renderChar($this->currentChar())));
+                    }
+                    $this->next();
+                }
+                return $this->currentByte;
+            }
+
+            private function peek(...$chars)
+            {
+                foreach ($chars as $i => $char) {
+                    $char = is_int($char) ? chr($char) : $char;
+                    if ($char !== ($this->json[$this->at + $i] ?? null)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            private function match($regex)
+            {
+                $subject = substr($this->json, $this->at);
+                // Only match on the current line
+                if ($pos = strpos($subject, "\n")) {
+                    $subject = substr($subject, 0, $pos);
+                }
+
+                if (!preg_match($regex, $subject, $matches, PREG_OFFSET_CAPTURE)) {
+                    return null;
+                }
+
+                $this->at += $matches[0][1] + strlen($matches[0][0]);
+                $this->currentByte = $this->json[$this->at] ?? null;
+
+                return $matches[0][0];
+            }
+
+            private function white()
+            {
+                while ($this->currentByte !== null) {
+                    // Comments always begin with a / character.
+                    if ($this->currentByte === '/') {
+                        $this->next();
+
+                        if ($this->currentByte === '/') {
+                            do {
+                                $this->next();
+                                if ($this->currentByte === "\n" || $this->currentByte === "\r") {
+                                    $this->next();
+                                    continue 2;
+                                }
+                            } while ($this->currentByte !== null);
+                        }
+                        elseif ($this->currentByte === '*') {
+                            do {
+                                $this->next();
+                                if ($this->peek('*', '/')) {
+                                    $this->next();
+                                    $this->next();
+                                    continue 2;
+                                }
+                            } while ($this->currentByte !== null);
+
+                            throw $this->exception('Unterminated block comment');
+                        }
+                        throw $this->exception('Unrecognized comment');
+                    }
+                    elseif (preg_match('/^[ \t\r\n\v\f\xA0]/', $this->currentByte) === 1) {
+                        $this->next();
+                    }
+                    elseif ($this->peek(0xC2, 0xA0)) {
+                        // Non-breaking space in UTF-8
+                        $this->next();
+                        $this->next();
+                    }
+                    else {
+                        return $this->currentByte;
+                    }
+                }
+            }
+
+            private function value()
+            {
+                $this->white();
+
+                switch ($this->currentByte) {
+                    case '{':
+                        return $this->associative ? (array) $this->object() : $this->object();
+                    case '[':
+                        return $this->array();
+                    case '"':
+                    case "'":
+                        return $this->string();
+                    case '-':
+                    case '+':
+                    case '.':
+                        return $this->number();
+                    default:
+                        return is_numeric($this->currentByte) ? $this->number() : $this->word();
+                }
+            }
+
+            private function identifier()
+            {
+                // Be careful when editing this regex, there are a couple Unicode characters in between here -------------vv
+                $match = $this->match('/^(?:[\$_\p{L}\p{Nl}]|\\\\u[0-9A-Fa-f]{4})(?:[\$_\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}‌‍]|\\\\u[0-9A-Fa-f]{4})*/u');
+
+                if ($match === null) {
+                    throw $this->exception('Bad identifier as unquoted key');
+                }
+
+                // Un-escape escaped Unicode chars
+                $unescaped = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/', function ($m) {
+                    return json_decode('"' . $m[0] . '"');
+                }, $match);
+
+                return $unescaped;
+            }
+
+            private function word()
+            {
+                $consts = [
+                    'true'     => true,
+                    'false'    => false,
+                    'null'     => null,
+                    'Infinity' => INF,
+                    'NaN'      => NAN,
+                ];
+
+                foreach ($consts as $const => $value) {
+                    if ($this->currentByte === $const[0]) {
+                        $this->nextOrFail(...str_split($const));
+                        return $value;
+                    }
+                }
+
+                throw $this->exception('Unexpected ' . $this->renderChar($this->currentChar()));
+            }
+
+            private function number()
+            {
+                $number = null;
+                $sign = '';
+                $string = '';
+                $base = 10;
+
+                if ($this->currentByte === '-' || $this->currentByte === '+') {
+                    $sign = $this->currentByte;
+                    $this->next();
+                }
+
+                // support for Infinity
+                if ($this->currentByte === 'I') {
+                    $this->word();
+
+                    return ($sign === '-') ? -INF : INF;
+                }
+
+                // support for NaN
+                if ($this->currentByte === 'N') {
+                    $number = $this->word();
+
+                    // ignore sign as -NaN also is NaN
+                    return $number;
+                }
+
+                if ($this->currentByte === '0') {
+                    $string .= $this->currentByte;
+                    $this->next();
+                    if ($this->currentByte === 'x' || $this->currentByte === 'X') {
+                        $string .= $this->currentByte;
+                        $this->next();
+                        $base = 16;
+                    }
+                    elseif (is_numeric($this->currentByte)) {
+                        throw $this->exception('Octal literal');
+                    }
+                }
+
+                switch ($base) {
+                    case 10:
+                        if ((is_numeric($this->currentByte) || $this->currentByte === '.') && ($match = $this->match('/^\d*\.?\d*/')) !== null) {
+                            $string .= $match;
+                        }
+                        if (($this->currentByte === 'E' || $this->currentByte === 'e') && ($match = $this->match('/^[Ee][-+]?\d*/')) !== null) {
+                            $string .= $match;
+                        }
+                        $number = $string;
+                        break;
+                    case 16:
+                        if (($match = $this->match('/^[A-Fa-f0-9]+/')) !== null) {
+                            $string .= $match;
+                            $number = hexdec($string);
+                            break;
+                        }
+                        throw $this->exception('Bad hex number');
+                }
+
+                if (!is_numeric($number) || !is_finite($number)) {
+                    throw $this->exception('Bad number');
+                }
+
+                if (false
+                    || ($this->intToString && ctype_digit("$number"))
+                    || ($this->floatToString && !ctype_digit("$number"))
+                    || ($this->bigIntToString && ctype_digit("$number") && is_float(($number + 0)))
+                ) {
+                    return $sign === '-' ? '-' . $number : $number;
+                }
+
+                if ($sign === '-') {
+                    $number = -1 * $number;
+                }
+
+                // Adding 0 will automatically cast this to an int or float
+                return $number + 0;
+            }
+
+            private function string()
+            {
+                $escapees = [
+                    "'"  => "'",
+                    '"'  => '"',
+                    '\\' => '\\',
+                    '/'  => '/',
+                    "\n" => '',
+                    'b'  => chr(8),
+                    'f'  => "\f",
+                    'n'  => "\n",
+                    'r'  => "\r",
+                    't'  => "\t",
+                ];
+
+                $string = '';
+
+                $delim = $this->currentByte;
+                $this->next();
+                while ($this->currentByte !== null) {
+                    if ($this->currentByte === $delim) {
+                        $this->next();
+
+                        return $string;
+                    }
+
+                    if ($this->peek('\\', 'u') && $unicodeEscaped = $this->match('/^(?:\\\\u[0-9A-Fa-f]{4})+/')) {
+                        $string .= \json_decode('"' . $unicodeEscaped . '"');
+                        continue;
+                    }
+                    if ($this->currentByte === '\\') {
+                        $this->next();
+
+                        if ($this->currentByte === "\r") {
+                            if ($this->peek("\r", "\n")) {
+                                $this->next();
+                            }
+                        }
+                        elseif (($escapee = ($escapees[$this->currentByte] ?? null)) !== null) {
+                            $string .= $escapee;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    elseif ($this->currentByte === "\n") {
+                        // unescaped newlines are invalid; see:
+                        // https://github.com/json5/json5/issues/24
+                        // @todo this feels special-cased; are there other invalid unescaped chars?
+                        break;
+                    }
+                    else {
+                        $string .= $this->currentByte;
+                    }
+
+                    $this->next();
+                }
+
+                throw $this->exception('Bad string');
+            }
+
+            private function array()
+            {
+                $array = [];
+
+                if (++$this->depth > $this->maxDepth) {
+                    throw $this->exception('Maximum stack depth exceeded');
+                }
+
+                $this->nextOrFail('[');
+                $this->white();
+                while ($this->currentByte !== null) {
+                    if ($this->currentByte === ']') {
+                        $this->next();
+                        $this->depth--;
+                        return $array; // Potentially empty array
+                    }
+                    // ES5 allows omitting elements in arrays, e.g. [,] and [,null]. We don't allow this in JSON5.
+                    if ($this->currentByte === ',') {
+                        throw $this->exception('Missing array element');
+                    }
+
+                    $array[] = $this->value();
+
+                    $this->white();
+                    // If there's no comma after this value, this needs to be the end of the array.
+                    if ($this->currentByte !== ',') {
+                        $this->nextOrFail(']');
+                        $this->depth--;
+                        return $array;
+                    }
+                    $this->nextOrFail(',');
+                    $this->white();
+                }
+
+                throw $this->exception('Invalid array');
+            }
+
+            private function object()
+            {
+                $object = new \stdClass;
+
+                if (++$this->depth > $this->maxDepth) {
+                    throw $this->exception('Maximum stack depth exceeded');
+                }
+
+                $this->nextOrFail('{');
+                $this->white();
+                while ($this->currentByte !== null) {
+                    if ($this->currentByte === '}') {
+                        $this->next();
+                        $this->depth--;
+                        return $object; // Potentially empty object
+                    }
+
+                    // Keys can be unquoted. If they are, they need to be valid JS identifiers.
+                    if ($this->currentByte === '"' || $this->currentByte === "'") {
+                        $key = $this->string();
+                    }
+                    else {
+                        $key = $this->identifier();
+                    }
+
+                    $this->white();
+                    $this->nextOrFail(':');
+                    $object->{$key} = $this->value();
+                    $this->white();
+                    // If there's no comma after this pair, this needs to be the end of the object.
+                    if ($this->currentByte !== ',') {
+                        $this->nextOrFail('}');
+                        $this->depth--;
+                        return $object;
+                    }
+                    $this->nextOrFail(',');
+                    $this->white();
+                }
+
+                throw $this->exception('Invalid object');
+            }
+
+            private function exception($message)
+            {
+                // Calculate the column number
+                $str = substr($this->json, $this->currentLineStartsAt, $this->at - $this->currentLineStartsAt);
+                $column = mb_strlen($str) + 1;
+
+                $message = sprintf('%s at line %d column %d of the JSON5 data', $message, $this->lineNumber, $column);
+                return new \ErrorException($message);
+            }
+
+            private function currentChar()
+            {
+                return $this->currentByte === null ? null : mb_substr(substr($this->json, $this->at, 4), 0, 1);
+            }
+
+            private function renderChar($char)
+            {
+                return $char === null ? 'EOF' : "'" . $char . "'";
+            }
+        };
+        return $json5_decoder($value, $specials);
     }
 
     /**
