@@ -6,6 +6,26 @@ use function tmpfile;
 
 class UtilityTest extends AbstractTestCase
 {
+    function test_ini_sets()
+    {
+        $precision = ini_get('precision');
+        $disable_functions = ini_get('disable_functions');
+
+        $restore = (ini_sets)([
+            'precision'         => '1',
+            'disable_functions' => 'time',
+        ]);
+        // precision は設定できる
+        that(ini_get('precision'))->isSame('1');
+        // disable_functions は設定不可
+        that(ini_get('disable_functions'))->isSame($disable_functions);
+
+        $restore();
+        // 返り値のクロージャを呼ぶと戻る
+        that(ini_get('precision'))->isSame($precision);
+        that(ini_get('disable_functions'))->isSame($disable_functions);
+    }
+
     function test_get_uploaded_files()
     {
         $actual = (get_uploaded_files)([
