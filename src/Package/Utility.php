@@ -1881,6 +1881,13 @@ class Utility
             throw new \InvalidArgumentException('benchset is empty.');
         }
 
+        // opcache を利用するようなベンチはこの辺を切っておかないと正確な結果にならない
+        // ウォームアップで mtime が更新され、その1秒以内にベンチが走るので一切 opcache が効かなくなるため
+        $restore = (ini_sets)([
+            'opcache.validate_timestamps'    => 0,
+            'opcache.file_update_protection' => "0",
+        ]);
+
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
         $assertions = (call_safely)(function ($benchset, $args) {
             $result = [];
@@ -1913,6 +1920,8 @@ class Utility
             }
             $counts[$name] = $n;
         }
+
+        $restore();
 
         // 結果配列
         $result = [];
