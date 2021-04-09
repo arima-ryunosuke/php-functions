@@ -685,6 +685,21 @@ if (!defined("ryunosuke\\Functions\\Package\\JSON_MAX_DEPTH")) {
     define("ryunosuke\\Functions\\Package\\JSON_MAX_DEPTH", -1);
 }
 
+if (!defined("ryunosuke\\Functions\\Package\\JSON_ES5")) {
+    /** json_*** 関数で json5 を取り扱うかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_ES5", -100);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_INT_AS_STRING")) {
+    /** json_*** 関数で整数を常に文字列で返すかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_INT_AS_STRING", -101);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_FLOAT_AS_STRING")) {
+    /** json_*** 関数で小数を常に文字列で返すかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_FLOAT_AS_STRING", -102);
+}
+
 if (!defined("ryunosuke\\Functions\\Package\\TOKEN_NAME")) {
     /** parse_php 関数でトークン名変換をするか */
     define("ryunosuke\\Functions\\Package\\TOKEN_NAME", 2);
@@ -802,6 +817,7 @@ define("ryunosuke\\Functions\\Package\\class_namespace", ["ryunosuke\\Functions\
 define("ryunosuke\\Functions\\Package\\class_shorten", ["ryunosuke\\Functions\\Package\\Classobj", "class_shorten"]);
 define("ryunosuke\\Functions\\Package\\class_replace", ["ryunosuke\\Functions\\Package\\Classobj", "class_replace"]);
 define("ryunosuke\\Functions\\Package\\class_extends", ["ryunosuke\\Functions\\Package\\Classobj", "class_extends"]);
+define("ryunosuke\\Functions\\Package\\reflect_types", ["ryunosuke\\Functions\\Package\\Classobj", "reflect_types"]);
 define("ryunosuke\\Functions\\Package\\const_exists", ["ryunosuke\\Functions\\Package\\Classobj", "const_exists"]);
 define("ryunosuke\\Functions\\Package\\object_dive", ["ryunosuke\\Functions\\Package\\Classobj", "object_dive"]);
 define("ryunosuke\\Functions\\Package\\get_class_constants", ["ryunosuke\\Functions\\Package\\Classobj", "get_class_constants"]);
@@ -913,10 +929,13 @@ define("ryunosuke\\Functions\\Package\\pascal_case", ["ryunosuke\\Functions\\Pac
 define("ryunosuke\\Functions\\Package\\snake_case", ["ryunosuke\\Functions\\Package\\Strings", "snake_case"]);
 define("ryunosuke\\Functions\\Package\\chain_case", ["ryunosuke\\Functions\\Package\\Strings", "chain_case"]);
 define("ryunosuke\\Functions\\Package\\namespace_split", ["ryunosuke\\Functions\\Package\\Strings", "namespace_split"]);
+define("ryunosuke\\Functions\\Package\\html_strip", ["ryunosuke\\Functions\\Package\\Strings", "html_strip"]);
 define("ryunosuke\\Functions\\Package\\htmltag", ["ryunosuke\\Functions\\Package\\Strings", "htmltag"]);
 define("ryunosuke\\Functions\\Package\\css_selector", ["ryunosuke\\Functions\\Package\\Strings", "css_selector"]);
 define("ryunosuke\\Functions\\Package\\build_uri", ["ryunosuke\\Functions\\Package\\Strings", "build_uri"]);
 define("ryunosuke\\Functions\\Package\\parse_uri", ["ryunosuke\\Functions\\Package\\Strings", "parse_uri"]);
+define("ryunosuke\\Functions\\Package\\build_query", ["ryunosuke\\Functions\\Package\\Strings", "build_query"]);
+define("ryunosuke\\Functions\\Package\\parse_query", ["ryunosuke\\Functions\\Package\\Strings", "parse_query"]);
 define("ryunosuke\\Functions\\Package\\ini_export", ["ryunosuke\\Functions\\Package\\Strings", "ini_export"]);
 define("ryunosuke\\Functions\\Package\\ini_import", ["ryunosuke\\Functions\\Package\\Strings", "ini_import"]);
 define("ryunosuke\\Functions\\Package\\csv_export", ["ryunosuke\\Functions\\Package\\Strings", "csv_export"]);
@@ -930,6 +949,7 @@ define("ryunosuke\\Functions\\Package\\ltsv_import", ["ryunosuke\\Functions\\Pac
 define("ryunosuke\\Functions\\Package\\markdown_table", ["ryunosuke\\Functions\\Package\\Strings", "markdown_table"]);
 define("ryunosuke\\Functions\\Package\\markdown_list", ["ryunosuke\\Functions\\Package\\Strings", "markdown_list"]);
 define("ryunosuke\\Functions\\Package\\random_string", ["ryunosuke\\Functions\\Package\\Strings", "random_string"]);
+define("ryunosuke\\Functions\\Package\\unique_string", ["ryunosuke\\Functions\\Package\\Strings", "unique_string"]);
 define("ryunosuke\\Functions\\Package\\kvsprintf", ["ryunosuke\\Functions\\Package\\Strings", "kvsprintf"]);
 define("ryunosuke\\Functions\\Package\\preg_matches", ["ryunosuke\\Functions\\Package\\Strings", "preg_matches"]);
 define("ryunosuke\\Functions\\Package\\preg_capture", ["ryunosuke\\Functions\\Package\\Strings", "preg_capture"]);
@@ -941,12 +961,14 @@ define("ryunosuke\\Functions\\Package\\str_guess", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\str_array", ["ryunosuke\\Functions\\Package\\Strings", "str_array"]);
 define("ryunosuke\\Functions\\Package\\mb_substr_replace", ["ryunosuke\\Functions\\Package\\Strings", "mb_substr_replace"]);
 define("ryunosuke\\Functions\\Package\\mb_trim", ["ryunosuke\\Functions\\Package\\Strings", "mb_trim"]);
+define("ryunosuke\\Functions\\Package\\render_template", ["ryunosuke\\Functions\\Package\\Strings", "render_template"]);
 define("ryunosuke\\Functions\\Package\\render_string", ["ryunosuke\\Functions\\Package\\Strings", "render_string"]);
 define("ryunosuke\\Functions\\Package\\render_file", ["ryunosuke\\Functions\\Package\\Strings", "render_file"]);
 define("ryunosuke\\Functions\\Package\\ob_include", ["ryunosuke\\Functions\\Package\\Strings", "ob_include"]);
 define("ryunosuke\\Functions\\Package\\include_string", ["ryunosuke\\Functions\\Package\\Strings", "include_string"]);
 define("ryunosuke\\Functions\\Package\\evaluate", ["ryunosuke\\Functions\\Package\\Syntax", "evaluate"]);
 define("ryunosuke\\Functions\\Package\\parse_php", ["ryunosuke\\Functions\\Package\\Syntax", "parse_php"]);
+define("ryunosuke\\Functions\\Package\\strip_php", ["ryunosuke\\Functions\\Package\\Syntax", "strip_php"]);
 define("ryunosuke\\Functions\\Package\\indent_php", ["ryunosuke\\Functions\\Package\\Syntax", "indent_php"]);
 define("ryunosuke\\Functions\\Package\\highlight_php", ["ryunosuke\\Functions\\Package\\Syntax", "highlight_php"]);
 define("ryunosuke\\Functions\\Package\\optional", ["ryunosuke\\Functions\\Package\\Syntax", "optional"]);
@@ -961,6 +983,7 @@ define("ryunosuke\\Functions\\Package\\try_return", ["ryunosuke\\Functions\\Pack
 define("ryunosuke\\Functions\\Package\\try_catch", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch"]);
 define("ryunosuke\\Functions\\Package\\try_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_finally"]);
 define("ryunosuke\\Functions\\Package\\try_catch_finally", ["ryunosuke\\Functions\\Package\\Syntax", "try_catch_finally"]);
+define("ryunosuke\\Functions\\Package\\ini_sets", ["ryunosuke\\Functions\\Package\\Utility", "ini_sets"]);
 define("ryunosuke\\Functions\\Package\\get_uploaded_files", ["ryunosuke\\Functions\\Package\\Utility", "get_uploaded_files"]);
 define("ryunosuke\\Functions\\Package\\number_serial", ["ryunosuke\\Functions\\Package\\Utility", "number_serial"]);
 define("ryunosuke\\Functions\\Package\\cacheobject", ["ryunosuke\\Functions\\Package\\Utility", "cacheobject"]);
@@ -984,6 +1007,7 @@ define("ryunosuke\\Functions\\Package\\stringify", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\numberify", ["ryunosuke\\Functions\\Package\\Vars", "numberify"]);
 define("ryunosuke\\Functions\\Package\\numval", ["ryunosuke\\Functions\\Package\\Vars", "numval"]);
 define("ryunosuke\\Functions\\Package\\arrayval", ["ryunosuke\\Functions\\Package\\Vars", "arrayval"]);
+define("ryunosuke\\Functions\\Package\\phpval", ["ryunosuke\\Functions\\Package\\Vars", "phpval"]);
 define("ryunosuke\\Functions\\Package\\arrayable_key_exists", ["ryunosuke\\Functions\\Package\\Vars", "arrayable_key_exists"]);
 define("ryunosuke\\Functions\\Package\\attr_exists", ["ryunosuke\\Functions\\Package\\Vars", "attr_exists"]);
 define("ryunosuke\\Functions\\Package\\attr_get", ["ryunosuke\\Functions\\Package\\Vars", "attr_get"]);

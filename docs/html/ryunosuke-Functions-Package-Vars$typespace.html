@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L2025" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L2070" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Vars</span></h2>
@@ -213,7 +213,7 @@ that(numberify('a1b2.c3', true))-&gt;isSame(12.3);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">string</td>
+				<td class="type">mixed</td>
 				<td class="rest">$var</td>
 				<td class="desc"><p>対象の値</p>
 </td>
@@ -383,7 +383,66 @@ that(arrayval([$stdclass], false))-&gt;isSame([$stdclass]);       // false な�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L225-L262" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L225-L267" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Vars::phpval()" tabindex="-1" class="structure-title ">
+                        phpval                        	<small>($var, $contextvars = []) : mixed</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>文字列を php の式として評価して値を返す</p>
+<p>実質的には <code>eval("return $var;")</code> とほぼ同義。<br />
+ただ、 eval するまでもない式はそのまま返し、bare な文字列はそのまま文字列として返す（7.2 以前の未定義定数のような動作）。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(phpval('strtoupper($var)', ['var' =&gt; 'string']))-&gt;isSame('STRING');
+that(phpval('bare string'))-&gt;isSame('bare string');
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">mixed</td>
+				<td class="rest">$var</td>
+				<td class="desc"><p>評価する式</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$contextvars = []</td>
+				<td class="desc"><p>eval される場合のローカル変数</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">mixed</td>
+			<td class="desc"><p>評価した値</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L269-L306" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::arrayable_key_exists()" tabindex="-1" class="structure-title ">
                         arrayable_key_exists                        	<small>($key, $arrayable) : bool</small>
@@ -456,7 +515,7 @@ that(isset($object['n']))-&gt;isFalse();                // isset だと null が
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L264-L295" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L308-L339" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::attr_exists()" tabindex="-1" class="structure-title ">
                         attr_exists                        	<small>($key, $value) : bool</small>
@@ -527,7 +586,7 @@ that(attr_exists('x', $object))-&gt;isFalse(); // 存在しないので false
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L297-L365" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L341-L409" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::attr_get()" tabindex="-1" class="structure-title ">
                         attr_get                        	<small>($key, $value, $default = null) : mixed</small>
@@ -603,7 +662,7 @@ that(attr_get('x', $object, 'default'))-&gt;isSame('default'); // 存在しな�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L367-L434" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L411-L478" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::si_prefix()" tabindex="-1" class="structure-title ">
                         si_prefix                        	<small>($var, $unit = 1000, $format = &quot;%.3f %s&quot;) : string<span class="type-separator"></span><wbr>array</small>
@@ -683,7 +742,7 @@ that(si_prefix(12345, 1000, function ($v, $u) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L436-L475" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L480-L519" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::si_unprefix()" tabindex="-1" class="structure-title ">
                         si_unprefix                        	<small>($var, $unit = 1000) : int<span class="type-separator"></span><wbr>float</small>
@@ -750,7 +809,7 @@ that(si_unprefix('1K'))-&gt;isSame(1000);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L477-L539" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L521-L583" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::is_empty()" tabindex="-1" class="structure-title ">
                         is_empty                        	<small>($var, $empty_stdClass = false) : bool</small>
@@ -832,7 +891,7 @@ that(is_empty($stdclass, true))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L541-L567" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L585-L611" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::is_primitive()" tabindex="-1" class="structure-title ">
                         is_primitive                        	<small>($var) : bool</small>
@@ -893,7 +952,7 @@ that(is_primitive(['array']))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L569-L615" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L613-L659" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::is_recursive()" tabindex="-1" class="structure-title ">
                         is_recursive                        	<small>($var) : bool</small>
@@ -950,7 +1009,7 @@ that(is_recursive($object))-&gt;isTrue();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L617-L648" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L661-L692" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::is_stringable()" tabindex="-1" class="structure-title ">
                         is_stringable                        	<small>($var) : bool</small>
@@ -1010,7 +1069,7 @@ that(is_stringable([1, 2, 3]))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L650-L666" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L694-L710" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::is_arrayable()" tabindex="-1" class="structure-title ">
                         is_arrayable                        	<small>($var) : bool</small>
@@ -1027,7 +1086,7 @@ that(is_arrayable(new \stdClass()))-&gt;isFalse();
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">array</td>
+				<td class="type">array<span class="type-separator"></span><wbr>object</td>
 				<td class="rest">$var</td>
 				<td class="desc"><p>調べる値</p>
 </td>
@@ -1062,7 +1121,7 @@ that(is_arrayable(new \stdClass()))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L668-L690" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L712-L734" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::is_countable()" tabindex="-1" class="structure-title ">
                         is_countable                        	<small>($var) : bool</small>
@@ -1117,7 +1176,7 @@ that(is_countable(new \stdClass()))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L692-L734" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L736-L778" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::encrypt()" tabindex="-1" class="structure-title ">
                         encrypt                        	<small>($plaindata, $password, $cipher = &quot;aes-256-cbc&quot;, &amp;$tag = &quot;&quot;) : string</small>
@@ -1203,7 +1262,7 @@ that(decrypt($encrypted, 'password', 'aes-256-gcm', 'invalid'))-&gt;isSame(null)
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L736-L769" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L780-L813" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::decrypt()" tabindex="-1" class="structure-title ">
                         decrypt                        	<small>($cipherdata, $password, $cipher = &quot;aes-256-cbc&quot;, $tag = &quot;&quot;) : mixed</small>
@@ -1272,7 +1331,7 @@ that(decrypt($encrypted, 'password', 'aes-256-gcm', 'invalid'))-&gt;isSame(null)
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L771-L851" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L815-L895" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::varcmp()" tabindex="-1" class="structure-title ">
                         varcmp                        	<small>($a, $b, $mode = null, $precision = null) : int</small>
@@ -1358,7 +1417,7 @@ that(varcmp((object) ['a'], (object) ['a'], SORT_STRICT) &lt; 0)-&gt;isTrue();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L853-L915" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L897-L959" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_type()" tabindex="-1" class="structure-title ">
                         var_type                        	<small>($var, $valid_name = false) : string</small>
@@ -1432,7 +1491,7 @@ that(var_type(new class implements \JsonSerializable{
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L917-L954" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L961-L998" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_apply()" tabindex="-1" class="structure-title ">
                         var_apply                        	<small>($var, $callback, ...$args) : mixed<span class="type-separator"></span><wbr>array</small>
@@ -1469,7 +1528,7 @@ that(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'ut
 </td>
 			</tr>
         			<tr>
-				<td class="type">array</td>
+				<td class="type">mixed</td>
 				<td class="rest">...$args</td>
 				<td class="desc"><p>$callback の残り引数（可変引数）</p>
 </td>
@@ -1504,7 +1563,7 @@ that(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'ut
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L956-L992" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1000-L1036" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_applys()" tabindex="-1" class="structure-title ">
                         var_applys                        	<small>($var, $callback, ...$args) : mixed<span class="type-separator"></span><wbr>array</small>
@@ -1544,7 +1603,7 @@ that(var_applys('a', $upper))-&gt;isSame('A');
 </td>
 			</tr>
         			<tr>
-				<td class="type">array</td>
+				<td class="type">mixed</td>
 				<td class="rest">...$args</td>
 				<td class="desc"><p>$callback の残り引数（可変引数）</p>
 </td>
@@ -1579,7 +1638,7 @@ that(var_applys('a', $upper))-&gt;isSame('A');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L994-L1110" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1038-L1154" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_export2()" tabindex="-1" class="structure-title ">
                         var_export2                        	<small>($value, $return = false) : string<span class="type-separator"></span><wbr>null</small>
@@ -1676,7 +1735,7 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1112-L1440" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1156-L1485" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_export3()" tabindex="-1" class="structure-title ">
                         var_export3                        	<small>($value, $return = false) : string</small>
@@ -1748,7 +1807,7 @@ set_state だけは呼ばれないので注意。</p>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1442-L1512" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1487-L1557" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_html()" tabindex="-1" class="structure-title ">
                         var_html                        	<small>($value) : void</small>
@@ -1801,7 +1860,7 @@ set_state だけは呼ばれないので注意。</p>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1514-L1897" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1559-L1942" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_pretty()" tabindex="-1" class="structure-title ">
                         var_pretty                        	<small>($value, $context = null, $return = false) : string</small>
@@ -1900,7 +1959,7 @@ var_pretty([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1899-L1937" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1944-L1982" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::console_log()" tabindex="-1" class="structure-title ">
                         console_log                        	<small>(...$values) : void</small>
@@ -1959,7 +2018,7 @@ var_pretty([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1939-L2024" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1984-L2069" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::hashvar()" tabindex="-1" class="structure-title ">
                         hashvar                        	<small>(...$vars) : array</small>

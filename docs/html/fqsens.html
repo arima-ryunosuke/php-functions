@@ -2016,6 +2016,53 @@ that($newobject-&gt;count())-&gt;isSame(6);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::reflect_types()">
+                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="Stringable$typespace.html#Stringable" class="fqsen ">Stringable</a></small>
+		</h4>
+	<div class="description"><p>ReflectionType の型配列を返す</p>
+<p>ReflectionType のインターフェース・仕様がコロコロ変わってついていけないので関数化した。</p>
+<p>ReflectionType に準ずるインスタンスを渡すと取り得る候補を配列ライクなオブジェクトで返す。<br />
+引数は配列で複数与えても良い。よしなに扱って複数型として返す。<br />
+null を与えた場合はエラーにはならず、スルーされる（getType は null を返し得るので利便性のため）。</p>
+<p>単純に ReflectionType の配列ライクなオブジェクトを返すが、そのオブジェクトは <code>__toString</code> が実装されており、文字列化するとパイプ区切りの型文字列を返す。<br />
+これは 8.0 における ReflectionUnionType の <code>__toString</code> を模倣したものである。<br />
+互換性のある型があった場合、上位の型に内包されて型文字列としては出現しない。</p>
+<p>Countable も実装されているが、その結果は「内部 Type の数」ではなく、論理的に「取り得る型の数」を返す。<br />
+例えば <code>?int</code> は型としては1つだが、実際は int, null の2つを取り得るため、 count は 2 を返す。<br />
+端的に言えば「<code>__toString</code> のパイプ区切りの型の数」を返す。</p>
+<p>あとは便利メソッドとして下記が生えている。</p>
+<ul>
+<li>jsonSerialize: JsonSerializable 実装</li>
+<li>getTypes: 取り得る型をすべて返す（ReflectionUnionType 互換）</li>
+<li>allows: その値を取りうるか判定して返す</li>
+</ul>
+<p>ReflectionUnionType とは完全互換ではないので、php8.0が完全に使える環境であれば素直に ReflectionUnionType を使ったほうが良い。<br />
+（「常に（型分岐せずに）複数形で扱える」程度のメリットしかない。allows は惜しいが）。</p>
+<p>ちなみに型の変遷は下記の通り。</p>
+<ul>
+<li>php7.1: ReflectionType::__toString が非推奨になった</li>
+<li>php7.1: ReflectionNamedType が追加され、各種 getType でそれを返すようになった</li>
+<li>php8.0: ReflectionType::__toString が非推奨ではなくなった</li>
+<li>php8.0: ReflectionUnionType が追加され、複合の場合は getType でそれを返すようになった</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$object = new class {
+    function method(object $o):?string {}
+};
+$method = new \ReflectionMethod($object, 'method');
+$types = reflect_types($method-&gt;getParameters()[0]-&gt;getType());
+// 文字列化すると型宣言文字列を返すし、配列アクセスや count, iterable でそれぞれの型が得られる
+that((string) $types)-&gt;is('object');
+that($types[0])-&gt;isInstanceOf(\ReflectionType::class);
+that(iterator_to_array($types))-&gt;eachIsInstanceOf(\ReflectionType::class);
+that(count($types))-&gt;is(1);
+// 返り値でも同じ（null 許容なので null が付くし count も 2 になる）
+$types = reflect_types($method-&gt;getReturnType());
+that((string) $types)-&gt;is('string|null');
+that(count($types))-&gt;is(2);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::const_exists()">
                                     ryunosuke\Functions\Package\Classobj::const_exists		</a>	<small>($classname, $constname = null) : bool</small>
 		</h4>
@@ -2338,7 +2385,7 @@ that($testpath)-&gt;fileEquals('pre-hoge-fix');
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_pos()">
-                                    ryunosuke\Functions\Package\FileSystem::file_pos		</a>	<small>($filename, $needle, $offset = 0, $length = null, $chunksize = null) : int<span class="type-separator"></span><wbr>false</small>
+                                    ryunosuke\Functions\Package\FileSystem::file_pos		</a>	<small>($filename, $needle, $start = 0, $end = null, $chunksize = null) : int<span class="type-separator"></span><wbr>false</small>
 		</h4>
 	<div class="description"><p>範囲指定でファイルを読んで位置を返す</p>
 <p>Example:</p>
@@ -3472,6 +3519,21 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
                                     ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH		</a>	</h4>
 	<div class="description"><p>json_*** 関数で $depth 引数を表す定数</p>
 </div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_ES5">
+                                    ryunosuke\Functions\Package\Strings::JSON_ES5		</a>	</h4>
+	<div class="description"><p>json_*** 関数で json5 を取り扱うかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_INT_AS_STRING">
+                                    ryunosuke\Functions\Package\Strings::JSON_INT_AS_STRING		</a>	</h4>
+	<div class="description"><p>json_*** 関数で整数を常に文字列で返すかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_FLOAT_AS_STRING">
+                                    ryunosuke\Functions\Package\Strings::JSON_FLOAT_AS_STRING		</a>	</h4>
+	<div class="description"><p>json_*** 関数で小数を常に文字列で返すかの定数</p>
+</div>
             	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()">
                                     ryunosuke\Functions\Package\Strings::strcat		</a>	<small>(...$variadic) : string</small>
@@ -4019,6 +4081,26 @@ that(namespace_split('\\hoge'))-&gt;isSame(['', 'hoge']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::html_strip()">
+                                    ryunosuke\Functions\Package\Strings::html_strip		</a>	<small>($html, $options = []) : string</small>
+		</h4>
+	<div class="description"><p>html の空白類を除去して minify する</p>
+<p>文字列的ではなく DOM 的に行うのでおかしな部分 html を食わせると意図しない結果になる可能性がある。<br />
+その副作用として属性のクオートやタグ内空白は全て正規化される。</p>
+<p>html コメントも削除される。<br />
+また、空白が意味を持つタグ（textarea, pre）は対象にならない。<br />
+さらに、php を含むような html （テンプレート）の php タグは一切の対象外となる。</p>
+<p>これらの挙動の一部はオプションで指定が可能。</p>
+<p>Example:</p>
+<pre><code class="language-php">// e.g. id が " でクオートされている
+// e.g. class のクオートが " になっている
+// e.g. タグ内空白（id, class の間隔等）がスペース1つになっている
+// e.g. php タグは一切変更されていない
+// e.g. textarea は保持されている
+that(html_strip("&lt;span  id=id  class='c1  c2  c3'&gt;&lt;?= '&lt;hoge&gt;  &lt;/hoge&gt;' ?&gt; a  b  c &lt;/span&gt; &lt;pre&gt; a  b  c &lt;/pre&gt;"))-&gt;isSame('&lt;span id="id" class="c1  c2  c3"&gt;&lt;?= \'&lt;hoge&gt;  &lt;/hoge&gt;\' ?&gt; a b c&lt;/span&gt;&lt;pre&gt; a  b  c &lt;/pre&gt;');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::htmltag()">
                                     ryunosuke\Functions\Package\Strings::htmltag		</a>	<small>($selector) : string</small>
 		</h4>
@@ -4153,6 +4235,36 @@ that(parse_uri('localhost/path/to/file', [
     'fragment' =&gt; '',
 ]);
 </code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::build_query()">
+                                    ryunosuke\Functions\Package\Strings::build_query		</a>	<small>($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738) : string</small>
+		</h4>
+	<div class="description"><p>数値キーを削除する http_build_query</p>
+<p>php の世界において配列のクエリ表現は <code>var[]=1&amp;var[]=2</code> で事足りる。<br />
+しかし http_build_query では数値キーでも必ず <code>var[0]=1&amp;var[1]=2</code> になる。<br />
+それはそれで正しいし、他言語との連携が必要な場合はそうせざるを得ない状況もあるが、単純に php だけで配列を表したい場合は邪魔だし文字長が長くなる。<br />
+この関数を使うと数値キーを削除し、<code>var[]=1&amp;var[]=2</code> のようなクエリ文字列を生成できる。</p>
+<p>シグネチャは http_build_query と同じで、 $numeric_prefix に数値的文字列を与えたときのみ動作が変化する。<br />
+（$numeric_prefix の意味を考えればこの引数に数値的文字列を与える意味は皆無だろうので流用している）。</p>
+<ul>
+<li>1 を与えると最前列を残して [] (%5B%5D) が置換される</li>
+<li>2 を与えると最前列とその右を残して [] (%5B%5D) が置換される</li>
+<li>要するに正数を与えると「abs(n) 個を残して [] (%5B%5D) を置換する」という指定になる</li>
+<li>-1 を与えると最後尾の [] (%5B%5D) が置換される</li>
+<li>-2 を与えると最後尾とその左の [] (%5B%5D) が置換される</li>
+<li>要するに負数を与えると「右から abs(n) 個の [] (%5B%5D) を置換する」という指定になる</li>
+</ul>
+<p>この仕様は <code>v[][]=1&amp;v[][]=2</code> のようなときにおいしくないためである。<br />
+これは <code>$v=[[1], [2]]</code> のような値になるが、この場合 <code>$v=[[1, 2]]</code> という値が欲しい、という事が多い。<br />
+そのためには <code>v[0][]=1&amp;v[0][]=2</code> のようにする必要があるための数値指定である。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::parse_query()">
+                                    ryunosuke\Functions\Package\Strings::parse_query		</a>	<small>($query) : array</small>
+		</h4>
+	<div class="description"><p>parse_str の返り値版</p>
+<p>標準の parse_str は参照で受ける謎シグネチャなのでそれを返り値に変更したもの。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::ini_export()">
@@ -4297,11 +4409,20 @@ that(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
 		</h4>
 	<div class="description"><p>json_decode のプロキシ関数</p>
 <p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
+<p>JSON_ES5 に null か true を渡すと json5 としてでデコードする（null はまず json_decode で試みる、true は json5 のみ）。<br />
+その場合拡張オプションとして下記がある。</p>
+<ul>
+<li>JSON_INT_AS_STRING: 常に整数を文字列で返す</li>
+<li>JSON_FLOAT_AS_STRING: 常に小数を文字列で返す</li>
+</ul>
 <p>Example:</p>
 <pre><code class="language-php">// オプションはこのように [定数 =&gt; bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
 that(json_import('{"a":"A","b":"B"}', [
    JSON_OBJECT_AS_ARRAY =&gt; true,
 ]))-&gt;is(['a' =&gt; 'A', 'b' =&gt; 'B']);
+
+// json5 が使える
+that(json_import('{a: "A", b: "B", }'))-&gt;is(['a' =&gt; 'A', 'b' =&gt; 'B']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4506,6 +4627,29 @@ that("\n" . markdown_list([
                                     ryunosuke\Functions\Package\Strings::random_string		</a>	<small>($length = 8, $charlist = &quot;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;) : string</small>
 		</h4>
 	<div class="description"><p>安全な乱数文字列を生成する</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::unique_string()">
+                                    ryunosuke\Functions\Package\Strings::unique_string		</a>	<small>($source, $initial = null, $charlist = &quot;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;) : string</small>
+		</h4>
+	<div class="description"><p>文字列に含まれない文字列を生成する</p>
+<p>例えば http のマルチパートバウンダリのような、「競合しない文字列」を生成する。<br />
+実装は愚直に文字列を調べて存在しなければそれを返すようになっている。<br />
+一応初期値や文字セットは指定可能。</p>
+<p>$initial に int を与えると初期値としてその文字数分 $charlist から確保する。<br />
+例えば生成後の変更が前提で、ある程度の長さを担保したいときに指定すれば最低でもその長さ以上は保証される。<br />
+$initial に string を与えるとそれがそのまま初期値として使用される。<br />
+例えば「ほぼ存在しない文字列」が予測できるのであればそれを指定すれば無駄な処理が省ける。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 単純に呼ぶと生成1,2文字程度の文字列になる
+that(unique_string('hello, world'))-&gt;stringLengthEqualsAny([1, 2]);
+// 数値を含んでいないので候補文字に数値のみを指定すれば1文字で「存在しない文字列」となる
+that(unique_string('hello, world', null, range(0, 9)))-&gt;stringLengthEquals(1);
+// int を渡すと最低でもそれ以上は保証される
+that(unique_string('hello, world', 5))-&gt;stringLengthEqualsAny([5, 6]);
+// string を渡すとそれが初期値となる
+that(unique_string('hello, world', 'prefix-'))-&gt;stringStartsWith('prefix');
+</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::kvsprintf()">
@@ -4744,6 +4888,23 @@ that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_template()">
+                                    ryunosuke\Functions\Package\Strings::render_template		</a>	<small>($template, $vars) : string</small>
+		</h4>
+	<div class="description"><p>"hoge ${hoge}" 形式のレンダリング</p>
+<p>ES6 のテンプレートリテラルのようなもの。</p>
+<ul>
+<li>埋め込みは ${var} のみで、{$var} は無効</li>
+<li>${expression} は「評価結果の変数名」ではなく「評価結果」が埋め込まれる</li>
+</ul>
+<p>$vars に callable を渡すと元文字列とプレースホルダー部分の配列でコールバックされる（タグ付きテンプレートの模倣）。</p>
+<p>実装的にはただの文字列 eval なので " はエスケープする必要がある。</p>
+<p>この関数は実験的機能のため、互換性を維持せず変更される可能性がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(render_template('${max($nums)}', ['nums' =&gt; [1, 9, 3]]))-&gt;isSame('9');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::render_string()">
                                     ryunosuke\Functions\Package\Strings::render_string		</a>	<small>($template, $array) : string</small>
 		</h4>
@@ -4842,6 +5003,25 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 	<div class="description"><p>php のコード断片をパースする</p>
 <p>結果配列は token_get_all したものだが、「字句の場合に文字列で返す」仕様は適用されずすべて配列で返す。<br />
 つまり必ず <code>[TOKENID, TOKEN, LINE, POS]</code> で返す。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::strip_php()">
+                                    ryunosuke\Functions\Package\Syntax::strip_php		</a>	<small>($phtml, $replacer = &quot;&quot;, &amp;$mapping = []) : string</small>
+		</h4>
+	<div class="description"><p>文字列から php コードを取り除く</p>
+<p>正確には $replacer で指定したものに置換される（デフォルト空文字なので削除になる）。<br />
+$replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。<br />
+文字列を指定すると自動で出現番号が付与される。</p>
+<p>$mapping 配列には「どれをどのように」と言った変換表が格納される。<br />
+典型的には strtr に渡して php コードを復元させるのに使用する。</p>
+<p>Example:</p>
+<pre><code class="language-php">$phtml = 'begin php code &lt;?php echo 123 ?&gt; end';
+// php コードが消えている
+that(strip_php($phtml))-&gt;is('begin php code  end');
+// $mapping を使用すると元の文字列に復元できる
+$html = strip_php($phtml, null, $mapping);
+that(strtr($html, $mapping))-&gt;is($phtml);
+</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::indent_php()">
@@ -5223,7 +5403,7 @@ that(try_finally($try, $finally, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 that($finally_count)-&gt;isSame(1); // 呼ばれている
 // 例外は投げっぱなすが、 $finally は実行される
 $try = function(){throw new \Exception('tried');};
-try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){};
+try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){}
 that($finally_count)-&gt;isSame(2); // 呼ばれている
 </code></pre>
 </div>
@@ -5252,6 +5432,13 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 	<div class="description"><p>汎用的なユーティリティ</p>
 </div>
                 	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::ini_sets()">
+                                    ryunosuke\Functions\Package\Utility::ini_sets		</a>	<small>($values) : callable</small>
+		</h4>
+	<div class="description"><p>複数の php.ini の設定をまとめて設定する</p>
+<p>返り値として「もとに戻すためのクロージャ」を返すので、復元するためにはそのクロージャを呼ぶだけで良い。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()">
                                     ryunosuke\Functions\Package\Utility::get_uploaded_files		</a>	<small>($files = null) : array</small>
 		</h4>
@@ -5781,6 +5968,18 @@ that(arrayval([123]))-&gt;isSame([123]); // 配列は配列のまま
 $stdclass = stdclass(['key' =&gt; 'val']);
 that(arrayval([$stdclass], true))-&gt;isSame([['key' =&gt; 'val']]); // true なので中身も配列化される
 that(arrayval([$stdclass], false))-&gt;isSame([$stdclass]);       // false なので中身は変わらない
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::phpval()">
+                                    ryunosuke\Functions\Package\Vars::phpval		</a>	<small>($var, $contextvars = []) : mixed</small>
+		</h4>
+	<div class="description"><p>文字列を php の式として評価して値を返す</p>
+<p>実質的には <code>eval("return $var;")</code> とほぼ同義。<br />
+ただ、 eval するまでもない式はそのまま返し、bare な文字列はそのまま文字列として返す（7.2 以前の未定義定数のような動作）。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(phpval('strtoupper($var)', ['var' =&gt; 'string']))-&gt;isSame('STRING');
+that(phpval('bare string'))-&gt;isSame('bare string');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>

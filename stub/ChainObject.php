@@ -1744,6 +1744,13 @@
  * @property \ChainObject $boolval
  * @method   \ChainObject  boolval()
  *
+ * @see build_query
+ * @property \ChainObject $build_query
+ * @method   \ChainObject  build_query($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738)
+ * @method   \ChainObject  build_query1($data, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738)
+ * @method   \ChainObject  build_query2($data, $numeric_prefix = null, $encoding_type = PHP_QUERY_RFC1738)
+ * @method   \ChainObject  build_query3($data, $numeric_prefix = null, $arg_separator = null)
+ *
  * @see build_uri
  * @property \ChainObject $build_uri
  * @method   \ChainObject  build_uri()
@@ -2461,11 +2468,11 @@
  * @method   \ChainObject  file_mimetype()
  *
  * @see file_pos
- * @method   \ChainObject  file_pos($needle, $offset = 0, $length = null, $chunksize = null)
- * @method   \ChainObject  file_pos1($filename, $offset = 0, $length = null, $chunksize = null)
- * @method   \ChainObject  file_pos2($filename, $needle, $length = null, $chunksize = null)
- * @method   \ChainObject  file_pos3($filename, $needle, $offset = 0, $chunksize = null)
- * @method   \ChainObject  file_pos4($filename, $needle, $offset = 0, $length = null)
+ * @method   \ChainObject  file_pos($needle, $start = 0, $end = null, $chunksize = null)
+ * @method   \ChainObject  file_pos1($filename, $start = 0, $end = null, $chunksize = null)
+ * @method   \ChainObject  file_pos2($filename, $needle, $end = null, $chunksize = null)
+ * @method   \ChainObject  file_pos3($filename, $needle, $start = 0, $chunksize = null)
+ * @method   \ChainObject  file_pos4($filename, $needle, $start = 0, $end = null)
  *
  * @see file_put_contents
  * @method   \ChainObject  file_put_contents($data, $flags = null, $context = null)
@@ -2991,6 +2998,11 @@
  * @method   \ChainObject  html_entity_decode1($string, $encoding = null)
  * @method   \ChainObject  html_entity_decode2($string, $quote_style = null)
  *
+ * @see html_strip
+ * @property \ChainObject $html_strip
+ * @method   \ChainObject  html_strip($options = [])
+ * @method   \ChainObject  html_strip1($html)
+ *
  * @see htmlentities
  * @property \ChainObject $htmlentities
  * @method   \ChainObject  htmlentities($quote_style = null, $encoding = null, $double_encode = null)
@@ -3120,6 +3132,10 @@
  * @see ini_set
  * @method   \ChainObject  ini_set($newvalue)
  * @method   \ChainObject  ini_set1($varname)
+ *
+ * @see ini_sets
+ * @property \ChainObject $ini_sets
+ * @method   \ChainObject  ini_sets()
  *
  * @see intdiv
  * @method   \ChainObject  intdiv($divisor)
@@ -4183,6 +4199,10 @@
  * @method   \ChainObject  parse_php($option = [])
  * @method   \ChainObject  parse_php1($phpcode)
  *
+ * @see parse_query
+ * @property \ChainObject $parse_query
+ * @method   \ChainObject  parse_query()
+ *
  * @see parse_uri
  * @property \ChainObject $parse_uri
  * @method   \ChainObject  parse_uri($default = [])
@@ -4257,6 +4277,11 @@
  *
  * @see phpinfo
  * @method   \ChainObject  phpinfo()
+ *
+ * @see phpval
+ * @property \ChainObject $phpval
+ * @method   \ChainObject  phpval($contextvars = [])
+ * @method   \ChainObject  phpval1($var)
  *
  * @see phpversion
  * @method   \ChainObject  phpversion()
@@ -4459,6 +4484,9 @@
  * @method   \ChainObject  reflect_callableP()
  * @method   \ChainObject  reflect_callableE()
  *
+ * @see reflect_types
+ * @method   \ChainObject  reflect_types()
+ *
  * @see register_shutdown_function
  * @property \ChainObject $register_shutdown_function
  * @method   \ChainObject  register_shutdown_function(...$parameters)
@@ -4491,6 +4519,10 @@
  * @see render_string
  * @method   \ChainObject  render_string($array)
  * @method   \ChainObject  render_string1($template)
+ *
+ * @see render_template
+ * @method   \ChainObject  render_template($vars)
+ * @method   \ChainObject  render_template1($template)
  *
  * @see resolve_symbol
  * @method   \ChainObject  resolve_symbol($nsfiles, $targets = ["const", "function", "alias"])
@@ -5487,6 +5519,12 @@
  * @see uniqid
  * @method   \ChainObject  uniqid($more_entropy = null)
  * @method   \ChainObject  uniqid1($prefix = null)
+ *
+ * @see unique_string
+ * @property \ChainObject $unique_string
+ * @method   \ChainObject  unique_string($initial = null, $charlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+ * @method   \ChainObject  unique_string1($source, $charlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+ * @method   \ChainObject  unique_string2($source, $initial = null)
  *
  * @see unlink
  * @property \ChainObject $unlink

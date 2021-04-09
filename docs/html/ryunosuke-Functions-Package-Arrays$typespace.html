@@ -1825,7 +1825,7 @@ that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, 
 </td>
 			</tr>
         			<tr>
-				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>array</td>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>array<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.closure.php" class="fqsen" target="_blank">\Closure</a></td>
 				<td class="rest">$key</td>
 				<td class="desc"><p>取得したいキー。配列を与えると全て返す。クロージャの場合は true 相当を返す</p>
 </td>
@@ -2973,7 +2973,7 @@ that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;
 </td>
 			</tr>
         			<tr>
-				<td class="type">callable[]</td>
+				<td class="type">callable</td>
 				<td class="rest">...$callbacks</td>
 				<td class="desc"><p>評価クロージャ配列</p>
 </td>
@@ -4347,7 +4347,7 @@ that(array_shrink_key($array1, $array2, $array3))-&gt;isSame(['c' =&gt; 'C3']);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">iterable[]</td>
+				<td class="type">iterable<span class="type-separator"></span><wbr>array</td>
 				<td class="rest">...$variadic</td>
 				<td class="desc"><p>共通項を取る配列（可変引数）</p>
 </td>

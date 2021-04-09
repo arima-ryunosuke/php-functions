@@ -49,10 +49,10 @@
       "ryunosuke\\Functions\\Transporter::exportAll"
     ],
     "test": [
-      "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml",
-      "env TEST_TARGET=global    vendor/bin/phpunit --configuration=tests/phpunit.xml",
-      "env TEST_TARGET=namespace vendor/bin/phpunit --configuration=tests/phpunit.xml",
-      "env TEST_TARGET=class     vendor/bin/phpunit --configuration=tests/phpunit.xml"
+      "env TEST_TARGET=package   php -d short_open_tag=0 vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=global    php -d short_open_tag=0 vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=namespace php -d short_open_tag=1 vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "env TEST_TARGET=class     php -d short_open_tag=1 vendor/bin/phpunit --configuration=tests/phpunit.xml"
     ],
     "test-coverage": [
       "env TEST_TARGET=package   vendor/bin/phpunit --configuration=tests/phpunit.xml --coverage-html=tests/coverage"
