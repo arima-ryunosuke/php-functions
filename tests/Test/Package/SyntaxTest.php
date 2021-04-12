@@ -275,6 +275,42 @@ plain text
         ]))->is($providerExpected($code, 0));
     }
 
+    function test_strip_php()
+    {
+        $code = '?>
+a<? echo 123 ?>
+plain text
+<? foreach ($array as $k => $v): ?>
+    <? echo $k ?>
+    plain text
+    <? echo $v ?>
+<? endforeach ?>
+<? echo 789;
+';
+
+        that((strip_php)($code))->is('?>
+aplain text
+        plain text
+    ');
+        that((strip_php)($code, 'xxx'))->is('?>
+axxx5plain text
+xxx4    xxx3    plain text
+    xxx2xxx1xxx0');
+        that((strip_php)($code, function ($code, $n) {
+            if (strpos($code, 'foreach')) {
+                return 'foreach';
+            }
+            return $n . "th";
+        }))->is('?>
+a5thplain text
+foreach    3th    plain text
+    2thforeach0th');
+
+        $mapping = [];
+        $html = (strip_php)($code, null, $mapping);
+        that(strtr($html, $mapping))->is($code);
+    }
+
     function test_indent_php()
     {
         $phpcode = '
