@@ -844,6 +844,117 @@ that is <del>a</del><ins>the</ins> pen
         that((namespace_split)(new \Concrete('aaa\bbb')))->is(['aaa', 'bbb']);
     }
 
+    function test_html_strip()
+    {
+        $html = '
+test
+<!-- comment -->
+ryunosuke-function
+<div>
+    <!-- comment -->
+    <strong
+        id   = "strong1"
+        class= "hoge fuga piyo"
+    >
+        <? $multiline ?>
+        <br>
+        <?php foreach($array as $k=>$v) {
+            echo $k, $v;
+        }
+        ?>
+    </strong>
+    <pre>
+      line1
+        line2
+          line3
+    </pre>
+    <textarea>
+      line1
+        line2
+          line3
+    </textarea>
+    <script>
+      var a = 0;
+      if (a >= 0)
+        alert(a);
+    </script>
+    <style>
+      body {
+        color: black
+      }
+      span, div {
+        background: red;
+      }
+    </style>
+    <strong
+        id=\'strong2\'
+        class="hoge fuga piyo"
+    >
+    
+    <span id="<?= $id ?>" class=\'<?= $class ?>\'>
+    asd
+</span>
+        line1
+line2
+
+line3
+    </strong>
+</div>
+
+';
+        that((html_strip)($html))->is('test ryunosuke-function<div><strong id="strong1" class="hoge fuga piyo"><? $multiline ?>
+<br><?php foreach($array as $k=>$v) {
+            echo $k, $v;
+        }
+        ?>
+</strong><pre>
+      line1
+        line2
+          line3
+    </pre><textarea>
+      line1
+        line2
+          line3
+    </textarea><script>
+      var a = 0;
+      if (a >= 0)
+        alert(a);
+    </script><style>
+      body {
+        color: black
+      }
+      span, div {
+        background: red;
+      }
+    </style><strong id="strong2" class="hoge fuga piyo"><span id="<?= $id ?>" class="<?= $class ?>">asd</span>line1 line2 line3</strong></div>');
+
+        that((html_strip)('<hoge> a  b  c </hoge>', [
+            'ignore-tags' => ['hoge'],
+        ]))->is('<hoge> a  b  c </hoge>');
+        that((html_strip)('<hoge> a  b  c </hoge>', [
+            'ignore-tags' => [],
+        ]))->is('<hoge>a b c</hoge>');
+
+        that((html_strip)('<span id="<?= $id ?>"><?= $content ?></span>', [
+            'escape-phpcode' => false,
+        ]))->is('<span id="&lt;?= $id ?&gt;">= $content ?&gt;</span>');
+        that((html_strip)('<span id="<?= $id ?>"><?= $content ?></span>', [
+            'escape-phpcode' => true,
+        ]))->is('<span id="<?= $id ?>"><?= $content ?></span>');
+
+        that((html_strip)(' <!-- C1 --> a <!-- C2 --> b <!-- C3 --> ', [
+            'html-comment' => true,
+        ]))->is('a b');
+        that((html_strip)(' <!-- C1 --> a <!-- C2 --> b <!-- C3 --> ', [
+            'html-comment' => false,
+        ]))->is('<!-- C1 --> a <!-- C2 --> b <!-- C3 -->');
+
+        @that((html_strip)('<span>&</span>', [
+            'error-level' => E_USER_NOTICE,
+        ]))->is('<span>&amp;</span>');
+        that(error_get_last()['message'])->contains('htmlParseEntityRef');
+    }
+
     function test_htmltag()
     {
         that((htmltag)('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;;;height:456px}'))->is(
