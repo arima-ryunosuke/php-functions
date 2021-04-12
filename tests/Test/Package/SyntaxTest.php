@@ -237,6 +237,44 @@ ERR
         that(implode('', array_column($tokens, 1)))->is('class C {function m(){if(false)return function(){};}}');
     }
 
+    function test_parse_php_short_open_tag()
+    {
+        $providerExpected = function ($code, $short_open_tag) {
+            $include = var_export(realpath(__DIR__ . '/../../../include/global.php'), true);
+            $export = var_export($code, true);
+            /** @noinspection PhpParamsInspection */
+            /** @noinspection PhpUnnecessarySemicolonInspection */
+            $stdin = "<?php include($include);var_export(parse_php($export, TOKEN_NAME));";
+            $stdout = '';
+            (process)(PHP_BINARY, [
+                "-d short_open_tag=$short_open_tag",
+            ], $stdin, $stdout);
+            /** @noinspection PhpUnreachableStatementInspection */
+            return eval("return $stdout;");
+        };
+
+        $code = '?>
+a<? echo 123 ?>
+plain text
+<? foreach ($array as $k => $v): ?>
+    <? echo $k ?>
+    plain text
+    <? echo $v ?>
+<? endforeach ?>
+<? echo 789;
+';
+
+        that((parse_php)($code, [
+            'short_open_tag' => true,
+            'flags'          => TOKEN_NAME,
+        ]))->is($providerExpected($code, 1));
+
+        that((parse_php)($code, [
+            'short_open_tag' => false,
+            'flags'          => TOKEN_NAME,
+        ]))->is($providerExpected($code, 0));
+    }
+
     function test_indent_php()
     {
         $phpcode = '
