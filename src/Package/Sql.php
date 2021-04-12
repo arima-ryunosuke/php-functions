@@ -175,10 +175,7 @@ class Sql
         };
 
         // 構文解析も先読みもない素朴な実装なので、特定文字列をあとから置換するための目印文字列
-        $MARK = "{:RM";
-        while (strpos($sql, $MARK) !== false) {
-            $MARK .= rand(1000, 9999);
-        }
+        $MARK = (unique_string)($sql, 8);
         $MARK_R = "{$MARK}_R:}";   // \r マーク
         $MARK_N = "{$MARK}_N:}";   // \n マーク
         $MARK_BR = "{$MARK}_BR:}"; // 改行マーク

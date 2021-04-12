@@ -1768,6 +1768,19 @@ z", quote2: "a\\\\nz"');
         that(random_string)->try(256, '')->wasThrown('empty');
     }
 
+    function test_unique_string()
+    {
+        that((unique_string)('hoge', 'xxx', 'X'))->is('xxxX');
+        that((unique_string)('hoge', null, 'o'))->stringLengthEquals(2);
+        that((unique_string)('hoge', 10))->stringLengthEquals(11);
+        that(unique_string)->try('hoge', null, '')->wasThrown('empty');
+
+        for ($i = 0; $i < 9999; $i++) {
+            $unique_string = (unique_string)('hoge');
+            that(strpos('hoge', $unique_string))->isFalse();
+        }
+    }
+
     public function test_kvsprintf()
     {
         $args = [
