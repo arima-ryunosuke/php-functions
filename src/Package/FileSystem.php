@@ -512,22 +512,25 @@ class FileSystem
      *
      * @param string $filename ファイル名
      * @param string $needle 探す文字列
-     * @param int $offset 読み込み位置
-     * @param int|null $length 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
+     * @param int $start 読み込み位置
+     * @param int|null $end 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
      * @param int|null $chunksize 読み込みチャンクサイズ。省略時は 4096 の倍数に正規化
      * @return int|false $needle の位置。見つからなかった場合は false
      */
-    public static function file_pos($filename, $needle, $offset = 0, $length = null, $chunksize = null)
+    public static function file_pos($filename, $needle, $start = 0, $end = null, $chunksize = null)
     {
         if (!is_file($filename)) {
             throw new \InvalidArgumentException("'$filename' is not found.");
         }
 
-        if ($offset < 0) {
-            $offset += $filesize ?? $filesize = filesize($filename);
+        if ($start < 0) {
+            $start += $filesize ?? $filesize = filesize($filename);
         }
-        if ($length === null) {
-            $length = $filesize ?? $filesize = filesize($filename);
+        if ($end === null) {
+            $end = $filesize ?? $filesize = filesize($filename);
+        }
+        if ($end < 0) {
+            $end += $filesize ?? $filesize = filesize($filename);
         }
         if ($chunksize === null) {
             $chunksize = 4096 * (strlen($needle) % 4096 + 1);
@@ -537,22 +540,22 @@ class FileSystem
 
         $fp = fopen($filename, 'rb');
         try {
-            fseek($fp, $offset);
+            fseek($fp, $start);
             while (!feof($fp)) {
-                if ($offset > $length) {
+                if ($start > $end) {
                     break;
                 }
                 $last = $part ?? '';
                 $part = fread($fp, $chunksize);
                 if (($p = strpos($part, $needle)) !== false) {
-                    $result = $offset + $p;
-                    return $result + strlen($needle) > $length ? false : $result;
+                    $result = $start + $p;
+                    return $result + strlen($needle) > $end ? false : $result;
                 }
                 if (($p = strpos($last . $part, $needle)) !== false) {
-                    $result = $offset + $p - strlen($last);
-                    return $result + strlen($needle) > $length ? false : $result;
+                    $result = $start + $p - strlen($last);
+                    return $result + strlen($needle) > $end ? false : $result;
                 }
-                $offset += strlen($part);
+                $start += strlen($part);
             }
             return false;
         }

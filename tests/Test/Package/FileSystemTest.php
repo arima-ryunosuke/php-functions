@@ -329,6 +329,14 @@ class FileSystemTest extends AbstractTestCase
         that((file_pos)($tmpfile, 'abc', 100, 102))->is(false);
         that((file_pos)($tmpfile, 'abc', 100, 103))->is(100);
 
+        that((file_pos)($tmpfile, 'ab', 0, -1))->is(100);
+        that((file_pos)($tmpfile, 'ab', 0, -2))->is(false);
+        that((file_pos)($tmpfile, 'ab', 0, -3))->is(false);
+
+        that((file_pos)($tmpfile, 'xab', 99, -1))->is(99);
+        that((file_pos)($tmpfile, 'xab', 99, -2))->is(false);
+        that((file_pos)($tmpfile, 'xab', 99, -3))->is(false);
+
         that((file_pos)($tmpfile, 'abc', null, null, 3))->is(100);
         that((file_pos)($tmpfile, 'abc', null, null, 4))->is(100);
         that((file_pos)($tmpfile, 'abc', null, null, 5))->is(100);
