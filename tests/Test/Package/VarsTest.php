@@ -279,6 +279,10 @@ class VarsTest extends AbstractTestCase
         that((attr_get)('notfound', $object, 'default'))->isSame('default');
         that((attr_get)('ex', $object, 'default'))->isSame('default');
 
+        $closure = function () { };
+        that((attr_get)('ok', $closure))->isSame(null);
+        that((attr_get)('ok', $closure, 'default'))->isSame('default');
+
         that(attr_get)->try(null, 'dummy')->wasThrown('must be array or object');
     }
 

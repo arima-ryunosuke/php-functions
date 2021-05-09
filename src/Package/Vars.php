@@ -392,10 +392,10 @@ class Vars
 
         // 上記のプロパティ版
         if (is_object($value)) {
-            if (isset($value->$key)) {
-                return $value->$key;
-            }
             try {
+                if (isset($value->$key)) {
+                    return $value->$key;
+                }
                 error_clear_last();
                 $result = @$value->$key;
                 return error_get_last() ? $default : $result;
