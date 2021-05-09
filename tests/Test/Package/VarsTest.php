@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use ArrayObject;
 use Concrete;
 use Exception as Ex;
 use ryunosuke\Functions\Package\Vars;
@@ -134,6 +135,34 @@ class VarsTest extends AbstractTestCase
             'key'   => 'inner-scalar1',
             'inner' => $inner
         ]);
+    }
+
+    function test_phpval()
+    {
+        that((phpval)("null"))->isSame(null);
+        that((phpval)("true"))->isSame(true);
+        that((phpval)("FALSE"))->isSame(false);
+        that((phpval)("PHP_INT_SIZE"))->isSame(PHP_INT_SIZE);
+        that((phpval)("\\PHP_INT_SIZE"))->isSame(PHP_INT_SIZE);
+        that((phpval)("ArrayObject::ARRAY_AS_PROPS"))->isSame(ArrayObject::ARRAY_AS_PROPS);
+        that((phpval)("ArrayObject::class"))->isSame(ArrayObject::class);
+
+        that((phpval)("-1"))->isSame(-1);
+        that((phpval)("+1"))->isSame(+1);
+        that((phpval)("0.0"))->isSame(0.0);
+        that((phpval)("-1.23"))->isSame(-1.23);
+
+        that((phpval)("hoge"))->isSame("hoge");
+        that((phpval)("bare string"))->isSame("bare string");
+        that((phpval)("return"))->isSame("return");
+        that((phpval)("strtoupper('a')"))->isSame("A");
+
+        that((phpval)("strtoupper(\$a)", ['a' => 'a']))->isSame("A");
+        that((phpval)("\$a + \$b", ['a' => 1, 'b' => 2]))->isSame(3);
+
+        that((phpval)($object = new \stdClass()))->isSame($object);
+        that((phpval)("strtoupper(\$undefined)"))->isSame("");
+        that((phpval)("strtoupper(undefined)"))->isSame("UNDEFINED");
     }
 
     function test_arrayable_key_exists()
