@@ -11,6 +11,21 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.17
+
+- [feature][Classobj] reflect_types を追加
+- [feature][FileSystem] file_pos の負数の位置指定が聞いていない不具合を修正
+- [feature][Vars] attr_get が例外を投げる不具合を修正
+- [feature][Vars] phpval を追加
+- [feature][Strings] build_query/parse_query を追加
+- [feature][Strings] render_template を追加
+- [feature][Strings] html_strip を追加
+- [feature][Strings] unique_string を追加
+- [feature][Strings] json_import の json5 対応
+- [feature][Syntax] strip_php を追加
+- [feature][Syntax] parse_php に phtml と short_open_tag オプションを追加
+- [feature][Utility] benchmark で opcache が使われないことがある不具合を修正
+
 ## 1.4.16
 
 - [feature][Arrays] array_lookup のクロージャ対応
