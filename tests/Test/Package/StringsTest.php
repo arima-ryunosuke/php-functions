@@ -1212,6 +1212,67 @@ line3
         ]);
     }
 
+    function test_build_query()
+    {
+        $data = [
+            'x' => [[1, 2]],
+        ];
+
+        that((build_query)($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1, 2]]]);
+        that((build_query)($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1, 2]]]);
+        that((build_query)($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1, 2]]]);
+
+        that((build_query)($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1, 2]]]);
+        that((build_query)($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1, 2]]]);
+        that((build_query)($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1], [2]]]);
+        that((build_query)($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1], [2]]]);
+        that((build_query)($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1], [2]]]);
+        that((build_query)($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that((parse_query)($expected))->is(['x' => [[1], [2]]]);
+
+        $data = [
+            'x' => [[1, [2], [[3]]]],
+        ];
+
+        that((build_query)($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that((build_query)($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that((build_query)($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [2], [[3]]]]]);
+
+        that((build_query)($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that((build_query)($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that((build_query)($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that((build_query)($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1, [[3]]], [[2]]]]);
+        that((build_query)($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1], [[2]], [[[3]]]]]);
+        that((build_query)($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
+        that((parse_query)($expected))->is(['x' => [[1], [[2]], [[[3]]]]]);
+
+        that((build_query)([1, 2, 3], 'pre-'))->is('pre-0=1&pre-1=2&pre-2=3');
+    }
+
+    function test_parse_query()
+    {
+        that((parse_query)('a=1&b[]=2'))->is([
+            'a' => 1,
+            'b' => [2],
+        ]);
+    }
+
     function test_ini_export()
     {
         $iniarray = [

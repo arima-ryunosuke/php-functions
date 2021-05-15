@@ -2182,6 +2182,86 @@ class Strings
     }
 
     /**
+     * 数値キーを削除する http_build_query
+     *
+     * php の世界において配列のクエリ表現は `var[]=1&var[]=2` で事足りる。
+     * しかし http_build_query では数値キーでも必ず `var[0]=1&var[1]=2` になる。
+     * それはそれで正しいし、他言語との連携が必要な場合はそうせざるを得ない状況もあるが、単純に php だけで配列を表したい場合は邪魔だし文字長が長くなる。
+     * この関数を使うと数値キーを削除し、`var[]=1&var[]=2` のようなクエリ文字列を生成できる。
+     *
+     * シグネチャは http_build_query と同じで、 $numeric_prefix に数値的文字列を与えたときのみ動作が変化する。
+     * （$numeric_prefix の意味を考えればこの引数に数値的文字列を与える意味は皆無だろうので流用している）。
+     *
+     * - 1 を与えると最前列を残して [] (%5B%5D) が置換される
+     * - 2 を与えると最前列とその右を残して [] (%5B%5D) が置換される
+     * - 要するに正数を与えると「abs(n) 個を残して [] (%5B%5D) を置換する」という指定になる
+     * - -1 を与えると最後尾の [] (%5B%5D) が置換される
+     * - -2 を与えると最後尾とその左の [] (%5B%5D) が置換される
+     * - 要するに負数を与えると「右から abs(n) 個の [] (%5B%5D) を置換する」という指定になる
+     *
+     * この仕様は `v[][]=1&v[][]=2` のようなときにおいしくないためである。
+     * これは `$v=[[1], [2]]` のような値になるが、この場合 `$v=[[1, 2]]` という値が欲しい、という事が多い。
+     * そのためには `v[0][]=1&v[0][]=2` のようにする必要があるための数値指定である。
+     *
+     * @param array|object $data クエリデータ
+     * @param string|int|null $numeric_prefix 数値キープレフィックス
+     * @param string|null $arg_separator クエリセパレータ
+     * @param int $encoding_type エンコードタイプ
+     * @return string クエリ文字列
+     */
+    public static function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738)
+    {
+        $arg_separator = $arg_separator ?? ini_get('arg_separator.output');
+
+        if ($numeric_prefix === null || ctype_digit(trim($numeric_prefix, '-+'))) {
+            $REGEX = '%5B\d+%5D';
+            $NOSEQ = '%5B%5D';
+            $numeric_prefix = $numeric_prefix === null ? null : (int) $numeric_prefix;
+            $query = http_build_query($data, '', $arg_separator, $encoding_type);
+            // 0は置換しないを意味する
+            if ($numeric_prefix === 0) {
+                return $query;
+            }
+            // null は無制限置換
+            if ($numeric_prefix === null) {
+                return preg_replace("#($REGEX)#u", $NOSEQ, $query);
+            }
+            // 正数は残す数とする
+            if ($numeric_prefix > 0) {
+                return preg_replace_callback("#(?:$REGEX)+#u", function ($m) use ($numeric_prefix) {
+                    $braces = explode('%5D', $m[0]);
+                    foreach (array_slice($braces, $numeric_prefix, null, true) as $n => $brace) {
+                        $braces[$n] = rtrim($brace, '0123456789');
+                    }
+                    return implode('%5D', $braces);
+                }, $query);
+            }
+            // 負数は後ろから n 個目まで
+            $pattern = str_repeat("($REGEX)?", abs($numeric_prefix) - 1);
+            return preg_replace_callback("#$pattern($REGEX=)#u", function ($m) use ($NOSEQ) {
+                return str_repeat($NOSEQ, count(array_filter($m, 'strlen')) - 2) . "$NOSEQ=";
+            }, $query);
+        }
+        else {
+            return http_build_query($data, $numeric_prefix ?? '', $arg_separator, $encoding_type);
+        }
+    }
+
+    /**
+     * parse_str の返り値版
+     *
+     * 標準の parse_str は参照で受ける謎シグネチャなのでそれを返り値に変更したもの。
+     *
+     * @param string $query クエリ文字列
+     * @return array クエリのパース結果配列
+     */
+    public static function parse_query($query)
+    {
+        parse_str($query, $result);
+        return $result;
+    }
+
+    /**
      * 連想配列を INI 的文字列に変換する
      *
      * Example:
