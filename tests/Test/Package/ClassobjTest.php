@@ -232,6 +232,87 @@ class ClassobjTest extends AbstractTestCase
         that($e->codemessage())->is('123:message');
     }
 
+    function test_reflect_types()
+    {
+        $object = new class() {
+            function m(?string $s, array $a, ?\ArrayObject $ao, $o, $n): void { }
+        };
+        $refmethod = new \ReflectionMethod($object, 'm');
+
+        $types = (reflect_types)($refmethod->getParameters()[0]->getType());
+        that($types)->count(2);
+        that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->__toString())->is('string|null');
+
+        $types = (reflect_types)($refmethod->getParameters()[1]->getType());
+        that($types)->count(1);
+        that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->__toString())->is('array');
+
+        $types = (reflect_types)($refmethod->getParameters()[2]->getType());
+        that($types)->count(2);
+        that($types->__toString())->is('ArrayObject|null');
+
+        $types = (reflect_types)($refmethod->getParameters()[3]->getType());
+        that($types)->count(0);
+        that($types->__toString())->is('');
+
+        $types = (reflect_types)($refmethod->getReturnType());
+        that($types)->count(1);
+        that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->__toString())->is('void');
+        that(json_encode($types))->is(json_encode(['void']));
+
+        $types = (reflect_types)();
+        $types[0] = 'int';
+        $types[1] = 'array';
+        $types[2] = 'iterable';
+        $types[3] = \Throwable::class;
+        $types[4] = '?' . \ArrayObject::class;
+
+        that($types)->count(5);
+        that($types->getTypes())->eachIsInstanceOf(\ReflectionType::class);
+        that(iterator_to_array($types))->eachIsInstanceOf(\ReflectionType::class);
+        that($types->__toString())->is('ArrayObject|Throwable|iterable|int|null');
+
+        $types[5] = 'object';
+
+        that($types)->count(4);
+        that($types->__toString())->is('iterable|object|int|null');
+
+        that($types->allows(new \ArrayObject()))->isTrue();
+        that($types->allows(new \Exception()))->isTrue();
+        that($types->allows(new \ArrayIterator()))->isTrue();
+        that($types->allows([]))->isTrue();
+        that($types->allows(null))->isTrue();
+        that($types->allows(false))->isTrue();
+        that($types->allows(123))->isTrue();
+        that($types->allows(123.4))->isTrue();
+        that($types->allows("123"))->isTrue();
+        that($types->allows("123.4"))->isTrue();
+        that($types->allows("hoge"))->isFalse();
+
+        $types = (reflect_types)();
+
+        $types[0] = '?string';
+        that($types->allows(null))->isTrue();
+        that($types->allows("hoge"))->isTrue();
+        that($types->allows(new \Exception()))->isTrue();
+        that($types->allows(new \ArrayObject()))->isFalse();
+
+        $types[0] = 'mixed';
+        that($types->allows(STDOUT))->isTrue();
+
+        $types = (reflect_types)();
+        that(isset($types[0]))->isFalse();
+        $types[] = 'mixed';
+        $types[] = 'object';
+        that($types[0])->is('mixed');
+        that($types[1])->is('object');
+        unset($types[0]);
+        that(isset($types[0]))->isFalse();
+    }
+
     function test_const_exists()
     {
         $class = get_class(new class {
