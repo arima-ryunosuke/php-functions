@@ -807,13 +807,13 @@ class Funchand
                     $result[$n] = $dependency[$pname];
                 }
             }
-            elseif (($type = $parameter->getType()) && $type instanceof \ReflectionNamedType) {
-                if (isset($dependency[$type->getName()])) {
-                    $result[$n] = $dependency[$type->getName()];
+            elseif (($typename = (string) (reflect_types)($parameter->getType()))) {
+                if (isset($dependency[$typename])) {
+                    $result[$n] = $dependency[$typename];
                 }
                 else {
                     foreach ($dependency as $key => $value) {
-                        if (is_subclass_of(ltrim($key, '\\'), $type->getName(), true)) {
+                        if (is_subclass_of(ltrim($key, '\\'), $typename, true)) {
                             if (array_key_exists($n, $result)) {
                                 unset($result[$n]);
                                 break;
@@ -1092,9 +1092,7 @@ CODE;
             $declare = '';
 
             if ($parameter->hasType()) {
-                /** @var \ReflectionNamedType $type */
-                $type = $parameter->getType();
-                $declare .= ($type->allowsNull() ? '?' : '') . ($type->isBuiltin() ? '' : '\\') . $type->getName() . ' ';
+                $declare .= (reflect_types)($parameter->getType())->getName() . ' ';
             }
 
             $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();

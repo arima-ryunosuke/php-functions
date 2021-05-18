@@ -239,27 +239,49 @@ class ClassobjTest extends AbstractTestCase
         };
         $refmethod = new \ReflectionMethod($object, 'm');
 
-        $types = (reflect_types)($refmethod->getParameters()[0]->getType());
+        $types = (reflect_types)([
+            new class($refmethod->getParameters()[0]->getType()) extends \ReflectionProperty {
+                private $type;
+
+                /** @noinspection PhpMissingParentConstructorInspection */
+                public function __construct($type) { $this->type = $type; }
+
+                public function getType() { return $this->type; }
+            },
+            $refmethod,
+            $refmethod->getParameters()[1],
+        ]);
+        that($types)->count(4);
+        that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->getName())->is('array|string|null|void');
+        that($types->__toString())->is('array|string|null|void');
+
+        $types = (reflect_types)($refmethod->getParameters()[0]);
         that($types)->count(2);
         that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->getName())->is('?string');
         that($types->__toString())->is('string|null');
 
-        $types = (reflect_types)($refmethod->getParameters()[1]->getType());
+        $types = (reflect_types)($refmethod->getParameters()[1]);
         that($types)->count(1);
         that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->getName())->is('array');
         that($types->__toString())->is('array');
 
         $types = (reflect_types)($refmethod->getParameters()[2]->getType());
         that($types)->count(2);
+        that($types->getName())->is('?\\ArrayObject');
         that($types->__toString())->is('ArrayObject|null');
 
         $types = (reflect_types)($refmethod->getParameters()[3]->getType());
         that($types)->count(0);
+        that($types->getName())->is('');
         that($types->__toString())->is('');
 
-        $types = (reflect_types)($refmethod->getReturnType());
+        $types = (reflect_types)($refmethod);
         that($types)->count(1);
         that($types[0])->isInstanceOf(\ReflectionType::class);
+        that($types->getName())->is('void');
         that($types->__toString())->is('void');
         that(json_encode($types))->is(json_encode(['void']));
 
@@ -271,6 +293,7 @@ class ClassobjTest extends AbstractTestCase
         $types[4] = '?' . \ArrayObject::class;
 
         that($types)->count(5);
+        that($types->getName())->is('\\ArrayObject|\\Throwable|iterable|int|null');
         that($types->getTypes())->eachIsInstanceOf(\ReflectionType::class);
         that(iterator_to_array($types))->eachIsInstanceOf(\ReflectionType::class);
         that($types->__toString())->is('ArrayObject|Throwable|iterable|int|null');

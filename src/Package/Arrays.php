@@ -2983,9 +2983,7 @@ class Arrays
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    /** @var \ReflectionNamedType $rtype */
-                    $rtype = $ref->getReturnType();
-                    $type = $rtype ? $rtype->getName() : gettype(reset($arg));
+                    $type = (reflect_types)($ref->getReturnType())->allows('string') ? 'string' : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
