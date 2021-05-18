@@ -211,6 +211,8 @@ class Funchand
             'and'        => static function ($v1, $v2) { return $v1 and $v2; },
             'xor'        => static function ($v1, $v2) { return $v1 xor $v2; },
             'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
+            'new'        => static function ($v1, ...$v) { return new $v1(...$v); },
+            'clone'      => static function ($v1) { return clone $v1; },
         ];
 
         $opefunc = $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));

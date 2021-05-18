@@ -106,6 +106,8 @@ class FunchandTest extends AbstractTestCase
             'and'        => [[false, false], [true, false], [false, true], [true, true]],
             'xor'        => [[false, false], [true, false], [false, true], [true, true]],
             'instanceof' => [], // 文字列化できないので個別にテストする
+            'new'        => [], // 文字列化できないので個別にテストする
+            'clone'      => [], // 文字列化できないので個別にテストする
         ];
         $ve = function ($v) { return var_export($v, true); };
         foreach ($operators as $op => $argss) {
@@ -134,6 +136,11 @@ class FunchandTest extends AbstractTestCase
         that($x)->isSame(99);
         that((ope_func)('instanceof')(new \stdClass(), \stdClass::class))->isTrue();
         that((ope_func)('instanceof')(new \stdClass(), \Exception::class))->isFalse();
+        $object = (ope_func)('new')(\Concrete::class, 'name');
+        that($object->getName())->is('name');
+        $object2= (ope_func)('clone')($object);
+        that($object2->getName())->is('name');
+        that($object2)->isNotSame($object);
 
         $p = [1, 1, 2, 4, 5, 6, 1, 3, 8, 4];
         that(array_filter($p, (ope_func)('==', 5)))->isSame([4 => 5]);
