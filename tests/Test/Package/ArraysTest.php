@@ -1303,10 +1303,10 @@ class ArraysTest extends AbstractTestCase
             3    => $row3,
         ];
 
-        that((array_group)($array, (array_of)('group')))->is(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]]);
-        that((array_group)($array, (array_of)('group'), true))->is(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]]);
+        that((array_group)($array, 'group'))->is(['A' => ['k1' => $row1, 0 => $row3], 'B' => ['k2' => $row2]]);
+        that((array_group)($array, 'group', true))->is(['A' => ['k1' => $row1, 3 => $row3], 'B' => ['k2' => $row2]]);
 
-        that((array_group)([$row1, $row2, $row3], (array_of)(['group', 'id'])))->is([
+        that((array_group)([$row1, $row2, $row3], ['group', 'id']))->is([
             'A' => [
                 1 => [
                     'id'    => 1,

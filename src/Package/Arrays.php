@@ -2523,6 +2523,7 @@ class Arrays
      * 配列をコールバックの返り値でグループ化する
      *
      * コールバックを省略すると値そのもので評価する。
+     * コールバックに配列・文字列を与えるとキーでグループ化する。
      * コールバックが配列を返すと入れ子としてグループ化する。
      *
      * Example:
@@ -2550,12 +2551,15 @@ class Arrays
      * ```
      *
      * @param iterable $array 対象配列
-     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
+     * @param ?callable|string|array $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
      */
     public static function array_group($array, $callback = null, $preserve_keys = false)
     {
+        if ($callback !== null && !is_callable($callback)) {
+            $callback = (array_of)($callback);
+        }
         $callback = (func_user_func_array)($callback);
 
         $result = [];
