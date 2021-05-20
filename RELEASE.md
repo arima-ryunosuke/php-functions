@@ -11,6 +11,12 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.18
+
+- [feature][Funchand] ope_func に new/clone を追加
+- [feature][Arrays] array_group のキー対応
+- [feature][Classobj] reflect_types 修正
+
 ## 1.4.17
 
 - [feature][Classobj] reflect_types を追加
