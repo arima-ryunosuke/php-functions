@@ -3516,6 +3516,7 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("ryunosuke\\
      * 配列をコールバックの返り値でグループ化する
      *
      * コールバックを省略すると値そのもので評価する。
+     * コールバックに配列・文字列を与えるとキーでグループ化する。
      * コールバックが配列を返すと入れ子としてグループ化する。
      *
      * Example:
@@ -3543,12 +3544,15 @@ if (!isset($excluded_functions["array_group"]) && (!function_exists("ryunosuke\\
      * ```
      *
      * @param iterable $array 対象配列
-     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
+     * @param ?callable|string|array $callback 評価クロージャ。 null なら値そのもので評価
      * @param bool $preserve_keys キーを保存するか。 false の場合数値キーは振り直される
      * @return array グルーピングされた配列
      */
     function array_group($array, $callback = null, $preserve_keys = false)
     {
+        if ($callback !== null && !is_callable($callback)) {
+            $callback = array_of($callback);
+        }
         $callback = func_user_func_array($callback);
 
         $result = [];
@@ -4001,9 +4005,7 @@ if (!isset($excluded_functions["array_order"]) && (!function_exists("ryunosuke\\
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    /** @var \ReflectionNamedType $rtype */
-                    $rtype = $ref->getReturnType();
-                    $type = $rtype ? $rtype->getName() : gettype(reset($arg));
+                    $type = reflect_types($ref->getReturnType())->allows('string') ? 'string' : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
@@ -5585,9 +5587,7 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
                         }
                         // 同上。返り値版
                         if (!$refmember->hasReturnType() && $refmethod->hasReturnType()) {
-                            /** @var \ReflectionNamedType $rtype */
-                            $rtype = $refmethod->getReturnType();
-                            $declare .= ':' . ($rtype->allowsNull() ? '?' : '') . ($rtype->isBuiltin() ? '' : '\\') . $rtype->getName();
+                            $declare .= ':' . reflect_types($refmethod->getReturnType())->getName();
                         }
                     }
                     $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $declare);
@@ -5727,16 +5727,7 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
 
         $getReturnType = function (\ReflectionFunctionAbstract $reffunc) {
             if ($reffunc->hasReturnType()) {
-                // @codeCoverageIgnoreStart
-                if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
-                    return ': ' . (string) $reffunc->getReturnType();
-                }
-                // @codeCoverageIgnoreEnd
-                else {
-                    /** @var \ReflectionNamedType $rt */
-                    $rt = $reffunc->getReturnType();
-                    return ': ' . ($rt->allowsNull() ? '?' : '') . ($rt->isBuiltin() ? '' : '\\') . $rt->getName();
-                }
+                return ': ' . reflect_types($reffunc->getReturnType())->getName();
             }
         };
 
@@ -5855,6 +5846,7 @@ if (!isset($excluded_functions["reflect_types"]) && (!function_exists("ryunosuke
      *
      * ReflectionType に準ずるインスタンスを渡すと取り得る候補を配列ライクなオブジェクトで返す。
      * 引数は配列で複数与えても良い。よしなに扱って複数型として返す。
+     * また「Type が一意に導出できる Reflection」を渡しても良い（ReflectionProperty など）。
      * null を与えた場合はエラーにはならず、スルーされる（getType は null を返し得るので利便性のため）。
      *
      * 単純に ReflectionType の配列ライクなオブジェクトを返すが、そのオブジェクトは `__toString` が実装されており、文字列化するとパイプ区切りの型文字列を返す。
@@ -5869,6 +5861,7 @@ if (!isset($excluded_functions["reflect_types"]) && (!function_exists("ryunosuke
      *
      * - jsonSerialize: JsonSerializable 実装
      * - getTypes: 取り得る型をすべて返す（ReflectionUnionType 互換）
+     * - getName: ReflectionUnionType 非互換 toString な型宣言文字列を返す
      * - allows: その値を取りうるか判定して返す
      *
      * ReflectionUnionType とは完全互換ではないので、php8.0が完全に使える環境であれば素直に ReflectionUnionType を使ったほうが良い。
@@ -5899,12 +5892,29 @@ if (!isset($excluded_functions["reflect_types"]) && (!function_exists("ryunosuke
      * that(count($types))->is(2);
      * ```
      *
-     * @param \ReflectionType|\ReflectionType[]|null $reflection_type getType 等で得られるインスタンス
-     * @return \Traversable|\ArrayAccess|\Countable|\Stringable
+     * @param \ReflectionFunctionAbstract|\ReflectionType|\ReflectionType[]|null $reflection_type getType 等で得られるインスタンス
+     * @return \Traversable|\ArrayAccess|\Countable|\ReflectionNamedType|\ReflectionUnionType
      */
     function reflect_types($reflection_type = null)
     {
-        return new class(...(is_array($reflection_type) ? $reflection_type : [$reflection_type]))
+        if (!is_array($reflection_type)) {
+            $reflection_type = [$reflection_type];
+        }
+
+        foreach ($reflection_type as $n => $rtype) {
+            if ($rtype instanceof \ReflectionProperty) {
+                /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+                $reflection_type[$n] = $rtype->getType();
+            }
+            if ($rtype instanceof \ReflectionFunctionAbstract) {
+                $reflection_type[$n] = $rtype->getReturnType();
+            }
+            if ($rtype instanceof \ReflectionParameter) {
+                $reflection_type[$n] = $rtype->getType();
+            }
+        }
+
+        return new class(...$reflection_type)
             extends \stdClass
             implements \IteratorAggregate, \ArrayAccess, \Countable, \JsonSerializable {
 
@@ -6011,6 +6021,22 @@ if (!isset($excluded_functions["reflect_types"]) && (!function_exists("ryunosuke
             public function jsonSerialize()
             {
                 return $this->toStrings(true, true);
+            }
+
+            public function getName()
+            {
+                $types = array_flip($this->toStrings(true, true));
+                $nullable = false;
+                if (isset($types['null']) && count($types) === 2) {
+                    unset($types['null']);
+                    $nullable = true;
+                }
+
+                $result = [];
+                foreach ($types as $type => $dummy) {
+                    $result[] = (isset(self::PSEUDO[$type]) ? '' : '\\') . $type;
+                }
+                return ($nullable ? '?' : '') . implode('|', $result);
             }
 
             public function getTypes()
@@ -8562,6 +8588,8 @@ if (!isset($excluded_functions["ope_func"]) && (!function_exists("ryunosuke\\Fun
             'and'        => static function ($v1, $v2) { return $v1 and $v2; },
             'xor'        => static function ($v1, $v2) { return $v1 xor $v2; },
             'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
+            'new'        => static function ($v1, ...$v) { return new $v1(...$v); },
+            'clone'      => static function ($v1) { return clone $v1; },
         ];
 
         $opefunc = $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
@@ -9218,13 +9246,13 @@ if (!isset($excluded_functions["parameter_wiring"]) && (!function_exists("ryunos
                     $result[$n] = $dependency[$pname];
                 }
             }
-            elseif (($type = $parameter->getType()) && $type instanceof \ReflectionNamedType) {
-                if (isset($dependency[$type->getName()])) {
-                    $result[$n] = $dependency[$type->getName()];
+            elseif (($typename = (string) reflect_types($parameter->getType()))) {
+                if (isset($dependency[$typename])) {
+                    $result[$n] = $dependency[$typename];
                 }
                 else {
                     foreach ($dependency as $key => $value) {
-                        if (is_subclass_of(ltrim($key, '\\'), $type->getName(), true)) {
+                        if (is_subclass_of(ltrim($key, '\\'), $typename, true)) {
                             if (array_key_exists($n, $result)) {
                                 unset($result[$n]);
                                 break;
@@ -9538,9 +9566,7 @@ if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryun
             $declare = '';
 
             if ($parameter->hasType()) {
-                /** @var \ReflectionNamedType $type */
-                $type = $parameter->getType();
-                $declare .= ($type->allowsNull() ? '?' : '') . ($type->isBuiltin() ? '' : '\\') . $type->getName() . ' ';
+                $declare .= reflect_types($parameter->getType())->getName() . ' ';
             }
 
             $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();

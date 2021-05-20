@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L1077" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L1101" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -474,7 +474,7 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L232-L393" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L232-L391" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace                        	<small>($class, $register) : void</small>
@@ -577,7 +577,7 @@ that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod())-&gt;isSame('
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L395-L629" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L393-L618" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_extends()" tabindex="-1" class="structure-title ">
                         class_extends                        	<small>($object, $methods, $fields = []) : object</small>
@@ -665,16 +665,17 @@ that($newobject-&gt;count())-&gt;isSame(6);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L631-L887" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L620-L911" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::reflect_types()" tabindex="-1" class="structure-title ">
-                        reflect_types                        	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="Stringable$typespace.html#Stringable" class="fqsen ">Stringable</a></small>
+                        reflect_types                        	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="ReflectionUnionType$typespace.html#ReflectionUnionType" class="fqsen ">ReflectionUnionType</a></small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>ReflectionType の型配列を返す</p>
 <p>ReflectionType のインターフェース・仕様がコロコロ変わってついていけないので関数化した。</p>
 <p>ReflectionType に準ずるインスタンスを渡すと取り得る候補を配列ライクなオブジェクトで返す。<br />
 引数は配列で複数与えても良い。よしなに扱って複数型として返す。<br />
+また「Type が一意に導出できる Reflection」を渡しても良い（ReflectionProperty など）。<br />
 null を与えた場合はエラーにはならず、スルーされる（getType は null を返し得るので利便性のため）。</p>
 <p>単純に ReflectionType の配列ライクなオブジェクトを返すが、そのオブジェクトは <code>__toString</code> が実装されており、文字列化するとパイプ区切りの型文字列を返す。<br />
 これは 8.0 における ReflectionUnionType の <code>__toString</code> を模倣したものである。<br />
@@ -686,6 +687,7 @@ null を与えた場合はエラーにはならず、スルーされる（getTyp
 <ul>
 <li>jsonSerialize: JsonSerializable 実装</li>
 <li>getTypes: 取り得る型をすべて返す（ReflectionUnionType 互換）</li>
+<li>getName: ReflectionUnionType 非互換 toString な型宣言文字列を返す</li>
 <li>allows: その値を取りうるか判定して返す</li>
 </ul>
 <p>ReflectionUnionType とは完全互換ではないので、php8.0が完全に使える環境であれば素直に ReflectionUnionType を使ったほうが良い。<br />
@@ -718,7 +720,7 @@ that(count($types))-&gt;is(2);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type"><a href="http://php.net/manual/ja/class.reflectiontype.php" class="fqsen" target="_blank">\ReflectionType</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectiontype.php" class="fqsen" target="_blank">\ReflectionType</a>[]<span class="type-separator"></span><wbr>null</td>
+				<td class="type"><a href="http://php.net/manual/ja/class.reflectionfunctionabstract.php" class="fqsen" target="_blank">\ReflectionFunctionAbstract</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectiontype.php" class="fqsen" target="_blank">\ReflectionType</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectiontype.php" class="fqsen" target="_blank">\ReflectionType</a>[]<span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$reflection_type = null</td>
 				<td class="desc"><p>getType 等で得られるインスタンス</p>
 </td>
@@ -729,7 +731,7 @@ that(count($types))-&gt;is(2);
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type"><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="Stringable$typespace.html#Stringable" class="fqsen ">Stringable</a></td>
+			<td class="type"><a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="ReflectionUnionType$typespace.html#ReflectionUnionType" class="fqsen ">ReflectionUnionType</a></td>
 			<td class="desc"></td>
 			<td class="rest"></td>
 		</tr>
@@ -752,7 +754,7 @@ that(count($types))-&gt;is(2);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L889-L937" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L913-L961" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::const_exists()" tabindex="-1" class="structure-title ">
                         const_exists                        	<small>($classname, $constname = null) : bool</small>
@@ -822,7 +824,7 @@ that(const_exists('UNDEFINED'))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L939-L975" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L963-L999" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
                         object_dive                        	<small>($object, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
@@ -901,7 +903,7 @@ that(object_dive($class, ['a', 'b', 'c']))-&gt;isSame('vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L977-L1035" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1001-L1059" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_class_constants()" tabindex="-1" class="structure-title ">
                         get_class_constants                        	<small>($class, $filter = null) : array</small>
@@ -982,7 +984,7 @@ that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1037-L1076" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1061-L1100" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
                         get_object_properties                        	<small>($object) : array</small>

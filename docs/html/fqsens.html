@@ -1165,6 +1165,7 @@ that(array_count($array, [
 		</h4>
 	<div class="description"><p>配列をコールバックの返り値でグループ化する</p>
 <p>コールバックを省略すると値そのもので評価する。<br />
+コールバックに配列・文字列を与えるとキーでグループ化する。<br />
 コールバックが配列を返すと入れ子としてグループ化する。</p>
 <p>Example:</p>
 <pre><code class="language-php">that(array_group([1, 1, 1]))-&gt;isSame([
@@ -2017,12 +2018,13 @@ that($newobject-&gt;count())-&gt;isSame(6);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::reflect_types()">
-                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="Stringable$typespace.html#Stringable" class="fqsen ">Stringable</a></small>
+                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="ReflectionUnionType$typespace.html#ReflectionUnionType" class="fqsen ">ReflectionUnionType</a></small>
 		</h4>
 	<div class="description"><p>ReflectionType の型配列を返す</p>
 <p>ReflectionType のインターフェース・仕様がコロコロ変わってついていけないので関数化した。</p>
 <p>ReflectionType に準ずるインスタンスを渡すと取り得る候補を配列ライクなオブジェクトで返す。<br />
 引数は配列で複数与えても良い。よしなに扱って複数型として返す。<br />
+また「Type が一意に導出できる Reflection」を渡しても良い（ReflectionProperty など）。<br />
 null を与えた場合はエラーにはならず、スルーされる（getType は null を返し得るので利便性のため）。</p>
 <p>単純に ReflectionType の配列ライクなオブジェクトを返すが、そのオブジェクトは <code>__toString</code> が実装されており、文字列化するとパイプ区切りの型文字列を返す。<br />
 これは 8.0 における ReflectionUnionType の <code>__toString</code> を模倣したものである。<br />
@@ -2034,6 +2036,7 @@ null を与えた場合はエラーにはならず、スルーされる（getTyp
 <ul>
 <li>jsonSerialize: JsonSerializable 実装</li>
 <li>getTypes: 取り得る型をすべて返す（ReflectionUnionType 互換）</li>
+<li>getName: ReflectionUnionType 非互換 toString な型宣言文字列を返す</li>
 <li>allows: その値を取りうるか判定して返す</li>
 </ul>
 <p>ReflectionUnionType とは完全互換ではないので、php8.0が完全に使える環境であれば素直に ReflectionUnionType を使ったほうが良い。<br />
