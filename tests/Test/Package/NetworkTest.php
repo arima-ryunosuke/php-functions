@@ -58,6 +58,9 @@ class NetworkTest extends AbstractTestCase
         that((ping)("udp://128.0.0.1", 1234, 1, $err))->isFloat();
         that($err)->isEmpty();
 
+        that((ping)("unknown-host", 1234, 1, $err))->isFalse();
+        that($err)->isNotEmpty();
+
         that((ping)("unknown-host", null, 1, $err))->isFalse();
         that($err)->isNotEmpty();
 

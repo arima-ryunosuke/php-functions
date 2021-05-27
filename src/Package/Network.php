@@ -129,7 +129,11 @@ class Network
         if ($protocol === 'icmp' && DIRECTORY_SEPARATOR === '/' && !is_readable('/root')) {
             // @codeCoverageIgnoreStart
             $stdout = null;
-            (process)('ping -c 1 -W ' . escapeshellarg($timeout), escapeshellarg($host), null, $stdout, $errstr);
+            (process)('ping', [
+                '-c' => 1,
+                '-W' => (int) $timeout,
+                $host,
+            ], null, $stdout, $errstr);
             // min/avg/max/mdev = 0.026/0.026/0.026/0.000
             if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
                 return $m[1] / 1000.0;
@@ -154,8 +158,11 @@ class Network
         $mtime = microtime(true);
         try {
             (call_safely)(function ($socket, $protocol, $host, $port, $timeout) {
+                socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => $timeout, 'usec' => 0]);
                 socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
-                socket_connect($socket, $host, $port);
+                if (!socket_connect($socket, $host, $port)) {
+                    throw new \RuntimeException(); // @codeCoverageIgnore
+                }
 
                 // icmp は ping メッセージを送信
                 if ($protocol === 'icmp') {
