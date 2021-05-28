@@ -901,12 +901,12 @@ line3
 </div>
 
 ';
-        that((html_strip)($html))->is('test ryunosuke-function<div><strong id="strong1" class="hoge fuga piyo"><? $multiline ?>
-<br><?php foreach($array as $k=>$v) {
+        that((html_strip)($html))->is('test ryunosuke-function <div><strong id="strong1" class="hoge fuga piyo"> <? $multiline ?>
+ <br><?php foreach($array as $k=>$v) {
             echo $k, $v;
         }
         ?>
-</strong><pre>
+ </strong><pre>
       line1
         line2
           line3
@@ -925,7 +925,10 @@ line3
       span, div {
         background: red;
       }
-    </style><strong id="strong2" class="hoge fuga piyo"><span id="<?= $id ?>" class="<?= $class ?>">asd</span>line1 line2 line3</strong></div>');
+    </style><strong id="strong2" class="hoge fuga piyo"> <span id="<?= $id ?>" class="<?= $class ?>">asd </span>line1 line2 line3 </strong></div>');
+
+        that((html_strip)("\n<div> \n </div>\n"))->is('<div></div>');
+        that((html_strip)("<h1>   Hello \r\n	<span> World!</span>	  </h1>"))->is('<h1>Hello <span>World!</span></h1>');
 
         that((html_strip)('<hoge> a  b  c </hoge>', [
             'ignore-tags' => ['hoge'],
@@ -946,12 +949,45 @@ line3
         ]))->is('a b');
         that((html_strip)(' <!-- C1 --> a <!-- C2 --> b <!-- C3 --> ', [
             'html-comment' => false,
-        ]))->is('<!-- C1 --> a <!-- C2 --> b <!-- C3 -->');
+        ]))->is('<!-- C1 -->a <!-- C2 -->b <!-- C3 -->');
 
         @that((html_strip)('<span>&</span>', [
             'error-level' => E_USER_NOTICE,
         ]))->is('<span>&amp;</span>');
         that(error_get_last()['message'])->contains('htmlParseEntityRef');
+    }
+
+    function test_html_strip_sep()
+    {
+        // くっつくはずのない文字がくっつくのはまずいのでテストで担保
+        $htmls = [
+            // plain
+            "<div>A B</div>"                                        => 'A B',
+            // spaceA
+            "<div>A <x>B</x></div>"                                 => 'A B',
+            "<div><x>A </x>B</div>"                                 => 'A B',
+            "<div><x>A </x><x>B</x></div>"                          => 'A B',
+            // spaceB
+            "<div>A<x> B</x></div>"                                 => 'A B',
+            "<div><x>A</x> B</div>"                                 => 'A B',
+            "<div><x>A</x><x> B</x></div>"                          => 'A B',
+            // spaceAB
+            "<div>A <x> B</x></div>"                                => 'A B',
+            "<div><x>A </x> B</div>"                                => 'A B',
+            "<div><x>A </x><x> B</x></div>"                         => 'A B',
+            // doubleAB
+            "<div> A <x> B </x></div>"                              => 'A B',
+            "<div><x> A </x> B </div>"                              => 'A B',
+            "<div><x> A </x><x> B </x></div>"                       => 'A B',
+            // nest
+            "<div>A<x> B<y> C<z> D</z></y></x></div>"               => 'A B C D',
+            "<div>A <x>B <y>C <z>D</z></y></x></div>"               => 'A B C D',
+            "<div> A <x> B <y> C <z> D </z> C </y> B </x> A </div>" => 'A B C D C B A',
+        ];
+        foreach ($htmls as $html => $expected) {
+            $text = trim(dom_import_simplexml(simplexml_load_string((html_strip)($html)))->textContent);
+            that($text)->as("$html\n▼▼▼▼▼\n$text")->is($expected);
+        }
     }
 
     function test_htmltag()

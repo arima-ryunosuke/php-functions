@@ -1698,7 +1698,7 @@ class Strings
      * // e.g. タグ内空白（id, class の間隔等）がスペース1つになっている
      * // e.g. php タグは一切変更されていない
      * // e.g. textarea は保持されている
-     * that(html_strip("<span  id=id  class='c1  c2  c3'><?= '<hoge>  </hoge>' ?> a  b  c </span> <pre> a  b  c </pre>"))->isSame('<span id="id" class="c1  c2  c3"><?= \'<hoge>  </hoge>\' ?> a b c</span><pre> a  b  c </pre>');
+     * that(html_strip("<span  id=id  class='c1  c2  c3'><?= '<hoge>  </hoge>' ?> a  b  c </span> <pre> a  b  c </pre>"))->isSame('<span id="id" class="c1  c2  c3"><?= \'<hoge>  </hoge>\' ?> a b c </span><pre> a  b  c </pre>');
      * ```
      *
      * @param string $html html 文字列
@@ -1726,7 +1726,10 @@ class Strings
 
         if ($options['escape-phpcode']) {
             $mapping = [];
-            $html = (strip_php)($html, $preserving, $mapping);
+            $html = (strip_php)($html, [
+                'replacer'       => $preserving,
+                'trailing_break' => false,
+            ], $mapping);
         }
 
         // xml 宣言がないとマルチバイト文字が html エンティティになってしまうし documentElement がないと <p> が自動付与されてしまう
@@ -1755,40 +1758,48 @@ class Strings
         }
         libxml_use_internal_errors($current);
 
-        // コメントの削除
-        $stripComment = function (\DOMNode $node) use (&$stripComment, $options) {
-            // ループ内で removeChild するとループが乱れるので配列化する
-            $childNodes = $node->childNodes === null ? [] : iterator_to_array($node->childNodes);
-            foreach ($childNodes as $child) {
-                $stripComment($child);
-                if ($child instanceof \DOMComment) {
-                    $node->removeChild($child);
-                }
-            }
-        };
-        // 空白類の削除
-        $stripWhitespace = function (\DOMNode $node) use (&$stripWhitespace, $options) {
-            foreach ($node->childNodes ?? [] as $child) {
-                $stripWhitespace($child);
-                if ($child instanceof \DOMText && !in_array($node->nodeName, $options['ignore-tags'], true)) {
-                    // html コメントは空白扱いではないが dom 的には分かれているので一律 trim するとまずい
-                    if (!$child->previousSibling instanceof \DOMComment) {
-                        $child->textContent = ltrim($child->textContent);
-                    }
-                    if (!$child->nextSibling instanceof \DOMComment) {
-                        $child->textContent = rtrim($child->textContent);
-                    }
-                    $child->textContent = preg_replace("#\s+#u", ' ', $child->textContent);
-                }
-            }
-        };
+        $xpath = new \DOMXPath($dom);
 
         if ($options['html-comment']) {
-            $stripComment($dom->documentElement);
+            /** @var \DOMComment[] $comments */
+            $comments = iterator_to_array($xpath->query('//comment()'), true);
+            foreach ($comments as $comment) {
+                $comment->parentNode->removeChild($comment);
+            }
             $dom->documentElement->normalize();
         }
-        $stripWhitespace($dom->documentElement);
-        return strtr($dom->saveHTML($dom->documentElement), $mapping);
+
+        /** @var \DOMText[] $texts */
+        $texts = iterator_to_array($xpath->query('//text()'), true);
+        $texts = array_values(array_filter($texts, function (\DOMNode $node) use ($options) {
+            while ($node = $node->parentNode) {
+                if (in_array($node->nodeName, $options['ignore-tags'], true)) {
+                    return false;
+                }
+            }
+            return true;
+        }));
+        // @see https://developer.mozilla.org/ja/docs/Web/API/Document_Object_Model/Whitespace
+        foreach ($texts as $n => $text) {
+            // 連続空白の正規化
+            $text->data = preg_replace("#[\t\n\r ]+#u", " ", $text->data);
+
+            // 空白の直後に他の空白がある場合は (2 つが別々なインライン要素をまたぐ場合も含めて) 無視
+            if (($next = $texts[$n + 1] ?? null) && ($text->data[-1] ?? null) === ' ') {
+                $next->data = ltrim($next->data, "\t\n\r ");
+            }
+
+            // 行頭と行末の一連の空白が削除される
+            $prev = $text->previousSibling ?? $text->parentNode->previousSibling;
+            if (!$prev || in_array($prev->nodeName, $options['ignore-tags'], true)) {
+                $text->data = ltrim($text->data, "\t\n\r ");
+            }
+            $next = $text->nextSibling ?? $text->parentNode->nextSibling;
+            if (!$next || in_array($next->nodeName, $options['ignore-tags'], true)) {
+                $text->data = rtrim($text->data, "\t\n\r ");
+            }
+        }
+        return trim(strtr($dom->saveHTML($dom->documentElement), $mapping), "\t\n\r ");
     }
 
     /**
