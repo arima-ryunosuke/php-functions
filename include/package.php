@@ -930,6 +930,7 @@ define("ryunosuke\\Functions\\Package\\snake_case", ["ryunosuke\\Functions\\Pack
 define("ryunosuke\\Functions\\Package\\chain_case", ["ryunosuke\\Functions\\Package\\Strings", "chain_case"]);
 define("ryunosuke\\Functions\\Package\\namespace_split", ["ryunosuke\\Functions\\Package\\Strings", "namespace_split"]);
 define("ryunosuke\\Functions\\Package\\html_strip", ["ryunosuke\\Functions\\Package\\Strings", "html_strip"]);
+define("ryunosuke\\Functions\\Package\\html_attr", ["ryunosuke\\Functions\\Package\\Strings", "html_attr"]);
 define("ryunosuke\\Functions\\Package\\htmltag", ["ryunosuke\\Functions\\Package\\Strings", "htmltag"]);
 define("ryunosuke\\Functions\\Package\\css_selector", ["ryunosuke\\Functions\\Package\\Strings", "css_selector"]);
 define("ryunosuke\\Functions\\Package\\build_uri", ["ryunosuke\\Functions\\Package\\Strings", "build_uri"]);

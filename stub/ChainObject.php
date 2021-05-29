@@ -2992,6 +2992,11 @@
  * @property \ChainObject $hrtime
  * @method   \ChainObject  hrtime()
  *
+ * @see html_attr
+ * @property \ChainObject $html_attr
+ * @method   \ChainObject  html_attr($options = [])
+ * @method   \ChainObject  html_attr1($array)
+ *
  * @see html_entity_decode
  * @property \ChainObject $html_entity_decode
  * @method   \ChainObject  html_entity_decode($quote_style = null, $encoding = null)

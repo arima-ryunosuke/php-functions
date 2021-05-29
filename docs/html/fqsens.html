@@ -1067,7 +1067,7 @@ that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v, $k){
 ]);
 
 // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-that(array_each([1, 2, 3], function(&amp;$carry = [], $v) {
+that(array_each([1, 2, 3], function(&amp;$carry = [], $v = null) {
         $carry[$v] = $v * $v;
     }))-&gt;isSame(array_each([1, 2, 3], function(&amp;$carry, $v) {
         $carry[$v] = $v * $v;
@@ -2757,10 +2757,10 @@ that($body)-&gt;isSame('{return true;}');
 	<div class="description"><p>エラーを例外に変換するブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">try {
-    call_safely(function(){return $v;});
+    call_safely(function(){return []['dummy'];});
 }
 catch (\Exception $ex) {
-    that($ex-&gt;getMessage())-&gt;isSame('Undefined variable: v');
+    that($ex-&gt;getMessage())-&gt;containsAll(['Undefined', 'dummy']);
 }
 </code></pre>
 </div>
@@ -4100,7 +4100,112 @@ that(namespace_split('\\hoge'))-&gt;isSame(['', 'hoge']);
 // e.g. タグ内空白（id, class の間隔等）がスペース1つになっている
 // e.g. php タグは一切変更されていない
 // e.g. textarea は保持されている
-that(html_strip("&lt;span  id=id  class='c1  c2  c3'&gt;&lt;?= '&lt;hoge&gt;  &lt;/hoge&gt;' ?&gt; a  b  c &lt;/span&gt; &lt;pre&gt; a  b  c &lt;/pre&gt;"))-&gt;isSame('&lt;span id="id" class="c1  c2  c3"&gt;&lt;?= \'&lt;hoge&gt;  &lt;/hoge&gt;\' ?&gt; a b c&lt;/span&gt;&lt;pre&gt; a  b  c &lt;/pre&gt;');
+that(html_strip("&lt;span  id=id  class='c1  c2  c3'&gt;&lt;?= '&lt;hoge&gt;  &lt;/hoge&gt;' ?&gt; a  b  c &lt;/span&gt; &lt;pre&gt; a  b  c &lt;/pre&gt;"))-&gt;isSame('&lt;span id="id" class="c1  c2  c3"&gt;&lt;?= \'&lt;hoge&gt;  &lt;/hoge&gt;\' ?&gt; a b c &lt;/span&gt;&lt;pre&gt; a  b  c &lt;/pre&gt;');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::html_attr()">
+                                    ryunosuke\Functions\Package\Strings::html_attr		</a>	<small>($array, $options = []) : string<span class="type-separator"></span><wbr>array</small>
+		</h4>
+	<div class="description"><p>配列を html の属性文字列に変換する</p>
+<p>data-* や style, 論理属性など、全てよしなに変換して文字列で返す。<br />
+返り値の文字列はエスケープが施されており、基本的にはそのまま html に埋め込んで良い。<br />
+（オプション次第では危険だったり乱れたりすることはある）。</p>
+<p>separator オプションを指定すると属性の区切り文字を指定できる。<br />
+大抵の場合は半角スペースであり、少し特殊な場合に改行文字を指定するくらいだろう。<br />
+ただし、この separator に null を与えると文字列ではなく生の配列で返す。<br />
+この配列は <code>属性名 =&gt; 属性値</code> な生の配列であり、エスケープも施されていない。<br />
+$options 自体に文字列を与えた場合は separator 指定とみなされる。</p>
+<p>属性の変換ルールは下記。</p>
+<ul>
+<li>属性名が数値の場合は属性としては生成されない</li>
+<li>属性名は camelCase -&gt; cahin-case の変換が行われる</li>
+<li>値が null の場合は無条件で無視される<ul>
+<li>下記 false との違いは「配列返しの場合に渡ってくるか？」である（null は無条件フィルタなので配列返しでも渡ってこない）</li>
+</ul>
+</li>
+<li>値が true の場合は論理属性とみなし値なしで生成される</li>
+<li>値が false の場合は論理属性とみなし、 属性としては生成されない</li>
+<li>値が配列の場合は ","（カンマ）で結合される<ul>
+<li>これは観測範囲内でカンマ区切りが多いため（srcset, accept など）。属性によってはカンマが適切ではない場合がある</li>
+<li>更にその配列が文字キーを持つ場合、キーが "=" で結合される<ul>
+<li>これは観測範囲内で = 区切りが多いため（viewport など）。属性によっては = が適切ではない場合がある</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>値が配列で属性名が class, style, data の場合は下記の特殊な挙動を示す<ul>
+<li>class: 半角スペースで結合される<ul>
+<li>キーは無視される</li>
+</ul>
+</li>
+<li>style: キーが css 名、値が css 値として ";" で結合される<ul>
+<li>キーは cahin-case に変換される</li>
+<li>キーが数値の場合は値がそのまま追加される</li>
+<li>値が配列の場合は半角スペースで結合される</li>
+</ul>
+</li>
+<li>data-: キーが data 名、値が data 値として data 属性になる<ul>
+<li>キーは cahin-case に変換される</li>
+<li>値が真偽値以外のスカラーの場合はそのまま、非スカラー||真偽値の場合は json で埋め込まれる<ul>
+<li>これは jQuery において json をよしなに扱うことができるため</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>※ 上記における「配列」とは iterable を指すが、toString を実装した iterable なオブジェクトは toString が優先され、文字列とみなされる</p>
+<p>複雑に見えるが「よしなに」やってくれると考えて良い。<br />
+配列や真偽値で分岐が大量にあるが、大前提として「string だった場合は余計なことはしない」がある。<br />
+ので迷ったり予期しない結果の場合は呼び出し側で文字列化して呼べば良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(html_attr([
+    // camelCase は camel-case になる
+    'camelCase' =&gt; '&lt;value&gt;',
+    // true は論理属性 true とみなし、値なし属性になる
+    'checked'   =&gt; true,
+    // false は論理属性 false とみなし、属性として現れない
+    'disabled'  =&gt; false,
+    // null は無条件で無視され、属性として現れない
+    'readonly'  =&gt; null,
+    // 配列はカンマで結合される
+    'srcset'    =&gt; [
+        'hoge.jpg 1x',
+        'fuga.jpg 2x',
+    ],
+    // 連想配列は = で結合される
+    'content'   =&gt; [
+        'width' =&gt; 'device-width',
+        'scale' =&gt; '1.0',
+    ],
+    // class はスペースで結合される
+    'class'     =&gt; ['hoge', 'fuga'],
+    // style 原則的に proerty:value; とみなす
+    'style'     =&gt; [
+        'color'           =&gt; 'red',
+        'backgroundColor' =&gt; 'white',      // camel-case になる
+        'margin'          =&gt; [1, 2, 3, 4], // スペースで結合される
+        'opacity:0.5',                     // 直値はそのまま追加される
+    ],
+    // data- はその分属性が生える
+    'data-'     =&gt; [
+        'camelCase' =&gt; 123,
+        'hoge'      =&gt; false,        // 真偽値は文字列として埋め込まれる
+        'fuga'      =&gt; "fuga",       // 文字列はそのまま文字列
+        'piyo'      =&gt; ['a' =&gt; 'A'], // 非スカラー以外は json になる
+    ],
+], ['separator' =&gt; "\n"]))-&gt;is('camel-case="&amp;lt;value&amp;gt;"
+checked
+srcset="hoge.jpg 1x,fuga.jpg 2x"
+content="width=device-width,scale=1.0"
+class="hoge fuga"
+style="color:red;background-color:white;margin:1 2 3 4;opacity:0.5"
+data-camel-case="123"
+data-hoge="false"
+data-fuga="fuga"
+data-piyo="{&amp;quot;a&amp;quot;:&amp;quot;A&amp;quot;}"');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5009,12 +5114,13 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::strip_php()">
-                                    ryunosuke\Functions\Package\Syntax::strip_php		</a>	<small>($phtml, $replacer = &quot;&quot;, &amp;$mapping = []) : string</small>
+                                    ryunosuke\Functions\Package\Syntax::strip_php		</a>	<small>($phtml, $option = [], &amp;$mapping = []) : string</small>
 		</h4>
 	<div class="description"><p>文字列から php コードを取り除く</p>
-<p>正確には $replacer で指定したものに置換される（デフォルト空文字なので削除になる）。<br />
-$replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。<br />
+<p>正確にはオプションの replacer で指定したものに置換される（デフォルト空文字なので削除になる）。<br />
+replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。<br />
 文字列を指定すると自動で出現番号が付与される。</p>
+<p>歴史的な理由によりオプションには直接 replacer を渡せるが、互換性のためでありその指定は推奨されない。</p>
 <p>$mapping 配列には「どれをどのように」と言った変換表が格納される。<br />
 典型的には strtr に渡して php コードを復元させるのに使用する。</p>
 <p>Example:</p>
@@ -5283,23 +5389,15 @@ that(''   ?? 'default')-&gt;isSame('');
 that(1    ?? 'default')-&gt;isSame(1);
 that('0'  ?? 'default')-&gt;isSame('0');
 that('X'  ?? 'default')-&gt;isSame('X');
-// 恣意的な例だが、 substr は false も '0' も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
-that(substr('000', 1, 1) ?: 'default')-&gt;isSame('default'); // '0' を返すので 'default' になる
-that(substr('xxx', 9, 1) ?: 'default')-&gt;isSame('default'); // （文字数が足りなくて）false を返すので 'default' になる
-that(substr('000', 1, 1) ?? 'default')-&gt;isSame('0');   // substr が null を返すことはないので 'default' になることはない
-that(substr('xxx', 9, 1) ?? 'default')-&gt;isSame(false); // substr が null を返すことはないので 'default' になることはない
-// 要するに単に「false が返ってきた場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
-that(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1))-&gt;isSame('default'); // 3項演算子で2回呼ぶ
-that(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp)-&gt;isSame('default');       // 一時変数を使用する（あるいは if 文）
-// このように書きたかった
-that(blank_if(substr('xxx', 9, 1)) ?? 'default')-&gt;isSame('default'); // null 合体演算子版
-that(blank_if(substr('xxx', 9, 1), 'default'))-&gt;isSame('default');   // 第2引数版
-
-// 恣意的な例その2。 0 は空ではないので array_search などにも応用できる（見つからない場合に false を返すので ?? はできないし、 false 相当を返し得るので ?: もできない）
-that(array_search('x', ['a', 'b', 'c']) ?? 'default')-&gt;isSame(false);     // 見つからないので 'default' としたいが false になってしまう
+// 恣意的な例だが、 array_search は false も 0 も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
 that(array_search('a', ['a', 'b', 'c']) ?: 'default')-&gt;isSame('default'); // 見つかったのに 0 に反応するので 'default' になってしまう
-that(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default')-&gt;isSame('default'); // このように書きたかった
-that(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default')-&gt;isSame(0);         // このように書きたかった
+that(array_search('x', ['a', 'b', 'c']) ?? 'default')-&gt;isSame(false);     // 見つからないので 'default' としたいが false になってしまう
+// 要するに単に「見つからなかった場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
+that(array_search('x', ['a', 'b', 'c']) === false ? 'default' : array_search('x', ['a', 'b', 'c']))-&gt;isSame('default'); // 3項演算子で2回呼ぶ
+that(($tmp = array_search('x', ['a', 'b', 'c']) === false) ? 'default' : $tmp)-&gt;isSame('default');                      // 一時変数を使用する（あるいは if 文）
+// このように書きたかった
+that(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default')-&gt;isSame('default'); // null 合体演算子版
+that(blank_if(array_search('x', ['a', 'b', 'c']), 'default'))-&gt;isSame('default');   // 第2引数版
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5851,8 +5949,8 @@ that($traces[1])-&gt;arraySubset([
 <p>「局所的にエラーハンドラを変更したいけど特定の状況は設定済みハンドラへ流したい」という状況はまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// @ 付きなら元々のハンドラに移譲、@ なしなら何らかのハンドリングを行う例
-add_error_handler(function () {
-    if (error_reporting() === 0) {
+add_error_handler(function ($errno) {
+    if (!(error_reporting() &amp; $errno)) {
         // この false はマニュアルにある「この関数が FALSE を返した場合は、通常のエラーハンドラが処理を引き継ぎます」ではなく、
         // 「さっきまで設定されていたエラーハンドラが処理を引き継ぎます」という意味になる
         return false;

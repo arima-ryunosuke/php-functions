@@ -3447,7 +3447,7 @@ that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v, $k){
 ]);
 
 // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-that(array_each([1, 2, 3], function(&amp;$carry = [], $v) {
+that(array_each([1, 2, 3], function(&amp;$carry = [], $v = null) {
         $carry[$v] = $v * $v;
     }))-&gt;isSame(array_each([1, 2, 3], function(&amp;$carry, $v) {
         $carry[$v] = $v * $v;

@@ -3270,7 +3270,7 @@ if (!isset($excluded_functions["array_each"]) && (!function_exists("array_each")
      * ]);
      *
      * // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-     * that(array_each([1, 2, 3], function(&$carry = [], $v) {
+     * that(array_each([1, 2, 3], function(&$carry = [], $v = null) {
      *         $carry[$v] = $v * $v;
      *     }))->isSame(array_each([1, 2, 3], function(&$carry, $v) {
      *         $carry[$v] = $v * $v;
@@ -5267,6 +5267,14 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect
                 if (is_array($token) && $token[0] === T_NAMESPACE) {
                     // T_NAMESPACE と T_WHITESPACE で最低でも2つは読み飛ばしてよい
                     for ($m = $n + 2; $m < $count; $m++) {
+                        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+                            if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_QUALIFIED) {
+                                return $tokens[$m][1];
+                            }
+                            if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_FULLY_QUALIFIED) {
+                                $namespace[] = trim($tokens[$m][1], '\\');
+                            }
+                        }
                         // よほどのことがないと T_NAMESPACE の次の T_STRING は名前空間の一部
                         if (is_array($tokens[$m]) && $tokens[$m][0] === T_STRING) {
                             $namespace[] = $tokens[$m][1];
@@ -8756,10 +8764,10 @@ if (!isset($excluded_functions["call_safely"]) && (!function_exists("call_safely
      * Example:
      * ```php
      * try {
-     *     call_safely(function(){return $v;});
+     *     call_safely(function(){return []['dummy'];});
      * }
      * catch (\Exception $ex) {
-     *     that($ex->getMessage())->isSame('Undefined variable: v');
+     *     that($ex->getMessage())->containsAll(['Undefined', 'dummy']);
      * }
      * ```
      *
@@ -8770,7 +8778,7 @@ if (!isset($excluded_functions["call_safely"]) && (!function_exists("call_safely
     function call_safely($callback, ...$variadic)
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            if (error_reporting() === 0) {
+            if (!(error_reporting() & $errno)) {
                 return false;
             }
             throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
@@ -10178,7 +10186,11 @@ if (!isset($excluded_functions["ping"]) && (!function_exists("ping") || (!false 
         if ($protocol === 'icmp' && DIRECTORY_SEPARATOR === '/' && !is_readable('/root')) {
             // @codeCoverageIgnoreStart
             $stdout = null;
-            process('ping -c 1 -W ' . escapeshellarg($timeout), escapeshellarg($host), null, $stdout, $errstr);
+            process('ping', [
+                '-c' => 1,
+                '-W' => (int) $timeout,
+                $host,
+            ], null, $stdout, $errstr);
             // min/avg/max/mdev = 0.026/0.026/0.026/0.000
             if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
                 return $m[1] / 1000.0;
@@ -10188,6 +10200,7 @@ if (!isset($excluded_functions["ping"]) && (!function_exists("ping") || (!false 
         }
 
         if ($protocol === 'icmp') {
+            $port = 0;
             $socket = socket_create(AF_INET, SOCK_RAW, getprotobyname($protocol));
         }
         elseif ($protocol === 'tcp') {
@@ -10203,8 +10216,11 @@ if (!isset($excluded_functions["ping"]) && (!function_exists("ping") || (!false 
         $mtime = microtime(true);
         try {
             call_safely(function ($socket, $protocol, $host, $port, $timeout) {
+                socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => $timeout, 'usec' => 0]);
                 socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
-                socket_connect($socket, $host, $port);
+                if (!socket_connect($socket, $host, $port)) {
+                    throw new \RuntimeException(); // @codeCoverageIgnore
+                }
 
                 // icmp は ping メッセージを送信
                 if ($protocol === 'icmp') {
@@ -10302,6 +10318,16 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
             CURLOPT_HEADER         => true, // ヘッダを含める
         ];
 
+        $stringify_curl = function ($curl) {
+            if (is_resource($curl)) {
+                return (string) $curl;
+            }
+            if (is_object($curl)) {
+                return spl_object_id($curl);
+            }
+            return null;
+        };
+
         $responses = [];
         $resultmap = [];
         $mh = curl_multi_init();
@@ -10316,11 +10342,11 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
             $rheader = null;
             $info = null;
             $res = http_request($default + $opt + $default_options, $rheader, $info);
-            if (is_array($res) && isset($res[0]) && is_resource($res[0])) {
+            if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
                 curl_multi_add_handle($mh, $res[0]);
 
                 // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-                $resultmap[(string) $res[0]] = [$key, $res[1]];
+                $resultmap[$handle_id] = [$key, $res[1]];
             }
             else {
                 $responses[$key] = [$res, $rheader, $info];
@@ -10343,15 +10369,16 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
                 }
 
                 $handle = $minfo['handle'];
+                $handle_id = $stringify_curl($handle);
 
                 if ($minfo['result'] !== CURLE_OK) {
-                    $responses[$resultmap[(string) $handle][0]] = $minfo['result'];
+                    $responses[$resultmap[$handle_id][0]] = $minfo['result'];
                 }
                 else {
                     $info = curl_getinfo($handle);
                     $response = curl_multi_getcontent($handle);
-                    [$info, $headers, $body] = $resultmap[(string) $handle][1]($response, $info);
-                    $responses[$resultmap[(string) $handle][0]] = [$body, $headers, $info];
+                    [$info, $headers, $body] = $resultmap[$handle_id][1]($response, $info);
+                    $responses[$resultmap[$handle_id][0]] = [$body, $headers, $info];
                 }
 
                 curl_multi_remove_handle($mh, $handle);
@@ -11075,7 +11102,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         // "tablename. columnname" になってしまう
                         // "@ var" になってしまう
                         // ": holder" になってしまう
-                        if ($prev !== '.' && $prev !== '@' && $prev !== ':') {
+                        if ($prev !== '.' && $prev !== '@' && $prev !== ':' && $prev !== ';') {
                             $result[] = $MARK_SP;
                         }
 
@@ -11229,7 +11256,7 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                         break;
                     case "UPDATE":
                     case "DELETE":
-                        $result[] = $MARK_SP . $virttoken;
+                        $result[] = $virttoken;
                         if ($subcontext !== 'REFERENCES') {
                             $result[] = $MARK_BR;
                             $context = $uppertoken;
@@ -13168,7 +13195,7 @@ if (!isset($excluded_functions["html_strip"]) && (!function_exists("html_strip")
      * // e.g. タグ内空白（id, class の間隔等）がスペース1つになっている
      * // e.g. php タグは一切変更されていない
      * // e.g. textarea は保持されている
-     * that(html_strip("<span  id=id  class='c1  c2  c3'><?= '<hoge>  </hoge>' ?> a  b  c </span> <pre> a  b  c </pre>"))->isSame('<span id="id" class="c1  c2  c3"><?= \'<hoge>  </hoge>\' ?> a b c</span><pre> a  b  c </pre>');
+     * that(html_strip("<span  id=id  class='c1  c2  c3'><?= '<hoge>  </hoge>' ?> a  b  c </span> <pre> a  b  c </pre>"))->isSame('<span id="id" class="c1  c2  c3"><?= \'<hoge>  </hoge>\' ?> a b c </span><pre> a  b  c </pre>');
      * ```
      *
      * @param string $html html 文字列
@@ -13196,7 +13223,10 @@ if (!isset($excluded_functions["html_strip"]) && (!function_exists("html_strip")
 
         if ($options['escape-phpcode']) {
             $mapping = [];
-            $html = strip_php($html, $preserving, $mapping);
+            $html = strip_php($html, [
+                'replacer'       => $preserving,
+                'trailing_break' => false,
+            ], $mapping);
         }
 
         // xml 宣言がないとマルチバイト文字が html エンティティになってしまうし documentElement がないと <p> が自動付与されてしまう
@@ -13225,44 +13255,267 @@ if (!isset($excluded_functions["html_strip"]) && (!function_exists("html_strip")
         }
         libxml_use_internal_errors($current);
 
-        // コメントの削除
-        $stripComment = function (\DOMNode $node) use (&$stripComment, $options) {
-            // ループ内で removeChild するとループが乱れるので配列化する
-            $childNodes = $node->childNodes === null ? [] : iterator_to_array($node->childNodes);
-            foreach ($childNodes as $child) {
-                $stripComment($child);
-                if ($child instanceof \DOMComment) {
-                    $node->removeChild($child);
-                }
-            }
-        };
-        // 空白類の削除
-        $stripWhitespace = function (\DOMNode $node) use (&$stripWhitespace, $options) {
-            foreach ($node->childNodes ?? [] as $child) {
-                $stripWhitespace($child);
-                if ($child instanceof \DOMText && !in_array($node->nodeName, $options['ignore-tags'], true)) {
-                    // html コメントは空白扱いではないが dom 的には分かれているので一律 trim するとまずい
-                    if (!$child->previousSibling instanceof \DOMComment) {
-                        $child->textContent = ltrim($child->textContent);
-                    }
-                    if (!$child->nextSibling instanceof \DOMComment) {
-                        $child->textContent = rtrim($child->textContent);
-                    }
-                    $child->textContent = preg_replace("#\s+#u", ' ', $child->textContent);
-                }
-            }
-        };
+        $xpath = new \DOMXPath($dom);
 
         if ($options['html-comment']) {
-            $stripComment($dom->documentElement);
+            /** @var \DOMComment[] $comments */
+            $comments = iterator_to_array($xpath->query('//comment()'), true);
+            foreach ($comments as $comment) {
+                $comment->parentNode->removeChild($comment);
+            }
             $dom->documentElement->normalize();
         }
-        $stripWhitespace($dom->documentElement);
-        return strtr($dom->saveHTML($dom->documentElement), $mapping);
+
+        /** @var \DOMText[] $texts */
+        $texts = iterator_to_array($xpath->query('//text()'), true);
+        $texts = array_values(array_filter($texts, function (\DOMNode $node) use ($options) {
+            while ($node = $node->parentNode) {
+                if (in_array($node->nodeName, $options['ignore-tags'], true)) {
+                    return false;
+                }
+            }
+            return true;
+        }));
+        // @see https://developer.mozilla.org/ja/docs/Web/API/Document_Object_Model/Whitespace
+        foreach ($texts as $n => $text) {
+            // 連続空白の正規化
+            $text->data = preg_replace("#[\t\n\r ]+#u", " ", $text->data);
+
+            // 空白の直後に他の空白がある場合は (2 つが別々なインライン要素をまたぐ場合も含めて) 無視
+            if (($next = $texts[$n + 1] ?? null) && ($text->data[-1] ?? null) === ' ') {
+                $next->data = ltrim($next->data, "\t\n\r ");
+            }
+
+            // 行頭と行末の一連の空白が削除される
+            $prev = $text->previousSibling ?? $text->parentNode->previousSibling;
+            if (!$prev || in_array($prev->nodeName, $options['ignore-tags'], true)) {
+                $text->data = ltrim($text->data, "\t\n\r ");
+            }
+            $next = $text->nextSibling ?? $text->parentNode->nextSibling;
+            if (!$next || in_array($next->nodeName, $options['ignore-tags'], true)) {
+                $text->data = rtrim($text->data, "\t\n\r ");
+            }
+        }
+        return trim(strtr($dom->saveHTML($dom->documentElement), $mapping), "\t\n\r ");
     }
 }
 if (function_exists("html_strip") && !defined("html_strip")) {
     define("html_strip", "html_strip");
+}
+
+if (!isset($excluded_functions["html_attr"]) && (!function_exists("html_attr") || (!false && (new \ReflectionFunction("html_attr"))->isInternal()))) {
+    /**
+     * 配列を html の属性文字列に変換する
+     *
+     * data-* や style, 論理属性など、全てよしなに変換して文字列で返す。
+     * 返り値の文字列はエスケープが施されており、基本的にはそのまま html に埋め込んで良い。
+     * （オプション次第では危険だったり乱れたりすることはある）。
+     *
+     * separator オプションを指定すると属性の区切り文字を指定できる。
+     * 大抵の場合は半角スペースであり、少し特殊な場合に改行文字を指定するくらいだろう。
+     * ただし、この separator に null を与えると文字列ではなく生の配列で返す。
+     * この配列は `属性名 => 属性値` な生の配列であり、エスケープも施されていない。
+     * $options 自体に文字列を与えた場合は separator 指定とみなされる。
+     *
+     * 属性の変換ルールは下記。
+     *
+     * - 属性名が数値の場合は属性としては生成されない
+     * - 属性名は camelCase -> cahin-case の変換が行われる
+     * - 値が null の場合は無条件で無視される
+     *     - 下記 false との違いは「配列返しの場合に渡ってくるか？」である（null は無条件フィルタなので配列返しでも渡ってこない）
+     * - 値が true の場合は論理属性とみなし値なしで生成される
+     * - 値が false の場合は論理属性とみなし、 属性としては生成されない
+     * - 値が配列の場合は ","（カンマ）で結合される
+     *     - これは観測範囲内でカンマ区切りが多いため（srcset, accept など）。属性によってはカンマが適切ではない場合がある
+     *     - 更にその配列が文字キーを持つ場合、キーが "=" で結合される
+     *         - これは観測範囲内で = 区切りが多いため（viewport など）。属性によっては = が適切ではない場合がある
+     * - 値が配列で属性名が class, style, data の場合は下記の特殊な挙動を示す
+     *     - class: 半角スペースで結合される
+     *         - キーは無視される
+     *     - style: キーが css 名、値が css 値として ";" で結合される
+     *         - キーは cahin-case に変換される
+     *         - キーが数値の場合は値がそのまま追加される
+     *         - 値が配列の場合は半角スペースで結合される
+     *     - data-: キーが data 名、値が data 値として data 属性になる
+     *         - キーは cahin-case に変換される
+     *         - 値が真偽値以外のスカラーの場合はそのまま、非スカラー||真偽値の場合は json で埋め込まれる
+     *             - これは jQuery において json をよしなに扱うことができるため
+     *
+     * ※ 上記における「配列」とは iterable を指すが、toString を実装した iterable なオブジェクトは toString が優先され、文字列とみなされる
+     *
+     * 複雑に見えるが「よしなに」やってくれると考えて良い。
+     * 配列や真偽値で分岐が大量にあるが、大前提として「string だった場合は余計なことはしない」がある。
+     * ので迷ったり予期しない結果の場合は呼び出し側で文字列化して呼べば良い。
+     *
+     * Example:
+     * ```php
+     * that(html_attr([
+     *     // camelCase は camel-case になる
+     *     'camelCase' => '<value>',
+     *     // true は論理属性 true とみなし、値なし属性になる
+     *     'checked'   => true,
+     *     // false は論理属性 false とみなし、属性として現れない
+     *     'disabled'  => false,
+     *     // null は無条件で無視され、属性として現れない
+     *     'readonly'  => null,
+     *     // 配列はカンマで結合される
+     *     'srcset'    => [
+     *         'hoge.jpg 1x',
+     *         'fuga.jpg 2x',
+     *     ],
+     *     // 連想配列は = で結合される
+     *     'content'   => [
+     *         'width' => 'device-width',
+     *         'scale' => '1.0',
+     *     ],
+     *     // class はスペースで結合される
+     *     'class'     => ['hoge', 'fuga'],
+     *     // style 原則的に proerty:value; とみなす
+     *     'style'     => [
+     *         'color'           => 'red',
+     *         'backgroundColor' => 'white',      // camel-case になる
+     *         'margin'          => [1, 2, 3, 4], // スペースで結合される
+     *         'opacity:0.5',                     // 直値はそのまま追加される
+     *     ],
+     *     // data- はその分属性が生える
+     *     'data-'     => [
+     *         'camelCase' => 123,
+     *         'hoge'      => false,        // 真偽値は文字列として埋め込まれる
+     *         'fuga'      => "fuga",       // 文字列はそのまま文字列
+     *         'piyo'      => ['a' => 'A'], // 非スカラー以外は json になる
+     *     ],
+     * ], ['separator' => "\n"]))->is('camel-case="&lt;value&gt;"
+     * checked
+     * srcset="hoge.jpg 1x,fuga.jpg 2x"
+     * content="width=device-width,scale=1.0"
+     * class="hoge fuga"
+     * style="color:red;background-color:white;margin:1 2 3 4;opacity:0.5"
+     * data-camel-case="123"
+     * data-hoge="false"
+     * data-fuga="fuga"
+     * data-piyo="{&quot;a&quot;:&quot;A&quot;}"');
+     * ```
+     *
+     * @param iterable $array 属性配列
+     * @param string|array|null $options オプション配列
+     * @return string|array 属性文字列 or 属性配列
+     */
+    function html_attr($array, $options = [])
+    {
+        if (!is_array($options)) {
+            $options = ['separator' => $options];
+        }
+
+        $options += [
+            'quote'     => '"',  // 属性のクオート文字
+            'separator' => " ",  // 属性の区切り文字
+            'chaincase' => true, // 属性名, data などキーで camelCase を chain-case に変換するか
+        ];
+
+        $chaincase = static function ($string) use ($options) {
+            if ($options['chaincase']) {
+                return chain_case($string);
+            }
+            return $string;
+        };
+        $is_iterable = static function ($value) {
+            if (is_array($value)) {
+                return true;
+            }
+            if (is_object($value) && $value instanceof \Traversable && !method_exists($value, '__toString')) {
+                return true;
+            }
+            return false;
+        };
+        $implode = static function ($glue, $iterable) use ($is_iterable) {
+            if (!$is_iterable($iterable)) {
+                return $iterable;
+            }
+            if (is_array($iterable)) {
+                return implode($glue, $iterable);
+            }
+            return implode($glue, iterator_to_array($iterable));
+        };
+
+        $attrs = [];
+        foreach ($array as $k => $v) {
+            if ($v === null) {
+                continue;
+            }
+
+            $k = $chaincase($k);
+            assert(!isset($attrs[$k]));
+
+            if (strpbrk($k, "\r\n\t\f '\"<>/=") !== false) {
+                throw new \UnexpectedValueException('found invalid charactor as attribute name');
+            }
+
+            switch ($k) {
+                default:
+                    if ($is_iterable($v)) {
+                        $tmp = [];
+                        foreach ($v as $name => $value) {
+                            $name = (is_string($name) ? "$name=" : '');
+                            $value = $implode(';', $value);
+                            $tmp[] = $name . $value;
+                        }
+                        $v = implode(',', $tmp);
+                    }
+                    break;
+                case 'class':
+                    $v = $implode(' ', $v);
+                    break;
+                case 'style':
+                    if ($is_iterable($v)) {
+                        $tmp = [];
+                        foreach ($v as $property => $value) {
+                            // css において CamelCace は意味を為さないのでオプションによらず強制的に chain-case にする
+                            $property = (is_string($property) ? chain_case($property) . ":" : '');
+                            $value = $implode(' ', $value);
+                            $tmp[] = rtrim($property . $value, ';');
+                        }
+                        $v = implode(';', $tmp);
+                    }
+                    break;
+                case 'data-':
+                    if ($is_iterable($v)) {
+                        foreach ($v as $name => $data) {
+                            $name = $chaincase($name);
+                            $data = is_scalar($data) && !is_bool($data) ? $data : json_encode($data);
+                            $attrs[$k . $name] = $data;
+                        }
+                        continue 2;
+                    }
+                    break;
+            }
+
+            $attrs[$k] = is_bool($v) ? $v : (string) $v;
+        }
+
+        if ($options['separator'] === null) {
+            return $attrs;
+        }
+
+        $result = [];
+        foreach ($attrs as $name => $value) {
+            if (is_int($name)) {
+                continue;
+            }
+            if ($value === false) {
+                continue;
+            }
+            elseif ($value === true) {
+                $result[] = htmlspecialchars($name, ENT_QUOTES);
+            }
+            else {
+                $result[] = htmlspecialchars($name, ENT_QUOTES) . '=' . $options['quote'] . htmlspecialchars($value, ENT_QUOTES) . $options['quote'];
+            }
+        }
+        return implode($options['separator'], $result);
+    }
+}
+if (function_exists("html_attr") && !defined("html_attr")) {
+    define("html_attr", "html_attr");
 }
 
 if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!false && (new \ReflectionFunction("htmltag"))->isInternal()))) {
@@ -15890,11 +16143,14 @@ if (!isset($excluded_functions["mb_substr_replace"]) && (!function_exists("mb_su
         if ($start < 0) {
             $start += $strlen;
         }
+        if ($length === null) {
+            $length = $strlen;
+        }
         if ($length < 0) {
             $length += $strlen - $start;
         }
 
-        return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, null);
+        return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length);
     }
 }
 if (function_exists("mb_substr_replace") && !defined("mb_substr_replace")) {
@@ -16459,9 +16715,11 @@ if (!isset($excluded_functions["strip_php"]) && (!function_exists("strip_php") |
     /**
      * 文字列から php コードを取り除く
      *
-     * 正確には $replacer で指定したものに置換される（デフォルト空文字なので削除になる）。
-     * $replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。
+     * 正確にはオプションの replacer で指定したものに置換される（デフォルト空文字なので削除になる）。
+     * replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。
      * 文字列を指定すると自動で出現番号が付与される。
+     *
+     * 歴史的な理由によりオプションには直接 replacer を渡せるが、互換性のためでありその指定は推奨されない。
      *
      * $mapping 配列には「どれをどのように」と言った変換表が格納される。
      * 典型的には strtr に渡して php コードを復元させるのに使用する。
@@ -16477,12 +16735,30 @@ if (!isset($excluded_functions["strip_php"]) && (!function_exists("strip_php") |
      * ```
      *
      * @param string $phtml php コードを含む文字列
-     * @param ?string|\Closure $replacer 置換文字列・処理
+     * @param array|string|\Closure $option オプション配列
      * @param array $mapping 変換表が格納される参照変数
      * @return string php コードが除かれた文字列
      */
-    function strip_php($phtml, $replacer = '', &$mapping = [])
+    function strip_php($phtml, $option = [], &$mapping = [])
     {
+        // for compatible
+        if (!is_array($option)) {
+            $option = [
+                'replacer' => $option,
+            ];
+        }
+
+        $option = array_replace([
+            'short_open_tag' => true,
+            'trailing_break' => true,
+            'replacer'       => '',
+        ], $option, [
+            //'flags'  => TOKEN_NAME,
+            //'cache'  => false,
+            'phptag' => false,
+        ]);
+
+        $replacer = $option['replacer'];
         if ($replacer === '') {
             $replacer = function ($phptag, $n) { return ''; };
         }
@@ -16490,12 +16766,41 @@ if (!isset($excluded_functions["strip_php"]) && (!function_exists("strip_php") |
             $replacer = unique_string($phtml, 64);
         }
 
-        $tokens = parse_php($phtml, [
-            //'flags'          => TOKEN_NAME,
-            //'cache'          => false,
-            'phptag'         => false,
-            'short_open_tag' => true,
-        ]);
+        $tmp = parse_php($phtml, $option);
+
+        if ($option['trailing_break']) {
+            $tokens = $tmp;
+        }
+        else {
+            $tokens = [];
+            $echoopen = false;
+            $taglength = strlen('?>');
+            foreach ($tmp as $token) {
+                if ($token[0] === T_OPEN_TAG_WITH_ECHO) {
+                    $echoopen = true;
+                }
+                if ($echoopen && $token[0] === T_CLOSE_TAG && isset($token[1][$taglength])) {
+                    $echoopen = false;
+
+                    $tokens[] = [
+                        $token[0],
+                        rtrim($token[1]),
+                        $token[2],
+                        $token[3],
+                    ];
+                    $tokens[] = [
+                        T_INLINE_HTML,
+                        substr($token[1], $taglength),
+                        $token[2],
+                        $token[3] + $taglength,
+                    ];
+                }
+                else {
+                    $tokens[] = $token;
+                }
+            }
+        }
+
         $offsets = [];
         foreach ($tokens as $token) {
             if ($token[0] === T_OPEN_TAG || $token[0] === T_OPEN_TAG_WITH_ECHO) {
@@ -17294,23 +17599,15 @@ if (!isset($excluded_functions["blank_if"]) && (!function_exists("blank_if") || 
      * that(1    ?? 'default')->isSame(1);
      * that('0'  ?? 'default')->isSame('0');
      * that('X'  ?? 'default')->isSame('X');
-     * // 恣意的な例だが、 substr は false も '0' も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
-     * that(substr('000', 1, 1) ?: 'default')->isSame('default'); // '0' を返すので 'default' になる
-     * that(substr('xxx', 9, 1) ?: 'default')->isSame('default'); // （文字数が足りなくて）false を返すので 'default' になる
-     * that(substr('000', 1, 1) ?? 'default')->isSame('0');   // substr が null を返すことはないので 'default' になることはない
-     * that(substr('xxx', 9, 1) ?? 'default')->isSame(false); // substr が null を返すことはないので 'default' になることはない
-     * // 要するに単に「false が返ってきた場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
-     * that(substr('xxx', 9, 1) === false ? 'default' : substr('xxx', 9, 1))->isSame('default'); // 3項演算子で2回呼ぶ
-     * that(($tmp = substr('xxx', 9, 1) === false) ? 'default' : $tmp)->isSame('default');       // 一時変数を使用する（あるいは if 文）
-     * // このように書きたかった
-     * that(blank_if(substr('xxx', 9, 1)) ?? 'default')->isSame('default'); // null 合体演算子版
-     * that(blank_if(substr('xxx', 9, 1), 'default'))->isSame('default');   // 第2引数版
-     *
-     * // 恣意的な例その2。 0 は空ではないので array_search などにも応用できる（見つからない場合に false を返すので ?? はできないし、 false 相当を返し得るので ?: もできない）
-     * that(array_search('x', ['a', 'b', 'c']) ?? 'default')->isSame(false);     // 見つからないので 'default' としたいが false になってしまう
+     * // 恣意的な例だが、 array_search は false も 0 も返し得るので ?: は使えない。 null を返すこともないので ?? も使えない（エラーも吐かない）
      * that(array_search('a', ['a', 'b', 'c']) ?: 'default')->isSame('default'); // 見つかったのに 0 に反応するので 'default' になってしまう
-     * that(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default')->isSame('default'); // このように書きたかった
-     * that(blank_if(array_search('a', ['a', 'b', 'c'])) ?? 'default')->isSame(0);         // このように書きたかった
+     * that(array_search('x', ['a', 'b', 'c']) ?? 'default')->isSame(false);     // 見つからないので 'default' としたいが false になってしまう
+     * // 要するに単に「見つからなかった場合に 'default' としたい」だけなんだが、下記のようにめんどくさいことをせざるを得ない
+     * that(array_search('x', ['a', 'b', 'c']) === false ? 'default' : array_search('x', ['a', 'b', 'c']))->isSame('default'); // 3項演算子で2回呼ぶ
+     * that(($tmp = array_search('x', ['a', 'b', 'c']) === false) ? 'default' : $tmp)->isSame('default');                      // 一時変数を使用する（あるいは if 文）
+     * // このように書きたかった
+     * that(blank_if(array_search('x', ['a', 'b', 'c'])) ?? 'default')->isSame('default'); // null 合体演算子版
+     * that(blank_if(array_search('x', ['a', 'b', 'c']), 'default'))->isSame('default');   // 第2引数版
      * ```
      *
      * @param mixed $var 判定する値
@@ -18151,6 +18448,11 @@ if (!isset($excluded_functions["parse_namespace"]) && (!function_exists("parse_n
     {
         return cache(realpath($filename), function () use ($filename) {
             $stringify = function ($tokens) {
+                if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+                    return trim(implode('', array_column(array_filter($tokens, function ($token) {
+                        return in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
+                    }), 1)), '\\');
+                }
                 return trim(implode('', array_column(array_filter($tokens, function ($token) {
                     return $token[0] === T_NS_SEPARATOR || $token[0] === T_STRING;
                 }), 1)), '\\');
@@ -19495,8 +19797,8 @@ if (!isset($excluded_functions["add_error_handler"]) && (!function_exists("add_e
      * Example:
      * ```php
      * // @ 付きなら元々のハンドラに移譲、@ なしなら何らかのハンドリングを行う例
-     * add_error_handler(function () {
-     *     if (error_reporting() === 0) {
+     * add_error_handler(function ($errno) {
+     *     if (!(error_reporting() & $errno)) {
      *         // この false はマニュアルにある「この関数が FALSE を返した場合は、通常のエラーハンドラが処理を引き継ぎます」ではなく、
      *         // 「さっきまで設定されていたエラーハンドラが処理を引き継ぎます」という意味になる
      *         return false;

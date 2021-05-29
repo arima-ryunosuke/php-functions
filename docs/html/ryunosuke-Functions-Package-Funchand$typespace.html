@@ -676,10 +676,10 @@ that($body)-&gt;isSame('{return true;}');
 						<div class="description"><p>エラーを例外に変換するブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">try {
-    call_safely(function(){return $v;});
+    call_safely(function(){return []['dummy'];});
 }
 catch (\Exception $ex) {
-    that($ex-&gt;getMessage())-&gt;isSame('Undefined variable: v');
+    that($ex-&gt;getMessage())-&gt;containsAll(['Undefined', 'dummy']);
 }
 </code></pre>
 </div>
