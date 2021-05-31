@@ -281,9 +281,11 @@ class Syntax
     /**
      * 文字列から php コードを取り除く
      *
-     * 正確には $replacer で指定したものに置換される（デフォルト空文字なので削除になる）。
-     * $replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。
+     * 正確にはオプションの replacer で指定したものに置換される（デフォルト空文字なので削除になる）。
+     * replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。
      * 文字列を指定すると自動で出現番号が付与される。
+     *
+     * 歴史的な理由によりオプションには直接 replacer を渡せるが、互換性のためでありその指定は推奨されない。
      *
      * $mapping 配列には「どれをどのように」と言った変換表が格納される。
      * 典型的には strtr に渡して php コードを復元させるのに使用する。
@@ -299,12 +301,30 @@ class Syntax
      * ```
      *
      * @param string $phtml php コードを含む文字列
-     * @param ?string|\Closure $replacer 置換文字列・処理
+     * @param array|string|\Closure $option オプション配列
      * @param array $mapping 変換表が格納される参照変数
      * @return string php コードが除かれた文字列
      */
-    public static function strip_php($phtml, $replacer = '', &$mapping = [])
+    public static function strip_php($phtml, $option = [], &$mapping = [])
     {
+        // for compatible
+        if (!is_array($option)) {
+            $option = [
+                'replacer' => $option,
+            ];
+        }
+
+        $option = array_replace([
+            'short_open_tag' => true,
+            'trailing_break' => true,
+            'replacer'       => '',
+        ], $option, [
+            //'flags'  => TOKEN_NAME,
+            //'cache'  => false,
+            'phptag' => false,
+        ]);
+
+        $replacer = $option['replacer'];
         if ($replacer === '') {
             $replacer = function ($phptag, $n) { return ''; };
         }
@@ -312,12 +332,41 @@ class Syntax
             $replacer = (unique_string)($phtml, 64);
         }
 
-        $tokens = (parse_php)($phtml, [
-            //'flags'          => TOKEN_NAME,
-            //'cache'          => false,
-            'phptag'         => false,
-            'short_open_tag' => true,
-        ]);
+        $tmp = (parse_php)($phtml, $option);
+
+        if ($option['trailing_break']) {
+            $tokens = $tmp;
+        }
+        else {
+            $tokens = [];
+            $echoopen = false;
+            $taglength = strlen('?>');
+            foreach ($tmp as $token) {
+                if ($token[0] === T_OPEN_TAG_WITH_ECHO) {
+                    $echoopen = true;
+                }
+                if ($echoopen && $token[0] === T_CLOSE_TAG && isset($token[1][$taglength])) {
+                    $echoopen = false;
+
+                    $tokens[] = [
+                        $token[0],
+                        rtrim($token[1]),
+                        $token[2],
+                        $token[3],
+                    ];
+                    $tokens[] = [
+                        T_INLINE_HTML,
+                        substr($token[1], $taglength),
+                        $token[2],
+                        $token[3] + $taglength,
+                    ];
+                }
+                else {
+                    $tokens[] = $token;
+                }
+            }
+        }
+
         $offsets = [];
         foreach ($tokens as $token) {
             if ($token[0] === T_OPEN_TAG || $token[0] === T_OPEN_TAG_WITH_ECHO) {

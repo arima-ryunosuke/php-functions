@@ -283,7 +283,7 @@ plain text
 <? foreach ($array as $k => $v): ?>
     <? echo $k ?>
     plain text
-    <? echo $v ?>
+    <? echo $v ?> and <?= $v ?>
 <? endforeach ?>
 <? echo 789;
 ';
@@ -291,20 +291,27 @@ plain text
         that((strip_php)($code))->is('?>
 aplain text
         plain text
-    ');
+     and ');
         that((strip_php)($code, 'xxx'))->is('?>
-axxx5plain text
-xxx4    xxx3    plain text
-    xxx2xxx1xxx0');
+axxx6plain text
+xxx5    xxx4    plain text
+    xxx3 and xxx2xxx1xxx0');
         that((strip_php)($code, function ($code, $n) {
             if (strpos($code, 'foreach')) {
                 return 'foreach';
             }
             return $n . "th";
         }))->is('?>
-a5thplain text
-foreach    3th    plain text
-    2thforeach0th');
+a6thplain text
+foreach    4th    plain text
+    3th and 2thforeach0th');
+        that((strip_php)($code, [
+            'trailing_break' => false,
+        ]))->is('?>
+aplain text
+        plain text
+     and 
+');
 
         $mapping = [];
         $html = (strip_php)($code, null, $mapping);
