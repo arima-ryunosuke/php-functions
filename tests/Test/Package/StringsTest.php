@@ -990,6 +990,113 @@ line3
         }
     }
 
+    function test_html_attr()
+    {
+        $attrs = [
+            'ignore',
+            'camelCase' => '<value>',
+            'checked'   => true,
+            'disabled'  => false,
+            'readonly'  => null,
+            'srcset'    => [
+                'hoge.jpg 1x',
+                'fuga.jpg 2x',
+            ],
+            'content'   => [
+                'width' => 'device-width',
+                'scale' => '1.0',
+            ],
+            'class'     => ['hoge', 'fuga'],
+            'style'     => [
+                'color'           => 'red',
+                'backgroundColor' => 'white',
+                'margin'          => [1, 2, 3, 4],
+                'opacity:0.5',
+            ],
+            'data-'     => [
+                'direct',
+                'camelCase' => 123,
+                'hoge'      => false,
+                'fuga'      => "fuga",
+                'piyo'      => ['a' => 'A'],
+            ],
+        ];
+
+        that((html_attr)($attrs, null))->is([
+            0                 => 'ignore',
+            'camel-case'      => '<value>',
+            'checked'         => true,
+            'disabled'        => false,
+            'srcset'          => 'hoge.jpg 1x,fuga.jpg 2x',
+            'content'         => 'width=device-width,scale=1.0',
+            'class'           => 'hoge fuga',
+            'style'           => 'color:red;background-color:white;margin:1 2 3 4;opacity:0.5',
+            'data-0'          => 'direct',
+            'data-camel-case' => 123,
+            'data-hoge'       => 'false',
+            'data-fuga'       => 'fuga',
+            'data-piyo'       => '{"a":"A"}',
+        ]);
+
+        that((html_attr)($attrs, "\n"))->is(<<<ATTRS
+camel-case="&lt;value&gt;"
+checked
+srcset="hoge.jpg 1x,fuga.jpg 2x"
+content="width=device-width,scale=1.0"
+class="hoge fuga"
+style="color:red;background-color:white;margin:1 2 3 4;opacity:0.5"
+data-0="direct"
+data-camel-case="123"
+data-hoge="false"
+data-fuga="fuga"
+data-piyo="{&quot;a&quot;:&quot;A&quot;}"
+ATTRS
+        );
+
+        that((html_attr)([
+            'camelCase' => 'hoge[]',
+            'data'      => 'hoge',
+            'data-'     => 'fuga',
+            'data-name' => 'name',
+        ], [
+            'quote'     => "'",
+            'chaincase' => false,
+            'separator' => "\n",
+        ]))->is(<<<ATTRS
+camelCase='hoge[]'
+data='hoge'
+data-='fuga'
+data-name='name'
+ATTRS
+        );
+
+        that((html_attr)([
+            'arrayarray' => [
+                new class() implements \IteratorAggregate {
+                    public function getIterator() { return new \ArrayIterator(['text/html', 'charset=UTF-8']); }
+                },
+            ],
+            'stringable' => new class() {
+                public function __toString() { return 'string'; }
+            },
+            'iterable'   => new class() implements \IteratorAggregate {
+                public function getIterator() { yield 'a' => 'A'; }
+            },
+            'both'       => new class() implements \IteratorAggregate {
+                public function __toString() { return 'string'; }
+
+                public function getIterator() { yield 'a' => 'A'; }
+            },
+        ], null))->is([
+            'arrayarray' => 'text/html;charset=UTF-8',
+            'stringable' => 'string',
+            'iterable'   => 'a=A',
+            'both'       => 'string',
+        ]);
+
+        that(html_attr)->try(['ho ge' => 'hoge'])->wasThrown('invalid charactor');
+    }
+
     function test_htmltag()
     {
         that((htmltag)('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;;;height:456px}'))->is(
