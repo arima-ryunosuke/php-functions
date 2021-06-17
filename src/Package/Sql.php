@@ -288,7 +288,7 @@ class Sql
                         // "tablename. columnname" になってしまう
                         // "@ var" になってしまう
                         // ": holder" になってしまう
-                        if ($prev !== '.' && $prev !== '@' && $prev !== ':') {
+                        if ($prev !== '.' && $prev !== '@' && $prev !== ':' && $prev !== ';') {
                             $result[] = $MARK_SP;
                         }
 
@@ -442,7 +442,7 @@ class Sql
                         break;
                     case "UPDATE":
                     case "DELETE":
-                        $result[] = $MARK_SP . $virttoken;
+                        $result[] = $virttoken;
                         if ($subcontext !== 'REFERENCES') {
                             $result[] = $MARK_BR;
                             $context = $uppertoken;

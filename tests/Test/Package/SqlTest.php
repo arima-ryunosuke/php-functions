@@ -643,6 +643,31 @@ where
   )
 ');
 
+        // transaction
+        that((sql_format)('begin;
+select * from t_table where id in (1,2,3);
+update t_table set name = "hoge" where id in (1,2,3);
+commit;'))->IsEqualTrimming('
+begin 
+;
+select
+  * 
+from
+  t_table 
+where
+  id in(1, 2, 3)
+;
+update
+  t_table 
+set
+  name = "hoge" 
+where
+  id in(1, 2, 3)
+;
+commit 
+;
+');
+
         // semicoron
         that((sql_format)('select 1; select 2;'))->IsEqualTrimming('
 select
