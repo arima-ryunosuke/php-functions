@@ -4491,11 +4491,14 @@ class Strings
         if ($start < 0) {
             $start += $strlen;
         }
+        if ($length === null) {
+            $length = $strlen;
+        }
         if ($length < 0) {
             $length += $strlen - $start;
         }
 
-        return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, null);
+        return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length);
     }
 
     /**

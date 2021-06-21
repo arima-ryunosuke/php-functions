@@ -2396,7 +2396,7 @@ z", quote2: "a\\\\nz"');
     {
         // 素の挙動は substr_replace と全く変わらない
         $params = [
-            ['0123456789', 'X', 2, null],
+            // ['0123456789', 'X', 2, null], // for php8
             ['0123456789', 'X', 2, 0],
             ['0123456789', 'X', 2, 6],
             ['0123456789', 'X', 2, -2],
@@ -2410,7 +2410,8 @@ z", quote2: "a\\\\nz"');
         }
 
         // もちろんマルチバイトでも動作する
-        that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, null))->is('０１X２３４５６７８９');
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, null))->is('０１X');
+        that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, 0))->is('０１X２３４５６７８９');
         that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, 6))->is('０１X８９');
         that((mb_substr_replace)('０１２３４５６７８９', 'X', 2, -2))->is('０１X８９');
         that((mb_substr_replace)('０１２３４５６７８９', 'X', -8, 6))->is('０１X８９');

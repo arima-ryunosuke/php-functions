@@ -355,10 +355,10 @@ class Funchand
      * Example:
      * ```php
      * try {
-     *     call_safely(function(){return $v;});
+     *     call_safely(function(){return []['dummy'];});
      * }
      * catch (\Exception $ex) {
-     *     that($ex->getMessage())->isSame('Undefined variable: v');
+     *     that($ex->getMessage())->containsAll(['Undefined', 'dummy']);
      * }
      * ```
      *
@@ -369,7 +369,7 @@ class Funchand
     public static function call_safely($callback, ...$variadic)
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            if (error_reporting() === 0) {
+            if (!(error_reporting() & $errno)) {
                 return false;
             }
             throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);

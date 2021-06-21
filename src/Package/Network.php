@@ -143,6 +143,7 @@ class Network
         }
 
         if ($protocol === 'icmp') {
+            $port = 0;
             $socket = socket_create(AF_INET, SOCK_RAW, getprotobyname($protocol));
         }
         elseif ($protocol === 'tcp') {
@@ -255,6 +256,16 @@ class Network
             CURLOPT_HEADER         => true, // ヘッダを含める
         ];
 
+        $stringify_curl = function ($curl) {
+            if (is_resource($curl)) {
+                return (string) $curl;
+            }
+            if (is_object($curl)) {
+                return spl_object_id($curl);
+            }
+            return null;
+        };
+
         $responses = [];
         $resultmap = [];
         $mh = curl_multi_init();
@@ -269,11 +280,11 @@ class Network
             $rheader = null;
             $info = null;
             $res = (http_request)($default + $opt + $default_options, $rheader, $info);
-            if (is_array($res) && isset($res[0]) && is_resource($res[0])) {
+            if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
                 curl_multi_add_handle($mh, $res[0]);
 
                 // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-                $resultmap[(string) $res[0]] = [$key, $res[1]];
+                $resultmap[$handle_id] = [$key, $res[1]];
             }
             else {
                 $responses[$key] = [$res, $rheader, $info];
@@ -296,15 +307,16 @@ class Network
                 }
 
                 $handle = $minfo['handle'];
+                $handle_id = $stringify_curl($handle);
 
                 if ($minfo['result'] !== CURLE_OK) {
-                    $responses[$resultmap[(string) $handle][0]] = $minfo['result'];
+                    $responses[$resultmap[$handle_id][0]] = $minfo['result'];
                 }
                 else {
                     $info = curl_getinfo($handle);
                     $response = curl_multi_getcontent($handle);
-                    [$info, $headers, $body] = $resultmap[(string) $handle][1]($response, $info);
-                    $responses[$resultmap[(string) $handle][0]] = [$body, $headers, $info];
+                    [$info, $headers, $body] = $resultmap[$handle_id][1]($response, $info);
+                    $responses[$resultmap[$handle_id][0]] = [$body, $headers, $info];
                 }
 
                 curl_multi_remove_handle($mh, $handle);

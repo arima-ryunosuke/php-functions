@@ -376,7 +376,8 @@ class FunchandTest extends AbstractTestCase
         ]);
 
         // コンストラクタ
-        $arrayobject = (namedcallize)('\\ArrayObject::__construct')([[1, 2, 3], 'iterator_class' => 'Iterator', \ArrayObject::ARRAY_AS_PROPS]);
+        $iterator_class = version_compare(PHP_VERSION, '8.0.0') >= 0 ? 'iteratorClass' : 'iterator_class';
+        $arrayobject = (namedcallize)('\\ArrayObject::__construct')([[1, 2, 3], $iterator_class => 'Iterator', \ArrayObject::ARRAY_AS_PROPS]);
         that($arrayobject)->getArrayCopy()->is([1, 2, 3]);
         that($arrayobject)->getIteratorClass()->is('Iterator');
         that($arrayobject)->getFlags()->is(\ArrayObject::ARRAY_AS_PROPS);
@@ -735,10 +736,13 @@ class FunchandTest extends AbstractTestCase
         ]);
 
         // internal
-        $params = (function_parameter)('trim');
-        that($params)->isSame([
-            '$str'            => '$str',
-            '$character_mask' => '$character_mask = null',
-        ]);
+        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+            $params = (function_parameter)('strpos');
+            that($params)->isSame([
+                '$haystack' => 'string $haystack',
+                '$needle'   => 'string $needle',
+                '$offset'   => 'int $offset = 0',
+            ]);
+        }
     }
 }

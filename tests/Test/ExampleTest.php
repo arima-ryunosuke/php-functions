@@ -6,6 +6,7 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
 {
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     function test_all()
     {

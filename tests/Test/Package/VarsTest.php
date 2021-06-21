@@ -162,7 +162,6 @@ class VarsTest extends AbstractTestCase
 
         that((phpval)($object = new \stdClass()))->isSame($object);
         that((phpval)("strtoupper(\$undefined)"))->isSame("");
-        that((phpval)("strtoupper(undefined)"))->isSame("UNDEFINED");
     }
 
     function test_arrayable_key_exists()

@@ -190,12 +190,7 @@ class ArraysTest extends AbstractTestCase
     {
         $array = array_fill_keys(range('a', 'z'), 9);
 
-        // asort は安定ソートではない
-        $native = $array;
-        asort($native);
-        that((kvsort)($array))->isNotSame($native);
-
-        // kvsort は安定ソートである
+        // 安定ソートである
         that((kvsort)($array))->isSame($array);
 
         // キーでソートできる
@@ -687,7 +682,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // さらに値が100以上のものを抽出
-        that((array_unset)($array, function ($v, $k) { return $v >= 100; }))->is([
+        that((array_unset)($array, function ($v, $k) { return intval($v) >= 100; }))->is([
             100 => 100,
             101 => 101,
         ]);

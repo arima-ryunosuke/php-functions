@@ -893,7 +893,7 @@ class UtilityTest extends AbstractTestCase
         that($stderr)->isSame(str_repeat("e", 100 * 1000));
 
         $return = (process)(PHP_BINARY, ['-r' => "syntax error"], '', $stdout, $stderr);
-        that($return)->isSame(254);
+        that($return)->isSame(version_compare(PHP_VERSION, '8.0.0') >= 0 ? 255: 254);
         that("$stdout $stderr")->stringContains('Parse error');
 
         $pingopt = DIRECTORY_SEPARATOR === '\\' ? '-n' : '-c';
@@ -1245,6 +1245,10 @@ class UtilityTest extends AbstractTestCase
         ]);
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     function test_profiler()
     {
         $profiler = (profiler)([
@@ -1290,13 +1294,12 @@ class UtilityTest extends AbstractTestCase
         that($fstat['size'])->is(filesize(__DIR__ . '/Utility/fake.php'));
 
         @file_get_contents(__DIR__ . '/Utility/notfound.php');
-        that(error_get_last()['message'])->containsAll(['notfound.php', 'failed to open stream']);
+        that(error_get_last()['message'])->contains('failed to open stream', false);
 
         $backup = set_include_path(__DIR__);
         that(file_get_contents(basename(__FILE__), true))->equalsFile(__FILE__);
         set_include_path($backup);
 
-        $profiler->__destruct();
         unset($profiler);
         unset($result);
 
@@ -1333,13 +1336,13 @@ class UtilityTest extends AbstractTestCase
     function test_add_error_handler()
     {
         $handler1 = function ($errno) use (&$receiver) {
-            if ($errno === E_WARNING) {
+            if ($errno === E_WARNING || $errno === E_USER_WARNING) {
                 return false;
             }
             $receiver = 'handler1';
         };
         $handler2 = function ($errno) use (&$receiver) {
-            if (error_reporting() === 0) {
+            if (!(error_reporting() & $errno)) {
                 return false;
             }
             $receiver = 'handler2';
@@ -1353,18 +1356,17 @@ class UtilityTest extends AbstractTestCase
 
         // @ をつけなければ handler2 が呼ばれる（receiver = handler2）
         $receiver = null;
-        $dummy[] = []['hoge'];
+        trigger_error('', E_USER_NOTICE);
         that($receiver)->is('handler2');
 
         // @ をつけると handler1 に移譲される（receiver = handler1）
         $receiver = null;
-        $dummy[] = @[]['hoge'];
+        @trigger_error('', E_USER_NOTICE);
         that($receiver)->is('handler1');
 
         // さらに WARNING ならその前（phpunit のハンドラ）に移譲される（receiver が設定されない）
         $receiver = null;
-        /** @noinspection PhpWrongStringConcatenationInspection */
-        $dummy[] = @('hoge' + 123);
+        @trigger_error('', E_USER_WARNING);
         that($receiver)->is(null);
 
         restore_error_handler();

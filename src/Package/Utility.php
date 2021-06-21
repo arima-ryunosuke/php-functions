@@ -487,6 +487,11 @@ class Utility
     {
         return (cache)(realpath($filename), function () use ($filename) {
             $stringify = function ($tokens) {
+                if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+                    return trim(implode('', array_column(array_filter($tokens, function ($token) {
+                        return in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
+                    }), 1)), '\\');
+                }
                 return trim(implode('', array_column(array_filter($tokens, function ($token) {
                     return $token[0] === T_NS_SEPARATOR || $token[0] === T_STRING;
                 }), 1)), '\\');
@@ -1776,8 +1781,8 @@ class Utility
      * Example:
      * ```php
      * // @ 付きなら元々のハンドラに移譲、@ なしなら何らかのハンドリングを行う例
-     * add_error_handler(function () {
-     *     if (error_reporting() === 0) {
+     * add_error_handler(function ($errno) {
+     *     if (!(error_reporting() & $errno)) {
      *         // この false はマニュアルにある「この関数が FALSE を返した場合は、通常のエラーハンドラが処理を引き継ぎます」ではなく、
      *         // 「さっきまで設定されていたエラーハンドラが処理を引き継ぎます」という意味になる
      *         return false;
