@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.19
+
+- [all] support php8
+- [Sql] 特定の SQL で妙なインデントが生まれる不具合を修正
+- [Strings] html_attr を追加
+- [Strings] html_strip で必要な空白まで消えてしまう不具合を修正
+- [Syntax] strip_php の第2引数をオプション化
+- [Network] ping の不具合を修正
+
 ## 1.4.18
 
 - [feature][Funchand] ope_func に new/clone を追加
