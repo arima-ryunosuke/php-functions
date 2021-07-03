@@ -5267,6 +5267,7 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect
                 if (is_array($token) && $token[0] === T_NAMESPACE) {
                     // T_NAMESPACE と T_WHITESPACE で最低でも2つは読み飛ばしてよい
                     for ($m = $n + 2; $m < $count; $m++) {
+                        // @codeCoverageIgnoreStart
                         if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
                             if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_QUALIFIED) {
                                 return $tokens[$m][1];
@@ -5275,6 +5276,7 @@ if (!isset($excluded_functions["detect_namespace"]) && (!function_exists("detect
                                 $namespace[] = trim($tokens[$m][1], '\\');
                             }
                         }
+                        // @codeCoverageIgnoreEnd
                         // よほどのことがないと T_NAMESPACE の次の T_STRING は名前空間の一部
                         if (is_array($tokens[$m]) && $tokens[$m][0] === T_STRING) {
                             $namespace[] = $tokens[$m][1];
@@ -5910,7 +5912,6 @@ if (!isset($excluded_functions["reflect_types"]) && (!function_exists("reflect_t
 
         foreach ($reflection_type as $n => $rtype) {
             if ($rtype instanceof \ReflectionProperty) {
-                /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
                 $reflection_type[$n] = $rtype->getType();
             }
             if ($rtype instanceof \ReflectionFunctionAbstract) {
@@ -10322,10 +10323,12 @@ if (!isset($excluded_functions["http_requests"]) && (!function_exists("http_requ
             if (is_resource($curl)) {
                 return (string) $curl;
             }
+            // @codeCoverageIgnoreStart
             if (is_object($curl)) {
                 return spl_object_id($curl);
             }
             return null;
+            // @codeCoverageIgnoreEnd
         };
 
         $responses = [];
@@ -18448,11 +18451,14 @@ if (!isset($excluded_functions["parse_namespace"]) && (!function_exists("parse_n
     {
         return cache(realpath($filename), function () use ($filename) {
             $stringify = function ($tokens) {
+                // @codeCoverageIgnoreStart
                 if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
                     return trim(implode('', array_column(array_filter($tokens, function ($token) {
+                        /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
                         return in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
                     }), 1)), '\\');
                 }
+                // @codeCoverageIgnoreEnd
                 return trim(implode('', array_column(array_filter($tokens, function ($token) {
                     return $token[0] === T_NS_SEPARATOR || $token[0] === T_STRING;
                 }), 1)), '\\');
