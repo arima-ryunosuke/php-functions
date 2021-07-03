@@ -487,11 +487,14 @@ class Utility
     {
         return (cache)(realpath($filename), function () use ($filename) {
             $stringify = function ($tokens) {
+                // @codeCoverageIgnoreStart
                 if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
                     return trim(implode('', array_column(array_filter($tokens, function ($token) {
+                        /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
                         return in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
                     }), 1)), '\\');
                 }
+                // @codeCoverageIgnoreEnd
                 return trim(implode('', array_column(array_filter($tokens, function ($token) {
                     return $token[0] === T_NS_SEPARATOR || $token[0] === T_STRING;
                 }), 1)), '\\');

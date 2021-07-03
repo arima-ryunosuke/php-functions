@@ -81,6 +81,7 @@ class Classobj
                 if (is_array($token) && $token[0] === T_NAMESPACE) {
                     // T_NAMESPACE と T_WHITESPACE で最低でも2つは読み飛ばしてよい
                     for ($m = $n + 2; $m < $count; $m++) {
+                        // @codeCoverageIgnoreStart
                         if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
                             if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_QUALIFIED) {
                                 return $tokens[$m][1];
@@ -89,6 +90,7 @@ class Classobj
                                 $namespace[] = trim($tokens[$m][1], '\\');
                             }
                         }
+                        // @codeCoverageIgnoreEnd
                         // よほどのことがないと T_NAMESPACE の次の T_STRING は名前空間の一部
                         if (is_array($tokens[$m]) && $tokens[$m][0] === T_STRING) {
                             $namespace[] = $tokens[$m][1];
@@ -689,7 +691,6 @@ class Classobj
 
         foreach ($reflection_type as $n => $rtype) {
             if ($rtype instanceof \ReflectionProperty) {
-                /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
                 $reflection_type[$n] = $rtype->getType();
             }
             if ($rtype instanceof \ReflectionFunctionAbstract) {

@@ -260,10 +260,12 @@ class Network
             if (is_resource($curl)) {
                 return (string) $curl;
             }
+            // @codeCoverageIgnoreStart
             if (is_object($curl)) {
                 return spl_object_id($curl);
             }
             return null;
+            // @codeCoverageIgnoreEnd
         };
 
         $responses = [];
