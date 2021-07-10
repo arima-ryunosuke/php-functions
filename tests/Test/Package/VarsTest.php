@@ -664,6 +664,93 @@ class VarsTest extends AbstractTestCase
         that((var_applys)(['a', 'b'], $upper))->isSame(['A', 'B']);
     }
 
+    function test_var_stream()
+    {
+        $var = null;
+        $f = (var_stream)($var);
+
+        // f 系の一連の流れ
+        that(flock($f, LOCK_EX))->is(true);
+        that(fwrite($f, 'Hello'))->is(5);
+        that(fwrite($f, 'World!'))->is(6);
+        that(fseek($f, 3, SEEK_SET))->is(0);
+        that(ftell($f))->is(3);
+        that(feof($f))->is(false);
+        that(fread($f, 3))->is('loW');
+        that(fread($f, 1024))->is('orld!');
+        that(fseek($f, 100, SEEK_SET))->is(0);
+        that(fwrite($f, 'x'))->is(1);
+        that(fflush($f))->is(true);
+        that(ftruncate($f, 16))->is(true);
+        that(flock($f, LOCK_UN))->is(true);
+        that(stream_get_contents($f, -1, 0))->is("HelloWorld!\0\0\0\0\0");
+        that(fclose($f))->is(true);
+
+        that($var)->is("HelloWorld!\0\0\0\0\0");
+
+        $f = (var_stream)($var, 'init');
+        that(stream_get_contents($f, -1, 0))->is("init");
+
+        that($var)->is("init");
+    }
+
+    function test_var_stream_io()
+    {
+        $var = "initial\nstring";
+        $f = (var_stream)($var);
+        that(fread($f, 3))->is("ini");
+        that(fgets($f))->is("tial\n");
+        that(fgets($f))->is("string");
+        that(fgets($f))->isFalse();
+        $var .= "append\nstring";
+        that(fgets($f))->is("append\n");
+        that(fgets($f))->is("string");
+        that(fgets($f))->isFalse();
+        that(fwrite($f, 'final'))->is(5);
+        that($var)->is("initial\nstringappend\nstringfinal");
+    }
+
+    function test_var_stream_seek()
+    {
+        $test = function ($expected, $actual) {
+            that(fwrite($expected, '0123456789') === fwrite($actual, '0123456789'))->isTrue();
+
+            that(fseek($expected, 1, SEEK_SET) === fseek($actual, 1, SEEK_SET))->isTrue();
+            that(fseek($expected, -1, SEEK_SET) === fseek($actual, -1, SEEK_SET))->isTrue();
+            that(ftell($expected) === ftell($actual))->isTrue();
+
+            that(fseek($expected, 1, SEEK_CUR) === fseek($actual, 1, SEEK_CUR))->isTrue();
+            that(fseek($expected, -1, SEEK_CUR) === fseek($actual, -1, SEEK_CUR))->isTrue();
+            that(fseek($expected, -111, SEEK_CUR) === fseek($actual, -111, SEEK_CUR))->isTrue();
+            that(ftell($expected) === ftell($actual))->isTrue();
+
+            that(fseek($expected, 1, SEEK_END) === fseek($actual, 1, SEEK_END))->isTrue();
+            that(fseek($expected, -1, SEEK_END) === fseek($actual, -1, SEEK_END))->isTrue();
+            that(fseek($expected, -111, SEEK_END) === fseek($actual, -111, SEEK_END))->isTrue();
+            that(ftell($expected) === ftell($actual))->isTrue();
+
+            that(fseek($expected, 100, SEEK_SET) === fseek($actual, 100, SEEK_SET))->isTrue();
+            that(fwrite($expected, 'x') === fwrite($actual, 'x'))->isTrue();
+            that(rewind($expected) === rewind($actual))->isTrue();
+            that(fread($expected, 1000) === fread($actual, 1000))->isTrue();
+        };
+        $var = null;
+        $test(tmpfile(), (var_stream)($var));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    function test_var_stream_already()
+    {
+        stream_wrapper_register('VarStreamV010000', 'stdClass');
+        that(function () {
+            $var = null;
+            (var_stream)($var);
+        })->try()->wasThrown('is registered already');
+    }
+
     function test_var_export2()
     {
         $value = [
