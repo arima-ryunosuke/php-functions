@@ -739,6 +739,12 @@ class Vars
      * データは json を経由して base64（URL セーフ） して返す。
      * $tag を与えると認証タグが設定される。
      *
+     * データ末尾には =v が付与される。
+     * これによって処理が変わり、バージョン違いの暗号化文字列を与えたとしても複合することができる。
+     *
+     * - v0: バージョンのない無印。json -> encrypt -> base64
+     * - v1: 上記に圧縮処理を加えたもの。json -> deflate -> encrypt -> base64
+     *
      * Example:
      * ```php
      * $plaindata = ['a', 'b', 'c'];
@@ -769,12 +775,13 @@ class Vars
     public static function encrypt($plaindata, $password, $cipher = 'aes-256-cbc', &$tag = '')
     {
         $jsondata = json_encode($plaindata, JSON_UNESCAPED_UNICODE);
+        $zlibdata = gzdeflate($jsondata, 9);
 
         $ivlen = openssl_cipher_iv_length($cipher);
         $iv = $ivlen ? random_bytes($ivlen) : '';
-        $payload = openssl_encrypt($jsondata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...func_num_args() < 4 ? [] : [&$tag]);
+        $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...func_num_args() < 4 ? [] : [&$tag]);
 
-        return rtrim(strtr(base64_encode($iv . $payload), ['+' => '-', '/' => '_']), '=');
+        return rtrim(strtr(base64_encode($iv . $payload), ['+' => '-', '/' => '_']), '=') . '=1';
     }
 
     /**
@@ -794,7 +801,9 @@ class Vars
      */
     public static function decrypt($cipherdata, $password, $cipher = 'aes-256-cbc', $tag = '')
     {
+        [$cipherdata, $version] = explode('=', $cipherdata, 2) + [1 => 0];
         $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
+        $version = (int) $version;
 
         foreach ((array) $cipher as $c) {
             $ivlen = openssl_cipher_iv_length($c);
@@ -804,9 +813,12 @@ class Vars
             $iv = substr($cipherdata, 0, $ivlen);
             $payload = substr($cipherdata, $ivlen);
 
-            $jsondata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
-            if ($jsondata !== false) {
-                return json_decode($jsondata, true);
+            $decryptdata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
+            if ($decryptdata !== false) {
+                if ($version === 1) {
+                    $decryptdata = gzinflate($decryptdata);
+                }
+                return json_decode($decryptdata, true);
             }
         }
         return null;

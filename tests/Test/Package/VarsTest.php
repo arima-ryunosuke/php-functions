@@ -477,7 +477,7 @@ class VarsTest extends AbstractTestCase
     {
         $data = [
             'user_id' => 12345,
-            'time'    => time(),
+            'time'    => '20141224T123456',
             'data'    => [
                 'a' => 'あああ',
                 'c' => 'ううう',
@@ -508,6 +508,37 @@ class VarsTest extends AbstractTestCase
         // 順に試みて複合される
         that(@(decrypt)($encrypted, 'secret', ['aes-128-ecb', 'aes-256-cbc', 'aes-256-ccm'], $tag))->isSame($data);
         that((decrypt)($encrypted, 'secret', ['aes-128-ecb', 'aes-256-cbc']))->isNull();
+    }
+
+    function test_encrypt_decrypt_invalid()
+    {
+        that((decrypt)('', 'secret', 'aes-128-ecb'))->isNull();
+        that((decrypt)('=0', 'secret', 'aes-128-ecb'))->isNull();
+        that((decrypt)('=1', 'secret', 'aes-128-ecb'))->isNull();
+        that((decrypt)('v=1', 'secret', 'aes-128-ecb'))->isNull();
+        that((decrypt)('xxxxxxxxxxxxxxxxxxxx', 'secret', 'aes-128-ecb'))->isNull();
+        that((decrypt)(base64_encode('xxxxxxxxxxxxxxxxxxxx') . '=1', 'secret', 'aes-128-ecb'))->isNull();
+    }
+
+    function test_encrypt_decrypt_regression()
+    {
+        $data = [
+            'user_id' => 12345,
+            'time'    => '20141224T123456',
+            'data'    => [
+                'a' => 'あああ',
+                'c' => 'ううう',
+            ],
+        ];
+
+        $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s";
+        that((decrypt)($v0, 'secret', 'aes-128-ecb'))->isSame($data);
+
+        $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s=0";
+        that((decrypt)($v0, 'secret', 'aes-128-ecb'))->isSame($data);
+
+        $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s=99";
+        that((decrypt)($v0, 'secret', 'aes-128-ecb'))->isSame($data);
     }
 
     function test_varcmp()
