@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.21
+
+- [fixbug][Vars] var_export3 のクロージャ出力の不具合を修正
+- [change][Vars] encrypt/decrypt のバージョニング
+- [change][Vars] var_pretty の仕様変更
+- [feature][Vars] var_stream を追加
+- [feature][Utility] parse_annotation の改行対応
+
 ## 1.4.19
 
 - [all] support php8
