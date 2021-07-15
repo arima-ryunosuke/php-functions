@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use ArrayObject;
 use Concrete;
 use Exception as Ex;
+use Invoker;
 use ryunosuke\Functions\Package\Vars;
 use SerialMethod;
 use SleepWakeupMethod;
@@ -992,6 +993,35 @@ VAR
         that($closures['internal2']('strlen')('fuga'))->is(4);
         that($closures['internal3']('Ymd'))->is('20141224');
         that($closures['internal4']('Ymd'))->is('20121224');
+
+        $object = new Invoker();
+        $closures = [
+            'array'  => \Closure::fromCallable([$object, 'm']),
+            'static' => \Closure::fromCallable([get_class($object), 'S']),
+            'invoke' => \Closure::fromCallable($object),
+        ];
+        $exported = (var_export3)($closures, ['outmode' => 'eval']);
+        $closures = eval($exported);
+        that($closures['array'](1))->is(2);
+        that($closures['static'](1))->is(3);
+        that($closures['invoke'](1))->is(4);
+
+        $closure = static function ($arg) {
+            $closure = function ($v) use ($arg) {
+                return $v + $arg;
+            };
+            $object = new class($closure) {
+                private $closure;
+
+                public function __construct($closure) { $this->closure = $closure; }
+
+                public function __invoke($arg) { return ($this->closure)($arg); }
+            };
+            return $object($arg);
+        };
+        $exported = (var_export3)($closure, ['outmode' => 'eval']);
+        $closure = eval($exported);
+        that($closure(2))->is(4);
 
         $fibonacci = (function ($n) use (&$fibonacci) {
             if ($n < 2) {

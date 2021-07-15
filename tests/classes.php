@@ -332,6 +332,15 @@ class BuiltIn implements \Countable
     }
 }
 
+class Invoker
+{
+    public function m($v) { return $v * 2; }
+
+    public static function S($v) { return $v * 3; }
+
+    public function __invoke($v) { return $v * 4; }
+}
+
 class Nest1
 {
     private $private = 1;

@@ -1496,7 +1496,9 @@ class Vars
                 $tokens = array_slice((parse_php)(implode(' ', (callable_code)($value)) . ';', TOKEN_PARSE), 1, -1);
                 $uses = "";
                 $context = [
-                    'use' => false,
+                    'use'   => false,
+                    'class' => 0,
+                    'brace' => 0,
                 ];
                 $neighborToken = function ($n, $d) use ($tokens) {
                     for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
@@ -1509,14 +1511,40 @@ class Vars
                     $prev = $neighborToken($n, -1) ?? [null, null, null];
                     $next = $neighborToken($n, +1) ?? [null, null, null];
 
+                    // クロージャは何でもかける（クロージャ・無名クラス・ジェネレータ etc）のでネスト（ブレース）レベルを記録しておく
+                    if ($token[1] === '{') {
+                        $context['brace']++;
+                    }
+                    if ($token[1] === '}') {
+                        $context['brace']--;
+                    }
+
+                    // 無名クラスは色々厄介なので読み飛ばすために覚えておく
+                    if ($prev[0] === T_NEW && $token[0] === T_CLASS) {
+                        $context['class'] = $context['brace'];
+                    }
+                    // そして無名クラスは色々かける上に終了条件が自明ではない（シンタックスエラーでない限りは {} が一致するはず）
+                    if ($token[1] === '}' && $context['class'] === $context['brace']) {
+                        $context['class'] = 0;
+                    }
+
+                    // fromCallable 由来だと名前がついてしまう
+                    if (!$context['class'] && $prev[0] === T_FUNCTION && $token[0] === T_STRING) {
+                        unset($tokens[$n]);
+                        continue;
+                    }
+
                     // use 変数の導出
                     if ($prev[1] === ')' && $token[0] === T_USE) {
                         $context['use'] = true;
                     }
                     if ($context['use'] && $token[0] === T_VARIABLE) {
                         $varname = substr($token[1], 1);
-                        $recurself = $statics[$varname] === $value ? '&' : '';
-                        $uses .= "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                        // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
+                        if (array_key_exists($varname, $statics)) {
+                            $recurself = $statics[$varname] === $value ? '&' : '';
+                            $uses .= "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                        }
                     }
                     if ($context['use'] && $token[1] === ')') {
                         $context['use'] = false;
