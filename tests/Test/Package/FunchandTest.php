@@ -138,7 +138,7 @@ class FunchandTest extends AbstractTestCase
         that((ope_func)('instanceof')(new \stdClass(), \Exception::class))->isFalse();
         $object = (ope_func)('new')(\Concrete::class, 'name');
         that($object->getName())->is('name');
-        $object2= (ope_func)('clone')($object);
+        $object2 = (ope_func)('clone')($object);
         that($object2->getName())->is('name');
         that($object2)->isNotSame($object);
 
@@ -377,9 +377,9 @@ class FunchandTest extends AbstractTestCase
 
         // コンストラクタ
         $iterator_class = version_compare(PHP_VERSION, '8.0.0') >= 0 ? 'iteratorClass' : 'iterator_class';
-        $arrayobject = (namedcallize)('\\ArrayObject::__construct')([[1, 2, 3], $iterator_class => 'Iterator', \ArrayObject::ARRAY_AS_PROPS]);
+        $arrayobject = (namedcallize)('\\ArrayObject::__construct')([[1, 2, 3], $iterator_class => 'ArrayIterator', \ArrayObject::ARRAY_AS_PROPS]);
         that($arrayobject)->getArrayCopy()->is([1, 2, 3]);
-        that($arrayobject)->getIteratorClass()->is('Iterator');
+        that($arrayobject)->getIteratorClass()->is('ArrayIterator');
         that($arrayobject)->getFlags()->is(\ArrayObject::ARRAY_AS_PROPS);
 
         // デフォルト

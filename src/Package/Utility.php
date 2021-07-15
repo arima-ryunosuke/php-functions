@@ -701,6 +701,7 @@ class Utility
      * Example:
      * ```php
      * $annotations = parse_annotation('
+     *
      * @noval
      * @single this is value
      * @closure this is value
