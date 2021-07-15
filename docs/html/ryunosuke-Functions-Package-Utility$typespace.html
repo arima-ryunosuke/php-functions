@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L1965" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L1973" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
@@ -602,7 +602,7 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L670-L853" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L670-L861" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::parse_annotation()" tabindex="-1" class="structure-title ">
                         parse_annotation                        	<small>($annotation, $schema = [], $nsfiles = []) : array</small>
@@ -613,7 +613,13 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 その場合、getDocComment や getFilename, getNamespaceName などを用いてある程度よしなに名前解決する。<br />
 もっとも、@Class(args) 形式を使わないのであれば特に意味はない。</p>
 <p>$schame で「どのように取得するか？」のスキーマ定義が渡せる。<br />
-ただし、現実装では「そのまま文字列で返すか？」の bool 値とクロージャしか渡すことはできない。</p>
+スキーマ定義は連想配列で各アノテーションごとに下記のような定義を指定でき、連想配列でない場合はすべてのアノテーションにおいて指定したとみなされる。</p>
+<ul>
+<li>true: 余計なことはせず、アノテーションの文字列をそのまま返す</li>
+<li>false: 下記にようによしなに変換して返す</li>
+<li>[]: 複数値モードを強制する</li>
+<li>null: 単一値モードを強制する</li>
+</ul>
 <p>アノテーションの仕様は下記（すべて $schema が false であるとする）。</p>
 <ul>
 <li>@から行末まで（1行に複数のアノテーションは含められない）<ul>
@@ -633,42 +639,8 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 あくまで簡易実装であり、本格的に何かをしたいなら専用のパッケージを導入したほうが良い。</p>
 <p>Example:</p>
 <pre><code class="language-php">$annotations = parse_annotation('
-冒頭の - に意味はない
-- @noval
-- @single this is value
-- @closure this is value
-- @array this is value
-- @hash {key: 123}
-- @list [1, 2, 3]
-- @ArrayObject([1, 2, 3])
-- @block message {
-      this is message1
-      this is message2
-  }
-- @same this is same value1
-- @same this is same value2
-- @same this is same value3
-', [
-    'single'  =&gt; true,
-    'closure' =&gt; function ($value) { return explode(' ', strtoupper($value)); },
-]);
-that($annotations)-&gt;is([
-    'noval'       =&gt; null,                        // 値なしは null になる
-    'single'      =&gt; 'this is value',             // $schema 指定してるので文字列になる
-    'closure'     =&gt; ['THIS', 'IS', 'VALUE'],     // $schema 指定してそれがクロージャだとコールバックされる
-    'array'       =&gt; ['this', 'is', 'value'],     // $schema 指定していないので配列になる
-    'hash'        =&gt; ['key' =&gt; '123'],            // 連想配列になる
-    'list'        =&gt; [1, 2, 3],                   // 連番配列になる
-    'ArrayObject' =&gt; new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
-    "block"       =&gt; [                            // ブロックはブロック外をキーとした連想配列になる（複数指定でキーは指定できるイメージ）
-        "message" =&gt; ["this is message1\n      this is message2"],
-    ],
-    'same'        =&gt; [                            // 複数あるのでそれぞれの配列になる
-        ['this', 'is', 'same', 'value1'],
-        ['this', 'is', 'same', 'value2'],
-        ['this', 'is', 'same', 'value3'],
-    ],
-]);
+
+
 </code></pre>
 </div>
                         	<table class="table">
@@ -722,7 +694,7 @@ that($annotations)-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L855-L883" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L863-L891" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::is_ansi()" tabindex="-1" class="structure-title ">
                         is_ansi                        	<small>($stream) : bool</small>
@@ -781,7 +753,7 @@ that($annotations)-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L885-L948" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L893-L956" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::ansi_colorize()" tabindex="-1" class="structure-title ">
                         ansi_colorize                        	<small>($string, $color) : string</small>
@@ -848,7 +820,7 @@ that($annotations)-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L950-L1071" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L958-L1079" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
                         process                        	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : int</small>
@@ -950,7 +922,7 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1073-L1246" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1081-L1254" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
                         arguments                        	<small>($rule, $argv = null) : array</small>
@@ -1068,7 +1040,7 @@ that(arguments($rule, '--long A -short B'))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1248-L1387" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1256-L1395" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::stacktrace()" tabindex="-1" class="structure-title ">
                         stacktrace                        	<small>($traces = null, $option = []) : string<span class="type-separator"></span><wbr>array</small>
@@ -1128,7 +1100,7 @@ limit と format は比較的指定頻度が高いかつ互換性維持のため
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1389-L1446" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1397-L1454" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::backtrace()" tabindex="-1" class="structure-title ">
                         backtrace                        	<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = []) : array</small>
@@ -1199,7 +1171,7 @@ that($traces[1])-&gt;arraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1448-L1713" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1456-L1721" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::profiler()" tabindex="-1" class="structure-title ">
                         profiler                        	<small>($options = []) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr>callable</small>
@@ -1262,7 +1234,7 @@ that($traces[1])-&gt;arraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1715-L1774" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1723-L1782" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error                        	<small>($message, $destination = null) : int</small>
@@ -1320,7 +1292,7 @@ that($traces[1])-&gt;arraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1776-L1813" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1784-L1821" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::add_error_handler()" tabindex="-1" class="structure-title ">
                         add_error_handler                        	<small>($handler, $error_types = 32767) : callable<span class="type-separator"></span><wbr>null</small>
@@ -1389,7 +1361,7 @@ restore_error_handler();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1815-L1842" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1823-L1850" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
                         timer                        	<small>($callable, $count = 1) : float</small>
@@ -1447,7 +1419,7 @@ that(timer(function(){usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1844-L1964" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1852-L1972" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark                        	<small>($suite, $args = [], $millisec = 1000, $output = true) : array</small>

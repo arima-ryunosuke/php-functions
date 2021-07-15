@@ -1026,6 +1026,7 @@ define("ryunosuke\\Functions\\Package\\varcmp", ["ryunosuke\\Functions\\Package\
 define("ryunosuke\\Functions\\Package\\var_type", ["ryunosuke\\Functions\\Package\\Vars", "var_type"]);
 define("ryunosuke\\Functions\\Package\\var_apply", ["ryunosuke\\Functions\\Package\\Vars", "var_apply"]);
 define("ryunosuke\\Functions\\Package\\var_applys", ["ryunosuke\\Functions\\Package\\Vars", "var_applys"]);
+define("ryunosuke\\Functions\\Package\\var_stream", ["ryunosuke\\Functions\\Package\\Vars", "var_stream"]);
 define("ryunosuke\\Functions\\Package\\var_export2", ["ryunosuke\\Functions\\Package\\Vars", "var_export2"]);
 define("ryunosuke\\Functions\\Package\\var_export3", ["ryunosuke\\Functions\\Package\\Vars", "var_export3"]);
 define("ryunosuke\\Functions\\Package\\var_html", ["ryunosuke\\Functions\\Package\\Vars", "var_html"]);

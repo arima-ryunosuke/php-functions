@@ -5688,7 +5688,13 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 その場合、getDocComment や getFilename, getNamespaceName などを用いてある程度よしなに名前解決する。<br />
 もっとも、@Class(args) 形式を使わないのであれば特に意味はない。</p>
 <p>$schame で「どのように取得するか？」のスキーマ定義が渡せる。<br />
-ただし、現実装では「そのまま文字列で返すか？」の bool 値とクロージャしか渡すことはできない。</p>
+スキーマ定義は連想配列で各アノテーションごとに下記のような定義を指定でき、連想配列でない場合はすべてのアノテーションにおいて指定したとみなされる。</p>
+<ul>
+<li>true: 余計なことはせず、アノテーションの文字列をそのまま返す</li>
+<li>false: 下記にようによしなに変換して返す</li>
+<li>[]: 複数値モードを強制する</li>
+<li>null: 単一値モードを強制する</li>
+</ul>
 <p>アノテーションの仕様は下記（すべて $schema が false であるとする）。</p>
 <ul>
 <li>@から行末まで（1行に複数のアノテーションは含められない）<ul>
@@ -5708,42 +5714,8 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 あくまで簡易実装であり、本格的に何かをしたいなら専用のパッケージを導入したほうが良い。</p>
 <p>Example:</p>
 <pre><code class="language-php">$annotations = parse_annotation('
-冒頭の - に意味はない
-- @noval
-- @single this is value
-- @closure this is value
-- @array this is value
-- @hash {key: 123}
-- @list [1, 2, 3]
-- @ArrayObject([1, 2, 3])
-- @block message {
-      this is message1
-      this is message2
-  }
-- @same this is same value1
-- @same this is same value2
-- @same this is same value3
-', [
-    'single'  =&gt; true,
-    'closure' =&gt; function ($value) { return explode(' ', strtoupper($value)); },
-]);
-that($annotations)-&gt;is([
-    'noval'       =&gt; null,                        // 値なしは null になる
-    'single'      =&gt; 'this is value',             // $schema 指定してるので文字列になる
-    'closure'     =&gt; ['THIS', 'IS', 'VALUE'],     // $schema 指定してそれがクロージャだとコールバックされる
-    'array'       =&gt; ['this', 'is', 'value'],     // $schema 指定していないので配列になる
-    'hash'        =&gt; ['key' =&gt; '123'],            // 連想配列になる
-    'list'        =&gt; [1, 2, 3],                   // 連番配列になる
-    'ArrayObject' =&gt; new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
-    "block"       =&gt; [                            // ブロックはブロック外をキーとした連想配列になる（複数指定でキーは指定できるイメージ）
-        "message" =&gt; ["this is message1\n      this is message2"],
-    ],
-    'same'        =&gt; [                            // 複数あるのでそれぞれの配列になる
-        ['this', 'is', 'same', 'value1'],
-        ['this', 'is', 'same', 'value2'],
-        ['this', 'is', 'same', 'value3'],
-    ],
-]);
+
+
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6325,6 +6297,12 @@ that(is_countable(new \stdClass()))-&gt;isFalse();
 	<div class="description"><p>指定されたパスワードとアルゴリズムで暗号化する</p>
 <p>データは json を経由して base64（URL セーフ） して返す。<br />
 $tag を与えると認証タグが設定される。</p>
+<p>データ末尾には =v が付与される。<br />
+これによって処理が変わり、バージョン違いの暗号化文字列を与えたとしても複合することができる。</p>
+<ul>
+<li>v0: バージョンのない無印。json -&gt; encrypt -&gt; base64</li>
+<li>v1: 上記に圧縮処理を加えたもの。json -&gt; deflate -&gt; encrypt -&gt; base64</li>
+</ul>
 <p>Example:</p>
 <pre><code class="language-php">$plaindata = ['a', 'b', 'c'];
 $encrypted = encrypt($plaindata, 'password');
@@ -6448,6 +6426,34 @@ that(var_applys(['a', 'b', 'c'], $upper))-&gt;isSame(['A', 'B', 'C']);
 that(var_applys('a', $upper))-&gt;isSame('A');
 # 要するに「大文字化したい」だけなわけだが、$upper が配列を前提としているので、「大文字化」部分を得るには配列化しなければならなくなっている
 # 「strtoupper だけ切り出せばよいのでは？」と思うかもしれないが、「（外部ライブラリなどで）手元に配列しか受け取ってくれない処理しかない」状況がまれによくある
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_stream()">
+                                    ryunosuke\Functions\Package\Vars::var_stream		</a>	<small>(&amp;$var, $initial = &quot;&quot;) : resource</small>
+		</h4>
+	<div class="description"><p>変数をリソースのように扱えるファイルポインタを返す</p>
+<p>得られたファイルポインタに fread すれば変数の値が見えるし、 fwrite すれば変数の値が書き換わる。<br />
+逆に変数を書き換えればファイルポインタで得られる値も書き換わる。</p>
+<p>用途は主にテスト用。<br />
+例えば「何らかのファイルポインタを要求する処理」に対して fopen や tmpfile を駆使して値の確認をするのは結構めんどくさい。<br />
+（<code>rewind</code> したり <code>stream_get_contents</code> したり削除したりする必要がある）。<br />
+それよりもこの関数で得られたファイルポインタを渡し、 <code>that($var)-&gt;is($expected)</code> とできる方がテストの視認性が良くなる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// $var のファイルポインタを取得
+$fp = var_stream($var);
+// ファイルポインタに書き込みを行うと変数にも反映される
+fwrite($fp, 'hoge');
+that($var)-&gt;is('hoge');
+// 変数に追記を行うとファイルポインタで読み取れる
+$var .= 'fuga';
+that(fread($fp, 1024))-&gt;is('fuga');
+// 変数をまるっと置換するとファイルポインタ側もまるっと変わる
+$var = 'hello, world';
+that(stream_get_contents($fp, -1, 0))-&gt;is('hello, world');
+// ファイルポインタをゴリっと削除すると変数も空になる
+ftruncate($fp, 0);
+that($var)-&gt;is('');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
