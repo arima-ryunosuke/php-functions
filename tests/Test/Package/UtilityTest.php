@@ -581,6 +581,8 @@ class UtilityTest extends AbstractTestCase
 
     function test_parse_annotation()
     {
+        that((parse_annotation)('aaaaa'))->isEmpty();
+
         $refmethod = new \ReflectionMethod(require __DIR__ . '/Utility/annotation.php', 'm');
 
         $actual = (parse_annotation)($refmethod);
@@ -611,7 +613,7 @@ class UtilityTest extends AbstractTestCase
             "double"    => [
                 ["a"],
                 ["b"],
-                ["c"],
+                ["c\n\nthis", "is", "\\@escape"],
             ],
             "DateTime2" => \This\Is\Space\DateTime2::__set_state([
                 "date"          => "2019-12-23 00:00:00.000000",
@@ -622,7 +624,7 @@ class UtilityTest extends AbstractTestCase
                 ["string", "\$arg1", "引数1"],
                 ["array", "\$arg2", "this", "is", "second", "argument"],
             ],
-            "return"    => ["null", "返り値"],
+            "return"    => ["null", "返り値\nthis", "is", "\\@escape"],
         ]);
 
         $actual = (parse_annotation)($refmethod, [
@@ -663,7 +665,7 @@ class UtilityTest extends AbstractTestCase
     this is message2
 ",
             ],
-            "double"    => ["a", "b", "c"],
+            "double"    => ["a", "b", "c\n\nthis is \\@escape"],
             "DateTime2" => \This\Is\Space\DateTime2::__set_state([
                 "date"          => "2019-12-23 00:00:00.000000",
                 "timezone_type" => 3,
@@ -673,7 +675,7 @@ class UtilityTest extends AbstractTestCase
                 ["string", "\$arg1", "引数1"],
                 ["array", "\$arg2", "this", "is", "second", "argument"],
             ],
-            "return"    => ["null", "返り値"],
+            "return"    => ["null", "返り値\nthis", "is", "\\@escape"],
         ]);
 
         $actual = (parse_annotation)(new \ReflectionMethod(\This\Is\Space\DateTime2::class, 'method'), true);
@@ -765,8 +767,23 @@ class UtilityTest extends AbstractTestCase
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "mix" => [
                 "type" => ["hoge1\n    hoge2"],
-                0      => ["fuga"],
+                0      => ["fuga\n}"],
             ],
+        ]);
+
+        $actual = (parse_annotation)('
+@hoge This is hoge
+@fuga This is fuga1
+@fuga This is fuga2
+', [
+            'hoge' => [],
+            'fuga' => null,
+        ]);
+        that($actual)->as('actual:' . (var_export2)($actual, true))->is([
+            "hoge" => [
+                ["This", "is", "hoge"],
+            ],
+            "fuga" => ["This", "is", "fuga2"],
         ]);
     }
 

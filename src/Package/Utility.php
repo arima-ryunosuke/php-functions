@@ -675,7 +675,12 @@ class Utility
      * もっとも、@Class(args) 形式を使わないのであれば特に意味はない。
      *
      * $schame で「どのように取得するか？」のスキーマ定義が渡せる。
-     * ただし、現実装では「そのまま文字列で返すか？」の bool 値とクロージャしか渡すことはできない。
+     * スキーマ定義は連想配列で各アノテーションごとに下記のような定義を指定でき、連想配列でない場合はすべてのアノテーションにおいて指定したとみなされる。
+     *
+     * - true: 余計なことはせず、アノテーションの文字列をそのまま返す
+     * - false: 下記にようによしなに変換して返す
+     * - []: 複数値モードを強制する
+     * - null: 単一値モードを強制する
      *
      * アノテーションの仕様は下記（すべて $schema が false であるとする）。
      *
@@ -696,21 +701,20 @@ class Utility
      * Example:
      * ```php
      * $annotations = parse_annotation('
-     * 冒頭の - に意味はない
-     * - @noval
-     * - @single this is value
-     * - @closure this is value
-     * - @array this is value
-     * - @hash {key: 123}
-     * - @list [1, 2, 3]
-     * - @ArrayObject([1, 2, 3])
-     * - @block message {
-     *       this is message1
-     *       this is message2
-     *   }
-     * - @same this is same value1
-     * - @same this is same value2
-     * - @same this is same value3
+     * @noval
+     * @single this is value
+     * @closure this is value
+     * @array this is value
+     * @hash {key: 123}
+     * @list [1, 2, 3]
+     * @ArrayObject([1, 2, 3])
+     * @block message {
+     *     this is message1
+     *     this is message2
+     * }
+     * @same this is same value1
+     * @same this is same value2
+     * @same this is same value3
      * ', [
      *     'single'  => true,
      *     'closure' => function ($value) { return explode(' ', strtoupper($value)); },
@@ -724,7 +728,7 @@ class Utility
      *     'list'        => [1, 2, 3],                   // 連番配列になる
      *     'ArrayObject' => new \ArrayObject([1, 2, 3]), // new されてインスタンスになる
      *     "block"       => [                            // ブロックはブロック外をキーとした連想配列になる（複数指定でキーは指定できるイメージ）
-     *         "message" => ["this is message1\n      this is message2"],
+     *         "message" => ["this is message1\n    this is message2"],
      *     ],
      *     'same'        => [                            // 複数あるのでそれぞれの配列になる
      *         ['this', 'is', 'same', 'value1'],
@@ -763,12 +767,17 @@ class Utility
             $nsfiles[$reflector->getFileName()] = $nsfiles[$reflector->getFileName()] ?? $namespaces;
 
             // doccomment 特有のインデントを削除する
-            $annotation = preg_replace('#(\\R)\\s+\\*\s#ui', '$1', $annotation);
+            $annotation = preg_replace('#(\\R)[ \\t]+\\*[ \\t]?#u', '$1', (str_chop)($annotation, '/**', '*/'));
         }
 
         $result = [];
         $multiples = [];
 
+        $brace = [
+            '(' => ')',
+            '{' => '}',
+            '[' => ']',
+        ];
         for ($i = 0, $l = strlen($annotation); $i < $l; $i++) {
             $i = (strpos_quoted)($annotation, '@', $i);
             if ($i === false) {
@@ -781,28 +790,20 @@ class Utility
             $name = trim($name);
 
             $key = null;
-            $value = '';
-            if ($annotation[$seppos] !== "\n") {
-                $endpos = (strpos_quoted)($annotation, "\n", $seppos);
-                $prev = $endpos - 1;
-                $brace = [
-                    '(' => ')',
-                    '{' => '}',
-                    '[' => ']',
-                ];
-                if (isset($brace[$annotation[$prev]])) {
-                    $s = $annotation[$prev];
-                    $e = $brace[$s];
-                    $endpos--;
-                    $key = trim(substr($annotation, $seppos, $endpos - $seppos));
-                    $value = $s . (str_between)($annotation, $s, $e, $endpos) . $e;
-                    $i = $endpos;
-                }
-                else {
-                    $value = substr($annotation, $seppos, $endpos - $seppos);
-                    $i += strlen($value);
-                    $value = trim($value);
-                }
+            $brkpos = (strpos_quoted)($annotation, "\n", $seppos) ?: strlen($annotation);
+            if (isset($brace[$annotation[$brkpos - 1]])) {
+                $s = $annotation[$brkpos - 1];
+                $e = $brace[$s];
+                $brkpos--;
+                $key = trim(substr($annotation, $seppos, $brkpos - $seppos));
+                $value = $s . (str_between)($annotation, $s, $e, $brkpos) . $e;
+                $i = $brkpos;
+            }
+            else {
+                $endpos = (strpos_quoted)($annotation, "@", $seppos) ?: strlen($annotation);
+                $value = substr($annotation, $seppos, $endpos - $seppos);
+                $i += strlen($value);
+                $value = trim($value);
             }
 
             $rawmode = $schema;
@@ -818,6 +819,12 @@ class Utility
                 }
             }
             else {
+                if (is_array($rawmode)) {
+                    $multiples[$name] = true;
+                }
+                if (is_null($rawmode)) {
+                    $multiples[$name] = false;
+                }
                 if ($value === '') {
                     $value = null;
                 }
@@ -829,7 +836,7 @@ class Utility
                     $value = (array) (paml_import)($value)[0];
                 }
                 else {
-                    $value = array_values(array_filter((quoteexplode)([" ", "\t", "\n"], $value), "strlen"));
+                    $value = array_values(array_filter((quoteexplode)([" ", "\t"], $value), "strlen"));
                 }
             }
 
@@ -841,7 +848,7 @@ class Utility
                 $multiples[$name] = true;
                 $result[$name][$key] = $value;
             }
-            elseif (isset($multiples[$name])) {
+            elseif (isset($multiples[$name]) && $multiples[$name] === true) {
                 $result[$name][] = $value;
             }
             else {
