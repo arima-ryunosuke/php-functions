@@ -1121,6 +1121,7 @@ VAR
         that((var_pretty)($value, [
             'context'   => 'plain',
             'return'    => true,
+            'maxcolumn' => 80,
             'maxdepth'  => 5,
             'maxcount'  => 16,
             'maxlength' => 128,
@@ -1138,9 +1139,9 @@ VAR
             ->stringContains("    1: Closure#")
             ->stringContains("  R: Resource id #2 of type (stream)")
             ->stringContains("          0: (too deep)")
-            ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 (more 4 elements)]")
+            ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16\n\t   (more 4 elements)]")
             ->stringContains("    (more 4 elements)")
-            ->stringContains(", ...(too length)..., ")
+            ->stringContains(", \n\t  ...(too length)..., ")
             ->stringContains("s...(too length)...s")
             ->stringContains("  more5: [...(too length)..., ]")
             ->stringContains("  more6: {\n    ...")

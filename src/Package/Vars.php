@@ -1786,11 +1786,12 @@ class Vars
     {
         $options = [
             'indent'    => 2,     // インデントの空白数
-            'context'   => null,  // html なコンテキストか cli なコンテキスト化
+            'context'   => null,  // html なコンテキストか cli なコンテキストか
             'return'    => false, // 値を戻すか出力するか
             'trace'     => false, // スタックトレースの表示
             'callback'  => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
             'debuginfo' => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
+            'maxcolumn' => null,  // 1行あたりの文字数
             'maxcount'  => null,  // 複合型の要素の数
             'maxdepth'  => null,  // 複合型の深さ
             'maxlength' => null,  // スカラー・非複合配列の文字数
@@ -1818,33 +1819,52 @@ class Vars
             private $objects;
             private $content;
             private $length;
+            private $column;
 
             public function __construct($options)
             {
                 $this->options = $options;
                 $this->objects = [];
-                $this->content = [];
+                $this->content = '';
                 $this->length = 0;
+                $this->column = 0;
             }
 
             private function _append($value, $style = null, $data = [])
             {
-                if ($this->options['limit'] && $this->options['limit'] < $this->length += strlen($value)) {
-                    throw new \LengthException(implode('', $this->content));
+                $strlen = strlen($value);
+
+                if ($this->options['limit'] && $this->options['limit'] < $this->length += $strlen) {
+                    throw new \LengthException($this->content);
                 }
 
-                $current = count($this->content) - 1;
+                //$current = count($this->content) - 1;
+                if ($this->options['maxcolumn'] !== null) {
+                    $breakpos = strrpos($value, "\n");
+                    if ($breakpos === false) {
+                        $this->column += $strlen;
+                    }
+                    else {
+                        $this->column = $strlen - $breakpos - 1;
+                    }
+                    if ($this->column >= $this->options['maxcolumn']) {
+                        preg_match('# +#', $this->content, $m, 0, strrpos($this->content, "\n"));
+                        $this->column = 0;
+                        $this->content .= "\n\t" . $m[0];
+                    }
+                }
+
                 if ($style === null || $this->options['context'] === 'plain') {
-                    $this->content[$current] .= $value;
+                    $this->content .= $value;
                 }
                 elseif ($this->options['context'] === 'cli') {
-                    $this->content[$current] .= (ansi_colorize)($value, $style);
+                    $this->content .= (ansi_colorize)($value, $style);
                 }
                 elseif ($this->options['context'] === 'html') {
                     // 今のところ bold しか使っていないのでこれでよい
                     $style = $style === 'bold' ? 'font-weight:bold' : "color:$style";
                     $dataattr = (array_sprintf)($data, 'data-%2$s="%1$s"', ' ');
-                    $this->content[$current] .= "<span style='$style' $dataattr>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
+                    $this->content .= "<span style='$style' $dataattr>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
                 }
                 else {
                     throw new \InvalidArgumentException("'{$this->options['context']}' is not supported.");
@@ -1925,14 +1945,14 @@ class Vars
 
             public function export($value, $nest, $parents, $callback)
             {
-                $this->content[] = '';
+                $position = strlen($this->content);
 
                 // オブジェクトは一度処理してれば無駄なので参照表示
                 if (is_object($value)) {
                     $id = spl_object_id($value);
                     if (isset($this->objects[$id])) {
                         $this->index($value);
-                        return array_pop($this->content);
+                        goto FINALLY_;
                     }
                     $this->objects[$id] = $value;
                 }
@@ -1941,14 +1961,14 @@ class Vars
                 foreach ($parents as $parent) {
                     if ($parent === $value) {
                         $this->plain('*RECURSION*');
-                        return array_pop($this->content);
+                        goto FINALLY_;
                     }
                 }
 
                 if (is_array($value)) {
                     if ($this->options['maxdepth'] && $nest + 1 > $this->options['maxdepth']) {
                         $this->plain('(too deep)');
-                        return array_pop($this->content);
+                        goto FINALLY_;
                     }
 
                     $parents[] = $value;
@@ -2000,7 +2020,7 @@ class Vars
                                 $this->plain($spacer1)->plain('...(too length)...')->plain(",\n");
                             }
                             $this->plain($spacer1)->index($k)->plain(': ');
-                            $this->plain($this->export($v, $nest + 1, $parents, true));
+                            $this->export($v, $nest + 1, $parents, true);
                             $this->plain(",\n");
                         }
                         if ($omitted > 0) {
@@ -2019,7 +2039,7 @@ class Vars
                             if ($key === $n++) {
                                 $this->plain('...(too length)...')->plain(', ');
                             }
-                            $this->plain($this->export($v, $nest, $parents, true));
+                            $this->export($v, $nest, $parents, true);
                             if ($k !== $lastkey) {
                                 $this->plain(', ');
                             }
@@ -2045,7 +2065,7 @@ class Vars
                     }
                     $this->plain(') use ');
                     if ($properties) {
-                        $this->plain($this->export($properties, $nest, $parents, false));
+                        $this->export($properties, $nest, $parents, false);
                     }
                     else {
                         $this->plain('{}');
@@ -2068,7 +2088,7 @@ class Vars
 
                     $this->value($value)->plain(" ");
                     if ($properties) {
-                        $this->plain($this->export($properties, $nest, $parents, false));
+                        $this->export($properties, $nest, $parents, false);
                     }
                     else {
                         $this->plain('{}');
@@ -2078,9 +2098,11 @@ class Vars
                     $this->value($value);
                 }
 
-                $content = array_pop($this->content);
+                FINALLY_:
+                $content = substr($this->content, $position);
                 if ($callback && $this->options['callback']) {
                     ($this->options['callback'])($content, $value, $nest);
+                    $this->content = substr_replace($this->content, $content, $position);
                 }
                 return $content;
             }
