@@ -343,7 +343,7 @@ class Funchand
         $body = (parse_php)("<?php $codeblock", [
             'begin'  => '{',
             'end'    => '}',
-            'offset' => count($meta),
+            'offset' => (last_key)($meta),
         ]);
 
         return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
