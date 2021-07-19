@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L1110" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L1116" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -984,10 +984,10 @@ that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1070-L1109" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1070-L1115" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
-                        get_object_properties                        	<small>($object) : array</small>
+                        get_object_properties                        	<small>($object, &amp;$privates = []) : array</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
@@ -1017,6 +1017,12 @@ that(get_object_properties($object))-&gt;arraySubset([
 				<td class="type">object</td>
 				<td class="rest">$object</td>
 				<td class="desc"><p>オブジェクト</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">&amp;$privates = []</td>
+				<td class="desc"><p>継承ツリー上の private が格納される</p>
 </td>
 			</tr>
         		</tbody>

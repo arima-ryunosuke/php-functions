@@ -6333,14 +6333,20 @@ if (!isset($excluded_functions["get_object_properties"]) && (!function_exists("g
      * ```
      *
      * @param object $object オブジェクト
+     * @param array $privates 継承ツリー上の private が格納される
      * @return array 全プロパティの配列
      */
-    function get_object_properties($object)
+    function get_object_properties($object, &$privates = [])
     {
         $fields = [];
         foreach ((array) $object as $name => $field) {
-            if (preg_match('#\A\\000(.+?)\\000(.+)#usm', $name, $m)) {
-                $name = $m[2];
+            $names = explode("\0", $name);
+            if (count($names) > 1) {
+                $name = array_pop($names);
+                $cname = $names[1];
+                if ($cname !== '*' && $cname !== get_class($object)) {
+                    $privates[$cname][$name] = $field;
+                }
             }
             if (!array_key_exists($name, $fields)) {
                 $fields[$name] = $field;
@@ -7123,7 +7129,7 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("file_tree") |
 
         $basedir = basename($dirname);
 
-        $result = [];
+        $result = [$basedir => []];
         $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS || \FilesystemIterator::CURRENT_AS_SELF));
         usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
             if ($a->isDir() xor $b->isDir()) {
@@ -7132,9 +7138,6 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("file_tree") |
             return strcmp($a->getPathname(), $b->getPathname());
         });
         foreach ($items as $item) {
-            if (!isset($result[$basedir])) {
-                $result[$basedir] = [];
-            }
             if ($item->isDir()) {
                 $result[$basedir] += file_tree($item->getPathname(), $filter_condition);
             }
@@ -7144,7 +7147,7 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("file_tree") |
                 }
             }
         }
-        // フィルタで全除去されると空エントリになるので明示的に削除
+        // for compatible. 空エントリは削除（この動作は将来的になくしたい）
         if (!$result[$basedir]) {
             unset($result[$basedir]);
         }
@@ -7712,7 +7715,11 @@ if (!isset($excluded_functions["path_resolve"]) && (!function_exists("path_resol
      * パスを絶対パスに変換して正規化する
      *
      * 可変引数で与えられた文字列群を結合して絶対パス化して返す。
-     * 出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。
+     * 出来上がったパスが絶対パスでない場合は PATH 環境変数を使用して解決を試みる。
+     *
+     * 歴史的な理由により最後の引数を配列にするとその候補と PATH からの解決を試みる。
+     * 解決できなかった場合 null を返す。
+     * 配列を指定しなかった場合はカレントディレクトリを結合して返す。
      *
      * Example:
      * ```php
@@ -7720,19 +7727,43 @@ if (!isset($excluded_functions["path_resolve"]) && (!function_exists("path_resol
      * that(path_resolve('/absolute/path'))->isSame("{$DS}absolute{$DS}path");
      * that(path_resolve('absolute/path'))->isSame(getcwd() . "{$DS}absolute{$DS}path");
      * that(path_resolve('/absolute/path/through', '../current/./path'))->isSame("{$DS}absolute{$DS}path{$DS}current{$DS}path");
+     *
+     * # 最後の引数に最列を与えるとそのパスと PATH から解決を試みる（要するに which 的な動作になる）
+     * if ($DS === '/') {
+     *     that(path_resolve('php', []))->isSame(PHP_BINARY);
+     * }
      * ```
      *
      * @param string ...$paths パス文字列（可変引数）
-     * @return string 絶対パス
+     * @return ?string 絶対パス
      */
     function path_resolve(...$paths)
     {
+        $resolver = [];
+        if (is_array($paths[count($paths) - 1] ?? '')) {
+            $resolver = array_pop($paths);
+            $resolver[] = getenv('PATH');
+        }
+
         $DS = DIRECTORY_SEPARATOR;
 
         $path = implode($DS, $paths);
 
         if (!path_is_absolute($path)) {
-            $path = getcwd() . $DS . $path;
+            // for compatible
+            if ($resolver) {
+                foreach ($resolver as $p) {
+                    foreach (explode(PATH_SEPARATOR, $p) as $dir) {
+                        if (file_exists("$dir/$path")) {
+                            return path_normalize("$dir/$path");
+                        }
+                    }
+                }
+                return null;
+            }
+            else {
+                $path = getcwd() . $DS . $path;
+            }
         }
 
         return path_normalize($path);
@@ -8748,7 +8779,7 @@ if (!isset($excluded_functions["callable_code"]) && (!function_exists("callable_
         $body = parse_php("<?php $codeblock", [
             'begin'  => '{',
             'end'    => '}',
-            'offset' => count($meta),
+            'offset' => last_key($meta),
         ]);
 
         return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
@@ -15308,19 +15339,27 @@ if (!isset($excluded_functions["markdown_table"]) && (!function_exists("markdown
      * ```
      *
      * @param array $array 連想配列の配列
+     * @param array $option オプション配列
      * @return string markdown テーブル文字列
      */
-    function markdown_table($array)
+    function markdown_table($array, $option = [])
     {
         if (!is_array($array) || is_empty($array)) {
             throw new \InvalidArgumentException('$array must be array of hasharray.');
         }
+
+        $option += [
+            'keylabel' => null, // 指定すると一番左端にキーの列が生える
+        ];
 
         $defaults = [];
         $numerics = [];
         $lengths = [];
         foreach ($array as $n => $fields) {
             assert(is_array($fields), '$array must be array of hasharray.');
+            if ($option['keylabel'] !== null) {
+                $fields = [$option['keylabel'] => $n] + $fields;
+            }
             foreach ($fields as $k => $v) {
                 $v = str_replace(["\r\n", "\r", "\n"], '<br>', $v);
                 $array[$n][$k] = $v;
@@ -19171,7 +19210,7 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("arguments") |
                 continue;
             }
             [$longname, $shortname] = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
-            if ($shortname !== null) {
+            if (strlen($shortname)) {
                 if (array_key_exists($shortname, $shortmap)) {
                     throw new \InvalidArgumentException("duplicated short option name '$shortname'");
                 }
@@ -21540,6 +21579,27 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
         // 再帰用クロージャ
         $vars = [];
         $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
+            $neighborToken = function ($n, $d, $tokens) {
+                for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
+                    if ($tokens[$i][0] !== T_WHITESPACE) {
+                        return $tokens[$i];
+                    }
+                }
+            };
+            $resolveSymbol = function ($token, $prev, $next, $filename) {
+                if ($token[0] === T_STRING) {
+                    if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
+                        $token[1] = resolve_symbol($token[1], $filename, 'alias') ?? $token[1];
+                    }
+                    elseif ($next[1] === '(') {
+                        $token[1] = resolve_symbol($token[1], $filename, 'function') ?? $token[1];
+                    }
+                    else {
+                        $token[1] = resolve_symbol($token[1], $filename, 'const') ?? $token[1];
+                    }
+                }
+                return $token;
+            };
             $var_export = function ($v) { return var_export($v, true); };
             $spacer0 = str_repeat(" ", 4 * ($nest + 0));
             $spacer1 = str_repeat(" ", 4 * ($nest + 1));
@@ -21594,16 +21654,9 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
                     'class' => 0,
                     'brace' => 0,
                 ];
-                $neighborToken = function ($n, $d) use ($tokens) {
-                    for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
-                        if ($tokens[$i][0] !== T_WHITESPACE) {
-                            return $tokens[$i];
-                        }
-                    }
-                };
                 foreach ($tokens as $n => $token) {
-                    $prev = $neighborToken($n, -1) ?? [null, null, null];
-                    $next = $neighborToken($n, +1) ?? [null, null, null];
+                    $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
+                    $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
 
                     // クロージャは何でもかける（クロージャ・無名クラス・ジェネレータ etc）のでネスト（ブレース）レベルを記録しておく
                     if ($token[1] === '{') {
@@ -21644,19 +21697,7 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
                         $context['use'] = false;
                     }
 
-                    // クラスや関数・定数の use 解決
-                    if ($token[0] === T_STRING) {
-                        if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
-                            $token[1] = resolve_symbol($token[1], $ref->getFileName(), 'alias') ?? $token[1];
-                        }
-                        elseif ($next[1] === '(') {
-                            $token[1] = resolve_symbol($token[1], $ref->getFileName(), 'function') ?? $token[1];
-                        }
-                        else {
-                            $token[1] = resolve_symbol($token[1], $ref->getFileName(), 'const') ?? $token[1];
-                        }
-                    }
-                    $tokens[$n] = $token;
+                    $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
                 }
 
                 $code = indent_php(implode('', array_column($tokens, 1)), [
@@ -21667,25 +21708,91 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
                     $scope = $var_export($class === 'Closure' ? 'static' : $class);
                     $code = "\Closure::bind($code, {$export($bind, $nest + 1)}, $scope)";
                 }
+                elseif (!is_bindable_closure($value)) {
+                    $code = "static $code";
+                }
 
                 return "\$this->$vid = (function () {\n{$uses}{$spacer1}return $code;\n$spacer0})->call(\$this)";
             }
             if (is_object($value)) {
                 $ref = new \ReflectionObject($value);
-                $classname = get_class($value);
 
                 // ジェネレータはどう頑張っても無理
                 if ($value instanceof \Generator) {
                     throw new \DomainException('Generator Class is not support.');
                 }
 
-                // 無名クラスもほぼ不可能
-                // コード自体を持ってくれば行けそうだけど、コンストラクタ引数を考えるとちょっと複雑すぎる
-                // `new class(new class(){}, new class(){}, new class(){}){};` みたいのもあり得るわけでパースが難しい
-                // `new class($localVar){};` みたいのも $localVar が得られない（コンストラクタに与えてるんだから property で取れなくもないが…）
+                // 無名クラスは定義がないのでパースが必要
+                // さらにコンストラクタを呼ぶわけには行かない（引数を検出するのは不可能）ので潰す必要もある
                 if ($ref->isAnonymous()) {
-                    throw new \DomainException('Anonymous Class is not support yet.');
+                    $fname = $ref->getFileName();
+                    $sline = $ref->getStartLine();
+                    $eline = $ref->getEndLine();
+                    $tokens = parse_php(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+
+                    $block = [];
+                    $starting = false;
+                    $constructing = 0;
+                    $nesting = 0;
+                    foreach ($tokens as $n => $token) {
+                        $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
+                        $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
+
+                        // 無名クラスは new class で始まるはず
+                        if ($token[0] === T_NEW && $next[0] === T_CLASS) {
+                            $starting = true;
+                        }
+                        if (!$starting) {
+                            continue;
+                        }
+
+                        // コンストラクタの呼び出し引数はスキップする
+                        if ($constructing !== null) {
+                            if ($token[1] === '(') {
+                                $constructing++;
+                            }
+                            if ($token[1] === ')') {
+                                $constructing--;
+                                if ($constructing === 0) {
+                                    $constructing = null; // null を終了済みマークとして変数を再利用している
+                                    $block[] = [null, '()', null]; // for psr-12
+                                    continue;
+                                }
+                            }
+                            if ($constructing) {
+                                continue;
+                            }
+                        }
+
+                        // コンストラクタは呼ばないのでリネームしておく
+                        if ($token[1] === '__construct') {
+                            $token[1] = "replaced__construct";
+                        }
+
+                        $block[] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
+
+                        if ($token[1] === '{') {
+                            $nesting++;
+                        }
+                        if ($token[1] === '}') {
+                            $nesting--;
+                            if ($nesting === 0) {
+                                break;
+                            }
+                        }
+                    }
+
+                    $code = indent_php(implode('', array_column($block, 1)), [
+                        'indent'   => $spacer1,
+                        'baseline' => -1,
+                    ]);
+                    $classname = "(function () {\n{$spacer1}return $code;\n{$spacer0}})";
                 }
+                else {
+                    $classname = "\\" . get_class($value) . "::class";
+                }
+
+                $privates = [];
 
                 // __serialize があるならそれに従う
                 if (method_exists($value, '__serialize')) {
@@ -21693,14 +21800,14 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
                 }
                 // __sleep があるならそれをプロパティとする
                 elseif (method_exists($value, '__sleep')) {
-                    $fields = array_intersect_key(get_object_properties($value), array_flip($value->__sleep()));
+                    $fields = array_intersect_key(get_object_properties($value, $privates), array_flip($value->__sleep()));
                 }
                 // それ以外は適当に漁る
                 else {
-                    $fields = get_object_properties($value);
+                    $fields = get_object_properties($value, $privates);
                 }
 
-                return "\$this->new(\$this->$vid, \\$classname::class, (function () {\n{$spacer1}return {$export($fields, $nest + 1)};\n{$spacer0}}))";
+                return "\$this->new(\$this->$vid, $classname, (function () {\n{$spacer1}return {$export([$fields, $privates], $nest + 1)};\n{$spacer0}}))";
             }
 
             return is_null($value) || is_resource($value) ? 'null' : $var_export($value);
@@ -21718,9 +21825,15 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
 " . '})->call(new class() {
     public function new(&$object, $class, $provider)
     {
-        $reflection = $this->reflect($class);
-        $object = $reflection["self"]->newInstanceWithoutConstructor();
-        $fields = $provider();
+        if ($class instanceof \\Closure) {
+            $object = $class();
+            $reflection = $this->reflect(get_class($object));
+        }
+        else {
+            $reflection = $this->reflect($class);
+            $object = $reflection["self"]->newInstanceWithoutConstructor();
+        }
+        [$fields, $privates] = $provider();
 
         if ($reflection["unserialize"]) {
             $object->__unserialize($fields);
@@ -21729,6 +21842,9 @@ if (!isset($excluded_functions["var_export3"]) && (!function_exists("var_export3
 
         foreach ($reflection["parents"] as $parent) {
             foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
+                if (isset($privates[$parent->name][$name])) {
+                    $property->setValue($object, $privates[$parent->name][$name]);
+                }
                 if (isset($fields[$name]) || array_key_exists($name, $fields)) {
                     $property->setValue($object, $fields[$name]);
                     unset($fields[$name]);

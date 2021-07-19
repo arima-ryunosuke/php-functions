@@ -2770,10 +2770,6 @@
  * @method   \ChainObject  get_meta_tags($use_include_path = null)
  * @method   \ChainObject  get_meta_tags1($filename)
  *
- * @see get_object_properties
- * @property \ChainObject $get_object_properties
- * @method   \ChainObject  get_object_properties()
- *
  * @see get_object_vars
  * @property \ChainObject $get_object_vars
  * @method   \ChainObject  get_object_vars()
@@ -3477,7 +3473,8 @@
  *
  * @see markdown_table
  * @property \ChainObject $markdown_table
- * @method   \ChainObject  markdown_table()
+ * @method   \ChainObject  markdown_table($option = [])
+ * @method   \ChainObject  markdown_table1($array)
  *
  * @see max
  * @property \ChainObject $max

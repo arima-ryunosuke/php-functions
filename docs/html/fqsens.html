@@ -2144,7 +2144,7 @@ that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))-&gt;isSame([
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::get_object_properties()">
-                                    ryunosuke\Functions\Package\Classobj::get_object_properties		</a>	<small>($object) : array</small>
+                                    ryunosuke\Functions\Package\Classobj::get_object_properties		</a>	<small>($object, &amp;$privates = []) : array</small>
 		</h4>
 	<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
 <p>get_object_vars + no public プロパティを返すイメージ。</p>
@@ -2507,16 +2507,24 @@ if (DIRECTORY_SEPARATOR === '\\') {
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_resolve()">
-                                    ryunosuke\Functions\Package\FileSystem::path_resolve		</a>	<small>(...$paths) : string</small>
+                                    ryunosuke\Functions\Package\FileSystem::path_resolve		</a>	<small>(...$paths) : ?string</small>
 		</h4>
 	<div class="description"><p>パスを絶対パスに変換して正規化する</p>
 <p>可変引数で与えられた文字列群を結合して絶対パス化して返す。<br />
-出来上がったパスが絶対パスでない場合はカレントディレクトリを結合して返す。</p>
+出来上がったパスが絶対パスでない場合は PATH 環境変数を使用して解決を試みる。</p>
+<p>歴史的な理由により最後の引数を配列にするとその候補と PATH からの解決を試みる。<br />
+解決できなかった場合 null を返す。<br />
+配列を指定しなかった場合はカレントディレクトリを結合して返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">$DS = DIRECTORY_SEPARATOR;
 that(path_resolve('/absolute/path'))-&gt;isSame("{$DS}absolute{$DS}path");
 that(path_resolve('absolute/path'))-&gt;isSame(getcwd() . "{$DS}absolute{$DS}path");
 that(path_resolve('/absolute/path/through', '../current/./path'))-&gt;isSame("{$DS}absolute{$DS}path{$DS}current{$DS}path");
+
+# 最後の引数に最列を与えるとそのパスと PATH から解決を試みる（要するに which 的な動作になる）
+if ($DS === '/') {
+    that(path_resolve('php', []))-&gt;isSame(PHP_BINARY);
+}
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4677,7 +4685,7 @@ that(ltsv_import("label1:value1	label2:`[1,2,3]`"))-&gt;is([
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::markdown_table()">
-                                    ryunosuke\Functions\Package\Strings::markdown_table		</a>	<small>($array) : string</small>
+                                    ryunosuke\Functions\Package\Strings::markdown_table		</a>	<small>($array, $option = []) : string</small>
 		</h4>
 	<div class="description"><p>連想配列の配列を markdown テーブル文字列にする</p>
 <p>見出しはキーの和集合で生成され、改行は <code>&lt;br&gt;</code> に置換される。<br />
