@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use AbstractConcrete;
 use ArrayObject;
 use Concrete;
 use Exception as Ex;
@@ -854,8 +855,10 @@ EXPECTED
 
         that((var_export2)($concrete, true))->is(<<<'VAR'
 Concrete::__set_state([
-    "value" => null,
-    "name"  => "hoge",
+    "privateField"    => "Concrete",
+    "value"           => null,
+    "name"            => "hoge",
+    "proptectedField" => 3.14,
 ])
 VAR
         );
@@ -863,9 +866,11 @@ VAR
         $concrete->external = 'aaa';
         that((var_export2)($concrete, true))->is(<<<'VAR'
 Concrete::__set_state([
-    "value"    => null,
-    "name"     => "hoge",
-    "external" => "aaa",
+    "privateField"    => "Concrete",
+    "value"           => null,
+    "name"            => "hoge",
+    "proptectedField" => 3.14,
+    "external"        => "aaa",
 ])
 VAR
         );
@@ -1043,18 +1048,52 @@ VAR
         $recursive->recur = $recursive;
         $setstate = new Concrete('setstate');
         $setstate->value = $setstate;
+        (function ($v) { $this->privateField = $v; })->bindTo($setstate, AbstractConcrete::class)('Changed');
         $objects = [
             'sleepwakeup' => new SleepWakeupMethod('sqlite::memory:'),
             'serial'      => new SerialMethod(),
+            'concreate'   => $setstate,
         ];
         $exported = (var_export3)($objects, ['outmode' => 'eval']);
         $objects2 = eval($exported);
         that($objects2['sleepwakeup']->getPdo())->isInstanceOf(\PDO::class);
+        that($objects2['concreate'])->is($setstate);
+        that($objects2['concreate']->getPrivate())->is('Changed/Concrete');
 
         // __serialize/__unserialize は 7.4 から
         if (version_compare(PHP_VERSION, '7.4.0') >= 0) {
             that(serialize($objects2))->isSame(serialize(unserialize(serialize($objects))));
         }
+    }
+
+    function test_var_export3_anonymous()
+    {
+        $anonymous = new class([1, 2, 3]) extends \ArrayObject {
+            function method()
+            {
+                return parent::getArrayCopy();
+            }
+        };
+        $objects = [
+            'anonymous' => new class($anonymous) {
+                private $object;
+
+                public function __construct($object)
+                {
+                    $this->object = $object;
+                }
+
+                function __invoke()
+                {
+                    return $this->object->method();
+                }
+            },
+            'resolve'   => new class ( ) extends Vars { },
+        ];
+        $exported = (var_export3)($objects, ['outmode' => 'eval']);
+        $objects2 = eval($exported);
+        that($objects2['anonymous']())->is([1, 2, 3]);
+        that($objects2['resolve'])->isInstanceOf(Vars::class);
     }
 
     function test_var_export3_reference()
@@ -1108,9 +1147,8 @@ VAR
         that((var_export3)([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
         that(var_export3)->try((function () { yield 1; })())->wasThrown('is not support');
-        that(var_export3)->try(new class ( ) { })->wasThrown('is not support');
 
-        $this->expectOutputRegex('#new class()#');
+        $this->expectOutputRegex('#newInstanceWithoutConstructor#');
         (var_export3)([1, 2, 3]);
     }
 

@@ -88,6 +88,11 @@ abstract class AbstractConcrete
     {
         return __METHOD__;
     }
+
+    public function getPrivate()
+    {
+        return $this->privateField;
+    }
 }
 
 /**
@@ -214,6 +219,11 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
     public function offsetUnset($offset)
     {
         unset($this->$offset);
+    }
+
+    public function getPrivate()
+    {
+        return parent::getPrivate() . '/' . $this->privateField;
     }
 }
 

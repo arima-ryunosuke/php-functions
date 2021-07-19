@@ -1446,6 +1446,27 @@ class Vars
         // 再帰用クロージャ
         $vars = [];
         $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
+            $neighborToken = function ($n, $d, $tokens) {
+                for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
+                    if ($tokens[$i][0] !== T_WHITESPACE) {
+                        return $tokens[$i];
+                    }
+                }
+            };
+            $resolveSymbol = function ($token, $prev, $next, $filename) {
+                if ($token[0] === T_STRING) {
+                    if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
+                        $token[1] = (resolve_symbol)($token[1], $filename, 'alias') ?? $token[1];
+                    }
+                    elseif ($next[1] === '(') {
+                        $token[1] = (resolve_symbol)($token[1], $filename, 'function') ?? $token[1];
+                    }
+                    else {
+                        $token[1] = (resolve_symbol)($token[1], $filename, 'const') ?? $token[1];
+                    }
+                }
+                return $token;
+            };
             $var_export = function ($v) { return var_export($v, true); };
             $spacer0 = str_repeat(" ", 4 * ($nest + 0));
             $spacer1 = str_repeat(" ", 4 * ($nest + 1));
@@ -1500,16 +1521,9 @@ class Vars
                     'class' => 0,
                     'brace' => 0,
                 ];
-                $neighborToken = function ($n, $d) use ($tokens) {
-                    for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
-                        if ($tokens[$i][0] !== T_WHITESPACE) {
-                            return $tokens[$i];
-                        }
-                    }
-                };
                 foreach ($tokens as $n => $token) {
-                    $prev = $neighborToken($n, -1) ?? [null, null, null];
-                    $next = $neighborToken($n, +1) ?? [null, null, null];
+                    $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
+                    $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
 
                     // クロージャは何でもかける（クロージャ・無名クラス・ジェネレータ etc）のでネスト（ブレース）レベルを記録しておく
                     if ($token[1] === '{') {
@@ -1550,19 +1564,7 @@ class Vars
                         $context['use'] = false;
                     }
 
-                    // クラスや関数・定数の use 解決
-                    if ($token[0] === T_STRING) {
-                        if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
-                            $token[1] = (resolve_symbol)($token[1], $ref->getFileName(), 'alias') ?? $token[1];
-                        }
-                        elseif ($next[1] === '(') {
-                            $token[1] = (resolve_symbol)($token[1], $ref->getFileName(), 'function') ?? $token[1];
-                        }
-                        else {
-                            $token[1] = (resolve_symbol)($token[1], $ref->getFileName(), 'const') ?? $token[1];
-                        }
-                    }
-                    $tokens[$n] = $token;
+                    $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
                 }
 
                 $code = (indent_php)(implode('', array_column($tokens, 1)), [
@@ -1573,25 +1575,91 @@ class Vars
                     $scope = $var_export($class === 'Closure' ? 'static' : $class);
                     $code = "\Closure::bind($code, {$export($bind, $nest + 1)}, $scope)";
                 }
+                elseif (!(is_bindable_closure)($value)) {
+                    $code = "static $code";
+                }
 
                 return "\$this->$vid = (function () {\n{$uses}{$spacer1}return $code;\n$spacer0})->call(\$this)";
             }
             if (is_object($value)) {
                 $ref = new \ReflectionObject($value);
-                $classname = get_class($value);
 
                 // ジェネレータはどう頑張っても無理
                 if ($value instanceof \Generator) {
                     throw new \DomainException('Generator Class is not support.');
                 }
 
-                // 無名クラスもほぼ不可能
-                // コード自体を持ってくれば行けそうだけど、コンストラクタ引数を考えるとちょっと複雑すぎる
-                // `new class(new class(){}, new class(){}, new class(){}){};` みたいのもあり得るわけでパースが難しい
-                // `new class($localVar){};` みたいのも $localVar が得られない（コンストラクタに与えてるんだから property で取れなくもないが…）
+                // 無名クラスは定義がないのでパースが必要
+                // さらにコンストラクタを呼ぶわけには行かない（引数を検出するのは不可能）ので潰す必要もある
                 if ($ref->isAnonymous()) {
-                    throw new \DomainException('Anonymous Class is not support yet.');
+                    $fname = $ref->getFileName();
+                    $sline = $ref->getStartLine();
+                    $eline = $ref->getEndLine();
+                    $tokens = (parse_php)(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+
+                    $block = [];
+                    $starting = false;
+                    $constructing = 0;
+                    $nesting = 0;
+                    foreach ($tokens as $n => $token) {
+                        $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
+                        $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
+
+                        // 無名クラスは new class で始まるはず
+                        if ($token[0] === T_NEW && $next[0] === T_CLASS) {
+                            $starting = true;
+                        }
+                        if (!$starting) {
+                            continue;
+                        }
+
+                        // コンストラクタの呼び出し引数はスキップする
+                        if ($constructing !== null) {
+                            if ($token[1] === '(') {
+                                $constructing++;
+                            }
+                            if ($token[1] === ')') {
+                                $constructing--;
+                                if ($constructing === 0) {
+                                    $constructing = null; // null を終了済みマークとして変数を再利用している
+                                    $block[] = [null, '()', null]; // for psr-12
+                                    continue;
+                                }
+                            }
+                            if ($constructing) {
+                                continue;
+                            }
+                        }
+
+                        // コンストラクタは呼ばないのでリネームしておく
+                        if ($token[1] === '__construct') {
+                            $token[1] = "replaced__construct";
+                        }
+
+                        $block[] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
+
+                        if ($token[1] === '{') {
+                            $nesting++;
+                        }
+                        if ($token[1] === '}') {
+                            $nesting--;
+                            if ($nesting === 0) {
+                                break;
+                            }
+                        }
+                    }
+
+                    $code = (indent_php)(implode('', array_column($block, 1)), [
+                        'indent'   => $spacer1,
+                        'baseline' => -1,
+                    ]);
+                    $classname = "(function () {\n{$spacer1}return $code;\n{$spacer0}})";
                 }
+                else {
+                    $classname = "\\" . get_class($value) . "::class";
+                }
+
+                $privates = [];
 
                 // __serialize があるならそれに従う
                 if (method_exists($value, '__serialize')) {
@@ -1599,14 +1667,14 @@ class Vars
                 }
                 // __sleep があるならそれをプロパティとする
                 elseif (method_exists($value, '__sleep')) {
-                    $fields = array_intersect_key((get_object_properties)($value), array_flip($value->__sleep()));
+                    $fields = array_intersect_key((get_object_properties)($value, $privates), array_flip($value->__sleep()));
                 }
                 // それ以外は適当に漁る
                 else {
-                    $fields = (get_object_properties)($value);
+                    $fields = (get_object_properties)($value, $privates);
                 }
 
-                return "\$this->new(\$this->$vid, \\$classname::class, (function () {\n{$spacer1}return {$export($fields, $nest + 1)};\n{$spacer0}}))";
+                return "\$this->new(\$this->$vid, $classname, (function () {\n{$spacer1}return {$export([$fields, $privates], $nest + 1)};\n{$spacer0}}))";
             }
 
             return is_null($value) || is_resource($value) ? 'null' : $var_export($value);
@@ -1624,9 +1692,15 @@ class Vars
 " . '})->call(new class() {
     public function new(&$object, $class, $provider)
     {
-        $reflection = $this->reflect($class);
-        $object = $reflection["self"]->newInstanceWithoutConstructor();
-        $fields = $provider();
+        if ($class instanceof \\Closure) {
+            $object = $class();
+            $reflection = $this->reflect(get_class($object));
+        }
+        else {
+            $reflection = $this->reflect($class);
+            $object = $reflection["self"]->newInstanceWithoutConstructor();
+        }
+        [$fields, $privates] = $provider();
 
         if ($reflection["unserialize"]) {
             $object->__unserialize($fields);
@@ -1635,6 +1709,9 @@ class Vars
 
         foreach ($reflection["parents"] as $parent) {
             foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
+                if (isset($privates[$parent->name][$name])) {
+                    $property->setValue($object, $privates[$parent->name][$name]);
+                }
                 if (isset($fields[$name]) || array_key_exists($name, $fields)) {
                     $property->setValue($object, $fields[$name]);
                     unset($fields[$name]);
