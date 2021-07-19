@@ -432,10 +432,18 @@ class ClassobjTest extends AbstractTestCase
         $concrete = new \Concrete('name');
         $concrete->value = 'value';
         $concrete->oreore = 'oreore';
-        that((get_object_properties)($concrete))->is([
-            'value'  => 'value',
-            'name'   => 'name',
-            'oreore' => 'oreore',
+        $private = [];
+        that((get_object_properties)($concrete, $private))->is([
+            'privateField'    => 'Concrete',
+            'proptectedField' => 3.14,
+            'value'           => 'value',
+            'name'            => 'name',
+            'oreore'          => 'oreore',
+        ]);
+        that($private)->is([
+            'AbstractConcrete' => [
+                'privateField' => 'AbstractConcrete',
+            ],
         ]);
 
         // 標準の var_export が親優先になっているのを変更しているテスト
@@ -457,6 +465,17 @@ class ClassobjTest extends AbstractTestCase
         that((get_object_properties)(new \ArrayObject(['a' => 'A', 'b' => 'B'])))->isSame([
             'a' => 'A',
             'b' => 'B',
+        ]);
+
+        // 無名クラス命名規則が違うので別途やる
+        that((get_object_properties)(new class {
+            private   $private   = 1;
+            protected $protected = 2;
+            public    $public    = 3;
+        }))->is([
+            'private'   => 1,
+            'protected' => 2,
+            'public'    => 3,
         ]);
     }
 }

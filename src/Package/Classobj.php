@@ -1092,14 +1092,20 @@ class Classobj
      * ```
      *
      * @param object $object オブジェクト
+     * @param array $privates 継承ツリー上の private が格納される
      * @return array 全プロパティの配列
      */
-    public static function get_object_properties($object)
+    public static function get_object_properties($object, &$privates = [])
     {
         $fields = [];
         foreach ((array) $object as $name => $field) {
-            if (preg_match('#\A\\000(.+?)\\000(.+)#usm', $name, $m)) {
-                $name = $m[2];
+            $names = explode("\0", $name);
+            if (count($names) > 1) {
+                $name = array_pop($names);
+                $cname = $names[1];
+                if ($cname !== '*' && $cname !== get_class($object)) {
+                    $privates[$cname][$name] = $field;
+                }
             }
             if (!array_key_exists($name, $fields)) {
                 $fields[$name] = $field;

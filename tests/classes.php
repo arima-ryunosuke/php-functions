@@ -75,6 +75,10 @@ if (!class_exists(\ReflectionReference::class)) {
 
 abstract class AbstractConcrete
 {
+    private $privateField = 'AbstractConcrete';
+
+    protected $proptectedField = 3.14;
+
     public static function staticMethod($a = null)
     {
         return __METHOD__;
@@ -91,6 +95,8 @@ abstract class AbstractConcrete
  */
 class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggregate
 {
+    private $privateField = 'Concrete';
+
     private const   PRIVATE_CONST   = null;
     protected const PROTECTED_CONST = null;
     public const    PUBLIC_CONST    = null;

@@ -1091,7 +1091,7 @@ class UtilityTest extends AbstractTestCase
                     123456789,
                     'stringarg',
                     'long string long string long string',
-                    new \Concrete('fields'),
+                    (stdclass)(['name' => "fields"]),
                     ['a', 'b', 'c'],
                     ['a' => 'A', 'b' => 'B', 'c' => 'C'],
                     ['n' => ['e' => ['s' => ['t' => 'X']]]],
@@ -1102,7 +1102,7 @@ class UtilityTest extends AbstractTestCase
         that($traces)->stringContains('123456789')
             ->stringContains('stringarg')
             ->stringContains('long string long...(more 19 length)')
-            ->stringContains('Concrete{value:null, name:"fields"}')
+            ->stringContains('stdClass{name:"fields"}')
             ->stringContains('["a", "b", "c"]')
             ->stringContains('{a:"A", b:"B", c:"C"}')
             ->stringContains('{n:{e:{s:{t:"X"}}}}')
