@@ -1177,7 +1177,7 @@ class Utility
                 continue;
             }
             [$longname, $shortname] = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
-            if ($shortname !== null) {
+            if (strlen($shortname)) {
                 if (array_key_exists($shortname, $shortmap)) {
                     throw new \InvalidArgumentException("duplicated short option name '$shortname'");
                 }
