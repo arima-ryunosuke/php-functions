@@ -3718,19 +3718,27 @@ class Strings
      * ```
      *
      * @param array $array 連想配列の配列
+     * @param array $option オプション配列
      * @return string markdown テーブル文字列
      */
-    public static function markdown_table($array)
+    public static function markdown_table($array, $option = [])
     {
         if (!is_array($array) || (is_empty)($array)) {
             throw new \InvalidArgumentException('$array must be array of hasharray.');
         }
+
+        $option += [
+            'keylabel' => null, // 指定すると一番左端にキーの列が生える
+        ];
 
         $defaults = [];
         $numerics = [];
         $lengths = [];
         foreach ($array as $n => $fields) {
             assert(is_array($fields), '$array must be array of hasharray.');
+            if ($option['keylabel'] !== null) {
+                $fields = [$option['keylabel'] => $n] + $fields;
+            }
             foreach ($fields as $k => $v) {
                 $v = str_replace(["\r\n", "\r", "\n"], '<br>', $v);
                 $array[$n][$k] = $v;

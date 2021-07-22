@@ -2024,6 +2024,14 @@ z", quote2: "a\\\\nz"');
 |     | い  |
 ");
 
+        that("\n" . (markdown_table)(['x' => ['a' => 'xx']], [
+                'keylabel' => 'key',
+            ]))->is("
+| key | a   |
+| --- | --- |
+| x   | xx  |
+");
+
         that(markdown_table)->try('')->wasThrown('must be array of hasharray');
     }
 
