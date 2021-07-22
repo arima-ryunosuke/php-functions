@@ -293,7 +293,7 @@ class FileSystem
 
         $basedir = basename($dirname);
 
-        $result = [];
+        $result = [$basedir => []];
         $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS || \FilesystemIterator::CURRENT_AS_SELF));
         usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
             if ($a->isDir() xor $b->isDir()) {
@@ -302,9 +302,6 @@ class FileSystem
             return strcmp($a->getPathname(), $b->getPathname());
         });
         foreach ($items as $item) {
-            if (!isset($result[$basedir])) {
-                $result[$basedir] = [];
-            }
             if ($item->isDir()) {
                 $result[$basedir] += (file_tree)($item->getPathname(), $filter_condition);
             }
@@ -314,7 +311,7 @@ class FileSystem
                 }
             }
         }
-        // フィルタで全除去されると空エントリになるので明示的に削除
+        // for compatible. 空エントリは削除（この動作は将来的になくしたい）
         if (!$result[$basedir]) {
             unset($result[$basedir]);
         }
