@@ -11,6 +11,16 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.22
+
+- [feature][Strings] markdown_table にオプション引数を導入
+- [fixbug][Utility] arguments で空白があるだけで空短縮オプションになってしまう不具合を修正
+- [feature][Vars] var_export3 の無名クラス対応
+- [feature][Classobj] get_object_properties の無名クラス対応
+- [change][FileSystem] path_resolve の $PATH 対応
+- [fixbug][FileSystem] file_tree で空ディレクトリがあると notice が出ていた不具合を修正
+- [fixbug][Funchand] callable_code で同一行に複数定義がある場合に間違った結果を返す不具合を修正
+
 ## 1.4.21
 
 - [fixbug][Vars] var_export3 のクロージャ出力の不具合を修正
