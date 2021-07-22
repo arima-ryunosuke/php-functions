@@ -473,6 +473,10 @@ class FileSystemTest extends AbstractTestCase
         if ($DS === '\\') {
             that((path_resolve)('C:\\a\\b\\c'))->is('C:\\a\\b\\c');
         }
+
+        that((path_resolve)(basename(__FILE__), [__DIR__]))->is(__FILE__);
+        that((path_resolve)(basename(__DIR__) . DIRECTORY_SEPARATOR . basename(__FILE__), [dirname(__DIR__)]))->is(__FILE__);
+        that((path_resolve)('notfound', [__DIR__]))->isNull();
     }
 
     function test_path_relative()
