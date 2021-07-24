@@ -833,7 +833,7 @@ class FileSystem
      * }
      * ```
      *
-     * @param string ...$paths パス文字列（可変引数）
+     * @param string|array ...$paths パス文字列（可変引数）
      * @return ?string 絶対パス
      */
     public static function path_resolve(...$paths)
