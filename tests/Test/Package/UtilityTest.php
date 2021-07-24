@@ -1030,6 +1030,33 @@ class UtilityTest extends AbstractTestCase
             '-short',
         ]);
 
+        // 知らんオプションが短縮名で複数与えられた・・・が、 thrown が false である
+        that((arguments)([
+            ''       => false,
+            'opt1 a' => null,
+            'opt2 b' => null,
+        ], ' A -ab B --unknown'))->isSame([
+            'opt1' => true,
+            'opt2' => true,
+            'A',
+            'B',
+            '--unknown',
+        ]);
+
+        // 上記が成り立つのは「すべての短縮オプションが既知の場合」のみ
+        that((arguments)([
+            ''       => false,
+            'opt1 a' => null,
+            'opt2 b' => null,
+        ], ' A -aXb B --unknown'))->isSame([
+            'opt1' => false,
+            'opt2' => false,
+            'A',
+            '-aXb',
+            'B',
+            '--unknown',
+        ]);
+
         // 知らんオプションが与えられた
         that(arguments)->try([], 'arg1 arg2 --hoge')->wasThrown('undefined option name');
         that(arguments)->try([], 'arg1 arg2 -h')->wasThrown('undefined short option');

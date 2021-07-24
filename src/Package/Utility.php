@@ -1203,7 +1203,7 @@ class Utility
                 }
                 else {
                     $shortname = substr($token, 1);
-                    if (!$opt['thrown'] && !isset($shortmap[$shortname])) {
+                    if (!$opt['thrown'] && !(array_keys_exist)(str_split($shortname, 1), $shortmap)) {
                         $result[$n++] = $token;
                         continue;
                     }
