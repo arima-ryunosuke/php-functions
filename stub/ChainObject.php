@@ -4246,6 +4246,10 @@
  * @property \ChainObject $path_normalize
  * @method   \ChainObject  path_normalize()
  *
+ * @see path_parse
+ * @property \ChainObject $path_parse
+ * @method   \ChainObject  path_parse()
+ *
  * @see path_relative
  * @method   \ChainObject  path_relative($to)
  * @method   \ChainObject  path_relative1($from)

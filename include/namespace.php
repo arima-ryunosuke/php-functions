@@ -7356,6 +7356,9 @@ if (!isset($excluded_functions["file_pos"]) && (!function_exists("ryunosuke\\Fun
     /**
      * 範囲指定でファイルを読んで位置を返す
      *
+     * $needle に配列を与えると OR 的動作で一つでも見つかった時点の位置を返す。
+     * このとき「どれが見つかったか？」は得られない（場合によっては不便なので将来の改修対象）。
+     *
      * Example:
      * ```php
      * // 適当にファイルを用意
@@ -7370,7 +7373,7 @@ if (!isset($excluded_functions["file_pos"]) && (!function_exists("ryunosuke\\Fun
      * ```
      *
      * @param string $filename ファイル名
-     * @param string $needle 探す文字列
+     * @param string|array $needle 探す文字列
      * @param int $start 読み込み位置
      * @param int|null $end 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
      * @param int|null $chunksize 読み込みチャンクサイズ。省略時は 4096 の倍数に正規化
@@ -7382,6 +7385,9 @@ if (!isset($excluded_functions["file_pos"]) && (!function_exists("ryunosuke\\Fun
             throw new \InvalidArgumentException("'$filename' is not found.");
         }
 
+        $needle = arrayval($needle, false);
+        $maxlength = max(array_map('strlen', $needle));
+
         if ($start < 0) {
             $start += $filesize ?? $filesize = filesize($filename);
         }
@@ -7392,11 +7398,11 @@ if (!isset($excluded_functions["file_pos"]) && (!function_exists("ryunosuke\\Fun
             $end += $filesize ?? $filesize = filesize($filename);
         }
         if ($chunksize === null) {
-            $chunksize = 4096 * (strlen($needle) % 4096 + 1);
+            $chunksize = 4096 * ($maxlength % 4096 + 1);
         }
 
         assert(isset($filesize) || !isset($filesize));
-        assert($chunksize >= strlen($needle));
+        assert($chunksize >= $maxlength);
 
         $fp = fopen($filename, 'rb');
         try {
@@ -7407,13 +7413,15 @@ if (!isset($excluded_functions["file_pos"]) && (!function_exists("ryunosuke\\Fun
                 }
                 $last = $part ?? '';
                 $part = fread($fp, $chunksize);
-                if (($p = strpos($part, $needle)) !== false) {
-                    $result = $start + $p;
-                    return $result + strlen($needle) > $end ? false : $result;
+                if (($p = strpos_array($part, $needle))) {
+                    $min = min($p);
+                    $result = $start + $min;
+                    return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
                 }
-                if (($p = strpos($last . $part, $needle)) !== false) {
-                    $result = $start + $p - strlen($last);
-                    return $result + strlen($needle) > $end ? false : $result;
+                if (($p = strpos_array($last . $part, $needle))) {
+                    $min = min($p);
+                    $result = $start + $min - strlen($last);
+                    return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
                 }
                 $start += strlen($part);
             }
@@ -7735,7 +7743,7 @@ if (!isset($excluded_functions["path_resolve"]) && (!function_exists("ryunosuke\
      * }
      * ```
      *
-     * @param string ...$paths パス文字列（可変引数）
+     * @param string|array ...$paths パス文字列（可変引数）
      * @return ?string 絶対パス
      */
     function path_resolve(...$paths)
@@ -7838,10 +7846,7 @@ if (!isset($excluded_functions["path_normalize"]) && (!function_exists("ryunosuk
         }
 
         $result = [];
-        foreach (preg_split("#[$ds]#u", $path) as $n => $part) {
-            if ($n > 0 && $part === '') {
-                continue;
-            }
+        foreach (preg_split("#[$ds]+#u", $path) as $part) {
             if ($part === '.') {
                 continue;
             }
@@ -7854,11 +7859,82 @@ if (!isset($excluded_functions["path_normalize"]) && (!function_exists("ryunosuk
             }
             $result[] = $part;
         }
+        if (count($result) > 2 && $result[count($result) - 1] === '') {
+            array_pop($result);
+        }
         return implode(DIRECTORY_SEPARATOR, $result);
     }
 }
 if (function_exists("ryunosuke\\Functions\\path_normalize") && !defined("ryunosuke\\Functions\\path_normalize")) {
     define("ryunosuke\\Functions\\path_normalize", "ryunosuke\\Functions\\path_normalize");
+}
+
+if (!isset($excluded_functions["path_parse"]) && (!function_exists("ryunosuke\\Functions\\path_parse") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\path_parse"))->isInternal()))) {
+    /**
+     * パスをパースする
+     *
+     * pathinfo の（ほぼ）上位互換で下記の差異がある。
+     *
+     * - パスは正規化される
+     * - $flags 引数はない（指定した各部だけを返すことはできない）
+     * - 要素が未設定になることはない（例えば extension は拡張子がなくても明示的に null が入る）
+     *
+     * 更に独自で下記のキーを返す。
+     *
+     * - dirlocalname: 親ディレクトリと localname の結合（≒フルパスから複数拡張子を除いたもの）
+     * - localname: 複数拡張子を除いた filename
+     * - extensions: 複数拡張子を配列で返す（拡張子がない場合は空配列）
+     *
+     * Example:
+     * ```php
+     * $DS = DIRECTORY_SEPARATOR;
+     * that(path_parse('/path/to/file.min.css'))->isSame([
+     *     'dirname'      => "{$DS}path{$DS}to",
+     *     'basename'     => "file.min.css",
+     *     'filename'     => "file.min",
+     *     'extension'    => "css",
+     *     // ここまでは（正規化はされるが） pathinfo と同じ
+     *     // ここからは独自のキー
+     *     'dirlocalname' => "{$DS}path{$DS}to{$DS}file",
+     *     'localname'    => "file",
+     *     'extensions'   => ["min", "css"],
+     * ]);
+     * ```
+     *
+     * @param string $path パス文字列
+     * @return array パスパーツ
+     */
+    function path_parse($path)
+    {
+        // dirname や extension など、キーの有無が分岐するのは使いにくいことこの上ないのでまずすべて null で埋める
+        $pathinfo = array_replace([
+            'dirname'   => null,
+            'basename'  => null,
+            'filename'  => null,
+            'extension' => null,
+        ], pathinfo(path_normalize($path)));
+
+        $localname = $pathinfo['filename'];
+        $extensions = (array) $pathinfo['extension'];
+
+        while ((($info = pathinfo($localname))['extension'] ?? null) !== null) {
+            $localname = $info['filename'];
+            array_unshift($extensions, $info['extension']);
+        }
+
+        return [
+            'dirname'      => path_normalize($pathinfo['dirname']),
+            'basename'     => $pathinfo['basename'],
+            'filename'     => $pathinfo['filename'],
+            'extension'    => $pathinfo['extension'],
+            'dirlocalname' => path_normalize($pathinfo['dirname'] . "/$localname"),
+            'localname'    => $localname,
+            'extensions'   => $extensions,
+        ];
+    }
+}
+if (function_exists("ryunosuke\\Functions\\path_parse") && !defined("ryunosuke\\Functions\\path_parse")) {
+    define("ryunosuke\\Functions\\path_parse", "ryunosuke\\Functions\\path_parse");
 }
 
 if (!isset($excluded_functions["cp_rf"]) && (!function_exists("ryunosuke\\Functions\\cp_rf") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\cp_rf"))->isInternal()))) {
@@ -11702,7 +11778,7 @@ if (!isset($excluded_functions["strpos_array"]) && (!function_exists("ryunosuke\
         }
 
         $result = [];
-        foreach (arrayval($needles) as $key => $needle) {
+        foreach (arrayval($needles, false) as $key => $needle) {
             $pos = strpos($haystack, $needle, $offset);
             if ($pos !== false) {
                 $result[$key] = $pos;
@@ -11745,7 +11821,7 @@ if (!isset($excluded_functions["strpos_quoted"]) && (!function_exists("ryunosuke
                 $enclosure = [];
             }
         }
-        $needles = arrayval($needle);
+        $needles = arrayval($needle, false);
 
         $strlen = strlen($haystack);
 
@@ -19237,7 +19313,7 @@ if (!isset($excluded_functions["arguments"]) && (!function_exists("ryunosuke\\Fu
                 }
                 else {
                     $shortname = substr($token, 1);
-                    if (!$opt['thrown'] && !isset($shortmap[$shortname])) {
+                    if (!$opt['thrown'] && !array_keys_exist(str_split($shortname, 1), $shortmap)) {
                         $result[$n++] = $token;
                         continue;
                     }

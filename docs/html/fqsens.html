@@ -2391,6 +2391,8 @@ that($testpath)-&gt;fileEquals('pre-hoge-fix');
                                     ryunosuke\Functions\Package\FileSystem::file_pos		</a>	<small>($filename, $needle, $start = 0, $end = null, $chunksize = null) : int<span class="type-separator"></span><wbr>false</small>
 		</h4>
 	<div class="description"><p>範囲指定でファイルを読んで位置を返す</p>
+<p>$needle に配列を与えると OR 的動作で一つでも見つかった時点の位置を返す。<br />
+このとき「どれが見つかったか？」は得られない（場合によっては不便なので将来の改修対象）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 適当にファイルを用意
 $testpath = sys_get_temp_dir() . '/file_pos.txt';
@@ -2552,6 +2554,38 @@ realpath ではない。のでシンボリックリンクの解決などはし�
 that(path_normalize('/path/to/something'))-&gt;isSame("{$DS}path{$DS}to{$DS}something");
 that(path_normalize('/path/through/../something'))-&gt;isSame("{$DS}path{$DS}something");
 that(path_normalize('./path/current/./through/../something'))-&gt;isSame("path{$DS}current{$DS}something");
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::path_parse()">
+                                    ryunosuke\Functions\Package\FileSystem::path_parse		</a>	<small>($path) : array</small>
+		</h4>
+	<div class="description"><p>パスをパースする</p>
+<p>pathinfo の（ほぼ）上位互換で下記の差異がある。</p>
+<ul>
+<li>パスは正規化される</li>
+<li>$flags 引数はない（指定した各部だけを返すことはできない）</li>
+<li>要素が未設定になることはない（例えば extension は拡張子がなくても明示的に null が入る）</li>
+</ul>
+<p>更に独自で下記のキーを返す。</p>
+<ul>
+<li>dirlocalname: 親ディレクトリと localname の結合（≒フルパスから複数拡張子を除いたもの）</li>
+<li>localname: 複数拡張子を除いた filename</li>
+<li>extensions: 複数拡張子を配列で返す（拡張子がない場合は空配列）</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$DS = DIRECTORY_SEPARATOR;
+that(path_parse('/path/to/file.min.css'))-&gt;isSame([
+    'dirname'      =&gt; "{$DS}path{$DS}to",
+    'basename'     =&gt; "file.min.css",
+    'filename'     =&gt; "file.min",
+    'extension'    =&gt; "css",
+    // ここまでは（正規化はされるが） pathinfo と同じ
+    // ここからは独自のキー
+    'dirlocalname' =&gt; "{$DS}path{$DS}to{$DS}file",
+    'localname'    =&gt; "file",
+    'extensions'   =&gt; ["min", "css"],
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>

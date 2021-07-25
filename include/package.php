@@ -844,6 +844,7 @@ define("ryunosuke\\Functions\\Package\\path_is_absolute", ["ryunosuke\\Functions
 define("ryunosuke\\Functions\\Package\\path_resolve", ["ryunosuke\\Functions\\Package\\FileSystem", "path_resolve"]);
 define("ryunosuke\\Functions\\Package\\path_relative", ["ryunosuke\\Functions\\Package\\FileSystem", "path_relative"]);
 define("ryunosuke\\Functions\\Package\\path_normalize", ["ryunosuke\\Functions\\Package\\FileSystem", "path_normalize"]);
+define("ryunosuke\\Functions\\Package\\path_parse", ["ryunosuke\\Functions\\Package\\FileSystem", "path_parse"]);
 define("ryunosuke\\Functions\\Package\\cp_rf", ["ryunosuke\\Functions\\Package\\FileSystem", "cp_rf"]);
 define("ryunosuke\\Functions\\Package\\rm_rf", ["ryunosuke\\Functions\\Package\\FileSystem", "rm_rf"]);
 define("ryunosuke\\Functions\\Package\\tmpname", ["ryunosuke\\Functions\\Package\\FileSystem", "tmpname"]);
