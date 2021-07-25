@@ -570,6 +570,93 @@ class FileSystemTest extends AbstractTestCase
         that(path_normalize)->try('a/b/c/../../../..')->wasThrown('is invalid');
     }
 
+    function test_path_parse()
+    {
+        $DS = DIRECTORY_SEPARATOR;
+
+        that((path_parse)("/path/to/local.txt"))->is([
+            "dirname"      => "{$DS}path{$DS}to",
+            "basename"     => "local.txt",
+            "extension"    => "txt",
+            "filename"     => "local",
+            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
+            "localname"    => "local",
+            "extensions"   => ["txt"],
+        ]);
+        that((path_parse)("/path/to/local.txt1.txt2"))->is([
+            "dirname"      => "{$DS}path{$DS}to",
+            "basename"     => "local.txt1.txt2",
+            "filename"     => "local.txt1",
+            "extension"    => "txt2",
+            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
+            "localname"    => "local",
+            "extensions"   => ["txt1", "txt2"],
+        ]);
+        that((path_parse)("/path/to/local"))->is([
+            "dirname"      => "{$DS}path{$DS}to",
+            "basename"     => "local",
+            "filename"     => "local",
+            "extension"    => null,
+            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
+            "localname"    => "local",
+            "extensions"   => [],
+        ]);
+        that((path_parse)("/path/to/local."))->is([
+            "dirname"      => "{$DS}path{$DS}to",
+            "basename"     => "local.",
+            "filename"     => "local",
+            "extension"    => "",
+            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
+            "localname"    => "local",
+            "extensions"   => [""],
+        ]);
+        that((path_parse)("/path/to/.local"))->is([
+            "dirname"      => "{$DS}path{$DS}to",
+            "basename"     => ".local",
+            "filename"     => "",
+            "extension"    => "local",
+            "dirlocalname" => "{$DS}path{$DS}to",
+            "localname"    => "",
+            "extensions"   => ["local"],
+        ]);
+        that((path_parse)("/local.txt"))->is([
+            "dirname"      => "{$DS}",
+            "basename"     => "local.txt",
+            "filename"     => "local",
+            "extension"    => "txt",
+            "dirlocalname" => "{$DS}local",
+            "localname"    => "local",
+            "extensions"   => ["txt"],
+        ]);
+        that((path_parse)("local"))->is([
+            "dirname"      => "",
+            "basename"     => "local",
+            "filename"     => "local",
+            "extension"    => null,
+            "dirlocalname" => "local",
+            "localname"    => "local",
+            "extensions"   => [],
+        ]);
+        that((path_parse)(""))->is([
+            "dirname"      => "",
+            "basename"     => "",
+            "filename"     => "",
+            "extension"    => null,
+            "dirlocalname" => "{$DS}",
+            "localname"    => "",
+            "extensions"   => [],
+        ]);
+        that((path_parse)("/"))->is([
+            "dirname"      => "{$DS}",
+            "basename"     => "",
+            "filename"     => "",
+            "extension"    => null,
+            "dirlocalname" => "{$DS}",
+            "localname"    => "",
+            "extensions"   => [],
+        ]);
+    }
+
     function test_mkdir_p()
     {
         $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
