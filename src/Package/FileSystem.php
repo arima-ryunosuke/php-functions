@@ -934,10 +934,7 @@ class FileSystem
         }
 
         $result = [];
-        foreach (preg_split("#[$ds]#u", $path) as $n => $part) {
-            if ($n > 0 && $part === '') {
-                continue;
-            }
+        foreach (preg_split("#[$ds]+#u", $path) as $part) {
             if ($part === '.') {
                 continue;
             }
@@ -949,6 +946,9 @@ class FileSystem
                 continue;
             }
             $result[] = $part;
+        }
+        if (count($result) > 2 && $result[count($result) - 1] === '') {
+            array_pop($result);
         }
         return implode(DIRECTORY_SEPARATOR, $result);
     }

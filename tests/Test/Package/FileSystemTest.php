@@ -533,6 +533,22 @@ class FileSystemTest extends AbstractTestCase
     function test_path_normalize()
     {
         $DS = DIRECTORY_SEPARATOR;
+        // empty
+        that((path_normalize)(''))->is("");
+        // current
+        that((path_normalize)('./'))->is("");
+        that((path_normalize)('./././././'))->is("");
+        // root
+        that((path_normalize)('/'))->is("{$DS}");
+        that((path_normalize)('///////'))->is("{$DS}");
+        // 1文字
+        that((path_normalize)('a'))->is("a");
+        // /1文字
+        that((path_normalize)('/a'))->is("{$DS}a");
+        that((path_normalize)('/////a'))->is("{$DS}a");
+        // root ピッタリな相対
+        that((path_normalize)('/a/../'))->is("{$DS}");
+        that((path_normalize)('/a/../././b/../'))->is("{$DS}");
         // 単純な相対
         that((path_normalize)('/a/b/c/../d/./e'))->is("{$DS}a{$DS}b{$DS}d{$DS}e");
         // 相対パス
