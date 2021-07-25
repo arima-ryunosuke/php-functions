@@ -494,6 +494,9 @@ class FileSystem
     /**
      * 範囲指定でファイルを読んで位置を返す
      *
+     * $needle に配列を与えると OR 的動作で一つでも見つかった時点の位置を返す。
+     * このとき「どれが見つかったか？」は得られない（場合によっては不便なので将来の改修対象）。
+     *
      * Example:
      * ```php
      * // 適当にファイルを用意
@@ -508,7 +511,7 @@ class FileSystem
      * ```
      *
      * @param string $filename ファイル名
-     * @param string $needle 探す文字列
+     * @param string|array $needle 探す文字列
      * @param int $start 読み込み位置
      * @param int|null $end 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
      * @param int|null $chunksize 読み込みチャンクサイズ。省略時は 4096 の倍数に正規化
@@ -520,6 +523,9 @@ class FileSystem
             throw new \InvalidArgumentException("'$filename' is not found.");
         }
 
+        $needle = (arrayval)($needle);
+        $maxlength = max(array_map('strlen', $needle));
+
         if ($start < 0) {
             $start += $filesize ?? $filesize = filesize($filename);
         }
@@ -530,11 +536,11 @@ class FileSystem
             $end += $filesize ?? $filesize = filesize($filename);
         }
         if ($chunksize === null) {
-            $chunksize = 4096 * (strlen($needle) % 4096 + 1);
+            $chunksize = 4096 * ($maxlength % 4096 + 1);
         }
 
         assert(isset($filesize) || !isset($filesize));
-        assert($chunksize >= strlen($needle));
+        assert($chunksize >= $maxlength);
 
         $fp = fopen($filename, 'rb');
         try {
@@ -545,13 +551,15 @@ class FileSystem
                 }
                 $last = $part ?? '';
                 $part = fread($fp, $chunksize);
-                if (($p = strpos($part, $needle)) !== false) {
-                    $result = $start + $p;
-                    return $result + strlen($needle) > $end ? false : $result;
+                if (($p = (strpos_array)($part, $needle))) {
+                    $min = min($p);
+                    $result = $start + $min;
+                    return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
                 }
-                if (($p = strpos($last . $part, $needle)) !== false) {
-                    $result = $start + $p - strlen($last);
-                    return $result + strlen($needle) > $end ? false : $result;
+                if (($p = (strpos_array)($last . $part, $needle))) {
+                    $min = min($p);
+                    $result = $start + $min - strlen($last);
+                    return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
                 }
                 $start += strlen($part);
             }

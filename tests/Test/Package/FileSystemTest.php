@@ -341,6 +341,18 @@ class FileSystemTest extends AbstractTestCase
         that((file_pos)($tmpfile, 'abc', null, null, 4))->is(100);
         that((file_pos)($tmpfile, 'abc', null, null, 5))->is(100);
 
+        file_put_contents($tmpfile, "0123|4567|89AB|CDEF|GHIJ|KLMN|OPQR|STUV|WXYZ|abcd|efgh|ijkl|mnop|qrst|uvwx|yz");
+
+        that((file_pos)($tmpfile, ['0123|', 'uvwx|'], 0, null, 5))->is(0);
+        that((file_pos)($tmpfile, ['X123|', 'uvwx|'], 0, null, 5))->is(70);
+        that((file_pos)($tmpfile, ['X123|', 'Xvwx|'], 0, null, 5))->is(false);
+        that((file_pos)($tmpfile, ['23|45', 'st|uv'], 0, null, 5))->is(2);
+        that((file_pos)($tmpfile, ['X3|45', 'st|uv'], 0, null, 5))->is(67);
+        that((file_pos)($tmpfile, ['X3|45', 'Xt|uv'], 0, null, 5))->is(false);
+
+        that((file_pos)($tmpfile, ['X123|4567', '0123|4567|89AB'], 0, 10))->is(false);
+        that((file_pos)($tmpfile, ['X123|4567', '0123|4567|89AB'], 0, 15))->is(0);
+
         file_put_contents($tmpfile, str_repeat('ん', 100) . "あ");
 
         that((file_pos)($tmpfile, 'あ'))->is(300);
