@@ -290,7 +290,7 @@ class Strings
         }
 
         $result = [];
-        foreach ((arrayval)($needles) as $key => $needle) {
+        foreach ((arrayval)($needles, false) as $key => $needle) {
             $pos = strpos($haystack, $needle, $offset);
             if ($pos !== false) {
                 $result[$key] = $pos;
@@ -328,7 +328,7 @@ class Strings
                 $enclosure = [];
             }
         }
-        $needles = (arrayval)($needle);
+        $needles = (arrayval)($needle, false);
 
         $strlen = strlen($haystack);
 

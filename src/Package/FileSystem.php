@@ -523,7 +523,7 @@ class FileSystem
             throw new \InvalidArgumentException("'$filename' is not found.");
         }
 
-        $needle = (arrayval)($needle);
+        $needle = (arrayval)($needle, false);
         $maxlength = max(array_map('strlen', $needle));
 
         if ($start < 0) {
