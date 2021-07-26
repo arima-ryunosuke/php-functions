@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.23
+
+- [fixbug][all] 必要のないところで arrayval を再帰的に行っていた不具合を修正
+- [feature][FileSystem] path_parse を追加
+- [fixbug][FileSystem] path_normalize に "/" "./" などを与えると空文字になる不具合を修正
+- [feature][FileSystem] file_pos の配列対応
+- [fixbug][FileSystem] path_resolve の型引数が誤っていたので修正
+- [fixbug][Utility] arguments で thrown と複数短縮オプションでオプションが得られない不具合を修正
+
 ## 1.4.22
 
 - [feature][Strings] markdown_table にオプション引数を導入
