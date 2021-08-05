@@ -134,15 +134,18 @@ class Utility
      * - キャッシュキーの . はディレクトリ区切りとして使用される
      * - TTL を指定しなかったときのデフォルト値は約100年（実質無期限だろう）
      * - clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない
+     * - psr-16 にはない getOrSet が生えている（利便性が非常に高く使用頻度が多いため）
      *
-     * psr-16 は依存に含めていないので別途 composer require psr/simple-cache が必要。
+     * psr/simple-cache （\Psr\SimpleCache\CacheInterface）が存在するなら implement される。
+     * 存在しないなら素の無名クラスで返す。
+     * 動作に違いはないが instanceoof や class_implements に違いが出てくるので注意。
      *
      * @param string $directory キャッシュ保存ディレクトリ
-     * @return \Psr\SimpleCache\CacheInterface psr-16 実装オブジェクト
+     * @return \Psr16CacheInterface psr-16 実装オブジェクト
      */
     public static function cacheobject($directory)
     {
-        return new class($directory) implements \Psr\SimpleCache\CacheInterface {
+        $cacheobject = new class($directory) {
             private $directory;
             private $entries = [];
 
@@ -154,8 +157,9 @@ class Utility
 
             private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
             {
-                return new class($message, $code, $previous) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException {
-                };
+                return interface_exists(\Psr\SimpleCache\InvalidArgumentException::class)
+                    ? new class ( $message, $code, $previous ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
+                    : new class ( $message, $code, $previous ) extends \InvalidArgumentException { };
             }
 
             private function _validateKey(string $key): void
@@ -187,7 +191,25 @@ class Utility
                 return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php";
             }
 
-            /** @inheritdoc */
+            public function fetch($key, $provider, $ttl = null)
+            {
+                $value = $this->get($key);
+                if ($value === null) {
+                    $value = $provider($this);
+                    $this->set($key, $value, $ttl);
+                }
+                return $value;
+            }
+
+            public function fetchMultiple($providers, $ttl = null)
+            {
+                $result = $this->getMultiple(array_keys($providers));
+                foreach ($providers as $key => $provider) {
+                    $result[$key] = $result[$key] ?? $this->fetch($key, $provider, $ttl);
+                }
+                return $result;
+            }
+
             public function get($key, $default = null)
             {
                 $this->_validateKey($key);
@@ -203,7 +225,6 @@ class Utility
                 return $entry[1];
             }
 
-            /** @inheritdoc */
             public function set($key, $value, $ttl = null)
             {
                 $this->_validateKey($key);
@@ -218,7 +239,6 @@ class Utility
                 return !!(file_set_contents)($this->_getFilename($key), $code);
             }
 
-            /** @inheritdoc */
             public function delete($key)
             {
                 $this->_validateKey($key);
@@ -227,14 +247,12 @@ class Utility
                 return @unlink($this->_getFilename($key));
             }
 
-            /** @inheritdoc */
             public function clear()
             {
                 $this->entries = [];
                 return (rm_rf)($this->directory, false);
             }
 
-            /** @inheritdoc */
             public function getMultiple($keys, $default = null)
             {
                 return (array_each)($keys, function (&$result, $v) use ($default) {
@@ -242,7 +260,6 @@ class Utility
                 }, []);
             }
 
-            /** @inheritdoc */
             public function setMultiple($values, $ttl = null)
             {
                 return (array_each)($values, function (&$result, $v, $k) use ($ttl) {
@@ -250,7 +267,6 @@ class Utility
                 }, true);
             }
 
-            /** @inheritdoc */
             public function deleteMultiple($keys)
             {
                 return (array_each)($keys, function (&$result, $v) {
@@ -258,11 +274,33 @@ class Utility
                 }, true);
             }
 
-            /** @inheritdoc */
             public function has($key)
             {
                 return $this->get($key) !== null;
             }
+        };
+
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return !interface_exists(\Psr\SimpleCache\CacheInterface::class) ? $cacheobject : new class($cacheobject) implements \Psr\SimpleCache\CacheInterface {
+            private $cacheobject;
+
+            public function __construct($cacheobject)
+            {
+                $this->cacheobject = $cacheobject;
+            }
+
+            // @formatter:off
+            public function fetch($key, $provider, $ttl = null)    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function fetchMultiple($providers, $ttl = null) { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function get($key, $default = null)             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function set($key, $value, $ttl = null)         { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function delete($key)                           { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function clear()                                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function getMultiple($keys, $default = null)    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function setMultiple($values, $ttl = null)      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function deleteMultiple($keys)                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function has($key)                              { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            // @formatter:on
         };
     }
 

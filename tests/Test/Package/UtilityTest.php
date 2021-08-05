@@ -239,7 +239,7 @@ class UtilityTest extends AbstractTestCase
 
     function test_cacheobject()
     {
-        /** @var \Psr\SimpleCache\CacheInterface $cache */
+        /** @var \Psr16CacheInterface $cache */
         $tmpdir = sys_get_temp_dir() . '/cacheobject';
         (rm_rf)($tmpdir);
         $cache = (cacheobject)($tmpdir);
@@ -307,6 +307,29 @@ class UtilityTest extends AbstractTestCase
         that($cache->getMultiple(['hoge', 'fuga'], 'default'))->isSame([
             'hoge' => 'default',
             'fuga' => 'default',
+        ]);
+
+        // fetch
+        that($cache->fetch('fetch', function ($cache) { return 'ok'; }, 1))->isSame('ok');
+        that($cache->fetch('fetch', function ($cache) { return 'ok2'; }))->isSame('ok');
+        sleep(2);
+        that($cache->fetch('fetch', function ($cache) { return 'ok2'; }, 1))->isSame('ok2');
+
+        // fetchMultiple
+        that($cache->fetchMultiple([
+            'fetch'  => function () { return 'ok3'; },
+            'fetchM' => function () { return 'okM'; },
+        ], 1))->isSame([
+            'fetch'  => 'ok2',
+            'fetchM' => 'okM',
+        ]);
+        sleep(2);
+        that($cache->fetchMultiple([
+            'fetch'  => function () { return 'ok3'; },
+            'fetchM' => function () { return 'okM2'; },
+        ]))->isSame([
+            'fetch'  => 'ok3',
+            'fetchM' => 'okM2',
         ]);
 
         /// misc
