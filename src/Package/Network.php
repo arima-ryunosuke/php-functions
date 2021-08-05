@@ -205,24 +205,50 @@ class Network
      *
      * $urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。
      * $urls の要素は単一の文字列か curl のオプションである必要がある。
+     * リクエストの実体は http_request なので、そっちで使えるオプションは一部を除きすべて使える。
      *
      * 返り値は $urls のキーを保持したまま、レスポンスが返ってきた順に格納して配列で返す。
      * 構造は下記のサンプルを参照。
+     *
+     * $infos を渡すと返り値がボディだけになり、その他の情報はすべてこの変数に格納される。
+     * この動作は互換性のためであり、将来的には指定の有無に関わらずボディだけを返すようになる（失敗したリクエストは null が格納される）。
      *
      * Example:
      * ```php
      * $responses = http_requests([
      *     // このように [キー => CURL オプション] 形式が正しい使い方
-     *     'fuga' => [
+     *     'fuga'             => [
      *         CURLOPT_URL     => 'http://unknown-host',
      *         CURLOPT_TIMEOUT => 5,
      *     ],
      *     // ただし、このように [キー => URL] 形式でもいい（オプションはデフォルトが使用される）
-     *     'hoge' => 'http://127.0.0.1',
-     * ]);
+     *     'hoge'             => 'http://127.0.0.1',
+     *     // さらに、このような [URL => CURL オプション] 形式も許容される（あまり用途はないだろうが）
+     *     'http://127.0.0.1' => [
+     *         CURLOPT_TIMEOUT => 5,
+     *     ],
+     * ], [
+     *     // 第2引数で各リクエストの共通オプションを指定できる（個別指定優先）
+     *     // @see https://www.php.net/manual/ja/function.curl-setopt.php
+     * ], [
+     *     // 第3引数でマルチリクエストのオプションを指定できる
+     *     // @see https://www.php.net/manual/ja/function.curl-multi-setopt.php
+     * ],
+     *     // 第4引数を与えると動作が変わる（将来的にこの動作がデフォルトになる）
+     *     $infos
+     * );
+     * # 第4引数を指定した場合の返り値
      * [
      *     // キーが維持されるので hoge キー
-     *     'hoge' => [
+     *     'hoge'             => 'response body',
+     *     // curl のエラーが出た場合は null になる（詳細なエラー情報は $infos に格納される）
+     *     'fuga'             => null,
+     *     'http://127.0.0.1' => 'response body',
+     * ];
+     * # 第4引数を指定しなかった場合の返り値
+     * [
+     *     // キーが維持されるので hoge キー
+     *     'hoge'             => [
      *         // 0 番目の要素は body 文字列
      *         'response body',
      *         // 1 番目の要素は header 配列
@@ -237,16 +263,22 @@ class Network
      *         ],
      *     ],
      *     // curl のエラーが出た場合は int になる（CURLE_*** の値）
-     *     'fuga' => 6,
+     *     'fuga'             => 6,
      * ];
      * ```
      *
      * @param array $urls 実行する curl オプション
-     * @param array $default_options 全 $urls に適用されるデフォルトオプション
+     * @param array $single_options 全 $urls に適用されるデフォルトオプション
+     * @param array $multi_options 並列リクエストとしてのオプション
+     * @param array $infos curl 情報やヘッダなどが格納される受け変数
      * @return array レスポンス配列。取得した順番でキーを保持しつつ追加される
      */
-    public static function http_requests($urls, $default_options = [])
+    public static function http_requests($urls, $single_options = [], $multi_options = [], &$infos = [])
     {
+        $multi_options += [
+            'throw' => false, // curl レイヤーでエラーが出たら例外を投げるか（http レイヤーではない）
+        ];
+
         // 固定オプション（必ずこの値が使用される）
         $default = [
             'raw'                  => true,
@@ -257,6 +289,7 @@ class Network
         ];
 
         $stringify_curl = function ($curl) {
+            // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
             if (is_resource($curl)) {
                 return (string) $curl;
             }
@@ -270,63 +303,112 @@ class Network
 
         $responses = [];
         $resultmap = [];
-        $mh = curl_multi_init();
-        foreach ($urls as $key => $opt) {
-            // 文字列は URL 指定とみなす
-            if (is_string($opt)) {
-                $opt = [
-                    CURLOPT_URL => $opt,
-                ];
-            }
+        $infos = [];
 
-            $rheader = null;
-            $info = null;
-            $res = (http_request)($default + $opt + $default_options, $rheader, $info);
-            if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
-                curl_multi_add_handle($mh, $res[0]);
-
-                // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-                $resultmap[$handle_id] = [$key, $res[1]];
+        // for compatible
+        $compatible_mode = func_num_args() !== 4;
+        $set_response = function ($key, $body, $header, $info) use ($compatible_mode, &$responses, &$infos) {
+            if ($compatible_mode) {
+                $responses[$key] = [$body, $header, $info];
             }
             else {
-                $responses[$key] = [$res, $rheader, $info];
+                $responses[$key] = $body;
+                $infos[$key] = [$header, $info];
             }
+        };
+
+        $mh = curl_multi_init();
+        foreach (array_filter($multi_options, 'is_int', ARRAY_FILTER_USE_KEY) as $name => $value) {
+            curl_multi_setopt($mh, $name, $value);
         }
 
-        do {
-            do {
-                $mrc = curl_multi_exec($mh, $active);
-            } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+        try {
+            foreach ($urls as $key => $opt) {
+                // 文字列は URL 指定とみなす
+                if (is_string($opt)) {
+                    $opt = [CURLOPT_URL => $opt];
+                }
+                // さらに URL 指定がないなら key を URL とみなす
+                if (!isset($opt[CURLOPT_URL]) && !isset($opt['url'])) {
+                    $opt[CURLOPT_URL] = $key;
+                }
 
-            // see http://php.net/manual/ja/function.curl-multi-select.php#115381
-            if (curl_multi_select($mh) == -1) {
-                usleep(1); // @codeCoverageIgnore
+                $rheader = null;
+                $info = null;
+                $res = (http_request)($default + $opt + $single_options, $rheader, $info);
+                if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
+                    curl_multi_add_handle($mh, $res[0]);
+                    $resultmap[$handle_id] = [$key, $res[1], $res[2], microtime(true), 0];
+                }
+                else {
+                    $set_response($key, $res, $rheader, $info);
+                }
             }
 
             do {
-                if (($minfo = curl_multi_info_read($mh, $remains)) === false) {
-                    continue;
+                do {
+                    $mrc = curl_multi_exec($mh, $active);
+                } while ($mrc === CURLM_CALL_MULTI_PERFORM);
+
+                // see http://php.net/manual/ja/function.curl-multi-select.php#115381
+                if (curl_multi_select($mh) === -1) {
+                    usleep(1); // @codeCoverageIgnore
                 }
 
-                $handle = $minfo['handle'];
-                $handle_id = $stringify_curl($handle);
+                do {
+                    if (($minfo = curl_multi_info_read($mh, $remains)) === false) {
+                        continue;
+                    }
 
-                if ($minfo['result'] !== CURLE_OK) {
-                    $responses[$resultmap[$handle_id][0]] = $minfo['result'];
-                }
-                else {
-                    $info = curl_getinfo($handle);
+                    $handle = $minfo['handle'];
+                    $handle_id = $stringify_curl($handle);
+                    [$key, $responser, $retry, $now, $retry_count] = $resultmap[$handle_id];
+
                     $response = curl_multi_getcontent($handle);
-                    [$info, $headers, $body] = $resultmap[$handle_id][1]($response, $info);
-                    $responses[$resultmap[$handle_id][0]] = [$body, $headers, $info];
-                }
+                    $info = curl_getinfo($handle);
+                    $info['errno'] = $minfo['result'];
+                    $info['retry'] = $retry_count;
 
-                curl_multi_remove_handle($mh, $handle);
-                curl_close($handle);
-            } while ($remains);
-        } while ($active && $mrc == CURLM_OK);
+                    if ($time = $retry($info, $response)) {
+                        // 同じリソースを使い回しても大丈夫っぽい？（大丈夫なわけないと思うが…動いてはいる）
+                        curl_multi_remove_handle($mh, $handle);
+                        curl_multi_add_handle($mh, $handle);
 
-        curl_multi_close($mh);
+                        // 他のリクエストの待機で既に指定秒数を超えている場合は待たない（分岐は本来不要だが現在以下だと警告が出るため）
+                        if (microtime(true) < ($next = $now + $time)) {
+                            time_sleep_until($next);
+                        }
+
+                        $resultmap[$handle_id][3] = microtime(true);
+                        $resultmap[$handle_id][4] = $retry_count + 1;
+
+                        $active++;
+                        continue;
+                    }
+
+                    if ($info['errno'] !== CURLE_OK) {
+                        if ($multi_options['throw']) {
+                            throw new \UnexpectedValueException("'{$info['url']}' curl_errno({$info['errno']}).");
+                        }
+                        if ($compatible_mode) {
+                            $responses[$key] = $info['errno'];
+                        }
+                        else {
+                            $set_response($key, null, [], $info);
+                        }
+                    }
+                    else {
+                        $set_response($key, ...$responser($response, $info));
+                    }
+
+                    curl_multi_remove_handle($mh, $handle);
+                    curl_close($handle);
+                } while ($remains);
+            } while ($active && $mrc === CURLM_OK);
+        }
+        finally {
+            curl_multi_close($mh);
+        }
 
         return $responses;
     }
@@ -350,6 +432,9 @@ class Network
      *     - ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず
      * - `throw` (bool): ステータスコードが 400 以上のときに例外を投げる
      *     - `CURLOPT_FAILONERROR` は原則使わないほうがいいと思う
+     * - `retry` (float[]|callable): エラーが出た場合にリトライする
+     *     - 配列で指定した回数・秒数のリトライを行う（[1, 2, 3] で、1秒後、2秒後、3秒後になる）
+     *     - callable を指定するとその callable が false を返すまでリトライする（引数として curl_info が渡ってきて待機秒数を返す）
      * - `atfile` (bool): キーに @ があるフィールドをファイルアップロードとみなす
      *     - 悪しき `CURLOPT_SAFE_UPLOAD` の代替。ただし値ではなくキーで判別する
      *     - 値が配列のフィールドのキーに @ をつけると連番要素のみアップロードになる
@@ -417,6 +502,7 @@ class Network
             // custom options
             'raw'                  => false,
             'throw'                => true,
+            'retry'                => [],
             'atfile'               => true,
             'cachedir'             => null,
             'parser'               => [
@@ -576,20 +662,49 @@ class Network
             }, '; ');
         }
 
+        assert(is_callable($options['retry']) || is_array($options['retry']));
+        $retry = is_callable($options['retry']) ? $options['retry'] : function ($info) use ($options) {
+            // リトライを費やしたなら打ち切り
+            $time = $options['retry'][$info['retry']] ?? null;
+            if ($time === null) {
+                return false;
+            }
+            // curl レイヤでは一部の curl_errno のみ
+            if (in_array($info['errno'], [CURLE_OPERATION_TIMEOUTED, CURLE_GOT_NOTHING, CURLE_SEND_ERROR, CURLE_RECV_ERROR])) {
+                return $time;
+            }
+            // 結果が返ってきてるなら打ち切り…としたいところだが、一部のコードはリトライ対象とする。ちょっと思うところがあるのでメモを下記に記す
+            // 429 は微妙。いわゆるレート制限が多いだろうので、リトライしてもどうせコケる
+            // 502 はもっと微妙。でも「たまたま具合の悪い ap サーバに到達してしまった」ならリトライの価値はある
+            // 503 は本来あるべきリトライだろうけど、過負荷でリトライしても…という思いもある
+            if ($info['errno'] === CURLE_OK && in_array($info['http_code'], [429, 502, 503])) {
+                return $time;
+            }
+
+            return false;
+        };
+
         $responser = function ($response, $info) use ($response_parse, $cache) {
             [$info, $head, $body] = $response_parse($response, $info);
-            return [$info, $head, $cache($response, $info) ?? $body];
+            return [$cache($response, $info) ?? $body, $head, $info];
         };
 
         $ch = curl_init();
         curl_setopt_array($ch, array_filter($options, 'is_int', ARRAY_FILTER_USE_KEY));
         if ($options['raw']) {
-            return [$ch, $responser];
+            return [$ch, $responser, $retry];
         }
 
         try {
-            $response = curl_exec($ch);
-            $info = curl_getinfo($ch);
+            $retry_count = 0;
+            do {
+                $response = curl_exec($ch);
+                $info = curl_getinfo($ch);
+                $info['retry'] = $retry_count++;
+                $info['errno'] = curl_errno($ch);
+                $time = $retry($info, $response);
+                usleep($time * 1000 * 1000);
+            } while ($time);
 
             if ($response === false) {
                 throw new \RuntimeException(curl_error($ch), curl_errno($ch));
@@ -603,7 +718,7 @@ class Network
             throw new \UnexpectedValueException("status is {$info['http_code']}.");
         }
 
-        [$info, $response_header, $body] = $responser($response, $info);
+        [$body, $response_header, $info] = $responser($response, $info);
         return $body;
     }
 

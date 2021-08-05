@@ -73,6 +73,114 @@ class NetworkTest extends AbstractTestCase
             return;
         }
         $server = TESTWEBSERVER;
+        $infos = [];
+
+        $time = microtime(true);
+        $responses = (http_requests)([
+            'w3' => "$server/delay/3",
+            'w4' => "$server/delay/4",
+            'to' => [
+                CURLOPT_URL     => "$server/delay/10",
+                CURLOPT_TIMEOUT => 3,
+            ],
+        ], [
+            CURLOPT_TIMEOUT => 10,
+        ], [], $infos);
+        $time = microtime(true) - $time;
+
+        // 普通に投げると(3+4+3)秒かかるが並列なので max(3, 4, 3) = 4 のはず
+        that($time)->isBetween(4.0, 4.2);
+        that($responses)->count(3);
+        that($responses['to'])->is(null);
+        that($infos['to'][1]['errno'])->is(CURLE_OPERATION_TIMEOUTED);
+
+        $time = microtime(true);
+        $responses = (http_requests)([
+            "$server/delay/5",
+            "$server/delay/1",
+            "$server/delay/1",
+            "$server/delay/1",
+            "$server/delay/1",
+            "$server/delay/1",
+            "$server/delay/1",
+        ], [], [
+            CURLMOPT_MAX_TOTAL_CONNECTIONS => 2,
+        ]);
+        $time = microtime(true) - $time;
+
+        // 並列度2なので d5 のリクエスト中に順次 d1 が入れ替わり実行される
+        // つまり d1 は d5 に巻きこまれる形で5つまでは並列だが、最後の1つは個別で実行されるので約6秒で完了することになる
+        that($time)->isBetween(6.0, 6.2);
+        that($responses)->count(7);
+
+        that(http_requests)->try([
+            "$server/delay/1",
+            "$server/delay/2" => [
+                CURLOPT_TIMEOUT => 1,
+            ],
+        ], [], [
+            'throw' => true,
+        ])->wasThrown('curl_errno');
+    }
+
+    function test_http_requests_retry()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+        $infos = [];
+
+        $time = microtime(true);
+        $responses = (http_requests)([
+            's200' => "$server/status/200",
+            's502' => [
+                'url'   => "$server/status/502",
+                'retry' => [1],
+            ],
+            's503' => [
+                'url'   => "$server/status/503",
+                'retry' => [2, 3],
+            ],
+        ], [], [], $infos);
+        $time = microtime(true) - $time;
+
+        // マルチのリトライはフェーズごとの最大値で max(1, 2) + max(3) なので約5秒かかる
+        that($time)->isBetween(5.0, 5.2);
+        that($responses)->count(3);
+        that(array_column(array_column($infos, 1), 'retry'))->is([0, 1, 2]);
+
+        $stocks = [];
+        $time = microtime(true);
+        $responses = (http_requests)([
+            "$server/uuid",
+            "$server/uuid",
+            "$server/uuid",
+        ], [
+            'retry' => function ($info, $response) use (&$stocks) {
+                $stocks[] = preg_split("#\R\R#u", $response)[1];
+                // 3回目で成功とする
+                if ($info['retry'] === 3) {
+                    return 0;
+                }
+                return 1;
+            },
+        ], [], $infos);
+        $time = microtime(true) - $time;
+
+        // 同時に投げているので約3秒以上はかからない
+        that($time)->isBetween(3.0, 3.2);
+        that($responses)->count(3);
+        // 3本のリクエストがリトライ3回（トータル4回）なので12個のUUIDが生成されており、かつすべてユニークになっているはず
+        that(array_unique($stocks))->count(12);
+    }
+
+    function test_http_requests_compatible()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
 
         $time = microtime(true);
         $responses = (http_requests)([
@@ -90,6 +198,7 @@ class NetworkTest extends AbstractTestCase
         // 普通に投げると(3+4+3)秒かかるがそんなにかかっていないはず
         that($time)->lessThan(7);
         that($responses['to'])->is(CURLE_OPERATION_TIMEOUTED);
+
     }
 
     function test_http_request()
@@ -151,6 +260,65 @@ class NetworkTest extends AbstractTestCase
         that(http_request)->try([
             CURLOPT_URL => "http://0.0.0.0:801",
         ])->wasThrown('Failed to connect');
+    }
+
+    function test_http_request_retry()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+        $response_header = null;
+        $info = null;
+
+        // 404 はリトライ対象ではない
+        $time = microtime(true);
+        (http_request)([
+            CURLOPT_URL => "$server/status/404",
+            'retry'     => [1, 2, 3],
+            'throw'     => false,
+        ], $response_header, $info);
+        that(microtime(true) - $time)->isBetween(0.0, 0.2);
+        that($info['retry'])->is(0);
+
+        // 503 はリトライ対象。1,2,3 間隔なので計6秒かかる
+        $time = microtime(true);
+        (http_request)([
+            CURLOPT_URL => "$server/status/503",
+            'retry'     => [1, 2, 3],
+            'throw'     => false,
+        ], $response_header, $info);
+        that(microtime(true) - $time)->isBetween(6.0, 6.2);
+        that($info['retry'])->is(3);
+
+        // 接続失敗はリトライ対象ではない
+        $time = microtime(true);
+        try {
+            (http_request)([
+                CURLOPT_URL => "http://0.0.0.0:801",
+                'retry'     => [1, 2, 3],
+            ], $response_header, $info);
+        }
+        catch (\Throwable $t) {
+            that($t->getMessage())->contains('Failed to connect');
+        }
+        that(microtime(true) - $time)->isBetween(0.0, 0.2);
+        that($info['retry'])->is(0);
+
+        // タイムアウトはリトライ対象。delay1 を 1,2,3 間隔なので計10秒かかる
+        $time = microtime(true);
+        try {
+            (http_request)([
+                CURLOPT_URL     => "$server/delay/3",
+                CURLOPT_TIMEOUT => 1,
+                'retry'         => [1, 2, 3],
+            ], $response_header, $info);
+        }
+        catch (\Throwable $t) {
+            that($t->getMessage())->contains('timed out after');
+        }
+        that(microtime(true) - $time)->isBetween(10.0, 10.2);
+        that($info['retry'])->is(3);
     }
 
     function test_http_method()
