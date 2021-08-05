@@ -1314,7 +1314,6 @@ VAR
         that(function () {
             $hoge = 1;
             $fuga = 2;
-            /** @noinspection PhpExpressionResultUnusedInspection */
             [(hashvar)($hoge), (hashvar)($fuga)];
         })->try()->wasThrown(new \UnexpectedValueException('ambiguous'));
     }

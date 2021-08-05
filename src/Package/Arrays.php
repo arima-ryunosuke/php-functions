@@ -893,7 +893,6 @@ class Arrays
         return $result;
     }
 
-
     /**
      * キーと値で sprintf する
      *
@@ -4001,7 +4000,6 @@ class Arrays
             return $result;
         }, $array1, $array2);
     }
-
 
     /**
      * 配列のスキーマを定義して配列を正規化する

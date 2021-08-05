@@ -1813,7 +1813,6 @@ class Vars
             $result = "return $result;";
         }
         if ($options['outmode'] === 'file') {
-            /** @noinspection PhpUnreachableStatementInspection */
             $result = "<?php return $result;\n";
         }
 

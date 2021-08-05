@@ -11,7 +11,6 @@ class Transporter
      */
     public static function importAsGlobal(array $excluded_functions = [])
     {
-        /** @noinspection PhpUnusedLocalVariableInspection */
         $excluded_functions = array_flip($excluded_functions);
         require_once __DIR__ . '/../include/global.php';
     }
@@ -23,7 +22,6 @@ class Transporter
      */
     public static function importAsNamespace(array $excluded_functions = [])
     {
-        /** @noinspection PhpUnusedLocalVariableInspection */
         $excluded_functions = array_flip($excluded_functions);
         require_once __DIR__ . '/../include/namespace.php';
     }
@@ -136,7 +134,6 @@ CONSTANT;
         }
 
         // 完全な php コードを返す
-        /** @noinspection PhpExpressionResultUnusedInspection */
         return <<<CONTENTS
 <?php
 
@@ -219,7 +216,6 @@ FUNCTION;
         }
 
         // 完全な php コードを返す
-        /** @noinspection PhpExpressionResultUnusedInspection */
         return <<<CONTENTS
 <?php
 

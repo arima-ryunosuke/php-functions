@@ -242,14 +242,11 @@ ERR
         $providerExpected = function ($code, $short_open_tag) {
             $include = var_export(realpath(__DIR__ . '/../../../include/global.php'), true);
             $export = var_export($code, true);
-            /** @noinspection PhpParamsInspection */
-            /** @noinspection PhpUnnecessarySemicolonInspection */
             $stdin = "<?php include($include);var_export(parse_php($export, TOKEN_NAME));";
             $stdout = '';
             (process)(PHP_BINARY, [
                 "-d short_open_tag=$short_open_tag",
             ], $stdin, $stdout);
-            /** @noinspection PhpUnreachableStatementInspection */
             return eval("return $stdout;");
         };
 

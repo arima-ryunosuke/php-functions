@@ -1312,10 +1312,6 @@ class UtilityTest extends AbstractTestCase
         ]);
     }
 
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
     function test_profiler()
     {
         $profiler = (profiler)([
@@ -1480,9 +1476,9 @@ class UtilityTest extends AbstractTestCase
         @(benchmark)(['md5', 'sha1'], ['hoge'], 10, false);
         that(error_get_last()['message'])->stringContains('Results of sha1 and md5 are different');
 
-        // usleep(15000) の平均実行時間は 15ms のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
-        $output = (benchmark)(['usleep'], [15000], 300, false);
-        that($output[0]['mills'])->lessThan(15 + 10);
+        // 1000 ミリ秒間の usleep(50000) の呼び出し回数は 20 回のはず（Windows での分解能がめちゃくちゃ？なので余裕を持たしてる）
+        $output = (benchmark)(['usleep'], [50 * 1000], 1000, false);
+        that($output[0]['called'])->isBetween(17, 20);
 
         // 参照渡しも呼べる
         (benchmark)(['reset', 'end'], [['hoge']], 10, false);

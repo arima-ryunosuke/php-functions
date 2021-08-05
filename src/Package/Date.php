@@ -2,7 +2,6 @@
 
 namespace ryunosuke\Functions\Package;
 
-
 /**
  * 日付・時刻関連のユーティリティ
  */
