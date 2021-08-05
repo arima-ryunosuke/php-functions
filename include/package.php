@@ -796,6 +796,7 @@ define("ryunosuke\\Functions\\Package\\array_distinct", ["ryunosuke\\Functions\\
 define("ryunosuke\\Functions\\Package\\array_order", ["ryunosuke\\Functions\\Package\\Arrays", "array_order"]);
 define("ryunosuke\\Functions\\Package\\array_shuffle", ["ryunosuke\\Functions\\Package\\Arrays", "array_shuffle"]);
 define("ryunosuke\\Functions\\Package\\array_shrink_key", ["ryunosuke\\Functions\\Package\\Arrays", "array_shrink_key"]);
+define("ryunosuke\\Functions\\Package\\array_extend", ["ryunosuke\\Functions\\Package\\Arrays", "array_extend"]);
 define("ryunosuke\\Functions\\Package\\array_fill_gap", ["ryunosuke\\Functions\\Package\\Arrays", "array_fill_gap"]);
 define("ryunosuke\\Functions\\Package\\array_fill_callback", ["ryunosuke\\Functions\\Package\\Arrays", "array_fill_callback"]);
 define("ryunosuke\\Functions\\Package\\array_pickup", ["ryunosuke\\Functions\\Package\\Arrays", "array_pickup"]);
@@ -1021,6 +1022,7 @@ define("ryunosuke\\Functions\\Package\\is_recursive", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\is_stringable", ["ryunosuke\\Functions\\Package\\Vars", "is_stringable"]);
 define("ryunosuke\\Functions\\Package\\is_arrayable", ["ryunosuke\\Functions\\Package\\Vars", "is_arrayable"]);
 define("ryunosuke\\Functions\\Package\\is_countable", ["ryunosuke\\Functions\\Package\\Vars", "is_countable"]);
+define("ryunosuke\\Functions\\Package\\cipher_metadata", ["ryunosuke\\Functions\\Package\\Vars", "cipher_metadata"]);
 define("ryunosuke\\Functions\\Package\\encrypt", ["ryunosuke\\Functions\\Package\\Vars", "encrypt"]);
 define("ryunosuke\\Functions\\Package\\decrypt", ["ryunosuke\\Functions\\Package\\Vars", "decrypt"]);
 define("ryunosuke\\Functions\\Package\\varcmp", ["ryunosuke\\Functions\\Package\\Vars", "varcmp"]);

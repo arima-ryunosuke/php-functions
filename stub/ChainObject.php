@@ -400,6 +400,24 @@
  * @method   \ChainObject  array_explode1($array, $limit = PHP_INT_MAX)
  * @method   \ChainObject  array_explode2($array, $condition)
  *
+ * @see array_extend
+ * @method   \ChainObject  array_extend(...$arrays)
+ * @method   \ChainObject  array_extend1($default = [], ...$arrays)
+ * @method   \ChainObject  array_extend2($default = [], ...$arrays)
+ * @method   \ChainObject  array_extend3($default = [], ...$arrays)
+ * @method   \ChainObject  array_extend4($default = [], ...$arrays)
+ * @method   \ChainObject  array_extend5($default = [], ...$arrays)
+ * @method   \ChainObject  array_extend6($default = [], ...$arrays)
+ *
+ * @see array_extend
+ * @method   \ChainObject  extend(...$arrays)
+ * @method   \ChainObject  extend1($default = [], ...$arrays)
+ * @method   \ChainObject  extend2($default = [], ...$arrays)
+ * @method   \ChainObject  extend3($default = [], ...$arrays)
+ * @method   \ChainObject  extend4($default = [], ...$arrays)
+ * @method   \ChainObject  extend5($default = [], ...$arrays)
+ * @method   \ChainObject  extend6($default = [], ...$arrays)
+ *
  * @see array_fill
  * @method   \ChainObject  array_fill($num, $val)
  * @method   \ChainObject  array_fill1($start_key, $val)
@@ -1903,6 +1921,10 @@
  * @method   \ChainObject  chunk_split1($str, $ending = null)
  * @method   \ChainObject  chunk_split2($str, $chunklen = null)
  *
+ * @see cipher_metadata
+ * @property \ChainObject $cipher_metadata
+ * @method   \ChainObject  cipher_metadata()
+ *
  * @see clamp
  * @method   \ChainObject  clamp($min, $max, $circulative = false)
  * @method   \ChainObject  clamp1($value, $max, $circulative = false)
@@ -1920,9 +1942,10 @@
  * @method   \ChainObject  class_exists1($classname)
  *
  * @see class_extends
- * @method   \ChainObject  class_extends($methods, $fields = [])
- * @method   \ChainObject  class_extends1($object, $fields = [])
- * @method   \ChainObject  class_extends2($object, $methods)
+ * @method   \ChainObject  class_extends($methods, $fields = [], $implements = [])
+ * @method   \ChainObject  class_extends1($object, $fields = [], $implements = [])
+ * @method   \ChainObject  class_extends2($object, $methods, $implements = [])
+ * @method   \ChainObject  class_extends3($object, $methods, $fields = [])
  *
  * @see class_loader
  * @method   \ChainObject  class_loader()
@@ -2250,10 +2273,10 @@
  * @method   \ChainObject  decoct()
  *
  * @see decrypt
- * @method   \ChainObject  decrypt($password, $cipher = "aes-256-cbc", $tag = "")
- * @method   \ChainObject  decrypt1($cipherdata, $cipher = "aes-256-cbc", $tag = "")
+ * @method   \ChainObject  decrypt($password, $ciphers = "aes-256-cbc", $tag = "")
+ * @method   \ChainObject  decrypt1($cipherdata, $ciphers = "aes-256-cbc", $tag = "")
  * @method   \ChainObject  decrypt2($cipherdata, $password, $tag = "")
- * @method   \ChainObject  decrypt3($cipherdata, $password, $cipher = "aes-256-cbc")
+ * @method   \ChainObject  decrypt3($cipherdata, $password, $ciphers = "aes-256-cbc")
  *
  * @see define
  * @method   \ChainObject  define($value, $case_insensitive = null)
@@ -3033,11 +3056,6 @@
  * @method   \ChainObject  http_build_query1($formdata, $arg_separator = null, $enc_type = null)
  * @method   \ChainObject  http_build_query2($formdata, $prefix = null, $enc_type = null)
  * @method   \ChainObject  http_build_query3($formdata, $prefix = null, $arg_separator = null)
- *
- * @see http_requests
- * @property \ChainObject $http_requests
- * @method   \ChainObject  http_requests($default_options = [])
- * @method   \ChainObject  http_requests1($urls)
  *
  * @see http_response_code
  * @method   \ChainObject  http_response_code()

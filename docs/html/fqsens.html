@@ -1365,6 +1365,75 @@ that(array_shrink_key($array1, $array2, $array3))-&gt;isSame(['c' =&gt; 'C3']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_extend()">
+                                    ryunosuke\Functions\Package\Arrays::array_extend		</a>	<small>($default = [], ...$arrays) : array</small>
+		</h4>
+	<div class="description"><p>独自拡張した array_replace_recursive</p>
+<p>下記の点で array_replace_recursive と異なる。</p>
+<ul>
+<li>元配列のキーのみでフィルタされる</li>
+<li>対象配列にクロージャを渡すと現在の状態を引数にしてコールバックされる</li>
+<li>値に Generator や Generator 関数を渡すと最後にまとめて値化される<ul>
+<li>つまり、上書きされた値は実質的にコールされない</li>
+</ul>
+</li>
+<li>recursive かどうかは 最初の引数で分岐する（jQuery の extend と同じ）</li>
+<li>recursive の場合、元配列の値が配列の場合のみ対象となる。配列でない場合は単純に上書きされる<ul>
+<li>次の値が非配列の場合、末尾に追加される</li>
+<li>次の値がクロージャの場合、元の値を引数にしてコールバックされる</li>
+<li>次の値が配列の場合<ul>
+<li>元配列が数値配列なら完全にマージされる</li>
+<li>元配列が連想配列なら再帰される</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>この仕様上、Generator を値とする配列を対象にすることはできないが、そのような状況は稀だろう。<br />
+その代わり、使われるかどうか分からない状態でもとりあえず Generator にしておけば無駄な処理を省くことができる。</p>
+<p>Example:</p>
+<pre><code class="language-php"># $deep ではない単純呼び出し
+that(array_extend([
+    'overwrite' =&gt; 'hoge',            // 後段で指定されているので上書きされる
+    'through'   =&gt; 'fuga',            // 後段で指定されていないので生き残る
+    'array'     =&gt; ['a', 'b', 'c'],   // $deep ではないし後段で指定されているので完全に上書きされる
+    'yield1'    =&gt; fn() =&gt; yield 123, // 後段で指定されているのでコールすらされない
+    'yield2'    =&gt; fn() =&gt; yield 456, // 後段で指定されていないのでコールされる
+], [
+    'ignore'    =&gt; null,              // 元配列に存在しないのでスルーされる
+    'overwrite' =&gt; 'HOGE',
+    'array'     =&gt; ['x', 'y', 'z'],
+    'yield1'    =&gt; fn() =&gt; yield 234,
+]))-&gt;is([
+    'overwrite' =&gt; 'HOGE',
+    'through'   =&gt; 'fuga',
+    'array'     =&gt; ['x', 'y', 'z'],
+    'yield1'    =&gt; 234,
+    'yield2'    =&gt; 456,
+]);
+# $deep の場合のマージ呼び出し
+that(array_extend(true, [
+    'array'    =&gt; ['hoge'],            // 後段がスカラーなので末尾に追加される
+    'callback' =&gt; ['fuga'],            // 後段がクロージャなのでコールバックされる
+    'list'     =&gt; ['a', 'b', 'c'],     // 数値配列なのでマージされる
+    'hash'     =&gt; ['a' =&gt; null],       // 連想配列なので再帰される
+    'yield'    =&gt; [fn() =&gt; yield 123], // generator は解決される
+], [
+    'array'    =&gt; 'HOGE',
+    'callback' =&gt; fn($v) =&gt; $v + [1 =&gt; 'FUGA'],
+    'list'     =&gt; ['x', 'y', 'z'],
+    'hash'     =&gt; ['a' =&gt; ['x' =&gt; ['y' =&gt; ['z' =&gt; 'xyz']]]],
+    'yield'    =&gt; [fn() =&gt; yield 456],
+]))-&gt;is([
+    'array'    =&gt; ['hoge', 'HOGE'],
+    'callback' =&gt; ['fuga', 'FUGA'],
+    'list'     =&gt; ['a', 'b', 'c', 'x', 'y', 'z'],
+    'hash'     =&gt; ['a' =&gt; ['x' =&gt; ['y' =&gt; ['z' =&gt; 'xyz']]]],
+    'yield'    =&gt; [123, 456],
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_fill_gap()">
                                     ryunosuke\Functions\Package\Arrays::array_fill_gap		</a>	<small>($array, ...$values) : array</small>
 		</h4>
@@ -1979,11 +2048,21 @@ class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
 that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method())-&gt;isSame('this is X3d');
 // トレイトのメソッドも生えている
 that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod())-&gt;isSame('this is XTrait::traitMethod');
+
+// メソッドとトレイトだけならば無名クラスを渡すことでも可能
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X4', new class() {
+    use \ryunosuke\Test\Package\Classobj\XTrait;
+    function method(){return 'this is X4d';}
+});
+// X4 を継承している Y4 にまで影響が出ている（X4 を完全に置換できたということ）
+that((new \ryunosuke\Test\Package\Classobj\Y4())-&gt;method())-&gt;isSame('this is X4d');
+// トレイトのメソッドも生えている
+that((new \ryunosuke\Test\Package\Classobj\Y4())-&gt;traitMethod())-&gt;isSame('this is XTrait::traitMethod');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_extends()">
-                                    ryunosuke\Functions\Package\Classobj::class_extends		</a>	<small>($object, $methods, $fields = []) : object</small>
+                                    ryunosuke\Functions\Package\Classobj::class_extends		</a>	<small>($object, $methods, $fields = [], $implements = []) : object</small>
 		</h4>
 	<div class="description"><p>インスタンスを動的に拡張する</p>
 <p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
@@ -1992,18 +2071,24 @@ that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;traitMethod())-&gt;isSame('
 <p>クロージャ配列を渡すと特異メソッドになる。<br />
 そのクロージャの $this は元オブジェクトで bind される。<br />
 ただし、static closure を渡した場合はそれは static メソッドとして扱われる。</p>
+<p>$implements でインターフェースの配列を渡すとすべてが動的に implement される。<br />
+つまり得られたオブジェクトが instanceof を通るようになる。<br />
+もちろんメソッド配列としてその名前が含まれていなければならない。</p>
 <p>内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。<br />
 当然ながら final クラス/メソッドの拡張もできない。</p>
 <p>Example:</p>
-<pre><code class="language-php">// Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
+<pre><code class="language-php">// Exception に「count」メソッドと「コードとメッセージを結合して返す」メソッドを動的に生やす
 $object = new \Exception('hoge', 123);
 $newobject = class_extends($object, [
+    'count'       =&gt; function() { return $this-&gt;code; },
     'codemessage' =&gt; function() {
         // bind されるので protected フィールドが使える
         return $this-&gt;code . ':' . $this-&gt;message;
     },
-]);
+], [], [\Countable::class]);
+that($newobject-&gt;count())-&gt;isSame(123);
 that($newobject-&gt;codemessage())-&gt;isSame('123:hoge');
+that($newobject)-&gt;isInstanceOf(\Countable::class); // instanceof をパスできる
 
 // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
 $object = new \ArrayObject([1, 2, 3]);
@@ -3364,26 +3449,51 @@ that(ping('127.0.0.1', 1234))-&gt;isFalse(); // tcp はスキームを省略で�
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::http_requests()">
-                                    ryunosuke\Functions\Package\Network::http_requests		</a>	<small>($urls, $default_options = []) : array</small>
+                                    ryunosuke\Functions\Package\Network::http_requests		</a>	<small>($urls, $single_options = [], $multi_options = [], &amp;$infos = []) : array</small>
 		</h4>
 	<div class="description"><p>http リクエストを並列で投げる</p>
 <p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
-$urls の要素は単一の文字列か curl のオプションである必要がある。</p>
+$urls の要素は単一の文字列か curl のオプションである必要がある。<br />
+リクエストの実体は http_request なので、そっちで使えるオプションは一部を除きすべて使える。</p>
 <p>返り値は $urls のキーを保持したまま、レスポンスが返ってきた順に格納して配列で返す。<br />
 構造は下記のサンプルを参照。</p>
+<p>$infos を渡すと返り値がボディだけになり、その他の情報はすべてこの変数に格納される。<br />
+この動作は互換性のためであり、将来的には指定の有無に関わらずボディだけを返すようになる（失敗したリクエストは null が格納される）。</p>
 <p>Example:</p>
 <pre><code class="language-php">$responses = http_requests([
     // このように [キー =&gt; CURL オプション] 形式が正しい使い方
-    'fuga' =&gt; [
+    'fuga'             =&gt; [
         CURLOPT_URL     =&gt; 'http://unknown-host',
         CURLOPT_TIMEOUT =&gt; 5,
     ],
     // ただし、このように [キー =&gt; URL] 形式でもいい（オプションはデフォルトが使用される）
-    'hoge' =&gt; 'http://127.0.0.1',
-]);
+    'hoge'             =&gt; 'http://127.0.0.1',
+    // さらに、このような [URL =&gt; CURL オプション] 形式も許容される（あまり用途はないだろうが）
+    'http://127.0.0.1' =&gt; [
+        CURLOPT_TIMEOUT =&gt; 5,
+    ],
+], [
+    // 第2引数で各リクエストの共通オプションを指定できる（個別指定優先）
+    // @see https://www.php.net/manual/ja/function.curl-setopt.php
+], [
+    // 第3引数でマルチリクエストのオプションを指定できる
+    // @see https://www.php.net/manual/ja/function.curl-multi-setopt.php
+],
+    // 第4引数を与えると動作が変わる（将来的にこの動作がデフォルトになる）
+    $infos
+);
+# 第4引数を指定した場合の返り値
 [
     // キーが維持されるので hoge キー
-    'hoge' =&gt; [
+    'hoge'             =&gt; 'response body',
+    // curl のエラーが出た場合は null になる（詳細なエラー情報は $infos に格納される）
+    'fuga'             =&gt; null,
+    'http://127.0.0.1' =&gt; 'response body',
+];
+# 第4引数を指定しなかった場合の返り値
+[
+    // キーが維持されるので hoge キー
+    'hoge'             =&gt; [
         // 0 番目の要素は body 文字列
         'response body',
         // 1 番目の要素は header 配列
@@ -3398,7 +3508,7 @@ $urls の要素は単一の文字列か curl のオプションである必要�
         ],
     ],
     // curl のエラーが出た場合は int になる（CURLE_*** の値）
-    'fuga' =&gt; 6,
+    'fuga'             =&gt; 6,
 ];
 </code></pre>
 </div>
@@ -3424,6 +3534,11 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 </li>
 <li><code>throw</code> (bool): ステータスコードが 400 以上のときに例外を投げる<ul>
 <li><code>CURLOPT_FAILONERROR</code> は原則使わないほうがいいと思う</li>
+</ul>
+</li>
+<li><code>retry</code> (float[]|callable): エラーが出た場合にリトライする<ul>
+<li>配列で指定した回数・秒数のリトライを行う（[1, 2, 3] で、1秒後、2秒後、3秒後になる）</li>
+<li>callable を指定するとその callable が false を返すまでリトライする（引数として curl_info が渡ってきて待機秒数を返す）</li>
 </ul>
 </li>
 <li><code>atfile</code> (bool): キーに @ があるフィールドをファイルアップロードとみなす<ul>
@@ -5609,7 +5724,7 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cacheobject()">
-                                    ryunosuke\Functions\Package\Utility::cacheobject		</a>	<small>($directory) : <a href="Psr-SimpleCache-CacheInterface$typespace.html#Psr\SimpleCache\CacheInterface" class="fqsen "><small>Psr\SimpleCache\</small><wbr>CacheInterface</a></small>
+                                    ryunosuke\Functions\Package\Utility::cacheobject		</a>	<small>($directory) : <a href="Psr16CacheInterface$typespace.html#Psr16CacheInterface" class="fqsen ">Psr16CacheInterface</a></small>
 		</h4>
 	<div class="description"><p>psr-16 を実装したキャッシュオブジェクトを返す</p>
 <p>このオブジェクトはあくまで「他のパッケージに依存したくない」場合のデフォルト実装としての使用を想定している。</p>
@@ -5618,8 +5733,11 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 <li>キャッシュキーの . はディレクトリ区切りとして使用される</li>
 <li>TTL を指定しなかったときのデフォルト値は約100年（実質無期限だろう）</li>
 <li>clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない</li>
+<li>psr-16 にはない getOrSet が生えている（利便性が非常に高く使用頻度が多いため）</li>
 </ul>
-<p>psr-16 は依存に含めていないので別途 composer require psr/simple-cache が必要。</p>
+<p>psr/simple-cache （\Psr\SimpleCache\CacheInterface）が存在するなら implement される。<br />
+存在しないなら素の無名クラスで返す。<br />
+動作に違いはないが instanceoof や class_implements に違いが出てくるので注意。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()">
@@ -6333,10 +6451,17 @@ that(is_countable(new \stdClass()))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
-		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::encrypt()">
-                                    ryunosuke\Functions\Package\Vars::encrypt		</a>	<small>($plaindata, $password, $cipher = &quot;aes-256-cbc&quot;, &amp;$tag = &quot;&quot;) : string</small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::cipher_metadata()">
+                                    ryunosuke\Functions\Package\Vars::cipher_metadata		</a>	<small>($cipher) : array</small>
 		</h4>
-	<div class="description"><p>指定されたパスワードとアルゴリズムで暗号化する</p>
+	<div class="description"><p>暗号化アルゴリズムのメタデータを返す</p>
+<p>※ 内部向け</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::encrypt()">
+                                    ryunosuke\Functions\Package\Vars::encrypt		</a>	<small>($plaindata, $password, $cipher = &quot;aes-256-gcm&quot;, &amp;$tag = &quot;&quot;) : string</small>
+		</h4>
+	<div class="description"><p>指定されたパスワードで暗号化する</p>
 <p>データは json を経由して base64（URL セーフ） して返す。<br />
 $tag を与えると認証タグが設定される。</p>
 <p>データ末尾には =v が付与される。<br />
@@ -6344,6 +6469,7 @@ $tag を与えると認証タグが設定される。</p>
 <ul>
 <li>v0: バージョンのない無印。json -&gt; encrypt -&gt; base64</li>
 <li>v1: 上記に圧縮処理を加えたもの。json -&gt; deflate -&gt; encrypt -&gt; base64</li>
+<li>v2: 生成文字列に $cipher, $iv, $tag を加えたもの。json -&gt; deflate -&gt; cipher+iv+tag+encrypt -&gt; base64</li>
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">$plaindata = ['a', 'b', 'c'];
@@ -6355,23 +6481,16 @@ that($encrypted)-&gt;isString();
 that($decrypted)-&gt;isSame(['a', 'b', 'c']);
 // password が異なれば失敗して null を返す
 that(decrypt($encrypted, 'invalid'))-&gt;isSame(null);
-
-$encrypted = encrypt($plaindata, 'password', 'aes-256-gcm', $tag);
-// タグが設定される
-that($tag)-&gt;isString();
-// タグが正しければ復号化されて元の配列になる
-that(decrypt($encrypted, 'password', 'aes-256-gcm', $tag))-&gt;isSame(['a', 'b', 'c']);
-// タグが不正なら失敗して null を返す
-that(decrypt($encrypted, 'password', 'aes-256-gcm', 'invalid'))-&gt;isSame(null);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::decrypt()">
-                                    ryunosuke\Functions\Package\Vars::decrypt		</a>	<small>($cipherdata, $password, $cipher = &quot;aes-256-cbc&quot;, $tag = &quot;&quot;) : mixed</small>
+                                    ryunosuke\Functions\Package\Vars::decrypt		</a>	<small>($cipherdata, $password, $ciphers = &quot;aes-256-cbc&quot;, $tag = &quot;&quot;) : mixed</small>
 		</h4>
-	<div class="description"><p>指定されたパスワードとアルゴリズムで復号化する</p>
-<p>$cipher は配列で複数与えることができる。<br />
-複数与えた場合、順に試みて複合できた段階でその値を返す。</p>
+	<div class="description"><p>指定されたパスワードで復号化する</p>
+<p>$ciphers は配列で複数与えることができる。<br />
+複数与えた場合、順に試みて複合できた段階でその値を返す。<br />
+v2 以降は生成文字列に $cipher が含まれているため指定不要（今後指定してはならない）。</p>
 <p>復号に失敗すると null を返す。<br />
 単体で使うことはないと思うので詳細は encrypt を参照。</p>
 </div>
