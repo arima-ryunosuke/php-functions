@@ -170,8 +170,9 @@ class ClassobjTest extends AbstractTestCase
             },
         ], [
             'fuga' => 'dummy',
-        ]);
+        ], [\ryunosuke\Test\Package\Classobj\Methods::class]);
 
+        that($object)->isInstanceOf(\ryunosuke\Test\Package\Classobj\Methods::class);
         that($object->fuga)->is('dummy');
         $object->fuga = 'dummy2';
         that($object->fuga)->is('dummy2');

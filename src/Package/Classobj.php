@@ -411,20 +411,27 @@ class Classobj
      * そのクロージャの $this は元オブジェクトで bind される。
      * ただし、static closure を渡した場合はそれは static メソッドとして扱われる。
      *
+     * $implements でインターフェースの配列を渡すとすべてが動的に implement される。
+     * つまり得られたオブジェクトが instanceof を通るようになる。
+     * もちろんメソッド配列としてその名前が含まれていなければならない。
+     *
      * 内部的にはいわゆる Decorator パターンを動的に実行しているだけであり、実行速度は劣悪。
      * 当然ながら final クラス/メソッドの拡張もできない。
      *
      * Example:
      * ```php
-     * // Expcetion に「コードとメッセージを結合して返す」メソッドを動的に生やす
+     * // Exception に「count」メソッドと「コードとメッセージを結合して返す」メソッドを動的に生やす
      * $object = new \Exception('hoge', 123);
      * $newobject = class_extends($object, [
+     *     'count'       => function() { return $this->code; },
      *     'codemessage' => function() {
      *         // bind されるので protected フィールドが使える
      *         return $this->code . ':' . $this->message;
      *     },
-     * ]);
+     * ], [], [\Countable::class]);
+     * that($newobject->count())->isSame(123);
      * that($newobject->codemessage())->isSame('123:hoge');
+     * that($newobject)->isInstanceOf(\Countable::class); // instanceof をパスできる
      *
      * // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
      * $object = new \ArrayObject([1, 2, 3]);
@@ -440,9 +447,10 @@ class Classobj
      * @param object $object 対象オブジェクト
      * @param \Closure[] $methods 注入するメソッド
      * @param array $fields 注入するフィールド
+     * @param array $implements 実装するインターフェース
      * @return object $object を拡張した object
      */
-    public static function class_extends($object, $methods, $fields = [])
+    public static function class_extends($object, $methods, $fields = [], $implements = [])
     {
         assert(is_array($methods));
 
@@ -623,7 +631,8 @@ class Classobj
         }
 
         $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
-        (evaluate)("class $newclassname extends $classname\n{\nuse X{$classalias}Trait;\n$declares}", [], 10);
+        $implements = $implements ? 'implements ' . implode(',', $implements) : '';
+        (evaluate)("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}", [], 10);
         return new $newclassname($spawners[$classname]['original'], $object, $fields, $methods);
     }
 

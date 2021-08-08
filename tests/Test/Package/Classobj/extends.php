@@ -41,3 +41,8 @@ trait Fields
     protected $protectedField;
     public    $publicField;
 }
+
+interface Methods
+{
+    public function publicMethod();
+}
