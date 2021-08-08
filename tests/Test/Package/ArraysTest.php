@@ -1902,6 +1902,82 @@ class ArraysTest extends AbstractTestCase
         that((array_shrink_key)($object, $object1, $object2, $object3))->isSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3']);
     }
 
+    function test_array_extend()
+    {
+        $default = [
+            'k1'     => 1,
+            'k2'     => 2,
+            'k3'     => [3],
+            'list'   => ['a', 'b', 'c'],
+            'hash'   => ['a' => 'A', 'b' => 'B', 'c' => 'C'],
+            'array'  => ['a' => 'A', 'a', 'b', 'b' => 'B',],
+            'yield'  => function () { yield 123; },
+            'yields' => [function () { yield 123; }],
+        ];
+
+        that((array_extend)($default))->is([
+            'k1'     => 1,
+            'k2'     => 2,
+            'k3'     => [3],
+            'list'   => ['a', 'b', 'c'],
+            'hash'   => ['a' => 'A', 'b' => 'B', 'c' => 'C'],
+            'array'  => ['a' => 'A', 'a', 'b', 'b' => 'B',],
+            'yield'  => 123,
+            'yields' => [function () { yield 123; }],
+        ]);
+
+        that((array_extend)(false, $default, [
+            'ignore' => 'X',
+            'k2'     => [2],
+            'k3'     => 9,
+            'list'   => ['x', 'y', 'z'],
+            'hash'   => ['x' => 'X', 'y' => 'Y', 'z' => 'Z'],
+            'array'  => ['x' => 'X', 'x', 'y', 'Y' => 'Y',],
+            'yield'  => function () { yield 456; },
+            'yields' => [456],
+        ]))->is([
+            'k1'     => 1,
+            'k2'     => [2],
+            'k3'     => 9,
+            'list'   => ['x', 'y', 'z'],
+            'hash'   => ['x' => 'X', 'y' => 'Y', 'z' => 'Z'],
+            'array'  => ['x' => 'X', 'x', 'y', 'Y' => 'Y',],
+            'yield'  => 456,
+            'yields' => [456],
+        ]);
+
+        that((array_extend)(true, $default, [
+            'ignore' => 'X',
+            'k2'     => [2],
+            'k3'     => 8,
+            'list'   => ['x', 'y', 'z'],
+            'hash'   => function ($value) {
+                return $value + ['x' => 'X', 'y' => 'Y', 'z' => 'Z'];
+            },
+            'array'  => ['x' => 'X', 'x', 'y', 'Y' => 'Y',],
+            'yield'  => function () { yield $this->fail("shouldn't be called"); },
+            'yields' => [function () { yield 456; }],
+        ], [
+            'yield'  => function () { yield 789; },
+            'yields' => [function () { yield 789; }],
+        ], function ($value) {
+            yield 'k2' => 3;
+            yield 'k3' => 9;
+        }))->is([
+            'k1'     => 1,
+            'k2'     => [2, 3],
+            'k3'     => [3, 8, 9],
+            'list'   => ['a', 'b', 'c', 'x', 'y', 'z'],
+            'hash'   => ['a' => 'A', 'b' => 'B', 'c' => 'C', 'x' => 'X', 'y' => 'Y', 'z' => 'Z'],
+            'array'  => ['a' => 'A', 'x', 'y', 'b' => 'B',],
+            'yield'  => 789,
+            'yields' => [123, 456, 789],
+        ]);
+
+        that(array_extend)->try(true)->wasThrown('target is empry');
+        that(array_extend)->try([], '')->wasThrown('target is not array');
+    }
+
     function test_array_fill_gap()
     {
         that((array_fill_gap)(['a', 'b', 'c'], 'd', 'e'))->isSame(['a', 'b', 'c', 'd', 'e']);
