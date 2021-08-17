@@ -300,10 +300,20 @@ class Classobj
      * that((new \ryunosuke\Test\Package\Classobj\Y3())->method())->isSame('this is X3d');
      * // トレイトのメソッドも生えている
      * that((new \ryunosuke\Test\Package\Classobj\Y3())->traitMethod())->isSame('this is XTrait::traitMethod');
+     *
+     * // メソッドとトレイトだけならば無名クラスを渡すことでも可能
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X4', new class() {
+     *     use \ryunosuke\Test\Package\Classobj\XTrait;
+     *     function method(){return 'this is X4d';}
+     * });
+     * // X4 を継承している Y4 にまで影響が出ている（X4 を完全に置換できたということ）
+     * that((new \ryunosuke\Test\Package\Classobj\Y4())->method())->isSame('this is X4d');
+     * // トレイトのメソッドも生えている
+     * that((new \ryunosuke\Test\Package\Classobj\Y4())->traitMethod())->isSame('this is XTrait::traitMethod');
      * ```
      *
      * @param string $class 対象クラス名
-     * @param \Closure|array $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列
+     * @param \Closure|object|array $register 置換クラスを定義 or 返すクロージャ or 定義メソッド配列 or 無名クラス
      */
     public static function class_replace($class, $register)
     {
@@ -327,6 +337,19 @@ class Classobj
         $classess = get_declared_classes();
         if ($register instanceof \Closure) {
             $newclass = $register();
+        }
+        elseif (is_object($register)) {
+            $ref = new \ReflectionObject($register);
+            $newclass = [class_uses($register)];
+            $trait_methods = $ref->getTraitAliases();
+            foreach (class_uses($register) as $trait) {
+                $trait_methods += array_flip(get_class_methods($trait));
+            }
+            foreach ($ref->getMethods() as $method) {
+                if (!isset($trait_methods[$method->getName()])) {
+                    $newclass[$method->getName()] = $method->isStatic() ? $method->getClosure() : $method->getClosure($register);
+                }
+            }
         }
         else {
             $newclass = $register;

@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Test\Package\Classobj;
 
-class D extends C
+class D2 extends C2
 {
     function f()
     {

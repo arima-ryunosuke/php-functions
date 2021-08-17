@@ -90,7 +90,7 @@ class ClassobjTest extends AbstractTestCase
             return new \B();
         });
 
-        (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\C', [
+        (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\C1', [
             [\Traitable::class],
             'newMethod' => function () {
                 return 'this is ' . (new \ReflectionClass($this))->getShortName();
@@ -111,7 +111,7 @@ class ClassobjTest extends AbstractTestCase
         ]);
 
         /** @var \Traitable $classC */
-        $classC = new \ryunosuke\Test\package\Classobj\C();
+        $classC = new \ryunosuke\Test\package\Classobj\C1();
         that($classC->publicField)->is('Traitable');
         that($classC->traitMethod())->is('Traitable');
         /** @noinspection PhpUndefinedMethodInspection */
@@ -122,10 +122,10 @@ class ClassobjTest extends AbstractTestCase
                 'this is C',
             ]);
             that($classC->g('string', true, new \ArrayObject([3])))->is(['string', true, new \ArrayObject([3])]);
-            that($classC->newMethod())->is('this is C__');
+            that($classC->newMethod())->is('this is C1__');
         }
 
-        $classD = new \ryunosuke\Test\package\Classobj\D();
+        $classD = new \ryunosuke\Test\package\Classobj\D1();
         that($classD->f())->is([
             'this is exA',
             'this is exB',
@@ -133,7 +133,55 @@ class ClassobjTest extends AbstractTestCase
             'this is D',
         ]);
         /** @noinspection PhpUndefinedMethodInspection */
-        that($classD->newMethod())->is('this is D');
+        that($classD->newMethod())->is('this is D1');
+
+        (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\C2', new class() extends \ryunosuke\Test\package\Classobj\B {
+            use \Traitable{
+                \Traitable::traitMethod as hge;
+            }
+
+
+            function newMethod()
+            {
+                return 'this is ' . (new \ReflectionClass($this))->getShortName();
+            }
+
+            function f()
+            {
+                return parent::f();
+            }
+
+            function g()
+            {
+                /** @noinspection PhpUndefinedMethodInspection */
+                return parent::g(...func_get_args());
+            }
+        });
+
+        /** @var \Traitable $classC */
+        $classC = new \ryunosuke\Test\package\Classobj\C2();
+        that($classC->publicField)->is('Traitable');
+        that($classC->traitMethod())->is('Traitable');
+        /** @noinspection PhpUndefinedMethodInspection */
+        {
+            that($classC->f())->is([
+                'this is exA',
+                'this is exB',
+                'this is C',
+            ]);
+            that($classC->g('string', true, new \ArrayObject([3])))->is(['string', true, new \ArrayObject([3])]);
+            that($classC->newMethod())->is('this is C2__');
+        }
+
+        $classD = new \ryunosuke\Test\package\Classobj\D2();
+        that($classD->f())->is([
+            'this is exA',
+            'this is exB',
+            'this is C',
+            'this is D',
+        ]);
+        /** @noinspection PhpUndefinedMethodInspection */
+        that($classD->newMethod())->is('this is D2');
     }
 
     function test_class_extends()
