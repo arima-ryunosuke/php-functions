@@ -1110,37 +1110,175 @@ class Strings
      */
     public static function str_diff($xstring, $ystring, $options = [])
     {
-        $options += [
-            'ignore-case'         => false,
-            'ignore-space-change' => false,
-            'ignore-all-space'    => false,
-            'stringify'           => 'unified',
-        ];
+        $differ = new class($options) {
+            private $options;
 
-        $xstring = is_array($xstring) ? array_values($xstring) : preg_split('#\R#u', $xstring);
-        $ystring = is_array($ystring) ? array_values($ystring) : preg_split('#\R#u', $ystring);
-        $trailingN = "";
-        if ($xstring[count($xstring) - 1] === '' && $ystring[count($ystring) - 1] === '') {
-            $trailingN = "\n";
-            array_pop($xstring);
-            array_pop($ystring);
-        }
+            public function __construct($options)
+            {
+                $options += [
+                    'ignore-case'         => false,
+                    'ignore-space-change' => false,
+                    'ignore-all-space'    => false,
+                    'stringify'           => 'unified',
+                ];
+                $this->options = $options;
+            }
 
-        $getdiff = function (array $xarray, array $yarray, $converter) {
-            $lcs = function (array $xarray, array $yarray) use (&$lcs) {
-                $length = function (array $xarray, array $yarray) {
-                    $xcount = count($xarray);
-                    $ycount = count($yarray);
-                    $current = array_fill(0, $ycount + 1, 0);
-                    for ($i = 0; $i < $xcount; $i++) {
-                        $prev = $current;
-                        for ($j = 0; $j < $ycount; $j++) {
-                            $current[$j + 1] = $xarray[$i] === $yarray[$j] ? $prev[$j] + 1 : max($current[$j], $prev[$j + 1]);
+            public function __invoke($xstring, $ystring)
+            {
+                $xstring = is_array($xstring) ? array_values($xstring) : preg_split('#\R#u', $xstring);
+                $ystring = is_array($ystring) ? array_values($ystring) : preg_split('#\R#u', $ystring);
+
+                $trailingN = "";
+                if ($xstring[count($xstring) - 1] === '' && $ystring[count($ystring) - 1] === '') {
+                    $trailingN = "\n";
+                    array_pop($xstring);
+                    array_pop($ystring);
+                }
+
+                $diffs = $this->diff($xstring, $ystring);
+
+                $stringfy = $this->options['stringify'];
+                if (!$stringfy) {
+                    return $diffs;
+                }
+                if ($stringfy === 'normal') {
+                    $stringfy = [$this, 'normal'];
+                }
+                if (is_string($stringfy) && preg_match('#context(=(\d+))?#', $stringfy, $m)) {
+                    $block_size = (int) ($m[2] ?? 3);
+                    $stringfy = [$this, 'context'];
+                }
+                if (is_string($stringfy) && preg_match('#unified(=(\d+))?#', $stringfy, $m)) {
+                    $block_size = isset($m[2]) ? (int) $m[2] : null;
+                    $stringfy = function ($diff) use ($block_size) { return $this->unified($diff, $block_size); };
+                }
+                if (is_string($stringfy) && preg_match('#html(=(.+))?#', $stringfy, $m)) {
+                    $mode = $m[2] ?? null;
+                    $stringfy = function ($diff) use ($mode) { return $this->html($diff, $mode); };
+                }
+
+                if (isset($block_size)) {
+                    $result = implode("\n", array_map($stringfy, $this->block($diffs, $block_size)));
+                }
+                else {
+                    $result = $stringfy($diffs);
+                }
+
+                return !strlen($result) ? $result : $result . $trailingN;
+            }
+
+            private function diff(array $xarray, array $yarray)
+            {
+                $convert = function ($string) {
+                    if ($this->options['ignore-case']) {
+                        $string = strtoupper($string);
+                    }
+                    if ($this->options['ignore-space-change']) {
+                        $string = preg_replace('#\s+#u', ' ', $string);
+                    }
+                    if ($this->options['ignore-all-space']) {
+                        $string = preg_replace('#\s+#u', '', $string);
+                    }
+                    return $string;
+                };
+                $xarray2 = array_map($convert, $xarray);
+                $yarray2 = array_map($convert, $yarray);
+                $xcount = count($xarray2);
+                $ycount = count($yarray2);
+
+                $head = [];
+                reset($yarray2);
+                foreach ($xarray2 as $xk => $xv) {
+                    $yk = key($yarray2);
+                    if ($yk !== $xk || $xv !== $yarray2[$xk]) {
+                        break;
+                    }
+                    $head[$xk] = $xv;
+                    unset($xarray2[$xk], $yarray2[$xk]);
+                }
+
+                $tail = [];
+                end($xarray2);
+                end($yarray2);
+                do {
+                    $xk = key($xarray2);
+                    $yk = key($yarray2);
+                    if (null === $xk || null === $yk || current($xarray2) !== current($yarray2)) {
+                        break;
+                    }
+                    prev($xarray2);
+                    prev($yarray2);
+                    $tail = [$xk - $xcount => $xarray2[$xk]] + $tail;
+                    unset($xarray2[$xk], $yarray2[$yk]);
+                } while (true);
+
+                $common = $this->lcs(array_values($xarray2), array_values($yarray2));
+
+                $xchanged = $ychanged = [];
+                foreach ($head as $n => $line) {
+                    $xchanged[$n] = false;
+                    $ychanged[$n] = false;
+                }
+                foreach ($common as $line) {
+                    foreach ($xarray2 as $n => $l) {
+                        unset($xarray2[$n]);
+                        $xchanged[$n] = $line !== $l;
+                        if (!$xchanged[$n]) {
+                            break;
                         }
                     }
-                    return $current;
-                };
+                    foreach ($yarray2 as $n => $l) {
+                        unset($yarray2[$n]);
+                        $ychanged[$n] = $line !== $l;
+                        if (!$ychanged[$n]) {
+                            break;
+                        }
+                    }
+                }
+                foreach ($xarray2 as $n => $line) {
+                    $xchanged[$n] = true;
+                }
+                foreach ($yarray2 as $n => $line) {
+                    $ychanged[$n] = true;
+                }
+                foreach ($tail as $n => $line) {
+                    $xchanged[$n + $xcount] = false;
+                    $ychanged[$n + $ycount] = false;
+                }
 
+                $diffs = [];
+                $xi = $yi = 0;
+                while ($xi < $xcount || $yi < $ycount) {
+                    for ($xequal = [], $yequal = []; $xi < $xcount && $yi < $ycount && !$xchanged[$xi] && !$ychanged[$yi]; $xi++, $yi++) {
+                        $xequal[$xi] = $xarray[$xi];
+                        $yequal[$yi] = $yarray[$yi];
+                    }
+                    for ($delete = []; $xi < $xcount && $xchanged[$xi]; $xi++) {
+                        $delete[$xi] = $xarray[$xi];
+                    }
+                    for ($append = []; $yi < $ycount && $ychanged[$yi]; $yi++) {
+                        $append[$yi] = $yarray[$yi];
+                    }
+
+                    if ($xequal && $yequal) {
+                        $diffs[] = ['=', $xequal, $yequal];
+                    }
+                    if ($delete && $append) {
+                        $diffs[] = ['*', $delete, $append];
+                    }
+                    elseif ($delete) {
+                        $diffs[] = ['-', $delete, $yi - 1];
+                    }
+                    elseif ($append) {
+                        $diffs[] = ['+', $xi - 1, $append];
+                    }
+                }
+                return $diffs;
+            }
+
+            private function lcs(array $xarray, array $yarray)
+            {
                 $xcount = count($xarray);
                 $ycount = count($yarray);
                 if ($xcount === 0) {
@@ -1155,8 +1293,8 @@ class Strings
                 $i = (int) ($xcount / 2);
                 $xprefix = array_slice($xarray, 0, $i);
                 $xsuffix = array_slice($xarray, $i);
-                $llB = $length($xprefix, $yarray);
-                $llE = $length(array_reverse($xsuffix), array_reverse($yarray));
+                $llB = $this->length($xprefix, $yarray);
+                $llE = $this->length(array_reverse($xsuffix), array_reverse($yarray));
                 $jMax = 0;
                 $max = 0;
                 for ($j = 0; $j <= $ycount; $j++) {
@@ -1168,156 +1306,142 @@ class Strings
                 }
                 $yprefix = array_slice($yarray, 0, $jMax);
                 $ysuffix = array_slice($yarray, $jMax);
-                return array_merge($lcs($xprefix, $yprefix), $lcs($xsuffix, $ysuffix));
-            };
-
-            $xarray2 = array_map($converter, $xarray);
-            $yarray2 = array_map($converter, $yarray);
-            $xcount = count($xarray2);
-            $ycount = count($yarray2);
-
-            $head = [];
-            reset($yarray2);
-            foreach ($xarray2 as $xk => $xv) {
-                $yk = key($yarray2);
-                if ($yk !== $xk || $xv !== $yarray2[$xk]) {
-                    break;
-                }
-                $head[$xk] = $xv;
-                unset($xarray2[$xk], $yarray2[$xk]);
+                return array_merge($this->lcs($xprefix, $yprefix), $this->lcs($xsuffix, $ysuffix));
             }
 
-            $tail = [];
-            end($xarray2);
-            end($yarray2);
-            do {
-                $xk = key($xarray2);
-                $yk = key($yarray2);
-                if (null === $xk || null === $yk || current($xarray2) !== current($yarray2)) {
-                    break;
-                }
-                prev($xarray2);
-                prev($yarray2);
-                $tail = [$xk - $xcount => $xarray2[$xk]] + $tail;
-                unset($xarray2[$xk], $yarray2[$yk]);
-            } while (true);
-
-            $common = $lcs(array_values($xarray2), array_values($yarray2));
-
-            $xchanged = $ychanged = [];
-            foreach ($head as $n => $line) {
-                $xchanged[$n] = false;
-                $ychanged[$n] = false;
-            }
-            foreach ($common as $line) {
-                foreach ($xarray2 as $n => $l) {
-                    unset($xarray2[$n]);
-                    $xchanged[$n] = $line !== $l;
-                    if (!$xchanged[$n]) {
-                        break;
+            private function length(array $xarray, array $yarray)
+            {
+                $xcount = count($xarray);
+                $ycount = count($yarray);
+                $current = array_fill(0, $ycount + 1, 0);
+                for ($i = 0; $i < $xcount; $i++) {
+                    $prev = $current;
+                    for ($j = 0; $j < $ycount; $j++) {
+                        $current[$j + 1] = $xarray[$i] === $yarray[$j] ? $prev[$j] + 1 : max($current[$j], $prev[$j + 1]);
                     }
                 }
-                foreach ($yarray2 as $n => $l) {
-                    unset($yarray2[$n]);
-                    $ychanged[$n] = $line !== $l;
-                    if (!$ychanged[$n]) {
-                        break;
+                return $current;
+            }
+
+            private function minmaxlen($diffs)
+            {
+                $xmin = $ymin = PHP_INT_MAX;
+                $xmax = $ymax = -1;
+                $xlen = $ylen = 0;
+                foreach ($diffs as $diff) {
+                    $xargs = (is_array($diff[1]) ? array_keys($diff[1]) : [$diff[1]]);
+                    $yargs = (is_array($diff[2]) ? array_keys($diff[2]) : [$diff[2]]);
+                    $xmin = min($xmin, ...$xargs);
+                    $ymin = min($ymin, ...$yargs);
+                    $xmax = max($xmax, ...$xargs);
+                    $ymax = max($ymax, ...$yargs);
+                    $xlen += is_array($diff[1]) ? count($diff[1]) : 0;
+                    $ylen += is_array($diff[2]) ? count($diff[2]) : 0;
+                }
+                if ($xmin === -1 && $xlen > 0) {
+                    $xmin = 0;
+                }
+                if ($ymin === -1 && $ylen > 0) {
+                    $ymin = 0;
+                }
+                return [$xmin + 1, $xmax + 1, $xlen, $ymin + 1, $ymax + 1, $ylen];
+            }
+
+            private function normal($diffs)
+            {
+                $index = function ($v) {
+                    if (!is_array($v)) {
+                        return $v + 1;
+                    }
+                    $keys = array_keys($v);
+                    $s = reset($keys) + 1;
+                    $e = end($keys) + 1;
+                    return $s === $e ? "$s" : "$s,$e";
+                };
+
+                $rule = [
+                    '+' => ['a', [2 => '> ']],
+                    '-' => ['d', [1 => '< ']],
+                    '*' => ['c', [1 => '< ', 2 => '> ']],
+                ];
+                $result = [];
+                foreach ($diffs as $diff) {
+                    if (isset($rule[$diff[0]])) {
+                        $difftext = [];
+                        foreach ($rule[$diff[0]][1] as $n => $sign) {
+                            $difftext[] = implode("\n", array_map(function ($v) use ($sign) { return $sign . $v; }, $diff[$n]));
+                        }
+                        $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
+                        $result[] = implode("\n---\n", $difftext);
                     }
                 }
-            }
-            foreach ($xarray2 as $n => $line) {
-                $xchanged[$n] = true;
-            }
-            foreach ($yarray2 as $n => $line) {
-                $ychanged[$n] = true;
-            }
-            foreach ($tail as $n => $line) {
-                $xchanged[$n + $xcount] = false;
-                $ychanged[$n + $ycount] = false;
+                return implode("\n", $result);
             }
 
-            $diffs = [];
-            $xi = $yi = 0;
-            while ($xi < $xcount || $yi < $ycount) {
-                for ($xequal = [], $yequal = []; $xi < $xcount && $yi < $ycount && !$xchanged[$xi] && !$ychanged[$yi]; $xi++, $yi++) {
-                    $xequal[$xi] = $xarray[$xi];
-                    $yequal[$yi] = $yarray[$yi];
+            private function context($diffs)
+            {
+                [$xmin, $xmax, , $ymin, $ymax,] = $this->minmaxlen($diffs);
+                $xheader = $xmin === $xmax ? "$xmin" : "$xmin,$xmax";
+                $yheader = $ymin === $ymax ? "$ymin" : "$ymin,$ymax";
+
+                $rules = [
+                    '-*' => [
+                        'header' => "*** {$xheader} ****",
+                        '-'      => [1 => '- '],
+                        '*'      => [1 => '! '],
+                        '='      => [1 => '  '],
+                    ],
+                    '+*' => [
+                        'header' => "--- {$yheader} ----",
+                        '+'      => [2 => '+ '],
+                        '*'      => [2 => '! '],
+                        '='      => [2 => '  '],
+                    ],
+                ];
+                $result = ["***************"];
+                foreach ($rules as $key => $rule) {
+                    $result[] = $rule['header'];
+                    if (array_filter($diffs, function ($d) use ($key) { return strpos($key, $d[0]) !== false; })) {
+                        foreach ($diffs as $diff) {
+                            foreach ($rule[$diff[0]] ?? [] as $n => $sign) {
+                                $result[] = implode("\n", array_map(function ($v) use ($sign) { return $sign . $v; }, $diff[$n]));
+                            }
+                        }
+                    }
                 }
-                for ($delete = []; $xi < $xcount && $xchanged[$xi]; $xi++) {
-                    $delete[$xi] = $xarray[$xi];
-                }
-                for ($append = []; $yi < $ycount && $ychanged[$yi]; $yi++) {
-                    $append[$yi] = $yarray[$yi];
+                return implode("\n", $result);
+            }
+
+            private function unified($diffs, $block_size)
+            {
+                $result = [];
+
+                if ($block_size !== null) {
+                    [$xmin, , $xlen, $ymin, , $ylen] = $this->minmaxlen($diffs);
+                    $xheader = $xlen === 1 ? "$xmin" : "$xmin,$xlen";
+                    $yheader = $ylen === 1 ? "$ymin" : "$ymin,$ylen";
+                    $result[] = "@@ -{$xheader} +{$yheader} @@";
                 }
 
-                if ($xequal && $yequal) {
-                    $diffs[] = ['=', $xequal, $yequal];
+                $rule = [
+                    '+' => [2 => '+'],
+                    '-' => [1 => '-'],
+                    '*' => [1 => '-', 2 => '+'],
+                    '=' => [1 => ' '],
+                ];
+                foreach ($diffs as $diff) {
+                    foreach ($rule[$diff[0]] as $n => $sign) {
+                        $result[] = implode("\n", array_map(function ($v) use ($sign) { return $sign . $v; }, $diff[$n]));
+                    }
                 }
-                if ($delete && $append) {
-                    $diffs[] = ['*', $delete, $append];
-                }
-                elseif ($delete) {
-                    $diffs[] = ['-', $delete, $yi - 1];
-                }
-                elseif ($append) {
-                    $diffs[] = ['+', $xi - 1, $append];
-                }
+                return implode("\n", $result);
             }
-            return $diffs;
-        };
 
-        $diffs = $getdiff($xstring, $ystring, function ($string) use ($options) {
-            if ($options['ignore-case']) {
-                $string = strtoupper($string);
-            }
-            if ($options['ignore-space-change']) {
-                $string = preg_replace('#\s+#u', ' ', $string);
-            }
-            if ($options['ignore-all-space']) {
-                $string = preg_replace('#\s+#u', '', $string);
-            }
-            return $string;
-        });
-
-        if (!$options['stringify']) {
-            return $diffs;
-        }
-
-        $htmlescape = function ($v) use (&$htmlescape) {
-            return is_array($v) ? array_map($htmlescape, $v) : htmlspecialchars($v, ENT_QUOTES);
-        };
-        $prefixjoin = function ($prefix, $array, $glue) {
-            return implode($glue, array_map(function ($v) use ($prefix) { return $prefix . $v; }, $array));
-        };
-        $minmaxlen = function ($diffs) {
-            $xmin = $ymin = PHP_INT_MAX;
-            $xmax = $ymax = -1;
-            $xlen = $ylen = 0;
-            foreach ($diffs as $diff) {
-                $xargs = (is_array($diff[1]) ? array_keys($diff[1]) : [$diff[1]]);
-                $yargs = (is_array($diff[2]) ? array_keys($diff[2]) : [$diff[2]]);
-                $xmin = min($xmin, ...$xargs);
-                $ymin = min($ymin, ...$yargs);
-                $xmax = max($xmax, ...$xargs);
-                $ymax = max($ymax, ...$yargs);
-                $xlen += is_array($diff[1]) ? count($diff[1]) : 0;
-                $ylen += is_array($diff[2]) ? count($diff[2]) : 0;
-            }
-            if ($xmin === -1 && $xlen > 0) {
-                $xmin = 0;
-            }
-            if ($ymin === -1 && $ylen > 0) {
-                $ymin = 0;
-            }
-            return [$xmin + 1, $xmax + 1, $xlen, $ymin + 1, $ymax + 1, $ylen];
-        };
-
-        $block_size = null;
-
-        if (is_string($options['stringify']) && preg_match('#html(=(.+))?#', $options['stringify'], $m)) {
-            $mode = $m[2] ?? null;
-            $options['stringify'] = function ($diffs) use ($htmlescape, $mode, $options) {
+            private function html($diffs, $mode)
+            {
+                $htmlescape = function ($v) use (&$htmlescape) { return is_array($v) ? array_map($htmlescape, $v) : htmlspecialchars($v, ENT_QUOTES); };
                 $taging = function ($tag, $content) { return strlen($tag) && strlen($content) ? "<$tag>$content</$tag>" : $content; };
+
                 $rule = [
                     '+' => [2 => 'ins'],
                     '-' => [1 => 'del'],
@@ -1331,7 +1455,7 @@ class Strings
                         $delete = array_splice($diff[1], 0, $length, []);
                         $append = array_splice($diff[2], 0, $length, []);
                         for ($i = 0; $i < $length; $i++) {
-                            $options2 = ['stringify' => null] + $options;
+                            $options2 = ['stringify' => null] + $this->options;
                             $diffs2 = (str_diff)(preg_split('/(?<!^)(?!$)/u', $delete[$i]), preg_split('/(?<!^)(?!$)/u', $append[$i]), $options2);
                             $result2 = [];
                             foreach ($diffs2 as $diff2) {
@@ -1356,160 +1480,56 @@ class Strings
                     }
                 }
                 return implode("\n", $result);
-            };
-        }
-
-        if ($options['stringify'] === 'normal') {
-            $options['stringify'] = function ($diffs) use ($prefixjoin) {
-                $index = function ($v) {
-                    if (!is_array($v)) {
-                        return $v + 1;
-                    }
-                    $keys = array_keys($v);
-                    $s = reset($keys) + 1;
-                    $e = end($keys) + 1;
-                    return $s === $e ? "$s" : "$s,$e";
-                };
-
-                $rule = [
-                    '+' => ['a', [2 => '> ']],
-                    '-' => ['d', [1 => '< ']],
-                    '*' => ['c', [1 => '< ', 2 => '> ']],
-                ];
-                $result = [];
-                foreach ($diffs as $diff) {
-                    if (isset($rule[$diff[0]])) {
-                        $difftext = [];
-                        foreach ($rule[$diff[0]][1] as $n => $sign) {
-                            $difftext[] = $prefixjoin($sign, $diff[$n], "\n");
-                        }
-                        $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
-                        $result[] = implode("\n---\n", $difftext);
-                    }
-                }
-                return implode("\n", $result);
-            };
-        }
-
-        if (is_string($options['stringify']) && preg_match('#context(=(\d+))?#', $options['stringify'], $m)) {
-            $block_size = (int) ($m[2] ?? 3);
-            $options['stringify'] = function ($diffs) use ($prefixjoin, $minmaxlen) {
-                $result = ["***************"];
-
-                [$xmin, $xmax, , $ymin, $ymax,] = $minmaxlen($diffs);
-                $xheader = $xmin === $xmax ? "$xmin" : "$xmin,$xmax";
-                $yheader = $ymin === $ymax ? "$ymin" : "$ymin,$ymax";
-
-                $rules = [
-                    '-*' => [
-                        'header' => "*** {$xheader} ****",
-                        '-'      => [1 => '- '],
-                        '*'      => [1 => '! '],
-                        '='      => [1 => '  '],
-                    ],
-                    '+*' => [
-                        'header' => "--- {$yheader} ----",
-                        '+'      => [2 => '+ '],
-                        '*'      => [2 => '! '],
-                        '='      => [2 => '  '],
-                    ],
-                ];
-                foreach ($rules as $key => $rule) {
-                    $result[] = $rule['header'];
-                    if (array_filter($diffs, function ($d) use ($key) { return strpos($key, $d[0]) !== false; })) {
-                        foreach ($diffs as $diff) {
-                            foreach ($rule[$diff[0]] ?? [] as $n => $sign) {
-                                $result[] = $prefixjoin($sign, $diff[$n], "\n");
-                            }
-                        }
-                    }
-                }
-                return implode("\n", $result);
-            };
-        }
-
-        if (is_string($options['stringify']) && preg_match('#unified(=(\d+))?#', $options['stringify'], $m)) {
-            $block_size = isset($m[2]) ? (int) $m[2] : null;
-            $options['stringify'] = function ($diffs) use ($prefixjoin, $minmaxlen, $block_size) {
-                $result = [];
-
-                if ($block_size !== null) {
-                    [$xmin, , $xlen, $ymin, , $ylen] = $minmaxlen($diffs);
-                    $xheader = $xlen === 1 ? "$xmin" : "$xmin,$xlen";
-                    $yheader = $ylen === 1 ? "$ymin" : "$ymin,$ylen";
-                    $result[] = "@@ -{$xheader} +{$yheader} @@";
-                }
-
-                $rule = [
-                    '+' => [2 => '+'],
-                    '-' => [1 => '-'],
-                    '*' => [1 => '-', 2 => '+'],
-                    '=' => [1 => ' '],
-                ];
-                foreach ($diffs as $diff) {
-                    foreach ($rule[$diff[0]] as $n => $sign) {
-                        $result[] = $prefixjoin($sign, $diff[$n], "\n");
-                    }
-                }
-                return implode("\n", $result);
-            };
-        }
-
-        if (!strlen($block_size)) {
-            $result = $options['stringify']($diffs);
-            if (strlen($result)) {
-                $result .= $trailingN;
-            }
-            return $result;
-        }
-
-        $head = function ($array) use ($block_size) { return array_slice($array, 0, $block_size, true); };
-        $tail = function ($array) use ($block_size) { return array_slice($array, -$block_size, null, true); };
-
-        $blocks = [];
-        $block = [];
-        $last = count($diffs) - 1;
-        foreach ($diffs as $n => $diff) {
-            if ($diff[0] !== '=') {
-                $block[] = $diff;
-                continue;
             }
 
-            if (!$block) {
-                if ($block_size) {
-                    $block[] = ['=', $tail($diff[1]), $tail($diff[2])];
-                }
-            }
-            elseif ($last === $n) {
-                if ($block_size) {
-                    $block[] = ['=', $head($diff[1]), $head($diff[2])];
-                }
-            }
-            elseif (count($diff[1]) > $block_size * 2) {
-                if ($block_size) {
-                    $block[] = ['=', $head($diff[1]), $head($diff[2])];
-                }
-                $blocks[] = $block;
+            private function block($diffs, $block_size)
+            {
+                $head = function ($array) use ($block_size) { return array_slice($array, 0, $block_size, true); };
+                $tail = function ($array) use ($block_size) { return array_slice($array, -$block_size, null, true); };
+
+                $blocks = [];
                 $block = [];
-                if ($block_size) {
-                    $block[] = ['=', $tail($diff[1]), $tail($diff[2])];
-                }
-            }
-            else {
-                if ($block_size) {
-                    $block[] = $diff;
-                }
-            }
-        }
-        if (trim(implode('', array_column($block, 0)), '=')) {
-            $blocks[] = $block;
-        }
+                $last = count($diffs) - 1;
+                foreach ($diffs as $n => $diff) {
+                    if ($diff[0] !== '=') {
+                        $block[] = $diff;
+                        continue;
+                    }
 
-        $result = implode("\n", array_map($options['stringify'], $blocks));
-        if (strlen($result)) {
-            $result .= $trailingN;
-        }
-        return $result;
+                    if (!$block) {
+                        if ($block_size) {
+                            $block[] = ['=', $tail($diff[1]), $tail($diff[2])];
+                        }
+                    }
+                    elseif ($last === $n) {
+                        if ($block_size) {
+                            $block[] = ['=', $head($diff[1]), $head($diff[2])];
+                        }
+                    }
+                    elseif (count($diff[1]) > $block_size * 2) {
+                        if ($block_size) {
+                            $block[] = ['=', $head($diff[1]), $head($diff[2])];
+                        }
+                        $blocks[] = $block;
+                        $block = [];
+                        if ($block_size) {
+                            $block[] = ['=', $tail($diff[1]), $tail($diff[2])];
+                        }
+                    }
+                    else {
+                        if ($block_size) {
+                            $block[] = $diff;
+                        }
+                    }
+                }
+                if (trim(implode('', array_column($block, 0)), '=')) {
+                    $blocks[] = $block;
+                }
+                return $blocks;
+            }
+        };
+
+        return $differ($xstring, $ystring);
     }
 
     /**
