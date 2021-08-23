@@ -734,7 +734,37 @@ class Vars
     }
 
     /**
-     * 指定されたパスワードとアルゴリズムで暗号化する
+     * 暗号化アルゴリズムのメタデータを返す
+     *
+     * ※ 内部向け
+     *
+     * @param string $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
+     * @return array 暗号化アルゴリズムのメタデータ
+     */
+    public static function cipher_metadata($cipher)
+    {
+        static $cache = [];
+
+        $cipher = strtolower($cipher);
+
+        if (!in_array($cipher, openssl_get_cipher_methods())) {
+            return [];
+        }
+
+        if (isset($cache[$cipher])) {
+            return $cache[$cipher];
+        }
+
+        $ivlen = openssl_cipher_iv_length($cipher);
+        @openssl_encrypt('dummy', $cipher, 'password', 0, str_repeat('x', $ivlen), $tag);
+        return $cache[$cipher] = [
+            'ivlen'  => $ivlen,
+            'taglen' => strlen($tag),
+        ];
+    }
+
+    /**
+     * 指定されたパスワードで暗号化する
      *
      * データは json を経由して base64（URL セーフ） して返す。
      * $tag を与えると認証タグが設定される。
@@ -744,6 +774,7 @@ class Vars
      *
      * - v0: バージョンのない無印。json -> encrypt -> base64
      * - v1: 上記に圧縮処理を加えたもの。json -> deflate -> encrypt -> base64
+     * - v2: 生成文字列に $cipher, $iv, $tag を加えたもの。json -> deflate -> cipher+iv+tag+encrypt -> base64
      *
      * Example:
      * ```php
@@ -756,56 +787,73 @@ class Vars
      * that($decrypted)->isSame(['a', 'b', 'c']);
      * // password が異なれば失敗して null を返す
      * that(decrypt($encrypted, 'invalid'))->isSame(null);
-     *
-     * $encrypted = encrypt($plaindata, 'password', 'aes-256-gcm', $tag);
-     * // タグが設定される
-     * that($tag)->isString();
-     * // タグが正しければ復号化されて元の配列になる
-     * that(decrypt($encrypted, 'password', 'aes-256-gcm', $tag))->isSame(['a', 'b', 'c']);
-     * // タグが不正なら失敗して null を返す
-     * that(decrypt($encrypted, 'password', 'aes-256-gcm', 'invalid'))->isSame(null);
      * ```
      *
      * @param mixed $plaindata 暗号化するデータ
-     * @param string $password パスワード
+     * @param string $password パスワード。十分な長さ、あるいは鍵導出関数を通した文字列でなければならない
      * @param string $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
      * @param string $tag 認証タグ
      * @return string 暗号化された文字列
      */
-    public static function encrypt($plaindata, $password, $cipher = 'aes-256-cbc', &$tag = '')
+    public static function encrypt($plaindata, $password, $cipher = 'aes-256-gcm', &$tag = '')
     {
         $jsondata = json_encode($plaindata, JSON_UNESCAPED_UNICODE);
         $zlibdata = gzdeflate($jsondata, 9);
 
-        $ivlen = openssl_cipher_iv_length($cipher);
-        $iv = $ivlen ? random_bytes($ivlen) : '';
-        $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...func_num_args() < 4 ? [] : [&$tag]);
+        $metadata = (cipher_metadata)($cipher);
+        if (!$metadata) {
+            throw new \InvalidArgumentException("undefined cipher algorithm('$cipher')");
+        }
+        $iv = $metadata['ivlen'] ? random_bytes($metadata['ivlen']) : '';
+        $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [&$tag] : []);
 
-        return rtrim(strtr(base64_encode($iv . $payload), ['+' => '-', '/' => '_']), '=') . '=1';
+        return rtrim(strtr(base64_encode($cipher . ':' . $iv . $tag . $payload), ['+' => '-', '/' => '_']), '=') . '=2';
     }
 
     /**
-     * 指定されたパスワードとアルゴリズムで復号化する
+     * 指定されたパスワードで復号化する
      *
-     * $cipher は配列で複数与えることができる。
+     * $ciphers は配列で複数与えることができる。
      * 複数与えた場合、順に試みて複合できた段階でその値を返す。
+     * v2 以降は生成文字列に $cipher が含まれているため指定不要（今後指定してはならない）。
      *
      * 復号に失敗すると null を返す。
      * 単体で使うことはないと思うので詳細は encrypt を参照。
      *
      * @param string $cipherdata 復号化するデータ
      * @param string $password パスワード
-     * @param string|array $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
+     * @param string|array $ciphers 暗号化方式（openssl_get_cipher_methods で得られるもの）
      * @param string $tag 認証タグ
      * @return mixed 復号化されたデータ
      */
-    public static function decrypt($cipherdata, $password, $cipher = 'aes-256-cbc', $tag = '')
+    public static function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
     {
         [$cipherdata, $version] = explode('=', $cipherdata, 2) + [1 => 0];
         $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
         $version = (int) $version;
 
-        foreach ((array) $cipher as $c) {
+        if ($version === 2) {
+            [$cipher, $ivtagpayload] = explode(':', $cipherdata, 2) + [1 => null];
+            $metadata = (cipher_metadata)($cipher);
+            if (!$metadata) {
+                return null;
+            }
+            $iv = substr($ivtagpayload, 0, $metadata['ivlen']);
+            $tag = substr($ivtagpayload, $metadata['ivlen'], $metadata['taglen']);
+            $payload = substr($ivtagpayload, $metadata['ivlen'] + $metadata['taglen']);
+            $tags = array_merge([$tag], (array) $ciphers); // for compatible
+            foreach ($tags as $tag) {
+                if ($metadata['taglen'] === strlen($tag)) {
+                    $decryptdata = openssl_decrypt($payload, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [$tag] : []);
+                    if ($decryptdata !== false) {
+                        return json_decode(gzinflate($decryptdata), true);
+                    }
+                }
+            }
+            return null;
+        }
+
+        foreach ((array) $ciphers as $c) {
             $ivlen = openssl_cipher_iv_length($c);
             if (strlen($cipherdata) <= $ivlen) {
                 continue;
@@ -1621,7 +1669,7 @@ class Vars
                             if ($token[1] === ')') {
                                 $constructing--;
                                 if ($constructing === 0) {
-                                    $constructing = null; // null を終了済みマークとして変数を再利用している
+                                    $constructing = null;          // null を終了済みマークとして変数を再利用している
                                     $block[] = [null, '()', null]; // for psr-12
                                     continue;
                                 }

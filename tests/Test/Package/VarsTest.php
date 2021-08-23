@@ -486,30 +486,25 @@ class VarsTest extends AbstractTestCase
             ],
         ];
 
-        $encrypted = (encrypt)($data, 'secret', 'aes-128-ecb');
-        that((decrypt)($encrypted, 'secret', 'aes-128-ecb'))->isSame($data);    // password が同じなら復号できる
-        that((decrypt)($encrypted, 'invalid', 'aes-128-ecb'))->isNull();        // password が異なれば複合できない
-        that((decrypt)('this is invalid', 'secret', 'aes-128-ecb'))->isNull();  // data が不正なら複合できない
+        $encrypted = (encrypt)($data, 'secret', 'aes-128-ecb');                 // IV なし, TAG なし
+        that((decrypt)($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
+        that((decrypt)($encrypted, 'invalid'))->isNull();                       // password が異なれば複合できない
+        that((decrypt)('this is invalid', 'secret'))->isNull();                 // data が不正なら複合できない
         that((encrypt)($data, 'secret', 'aes-128-ecb'))->isSame($encrypted);    // ecb なので同じ暗号文が生成される
 
-        $encrypted = (encrypt)($data, 'secret', 'aes-256-cbc');
-        that((decrypt)($encrypted, 'secret', 'aes-256-cbc'))->isSame($data);    // password が同じなら復号できる
-        that((decrypt)($encrypted, 'invalid', 'aes-256-cbc'))->isNull();        // password が異なれば複合できない
-        that((decrypt)('this is invalid', 'secret', 'aes-256-cbc'))->isNull();  // data が不正なら複合できない
+        $encrypted = (encrypt)($data, 'secret', 'aes-256-cbc');                 // IV あり, TAG なし
+        that((decrypt)($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
+        that((decrypt)($encrypted, 'invalid'))->isNull();                       // password が異なれば複合できない
+        that((decrypt)('this is invalid', 'secret'))->isNull();                 // data が不正なら複合できない
         that((encrypt)($data, 'secret', 'aes-256-cbc'))->isNotSame($encrypted); // cbc なので異なる暗号文が生成される
 
-        $tag = $dummy = null;
-        $encrypted = (encrypt)($data, 'secret', 'aes-256-ccm', $tag);
-        that($tag)->isNotNull();
-        that((decrypt)($encrypted, 'secret', 'aes-256-ccm', $tag))->isSame($data);    // password,tag が同じなら復号できる
-        that((decrypt)($encrypted, 'invalid', 'aes-256-ccm', $tag))->isNull();        // password が異なれば複合できない
-        that((decrypt)($encrypted, 'secret', 'aes-256-ccm', 'hoge'))->isNull();       // tag が異なれば複合できない
-        that((decrypt)('this is invalid', 'secret', 'aes-256-ccm', $tag))->isNull();  // data が不正なら複合できない
-        that((encrypt)($data, 'secret', 'aes-256-ccm', $dummy))->isNotSame($encrypted); // ccm なので異なる暗号文が生成される
+        $encrypted = (encrypt)($data, 'secret', 'aes-256-ccm');                 // IV あり, TAG あり
+        that((decrypt)($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
+        that((decrypt)($encrypted, 'invalid'))->isNull();                       // password が異なれば複合できない
+        that((decrypt)('this is invalid=2', 'secret'))->isNull();               // data が不正なら複合できない
+        that((encrypt)($data, 'secret', 'aes-256-ccm'))->isNotSame($encrypted); // ccm なので異なる暗号文が生成される
 
-        // 順に試みて複合される
-        that(@(decrypt)($encrypted, 'secret', ['aes-128-ecb', 'aes-256-cbc', 'aes-256-ccm'], $tag))->isSame($data);
-        that((decrypt)($encrypted, 'secret', ['aes-128-ecb', 'aes-256-cbc']))->isNull();
+        that(encrypt)->try('dummy', 'pass', 'unknown')->wasThrown('undefined cipher algorithm');
     }
 
     function test_encrypt_decrypt_invalid()
@@ -541,6 +536,9 @@ class VarsTest extends AbstractTestCase
 
         $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s=99";
         that((decrypt)($v0, 'secret', 'aes-128-ecb'))->isSame($data);
+
+        $v1 = "uuz9p1tBXG3jFKV_y2PN_23s549iyppC5TsUeC4uOe5vdDNkot8DjuXL9kWzmDUlmPH4k0VP05nlHazteEQndsClvXVt_LztaTFno0Y0tg8=1";
+        that((decrypt)($v1, 'secret', 'aes-128-ecb'))->isSame($data);
     }
 
     function test_varcmp()
