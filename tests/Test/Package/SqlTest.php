@@ -712,7 +712,7 @@ WITH RECURSIVE cte AS
   UNION ALL
   SELECT * from t_something2 where (C and D)
 )
-SELECT * FROM cte'))->IsEqualTrimming('
+SELECT (1 + 2) as t FROM cte'))->IsEqualTrimming('
 WITH RECURSIVE cte AS(
   SELECT
     * 
@@ -727,9 +727,9 @@ WITH RECURSIVE cte AS(
     t_something2 
   where
     (C and D)
-  )
+)
 SELECT
-  * 
+  (1 + 2) as t 
 FROM
   cte
 ');

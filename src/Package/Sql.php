@@ -482,11 +482,12 @@ class Sql
                             $parts = $parts . $MARK_BR;
                         }
                         else {
+                            $lastnt = $subcontext === 'WITH' ? '' : $MARK_NT;
                             $brnt = $MARK_BR . $MARK_NT;
                             if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)[1]) === 'SELECT') {
                                 $brnt .= $MARK_NT;
                             }
-                            $parts = preg_replace("#($MARK_BR)+#u", $brnt, $parts) . $MARK_BR . $MARK_NT;
+                            $parts = preg_replace("#($MARK_BR)+#u", $brnt, $parts) . $MARK_BR . $lastnt;
                             $parts = preg_replace("#$MARK_CS#u", "", $parts);
                         }
 
@@ -497,6 +498,7 @@ class Sql
                             $suffix = '';
                         }
                         if ($subcontext === 'WITH') {
+                            $subcontext = '';
                             $suffix .= $MARK_BR;
                         }
 
