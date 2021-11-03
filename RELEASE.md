@@ -11,6 +11,17 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.24
+
+- [fixbug][Sql] sql_format で WITH があるとインデントが乱れる不具合を修正
+- [refactor][Strings] str_diff のリファクタ
+- [change][Vars] encrypt のバージョンアップ
+- [feature][Arrays] array_extend を追加
+- [feature][Classobj] class_replace の無名クラス対応
+- [feature][Classobj] class_extends に implements 引数を追加
+- [change][Utility] cacheobject の仕様変更
+- [change][Network] http_request(s) の仕様変更
+
 ## 1.4.23
 
 - [fixbug][all] 必要のないところで arrayval を再帰的に行っていた不具合を修正
