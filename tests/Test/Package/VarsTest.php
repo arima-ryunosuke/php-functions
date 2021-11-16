@@ -541,6 +541,15 @@ class VarsTest extends AbstractTestCase
         that((decrypt)($v1, 'secret', 'aes-128-ecb'))->isSame($data);
     }
 
+    function test_var_hash()
+    {
+        that((var_hash)([1, 2, 3], ['md5'], false))->isSame('262bbc0aa0dc62a93e350f1f7df792b9');
+        that((var_hash)([1, 2, 3], ['sha1'], false))->isSame('899a999da95e9f021fc63c6af006933fd4dc3aa1');
+        that((var_hash)([1, 2, 3], ['md5', 'sha1'], false))->isSame('262bbc0aa0dc62a93e350f1f7df792b9899a999da95e9f021fc63c6af006933fd4dc3aa1');
+        that((var_hash)([1, 2, 3], ['md5', 'sha1'], true))->isSame('Jiu8CqDcYqk-NQ8fffeSuYmamZ2pXp8CH8Y8avAGkz_U3Dqh');
+        that((var_hash)([1, 2, 3], ['md5', 'sha1'], null))->stringLengthEquals(36);
+    }
+
     function test_varcmp()
     {
         // strict
