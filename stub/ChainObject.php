@@ -202,12 +202,15 @@
  * @method   \ChainObject  convertE2($array, $callback)
  *
  * @see array_count
- * @method   \ChainObject  array_count($callback)
- * @method   \ChainObject  array_count1($array)
- * @method   \ChainObject  array_countP($callback)
- * @method   \ChainObject  array_countP1($array)
- * @method   \ChainObject  array_countE($callback)
- * @method   \ChainObject  array_countE1($array)
+ * @method   \ChainObject  array_count($callback, $recursive = false)
+ * @method   \ChainObject  array_count1($array, $recursive = false)
+ * @method   \ChainObject  array_count2($array, $callback)
+ * @method   \ChainObject  array_countP($callback, $recursive = false)
+ * @method   \ChainObject  array_countP1($array, $recursive = false)
+ * @method   \ChainObject  array_countP2($array, $callback)
+ * @method   \ChainObject  array_countE($callback, $recursive = false)
+ * @method   \ChainObject  array_countE1($array, $recursive = false)
+ * @method   \ChainObject  array_countE2($array, $callback)
  *
  * @see array_count_values
  * @property \ChainObject $array_count_values
@@ -941,26 +944,32 @@
  * @method   \ChainObject  map_method3($array, $method, $args = [])
  *
  * @see array_map_recursive
- * @method   \ChainObject  array_map_recursive($callback, $iterable = true)
- * @method   \ChainObject  array_map_recursive1($array, $iterable = true)
- * @method   \ChainObject  array_map_recursive2($array, $callback)
- * @method   \ChainObject  array_map_recursiveP($callback, $iterable = true)
- * @method   \ChainObject  array_map_recursiveP1($array, $iterable = true)
- * @method   \ChainObject  array_map_recursiveP2($array, $callback)
- * @method   \ChainObject  array_map_recursiveE($callback, $iterable = true)
- * @method   \ChainObject  array_map_recursiveE1($array, $iterable = true)
- * @method   \ChainObject  array_map_recursiveE2($array, $callback)
+ * @method   \ChainObject  array_map_recursive($callback, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  array_map_recursive1($array, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  array_map_recursive2($array, $callback, $apply_array = false)
+ * @method   \ChainObject  array_map_recursive3($array, $callback, $iterable = true)
+ * @method   \ChainObject  array_map_recursiveP($callback, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  array_map_recursiveP1($array, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  array_map_recursiveP2($array, $callback, $apply_array = false)
+ * @method   \ChainObject  array_map_recursiveP3($array, $callback, $iterable = true)
+ * @method   \ChainObject  array_map_recursiveE($callback, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  array_map_recursiveE1($array, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  array_map_recursiveE2($array, $callback, $apply_array = false)
+ * @method   \ChainObject  array_map_recursiveE3($array, $callback, $iterable = true)
  *
  * @see array_map_recursive
- * @method   \ChainObject  map_recursive($callback, $iterable = true)
- * @method   \ChainObject  map_recursive1($array, $iterable = true)
- * @method   \ChainObject  map_recursive2($array, $callback)
- * @method   \ChainObject  map_recursiveP($callback, $iterable = true)
- * @method   \ChainObject  map_recursiveP1($array, $iterable = true)
- * @method   \ChainObject  map_recursiveP2($array, $callback)
- * @method   \ChainObject  map_recursiveE($callback, $iterable = true)
- * @method   \ChainObject  map_recursiveE1($array, $iterable = true)
- * @method   \ChainObject  map_recursiveE2($array, $callback)
+ * @method   \ChainObject  map_recursive($callback, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  map_recursive1($array, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  map_recursive2($array, $callback, $apply_array = false)
+ * @method   \ChainObject  map_recursive3($array, $callback, $iterable = true)
+ * @method   \ChainObject  map_recursiveP($callback, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  map_recursiveP1($array, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  map_recursiveP2($array, $callback, $apply_array = false)
+ * @method   \ChainObject  map_recursiveP3($array, $callback, $iterable = true)
+ * @method   \ChainObject  map_recursiveE($callback, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  map_recursiveE1($array, $iterable = true, $apply_array = false)
+ * @method   \ChainObject  map_recursiveE2($array, $callback, $apply_array = false)
+ * @method   \ChainObject  map_recursiveE3($array, $callback, $iterable = true)
  *
  * @see array_maps
  * @property \ChainObject $array_maps
@@ -1202,6 +1211,18 @@
  * @property \ChainObject $array_rand
  * @method   \ChainObject  array_rand($num_req = null)
  * @method   \ChainObject  array_rand1($arg)
+ *
+ * @see array_random
+ * @property \ChainObject $array_random
+ * @method   \ChainObject  array_random($count = null, $preserve_keys = false)
+ * @method   \ChainObject  array_random1($array, $preserve_keys = false)
+ * @method   \ChainObject  array_random2($array, $count = null)
+ *
+ * @see array_random
+ * @property \ChainObject $random
+ * @method   \ChainObject  random($count = null, $preserve_keys = false)
+ * @method   \ChainObject  random1($array, $preserve_keys = false)
+ * @method   \ChainObject  random2($array, $count = null)
  *
  * @see array_reduce
  * @method   \ChainObject  array_reduce($callback, $initial = null)
@@ -1706,6 +1727,9 @@
  * @method   \ChainObject  attr_get($value, $default = null)
  * @method   \ChainObject  attr_get1($key, $default = null)
  * @method   \ChainObject  attr_get2($key, $value)
+ *
+ * @see auto_loader
+ * @method   \ChainObject  auto_loader()
  *
  * @see average
  * @method   \ChainObject  average(...$variadic)
@@ -2468,6 +2492,11 @@
  * @property \ChainObject $file_extension
  * @method   \ChainObject  file_extension($extension = "")
  * @method   \ChainObject  file_extension1($filename)
+ *
+ * @see file_get_arrays
+ * @property \ChainObject $file_get_arrays
+ * @method   \ChainObject  file_get_arrays($options = [])
+ * @method   \ChainObject  file_get_arrays1($filename)
  *
  * @see file_get_contents
  * @property \ChainObject $file_get_contents
@@ -4212,7 +4241,8 @@
  *
  * @see parse_namespace
  * @property \ChainObject $parse_namespace
- * @method   \ChainObject  parse_namespace()
+ * @method   \ChainObject  parse_namespace($options = [])
+ * @method   \ChainObject  parse_namespace1($filename)
  *
  * @see parse_php
  * @property \ChainObject $parse_php
@@ -4389,6 +4419,14 @@
  * @property \ChainObject $proc_terminate
  * @method   \ChainObject  proc_terminate($signal = null)
  * @method   \ChainObject  proc_terminate1($process)
+ *
+ * @see process_parallel
+ * @property \ChainObject $process_parallel
+ * @method   \ChainObject  process_parallel($args = [], $autoload = null, $workdir = null, $env = null)
+ * @method   \ChainObject  process_parallel1($tasks, $autoload = null, $workdir = null, $env = null)
+ * @method   \ChainObject  process_parallel2($tasks, $args = [], $workdir = null, $env = null)
+ * @method   \ChainObject  process_parallel3($tasks, $args = [], $autoload = null, $env = null)
+ * @method   \ChainObject  process_parallel4($tasks, $args = [], $autoload = null, $workdir = null)
  *
  * @see profiler
  * @method   \ChainObject  profiler()
@@ -5669,6 +5707,12 @@
  * @property \ChainObject $var_export3
  * @method   \ChainObject  var_export3($return = false)
  * @method   \ChainObject  var_export31($value)
+ *
+ * @see var_hash
+ * @property \ChainObject $var_hash
+ * @method   \ChainObject  var_hash($algos = ["md5", "sha1"], $base64 = true)
+ * @method   \ChainObject  var_hash1($var, $base64 = true)
+ * @method   \ChainObject  var_hash2($var, $algos = ["md5", "sha1"])
  *
  * @see var_html
  * @property \ChainObject $var_html

@@ -714,7 +714,7 @@ that(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', tru
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_recursive()">
-                                    ryunosuke\Functions\Package\Arrays::array_map_recursive		</a>	<small>($array, $callback, $iterable = true) : array</small>
+                                    ryunosuke\Functions\Package\Arrays::array_map_recursive		</a>	<small>($array, $callback, $iterable = true, $apply_array = false) : array</small>
 		</h4>
 	<div class="description"><p>array_map の再帰版</p>
 <p>下記の点で少し array_map とは挙動が異なる。</p>
@@ -726,7 +726,7 @@ that(array_grep_key(['a' =&gt; 'A', 'aa' =&gt; 'AA', 'b' =&gt; 'B'], '#^a#', tru
 <li>値だけでなくキーも渡ってくる</li>
 </ul>
 <p>Example:</p>
-<pre><code class="language-php">// array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
+<pre><code class="language-php">// デフォルトでは array_walk 等と同様に葉のみが渡ってくる（iterable も対象になる）
 that(array_map_recursive([
     'k' =&gt; 'v',
     'c' =&gt; new \ArrayObject([
@@ -751,6 +751,24 @@ that(array_map_recursive([
 ], 'gettype', false))-&gt;isSame([
     'k' =&gt; 'string',
     'c' =&gt; 'object',
+]);
+
+// さらに、自身にも適用できる（呼び出しは子が先で、本当の意味で「すべての要素」で呼び出される）
+that((array_map_recursive)([
+    'k' =&gt; 'v',
+    'c' =&gt; [
+        'k1' =&gt; 'v1',
+        'k2' =&gt; 'v2',
+    ],
+], function ($v) {
+    // 配列は stdclass 化、それ以外は大文字化
+    return is_array($v) ? (object) $v : strtoupper($v);
+}, true, true))-&gt;is((object) [
+    'k' =&gt; 'V',
+    'c' =&gt; (object) [
+        'k1' =&gt; 'V1',
+        'k2' =&gt; 'V2',
+    ],
 ]);
 </code></pre>
 </div>
@@ -1136,7 +1154,7 @@ that(array_assort(['1', '2', '3'], [
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()">
-                                    ryunosuke\Functions\Package\Arrays::array_count		</a>	<small>($array, $callback) : int<span class="type-separator"></span><wbr>array</small>
+                                    ryunosuke\Functions\Package\Arrays::array_count		</a>	<small>($array, $callback, $recursive = false) : int<span class="type-separator"></span><wbr>array</small>
 		</h4>
 	<div class="description"><p>配列をコールバックに従ってカウントする</p>
 <p>コールバックが true 相当を返した要素をカウントして返す。<br />
@@ -1145,6 +1163,8 @@ that(array_assort(['1', '2', '3'], [
 <li>$callback が要求するならキーも渡ってくる</li>
 <li>$callback には配列が渡せる。配列を渡した場合は件数を配列で返す（Example 参照）</li>
 </ul>
+<p>$recursive に true を渡すと再帰的に動作する。<br />
+末端・配列を問わずに呼び出されるので場合によっては is_array などの判定が必要になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = ['hoge', 'fuga', 'piyo'];
 // 'o' を含むものの数（2個）
@@ -1156,6 +1176,23 @@ that(array_count($array, [
 ]))-&gt;isSame([
     'a' =&gt; 1,
     'o' =&gt; 2,
+]);
+
+// 再帰版
+$array = [
+    ['1', '2', '3'],
+    ['a', 'b', 'c'],
+    ['X', 'Y', 'Z'],
+    [[[['a', 'M', 'Z']]]],
+];
+that((array_count)($array, [
+    'lower' =&gt; function ($v) { return !is_array($v) &amp;&amp; ctype_lower($v);},
+    'upper' =&gt; function ($v) { return !is_array($v) &amp;&amp; ctype_upper($v);},
+    'array' =&gt; function ($v) { return is_array($v);},
+], true))-&gt;is([
+    'lower' =&gt; 4, // 小文字の数
+    'upper' =&gt; 5, // 大文字の数
+    'array' =&gt; 7, // 配列の数
 ]);
 </code></pre>
 </div>
@@ -1347,6 +1384,28 @@ that(array_order([$v1, $v2, $v3], ['name' =&gt; true, 'no' =&gt; -SORT_NATURAL])
 	<div class="description"><p>shuffle のキーが保存される＋参照渡しではない版</p>
 <p>Example:</p>
 <pre><code class="language-php">that(array_shuffle(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']))-&gt;is(['b' =&gt; 'B', 'a' =&gt; 'A', 'c' =&gt; 'C']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_random()">
+                                    ryunosuke\Functions\Package\Arrays::array_random		</a>	<small>($array, $count = null, $preserve_keys = false) : mixed</small>
+		</h4>
+	<div class="description"><p>array_rand の要素版</p>
+<p>とはいえ多少の差異がある。</p>
+<ul>
+<li>第2引数に null を与えると単一の値として返す</li>
+<li>第2引数に数値を与えると配列で返す（たとえ1でも配列で返す）</li>
+<li>第2引数に 0 を与えてもエラーにはならない（空配列を返す）</li>
+<li>第3引数に true を与えるとキーを維持して返す</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">mt_srand(4); // テストがコケるので種固定
+// 配列からランダムに値1件取得（単一で返す）
+that(array_random(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C']))-&gt;isSame('B');
+// 配列からランダムに値2件取得（配列で返す）
+that(array_random(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 2))-&gt;isSame(['B', 'C']);
+// 配列からランダムに値2件取得（キーを維持）
+that(array_random(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 2, true))-&gt;isSame(['a' =&gt; 'A', 'c' =&gt; 'C']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -1966,6 +2025,16 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::auto_loader()">
+                                    ryunosuke\Functions\Package\Classobj::auto_loader		</a>	<small>($startdir = null) : string</small>
+		</h4>
+	<div class="description"><p>vendor/autoload.php を返す</p>
+<p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(auto_loader())-&gt;contains('autoload.php');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_loader()">
                                     ryunosuke\Functions\Package\Classobj::class_loader		</a>	<small>($startdir = null) : <a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></small>
 		</h4>
@@ -2444,6 +2513,39 @@ that(file_suffix('filename.ext1.ext2', '-min'))-&gt;isSame('filename-min.ext1.ex
 <pre><code class="language-php">that(file_extension('filename.ext'))-&gt;isSame('ext');
 that(file_extension('filename.ext', 'txt'))-&gt;isSame('filename.txt');
 that(file_extension('filename.ext', ''))-&gt;isSame('filename');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_get_arrays()">
+                                    ryunosuke\Functions\Package\FileSystem::file_get_arrays		</a>	<small>($filename, $options = []) : array</small>
+		</h4>
+	<div class="description"><p>指定ファイルを拡張子別に php の配列として読み込む</p>
+<p>形式は拡張子で自動判別する。<br />
+その際、2重拡張子で hoge.sjis.csv のように指定するとそのファイルのエンコーディングを指定したことになる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// csv ファイルを読み込んで配列で返す
+file_put_contents($csvfile = sys_get_temp_dir() . '/hoge.csv', 'a,b,c
+1,2,3
+4,5,6
+7,8,9
+');
+that(file_get_arrays($csvfile))-&gt;isSame([
+    ['a' =&gt; '1', 'b' =&gt; '2', 'c' =&gt; '3'],
+    ['a' =&gt; '4', 'b' =&gt; '5', 'c' =&gt; '6'],
+    ['a' =&gt; '7', 'b' =&gt; '8', 'c' =&gt; '9'],
+]);
+
+// sjis の json ファイルを読み込んで配列で返す
+file_put_contents($jsonfile = sys_get_temp_dir() . '/hoge.sjis.json', '[
+{"a": 1, "b": 2, "c": 3},
+{"a": 4, "b": 5, "c": 6},
+{"a": 7, "b": 8, "c": 9}
+]');
+that(file_get_arrays($jsonfile))-&gt;isSame([
+    ['a' =&gt; 1, 'b' =&gt; 2, 'c' =&gt; 3],
+    ['a' =&gt; 4, 'b' =&gt; 5, 'c' =&gt; 6],
+    ['a' =&gt; 7, 'b' =&gt; 8, 'c' =&gt; 9],
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4599,6 +4701,17 @@ that(csv_export($csvarrays, [
 A2,C2
 A3,C3
 ");
+
+// structure:true で配列も扱える
+that(csv_export([
+    ['scalar' =&gt; '123', 'list' =&gt; ['list11', 'list12'], 'hash' =&gt; ['a' =&gt; 'hash1A', 'b' =&gt; 'hash1B']],
+    ['scalar' =&gt; '456', 'list' =&gt; ['list21', 'list22'], 'hash' =&gt; ['a' =&gt; 'hash2A', 'b' =&gt; 'hash2B']],
+], [
+    'structure' =&gt; true,
+]))-&gt;is("scalar,list[],list[],hash[a],hash[b]
+123,list11,list12,hash1A,hash1B
+456,list21,list22,hash2A,hash2B
+");
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -4610,6 +4723,7 @@ A3,C3
 ただし、オプションで headers が与えられた場合はそれを使用する。<br />
 この headers オプションはヘッダフィルタも兼ねる（[n =&gt; header] で「n 番目フィールドを header で取り込み」となる）。<br />
 入力にヘッダがありかつ headers に連想配列が渡された場合はフィルタ兼読み換えとなる（Example を参照）。</p>
+<p>structure オプションが渡された場合は query like なヘッダーで配列になる。</p>
 <p>callback オプションが渡された場合は「あらゆる処理の最後」にコールされる。<br />
 つまりヘッダの読み換えや文字エンコーディングの変換が行われた後の状態でコールされる。<br />
 また、 false を返すとその要素はスルーされる。</p>
@@ -4652,6 +4766,18 @@ A3,B3,C3
     ['hoge' =&gt; 'A1', 'piyo' =&gt; 'C1'],
     ['hoge' =&gt; 'A2', 'piyo' =&gt; 'C2'],
     ['hoge' =&gt; 'A3', 'piyo' =&gt; 'C3'],
+]);
+
+// structure:true で配列も扱える
+that(csv_import("
+scalar,list[],list[],hash[a],hash[b]
+123,list11,list12,hash1A,hash1B
+456,list21,list22,hash2A,hash2B
+", [
+    'structure' =&gt; true,
+]))-&gt;is([
+    ['scalar' =&gt; '123', 'list' =&gt; ['list11', 'list12'], 'hash' =&gt; ['a' =&gt; 'hash1A', 'b' =&gt; 'hash1B']],
+    ['scalar' =&gt; '456', 'list' =&gt; ['list21', 'list22'], 'hash' =&gt; ['a' =&gt; 'hash2A', 'b' =&gt; 'hash2B']],
 ]);
 </code></pre>
 </div>
@@ -5767,7 +5893,7 @@ that($rand1)-&gt;isNotSame($rand3);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::parse_namespace()">
-                                    ryunosuke\Functions\Package\Utility::parse_namespace		</a>	<small>($filename) : array</small>
+                                    ryunosuke\Functions\Package\Utility::parse_namespace		</a>	<small>($filename, $options = []) : array</small>
 		</h4>
 	<div class="description"><p>php ファイルをパースして名前空間配列を返す</p>
 <p>ファイル内で use/use const/use function していたり、シンボルを定義していたりする箇所を検出して名前空間単位で返す。</p>
@@ -5780,6 +5906,7 @@ use ArrayObject as AO;
 use function strlen as SL;
 function InnerFunc(){}
 class InnerClass{}
+define("OUTER\\\\CONST", "OuterConst");
 
 namespace NS2;
 use RuntimeException as RE;
@@ -5799,6 +5926,13 @@ that(parse_namespace(sys_get_temp_dir() . '/namespace.php'))-&gt;isSame([
             'AO'         =&gt; 'ArrayObject',
             'InnerClass' =&gt; 'NS1\\InnerClass',
         ],
+    ],
+    'OUTER' =&gt; [
+        'const'    =&gt; [
+            'CONST' =&gt; 'OUTER\\CONST',
+        ],
+        'function' =&gt; [],
+        'alias'    =&gt; [],
     ],
     'NS2' =&gt; [
         'const'    =&gt; [
@@ -5928,6 +6062,91 @@ $rc = process(PHP_BINARY, [
 that($rc)-&gt;isSame(123); // -d で与えた max_file_uploads で exit してるので 123
 that($stdout)-&gt;isSame('out'); // 標準出力に標準入力を書き込んでいるので "out" が格納される
 that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるので "err" が格納される
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process_async()">
+                                    ryunosuke\Functions\Package\Utility::process_async		</a>	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : callable</small>
+		</h4>
+	<div class="description"><p>proc_open ～ proc_close の一連の処理を行う（非同期版）</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process_parallel()">
+                                    ryunosuke\Functions\Package\Utility::process_parallel		</a>	<small>($tasks, $args = [], $autoload = null, $workdir = null, $env = null) : array</small>
+		</h4>
+	<div class="description"><p>複数の callable を並列で実行する</p>
+<p>callable はクロージャも使用できるが、独自の方法でエクスポートしてから実行するので可能な限り this bind は外したほうが良い。</p>
+<p>Example:</p>
+<pre><code class="language-php"># 単一のクロージャを複数の引数で回す
+$t = microtime(true);
+$result = process_parallel(static function ($arg1, $arg2) {
+    usleep(500 * 1000);
+    fwrite(STDOUT, "this is stdout");
+    fwrite(STDERR, "this is stderr");
+    return $arg1 + $arg2;
+}, ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [3, 4]]);
+// 500ms かかる処理を3本実行するが、トータル時間は 1500ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+that(microtime(true) - $t)-&gt;lessThan(1.0);
+// 実行結果は下記のような配列で返ってくる（その際キーは維持される）
+that($result)-&gt;isSame([
+    'a' =&gt; [
+        'status' =&gt; 0,
+        'stdout' =&gt; "this is stdout",
+        'stderr' =&gt; "this is stderr",
+        'return' =&gt; 3,
+    ],
+    'b' =&gt; [
+        'status' =&gt; 0,
+        'stdout' =&gt; "this is stdout",
+        'stderr' =&gt; "this is stderr",
+        'return' =&gt; 5,
+    ],
+    [
+        'status' =&gt; 0,
+        'stdout' =&gt; "this is stdout",
+        'stderr' =&gt; "this is stderr",
+        'return' =&gt; 7,
+    ],
+]);
+# 複数のクロージャを複数の引数で回す（この場合、引数のキーは合わせなければならない）
+$t = microtime(true);
+$result = process_parallel([
+    'a' =&gt; static function ($arg1, $arg2) {
+        usleep(100 * 1000);
+        return $arg1 + $arg2;
+    },
+    'b' =&gt; static function ($arg1, $arg2) {
+        usleep(300 * 1000);
+        return $arg1 * $arg2;
+    },
+    static function ($arg) {
+        usleep(500 * 1000);
+        exit($arg);
+    },
+], ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [127]]);
+// 100,300,500ms かかる処理を3本実行するが、トータル時間は 900ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+that(microtime(true) - $t)-&gt;lessThan(1.0);
+// 実行結果は下記のような配列で返ってくる（その際キーは維持される）
+that($result)-&gt;isSame([
+    'a' =&gt; [
+        'status' =&gt; 0,
+        'stdout' =&gt; "",
+        'stderr' =&gt; "",
+        'return' =&gt; 3,
+    ],
+    'b' =&gt; [
+        'status' =&gt; 0,
+        'stdout' =&gt; "",
+        'stderr' =&gt; "",
+        'return' =&gt; 6,
+    ],
+    [
+        'status' =&gt; 127,  // 終了コードが入ってくる
+        'stdout' =&gt; "",
+        'stderr' =&gt; "",
+        'return' =&gt; null,
+    ],
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6493,6 +6712,21 @@ that(decrypt($encrypted, 'invalid'))-&gt;isSame(null);
 v2 以降は生成文字列に $cipher が含まれているため指定不要（今後指定してはならない）。</p>
 <p>復号に失敗すると null を返す。<br />
 単体で使うことはないと思うので詳細は encrypt を参照。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_hash()">
+                                    ryunosuke\Functions\Package\Vars::var_hash		</a>	<small>($var, $algos = [&quot;md5&quot;, &quot;sha1&quot;], $base64 = true) : string</small>
+		</h4>
+	<div class="description"><p>値に複数のハッシュアルゴリズムを適用させて結合して返す</p>
+<p>$data は何らかの方法で文字列化される（この「何らかの方法」は互換性を担保しない）。<br />
+文字長がかなり増えるため、 $base64 に true を与えるとバイナリ変換してその結果を base64（url セーフ）して返す。<br />
+さらに false を与えると 16進数文字列で返し、 null を与えるとバイナリ文字列で返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 配列をハッシュ化する
+that(var_hash(['a', 'b', 'c']))-&gt;isSame('7BDgx6NE2hkXAKtKzhpeJm6-mheMOQWNgrCe7768OiFeoWgA');
+// オブジェクトをハッシュ化する
+that(var_hash(new \ArrayObject(['a', 'b', 'c'])))-&gt;isSame('-zR2rZ58CzuYhhdHn1Oq90zkYSaxMS-dHUbmb0MTRM4gBpj2');
+</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::varcmp()">

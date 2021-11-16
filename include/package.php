@@ -795,6 +795,7 @@ define("ryunosuke\\Functions\\Package\\array_any", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\array_distinct", ["ryunosuke\\Functions\\Package\\Arrays", "array_distinct"]);
 define("ryunosuke\\Functions\\Package\\array_order", ["ryunosuke\\Functions\\Package\\Arrays", "array_order"]);
 define("ryunosuke\\Functions\\Package\\array_shuffle", ["ryunosuke\\Functions\\Package\\Arrays", "array_shuffle"]);
+define("ryunosuke\\Functions\\Package\\array_random", ["ryunosuke\\Functions\\Package\\Arrays", "array_random"]);
 define("ryunosuke\\Functions\\Package\\array_shrink_key", ["ryunosuke\\Functions\\Package\\Arrays", "array_shrink_key"]);
 define("ryunosuke\\Functions\\Package\\array_extend", ["ryunosuke\\Functions\\Package\\Arrays", "array_extend"]);
 define("ryunosuke\\Functions\\Package\\array_fill_gap", ["ryunosuke\\Functions\\Package\\Arrays", "array_fill_gap"]);
@@ -813,6 +814,7 @@ define("ryunosuke\\Functions\\Package\\array_schema", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\stdclass", ["ryunosuke\\Functions\\Package\\Classobj", "stdclass"]);
 define("ryunosuke\\Functions\\Package\\detect_namespace", ["ryunosuke\\Functions\\Package\\Classobj", "detect_namespace"]);
 define("ryunosuke\\Functions\\Package\\class_uses_all", ["ryunosuke\\Functions\\Package\\Classobj", "class_uses_all"]);
+define("ryunosuke\\Functions\\Package\\auto_loader", ["ryunosuke\\Functions\\Package\\Classobj", "auto_loader"]);
 define("ryunosuke\\Functions\\Package\\class_loader", ["ryunosuke\\Functions\\Package\\Classobj", "class_loader"]);
 define("ryunosuke\\Functions\\Package\\class_namespace", ["ryunosuke\\Functions\\Package\\Classobj", "class_namespace"]);
 define("ryunosuke\\Functions\\Package\\class_shorten", ["ryunosuke\\Functions\\Package\\Classobj", "class_shorten"]);
@@ -832,6 +834,7 @@ define("ryunosuke\\Functions\\Package\\file_list", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\file_tree", ["ryunosuke\\Functions\\Package\\FileSystem", "file_tree"]);
 define("ryunosuke\\Functions\\Package\\file_suffix", ["ryunosuke\\Functions\\Package\\FileSystem", "file_suffix"]);
 define("ryunosuke\\Functions\\Package\\file_extension", ["ryunosuke\\Functions\\Package\\FileSystem", "file_extension"]);
+define("ryunosuke\\Functions\\Package\\file_get_arrays", ["ryunosuke\\Functions\\Package\\FileSystem", "file_get_arrays"]);
 define("ryunosuke\\Functions\\Package\\file_set_contents", ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_contents"]);
 define("ryunosuke\\Functions\\Package\\file_rewrite_contents", ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"]);
 define("ryunosuke\\Functions\\Package\\file_pos", ["ryunosuke\\Functions\\Package\\FileSystem", "file_pos"]);
@@ -998,6 +1001,8 @@ define("ryunosuke\\Functions\\Package\\parse_annotation", ["ryunosuke\\Functions
 define("ryunosuke\\Functions\\Package\\is_ansi", ["ryunosuke\\Functions\\Package\\Utility", "is_ansi"]);
 define("ryunosuke\\Functions\\Package\\ansi_colorize", ["ryunosuke\\Functions\\Package\\Utility", "ansi_colorize"]);
 define("ryunosuke\\Functions\\Package\\process", ["ryunosuke\\Functions\\Package\\Utility", "process"]);
+define("ryunosuke\\Functions\\Package\\process_async", ["ryunosuke\\Functions\\Package\\Utility", "process_async"]);
+define("ryunosuke\\Functions\\Package\\process_parallel", ["ryunosuke\\Functions\\Package\\Utility", "process_parallel"]);
 define("ryunosuke\\Functions\\Package\\arguments", ["ryunosuke\\Functions\\Package\\Utility", "arguments"]);
 define("ryunosuke\\Functions\\Package\\stacktrace", ["ryunosuke\\Functions\\Package\\Utility", "stacktrace"]);
 define("ryunosuke\\Functions\\Package\\backtrace", ["ryunosuke\\Functions\\Package\\Utility", "backtrace"]);
@@ -1025,6 +1030,7 @@ define("ryunosuke\\Functions\\Package\\is_countable", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\cipher_metadata", ["ryunosuke\\Functions\\Package\\Vars", "cipher_metadata"]);
 define("ryunosuke\\Functions\\Package\\encrypt", ["ryunosuke\\Functions\\Package\\Vars", "encrypt"]);
 define("ryunosuke\\Functions\\Package\\decrypt", ["ryunosuke\\Functions\\Package\\Vars", "decrypt"]);
+define("ryunosuke\\Functions\\Package\\var_hash", ["ryunosuke\\Functions\\Package\\Vars", "var_hash"]);
 define("ryunosuke\\Functions\\Package\\varcmp", ["ryunosuke\\Functions\\Package\\Vars", "varcmp"]);
 define("ryunosuke\\Functions\\Package\\var_type", ["ryunosuke\\Functions\\Package\\Vars", "var_type"]);
 define("ryunosuke\\Functions\\Package\\var_apply", ["ryunosuke\\Functions\\Package\\Vars", "var_apply"]);
