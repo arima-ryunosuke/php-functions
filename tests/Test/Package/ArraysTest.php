@@ -1986,6 +1986,25 @@ class ArraysTest extends AbstractTestCase
         that((array_shuffle)(['a' => 'A', 'b' => 'B', 'c' => 'C']))->isNotSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
     }
 
+    function test_array_random()
+    {
+        srand(123);
+        mt_srand(123);
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        that((array_random)($array, null))->is('B');
+        that((array_random)($array, 0))->is([]);
+        that((array_random)($array, 1))->is(['B']);
+        that((array_random)($array, 2))->is(['B', 'C']);
+        that((array_random)($array, 3))->is(['A', 'B', 'C']);
+        that((array_random)($array, 2, true))->is(['b' => 'B', 'c' => 'C']);
+
+        that((array_random)([], 0))->is([]);
+
+        that(array_random)->try($array, 4)->wasThrown('number of elements');
+        that(array_random)->try([], +1)->wasThrown('number of elements');
+        that(array_random)->try([], -1)->wasThrown('number of elements');
+    }
+
     function test_array_shrink_key()
     {
         $array = [0 => 'first', 'a' => 'A', 'b' => 'B', 'c' => 'C', 'x' => 'X', 'y' => 'Y', 'z' => 'Z', 99 => 'end'];
