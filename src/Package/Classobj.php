@@ -168,6 +168,34 @@ class Classobj
     }
 
     /**
+     * vendor/autoload.php を返す
+     *
+     * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
+     *
+     * Example:
+     * ```php
+     * that(auto_loader())->contains('autoload.php');
+     * ```
+     *
+     * @param ?string $startdir 高速化用の検索開始ディレクトリを指定するが、どちらかと言えばテスト用
+     * @return string autoload.php のフルパス
+     */
+    public static function auto_loader($startdir = null)
+    {
+        return (cache)("path-$startdir", function () use ($startdir) {
+            $cache = (dirname_r)($startdir ?: __DIR__, function ($dir) {
+                if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
+                    return $file;
+                }
+            });
+            if (!$cache) {
+                throw new \DomainException('autoloader is not found.');
+            }
+            return $cache;
+        }, __FUNCTION__);
+    }
+
+    /**
      * composer のクラスローダを返す
      *
      * かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。
@@ -182,18 +210,7 @@ class Classobj
      */
     public static function class_loader($startdir = null)
     {
-        $file = (cache)('path', function () use ($startdir) {
-            $cache = (dirname_r)($startdir ?: __DIR__, function ($dir) {
-                if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
-                    return $file;
-                }
-            });
-            if (!$cache) {
-                throw new \DomainException('autoloader is not found.');
-            }
-            return $cache;
-        }, __FUNCTION__);
-        return require $file;
+        return require (auto_loader)($startdir);
     }
 
     /**

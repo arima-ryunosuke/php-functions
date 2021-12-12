@@ -54,8 +54,15 @@ class ClassobjTest extends AbstractTestCase
         that((class_uses_all)(new stdClass()))->is([]);
     }
 
+    function test_auto_loader()
+    {
+        that((auto_loader)())->fileExists();
+        that(auto_loader)->try('/notfounddir')->wasThrown('not found');
+    }
+
     function test_class_loader()
     {
+        that((class_loader)())->isObject();
         that(class_loader)->try('/notfounddir')->wasThrown('not found');
     }
 
