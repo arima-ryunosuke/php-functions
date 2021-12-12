@@ -977,6 +977,38 @@ class UtilityTest extends AbstractTestCase
         that($stdout)->isSame('hoge');
     }
 
+    function test_process_async()
+    {
+        $file = sys_get_temp_dir() . '/rf-process_async.php';
+        $stdout = null;
+        $stderr = null;
+
+        file_put_contents($file, '<?php
+            fwrite(STDOUT, stream_get_contents(STDIN));
+            fwrite(STDERR, "STDERR!");
+            exit(123);
+        ');
+        $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+        that($process)->isObject();
+        that($process->stdout)->isSame('');
+        that($process->stderr)->isSame('');
+
+        $status = $process->status();
+        that($status['command'])->contains('rf-process_async.php');
+        that($status['pid'])->isInt();
+        that($status['running'])->isTrue();
+        that($status['exitcode'])->isSame(-1);
+
+        that($process())->isSame(123);
+        that($process->stdout)->isSame('STDIN!');
+        that($process->stderr)->isSame('STDERR!');
+
+        $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+
+        unset($process);
+        gc_collect_cycles();
+    }
+
     function test_arguments()
     {
         // 超シンプル

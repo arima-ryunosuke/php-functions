@@ -1048,6 +1048,30 @@ class Utility
      */
     public static function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
     {
+        $rc = (process_async)($command, $args, $stdin, $stdout, $stderr, $cwd, $env)();
+        if ($rc === -1) {
+            // どうしたら失敗するのかわからない
+            throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
+        }
+        return $rc;
+    }
+
+    /**
+     * proc_open ～ proc_close の一連の処理を行う（非同期版）
+     *
+     * @see process
+     *
+     * @param string $command 実行コマンド。php7.4 未満では escapeshellcmd される
+     * @param array|string $args コマンドライン引数。php7.4 未満では文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される
+     * @param string|resource $stdin 標準入力（string を渡すと単純に読み取れられる。resource を渡すと fread される）
+     * @param string|resource $stdout 標準出力（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
+     * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
+     * @param ?string $cwd 作業ディレクトリ
+     * @param ?array $env 環境変数
+     * @return callable プロセスオブジェクト
+     */
+    public static function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
+    {
         if (version_compare(PHP_VERSION, '7.4.0') >= 0 && is_array($args)) {
             $statement = [$command];
             foreach ($args as $k => $v) {
@@ -1093,46 +1117,76 @@ class Utility
 
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
-        try {
-            while (feof($pipes[1]) === false || feof($pipes[2]) === false) {
-                $read = [$pipes[1], $pipes[2]];
-                $write = $except = null;
-                if (stream_select($read, $write, $except, 1) === false) {
-                    // （システムコールが別のシグナルによって中断された場合などに起こりえます）
-                    throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
-                }
-                foreach ($read as $fp) {
-                    $buffer = fread($fp, 1024);
-                    if ($fp === $pipes[1]) {
-                        if (!is_resource($stdout)) {
-                            $stdout .= $buffer;
-                        }
-                        else {
-                            fwrite($stdout, $buffer);
-                        }
-                    }
-                    elseif ($fp === $pipes[2]) {
-                        if (!is_resource($stderr)) {
-                            $stderr .= $buffer;
-                        }
-                        else {
-                            fwrite($stderr, $buffer);
-                        }
-                    }
+
+        return new class($proc, $pipes, $stdout, $stderr) {
+            private $proc;
+            private $pipes;
+            public  $stdout;
+            public  $stderr;
+
+            public function __construct($proc, $pipes, &$stdout, &$stderr)
+            {
+                $this->proc = $proc;
+                $this->pipes = $pipes;
+                $this->stdout = &$stdout;
+                $this->stderr = &$stderr;
+            }
+
+            public function __destruct()
+            {
+                if ($this->proc !== null) {
+                    fclose($this->pipes[1]);
+                    fclose($this->pipes[2]);
+                    proc_close($this->proc);
                 }
             }
-        }
-        finally {
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            $rc = proc_close($proc);
-        }
 
-        if ($rc === -1) {
-            // どうしたら失敗するのかわからない
-            throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
-        }
-        return $rc;
+            public function __invoke()
+            {
+                try {
+                    while (feof($this->pipes[1]) === false || feof($this->pipes[2]) === false) {
+                        $read = [$this->pipes[1], $this->pipes[2]];
+                        $write = $except = null;
+                        if (stream_select($read, $write, $except, 1) === false) {
+                            // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                            throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
+                        }
+                        foreach ($read as $fp) {
+                            $buffer = fread($fp, 1024);
+                            if ($fp === $this->pipes[1]) {
+                                if (!is_resource($this->stdout)) {
+                                    $this->stdout .= $buffer;
+                                }
+                                else {
+                                    fwrite($this->stdout, $buffer);
+                                }
+                            }
+                            elseif ($fp === $this->pipes[2]) {
+                                if (!is_resource($this->stderr)) {
+                                    $this->stderr .= $buffer;
+                                }
+                                else {
+                                    fwrite($this->stderr, $buffer);
+                                }
+                            }
+                        }
+                    }
+                }
+                finally {
+                    fclose($this->pipes[1]);
+                    fclose($this->pipes[2]);
+                    $rc = proc_close($this->proc);
+                    $this->proc = null;
+                }
+
+                return $rc;
+            }
+
+            public function status()
+            {
+                return proc_get_status($this->proc);
+            }
+        };
     }
 
     /**
