@@ -140,9 +140,9 @@ class Syntax
         ];
         $option += $default;
 
-        $cachekey = $option['flags'] . '-' . $option['phptag'] . '-' . var_export($option['short_open_tag'], true);
+        $cachekey = (var_hash)($phpcode) . $option['flags'] . '-' . $option['phptag'] . '-' . var_export($option['short_open_tag'], true);
         static $cache = [];
-        if (!($option['cache'] && isset($cache[$phpcode][$cachekey]))) {
+        if (!($option['cache'] && isset($cache[$cachekey]))) {
             $phptag = $option['phptag'] ? '<?php ' : '';
             $phpcode = $phptag . $phpcode;
             $position = -strlen($phptag);
@@ -215,9 +215,9 @@ class Syntax
                 }
             }
             // @codeCoverageIgnoreEnd
-            $cache[$phpcode][$cachekey] = $tokens;
+            $cache[$cachekey] = $tokens;
         }
-        $tokens = $cache[$phpcode][$cachekey];
+        $tokens = $cache[$cachekey];
 
         $lines = $option['line'] + [-PHP_INT_MAX, PHP_INT_MAX];
         $positions = $option['position'] + [-PHP_INT_MAX, PHP_INT_MAX];
