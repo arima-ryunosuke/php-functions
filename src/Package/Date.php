@@ -201,7 +201,7 @@ class Date
             // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
             static $dtz = null;
             $dtz = $dtz ?? new \DateTimeZone(date_default_timezone_get());
-            return \DateTime::createFromFormat('U.u', $timestamp)->setTimezone($dtz)->format($format);
+            return \DateTime::createFromFormat('U.u', sprintf('%f', $timestamp))->setTimezone($dtz)->format($format);
         }
         return date($format, $timestamp);
     }

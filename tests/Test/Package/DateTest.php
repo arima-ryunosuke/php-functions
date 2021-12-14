@@ -101,6 +101,7 @@ class DateTest extends AbstractTestCase
         that((date_convert)('Y/m/d H:i:s', 1234567890.123))->is('2009/02/14 08:31:30');
         that((date_convert)('Y/m/d H:i:s.u', 1234567890))->is('2009/02/14 08:31:30.000000');
         that((date_convert)('Y/m/d H:i:s.u', 1234567890.123))->is('2009/02/14 08:31:30.123000');
+        that((date_convert)('Y/m/d H:i:s.u', "1234567890.000"))->is('2009/02/14 08:31:30.000000');
         that((date_convert)('Y/m/d H:i:s.u', '2014/12/24 12:34:56.123'))->is('2014/12/24 12:34:56.123000');
         that((date_convert)('Y/m/d H:i:s.u', '令和元年12月24日 12時34分56.123秒'))->is('2019/12/24 12:34:56.123000');
         that((date_convert)('Y/m/d H:i:s.u', \DateTime::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.123000');
