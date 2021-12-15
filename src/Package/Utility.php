@@ -483,6 +483,7 @@ class Utility
      * use function strlen as SL;
      * function InnerFunc(){}
      * class InnerClass{}
+     * define("OUTER\\\\CONST", "OuterConst");
      *
      * namespace NS2;
      * use RuntimeException as RE;
@@ -503,6 +504,13 @@ class Utility
      *             'InnerClass' => 'NS1\\InnerClass',
      *         ],
      *     ],
+     *     'OUTER' => [
+     *         'const'    => [
+     *             'CONST' => 'OUTER\\CONST',
+     *         ],
+     *         'function' => [],
+     *         'alias'    => [],
+     *     ],
      *     'NS2' => [
      *         'const'    => [
      *             'CR'         => 'COUNT_RECURSIVE',
@@ -518,10 +526,17 @@ class Utility
      * ```
      *
      * @param string $filename ファイル名
+     * @param array $options オプション配列
      * @return array 名前空間配列
      */
-    public static function parse_namespace($filename)
+    public static function parse_namespace($filename, $options = [])
     {
+        $options += [
+            'cache' => true,
+        ];
+        if (!$options['cache']) {
+            (cache)(realpath($filename), null, __FUNCTION__);
+        }
         return (cache)(realpath($filename), function () use ($filename) {
             $stringify = function ($tokens) {
                 // @codeCoverageIgnoreStart
@@ -554,7 +569,7 @@ class Utility
             while (true) {
                 $tokens = (parse_php)($contents, [
                     'flags'  => TOKEN_PARSE,
-                    'begin'  => [T_NAMESPACE, T_USE, T_STRING, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
+                    'begin'  => ["define", T_NAMESPACE, T_USE, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
                     'end'    => ['{', ';', '(', T_EXTENDS, T_IMPLEMENTS],
                     'offset' => (last_key)($tokens) + 1,
                 ]);
@@ -562,6 +577,25 @@ class Utility
                     break;
                 }
                 $token = reset($tokens);
+                // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
+                if ($token[0] === T_STRING && $token[1] === "define") {
+                    $tokens = (parse_php)($contents, [
+                        'flags'  => TOKEN_PARSE,
+                        'begin'  => [T_CONSTANT_ENCAPSED_STRING],
+                        'end'    => [T_CONSTANT_ENCAPSED_STRING],
+                        'offset' => (last_key)($tokens),
+                    ]);
+                    $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
+                    [$ns, $nm] = (namespace_split)($define);
+                    if (!isset($result[$ns])) {
+                        $result[$ns] = [
+                            'const'    => [],
+                            'function' => [],
+                            'alias'    => [],
+                        ];
+                    }
+                    $result[$ns][$keys[$token[0]]][$nm] = $define;
+                }
                 switch ($token[0]) {
                     case T_NAMESPACE:
                         $namespace = $stringify($tokens);
@@ -598,20 +632,6 @@ class Utility
                             else {
                                 $result[$namespace][$keys[$tokenCorF]][(namespace_split)($alias)[1]] = (concat)($prefix, '\\') . $alias;
                             }
-                        }
-                        break;
-                    case T_STRING:
-                        // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
-                        if (strtolower($token[1]) === 'define') {
-                            $tokens = (parse_php)($contents, [
-                                'flags'  => TOKEN_PARSE,
-                                'begin'  => [T_CONSTANT_ENCAPSED_STRING],
-                                'end'    => [T_CONSTANT_ENCAPSED_STRING],
-                                'offset' => (last_key)($tokens),
-                            ]);
-                            $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
-                            [$ns, $nm] = (namespace_split)($define);
-                            $result[$ns][$keys[$token[0]]][$nm] = $define;
                         }
                         break;
                     case T_CONST:

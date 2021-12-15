@@ -43,6 +43,7 @@ namespace vendor\NS1 {
     echo C1;
     echo xC2;
 
+    define("other\\space\\CONST1", 'dummy');
     const nsC = 123;
     function nsF()
     {
@@ -113,6 +114,7 @@ namespace vendor\NS2 {
     echo C1;
     echo xC2;
 
+    define("other\\space\\CONST2", 'dummy');
     const nsC = 123;
     function nsF()
     {

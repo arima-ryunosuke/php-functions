@@ -432,9 +432,11 @@ class UtilityTest extends AbstractTestCase
                 ],
             ],
             "other\\space" => [
-                "const" => [
+                "const"    => [
                     "CONST" => "other\\space\\CONST",
                 ],
+                "function" => [],
+                "alias"    => [],
             ],
         ]);
 
@@ -472,6 +474,14 @@ class UtilityTest extends AbstractTestCase
                     "nsT"         => "vendor\\NS1\\nsT",
                     "D"           => "Main\\Sub11\\D",
                 ],
+            ],
+            "other\\space" => [
+                "const"    => [
+                    "CONST1" => "other\\space\\CONST1",
+                    "CONST2" => "other\\space\\CONST2",
+                ],
+                "function" => [],
+                "alias"    => [],
             ],
             "vendor\\NS2" => [
                 "const"    => [
@@ -543,6 +553,14 @@ class UtilityTest extends AbstractTestCase
                     "D"           => "Main\\Sub21\\D",
                 ],
             ],
+            "other\\space" => [
+                "const"    => [
+                    "CONST1" => "other\\space\\CONST1",
+                    "CONST2" => "other\\space\\CONST2",
+                ],
+                "function" => [],
+                "alias"    => [],
+            ],
             "vendor\\NS2" => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
@@ -577,6 +595,12 @@ class UtilityTest extends AbstractTestCase
                 ],
             ],
         ]);
+
+        $file = sys_get_temp_dir() . '/rf-parse_namespace.php';
+        file_put_contents($file, '<?php namespace hoge;');
+        that((parse_namespace)($file, ['cache' => false]))->hasKey('hoge');
+        file_put_contents($file, '<?php namespace fuga;');
+        that((parse_namespace)($file, ['cache' => false]))->hasKey('fuga');
     }
 
     function test_resolve_symbol()

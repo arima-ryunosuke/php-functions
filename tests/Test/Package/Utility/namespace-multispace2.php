@@ -43,6 +43,7 @@ echo xC;
 echo C1;
 echo xC2;
 
+define("other\\space\\CONST1", 'dummy');
 const nsC = 123;
 function nsF()
 {
@@ -112,6 +113,7 @@ echo xC;
 echo C1;
 echo xC2;
 
+define("other\\space\\CONST2", 'dummy');
 const nsC = 123;
 function nsF()
 {
