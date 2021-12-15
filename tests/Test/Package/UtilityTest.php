@@ -1009,6 +1009,90 @@ class UtilityTest extends AbstractTestCase
         gc_collect_cycles();
     }
 
+    function test_process_parallel()
+    {
+        $t = microtime(true);
+        that((process_parallel)(static function ($rate = 9) {
+            $result = 0;
+            foreach (range(1, 10) as $n) {
+                usleep(100 * 1000);
+                $result += $n * $rate;
+            }
+            fwrite(STDOUT, "out:$result");
+            fwrite(STDERR, "err:$result");
+            return $result;
+        }, ['x' => 1, [2], []]))->isSame([
+            'x' => [
+                'status' => 0,
+                'stdout' => 'out:55',
+                'stderr' => 'err:55',
+                'return' => 55,
+            ],
+            [
+                'status' => 0,
+                'stdout' => 'out:110',
+                'stderr' => 'err:110',
+                'return' => 110,
+            ],
+            [
+                'status' => 0,
+                'stdout' => 'out:495',
+                'stderr' => 'err:495',
+                'return' => 495,
+            ],
+        ]);
+        // 100ms の sleep を10回回すのを3回行うので合計3秒…ではなく並列なので1秒前後になる。まぁ誤差はあれど絶対に2秒は超えない
+        that(microtime(true) - $t)->lessThan(2.0);
+
+        $t = microtime(true);
+        that((process_parallel)([
+            static function ($rate) {
+                $result = 0;
+                foreach (range(1, 10) as $n) {
+                    usleep(100 * 1000);
+                    $result += $n * $rate;
+                }
+                fwrite(STDOUT, "out:$result");
+                fwrite(STDERR, "err:$result");
+                return $result;
+            },
+            'y' => static function ($rate = 2) {
+                $result = 1;
+                foreach (range(1, 10) as $n) {
+                    usleep(100 * 1000);
+                    $result *= $n * $rate;
+                }
+                fwrite(STDOUT, "out:$result");
+                fwrite(STDERR, "err:$result");
+                return $result;
+            },
+            'e' => static function () {
+                exit(127);
+            },
+        ], [1, 'y' => []]))->isSame([
+            [
+                'status' => 0,
+                'stdout' => 'out:55',
+                'stderr' => 'err:55',
+                'return' => 55,
+            ],
+            'y' => [
+                'status' => 0,
+                'stdout' => 'out:3715891200',
+                'stderr' => 'err:3715891200',
+                'return' => 3715891200,
+            ],
+            'e' => [
+                'status' => 127,
+                'stdout' => '',
+                'stderr' => '',
+                'return' => null,
+            ],
+        ]);
+        // 100ms の sleep を10回回すのを2回行うので合計2秒…ではなく並列なので1秒前後になる。まぁ誤差はあれど絶対に2秒は超えない
+        that(microtime(true) - $t)->lessThan(2.0);
+    }
+
     function test_arguments()
     {
         // 超シンプル

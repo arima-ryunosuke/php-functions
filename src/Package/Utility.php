@@ -1190,6 +1190,149 @@ class Utility
     }
 
     /**
+     * 複数の callable を並列で実行する
+     *
+     * callable はクロージャも使用できるが、独自の方法でエクスポートしてから実行するので可能な限り this bind は外したほうが良い。
+     *
+     * Example:
+     * ```php
+     * # 単一のクロージャを複数の引数で回す
+     * $t = microtime(true);
+     * $result = process_parallel(static function ($arg1, $arg2) {
+     *     usleep(500 * 1000);
+     *     fwrite(STDOUT, "this is stdout");
+     *     fwrite(STDERR, "this is stderr");
+     *     return $arg1 + $arg2;
+     * }, ['a' => [1, 2], 'b' => [2, 3], [3, 4]]);
+     * // 500ms かかる処理を3本実行するが、トータル時間は 1500ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+     * that(microtime(true) - $t)->lessThan(1.0);
+     * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
+     * that($result)->isSame([
+     *     'a' => [
+     *         'status' => 0,
+     *         'stdout' => "this is stdout",
+     *         'stderr' => "this is stderr",
+     *         'return' => 3,
+     *     ],
+     *     'b' => [
+     *         'status' => 0,
+     *         'stdout' => "this is stdout",
+     *         'stderr' => "this is stderr",
+     *         'return' => 5,
+     *     ],
+     *     [
+     *         'status' => 0,
+     *         'stdout' => "this is stdout",
+     *         'stderr' => "this is stderr",
+     *         'return' => 7,
+     *     ],
+     * ]);
+     * # 複数のクロージャを複数の引数で回す（この場合、引数のキーは合わせなければならない）
+     * $t = microtime(true);
+     * $result = process_parallel([
+     *     'a' => static function ($arg1, $arg2) {
+     *         usleep(100 * 1000);
+     *         return $arg1 + $arg2;
+     *     },
+     *     'b' => static function ($arg1, $arg2) {
+     *         usleep(300 * 1000);
+     *         return $arg1 * $arg2;
+     *     },
+     *     static function ($arg) {
+     *         usleep(500 * 1000);
+     *         exit($arg);
+     *     },
+     * ], ['a' => [1, 2], 'b' => [2, 3], [127]]);
+     * // 100,300,500ms かかる処理を3本実行するが、トータル時間は 900ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+     * that(microtime(true) - $t)->lessThan(1.0);
+     * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
+     * that($result)->isSame([
+     *     'a' => [
+     *         'status' => 0,
+     *         'stdout' => "",
+     *         'stderr' => "",
+     *         'return' => 3,
+     *     ],
+     *     'b' => [
+     *         'status' => 0,
+     *         'stdout' => "",
+     *         'stderr' => "",
+     *         'return' => 6,
+     *     ],
+     *     [
+     *         'status' => 127,  // 終了コードが入ってくる
+     *         'stdout' => "",
+     *         'stderr' => "",
+     *         'return' => null,
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param callable|callable[] $tasks 並列実行する callable. 単一の場合は引数分実行して結果を返す
+     * @param array $args 各々の引数。$tasks が配列の場合はそれに対応する引数配列。単一の場合は実行回数も兼ねた引数配列
+     * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php
+     * @param ?string $workdir ワーキングディレクトリ。省略時はテンポラリディレクトリ
+     * @return array 実行結果（['return' => callable の返り値, 'status' => 終了コード, 'stdout' => 標準出力, 'stderr' => 標準エラー]）
+     */
+    public static function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null)
+    {
+        // 単一で来た場合は同じものを異なる引数で呼び出すシングルモードとなる
+        if (!is_array($tasks)) {
+            $tasks = array_fill_keys(array_keys($args) ?: [0], $tasks);
+        }
+
+        // 引数配列は単一の値でも良い
+        $args = array_map(arrayize, $args);
+
+        // 実行すれば "ArgumentCountError: Too few arguments" で怒られるがもっと早い段階で気づきたい
+        foreach ($tasks as $key => $task) {
+            assert((parameter_length)($task, true) <= count($args[$key] ?? []), "task $key's arguments are mismatch.");
+        }
+
+        // 変数や環境の準備
+        $autoload = (arrayize)($autoload ?? (auto_loader)());
+        $workdir = $workdir ?? (sys_get_temp_dir() . '/rfpp');
+        (mkdir_p)($workdir);
+
+        // 実行バイナリとコード本体
+        $phpbin = (path_resolve)('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
+        $maincode = '<?php
+            $context = ' . (var_export3)([$autoload, $tasks], true) . ';
+            foreach ($context[0] as $file) {
+                require_once $file;
+            }
+            $stdin = unserialize(stream_get_contents(STDIN));
+            $return = $context[1][$argv[2]](...$stdin);
+            file_put_contents($argv[1], serialize($return));
+        ';
+        file_put_contents($mainscript = tempnam($workdir, 'main'), $maincode);
+
+        // プロセスを準備
+        $processes = [];
+        foreach ($tasks as $key => $task) {
+            unset($stdout, $stderr);
+            $stdout = $stderr = '';
+            $return = tempnam($workdir, 'return');
+            $processes[$key] = (process_async)($phpbin, [$mainscript, $return, $key], serialize($args[$key] ?? []), $stdout, $stderr, $workdir, $env);
+            $processes[$key]->return = static function () use ($return) {
+                return strlen($result = file_get_contents($return)) ? unserialize($result) : null;
+            };
+        }
+
+        // プロセスを実行兼返り値用に加工
+        $results = [];
+        foreach ($processes as $key => $process) {
+            $results[$key] = [
+                'status' => $process(),
+                'stdout' => $process->stdout,
+                'stderr' => $process->stderr,
+                'return' => ($process->return)(),
+            ];
+        }
+        return $results;
+    }
+
+    /**
      * コマンドライン引数をパースして引数とオプションを返す
      *
      * 少しリッチな {@link http://php.net/manual/function.getopt.php getopt} として使える（shell 由来のオプション構文(a:b::)はどうも馴染みにくい）。
