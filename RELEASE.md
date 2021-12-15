@@ -11,6 +11,21 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.25
+
+- [feature][FileSystem] file_get_arrays を追加
+- [feature][Utility] process_parallel を追加
+- [feature][Utility] process_async を追加
+- [feature][Classobj] auto_loader を追加
+- [feature][Vars] var_hash を追加
+- [feature][Arrays] array_random を追加
+- [feature][Arrays] array_map_recursive に自身にも適用する引数を追加
+- [feature][Arrays] array_count に再帰フラグを追加
+- [feature][Strings] csv_export/import の配列対応
+- [fixbug][Utility] parse_namespace の不具合を修正
+- [fixbug][Date] date_convert に小数部が0の数値文字列を与えると即死する不具合を修正
+- [fixbug][Syntax] parse_php でオプション次第ではキャッシュが効かない不具合を修正
+
 ## 1.4.24
 
 - [fixbug][Sql] sql_format で WITH があるとインデントが乱れる不具合を修正
