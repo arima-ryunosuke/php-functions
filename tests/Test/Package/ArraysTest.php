@@ -875,6 +875,81 @@ class ArraysTest extends AbstractTestCase
             'k' => 'string',
             'c' => 'object',
         ]);
+
+        that((array_map_recursive)([
+            'k' => 'v',
+            'c' => [
+                'k1' => 'v1',
+                'k2' => 'v2',
+            ],
+        ], function ($v) {
+            return is_array($v) ? (object) $v : strtoupper($v);
+        }, true, true))->is((object) [
+            'k' => 'V',
+            'c' => (object) [
+                'k1' => 'V1',
+                'k2' => 'V2',
+            ],
+        ]);
+
+        $array = [
+            'scalar' => 123,
+            'list'   => [1, 2, 3],
+            'hash'   => ['a' => 'A'],
+            'nest'   => [
+                'scalar' => 456,
+                'list'   => [4, 5, 6],
+                'hash'   => ['b' => 'B'],
+                'xyz'    => ['x', 'y', 'z'],
+            ],
+        ];
+        $all = [];
+        that((array_map_recursive)($array, function ($v) use (&$all) {
+            $all[] = $v;
+            return $v;
+        }, true, true))->isSame($array);
+        // 実行結果より呼び出し順のほうが大事
+        that($all)->isSame([
+            // scalar
+            123,
+            // list[0,1,2]
+            1,
+            2,
+            3,
+            // list
+            [1, 2, 3],
+            // hash[a]
+            'A',
+            // hash
+            ['a' => 'A'],
+            // nest.scalar
+            456,
+            // nest.list[0,1,2]
+            4,
+            5,
+            6,
+            // nest.list
+            [4, 5, 6],
+            // nest.hash[b]
+            'B',
+            // nest.hash
+            ['b' => 'B'],
+            // nest.xyz[0,1,2]
+            'x',
+            'y',
+            'z',
+            // nest.xyz
+            ['x', 'y', 'z'],
+            // nest
+            [
+                'scalar' => 456,
+                'list'   => [4, 5, 6],
+                'hash'   => ['b' => 'B'],
+                'xyz'    => ['x', 'y', 'z'],
+            ],
+            // self
+            $array,
+        ]);
     }
 
     function test_array_map_key()
