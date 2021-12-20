@@ -1272,6 +1272,35 @@ class ArraysTest extends AbstractTestCase
             'A' => 1,
             'B' => 2,
         ]);
+
+        // 再帰
+        $array = [
+            ['1', '2', '3'],
+            ['a', 'b', 'c'],
+            ['X', 'Y', 'Z'],
+            [[[['a', 'M', 'Z']]]],
+        ];
+        $islower = function ($v) {
+            return !is_array($v) && ctype_lower($v);
+        };
+        $isupper = function ($v) {
+            return !is_array($v) && ctype_upper($v);
+        };
+        $isarray = function ($v) {
+            return is_array($v);
+        };
+        that((array_count)($array, $islower, true))->is(4);
+        that((array_count)($array, $isupper, true))->is(5);
+        that((array_count)($array, $isarray, true))->is(7);
+        that((array_count)($array, [
+            'lower' => $islower,
+            'upper' => $isupper,
+            'array' => $isarray,
+        ], true))->is([
+            'lower' => 4,
+            'upper' => 5,
+            'array' => 7,
+        ]);
     }
 
     function test_array_group()
