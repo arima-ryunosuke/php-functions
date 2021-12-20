@@ -1614,6 +1614,40 @@ a1 b1 ' c
 a2 b2 c2
 a3 b3 c3
 ");
+
+        // 構造化
+        $csvarrays = [
+            ['scalar' => '1', 'list' => ['a1', 'b1'], 'hash' => ['x' => 'x1', 'y' => 'y1'], 'nest' => ['p1' => ['11', '12'], 'p2' => ['%', '14']]],
+            ['scalar' => '2', 'list' => ['a2', 'b2'], 'hash' => ['x' => 'x2', 'y' => 'y2'], 'nest' => ['p1' => ['21', '22'], 'p2' => ['#', '24']]],
+            ['scalar' => '3', 'list' => ['a3', 'b3'], 'hash' => ['x' => 'x3', 'y' => 'y3'], 'nest' => ['p1' => ['31', '32'], 'p2' => ['&', '34']]],
+        ];
+        that((csv_export)($csvarrays, ['structure' => true]))->is("scalar,list[],list[],hash[x],hash[y],nest[p1][],nest[p1][],nest[p2][],nest[p2][]
+1,a1,b1,x1,y1,11,12,%,14
+2,a2,b2,x2,y2,21,22,#,24
+3,a3,b3,x3,y3,31,32,&,34
+");
+
+        // 構造化（ジャグ）
+        $csvarrays = [
+            ['scalar' => '1', 'list' => ['a1'], 'hash' => ['x' => 'x1', 'y' => 'y1'], 'nest' => ['p1' => ['11'], 'p2' => ['%', '14']]],
+            ['scalar' => '2', 'list' => ['a2', 'b2'], 'hash' => ['x' => 'x2', 'y' => 'y2'], 'nest' => ['p1' => ['21', '22'], 'p2' => ['#', '24']]],
+            ['scalar' => '3', 'list' => ['a3', 'b3', 'c3'], 'hash' => ['x' => 'x3', 'y' => 'y3'], 'nest' => ['p1' => ['31', '32', '33'], 'p2' => ['&', '34']]],
+        ];
+        that((csv_export)($csvarrays, ['structure' => true]))->is("scalar,list[],list[],list[],hash[x],hash[y],nest[p1][],nest[p1][],nest[p1][],nest[p2][],nest[p2][]
+1,a1,,,x1,y1,11,,,%,14
+2,a2,b2,,x2,y2,21,22,,#,24
+3,a3,b3,c3,x3,y3,31,32,33,&,34
+");
+
+        // 構造化（空文字）
+        $csvarrays = [
+            ['scalar' => '1', 'list' => [], 'hash' => ['x' => 'x1', 'y' => 'y1'], 'nest' => ['p1' => ['11'], 'p2' => []]],
+            ['scalar' => '1', 'list' => ['a2', 'b2'], 'hash' => ['x' => 'x1', 'y' => 'y1'], 'nest' => ['p1' => [], 'p2' => ['22']]],
+        ];
+        that((csv_export)($csvarrays, ['structure' => true]))->is("scalar,hash[x],hash[y],nest[p1][],list[],list[],nest[p2][]
+1,x1,y1,11,,,
+1,x1,y1,,a2,b2,22
+");
     }
 
     function test_csv_import()
@@ -1683,6 +1717,35 @@ a3,b3,c3
         ]))->is([
             ['a' => 'a1', 'b' => 'B1', 'c' => 'c1'],
             ['a' => 'a3', 'b' => 'B3', 'c' => 'c3'],
+        ]);
+
+        // 構造化
+        that((csv_import)('scalar,list[],list[],hash[x],hash[y],nest[p1][],nest[p1][],nest[p2][],nest[p2][]
+1,a1,b1,x1,y1,11,12,%,14
+2,a2,b2,x2,y2,21,22,#,24
+3,a3,b3,x3,y3,31,32,&,34
+', ['structure' => true]))->is([
+            ['scalar' => '1', 'list' => ['a1', 'b1'], 'hash' => ['x' => 'x1', 'y' => 'y1'], 'nest' => ['p1' => ['11', '12'], 'p2' => ['%', '14']]],
+            ['scalar' => '2', 'list' => ['a2', 'b2'], 'hash' => ['x' => 'x2', 'y' => 'y2'], 'nest' => ['p1' => ['21', '22'], 'p2' => ['#', '24']]],
+            ['scalar' => '3', 'list' => ['a3', 'b3'], 'hash' => ['x' => 'x3', 'y' => 'y3'], 'nest' => ['p1' => ['31', '32'], 'p2' => ['&', '34']]],
+        ]);
+
+        // 構造化（ジャグ）
+        that((csv_import)('scalar,list[],list[],list[],hash[x],hash[y],nest[p1][],nest[p1][],nest[p1][],nest[p2][],nest[p2][]
+1,a1,,,x1,y1,11,,,%,14
+2,a2,b2,,x2,y2,21,22,,#,24
+3,a3,b3,c3,x3,y3,31,32,33,&,34
+', ['structure' => true]))->is([
+            ['scalar' => '1', 'list' => ['a1'], 'hash' => ['x' => 'x1', 'y' => 'y1'], 'nest' => ['p1' => ['11'], 'p2' => ['%', '14']]],
+            ['scalar' => '2', 'list' => ['a2', 'b2'], 'hash' => ['x' => 'x2', 'y' => 'y2'], 'nest' => ['p1' => ['21', '22'], 'p2' => ['#', '24']]],
+            ['scalar' => '3', 'list' => ['a3', 'b3', 'c3'], 'hash' => ['x' => 'x3', 'y' => 'y3'], 'nest' => ['p1' => ['31', '32', '33'], 'p2' => ['&', '34']]],
+        ]);
+
+        // 構造化（空文字）
+        that((csv_import)('scalar,list[],list[],hash[x],hash[y],nest[0][p1],nest[0][p2],nest[1][p1],nest[1][p2]
+,,,,,,,,
+', ['structure' => true]))->is([
+            ['scalar' => '', 'list' => [], 'hash' => ['x' => '', 'y' => ''], 'nest' => []],
         ]);
 
         // 要素数が合わないと例外

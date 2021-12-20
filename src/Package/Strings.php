@@ -2618,6 +2618,17 @@ class Strings
      * A2,C2
      * A3,C3
      * ");
+     *
+     * // structure:true で配列も扱える
+     * that(csv_export([
+     *     ['scalar' => '123', 'list' => ['list11', 'list12'], 'hash' => ['a' => 'hash1A', 'b' => 'hash1B']],
+     *     ['scalar' => '456', 'list' => ['list21', 'list22'], 'hash' => ['a' => 'hash2A', 'b' => 'hash2B']],
+     * ], [
+     *     'structure' => true,
+     * ]))->is("scalar,list[],list[],hash[a],hash[b]
+     * 123,list11,list12,hash1A,hash1B
+     * 456,list21,list22,hash2A,hash2B
+     * ");
      * ```
      *
      * @param array $csvarrays 連想配列の配列
@@ -2632,6 +2643,7 @@ class Strings
             'escape'    => '\\',
             'encoding'  => mb_internal_encoding(),
             'headers'   => null,
+            'structure' => false,
             'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
             'output'    => null,
         ];
@@ -2645,25 +2657,63 @@ class Strings
             $fp = fopen('php://temp', 'rw+');
         }
         try {
-            $size = (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $callback) {
+            $size = (call_safely)(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $structure, $callback) {
                 $size = 0;
                 $mb_internal_encoding = mb_internal_encoding();
+                if ($structure) {
+                    foreach ($csvarrays as $n => $array) {
+                        $query = strtr(http_build_query($array, null), ['%5B' => '[', '%5D' => ']']);
+                        $csvarrays[$n] = array_map('rawurldecode', (str_array)(explode('&', $query), '=', true));
+                    }
+                }
                 if (!$headers) {
                     $tmp = [];
                     foreach ($csvarrays as $array) {
-                        $tmp = $tmp ? array_intersect_key($tmp, $array) : $array;
+                        // この関数は積集合のヘッダを出すと定義してるが、構造化の場合は和集合で出す
+                        if ($structure) {
+                            $tmp += $array;
+                        }
+                        else {
+                            $tmp = array_intersect_key($tmp ?: $array, $array);
+                        }
                     }
                     $keys = array_keys($tmp);
+                    if ($structure) {
+                        $tmp = [];
+                        for ($i = 0, $l = count($keys); $i < $l; $i++) {
+                            $key = $keys[$i];
+                            if (isset($tmp[$key])) {
+                                continue;
+                            }
+                            $tmp[$key] = true;
+                            $p = strrpos($key, '[');
+                            if ($p !== false) {
+                                $plain = substr($key, 0, $p + 1);
+                                for ($j = $i + 1; $j < $l; $j++) {
+                                    if ((starts_with)($keys[$j], $plain)) {
+                                        $tmp[$keys[$j]] = true;
+                                    }
+                                }
+                            }
+                        }
+                        $keys = array_keys($tmp);
+                    }
                     $headers = is_array($headers) ? $keys : array_combine($keys, $keys);
                 }
                 if (!(is_hasharray)($headers)) {
                     $headers = array_combine($headers, $headers);
                 }
                 else {
+                    $headerline = $headers;
                     if ($encoding !== $mb_internal_encoding) {
-                        mb_convert_variables($encoding, $mb_internal_encoding, $headers);
+                        mb_convert_variables($encoding, $mb_internal_encoding, $headerline);
                     }
-                    $size += fputcsv($fp, $headers, $delimiter, $enclosure, $escape);
+                    if ($structure) {
+                        $headerline = array_map(function ($header) {
+                            return preg_replace('#\[\d+]$#imu', '[]', $header);
+                        }, $headerline);
+                    }
+                    $size += fputcsv($fp, $headerline, $delimiter, $enclosure, $escape);
                 }
                 $default = array_fill_keys(array_keys($headers), '');
 
@@ -2680,7 +2730,7 @@ class Strings
                     $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
                 }
                 return $size;
-            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['callback']);
+            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['structure'], $options['callback']);
             if ($output) {
                 return $size;
             }
@@ -2701,6 +2751,8 @@ class Strings
      * ただし、オプションで headers が与えられた場合はそれを使用する。
      * この headers オプションはヘッダフィルタも兼ねる（[n => header] で「n 番目フィールドを header で取り込み」となる）。
      * 入力にヘッダがありかつ headers に連想配列が渡された場合はフィルタ兼読み換えとなる（Example を参照）。
+     *
+     * structure オプションが渡された場合は query like なヘッダーで配列になる。
      *
      * callback オプションが渡された場合は「あらゆる処理の最後」にコールされる。
      * つまりヘッダの読み換えや文字エンコーディングの変換が行われた後の状態でコールされる。
@@ -2748,6 +2800,18 @@ class Strings
      *     ['hoge' => 'A2', 'piyo' => 'C2'],
      *     ['hoge' => 'A3', 'piyo' => 'C3'],
      * ]);
+     *
+     * // structure:true で配列も扱える
+     * that(csv_import("
+     * scalar,list[],list[],hash[a],hash[b]
+     * 123,list11,list12,hash1A,hash1B
+     * 456,list21,list22,hash2A,hash2B
+     * ", [
+     *     'structure' => true,
+     * ]))->is([
+     *     ['scalar' => '123', 'list' => ['list11', 'list12'], 'hash' => ['a' => 'hash1A', 'b' => 'hash1B']],
+     *     ['scalar' => '456', 'list' => ['list21', 'list22'], 'hash' => ['a' => 'hash2A', 'b' => 'hash2B']],
+     * ]);
      * ```
      *
      * @param string|resource $csvstring CSV 的文字列。ファイルポインタでも良いが終了後に必ず閉じられる
@@ -2763,6 +2827,7 @@ class Strings
             'encoding'  => mb_internal_encoding(),
             'headers'   => [],
             'headermap' => null,
+            'structure' => false,
             'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
         ];
 
@@ -2782,7 +2847,7 @@ class Strings
         }
 
         try {
-            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $callback) {
+            return (call_safely)(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $callback) {
                 $mb_internal_encoding = mb_internal_encoding();
                 $result = [];
                 $n = -1;
@@ -2799,7 +2864,28 @@ class Strings
                     }
 
                     $n++;
-                    $row = array_combine($headers, array_intersect_key($row, $headers));
+                    if ($structure) {
+                        $query = [];
+                        foreach ($headers as $i => $header) {
+                            $query[] = $header . "=" . rawurlencode($row[$i]);
+                        }
+                        parse_str(implode('&', $query), $row);
+                        // csv の仕様上、空文字を置かざるを得ないが、数値配列の場合は空にしたいことがある
+                        $row = (array_map_recursive)($row, function ($v) {
+                            if (is_array($v) && (is_indexarray)($v)) {
+                                return array_values(array_filter($v, function ($v) {
+                                    if (is_array($v)) {
+                                        $v = implode('', (array_flatten)($v));
+                                    }
+                                    return strlen($v);
+                                }));
+                            }
+                            return $v;
+                        }, true, true);
+                    }
+                    else {
+                        $row = array_combine($headers, array_intersect_key($row, $headers));
+                    }
                     if ($headermap) {
                         $row = (array_pickup)($row, $headermap);
                     }
@@ -2811,7 +2897,7 @@ class Strings
                     $result[] = $row;
                 }
                 return $result;
-            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['callback']);
+            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['callback']);
         }
         finally {
             fclose($fp);

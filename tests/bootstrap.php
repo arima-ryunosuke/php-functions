@@ -13,6 +13,10 @@ if (DIRECTORY_SEPARATOR === '\\') {
     putenv("TMP=$tmpdir");
 }
 
+if (DIRECTORY_SEPARATOR === '\\') {
+    setlocale(LC_CTYPE, 'C');
+}
+
 // actualThat を定義
 \ryunosuke\PHPUnit\Actual::$compatibleVersion = 2;
 \ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite
