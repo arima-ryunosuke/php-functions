@@ -240,6 +240,91 @@ class FileSystemTest extends AbstractTestCase
         that((file_extension)('.ext'))->is('ext');
     }
 
+    function test_file_get_arrays()
+    {
+        $array = [
+            [
+                'id'   => 1,
+                'name' => 'ほげ',
+                'list' => [1],
+                'hash' => ['x' => 'A'],
+                'nest' => [
+                    ['a' => 'A11', 'b' => 'B11', 'c' => 'C11'],
+                ],
+            ],
+            [
+                'id'   => 2,
+                'name' => 'ふが',
+                'list' => [1, 2],
+                'hash' => ['x' => 'B'],
+                'nest' => [
+                    ['a' => 'A21', 'b' => 'B21', 'c' => 'C21'],
+                    ['a' => 'A22', 'b' => 'B22', 'c' => 'C22'],
+                ],
+            ],
+            [
+                'id'   => 3,
+                'name' => 'ぴよ',
+                'list' => [1, 2, 3],
+                'hash' => ['x' => 'C'],
+                'nest' => [
+                    ['a' => 'A31', 'b' => 'B31', 'c' => 'C31'],
+                    ['a' => 'A32', 'b' => 'B32', 'c' => 'C32'],
+                    ['a' => 'A33', 'b' => 'B33', 'c' => 'C33'],
+                ],
+            ],
+        ];
+
+        $tmpdir = sys_get_temp_dir();
+        file_put_contents($php_utf8 = "$tmpdir/data.php", '<?php return ' . var_export($array, true) . ';');
+        file_put_contents($csv_utf8 = "$tmpdir/data.csv", (csv_export)($array, ['structure' => true]));
+        file_put_contents($csv_sjis = "$tmpdir/data.sjis.csv", mb_convert_encoding((csv_export)($array, ['structure' => true]), 'sjis'));
+        file_put_contents($json_utf8 = "$tmpdir/data.json", (json_export)($array));
+        file_put_contents($json_sjis = "$tmpdir/data.sjis.json", mb_convert_encoding((json_export)($array), 'sjis'));
+        file_put_contents($jsonl_utf8 = "$tmpdir/data.jsonl", implode("\n", array_map(fn($v) => (json_export)($v), $array)));
+        file_put_contents($jsonl_sjis = "$tmpdir/data.sjis.jsonl", mb_convert_encoding(implode("\n", array_map(fn($v) => (json_export)($v), $array)), 'sjis'));
+        file_put_contents($yaml_utf8 = "$tmpdir/data.yaml", yaml_emit($array, YAML_UTF8_ENCODING));
+        file_put_contents($yaml_sjis = "$tmpdir/data.sjis.yaml", mb_convert_encoding(yaml_emit($array, YAML_UTF8_ENCODING), 'sjis'));
+        file_put_contents($ltsv_utf8 = "$tmpdir/data.ltsv", implode("\n", array_map(fn($v) => (ltsv_export)($v), $array)));
+        file_put_contents($ltsv_sjis = "$tmpdir/data.sjis.ltsv", mb_convert_encoding(implode("\n", array_map(fn($v) => (ltsv_export)($v), $array)), 'sjis'));
+
+        that((file_get_arrays)($php_utf8))->is($array);
+        that((file_get_arrays)($csv_utf8))->is($array);
+        that((file_get_arrays)($csv_sjis))->is($array);
+        that((file_get_arrays)($json_utf8))->is($array);
+        that((file_get_arrays)($json_sjis))->is($array);
+        that((file_get_arrays)($jsonl_utf8))->is($array);
+        that((file_get_arrays)($jsonl_sjis))->is($array);
+        that((file_get_arrays)($yaml_utf8))->is($array);
+        that((file_get_arrays)($yaml_sjis))->is($array);
+        that((file_get_arrays)($ltsv_utf8))->is($array);
+        that((file_get_arrays)($ltsv_sjis))->is($array);
+
+        file_put_contents($empty_php = "$tmpdir/empty.php", "<?php return [];");
+        file_put_contents($empty1_csv = "$tmpdir/empty1.csv", "id,name");
+        file_put_contents($empty2_csv = "$tmpdir/empty2.csv", "");
+        file_put_contents($empty_json = "$tmpdir/empty.json", "[]");
+        file_put_contents($empty_jsonl = "$tmpdir/empty.jsonl", "");
+        file_put_contents($empty1_yaml = "$tmpdir/empty.yaml", "---");
+        file_put_contents($empty2_yaml = "$tmpdir/empty2.yaml", "");
+        file_put_contents($empty_ltsv = "$tmpdir/empty.ltsv", "");
+
+        that((file_get_arrays)($empty_php))->is([]);
+        that((file_get_arrays)($empty1_csv))->is([]);
+        that((file_get_arrays)($empty2_csv))->is([]);
+        that((file_get_arrays)($empty_json))->is([]);
+        that((file_get_arrays)($empty_jsonl))->is([]);
+        that((file_get_arrays)($empty1_yaml))->is([]);
+        that((file_get_arrays)($empty2_yaml))->is([]);
+        that((file_get_arrays)($empty_ltsv))->is([]);
+
+        touch($txt = sys_get_temp_dir() . '/hoge.txt');
+        touch($xml = sys_get_temp_dir() . '/hoge.xml');
+        that(file_get_arrays)->try('notfoundfile')->wasThrown('is not exists');
+        that(file_get_arrays)->try($txt)->wasThrown('is not supported');
+        that(file_get_arrays)->try($xml)->wasThrown('in the future');
+    }
+
     function test_file_rewrite_contents()
     {
         $testpath = sys_get_temp_dir() . '/rewrite/test.txt';
@@ -728,7 +813,7 @@ class FileSystemTest extends AbstractTestCase
         (rm_rf)($dir2);
         that($dir2)->fileNotExists();       // 自身は消える
         that(dirname($dir2))->fileExists(); // 親は残る
-        that((rm_rf)($dir))->isFalse(); // 存在しないと false を返す
+        that((rm_rf)($dir))->isFalse();     // 存在しないと false を返す
 
         (file_set_contents)("$dir/a.txt", '');
         (rm_rf)($dir1, false);
@@ -742,19 +827,19 @@ class FileSystemTest extends AbstractTestCase
         (file_set_contents)("$dir/.dotfile", '');
 
         that((rm_rf)("$dir/a", false))->isTrue();
-        that("$dir/a")->directoryExists(); // x は残る
+        that("$dir/a")->directoryExists();     // x は残る
         that("$dir/a/x.txt")->fileNotExists(); // x は消える
 
         that((rm_rf)("$dir/b", true))->isTrue();
-        that("$dir/b")->directoryNotExists(); // y は消える
+        that("$dir/b")->directoryNotExists();  // y は消える
         that("$dir/b/x.txt")->fileNotExists(); // x は消える
 
         that((rm_rf)("$dir/*", false))->isTrue();
-        that("$dir/c")->directoryExists(); // c は残る
+        that("$dir/c")->directoryExists();     // c は残る
         that("$dir/c/x.txt")->fileNotExists(); // x は消える
 
         that((rm_rf)("$dir/*", true))->isTrue();
-        that("$dir/c")->directoryNotExists(); // c は消える
+        that("$dir/c")->directoryNotExists();  // c は消える
         that("$dir/c/x.txt")->fileNotExists(); // x は消える
 
         that((rm_rf)("$dir/*", true))->isFalse();
