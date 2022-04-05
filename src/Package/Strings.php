@@ -3131,9 +3131,6 @@ class Strings
      * that(json_import('{a: "A", b: "B", }'))->is(['a' => 'A', 'b' => 'B']);
      * ```
      *
-     * @license MIT https://github.com/colinodell/json5
-     * @copyright Copyright (c) 2017-2019 Colin O'Dell colinodell@gmail.com. Based on https://github.com/json5/json5; Copyright (c) 2012-2016 Aseem Kishore, and others.
-     *
      * @param string $value JSON 文字列
      * @param array $options JSON_*** をキーにした連想配列。値が false は指定されていないとみなされる
      * @return mixed decode された値
@@ -3172,433 +3169,269 @@ class Strings
         }
 
         // 上記を通り抜けたら json5 で試行
-        $json5_decoder = new class() {
-            private $json;
-            private $associative;
-            private $maxDepth;
-            private $bigIntToString;
-            private $intToString;
-            private $floatToString;
+        $parser = new class($value) {
+            private $json_string;
+            private $type;
+            private $begin_position;
+            private $end_position;
+            private $keys;
+            private $values;
 
-            private $currentByte;
-            private $lineNumber          = 1;
-            private $currentLineStartsAt = 0;
-            private $at                  = 0;
-            private $depth               = 1;
-
-            public function __invoke($json, $options)
+            public function __construct($json_string)
             {
-                $this->json = $json;
-                $this->associative = !!$options[JSON_OBJECT_AS_ARRAY];
-                $this->maxDepth = (int) $options[JSON_MAX_DEPTH];
-                $this->bigIntToString = !!$options[JSON_BIGINT_AS_STRING];
-                $this->intToString = !!$options[JSON_INT_AS_STRING];
-                $this->floatToString = !!$options[JSON_FLOAT_AS_STRING];
-
-                $this->currentByte = $this->json[0] ?? null;
-
-                $result = $this->value();
-                $this->white();
-                if ($this->currentByte) {
-                    throw $this->exception('Syntax error');
-                }
-                return $result;
+                $this->json_string = "[$json_string]";
             }
 
-            private function next()
+            public function parse($options)
             {
-                // Get the next character. When there are no more characters, return the empty string.
-                if ($this->peek("\n") || $this->peek("\r", "\n")) {
-                    $this->lineNumber++;
-                    $this->currentLineStartsAt = $this->at + 1;
+                error_clear_last();
+                $tokens = @(parse_php)($this->json_string, [
+                    'cache' => false,
+                ]);
+                $error = error_get_last();
+                if (strpos($error['message'] ?? '', 'Unterminated comment') !== false) {
+                    throw new \ErrorException(sprintf('%s at line %d of the JSON5 data', "Unterminated block comment", $error['line']));
                 }
+                array_shift($tokens);
 
-                return $this->currentByte = $this->json[++$this->at] ?? null;
-            }
-
-            private function nextOrFail(...$chars)
-            {
-                foreach ($chars as $char) {
-                    $char = is_int($char) ? chr($char) : $char;
-                    if ($char !== $this->currentByte) {
-                        throw $this->exception(sprintf('Expected %s instead of %s', $this->renderChar($char), $this->renderChar($this->currentChar())));
+                $braces = [];
+                for ($i = 0; $i < count($tokens); $i++) {
+                    $token = $tokens[$i];
+                    if ($token[1] === '{' || $token[1] === '[') {
+                        if ($options[JSON_MAX_DEPTH] <= count($braces) + 1) {
+                            throw $this->exception("Maximum stack depth exceeded", $token);
+                        }
+                        $braces[] = $i;
                     }
-                    $this->next();
-                }
-                return $this->currentByte;
-            }
-
-            private function peek(...$chars)
-            {
-                foreach ($chars as $i => $char) {
-                    $char = is_int($char) ? chr($char) : $char;
-                    if ($char !== ($this->json[$this->at + $i] ?? null)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            private function match($regex)
-            {
-                $subject = substr($this->json, $this->at);
-                // Only match on the current line
-                if ($pos = strpos($subject, "\n")) {
-                    $subject = substr($subject, 0, $pos);
-                }
-
-                if (!preg_match($regex, $subject, $matches, PREG_OFFSET_CAPTURE)) {
-                    return null;
-                }
-
-                $this->at += $matches[0][1] + strlen($matches[0][0]);
-                $this->currentByte = $this->json[$this->at] ?? null;
-
-                return $matches[0][0];
-            }
-
-            private function white()
-            {
-                while ($this->currentByte !== null) {
-                    // Comments always begin with a / character.
-                    if ($this->currentByte === '/') {
-                        $this->next();
-
-                        if ($this->currentByte === '/') {
-                            do {
-                                $this->next();
-                                if ($this->currentByte === "\n" || $this->currentByte === "\r") {
-                                    $this->next();
-                                    continue 2;
+                    elseif ($token[1] === '}' || $token[1] === ']') {
+                        if (!$braces) {
+                            throw $this->exception("Mismatch", $token);
+                        }
+                        $brace = array_pop($braces);
+                        if ($tokens[$brace][1] !== '{' && $token[1] === '}' || $tokens[$brace][1] !== '[' && $token[1] === ']') {
+                            throw $this->exception("Mismatch", $token);
+                        }
+                        $block = array_filter(array_slice(array_splice($tokens, $brace + 1, $i - $brace, []), 0, -1), function ($token) {
+                            return !(is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_BAD_CHARACTER], true));
+                        });
+                        $elements = (array_explode)($block, function ($token) { return is_array($token) && $token[1] === ','; });
+                        // for trailing comma
+                        if ($elements && !$elements[count($elements) - 1]) {
+                            array_pop($elements);
+                        }
+                        // check consecutive comma (e.g. [1,,3])
+                        if (count(array_filter($elements)) !== count($elements)) {
+                            throw $this->exception("Missing element", $token);
+                        }
+                        $i = $brace;
+                        if ($token[1] === '}') {
+                            $object = $this->token('object', $tokens[$brace][3], $token[3] + strlen($token[1]));
+                            foreach ($elements as $element) {
+                                $keyandval = (array_explode)($element, function ($token) { return is_array($token) && $token[1] === ':'; });
+                                // check no colon (e.g. {123})
+                                if (count($keyandval) !== 2) {
+                                    throw $this->exception("Missing object key", (first_value)($keyandval[0]));
                                 }
-                            } while ($this->currentByte !== null);
-                        }
-                        elseif ($this->currentByte === '*') {
-                            do {
-                                $this->next();
-                                if ($this->peek('*', '/')) {
-                                    $this->next();
-                                    $this->next();
-                                    continue 2;
+                                // check objective key (e.g. {[1]: 123})
+                                if (($k = (array_find)($keyandval[0], 'is_object')) !== false) {
+                                    throw $this->exception("Unexpected object key", $keyandval[0][$k]);
                                 }
-                            } while ($this->currentByte !== null);
-
-                            throw $this->exception('Unterminated block comment');
-                        }
-                        throw $this->exception('Unrecognized comment');
-                    }
-                    elseif (preg_match('/^[ \t\r\n\v\f\xA0]/', $this->currentByte) === 1) {
-                        $this->next();
-                    }
-                    elseif ($this->peek(0xC2, 0xA0)) {
-                        // Non-breaking space in UTF-8
-                        $this->next();
-                        $this->next();
-                    }
-                    else {
-                        return $this->currentByte;
-                    }
-                }
-            }
-
-            private function value()
-            {
-                $this->white();
-
-                switch ($this->currentByte) {
-                    case '{':
-                        return $this->associative ? (array) $this->object() : $this->object();
-                    case '[':
-                        return $this->array();
-                    case '"':
-                    case "'":
-                        return $this->string();
-                    case '-':
-                    case '+':
-                    case '.':
-                        return $this->number();
-                    default:
-                        return is_numeric($this->currentByte) ? $this->number() : $this->word();
-                }
-            }
-
-            private function identifier()
-            {
-                // Be careful when editing this regex, there are a couple Unicode characters in between here -------------vv
-                $match = $this->match('/^(?:[\$_\p{L}\p{Nl}]|\\\\u[0-9A-Fa-f]{4})(?:[\$_\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}‌‍]|\\\\u[0-9A-Fa-f]{4})*/u');
-
-                if ($match === null) {
-                    throw $this->exception('Bad identifier as unquoted key');
-                }
-
-                // Un-escape escaped Unicode chars
-                $unescaped = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/', function ($m) {
-                    return json_decode('"' . $m[0] . '"');
-                }, $match);
-
-                return $unescaped;
-            }
-
-            private function word()
-            {
-                $consts = [
-                    'true'     => true,
-                    'false'    => false,
-                    'null'     => null,
-                    'Infinity' => INF,
-                    'NaN'      => NAN,
-                ];
-
-                foreach ($consts as $const => $value) {
-                    if ($this->currentByte === $const[0]) {
-                        $this->nextOrFail(...str_split($const));
-                        return $value;
-                    }
-                }
-
-                throw $this->exception('Unexpected ' . $this->renderChar($this->currentChar()));
-            }
-
-            private function number()
-            {
-                $number = null;
-                $sign = '';
-                $string = '';
-                $base = 10;
-
-                if ($this->currentByte === '-' || $this->currentByte === '+') {
-                    $sign = $this->currentByte;
-                    $this->next();
-                }
-
-                // support for Infinity
-                if ($this->currentByte === 'I') {
-                    $this->word();
-
-                    return ($sign === '-') ? -INF : INF;
-                }
-
-                // support for NaN
-                if ($this->currentByte === 'N') {
-                    $number = $this->word();
-
-                    // ignore sign as -NaN also is NaN
-                    return $number;
-                }
-
-                if ($this->currentByte === '0') {
-                    $string .= $this->currentByte;
-                    $this->next();
-                    if ($this->currentByte === 'x' || $this->currentByte === 'X') {
-                        $string .= $this->currentByte;
-                        $this->next();
-                        $base = 16;
-                    }
-                    elseif (is_numeric($this->currentByte)) {
-                        throw $this->exception('Octal literal');
-                    }
-                }
-
-                switch ($base) {
-                    case 10:
-                        if ((is_numeric($this->currentByte) || $this->currentByte === '.') && ($match = $this->match('/^\d*\.?\d*/')) !== null) {
-                            $string .= $match;
-                        }
-                        if (($this->currentByte === 'E' || $this->currentByte === 'e') && ($match = $this->match('/^[Ee][-+]?\d*/')) !== null) {
-                            $string .= $match;
-                        }
-                        $number = $string;
-                        break;
-                    case 16:
-                        if (($match = $this->match('/^[A-Fa-f0-9]+/')) !== null) {
-                            $string .= $match;
-                            $number = hexdec($string);
-                            break;
-                        }
-                        throw $this->exception('Bad hex number');
-                }
-
-                if (!is_numeric($number) || !is_finite($number)) {
-                    throw $this->exception('Bad number');
-                }
-
-                if (false
-                    || ($this->intToString && ctype_digit("$number"))
-                    || ($this->floatToString && !ctype_digit("$number"))
-                    || ($this->bigIntToString && ctype_digit("$number") && is_float(($number + 0)))
-                ) {
-                    return $sign === '-' ? '-' . $number : $number;
-                }
-
-                if ($sign === '-') {
-                    $number = -1 * $number;
-                }
-
-                // Adding 0 will automatically cast this to an int or float
-                return $number + 0;
-            }
-
-            private function string()
-            {
-                $escapees = [
-                    "'"  => "'",
-                    '"'  => '"',
-                    '\\' => '\\',
-                    '/'  => '/',
-                    "\n" => '',
-                    'b'  => chr(8),
-                    'f'  => "\f",
-                    'n'  => "\n",
-                    'r'  => "\r",
-                    't'  => "\t",
-                ];
-
-                $string = '';
-
-                $delim = $this->currentByte;
-                $this->next();
-                while ($this->currentByte !== null) {
-                    if ($this->currentByte === $delim) {
-                        $this->next();
-
-                        return $string;
-                    }
-
-                    if ($this->peek('\\', 'u') && $unicodeEscaped = $this->match('/^(?:\\\\u[0-9A-Fa-f]{4})+/')) {
-                        $string .= \json_decode('"' . $unicodeEscaped . '"');
-                        continue;
-                    }
-                    if ($this->currentByte === '\\') {
-                        $this->next();
-
-                        if ($this->currentByte === "\r") {
-                            if ($this->peek("\r", "\n")) {
-                                $this->next();
+                                // check consecutive objective value (e.g. {k: 123 [1]})
+                                if (!(count($keyandval[1]) === 1 && count(array_filter($keyandval[1], 'is_object')) === 1 || count(array_filter($keyandval[1], 'is_array')) === count($keyandval[1]))) {
+                                    throw $this->exception("Unexpected object value", $token);
+                                }
+                                $key = (first_value)($keyandval[0]);
+                                $lastkey = (last_value)($keyandval[0]);
+                                $val = (first_value)($keyandval[1]);
+                                $lastval = (last_value)($keyandval[1]);
+                                if (!is_object($val)) {
+                                    $val = $this->token('value', $val[3], $lastval[3] + strlen($lastval[1]));
+                                }
+                                $object->append($this->token('key', $key[3], $lastkey[3] + strlen($lastkey[1])), $val);
                             }
+                            $tokens[$brace] = $object;
                         }
-                        elseif (($escapee = ($escapees[$this->currentByte] ?? null)) !== null) {
-                            $string .= $escapee;
+                        if ($token[1] === ']') {
+                            $array = $this->token('array', $tokens[$brace][3], $token[3] + strlen($token[1]));
+                            foreach ($elements as $element) {
+                                // check consecutive objective value (e.g. [123 [1]])
+                                if (!(count($element) === 1 && count(array_filter($element, 'is_object')) === 1 || count(array_filter($element, 'is_array')) === count($element))) {
+                                    throw $this->exception("Unexpected array value", $token);
+                                }
+                                $val = (first_value)($element);
+                                $lastval = (last_value)($element);
+                                if (!is_object($val)) {
+                                    $val = $this->token('value', $val[3], $lastval[3] + strlen($lastval[1]));
+                                }
+                                $array->append(null, $val);
+                            }
+                            $tokens[$brace] = $array;
                         }
-                        else {
-                            break;
+                    }
+                }
+
+                if ($braces) {
+                    throw $this->exception("Mismatch", $tokens[$braces[count($braces) - 1]]);
+                }
+
+                /** @var self $root */
+                $root = $tokens[0];
+                $result = $root->value($options);
+
+                if (count($result) !== 1) {
+                    throw $this->exception("Mismatch", $tokens[0]);
+                }
+                return $result[0];
+            }
+
+            private function token($type, $begin_position, $end_position)
+            {
+                $clone = clone $this;
+                $clone->type = $type;
+                $clone->begin_position = $begin_position;
+                $clone->end_position = $end_position;
+                $clone->keys = [];
+                $clone->values = [];
+                return $clone;
+            }
+
+            private function append($key, $value)
+            {
+                assert(($key !== null && $this->type === 'object') || ($key === null && $this->type === 'array'));
+                $this->keys[] = $key ?? count($this->keys);
+                $this->values[] = $value;
+            }
+
+            private function value($options = [])
+            {
+                $numberify = function ($token) use ($options) {
+                    if (is_numeric($token[0]) || $token[0] === '-' || $token[0] === '+' || $token[0] === '.') {
+                        $sign = 1;
+                        if ($token[0] === '+' || $token[0] === '-') {
+                            $sign = substr($token, 0, 1) === '-' ? -1 : 1;
+                            $token = substr($token, 1);
                         }
-                    }
-                    elseif ($this->currentByte === "\n") {
-                        // unescaped newlines are invalid; see:
-                        // https://github.com/json5/json5/issues/24
-                        // @todo this feels special-cased; are there other invalid unescaped chars?
-                        break;
-                    }
-                    else {
-                        $string .= $this->currentByte;
-                    }
+                        if (($token[0] ?? null) === '0' && isset($token[1]) && $token[1] !== '.') {
+                            if (!($token[1] === 'x' || $token[1] === 'X')) {
+                                throw $this->exception("Octal literal", $this);
+                            }
+                            $token = substr($token, 2);
+                            if (!ctype_xdigit($token)) {
+                                throw $this->exception("Bad hex number", $this);
+                            }
+                            $token = hexdec($token);
+                        }
+                        if (!is_numeric($token) || !is_finite($token)) {
+                            throw $this->exception("Bad number", $this);
+                        }
+                        if (false
+                            || ($options[JSON_INT_AS_STRING] && ctype_digit("$token"))
+                            || ($options[JSON_FLOAT_AS_STRING] && !ctype_digit("$token"))
+                            || ($options[JSON_BIGINT_AS_STRING] && ctype_digit("$token") && is_float(($token + 0)))
+                        ) {
+                            return $sign === -1 ? "-$token" : $token;
+                        }
 
-                    $this->next();
+                        return 0 + $sign * $token;
+                    }
+                    return null;
+                };
+                $stringify = function ($token) {
+                    if (strlen($token) > 1 && ($token[0] === '"' || $token[0] === "'")) {
+                        if ($token[0] !== $token[-1]) {
+                            throw $this->exception("Bad string", $this);
+                        }
+                        $token = substr($token, 1, -1);
+                        $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', function ($m) { return json_decode('"' . $m[0] . '"'); }, $token);
+                        $token = strtr($token, [
+                            "\\'"    => "'",
+                            '\\"'    => '"',
+                            '\\\\'   => '\\',
+                            '\\/'    => '/',
+                            "\\\n"   => "",
+                            "\\\r"   => "",
+                            "\\\r\n" => "",
+                            '\\b'    => chr(8),
+                            '\\f'    => "\f",
+                            '\\n'    => "\n",
+                            '\\r'    => "\r",
+                            '\\t'    => "\t",
+                        ]);
+                        return $token;
+                    }
+                    return null;
+                };
+
+                switch ($this->type) {
+                    default:
+                        throw new \DomainException(); // @codeCoverageIgnore
+                    case 'array':
+                        return array_map(function ($value) use ($options) { return $value->value($options); }, $this->values);
+                    case 'object':
+                        $array = array_combine(
+                            array_map(function ($value) use ($options) { return $value->value($options); }, $this->keys),
+                            array_map(function ($value) use ($options) { return $value->value($options); }, $this->values)
+                        );
+                        return $options[JSON_OBJECT_AS_ARRAY] ? $array : (object) $array;
+                    case 'key':
+                        $token = substr($this->json_string, $this->begin_position, $this->end_position - $this->begin_position);
+                        $token = trim($token, chr(0xC2) . chr(0xA0) . " \n\r\t\v\x00\x0c");
+                        if (preg_match('/^(?:[\$_\p{L}\p{Nl}]|\\\\u[0-9A-Fa-f]{4})(?:[\$_\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}‌‍]|\\\\u[0-9A-Fa-f]{4})*/u', $token)) {
+                            $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', function ($m) { return json_decode('"' . $m[0] . '"'); }, $token);
+                            return $token;
+                        }
+                        if (($string = $stringify($token)) !== null) {
+                            return $string;
+                        }
+                        throw $this->exception("Bad identifier", $this);
+                    case 'value':
+                        $token = substr($this->json_string, $this->begin_position, $this->end_position - $this->begin_position);
+                        $token = trim($token, chr(0xC2) . chr(0xA0) . " \n\r\t\v\x00\x0c");
+                        $literals = [
+                            'null'      => null,
+                            'false'     => false,
+                            'true'      => true,
+                            'Infinity'  => INF,
+                            '+Infinity' => +INF,
+                            '-Infinity' => -INF,
+                            'NaN'       => NAN,
+                            '+NaN'      => +NAN,
+                            '-NaN'      => -NAN,
+                        ];
+                        // literals
+                        if (array_key_exists($token, $literals)) {
+                            return $literals[$token];
+                        }
+                        // numbers
+                        if (($number = $numberify($token)) !== null) {
+                            return $number;
+                        }
+                        // strings
+                        if (($string = $stringify($token)) !== null) {
+                            return $string;
+                        }
+                        throw $this->exception("Bad value", $this);
                 }
-
-                throw $this->exception('Bad string');
             }
 
-            private function array()
+            private function exception($message, $token)
             {
-                $array = [];
-
-                if (++$this->depth > $this->maxDepth) {
-                    throw $this->exception('Maximum stack depth exceeded');
+                $line = $column = $word = null;
+                if (is_array($token)) {
+                    $line = $token[2];
+                    $column = $token[3] - strrpos($this->json_string, "\n", $token[3] - strlen($this->json_string));
+                    $word = $token[1];
                 }
-
-                $this->nextOrFail('[');
-                $this->white();
-                while ($this->currentByte !== null) {
-                    if ($this->currentByte === ']') {
-                        $this->next();
-                        $this->depth--;
-                        return $array; // Potentially empty array
-                    }
-                    // ES5 allows omitting elements in arrays, e.g. [,] and [,null]. We don't allow this in JSON5.
-                    if ($this->currentByte === ',') {
-                        throw $this->exception('Missing array element');
-                    }
-
-                    $array[] = $this->value();
-
-                    $this->white();
-                    // If there's no comma after this value, this needs to be the end of the array.
-                    if ($this->currentByte !== ',') {
-                        $this->nextOrFail(']');
-                        $this->depth--;
-                        return $array;
-                    }
-                    $this->nextOrFail(',');
-                    $this->white();
+                if (is_object($token)) {
+                    $line = substr_count($token->json_string, "\n", 0, $token->begin_position) + 1;
+                    $column = $token->begin_position - strrpos($token->json_string, "\n", $token->begin_position - strlen($token->json_string));
+                    $word = substr($token->json_string, $token->begin_position, $token->end_position - $token->begin_position);
                 }
-
-                throw $this->exception('Invalid array');
-            }
-
-            private function object()
-            {
-                $object = new \stdClass;
-
-                if (++$this->depth > $this->maxDepth) {
-                    throw $this->exception('Maximum stack depth exceeded');
-                }
-
-                $this->nextOrFail('{');
-                $this->white();
-                while ($this->currentByte !== null) {
-                    if ($this->currentByte === '}') {
-                        $this->next();
-                        $this->depth--;
-                        return $object; // Potentially empty object
-                    }
-
-                    // Keys can be unquoted. If they are, they need to be valid JS identifiers.
-                    if ($this->currentByte === '"' || $this->currentByte === "'") {
-                        $key = $this->string();
-                    }
-                    else {
-                        $key = $this->identifier();
-                    }
-
-                    $this->white();
-                    $this->nextOrFail(':');
-                    $object->{$key} = $this->value();
-                    $this->white();
-                    // If there's no comma after this pair, this needs to be the end of the object.
-                    if ($this->currentByte !== ',') {
-                        $this->nextOrFail('}');
-                        $this->depth--;
-                        return $object;
-                    }
-                    $this->nextOrFail(',');
-                    $this->white();
-                }
-
-                throw $this->exception('Invalid object');
-            }
-
-            private function exception($message)
-            {
-                // Calculate the column number
-                $str = substr($this->json, $this->currentLineStartsAt, $this->at - $this->currentLineStartsAt);
-                $column = mb_strlen($str) + 1;
-
-                $message = sprintf('%s at line %d column %d of the JSON5 data', $message, $this->lineNumber, $column);
-                return new \ErrorException($message);
-            }
-
-            private function currentChar()
-            {
-                return $this->currentByte === null ? null : mb_substr(substr($this->json, $this->at, 4), 0, 1);
-            }
-
-            private function renderChar($char)
-            {
-                return $char === null ? 'EOF' : "'" . $char . "'";
+                return new \ErrorException(sprintf("%s '%s' at line %d column %d of the JSON5 data", $message, $word, $line, $column));
             }
         };
-        return $json5_decoder($value, $specials);
+
+        return $parser->parse($specials);
     }
 
     /**

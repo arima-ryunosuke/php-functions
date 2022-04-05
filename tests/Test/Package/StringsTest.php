@@ -2250,23 +2250,33 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 
     function test_json_import5_error()
     {
-        that(json_import)->try('{')->wasThrown('Invalid object');
-        that(json_import)->try('[')->wasThrown('Invalid array');
-        that(json_import)->try('[1] dummy')->wasThrown("Syntax error");
-        that(json_import)->try('[1')->wasThrown("Expected ']'");
-        that(json_import)->try('[,]')->wasThrown("Missing array");
+        that(json_import)->try('123,456')->wasThrown("Mismatch");
+        that(json_import)->try('{')->wasThrown("Mismatch ']'");
+        that(json_import)->try('[')->wasThrown("Mismatch '['");
+        that(json_import)->try('[1')->wasThrown("Mismatch '['");
+        that(json_import)->try('{{}')->wasThrown("Mismatch ']'");
+        that(json_import)->try('[}')->wasThrown("Mismatch '}'");
+        that(json_import)->try(']]')->wasThrown("Mismatch ']'");
+        that(json_import)->try('[1] dummy')->wasThrown("Unexpected array value ']'");
+        that(json_import)->try('{[1]: 1}')->wasThrown("Unexpected object key '[1]'");
+        that(json_import)->try('{aaa: [1] ccc}')->wasThrown("Unexpected object value '}'");
+        that(json_import)->try('{aaa bbb}')->wasThrown("Missing object key 'aaa'");
+        that(json_import)->try('{,}')->wasThrown("Missing element");
+        that(json_import)->try('[,]')->wasThrown("Missing element");
+        that(json_import)->try('{a:1,,b:2}')->wasThrown("Missing element");
+        that(json_import)->try('[1,,2]')->wasThrown("Missing element");
 
         that(json_import)->try('/* ccc')->wasThrown("Unterminated block comment");
-        that(json_import)->try('/# ccc')->wasThrown("Unrecognized comment");
+        that(json_import)->try('/# ccc')->wasThrown("Mismatch '['");
         that(json_import)->try('{123 : 456}')->wasThrown("Bad identifier");
 
-        that(json_import)->try("'a\nb'")->wasThrown("Bad string");
+        that(json_import)->try( '"" \'\'')->wasThrown("Bad string");
         that(json_import)->try('08')->wasThrown("Octal literal");
         that(json_import)->try('0xxxx')->wasThrown("Bad hex number");
         that(json_import)->try('+true')->wasThrown("Bad number");
-        that(json_import)->try('hoge')->wasThrown("Unexpected 'h'");
-        that(json_import)->try('+Indigo')->wasThrown("Expected 'f'");
-        that(json_import)->try('NotANumber')->wasThrown("Expected 'a'");
+        that(json_import)->try('+Indigo')->wasThrown("Bad number");
+        that(json_import)->try('hoge')->wasThrown("Bad value");
+        that(json_import)->try('NotANumber')->wasThrown("Bad value");
 
         that(json_import)->try('[[1]]', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
         that(json_import)->try('{"foo": {"bar": "baz"}}', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
