@@ -9,12 +9,24 @@ class Strings
 {
     /** json_*** 関数で $depth 引数を表す定数 */
     const JSON_MAX_DEPTH = -1;
+    /** json_*** 関数でインデント数・文字を指定する定数 */
+    const JSON_INDENT = -71;
+    /** json_*** 関数でクロージャをサポートするかの定数 */
+    const JSON_CLOSURE = -72;
+    /** json_*** 関数で一定以上の階層をインライン化するかの定数 */
+    const JSON_INLINE_LEVEL = -73;
+    /** json_*** 関数でスカラーのみのリストをインライン化するかの定数 */
+    const JSON_INLINE_SCALARLIST = -74;
     /** json_*** 関数で json5 を取り扱うかの定数 */
     const JSON_ES5 = -100;
     /** json_*** 関数で整数を常に文字列で返すかの定数 */
     const JSON_INT_AS_STRING = -101;
     /** json_*** 関数で小数を常に文字列で返すかの定数 */
     const JSON_FLOAT_AS_STRING = -102;
+    /** json_*** 関数で強制ケツカンマを振るかの定数 */
+    const JSON_TRAILING_COMMA = -103;
+    /** json_*** 関数でコメントを判定するプレフィックス定数 */
+    const JSON_COMMENT_PREFIX = -104;
 
     /**
      * 文字列結合の関数版
@@ -2909,12 +2921,39 @@ class Strings
      *
      * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
      *
+     * 下記の拡張オプションがある。
+     *
+     * - JSON_INLINE_LEVEL: PRETTY_PRINT 時に指定以上の階層をインライン化する（数値以外にパスで階層も指定できる）
+     * - JSON_INLINE_SCALARLIST: PRETTY_PRINT 時にスカラーのみのリストをインライン化する
+     * - JSON_INDENT: PRETTY_PRINT 時にインデント数・文字列を指定する
+     * - JSON_CLOSURE: 任意のリテラルを埋め込む
+     *   - クロージャの返り値がそのまま埋め込まれるので、文字列化可能な結果を返さなければならない
+     *
+     * JSON_ES5 を与えると JSON5 互換でエンコードされる。
+     * その際下記のプションも使用可能になる。
+     *
+     * - JSON_TRAILING_COMMA: 末尾カンマを強制する
+     * - JSON_COMMENT_PREFIX: コメントとして埋め込まれるキープレフィックスを指定する
+     *   - そのキーで始まる要素が文字列なら // コメントになる
+     *   - そのキーで始まる要素が配列なら /* コメントになる
+     *
      * Example:
      * ```php
      * // オプションはこのように [定数 => bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
      * that(json_export(['a' => 'A', 'b' => 'B'], [
      *    JSON_PRETTY_PRINT => false,
      * ]))->is('{"a":"A","b":"B"}');
+     * // json5 でコメント付きかつ末尾カンマ強制モード
+     * that(json_export(['a' => 'A', '#comment' => 'this is comment', 'b' => 'B'], [
+     *    JSON_ES5            => true,
+     *    JSON_TRAILING_COMMA => true,
+     *    JSON_COMMENT_PREFIX => '#',
+     *    JSON_PRETTY_PRINT   => true,
+     * ]))->is('{
+     *     a: "A",
+     *     // this is comment
+     *     b: "B",
+     * }');
      * ```
      *
      * @param mixed $value encode する値
@@ -2927,14 +2966,144 @@ class Strings
             JSON_UNESCAPED_UNICODE      => true, // エスケープなしで特にデメリットはない
             JSON_PRESERVE_ZERO_FRACTION => true, // 勝手に変換はできるだけ避けたい
         ];
+        $es5 = (array_unset)($options, JSON_ES5, false);
+        $comma = (array_unset)($options, JSON_TRAILING_COMMA, false);
+        $comment = (array_unset)($options, JSON_COMMENT_PREFIX, null);
         $depth = (array_unset)($options, JSON_MAX_DEPTH, 512);
+        $indent = (array_unset)($options, JSON_INDENT, null);
+        $closure = (array_unset)($options, JSON_CLOSURE, false);
+        $inline_level = (array_unset)($options, JSON_INLINE_LEVEL, 0);
+        $inline_scalarlist = (array_unset)($options, JSON_INLINE_SCALARLIST, false);
+
+        // for compatible
+        if (defined('JSON_THROW_ON_ERROR')) {
+            $options[JSON_THROW_ON_ERROR] = true;
+        }
         $option = array_sum(array_keys(array_filter($options)));
 
-        $result = json_encode($value, $option, $depth);
+        $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $inline_scalarlist, $inline_level, $es5, $comma, $comment) {
+            $nest = count($parents);
 
-        // エラーが出ていたら例外に変換
-        if (json_last_error()) {
-            throw new \ErrorException(json_last_error_msg(), json_last_error());
+            if ($depth < $nest) {
+                throw new \ErrorException('Maximum stack depth exceeded', JSON_ERROR_DEPTH);
+            }
+            if ($closure && $value instanceof \Closure) {
+                return $value();
+            }
+            if (is_object($value)) {
+                if ($value instanceof \JsonSerializable) {
+                    return $encode($value->jsonSerialize(), $parents, false);
+                }
+                return $encode((arrayval)($value, false), $parents, true);
+            }
+            if (is_array($value)) {
+                $pretty_print = $option & JSON_PRETTY_PRINT;
+                $force_object = $option & JSON_FORCE_OBJECT;
+
+                $withoutcommentarray = $value;
+                if ($es5 && strlen($comment)) {
+                    $withoutcommentarray = array_filter($withoutcommentarray, function ($k) use ($comment) { return strpos("$k", $comment) === false; }, ARRAY_FILTER_USE_KEY);
+                }
+
+                $objective = $force_object || $objective || (is_hasharray)($withoutcommentarray);
+
+                if (!$value) {
+                    return $objective ? '{}' : '[]';
+                }
+
+                $inline = false;
+                if ($inline_level) {
+                    if (is_array($inline_level)) {
+                        $inline = $inline || (fnmatch_or)(array_map(function ($v) { return "$v.*"; }, $inline_level), implode('.', $parents) . '.');
+                    }
+                    elseif (ctype_digit("$inline_level")) {
+                        $inline = $inline || $inline_level <= $nest;
+                    }
+                    else {
+                        $inline = $inline || fnmatch("$inline_level.*", implode('.', $parents) . '.');
+                    }
+                }
+                if ($inline_scalarlist) {
+                    $inline = $inline || !$objective && (array_all)($value, function ($v) { return (is_primitive)($v) || $v instanceof \Closure; });
+                }
+
+                $break = $indent0 = $indent1 = $indent2 = $separator = '';
+                $delimiter = ',';
+                if ($pretty_print && !$inline) {
+                    $break = "\n";
+                    $separator = ' ';
+                    $indent = $indent ?: 4;
+                    $indent0 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 0) * $indent) : str_repeat($indent, ($nest + 0));
+                    $indent1 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 1) * $indent) : str_repeat($indent, ($nest + 1));
+                    $indent2 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 2) * $indent) : str_repeat($indent, ($nest + 2));
+                }
+                if ($pretty_print && $inline) {
+                    $separator = ' ';
+                    $delimiter = ', ';
+                }
+
+                $n = 0;
+                $count = count($withoutcommentarray);
+                $result = ($objective ? '{' : '[') . $break;
+                foreach ($value as $k => $v) {
+                    if ($es5 && strlen($comment) && strpos("$k", $comment) === 0) {
+                        if (!$pretty_print) {
+                            $v = (array) $v;
+                        }
+                        if (is_array($v)) {
+                            $comments = [];
+                            foreach ($v as $vv) {
+                                $comments[] = "$indent2$vv";
+                            }
+                            $result .= "$indent1/*$break" . implode($break, $comments) . "$break$indent1*/";
+                        }
+                        else {
+                            $comments = [];
+                            foreach (preg_split('#\\R#u', $v) as $vv) {
+                                $comments[] = "$indent1// $vv";
+                            }
+                            $result .= implode($break, $comments);
+                        }
+                    }
+                    else {
+                        $result .= $indent1;
+                        if ($objective) {
+                            $result .= ($es5 && preg_match("#^[a-zA-Z_$][a-zA-Z0-9_$]*$#u", $k) ? $k : json_encode("$k")) . ":$separator";
+                        }
+                        $result .= $encode($v, (array_append)($parents, $k), false);
+                        if (++$n !== $count || ($comma && !$inline)) {
+                            $result .= $delimiter;
+                        }
+                    }
+                    $result .= $break;
+                }
+                return $result . $indent0 . ($objective ? '}' : ']');
+            }
+
+            if ($es5) {
+                if (is_float($value) && is_nan($value)) {
+                    return 'NaN';
+                }
+                if (is_float($value) && is_infinite($value) && $value > 0) {
+                    return '+Infinity';
+                }
+                if (is_float($value) && is_infinite($value) && $value < 0) {
+                    return '-Infinity';
+                }
+            }
+            return json_encode($value, $option, $depth);
+        };
+
+        // 特別な状況（クロージャを使うとか ES5 でないとか）以外は 標準を使用したほうが遥かに速い
+        if ($indent || $closure || $inline_scalarlist || $inline_level || $es5 || $comma || $comment) {
+            $result = $encode($value, [], false);
+        }
+        else {
+            $result = json_encode($value, $option, $depth);
+            // for compatible
+            if (json_last_error()) {
+                throw new \ErrorException(json_last_error_msg(), json_last_error()); // @codeCoverageIgnore
+            }
         }
 
         return $result;

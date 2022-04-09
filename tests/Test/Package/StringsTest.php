@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use Concrete;
+use JetBrains\PhpStorm\Internal\TentativeType;
 
 class StringsTest extends AbstractTestCase
 {
@@ -1764,8 +1765,433 @@ a3,b3,c3
             JSON_PRETTY_PRINT           => true,
         ]))->is("[\n    123,\n    \"\u3042\"\n]");
 
+        // JSON_INDENT
+        that((json_export)(['a' => 1, ['b' => 2]], [
+            JSON_PRETTY_PRINT => true,
+            JSON_INDENT       => "\t",
+        ]))->is('{
+	"a": 1,
+	"0": {
+		"b": 2
+	}
+}');
+        that((json_export)(['a' => 1, ['b' => 2]], [
+            JSON_PRETTY_PRINT => true,
+            JSON_INDENT       => 8,
+        ]))->is('{
+        "a": 1,
+        "0": {
+                "b": 2
+        }
+}');
+
+        // JSON_INLINE_SCALARLIST
+        that((json_export)(['a' => 1, ['b' => 2, ['c' => [1, 2, 3], 'd' => [7, [], 9]]]], [
+            JSON_PRETTY_PRINT      => true,
+            JSON_INLINE_SCALARLIST => true,
+        ]))->is('{
+    "a": 1,
+    "0": {
+        "b": 2,
+        "0": {
+            "c": [1, 2, 3],
+            "d": [
+                7,
+                [],
+                9
+            ]
+        }
+    }
+}');
+
+        // JSON_INLINE_LEVEL
+        $array = [
+            'a1' => ['a', 'A'],
+            'a2' => [
+                'b1' => ['b', 'B'],
+                'b2' => [
+                    'c1' => ['c', 'C'],
+                    'c2' => [
+                        'x' => [7 => 'X'],
+                        'y' => [8 => 'Y'],
+                        'z' => [9 => 'Z'],
+                    ],
+                ],
+            ],
+        ];
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT => true,
+            JSON_INLINE_LEVEL => 1,
+        ]))->is('{
+    "a1": ["a", "A"],
+    "a2": {"b1": ["b", "B"], "b2": {"c1": ["c", "C"], "c2": {"x": {"7": "X"}, "y": {"8": "Y"}, "z": {"9": "Z"}}}}
+}');
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT => true,
+            JSON_INLINE_LEVEL => 2,
+        ]))->is('{
+    "a1": [
+        "a",
+        "A"
+    ],
+    "a2": {
+        "b1": ["b", "B"],
+        "b2": {"c1": ["c", "C"], "c2": {"x": {"7": "X"}, "y": {"8": "Y"}, "z": {"9": "Z"}}}
+    }
+}');
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT => true,
+            JSON_INLINE_LEVEL => 3,
+        ]))->is('{
+    "a1": [
+        "a",
+        "A"
+    ],
+    "a2": {
+        "b1": [
+            "b",
+            "B"
+        ],
+        "b2": {
+            "c1": ["c", "C"],
+            "c2": {"x": {"7": "X"}, "y": {"8": "Y"}, "z": {"9": "Z"}}
+        }
+    }
+}');
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT => true,
+            JSON_INLINE_LEVEL => 'a2.b2.c2',
+        ]))->is('{
+    "a1": [
+        "a",
+        "A"
+    ],
+    "a2": {
+        "b1": [
+            "b",
+            "B"
+        ],
+        "b2": {
+            "c1": [
+                "c",
+                "C"
+            ],
+            "c2": {"x": {"7": "X"}, "y": {"8": "Y"}, "z": {"9": "Z"}}
+        }
+    }
+}');
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT => true,
+            JSON_INLINE_LEVEL => 'a2.b2.c2.y',
+        ]))->is('{
+    "a1": [
+        "a",
+        "A"
+    ],
+    "a2": {
+        "b1": [
+            "b",
+            "B"
+        ],
+        "b2": {
+            "c1": [
+                "c",
+                "C"
+            ],
+            "c2": {
+                "x": {
+                    "7": "X"
+                },
+                "y": {"8": "Y"},
+                "z": {
+                    "9": "Z"
+                }
+            }
+        }
+    }
+}');
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT => true,
+            JSON_INLINE_LEVEL => ['a2.b1', 'a2.b2.c2.y'],
+        ]))->is('{
+    "a1": [
+        "a",
+        "A"
+    ],
+    "a2": {
+        "b1": ["b", "B"],
+        "b2": {
+            "c1": [
+                "c",
+                "C"
+            ],
+            "c2": {
+                "x": {
+                    "7": "X"
+                },
+                "y": {"8": "Y"},
+                "z": {
+                    "9": "Z"
+                }
+            }
+        }
+    }
+}');
+        that((json_export)($array, [
+            JSON_PRETTY_PRINT      => true,
+            JSON_INLINE_LEVEL      => 'a2.b2.c2.y',
+            JSON_INLINE_SCALARLIST => true,
+        ]))->is('{
+    "a1": ["a", "A"],
+    "a2": {
+        "b1": ["b", "B"],
+        "b2": {
+            "c1": ["c", "C"],
+            "c2": {
+                "x": {
+                    "7": "X"
+                },
+                "y": {"8": "Y"},
+                "z": {
+                    "9": "Z"
+                }
+            }
+        }
+    }
+}');
+
+        // JSON_CLOSURE
+        that((json_export)(['a' => function () { return '[1,2,3]'; }, 'f' => function () { return 'function () {}'; }], [
+            JSON_PRETTY_PRINT => true,
+            JSON_CLOSURE      => true,
+        ]))->is('{
+    "a": [1,2,3],
+    "f": function () {}
+}');
+    }
+
+    function test_json_export5()
+    {
+        $array = [
+            'empty-list'  => [],
+            'empty-empty' => [[]],
+            'scalar-list' => [1, 2, 3, 'a', 'b', 'c'],
+            'nest-hash'   => [
+                'nest-hash' => [
+                    'nest-hash' => [
+                        'list-list' => [7, [8, [9]]],
+                        'hash-list' => [
+                            ['id' => 1, 'name' => 'x'],
+                            ['id' => 2, 'name' => 'y'],
+                            ['id' => 3, 'name' => 'z'],
+                        ],
+                        'list-hash' => [
+                            'id'   => [1, 2, 3],
+                            'name' => ['x', 'y', 'z'],
+                        ],
+                        'hash-hash' => [
+                            'a' => ['id' => 1, 'name' => 'x'],
+                            'b' => ['id' => 2, 'name' => 'y'],
+                            'c' => ['id' => 3, 'name' => 'z'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $json = '{
+  "empty-list": [],
+  "empty-empty": [
+    [],
+  ],
+  "scalar-list": [1, 2, 3, "a", "b", "c"],
+  "nest-hash": {
+    "nest-hash": {
+      "nest-hash": {
+        "list-list": [
+          7,
+          [
+            8,
+            [9],
+          ],
+        ],
+        "hash-list": [
+          {
+            id: 1,
+            name: "x",
+          },
+          {
+            id: 2,
+            name: "y",
+          },
+          {
+            id: 3,
+            name: "z",
+          },
+        ],
+        "list-hash": {
+          id: [1, 2, 3],
+          name: ["x", "y", "z"],
+        },
+        "hash-hash": {
+          a: {
+            id: 1,
+            name: "x",
+          },
+          b: {
+            id: 2,
+            name: "y",
+          },
+          c: {
+            id: 3,
+            name: "z",
+          },
+        },
+      },
+    },
+  },
+}';
+
+        $es5_opt = [
+            JSON_ES5               => true,
+            JSON_INDENT            => "  ",
+            JSON_TRAILING_COMMA    => true,
+            JSON_COMMENT_PREFIX    => '#',
+            JSON_INLINE_SCALARLIST => true,
+            JSON_PRETTY_PRINT      => true,
+        ];
+
+        that((json_export)($array, $es5_opt))->is($json);
+        that((json_import)($json))->is($array); // 戻せることを担保
+
+        // JSON_PRETTY_PRINT なコメント
+        that($json = (json_export)([
+            '#comment-a'   => "this is line comment1\nthis is line comment2",
+            'a'            => 'A',
+            '#comment-b'   => ['this is block comment1', 'this is block comment2'],
+            'b'            => 'B',
+            'c'            => 'C',
+            '#comment-end' => 'this is comment',
+        ], [
+                JSON_PRETTY_PRINT   => true,
+                JSON_TRAILING_COMMA => false,
+            ] + $es5_opt))->is('{
+  // this is line comment1
+  // this is line comment2
+  a: "A",
+  /*
+    this is block comment1
+    this is block comment2
+  */
+  b: "B",
+  c: "C"
+  // this is comment
+}');
+        that((json_import)($json))->isArray(); // コメントがあるので戻せないが、エラーにならないことは担保
+
+        // JSON_PRETTY_PRINT でないコメント
+        that($json = (json_export)([
+            '#comment-a'   => "this is line comment1\nthis is line comment2",
+            'a'            => 'A',
+            '#comment-b'   => ['this is block comment1', 'this is block comment2'],
+            'b'            => 'B',
+            'c'            => 'C',
+            '#comment-end' => 'this is comment',
+        ], [
+                JSON_PRETTY_PRINT   => false,
+                JSON_TRAILING_COMMA => true,
+            ] + $es5_opt))->is('{/*this is line comment1
+this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"B",c:"C",/*this is comment*/}');
+        that((json_import)($json))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']); // 戻せることを担保
+
+        // コメントが混在していてもインデックス配列になる
+        that($json = (json_export)([
+            '#comment-a'   => "this is line comment1\nthis is line comment2",
+            'A',
+            '#comment-b'   => ['this is block comment1', 'this is block comment2'],
+            'B',
+            'C',
+            '#comment-end' => 'this is comment',
+        ], [
+                JSON_PRETTY_PRINT   => true,
+                JSON_TRAILING_COMMA => false,
+            ] + $es5_opt))->is('[
+  // this is line comment1
+  // this is line comment2
+  "A",
+  /*
+    this is block comment1
+    this is block comment2
+  */
+  "B",
+  "C"
+  // this is comment
+]');
+        that((json_import)($json))->is(['A', 'B', 'C']); // 戻せることを担保
+
+        // コメントのみの配列
+        that($json = (json_export)([
+            '#comment-a'   => "this is line comment1\nthis is line comment2",
+            '#comment-b'   => ['this is block comment1', 'this is block comment2'],
+            '#comment-end' => 'this is comment',
+        ], [
+                JSON_PRETTY_PRINT => true,
+            ] + $es5_opt))->is('[
+  // this is line comment1
+  // this is line comment2
+  /*
+    this is block comment1
+    this is block comment2
+  */
+  // this is comment
+]');
+        that((json_import)($json))->is([]); // 戻せることを担保
+
+        // 雑多なもの
+        that((json_export)([], $es5_opt))->is('[]');
+        that((json_export)((object) [], $es5_opt))->is('{}');
+        that((json_export)([true, false, null, NAN, -INF, +INF], $es5_opt))->is('[true, false, null, NaN, -Infinity, +Infinity]');
+        that((json_export)([
+            'empty-list'  => [],
+            'empty-hash'  => (object) [],
+            'empty-empty' => [[]],
+        ], [JSON_FORCE_OBJECT => true] + $es5_opt))->is('{
+  "empty-list": {},
+  "empty-hash": {},
+  "empty-empty": {
+    "0": {},
+  },
+}');
+        that((json_export)([
+            new class implements \JsonSerializable {
+                public function jsonSerialize()
+                {
+                    return [];
+                }
+            },
+            new class implements \JsonSerializable {
+                public function jsonSerialize()
+                {
+                    return ['a' => 'A', 'b' => 'B'];
+                }
+            },
+            (object) ['a' => 'A', 'b' => 'B'],
+        ], $es5_opt))->is('[
+  [],
+  {
+    a: "A",
+    b: "B",
+  },
+  {
+    a: "A",
+    b: "B",
+  },
+]');
+
         // depth
-        that(json_export)->try([[[[[[]]]]]], [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3])->wasThrown('Maximum stack depth exceeded');
+        that(json_export)->try([[[[[[]]]]]], [
+            JSON_ES5       => true,
+            JSON_MAX_DEPTH => 3,
+        ])->wasThrown('Maximum stack depth exceeded');
     }
 
     function test_json_import()
@@ -1787,7 +2213,7 @@ a3,b3,c3
         ])->wasThrown('Syntax error');
 
         // depth
-        that(json_import)->try('[[[[[[]]]]]]', [\ryunosuke\Functions\Package\Strings::JSON_MAX_DEPTH => 3])->wasThrown('Maximum stack depth exceeded');
+        that(json_import)->try('[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3])->wasThrown('Maximum stack depth exceeded');
     }
 
     function test_json_import5()
@@ -2146,7 +2572,7 @@ z", quote2: "a\\\\nz"');
     function test_random_string()
     {
         $actual = (random_string)(256, 'abc');
-        that(strlen($actual))->is(256); // 256文字のはず
+        that(strlen($actual))->is(256);  // 256文字のはず
         that($actual)->matches('#abc#'); // 大抵の場合含まれるはず（極稀にコケる）
 
         that(random_string)->try(0, 'x')->wasThrown('positive number');
