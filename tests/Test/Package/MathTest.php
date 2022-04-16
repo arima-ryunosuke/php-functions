@@ -513,4 +513,18 @@ class MathTest extends AbstractTestCase
         ];
         that(array_sum($average) / count($average))->isBetween(45, 55);
     }
+
+    function test_calculate_formula()
+    {
+        define('NS\\NINE', 9);
+        that((calculate_formula)('(1 - 2 + 3) ** 3 / 4'))->is(2);
+        that((calculate_formula)('NS\\NINE + M_PI * 3 + \\M_PI'))->is(9 + M_PI * 4);
+        that((calculate_formula)('NS\\NINE + ArrayObject::ARRAY_AS_PROPS * 3 + \\ArrayObject::ARRAY_AS_PROPS'))->is(9 + \ArrayObject::ARRAY_AS_PROPS * 4);
+
+        define('NS\\STR', 'evil');
+        that(calculate_formula)->try('NS\\STR + 1')->wasThrown();
+        that(calculate_formula)->try('NS\\STR (1)')->wasThrown();
+        that(calculate_formula)->try('UNDEFINED(1)')->wasThrown();
+        that(calculate_formula)->try('1 + "aaa"')->wasThrown();
+    }
 }
