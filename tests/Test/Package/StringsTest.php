@@ -3068,6 +3068,30 @@ TEXT;
         ]);
     }
 
+    public function test_str_common_prefix()
+    {
+        that((str_common_prefix)())->isSame(null);
+        that((str_common_prefix)('a'))->isSame(null);
+
+        that((str_common_prefix)('a', 'ab', 'abc'))->isSame('a');
+        that((str_common_prefix)('abc', 'ab', 'a'))->isSame('a');
+        that((str_common_prefix)('ab', 'ab', 'abc'))->isSame('ab');
+        that((str_common_prefix)('abc', 'ab', 'ab'))->isSame('ab');
+        that((str_common_prefix)('abc', 'abc', 'abc'))->isSame('abc');
+
+        that((str_common_prefix)('x', 'a', 'ab', 'abc'))->isSame('');
+        that((str_common_prefix)('', 'a', 'ab', 'abc'))->isSame('');
+
+        that((str_common_prefix)('あ', 'あい', 'あいう'))->isSame('あ');
+        that((str_common_prefix)('あいう', 'あい', 'あ'))->isSame('あ');
+        that((str_common_prefix)('あい', 'あい', 'あいう'))->isSame('あい');
+        that((str_common_prefix)('あいう', 'あい', 'あい'))->isSame('あい');
+        that((str_common_prefix)('あいう', 'あいう', 'あいう'))->isSame('あいう');
+
+        that((str_common_prefix)('ん', 'あ', 'あい', 'あいう'))->isSame('');
+        that((str_common_prefix)('', 'あいう', 'あい', 'あ'))->isSame('');
+    }
+
     public function test_render_template()
     {
         // escape
