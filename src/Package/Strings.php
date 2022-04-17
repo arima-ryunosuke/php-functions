@@ -4583,6 +4583,46 @@ class Strings
     }
 
     /**
+     * 文字列群の共通のプレフィックスを返す
+     *
+     * 共通部分がない場合は空文字を返す。
+     * 引数は2個以上必要で足りない場合は null を返す。
+     *
+     * Example:
+     * ```php
+     * // 共通プレフィックスを返す
+     * that(str_common_prefix('ab', 'abc', 'abcd'))->isSame('ab');
+     * that(str_common_prefix('あ', 'あい', 'あいう'))->isSame('あ');
+     * // 共通部分がない場合は空文字を返す
+     * that(str_common_prefix('xab', 'yabc', 'zabcd'))->isSame('');
+     * that(str_common_prefix('わあ', 'をあい', 'んあいう'))->isSame('');
+     * // 引数不足の場合は null を返す
+     * that(str_common_prefix('a'))->isSame(null);
+     * ```
+     *
+     * @param string[] ...$strings
+     * @return ?string 共通部分（共通がない場合は空文字）
+     */
+    public static function str_common_prefix(...$strings)
+    {
+        if (count($strings) < 2) {
+            return null;
+        }
+        $common = array_shift($strings);
+        foreach ($strings as $string) {
+            for ($i = min(mb_strlen($common), mb_strlen($string)); $i >= 1; $i--) {
+                $part = mb_substr($common, 0, $i);
+                if ($part === mb_substr($string, 0, $i)) {
+                    $common = $part;
+                    continue 2;
+                }
+            }
+            return '';
+        }
+        return $common;
+    }
+
+    /**
      * マルチバイト対応 substr_replace
      *
      * 本家は配列を与えたりできるが、ややこしいし使う気がしないので未対応。
