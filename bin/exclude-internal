@@ -68,7 +68,6 @@ $dom->formatOutput = true;
 
 $workXml = "$BASEDIR/.idea/workspace.xml";
 if (!file_exists($workXml)) {
-    echo("failed to detect .idea.\n");
     exit(0);
 }
 $version = (function ($filename) use ($dom, $BASEDIR) {
