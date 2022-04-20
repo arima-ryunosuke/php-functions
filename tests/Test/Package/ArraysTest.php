@@ -220,6 +220,30 @@ class ArraysTest extends AbstractTestCase
         that((array_add)(['a', 'b', 'c'], [3 => 'd'], [4 => 'e']))->is(['a', 'b', 'c', 'd', 'e']);
     }
 
+    function test_array_append()
+    {
+        that((array_append)(['a', 'b', 'c'], 'X'))->isSame(['a', 'b', 'c', 'X']);
+        that((array_append)(['a', 'b', 'c'], 'X', 9))->isSame(['a', 'b', 'c', 9 => 'X']);
+        that((array_append)(['a', 'b', 'c'], 'X', 'key'))->isSame(['a', 'b', 'c', 'key' => 'X']);
+
+        that((array_append)(['a' => 'A', 'b' => 'B', 'c'], 'X'))->isSame(['a' => 'A', 'b' => 'B', 'c', 'X']);
+        that((array_append)(['a' => 'A', 'b' => 'B', 'c'], 'X', 9))->isSame(['a' => 'A', 'b' => 'B', 'c', 9 => 'X']);
+        that((array_append)(['a' => 'A', 'b' => 'B', 'c'], 'X', 'key'))->isSame(['a' => 'A', 'b' => 'B', 'c', 'key' => 'X']);
+        that((array_append)(['a' => 'A', 'b' => 'B', 'c'], 'X', 'a'))->isSame(['b' => 'B', 'c', 'a' => 'X']);
+    }
+
+    function test_array_prepend()
+    {
+        that((array_prepend)(['a', 'b', 'c'], 'X'))->isSame(['X', 'a', 'b', 'c']);
+        that((array_prepend)(['a', 'b', 'c'], 'X', 9))->isSame([9 => 'X', 0 => 'a', 1 => 'b', 2 => 'c']);
+        that((array_prepend)(['a', 'b', 'c'], 'X', 'key'))->isSame(['key' => 'X', 'a', 'b', 'c']);
+
+        that((array_prepend)(['a' => 'A', 'b' => 'B', 'c'], 'X'))->isSame(['X', 'a' => 'A', 'b' => 'B', 'c']);
+        that((array_prepend)(['a' => 'A', 'b' => 'B', 'c'], 'X', 9))->isSame([9 => 'X', 'a' => 'A', 'b' => 'B', 0 => 'c']);
+        that((array_prepend)(['a' => 'A', 'b' => 'B', 'c'], 'X', 'key'))->isSame(['key' => 'X', 'a' => 'A', 'b' => 'B', 'c']);
+        that((array_prepend)(['a' => 'A', 'b' => 'B', 'c'], 'X', 'a'))->isSame(['a' => 'X', 'b' => 'B', 'c']);
+    }
+
     function test_array_merge2()
     {
         that((array_merge2)())->is([]);
