@@ -2328,6 +2328,9 @@ class Strings
             'query'    => '',
             'fragment' => '',
         ];
+
+        $parts['user'] = rawurlencode($parts['user']);
+        $parts['pass'] = rawurlencode($parts['pass']);
         $parts['host'] = filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? "[{$parts['host']}]" : $parts['host'];
         $parts['path'] = ltrim($parts['path'], '/');
         $parts['query'] = is_array($parts['query']) ? http_build_query($parts['query'], '', '&') : $parts['query'];
@@ -2424,7 +2427,9 @@ class Strings
         $uri = (preg_splice)('#^//#', '', $uri);
         $parts = (preg_capture)("#^$regex\$#ix", $uri, $default + $default_default);
 
-        // 諸々調整（IPv6、パス / の正規化、クエリ配列化）
+        // 諸々調整（認証エンコード、IPv6、パス / の正規化、クエリ配列化）
+        $parts['user'] = rawurldecode($parts['user']);
+        $parts['pass'] = rawurldecode($parts['pass']);
         $parts['host'] = (preg_splice)('#^\\[(.+)\\]$#', '$1', $parts['host']);
         $parts['path'] = (concat)('/', ltrim($parts['path'], '/'));
         if (is_string($parts['query'])) {

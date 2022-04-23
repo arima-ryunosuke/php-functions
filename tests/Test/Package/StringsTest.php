@@ -1218,6 +1218,10 @@ ATTRS
                 'uri'   => '',
                 'parts' => $gen(),
             ],
+            'signed auth'   => [
+                'uri'   => 'scheme://user%2313:pass%40word@127.0.0.1:12345/path/to/hoge?op1=1&op2=2#hash',
+                'parts' => $gen('scheme', 'user#13', 'pass@word', '127.0.0.1', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
+            ],
             'ipv4'          => [
                 'uri'   => 'scheme://user:pass@127.0.0.1:12345/path/to/hoge?op1=1&op2=2#hash',
                 'parts' => $gen('scheme', 'user', 'pass', '127.0.0.1', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
