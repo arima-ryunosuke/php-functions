@@ -6,9 +6,86 @@ class NetworkTest extends AbstractTestCase
 {
     function test_getipaddress()
     {
-        that((getipaddress)())->matches('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#');
+        if (getenv('TEST_TARGET') === 'namespace') {
+            return;
+        }
 
-        @that(getipaddress)->try('256.256.256.256')->wasThrown('php_network_getaddresses');
+        // cachedir を設定することで擬似的にインジェクションする
+        $cachedir = (cachedir)();
+        (cachedir)(sys_get_temp_dir() . '/' . __FUNCTION__);
+        (cache)('net_get_interfaces', null, 'getipaddress');
+        (cache)('net_get_interfaces', fn() => [
+            'lo'   => [
+                'unicast' => [
+                    [
+                        'family'  => AF_INET,
+                        'address' => '127.0.0.1',
+                        'netmask' => '255.0.0.0',
+                    ],
+                ],
+            ],
+            'hoge' => [
+                'unicast' => [
+                    [
+                        'family'  => AF_INET,
+                        'address' => '192.168.1.100',
+                        'netmask' => '255.255.255.0',
+                    ],
+                    [
+                        'family'  => AF_INET6,
+                        'address' => '0001:0203:0405:0607:0809:0a0b:0c0d:5678',
+                        'netmask' => 'ffff:ffff:ffff:ffff:ffff:ffff:0000:0000',
+                    ],
+                ],
+            ],
+            'fuga' => [
+                'unicast' => [
+                    [
+                        'family'  => AF_INET,
+                        'address' => '172.17.100.200',
+                        'netmask' => '255.255.0.0',
+                    ],
+                    [
+                        'family'  => AF_INET6,
+                        'address' => '0001:0203:0405:0607:0809:0a0b:0c0d:1234',
+                        'netmask' => 'ffff:ffff:ffff:ffff:0000:0000:0000:0000',
+                    ],
+                ],
+            ],
+        ], 'getipaddress');
+
+        that((getipaddress)())->isValidIpv4();
+        that((getipaddress)(AF_INET))->isValidIpv4();
+        that((getipaddress)(AF_INET6))->isValidIpv6();
+        that((getipaddress)('127.0.0.9'))->is('127.0.0.1');
+
+        that((getipaddress)('192.168.0.200'))->isNull();
+        that((getipaddress)('192.168.1.100'))->is('192.168.1.100');
+        that((getipaddress)('192.168.1.200'))->is('192.168.1.100');
+        that((getipaddress)('192.168.2.200'))->isNull();
+
+        that((getipaddress)('172.16.0.0'))->isNull();
+        that((getipaddress)('172.17.100.100'))->is('172.17.100.200');
+        that((getipaddress)('172.17.200.200'))->is('172.17.100.200');
+        that((getipaddress)('172.18.0.0'))->isNull();
+
+        that((getipaddress)('0001:0203:0405:0606:1111:1111:1111:1111'))->isNull();
+        that((getipaddress)('0001:0203:0405:0607:1111:1111:1111:1111'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:1234');
+        that((getipaddress)('0001:0203:0405:0607:ffff:ffff:ffff:ffff'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:1234');
+        that((getipaddress)('0001:0203:0405:0608:1111:1111:1111:1111'))->isNull();
+
+        that((getipaddress)('0001:0203:0405:0607:0809:0a0a:1111:1111'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:1234');
+        that((getipaddress)('0001:0203:0405:0607:0809:0a0b:1111:1111'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:5678');
+        that((getipaddress)('0001:0203:0405:0607:0809:0a0b:ffff:ffff'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:5678');
+        that((getipaddress)('0001:0203:0405:0607:0809:0a0c:1111:1111'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:1234');
+
+        (cache)('net_get_interfaces', null, 'getipaddress');
+        (cache)('net_get_interfaces', fn() => [], 'getipaddress');
+
+        that((getipaddress)())->isNull();
+        that(getipaddress)->try('256.256.256.256')->wasThrown('is invalid ip address');
+
+        (cachedir)($cachedir);
     }
 
     function test_incidr()
