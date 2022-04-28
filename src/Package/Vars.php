@@ -2217,7 +2217,12 @@ class Vars
                     }
                     elseif ($assoc) {
                         $n = 0;
-                        $this->plain("{\n");
+                        if ($is_hasharray) {
+                            $this->plain("{\n");
+                        }
+                        else {
+                            $this->plain("[\n");
+                        }
                         if (!$value) {
                             $this->plain($spacer1)->plain('...(too length)...')->plain(",\n");
                         }
@@ -2225,14 +2230,22 @@ class Vars
                             if ($key === $n++) {
                                 $this->plain($spacer1)->plain('...(too length)...')->plain(",\n");
                             }
-                            $this->plain($spacer1)->index($k)->plain(': ');
+                            $this->plain($spacer1);
+                            if ($is_hasharray) {
+                                $this->index($k)->plain(': ');
+                            }
                             $this->export($v, $nest + 1, $parents, true);
                             $this->plain(",\n");
                         }
                         if ($omitted > 0) {
                             $this->plain("$spacer1(more $omitted elements)\n");
                         }
-                        $this->plain("{$spacer2}}");
+                        if ($is_hasharray) {
+                            $this->plain("{$spacer2}}");
+                        }
+                        else {
+                            $this->plain("{$spacer2}]");
+                        }
                     }
                     else {
                         $lastkey = (last_key)($value);
