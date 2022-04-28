@@ -318,6 +318,9 @@ class FileSystemTest extends AbstractTestCase
         that((file_get_arrays)($empty2_yaml))->is([]);
         that((file_get_arrays)($empty_ltsv))->is([]);
 
+        file_put_contents($csv_undefined = "$tmpdir/data.undefined.csv", "a,i,u,e,o\nあ,い,う,え,お");
+        that((file_get_arrays)($csv_undefined))->is([['a' => 'あ', 'i' => 'い', 'u' => 'う', 'e' => 'え', 'o' => 'お']]);
+
         touch($txt = sys_get_temp_dir() . '/hoge.txt');
         touch($xml = sys_get_temp_dir() . '/hoge.xml');
         that(file_get_arrays)->try('notfoundfile')->wasThrown('is not exists');

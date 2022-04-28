@@ -428,6 +428,11 @@ class FileSystem
      */
     public static function file_get_arrays($filename, $options = [])
     {
+        static $supported_encodings = null;
+        if ($supported_encodings === null) {
+            $supported_encodings = array_combine(array_map('strtolower', mb_list_encodings()), mb_list_encodings());
+        }
+
         if (!file_exists($filename)) {
             throw new \InvalidArgumentException("$filename is not exists");
         }
@@ -441,7 +446,8 @@ class FileSystem
         };
 
         $pathinfo = pathinfo($filename);
-        $encoding = pathinfo($pathinfo['filename'], PATHINFO_EXTENSION) ?: $internal_encoding;
+        $encoding = pathinfo($pathinfo['filename'], PATHINFO_EXTENSION);
+        $encoding = $supported_encodings[strtolower($encoding)] ?? $internal_encoding;
         $extension = $pathinfo['extension'] ?? '';
 
         switch (strtolower($extension)) {
