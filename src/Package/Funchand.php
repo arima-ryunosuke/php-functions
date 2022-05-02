@@ -19,11 +19,11 @@ class Funchand
      */
     public static function delegate($invoker, $callable, $arity = null)
     {
-        $arity = $arity ?? (parameter_length)($callable, true, true);
+        $arity ??= (parameter_length)($callable, true, true);
 
         if ((reflect_callable)($callable)->isInternal()) {
             static $cache = [];
-            $cache[$arity] = $cache[$arity] ?? (evaluate)('return new class()
+            $cache[$arity] ??= (evaluate)('return new class()
             {
                 private $invoker, $callable;
 
@@ -37,7 +37,7 @@ class Funchand
 
                 public function __invoke(' . implode(',', is_infinite($arity)
                         ? ['...$_']
-                        : array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null)))
+                        : array_map(fn($v) => '$_' . $v, array_keys(array_fill(1, $arity, null)))
                     ) . ')
                 {
                     return ($this->invoker)($this->callable, func_get_args());
@@ -48,21 +48,21 @@ class Funchand
 
         switch (true) {
             case $arity === 0:
-                return function () use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn() => $invoker($callable, func_get_args());
             case $arity === 1:
-                return function ($_1) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn($_1) => $invoker($callable, func_get_args());
             case $arity === 2:
-                return function ($_1, $_2) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn($_1, $_2) => $invoker($callable, func_get_args());
             case $arity === 3:
-                return function ($_1, $_2, $_3) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn($_1, $_2, $_3) => $invoker($callable, func_get_args());
             case $arity === 4:
-                return function ($_1, $_2, $_3, $_4) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn($_1, $_2, $_3, $_4) => $invoker($callable, func_get_args());
             case $arity === 5:
-                return function ($_1, $_2, $_3, $_4, $_5) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn($_1, $_2, $_3, $_4, $_5) => $invoker($callable, func_get_args());
             case is_infinite($arity):
-                return function (...$_) use ($invoker, $callable) { return $invoker($callable, func_get_args()); };
+                return fn(...$_) => $invoker($callable, func_get_args());
             default:
-                $args = implode(',', array_map(function ($v) { return '$_' . $v; }, array_keys(array_fill(1, $arity, null))));
+                $args = implode(',', array_map(fn($v) => '$_' . $v, array_keys(array_fill(1, $arity, null))));
                 $stmt = 'return function (' . $args . ') use ($invoker, $callable) { return $invoker($callable, func_get_args()); };';
                 return eval($stmt);
         }
@@ -176,51 +176,49 @@ class Funchand
     {
         static $operators = null;
         $operators = $operators ?: [
-            ''           => static function ($v1) { return $v1; }, // こんな演算子はないが、「if ($value) {}」として使えることがある
-            '!'          => static function ($v1) { return !$v1; },
-            '+'          => static function ($v1, $v2 = null) { return func_num_args() === 1 ? (+$v1) : ($v1 + $v2); },
-            '-'          => static function ($v1, $v2 = null) { return func_num_args() === 1 ? (-$v1) : ($v1 - $v2); },
-            '~'          => static function ($v1) { return ~$v1; },
-            '++'         => static function (&$v1) { return ++$v1; },
-            '--'         => static function (&$v1) { return --$v1; },
-            '?:'         => static function ($v1, $v2, $v3 = null) { return func_num_args() === 2 ? ($v1 ?: $v2) : ($v1 ? $v2 : $v3); },
-            '??'         => static function ($v1, $v2) { return $v1 ?? $v2; },
-            '=='         => static function ($v1, $v2) { return $v1 == $v2; },
-            '==='        => static function ($v1, $v2) { return $v1 === $v2; },
-            '!='         => static function ($v1, $v2) { return $v1 != $v2; },
-            '<>'         => static function ($v1, $v2) { return $v1 <> $v2; },
-            '!=='        => static function ($v1, $v2) { return $v1 !== $v2; },
-            '<'          => static function ($v1, $v2) { return $v1 < $v2; },
-            '<='         => static function ($v1, $v2) { return $v1 <= $v2; },
-            '>'          => static function ($v1, $v2) { return $v1 > $v2; },
-            '>='         => static function ($v1, $v2) { return $v1 >= $v2; },
-            '<=>'        => static function ($v1, $v2) { return $v1 <=> $v2; },
-            '.'          => static function ($v1, $v2) { return $v1 . $v2; },
-            '*'          => static function ($v1, $v2) { return $v1 * $v2; },
-            '/'          => static function ($v1, $v2) { return $v1 / $v2; },
-            '%'          => static function ($v1, $v2) { return $v1 % $v2; },
-            '**'         => static function ($v1, $v2) { return $v1 ** $v2; },
-            '^'          => static function ($v1, $v2) { return $v1 ^ $v2; },
-            '&'          => static function ($v1, $v2) { return $v1 & $v2; },
-            '|'          => static function ($v1, $v2) { return $v1 | $v2; },
-            '<<'         => static function ($v1, $v2) { return $v1 << $v2; },
-            '>>'         => static function ($v1, $v2) { return $v1 >> $v2; },
-            '&&'         => static function ($v1, $v2) { return $v1 && $v2; },
-            '||'         => static function ($v1, $v2) { return $v1 || $v2; },
-            'or'         => static function ($v1, $v2) { return $v1 or $v2; },
-            'and'        => static function ($v1, $v2) { return $v1 and $v2; },
-            'xor'        => static function ($v1, $v2) { return $v1 xor $v2; },
-            'instanceof' => static function ($v1, $v2) { return $v1 instanceof $v2; },
-            'new'        => static function ($v1, ...$v) { return new $v1(...$v); },
-            'clone'      => static function ($v1) { return clone $v1; },
+            ''           => static fn($v1) => $v1, // こんな演算子はないが、「if ($value) {}」として使えることがある
+            '!'          => static fn($v1) => !$v1,
+            '+'          => static fn($v1, $v2 = null) => func_num_args() === 1 ? (+$v1) : ($v1 + $v2),
+            '-'          => static fn($v1, $v2 = null) => func_num_args() === 1 ? (-$v1) : ($v1 - $v2),
+            '~'          => static fn($v1) => ~$v1,
+            '++'         => static fn(&$v1) => ++$v1,
+            '--'         => static fn(&$v1) => --$v1,
+            '?:'         => static fn($v1, $v2, $v3 = null) => func_num_args() === 2 ? ($v1 ?: $v2) : ($v1 ? $v2 : $v3),
+            '??'         => static fn($v1, $v2) => $v1 ?? $v2,
+            '=='         => static fn($v1, $v2) => $v1 == $v2,
+            '==='        => static fn($v1, $v2) => $v1 === $v2,
+            '!='         => static fn($v1, $v2) => $v1 != $v2,
+            '<>'         => static fn($v1, $v2) => $v1 <> $v2,
+            '!=='        => static fn($v1, $v2) => $v1 !== $v2,
+            '<'          => static fn($v1, $v2) => $v1 < $v2,
+            '<='         => static fn($v1, $v2) => $v1 <= $v2,
+            '>'          => static fn($v1, $v2) => $v1 > $v2,
+            '>='         => static fn($v1, $v2) => $v1 >= $v2,
+            '<=>'        => static fn($v1, $v2) => $v1 <=> $v2,
+            '.'          => static fn($v1, $v2) => $v1 . $v2,
+            '*'          => static fn($v1, $v2) => $v1 * $v2,
+            '/'          => static fn($v1, $v2) => $v1 / $v2,
+            '%'          => static fn($v1, $v2) => $v1 % $v2,
+            '**'         => static fn($v1, $v2) => $v1 ** $v2,
+            '^'          => static fn($v1, $v2) => $v1 ^ $v2,
+            '&'          => static fn($v1, $v2) => $v1 & $v2,
+            '|'          => static fn($v1, $v2) => $v1 | $v2,
+            '<<'         => static fn($v1, $v2) => $v1 << $v2,
+            '>>'         => static fn($v1, $v2) => $v1 >> $v2,
+            '&&'         => static fn($v1, $v2) => $v1 && $v2,
+            '||'         => static fn($v1, $v2) => $v1 || $v2,
+            'or'         => static fn($v1, $v2) => $v1 or $v2,
+            'and'        => static fn($v1, $v2) => $v1 and $v2,
+            'xor'        => static fn($v1, $v2) => $v1 xor $v2,
+            'instanceof' => static fn($v1, $v2) => $v1 instanceof $v2,
+            'new'        => static fn($v1, ...$v) => new $v1(...$v),
+            'clone'      => static fn($v1) => clone $v1,
         ];
 
         $opefunc = $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));
 
         if ($operands) {
-            return static function ($v1) use ($opefunc, $operands) {
-                return $opefunc($v1, ...$operands);
-            };
+            return static fn($v1) => $opefunc($v1, ...$operands);
         }
 
         return $opefunc;
@@ -241,9 +239,7 @@ class Funchand
      */
     public static function not_func($callable)
     {
-        return (delegate)(function ($callable, $args) {
-            return !$callable(...$args);
-        }, $callable);
+        return (delegate)(fn($callable, $args) => !$callable(...$args), $callable);
     }
 
     /**
@@ -313,13 +309,13 @@ class Funchand
      *
      * Example:
      * ```php
-     * list($meta, $body) = callable_code(function(...$args){return true;});
-     * that($meta)->isSame('function(...$args)');
+     * list($meta, $body) = callable_code(function (...$args) {return true;});
+     * that($meta)->isSame('function (...$args)');
      * that($body)->isSame('{return true;}');
      *
      * // ReflectionFunctionAbstract を渡しても動作する
-     * list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
-     * that($meta)->isSame('function(...$args)');
+     * list($meta, $body) = callable_code(new \ReflectionFunction(function (...$args) {return true;}));
+     * that($meta)->isSame('function (...$args)');
      * that($body)->isSame('{return true;}');
      * ```
      *
@@ -355,7 +351,7 @@ class Funchand
      * Example:
      * ```php
      * try {
-     *     call_safely(function(){return []['dummy'];});
+     *     call_safely(fn() => []['dummy']);
      * }
      * catch (\Exception $ex) {
      *     that($ex->getMessage())->containsAll(['Undefined', 'dummy']);
@@ -389,7 +385,7 @@ class Funchand
      * Example:
      * ```php
      * // コールバック内のテキストが得られる
-     * that(ob_capture(function(){echo 123;}))->isSame('123');
+     * that(ob_capture(fn() => print(123)))->isSame('123');
      * // こういう事もできる
      * that(ob_capture(function () {
      * ?>
@@ -420,8 +416,8 @@ class Funchand
      *
      * Example:
      * ```php
-     * that(is_bindable_closure(function(){}))->isTrue();
-     * that(is_bindable_closure(static function(){}))->isFalse();
+     * that(is_bindable_closure(function () {}))->isTrue();
+     * that(is_bindable_closure(static function () {}))->isFalse();
      * ```
      *
      * @param \Closure $closure 調べるクロージャ
@@ -510,7 +506,7 @@ class Funchand
      * Example:
      * ```php
      * // ベースとなる関数（引数をそのまま連想配列で返す）
-     * $f = function ($x, $a = 1, $b = 2, ...$other){return get_defined_vars();};
+     * $f = fn ($x, $a = 1, $b = 2, ...$other) => get_defined_vars();
      *
      * // x に 'X', a に 9 を与えて名前付きで呼べるクロージャ
      * $f1 = namedcallize($f, [
@@ -570,7 +566,7 @@ class Funchand
     public static function namedcallize($callable, $defaults = [])
     {
         static $dummy_arg;
-        $dummy_arg = $dummy_arg ?? new \stdClass();
+        $dummy_arg ??= new \stdClass();
 
         /** @var \ReflectionFunctionAbstract $reffunc */
         $reffunc = (reflect_callable)($callable);
@@ -607,11 +603,11 @@ class Funchand
         }
 
         return function ($params = []) use ($reffunc, $defargs, $argnames, $variadicname, $dummy_arg) {
-            $params = (array_map_key)($params, function ($k) use ($argnames) { return is_int($k) ? $argnames[$k] : $k; });
+            $params = (array_map_key)($params, fn($k) => is_int($k) ? $argnames[$k] : $k);
             $params = array_replace($defargs, $params);
 
             // 勝手に突っ込んだ $dummy_class がいるのはおかしい。指定されていないと思われる
-            if ($dummyargs = array_filter($params, function ($v) use ($dummy_arg) { return $v === $dummy_arg; })) {
+            if ($dummyargs = array_filter($params, fn($v) => $v === $dummy_arg)) {
                 // が、php8 未満では組み込みのデフォルト値は取れないので、除外
                 if (!$reffunc->isInternal()) {
                     throw new \InvalidArgumentException('missing required arguments(' . implode(', ', array_keys($dummyargs)) . ').');
@@ -768,7 +764,7 @@ class Funchand
      * $params = (parameter_wiring)($closure, [
      *     \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
      *     \RuntimeException::class => $t = new \RuntimeException('hoge'),
-     *     '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
+     *     '$array'                 => fn (\ArrayObject $ao) => (array) $ao,
      *     4                        => 'default1',
      *     '$misc'                  => ['x', 'y', 'z'],
      * ]);
@@ -882,7 +878,7 @@ class Funchand
     {
         // null は第1引数を返す特殊仕様
         if ($callback === null) {
-            return function ($v) { return $v; };
+            return fn($v) => $v;
         }
         // クロージャはユーザ定義しかありえないので調べる必要がない
         if ($callback instanceof \Closure) {
@@ -912,7 +908,7 @@ class Funchand
      *
      * Example:
      * ```php
-     * $closure = function ($a, $b) { return func_get_args(); };
+     * $closure = fn ($a, $b) => func_get_args();
      * $new_closure = func_wiring($closure, [
      *     '$a' => 'a',
      *     '$b' => 'b',
@@ -929,9 +925,7 @@ class Funchand
     public static function func_wiring($callable, $dependency)
     {
         $params = (parameter_wiring)($callable, $dependency);
-        return function (...$args) use ($callable, $params) {
-            return $callable(...$args + $params);
-        };
+        return fn(...$args) => $callable(...$args + $params);
     }
 
     /**
@@ -957,9 +951,7 @@ class Funchand
      */
     public static function func_new($classname, ...$defaultargs)
     {
-        return function (...$args) use ($classname, $defaultargs) {
-            return new $classname(...$args + $defaultargs);
-        };
+        return fn(...$args) => new $classname(...$args + $defaultargs);
     }
 
     /**
@@ -999,13 +991,9 @@ class Funchand
     public static function func_method($methodname, ...$defaultargs)
     {
         if ($methodname === '__construct') {
-            return function ($object, ...$args) use ($defaultargs) {
-                return new $object(...$args + $defaultargs);
-            };
+            return fn($object, ...$args) => new $object(...$args + $defaultargs);
         }
-        return function ($object, ...$args) use ($methodname, $defaultargs) {
-            return ([$object, $methodname])(...$args + $defaultargs);
-        };
+        return fn($object, ...$args) => ([$object, $methodname])(...$args + $defaultargs);
     }
 
     /**
@@ -1063,13 +1051,13 @@ class Funchand
             }
 
             $code = <<<CODE
-namespace $namespace {
-    function $funcname($prms) {
-        \$return = $reference \\$calllname(...$args);
-        return \$return;
-    }
-}
-CODE;
+            namespace $namespace {
+                function $funcname($prms) {
+                    \$return = $reference \\$calllname(...$args);
+                    return \$return;
+                }
+            }
+            CODE;
             file_put_contents($cachefile, "<?php\n" . $code);
         }
         require_once $cachefile;

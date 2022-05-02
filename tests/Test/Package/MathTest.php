@@ -250,7 +250,7 @@ class MathTest extends AbstractTestCase
 
     function test_decimal()
     {
-        $decimal = function (...$args) { return that((decimal)(...$args)); };
+        $decimal = fn(...$args) => that((decimal)(...$args));
 
         $compatible_round = [
             [-115, -1, PHP_ROUND_HALF_UP],

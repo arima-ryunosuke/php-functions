@@ -370,9 +370,7 @@ class VarsTest extends AbstractTestCase
         that((si_prefix)(1025, 1024))->is('1.001 k');
         that((si_prefix)(0, 1000, null))->is([0, '']);
         that((si_prefix)(12345, 1000, null))->is([12.345, 'k']);
-        that((si_prefix)(12345, 1000, function ($v, $u) {
-            return number_format($v, 2) . $u;
-        }))->is('12.35k');
+        that((si_prefix)(12345, 1000, fn($v, $u) => number_format($v, 2) . $u))->is('12.35k');
 
         that(si_prefix)->try(pow(10, 30))->wasThrown('too large or small');
     }
@@ -513,16 +511,6 @@ class VarsTest extends AbstractTestCase
 
         that((is_arrayable)(1))->isFalse();
         that((is_arrayable)(new \stdClass()))->isFalse();
-    }
-
-    function test_is_countable()
-    {
-        that((is_countable)([1, 2, 3]))->isTrue();
-        that((is_countable)(new \ArrayObject()))->isTrue();
-
-        that((is_countable)((function () { yield 1; })()))->isFalse();
-        that((is_countable)(1))->isFalse();
-        that((is_countable)(new \stdClass()))->isFalse();
     }
 
     function test_encrypt_decrypt()
@@ -749,7 +737,7 @@ class VarsTest extends AbstractTestCase
 
     function test_var_applys()
     {
-        $upper = function ($array) { return array_map('strtoupper', $array); };
+        $upper = fn($array) => array_map('strtoupper', $array);
         that((var_applys)('a', $upper))->isSame('A');
         that((var_applys)(['a', 'b'], $upper))->isSame(['A', 'B']);
     }
@@ -885,21 +873,21 @@ class VarsTest extends AbstractTestCase
             'null'   => null,
             'nulls'  => [null],
         ], true))->isSame(<<<'EXPECTED'
-[
-    "'\000\"" => 123,
-    "\$var"   => "\$var",
-    "\${var}" => "\${var}",
-    "{\$var}" => "{\$var}",
-    "
-"       => "
-",
-    "\\"      => "\\",
-    "\""      => "\"",
-    "key"     => 456,
-    "null"    => null,
-    "nulls"   => [null],
-]
-EXPECTED
+        [
+            "'\000\"" => 123,
+            "\$var"   => "\$var",
+            "\${var}" => "\${var}",
+            "{\$var}" => "{\$var}",
+            "
+        "       => "
+        ",
+            "\\"      => "\\",
+            "\""      => "\"",
+            "key"     => 456,
+            "null"    => null,
+            "nulls"   => [null],
+        ]
+        EXPECTED
         );
 
         $this->expectOutputRegex('#hoge#');
@@ -911,25 +899,25 @@ EXPECTED
         $concrete = new \Concrete('hoge');
 
         that((var_export2)($concrete, true))->is(<<<'VAR'
-Concrete::__set_state([
-    "privateField"    => "Concrete",
-    "value"           => null,
-    "name"            => "hoge",
-    "proptectedField" => 3.14,
-])
-VAR
+        Concrete::__set_state([
+            "privateField"    => "Concrete",
+            "value"           => null,
+            "name"            => "hoge",
+            "proptectedField" => 3.14,
+        ])
+        VAR
         );
 
         $concrete->external = 'aaa';
         that((var_export2)($concrete, true))->is(<<<'VAR'
-Concrete::__set_state([
-    "privateField"    => "Concrete",
-    "value"           => null,
-    "name"            => "hoge",
-    "proptectedField" => 3.14,
-    "external"        => "aaa",
-])
-VAR
+        Concrete::__set_state([
+            "privateField"    => "Concrete",
+            "value"           => null,
+            "name"            => "hoge",
+            "proptectedField" => 3.14,
+            "external"        => "aaa",
+        ])
+        VAR
         );
     }
 
@@ -938,14 +926,14 @@ VAR
         $rarray = [];
         $rarray['parent']['child']['grand'] = &$rarray;
         that((var_export2)($rarray, true))->is(<<<'VAR'
-[
-    "parent" => [
-        "child" => [
-            "grand" => "*RECURSION*",
-        ],
-    ],
-]
-VAR
+        [
+            "parent" => [
+                "child" => [
+                    "grand" => "*RECURSION*",
+                ],
+            ],
+        ]
+        VAR
         );
 
         $robject = new \stdClass();
@@ -953,14 +941,14 @@ VAR
         $robject->parent->child = new \stdClass();
         $robject->parent->child->grand = $robject;
         that((var_export2)($robject, true))->is(<<<'VAR'
-stdClass::__set_state([
-    "parent" => stdClass::__set_state([
-        "child" => stdClass::__set_state([
-            "grand" => "*RECURSION*",
-        ]),
-    ]),
-])
-VAR
+        stdClass::__set_state([
+            "parent" => stdClass::__set_state([
+                "child" => stdClass::__set_state([
+                    "grand" => "*RECURSION*",
+                ]),
+            ]),
+        ])
+        VAR
         );
 
     }
@@ -1032,9 +1020,7 @@ VAR
         $object = new \DateTime('2014/12/24 12:34:56');
         $closures = [
             'object'    => $object,
-            'simple'    => static function () {
-                return 123;
-            },
+            'simple'    => static function () { return 123; },
             'declare'   => static function (?Ex $e = null, $c = SR): Ex { return $e; },
             'alias'     => static function () { return [SR, Ex::class, gt(123)]; },
             'use'       => static function () use ($object) { return $object; },
@@ -1117,10 +1103,7 @@ VAR
         that($objects2['concreate'])->is($setstate);
         that($objects2['concreate']->getPrivate())->is('Changed/Concrete');
 
-        // __serialize/__unserialize は 7.4 から
-        if (version_compare(PHP_VERSION, '7.4.0') >= 0) {
-            that(serialize($objects2))->isSame(serialize(unserialize(serialize($objects))));
-        }
+        that(serialize($objects2))->isSame(serialize(unserialize(serialize($objects))));
     }
 
     function test_var_export3_anonymous()
@@ -1251,8 +1234,8 @@ VAR
 
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
-        $closure = function () use ($recur) { return $recur; };
-        $sclosure = static function () use ($recur) { return $recur; };
+        $closure = fn() => $recur;
+        $sclosure = static fn() => $recur;
         $value = [
             (stdclass)([
                 'A' => (stdclass)([

@@ -273,15 +273,8 @@ class Arrays
             return $default;
         }
         if (is_array($array)) {
-            if (function_exists('array_key_last')) {
-                $k = array_key_last($array);
-                return [$k, $array[$k]];
-            }
-            // @codeCoverageIgnoreStart
-            $v = end($array);
-            $k = key($array);
-            return [$k, $v];
-            // @codeCoverageIgnoreEnd
+            $k = array_key_last($array);
+            return [$k, $array[$k]];
         }
         /** @noinspection PhpStatementHasEmptyBodyInspection */
         foreach ($array as $k => $v) {
@@ -484,7 +477,7 @@ class Arrays
      *     'x3' => 9,
      * ]);
      * // キーを使用したソート
-     * that(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}))->isSame([
+     * that(kvsort($array, fn($av, $bv, $ak, $bk) => strcmp($bk, $ak)))->isSame([
      *     'x3' => 9,
      *     'x2' => 9,
      *     'x1' => 9,
@@ -502,9 +495,7 @@ class Arrays
     {
         if ($comparator === null || is_int($comparator)) {
             $sort_flg = $comparator;
-            $comparator = function ($av, $bv, $ak, $bk) use ($sort_flg) {
-                return (varcmp)($av, $bv, $sort_flg);
-            };
+            $comparator = fn($av, $bv, $ak, $bk) => (varcmp)($av, $bv, $sort_flg);
         }
 
         $n = 0;
@@ -513,9 +504,7 @@ class Arrays
             $tmp[$k] = [$n++, $k, $v];
         }
 
-        uasort($tmp, function ($a, $b) use ($comparator) {
-            return $comparator($a[2], $b[2], $a[1], $b[1]) ?: ($a[0] - $b[0]);
-        });
+        uasort($tmp, fn($a, $b) => $comparator($a[2], $b[2], $a[1], $b[1]) ?: ($a[0] - $b[0]));
 
         foreach ($tmp as $k => $v) {
             $tmp[$k] = $v[2];
@@ -694,7 +683,7 @@ class Arrays
      */
     public static function array_mix(...$variadic)
     {
-        assert(count(array_filter($variadic, function ($v) { return !is_array($v); })) === 0);
+        assert(count(array_filter($variadic, fn($v) => !is_array($v))) === 0);
 
         if (!$variadic) {
             return [];
@@ -773,7 +762,7 @@ class Arrays
 
         // array_map(null) は1つだけ与えると構造がぶっ壊れる
         if ($count === 1) {
-            return array_map(function ($v) { return [$v]; }, $arrays[0]);
+            return array_map(fn($v) => [$v], $arrays[0]);
         }
         return array_map(null, ...$arrays);
 
@@ -898,7 +887,7 @@ class Arrays
      * // null 要素で分割
      * that(array_explode(['a', null, 'b', 'c'], null))->isSame([['a'], [2 => 'b', 3 => 'c']]);
      * // クロージャで分割（大文字で分割）
-     * that(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}))->isSame([['a'], [2 => 'c'], [4 => 'e']]);
+     * that(array_explode(['a', 'B', 'c', 'D', 'e'], fn($v) => ctype_upper($v)))->isSame([['a'], [2 => 'c'], [4 => 'e']]);
      * // 負数指定
      * that(array_explode(['a', null, 'b', null, 'c'], null, -2))->isSame([[0 => 'a', 1 => null, 2 => 'b'], [4 => 'c']]);
      * ```
@@ -916,7 +905,7 @@ class Arrays
         if ($limit < 0) {
             // キーまで考慮するとかなりややこしくなるので富豪的にやる
             $reverse = (array_explode)(array_reverse($array, true), $condition, -$limit);
-            $reverse = array_map(function ($v) { return array_reverse($v, true); }, $reverse);
+            $reverse = array_map(fn($v) => array_reverse($v, true), $reverse);
             return array_reverse($reverse);
         }
         // explode において 0 は 1 と等しい
@@ -973,7 +962,7 @@ class Arrays
      * // 第3引数を与えるとさらに implode される
      * that(array_sprintf($array, '%2$s=%1$s', ' '))->isSame('key1=val1 key2=val2');
      * // クロージャを与えるとコールバック動作になる
-     * $closure = function($v, $k){return "$k=" . strtoupper($v);};
+     * $closure = fn($v, $k) => "$k=" . strtoupper($v);
      * that(array_sprintf($array, $closure, ' '))->isSame('key1=VAL1 key2=VAL2');
      * // 省略すると vsprintf になる
      * that(array_sprintf([
@@ -993,10 +982,10 @@ class Arrays
             $callback = (func_user_func_array)($format);
         }
         elseif ($format === null) {
-            $callback = function ($v, $k, $n) { return vsprintf($k, is_array($v) ? $v : [$v]); };
+            $callback = fn($v, $k, $n) => vsprintf($k, is_array($v) ? $v : [$v]);
         }
         else {
-            $callback = function ($v, $k, $n) use ($format) { return sprintf($format, $v, $k); };
+            $callback = fn($v, $k, $n) => sprintf($format, $v, $k);
         }
 
         $result = [];
@@ -1157,14 +1146,7 @@ class Arrays
     public static function array_of($key, $default = null)
     {
         $nodefault = func_num_args() === 1;
-        return function (array $array) use ($key, $default, $nodefault) {
-            if ($nodefault) {
-                return (array_get)($array, $key);
-            }
-            else {
-                return (array_get)($array, $key, $default);
-            }
-        };
+        return fn(array $array) => $nodefault ? (array_get)($array, $key) : (array_get)($array, $key, $default);
     }
 
     /**
@@ -1193,9 +1175,9 @@ class Arrays
      * // 配列デフォルト（null ではなく [] を返す）
      * that(array_get(['a', 'b', 'c'], [9]))->isSame([]);
      * // クロージャ指定＆単値（コールバックが true を返す最初の要素）
-     * that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}))->isSame('b');
+     * that(array_get(['a', 'b', 'c'], fn($v) => in_array($v, ['b', 'c'])))->isSame('b');
      * // クロージャ指定＆配列（コールバックが true を返すもの）
-     * that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []))->isSame([1 => 'b', 2 => 'c']);
+     * that(array_get(['a', 'b', 'c'], fn($v) => in_array($v, ['b', 'c']), []))->isSame([1 => 'b', 2 => 'c']);
      * ```
      *
      * @param array $array 配列
@@ -1332,9 +1314,9 @@ class Arrays
      * that(array_put($array, 'Z', ['x', 'y', 'z']))->isSame('z');
      * that($array)->isSame(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
      * // 第4引数で条件を指定（キーが存在するなら追加しない）
-     * that(array_put($array, 'Z', 'z', function ($v, $k, $array){return !isset($array[$k]);}))->isSame(false);
+     * that(array_put($array, 'Z', 'z', fn($v, $k, $array) => !isset($array[$k])))->isSame(false);
      * // 第4引数で条件を指定（値が存在するなら追加しない）
-     * that(array_put($array, 'Z', null, function ($v, $k, $array){return !in_array($v, $array);}))->isSame(false);
+     * that(array_put($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->isSame(false);
      * ```
      *
      * @param array $array 配列
@@ -1366,9 +1348,7 @@ class Arrays
 
         if ($key === null || is_int($key)) {
             $array[] = $value;
-            // compatible array_key_last under 7.3
-            end($array);
-            $key = key($array);
+            $key = array_key_last($array);
         }
         else {
             $array[$key] = $value;
@@ -1410,7 +1390,7 @@ class Arrays
      *
      * $array = ['hoge' => 'HOGE', 'fuga' => 'FUGA', 'piyo' => 'PIYO'];
      * // 値に "G" を含むものを返す。その要素は伏せられている
-     * that(array_unset($array, function($v){return strpos($v, 'G') !== false;}))->isSame(['hoge' => 'HOGE', 'fuga' => 'FUGA']);
+     * that(array_unset($array, fn($v) => strpos($v, 'G') !== false))->isSame(['hoge' => 'HOGE', 'fuga' => 'FUGA']);
      * that($array)->isSame(['piyo' => 'PIYO']);
      * ```
      *
@@ -1571,9 +1551,9 @@ class Arrays
      * ```php
      * // 最初に見つかったキーを返す
      * that(array_find(['a', 'b', '9'], 'ctype_digit'))->isSame(2);
-     * that(array_find(['a', 'b', '9'], function($v){return $v === 'b';}))->isSame(1);
+     * that(array_find(['a', 'b', '9'], fn($v) => $v === 'b'))->isSame(1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
-     * $ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
+     * $ifnumeric2power = fn($v) => ctype_digit($v) ? $v * $v : false;
      * that(array_find(['a', 'b', '9'], $ifnumeric2power, false))->isSame(81);
      * ```
      *
@@ -1776,7 +1756,7 @@ class Arrays
      * Example:
      * ```php
      * that(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'))->isSame(['A' => 'A', 'B' => 'B']);
-     * that(array_map_key(['a' => 'A', 'b' => 'B'], function(){}))->isSame([]);
+     * that(array_map_key(['a' => 'A', 'b' => 'B'], function () { }))->isSame([]);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1805,8 +1785,8 @@ class Arrays
      *
      * Example:
      * ```php
-     * that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }))->isSame([0 => 'a', 2 => 'c']);
-     * that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }))->isSame([0 => 'a', 2 => 'c']);
+     * that(array_filter_key(['a', 'b', 'c'], fn($k, $v) => $k !== 1))->isSame([0 => 'a', 2 => 'c']);
+     * that(array_filter_key(['a', 'b', 'c'], fn($k, $v) => $v !== 'b'))->isSame([0 => 'a', 2 => 'c']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -1852,17 +1832,17 @@ class Arrays
      *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
      * ]);
      * // 'name' に 'h' を含むものだけ返す
-     * $contain_h = function($name){return strpos($name, 'h') !== false;};
+     * $contain_h = fn($name) => strpos($name, 'h') !== false;
      * that(array_where($array, 'name', $contain_h))->isSame([
      *     0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
      * ]);
      * // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
-     * $equal_2 = function($row, $key){return $key === 2;};
+     * $equal_2 = fn($row, $key) => $key === 2;
      * that(array_where($array, null, $equal_2))->isSame([
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
      * // $column に配列を渡すと共通項が渡ってくる
-     * $idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
+     * $idname_is_2fuga = fn($idname) => ($idname['id'] . $idname['name']) === '2fuga';
      * that(array_where($array, ['id', 'name'], $idname_is_2fuga))->isSame([
      *     1 => ['id' => 2, 'name' => 'fuga', 'flag' => true],
      * ]);
@@ -1877,8 +1857,8 @@ class Arrays
      * ]);
      * // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
      * that(array_where($array, [
-     *     'id'   => function($id){return $id >= 3;},                       // id が 3 以上
-     *     'name' => function($name){return strpos($name, 'o') !== false;}, // name に o を含む
+     *     'id'   => fn($id) => $id >= 3,                       // id が 3 以上
+     *     'name' => fn($name) => strpos($name, 'o') !== false, // name に o を含む
      * ]))->isSame([
      *     2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
      * ]);
@@ -1907,10 +1887,10 @@ class Arrays
                         return $c;
                     }
                     if ($callback) {
-                        return function ($v) use ($c) { return $v === $c; };
+                        return fn($v) => $v === $c;
                     }
                     else {
-                        return function ($v) use ($c) { return is_array($c) ? in_array($v, $c) : $v == $c; };
+                        return fn($v) => is_array($c) ? in_array($v, $c) : $v == $c;
                     }
                 }, $column);
                 $callback = function ($vv, $k, $v) use ($callbacks) {
@@ -2010,9 +1990,7 @@ class Arrays
     public static function array_map_method($array, $method, $args = [], $ignore = false)
     {
         if ($ignore === true) {
-            $array = array_filter((arrayval)($array, false), function ($object) use ($method) {
-                return is_callable([$object, $method]);
-            });
+            $array = array_filter((arrayval)($array, false), fn($object) => is_callable([$object, $method]));
         }
         return array_map(function ($object) use ($method, $args, $ignore) {
             if ($ignore === null && !is_callable([$object, $method])) {
@@ -2039,7 +2017,7 @@ class Arrays
      * // 値を3乗したあと16進表記にして大文字化する
      * that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))->isSame(['1', '8', '1B', '40', '7D']);
      * // キーも渡ってくる
-     * that(array_maps(['a' => 'A', 'b' => 'B'], function($v, $k){return "$k:$v";}))->isSame(['a' => 'a:A', 'b' => 'b:B']);
+     * that(array_maps(['a' => 'A', 'b' => 'B'], fn($v, $k) => "$k:$v"))->isSame(['a' => 'a:A', 'b' => 'b:B']);
      * // ... で可変引数コール
      * that(array_maps([[1, 3], [1, 5, 2]], '...range'))->isSame([[1, 2, 3], [1, 3, 5]]);
      * // メソッドコールもできる（引数不要なら `@method` でも同じ）
@@ -2113,7 +2091,7 @@ class Arrays
      *    'd' => 'D',
      * ];
      * // キーに '_' 、値に 'prefix-' を付与。'b' は一切何もしない。'c' は値のみ。'd' はそれ自体伏せる
-     * that(array_kvmap($array, function($k, $v){
+     * that(array_kvmap($array, function ($k, $v) {
      *     if ($k === 'b') return null;
      *     if ($k === 'd') return [];
      *     if ($k !== 'c') $k = "_$k";
@@ -2125,12 +2103,10 @@ class Arrays
      * ]);
      *
      * // 複数返せばその分増える（要素の水増し）
-     * that(array_kvmap($array, function($k, $v){
-     *     return [
-     *         "{$k}1" => "{$v}1",
-     *         "{$k}2" => "{$v}2",
-     *     ];
-     * }))->isSame([
+     * that(array_kvmap($array, fn($k, $v) => [
+     *     "{$k}1" => "{$v}1",
+     *     "{$k}2" => "{$v}2",
+     * ]))->isSame([
      *    'a1' => 'A1',
      *    'a2' => 'A2',
      *    'b1' => 'B1',
@@ -2150,7 +2126,7 @@ class Arrays
      *             'z' => ['Z'],
      *         ],
      *     ],
-     * ], function($k, $v, $callback){
+     * ], function ($k, $v, $callback) {
      *     // 配列だったら再帰する
      *     return ["_$k" => is_array($v) ? array_kvmap($v, $callback) : "prefix-$v"];
      * }))->isSame([
@@ -2209,7 +2185,7 @@ class Arrays
      *     'k1' => 'v1',
      *     'k2' => 'v2',
      *     'k3' => 'v3',
-     * ], function($v, $k){return "$k:$v";}))->isSame([
+     * ], fn($v, $k) => "$k:$v"))->isSame([
      *     'k1' => 'k1:v1',
      *     'k2' => 'k2:v2',
      *     'k3' => 'k3:v3',
@@ -2241,10 +2217,10 @@ class Arrays
      * Example:
      * ```php
      * // 1番目に値を渡して map
-     * $sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
+     * $sprintf = fn() => vsprintf('%s%s%s', func_get_args());
      * that(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'))->isSame(['prefix-a-suffix', 'prefix-b-suffix']);
      * // 1番目にキー、2番目に値を渡して map
-     * $sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
+     * $sprintf = fn() => vsprintf('%s %s %s %s %s', func_get_args());
      * that(array_nmap(['k' => 'v'], $sprintf, [1 => 2], 'a', 'b', 'c'))->isSame(['k' => 'a k b v c']);
      * ```
      *
@@ -2309,7 +2285,7 @@ class Arrays
      *
      * Example:
      * ```php
-     * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
+     * $sprintf = fn() => vsprintf('%s%s', func_get_args());
      * that(array_lmap(['a', 'b'], $sprintf, '-suffix'))->isSame(['a-suffix', 'b-suffix']);
      * ```
      *
@@ -2328,7 +2304,7 @@ class Arrays
      *
      * Example:
      * ```php
-     * $sprintf = function(){return vsprintf('%s%s', func_get_args());};
+     * $sprintf = fn() => vsprintf('%s%s', func_get_args());
      * that(array_rmap(['a', 'b'], $sprintf, 'prefix-'))->isSame(['prefix-a', 'prefix-b']);
      * ```
      *
@@ -2366,9 +2342,9 @@ class Arrays
      * Example:
      * ```php
      * // 全要素を文字列的に足し合わせる
-     * that(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry .= $v;}, ''))->isSame('12345');
+     * that(array_each([1, 2, 3, 4, 5], function (&$carry, $v) {$carry .= $v;}, ''))->isSame('12345');
      * // 値をキーにして要素を2乗値にする
-     * that(array_each([1, 2, 3, 4, 5], function(&$carry, $v){$carry[$v] = $v * $v;}, []))->isSame([
+     * that(array_each([1, 2, 3, 4, 5], function (&$carry, $v) {$carry[$v] = $v * $v;}, []))->isSame([
      *     1 => 1,
      *     2 => 4,
      *     3 => 9,
@@ -2376,7 +2352,7 @@ class Arrays
      *     5 => 25,
      * ]);
      * // 上記と同じ。ただし、3 で break する
-     * that(array_each([1, 2, 3, 4, 5], function(&$carry, $v, $k){
+     * that(array_each([1, 2, 3, 4, 5], function (&$carry, $v, $k){
      *     if ($k === 3) return false;
      *     $carry[$v] = $v * $v;
      * }, []))->isSame([
@@ -2386,9 +2362,9 @@ class Arrays
      * ]);
      *
      * // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-     * that(array_each([1, 2, 3], function(&$carry = [], $v = null) {
+     * that(array_each([1, 2, 3], function (&$carry = [], $v = null) {
      *         $carry[$v] = $v * $v;
-     *     }))->isSame(array_each([1, 2, 3], function(&$carry, $v) {
+     *     }))->isSame(array_each([1, 2, 3], function (&$carry, $v) {
      *         $carry[$v] = $v * $v;
      *     }, [])
      *     // 個人的に↑のようなぶら下がり引数があまり好きではない（クロージャを最後の引数にしたい）
@@ -2460,7 +2436,7 @@ class Arrays
             }
 
             // 配下の内で最大を返す
-            return 1 + max(array_map(function ($v) use ($main, $depth) { return $main($v, $depth + 1); }, $arrays));
+            return 1 + max(array_map(fn($v) => $main($v, $depth + 1), $arrays));
         };
 
         return $main($array, 1);
@@ -2510,14 +2486,14 @@ class Arrays
      * Example:
      * ```php
      * // lt2(2より小さい)で分類
-     * $lt2 = function($v){return $v < 2;};
+     * $lt2 = fn($v) => $v < 2;
      * that(array_assort([1, 2, 3], [
      *     'lt2' => $lt2,
      * ]))->isSame([
      *     'lt2' => [1],
      * ]);
      * // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
-     * $lt3 = function($v){return $v < 3;};
+     * $lt3 = fn($v) => $v < 3;
      * that(array_assort(['1', '2', '3'], [
      *     'lt3' => $lt3,
      *     'ctd' => 'ctype_digit',
@@ -2562,11 +2538,11 @@ class Arrays
      * ```php
      * $array = ['hoge', 'fuga', 'piyo'];
      * // 'o' を含むものの数（2個）
-     * that(array_count($array, function($s){return strpos($s, 'o') !== false;}))->isSame(2);
+     * that(array_count($array, fn($s) => strpos($s, 'o') !== false))->isSame(2);
      * // 'a' と 'o' を含むものをそれぞれ（1個と2個）
      * that(array_count($array, [
-     *     'a' => function($s){return strpos($s, 'a') !== false;},
-     *     'o' => function($s){return strpos($s, 'o') !== false;},
+     *     'a' => fn($s) => strpos($s, 'a') !== false,
+     *     'o' => fn($s) => strpos($s, 'o') !== false,
      * ]))->isSame([
      *     'a' => 1,
      *     'o' => 2,
@@ -2580,9 +2556,9 @@ class Arrays
      *     [[[['a', 'M', 'Z']]]],
      * ];
      * that((array_count)($array, [
-     *     'lower' => function ($v) { return !is_array($v) && ctype_lower($v);},
-     *     'upper' => function ($v) { return !is_array($v) && ctype_upper($v);},
-     *     'array' => function ($v) { return is_array($v);},
+     *     'lower' => fn($v) => !is_array($v) && ctype_lower($v),
+     *     'upper' => fn($v) => !is_array($v) && ctype_upper($v),
+     *     'array' => fn($v) => is_array($v),
      * ], true))->is([
      *     'lower' => 4, // 小文字の数
      *     'upper' => 5, // 大文字の数
@@ -2641,7 +2617,7 @@ class Arrays
      * that(array_group([1, 1, 1]))->isSame([
      *     1 => [1, 1, 1],
      * ]);
-     * that(array_group([1, 2, 3], function($v){return $v % 2;}))->isSame([
+     * that(array_group([1, 2, 3], fn($v) => $v % 2))->isSame([
      *     1 => [1, 3],
      *     0 => [2],
      * ]);
@@ -2649,7 +2625,7 @@ class Arrays
      * $row1 = ['id' => 1, 'group' => 'hoge'];
      * $row2 = ['id' => 2, 'group' => 'fuga'];
      * $row3 = ['id' => 3, 'group' => 'hoge'];
-     * that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}))->isSame([
+     * that(array_group([$row1, $row2, $row3], fn($row) => [$row['group'], $row['id']]))->isSame([
      *     'hoge' => [
      *         1 => $row1,
      *         3 => $row3,
@@ -2713,9 +2689,9 @@ class Arrays
      * ```php
      * // 単純な配列の集計
      * that(array_aggregate([1, 2, 3], [
-     *     'min' => function($elems) {return min($elems);},
-     *     'max' => function($elems) {return max($elems);},
-     *     'avg' => function($elems) {return array_sum($elems) / count($elems);},
+     *     'min' => fn($elems) => min($elems),
+     *     'max' => fn($elems) => max($elems),
+     *     'avg' => fn($elems) => array_sum($elems) / count($elems),
      * ]))->isSame([
      *     'min' => 1, // 最小値
      *     'max' => 3, // 最大値
@@ -2729,8 +2705,8 @@ class Arrays
      *
      * // user_id, group ごとの score を集計して階層配列で返す（第2引数 $current を利用している）
      * that(array_aggregate([$row1, $row2, $row3, $row4], [
-     *     'scores' => function($rows) {return array_column($rows, 'score');},
-     *     'score'  => function($rows, $current) {return array_sum($current['scores']);},
+     *     'scores' => fn($rows) => array_column($rows, 'score'),
+     *     'score'  => fn($rows, $current) => array_sum($current['scores']),
      * ], ['user_id', 'group']))->isSame([
      *     'hoge' => [
      *         'A' => [
@@ -2752,8 +2728,8 @@ class Arrays
      *
      * // user_id ごとの score を集計して単一列で返す（キーのクロージャも利用している）
      * that(array_aggregate([$row1, $row2, $row3, $row4],
-     *     function($rows) {return array_sum(array_column($rows, 'score'));},
-     *     function($row) {return strtoupper($row['user_id']);}))->isSame([
+     *     fn($rows) => array_sum(array_column($rows, 'score')),
+     *     fn($row) => strtoupper($row['user_id'])))->isSame([
      *     'HOGE' => 12,
      *     'FUGA' => 11,
      * ]);
@@ -2920,7 +2896,7 @@ class Arrays
      * $v3 = new \ArrayObject(['id' => '3', 'group' => 'aaa', 'dummy' => 456]);
      * $v4 = new \ArrayObject(['id' => '4', 'group' => 'bbb', 'dummy' => 789]);
      * // クロージャを指定して重複除去
-     * that(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] <=> $b['group']; }))->isSame([$v1, $v2]);
+     * that(array_distinct([$v1, $v2, $v3, $v4], fn($a, $b) => $a['group'] <=> $b['group']))->isSame([$v1, $v2]);
      * // 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
      * that(array_distinct([$v1, $v2, $v3, $v4], 'group'))->isSame([$v1, $v2]);
      * // 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
@@ -2943,15 +2919,11 @@ class Arrays
 
         // 省略時は宇宙船
         if ($comparator === null) {
-            $comparator = static function ($a, $b) {
-                return $a <=> $b;
-            };
+            $comparator = static fn($a, $b) => $a <=> $b;
         }
         // 数字が来たら varcmp とする
         elseif (is_int($comparator)) {
-            $comparator = static function ($a, $b) use ($comparator) {
-                return (varcmp)($a, $b, $comparator);
-            };
+            $comparator = static fn($a, $b) => (varcmp)($a, $b, $comparator);
         }
         // 文字列・配列が来たらキーアクセス/メソッドコールとする
         elseif (is_string($comparator) || is_array($comparator)) {
@@ -3000,11 +2972,11 @@ class Arrays
      *
      * ```php
      * $orders = [
-     *     'col1' => true,                               // true: 昇順, false: 降順。照合は型に依存
-     *     'col2' => SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
-     *     'col3' => ['sort', 'this', 'order'],          // 指定した配列順で昇順
-     *     'col4' => function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型に依存
-     *     'col5' => function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+     *     'col1' => true,                      // true: 昇順, false: 降順。照合は型に依存
+     *     'col2' => SORT_NATURAL,              // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+     *     'col3' => ['sort', 'this', 'order'], // 指定した配列順で昇順
+     *     'col4' => fn($v) => $v,              // クロージャを通した値で昇順。照合は返り値の型に依存
+     *     'col5' => fn($a, $b) => $a - $b,     // クロージャで比較して昇順（いわゆる比較関数を渡す）
      * ];
      * ```
      *
@@ -3033,12 +3005,10 @@ class Arrays
         }
 
         // 配列内の位置をマップして返すクロージャ
-        $position = function ($columns, $order) {
-            return array_map(function ($v) use ($order) {
-                $ndx = array_search($v, $order, true);
-                return $ndx === false ? count($order) : $ndx;
-            }, $columns);
-        };
+        $position = fn($columns, $order) => array_map(function ($v) use ($order) {
+            $ndx = array_search($v, $order, true);
+            return $ndx === false ? count($order) : $ndx;
+        }, $columns);
 
         // 全要素は舐めてられないので最初の要素を代表選手としてピックアップ
         $first = reset($array);
@@ -3183,7 +3153,7 @@ class Arrays
         }
 
         if ($count < 0 || count($array) < $count) {
-            throw new \ValueError('Argument #2 ($count) must be between 1 and the number of elements in argument #1 ($array)');
+            throw new \InvalidArgumentException('Argument #2 ($count) must be between 1 and the number of elements in argument #1 ($array)');
         }
 
         $result = [];
@@ -3462,7 +3432,7 @@ class Arrays
      *     'c' => 'C',
      * ]);
      * // [a, b, c] からその sha1 配列を作って大文字化する
-     * that(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }))->isSame([
+     * that(array_fill_callback($abc, fn($v) => strtoupper(sha1($v))))->isSame([
      *     'a' => '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
      *     'b' => 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
      *     'c' => '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -3572,7 +3542,7 @@ class Arrays
      *     13 => 'name3',
      * ]);
      * // クロージャを指定すればキーが生成される
-     * that(array_lookup($array, 'name', function ($v, $k) {return $k * 2;}))->isSame([
+     * that(array_lookup($array, 'name', fn($v, $k) => $k * 2))->isSame([
      *     22 => 'name1',
      *     24 => 'name2',
      *     26 => 'name3',
@@ -3624,9 +3594,9 @@ class Arrays
      *
      * that(array_select($array, [
      *     // id の 10 倍を取得
-     *     'id'     => function ($id) {return $id * 10;},
+     *     'id'     => fn($id) => $id * 10,
      *     // id と name の結合を取得
-     *     'idname' => function ($null, $row, $index) {return $row['id'] . $row['name'];},
+     *     'idname' => fn($null, $row, $index) => $row['id'] . $row['name'],
      * ]))->isSame([
      *     11 => ['id' => 10, 'idname' => '1name1'],
      *     12 => ['id' => 20, 'idname' => '2name2'],
@@ -3819,7 +3789,7 @@ class Arrays
      *    ],
      * ];
      * // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k21' はそのままとする。さらに 'k22' はまるごと伏せる。 'k23' は数値キーになる
-     * $callback = function($k, &$v){
+     * $callback = function ($k, &$v) {
      *     if ($k === 'k21') return null;
      *     if ($k === 'k22') return false;
      *     if ($k === 'k23') return true;
@@ -4107,11 +4077,11 @@ class Arrays
     public static function array_difference($array1, $array2, $delimiter = '.')
     {
         $rule = [
-            'list' => static function ($v, $k) { return is_int($k); },
-            'hash' => static function ($v, $k) { return !is_int($k); },
+            'list' => static fn($v, $k) => is_int($k),
+            'hash' => static fn($v, $k) => !is_int($k),
         ];
 
-        $udiff = static function ($a, $b) { return $a <=> $b; };
+        $udiff = static fn($a, $b) => $a <=> $b;
 
         return call_user_func($f = static function ($array1, $array2, $key = null) use (&$f, $rule, $udiff, $delimiter) {
             $result = [];
@@ -4336,7 +4306,7 @@ class Arrays
             if (is_string($rule['type'])) {
                 $rule['type'] = explode('|', $rule['type']);
             }
-            $rule['type'] = array_map(function ($type) { return explode('@', $type, 2)[0]; }, $rule['type']);
+            $rule['type'] = array_map(fn($type) => explode('@', $type, 2)[0], $rule['type']);
 
             foreach ($validators as $name => $validator) {
                 if (array_key_exists($name, $rule)) {
@@ -4364,7 +4334,7 @@ class Arrays
             if ($maintype === 'list') {
                 $result = array_merge(...(array_lmap)($arrays, $validate, $schema, $path));
                 if (isset($subtype)) {
-                    $subschema = ['type' => $subtype] + (array_map_key)($schema, function ($k) { return $k[0] === '@' ? substr($k, 1) : null; });
+                    $subschema = ['type' => $subtype] + (array_map_key)($schema, fn($k) => $k[0] === '@' ? substr($k, 1) : null);
                     foreach ($result as $k => $v) {
                         $result[$k] = $main($subschema, "$path/$k", $v);
                     }

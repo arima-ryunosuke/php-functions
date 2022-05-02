@@ -205,7 +205,7 @@ class Utility
             {
                 $result = $this->getMultiple(array_keys($providers));
                 foreach ($providers as $key => $provider) {
-                    $result[$key] = $result[$key] ?? $this->fetch($key, $provider, $ttl);
+                    $result[$key] ??= $this->fetch($key, $provider, $ttl);
                 }
                 return $result;
             }
@@ -340,7 +340,7 @@ class Utility
      *
      * Example:
      * ```php
-     * $provider = function(){return rand();};
+     * $provider = fn() => rand();
      * // 乱数を返す処理だが、キャッシュされるので同じ値になる
      * $rand1 = cache('rand', $provider);
      * $rand2 = cache('rand', $provider);
@@ -359,92 +359,92 @@ class Utility
     public static function cache($key, $provider, $namespace = null)
     {
         static $cacheobject;
-        $cacheobject = $cacheobject ?? new class((cachedir)()) {
-                const CACHE_EXT = '.php-cache';
+        $cacheobject ??= new class((cachedir)()) {
+            const CACHE_EXT = '.php-cache';
 
-                /** @var string キャッシュディレクトリ */
-                private $cachedir;
+            /** @var string キャッシュディレクトリ */
+            private $cachedir;
 
-                /** @var array 内部キャッシュ */
-                private $cache;
+            /** @var array 内部キャッシュ */
+            private $cache;
 
-                /** @var array 変更感知配列 */
-                private $changed;
+            /** @var array 変更感知配列 */
+            private $changed;
 
-                public function __construct($cachedir)
-                {
-                    $this->cachedir = $cachedir;
-                    $this->cache = [];
-                    $this->changed = [];
-                }
+            public function __construct($cachedir)
+            {
+                $this->cachedir = $cachedir;
+                $this->cache = [];
+                $this->changed = [];
+            }
 
-                public function __destruct()
-                {
-                    // 変更されているもののみ保存
-                    foreach ($this->changed as $namespace => $dummy) {
-                        $filepath = $this->cachedir . '/' . rawurlencode($namespace) . self::CACHE_EXT;
-                        $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
+            public function __destruct()
+            {
+                // 変更されているもののみ保存
+                foreach ($this->changed as $namespace => $dummy) {
+                    $filepath = $this->cachedir . '/' . rawurlencode($namespace) . self::CACHE_EXT;
+                    $content = "<?php\nreturn " . var_export($this->cache[$namespace], true) . ";\n";
 
-                        $temppath = tempnam(sys_get_temp_dir(), 'cache');
-                        if (file_put_contents($temppath, $content) !== false) {
-                            @chmod($temppath, 0644);
-                            if (!@rename($temppath, $filepath)) {
-                                @unlink($temppath); // @codeCoverageIgnore
-                            }
+                    $temppath = tempnam(sys_get_temp_dir(), 'cache');
+                    if (file_put_contents($temppath, $content) !== false) {
+                        @chmod($temppath, 0644);
+                        if (!@rename($temppath, $filepath)) {
+                            @unlink($temppath); // @codeCoverageIgnore
                         }
                     }
                 }
+            }
 
-                public function has($namespace, $key)
-                {
-                    // ファイルから読み込む必要があるので get しておく
-                    $this->get($namespace, $key);
-                    return array_key_exists($key, $this->cache[$namespace]);
-                }
+            public function has($namespace, $key)
+            {
+                // ファイルから読み込む必要があるので get しておく
+                $this->get($namespace, $key);
+                return array_key_exists($key, $this->cache[$namespace]);
+            }
 
-                public function get($namespace, $key)
-                {
-                    // 名前空間自体がないなら作る or 読む
-                    if (!isset($this->cache[$namespace])) {
-                        $nsarray = [];
-                        $cachpath = $this->cachedir . '/' . rawurldecode($namespace) . self::CACHE_EXT;
-                        if (file_exists($cachpath)) {
-                            $nsarray = require $cachpath;
-                        }
-                        $this->cache[$namespace] = $nsarray;
+            public function get($namespace, $key)
+            {
+                // 名前空間自体がないなら作る or 読む
+                if (!isset($this->cache[$namespace])) {
+                    $nsarray = [];
+                    $cachpath = $this->cachedir . '/' . rawurldecode($namespace) . self::CACHE_EXT;
+                    if (file_exists($cachpath)) {
+                        $nsarray = require $cachpath;
                     }
-
-                    return $this->cache[$namespace][$key] ?? null;
+                    $this->cache[$namespace] = $nsarray;
                 }
 
-                public function set($namespace, $key, $value)
-                {
-                    // 新しい値が来たら変更フラグを立てる
-                    if (!isset($this->cache[$namespace]) || !array_key_exists($key, $this->cache[$namespace]) || $this->cache[$namespace][$key] !== $value) {
-                        $this->changed[$namespace] = true;
-                    }
+                return $this->cache[$namespace][$key] ?? null;
+            }
 
-                    $this->cache[$namespace][$key] = $value;
-                }
-
-                public function delete($namespace, $key)
-                {
+            public function set($namespace, $key, $value)
+            {
+                // 新しい値が来たら変更フラグを立てる
+                if (!isset($this->cache[$namespace]) || !array_key_exists($key, $this->cache[$namespace]) || $this->cache[$namespace][$key] !== $value) {
                     $this->changed[$namespace] = true;
-                    unset($this->cache[$namespace][$key]);
                 }
 
-                public function clear()
-                {
-                    // インメモリ情報をクリアして・・・
-                    $this->cache = [];
-                    $this->changed = [];
+                $this->cache[$namespace][$key] = $value;
+            }
 
-                    // ファイルも消す
-                    foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
-                        unlink($file);
-                    }
+            public function delete($namespace, $key)
+            {
+                $this->changed[$namespace] = true;
+                unset($this->cache[$namespace][$key]);
+            }
+
+            public function clear()
+            {
+                // インメモリ情報をクリアして・・・
+                $this->cache = [];
+                $this->changed = [];
+
+                // ファイルも消す
+                foreach (glob($this->cachedir . '/*' . self::CACHE_EXT) as $file) {
+                    unlink($file);
                 }
-            };
+            }
+        };
 
         // flush (for test)
         if ($key === null) {
@@ -455,7 +455,7 @@ class Utility
             return;
         }
 
-        $namespace = $namespace ?? __FILE__;
+        $namespace ??= __FILE__;
 
         $exist = $cacheobject->has($namespace, $key);
         if ($provider === null) {
@@ -606,9 +606,7 @@ class Utility
                         ];
                         break;
                     case T_USE:
-                        $tokenCorF = (array_find)($tokens, function ($token) {
-                            return ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0;
-                        }, false);
+                        $tokenCorF = (array_find)($tokens, fn($token) => ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0, false);
 
                         $prefix = '';
                         if (end($tokens)[1] === '{') {
@@ -621,9 +619,9 @@ class Utility
                             ]);
                         }
 
-                        $multi = (array_explode)($tokens, function ($token) { return $token[1] === ','; });
+                        $multi = (array_explode)($tokens, fn($token) => $token[1] === ',');
                         foreach ($multi as $ttt) {
-                            $as = (array_explode)($ttt, function ($token) { return $token[0] === T_AS; });
+                            $as = (array_explode)($ttt, fn($token) => $token[0] === T_AS);
 
                             $alias = $stringify($as[0]);
                             if (isset($as[1])) {
@@ -706,7 +704,7 @@ class Utility
 
         $targets = (array) $targets;
         foreach ($nsfiles as $filename => $namespaces) {
-            $namespaces = array_flip(array_map(function ($n) { return trim($n, '\\'); }, (array) $namespaces));
+            $namespaces = array_flip(array_map(fn($n) => trim($n, '\\'), (array) $namespaces));
             foreach ((parse_namespace)($filename) as $namespace => $ns) {
                 /** @noinspection PhpIllegalArrayKeyTypeInspection */
                 if (!$namespaces || isset($namespaces[$namespace])) {
@@ -775,7 +773,7 @@ class Utility
      * @same this is same value3
      * ', [
      *     'single'  => true,
-     *     'closure' => function ($value) { return explode(' ', strtoupper($value)); },
+     *     'closure' => fn($value) => explode(' ', strtoupper($value)),
      * ]);
      * that($annotations)->is([
      *     'noval'       => null,                        // 値なしは null になる
@@ -1061,8 +1059,8 @@ class Utility
      *
      * @see process
      *
-     * @param string $command 実行コマンド。php7.4 未満では escapeshellcmd される
-     * @param array|string $args コマンドライン引数。php7.4 未満では文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される
+     * @param string $command 実行コマンド
+     * @param array|string $args コマンドライン引数。文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される
      * @param string|resource $stdin 標準入力（string を渡すと単純に読み取れられる。resource を渡すと fread される）
      * @param string|resource $stdout 標準出力（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
@@ -1072,7 +1070,7 @@ class Utility
      */
     public static function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
     {
-        if (version_compare(PHP_VERSION, '7.4.0') >= 0 && is_array($args)) {
+        if (is_array($args)) {
             $statement = [$command];
             foreach ($args as $k => $v) {
                 if (!is_int($k)) {
@@ -1082,15 +1080,7 @@ class Utility
             }
         }
         else {
-            // @codeCoverageIgnoreStart
-            if (is_array($args)) {
-                $args = (array_sprintf)($args, function ($v, $k) {
-                    $ev = escapeshellarg($v);
-                    return is_int($k) ? $ev : "$k $ev";
-                }, ' ');
-            }
             $statement = escapeshellcmd($command) . " $args";
-            // @codeCoverageIgnoreEnd
         }
 
         $proc = proc_open($statement, [
@@ -1291,7 +1281,7 @@ class Utility
 
         // 変数や環境の準備
         $autoload = (arrayize)($autoload ?? (auto_loader)());
-        $workdir = $workdir ?? (sys_get_temp_dir() . '/rfpp');
+        $workdir ??= (sys_get_temp_dir() . '/rfpp');
         (mkdir_p)($workdir);
 
         // 実行バイナリとコード本体
@@ -1314,9 +1304,7 @@ class Utility
             $stdout = $stderr = '';
             $return = tempnam($workdir, 'return');
             $processes[$key] = (process_async)($phpbin, [$mainscript, $return, $key], serialize($args[$key] ?? []), $stdout, $stderr, $workdir, $env);
-            $processes[$key]->return = static function () use ($return) {
-                return strlen($result = file_get_contents($return)) ? unserialize($result) : null;
-            };
+            $processes[$key]->return = static fn() => strlen($result = file_get_contents($return)) ? unserialize($result) : null;
         }
 
         // プロセスを実行兼返り値用に加工
@@ -1445,7 +1433,7 @@ class Utility
 
         $n = 0;
         $already = [];
-        $result = array_map(function ($v) { return $v === null ? false : $v; }, $optsdefaults);
+        $result = array_map(fn($v) => $v === null ? false : $v, $optsdefaults);
         while (($token = array_shift($argv)) !== null) {
             if (strlen($token) >= 2 && $token[0] === '-') {
                 if ($token[1] === '-') {
@@ -1599,7 +1587,7 @@ class Utility
             return $export($value);
         };
 
-        $traces = $traces ?? array_slice(debug_backtrace(), 1);
+        $traces ??= array_slice(debug_backtrace(), 1);
         $result = [];
         foreach ($traces as $i => $trace) {
             // メソッド内で関数定義して呼び出したりすると file が無いことがある（かなりレアケースなので無視する）
@@ -1729,154 +1717,154 @@ class Utility
     public static function profiler($options = [])
     {
         static $declareProtocol = null;
-        $declareProtocol = $declareProtocol ?? new
-            /**
-             * @method opendir($path, $context = null)
-             * @method touch($filename, $time = null, $atime = null)
-             * @method chmod($filename, $mode)
-             * @method chown($filename, $user)
-             * @method chgrp($filename, $group)
-             * @method fopen($filename, $mode, $use_include_path = false, $context = null)
-             */
-            class {
-                const DECLARE_TICKS = "<?php declare(ticks=1) ?>";
+        $declareProtocol ??= new
+        /**
+         * @method opendir($path, $context = null)
+         * @method touch($filename, $time = null, $atime = null)
+         * @method chmod($filename, $mode)
+         * @method chown($filename, $user)
+         * @method chgrp($filename, $group)
+         * @method fopen($filename, $mode, $use_include_path = false, $context = null)
+         */
+        class {
+            const DECLARE_TICKS = "<?php declare(ticks=1) ?>";
 
-                /** @var int https://github.com/php/php-src/blob/php-7.2.11/main/php_streams.h#L528-L529 */
-                private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
+            /** @var int https://github.com/php/php-src/blob/php-7.2.11/main/php_streams.h#L528-L529 */
+            private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
-                /** @var resource https://www.php.net/manual/class.streamwrapper.php */
-                public $context;
+            /** @var resource https://www.php.net/manual/class.streamwrapper.php */
+            public $context;
 
-                private $require;
-                private $prepend;
-                private $handle;
+            private $require;
+            private $prepend;
+            private $handle;
 
-                public function __call($name, $arguments)
-                {
-                    $fname = preg_replace(['#^dir_#', '#^stream_#'], ['', 'f'], $name, 1, $count);
-                    if ($count) {
-                        // flock は特別扱い（file_put_contents (LOCK_EX) を呼ぶと 0 で来ることがある）
-                        // __call で特別扱いもおかしいけど、個別に定義するほうが逆にわかりにくい
-                        if ($fname === 'flock' && ($arguments[0] ?? null) === 0) {
-                            return true;
-                        }
-                        return $fname($this->handle, ...$arguments);
+            public function __call($name, $arguments)
+            {
+                $fname = preg_replace(['#^dir_#', '#^stream_#'], ['', 'f'], $name, 1, $count);
+                if ($count) {
+                    // flock は特別扱い（file_put_contents (LOCK_EX) を呼ぶと 0 で来ることがある）
+                    // __call で特別扱いもおかしいけど、個別に定義するほうが逆にわかりにくい
+                    if ($fname === 'flock' && ($arguments[0] ?? null) === 0) {
+                        return true;
                     }
-
-                    stream_wrapper_restore('file');
-                    try {
-                        switch ($name) {
-                            default:
-                                // mkdir, rename, unlink, ...
-                                return $name(...$arguments);
-                            case 'rmdir':
-                                [$path, $options] = $arguments + [1 => 0];
-                                assert(isset($options)); // @todo It is used?
-                                return rmdir($path, $this->context);
-                            case 'url_stat':
-                                [$path, $flags] = $arguments + [1 => 0];
-                                if ($flags & STREAM_URL_STAT_LINK) {
-                                    $func = 'lstat';
-                                }
-                                else {
-                                    $func = 'stat';
-                                }
-                                if ($flags & STREAM_URL_STAT_QUIET) {
-                                    return @$func($path);
-                                }
-                                else {
-                                    return $func($path);
-                                }
-                        }
-                    }
-                    finally {
-                        stream_wrapper_unregister('file');
-                        stream_wrapper_register('file', get_class($this));
-                    }
+                    return $fname($this->handle, ...$arguments);
                 }
 
-                /** @noinspection PhpUnusedParameterInspection */
-                public function dir_opendir($path, $options)
-                {
-                    return !!$this->handle = $this->opendir(...$this->context ? [$path, $this->context] : [$path]);
-                }
-
-                public function stream_open($path, $mode, $options, &$opened_path)
-                {
-                    $this->require = $options & self::STREAM_OPEN_FOR_INCLUDE;
-                    $this->prepend = false;
-                    $use_path = $options & STREAM_USE_PATH;
-                    if ($options & STREAM_REPORT_ERRORS) {
-                        $this->handle = $this->fopen($path, $mode, $use_path); // @codeCoverageIgnore
-                    }
-                    else {
-                        $this->handle = @$this->fopen($path, $mode, $use_path);
-                    }
-                    if ($use_path && $this->handle) {
-                        $opened_path = stream_get_meta_data($this->handle)['uri']; // @codeCoverageIgnore
-                    }
-                    return !!$this->handle;
-                }
-
-                public function stream_read($count)
-                {
-                    if (!$this->prepend && $this->require && ftell($this->handle) === 0) {
-                        $this->prepend = true;
-                        return self::DECLARE_TICKS;
-                    }
-                    return fread($this->handle, $count);
-                }
-
-                public function stream_stat()
-                {
-                    $stat = fstat($this->handle);
-                    if ($this->require) {
-                        $decsize = strlen(self::DECLARE_TICKS);
-                        $stat[7] += $decsize;
-                        $stat['size'] += $decsize;
-                    }
-                    return $stat;
-                }
-
-                public function stream_set_option($option, $arg1, $arg2)
-                {
-                    // Windows の file スキームでは呼ばれない？（確かにブロッキングやタイムアウトは無縁そう）
-                    // @codeCoverageIgnoreStart
-                    switch ($option) {
+                stream_wrapper_restore('file');
+                try {
+                    switch ($name) {
                         default:
-                            throw new \Exception();
-                        case STREAM_OPTION_BLOCKING:
-                            return stream_set_blocking($this->handle, $arg1);
-                        case STREAM_OPTION_READ_TIMEOUT:
-                            return stream_set_timeout($this->handle, $arg1, $arg2);
-                        case STREAM_OPTION_READ_BUFFER:
-                            return stream_set_read_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
-                        case STREAM_OPTION_WRITE_BUFFER:
-                            return stream_set_write_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
-                    }
-                    // @codeCoverageIgnoreEnd
-                }
-
-                public function stream_metadata($path, $option, $value)
-                {
-                    switch ($option) {
-                        default:
-                            throw new \Exception(); // @codeCoverageIgnore
-                        case STREAM_META_TOUCH:
-                            return $this->touch($path, ...$value);
-                        case STREAM_META_ACCESS:
-                            return $this->chmod($path, $value);
-                        case STREAM_META_OWNER_NAME:
-                        case STREAM_META_OWNER:
-                            return $this->chown($path, $value);
-                        case STREAM_META_GROUP_NAME:
-                        case STREAM_META_GROUP:
-                            return $this->chgrp($path, $value);
+                            // mkdir, rename, unlink, ...
+                            return $name(...$arguments);
+                        case 'rmdir':
+                            [$path, $options] = $arguments + [1 => 0];
+                            assert(isset($options)); // @todo It is used?
+                            return rmdir($path, $this->context);
+                        case 'url_stat':
+                            [$path, $flags] = $arguments + [1 => 0];
+                            if ($flags & STREAM_URL_STAT_LINK) {
+                                $func = 'lstat';
+                            }
+                            else {
+                                $func = 'stat';
+                            }
+                            if ($flags & STREAM_URL_STAT_QUIET) {
+                                return @$func($path);
+                            }
+                            else {
+                                return $func($path);
+                            }
                     }
                 }
+                finally {
+                    stream_wrapper_unregister('file');
+                    stream_wrapper_register('file', get_class($this));
+                }
+            }
 
-                public function stream_cast($cast_as) { /* @todo I'm not sure */ }
-            };
+            /** @noinspection PhpUnusedParameterInspection */
+            public function dir_opendir($path, $options)
+            {
+                return !!$this->handle = $this->opendir(...$this->context ? [$path, $this->context] : [$path]);
+            }
+
+            public function stream_open($path, $mode, $options, &$opened_path)
+            {
+                $this->require = $options & self::STREAM_OPEN_FOR_INCLUDE;
+                $this->prepend = false;
+                $use_path = $options & STREAM_USE_PATH;
+                if ($options & STREAM_REPORT_ERRORS) {
+                    $this->handle = $this->fopen($path, $mode, $use_path); // @codeCoverageIgnore
+                }
+                else {
+                    $this->handle = @$this->fopen($path, $mode, $use_path);
+                }
+                if ($use_path && $this->handle) {
+                    $opened_path = stream_get_meta_data($this->handle)['uri']; // @codeCoverageIgnore
+                }
+                return !!$this->handle;
+            }
+
+            public function stream_read($count)
+            {
+                if (!$this->prepend && $this->require && ftell($this->handle) === 0) {
+                    $this->prepend = true;
+                    return self::DECLARE_TICKS;
+                }
+                return fread($this->handle, $count);
+            }
+
+            public function stream_stat()
+            {
+                $stat = fstat($this->handle);
+                if ($this->require) {
+                    $decsize = strlen(self::DECLARE_TICKS);
+                    $stat[7] += $decsize;
+                    $stat['size'] += $decsize;
+                }
+                return $stat;
+            }
+
+            public function stream_set_option($option, $arg1, $arg2)
+            {
+                // Windows の file スキームでは呼ばれない？（確かにブロッキングやタイムアウトは無縁そう）
+                // @codeCoverageIgnoreStart
+                switch ($option) {
+                    default:
+                        throw new \Exception();
+                    case STREAM_OPTION_BLOCKING:
+                        return stream_set_blocking($this->handle, $arg1);
+                    case STREAM_OPTION_READ_TIMEOUT:
+                        return stream_set_timeout($this->handle, $arg1, $arg2);
+                    case STREAM_OPTION_READ_BUFFER:
+                        return stream_set_read_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
+                    case STREAM_OPTION_WRITE_BUFFER:
+                        return stream_set_write_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
+                }
+                // @codeCoverageIgnoreEnd
+            }
+
+            public function stream_metadata($path, $option, $value)
+            {
+                switch ($option) {
+                    default:
+                        throw new \Exception(); // @codeCoverageIgnore
+                    case STREAM_META_TOUCH:
+                        return $this->touch($path, ...$value);
+                    case STREAM_META_ACCESS:
+                        return $this->chmod($path, $value);
+                    case STREAM_META_OWNER_NAME:
+                    case STREAM_META_OWNER:
+                        return $this->chown($path, $value);
+                    case STREAM_META_GROUP_NAME:
+                    case STREAM_META_GROUP:
+                        return $this->chgrp($path, $value);
+                }
+            }
+
+            public function stream_cast($cast_as) { /* @todo I'm not sure */ }
+        };
 
         $profiler = new class(get_class($declareProtocol), $options) implements \IteratorAggregate {
             private $result = [];
@@ -2077,7 +2065,7 @@ class Utility
      * Example:
      * ```php
      * // 0.01 秒を 10 回回すので 0.1 秒は超える
-     * that(timer(function(){usleep(10 * 1000);}, 10))->greaterThan(0.1);
+     * that(timer(function () {usleep(10 * 1000);}, 10))->greaterThan(0.1);
      * ```
      *
      * @param callable $callable 処理クロージャ
@@ -2111,7 +2099,7 @@ class Utility
      * // intval と int キャストはどちらが早いか調べる
      * benchmark([
      *     'intval',
-     *     'intcast' => function($v){return (int)$v;},
+     *     'intcast' => fn($v) => (int) $v,
      * ], ['12345'], 10);
      * ```
      *

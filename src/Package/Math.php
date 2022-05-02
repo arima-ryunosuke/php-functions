@@ -372,7 +372,7 @@ class Math
     public static function normal_rand($average = 0.0, $std_deviation = 1.0)
     {
         static $z2, $rand_max, $generate = true;
-        $rand_max = $rand_max ?? mt_getrandmax();
+        $rand_max ??= mt_getrandmax();
         $generate = !$generate;
 
         if ($generate) {

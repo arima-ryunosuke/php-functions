@@ -22,7 +22,7 @@ class FunchandTest extends AbstractTestCase
     function test_nbind_arity()
     {
         // 引数を7個要求するクロージャ
-        $func7 = function ($_0, $_1, $_2, $_3, $_4, $_5, $_6) { return func_get_args(); };
+        $func7 = fn($_0, $_1, $_2, $_3, $_4, $_5, $_6) => func_get_args();
         $func6 = (nbind)($func7, 6, 'g');// 引数を6個要求するクロージャ
         $func5 = (nbind)($func6, 5, 'f');// 引数を5個要求するクロージャ
         $func4 = (nbind)($func5, 4, 'e');// 引数を4個要求するクロージャ
@@ -109,7 +109,7 @@ class FunchandTest extends AbstractTestCase
             'new'        => [], // 文字列化できないので個別にテストする
             'clone'      => [], // 文字列化できないので個別にテストする
         ];
-        $ve = function ($v) { return var_export($v, true); };
+        $ve = fn($v) => var_export($v, true);
         foreach ($operators as $op => $argss) {
             foreach ($argss as $args) {
                 $n = count($args);
@@ -178,7 +178,7 @@ class FunchandTest extends AbstractTestCase
     function test_reflect_callable()
     {
         // タイプ 0: クロージャ
-        that((reflect_callable)(function () { }))->isInstanceOf('\ReflectionFunction');
+        that((reflect_callable)(fn() => null))->isInstanceOf('\ReflectionFunction');
 
         // タイプ 1: 単純なコールバック
         that((reflect_callable)('strlen'))->isInstanceOf('\ReflectionFunction');
@@ -261,14 +261,14 @@ class FunchandTest extends AbstractTestCase
 
     function test_call_safely()
     {
-        $h = function () { };
+        $h = fn() => null;
         set_error_handler($h);
 
         // 正常なら返り値を返す
-        that((call_safely)(function ($v) { return $v; }, 999))->is(999);
+        that((call_safely)(fn($v) => $v, 999))->is(999);
 
         // エラーが出たら例外を投げる
-        that(call_safely)->try(function () { return (string) []; })->wasThrown('Array to string conversion');
+        that(call_safely)->try(fn() => (string) [])->wasThrown('Array to string conversion');
 
         // @で抑制した場合は例外は飛ばない
         that((call_safely)(function () {
@@ -277,7 +277,7 @@ class FunchandTest extends AbstractTestCase
         }))->isSame(null);
 
         // エラーハンドラが戻っている
-        that(set_error_handler(function () { }))->isSame($h);
+        that(set_error_handler(fn() => null))->isSame($h);
         restore_error_handler();
 
         restore_error_handler();
@@ -303,18 +303,18 @@ class FunchandTest extends AbstractTestCase
 
     function test_is_bindable_closure()
     {
-        function _global_nostatic_closure() { return function () { return get_class($this); }; }
+        function _global_nostatic_closure() { return fn() => get_class($this); }
 
-        function _global_static_closure() { return static function () { return get_class($this); }; }
+        function _global_static_closure() { return static fn() => get_class($this); }
 
         $class = new class {
-            public function _nostatic_nostatic_closure() { return function () { return get_class($this); }; }
+            public function _nostatic_nostatic_closure() { return fn() => get_class($this); }
 
-            public function _nostatic_static_closure() { return static function () { return get_class($this); }; }
+            public function _nostatic_static_closure() { return static fn() => get_class($this); }
 
-            public static function _static_nostatic_closure() { return function () { return get_class($this); }; }
+            public static function _static_nostatic_closure() { return fn() => get_class($this); }
 
-            public static function _static_static_closure() { return static function () { return get_class($this); }; }
+            public static function _static_static_closure() { return static fn() => get_class($this); }
         };
 
         that((is_bindable_closure)(_global_nostatic_closure()))->isTrue();
@@ -354,16 +354,16 @@ class FunchandTest extends AbstractTestCase
         that((new \ReflectionFunction('count'))->invokeArgs([$object]))->is(1);
         that((new \ReflectionMethod($object, 'count'))->invokeArgs($object, []))->is(0);
 
-        that((function () use ($object) { return count($object); })())->is(1);
-        that((function () use ($object) { return $object->count(); })())->is(0);
+        that((fn() => count($object))())->is(1);
+        that((fn() => $object->count())())->is(0);
 
         that(by_builtin)->try('', '')->wasThrown('backtrace');
     }
 
     function test_namedcallize()
     {
-        $f1 = function ($x, $a = 1) { return get_defined_vars(); };
-        $f2 = function ($x, ...$args) { return get_defined_vars(); };
+        $f1 = fn($x, $a = 1) => get_defined_vars();
+        $f2 = fn($x, ...$args) => get_defined_vars();
 
         // 単純呼び出し
         that((namedcallize)($f1)(['x' => 0]))->is([
@@ -487,9 +487,9 @@ class FunchandTest extends AbstractTestCase
             \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
             \Exception::class        => new \Exception('hoge'),
             \RuntimeException::class => new \RuntimeException('hoge'),
-            '$array'                 => function (\ArrayObject $ao) { return (array) $ao; },
+            '$array'                 => fn(\ArrayObject $ao) => (array) $ao,
             '$method'                => \Closure::fromCallable([$ao, 'getArrayCopy']),
-            '$closure'               => function () { return (array) $this; },
+            '$closure'               => fn() => (array) $this,
             6                        => 'default1',
             '$misc'                  => ['x', 'y', 'z'],
         ]);
@@ -534,7 +534,7 @@ class FunchandTest extends AbstractTestCase
         that($strlen('abc', null, 'dummy'))->is(3);
 
         // 可変引数
-        $variadic = function (...$v) { return $v; };
+        $variadic = fn(...$v) => $v;
         $vcall = (func_user_func_array)($variadic);
         that($vcall('abc', null, 'dummy'))->is(['abc', null, 'dummy']);
 
@@ -547,7 +547,7 @@ class FunchandTest extends AbstractTestCase
 
     function test_func_wiring()
     {
-        $closure = function ($a, $b, \Exception $c = null) { return func_get_args(); };
+        $closure = fn($a, $b, \Exception $c = null) => func_get_args();
         $new_closure = (func_wiring)($closure, [
             \LogicException::class  => null,
             \DomainException::class => null,

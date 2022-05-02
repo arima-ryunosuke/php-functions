@@ -356,7 +356,7 @@ class Classobj
      * Example:
      * ```php
      * // Y1 extends X1 だとしてクラス定義でオーバーライドする
-     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function () {
      *     // アンスコがついたクラスが定義されるのでそれを継承して定義する
      *     class X1d extends \ryunosuke\Test\Package\Classobj\X1_
      *     {
@@ -375,12 +375,10 @@ class Classobj
      * that((new \ryunosuke\Test\Package\Classobj\Y1())->newmethod())->isSame('this is newmethod');
      *
      * // Y2 extends X2 だとしてクロージャ配列でオーバーライドする
-     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
-     *     return [
-     *         'method'    => function(){return 'this is X2d';},
-     *         'newmethod' => function(){return 'this is newmethod';},
-     *     ];
-     * });
+     * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', fn() => [
+     *     'method'    => function () {return 'this is X2d';},
+     *     'newmethod' => function () {return 'this is newmethod';},
+     * ]);
      * // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
      * that((new \ryunosuke\Test\Package\Classobj\Y2())->method())->isSame('this is X2d');
      * that((new \ryunosuke\Test\Package\Classobj\Y2())->newmethod())->isSame('this is newmethod');
@@ -388,7 +386,7 @@ class Classobj
      * // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
      * class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
      *     [\ryunosuke\Test\Package\Classobj\XTrait::class],
-     *     'method' => function(){return 'this is X3d';},
+     *     'method' => function () {return 'this is X3d';},
      * ]);
      * // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
      * that((new \ryunosuke\Test\Package\Classobj\Y3())->method())->isSame('this is X3d');
@@ -540,8 +538,8 @@ class Classobj
      * // Exception に「count」メソッドと「コードとメッセージを結合して返す」メソッドを動的に生やす
      * $object = new \Exception('hoge', 123);
      * $newobject = class_extends($object, [
-     *     'count'       => function() { return $this->code; },
-     *     'codemessage' => function() {
+     *     'count'       => function () { return $this->code; },
+     *     'codemessage' => function () {
      *         // bind されるので protected フィールドが使える
      *         return $this->code . ':' . $this->message;
      *     },
@@ -553,7 +551,7 @@ class Classobj
      * // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
      * $object = new \ArrayObject([1, 2, 3]);
      * $newobject = class_extends($object, [
-     *     'count' => function() {
+     *     'count' => function () {
      *         // parent は元オブジェクトを表す
      *         return parent::count() * 2;
      *     },
@@ -1024,7 +1022,7 @@ class Classobj
 
                 if ($sort) {
                     static $orders = null;
-                    $orders = $orders ?? array_flip(array_keys(self::PSEUDO));
+                    $orders ??= array_flip(array_keys(self::PSEUDO));
                     uksort($types, function ($a, $b) use ($orders) {
                         $issetA = isset($orders[$a]);
                         $issetB = isset($orders[$b]);
@@ -1174,7 +1172,7 @@ class Classobj
     public static function get_class_constants($class, $filter = null)
     {
         $class = ltrim(is_object($class) ? get_class($class) : $class, '\\');
-        $filter = $filter ?? (IS_PUBLIC | IS_PROTECTED | IS_PRIVATE);
+        $filter ??= (IS_PUBLIC | IS_PROTECTED | IS_PRIVATE);
 
         $result = [];
         foreach ((new \ReflectionClass($class))->getReflectionConstants() as $constant) {

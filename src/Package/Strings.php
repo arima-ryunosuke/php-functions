@@ -144,7 +144,7 @@ class Strings
         if ($limit === 0) {
             $limit = 1;
         }
-        $delimiter = array_map(function ($v) { return preg_quote($v, '#'); }, (arrayize)($delimiter));
+        $delimiter = array_map(fn($v) => preg_quote($v, '#'), (arrayize)($delimiter));
         return preg_split('#' . implode('|', $delimiter) . '#', $string, $limit);
     }
 
@@ -836,7 +836,7 @@ class Strings
 
         $repkeys = array_keys($mapping);
         $counter = array_fill_keys($repkeys, 0);
-        $patterns = array_map(function ($k) { return preg_quote($k, '#'); }, $repkeys);
+        $patterns = array_map(fn($k) => preg_quote($k, '#'), $repkeys);
 
         $i_flag = $case_insensitivity ? 'i' : '';
         return preg_replace_callback("#" . implode('|', $patterns) . "#u$i_flag", function ($matches) use (&$counter, $mapping, $case_insensitivity) {
@@ -897,7 +897,7 @@ class Strings
 
         // 長いキーから処理するためソートしておく
         $replacemap = (arrayval)($replacemap, false);
-        uksort($replacemap, function ($a, $b) { return strlen($b) - strlen($a); });
+        uksort($replacemap, fn($a, $b) => strlen($b) - strlen($a));
         $srcs = array_keys($replacemap);
 
         $counter = array_fill_keys(array_keys($replacemap), 0);
@@ -1032,7 +1032,7 @@ class Strings
         }
 
         $length = $width - $markerlen;
-        $pos = $pos ?? $length / 2;
+        $pos ??= $length / 2;
         if ($pos < 0) {
             $pos += $length;
         }
@@ -1163,11 +1163,11 @@ class Strings
                 }
                 if (is_string($stringfy) && preg_match('#unified(=(\d+))?#', $stringfy, $m)) {
                     $block_size = isset($m[2]) ? (int) $m[2] : null;
-                    $stringfy = function ($diff) use ($block_size) { return $this->unified($diff, $block_size); };
+                    $stringfy = fn($diff) => $this->unified($diff, $block_size);
                 }
                 if (is_string($stringfy) && preg_match('#html(=(.+))?#', $stringfy, $m)) {
                     $mode = $m[2] ?? null;
-                    $stringfy = function ($diff) use ($mode) { return $this->html($diff, $mode); };
+                    $stringfy = fn($diff) => $this->html($diff, $mode);
                 }
 
                 if (isset($block_size)) {
@@ -1381,7 +1381,7 @@ class Strings
                     if (isset($rule[$diff[0]])) {
                         $difftext = [];
                         foreach ($rule[$diff[0]][1] as $n => $sign) {
-                            $difftext[] = implode("\n", array_map(function ($v) use ($sign) { return $sign . $v; }, $diff[$n]));
+                            $difftext[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
                         }
                         $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
                         $result[] = implode("\n---\n", $difftext);
@@ -1413,10 +1413,10 @@ class Strings
                 $result = ["***************"];
                 foreach ($rules as $key => $rule) {
                     $result[] = $rule['header'];
-                    if (array_filter($diffs, function ($d) use ($key) { return strpos($key, $d[0]) !== false; })) {
+                    if (array_filter($diffs, fn($d) => strpos($key, $d[0]) !== false)) {
                         foreach ($diffs as $diff) {
                             foreach ($rule[$diff[0]] ?? [] as $n => $sign) {
-                                $result[] = implode("\n", array_map(function ($v) use ($sign) { return $sign . $v; }, $diff[$n]));
+                                $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
                             }
                         }
                     }
@@ -1443,7 +1443,7 @@ class Strings
                 ];
                 foreach ($diffs as $diff) {
                     foreach ($rule[$diff[0]] as $n => $sign) {
-                        $result[] = implode("\n", array_map(function ($v) use ($sign) { return $sign . $v; }, $diff[$n]));
+                        $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
                     }
                 }
                 return implode("\n", $result);
@@ -1452,7 +1452,7 @@ class Strings
             private function html($diffs, $mode)
             {
                 $htmlescape = function ($v) use (&$htmlescape) { return is_array($v) ? array_map($htmlescape, $v) : htmlspecialchars($v, ENT_QUOTES); };
-                $taging = function ($tag, $content) { return strlen($tag) && strlen($content) ? "<$tag>$content</$tag>" : $content; };
+                $taging = fn($tag, $content) => strlen($tag) && strlen($content) ? "<$tag>$content</$tag>" : $content;
 
                 $rule = [
                     '+' => [2 => 'ins'],
@@ -1496,8 +1496,8 @@ class Strings
 
             private function block($diffs, $block_size)
             {
-                $head = function ($array) use ($block_size) { return array_slice($array, 0, $block_size, true); };
-                $tail = function ($array) use ($block_size) { return array_slice($array, -$block_size, null, true); };
+                $head = fn($array) => array_slice($array, 0, $block_size, true);
+                $tail = fn($array) => array_slice($array, -$block_size, null, true);
 
                 $blocks = [];
                 $block = [];
@@ -2092,9 +2092,7 @@ class Strings
             $selector = [$selector => ''];
         }
 
-        $html = static function ($string) {
-            return htmlspecialchars($string, ENT_QUOTES);
-        };
+        $html = static fn($string) => htmlspecialchars($string, ENT_QUOTES);
 
         $build = static function ($selector, $content, $escape) use ($html) {
             $p = min((strpos_array)($selector, ['#', '.', '[', '{']) ?: [strlen($selector)]);
@@ -2115,9 +2113,7 @@ class Strings
                     $v = $html($k);
                 }
                 elseif (is_array($v)) {
-                    $v = 'style="' . (array_sprintf)($v, function ($style, $key) {
-                            return is_int($key) ? $style : "$key:$style";
-                        }, ';') . '"';
+                    $v = 'style="' . (array_sprintf)($v, fn($style, $key) => is_int($key) ? $style : "$key:$style", ';') . '"';
                 }
                 else {
                     $v = sprintf('%s="%s"', $html($k), $html(preg_replace('#^([\"\'])|([^\\\\])([\"\'])$#u', '$2', $v)));
@@ -2469,7 +2465,7 @@ class Strings
      */
     public static function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738)
     {
-        $arg_separator = $arg_separator ?? ini_get('arg_separator.output');
+        $arg_separator ??= ini_get('arg_separator.output');
 
         if ($numeric_prefix === null || ctype_digit(trim($numeric_prefix, '-+'))) {
             $REGEX = '%5B\d+%5D';
@@ -2556,9 +2552,7 @@ class Strings
         };
 
         if ($options['process_sections']) {
-            return (array_sprintf)($iniarray, function ($v, $k) use ($generate) {
-                return "[$k]\n{$generate($v)}\n";
-            }, "\n");
+            return (array_sprintf)($iniarray, fn($v, $k) => "[$k]\n{$generate($v)}\n", "\n");
         }
 
         return $generate($iniarray) . "\n";
@@ -2726,9 +2720,7 @@ class Strings
                         mb_convert_variables($encoding, $mb_internal_encoding, $headerline);
                     }
                     if ($structure) {
-                        $headerline = array_map(function ($header) {
-                            return preg_replace('#\[\d+]$#imu', '[]', $header);
-                        }, $headerline);
+                        $headerline = array_map(fn($header) => preg_replace('#\[\d+]$#imu', '[]', $header), $headerline);
                     }
                     $size += fputcsv($fp, $headerline, $delimiter, $enclosure, $escape);
                 }
@@ -2970,6 +2962,7 @@ class Strings
         $options += [
             JSON_UNESCAPED_UNICODE      => true, // エスケープなしで特にデメリットはない
             JSON_PRESERVE_ZERO_FRACTION => true, // 勝手に変換はできるだけ避けたい
+            JSON_THROW_ON_ERROR         => true, // 標準動作はエラーすら出ずに false を返すだけ
         ];
         $es5 = (array_unset)($options, JSON_ES5, false);
         $comma = (array_unset)($options, JSON_TRAILING_COMMA, false);
@@ -2980,10 +2973,6 @@ class Strings
         $inline_level = (array_unset)($options, JSON_INLINE_LEVEL, 0);
         $inline_scalarlist = (array_unset)($options, JSON_INLINE_SCALARLIST, false);
 
-        // for compatible
-        if (defined('JSON_THROW_ON_ERROR')) {
-            $options[JSON_THROW_ON_ERROR] = true;
-        }
         $option = array_sum(array_keys(array_filter($options)));
 
         $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $inline_scalarlist, $inline_level, $es5, $comma, $comment) {
@@ -3007,7 +2996,7 @@ class Strings
 
                 $withoutcommentarray = $value;
                 if ($es5 && strlen($comment)) {
-                    $withoutcommentarray = array_filter($withoutcommentarray, function ($k) use ($comment) { return strpos("$k", $comment) === false; }, ARRAY_FILTER_USE_KEY);
+                    $withoutcommentarray = array_filter($withoutcommentarray, fn($k) => strpos("$k", $comment) === false, ARRAY_FILTER_USE_KEY);
                 }
 
                 $objective = $force_object || $objective || (is_hasharray)($withoutcommentarray);
@@ -3019,7 +3008,7 @@ class Strings
                 $inline = false;
                 if ($inline_level) {
                     if (is_array($inline_level)) {
-                        $inline = $inline || (fnmatch_or)(array_map(function ($v) { return "$v.*"; }, $inline_level), implode('.', $parents) . '.');
+                        $inline = $inline || (fnmatch_or)(array_map(fn($v) => "$v.*", $inline_level), implode('.', $parents) . '.');
                     }
                     elseif (ctype_digit("$inline_level")) {
                         $inline = $inline || $inline_level <= $nest;
@@ -3029,7 +3018,7 @@ class Strings
                     }
                 }
                 if ($inline_scalarlist) {
-                    $inline = $inline || !$objective && (array_all)($value, function ($v) { return (is_primitive)($v) || $v instanceof \Closure; });
+                    $inline = $inline || !$objective && (array_all)($value, fn($v) => (is_primitive)($v) || $v instanceof \Closure);
                 }
 
                 $break = $indent0 = $indent1 = $indent2 = $separator = '';
@@ -3101,17 +3090,11 @@ class Strings
 
         // 特別な状況（クロージャを使うとか ES5 でないとか）以外は 標準を使用したほうが遥かに速い
         if ($indent || $closure || $inline_scalarlist || $inline_level || $es5 || $comma || $comment) {
-            $result = $encode($value, [], false);
+            return $encode($value, [], false);
         }
         else {
-            $result = json_encode($value, $option, $depth);
-            // for compatible
-            if (json_last_error()) {
-                throw new \ErrorException(json_last_error_msg(), json_last_error()); // @codeCoverageIgnore
-            }
+            return json_encode($value, $option, $depth);
         }
-
-        return $result;
     }
 
     /**
@@ -3216,10 +3199,8 @@ class Strings
                         if ($tokens[$brace][1] !== '{' && $token[1] === '}' || $tokens[$brace][1] !== '[' && $token[1] === ']') {
                             throw $this->exception("Mismatch", $token);
                         }
-                        $block = array_filter(array_slice(array_splice($tokens, $brace + 1, $i - $brace, []), 0, -1), function ($token) {
-                            return !(is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_BAD_CHARACTER], true));
-                        });
-                        $elements = (array_explode)($block, function ($token) { return is_array($token) && $token[1] === ','; });
+                        $block = array_filter(array_slice(array_splice($tokens, $brace + 1, $i - $brace, []), 0, -1), fn($token) => !(is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_BAD_CHARACTER], true)));
+                        $elements = (array_explode)($block, fn($token) => is_array($token) && $token[1] === ',');
                         // for trailing comma
                         if ($elements && !$elements[count($elements) - 1]) {
                             array_pop($elements);
@@ -3232,7 +3213,7 @@ class Strings
                         if ($token[1] === '}') {
                             $object = $this->token('object', $tokens[$brace][3], $token[3] + strlen($token[1]));
                             foreach ($elements as $element) {
-                                $keyandval = (array_explode)($element, function ($token) { return is_array($token) && $token[1] === ':'; });
+                                $keyandval = (array_explode)($element, fn($token) => is_array($token) && $token[1] === ':');
                                 // check no colon (e.g. {123})
                                 if (count($keyandval) !== 2) {
                                     throw $this->exception("Missing object key", (first_value)($keyandval[0]));
@@ -3371,18 +3352,18 @@ class Strings
                     default:
                         throw new \DomainException(); // @codeCoverageIgnore
                     case 'array':
-                        return array_map(function ($value) use ($options) { return $value->value($options); }, $this->values);
+                        return array_map(fn($value) => $value->value($options), $this->values);
                     case 'object':
                         $array = array_combine(
-                            array_map(function ($value) use ($options) { return $value->value($options); }, $this->keys),
-                            array_map(function ($value) use ($options) { return $value->value($options); }, $this->values)
+                            array_map(fn($value) => $value->value($options), $this->keys),
+                            array_map(fn($value) => $value->value($options), $this->values)
                         );
                         return $options[JSON_OBJECT_AS_ARRAY] ? $array : (object) $array;
                     case 'key':
                         $token = substr($this->json_string, $this->begin_position, $this->end_position - $this->begin_position);
                         $token = trim($token, chr(0xC2) . chr(0xA0) . " \n\r\t\v\x00\x0c");
                         if (preg_match('/^(?:[\$_\p{L}\p{Nl}]|\\\\u[0-9A-Fa-f]{4})(?:[\$_\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}‌‍]|\\\\u[0-9A-Fa-f]{4})*/u', $token)) {
-                            $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', function ($m) { return json_decode('"' . $m[0] . '"'); }, $token);
+                            $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', fn($m) => json_decode('"' . $m[0] . '"'), $token);
                             return $token;
                         }
                         if (($string = $stringify($token)) !== null) {
@@ -3575,7 +3556,7 @@ class Strings
         static $caches = [];
         if ($options['cache']) {
             $key = $pamlstring . json_encode($options);
-            return $caches[$key] = $caches[$key] ?? (paml_import)($pamlstring, ['cache' => false] + $options);
+            return $caches[$key] ??= (paml_import)($pamlstring, ['cache' => false] + $options);
         }
 
         $resolve = function (&$value) use ($options) {
@@ -3701,7 +3682,7 @@ class Strings
     {
         $options += [
             'escape' => '\\',
-            'encode' => function ($v) { return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); },
+            'encode' => fn($v) => json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
         ];
         $escape = $options['escape'];
         $encode = $options['encode'];
@@ -3774,7 +3755,7 @@ class Strings
     {
         $options += [
             'escape' => '\\',
-            'decode' => function ($v) { return json_decode($v, true); },
+            'decode' => fn($v) => json_decode($v, true),
         ];
         $escape = $options['escape'];
         $decode = $options['decode'];
@@ -4214,7 +4195,7 @@ class Strings
      * that($m)->isSame(['123']);
      *
      * // callable だと preg_replace_callback が呼ばれる
-     * that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))->isSame('ABC123');
+     * that(preg_splice('#[a-z]+#', fn($m) => strtoupper($m[0]), 'abc123', $m))->isSame('ABC123');
      * that($m)->isSame(['abc']);
      *
      * // ただし、 文字列 callable は文字列として扱う
@@ -4257,11 +4238,11 @@ class Strings
      * // 名前付きキャプチャも指定できる
      * that(preg_replaces('#a(?<digit>\d+)z#', ['digit' => 'XXX'], 'a123z'))->isSame('aXXXz');
      * // クロージャを渡すと元文字列を引数としてコールバックされる
-     * that(preg_replaces('#a(?<digit>\d+)z#', ['digit' => function($src){return $src * 2;}], 'a123z'))->isSame('a246z');
+     * that(preg_replaces('#a(?<digit>\d+)z#', ['digit' => fn($src) => $src * 2], 'a123z'))->isSame('a246z');
      * // 複合的なサンプル（a タグの href と target 属性を書き換える）
      * that(preg_replaces('#<a\s+href="(?<href>.*)"\s+target="(?<target>.*)">#', [
-     *     'href'   => function($href){return strtoupper($href);},
-     *     'target' => function($target){return strtoupper($target);},
+     *     'href'   => fn($href) => strtoupper($href),
+     *     'target' => fn($target) => strtoupper($target),
      * ], '<a href="hoge" target="fuga">inner text</a>'))->isSame('<a href="HOGE" target="FUGA">inner text</a>');
      * ```
      *
@@ -4498,9 +4479,7 @@ class Strings
             $percent = reset($result);
         }
         else {
-            return array_map('strval', array_keys(array_filter($result, function ($score) use ($percent) {
-                return $score >= $percent;
-            })));
+            return array_map('strval', array_keys(array_filter($result, fn($score) => $score >= $percent)));
         }
 
         return (string) key($result);
@@ -4883,7 +4862,7 @@ class Strings
         }
 
         $template = '"' . implode('', array_column($tokens, 1)) . '"';
-        return (evaluate)("return $template;", $vars + [$embed => function ($v) { return $v; }]);
+        return (evaluate)("return $template;", $vars + [$embed => fn($v) => $v]);
     }
 
     /**
@@ -4908,7 +4887,7 @@ class Strings
      * // 数値キーが参照できる
      * that(render_string('${0}', ['number']))->isSame('number');
      * // クロージャは呼び出し結果が埋め込まれる
-     * that(render_string('$c', ['c' => function($vars, $k){return $k . '-closure';}]))->isSame('c-closure');
+     * that(render_string('$c', ['c' => fn($vars, $k) => $k . '-closure']))->isSame('c-closure');
      * // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
      * that(render_string('{$_(123 + 456)}', []))->isSame('579');
      * // 要するに '$_()' の中に php の式が書けるようになる
@@ -4936,7 +4915,7 @@ class Strings
         }
         // '_' はそのまま返すクロージャとする（キーがないときのみ）
         if (!array_key_exists('_', $vars)) {
-            $vars['_'] = function ($v) { return $v; };
+            $vars['_'] = fn($v) => $v;
         }
 
         try {

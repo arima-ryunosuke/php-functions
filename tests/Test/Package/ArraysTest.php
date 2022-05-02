@@ -194,7 +194,7 @@ class ArraysTest extends AbstractTestCase
         that((kvsort)($array))->isSame($array);
 
         // キーでソートできる
-        that(array_keys((kvsort)($array, function ($av, $bv, $ak, $bk) { return strcmp($bk, $ak); })))->isSame(array_reverse(array_keys($array)));
+        that(array_keys((kvsort)($array, fn($av, $bv, $ak, $bk) => strcmp($bk, $ak))))->isSame(array_reverse(array_keys($array)));
 
         // 負数定数でリバースソートになる
         that((kvsort)([1, 2, 3, 4, 5], -SORT_NUMERIC))->isSame(array_reverse([1, 2, 3, 4, 5], true));
@@ -210,7 +210,7 @@ class ArraysTest extends AbstractTestCase
 
         // 上記は挙動のテストであってソートのテストを行っていないのでテスト
         $array = array_combine(range('a', 'z'), range('a', 'z'));
-        that((kvsort)((array_shuffle)($array), function ($a, $b) { return strcmp($a, $b); }))->isSame($array);
+        that((kvsort)((array_shuffle)($array), fn($a, $b) => strcmp($a, $b)))->isSame($array);
     }
 
     function test_array_add()
@@ -444,9 +444,7 @@ class ArraysTest extends AbstractTestCase
             3 => $r3 = ['id' => 3, 'name' => 'C'],
             4 => $r4 = ['id' => 4, 'name' => 'D'],
         ];
-        that((array_explode)($rows, function ($v, $k) {
-            return $k === 3 && $v['name'] === 'C';
-        }))->is([[1 => $r1, 2 => $r2], [4 => $r4]]);
+        that((array_explode)($rows, fn($v, $k) => $k === 3 && $v['name'] === 'C'))->is([[1 => $r1, 2 => $r2], [4 => $r4]]);
     }
 
     function test_array_sprintf()
@@ -456,11 +454,11 @@ class ArraysTest extends AbstractTestCase
         that((array_sprintf)($array, '%s:%s'))->is(['A:a', 'B:b', 'C:c']);
         that((array_sprintf)($array, '%s:%s', ','))->is('A:a,B:b,C:c');
 
-        that((array_sprintf)($array, function ($v) { return "v-$v"; }))->is(['v-A', 'v-B', 'v-C']);
-        that((array_sprintf)($array, function ($v) { return "v-$v"; }, ','))->is('v-A,v-B,v-C');
+        that((array_sprintf)($array, fn($v) => "v-$v"))->is(['v-A', 'v-B', 'v-C']);
+        that((array_sprintf)($array, fn($v) => "v-$v", ','))->is('v-A,v-B,v-C');
 
-        that((array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }))->is(['kv-aA', 'kv-bB', 'kv-cC']);
-        that((array_sprintf)($array, function ($v, $k) { return "kv-$k$v"; }, ','))->is('kv-aA,kv-bB,kv-cC');
+        that((array_sprintf)($array, fn($v, $k) => "kv-$k$v"))->is(['kv-aA', 'kv-bB', 'kv-cC']);
+        that((array_sprintf)($array, fn($v, $k) => "kv-$k$v", ','))->is('kv-aA,kv-bB,kv-cC');
 
         that((array_sprintf)([
             'str:%s,int:%d' => ['sss', '3.14'],
@@ -566,13 +564,13 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // キーが数値でないものを抽出
-        that((array_get)($array, function ($v, $k) { return !is_int($k); }, []))->is([
+        that((array_get)($array, fn($v, $k) => !is_int($k), []))->is([
             'key1' => 'value1',
             'key2' => 'value2',
         ]);
 
         // キーが数値のものを抽出
-        that((array_get)($array, function ($v, $k) { return is_int($k); }, []))->is([
+        that((array_get)($array, fn($v, $k) => is_int($k), []))->is([
             0   => 'first',
             1   => 'second',
             2   => 'third',
@@ -582,10 +580,10 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // 単値モード
-        that((array_get)($array, function ($v, $k) { return is_int($k); }))->is('first');
+        that((array_get)($array, fn($v, $k) => is_int($k)))->is('first');
 
         // 値がオブジェクトのものを抽出（そんなものはない）
-        that((array_get)($array, function ($v, $k) { return is_object($v); }))->is(null);
+        that((array_get)($array, fn($v, $k) => is_object($v)))->is(null);
     }
 
     function test_array_set()
@@ -629,13 +627,9 @@ class ArraysTest extends AbstractTestCase
 
         // condition
         $array = ['a' => 'A', 'B'];
-        that((array_put)($array, 'Z', null, function ($v, $k, $array) {
-            return !in_array($v, $array);
-        }))->is(1);
+        that((array_put)($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(1);
         that($array)->is(['a' => 'A', 'B', 'Z']);
-        that((array_put)($array, 'Z', null, function ($v, $k, $array) {
-            return !in_array($v, $array);
-        }))->is(false);
+        that((array_put)($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(false);
         that($array)->is(['a' => 'A', 'B', 'Z']);
 
         // array
@@ -692,7 +686,7 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // まずキーが数値でないものを抽出
-        that((array_unset)($array, function ($v, $k) { return !is_int($k); }))->is([
+        that((array_unset)($array, fn($v, $k) => !is_int($k)))->is([
             'key1' => 'value1',
             'key2' => 'value2',
         ]);
@@ -706,7 +700,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // さらに値が100以上のものを抽出
-        that((array_unset)($array, function ($v, $k) { return intval($v) >= 100; }))->is([
+        that((array_unset)($array, fn($v, $k) => intval($v) >= 100))->is([
             100 => 100,
             101 => 101,
         ]);
@@ -718,7 +712,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // さらに値が "second" のものを抽出
-        that((array_unset)($array, function ($v, $k) { return $v === 'second'; }))->is([
+        that((array_unset)($array, fn($v, $k) => $v === 'second'))->is([
             1 => 'second',
         ]);
         that($array)->is([
@@ -728,7 +722,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // さらに値がオブジェクトのものを抽出（そんなものはない）
-        that((array_unset)($array, function ($v, $k) { return is_object($v); }))->is(null);
+        that((array_unset)($array, fn($v, $k) => is_object($v)))->is(null);
         that($array)->is([
             'first',
             2  => 'third',
@@ -736,7 +730,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // さらにキー数値のものを抽出（全て）
-        that((array_unset)($array, function ($v, $k) { return is_int($k); }))->is([
+        that((array_unset)($array, fn($v, $k) => is_int($k)))->is([
             'first',
             2  => 'third',
             99 => 99,
@@ -827,19 +821,13 @@ class ArraysTest extends AbstractTestCase
     function test_array_find()
     {
         that((array_find)(['a', 'b', '9'], 'ctype_digit'))->is(2);
-        that((array_find)(['a' => 'A', 'b' => 'B'], function ($v) { return $v === 'B'; }))->is('b');
+        that((array_find)(['a' => 'A', 'b' => 'B'], fn($v) => $v === 'B'))->is('b');
         that((array_find)(['9', 'b', 'c'], 'ctype_digit'))->isSame(0);
-        that((array_find)(['a', 'b', 'c'], function ($v) { }))->isSame(false);
+        that((array_find)(['a', 'b', 'c'], fn($v) => null))->isSame(false);
 
-        that((array_find)(['a', 'b', '9'], function ($v) {
-            return ctype_digit($v) ? false : strtoupper($v);
-        }, false))->is('A');
-        that((array_find)(['9', 'b', 'c'], function ($v) {
-            return ctype_digit($v) ? false : strtoupper($v);
-        }, false))->is('B');
-        that((array_find)([1, 2, 3, 4, -5, -6], function ($v) {
-            return $v < 0 ? abs($v) : false;
-        }, false))->is(5);
+        that((array_find)(['a', 'b', '9'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('A');
+        that((array_find)(['9', 'b', 'c'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('B');
+        that((array_find)([1, 2, 3, 4, -5, -6], fn($v) => $v < 0 ? abs($v) : false, false))->is(5);
     }
 
     function test_array_rekey()
@@ -906,9 +894,7 @@ class ArraysTest extends AbstractTestCase
                 'k1' => 'v1',
                 'k2' => 'v2',
             ],
-        ], function ($v) {
-            return is_array($v) ? (object) $v : strtoupper($v);
-        }, true, true))->is((object) [
+        ], fn($v) => is_array($v) ? (object) $v : strtoupper($v), true, true))->is((object) [
             'k' => 'V',
             'c' => (object) [
                 'k1' => 'V1',
@@ -980,20 +966,16 @@ class ArraysTest extends AbstractTestCase
     {
         that((array_map_key)([' a ' => 'A', ' b ' => 'B'], 'trim'))->is(['a' => 'A', 'b' => 'B']);
         that((array_map_key)(['a' => 'A', 'b' => 'B'], 'strtoupper'))->is(['A' => 'A', 'B' => 'B']);
-        that((array_map_key)(['a' => 'A', 'b' => 'B'], function ($k) {
-            return $k === 'b' ? null : strtoupper($k);
-        }))->is(['A' => 'A']);
-        that((array_map_key)(['a' => 'A', 'b' => 'B'], function ($k, $v) {
-            return $v === 'B' ? null : strtoupper($k);
-        }))->is(['A' => 'A']);
+        that((array_map_key)(['a' => 'A', 'b' => 'B'], fn($k) => $k === 'b' ? null : strtoupper($k)))->is(['A' => 'A']);
+        that((array_map_key)(['a' => 'A', 'b' => 'B'], fn($k, $v) => $v === 'B' ? null : strtoupper($k)))->is(['A' => 'A']);
     }
 
     function test_array_filter_key()
     {
         that((array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], 'ctype_alpha'))->is(['a' => 'A', 'b' => 'B']);
-        that((array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $k === 1; }))->is([1 => 'b']);
-        that((array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v === "b"; }))->is([1 => 'b']);
-        that((array_filter_key)(['a', 'b', 'c'], function ($k, $v) { return $v !== "b"; }))->is(['a', 2 => 'c']);
+        that((array_filter_key)(['a', 'b', 'c'], fn($k, $v) => $k === 1))->is([1 => 'b']);
+        that((array_filter_key)(['a', 'b', 'c'], fn($k, $v) => $v === "b"))->is([1 => 'b']);
+        that((array_filter_key)(['a', 'b', 'c'], fn($k, $v) => $v !== "b"))->is(['a', 2 => 'c']);
     }
 
     function test_array_where()
@@ -1008,9 +990,7 @@ class ArraysTest extends AbstractTestCase
         that((array_where)($array))->is($array);
 
         // シンプルクロージャフィルタ（key === 0 || p を含む）
-        that((array_where)($array, function ($row, $key) {
-            return $key === 0 || strpos($row['name'], 'p') !== false;
-        }))->is([
+        that((array_where)($array, fn($row, $key) => $key === 0 || strpos($row['name'], 'p') !== false))->is([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
         ]);
@@ -1021,24 +1001,18 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // name 値でクロージャフィルタ（'o' を含む）
-        that((array_where)($array, 'name', function ($name) {
-            return strpos($name, 'o') !== false;
-        }))->is([
+        that((array_where)($array, 'name', fn($name) => strpos($name, 'o') !== false))->is([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
         ]);
 
         // id, name 値でクロージャフィルタ（id === 3 && 'o' を含む）
-        that((array_where)($array, ['id', 'name'], function ($id_name) {
-            return $id_name['id'] === 3 && strpos($id_name['name'], 'o') !== false;
-        }))->is([
+        that((array_where)($array, ['id', 'name'], fn($id_name) => $id_name['id'] === 3 && strpos($id_name['name'], 'o') !== false))->is([
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
         ]);
 
         // キーでクロージャフィルタ（key === 2）
-        that((array_where)($array, null, function ($name, $key) {
-            return $key === 2;
-        }))->is([
+        that((array_where)($array, null, fn($name, $key) => $key === 2))->is([
             2 => ['id' => 3, 'name' => 'piyo', 'flag' => false],
         ]);
 
@@ -1057,12 +1031,12 @@ class ArraysTest extends AbstractTestCase
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
         ]);
         that((array_where)($array, ['flag' => 1], true))->is([]);
-        that((array_where)($array, ['name' => function ($name) { return $name === 'hoge'; }, 'flag' => function ($flag) { return !$flag; }]))->is([
+        that((array_where)($array, ['name' => fn($name) => $name === 'hoge', 'flag' => fn($flag) => !$flag]))->is([
             0 => ['id' => 1, 'name' => 'hoge', 'flag' => false],
         ]);
 
         // 例外
-        that(array_where)->try($array, ['flag' => 1], function () { })->wasThrown('must be bool');
+        that(array_where)->try($array, ['flag' => 1], fn() => null)->wasThrown('must be bool');
     }
 
     function test_array_kvmap()
@@ -1122,19 +1096,13 @@ class ArraysTest extends AbstractTestCase
     function test_array_map_filter()
     {
         // strict:false なので 0 が除外される
-        that((array_map_filter)([1, 2, 3, 4, 5], function ($v) {
-            return $v - 3;
-        }, false))->is([-2, -1, '3' => 1, 2]);
+        that((array_map_filter)([1, 2, 3, 4, 5], fn($v) => $v - 3, false))->is([-2, -1, '3' => 1, 2]);
 
         // strict:true なので全て返ってくる
-        that((array_map_filter)([1, 2, 3, 4, 5], function ($v) {
-            return $v - 3;
-        }, true))->is([-2, -1, 0, 1, 2]);
+        that((array_map_filter)([1, 2, 3, 4, 5], fn($v) => $v - 3, true))->is([-2, -1, 0, 1, 2]);
 
         // strict:true は null がフィルタされる
-        that((array_map_filter)([1, 2, 3, 4, 5], function ($v) {
-            return $v === 3 ? null : $v - 3;
-        }, true))->is([-2, -1, '3' => 1, 2]);
+        that((array_map_filter)([1, 2, 3, 4, 5], fn($v) => $v === 3 ? null : $v - 3, true))->is([-2, -1, '3' => 1, 2]);
     }
 
     function test_array_map_method()
@@ -1187,7 +1155,7 @@ class ArraysTest extends AbstractTestCase
             'k2' => 'v2',
             'k3' => 'v3',
         ];
-        that((array_kmap)($array, function ($v, $k, $n) { return "$n:$k-$v"; }))->is([
+        that((array_kmap)($array, fn($v, $k, $n) => "$n:$k-$v"))->is([
             'k1' => '0:k1-v1',
             'k2' => '1:k2-v2',
             'k3' => '2:k3-v3',
@@ -1316,10 +1284,10 @@ class ArraysTest extends AbstractTestCase
     {
         // 普通に使う
         that((array_assort)(['a', 'bb', 'ccc'], [
-            'none'  => function ($v) { return strlen($v) === 0; },
-            'char1' => function ($v) { return strlen($v) === 1; },
-            'char2' => function ($v) { return strlen($v) === 2; },
-            'char3' => function ($v) { return strlen($v) === 3; },
+            'none'  => fn($v) => strlen($v) === 0,
+            'char1' => fn($v) => strlen($v) === 1,
+            'char2' => fn($v) => strlen($v) === 2,
+            'char3' => fn($v) => strlen($v) === 3,
         ]))->is([
             'none'  => [],
             'char1' => [0 => 'a'],
@@ -1329,8 +1297,8 @@ class ArraysTest extends AbstractTestCase
 
         // 複数条件にマッチ
         that((array_assort)(['a', 'bb', 'ccc'], [
-            'rule1' => function () { return true; },
-            'rule2' => function () { return true; },
+            'rule1' => fn() => true,
+            'rule2' => fn() => true,
         ]))->is([
             'rule1' => ['a', 'bb', 'ccc'],
             'rule2' => ['a', 'bb', 'ccc'],
@@ -1342,7 +1310,7 @@ class ArraysTest extends AbstractTestCase
         $array = ['a', 'b', 'c'];
 
         // 普通に使う分には count(array_filter()) と同じ
-        $eq_b = function ($v) { return $v === 'b'; };
+        $eq_b = fn($v) => $v === 'b';
         that((array_count)($array, $eq_b))->is(count(array_filter($array, $eq_b)));
 
         $row1 = ['id' => 1, 'group' => 'A', 'flag' => false];
@@ -1359,14 +1327,12 @@ class ArraysTest extends AbstractTestCase
         that((array_count)($array, (not_func)((array_of)('flag'))))->is(2);
 
         // group: 'B' をカウント。ただし、数値キーの場合のみ
-        that((array_count)($array, function ($v, $k) {
-            return is_int($k) && $v['group'] === 'B';
-        }))->is(1);
+        that((array_count)($array, fn($v, $k) => is_int($k) && $v['group'] === 'B'))->is(1);
 
         // group: 'A', 'B' をそれぞれカウント
         that((array_count)($array, [
-            'A' => function ($v) { return $v['group'] === 'A'; },
-            'B' => function ($v) { return $v['group'] === 'B'; },
+            'A' => fn($v) => $v['group'] === 'A',
+            'B' => fn($v) => $v['group'] === 'B',
         ]))->is([
             'A' => 1,
             'B' => 2,
@@ -1379,15 +1345,9 @@ class ArraysTest extends AbstractTestCase
             ['X', 'Y', 'Z'],
             [[[['a', 'M', 'Z']]]],
         ];
-        $islower = function ($v) {
-            return !is_array($v) && ctype_lower($v);
-        };
-        $isupper = function ($v) {
-            return !is_array($v) && ctype_upper($v);
-        };
-        $isarray = function ($v) {
-            return is_array($v);
-        };
+        $islower = fn($v) => !is_array($v) && ctype_lower($v);
+        $isupper = fn($v) => !is_array($v) && ctype_upper($v);
+        $isarray = fn($v) => is_array($v);
         that((array_count)($array, $islower, true))->is(4);
         that((array_count)($array, $isupper, true))->is(5);
         that((array_count)($array, $isarray, true))->is(7);
@@ -1412,7 +1372,7 @@ class ArraysTest extends AbstractTestCase
             5 => [5],
         ]);
 
-        that((array_group)([1, 2, 3, 4, 5], function ($v) { return $v % 2; }))->is([
+        that((array_group)([1, 2, 3, 4, 5], fn($v) => $v % 2))->is([
             0 => [2, 4],
             1 => [1, 3, 5],
         ]);
@@ -1455,8 +1415,8 @@ class ArraysTest extends AbstractTestCase
     function test_array_aggregate()
     {
         that((array_aggregate)([1, 2, 3, 4, 5], [
-            'min' => function ($v) { return min($v); },
-            'max' => function ($v) { return max($v); },
+            'min' => fn($v) => min($v),
+            'max' => fn($v) => max($v),
         ]))->isSame([
             'min' => 1,
             'max' => 5,
@@ -1469,8 +1429,8 @@ class ArraysTest extends AbstractTestCase
         $array = [$row1, $row2, $row3, $row4];
 
         that((array_aggregate)($array, [
-            'ids'    => function ($rows) { return array_column($rows, 'id'); },
-            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+            'ids'    => fn($rows) => array_column($rows, 'id'),
+            'scores' => fn($rows) => array_sum(array_column($rows, 'score')),
         ], 'group'))->is([
             'A' => [
                 'ids'    => [1, 3, 4],
@@ -1483,10 +1443,10 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         that((array_aggregate)($array, [
-            'scores' => function ($rows, $current) { return array_column($rows, 'score'); },
-            'count'  => function ($rows, $current) { return count($current['scores']); },
-            'sum'    => function ($rows, $current) { return array_sum($current['scores']); },
-            'avg'    => function ($rows, $current) { return $current['sum'] / $current['count']; },
+            'scores' => fn($rows, $current) => array_column($rows, 'score'),
+            'count'  => fn($rows, $current) => count($current['scores']),
+            'sum'    => fn($rows, $current) => array_sum($current['scores']),
+            'avg'    => fn($rows, $current) => $current['sum'] / $current['count'],
         ], 'group'))->is([
             'A' => [
                 'scores' => [2, 3, 2],
@@ -1503,8 +1463,8 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         that((array_aggregate)($array, [
-            'ids'    => function ($rows) { return array_column($rows, 'id'); },
-            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+            'ids'    => fn($rows) => array_column($rows, 'id'),
+            'scores' => fn($rows) => array_sum(array_column($rows, 'score')),
         ], ['group', 'class']))->is([
             'A' => [
                 'H' => [
@@ -1525,8 +1485,8 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         that((array_aggregate)($array, [
-            'ids'    => function ($rows) { return array_column($rows, 'id'); },
-            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
+            'ids'    => fn($rows) => array_column($rows, 'id'),
+            'scores' => fn($rows) => array_sum(array_column($rows, 'score')),
         ], ['group', 'class']))->is([
             'A' => [
                 'H' => [
@@ -1547,9 +1507,9 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         that((array_aggregate)($array, [
-            'ids'    => function ($rows) { return array_column($rows, 'id'); },
-            'scores' => function ($rows) { return array_sum(array_column($rows, 'score')); },
-        ], function ($row) { return $row['group'] . '/' . $row['class']; }))->is([
+            'ids'    => fn($rows) => array_column($rows, 'id'),
+            'scores' => fn($rows) => array_sum(array_column($rows, 'score')),
+        ], fn($row) => $row['group'] . '/' . $row['class']))->is([
             'A/H' => [
                 'ids'    => [1, 4],
                 'scores' => 4,
@@ -1564,7 +1524,7 @@ class ArraysTest extends AbstractTestCase
             ],
         ]);
 
-        that((array_aggregate)($array, function ($rows) { return array_sum(array_column($rows, 'score')); }, function ($row) { return $row['group'] . '/' . $row['class']; }))->is([
+        that((array_aggregate)($array, fn($rows) => array_sum(array_column($rows, 'score')), fn($row) => $row['group'] . '/' . $row['class']))->is([
             'A/H' => 4,
             'B/H' => 4,
             'A/L' => 3,
@@ -1586,10 +1546,10 @@ class ArraysTest extends AbstractTestCase
         that((array_all)([true, false]))->isFalse();
         that((array_all)([false, false]))->isFalse();
 
-        that((array_all)($array, function ($v) { return $v['id']; }))->isTrue();
-        that((array_all)($array, function ($v) { return $v['flag']; }))->isFalse();
-        that((array_all)($array, function ($v) { return $v['name']; }))->isFalse();
-        that((array_all)($array, function ($v, $k) { return $k && $v['flag']; }))->isFalse();
+        that((array_all)($array, fn($v) => $v['id']))->isTrue();
+        that((array_all)($array, fn($v) => $v['flag']))->isFalse();
+        that((array_all)($array, fn($v) => $v['name']))->isFalse();
+        that((array_all)($array, fn($v, $k) => $k && $v['flag']))->isFalse();
     }
 
     function test_array_any()
@@ -1607,10 +1567,10 @@ class ArraysTest extends AbstractTestCase
         that((array_any)([true, false]))->isTrue();
         that((array_any)([false, false]))->isFalse();
 
-        that((array_any)($array, function ($v) { return $v['id']; }))->isTrue();
-        that((array_any)($array, function ($v) { return $v['flag']; }))->isTrue();
-        that((array_any)($array, function ($v) { return $v['name']; }))->isFalse();
-        that((array_any)($array, function ($v, $k) { return $k && $v['flag']; }))->isTrue();
+        that((array_any)($array, fn($v) => $v['id']))->isTrue();
+        that((array_any)($array, fn($v) => $v['flag']))->isTrue();
+        that((array_any)($array, fn($v) => $v['name']))->isFalse();
+        that((array_any)($array, fn($v, $k) => $k && $v['flag']))->isTrue();
     }
 
     function test_array_distinct()
@@ -1624,9 +1584,7 @@ class ArraysTest extends AbstractTestCase
         that((array_distinct)(['a', 'A'], SORT_STRING | SORT_FLAG_CASE))->isSame(['a']);
 
         // クロージャを与える
-        that((array_distinct)([1, 2, -2, 3, -3], function ($a, $b) {
-            return abs($a) <=> abs($b);
-        }))->is([1, 2, 3 => 3]);
+        that((array_distinct)([1, 2, -2, 3, -3], fn($a, $b) => abs($a) <=> abs($b)))->is([1, 2, 3 => 3]);
 
         // 配列の配列
         $rows = [
@@ -1884,14 +1842,10 @@ class ArraysTest extends AbstractTestCase
         ];
 
         that((array_order)($data, [
-            'integer' => function ($v) {
-                // 6は0とみなす
-                return $v === 6 ? 0 : $v;
-            },
-            'string'  => function ($v) {
-                // "aa"は"zz"とみなす
-                return $v === 'aa' ? 'zz' : $v;
-            },
+            // 6は0とみなす
+            'integer' => fn($v) => $v === 6 ? 0 : $v,
+            // "aa"は"zz"とみなす
+            'string'  => fn($v) => $v === 'aa' ? 'zz' : $v,
         ], true))->isSame([
             3 => ['string' => 'bb', 'integer' => 6],
             5 => ['string' => 'cc', 'integer' => 6],
@@ -1929,8 +1883,8 @@ class ArraysTest extends AbstractTestCase
         ];
 
         that((array_order)($data, [
-            'string' => function ($a, $b) { return strcmp($a, $b); },
-            'array'  => function ($a, $b) { return array_sum($b) - array_sum($a); },
+            'string' => fn($a, $b) => strcmp($a, $b),
+            'array'  => fn($a, $b) => array_sum($b) - array_sum($a),
         ], true))->isSame([
             0 => ['string' => 'aa', 'array' => [7, 3]],
             2 => ['string' => 'aa', 'array' => [2, 2]],
@@ -1995,8 +1949,8 @@ class ArraysTest extends AbstractTestCase
             'a' => true,
             'b' => false,
             'c' => [1, 2, 3],
-            'd' => function ($v) { return "$v"; },
-            'e' => function ($a, $b) { return strcmp($a, $b); },
+            'd' => fn($v) => "$v",
+            'e' => fn($a, $b) => strcmp($a, $b),
         ]);
         $t = microtime(true) - $t;
         that($t)->as("$t milliseconds is too slow.")->lessThan(1.0);
@@ -2190,7 +2144,7 @@ class ArraysTest extends AbstractTestCase
         $objects = array_map(stdclass, $arrays);
         that((array_lookup)($objects, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
         // クロージャもOK
-        that((array_lookup)($objects, 'name', function ($v, $k) { return "$k-{$v->name}"; }))->isSame(["11-name1" => 'name1', "12-name2" => 'name2', "13-name3" => 'name3']);
+        that((array_lookup)($objects, 'name', fn($v, $k) => "$k-{$v->name}"))->isSame(["11-name1" => 'name1', "12-name2" => 'name2', "13-name3" => 'name3']);
     }
 
     function test_array_select()
@@ -2203,42 +2157,40 @@ class ArraysTest extends AbstractTestCase
 
         that((array_select)($arrays, 'name', null))->isSame((array_lookup)($arrays, 'name', null));
 
-        that((array_select)($arrays, function ($row) {
-            return [
-                'hoge' => (attr_get)('id', $row),
-                'fuga' => (attr_get)('name', $row),
-                'piyo' => 123,
-            ];
-        }))->isSame([
+        that((array_select)($arrays, fn($row) => [
+            'hoge' => (attr_get)('id', $row),
+            'fuga' => (attr_get)('name', $row),
+            'piyo' => 123,
+        ]))->isSame([
             11 => ['hoge' => 1, 'fuga' => 'name1', 'piyo' => 123],
             12 => ['hoge' => 2, 'fuga' => 'name2', 'piyo' => 123],
             13 => ['hoge' => 3, 'fuga' => 'name3', 'piyo' => 123],
         ]);
         that((array_select)($arrays, [
-            'name' => function ($name) { return strtoupper($name); },
+            'name' => fn($name) => strtoupper($name),
         ], null))->isSame([
             ['name' => 'NAME1'],
             ['name' => 'NAME2'],
             ['name' => 'NAME3'],
         ]);
         that((array_select)($arrays, [
-            'id' => function ($id, $row) { return (attr_get)('id', $row) * 10; },
+            'id' => fn($id, $row) => (attr_get)('id', $row) * 10,
         ], 'id'))->isSame([
             10 => ['id' => 10],
             20 => ['id' => 20],
             30 => ['id' => 30],
         ]);
         that((array_select)($arrays, [
-            'id10' => function ($id, $row) { return (attr_get)('id', $row) * 10; },
+            'id10' => fn($id, $row) => (attr_get)('id', $row) * 10,
         ], 'id'))->isSame([
             1 => ['id10' => 10],
             2 => ['id10' => 20],
             3 => ['id10' => 30],
         ]);
         that((array_select)($arrays, [
-            'id'     => function ($id, $row) { return (attr_get)('id', $row) * 10; },
+            'id'     => fn($id, $row) => (attr_get)('id', $row) * 10,
             'name',
-            'idname' => function ($val, $row) { return (attr_get)('id', $row) . ':' . (attr_get)('name', $row); },
+            'idname' => fn($val, $row) => (attr_get)('id', $row) . ':' . (attr_get)('name', $row),
         ]))->isSame([
             11 => ['id' => 10, 'name' => 'name1', 'idname' => '1:name1'],
             12 => ['id' => 20, 'name' => 'name2', 'idname' => '2:name2'],
@@ -2360,9 +2312,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // キー 'k21', 'k222' を取り除く
-        that((array_convert)($array, function ($k, $v) {
-            return in_array($k, ['k21', 'k222']) ? false : null;
-        }))->is([
+        that((array_convert)($array, fn($k, $v) => in_array($k, ['k21', 'k222']) ? false : null))->is([
             'k1' => 'v1',
             'k2' => [
                 'k22' => [
@@ -2372,9 +2322,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // キー 'k21', 'k221', 'k222' を取り除く
-        that((array_convert)($array, function ($k, $v) {
-            return in_array($k, ['k21', 'k221', 'k222']) ? false : null;
-        }))->is([
+        that((array_convert)($array, fn($k, $v) => in_array($k, ['k21', 'k221', 'k222']) ? false : null))->is([
             'k1' => 'v1',
             'k2' => [
                 'k22' => [],
@@ -2382,9 +2330,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // キー 'k22' を取り除く
-        that((array_convert)($array, function ($k, $v) {
-            return in_array($k, ['k22']) ? false : null;
-        }, true))->is([
+        that((array_convert)($array, fn($k, $v) => in_array($k, ['k22']) ? false : null, true))->is([
             'k1' => 'v1',
             'k2' => [
                 'k21' => 'v21',
@@ -2437,11 +2383,7 @@ class ArraysTest extends AbstractTestCase
         ];
 
         // キー 'k1' を数値連番にする
-        that((array_convert)($array, function ($k) {
-            if ($k === 'k1') {
-                return true;
-            }
-        }))->is([
+        that((array_convert)($array, fn($k) => $k === 'k1' ? true : null))->is([
             'k2' => [
                 'v21',
                 'k22' => ['v221', 'v222'],
@@ -2451,11 +2393,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // 値 v221 を数値連番にする
-        that((array_convert)($array, function ($k, $v) {
-            if ($v === 'v221') {
-                return true;
-            }
-        }))->is([
+        that((array_convert)($array, fn($k, $v) => $v === 'v221' ? true : null))->is([
             'k1' => 'v1',
             'k2' => [
                 'v21',
@@ -2475,9 +2413,7 @@ class ArraysTest extends AbstractTestCase
             ],
             9 => 3,
         ];
-        that((array_convert)($array, function ($k, $v) {
-            return true;
-        }, true))->is([
+        that((array_convert)($array, fn($k, $v) => true, true))->is([
             0 => 1,
             1 => 2,
             2 => [
@@ -2498,11 +2434,7 @@ class ArraysTest extends AbstractTestCase
                 'k22' => 123,
             ],
         ];
-        that((array_convert)($array, function ($k, $v) {
-            if ($k === 'k22') {
-                return [1, 2, 3];
-            }
-        }))->is([
+        that((array_convert)($array, fn($k, $v) => $k === 'k22' ? [1, 2, 3] : null))->is([
             'k1' => 'v1',
             'k2' => [
                 'k21' => 'v21',
@@ -2573,9 +2505,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // クロージャ指定
-        that((array_flatten)($array, function ($keys) {
-            return implode('.', $keys);
-        }))->isSame([
+        that((array_flatten)($array, fn($keys) => implode('.', $keys)))->isSame([
             'k1'       => 'v1',
             'k2.k21'   => 'v21',
             'k2.k22'   => 123,
@@ -2584,9 +2514,7 @@ class ArraysTest extends AbstractTestCase
             'k2.k23.2' => 3,
             'o'        => $o,
         ]);
-        that((array_flatten)($array, function ($keys) {
-            return array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : '');
-        }))->isSame([
+        that((array_flatten)($array, fn($keys) => array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : '')))->isSame([
             'k1'         => 'v1',
             'k2[k21]'    => 'v21',
             'k2[k22]'    => 123,
@@ -2872,7 +2800,7 @@ class ArraysTest extends AbstractTestCase
         that((array_schema)(['type' => ['int', 'string']], '123'))->isSame('123');
 
         that((array_schema)(['type' => 'number'], 123.45))->isSame(123.45);
-        that((array_schema)(['type' => 'int', 'closure' => function ($v) { return $v * 10; }], 123))->isSame(1230);
+        that((array_schema)(['type' => 'int', 'closure' => fn($v) => $v * 10], 123))->isSame(1230);
         that((array_schema)(['type' => 'list', 'unique' => null], [1, 1, 2, 2, 3, 3]))->isSame([1, 2, 3]);
         that((array_schema)(['type' => 'int', 'min' => 1], 1))->isSame(1);
         that((array_schema)(['type' => 'int', 'max' => 9], 5))->isSame(5);

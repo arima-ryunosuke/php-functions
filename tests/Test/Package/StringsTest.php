@@ -3,7 +3,6 @@
 namespace ryunosuke\Test\Package;
 
 use Concrete;
-use JetBrains\PhpStorm\Internal\TentativeType;
 
 class StringsTest extends AbstractTestCase
 {
@@ -1965,7 +1964,7 @@ a3,b3,c3
 }');
 
         // JSON_CLOSURE
-        that((json_export)(['a' => function () { return '[1,2,3]'; }, 'f' => function () { return 'function () {}'; }], [
+        that((json_export)(['a' => fn() => '[1,2,3]', 'f' => fn() => 'function () {}'], [
             JSON_PRETTY_PRINT => true,
             JSON_CLOSURE      => true,
         ]))->is('{
@@ -2298,18 +2297,18 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
             try {
                 if ($expected1) {
                     $message = <<<MESSAGE
-file: $file
-json: $json
-expected: $expected1
-MESSAGE;
+                    file: $file
+                    json: $json
+                    expected: $expected1
+                    MESSAGE;
                     that(serialize((json_import)($json, [JSON_ES5 => true, JSON_OBJECT_AS_ARRAY => false])))->as($message)->isSame($expected1);
                 }
                 if ($expected2) {
                     $message = <<<MESSAGE
-file: $file
-json: $json
-expected: $expected2
-MESSAGE;
+                    file: $file
+                    json: $json
+                    expected: $expected2
+                    MESSAGE;
                     that(serialize((json_import)($json, [JSON_ES5 => true, JSON_OBJECT_AS_ARRAY => true])))->as($message)->isSame($expected2);
                 }
             }
@@ -2781,7 +2780,7 @@ z", quote2: "a\\\\nz"');
         $m = [];
         that((preg_splice)('#\d+#', '', 'abc123', $m))->is("abc");
         that($m)->is(['123']);
-        that((preg_splice)('#([a-z]+)#', function ($m) { return strtoupper($m[1]); }, 'abc123', $m))->is("ABC123");
+        that((preg_splice)('#([a-z]+)#', fn($m) => strtoupper($m[1]), 'abc123', $m))->is("ABC123");
         that($m)->is(['abc', 'abc']);
         that((preg_splice)('#[a-z]+#', 'strtoupper', 'abc123', $m))->is('strtoupper123');
         that($m)->is(['abc']);
@@ -2808,7 +2807,7 @@ z", quote2: "a\\\\nz"');
 
         // misc
         that((preg_replaces)('#aaa(\d\d\d)zzz#', 99999, 'aaa123zzz'))->is('aaa99999zzz');
-        that((preg_replaces)('#aaa(\d\d\d)zzz#', function ($v) { return $v * 2; }, 'aaa123zzz'))->is('aaa246zzz');
+        that((preg_replaces)('#aaa(\d\d\d)zzz#', fn($v) => $v * 2, 'aaa123zzz'))->is('aaa246zzz');
     }
 
     public function test_damerau_levenshtein()
@@ -3054,10 +3053,10 @@ z", quote2: "a\\\\nz"');
     {
         // http header
         $string = <<<TEXT
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=utf-8
-Connection: Keep-Alive
-TEXT;
+        HTTP/1.1 200 OK
+        Content-Type: text/html; charset=utf-8
+        Connection: Keep-Alive
+        TEXT;
         that((str_array)($string, ':', true))->is([
             'HTTP/1.1 200 OK',
             'Content-Type' => 'text/html; charset=utf-8',
@@ -3066,10 +3065,10 @@ TEXT;
 
         // sar
         $string = <<<TEXT
-13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
-13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
-13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
-TEXT;
+        13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
+        13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
+        13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74
+        TEXT;
         that((str_array)($string, ' ', false))->is(
             [
                 1 => [
@@ -3144,9 +3143,7 @@ TEXT;
         that($actual)->is("C:cli, V:hoge, E:{\$val}, F:PRE-HOGE, S:6");
 
         // embed closure
-        $actual = (render_template)('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper("pre-$val")}, S:${1+2+3}', function ($strings, ...$values) {
-            return [$strings, $values];
-        });
+        $actual = (render_template)('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper("pre-$val")}, S:${1+2+3}', fn($strings, ...$values) => [$strings, $values]);
         that($actual)->is([
             ['C:', ', V:', ', E:{$val}, F:', ', S:'],
             ['cli', 'val', 'PRE-', 6],
@@ -3188,9 +3185,9 @@ TEXT;
         that($actual)->is("aaa XXX zzz");
 
         // closure
-        $actual = (render_string)('aaa $val zzz', ['val' => function () { return 'XXX'; }]);
+        $actual = (render_string)('aaa $val zzz', ['val' => fn() => 'XXX']);
         that($actual)->is("aaa XXX zzz");
-        $actual = (render_string)('aaa $v1 $v2 zzz', ['v1' => 9, 'v2' => function ($vars, $k) { return $vars['v1'] . $k; }]);
+        $actual = (render_string)('aaa $v1 $v2 zzz', ['v1' => 9, 'v2' => fn($vars, $k) => $vars['v1'] . $k]);
         that($actual)->is("aaa 9 9v2 zzz");
 
         // _
@@ -3214,7 +3211,7 @@ TEXT;
         $actual = (render_file)(__DIR__ . '/Strings/template.txt', [
             'zero',
             'string'  => 'string',
-            'closure' => function () { return 'closure'; },
+            'closure' => fn() => 'closure',
         ]);
         that($actual)->is("string is string.
 closure is closure.

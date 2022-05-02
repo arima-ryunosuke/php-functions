@@ -125,13 +125,13 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
 
         // 内部テストのためにちょっと小細工する
         file_put_contents(__DIR__ . '/../../src/Package/Dummy.php', <<<DUMMY
-<?php
-namespace ryunosuke\Functions\Package;
-class DUMMY
-{
-    const simple_array = [1, 2, 3];
-}
-DUMMY
+        <?php
+        namespace ryunosuke\Functions\Package;
+        class DUMMY
+        {
+            const simple_array = [1, 2, 3];
+        }
+        DUMMY
         );
 
         unlink(__DIR__ . '/../../src/Package/Dummy.php');

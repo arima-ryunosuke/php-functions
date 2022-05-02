@@ -218,7 +218,7 @@ class UtilityTest extends AbstractTestCase
         $numbers = [1, 2, 3, 5, 7, 8, 9];
         that((number_serial)($numbers, 1, '~'))->is(['1~3', 5, '7~9']);
         that((number_serial)($numbers, 1, null))->is([[1, 3], [5, 5], [7, 9]]);
-        that((number_serial)($numbers, 1, function ($from, $to) { return "$from~$to"; }))->is(['1~3', '5~5', '7~9']);
+        that((number_serial)($numbers, 1, fn($from, $to) => "$from~$to"))->is(['1~3', '5~5', '7~9']);
         that((number_serial)($numbers, -1, null))->is([[9, 7], [5, 5], [3, 1]]);
 
         $numbers = [0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9];
@@ -310,23 +310,23 @@ class UtilityTest extends AbstractTestCase
         ]);
 
         // fetch
-        that($cache->fetch('fetch', function ($cache) { return 'ok'; }, 1))->isSame('ok');
-        that($cache->fetch('fetch', function ($cache) { return 'ok2'; }))->isSame('ok');
+        that($cache->fetch('fetch', fn($cache) => 'ok', 1))->isSame('ok');
+        that($cache->fetch('fetch', fn($cache) => 'ok2'))->isSame('ok');
         sleep(2);
-        that($cache->fetch('fetch', function ($cache) { return 'ok2'; }, 1))->isSame('ok2');
+        that($cache->fetch('fetch', fn($cache) => 'ok2', 1))->isSame('ok2');
 
         // fetchMultiple
         that($cache->fetchMultiple([
-            'fetch'  => function () { return 'ok3'; },
-            'fetchM' => function () { return 'okM'; },
+            'fetch'  => fn() => 'ok3',
+            'fetchM' => fn() => 'okM',
         ], 1))->isSame([
             'fetch'  => 'ok2',
             'fetchM' => 'okM',
         ]);
         sleep(2);
         that($cache->fetchMultiple([
-            'fetch'  => function () { return 'ok3'; },
-            'fetchM' => function () { return 'okM2'; },
+            'fetch'  => fn() => 'ok3',
+            'fetchM' => fn() => 'okM2',
         ]))->isSame([
             'fetch'  => 'ok3',
             'fetchM' => 'okM2',
@@ -358,9 +358,7 @@ class UtilityTest extends AbstractTestCase
 
     function test_cache()
     {
-        $provider = function () {
-            return sha1(uniqid(mt_rand(), true));
-        };
+        $provider = fn() => sha1(uniqid(mt_rand(), true));
 
         // 何度呼んでもキャッシュされるので一致する
         $current = (cache)('test', $provider, null, false);
@@ -373,7 +371,7 @@ class UtilityTest extends AbstractTestCase
 
         // null を与えると削除される
         that((cache)('test', null, __FUNCTION__, false))->isTrue();
-        that((cache)('test', function () { return 1; }, __FUNCTION__, false))->is(1);
+        that((cache)('test', fn() => 1, __FUNCTION__, false))->is(1);
     }
 
     function test_cache_object()
@@ -384,12 +382,12 @@ class UtilityTest extends AbstractTestCase
         $tmpdir = self::$TMPDIR . '/cache_object';
         (rm_rf)($tmpdir);
         (cachedir)($tmpdir);
-        (cache)('key', function () use ($value) { return $value; }, 'hoge');
+        (cache)('key', fn() => $value, 'hoge');
         (cache)(null, 'dummy');
         that("$tmpdir/hoge.php-cache")->fileExists();
-        that((cache)('key', function () { return 'dummy'; }, 'hoge'))->is($value);
+        that((cache)('key', fn() => 'dummy', 'hoge'))->is($value);
 
-        (cache)('key', function () use ($value) { return $value; }, 'fuga');
+        (cache)('key', fn() => $value, 'fuga');
         (cache)(null, null);
         that("$tmpdir/hoge.php-cache")->fileNotExists();
     }
@@ -679,7 +677,7 @@ class UtilityTest extends AbstractTestCase
             'double'  => true,
             'block'   => true,
             'blockX'  => true,
-            'closure' => function ($value) { return (phpval)($value); },
+            'closure' => fn($value) => (phpval)($value),
         ]);
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
             "single"    => "123",
@@ -973,7 +971,7 @@ class UtilityTest extends AbstractTestCase
         (process)(PHP_BINARY, ['-r' => "echo getcwd();"], '', $stdout, $stderr, __DIR__);
         that($stdout)->isSame(__DIR__);
 
-        (process)(PHP_BINARY, ['-r' => "echo getenv('HOGE');"], '', $stdout, $stderr, null, ['HOGE' => 'hoge']);
+        (process)(PHP_BINARY, ['-r' => "echo getenv('HOGE');"], '', $stdout, $stderr, null, getenv() + ['HOGE' => 'hoge']);
         that($stdout)->isSame('hoge');
     }
 
@@ -1247,9 +1245,7 @@ class UtilityTest extends AbstractTestCase
         function test_stacktrace($that)
         {
             $that->that = $that;
-            $c = function ($that) {
-                return (phpval)('\\ryunosuke\\Test\\Package\\test_stacktrace_in()');
-            };
+            $c = fn($that) => (phpval)('\\ryunosuke\\Test\\Package\\test_stacktrace_in()');
             return $c($that);
         }
 
@@ -1401,7 +1397,7 @@ class UtilityTest extends AbstractTestCase
         ]);
 
         $traces = $mock->m3([
-            'class' => function ($v) { return (str_exists)($v, 'class@anonymous'); },
+            'class' => fn($v) => (str_exists)($v, 'class@anonymous'),
         ]);
         that($traces[0])->arraySubset([
             'file'     => __FILE__,
@@ -1455,7 +1451,7 @@ class UtilityTest extends AbstractTestCase
     function test_profiler()
     {
         $profiler = (profiler)([
-            'callee'   => function ($callee) { return $callee !== 'X'; },
+            'callee'   => fn($callee) => $callee !== 'X',
             'location' => '#profile#',
         ]);
         require_once __DIR__ . '/Utility/profile.php';
@@ -1594,7 +1590,7 @@ class UtilityTest extends AbstractTestCase
         $output = (ob_capture)(function () use (&$return) {
             $return = (benchmark)([
                 [new \Concrete('hoge'), 'getName'],
-                function () { return 'hoge'; },
+                fn() => 'hoge',
             ], [], 100);
         });
 

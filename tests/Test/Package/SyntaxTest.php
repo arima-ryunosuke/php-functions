@@ -65,83 +65,83 @@ syntax error
     }
 };
 ')->wasThrown(new \ParseError(<<<ERR
-on line 14
-ERR
+        on line 14
+        ERR
         ));
 
         that(evaluate)->try('syntax error')->wasThrown(new \ParseError(<<<ERR
->>> syntax error
-ERR
+        >>> syntax error
+        ERR
         ));
 
         that(evaluate)->try(<<<PHP
-// 01
-syntax error // 02
-// 03
-// 04
-// 05
-// 06
-// 07
-// 08
-// 09
-// 10
-// 11
-// 12
-// 13
-PHP
+        // 01
+        syntax error // 02
+        // 03
+        // 04
+        // 05
+        // 06
+        // 07
+        // 08
+        // 09
+        // 10
+        // 11
+        // 12
+        // 13
+        PHP
         )->wasThrown(new \ParseError(<<<ERR
-// 01
->>> syntax error // 02
-// 03
-// 04
-// 05
-// 06
-// 07
-ERR
+        // 01
+        >>> syntax error // 02
+        // 03
+        // 04
+        // 05
+        // 06
+        // 07
+        ERR
         ));
 
         that(evaluate)->try(<<<PHP
-// 07
-// 08
-// 09
-// 10
-// 11
->>> syntax error // 12
-// 13
-PHP
+        // 07
+        // 08
+        // 09
+        // 10
+        // 11
+        >>> syntax error // 12
+        // 13
+        PHP
         )->wasThrown(new \ParseError(<<<ERR
->>> syntax error
-ERR
+        >>> syntax error
+        ERR
         ));
 
         that(evaluate)->try(<<<PHP
-// 01
-// 02
-// 03
-// 04
-// 05
-// 06
-syntax error // 07
-// 08
-// 09
-// 10
-// 11
-// 12
-// 13
-PHP
+        // 01
+        // 02
+        // 03
+        // 04
+        // 05
+        // 06
+        syntax error // 07
+        // 08
+        // 09
+        // 10
+        // 11
+        // 12
+        // 13
+        PHP
         )->wasThrown(new \ParseError(<<<ERR
-// 02
-// 03
-// 04
-// 05
-// 06
->>> syntax error // 07
-// 08
-// 09
-// 10
-// 11
-// 12
-ERR
+        // 02
+        // 03
+        // 04
+        // 05
+        // 06
+        >>> syntax error // 07
+        // 08
+        // 09
+        // 10
+        // 11
+        // 12
+        ERR
         ));
     }
 
@@ -293,12 +293,7 @@ aplain text
 axxx6plain text
 xxx5    xxx4    plain text
     xxx3 and xxx2xxx1xxx0');
-        that((strip_php)($code, function ($code, $n) {
-            if (strpos($code, 'foreach')) {
-                return 'foreach';
-            }
-            return $n . "th";
-        }))->is('?>
+        that((strip_php)($code, fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"))->is('?>
 a6thplain text
 foreach    4th    plain text
     3th and 2thforeach0th');
@@ -837,8 +832,8 @@ $var3 = function () { return \ArrayObject::class; };
         that((call_if)(true, $callback, 'true'))->is('true');
         that((call_if)(false, $callback, 'false'))->is(null);
 
-        that((call_if)(function () { return true; }, $callback, 'closure_true'))->is('closure_true');
-        that((call_if)(function () { return false; }, $callback, 'closure_false'))->is(null);
+        that((call_if)(fn() => true, $callback, 'closure_true'))->is('closure_true');
+        that((call_if)(fn() => false, $callback, 'closure_false'))->is(null);
 
         for ($i = 0; $i < 5; $i++) {
             (call_if)(-2, $callback, 'number:-2');
@@ -863,7 +858,7 @@ $var3 = function () { return \ArrayObject::class; };
     {
         $cases = [
             1 => 'value is 1',
-            2 => function () { return 'value is 2'; },
+            2 => fn() => 'value is 2',
         ];
         that((switchs)(1, $cases, 'undefined'))->is('value is 1');
         that((switchs)(2, $cases, 'undefined'))->is('value is 2');

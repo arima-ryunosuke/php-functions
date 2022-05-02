@@ -462,9 +462,7 @@ class Vars
      * // フォーマットに null を与えると sprintf せずに配列で返す
      * that(si_prefix(12345, 1000, null))->isSame([12.345, 'k']);
      * // フォーマットにクロージャを与えると実行して返す
-     * that(si_prefix(12345, 1000, function ($v, $u) {
-     *     return number_format($v, 2) . $u;
-     * }))->isSame('12.35k');
+     * that(si_prefix(12345, 1000, fn($v, $u) => number_format($v, 2) . $u))->isSame('12.35k');
      * ```
      *
      * @param mixed $var 丸める値
@@ -599,7 +597,7 @@ class Vars
             if ($empty_stdClass && get_class($var) === 'stdClass') {
                 return !(array) $var;
             }
-            if ((is_countable)($var)) {
+            if (is_countable($var)) {
                 return !count($var);
             }
             return false;
@@ -739,30 +737,6 @@ class Vars
     public static function is_arrayable($var)
     {
         return is_array($var) || $var instanceof \ArrayAccess;
-    }
-
-    /**
-     * 変数が count でカウントできるか調べる
-     *
-     * 要するに {@link http://php.net/manual/function.is-countable.php is_countable} の polyfill。
-     *
-     * Example:
-     * ```php
-     * that(is_countable([1, 2, 3]))->isTrue();
-     * that(is_countable(new \ArrayObject()))->isTrue();
-     * that(is_countable((function () { yield 1; })()))->isFalse();
-     * that(is_countable(1))->isFalse();
-     * that(is_countable(new \stdClass()))->isFalse();
-     * ```
-     *
-     * @polyfill
-     *
-     * @param mixed $var 調べる値
-     * @return bool count でカウントできるなら true
-     */
-    public static function is_countable($var)
-    {
-        return is_array($var) || $var instanceof \Countable;
     }
 
     /**
@@ -1142,7 +1116,7 @@ class Vars
      * Example:
      * ```php
      * // 配列を受け取って中身を大文字化して返すクロージャ
-     * $upper = function($array){return array_map('strtoupper', $array);};
+     * $upper = fn($array) => array_map('strtoupper', $array);
      * // 普通はこうやって使うが・・・
      * that($upper(['a', 'b', 'c']))->isSame(['A', 'B', 'C']);
      * // 手元に配列ではなくスカラー値しか無いときはこうせざるをえない
@@ -1464,16 +1438,15 @@ class Vars
     /**
      * var_export を色々と出力できるようにしたもの
      *
-     * php のコードに落とし込むことで serialize と比較してかなり高速に動作する。ただし、要 php7.4.
+     * php のコードに落とし込むことで serialize と比較してかなり高速に動作する。
      *
      * 各種オブジェクトやクロージャ、循環参照を含む配列など様々なものが出力できる。
      * ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。
      *
-     * - 無名クラス
      * - Generator クラス
      * - 特定の内部クラス（PDO など）
      * - リソース
-     * - php7.4 以降のアロー関数によるクロージャ
+     * - アロー関数によるクロージャ
      *
      * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
      * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
@@ -1504,7 +1477,7 @@ class Vars
             'format'  => 'pretty', // pretty or minify
             'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
         ];
-        $options['return'] = $options['return'] ?? !!$options['outmode'];
+        $options['return'] ??= !!$options['outmode'];
 
         $var_manager = new class() {
             private $vars = [];
@@ -1589,7 +1562,7 @@ class Vars
                 }
                 return $token;
             };
-            $var_export = function ($v) { return var_export($v, true); };
+            $var_export = fn($v) => var_export($v, true);
             $spacer0 = str_repeat(" ", 4 * ($nest + 0));
             $spacer1 = str_repeat(" ", 4 * ($nest + 1));
 
@@ -1989,7 +1962,7 @@ class Vars
      *         "c" => "C",
      *     ],
      *     "object"  => new \Exception(),
-     *     "closure" => function () use($using) { },
+     *     "closure" => function () use ($using) { },
      * ]);
      * ?>
      * {
@@ -2237,7 +2210,7 @@ class Vars
                         }
                         while (count($lengths) > 0 && array_sum($lengths) > $this->options['maxlength']) {
                             $middle = (int) (count($lengths) / 2);
-                            $unpos = function ($v, $k, $n) use ($middle) { return $n === $middle; };
+                            $unpos = fn($v, $k, $n) => $n === $middle;
                             (array_unset)($value, $unpos);
                             (array_unset)($lengths, $unpos);
                             $key = (int) (count($lengths) / 2);

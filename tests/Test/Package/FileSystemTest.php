@@ -97,10 +97,10 @@ class FileSystemTest extends AbstractTestCase
         that((file_matcher)(['contains' => 'zz'])($base . '/a/a1.txt'))->isFalse();
         that((file_matcher)(['!contains' => 'zz'])($base . '/a/a1.txt'))->isTrue();
 
-        $filter = function ($file) { return mime_content_type($file->getPathname()) === 'text/plain'; };
+        $filter = fn($file) => mime_content_type($file->getPathname()) === 'text/plain';
         that((file_matcher)(['filter' => $filter])($base . '/a/a1.txt'))->isTrue();
         that((file_matcher)(['!filter' => $filter])($base . '/a/a1.txt'))->isFalse();
-        $filter = function ($file) { return mime_content_type($file->getPathname()) === 'text/html'; };
+        $filter = fn($file) => mime_content_type($file->getPathname()) === 'text/html';
         that((file_matcher)(['filter' => $filter])($base . '/a/a1.txt'))->isFalse();
         that((file_matcher)(['!filter' => $filter])($base . '/a/a1.txt'))->isTrue();
     }
@@ -129,14 +129,14 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // 拡張子でフィルタ
-        that((file_list)($base, function ($fname) { return (file_extension)($fname) === 'txt'; }))->equalsCanonicalizing([
+        that((file_list)($base, fn($fname) => (file_extension)($fname) === 'txt'))->equalsCanonicalizing([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
             realpath($base . '/a/b/ab1.txt'),
         ]);
 
         // ファイルサイズでフィルタ
-        that((file_list)($base, function ($fname) { return filesize($fname) > 0; }))->equalsCanonicalizing([
+        that((file_list)($base, fn($fname) => filesize($fname) > 0))->equalsCanonicalizing([
             realpath($base . '/a/b/ab2.log'),
             realpath($base . '/a/b/c/abc1.log'),
             realpath($base . '/a/b/c/abc2.log'),
@@ -177,7 +177,7 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // 拡張子でフィルタ
-        that((file_tree)($base, function ($fname) { return (file_extension)($fname) === 'txt'; }))->isSame([
+        that((file_tree)($base, fn($fname) => (file_extension)($fname) === 'txt'))->isSame([
             'tree' => [
                 'a' => [
                     'a1.txt' => realpath($base . '/a/a1.txt'),
@@ -190,7 +190,7 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // ファイルサイズでフィルタ
-        that((file_tree)($base, function ($fname) { return filesize($fname) > 0; }))->isSame([
+        that((file_tree)($base, fn($fname) => filesize($fname) > 0))->isSame([
             'tree' => [
                 'a' => [
                     'b' => [
@@ -343,29 +343,27 @@ class FileSystemTest extends AbstractTestCase
         that('rewrite!')->equalsFile($testpath);
 
         // 0 bytes
-        $bytes = (file_rewrite_contents)($testpath, function ($contents) { return ''; });
+        $bytes = (file_rewrite_contents)($testpath, fn($contents) => '');
         that($bytes)->is(0);
         that('')->equalsFile($testpath);
 
         // no exists
-        $bytes = (file_rewrite_contents)(dirname($testpath) . '/test2.txt', function ($contents) {
-            return 'test2!';
-        }, LOCK_EX);
+        $bytes = (file_rewrite_contents)(dirname($testpath) . '/test2.txt', fn($contents) => 'test2!', LOCK_EX);
         that($bytes)->is(6);
         that('test2!')->equalsFile(dirname($testpath) . '/test2.txt');
 
         // lock
-        $bytes = (file_rewrite_contents)($testpath, function ($contents) { return 'locked!'; }, LOCK_EX);
+        $bytes = (file_rewrite_contents)($testpath, fn($contents) => 'locked!', LOCK_EX);
         that($bytes)->is(7);
         that('locked!')->equalsFile($testpath);
 
         // open failed
-        @that(file_rewrite_contents)->try(dirname($testpath), function () { })->wasThrown('failed to fopen');
+        @that(file_rewrite_contents)->try(dirname($testpath), fn() => null)->wasThrown('failed to fopen');
 
         // lock failed
         $fp = fopen($testpath, 'r');
         flock($fp, LOCK_EX);
-        @that(file_rewrite_contents)->try($testpath, function () { }, LOCK_EX | LOCK_NB)->wasThrown('failed to flock');
+        @that(file_rewrite_contents)->try($testpath, fn() => null, LOCK_EX | LOCK_NB)->wasThrown('failed to flock');
         flock($fp, LOCK_UN);
         fclose($fp);
     }
@@ -469,13 +467,9 @@ class FileSystemTest extends AbstractTestCase
     function test_dirname_r()
     {
         // composer.json が見つかるまで親を辿って見つかったらそのパスを返す
-        that((dirname_r)(__DIR__, function ($path) {
-            return realpath("$path/composer.json");
-        }))->is(realpath(__DIR__ . '/../../../composer.json'));
+        that((dirname_r)(__DIR__, fn($path) => realpath("$path/composer.json")))->is(realpath(__DIR__ . '/../../../composer.json'));
         // 見つからない場合は false を返す
-        that((dirname_r)(__DIR__, function ($path) {
-            return realpath("$path/notfound.ext");
-        }))->is(false);
+        that((dirname_r)(__DIR__, fn($path) => realpath("$path/notfound.ext")))->is(false);
         // 使い方の毛色は違うが、このようにすると各構成要素が得られる
         $paths = [];
         that((dirname_r)('/root/path/to/something', function ($path) use (&$paths) {

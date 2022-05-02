@@ -654,7 +654,7 @@ class Network
                     if ($atfile) {
                         $k = substr($k, 1);
                         if (is_array($v)) {
-                            $v = (array_kvmap)($v, function ($k, $v) { return [is_int($k) ? "@$k" : $k => $v]; });
+                            $v = (array_kvmap)($v, fn($k, $v) => [is_int($k) ? "@$k" : $k => $v]);
                         }
                         else {
                             $v = new \CURLFile($v);
@@ -667,9 +667,7 @@ class Network
                 });
             }
             // CURLFile が含まれているかもしれないので http_build_query は使えない
-            $options[CURLOPT_POSTFIELDS] = (array_flatten)($options[CURLOPT_POSTFIELDS], function ($keys) {
-                return array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : '');
-            });
+            $options[CURLOPT_POSTFIELDS] = (array_flatten)($options[CURLOPT_POSTFIELDS], fn($keys) => array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : ''));
         }
 
         // 単一ファイルは単一アップロードとする
@@ -685,15 +683,11 @@ class Network
         }
 
         // CURLOPT_HTTPHEADER は素の配列しか受け入れてくれないので連想配列を k: v 形式に変換
-        $options[CURLOPT_HTTPHEADER] = (array_sprintf)($options[CURLOPT_HTTPHEADER], function ($v, $k) {
-            return is_int($k) ? $v : "$k: $v";
-        });
+        $options[CURLOPT_HTTPHEADER] = (array_sprintf)($options[CURLOPT_HTTPHEADER], fn($v, $k) => is_int($k) ? $v : "$k: $v");
 
         // 同上： CURLOPT_COOKIE
         if ($options[CURLOPT_COOKIE] && is_array($options[CURLOPT_COOKIE])) {
-            $options[CURLOPT_COOKIE] = (array_sprintf)($options[CURLOPT_COOKIE], function ($v, $k) {
-                return is_int($k) ? $v : rawurlencode($k) . "=" . rawurlencode($v);
-            }, '; ');
+            $options[CURLOPT_COOKIE] = (array_sprintf)($options[CURLOPT_COOKIE], fn($v, $k) => is_int($k) ? $v : rawurlencode($k) . "=" . rawurlencode($v), '; ');
         }
 
         assert(is_callable($options['retry']) || is_array($options['retry']));

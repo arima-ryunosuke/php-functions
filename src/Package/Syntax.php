@@ -188,9 +188,7 @@ class Syntax
                             break;
                         }
                     }
-                    $html = implode('', array_map(function ($token) {
-                        return is_array($token) ? $token[1] : $token;
-                    }, array_slice($tmp, $i, $j - $i + 1)));
+                    $html = implode('', array_map(fn($token) => is_array($token) ? $token[1] : $token, array_slice($tmp, $i, $j - $i + 1)));
                     array_splice($tmp, $i + 1, $j - $i, [[T_INLINE_HTML, $html, $token[2]]]);
                     continue;
                 }
@@ -326,7 +324,7 @@ class Syntax
 
         $replacer = $option['replacer'];
         if ($replacer === '') {
-            $replacer = function ($phptag, $n) { return ''; };
+            $replacer = fn($phptag, $n) => '';
         }
         if ($replacer === null) {
             $replacer = (unique_string)($phtml, 64);
@@ -434,7 +432,7 @@ class Syntax
      *     'baseline'  => 1,    // 基準インデントの行番号（負数で下からの指定になる）
      *     'indent'    => 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
      *     'trimempty' => true, // 空行を trim するか
-     *     'heredoc'   => true, // php7.3 の Flexible Heredoc もインデントするか
+     *     'heredoc'   => true, // Flexible Heredoc もインデントするか
      * ]))->isSame('
      *     echo 123;
      *
@@ -457,7 +455,7 @@ class Syntax
             'baseline'  => 1,
             'indent'    => 0,
             'trimempty' => true,
-            'heredoc'   => version_compare(PHP_VERSION, '7.3.0') < 0,
+            'heredoc'   => true,
         ];
         if (is_int($options['indent'])) {
             $options['indent'] = str_repeat(' ', $options['indent']);
@@ -728,7 +726,7 @@ class Syntax
      * Example:
      * ```php
      * // null を返すかもしれないステートメント
-     * $getobject = function () {return null;};
+     * $getobject = fn () => null;
      * // メソッド呼び出しは null を返す
      * that(optional($getobject())->method())->isSame(null);
      * // プロパティアクセスは null を返す
@@ -828,10 +826,10 @@ class Syntax
      * # 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
      * $n1_9 = range(1, 9);
      * // 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
-     * that(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v <= 5; }))))->isSame(30);
-     * // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
-     * that(chain($n1_9)->filter(function ($v) { return $v <= 5; })->map(function ($v) { return $v * 2; })->sum()())->isSame(30);
-     * // funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
+     * that(array_sum(array_map(fn($v) => $v * 2, array_filter($n1_9, fn($v) => $v <= 5))))->isSame(30);
+     * // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 fn() が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
+     * that(chain($n1_9)->filter(fn($v) => $v <= 5)->map(fn($v) => $v * 2)->sum()())->isSame(30);
+     * // funcP を介して fn() をなくしたもの。ここまで来ると若干読みやすい
      * that(chain($n1_9)->filterP(['<=' => 5])->mapP(['*' => 2])->sum()())->isSame(30);
      * // funcE を介したもの。かなり直感的だが eval なので少し不安
      * that(chain($n1_9)->filterE('<= 5')->mapE('* 2')->sum()())->isSame(30);
@@ -1153,7 +1151,7 @@ class Syntax
                 return strlen($var) ? $var : $default;
             }
             // 次点で countable
-            if ((is_countable)($var)) {
+            if (is_countable($var)) {
                 return count($var) ? $var : $default;
             }
             return $var;
@@ -1207,7 +1205,7 @@ class Syntax
             static $counts = [];
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
             $caller = $trace['file'] . '#' . $trace['line'];
-            $counts[$caller] = $counts[$caller] ?? 0;
+            $counts[$caller] ??= 0;
             if ($condition === 0) {
                 $condition = true;
             }
@@ -1240,7 +1238,7 @@ class Syntax
      * ```php
      * $cases = [
      *     1 => 'value is 1',
-     *     2 => function(){return 'value is 2';},
+     *     2 => fn() => 'value is 2',
      * ];
      * that(switchs(1, $cases))->isSame('value is 1');
      * that(switchs(2, $cases))->isSame('value is 2');
@@ -1276,10 +1274,10 @@ class Syntax
      * Example:
      * ```php
      * // 例外が飛ばない場合は平和極まりない
-     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * $try = function ($a, $b, $c) {return [$a, $b, $c];};
      * that(try_null($try, 1, 2, 3))->isSame([1, 2, 3]);
      * // 例外が飛ぶ場合は null が返ってくる
-     * $try = function(){throw new \Exception('tried');};
+     * $try = function () {throw new \Exception('tried');};
      * that(try_null($try))->isSame(null);
      * ```
      *
@@ -1305,10 +1303,10 @@ class Syntax
      * Example:
      * ```php
      * // 例外が飛ばない場合は平和極まりない
-     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * $try = function ($a, $b, $c) {return [$a, $b, $c];};
      * that(try_return($try, 1, 2, 3))->isSame([1, 2, 3]);
      * // 例外が飛ぶ場合は例外オブジェクトが返ってくる
-     * $try = function(){throw new \Exception('tried');};
+     * $try = function () {throw new \Exception('tried');};
      * that(try_return($try))->IsInstanceOf(\Exception::class);
      * ```
      *
@@ -1334,10 +1332,10 @@ class Syntax
      * Example:
      * ```php
      * // 例外が飛ばない場合は平和極まりない
-     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * $try = function ($a, $b, $c) {return [$a, $b, $c];};
      * that(try_catch($try, null, 1, 2, 3))->isSame([1, 2, 3]);
      * // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
-     * $try = function(){throw new \Exception('tried');};
+     * $try = function () {throw new \Exception('tried');};
      * that(try_catch($try)->getMessage())->isSame('tried');
      * ```
      *
@@ -1359,13 +1357,13 @@ class Syntax
      * Example:
      * ```php
      * $finally_count = 0;
-     * $finally = function()use(&$finally_count){$finally_count++;};
+     * $finally = function () use (&$finally_count) {$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
-     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * $try = function ($a, $b, $c) {return [$a, $b, $c];};
      * that(try_finally($try, $finally, 1, 2, 3))->isSame([1, 2, 3]);
      * that($finally_count)->isSame(1); // 呼ばれている
      * // 例外は投げっぱなすが、 $finally は実行される
-     * $try = function(){throw new \Exception('tried');};
+     * $try = function () {throw new \Exception('tried');};
      * try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){}
      * that($finally_count)->isSame(2); // 呼ばれている
      * ```
@@ -1388,13 +1386,13 @@ class Syntax
      * Example:
      * ```php
      * $finally_count = 0;
-     * $finally = function()use(&$finally_count){$finally_count++;};
+     * $finally = function () use (&$finally_count) {$finally_count++;};
      * // 例外が飛ぼうと飛ぶまいと $finally は実行される
-     * $try = function($a, $b, $c){return [$a, $b, $c];};
+     * $try = function ($a, $b, $c) {return [$a, $b, $c];};
      * that(try_catch_finally($try, null, $finally, 1, 2, 3))->isSame([1, 2, 3]);
      * that($finally_count)->isSame(1); // 呼ばれている
      * // 例外を投げるが、 $catch で握りつぶす
-     * $try = function(){throw new \Exception('tried');};
+     * $try = function () {throw new \Exception('tried');};
      * that(try_catch_finally($try, null, $finally, 1, 2, 3)->getMessage())->isSame('tried');
      * that($finally_count)->isSame(2); // 呼ばれている
      * ```
@@ -1408,7 +1406,7 @@ class Syntax
     public static function try_catch_finally($try, $catch = null, $finally = null, ...$variadic)
     {
         if ($catch === null) {
-            $catch = function ($v) { return $v; };
+            $catch = fn($v) => $v;
         }
 
         try {

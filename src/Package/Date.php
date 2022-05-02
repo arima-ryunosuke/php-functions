@@ -99,7 +99,7 @@ class Date
             if (!isset($parts['relative'])) {
                 return null;
             }
-            $baseTimestamp = $baseTimestamp ?? time();
+            $baseTimestamp ??= time();
             $parts['year'] = idate('Y', $baseTimestamp);
             $parts['month'] = idate('m', $baseTimestamp);
             $parts['day'] = idate('d', $baseTimestamp);
@@ -175,7 +175,7 @@ class Date
 
         $replace = function ($string, $char, $replace) {
             $string = preg_replace('/(?<!\\\)' . $char . '/', '${1}' . $replace, $string);
-            return preg_replace('/\\\\' . $char . '/', $char, $string);
+            return preg_replace('/\\\\' . $char . '/', $char, preg_replace('/(?<!\\\)' . $char . '/', '${1}' . $replace, $string));
         };
 
         if (preg_match('/[JbKk]/', $format)) {
@@ -200,7 +200,7 @@ class Date
         if (is_float($timestamp)) {
             // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
             static $dtz = null;
-            $dtz = $dtz ?? new \DateTimeZone(date_default_timezone_get());
+            $dtz ??= new \DateTimeZone(date_default_timezone_get());
             return \DateTime::createFromFormat('U.u', sprintf('%f', $timestamp))->setTimezone($dtz)->format($format);
         }
         return date($format, $timestamp);
@@ -257,7 +257,7 @@ class Date
             return null;
         }
 
-        $y = $y ?? idate('Y');
+        $y ??= idate('Y');
         $ld = $d ?? idate('t', mktime(0, 0, 0, $m ?? 12, 1, $y));
 
         $min = mktime($h ?? 0, $i ?? 0, $s ?? 0, $m ?? 1, $d ?? 1, $y);
@@ -297,7 +297,7 @@ class Date
      * that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'))->isSame('02/05/18 03:25:45.678');
      *
      * // 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
-     * that(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}))->isSame('678,45,25,3,18,5,2,0');
+     * that(date_interval(60 * 60 * 24 * 900 + 12345.678, fn() => implode(',', func_get_args())))->isSame('678,45,25,3,18,5,2,0');
      *
      * // リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
      * that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))->isSame('00/29/18 03:25:45.678');
@@ -415,9 +415,9 @@ class Date
                     }
                     $fmt = (arrayize)($fmt);
                     $fmt = (switchs)(count($fmt), [
-                        1 => static function () use ($fmt) { return ['', $fmt[0], '']; },
-                        2 => static function () use ($fmt) { return ['', $fmt[0], $fmt[1]]; },
-                        3 => static function () use ($fmt) { return array_values($fmt); },
+                        1 => static fn() => ['', $fmt[0], ''],
+                        2 => static fn() => ['', $fmt[0], $fmt[1]],
+                        3 => static fn() => array_values($fmt),
                     ]);
                 }
                 $tmp[] = $fmt;

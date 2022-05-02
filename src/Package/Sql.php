@@ -110,7 +110,7 @@ class Sql
     public static function sql_format($sql, $options = [])
     {
         static $keywords;
-        $keywords = $keywords ?? array_flip(KEYWORDS);
+        $keywords ??= array_flip(KEYWORDS);
 
         $options += [
             // インデント文字
@@ -137,16 +137,16 @@ class Sql
         if (is_string($options['highlight'])) {
             $rules = [
                 'cli'  => [
-                    'KEYWORD' => function ($token) { return "\e[1m" . $token . "\e[m"; },
-                    'COMMENT' => function ($token) { return "\e[33m" . $token . "\e[m"; },
-                    'STRING'  => function ($token) { return "\e[31m" . $token . "\e[m"; },
-                    'NUMBER'  => function ($token) { return "\e[36m" . $token . "\e[m"; },
+                    'KEYWORD' => fn($token) => "\e[1m" . $token . "\e[m",
+                    'COMMENT' => fn($token) => "\e[33m" . $token . "\e[m",
+                    'STRING'  => fn($token) => "\e[31m" . $token . "\e[m",
+                    'NUMBER'  => fn($token) => "\e[36m" . $token . "\e[m",
                 ],
                 'html' => [
-                    'KEYWORD' => function ($token) { return "<span style='font-weight:bold;'>" . htmlspecialchars($token) . "</span>"; },
-                    'COMMENT' => function ($token) { return "<span style='color:#FF8000;'>" . htmlspecialchars($token) . "</span>"; },
-                    'STRING'  => function ($token) { return "<span style='color:#DD0000;'>" . htmlspecialchars($token) . "</span>"; },
-                    'NUMBER'  => function ($token) { return "<span style='color:#0000BB;'>" . htmlspecialchars($token) . "</span>"; },
+                    'KEYWORD' => fn($token) => "<span style='font-weight:bold;'>" . htmlspecialchars($token) . "</span>",
+                    'COMMENT' => fn($token) => "<span style='color:#FF8000;'>" . htmlspecialchars($token) . "</span>",
+                    'STRING'  => fn($token) => "<span style='color:#DD0000;'>" . htmlspecialchars($token) . "</span>",
+                    'NUMBER'  => fn($token) => "<span style='color:#0000BB;'>" . htmlspecialchars($token) . "</span>",
                 ],
             ];
             $rule = $rules[$options['highlight']] ?? (throws)(new \InvalidArgumentException('highlight must be "cli" or "html".'));
@@ -529,9 +529,7 @@ class Sql
                 "(?<R>$MARK_R)",
                 "(?<N>$MARK_N)",
             ]) . "#u", [
-            'indent' => function ($str) use ($options, $MARK_NT, $MARK_SP) {
-                return "\n" . str_repeat($options['indent'], (substr_count($str, $MARK_NT) + substr_count($str, $MARK_SP)));
-            },
+            'indent' => fn($str) => "\n" . str_repeat($options['indent'], (substr_count($str, $MARK_NT) + substr_count($str, $MARK_SP))),
             'cs1'    => "\n" . $options['indent'],
             'cs2'    => "",
             'br'     => "\n",

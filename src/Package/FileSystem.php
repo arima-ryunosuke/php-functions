@@ -217,9 +217,7 @@ class FileSystem
         // for compatible
         if (is_callable($filter_condition)) {
             $filter_condition = [
-                'filter' => function (\SplFileInfo $file) use ($filter_condition) {
-                    return $filter_condition($file->getPathname());
-                },
+                'filter' => fn(\SplFileInfo $file) => $filter_condition($file->getPathname()),
             ];
         }
         $filter_condition += [
@@ -281,9 +279,7 @@ class FileSystem
         // for compatible
         if (is_callable($filter_condition)) {
             $filter_condition = [
-                'filter' => function (\SplFileInfo $file) use ($filter_condition) {
-                    return $filter_condition($file->getPathname());
-                },
+                'filter' => fn(\SplFileInfo $file) => $filter_condition($file->getPathname()),
             ];
         }
         $filter_condition += [
@@ -462,14 +458,14 @@ class FileSystem
                 return (array) (json_import)($mb_convert_encoding($encoding, file_get_contents($filename)), $options);
             case 'jsonl':
             case 'jsonl5':
-                return (array) array_map(function ($json) use ($options) { return (json_import)($json, $options); }, $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
+                return (array) array_map(fn($json) => (json_import)($json, $options), $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
             case 'yml':
             case 'yaml':
                 return (array) yaml_parse($mb_convert_encoding($encoding, file_get_contents($filename)), 0, $ndocs, $options);
             case 'xml':
                 throw new \DomainException("ext '$extension' is supported in the future.");
             case 'ltsv':
-                return (array) array_map(function ($ltsv) use ($options) { return (ltsv_import)($ltsv, $options); }, $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
+                return (array) array_map(fn($ltsv) => (ltsv_import)($ltsv, $options), $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
         }
     }
 
@@ -523,7 +519,7 @@ class FileSystem
      * $testpath = sys_get_temp_dir() . '/rewrite.txt';
      * file_put_contents($testpath, 'hoge');
      * // 前後に 'pre-', '-fix' を付与する
-     * file_rewrite_contents($testpath, function($contents, $fp){ return "pre-$contents-fix"; });
+     * file_rewrite_contents($testpath, fn($contents, $fp) => "pre-$contents-fix");
      * that($testpath)->fileEquals('pre-hoge-fix');
      * ```
      *
@@ -724,7 +720,7 @@ class FileSystem
      * $tmp = sys_get_temp_dir();
      * file_set_contents("$tmp/a/b/file.txt", 'hoge');
      * // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
-     * $callback = function($path){return realpath("$path/file.txt");};
+     * $callback = fn($path) => realpath("$path/file.txt");
      * that(dirname_r("$tmp/a/b/c/d/e/f", $callback))->isSame(realpath("$tmp/a/b/file.txt"));
      * ```
      *
@@ -984,9 +980,7 @@ class FileSystem
         $fa = array_filter(explode($DS, (path_resolve)($from)), 'strlen');
         $ta = array_filter(explode($DS, (path_resolve)($to)), 'strlen');
 
-        $compare = function ($a, $b) use ($DS) {
-            return $DS === '\\' ? strcasecmp($a, $b) : strcmp($a, $b);
-        };
+        $compare = fn($a, $b) => $DS === '\\' ? strcasecmp($a, $b) : strcmp($a, $b);
         $ca = array_udiff_assoc($fa, $ta, $compare);
         $da = array_udiff_assoc($ta, $fa, $compare);
 
@@ -1305,9 +1299,6 @@ class FileSystem
                 private $entry;
                 private $id;
                 private $position;
-                // compatible: 下記は php7.4 以降では標準でエラーになるようにあったため基本的に不要
-                private $readable;
-                private $writable;
                 private $appendable;
 
                 public $context;
@@ -1372,8 +1363,6 @@ class FileSystem
                             throw new \InvalidArgumentException("'$path' is not exist.");
                         }
                         $this->position = 0;
-                        $this->readable = true;
-                        $this->writable = strpos($mode, '+') !== false;
                         $this->appendable = false;
                     }
                     elseif (strpos($mode, 'w') !== false) {
@@ -1381,8 +1370,6 @@ class FileSystem
                         // ファイルが存在しない場合には、作成を試みます。
                         self::$entries[$this->id] = self::create();
                         $this->position = 0;
-                        $this->readable = strpos($mode, '+') !== false;
-                        $this->writable = true;
                         $this->appendable = false;
                     }
                     elseif (strpos($mode, 'a') !== false) {
@@ -1392,8 +1379,6 @@ class FileSystem
                             self::$entries[$this->id] = self::create();
                         }
                         $this->position = 0;
-                        $this->readable = strpos($mode, '+') !== false;
-                        $this->writable = true;
                         $this->appendable = true;
                     }
                     elseif (strpos($mode, 'x') !== false) {
@@ -1405,8 +1390,6 @@ class FileSystem
                         }
                         self::$entries[$this->id] = self::create();
                         $this->position = 0;
-                        $this->readable = strpos($mode, '+') !== false;
-                        $this->writable = true;
                         $this->appendable = false;
                     }
                     elseif (strpos($mode, 'c') !== false) {
@@ -1417,8 +1400,6 @@ class FileSystem
                             self::$entries[$this->id] = self::create();
                         }
                         $this->position = 0;
-                        $this->readable = strpos($mode, '+') !== false;
-                        $this->writable = true;
                         $this->appendable = false;
                     }
 
@@ -1451,7 +1432,6 @@ class FileSystem
 
                 public function stream_read(int $count): string
                 {
-                    assert($this->readable);
                     $result = substr($this->entry->content, $this->position, $count);
                     $this->position += strlen($result);
                     return $result;
@@ -1459,7 +1439,6 @@ class FileSystem
 
                 public function stream_write(string $data): int
                 {
-                    assert($this->writable);
                     $datalen = strlen($data);
                     $posision = $this->position;
                     // このモードは、fseek() では何の効果もありません。書き込みは、常に追記となります。
@@ -1476,7 +1455,6 @@ class FileSystem
 
                 public function stream_truncate(int $new_size): bool
                 {
-                    assert($this->writable);
                     $current = substr($this->entry->content, 0, $new_size);
                     $this->entry->content = str_pad($current, $new_size, "\0", STR_PAD_RIGHT);
                     return true;

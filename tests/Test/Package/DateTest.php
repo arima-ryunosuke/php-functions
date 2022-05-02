@@ -182,7 +182,7 @@ class DateTest extends AbstractTestCase
         that((date_interval)($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'i'))->is('00/00/00 00:583405:45.678');
         that((date_interval)($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 's'))->is('00/00/00 00:00:35004345.678');
 
-        that((date_interval)(60 * 60 * 24 * 900 + 12345.678, function () { return implode(',', func_get_args()); }, 'c'))->is('678,45,25,3,18,5,2,0');
+        that((date_interval)(60 * 60 * 24 * 900 + 12345.678, fn() => implode(',', func_get_args()), 'c'))->is('678,45,25,3,18,5,2,0');
 
         $format = [
             'c' => ['%c century', ' '],
