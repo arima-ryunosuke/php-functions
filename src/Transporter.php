@@ -110,6 +110,7 @@ CONSTANT;
             else {
                 $doccomment = $method->getDocComment();
                 $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
+                $deprecated = !!preg_match('#@deprecated#us', $doccomment);
 
                 $block = $symbols['phpblock'][$name];
                 $block = self::replaceConstant($block, '');
@@ -126,6 +127,9 @@ if (!isset(\$excluded_functions[{$ve($name)}]) && (!function_exists($id) || (!$p
 FUNCTION;
                 $funcs[] = <<<CONSTANT
 if (function_exists($id) && !defined($cname)) {
+    /**
+     *{$_($deprecated ? ' @deprecated' : '')}
+     */
     define($cname, $id);
 }
 
