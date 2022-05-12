@@ -86,6 +86,56 @@ class VarsTest extends AbstractTestCase
         that((numval)("30", 16))->isSame(48);
     }
 
+    function test_flagval()
+    {
+        that((flagval)(true))->isTrue();
+        that((flagval)(false))->isFalse();
+
+        that((flagval)(1))->isTrue();
+        that((flagval)(0))->isFalse();
+        that((flagval)(-0))->isFalse();
+        that((flagval)(0.0))->isFalse();
+        that((flagval)(-0.0))->isFalse();
+
+        that((flagval)(NAN))->isTrue();
+        that((flagval)(INF))->isTrue();
+
+        that((flagval)([0]))->isTrue();
+        that((flagval)([]))->isFalse();
+
+        that((flagval)((object) []))->isTrue();
+        that((flagval)(new \ArrayObject([])))->isTrue();
+
+        that((flagval)(''))->isFalse();
+        that((flagval)("\t \n"))->isTrue();
+        that((flagval)("\t \n", true))->isFalse();
+        that((flagval)(' false '))->isTrue();
+        that((flagval)(' false ', true))->isFalse();
+
+        that((flagval)('1'))->isTrue();
+        that((flagval)('0.0'))->isTrue();
+        that((flagval)("0"))->isFalse();
+
+        that((flagval)('true'))->isTrue();
+        that((flagval)('tRUE'))->isTrue();
+        that((flagval)('false'))->isFalse();
+        that((flagval)('fALSE'))->isFalse();
+
+        that((flagval)('on'))->isTrue();
+        that((flagval)('oN'))->isTrue();
+        that((flagval)('off'))->isFalse();
+        that((flagval)('oFF'))->isFalse();
+
+        that((flagval)('yes'))->isTrue();
+        that((flagval)('yES'))->isTrue();
+        that((flagval)('no'))->isFalse();
+        that((flagval)('nO'))->isFalse();
+
+        that((flagval)('hoge'))->isTrue();
+        that((flagval)('null'))->isTrue();
+        that((flagval)('nil'))->isTrue();
+    }
+
     function test_arrayval()
     {
         that((arrayval)('str'))->is(['str']);
