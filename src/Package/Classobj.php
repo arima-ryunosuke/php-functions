@@ -253,6 +253,44 @@ class Classobj
     }
 
     /**
+     * 遅延ロードする class_alias
+     *
+     * class_alias は即座にオートロードされるが、この関数は必要とされるまでオートロードしない。
+     *
+     * Example:
+     * ```php
+     * class_aliases([
+     *     'TestCase' => \PHPUnit\Framework\TestCase::class,
+     * ]);
+     * that(class_exists('TestCase', false))->isFalse(); // オートロードを走らせなければまだ定義されていない
+     * that(class_exists('TestCase', true))->isTrue();   // オートロードを走らせなければ定義されている
+     * ```
+     *
+     * @param array $aliases
+     * @return array エイリアス配列
+     */
+    public static function class_aliases($aliases)
+    {
+        static $alias_map = [];
+
+        foreach ($aliases as $alias => $class) {
+            $alias_map[trim($alias, '\\')] = $class;
+        }
+
+        static $registered = false;
+        if (!$registered) {
+            $registered = true;
+            spl_autoload_register(function ($class) use (&$alias_map) {
+                if (isset($alias_map[$class])) {
+                    class_alias($alias_map[$class], $class);
+                }
+            }, true, true);
+        }
+
+        return $alias_map;
+    }
+
+    /**
      * クラスの名前空間部分を取得する
      *
      * Example:

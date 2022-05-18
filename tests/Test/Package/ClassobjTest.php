@@ -87,6 +87,26 @@ class ClassobjTest extends AbstractTestCase
         that(class_loader)->try('/notfounddir')->wasThrown('not found');
     }
 
+    function test_class_aliases()
+    {
+        that((class_aliases)([
+            'Alias\\Alias1' => Classobj\Alias1::class,
+        ]))->is([
+            'Alias\\Alias1' => Classobj\Alias1::class,
+        ]);
+        that(class_exists('Alias\\Alias1', false))->isFalse();
+        that(class_exists('Alias\\Alias1', true))->isTrue();
+
+        that((class_aliases)([
+            'Alias\\Alias2' => Classobj\Alias2::class,
+        ]))->is([
+            'Alias\\Alias1' => Classobj\Alias1::class,
+            'Alias\\Alias2' => Classobj\Alias2::class,
+        ]);
+        that(class_exists('Alias\\Alias2', false))->isFalse();
+        that(class_exists('Alias\\Alias2', true))->isTrue();
+    }
+
     function test_class_namespace()
     {
         that((class_namespace)(new \stdClass()))->is('');
