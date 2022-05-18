@@ -54,6 +54,27 @@ class ClassobjTest extends AbstractTestCase
         that((class_uses_all)(new stdClass()))->is([]);
     }
 
+    function test_type_exists()
+    {
+        that((type_exists)(\Exception::class))->isTrue();
+        that((type_exists)(\Throwable::class))->isTrue();
+        that((type_exists)(\Traitable::class))->isTrue();
+
+        spl_autoload_register(function ($class) {
+            if (strpos($class, __NAMESPACE__) === 0) {
+                require_once __DIR__ . '/Classobj/Type.php';
+            }
+        });
+
+        that((type_exists)(Classobj\Type::class, false))->isFalse();
+        that((type_exists)(Classobj\Typable::class, false))->isFalse();
+        that((type_exists)(Classobj\TypeTrait::class, false))->isFalse();
+
+        that((type_exists)(Classobj\Type::class, true))->isTrue();
+        that((type_exists)(Classobj\Typable::class, true))->isTrue();
+        that((type_exists)(Classobj\TypeTrait::class, true))->isTrue();
+    }
+
     function test_auto_loader()
     {
         that((auto_loader)())->fileExists();
