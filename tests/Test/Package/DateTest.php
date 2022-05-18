@@ -237,4 +237,123 @@ class DateTest extends AbstractTestCase
         that(date_interval)->try(0, '', 2)->wasThrown('$format must be array');
         that(date_interval)->try(1, [], 2)->wasThrown('$format is empty');
     }
+
+    function test_date_alter()
+    {
+        // 順番に依存しないようにシャッフルしておく
+        $holidays = (array_shuffle)([
+            '2022-04-29' => '昭和の日',
+            '2022-04-30' => '所定休日',
+            '2022-05-01' => '法定休日',
+            '2022-05-03' => '憲法記念日',
+            '2022-05-04' => 'みどりの日',
+            '2022-05-05' => 'こどもの日',
+            '2022-05-07' => '所定休日',
+            '2022-05-08' => '法定休日',
+        ]);
+
+        that((date_alter)('2022/04/28', $holidays, -3))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, -3))->is('2022-04-28');
+        that((date_alter)('2022/04/30', $holidays, -3))->is('2022-04-28');
+        that((date_alter)('2022/05/01', $holidays, -3))->is('2022-04-28');
+        that((date_alter)('2022/05/02', $holidays, -3))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, -3))->is('2022-05-02');
+        that((date_alter)('2022/05/04', $holidays, -3))->is('2022-05-02');
+        that((date_alter)('2022/05/05', $holidays, -3))->is('2022-05-02');
+        that((date_alter)('2022/05/06', $holidays, -3))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, -3))->is('2022-05-06');
+        that((date_alter)('2022/05/08', $holidays, -3))->is('2022-05-06');
+        that((date_alter)('2022/05/09', $holidays, -3))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, -2))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, -2))->is('2022-04-28');
+        that((date_alter)('2022/04/30', $holidays, -2))->is('2022-04-28');
+        that((date_alter)('2022/05/01', $holidays, -2))->is(null);
+        that((date_alter)('2022/05/02', $holidays, -2))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, -2))->is('2022-05-02');
+        that((date_alter)('2022/05/04', $holidays, -2))->is('2022-05-02');
+        that((date_alter)('2022/05/05', $holidays, -2))->is(null);
+        that((date_alter)('2022/05/06', $holidays, -2))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, -2))->is('2022-05-06');
+        that((date_alter)('2022/05/08', $holidays, -2))->is('2022-05-06');
+        that((date_alter)('2022/05/09', $holidays, -2))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, -1))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, -1))->is('2022-04-28');
+        that((date_alter)('2022/04/30', $holidays, -1))->is(null);
+        that((date_alter)('2022/05/01', $holidays, -1))->is(null);
+        that((date_alter)('2022/05/02', $holidays, -1))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, -1))->is('2022-05-02');
+        that((date_alter)('2022/05/04', $holidays, -1))->is(null);
+        that((date_alter)('2022/05/05', $holidays, -1))->is(null);
+        that((date_alter)('2022/05/06', $holidays, -1))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, -1))->is('2022-05-06');
+        that((date_alter)('2022/05/08', $holidays, -1))->is(null);
+        that((date_alter)('2022/05/09', $holidays, -1))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, 0))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, 0))->is(null);
+        that((date_alter)('2022/04/30', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/01', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/02', $holidays, 0))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/04', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/05', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/06', $holidays, 0))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/08', $holidays, 0))->is(null);
+        that((date_alter)('2022/05/09', $holidays, 0))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, +1))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, +1))->is(null);
+        that((date_alter)('2022/04/30', $holidays, +1))->is(null);
+        that((date_alter)('2022/05/01', $holidays, +1))->is('2022-05-02');
+        that((date_alter)('2022/05/02', $holidays, +1))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, +1))->is(null);
+        that((date_alter)('2022/05/04', $holidays, +1))->is(null);
+        that((date_alter)('2022/05/05', $holidays, +1))->is('2022-05-06');
+        that((date_alter)('2022/05/06', $holidays, +1))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, +1))->is(null);
+        that((date_alter)('2022/05/08', $holidays, +1))->is('2022-05-09');
+        that((date_alter)('2022/05/09', $holidays, +1))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, +2))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, +2))->is(null);
+        that((date_alter)('2022/04/30', $holidays, +2))->is('2022-05-02');
+        that((date_alter)('2022/05/01', $holidays, +2))->is('2022-05-02');
+        that((date_alter)('2022/05/02', $holidays, +2))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, +2))->is(null);
+        that((date_alter)('2022/05/04', $holidays, +2))->is('2022-05-06');
+        that((date_alter)('2022/05/05', $holidays, +2))->is('2022-05-06');
+        that((date_alter)('2022/05/06', $holidays, +2))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, +2))->is('2022-05-09');
+        that((date_alter)('2022/05/08', $holidays, +2))->is('2022-05-09');
+        that((date_alter)('2022/05/09', $holidays, +2))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, +3))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, +3))->is('2022-05-02');
+        that((date_alter)('2022/04/30', $holidays, +3))->is('2022-05-02');
+        that((date_alter)('2022/05/01', $holidays, +3))->is('2022-05-02');
+        that((date_alter)('2022/05/02', $holidays, +3))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, +3))->is('2022-05-06');
+        that((date_alter)('2022/05/04', $holidays, +3))->is('2022-05-06');
+        that((date_alter)('2022/05/05', $holidays, +3))->is('2022-05-06');
+        that((date_alter)('2022/05/06', $holidays, +3))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, +3))->is('2022-05-09');
+        that((date_alter)('2022/05/08', $holidays, +3))->is('2022-05-09');
+        that((date_alter)('2022/05/09', $holidays, +3))->is('2022-05-09');
+
+        that((date_alter)('2022/04/28', $holidays, null))->is('2022-04-28');
+        that((date_alter)('2022/04/29', $holidays, null))->is('2022-04-29');
+        that((date_alter)('2022/04/30', $holidays, null))->is('2022-04-30');
+        that((date_alter)('2022/05/01', $holidays, null))->is('2022-05-01');
+        that((date_alter)('2022/05/02', $holidays, null))->is('2022-05-02');
+        that((date_alter)('2022/05/03', $holidays, null))->is('2022-05-03');
+        that((date_alter)('2022/05/04', $holidays, null))->is('2022-05-04');
+        that((date_alter)('2022/05/05', $holidays, null))->is('2022-05-05');
+        that((date_alter)('2022/05/06', $holidays, null))->is('2022-05-06');
+        that((date_alter)('2022/05/07', $holidays, null))->is('2022-05-07');
+        that((date_alter)('2022/05/08', $holidays, null))->is('2022-05-08');
+        that((date_alter)('2022/05/09', $holidays, null))->is('2022-05-09');
+    }
 }
