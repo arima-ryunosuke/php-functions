@@ -2996,6 +2996,43 @@ z", quote2: "a\\\\nz"');
         );
     }
 
+    function test_mb_ellipsis()
+    {
+        that((mb_ellipsis)('1234567890', 8, '...'))->isSame('123...90');
+        that((mb_ellipsis)('1234567890', 8, '...', +0))->isSame('...67890');
+        that((mb_ellipsis)('1234567890', 8, '...', +1))->isSame('1...7890');
+        that((mb_ellipsis)('1234567890', 8, '...', +2))->isSame('12...890');
+        that((mb_ellipsis)('1234567890', 8, '...', +3))->isSame('123...90');
+        that((mb_ellipsis)('1234567890', 8, '...', +4))->isSame('1234...0');
+        that((mb_ellipsis)('1234567890', 8, '...', +5))->isSame('12345...');
+        that((mb_ellipsis)('1234567890', 8, '...', +6))->isSame('12345...');
+        that((mb_ellipsis)('1234567890', 8, '...', -1))->isSame('1234...0');
+        that((mb_ellipsis)('1234567890', 8, '...', -2))->isSame('123...90');
+        that((mb_ellipsis)('1234567890', 8, '...', -3))->isSame('12...890');
+        that((mb_ellipsis)('1234567890', 8, '...', -4))->isSame('1...7890');
+        that((mb_ellipsis)('1234567890', 8, '...', -5))->isSame('...67890');
+        that((mb_ellipsis)('1234567890', 8, '...', -6))->isSame('...67890');
+
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...'))->isSame('1あ...お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +0))->isSame('...え5お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +1))->isSame('1...5お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +2))->isSame('1...5お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +3))->isSame('1あ...お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +4))->isSame('1あ2...');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +5))->isSame('1あ2...');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', +6))->isSame('1あ2...');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', -1))->isSame('1あ2...');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', -2))->isSame('1あ...お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', -3))->isSame('1...5お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', -4))->isSame('1...5お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', -5))->isSame('...え5お');
+        that((mb_ellipsis)('1あ2い3う4え5お', 8, '...', -6))->isSame('...え5お');
+
+        that((mb_ellipsis)('', 1, '...', null))->isSame('');
+        that((mb_ellipsis)('1234567890', 1, '...', null))->isSame('...');
+        that((mb_ellipsis)('1234567890', 1000, '...', null))->isSame('1234567890');
+    }
+
     function test_mb_trim()
     {
         that((mb_trim)(' 　 　 　'))->is('');
