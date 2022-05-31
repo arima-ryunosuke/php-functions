@@ -1948,7 +1948,7 @@ class Utility
                 return $this->result;
             }
 
-            public function getIterator()
+            public function getIterator(): \Traversable
             {
                 return yield from $this->result;
             }

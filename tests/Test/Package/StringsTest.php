@@ -1073,19 +1073,19 @@ ATTRS
         that((html_attr)([
             'arrayarray' => [
                 new class() implements \IteratorAggregate {
-                    public function getIterator() { return new \ArrayIterator(['text/html', 'charset=UTF-8']); }
+                    public function getIterator(): \Traversable { return new \ArrayIterator(['text/html', 'charset=UTF-8']); }
                 },
             ],
             'stringable' => new class() {
-                public function __toString() { return 'string'; }
+                public function __toString(): string { return 'string'; }
             },
             'iterable'   => new class() implements \IteratorAggregate {
-                public function getIterator() { yield 'a' => 'A'; }
+                public function getIterator(): \Traversable { yield 'a' => 'A'; }
             },
             'both'       => new class() implements \IteratorAggregate {
-                public function __toString() { return 'string'; }
+                public function __toString(): string { return 'string'; }
 
-                public function getIterator() { yield 'a' => 'A'; }
+                public function getIterator(): \Traversable { yield 'a' => 'A'; }
             },
         ], null))->is([
             'arrayarray' => 'text/html;charset=UTF-8',
@@ -2166,13 +2166,13 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 }');
         that((json_export)([
             new class implements \JsonSerializable {
-                public function jsonSerialize()
+                public function jsonSerialize(): array
                 {
                     return [];
                 }
             },
             new class implements \JsonSerializable {
-                public function jsonSerialize()
+                public function jsonSerialize(): array
                 {
                     return ['a' => 'A', 'b' => 'B'];
                 }
@@ -2269,7 +2269,7 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
         that(json_import)->try('{a:1,,b:2}')->wasThrown("Missing element");
         that(json_import)->try('[1,,2]')->wasThrown("Missing element");
 
-        that(json_import)->try('/* ccc')->wasThrown("Unterminated block comment");
+        that(json_import)->try('/* ccc')->wasThrown("at line"); // for both php 7.4 and 8.1
         that(json_import)->try('/# ccc')->wasThrown("Mismatch '['");
         that(json_import)->try('{123 : 456}')->wasThrown("Bad identifier");
 

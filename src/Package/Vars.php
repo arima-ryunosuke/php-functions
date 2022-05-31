@@ -53,7 +53,7 @@ class Vars
                 if (method_exists($var, '__toString')) {
                     return (string) $var;
                 }
-                if ($var instanceof \Serializable) {
+                if (method_exists($var, '__serialize') || $var instanceof \Serializable) {
                     return serialize($var);
                 }
                 if ($var instanceof \JsonSerializable) {

@@ -343,7 +343,7 @@ class ClassobjTest extends AbstractTestCase
                 /** @noinspection PhpMissingParentConstructorInspection */
                 public function __construct($type) { $this->type = $type; }
 
-                public function getType() { return $this->type; }
+                public function getType(): ?\ReflectionType { return $this->type; }
             },
             $refmethod,
             $refmethod->getParameters()[1],
@@ -547,10 +547,7 @@ class ClassobjTest extends AbstractTestCase
         $object = new \Nest3();
         $object->set(999);
 
-        // 復元したのに 999 になっていない（どうも同じキーの配列で __set_state されている模様）
-        that(((phpval)(var_export($object, true)))->get())->isSame(1);
-
-        // get_object_properties はそのようなことにはならない
+        // 子が優先される
         that(((phpval)((var_export2)($object, true)))->get())->isSame(999);
 
         // DateTime や ArrayObject はかなり特殊で、プロパティが標準の手段では取れない

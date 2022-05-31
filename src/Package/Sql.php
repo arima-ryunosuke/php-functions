@@ -143,10 +143,10 @@ class Sql
                     'NUMBER'  => fn($token) => "\e[36m" . $token . "\e[m",
                 ],
                 'html' => [
-                    'KEYWORD' => fn($token) => "<span style='font-weight:bold;'>" . htmlspecialchars($token) . "</span>",
-                    'COMMENT' => fn($token) => "<span style='color:#FF8000;'>" . htmlspecialchars($token) . "</span>",
-                    'STRING'  => fn($token) => "<span style='color:#DD0000;'>" . htmlspecialchars($token) . "</span>",
-                    'NUMBER'  => fn($token) => "<span style='color:#0000BB;'>" . htmlspecialchars($token) . "</span>",
+                    'KEYWORD' => fn($token) => "<span style='font-weight:bold;'>" . htmlspecialchars($token, ENT_QUOTES) . "</span>",
+                    'COMMENT' => fn($token) => "<span style='color:#FF8000;'>" . htmlspecialchars($token, ENT_QUOTES) . "</span>",
+                    'STRING'  => fn($token) => "<span style='color:#DD0000;'>" . htmlspecialchars($token, ENT_QUOTES) . "</span>",
+                    'NUMBER'  => fn($token) => "<span style='color:#0000BB;'>" . htmlspecialchars($token, ENT_QUOTES) . "</span>",
                 ],
             ];
             $rule = $rules[$options['highlight']] ?? (throws)(new \InvalidArgumentException('highlight must be "cli" or "html".'));

@@ -2673,7 +2673,7 @@ class Strings
                 $mb_internal_encoding = mb_internal_encoding();
                 if ($structure) {
                     foreach ($csvarrays as $n => $array) {
-                        $query = strtr(http_build_query($array, null), ['%5B' => '[', '%5D' => ']']);
+                        $query = strtr(http_build_query($array, ''), ['%5B' => '[', '%5D' => ']']);
                         $csvarrays[$n] = array_map('rawurldecode', (str_array)(explode('&', $query), '=', true));
                     }
                 }

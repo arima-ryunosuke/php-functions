@@ -643,7 +643,10 @@ class Classobj
 
         $getReturnType = function (\ReflectionFunctionAbstract $reffunc) {
             if ($reffunc->hasReturnType()) {
-                return ': ' . (reflect_types)($reffunc->getReturnType())->getName();
+                $type = (reflect_types)($reffunc->getReturnType())->getName();
+                if ($type !== 'void') {
+                    return ": $type";
+                }
             }
         };
 
@@ -870,23 +873,25 @@ class Classobj
                 return implode('|', $this->toStrings(true, true));
             }
 
-            public function getIterator()
+            public function getIterator(): \Traversable
             {
                 // yield from $this->getTypes();
                 return new \ArrayIterator($this->getTypes());
             }
 
-            public function offsetExists($offset)
+            public function offsetExists($offset): bool
             {
                 return isset($this->$offset);
             }
 
+            /** @noinspection PhpLanguageLevelInspection */
+            #[\ReturnTypeWillChange]
             public function offsetGet($offset)
             {
                 return $this->$offset;
             }
 
-            public function offsetSet($offset, $value)
+            public function offsetSet($offset, $value): void
             {
                 // for debug
                 if (is_string($value)) {
@@ -902,11 +907,11 @@ class Classobj
                             $this->builtins = $builtins;
                         }
 
-                        public function getName() { return $this->typename; }
+                        public function getName(): string { return $this->typename; }
 
-                        public function allowsNull() { return $this->nullable; }
+                        public function allowsNull(): bool { return $this->nullable; }
 
-                        public function isBuiltin() { return isset($this->builtins[$this->typename]); }
+                        public function isBuiltin(): bool { return isset($this->builtins[$this->typename]); }
 
                         public function __toString() { return $this->getName(); }
                     };
@@ -919,17 +924,17 @@ class Classobj
                 $this->$offset = $value;
             }
 
-            public function offsetUnset($offset)
+            public function offsetUnset($offset): void
             {
                 unset($this->$offset);
             }
 
-            public function count()
+            public function count(): int
             {
                 return count($this->toStrings(true, false));
             }
 
-            public function jsonSerialize()
+            public function jsonSerialize(): array
             {
                 return $this->toStrings(true, true);
             }
@@ -1223,18 +1228,33 @@ class Classobj
     {
         $fields = [];
         foreach ((array) $object as $name => $field) {
+            $cname = '';
             $names = explode("\0", $name);
-            if (count($names) > 1) {
+            if (count($names) > 1){
                 $name = array_pop($names);
                 $cname = $names[1];
-                if ($cname !== '*' && $cname !== get_class($object)) {
+            }
+            $fields[$cname][$name] = $field;
+        }
+
+        $classname = get_class($object);
+        $parents = array_values(['', '*', $classname] + class_parents($object));
+        uksort($fields, function ($a, $b) use ($parents) {
+            return array_search($a, $parents, true) <=> array_search($b, $parents, true);
+        });
+
+        $result = [];
+        foreach ($fields as $cname => $props) {
+            foreach ($props as $name => $field) {
+                if ($cname !== '' && $cname !== '*' && $classname !== $cname) {
                     $privates[$cname][$name] = $field;
                 }
-            }
-            if (!array_key_exists($name, $fields)) {
-                $fields[$name] = $field;
+                if (!array_key_exists($name, $result)) {
+                    $result[$name] = $field;
+                }
             }
         }
-        return $fields;
+
+        return $result;
     }
 }

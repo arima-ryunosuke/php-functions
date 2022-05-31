@@ -771,11 +771,11 @@ class Syntax
                 public function __call($name, $arguments) { return null; }
                 public function __invoke() { return null; }
                 public function __toString() { return ''; }
-                public function offsetExists($offset) { return false; }
-                public function offsetGet($offset) { return null; }
-                public function offsetSet($offset, $value) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function offsetUnset($offset) { throw new \DomainException('called NullObject#' . __FUNCTION__); }
-                public function getIterator() { return new \ArrayIterator([]); }
+                public function offsetExists($offset): bool { return false; }
+                public function offsetGet($offset): ?string { return null; }
+                public function offsetSet($offset, $value): void { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                public function offsetUnset($offset): void { throw new \DomainException('called NullObject#' . __FUNCTION__); }
+                public function getIterator(): \Traversable { return new \ArrayIterator([]); }
                 // @formatter:on
             };
         }
@@ -924,7 +924,7 @@ class Syntax
                 return (string) $this->data;
             }
 
-            public function getIterator()
+            public function getIterator(): \Traversable
             {
                 foreach ($this->data as $k => $v) {
                     yield $k => $v;

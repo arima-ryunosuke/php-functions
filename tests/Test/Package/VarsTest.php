@@ -28,7 +28,7 @@ class VarsTest extends AbstractTestCase
         that((stringify)(['array']))->is('["array"]');
         that((stringify)(new \stdClass()))->is('stdClass');
         that((stringify)(new \Concrete('hoge')))->is('hoge');
-        that((stringify)(new \SerialObject('hoge')))->is('C:12:"SerialObject":11:{s:4:"hoge";}');
+        that((stringify)(new \SerialObject(['hoge'])))->is('O:12:"SerialObject":1:{i:0;s:4:"hoge";}');
         that((stringify)(new \JsonObject(['hoge'])))->is('JsonObject:["hoge"]');
     }
 
@@ -235,11 +235,13 @@ class VarsTest extends AbstractTestCase
                 'false' => false,
             ];
 
-            public function offsetExists($offset)
+            public function offsetExists($offset): bool
             {
                 return isset($this->holder[$offset]);
             }
 
+            /** @noinspection PhpLanguageLevelInspection */
+            #[\ReturnTypeWillChange]
             public function offsetGet($offset)
             {
                 if ($offset === 'ex') {
@@ -248,9 +250,9 @@ class VarsTest extends AbstractTestCase
                 return $this->holder[$offset];
             }
 
-            public function offsetSet($offset, $value) { }
+            public function offsetSet($offset, $value): void { }
 
-            public function offsetUnset($offset) { }
+            public function offsetUnset($offset): void { }
         };
         that((arrayable_key_exists)('ok', $object))->isTrue();
         that((arrayable_key_exists)('null', $object))->isTrue();
@@ -286,11 +288,13 @@ class VarsTest extends AbstractTestCase
                 'false' => false,
             ];
 
-            public function offsetExists($offset)
+            public function offsetExists($offset): bool
             {
                 return isset($this->holder[$offset]);
             }
 
+            /** @noinspection PhpLanguageLevelInspection */
+            #[\ReturnTypeWillChange]
             public function offsetGet($offset)
             {
                 if ($offset === 'ex') {
@@ -299,9 +303,9 @@ class VarsTest extends AbstractTestCase
                 return $this->holder[$offset];
             }
 
-            public function offsetSet($offset, $value) { }
+            public function offsetSet($offset, $value): void { }
 
-            public function offsetUnset($offset) { }
+            public function offsetUnset($offset): void { }
         };
         that((attr_get)('ok', $object))->isSame('OK');
         that((attr_get)('null', $object))->isSame(null);
@@ -701,10 +705,10 @@ class VarsTest extends AbstractTestCase
         that((var_type)(new \Concrete('hoge')))->is('\\' . \Concrete::class);
 
         that((var_type)(new class extends \stdClass implements \JsonSerializable {
-            public function jsonSerialize() { return ''; }
+            public function jsonSerialize(): string { return ''; }
         }))->is('\stdClass');
         that((var_type)(new class implements \JsonSerializable {
-            public function jsonSerialize() { return ''; }
+            public function jsonSerialize(): string { return ''; }
         }))->is('\JsonSerializable');
         that((var_type)(new class extends \stdClass { }))->is('\stdClass');
         that((var_type)(new class { }))->stringContains('anonymous');
@@ -900,10 +904,10 @@ class VarsTest extends AbstractTestCase
 
         that((var_export2)($concrete, true))->is(<<<'VAR'
         Concrete::__set_state([
-            "privateField"    => "Concrete",
             "value"           => null,
-            "name"            => "hoge",
             "proptectedField" => 3.14,
+            "privateField"    => "Concrete",
+            "name"            => "hoge",
         ])
         VAR
         );
@@ -911,11 +915,11 @@ class VarsTest extends AbstractTestCase
         $concrete->external = 'aaa';
         that((var_export2)($concrete, true))->is(<<<'VAR'
         Concrete::__set_state([
-            "privateField"    => "Concrete",
             "value"           => null,
-            "name"            => "hoge",
-            "proptectedField" => 3.14,
             "external"        => "aaa",
+            "proptectedField" => 3.14,
+            "privateField"    => "Concrete",
+            "name"            => "hoge",
         ])
         VAR
         );

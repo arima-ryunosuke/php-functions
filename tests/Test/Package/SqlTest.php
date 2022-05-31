@@ -536,7 +536,7 @@ from
         that((sql_format)("/* comment */select '<abc>' str, 123 as num, t.xxx from t_table t", ['highlight' => 'html']))->IsEqualTrimming("
 <span style='color:#FF8000;'>/* comment */</span>
 <span style='font-weight:bold;'>select</span>
-  <span style='color:#DD0000;'>'&lt;abc&gt;'</span> str,
+  <span style='color:#DD0000;'>&#039;&lt;abc&gt;&#039;</span> str,
   <span style='color:#0000BB;'>123</span> <span style='font-weight:bold;'>as</span> num,
   t.xxx 
 <span style='font-weight:bold;'>from</span>

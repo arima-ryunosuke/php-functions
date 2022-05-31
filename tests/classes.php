@@ -123,27 +123,29 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
         return $name;
     }
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator(get_object_vars($this));
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset);
     }
 
+    /** @noinspection PhpLanguageLevelInspection */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->$offset;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->$offset = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->$offset);
     }
@@ -159,7 +161,7 @@ class PrivateClass
     private function privateMethod() { }
 }
 
-class SerialObject implements \Serializable
+class SerialObject
 {
     private $values;
 
@@ -168,14 +170,14 @@ class SerialObject implements \Serializable
         $this->values = $values;
     }
 
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->values);
+        return $this->values;
     }
 
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        $this->values = unserialize($serialized);
+        $this->values = $data;
     }
 }
 
@@ -188,6 +190,8 @@ class JsonObject implements \JsonSerializable
         $this->values = $values;
     }
 
+    /** @noinspection PhpLanguageLevelInspection */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->values;
@@ -203,22 +207,24 @@ class Arrayable implements \ArrayAccess
         $this->array = $array;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->array);
     }
 
+    /** @noinspection PhpLanguageLevelInspection */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->array[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->array[$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
@@ -269,7 +275,7 @@ class SleepWakeupMethod
 
 class BuiltIn implements \Countable
 {
-    public function count()
+    public function count(): int
     {
         return (int) \ryunosuke\Functions\Package\Funchand::by_builtin($this, 'count');
     }

@@ -972,7 +972,7 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_filter_key()
     {
-        that((array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], 'ctype_alpha'))->is(['a' => 'A', 'b' => 'B']);
+        that((array_filter_key)(['a' => 'A', 'b' => 'B', 'X'], fn($v) => ctype_alpha("$v")))->is(['a' => 'A', 'b' => 'B']);
         that((array_filter_key)(['a', 'b', 'c'], fn($k, $v) => $k === 1))->is([1 => 'b']);
         that((array_filter_key)(['a', 'b', 'c'], fn($k, $v) => $v === "b"))->is([1 => 'b']);
         that((array_filter_key)(['a', 'b', 'c'], fn($k, $v) => $v !== "b"))->is(['a', 2 => 'c']);
