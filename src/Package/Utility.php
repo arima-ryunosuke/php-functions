@@ -1189,13 +1189,13 @@ class Utility
      * # 単一のクロージャを複数の引数で回す
      * $t = microtime(true);
      * $result = process_parallel(static function ($arg1, $arg2) {
-     *     usleep(500 * 1000);
+     *     usleep(1000 * 1000);
      *     fwrite(STDOUT, "this is stdout");
      *     fwrite(STDERR, "this is stderr");
      *     return $arg1 + $arg2;
      * }, ['a' => [1, 2], 'b' => [2, 3], [3, 4]]);
-     * // 500ms かかる処理を3本実行するが、トータル時間は 1500ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-     * that(microtime(true) - $t)->lessThan(1.0);
+     * // 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+     * that(microtime(true) - $t)->lessThan(2.0);
      * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
      * that($result)->isSame([
      *     'a' => [
@@ -1221,20 +1221,20 @@ class Utility
      * $t = microtime(true);
      * $result = process_parallel([
      *     'a' => static function ($arg1, $arg2) {
-     *         usleep(100 * 1000);
+     *         usleep(300 * 1000);
      *         return $arg1 + $arg2;
      *     },
      *     'b' => static function ($arg1, $arg2) {
-     *         usleep(300 * 1000);
+     *         usleep(500 * 1000);
      *         return $arg1 * $arg2;
      *     },
      *     static function ($arg) {
-     *         usleep(500 * 1000);
+     *         usleep(1000 * 1000);
      *         exit($arg);
      *     },
      * ], ['a' => [1, 2], 'b' => [2, 3], [127]]);
-     * // 100,300,500ms かかる処理を3本実行するが、トータル時間は 900ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-     * that(microtime(true) - $t)->lessThan(1.0);
+     * // 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+     * that(microtime(true) - $t)->lessThan(1.5);
      * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
      * that($result)->isSame([
      *     'a' => [

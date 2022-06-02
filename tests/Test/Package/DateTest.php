@@ -89,9 +89,9 @@ class DateTest extends AbstractTestCase
         that($test('2012/12/24 12:34:55 +1 second'))->is('2012/12/24 12:34:56.000000');
         that($test('2012/12/24 12:34:57 -1 second'))->is('2012/12/24 12:34:56.000000');
         // 不正系
-        that($test('hogera'))->is(null);     // 明らかにヤバイ1
-        that($test('9999/99/99'))->is(null); // 明らかにヤバイ2
-        that($test('2014/2/29'))->is(null);  // 閏日でない
+        that($test('hogera'))->is(null);               // 明らかにヤバイ1
+        that($test('9999/99/99'))->is(null);           // 明らかにヤバイ2
+        that($test('2014/2/29'))->is(null);            // 閏日でない
         that($test('2014/12/24 12:34:70'))->is(null);  // 秒が不正
     }
 

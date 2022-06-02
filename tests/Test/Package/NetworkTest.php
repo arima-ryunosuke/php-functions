@@ -166,7 +166,7 @@ class NetworkTest extends AbstractTestCase
         $time = microtime(true) - $time;
 
         // 普通に投げると(3+4+3)秒かかるが並列なので max(3, 4, 3) = 4 のはず
-        that($time)->isBetween(4.0, 4.2);
+        that($time)->isBetween(4.0, 4.5);
         that($responses)->count(3);
         that($responses['to'])->is(null);
         that($infos['to'][1]['errno'])->is(CURLE_OPERATION_TIMEOUTED);
@@ -187,7 +187,7 @@ class NetworkTest extends AbstractTestCase
 
         // 並列度2なので d5 のリクエスト中に順次 d1 が入れ替わり実行される
         // つまり d1 は d5 に巻きこまれる形で5つまでは並列だが、最後の1つは個別で実行されるので約6秒で完了することになる
-        that($time)->isBetween(6.0, 6.2);
+        that($time)->isBetween(6.0, 6.5);
         that($responses)->count(7);
 
         that(http_requests)->try([
@@ -223,7 +223,7 @@ class NetworkTest extends AbstractTestCase
         $time = microtime(true) - $time;
 
         // マルチのリトライはフェーズごとの最大値で max(1, 2) + max(3) なので約5秒かかる
-        that($time)->isBetween(5.0, 5.2);
+        that($time)->isBetween(5.0, 5.5);
         that($responses)->count(3);
         that(array_column(array_column($infos, 1), 'retry'))->is([0, 1, 2]);
 
@@ -246,7 +246,7 @@ class NetworkTest extends AbstractTestCase
         $time = microtime(true) - $time;
 
         // 同時に投げているので約3秒以上はかからない
-        that($time)->isBetween(3.0, 3.2);
+        that($time)->isBetween(3.0, 3.5);
         that($responses)->count(3);
         // 3本のリクエストがリトライ3回（トータル4回）なので12個のUUIDが生成されており、かつすべてユニークになっているはず
         that(array_unique($stocks))->count(12);

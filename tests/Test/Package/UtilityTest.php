@@ -440,7 +440,7 @@ class UtilityTest extends AbstractTestCase
 
         $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-multispace1.php');
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
-            "vendor\\NS1" => [
+            "vendor\\NS1"  => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
                     "DS"                  => "DIRECTORY_SEPARATOR",
@@ -481,7 +481,7 @@ class UtilityTest extends AbstractTestCase
                 "function" => [],
                 "alias"    => [],
             ],
-            "vendor\\NS2" => [
+            "vendor\\NS2"  => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
                     "DS"                  => "DIRECTORY_SEPARATOR",
@@ -518,7 +518,7 @@ class UtilityTest extends AbstractTestCase
 
         $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-multispace2.php');
         that($actual)->as('actual:' . (var_export2)($actual, true))->is([
-            "vendor\\NS1" => [
+            "vendor\\NS1"  => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
                     "DS"                  => "DIRECTORY_SEPARATOR",
@@ -559,7 +559,7 @@ class UtilityTest extends AbstractTestCase
                 "function" => [],
                 "alias"    => [],
             ],
-            "vendor\\NS2" => [
+            "vendor\\NS2"  => [
                 "const"    => [
                     "DIRECTORY_SEPARATOR" => "DIRECTORY_SEPARATOR",
                     "DS"                  => "DIRECTORY_SEPARATOR",

@@ -86,12 +86,12 @@ class Transporter
             $cname = $ve("{$nameprefix}$name");
             $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
             $consts[] = <<<CONSTANT
-if (!defined($cname)) {
-    $doccomment
-    define($cname, $cvalue);
-}
-
-CONSTANT;
+            if (!defined($cname)) {
+                $doccomment
+                define($cname, $cvalue);
+            }
+            
+            CONSTANT;
         }
 
         // 関数コードの取得
@@ -120,36 +120,36 @@ CONSTANT;
                 $cname = $ve("{$nameprefix}$name");
                 $id = $ve("{$nameprefix}$name");
                 $funcs[] = <<<FUNCTION
-if (!isset(\$excluded_functions[{$ve($name)}]) && (!function_exists($id) || (!$polyfill && (new \\ReflectionFunction($id))->isInternal()))) {
-    $doccomment
-    $block
-}
-FUNCTION;
+                if (!isset(\$excluded_functions[{$ve($name)}]) && (!function_exists($id) || (!$polyfill && (new \\ReflectionFunction($id))->isInternal()))) {
+                    $doccomment
+                    $block
+                }
+                FUNCTION;
                 $funcs[] = <<<CONSTANT
-if (function_exists($id) && !defined($cname)) {
-    /**
-     *{$_($deprecated ? ' @deprecated' : '')}
-     */
-    define($cname, $id);
-}
-
-CONSTANT;
+                if (function_exists($id) && !defined($cname)) {
+                    /**
+                     *{$_($deprecated ? ' @deprecated' : '')}
+                     */
+                    define($cname, $id);
+                }
+                
+                CONSTANT;
             }
         }
 
         // 完全な php コードを返す
         return <<<CONTENTS
-<?php
-
-# Don't touch this code. This is auto generated.
-
-{$_($namespace ? "namespace $namespace;\n" : "")}
-# constants
-{$_(implode("\n", $consts))}
-
-# functions
-{$_(implode("\n", $funcs))}
-CONTENTS;
+        <?php
+        
+        # Don't touch this code. This is auto generated.
+        
+        {$_($namespace ? "namespace $namespace;\n" : "")}
+        # constants
+        {$_(implode("\n", $consts))}
+        
+        # functions
+        {$_(implode("\n", $funcs))}
+        CONTENTS;
     }
 
     /**
@@ -190,10 +190,10 @@ CONTENTS;
             $doccomment = $const->getDocComment();
             $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
             $consts[] = <<<CONSTANT
-    $doccomment
-    const $name = $cvalue;
-
-CONSTANT;
+                $doccomment
+                const $name = $cvalue;
+            
+            CONSTANT;
         }
 
         // 関数コードの取得
@@ -211,28 +211,28 @@ CONSTANT;
             $block = trim($block);
 
             $consts[] = <<<CONSTANT
-    const $name = {$_($ve(["\\$classname", $name]))};
-CONSTANT;
+                const $name = {$_($ve(["\\$classname", $name]))};
+            CONSTANT;
             $funcs[] = <<<FUNCTION
-    $doccomment
-    $block
-FUNCTION;
+                $doccomment
+                $block
+            FUNCTION;
         }
 
         // 完全な php コードを返す
         return <<<CONTENTS
-<?php
-
-# Don't touch this code. This is auto generated.
-
-{$_($namespace ? "namespace $namespace;\n" : "")}
-class $shortname
-{
-{$_(implode("\n", $consts))}
-
-{$_(implode("\n\n", $funcs))}
-}
-CONTENTS;
+        <?php
+        
+        # Don't touch this code. This is auto generated.
+        
+        {$_($namespace ? "namespace $namespace;\n" : "")}
+        class $shortname
+        {
+        {$_(implode("\n", $consts))}
+        
+        {$_(implode("\n\n", $funcs))}
+        }
+        CONTENTS;
     }
 
     /**

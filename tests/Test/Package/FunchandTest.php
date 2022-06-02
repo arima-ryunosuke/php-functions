@@ -377,6 +377,7 @@ class FunchandTest extends AbstractTestCase
 
         // コンストラクタ
         $iterator_class = version_compare(PHP_VERSION, '8.0.0') >= 0 ? 'iteratorClass' : 'iterator_class';
+        /** @var \ArrayObject $arrayobject */
         $arrayobject = (namedcallize)('\\ArrayObject::__construct')([[1, 2, 3], $iterator_class => 'ArrayIterator', \ArrayObject::ARRAY_AS_PROPS]);
         that($arrayobject)->getArrayCopy()->is([1, 2, 3]);
         that($arrayobject)->getIteratorClass()->is('ArrayIterator');

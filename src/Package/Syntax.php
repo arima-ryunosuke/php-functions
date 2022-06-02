@@ -748,9 +748,10 @@ class Syntax
      * that(optional(new \ArrayObject([1]), 'stdClass')->count())->isSame(null);
      * ```
      *
-     * @param object|null $object オブジェクト
+     * @template T
+     * @param T|null $object オブジェクト
      * @param ?string $expected 期待するクラス名。指定した場合は is_a される
-     * @return object $object がオブジェクトならそのまま返し、違うなら NullObject を返す
+     * @return T $object がオブジェクトならそのまま返し、違うなら NullObject を返す
      */
     public static function optional($object, $expected = null)
     {
@@ -779,7 +780,6 @@ class Syntax
                 // @formatter:on
             };
         }
-        /** @var object $nullobject */
         return $nullobject;
     }
 

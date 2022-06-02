@@ -289,10 +289,10 @@ class MathTest extends AbstractTestCase
             that($actual)->as("round($number, $precision, $mode)")->isSame($expected);
         }
 
-        $ZERO = 0;    // 0 方向
+        $ZERO = 0;     // 0 方向
         $PINF = +INF;  // 正の無限大
-        $NINF = -INF; // 負の無限大
-        $AUTO = null; // 正負で自動
+        $NINF = -INF;  // 負の無限大
+        $AUTO = null;  // 正負で自動
 
         $decimal(-110, -1, $NINF)->isSame(-110.0);
         $decimal(-114, -1, $NINF)->isSame(-120.0);

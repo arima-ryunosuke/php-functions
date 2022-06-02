@@ -21,8 +21,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 
 // actualThat を定義
 \ryunosuke\PHPUnit\Actual::$compatibleVersion = 2;
-\ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite
-{
+\ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite {
     public function __construct($value, bool $ignoreCase = false)
     {
         parent::__construct(new \PHPUnit\Framework\Constraint\IsEqual($this->filter($value), 0.0, 10, false, $ignoreCase));
@@ -34,6 +33,11 @@ if (DIRECTORY_SEPARATOR === '\\') {
     }
 };
 if (!function_exists('that')) {
+    /**
+     * @template T
+     * @param T $value
+     * @return T
+     */
     function that($value)
     {
         return new \ryunosuke\PHPUnit\Actual($value);

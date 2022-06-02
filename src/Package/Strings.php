@@ -4584,7 +4584,7 @@ class Strings
      * that(str_common_prefix('a'))->isSame(null);
      * ```
      *
-     * @param string[] ...$strings
+     * @param string[] $strings
      * @return ?string 共通部分（共通がない場合は空文字）
      */
     public static function str_common_prefix(...$strings)

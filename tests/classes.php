@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpUnusedPrivateMethodInspection
+ * @noinspection PhpUnusedPrivateFieldInspection
+ */
 
 abstract class AbstractConcrete
 {

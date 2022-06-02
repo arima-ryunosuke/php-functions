@@ -184,10 +184,9 @@ class ClassobjTest extends AbstractTestCase
         that($classD->newMethod())->is('this is D1');
 
         (class_replace)('\\ryunosuke\\Test\\package\\Classobj\\C2', new class() extends \ryunosuke\Test\package\Classobj\B {
-            use \Traitable{
+            use \Traitable {
                 \Traitable::traitMethod as hge;
             }
-
 
             function newMethod()
             {
@@ -524,6 +523,7 @@ class ClassobjTest extends AbstractTestCase
         ]);
     }
 
+    /** @noinspection PhpUnusedPrivateFieldInspection */
     function test_get_object_properties()
     {
         $concrete = new \Concrete('name');

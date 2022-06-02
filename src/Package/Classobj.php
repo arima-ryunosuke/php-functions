@@ -559,21 +559,16 @@ class Classobj
      * that($newobject->count())->isSame(6);
      * ```
      *
-     * @param object $object 対象オブジェクト
+     * @template T
+     * @param T $object 対象オブジェクト
      * @param \Closure[] $methods 注入するメソッド
      * @param array $fields 注入するフィールド
      * @param array $implements 実装するインターフェース
-     * @return object $object を拡張した object
+     * @return T $object を拡張した object
      */
     public static function class_extends($object, $methods, $fields = [], $implements = [])
     {
         assert(is_array($methods));
-
-        // こうするとコード補完が活きやすくなる
-        if (false) {
-            /** @noinspection PhpUnreachableStatementInspection */
-            return $object; // @codeCoverageIgnore
-        }
 
         static $template_source, $template_reflection;
         if (!isset($template_source)) {
@@ -913,7 +908,7 @@ class Classobj
 
                         public function isBuiltin(): bool { return isset($this->builtins[$this->typename]); }
 
-                        public function __toString() { return $this->getName(); }
+                        public function __toString(): string { return $this->getName(); }
                     };
                 }
 
@@ -1230,7 +1225,7 @@ class Classobj
         foreach ((array) $object as $name => $field) {
             $cname = '';
             $names = explode("\0", $name);
-            if (count($names) > 1){
+            if (count($names) > 1) {
                 $name = array_pop($names);
                 $cname = $names[1];
             }

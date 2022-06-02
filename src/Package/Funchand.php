@@ -36,9 +36,9 @@ class Funchand
                 }
 
                 public function __invoke(' . implode(',', is_infinite($arity)
-                        ? ['...$_']
-                        : array_map(fn($v) => '$_' . $v, array_keys(array_fill(1, $arity, null)))
-                    ) . ')
+                    ? ['...$_']
+                    : array_map(fn($v) => '$_' . $v, array_keys(array_fill(1, $arity, null)))
+                ) . ')
                 {
                     return ($this->invoker)($this->callable, func_get_args());
                 }

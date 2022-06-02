@@ -438,6 +438,7 @@ class ArraysTest extends AbstractTestCase
             ],
         ]);
 
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $rows = [
             1 => $r1 = ['id' => 1, 'name' => 'A'],
             2 => $r2 = ['id' => 2, 'name' => 'B'],
@@ -1587,6 +1588,7 @@ class ArraysTest extends AbstractTestCase
         that((array_distinct)([1, 2, -2, 3, -3], fn($a, $b) => abs($a) <=> abs($b)))->is([1, 2, 3 => 3]);
 
         // 配列の配列
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $rows = [
             11 => $r1 = ['id' => 1, 'group1' => 'groupA', 'group2' => 'groupA'],
             12 => $r2 = ['id' => 2, 'group1' => 'groupB', 'group2' => 'groupB'],
@@ -1603,6 +1605,7 @@ class ArraysTest extends AbstractTestCase
             13 => $r3,
         ]);
 
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $objects = [
             11 => $e1 = new \Exception('a', 1),
             12 => $e2 = new \Exception('b', 2),
