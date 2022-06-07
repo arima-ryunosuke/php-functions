@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L840" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L868" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Network</span></h2>
@@ -83,17 +83,18 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L38" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L72" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::getipaddress()" tabindex="-1" class="structure-title ">
-                        getipaddress                        	<small>($target = &quot;128.0.0.0&quot;) : string</small>
+                        getipaddress                        	<small>($target = null) : ?string</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>接続元となる IP を返す</p>
-<p>要するに自分の IP を返す。</p>
+<p>IP を指定してそこへ接続する際の SourceIP を返す（省略すると最初のエントリを返す）。<br />
+複数のネットワークにマッチした場合の結果は不定（最長が無難だろうがそもそも SourceIP がどうなるかが不定）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 何らかの IP アドレスが返ってくる
-that(getipaddress())-&gt;matches('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#');
+that(getipaddress())-&gt;isValidIpv4();
 // 自分への接続元は自分なので 127.0.0.1 を返す
 that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
 </code></pre>
@@ -102,9 +103,9 @@ that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">string</td>
-				<td class="rest">$target = &quot;128.0.0.0&quot;</td>
-				<td class="desc"><p>接続先。基本的に指定することはない</p>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr>null</td>
+				<td class="rest">$target = null</td>
+				<td class="desc"><p>接続先</p>
 </td>
 			</tr>
         		</tbody>
@@ -113,7 +114,7 @@ that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type">string</td>
+			<td class="type">?string</td>
 			<td class="desc"><p>IP アドレス</p>
 </td>
 			<td class="rest"></td>
@@ -137,7 +138,7 @@ that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L40-L86" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L74-L120" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::incidr()" tabindex="-1" class="structure-title ">
                         incidr                        	<small>($ipaddr, $cidr) : bool</small>
@@ -203,7 +204,7 @@ that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L88-L201" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L122-L235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::ping()" tabindex="-1" class="structure-title ">
                         ping                        	<small>($host, $port = null, $timeout = 1, &amp;$errstr = &quot;&quot;) : float<span class="type-separator"></span><wbr>bool</small>
@@ -279,7 +280,7 @@ that(ping('127.0.0.1', 1234))-&gt;isFalse(); // tcp はスキームを省略で�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L203-L414" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L237-L448" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_requests()" tabindex="-1" class="structure-title ">
                         http_requests                        	<small>($urls, $single_options = [], $multi_options = [], &amp;$infos = []) : array</small>
@@ -403,7 +404,7 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L416-L723" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L450-L751" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_request()" tabindex="-1" class="structure-title ">
                         http_request                        	<small>($options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -523,7 +524,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L725-L742" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L753-L770" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_head()" tabindex="-1" class="structure-title ">
                         http_head                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : array</small>
@@ -594,7 +595,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L744-L763" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L772-L791" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_get()" tabindex="-1" class="structure-title ">
                         http_get                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -665,7 +666,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L765-L782" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L793-L810" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_post()" tabindex="-1" class="structure-title ">
                         http_post                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -736,7 +737,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L784-L801" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L812-L829" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_put()" tabindex="-1" class="structure-title ">
                         http_put                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -807,7 +808,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L803-L820" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L831-L848" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_patch()" tabindex="-1" class="structure-title ">
                         http_patch                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -878,7 +879,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L822-L839" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L850-L867" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_delete()" tabindex="-1" class="structure-title ">
                         http_delete                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>

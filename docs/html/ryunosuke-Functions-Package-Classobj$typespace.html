@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L1165" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L5-L1255" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Classobj</span></h2>
@@ -323,7 +323,72 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L170-L196" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L170-L207" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::type_exists()" tabindex="-1" class="structure-title ">
+                        type_exists                        	<small>($typename, $autoload = true) : bool</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>型が存在するか返す</p>
+<p>class/interface/trait/enum exists の合せ技。<br />
+trait/enum のように今後型的なものがさらに増えるかもしれないし、class_exists だけして interface/trait が抜けているコードを何度も見てきた。<br />
+それを一元管理するような関数となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(class_exists(\Throwable::class))-&gt;isFalse();     // class_exists は class にしか反応しない
+that(interface_exists(\Exception::class))-&gt;isFalse(); // interface_exists は interface にしか反応しない
+that(trait_exists(\Error::class))-&gt;isFalse();         // trait_exists は trait にしか反応しない
+// type_exists であれば全てに反応する
+that(type_exists(\Throwable::class))-&gt;isTrue();
+that(type_exists(\Exception::class))-&gt;isTrue();
+that(type_exists(\Error::class))-&gt;isTrue();
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$typename</td>
+				<td class="desc"><p>調べる型名</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$autoload = true</td>
+				<td class="desc"><p>オートロードを行うか</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">bool</td>
+			<td class="desc"><p>型が存在するなら true</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L209-L235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::auto_loader()" tabindex="-1" class="structure-title ">
                         auto_loader                        	<small>($startdir = null) : string</small>
@@ -374,7 +439,7 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L198-L214" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L237-L253" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_loader()" tabindex="-1" class="structure-title ">
                         class_loader                        	<small>($startdir = null) : <a href="Composer-Autoload-ClassLoader$typespace.html#Composer\Autoload\ClassLoader" class="fqsen "><small>Composer\Autoload\</small><wbr>ClassLoader</a></small>
@@ -425,7 +490,61 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L216-L236" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L255-L291" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Classobj::class_aliases()" tabindex="-1" class="structure-title ">
+                        class_aliases                        	<small>($aliases) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>遅延ロードする class_alias</p>
+<p>class_alias は即座にオートロードされるが、この関数は必要とされるまでオートロードしない。</p>
+<p>Example:</p>
+<pre><code class="language-php">class_aliases([
+    'TestCase' =&gt; \PHPUnit\Framework\TestCase::class,
+]);
+that(class_exists('TestCase', false))-&gt;isFalse(); // オートロードを走らせなければまだ定義されていない
+that(class_exists('TestCase', true))-&gt;isTrue();   // オートロードを走らせなければ定義されている
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$aliases</td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>エイリアス配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L293-L313" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_namespace()" tabindex="-1" class="structure-title ">
                         class_namespace                        	<small>($class) : string</small>
@@ -475,7 +594,7 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L238-L257" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L315-L334" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_shorten()" tabindex="-1" class="structure-title ">
                         class_shorten                        	<small>($class) : string</small>
@@ -525,7 +644,7 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L259-L441" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L336-L516" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_replace()" tabindex="-1" class="structure-title ">
                         class_replace                        	<small>($class, $register) : void</small>
@@ -544,7 +663,7 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 <p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p>
 <p>Example:</p>
 <pre><code class="language-php">// Y1 extends X1 だとしてクラス定義でオーバーライドする
-class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function () {
     // アンスコがついたクラスが定義されるのでそれを継承して定義する
     class X1d extends \ryunosuke\Test\Package\Classobj\X1_
     {
@@ -563,12 +682,10 @@ that((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;method())-&gt;isSame('this 
 that((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;newmethod())-&gt;isSame('this is newmethod');
 
 // Y2 extends X2 だとしてクロージャ配列でオーバーライドする
-class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
-    return [
-        'method'    =&gt; function(){return 'this is X2d';},
-        'newmethod' =&gt; function(){return 'this is newmethod';},
-    ];
-});
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', fn() =&gt; [
+    'method'    =&gt; function () {return 'this is X2d';},
+    'newmethod' =&gt; function () {return 'this is newmethod';},
+]);
 // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
 that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method())-&gt;isSame('this is X2d');
 that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod())-&gt;isSame('this is newmethod');
@@ -576,7 +693,7 @@ that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod())-&gt;isSame('th
 // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
 class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
     [\ryunosuke\Test\Package\Classobj\XTrait::class],
-    'method' =&gt; function(){return 'this is X3d';},
+    'method' =&gt; function () {return 'this is X3d';},
 ]);
 // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
 that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method())-&gt;isSame('this is X3d');
@@ -638,10 +755,10 @@ that((new \ryunosuke\Test\Package\Classobj\Y4())-&gt;traitMethod())-&gt;isSame('
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L443-L677" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L518-L750" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::class_extends()" tabindex="-1" class="structure-title ">
-                        class_extends                        	<small>($object, $methods, $fields = [], $implements = []) : object</small>
+                        class_extends                        	<small>($object, $methods, $fields = [], $implements = []) : <a href="T$typespace.html#T" class="fqsen ">T</a></small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>インスタンスを動的に拡張する</p>
@@ -660,8 +777,8 @@ that((new \ryunosuke\Test\Package\Classobj\Y4())-&gt;traitMethod())-&gt;isSame('
 <pre><code class="language-php">// Exception に「count」メソッドと「コードとメッセージを結合して返す」メソッドを動的に生やす
 $object = new \Exception('hoge', 123);
 $newobject = class_extends($object, [
-    'count'       =&gt; function() { return $this-&gt;code; },
-    'codemessage' =&gt; function() {
+    'count'       =&gt; function () { return $this-&gt;code; },
+    'codemessage' =&gt; function () {
         // bind されるので protected フィールドが使える
         return $this-&gt;code . ':' . $this-&gt;message;
     },
@@ -673,7 +790,7 @@ that($newobject)-&gt;isInstanceOf(\Countable::class); // instanceof をパスで
 // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
 $object = new \ArrayObject([1, 2, 3]);
 $newobject = class_extends($object, [
-    'count' =&gt; function() {
+    'count' =&gt; function () {
         // parent は元オブジェクトを表す
         return parent::count() * 2;
     },
@@ -685,7 +802,7 @@ that($newobject-&gt;count())-&gt;isSame(6);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">object</td>
+				<td class="type"><a href="T$typespace.html#T" class="fqsen ">T</a></td>
 				<td class="rest">$object</td>
 				<td class="desc"><p>対象オブジェクト</p>
 </td>
@@ -714,7 +831,7 @@ that($newobject-&gt;count())-&gt;isSame(6);
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type">object</td>
+			<td class="type"><a href="T$typespace.html#T" class="fqsen ">T</a></td>
 			<td class="desc"><p>$object を拡張した object</p>
 </td>
 			<td class="rest"></td>
@@ -738,7 +855,7 @@ that($newobject-&gt;count())-&gt;isSame(6);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L679-L969" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L752-L1044" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::reflect_types()" tabindex="-1" class="structure-title ">
                         reflect_types                        	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="ReflectionUnionType$typespace.html#ReflectionUnionType" class="fqsen ">ReflectionUnionType</a></small>
@@ -827,7 +944,7 @@ that(count($types))-&gt;is(2);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L971-L1019" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1046-L1094" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::const_exists()" tabindex="-1" class="structure-title ">
                         const_exists                        	<small>($classname, $constname = null) : bool</small>
@@ -897,7 +1014,7 @@ that(const_exists('UNDEFINED'))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1021-L1057" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1096-L1132" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::object_dive()" tabindex="-1" class="structure-title ">
                         object_dive                        	<small>($object, $path, $default = null, $delimiter = &quot;.&quot;) : mixed</small>
@@ -976,7 +1093,7 @@ that(object_dive($class, ['a', 'b', 'c']))-&gt;isSame('vvv');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1059-L1117" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1134-L1192" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_class_constants()" tabindex="-1" class="structure-title ">
                         get_class_constants                        	<small>($class, $filter = null) : array</small>
@@ -1057,7 +1174,7 @@ that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1119-L1164" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Classobj.php#L1194-L1254" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Classobj::get_object_properties()" tabindex="-1" class="structure-title ">
                         get_object_properties                        	<small>($object, &amp;$privates = []) : array</small>

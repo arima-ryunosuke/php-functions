@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L5-L471" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L5-L507" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Date</span></h2>
@@ -345,7 +345,7 @@ $format は配列で与えることができる。配列で与えた場合、 0 
 that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'))-&gt;isSame('02/05/18 03:25:45.678');
 
 // 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
-that(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}))-&gt;isSame('678,45,25,3,18,5,2,0');
+that(date_interval(60 * 60 * 24 * 900 + 12345.678, fn() =&gt; implode(',', func_get_args())))-&gt;isSame('678,45,25,3,18,5,2,0');
 
 // リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
 that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))-&gt;isSame('00/29/18 03:25:45.678');
@@ -400,6 +400,79 @@ that(date_interval(123.456))-&gt;isInstanceOf(\DateInterval::class);
 		<tr>
 			<td class="type">string<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.dateinterval.php" class="fqsen" target="_blank">\DateInterval</a></td>
 			<td class="desc"><p>時間差文字列 or DateInterval オブジェクト</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L472-L506" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Date::date_alter()" tabindex="-1" class="structure-title ">
+                        date_alter                        	<small>($datetime, $excluded_dates, $follow_count, $format = &quot;Y-m-d&quot;) : string<span class="type-separator"></span><wbr>null</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>日付を除外日リストに基づいてずらす</p>
+<p>典型的には「祝日前の営業日」「祝日後の営業日」のような代理日を返すイメージ。<br />
+$follow_count に応じて下記のように返す。</p>
+<ul>
+<li>null: 除外日でもずらさないでそのまま返す</li>
+<li>-N: 除外日なら最大N日分前倒しした日付を返す</li>
+<li>+N: 除外日なら最大N日分先送りした日付を返す</li>
+<li>0: 除外日でもずらさないで null を返す</li>
+</ul>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string<span class="type-separator"></span><wbr>int<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.datetimeinterface.php" class="fqsen" target="_blank">\DateTimeInterface</a></td>
+				<td class="rest">$datetime</td>
+				<td class="desc"><p>調べる日付</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">array</td>
+				<td class="rest">$excluded_dates</td>
+				<td class="desc"><p>除外日（いわゆる祝休日リスト）</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$follow_count</td>
+				<td class="desc"><p>ずらす範囲</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$format = &quot;Y-m-d&quot;</td>
+				<td class="desc"><p>日付フォーマット（$excluded_dates の形式＋返り値の形式）</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">string<span class="type-separator"></span><wbr>null</td>
+			<td class="desc"><p>代替日。除外日 null</p>
 </td>
 			<td class="rest"></td>
 		</tr>

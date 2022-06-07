@@ -288,7 +288,7 @@ that(kvsort($array))-&gt;isSame([
     'x3' =&gt; 9,
 ]);
 // キーを使用したソート
-that(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}))-&gt;isSame([
+that(kvsort($array, fn($av, $bv, $ak, $bk) =&gt; strcmp($bk, $ak)))-&gt;isSame([
     'x3' =&gt; 9,
     'x2' =&gt; 9,
     'x1' =&gt; 9,
@@ -308,6 +308,39 @@ that(kvsort($array, function($av, $bv, $ak, $bk){return strcmp($bk, $ak);}))-&gt
 that(array_add(['a', 'b', 'c'], ['X']))-&gt;isSame(['a', 'b', 'c']);
 // 異なるキーは生える
 that(array_add(['a', 'b', 'c'], ['x' =&gt; 'X']))-&gt;isSame(['a', 'b', 'c', 'x' =&gt; 'X']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_append()">
+                                    ryunosuke\Functions\Package\Arrays::array_append		</a>	<small>($array, $value, $key = null) : array</small>
+		</h4>
+	<div class="description"><p>配列の末尾に要素を追加する</p>
+<p>array_push のキーが指定できる参照渡しでない版と言える。<br />
+キー指定でかつそのキーが存在するとき、値を変えつつ末尾に移動する動作となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// キー未指定は言語機構を利用して末尾に追加される
+that(array_append([1, 2, 3], 99))-&gt;is([1, 2, 3, 99]);
+// キーを指定すればそのキーで生える
+that(array_append([1, 2, 3], 99, 'newkey'))-&gt;is([1, 2, 3, 'newkey' =&gt; 99]);
+// 存在する場合は値が変わって末尾に移動する
+that(array_append([1, 2, 3], 99, 1))-&gt;is([0 =&gt; 1, 2 =&gt; 3, 1 =&gt; 99]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_prepend()">
+                                    ryunosuke\Functions\Package\Arrays::array_prepend		</a>	<small>($array, $value, $key = null) : array</small>
+		</h4>
+	<div class="description"><p>配列の先頭に要素を追加する</p>
+<p>array_unshift のキーが指定できる参照渡しでない版と言える。<br />
+配列の数値キーは振り直される。<br />
+キー指定でかつそのキーが存在するとき、値を変えつつ先頭に移動する動作となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// キー未指定は0で挿入される
+that(array_prepend([1, 2, 3], 99))-&gt;is([99, 1, 2, 3]);
+// キーを指定すればそのキーで生える
+that(array_prepend([1, 2, 3], 99, 'newkey'))-&gt;is(['newkey' =&gt; 99, 1, 2, 3]);
+// 存在する場合は値が変わって先頭に移動する
+that(array_prepend([1, 2, 3], 99, 1))-&gt;is([1 =&gt; 99, 0 =&gt; 1, 2 =&gt; 3]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -424,7 +457,7 @@ $condition で指定された要素は結果配列に含まれない。</p>
 <pre><code class="language-php">// null 要素で分割
 that(array_explode(['a', null, 'b', 'c'], null))-&gt;isSame([['a'], [2 =&gt; 'b', 3 =&gt; 'c']]);
 // クロージャで分割（大文字で分割）
-that(array_explode(['a', 'B', 'c', 'D', 'e'], function($v){return ctype_upper($v);}))-&gt;isSame([['a'], [2 =&gt; 'c'], [4 =&gt; 'e']]);
+that(array_explode(['a', 'B', 'c', 'D', 'e'], fn($v) =&gt; ctype_upper($v)))-&gt;isSame([['a'], [2 =&gt; 'c'], [4 =&gt; 'e']]);
 // 負数指定
 that(array_explode(['a', null, 'b', null, 'c'], null, -2))-&gt;isSame([[0 =&gt; 'a', 1 =&gt; null, 2 =&gt; 'b'], [4 =&gt; 'c']]);
 </code></pre>
@@ -446,7 +479,7 @@ that(array_sprintf($array, '%2$s=%1$s'))-&gt;isSame(['key1=val1', 'key2=val2']);
 // 第3引数を与えるとさらに implode される
 that(array_sprintf($array, '%2$s=%1$s', ' '))-&gt;isSame('key1=val1 key2=val2');
 // クロージャを与えるとコールバック動作になる
-$closure = function($v, $k){return "$k=" . strtoupper($v);};
+$closure = fn($v, $k) =&gt; "$k=" . strtoupper($v);
 that(array_sprintf($array, $closure, ' '))-&gt;isSame('key1=VAL1 key2=VAL2');
 // 省略すると vsprintf になる
 that(array_sprintf([
@@ -531,9 +564,9 @@ that(array_get(['a', 'b', 'c'], [0, 9]))-&gt;isSame([0 =&gt; 'a']);
 // 配列デフォルト（null ではなく [] を返す）
 that(array_get(['a', 'b', 'c'], [9]))-&gt;isSame([]);
 // クロージャ指定＆単値（コールバックが true を返す最初の要素）
-that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}))-&gt;isSame('b');
+that(array_get(['a', 'b', 'c'], fn($v) =&gt; in_array($v, ['b', 'c'])))-&gt;isSame('b');
 // クロージャ指定＆配列（コールバックが true を返すもの）
-that(array_get(['a', 'b', 'c'], function($v){return in_array($v, ['b', 'c']);}, []))-&gt;isSame([1 =&gt; 'b', 2 =&gt; 'c']);
+that(array_get(['a', 'b', 'c'], fn($v) =&gt; in_array($v, ['b', 'c']), []))-&gt;isSame([1 =&gt; 'b', 2 =&gt; 'c']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -587,9 +620,9 @@ that(array_put($array, 'Z', 'z'))-&gt;isSame('z');
 that(array_put($array, 'Z', ['x', 'y', 'z']))-&gt;isSame('z');
 that($array)-&gt;isSame(['a' =&gt; 'A', 'B', 'Z', 'Z', 'z' =&gt; 'Z', 'x' =&gt; ['y' =&gt; ['z' =&gt; 'Z']]]);
 // 第4引数で条件を指定（キーが存在するなら追加しない）
-that(array_put($array, 'Z', 'z', function ($v, $k, $array){return !isset($array[$k]);}))-&gt;isSame(false);
+that(array_put($array, 'Z', 'z', fn($v, $k, $array) =&gt; !isset($array[$k])))-&gt;isSame(false);
 // 第4引数で条件を指定（値が存在するなら追加しない）
-that(array_put($array, 'Z', null, function ($v, $k, $array){return !in_array($v, $array);}))-&gt;isSame(false);
+that(array_put($array, 'Z', null, fn($v, $k, $array) =&gt; !in_array($v, $array)))-&gt;isSame(false);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -623,7 +656,7 @@ that(array_unset($array, ['x2' =&gt; 'b', 'x1' =&gt; 'a']))-&gt;isSame(['x2' =&g
 
 $array = ['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA', 'piyo' =&gt; 'PIYO'];
 // 値に "G" を含むものを返す。その要素は伏せられている
-that(array_unset($array, function($v){return strpos($v, 'G') !== false;}))-&gt;isSame(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);
+that(array_unset($array, fn($v) =&gt; strpos($v, 'G') !== false))-&gt;isSame(['hoge' =&gt; 'HOGE', 'fuga' =&gt; 'FUGA']);
 that($array)-&gt;isSame(['piyo' =&gt; 'PIYO']);
 </code></pre>
 </div>
@@ -677,9 +710,9 @@ $is_key に false を与えるとコールバックの結果を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最初に見つかったキーを返す
 that(array_find(['a', 'b', '9'], 'ctype_digit'))-&gt;isSame(2);
-that(array_find(['a', 'b', '9'], function($v){return $v === 'b';}))-&gt;isSame(1);
+that(array_find(['a', 'b', '9'], fn($v) =&gt; $v === 'b'))-&gt;isSame(1);
 // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
-$ifnumeric2power = function($v){return ctype_digit($v) ? $v * $v : false;};
+$ifnumeric2power = fn($v) =&gt; ctype_digit($v) ? $v * $v : false;
 that(array_find(['a', 'b', '9'], $ifnumeric2power, false))-&gt;isSame(81);
 </code></pre>
 </div>
@@ -780,7 +813,7 @@ that((array_map_recursive)([
 <p>$callback が null を返すとその要素は取り除かれる。</p>
 <p>Example:</p>
 <pre><code class="language-php">that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], 'strtoupper'))-&gt;isSame(['A' =&gt; 'A', 'B' =&gt; 'B']);
-that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}))-&gt;isSame([]);
+that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function () { }))-&gt;isSame([]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -791,8 +824,8 @@ that(array_map_key(['a' =&gt; 'A', 'b' =&gt; 'B'], function(){}))-&gt;isSame([])
 <p>$callback が要求するなら値も渡ってくる。 php 5.6 の array_filter の ARRAY_FILTER_USE_BOTH と思えばよい。<br />
 ただし、完全な互換ではなく、引数順は ($k, $v) なので注意。</p>
 <p>Example:</p>
-<pre><code class="language-php">that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $k !== 1; }))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
-that(array_filter_key(['a', 'b', 'c'], function ($k, $v) { return $v !== 'b'; }))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
+<pre><code class="language-php">that(array_filter_key(['a', 'b', 'c'], fn($k, $v) =&gt; $k !== 1))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
+that(array_filter_key(['a', 'b', 'c'], fn($k, $v) =&gt; $v !== 'b'))-&gt;isSame([0 =&gt; 'a', 2 =&gt; 'c']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -818,17 +851,17 @@ that(array_where($array, 'flag'))-&gt;isSame([
     1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
 ]);
 // 'name' に 'h' を含むものだけ返す
-$contain_h = function($name){return strpos($name, 'h') !== false;};
+$contain_h = fn($name) =&gt; strpos($name, 'h') !== false;
 that(array_where($array, 'name', $contain_h))-&gt;isSame([
     0 =&gt; ['id' =&gt; 1, 'name' =&gt; 'hoge', 'flag' =&gt; false],
 ]);
 // $callback が引数2つならキーも渡ってくる（キーが 2 のものだけ返す）
-$equal_2 = function($row, $key){return $key === 2;};
+$equal_2 = fn($row, $key) =&gt; $key === 2;
 that(array_where($array, null, $equal_2))-&gt;isSame([
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
 // $column に配列を渡すと共通項が渡ってくる
-$idname_is_2fuga = function($idname){return ($idname['id'] . $idname['name']) === '2fuga';};
+$idname_is_2fuga = fn($idname) =&gt; ($idname['id'] . $idname['name']) === '2fuga';
 that(array_where($array, ['id', 'name'], $idname_is_2fuga))-&gt;isSame([
     1 =&gt; ['id' =&gt; 2, 'name' =&gt; 'fuga', 'flag' =&gt; true],
 ]);
@@ -843,8 +876,8 @@ that(array_where($array, ['id' =&gt; [2, 3]]))-&gt;isSame([
 ]);
 // $column の連想配列の値にはコールバックが渡せる（それぞれで AND）
 that(array_where($array, [
-    'id'   =&gt; function($id){return $id &gt;= 3;},                       // id が 3 以上
-    'name' =&gt; function($name){return strpos($name, 'o') !== false;}, // name に o を含む
+    'id'   =&gt; fn($id) =&gt; $id &gt;= 3,                       // id が 3 以上
+    'name' =&gt; fn($name) =&gt; strpos($name, 'o') !== false, // name に o を含む
 ]))-&gt;isSame([
     2 =&gt; ['id' =&gt; 3, 'name' =&gt; 'piyo', 'flag' =&gt; false],
 ]);
@@ -899,7 +932,7 @@ that(array_map_method([$exa, $exb, $std, null], 'getMessage', [], null))-&gt;isS
 <pre><code class="language-php">// 値を3乗したあと16進表記にして大文字化する
 that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))-&gt;isSame(['1', '8', '1B', '40', '7D']);
 // キーも渡ってくる
-that(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], function($v, $k){return "$k:$v";}))-&gt;isSame(['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
+that(array_maps(['a' =&gt; 'A', 'b' =&gt; 'B'], fn($v, $k) =&gt; "$k:$v"))-&gt;isSame(['a' =&gt; 'a:A', 'b' =&gt; 'b:B']);
 // ... で可変引数コール
 that(array_maps([[1, 3], [1, 5, 2]], '...range'))-&gt;isSame([[1, 2, 3], [1, 3, 5]]);
 // メソッドコールもできる（引数不要なら `@method` でも同じ）
@@ -928,7 +961,7 @@ iterable を返す必要があるが、もし iterable でない場合は配列�
    'd' =&gt; 'D',
 ];
 // キーに '_' 、値に 'prefix-' を付与。'b' は一切何もしない。'c' は値のみ。'd' はそれ自体伏せる
-that(array_kvmap($array, function($k, $v){
+that(array_kvmap($array, function ($k, $v) {
     if ($k === 'b') return null;
     if ($k === 'd') return [];
     if ($k !== 'c') $k = "_$k";
@@ -940,12 +973,10 @@ that(array_kvmap($array, function($k, $v){
 ]);
 
 // 複数返せばその分増える（要素の水増し）
-that(array_kvmap($array, function($k, $v){
-    return [
-        "{$k}1" =&gt; "{$v}1",
-        "{$k}2" =&gt; "{$v}2",
-    ];
-}))-&gt;isSame([
+that(array_kvmap($array, fn($k, $v) =&gt; [
+    "{$k}1" =&gt; "{$v}1",
+    "{$k}2" =&gt; "{$v}2",
+]))-&gt;isSame([
    'a1' =&gt; 'A1',
    'a2' =&gt; 'A2',
    'b1' =&gt; 'B1',
@@ -965,7 +996,7 @@ that(array_kvmap([
             'z' =&gt; ['Z'],
         ],
     ],
-], function($k, $v, $callback){
+], function ($k, $v, $callback) {
     // 配列だったら再帰する
     return ["_$k" =&gt; is_array($v) ? array_kvmap($v, $callback) : "prefix-$v"];
 }))-&gt;isSame([
@@ -1000,7 +1031,7 @@ that(array_kmap([
     'k1' =&gt; 'v1',
     'k2' =&gt; 'v2',
     'k3' =&gt; 'v3',
-], function($v, $k){return "$k:$v";}))-&gt;isSame([
+], fn($v, $k) =&gt; "$k:$v"))-&gt;isSame([
     'k1' =&gt; 'k1:v1',
     'k2' =&gt; 'k2:v2',
     'k3' =&gt; 'k3:v3',
@@ -1016,10 +1047,10 @@ that(array_kmap([
 その際、「挿入後の番目」ではなく、単純に「元の引数の番目」であることに留意。キー・値が同じ位置を指定している場合はキーが先にくる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 1番目に値を渡して map
-$sprintf = function(){return vsprintf('%s%s%s', func_get_args());};
+$sprintf = fn() =&gt; vsprintf('%s%s%s', func_get_args());
 that(array_nmap(['a', 'b'], $sprintf, 1, 'prefix-', '-suffix'))-&gt;isSame(['prefix-a-suffix', 'prefix-b-suffix']);
 // 1番目にキー、2番目に値を渡して map
-$sprintf = function(){return vsprintf('%s %s %s %s %s', func_get_args());};
+$sprintf = fn() =&gt; vsprintf('%s %s %s %s %s', func_get_args());
 that(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'))-&gt;isSame(['k' =&gt; 'a k b v c']);
 </code></pre>
 </div>
@@ -1029,7 +1060,7 @@ that(array_nmap(['k' =&gt; 'v'], $sprintf, [1 =&gt; 2], 'a', 'b', 'c'))-&gt;isSa
 		</h4>
 	<div class="description"><p>要素値を $callback の最左に適用して array_map する</p>
 <p>Example:</p>
-<pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
+<pre><code class="language-php">$sprintf = fn() =&gt; vsprintf('%s%s', func_get_args());
 that(array_lmap(['a', 'b'], $sprintf, '-suffix'))-&gt;isSame(['a-suffix', 'b-suffix']);
 </code></pre>
 </div>
@@ -1039,7 +1070,7 @@ that(array_lmap(['a', 'b'], $sprintf, '-suffix'))-&gt;isSame(['a-suffix', 'b-suf
 		</h4>
 	<div class="description"><p>要素値を $callback の最右に適用して array_map する</p>
 <p>Example:</p>
-<pre><code class="language-php">$sprintf = function(){return vsprintf('%s%s', func_get_args());};
+<pre><code class="language-php">$sprintf = fn() =&gt; vsprintf('%s%s', func_get_args());
 that(array_rmap(['a', 'b'], $sprintf, 'prefix-'))-&gt;isSame(['prefix-a', 'prefix-b']);
 </code></pre>
 </div>
@@ -1065,9 +1096,9 @@ array_reduce と少し似てるが、下記の点が異なる。</p>
 （ただ、「意図していることをコードで表す」といった観点ではこの記法の方が正しいとも思う）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 全要素を文字列的に足し合わせる
-that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry .= $v;}, ''))-&gt;isSame('12345');
+that(array_each([1, 2, 3, 4, 5], function (&amp;$carry, $v) {$carry .= $v;}, ''))-&gt;isSame('12345');
 // 値をキーにして要素を2乗値にする
-that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry[$v] = $v * $v;}, []))-&gt;isSame([
+that(array_each([1, 2, 3, 4, 5], function (&amp;$carry, $v) {$carry[$v] = $v * $v;}, []))-&gt;isSame([
     1 =&gt; 1,
     2 =&gt; 4,
     3 =&gt; 9,
@@ -1075,7 +1106,7 @@ that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v){$carry[$v] = $v * $v;
     5 =&gt; 25,
 ]);
 // 上記と同じ。ただし、3 で break する
-that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v, $k){
+that(array_each([1, 2, 3, 4, 5], function (&amp;$carry, $v, $k){
     if ($k === 3) return false;
     $carry[$v] = $v * $v;
 }, []))-&gt;isSame([
@@ -1085,9 +1116,9 @@ that(array_each([1, 2, 3, 4, 5], function(&amp;$carry, $v, $k){
 ]);
 
 // 下記は完全に同じ（第3引数の代わりにデフォルト引数を使っている）
-that(array_each([1, 2, 3], function(&amp;$carry = [], $v = null) {
+that(array_each([1, 2, 3], function (&amp;$carry = [], $v = null) {
         $carry[$v] = $v * $v;
-    }))-&gt;isSame(array_each([1, 2, 3], function(&amp;$carry, $v) {
+    }))-&gt;isSame(array_each([1, 2, 3], function (&amp;$carry, $v) {
         $carry[$v] = $v * $v;
     }, [])
     // 個人的に↑のようなぶら下がり引数があまり好きではない（クロージャを最後の引数にしたい）
@@ -1135,14 +1166,14 @@ that(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1))-&gt;isSame([1, 
 <p>$rule が要求するならキーも渡ってくる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// lt2(2より小さい)で分類
-$lt2 = function($v){return $v &lt; 2;};
+$lt2 = fn($v) =&gt; $v &lt; 2;
 that(array_assort([1, 2, 3], [
     'lt2' =&gt; $lt2,
 ]))-&gt;isSame([
     'lt2' =&gt; [1],
 ]);
 // lt3(3より小さい)、ctd(ctype_digit)で分類（両方に属する要素が存在する）
-$lt3 = function($v){return $v &lt; 3;};
+$lt3 = fn($v) =&gt; $v &lt; 3;
 that(array_assort(['1', '2', '3'], [
     'lt3' =&gt; $lt3,
     'ctd' =&gt; 'ctype_digit',
@@ -1168,11 +1199,11 @@ that(array_assort(['1', '2', '3'], [
 <p>Example:</p>
 <pre><code class="language-php">$array = ['hoge', 'fuga', 'piyo'];
 // 'o' を含むものの数（2個）
-that(array_count($array, function($s){return strpos($s, 'o') !== false;}))-&gt;isSame(2);
+that(array_count($array, fn($s) =&gt; strpos($s, 'o') !== false))-&gt;isSame(2);
 // 'a' と 'o' を含むものをそれぞれ（1個と2個）
 that(array_count($array, [
-    'a' =&gt; function($s){return strpos($s, 'a') !== false;},
-    'o' =&gt; function($s){return strpos($s, 'o') !== false;},
+    'a' =&gt; fn($s) =&gt; strpos($s, 'a') !== false,
+    'o' =&gt; fn($s) =&gt; strpos($s, 'o') !== false,
 ]))-&gt;isSame([
     'a' =&gt; 1,
     'o' =&gt; 2,
@@ -1186,9 +1217,9 @@ $array = [
     [[[['a', 'M', 'Z']]]],
 ];
 that((array_count)($array, [
-    'lower' =&gt; function ($v) { return !is_array($v) &amp;&amp; ctype_lower($v);},
-    'upper' =&gt; function ($v) { return !is_array($v) &amp;&amp; ctype_upper($v);},
-    'array' =&gt; function ($v) { return is_array($v);},
+    'lower' =&gt; fn($v) =&gt; !is_array($v) &amp;&amp; ctype_lower($v),
+    'upper' =&gt; fn($v) =&gt; !is_array($v) &amp;&amp; ctype_upper($v),
+    'array' =&gt; fn($v) =&gt; is_array($v),
 ], true))-&gt;is([
     'lower' =&gt; 4, // 小文字の数
     'upper' =&gt; 5, // 大文字の数
@@ -1208,7 +1239,7 @@ that((array_count)($array, [
 <pre><code class="language-php">that(array_group([1, 1, 1]))-&gt;isSame([
     1 =&gt; [1, 1, 1],
 ]);
-that(array_group([1, 2, 3], function($v){return $v % 2;}))-&gt;isSame([
+that(array_group([1, 2, 3], fn($v) =&gt; $v % 2))-&gt;isSame([
     1 =&gt; [1, 3],
     0 =&gt; [2],
 ]);
@@ -1216,7 +1247,7 @@ that(array_group([1, 2, 3], function($v){return $v % 2;}))-&gt;isSame([
 $row1 = ['id' =&gt; 1, 'group' =&gt; 'hoge'];
 $row2 = ['id' =&gt; 2, 'group' =&gt; 'fuga'];
 $row3 = ['id' =&gt; 3, 'group' =&gt; 'hoge'];
-that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $row['id']];}))-&gt;isSame([
+that(array_group([$row1, $row2, $row3], fn($row) =&gt; [$row['group'], $row['id']]))-&gt;isSame([
     'hoge' =&gt; [
         1 =&gt; $row1,
         3 =&gt; $row3,
@@ -1244,9 +1275,9 @@ that(array_group([$row1, $row2, $row3], function($row){return [$row['group'], $r
 <p>Example:</p>
 <pre><code class="language-php">// 単純な配列の集計
 that(array_aggregate([1, 2, 3], [
-    'min' =&gt; function($elems) {return min($elems);},
-    'max' =&gt; function($elems) {return max($elems);},
-    'avg' =&gt; function($elems) {return array_sum($elems) / count($elems);},
+    'min' =&gt; fn($elems) =&gt; min($elems),
+    'max' =&gt; fn($elems) =&gt; max($elems),
+    'avg' =&gt; fn($elems) =&gt; array_sum($elems) / count($elems),
 ]))-&gt;isSame([
     'min' =&gt; 1, // 最小値
     'max' =&gt; 3, // 最大値
@@ -1260,8 +1291,8 @@ $row4 = ['user_id' =&gt; 'hoge', 'group' =&gt; 'A', 'score' =&gt; 8];
 
 // user_id, group ごとの score を集計して階層配列で返す（第2引数 $current を利用している）
 that(array_aggregate([$row1, $row2, $row3, $row4], [
-    'scores' =&gt; function($rows) {return array_column($rows, 'score');},
-    'score'  =&gt; function($rows, $current) {return array_sum($current['scores']);},
+    'scores' =&gt; fn($rows) =&gt; array_column($rows, 'score'),
+    'score'  =&gt; fn($rows, $current) =&gt; array_sum($current['scores']),
 ], ['user_id', 'group']))-&gt;isSame([
     'hoge' =&gt; [
         'A' =&gt; [
@@ -1283,8 +1314,8 @@ that(array_aggregate([$row1, $row2, $row3, $row4], [
 
 // user_id ごとの score を集計して単一列で返す（キーのクロージャも利用している）
 that(array_aggregate([$row1, $row2, $row3, $row4],
-    function($rows) {return array_sum(array_column($rows, 'score'));},
-    function($row) {return strtoupper($row['user_id']);}))-&gt;isSame([
+    fn($rows) =&gt; array_sum(array_column($rows, 'score')),
+    fn($row) =&gt; strtoupper($row['user_id'])))-&gt;isSame([
     'HOGE' =&gt; 12,
     'FUGA' =&gt; 11,
 ]);
@@ -1343,7 +1374,7 @@ $v2 = new \ArrayObject(['id' =&gt; '2', 'group' =&gt; 'bbb', 'dummy' =&gt; 123])
 $v3 = new \ArrayObject(['id' =&gt; '3', 'group' =&gt; 'aaa', 'dummy' =&gt; 456]);
 $v4 = new \ArrayObject(['id' =&gt; '4', 'group' =&gt; 'bbb', 'dummy' =&gt; 789]);
 // クロージャを指定して重複除去
-that(array_distinct([$v1, $v2, $v3, $v4], function($a, $b) { return $a['group'] &lt;=&gt; $b['group']; }))-&gt;isSame([$v1, $v2]);
+that(array_distinct([$v1, $v2, $v3, $v4], fn($a, $b) =&gt; $a['group'] &lt;=&gt; $b['group']))-&gt;isSame([$v1, $v2]);
 // 単純な配列アクセスなら文字列や配列でよい（上記と同じ結果になる）
 that(array_distinct([$v1, $v2, $v3, $v4], 'group'))-&gt;isSame([$v1, $v2]);
 // 文字キーの配列はメソッドコールになる（ArrayObject::count で重複検出）
@@ -1362,11 +1393,11 @@ that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' =&gt; []]))-&gt;isSa
 <p>$orders には下記のような配列を渡す。<br />
 キーに空文字を渡すとそれは「キー自体」を意味する。</p>
 <pre><code class="language-php">$orders = [
-    'col1' =&gt; true,                               // true: 昇順, false: 降順。照合は型に依存
-    'col2' =&gt; SORT_NATURAL,                       // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
-    'col3' =&gt; ['sort', 'this', 'order'],          // 指定した配列順で昇順
-    'col4' =&gt; function($v) {return $v;},          // クロージャを通した値で昇順。照合は返り値の型に依存
-    'col5' =&gt; function($a, $b) {return $a - $b;}, // クロージャで比較して昇順（いわゆる比較関数を渡す）
+    'col1' =&gt; true,                      // true: 昇順, false: 降順。照合は型に依存
+    'col2' =&gt; SORT_NATURAL,              // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+    'col3' =&gt; ['sort', 'this', 'order'], // 指定した配列順で昇順
+    'col4' =&gt; fn($v) =&gt; $v,              // クロージャを通した値で昇順。照合は返り値の型に依存
+    'col5' =&gt; fn($a, $b) =&gt; $a - $b,     // クロージャで比較して昇順（いわゆる比較関数を渡す）
 ];
 </code></pre>
 <p>Example:</p>
@@ -1564,7 +1595,7 @@ that(array_fill_callback($abc, 'strtoupper'))-&gt;isSame([
     'c' =&gt; 'C',
 ]);
 // [a, b, c] からその sha1 配列を作って大文字化する
-that(array_fill_callback($abc, function ($v){ return strtoupper(sha1($v)); }))-&gt;isSame([
+that(array_fill_callback($abc, fn($v) =&gt; strtoupper(sha1($v))))-&gt;isSame([
     'a' =&gt; '86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8',
     'b' =&gt; 'E9D71F5EE7C92D6DC9E92FFDAD17B8BD49418F98',
     'c' =&gt; '84A516841BA77A5B4648DE2CD0DFCB30EA46DBB4',
@@ -1626,7 +1657,7 @@ that(array_lookup($array, 'name'))-&gt;isSame([
     13 =&gt; 'name3',
 ]);
 // クロージャを指定すればキーが生成される
-that(array_lookup($array, 'name', function ($v, $k) {return $k * 2;}))-&gt;isSame([
+that(array_lookup($array, 'name', fn($v, $k) =&gt; $k * 2))-&gt;isSame([
     22 =&gt; 'name1',
     24 =&gt; 'name2',
     26 =&gt; 'name3',
@@ -1660,9 +1691,9 @@ that(array_select($array, [
 
 that(array_select($array, [
     // id の 10 倍を取得
-    'id'     =&gt; function ($id) {return $id * 10;},
+    'id'     =&gt; fn($id) =&gt; $id * 10,
     // id と name の結合を取得
-    'idname' =&gt; function ($null, $row, $index) {return $row['id'] . $row['name'];},
+    'idname' =&gt; fn($null, $row, $index) =&gt; $row['id'] . $row['name'],
 ]))-&gt;isSame([
     11 =&gt; ['id' =&gt; 10, 'idname' =&gt; '1name1'],
     12 =&gt; ['id' =&gt; 20, 'idname' =&gt; '2name2'],
@@ -1735,7 +1766,7 @@ that(array_columns($rows, 'name', 'id'))-&gt;isSame(['name' =&gt; [1 =&gt; 'A', 
    ],
 ];
 // 全要素に 'prefix-' を付与する。キーには '_' をつける。ただし 'k21' はそのままとする。さらに 'k22' はまるごと伏せる。 'k23' は数値キーになる
-$callback = function($k, &amp;$v){
+$callback = function ($k, &amp;$v) {
     if ($k === 'k21') return null;
     if ($k === 'k22') return false;
     if ($k === 'k23') return true;
@@ -2025,6 +2056,24 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::type_exists()">
+                                    ryunosuke\Functions\Package\Classobj::type_exists		</a>	<small>($typename, $autoload = true) : bool</small>
+		</h4>
+	<div class="description"><p>型が存在するか返す</p>
+<p>class/interface/trait/enum exists の合せ技。<br />
+trait/enum のように今後型的なものがさらに増えるかもしれないし、class_exists だけして interface/trait が抜けているコードを何度も見てきた。<br />
+それを一元管理するような関数となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(class_exists(\Throwable::class))-&gt;isFalse();     // class_exists は class にしか反応しない
+that(interface_exists(\Exception::class))-&gt;isFalse(); // interface_exists は interface にしか反応しない
+that(trait_exists(\Error::class))-&gt;isFalse();         // trait_exists は trait にしか反応しない
+// type_exists であれば全てに反応する
+that(type_exists(\Throwable::class))-&gt;isTrue();
+that(type_exists(\Exception::class))-&gt;isTrue();
+that(type_exists(\Error::class))-&gt;isTrue();
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::auto_loader()">
                                     ryunosuke\Functions\Package\Classobj::auto_loader		</a>	<small>($startdir = null) : string</small>
 		</h4>
@@ -2042,6 +2091,20 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 <p>かなり局所的な実装で vendor ディレクトリを変更していたりするとそれだけで例外になる。</p>
 <p>Example:</p>
 <pre><code class="language-php">that(class_loader())-&gt;isInstanceOf(\Composer\Autoload\ClassLoader::class);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_aliases()">
+                                    ryunosuke\Functions\Package\Classobj::class_aliases		</a>	<small>($aliases) : array</small>
+		</h4>
+	<div class="description"><p>遅延ロードする class_alias</p>
+<p>class_alias は即座にオートロードされるが、この関数は必要とされるまでオートロードしない。</p>
+<p>Example:</p>
+<pre><code class="language-php">class_aliases([
+    'TestCase' =&gt; \PHPUnit\Framework\TestCase::class,
+]);
+that(class_exists('TestCase', false))-&gt;isFalse(); // オートロードを走らせなければまだ定義されていない
+that(class_exists('TestCase', true))-&gt;isTrue();   // オートロードを走らせなければ定義されている
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -2079,7 +2142,7 @@ that(class_uses_all(new class{use T3;}))-&gt;isSame([
 <p>実際のところかなり強力な機能だが、同時にかなり黒魔術的なので乱用は控えたほうがいい。</p>
 <p>Example:</p>
 <pre><code class="language-php">// Y1 extends X1 だとしてクラス定義でオーバーライドする
-class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function() {
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X1', function () {
     // アンスコがついたクラスが定義されるのでそれを継承して定義する
     class X1d extends \ryunosuke\Test\Package\Classobj\X1_
     {
@@ -2098,12 +2161,10 @@ that((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;method())-&gt;isSame('this 
 that((new \ryunosuke\Test\Package\Classobj\Y1())-&gt;newmethod())-&gt;isSame('this is newmethod');
 
 // Y2 extends X2 だとしてクロージャ配列でオーバーライドする
-class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', function() {
-    return [
-        'method'    =&gt; function(){return 'this is X2d';},
-        'newmethod' =&gt; function(){return 'this is newmethod';},
-    ];
-});
+class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X2', fn() =&gt; [
+    'method'    =&gt; function () {return 'this is X2d';},
+    'newmethod' =&gt; function () {return 'this is newmethod';},
+]);
 // X2 を継承している Y2 にまで影響が出ている（X2 を完全に置換できたということ）
 that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;method())-&gt;isSame('this is X2d');
 that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod())-&gt;isSame('this is newmethod');
@@ -2111,7 +2172,7 @@ that((new \ryunosuke\Test\Package\Classobj\Y2())-&gt;newmethod())-&gt;isSame('th
 // メソッド定義だけであればクロージャではなく配列指定でも可能。さらに trait 配列を渡すとそれらを use できる
 class_replace('\\ryunosuke\\Test\\Package\\Classobj\\X3', [
     [\ryunosuke\Test\Package\Classobj\XTrait::class],
-    'method' =&gt; function(){return 'this is X3d';},
+    'method' =&gt; function () {return 'this is X3d';},
 ]);
 // X3 を継承している Y3 にまで影響が出ている（X3 を完全に置換できたということ）
 that((new \ryunosuke\Test\Package\Classobj\Y3())-&gt;method())-&gt;isSame('this is X3d');
@@ -2131,7 +2192,7 @@ that((new \ryunosuke\Test\Package\Classobj\Y4())-&gt;traitMethod())-&gt;isSame('
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::class_extends()">
-                                    ryunosuke\Functions\Package\Classobj::class_extends		</a>	<small>($object, $methods, $fields = [], $implements = []) : object</small>
+                                    ryunosuke\Functions\Package\Classobj::class_extends		</a>	<small>($object, $methods, $fields = [], $implements = []) : <a href="T$typespace.html#T" class="fqsen ">T</a></small>
 		</h4>
 	<div class="description"><p>インスタンスを動的に拡張する</p>
 <p>インスタンスに特異メソッド・特異フィールドのようなものを生やす。<br />
@@ -2149,8 +2210,8 @@ that((new \ryunosuke\Test\Package\Classobj\Y4())-&gt;traitMethod())-&gt;isSame('
 <pre><code class="language-php">// Exception に「count」メソッドと「コードとメッセージを結合して返す」メソッドを動的に生やす
 $object = new \Exception('hoge', 123);
 $newobject = class_extends($object, [
-    'count'       =&gt; function() { return $this-&gt;code; },
-    'codemessage' =&gt; function() {
+    'count'       =&gt; function () { return $this-&gt;code; },
+    'codemessage' =&gt; function () {
         // bind されるので protected フィールドが使える
         return $this-&gt;code . ':' . $this-&gt;message;
     },
@@ -2162,7 +2223,7 @@ that($newobject)-&gt;isInstanceOf(\Countable::class); // instanceof をパスで
 // オーバーライドもできる（ArrayObject の count を2倍になるように上書き）
 $object = new \ArrayObject([1, 2, 3]);
 $newobject = class_extends($object, [
-    'count' =&gt; function() {
+    'count' =&gt; function () {
         // parent は元オブジェクトを表す
         return parent::count() * 2;
     },
@@ -2406,7 +2467,7 @@ $format は配列で与えることができる。配列で与えた場合、 0 
 that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v'))-&gt;isSame('02/05/18 03:25:45.678');
 
 // 書式にクロージャを与えるとコールバックされる（引数はスケールの小さい方から）
-that(date_interval(60 * 60 * 24 * 900 + 12345.678, function(){return implode(',', func_get_args());}))-&gt;isSame('678,45,25,3,18,5,2,0');
+that(date_interval(60 * 60 * 24 * 900 + 12345.678, fn() =&gt; implode(',', func_get_args())))-&gt;isSame('678,45,25,3,18,5,2,0');
 
 // リミットを指定（month までしか計算しないので year は 0 になり month は 29になる）
 that(date_interval(60 * 60 * 24 * 900 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))-&gt;isSame('00/29/18 03:25:45.678');
@@ -2431,6 +2492,20 @@ that(date_interval(1234, $format, 3))-&gt;isSame('0時間20分34秒');
 // 書式指定なし（DateInterval を返す）
 that(date_interval(123.456))-&gt;isInstanceOf(\DateInterval::class);
 </code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_alter()">
+                                    ryunosuke\Functions\Package\Date::date_alter		</a>	<small>($datetime, $excluded_dates, $follow_count, $format = &quot;Y-m-d&quot;) : string<span class="type-separator"></span><wbr>null</small>
+		</h4>
+	<div class="description"><p>日付を除外日リストに基づいてずらす</p>
+<p>典型的には「祝日前の営業日」「祝日後の営業日」のような代理日を返すイメージ。<br />
+$follow_count に応じて下記のように返す。</p>
+<ul>
+<li>null: 除外日でもずらさないでそのまま返す</li>
+<li>-N: 除外日なら最大N日分前倒しした日付を返す</li>
+<li>+N: 除外日なら最大N日分先送りした日付を返す</li>
+<li>0: 除外日でもずらさないで null を返す</li>
+</ul>
 </div>
             	<h4 class="fqsen-title">class		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem">
@@ -2569,7 +2644,7 @@ that(file_get_contents(sys_get_temp_dir() . '/not/filename.ext'))-&gt;isSame('ho
 $testpath = sys_get_temp_dir() . '/rewrite.txt';
 file_put_contents($testpath, 'hoge');
 // 前後に 'pre-', '-fix' を付与する
-file_rewrite_contents($testpath, function($contents, $fp){ return "pre-$contents-fix"; });
+file_rewrite_contents($testpath, fn($contents, $fp) =&gt; "pre-$contents-fix");
 that($testpath)-&gt;fileEquals('pre-hoge-fix');
 </code></pre>
 </div>
@@ -2626,7 +2701,7 @@ that(file_mimetype('http://httpbin.org/get?name=value'))-&gt;is('application/jso
 $tmp = sys_get_temp_dir();
 file_set_contents("$tmp/a/b/file.txt", 'hoge');
 // /a/b/c/d/e/f から開始して「どこかの階層の file.txt を探したい」という状況を想定
-$callback = function($path){return realpath("$path/file.txt");};
+$callback = fn($path) =&gt; realpath("$path/file.txt");
 that(dirname_r("$tmp/a/b/c/d/e/f", $callback))-&gt;isSame(realpath("$tmp/a/b/file.txt"));
 </code></pre>
 </div>
@@ -2969,13 +3044,13 @@ that(reflect_callable('\Closure::bind'))-&gt;isInstanceOf(\ReflectionMethod::cla
 	<div class="description"><p>callable のコードブロックを返す</p>
 <p>返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。</p>
 <p>Example:</p>
-<pre><code class="language-php">list($meta, $body) = callable_code(function(...$args){return true;});
-that($meta)-&gt;isSame('function(...$args)');
+<pre><code class="language-php">list($meta, $body) = callable_code(function (...$args) {return true;});
+that($meta)-&gt;isSame('function (...$args)');
 that($body)-&gt;isSame('{return true;}');
 
 // ReflectionFunctionAbstract を渡しても動作する
-list($meta, $body) = callable_code(new \ReflectionFunction(function(...$args){return true;}));
-that($meta)-&gt;isSame('function(...$args)');
+list($meta, $body) = callable_code(new \ReflectionFunction(function (...$args) {return true;}));
+that($meta)-&gt;isSame('function (...$args)');
 that($body)-&gt;isSame('{return true;}');
 </code></pre>
 </div>
@@ -2986,7 +3061,7 @@ that($body)-&gt;isSame('{return true;}');
 	<div class="description"><p>エラーを例外に変換するブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">try {
-    call_safely(function(){return []['dummy'];});
+    call_safely(fn() =&gt; []['dummy']);
 }
 catch (\Exception $ex) {
     that($ex-&gt;getMessage())-&gt;containsAll(['Undefined', 'dummy']);
@@ -3000,7 +3075,7 @@ catch (\Exception $ex) {
 	<div class="description"><p>ob_start ～ ob_get_clean のブロックでコールバックを実行する</p>
 <p>Example:</p>
 <pre><code class="language-php">// コールバック内のテキストが得られる
-that(ob_capture(function(){echo 123;}))-&gt;isSame('123');
+that(ob_capture(fn() =&gt; print(123)))-&gt;isSame('123');
 // こういう事もできる
 that(ob_capture(function () {
 ?&gt;
@@ -3016,8 +3091,8 @@ bare string2
 		</h4>
 	<div class="description"><p>$this を bind 可能なクロージャか調べる</p>
 <p>Example:</p>
-<pre><code class="language-php">that(is_bindable_closure(function(){}))-&gt;isTrue();
-that(is_bindable_closure(static function(){}))-&gt;isFalse();
+<pre><code class="language-php">that(is_bindable_closure(function () {}))-&gt;isTrue();
+that(is_bindable_closure(static function () {}))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -3059,7 +3134,7 @@ n 番目の場合は引数名に依存しないが、順番に依存してしま
 必須引数が渡されていない or 定義されていない引数が渡された場合は例外を投げる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// ベースとなる関数（引数をそのまま連想配列で返す）
-$f = function ($x, $a = 1, $b = 2, ...$other){return get_defined_vars();};
+$f = fn ($x, $a = 1, $b = 2, ...$other) =&gt; get_defined_vars();
 
 // x に 'X', a に 9 を与えて名前付きで呼べるクロージャ
 $f1 = namedcallize($f, [
@@ -3170,7 +3245,7 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 $params = (parameter_wiring)($closure, [
     \ArrayObject::class      =&gt; $ao = new \ArrayObject([1, 2, 3]),
     \RuntimeException::class =&gt; $t = new \RuntimeException('hoge'),
-    '$array'                 =&gt; function (\ArrayObject $ao) { return (array) $ao; },
+    '$array'                 =&gt; fn (\ArrayObject $ao) =&gt; (array) $ao,
     4                        =&gt; 'default1',
     '$misc'                  =&gt; ['x', 'y', 'z'],
 ]);
@@ -3216,7 +3291,7 @@ that($strlen('abc', null))-&gt;isSame(3);
 得られたクロージャの呼び出し時に引数を与える事ができる。</p>
 <p>parameter_wiring も参照。</p>
 <p>Example:</p>
-<pre><code class="language-php">$closure = function ($a, $b) { return func_get_args(); };
+<pre><code class="language-php">$closure = fn ($a, $b) =&gt; func_get_args();
 $new_closure = func_wiring($closure, [
     '$a' =&gt; 'a',
     '$b' =&gt; 'b',
@@ -3495,6 +3570,21 @@ that(normal_rand(100, 10))-&gt;isSame(99.1917453115627);
 that(normal_rand(100, 10))-&gt;isSame(96.74688207698713);
 </code></pre>
 </div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Math$typespace.html#ryunosuke\Functions\Package\Math::calculate_formula()">
+                                    ryunosuke\Functions\Package\Math::calculate_formula		</a>	<small>($formula) : int<span class="type-separator"></span><wbr>float</small>
+		</h4>
+	<div class="description"><p>数式を計算して結果を返す</p>
+<p>内部的には eval で計算するが、文字列や関数呼び出しなどは受け付けないため原則としてセーフティ。<br />
+許可されるのは定数・数値リテラルと演算子のみ。<br />
+定数を許可しているのは PI(3.14) や HOUR(3600) などの利便性のため。<br />
+定数値が非数値の場合、強制的に数値化して警告を促す。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(calculate_formula('1 + 2 - 3 * 4'))-&gt;isSame(-9);
+that(calculate_formula('1 + (2 - 3) * 4'))-&gt;isSame(-3);
+that(calculate_formula('PHP_INT_SIZE * 3'))-&gt;isSame(PHP_INT_SIZE * 3);
+</code></pre>
+</div>
             	<h4 class="fqsen-title">class		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network">
                                     ryunosuke\Functions\Package::Network		</a>	</h4>
@@ -3502,13 +3592,14 @@ that(normal_rand(100, 10))-&gt;isSame(96.74688207698713);
 </div>
                 	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::getipaddress()">
-                                    ryunosuke\Functions\Package\Network::getipaddress		</a>	<small>($target = &quot;128.0.0.0&quot;) : string</small>
+                                    ryunosuke\Functions\Package\Network::getipaddress		</a>	<small>($target = null) : ?string</small>
 		</h4>
 	<div class="description"><p>接続元となる IP を返す</p>
-<p>要するに自分の IP を返す。</p>
+<p>IP を指定してそこへ接続する際の SourceIP を返す（省略すると最初のエントリを返す）。<br />
+複数のネットワークにマッチした場合の結果は不定（最長が無難だろうがそもそも SourceIP がどうなるかが不定）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 何らかの IP アドレスが返ってくる
-that(getipaddress())-&gt;matches('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#');
+that(getipaddress())-&gt;isValidIpv4();
 // 自分への接続元は自分なので 127.0.0.1 を返す
 that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
 </code></pre>
@@ -3782,6 +3873,26 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
 	<div class="description"><p>json_*** 関数で $depth 引数を表す定数</p>
 </div>
     	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_INDENT">
+                                    ryunosuke\Functions\Package\Strings::JSON_INDENT		</a>	</h4>
+	<div class="description"><p>json_*** 関数でインデント数・文字を指定する定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_CLOSURE">
+                                    ryunosuke\Functions\Package\Strings::JSON_CLOSURE		</a>	</h4>
+	<div class="description"><p>json_*** 関数でクロージャをサポートするかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_INLINE_LEVEL">
+                                    ryunosuke\Functions\Package\Strings::JSON_INLINE_LEVEL		</a>	</h4>
+	<div class="description"><p>json_*** 関数で一定以上の階層をインライン化するかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_INLINE_SCALARLIST">
+                                    ryunosuke\Functions\Package\Strings::JSON_INLINE_SCALARLIST		</a>	</h4>
+	<div class="description"><p>json_*** 関数でスカラーのみのリストをインライン化するかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_ES5">
                                     ryunosuke\Functions\Package\Strings::JSON_ES5		</a>	</h4>
 	<div class="description"><p>json_*** 関数で json5 を取り扱うかの定数</p>
@@ -3795,6 +3906,16 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_FLOAT_AS_STRING">
                                     ryunosuke\Functions\Package\Strings::JSON_FLOAT_AS_STRING		</a>	</h4>
 	<div class="description"><p>json_*** 関数で小数を常に文字列で返すかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_TRAILING_COMMA">
+                                    ryunosuke\Functions\Package\Strings::JSON_TRAILING_COMMA		</a>	</h4>
+	<div class="description"><p>json_*** 関数で強制ケツカンマを振るかの定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_COMMENT_PREFIX">
+                                    ryunosuke\Functions\Package\Strings::JSON_COMMENT_PREFIX		</a>	</h4>
+	<div class="description"><p>json_*** 関数でコメントを判定するプレフィックス定数</p>
 </div>
             	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()">
@@ -4162,8 +4283,8 @@ that(str_between('{nest1{nest2{nest3}}}', '{', '}'))-&gt;isSame('nest1{nest2{nes
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_ellipsis()">
                                     ryunosuke\Functions\Package\Strings::str_ellipsis		</a>	<small>($string, $width, $trimmarker = &quot;...&quot;, $pos = null) : string</small>
 		</h4>
-	<div class="description"><p>文字列を指定幅に丸める</p>
-<p>mb_strimwidth と機能的には同じだが、省略文字の差し込み位置を $pos で指定できる。<br />
+	<div class="description"><p>文字列を指定数に丸める</p>
+<p>mb_strimwidth と似ているが、省略文字の差し込み位置を $pos で指定できる。<br />
 $pos は負数が指定できる。負数の場合後ろから数えられる。<br />
 省略した場合は真ん中となる。</p>
 <p>Example:</p>
@@ -4787,11 +4908,42 @@ scalar,list[],list[],hash[a],hash[b]
 		</h4>
 	<div class="description"><p>json_encode のプロキシ関数</p>
 <p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
+<p>下記の拡張オプションがある。</p>
+<ul>
+<li>JSON_INLINE_LEVEL: PRETTY_PRINT 時に指定以上の階層をインライン化する（数値以外にパスで階層も指定できる）</li>
+<li>JSON_INLINE_SCALARLIST: PRETTY_PRINT 時にスカラーのみのリストをインライン化する</li>
+<li>JSON_INDENT: PRETTY_PRINT 時にインデント数・文字列を指定する</li>
+<li>JSON_CLOSURE: 任意のリテラルを埋め込む<ul>
+<li>クロージャの返り値がそのまま埋め込まれるので、文字列化可能な結果を返さなければならない</li>
+</ul>
+</li>
+</ul>
+<p>JSON_ES5 を与えると JSON5 互換でエンコードされる。<br />
+その際下記のプションも使用可能になる。</p>
+<ul>
+<li>JSON_TRAILING_COMMA: 末尾カンマを強制する</li>
+<li>JSON_COMMENT_PREFIX: コメントとして埋め込まれるキープレフィックスを指定する<ul>
+<li>そのキーで始まる要素が文字列なら // コメントになる</li>
+<li>そのキーで始まる要素が配列なら /* コメントになる</li>
+</ul>
+</li>
+</ul>
 <p>Example:</p>
 <pre><code class="language-php">// オプションはこのように [定数 =&gt; bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
 that(json_export(['a' =&gt; 'A', 'b' =&gt; 'B'], [
    JSON_PRETTY_PRINT =&gt; false,
 ]))-&gt;is('{"a":"A","b":"B"}');
+// json5 でコメント付きかつ末尾カンマ強制モード
+that(json_export(['a' =&gt; 'A', '#comment' =&gt; 'this is comment', 'b' =&gt; 'B'], [
+   JSON_ES5            =&gt; true,
+   JSON_TRAILING_COMMA =&gt; true,
+   JSON_COMMENT_PREFIX =&gt; '#',
+   JSON_PRETTY_PRINT   =&gt; true,
+]))-&gt;is('{
+    a: "A",
+    // this is comment
+    b: "B",
+}');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5116,7 +5268,7 @@ that(preg_splice('#\\d+#', '', 'abc123', $m))-&gt;isSame('abc');
 that($m)-&gt;isSame(['123']);
 
 // callable だと preg_replace_callback が呼ばれる
-that(preg_splice('#[a-z]+#', function($m){return strtoupper($m[0]);}, 'abc123', $m))-&gt;isSame('ABC123');
+that(preg_splice('#[a-z]+#', fn($m) =&gt; strtoupper($m[0]), 'abc123', $m))-&gt;isSame('ABC123');
 that($m)-&gt;isSame(['abc']);
 
 // ただし、 文字列 callable は文字列として扱う
@@ -5139,11 +5291,11 @@ that(preg_replaces('#a(\d+)z#', [1 =&gt; 'XXX'], 'a123z'))-&gt;isSame('aXXXz');
 // 名前付きキャプチャも指定できる
 that(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; 'XXX'], 'a123z'))-&gt;isSame('aXXXz');
 // クロージャを渡すと元文字列を引数としてコールバックされる
-that(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; function($src){return $src * 2;}], 'a123z'))-&gt;isSame('a246z');
+that(preg_replaces('#a(?&lt;digit&gt;\d+)z#', ['digit' =&gt; fn($src) =&gt; $src * 2], 'a123z'))-&gt;isSame('a246z');
 // 複合的なサンプル（a タグの href と target 属性を書き換える）
 that(preg_replaces('#&lt;a\s+href="(?&lt;href&gt;.*)"\s+target="(?&lt;target&gt;.*)"&gt;#', [
-    'href'   =&gt; function($href){return strtoupper($href);},
-    'target' =&gt; function($target){return strtoupper($target);},
+    'href'   =&gt; fn($href) =&gt; strtoupper($href),
+    'target' =&gt; fn($target) =&gt; strtoupper($target),
 ], '&lt;a href="hoge" target="fuga"&gt;inner text&lt;/a&gt;'))-&gt;isSame('&lt;a href="HOGE" target="FUGA"&gt;inner text&lt;/a&gt;');
 </code></pre>
 </div>
@@ -5259,6 +5411,24 @@ that(str_array("
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_common_prefix()">
+                                    ryunosuke\Functions\Package\Strings::str_common_prefix		</a>	<small>(...$strings) : ?string</small>
+		</h4>
+	<div class="description"><p>文字列群の共通のプレフィックスを返す</p>
+<p>共通部分がない場合は空文字を返す。<br />
+引数は2個以上必要で足りない場合は null を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 共通プレフィックスを返す
+that(str_common_prefix('ab', 'abc', 'abcd'))-&gt;isSame('ab');
+that(str_common_prefix('あ', 'あい', 'あいう'))-&gt;isSame('あ');
+// 共通部分がない場合は空文字を返す
+that(str_common_prefix('xab', 'yabc', 'zabcd'))-&gt;isSame('');
+that(str_common_prefix('わあ', 'をあい', 'んあいう'))-&gt;isSame('');
+// 引数不足の場合は null を返す
+that(str_common_prefix('a'))-&gt;isSame(null);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_substr_replace()">
                                     ryunosuke\Functions\Package\Strings::mb_substr_replace		</a>	<small>($string, $replacement, $start, $length = null) : string</small>
 		</h4>
@@ -5267,6 +5437,45 @@ that(str_array("
 <p>Example:</p>
 <pre><code class="language-php">// 2文字目から5文字を「あいうえお」に置換する
 that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5))-&gt;isSame('０１あいうえお７８９');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_str_pad()">
+                                    ryunosuke\Functions\Package\Strings::mb_str_pad		</a>	<small>($string, $width, $pad_string = &quot; &quot;, $pad_type = ryunosuke\Functions\Package\STR_PAD_RIGHT) : string</small>
+		</h4>
+	<div class="description"><p>マルチバイト版 str_pad</p>
+<p>単純な mb_strlen での実装ではなく mb_strwidth による実装となっている。<br />
+「文字数を指定して pad したい」という状況は utf8 で2バイト超えという状況がふさわしくないことが非常に多い。<br />
+多くは単純に「全角は2文字、半角は1文字」というユースケースが多い（埋める文字がスペースなら特に）。</p>
+<p>また、$pad_string が切り捨てられることもない。<br />
+標準の str_pad はできるだけ詰めようとして中途半端な $pad_string になることがあるが、その動作は模倣していない。<br />
+端的に「$width を超えないようにできる限り敷き詰めて返す」という動作になる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// マルチバイトは2文字幅として換算される
+that(mb_str_pad('aaaa', 12, '-'))-&gt;isSame('aaaa--------');
+that(mb_str_pad('ああ', 12, '-'))-&gt;isSame('ああ--------');
+// $pad_string は切り捨てられない
+that(mb_str_pad('aaaa', 12, 'xyz'))-&gt;isSame('aaaaxyzxyz'); // 10文字で返す（あと1回 xyz すると 13 文字になり width を超えてしまう（かといって xy だけを足したりもしない））
+that(mb_str_pad('ああ', 12, 'xyz'))-&gt;isSame('ああxyzxyz'); // マルチバイトでも同じ
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::mb_ellipsis()">
+                                    ryunosuke\Functions\Package\Strings::mb_ellipsis		</a>	<small>($string, $width, $trimmarker = &quot;...&quot;, $pos = null) : string</small>
+		</h4>
+	<div class="description"><p>文字列を指定幅に丸める</p>
+<p>mb_strimwidth と機能的には同じだが、省略文字の差し込み位置を $pos で指定できる。<br />
+$pos は負数が指定できる。負数の場合後ろから数えられる。<br />
+省略した場合は真ん中となる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 10文字幅に丸める（$pos 省略なので真ん中が省略される）
+that(mb_ellipsis('あいうえお1234567890', 10, '...'))-&gt;isSame('あい...890');
+// 10文字幅に丸める（$pos=1 なので1幅目から省略される…が、1文字は「あ」なので前方に切られる）
+that(mb_ellipsis('あいうえお1234567890', 10, '...', 1))-&gt;isSame('...567890');
+// 10文字幅に丸める（$pos=2 なので2幅目から省略される）
+that(mb_ellipsis('あいうえお1234567890', 10, '...', 2))-&gt;isSame('あ...67890');
+// 10文字幅に丸める（$pos=-1 なので後ろから1幅目から省略される）
+that(mb_ellipsis('あいうえお1234567890', 10, '...', -1))-&gt;isSame('あいう...0');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5316,7 +5525,7 @@ that(mb_substr_replace('０１２３４５６７８９', 'あいうえお', 2, 5
 <pre><code class="language-php">// 数値キーが参照できる
 that(render_string('${0}', ['number']))-&gt;isSame('number');
 // クロージャは呼び出し結果が埋め込まれる
-that(render_string('$c', ['c' =&gt; function($vars, $k){return $k . '-closure';}]))-&gt;isSame('c-closure');
+that(render_string('$c', ['c' =&gt; fn($vars, $k) =&gt; $k . '-closure']))-&gt;isSame('c-closure');
 // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
 that(render_string('{$_(123 + 456)}', []))-&gt;isSame('579');
 // 要するに '$_()' の中に php の式が書けるようになる
@@ -5451,7 +5660,7 @@ that(indent_php($phpcode, [
     'baseline'  =&gt; 1,    // 基準インデントの行番号（負数で下からの指定になる）
     'indent'    =&gt; 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
     'trimempty' =&gt; true, // 空行を trim するか
-    'heredoc'   =&gt; true, // php7.3 の Flexible Heredoc もインデントするか
+    'heredoc'   =&gt; true, // Flexible Heredoc もインデントするか
 ]))-&gt;isSame('
     echo 123;
 
@@ -5471,7 +5680,7 @@ highlight_string の CLI 対応版とも言える。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Syntax$typespace.html#ryunosuke\Functions\Package\Syntax::optional()">
-                                    ryunosuke\Functions\Package\Syntax::optional		</a>	<small>($object, $expected = null) : object</small>
+                                    ryunosuke\Functions\Package\Syntax::optional		</a>	<small>($object, $expected = null) : <a href="T$typespace.html#T" class="fqsen ">T</a></small>
 		</h4>
 	<div class="description"><p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
 <p>null を返すかもしれないステートメントを一時変数を介さずワンステートメントで呼ぶことが可能になる。</p>
@@ -5480,7 +5689,7 @@ highlight_string の CLI 対応版とも言える。</p>
 __set のような明らかに設定が意図されているものは例外が飛ぶ。</p>
 <p>Example:</p>
 <pre><code class="language-php">// null を返すかもしれないステートメント
-$getobject = function () {return null;};
+$getobject = fn () =&gt; null;
 // メソッド呼び出しは null を返す
 that(optional($getobject())-&gt;method())-&gt;isSame(null);
 // プロパティアクセスは null を返す
@@ -5549,10 +5758,10 @@ map や filter を駆使しようとすると必要になるが、イテレー�
 <pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
 $n1_9 = range(1, 9);
 // 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
-that(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v &lt;= 5; }))))-&gt;isSame(30);
-// chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
-that(chain($n1_9)-&gt;filter(function ($v) { return $v &lt;= 5; })-&gt;map(function ($v) { return $v * 2; })-&gt;sum()())-&gt;isSame(30);
-// funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
+that(array_sum(array_map(fn($v) =&gt; $v * 2, array_filter($n1_9, fn($v) =&gt; $v &lt;= 5))))-&gt;isSame(30);
+// chain でクロージャを渡したもの。処理の順番が思考どおりだが、 fn() が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
+that(chain($n1_9)-&gt;filter(fn($v) =&gt; $v &lt;= 5)-&gt;map(fn($v) =&gt; $v * 2)-&gt;sum()())-&gt;isSame(30);
+// funcP を介して fn() をなくしたもの。ここまで来ると若干読みやすい
 that(chain($n1_9)-&gt;filterP(['&lt;=' =&gt; 5])-&gt;mapP(['*' =&gt; 2])-&gt;sum()())-&gt;isSame(30);
 // funcE を介したもの。かなり直感的だが eval なので少し不安
 that(chain($n1_9)-&gt;filterE('&lt;= 5')-&gt;mapE('* 2')-&gt;sum()())-&gt;isSame(30);
@@ -5720,7 +5929,7 @@ that($output)-&gt;isSame([
 <p>Example:</p>
 <pre><code class="language-php">$cases = [
     1 =&gt; 'value is 1',
-    2 =&gt; function(){return 'value is 2';},
+    2 =&gt; fn() =&gt; 'value is 2',
 ];
 that(switchs(1, $cases))-&gt;isSame('value is 1');
 that(switchs(2, $cases))-&gt;isSame('value is 2');
@@ -5735,10 +5944,10 @@ that(switchs(3, $cases, 'undefined'))-&gt;isSame('undefined');
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_null($try, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 // 例外が飛ぶ場合は null が返ってくる
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_null($try))-&gt;isSame(null);
 </code></pre>
 </div>
@@ -5750,10 +5959,10 @@ that(try_null($try))-&gt;isSame(null);
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_return($try, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 // 例外が飛ぶ場合は例外オブジェクトが返ってくる
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_return($try))-&gt;IsInstanceOf(\Exception::class);
 </code></pre>
 </div>
@@ -5765,10 +5974,10 @@ that(try_return($try))-&gt;IsInstanceOf(\Exception::class);
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_catch($try, null, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_catch($try)-&gt;getMessage())-&gt;isSame('tried');
 </code></pre>
 </div>
@@ -5780,13 +5989,13 @@ that(try_catch($try)-&gt;getMessage())-&gt;isSame('tried');
 <p>例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">$finally_count = 0;
-$finally = function()use(&amp;$finally_count){$finally_count++;};
+$finally = function () use (&amp;$finally_count) {$finally_count++;};
 // 例外が飛ぼうと飛ぶまいと $finally は実行される
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_finally($try, $finally, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 that($finally_count)-&gt;isSame(1); // 呼ばれている
 // 例外は投げっぱなすが、 $finally は実行される
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){}
 that($finally_count)-&gt;isSame(2); // 呼ばれている
 </code></pre>
@@ -5799,13 +6008,13 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">$finally_count = 0;
-$finally = function()use(&amp;$finally_count){$finally_count++;};
+$finally = function () use (&amp;$finally_count) {$finally_count++;};
 // 例外が飛ぼうと飛ぶまいと $finally は実行される
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_catch_finally($try, null, $finally, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 that($finally_count)-&gt;isSame(1); // 呼ばれている
 // 例外を投げるが、 $catch で握りつぶす
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_catch_finally($try, null, $finally, 1, 2, 3)-&gt;getMessage())-&gt;isSame('tried');
 that($finally_count)-&gt;isSame(2); // 呼ばれている
 </code></pre>
@@ -5880,7 +6089,7 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
 <p>$provider に null を与えるとキャッシュの削除となる。</p>
 <p>Example:</p>
-<pre><code class="language-php">$provider = function(){return rand();};
+<pre><code class="language-php">$provider = fn() =&gt; rand();
 // 乱数を返す処理だが、キャッシュされるので同じ値になる
 $rand1 = cache('rand', $provider);
 $rand2 = cache('rand', $provider);
@@ -6080,13 +6289,13 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 <pre><code class="language-php"># 単一のクロージャを複数の引数で回す
 $t = microtime(true);
 $result = process_parallel(static function ($arg1, $arg2) {
-    usleep(500 * 1000);
+    usleep(1000 * 1000);
     fwrite(STDOUT, "this is stdout");
     fwrite(STDERR, "this is stderr");
     return $arg1 + $arg2;
 }, ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [3, 4]]);
-// 500ms かかる処理を3本実行するが、トータル時間は 1500ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-that(microtime(true) - $t)-&gt;lessThan(1.0);
+// 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+that(microtime(true) - $t)-&gt;lessThan(2.0);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
 that($result)-&gt;isSame([
     'a' =&gt; [
@@ -6112,20 +6321,20 @@ that($result)-&gt;isSame([
 $t = microtime(true);
 $result = process_parallel([
     'a' =&gt; static function ($arg1, $arg2) {
-        usleep(100 * 1000);
+        usleep(300 * 1000);
         return $arg1 + $arg2;
     },
     'b' =&gt; static function ($arg1, $arg2) {
-        usleep(300 * 1000);
+        usleep(500 * 1000);
         return $arg1 * $arg2;
     },
     static function ($arg) {
-        usleep(500 * 1000);
+        usleep(1000 * 1000);
         exit($arg);
     },
 ], ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [127]]);
-// 100,300,500ms かかる処理を3本実行するが、トータル時間は 900ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-that(microtime(true) - $t)-&gt;lessThan(1.0);
+// 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+that(microtime(true) - $t)-&gt;lessThan(1.5);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
 that($result)-&gt;isSame([
     'a' =&gt; [
@@ -6320,7 +6529,7 @@ restore_error_handler();
 <p>第1引数 $callable を $count 回回してその処理時間を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 0.01 秒を 10 回回すので 0.1 秒は超える
-that(timer(function(){usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
+that(timer(function () {usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6335,7 +6544,7 @@ that(timer(function(){usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
 <pre><code class="language-php">// intval と int キャストはどちらが早いか調べる
 benchmark([
     'intval',
-    'intcast' =&gt; function($v){return (int)$v;},
+    'intcast' =&gt; fn($v) =&gt; (int) $v,
 ], ['12345'], 10);
 </code></pre>
 </div>
@@ -6399,6 +6608,23 @@ int でも float でも stringable でもない場合は実装依存（ただの
 <pre><code class="language-php">that(numval(3.14))-&gt;isSame(3.14);   // int や float はそのまま返す
 that(numval('3.14'))-&gt;isSame(3.14); // . を含む文字列は float を返す
 that(numval('11', 8))-&gt;isSame(9);   // 基数が指定できる
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::flagval()">
+                                    ryunosuke\Functions\Package\Vars::flagval		</a>	<small>($var, $trim = false) : bool</small>
+		</h4>
+	<div class="description"><p>falsy の範囲を少し拡張した bool キャスト</p>
+<p>例えば ajax 等で {hoge: false} とすると "false" が飛んできてしまうが、その場合も false 判定されるようになる。<br />
+この処理は FILTER_VALIDATE_BOOLEAN で行うので "off", "no", 等も false を返す。</p>
+<p>あとドキュメントには空白文字について言及がないが、どうも trim される模様。<br />
+trim するかどうかは呼び元で判断すべきだと思う（" true " が true, "    " が false になるのは果たして正しいのか）ので、第2引数で分岐できるようにしてある。<br />
+boolval やキャストでは trim されないようなのでデフォルト false にしてある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// こういう文字列も false になる
+that(flagval('false'))-&gt;isFalse();
+that(flagval('off'))-&gt;isFalse();
+that(flagval('no'))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6529,9 +6755,7 @@ that(si_prefix(10240, 1024, '%.3f %sbyte'))-&gt;isSame('10.000 kbyte');
 // フォーマットに null を与えると sprintf せずに配列で返す
 that(si_prefix(12345, 1000, null))-&gt;isSame([12.345, 'k']);
 // フォーマットにクロージャを与えると実行して返す
-that(si_prefix(12345, 1000, function ($v, $u) {
-    return number_format($v, 2) . $u;
-}))-&gt;isSame('12.35k');
+that(si_prefix(12345, 1000, fn($v, $u) =&gt; number_format($v, 2) . $u))-&gt;isSame('12.35k');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6653,20 +6877,6 @@ that(is_stringable([1, 2, 3]))-&gt;isFalse();
 <pre><code class="language-php">that(is_arrayable([]))-&gt;isTrue();
 that(is_arrayable(new \ArrayObject()))-&gt;isTrue();
 that(is_arrayable(new \stdClass()))-&gt;isFalse();
-</code></pre>
-</div>
-    	<h4 class="fqsen-title">method		<small></small>
-		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_countable()">
-                                    ryunosuke\Functions\Package\Vars::is_countable		</a>	<small>($var) : bool</small>
-		</h4>
-	<div class="description"><p>変数が count でカウントできるか調べる</p>
-<p>要するに <tag_link data-kind='uri' data-type='http://php.net/manual/function.is-countable.php' data-description='is_countable'>is_countable</tag_link> の polyfill。</p>
-<p>Example:</p>
-<pre><code class="language-php">that(is_countable([1, 2, 3]))-&gt;isTrue();
-that(is_countable(new \ArrayObject()))-&gt;isTrue();
-that(is_countable((function () { yield 1; })()))-&gt;isFalse();
-that(is_countable(1))-&gt;isFalse();
-that(is_countable(new \stdClass()))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6811,7 +7021,7 @@ that(var_apply(['&lt;x&gt;', ['&lt;y&gt;']], 'htmlspecialchars', ENT_QUOTES, 'ut
 <p>「配列を受け取って配列を返す関数があるが、手元にスカラー値しか無い」という状況はまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 配列を受け取って中身を大文字化して返すクロージャ
-$upper = function($array){return array_map('strtoupper', $array);};
+$upper = fn($array) =&gt; array_map('strtoupper', $array);
 // 普通はこうやって使うが・・・
 that($upper(['a', 'b', 'c']))-&gt;isSame(['A', 'B', 'C']);
 // 手元に配列ではなくスカラー値しか無いときはこうせざるをえない
@@ -6906,15 +7116,14 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
                                     ryunosuke\Functions\Package\Vars::var_export3		</a>	<small>($value, $return = false) : string</small>
 		</h4>
 	<div class="description"><p>var_export を色々と出力できるようにしたもの</p>
-<p>php のコードに落とし込むことで serialize と比較してかなり高速に動作する。ただし、要 php7.4.</p>
+<p>php のコードに落とし込むことで serialize と比較してかなり高速に動作する。</p>
 <p>各種オブジェクトやクロージャ、循環参照を含む配列など様々なものが出力できる。<br />
 ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。</p>
 <ul>
-<li>無名クラス</li>
 <li>Generator クラス</li>
 <li>特定の内部クラス（PDO など）</li>
 <li>リソース</li>
-<li>php7.4 以降のアロー関数によるクロージャ</li>
+<li>アロー関数によるクロージャ</li>
 </ul>
 <p>オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。<br />
 のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。<br />
@@ -6959,7 +7168,7 @@ var_pretty([
         "c" =&gt; "C",
     ],
     "object"  =&gt; new \Exception(),
-    "closure" =&gt; function () use($using) { },
+    "closure" =&gt; function () use ($using) { },
 ]);
 ?&gt;
 {

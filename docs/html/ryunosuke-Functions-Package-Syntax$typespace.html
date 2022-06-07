@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L1431" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L5-L1429" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Syntax</span></h2>
@@ -174,7 +174,7 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L83-L279" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L83-L277" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::parse_php()" tabindex="-1" class="structure-title ">
                         parse_php                        	<small>($phpcode, $option = []) : array</small>
@@ -229,7 +229,7 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L281-L399" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L279-L397" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::strip_php()" tabindex="-1" class="structure-title ">
                         strip_php                        	<small>($phtml, $option = [], &amp;$mapping = []) : string</small>
@@ -302,7 +302,7 @@ that(strtr($html, $mapping))-&gt;is($phtml);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L401-L541" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L399-L539" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::indent_php()" tabindex="-1" class="structure-title ">
                         indent_php                        	<small>($phpcode, $options = []) : string</small>
@@ -340,7 +340,7 @@ that(indent_php($phpcode, [
     'baseline'  =&gt; 1,    // 基準インデントの行番号（負数で下からの指定になる）
     'indent'    =&gt; 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
     'trimempty' =&gt; true, // 空行を trim するか
-    'heredoc'   =&gt; true, // php7.3 の Flexible Heredoc もインデントするか
+    'heredoc'   =&gt; true, // Flexible Heredoc もインデントするか
 ]))-&gt;isSame('
     echo 123;
 
@@ -395,7 +395,7 @@ that(indent_php($phpcode, [
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L543-L717" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L541-L715" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::highlight_php()" tabindex="-1" class="structure-title ">
                         highlight_php                        	<small>($phpcode, $options = []) : string</small>
@@ -450,10 +450,10 @@ highlight_string の CLI 対応版とも言える。</p>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L719-L786" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L717-L784" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::optional()" tabindex="-1" class="structure-title ">
-                        optional                        	<small>($object, $expected = null) : object</small>
+                        optional                        	<small>($object, $expected = null) : <a href="T$typespace.html#T" class="fqsen ">T</a></small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>オブジェクトならそれを、オブジェクトでないなら NullObject を返す</p>
@@ -463,7 +463,7 @@ highlight_string の CLI 対応版とも言える。</p>
 __set のような明らかに設定が意図されているものは例外が飛ぶ。</p>
 <p>Example:</p>
 <pre><code class="language-php">// null を返すかもしれないステートメント
-$getobject = function () {return null;};
+$getobject = fn () =&gt; null;
 // メソッド呼び出しは null を返す
 that(optional($getobject())-&gt;method())-&gt;isSame(null);
 // プロパティアクセスは null を返す
@@ -489,7 +489,7 @@ that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;isSame(null);
 		<caption>Parameters</caption>
 		<tbody>
         			<tr>
-				<td class="type">object<span class="type-separator"></span><wbr>null</td>
+				<td class="type"><a href="T$typespace.html#T" class="fqsen ">T</a><span class="type-separator"></span><wbr>null</td>
 				<td class="rest">$object</td>
 				<td class="desc"><p>オブジェクト</p>
 </td>
@@ -506,7 +506,7 @@ that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;isSame(null);
 		<caption>Return</caption>
 		<tbody>
 		<tr>
-			<td class="type">object</td>
+			<td class="type"><a href="T$typespace.html#T" class="fqsen ">T</a></td>
 			<td class="desc"><p>$object がオブジェクトならそのまま返し、違うなら NullObject を返す</p>
 </td>
 			<td class="rest"></td>
@@ -530,7 +530,7 @@ that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;isSame(null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L788-L1025" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L786-L1023" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::chain()" tabindex="-1" class="structure-title ">
                         chain                        	<small>($source = null) : <a href="ChainObject$typespace.html#ChainObject" class="fqsen ">ChainObject</a></small>
@@ -579,10 +579,10 @@ map や filter を駆使しようとすると必要になるが、イテレー�
 <pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
 $n1_9 = range(1, 9);
 // 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
-that(array_sum(array_map(function ($v) { return $v * 2; }, array_filter($n1_9, function ($v) { return $v &lt;= 5; }))))-&gt;isSame(30);
-// chain でクロージャを渡したもの。処理の順番が思考どおりだが、 function(){} が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
-that(chain($n1_9)-&gt;filter(function ($v) { return $v &lt;= 5; })-&gt;map(function ($v) { return $v * 2; })-&gt;sum()())-&gt;isSame(30);
-// funcP を介して function(){} をなくしたもの。ここまで来ると若干読みやすい
+that(array_sum(array_map(fn($v) =&gt; $v * 2, array_filter($n1_9, fn($v) =&gt; $v &lt;= 5))))-&gt;isSame(30);
+// chain でクロージャを渡したもの。処理の順番が思考どおりだが、 fn() が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
+that(chain($n1_9)-&gt;filter(fn($v) =&gt; $v &lt;= 5)-&gt;map(fn($v) =&gt; $v * 2)-&gt;sum()())-&gt;isSame(30);
+// funcP を介して fn() をなくしたもの。ここまで来ると若干読みやすい
 that(chain($n1_9)-&gt;filterP(['&lt;=' =&gt; 5])-&gt;mapP(['*' =&gt; 2])-&gt;sum()())-&gt;isSame(30);
 // funcE を介したもの。かなり直感的だが eval なので少し不安
 that(chain($n1_9)-&gt;filterE('&lt;= 5')-&gt;mapE('* 2')-&gt;sum()())-&gt;isSame(30);
@@ -658,7 +658,7 @@ that(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()($r
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1027-L1048" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1025-L1046" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throws()" tabindex="-1" class="structure-title ">
                         throws                        	<small>($ex) : mixed</small>
@@ -714,7 +714,7 @@ catch (\Exception $ex) {
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1050-L1077" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1048-L1075" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::throw_if()" tabindex="-1" class="structure-title ">
                         throw_if                        	<small>($flag, $ex, ...$ex_args) : void</small>
@@ -781,7 +781,7 @@ try{throw_if(true, \Exception::class, 'message', 123);}catch(\Exception $ex){}
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1079-L1169" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1077-L1167" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::blank_if()" tabindex="-1" class="structure-title ">
                         blank_if                        	<small>($var, $default = null) : mixed</small>
@@ -891,7 +891,7 @@ that(blank_if(array_search('x', ['a', 'b', 'c']), 'default'))-&gt;isSame('defaul
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1171-L1229" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1169-L1227" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::call_if()" tabindex="-1" class="structure-title ">
                         call_if                        	<small>($condition, $callable, ...$arguments) : mixed</small>
@@ -970,7 +970,7 @@ that($output)-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1231-L1269" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1229-L1267" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::switchs()" tabindex="-1" class="structure-title ">
                         switchs                        	<small>($value, $cases, $default = null) : mixed</small>
@@ -983,7 +983,7 @@ that($output)-&gt;isSame([
 <p>Example:</p>
 <pre><code class="language-php">$cases = [
     1 =&gt; 'value is 1',
-    2 =&gt; function(){return 'value is 2';},
+    2 =&gt; fn() =&gt; 'value is 2',
 ];
 that(switchs(1, $cases))-&gt;isSame('value is 1');
 that(switchs(2, $cases))-&gt;isSame('value is 2');
@@ -1040,7 +1040,7 @@ that(switchs(3, $cases, 'undefined'))-&gt;isSame('undefined');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1271-L1298" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1269-L1296" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_null()" tabindex="-1" class="structure-title ">
                         try_null                        	<small>($try, ...$variadic) : mixed</small>
@@ -1050,10 +1050,10 @@ that(switchs(3, $cases, 'undefined'))-&gt;isSame('undefined');
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_null($try, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 // 例外が飛ぶ場合は null が返ってくる
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_null($try))-&gt;isSame(null);
 </code></pre>
 </div>
@@ -1102,7 +1102,7 @@ that(try_null($try))-&gt;isSame(null);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1300-L1327" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1298-L1325" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_return()" tabindex="-1" class="structure-title ">
                         try_return                        	<small>($try, ...$variadic) : mixed</small>
@@ -1112,10 +1112,10 @@ that(try_null($try))-&gt;isSame(null);
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_return($try, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 // 例外が飛ぶ場合は例外オブジェクトが返ってくる
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_return($try))-&gt;IsInstanceOf(\Exception::class);
 </code></pre>
 </div>
@@ -1164,7 +1164,7 @@ that(try_return($try))-&gt;IsInstanceOf(\Exception::class);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1329-L1352" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1327-L1350" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch()" tabindex="-1" class="structure-title ">
                         try_catch                        	<small>($try, $catch = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1174,10 +1174,10 @@ that(try_return($try))-&gt;IsInstanceOf(\Exception::class);
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 例外が飛ばない場合は平和極まりない
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_catch($try, null, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 // 例外が飛ぶ場合は特殊なことをしなければ例外オブジェクトが返ってくる
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_catch($try)-&gt;getMessage())-&gt;isSame('tried');
 </code></pre>
 </div>
@@ -1232,7 +1232,7 @@ that(try_catch($try)-&gt;getMessage())-&gt;isSame('tried');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1354-L1381" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1352-L1379" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_finally()" tabindex="-1" class="structure-title ">
                         try_finally                        	<small>($try, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1242,13 +1242,13 @@ that(try_catch($try)-&gt;getMessage())-&gt;isSame('tried');
 <p>例外は投げっぱなす。例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">$finally_count = 0;
-$finally = function()use(&amp;$finally_count){$finally_count++;};
+$finally = function () use (&amp;$finally_count) {$finally_count++;};
 // 例外が飛ぼうと飛ぶまいと $finally は実行される
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_finally($try, $finally, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 that($finally_count)-&gt;isSame(1); // 呼ばれている
 // 例外は投げっぱなすが、 $finally は実行される
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 try {try_finally($try, $finally, 1, 2, 3);} catch(\Exception $e){}
 that($finally_count)-&gt;isSame(2); // 呼ばれている
 </code></pre>
@@ -1304,7 +1304,7 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1383-L1430" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Syntax.php#L1381-L1428" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Syntax::try_catch_finally()" tabindex="-1" class="structure-title ">
                         try_catch_finally                        	<small>($try, $catch = null, $finally = null, ...$variadic) : <a href="http://php.net/manual/ja/class.exception.php" class="fqsen" target="_blank">\Exception</a><span class="type-separator"></span><wbr>mixed</small>
@@ -1314,13 +1314,13 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 <p>例外機構構文が冗長なことがまれによくあるはず。</p>
 <p>Example:</p>
 <pre><code class="language-php">$finally_count = 0;
-$finally = function()use(&amp;$finally_count){$finally_count++;};
+$finally = function () use (&amp;$finally_count) {$finally_count++;};
 // 例外が飛ぼうと飛ぶまいと $finally は実行される
-$try = function($a, $b, $c){return [$a, $b, $c];};
+$try = function ($a, $b, $c) {return [$a, $b, $c];};
 that(try_catch_finally($try, null, $finally, 1, 2, 3))-&gt;isSame([1, 2, 3]);
 that($finally_count)-&gt;isSame(1); // 呼ばれている
 // 例外を投げるが、 $catch で握りつぶす
-$try = function(){throw new \Exception('tried');};
+$try = function () {throw new \Exception('tried');};
 that(try_catch_finally($try, null, $finally, 1, 2, 3)-&gt;getMessage())-&gt;isSame('tried');
 that($finally_count)-&gt;isSame(2); // 呼ばれている
 </code></pre>

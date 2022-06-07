@@ -121,6 +121,16 @@
  * @method   \ChainObject  anyE1($array, $default = false)
  * @method   \ChainObject  anyE2($array, $callback = null)
  *
+ * @see array_append
+ * @method   \ChainObject  array_append($value, $key = null)
+ * @method   \ChainObject  array_append1($array, $key = null)
+ * @method   \ChainObject  array_append2($array, $value)
+ *
+ * @see array_append
+ * @method   \ChainObject  append($value, $key = null)
+ * @method   \ChainObject  append1($array, $key = null)
+ * @method   \ChainObject  append2($array, $value)
+ *
  * @see array_assort
  * @method   \ChainObject  array_assort($rules)
  * @method   \ChainObject  array_assort1($array)
@@ -1199,6 +1209,16 @@
  * @method   \ChainObject  pos_key1($array, $default = null)
  * @method   \ChainObject  pos_key2($array, $key)
  *
+ * @see array_prepend
+ * @method   \ChainObject  array_prepend($value, $key = null)
+ * @method   \ChainObject  array_prepend1($array, $key = null)
+ * @method   \ChainObject  array_prepend2($array, $value)
+ *
+ * @see array_prepend
+ * @method   \ChainObject  prepend($value, $key = null)
+ * @method   \ChainObject  prepend1($array, $key = null)
+ * @method   \ChainObject  prepend2($array, $value)
+ *
  * @see array_product
  * @property \ChainObject $array_product
  * @method   \ChainObject  array_product()
@@ -1813,6 +1833,10 @@
  * @property \ChainObject $cacheobject
  * @method   \ChainObject  cacheobject()
  *
+ * @see calculate_formula
+ * @property \ChainObject $calculate_formula
+ * @method   \ChainObject  calculate_formula()
+ *
  * @see call_if
  * @method   \ChainObject  call_if($callable, ...$arguments)
  * @method   \ChainObject  call_if1($condition, ...$arguments)
@@ -1959,6 +1983,10 @@
  * @method   \ChainObject  class_alias($alias_name, $autoload = null)
  * @method   \ChainObject  class_alias1($user_class_name, $autoload = null)
  * @method   \ChainObject  class_alias2($user_class_name, $alias_name)
+ *
+ * @see class_aliases
+ * @property \ChainObject $class_aliases
+ * @method   \ChainObject  class_aliases()
  *
  * @see class_exists
  * @property \ChainObject $class_exists
@@ -2123,6 +2151,12 @@
  * @see date_add
  * @method   \ChainObject  date_add($interval)
  * @method   \ChainObject  date_add1($object)
+ *
+ * @see date_alter
+ * @method   \ChainObject  date_alter($excluded_dates, $follow_count, $format = "Y-m-d")
+ * @method   \ChainObject  date_alter1($datetime, $follow_count, $format = "Y-m-d")
+ * @method   \ChainObject  date_alter2($datetime, $excluded_dates, $format = "Y-m-d")
+ * @method   \ChainObject  date_alter3($datetime, $excluded_dates, $follow_count)
  *
  * @see date_convert
  * @property \ChainObject $date_convert
@@ -2607,6 +2641,11 @@
  * @property \ChainObject $first_value
  * @method   \ChainObject  first_value($default = null)
  * @method   \ChainObject  first_value1($array)
+ *
+ * @see flagval
+ * @property \ChainObject $flagval
+ * @method   \ChainObject  flagval($trim = false)
+ * @method   \ChainObject  flagval1($var)
  *
  * @see floatval
  * @property \ChainObject $floatval
@@ -3584,6 +3623,12 @@
  * @see mb_detect_order
  * @method   \ChainObject  mb_detect_order()
  *
+ * @see mb_ellipsis
+ * @method   \ChainObject  mb_ellipsis($width, $trimmarker = "...", $pos = null)
+ * @method   \ChainObject  mb_ellipsis1($string, $trimmarker = "...", $pos = null)
+ * @method   \ChainObject  mb_ellipsis2($string, $width, $pos = null)
+ * @method   \ChainObject  mb_ellipsis3($string, $width, $trimmarker = "...")
+ *
  * @see mb_encode_mimeheader
  * @property \ChainObject $mb_encode_mimeheader
  * @method   \ChainObject  mb_encode_mimeheader($charset = null, $transfer = null, $linefeed = null, $indent = null)
@@ -3705,6 +3750,12 @@
  * @method   \ChainObject  mb_split($string, $limit = null)
  * @method   \ChainObject  mb_split1($pattern, $limit = null)
  * @method   \ChainObject  mb_split2($pattern, $string)
+ *
+ * @see mb_str_pad
+ * @method   \ChainObject  mb_str_pad($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
+ * @method   \ChainObject  mb_str_pad1($string, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
+ * @method   \ChainObject  mb_str_pad2($string, $width, $pad_type = STR_PAD_RIGHT)
+ * @method   \ChainObject  mb_str_pad3($string, $width, $pad_string = " ")
  *
  * @see mb_str_split
  * @property \ChainObject $mb_str_split
@@ -4837,6 +4888,22 @@
  * @method   \ChainObject  str_chunk5($string, ...$chunks)
  * @method   \ChainObject  str_chunk6($string, ...$chunks)
  *
+ * @see str_common_prefix
+ * @method   \ChainObject  str_common_prefix(...$strings)
+ * @method   \ChainObject  str_common_prefix1(...$strings)
+ * @method   \ChainObject  str_common_prefix2(...$strings)
+ * @method   \ChainObject  str_common_prefix3(...$strings)
+ * @method   \ChainObject  str_common_prefix4(...$strings)
+ * @method   \ChainObject  str_common_prefix5(...$strings)
+ *
+ * @see str_common_prefix
+ * @method   \ChainObject  common_prefix(...$strings)
+ * @method   \ChainObject  common_prefix1(...$strings)
+ * @method   \ChainObject  common_prefix2(...$strings)
+ * @method   \ChainObject  common_prefix3(...$strings)
+ * @method   \ChainObject  common_prefix4(...$strings)
+ * @method   \ChainObject  common_prefix5(...$strings)
+ *
  * @see str_contains
  * @method   \ChainObject  str_contains($needle, $case_insensitivity = false, $and_flag = false)
  * @method   \ChainObject  str_contains1($haystack, $case_insensitivity = false, $and_flag = false)
@@ -5565,6 +5632,11 @@
  * @method   \ChainObject  try_return4($try, ...$variadic)
  * @method   \ChainObject  try_return5($try, ...$variadic)
  * @method   \ChainObject  try_return6($try, ...$variadic)
+ *
+ * @see type_exists
+ * @property \ChainObject $type_exists
+ * @method   \ChainObject  type_exists($autoload = true)
+ * @method   \ChainObject  type_exists1($typename)
  *
  * @see ucfirst
  * @property \ChainObject $ucfirst

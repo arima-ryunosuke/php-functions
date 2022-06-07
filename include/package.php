@@ -685,6 +685,26 @@ if (!defined("ryunosuke\\Functions\\Package\\JSON_MAX_DEPTH")) {
     define("ryunosuke\\Functions\\Package\\JSON_MAX_DEPTH", -1);
 }
 
+if (!defined("ryunosuke\\Functions\\Package\\JSON_INDENT")) {
+    /** json_*** 関数でインデント数・文字を指定する定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_INDENT", -71);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_CLOSURE")) {
+    /** json_*** 関数でクロージャをサポートするかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_CLOSURE", -72);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_INLINE_LEVEL")) {
+    /** json_*** 関数で一定以上の階層をインライン化するかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_INLINE_LEVEL", -73);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_INLINE_SCALARLIST")) {
+    /** json_*** 関数でスカラーのみのリストをインライン化するかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_INLINE_SCALARLIST", -74);
+}
+
 if (!defined("ryunosuke\\Functions\\Package\\JSON_ES5")) {
     /** json_*** 関数で json5 を取り扱うかの定数 */
     define("ryunosuke\\Functions\\Package\\JSON_ES5", -100);
@@ -698,6 +718,16 @@ if (!defined("ryunosuke\\Functions\\Package\\JSON_INT_AS_STRING")) {
 if (!defined("ryunosuke\\Functions\\Package\\JSON_FLOAT_AS_STRING")) {
     /** json_*** 関数で小数を常に文字列で返すかの定数 */
     define("ryunosuke\\Functions\\Package\\JSON_FLOAT_AS_STRING", -102);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_TRAILING_COMMA")) {
+    /** json_*** 関数で強制ケツカンマを振るかの定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_TRAILING_COMMA", -103);
+}
+
+if (!defined("ryunosuke\\Functions\\Package\\JSON_COMMENT_PREFIX")) {
+    /** json_*** 関数でコメントを判定するプレフィックス定数 */
+    define("ryunosuke\\Functions\\Package\\JSON_COMMENT_PREFIX", -104);
 }
 
 if (!defined("ryunosuke\\Functions\\Package\\TOKEN_NAME")) {
@@ -751,6 +781,8 @@ define("ryunosuke\\Functions\\Package\\in_array_and", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\in_array_or", ["ryunosuke\\Functions\\Package\\Arrays", "in_array_or"]);
 define("ryunosuke\\Functions\\Package\\kvsort", ["ryunosuke\\Functions\\Package\\Arrays", "kvsort"]);
 define("ryunosuke\\Functions\\Package\\array_add", ["ryunosuke\\Functions\\Package\\Arrays", "array_add"]);
+define("ryunosuke\\Functions\\Package\\array_append", ["ryunosuke\\Functions\\Package\\Arrays", "array_append"]);
+define("ryunosuke\\Functions\\Package\\array_prepend", ["ryunosuke\\Functions\\Package\\Arrays", "array_prepend"]);
 define("ryunosuke\\Functions\\Package\\array_merge2", ["ryunosuke\\Functions\\Package\\Arrays", "array_merge2"]);
 define("ryunosuke\\Functions\\Package\\array_mix", ["ryunosuke\\Functions\\Package\\Arrays", "array_mix"]);
 define("ryunosuke\\Functions\\Package\\array_zip", ["ryunosuke\\Functions\\Package\\Arrays", "array_zip"]);
@@ -814,8 +846,10 @@ define("ryunosuke\\Functions\\Package\\array_schema", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\stdclass", ["ryunosuke\\Functions\\Package\\Classobj", "stdclass"]);
 define("ryunosuke\\Functions\\Package\\detect_namespace", ["ryunosuke\\Functions\\Package\\Classobj", "detect_namespace"]);
 define("ryunosuke\\Functions\\Package\\class_uses_all", ["ryunosuke\\Functions\\Package\\Classobj", "class_uses_all"]);
+define("ryunosuke\\Functions\\Package\\type_exists", ["ryunosuke\\Functions\\Package\\Classobj", "type_exists"]);
 define("ryunosuke\\Functions\\Package\\auto_loader", ["ryunosuke\\Functions\\Package\\Classobj", "auto_loader"]);
 define("ryunosuke\\Functions\\Package\\class_loader", ["ryunosuke\\Functions\\Package\\Classobj", "class_loader"]);
+define("ryunosuke\\Functions\\Package\\class_aliases", ["ryunosuke\\Functions\\Package\\Classobj", "class_aliases"]);
 define("ryunosuke\\Functions\\Package\\class_namespace", ["ryunosuke\\Functions\\Package\\Classobj", "class_namespace"]);
 define("ryunosuke\\Functions\\Package\\class_shorten", ["ryunosuke\\Functions\\Package\\Classobj", "class_shorten"]);
 define("ryunosuke\\Functions\\Package\\class_replace", ["ryunosuke\\Functions\\Package\\Classobj", "class_replace"]);
@@ -829,6 +863,7 @@ define("ryunosuke\\Functions\\Package\\date_timestamp", ["ryunosuke\\Functions\\
 define("ryunosuke\\Functions\\Package\\date_convert", ["ryunosuke\\Functions\\Package\\Date", "date_convert"]);
 define("ryunosuke\\Functions\\Package\\date_fromto", ["ryunosuke\\Functions\\Package\\Date", "date_fromto"]);
 define("ryunosuke\\Functions\\Package\\date_interval", ["ryunosuke\\Functions\\Package\\Date", "date_interval"]);
+define("ryunosuke\\Functions\\Package\\date_alter", ["ryunosuke\\Functions\\Package\\Date", "date_alter"]);
 define("ryunosuke\\Functions\\Package\\file_matcher", ["ryunosuke\\Functions\\Package\\FileSystem", "file_matcher"]);
 define("ryunosuke\\Functions\\Package\\file_list", ["ryunosuke\\Functions\\Package\\FileSystem", "file_list"]);
 define("ryunosuke\\Functions\\Package\\file_tree", ["ryunosuke\\Functions\\Package\\FileSystem", "file_tree"]);
@@ -890,6 +925,7 @@ define("ryunosuke\\Functions\\Package\\decimal", ["ryunosuke\\Functions\\Package
 define("ryunosuke\\Functions\\Package\\random_at", ["ryunosuke\\Functions\\Package\\Math", "random_at"]);
 define("ryunosuke\\Functions\\Package\\probability", ["ryunosuke\\Functions\\Package\\Math", "probability"]);
 define("ryunosuke\\Functions\\Package\\normal_rand", ["ryunosuke\\Functions\\Package\\Math", "normal_rand"]);
+define("ryunosuke\\Functions\\Package\\calculate_formula", ["ryunosuke\\Functions\\Package\\Math", "calculate_formula"]);
 define("ryunosuke\\Functions\\Package\\getipaddress", ["ryunosuke\\Functions\\Package\\Network", "getipaddress"]);
 define("ryunosuke\\Functions\\Package\\incidr", ["ryunosuke\\Functions\\Package\\Network", "incidr"]);
 define("ryunosuke\\Functions\\Package\\ping", ["ryunosuke\\Functions\\Package\\Network", "ping"]);
@@ -965,7 +1001,10 @@ define("ryunosuke\\Functions\\Package\\damerau_levenshtein", ["ryunosuke\\Functi
 define("ryunosuke\\Functions\\Package\\ngram", ["ryunosuke\\Functions\\Package\\Strings", "ngram"]);
 define("ryunosuke\\Functions\\Package\\str_guess", ["ryunosuke\\Functions\\Package\\Strings", "str_guess"]);
 define("ryunosuke\\Functions\\Package\\str_array", ["ryunosuke\\Functions\\Package\\Strings", "str_array"]);
+define("ryunosuke\\Functions\\Package\\str_common_prefix", ["ryunosuke\\Functions\\Package\\Strings", "str_common_prefix"]);
 define("ryunosuke\\Functions\\Package\\mb_substr_replace", ["ryunosuke\\Functions\\Package\\Strings", "mb_substr_replace"]);
+define("ryunosuke\\Functions\\Package\\mb_str_pad", ["ryunosuke\\Functions\\Package\\Strings", "mb_str_pad"]);
+define("ryunosuke\\Functions\\Package\\mb_ellipsis", ["ryunosuke\\Functions\\Package\\Strings", "mb_ellipsis"]);
 define("ryunosuke\\Functions\\Package\\mb_trim", ["ryunosuke\\Functions\\Package\\Strings", "mb_trim"]);
 define("ryunosuke\\Functions\\Package\\render_template", ["ryunosuke\\Functions\\Package\\Strings", "render_template"]);
 define("ryunosuke\\Functions\\Package\\render_string", ["ryunosuke\\Functions\\Package\\Strings", "render_string"]);
@@ -1014,6 +1053,7 @@ define("ryunosuke\\Functions\\Package\\benchmark", ["ryunosuke\\Functions\\Packa
 define("ryunosuke\\Functions\\Package\\stringify", ["ryunosuke\\Functions\\Package\\Vars", "stringify"]);
 define("ryunosuke\\Functions\\Package\\numberify", ["ryunosuke\\Functions\\Package\\Vars", "numberify"]);
 define("ryunosuke\\Functions\\Package\\numval", ["ryunosuke\\Functions\\Package\\Vars", "numval"]);
+define("ryunosuke\\Functions\\Package\\flagval", ["ryunosuke\\Functions\\Package\\Vars", "flagval"]);
 define("ryunosuke\\Functions\\Package\\arrayval", ["ryunosuke\\Functions\\Package\\Vars", "arrayval"]);
 define("ryunosuke\\Functions\\Package\\phpval", ["ryunosuke\\Functions\\Package\\Vars", "phpval"]);
 define("ryunosuke\\Functions\\Package\\arrayable_key_exists", ["ryunosuke\\Functions\\Package\\Vars", "arrayable_key_exists"]);
@@ -1026,7 +1066,6 @@ define("ryunosuke\\Functions\\Package\\is_primitive", ["ryunosuke\\Functions\\Pa
 define("ryunosuke\\Functions\\Package\\is_recursive", ["ryunosuke\\Functions\\Package\\Vars", "is_recursive"]);
 define("ryunosuke\\Functions\\Package\\is_stringable", ["ryunosuke\\Functions\\Package\\Vars", "is_stringable"]);
 define("ryunosuke\\Functions\\Package\\is_arrayable", ["ryunosuke\\Functions\\Package\\Vars", "is_arrayable"]);
-define("ryunosuke\\Functions\\Package\\is_countable", ["ryunosuke\\Functions\\Package\\Vars", "is_countable"]);
 define("ryunosuke\\Functions\\Package\\cipher_metadata", ["ryunosuke\\Functions\\Package\\Vars", "cipher_metadata"]);
 define("ryunosuke\\Functions\\Package\\encrypt", ["ryunosuke\\Functions\\Package\\Vars", "encrypt"]);
 define("ryunosuke\\Functions\\Package\\decrypt", ["ryunosuke\\Functions\\Package\\Vars", "decrypt"]);

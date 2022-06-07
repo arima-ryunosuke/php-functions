@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L2222" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L5-L2210" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Utility</span></h2>
@@ -375,7 +375,7 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 キャッシュがある場合はそれを返し、ない場合は $provider を呼び出してその結果をキャッシュしつつそれを返す。</p>
 <p>$provider に null を与えるとキャッシュの削除となる。</p>
 <p>Example:</p>
-<pre><code class="language-php">$provider = function(){return rand();};
+<pre><code class="language-php">$provider = fn() =&gt; rand();
 // 乱数を返す処理だが、キャッシュされるので同じ値になる
 $rand1 = cache('rand', $provider);
 $rand2 = cache('rand', $provider);
@@ -437,7 +437,7 @@ that($rand1)-&gt;isNotSame($rand3);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L471-L660" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L471-L658" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::parse_namespace()" tabindex="-1" class="structure-title ">
                         parse_namespace                        	<small>($filename, $options = []) : array</small>
@@ -541,7 +541,7 @@ that(parse_namespace(sys_get_temp_dir() . '/namespace.php'))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L662-L725" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L660-L723" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::resolve_symbol()" tabindex="-1" class="structure-title ">
                         resolve_symbol                        	<small>($shortname, $nsfiles, $targets = [&quot;const&quot;, &quot;function&quot;, &quot;alias&quot;]) : string<span class="type-separator"></span><wbr>null</small>
@@ -619,7 +619,7 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L727-L918" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L725-L916" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::parse_annotation()" tabindex="-1" class="structure-title ">
                         parse_annotation                        	<small>($annotation, $schema = [], $nsfiles = []) : array</small>
@@ -711,7 +711,7 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L920-L948" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L918-L946" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::is_ansi()" tabindex="-1" class="structure-title ">
                         is_ansi                        	<small>($stream) : bool</small>
@@ -770,7 +770,7 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L950-L1013" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L948-L1011" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::ansi_colorize()" tabindex="-1" class="structure-title ">
                         ansi_colorize                        	<small>($string, $color) : string</small>
@@ -837,7 +837,7 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1015-L1057" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1013-L1055" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process()" tabindex="-1" class="structure-title ">
                         process                        	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : int</small>
@@ -939,7 +939,7 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1059-L1190" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1057-L1180" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process_async()" tabindex="-1" class="structure-title ">
                         process_async                        	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : callable</small>
@@ -953,13 +953,13 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$command</td>
-				<td class="desc"><p>実行コマンド。php7.4 未満では escapeshellcmd される</p>
+				<td class="desc"><p>実行コマンド</p>
 </td>
 			</tr>
         			<tr>
 				<td class="type">array<span class="type-separator"></span><wbr>string</td>
 				<td class="rest">$args = []</td>
-				<td class="desc"><p>コマンドライン引数。php7.4 未満では文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される</p>
+				<td class="desc"><p>コマンドライン引数。文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される</p>
 </td>
 			</tr>
         			<tr>
@@ -1032,7 +1032,7 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1192-L1333" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1182-L1321" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::process_parallel()" tabindex="-1" class="structure-title ">
                         process_parallel                        	<small>($tasks, $args = [], $autoload = null, $workdir = null, $env = null) : array</small>
@@ -1044,13 +1044,13 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 <pre><code class="language-php"># 単一のクロージャを複数の引数で回す
 $t = microtime(true);
 $result = process_parallel(static function ($arg1, $arg2) {
-    usleep(500 * 1000);
+    usleep(1000 * 1000);
     fwrite(STDOUT, "this is stdout");
     fwrite(STDERR, "this is stderr");
     return $arg1 + $arg2;
 }, ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [3, 4]]);
-// 500ms かかる処理を3本実行するが、トータル時間は 1500ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-that(microtime(true) - $t)-&gt;lessThan(1.0);
+// 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+that(microtime(true) - $t)-&gt;lessThan(2.0);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
 that($result)-&gt;isSame([
     'a' =&gt; [
@@ -1076,20 +1076,20 @@ that($result)-&gt;isSame([
 $t = microtime(true);
 $result = process_parallel([
     'a' =&gt; static function ($arg1, $arg2) {
-        usleep(100 * 1000);
+        usleep(300 * 1000);
         return $arg1 + $arg2;
     },
     'b' =&gt; static function ($arg1, $arg2) {
-        usleep(300 * 1000);
+        usleep(500 * 1000);
         return $arg1 * $arg2;
     },
     static function ($arg) {
-        usleep(500 * 1000);
+        usleep(1000 * 1000);
         exit($arg);
     },
 ], ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [127]]);
-// 100,300,500ms かかる処理を3本実行するが、トータル時間は 900ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-that(microtime(true) - $t)-&gt;lessThan(1.0);
+// 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
+that(microtime(true) - $t)-&gt;lessThan(1.5);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
 that($result)-&gt;isSame([
     'a' =&gt; [
@@ -1175,7 +1175,7 @@ that($result)-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1335-L1508" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1323-L1496" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::arguments()" tabindex="-1" class="structure-title ">
                         arguments                        	<small>($rule, $argv = null) : array</small>
@@ -1293,7 +1293,7 @@ that(arguments($rule, '--long A -short B'))-&gt;isSame([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1510-L1649" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1498-L1637" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::stacktrace()" tabindex="-1" class="structure-title ">
                         stacktrace                        	<small>($traces = null, $option = []) : string<span class="type-separator"></span><wbr>array</small>
@@ -1353,7 +1353,7 @@ limit と format は比較的指定頻度が高いかつ互換性維持のため
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1651-L1708" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1639-L1696" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::backtrace()" tabindex="-1" class="structure-title ">
                         backtrace                        	<small>($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = []) : array</small>
@@ -1424,7 +1424,7 @@ that($traces[1])-&gt;arraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1710-L1970" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1698-L1958" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::profiler()" tabindex="-1" class="structure-title ">
                         profiler                        	<small>($options = []) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr>callable</small>
@@ -1487,7 +1487,7 @@ that($traces[1])-&gt;arraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1972-L2031" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L1960-L2019" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::error()" tabindex="-1" class="structure-title ">
                         error                        	<small>($message, $destination = null) : int</small>
@@ -1545,7 +1545,7 @@ that($traces[1])-&gt;arraySubset([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L2033-L2070" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L2021-L2058" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::add_error_handler()" tabindex="-1" class="structure-title ">
                         add_error_handler                        	<small>($handler, $error_types = 32767) : callable<span class="type-separator"></span><wbr>null</small>
@@ -1614,7 +1614,7 @@ restore_error_handler();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L2072-L2099" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L2060-L2087" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::timer()" tabindex="-1" class="structure-title ">
                         timer                        	<small>($callable, $count = 1) : float</small>
@@ -1624,7 +1624,7 @@ restore_error_handler();
 <p>第1引数 $callable を $count 回回してその処理時間を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 0.01 秒を 10 回回すので 0.1 秒は超える
-that(timer(function(){usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
+that(timer(function () {usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
 </code></pre>
 </div>
                         	<table class="table">
@@ -1672,7 +1672,7 @@ that(timer(function(){usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L2101-L2221" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Utility.php#L2089-L2209" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Utility::benchmark()" tabindex="-1" class="structure-title ">
                         benchmark                        	<small>($suite, $args = [], $millisec = 1000, $output = true) : array</small>
@@ -1686,7 +1686,7 @@ that(timer(function(){usleep(10 * 1000);}, 10))-&gt;greaterThan(0.1);
 <pre><code class="language-php">// intval と int キャストはどちらが早いか調べる
 benchmark([
     'intval',
-    'intcast' =&gt; function($v){return (int)$v;},
+    'intcast' =&gt; fn($v) =&gt; (int) $v,
 ], ['12345'], 10);
 </code></pre>
 </div>
