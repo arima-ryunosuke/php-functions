@@ -63,9 +63,9 @@ class VarsTest extends AbstractTestCase
         that((numberify)('a1b2.c3', true))->isSame(12.3);
         that((numberify)('-a1b2c.3', true))->isSame(-12.3);
 
-        that(numberify)->try('aaa')->wasThrown('is not numeric');
-        that(numberify)->try('a.a')->wasThrown('is not numeric');
-        that(numberify)->try('1.2.3', true)->wasThrown('is not numeric');
+        that(numberify)('aaa')->wasThrown('is not numeric');
+        that(numberify)('a.a')->wasThrown('is not numeric');
+        that(numberify)('1.2.3', true)->wasThrown('is not numeric');
     }
 
     function test_numval()
@@ -260,7 +260,7 @@ class VarsTest extends AbstractTestCase
         that((arrayable_key_exists)('notfound', $object))->isFalse();
         that((arrayable_key_exists)('ex', $object))->isFalse();
 
-        that(arrayable_key_exists)->try(null, new \stdClass())->wasThrown('must be array or ArrayAccess');
+        that(arrayable_key_exists)(null, new \stdClass())->wasThrown('must be array or ArrayAccess');
     }
 
     function test_attr_get()
@@ -338,7 +338,7 @@ class VarsTest extends AbstractTestCase
         that((attr_get)('ok', $closure))->isSame(null);
         that((attr_get)('ok', $closure, 'default'))->isSame('default');
 
-        that(attr_get)->try(null, 'dummy')->wasThrown('must be array or object');
+        that(attr_get)(null, 'dummy')->wasThrown('must be array or object');
     }
 
     function test_si_prefix()
@@ -376,7 +376,7 @@ class VarsTest extends AbstractTestCase
         that((si_prefix)(12345, 1000, null))->is([12.345, 'k']);
         that((si_prefix)(12345, 1000, fn($v, $u) => number_format($v, 2) . $u))->is('12.35k');
 
-        that(si_prefix)->try(pow(10, 30))->wasThrown('too large or small');
+        that(si_prefix)(pow(10, 30))->wasThrown('too large or small');
     }
 
     function test_si_unprefix()
@@ -546,7 +546,7 @@ class VarsTest extends AbstractTestCase
         that((decrypt)('this is invalid=2', 'secret'))->isNull();               // data が不正なら複合できない
         that((encrypt)($data, 'secret', 'aes-256-ccm'))->isNotSame($encrypted); // ccm なので異なる暗号文が生成される
 
-        that(encrypt)->try('dummy', 'pass', 'unknown')->wasThrown('undefined cipher algorithm');
+        that(encrypt)('dummy', 'pass', 'unknown')->wasThrown('undefined cipher algorithm');
     }
 
     function test_encrypt_decrypt_invalid()
@@ -830,7 +830,7 @@ class VarsTest extends AbstractTestCase
         that(function () {
             $var = null;
             (var_stream)($var);
-        })->try()->wasThrown('is registered already');
+        })()->wasThrown('is registered already');
     }
 
     function test_var_export2()
@@ -894,8 +894,7 @@ class VarsTest extends AbstractTestCase
         EXPECTED
         );
 
-        $this->expectOutputRegex('#hoge#');
-        (var_export2)('hoge');
+        that(var_export2)->callable(null, 'hoge')->outputMatches('#hoge#');
     }
 
     function test_var_export2_private()
@@ -1190,10 +1189,9 @@ class VarsTest extends AbstractTestCase
         that((var_export3)([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function () {');
         that((var_export3)([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
-        that(var_export3)->try((function () { yield 1; })())->wasThrown('is not support');
+        that(var_export3)((function () { yield 1; })())->wasThrown('is not support');
 
-        $this->expectOutputRegex('#newInstanceWithoutConstructor#');
-        (var_export3)([1, 2, 3]);
+        that(var_export3)->callable(null, [1, 2, 3])->outputMatches('#newInstanceWithoutConstructor#');
     }
 
     function test_var_html()
@@ -1228,13 +1226,12 @@ class VarsTest extends AbstractTestCase
             'resource'    => STDOUT,
             'recur'       => $recur,
         ];
-        $this->expectOutputRegex('#<pre class=\'var_html\'>#');
-        (var_html)($value);
+        that(var_html)->callable(null, $value)->outputMatches('#<pre class=\'var_html\'>#');
     }
 
     function test_var_pretty()
     {
-        that(var_pretty)->try(null, 'hoge')->wasThrown('is not supported');
+        that(var_pretty)(null, 'hoge')->wasThrown('is not supported');
 
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
@@ -1311,8 +1308,7 @@ class VarsTest extends AbstractTestCase
         that((var_pretty)($value, 'cli', true))->stringContains("\033");
         that((var_pretty)($value, 'html', true))->stringContains("<span");
 
-        $this->expectOutputRegex('#Concrete#');
-        (var_pretty)($value);
+        that(var_pretty)->callable(null, $value)->outputMatches('#Concrete#');
     }
 
     /**
@@ -1354,13 +1350,13 @@ class VarsTest extends AbstractTestCase
         that(function () {
             $hoge = 1;
             (hashvar)($hoge, 1);
-        })->try()->wasThrown(new \UnexpectedValueException('variable'));
+        })()->wasThrown(new \UnexpectedValueException('variable'));
 
         // 同一行に同じ引数2つだと区別出来ない
         that(function () {
             $hoge = 1;
             $fuga = 2;
             [(hashvar)($hoge), (hashvar)($fuga)];
-        })->try()->wasThrown(new \UnexpectedValueException('ambiguous'));
+        })()->wasThrown(new \UnexpectedValueException('ambiguous'));
     }
 }

@@ -323,9 +323,9 @@ class FileSystemTest extends AbstractTestCase
 
         touch($txt = sys_get_temp_dir() . '/hoge.txt');
         touch($xml = sys_get_temp_dir() . '/hoge.xml');
-        that(file_get_arrays)->try('notfoundfile')->wasThrown('is not exists');
-        that(file_get_arrays)->try($txt)->wasThrown('is not supported');
-        that(file_get_arrays)->try($xml)->wasThrown('in the future');
+        that(file_get_arrays)('notfoundfile')->wasThrown('is not exists');
+        that(file_get_arrays)($txt)->wasThrown('is not supported');
+        that(file_get_arrays)($xml)->wasThrown('in the future');
     }
 
     function test_file_rewrite_contents()
@@ -358,12 +358,12 @@ class FileSystemTest extends AbstractTestCase
         that('locked!')->equalsFile($testpath);
 
         // open failed
-        @that(file_rewrite_contents)->try(dirname($testpath), fn() => null)->wasThrown('failed to fopen');
+        @that(file_rewrite_contents)(dirname($testpath), fn() => null)->wasThrown('failed to fopen');
 
         // lock failed
         $fp = fopen($testpath, 'r');
         flock($fp, LOCK_EX);
-        @that(file_rewrite_contents)->try($testpath, fn() => null, LOCK_EX | LOCK_NB)->wasThrown('failed to flock');
+        @that(file_rewrite_contents)($testpath, fn() => null, LOCK_EX | LOCK_NB)->wasThrown('failed to flock');
         flock($fp, LOCK_UN);
         fclose($fp);
     }
@@ -379,7 +379,7 @@ class FileSystemTest extends AbstractTestCase
         (file_set_contents)("$dir/dir4/fuga/../", 'fuga');
         that('fuga')->equalsFile("$dir/dir4");
 
-        that(file_set_contents)->try('/dev/null/::::::/a', '')->wasThrown('failed to mkdir');
+        that(file_set_contents)('/dev/null/::::::/a', '')->wasThrown('failed to mkdir');
 
         if (DIRECTORY_SEPARATOR === '\\') {
             error_clear_last();
@@ -446,7 +446,7 @@ class FileSystemTest extends AbstractTestCase
         that((file_pos)($tmpfile, 'あ', 300))->is(300);
         that((file_pos)($tmpfile, 'あ', 301))->is(false);
 
-        that(file_pos)->try('not found', 'hoge')->wasThrown('is not found');
+        that(file_pos)('not found', 'hoge')->wasThrown('is not found');
     }
 
     function test_file_mimetype()
@@ -518,7 +518,7 @@ class FileSystemTest extends AbstractTestCase
         that((dirmtime)($dir, true))->is($base + 20);
         that((dirmtime)($dir, false))->is($base + 10);
 
-        that(dirmtime)->try(__FILE__)->wasThrown('is not directory');
+        that(dirmtime)(__FILE__)->wasThrown('is not directory');
     }
 
     function test_fnmatch_and()
@@ -526,7 +526,7 @@ class FileSystemTest extends AbstractTestCase
         that((fnmatch_and)(['*aaa*', '*bbb*'], 'aaaXbbbX'))->isTrue();
         that((fnmatch_and)(['*aaa*', '*bbb*'], 'aaaX'))->isFalse();
 
-        that(fnmatch_and)->try([], '')->wasThrown('empty');
+        that(fnmatch_and)([], '')->wasThrown('empty');
     }
 
     function test_fnmatch_or()
@@ -534,7 +534,7 @@ class FileSystemTest extends AbstractTestCase
         that((fnmatch_or)(['*aaa*', '*bbb*'], 'aaaX'))->isTrue();
         that((fnmatch_or)(['*aaa*', '*bbb*'], 'cccX'))->isFalse();
 
-        that(fnmatch_or)->try([], '')->wasThrown('empty');
+        that(fnmatch_or)([], '')->wasThrown('empty');
     }
 
     function test_path_is_absolute()
@@ -647,9 +647,9 @@ class FileSystemTest extends AbstractTestCase
             that((path_normalize)('\\/a/\\\\/\\b'))->is("{$DS}a{$DS}b");
         }
         // いきなり親をたどると例外
-        that(path_normalize)->try('../')->wasThrown('is invalid');
+        that(path_normalize)('../')->wasThrown('is invalid');
         // 辿りすぎも例外
-        that(path_normalize)->try('a/b/c/../../../..')->wasThrown('is invalid');
+        that(path_normalize)('a/b/c/../../../..')->wasThrown('is invalid');
     }
 
     function test_path_parse()
@@ -914,7 +914,7 @@ class FileSystemTest extends AbstractTestCase
         that(file_exists($hoge))->is(false);
         that(file_exists($piyo))->is(true);
 
-        that('mkdir')->try($hoge)->wasThrown('is not supported');
+        that('mkdir')($hoge)->wasThrown('is not supported');
     }
 
     function test_memory_path_open()
@@ -952,9 +952,9 @@ class FileSystemTest extends AbstractTestCase
         fopen($path, 'c');
         that(file_exists($path))->isTrue();
         unlink($path);
-        that('fopen')->try($path, 'r')->wasThrown('is not exist');
+        that('fopen')($path, 'r')->wasThrown('is not exist');
         touch($path);
-        that('fopen')->try($path, 'x')->wasThrown('is exist already');
+        that('fopen')($path, 'x')->wasThrown('is exist already');
     }
 
     function test_memory_path_seek()
@@ -1038,6 +1038,6 @@ class FileSystemTest extends AbstractTestCase
     function test_memory_path_already()
     {
         stream_wrapper_register('MemoryStreamV010000', 'stdClass');
-        that(memory_path)->try('hoge')->wasThrown('is registered already');
+        that(memory_path)('hoge')->wasThrown('is registered already');
     }
 }

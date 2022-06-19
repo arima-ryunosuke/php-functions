@@ -329,7 +329,7 @@ class ArraysTest extends AbstractTestCase
             ]
         );
 
-        that(array_zip)->try()->wasThrown('$arrays is empty');
+        that(array_zip)()->wasThrown('$arrays is empty');
     }
 
     function test_array_cross()
@@ -347,7 +347,7 @@ class ArraysTest extends AbstractTestCase
 
         that((array_cross)(['A', 'b' => 'B'], ['c' => 'C', 'D']))->isSame([['A', 'c' => 'C'], ['A', 'D'], ['b' => 'B', 'c' => 'C'], ['b' => 'B', 'D']]);
 
-        that(array_cross)->try(['a' => 'A', 'B'], ['C', 'a' => 'D'])->wasThrown('duplicated key');
+        that(array_cross)(['a' => 'A', 'B'], ['C', 'a' => 'D'])->wasThrown('duplicated key');
     }
 
     function test_array_implode()
@@ -510,14 +510,14 @@ class ArraysTest extends AbstractTestCase
         that((array_pos)(['x', 'y', 'z'], -1, true))->is(2);
 
         // 範囲外は例外が飛ぶ
-        that(array_pos)->try(['x', 'y', 'z'], 9, true)->wasThrown('OutOfBoundsException');
+        that(array_pos)(['x', 'y', 'z'], 9, true)->wasThrown('OutOfBoundsException');
     }
 
     function test_array_pos_key()
     {
         that((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'))->is(2);
         that((array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1))->is(-1);
-        that(array_pos_key)->try(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x')->wasThrown('OutOfBoundsException');
+        that(array_pos_key)(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x')->wasThrown('OutOfBoundsException');
     }
 
     function test_array_of()
@@ -610,7 +610,7 @@ class ArraysTest extends AbstractTestCase
         that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']]);
         that((array_set)($array, 'Y2', ['y', null]))->is(0);
         that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']]);
-        that(array_set)->try($array, 'X', ['a', 'b', 'c'])->wasThrown('is not array');
+        that(array_set)($array, 'X', ['a', 'b', 'c'])->wasThrown('is not array');
     }
 
     function test_array_put()
@@ -643,7 +643,7 @@ class ArraysTest extends AbstractTestCase
         that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']]);
         that((array_put)($array, 'Y2', ['y', null]))->is(0);
         that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']]);
-        that(array_put)->try($array, 'X', ['a', 'b', 'c'])->wasThrown('is not array');
+        that(array_put)($array, 'X', ['a', 'b', 'c'])->wasThrown('is not array');
     }
 
     function test_array_unset()
@@ -778,7 +778,7 @@ class ArraysTest extends AbstractTestCase
         // 単一文字指定で含まない
         that((array_keys_exist)('X', $array))->isFalse();
         // 空は例外
-        that(array_keys_exist)->try([], $array)->wasThrown('empty');
+        that(array_keys_exist)([], $array)->wasThrown('empty');
 
         // ネスト調査
         that((array_keys_exist)([
@@ -1037,7 +1037,7 @@ class ArraysTest extends AbstractTestCase
         ]);
 
         // 例外
-        that(array_where)->try($array, ['flag' => 1], fn() => null)->wasThrown('must be bool');
+        that(array_where)($array, ['flag' => 1], fn() => null)->wasThrown('must be bool');
     }
 
     function test_array_kvmap()
@@ -1178,9 +1178,9 @@ class ArraysTest extends AbstractTestCase
         // キーを1番目、値を1番目に渡す（キーが優先される）
         that((array_nmap)(['k' => 'v'], strcat, [1 => 1], ' a ', ' b ', ' c '))->is(['k' => ' a kv b  c ']);
 
-        that(array_nmap)->try([], strcat, [])->wasThrown('empty');
-        that(array_nmap)->try([], strcat, [1 => -1])->wasThrown('positive');
-        that(array_nmap)->try([], strcat, [-1 => 1])->wasThrown('positive');
+        that(array_nmap)([], strcat, [])->wasThrown('empty');
+        that(array_nmap)([], strcat, [1 => -1])->wasThrown('positive');
+        that(array_nmap)([], strcat, [-1 => 1])->wasThrown('positive');
     }
 
     function test_array_lmap()
@@ -1938,25 +1938,22 @@ class ArraysTest extends AbstractTestCase
         that((array_order)([], [[]]))->is([]);
         that((array_order)([1], [[]]))->is([1]);
 
-        that(array_order)->try([['a' => 1], ['a' => 2]], ['x' => true])->wasThrown(new \InvalidArgumentException('x is undefined'));
+        that(array_order)([['a' => 1], ['a' => 2]], ['x' => true])->wasThrown(new \InvalidArgumentException('x is undefined'));
 
-        that(array_order)->try([['a' => 1], ['a' => 2]], ['a' => new \stdClass()])->wasThrown(new \DomainException('$order is invalid'));
+        that(array_order)([['a' => 1], ['a' => 2]], ['a' => new \stdClass()])->wasThrown(new \DomainException('$order is invalid'));
     }
 
     function test_array_order_misc()
     {
         // 1000 rows, 26 cols, 5 order is in 1 seconds
         $data = array_fill(0, 999, array_fill_keys(range('a', 'z'), 1));
-        $t = microtime(true);
-        (array_order)($data, [
+        that(array_order)->callable(null, $data, [
             'a' => true,
             'b' => false,
             'c' => [1, 2, 3],
             'd' => fn($v) => "$v",
             'e' => fn($a, $b) => strcmp($a, $b),
-        ]);
-        $t = microtime(true) - $t;
-        that($t)->as("$t milliseconds is too slow.")->lessThan(1.0);
+        ])->inTime(1.0);
     }
 
     function test_array_shuffle()
@@ -1981,9 +1978,9 @@ class ArraysTest extends AbstractTestCase
 
         that((array_random)([], 0))->is([]);
 
-        that(array_random)->try($array, 4)->wasThrown('number of elements');
-        that(array_random)->try([], +1)->wasThrown('number of elements');
-        that(array_random)->try([], -1)->wasThrown('number of elements');
+        that(array_random)($array, 4)->wasThrown('number of elements');
+        that(array_random)([], +1)->wasThrown('number of elements');
+        that(array_random)([], -1)->wasThrown('number of elements');
     }
 
     function test_array_shrink_key()
@@ -2078,8 +2075,8 @@ class ArraysTest extends AbstractTestCase
             'yields' => [123, 456, 789],
         ]);
 
-        that(array_extend)->try(true)->wasThrown('target is empry');
-        that(array_extend)->try([], '')->wasThrown('target is not array');
+        that(array_extend)(true)->wasThrown('target is empry');
+        that(array_extend)([], '')->wasThrown('target is not array');
     }
 
     function test_array_fill_gap()
@@ -2200,11 +2197,11 @@ class ArraysTest extends AbstractTestCase
             13 => ['id' => 30, 'name' => 'name3', 'idname' => '3:name3'],
         ]);
 
-        that(array_select)->try($arrays, [
+        that(array_select)($arrays, [
             'undefined',
         ])->wasThrown('is not exists');
 
-        that(array_select)->try($arrays, [
+        that(array_select)($arrays, [
             'name',
         ], 'undefined')->wasThrown('is not exists');
     }
@@ -2226,7 +2223,7 @@ class ArraysTest extends AbstractTestCase
             'name' => [1 => 'A', 2 => 'B', 3 => 'C'],
         ]);
 
-        that(array_columns)->try([])->wasThrown('InvalidArgumentException');
+        that(array_columns)([])->wasThrown('InvalidArgumentException');
     }
 
     function test_array_uncolumns()
@@ -2575,7 +2572,7 @@ class ArraysTest extends AbstractTestCase
                 'k2' => 'v2',
             ],
         ]);
-        that(array_nest)->try([
+        that(array_nest)([
             'k1'    => 'v1',
             'k1.k2' => 'v2',
         ])->wasThrown('already exists');
@@ -2823,38 +2820,38 @@ class ArraysTest extends AbstractTestCase
 
     function test_array_schema_ng()
     {
-        that(array_schema)->try(['type' => 'number', 'filter' => FILTER_VALIDATE_INT], 'hoge')->wasThrown('hoge must be filter_var int([])');
-        that(array_schema)->try(['type' => 'int|string'], true)->wasThrown('true must be int or string');
-        that(array_schema)->try(['type' => ['int', 'string']], true)->wasThrown('true must be int or string');
+        that(array_schema)(['type' => 'number', 'filter' => FILTER_VALIDATE_INT], 'hoge')->wasThrown('hoge must be filter_var int([])');
+        that(array_schema)(['type' => 'int|string'], true)->wasThrown('true must be int or string');
+        that(array_schema)(['type' => ['int', 'string']], true)->wasThrown('true must be int or string');
 
-        that(array_schema)->try(['type' => 'string'], 123)->wasThrown("123 must be string");
-        that(array_schema)->try(['type' => 'number'], "123")->wasThrown("123 must be number");
-        that(array_schema)->try(['type' => 'numeric'], "12..45")->wasThrown("12..45 must be numeric");
-        that(array_schema)->try(['type' => 'list'], "hoge")->wasThrown("hoge must be list");
-        that(array_schema)->try(['type' => \ArrayObject::class], "hoge")->wasThrown("hoge must be ArrayObject");
+        that(array_schema)(['type' => 'string'], 123)->wasThrown("123 must be string");
+        that(array_schema)(['type' => 'number'], "123")->wasThrown("123 must be number");
+        that(array_schema)(['type' => 'numeric'], "12..45")->wasThrown("12..45 must be numeric");
+        that(array_schema)(['type' => 'list'], "hoge")->wasThrown("hoge must be list");
+        that(array_schema)(['type' => \ArrayObject::class], "hoge")->wasThrown("hoge must be ArrayObject");
 
-        that(array_schema)->try(['type' => 'int', 'min' => 1], 0)->wasThrown("0 must be >= 1");
-        that(array_schema)->try(['type' => 'int', 'max' => 1], 3)->wasThrown("3 must be <= 1");
-        that(array_schema)->try(['type' => 'string', 'min' => 1], '')->wasThrown("must be strlen >= 1");
-        that(array_schema)->try(['type' => 'string', 'max' => 1], 'abc')->wasThrown("abc must be strlen <= 1");
-        that(array_schema)->try(['type' => 'list', 'min' => 1], [])->wasThrown("[] must be count >= 1");
-        that(array_schema)->try(['type' => 'list', 'max' => 1], [1, 2, 3])->wasThrown("[1, 2, 3] must be count <= 1");
+        that(array_schema)(['type' => 'int', 'min' => 1], 0)->wasThrown("0 must be >= 1");
+        that(array_schema)(['type' => 'int', 'max' => 1], 3)->wasThrown("3 must be <= 1");
+        that(array_schema)(['type' => 'string', 'min' => 1], '')->wasThrown("must be strlen >= 1");
+        that(array_schema)(['type' => 'string', 'max' => 1], 'abc')->wasThrown("abc must be strlen <= 1");
+        that(array_schema)(['type' => 'list', 'min' => 1], [])->wasThrown("[] must be count >= 1");
+        that(array_schema)(['type' => 'list', 'max' => 1], [1, 2, 3])->wasThrown("[1, 2, 3] must be count <= 1");
 
-        that(array_schema)->try(['type' => 'float', 'precision' => 3], 1.2345)->wasThrown("1.2345 must be precision 3");
+        that(array_schema)(['type' => 'float', 'precision' => 3], 1.2345)->wasThrown("1.2345 must be precision 3");
 
-        that(array_schema)->try(['type' => 'int', 'enum' => [1, 2, 3]], 4)->wasThrown("4 must be any of [1,2,3]");
+        that(array_schema)(['type' => 'int', 'enum' => [1, 2, 3]], 4)->wasThrown("4 must be any of [1,2,3]");
 
-        that(array_schema)->try(['type' => 'string', 'match' => '#[1-9]#'], 'abc')->wasThrown("must be match #[1-9]#");
-        that(array_schema)->try(['type' => 'string', 'unmatch' => '#[1-9]#'], '123')->wasThrown("must be unmatch #[1-9]#");
+        that(array_schema)(['type' => 'string', 'match' => '#[1-9]#'], 'abc')->wasThrown("must be match #[1-9]#");
+        that(array_schema)(['type' => 'string', 'unmatch' => '#[1-9]#'], '123')->wasThrown("must be unmatch #[1-9]#");
 
-        that(array_schema)->try(['type' => 'string', 'include' => 'X'], 'abc')->wasThrown("abc must be include X");
-        that(array_schema)->try(['type' => 'list', 'include' => 'X'], [1, 2, 3])->wasThrown("[1, 2, 3] must be include X");
+        that(array_schema)(['type' => 'string', 'include' => 'X'], 'abc')->wasThrown("abc must be include X");
+        that(array_schema)(['type' => 'list', 'include' => 'X'], [1, 2, 3])->wasThrown("[1, 2, 3] must be include X");
 
-        that(array_schema)->try(['type' => 'string', 'exclude' => 'X'], 'X')->wasThrown("X must be exclude X");
-        that(array_schema)->try(['type' => 'list', 'exclude' => 'X'], [1, 'X', 3])->wasThrown("[1, \"X\", 3] must be exclude X");
+        that(array_schema)(['type' => 'string', 'exclude' => 'X'], 'X')->wasThrown("X must be exclude X");
+        that(array_schema)(['type' => 'list', 'exclude' => 'X'], [1, 'X', 3])->wasThrown("[1, \"X\", 3] must be exclude X");
 
-        that(array_schema)->try(['type' => 'hash', '#key' => []], ['key' => 'val'])->wasThrown('not have type key');
-        that(array_schema)->try(['type' => 'number'])->wasThrown('has no value');
+        that(array_schema)(['type' => 'hash', '#key' => []], ['key' => 'val'])->wasThrown('not have type key');
+        that(array_schema)(['type' => 'number'])->wasThrown('has no value');
     }
 
     function test_array_schema_misc()
@@ -2949,12 +2946,12 @@ class ArraysTest extends AbstractTestCase
             ],
         ];
         that((array_schema)($schema, [['name' => 'XY']]))->isSame([['name' => 'XY']]);
-        that(array_schema)->try($schema, [
+        that(array_schema)($schema, [
             ['name' => 'X'],
         ], [
             ['name' => 'Y'],
         ])->wasThrown("must be count <= 1");
-        that(array_schema)->try($schema, [
+        that(array_schema)($schema, [
             ['name' => 'XYZ'],
         ])->wasThrown("must be strlen <= 2");
     }

@@ -19,12 +19,13 @@ if (DIRECTORY_SEPARATOR === '\\') {
     setlocale(LC_CTYPE, 'C');
 }
 
+\ryunosuke\PHPUnit\Actual::generateStub(__DIR__ . '/../src', __DIR__ . '/.stub');
+\ryunosuke\PHPUnit\Exporter\Exporter::insteadOf();
 // actualThat を定義
-\ryunosuke\PHPUnit\Actual::$compatibleVersion = 2;
 \ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite {
     public function __construct($value, bool $ignoreCase = false)
     {
-        parent::__construct(new \PHPUnit\Framework\Constraint\IsEqual($this->filter($value), 0.0, 10, false, $ignoreCase));
+        parent::__construct(new \PHPUnit\Framework\Constraint\IsEqual($this->filter($value), 0.0, 10, $ignoreCase));
     }
 
     protected function filter($other)

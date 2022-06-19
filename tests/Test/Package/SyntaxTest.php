@@ -42,7 +42,7 @@ return new class($x)
         // ある程度長ければキャッシュされる
         that(glob("$tmpdir/*.php"))->count(1);
 
-        that(evaluate)->try('
+        that(evaluate)('
 return new class()
 {
     private $var1;
@@ -69,12 +69,12 @@ syntax error
         ERR
         ));
 
-        that(evaluate)->try('syntax error')->wasThrown(new \ParseError(<<<ERR
+        that(evaluate)('syntax error')->wasThrown(new \ParseError(<<<ERR
         >>> syntax error
         ERR
         ));
 
-        that(evaluate)->try(<<<PHP
+        that(evaluate)(<<<PHP
         // 01
         syntax error // 02
         // 03
@@ -100,7 +100,7 @@ syntax error
         ERR
         ));
 
-        that(evaluate)->try(<<<PHP
+        that(evaluate)(<<<PHP
         // 07
         // 08
         // 09
@@ -114,7 +114,7 @@ syntax error
         ERR
         ));
 
-        that(evaluate)->try(<<<PHP
+        that(evaluate)(<<<PHP
         // 01
         // 02
         // 03
@@ -607,7 +607,7 @@ $var3 = function () { return \ArrayObject::class; };
         that((highlight_php)($phpcode, ['context' => 'html']))->stringContains('<span style');
         that((highlight_php)($phpcode))->stringContains('function');
 
-        that(highlight_php)->try($phpcode, ['context' => 'hoge'])->wasThrown('is not supported');
+        that(highlight_php)($phpcode, ['context' => 'hoge'])->wasThrown('is not supported');
     }
 
     function test_optional()
@@ -754,8 +754,8 @@ $var3 = function () { return \ArrayObject::class; };
         that($chainer('world'))->is('880');
         that($chainer('hello', 'world'))->is(['69', '880']);
 
-        that($chain())->try()->wasThrown('nonempty stack and no parameter given');
-        that($chain('hoge'))->callable('__invoke')->try(null)->wasThrown('empty stack and parameter given > 0');
+        that($chain())()->wasThrown('nonempty stack and no parameter given');
+        that($chain('hoge'))(null)->wasThrown('empty stack and parameter given > 0');
 
         // for compatible
         if (get_cfg_var('rfunc.chain_overload')) {
@@ -774,14 +774,14 @@ $var3 = function () { return \ArrayObject::class; };
 
         that(function () {
             @mkdir(__DIR__) or (throws)(new \Exception('mkdir fail'));
-        })->try()->wasThrown(new \Exception('mkdir fail'));
+        })()->wasThrown(new \Exception('mkdir fail'));
     }
 
     function test_throw_if()
     {
         (throw_if)(false, new \Exception('message', 123));
-        that(throw_if)->try(true, new \Exception('message', 123))->wasThrown(new \Exception('message', 123));
-        that(throw_if)->try(true, \Exception::class, 'message', 123)->wasThrown(new \Exception('message', 123));
+        that(throw_if)(true, new \Exception('message', 123))->wasThrown(new \Exception('message', 123));
+        that(throw_if)(true, \Exception::class, 'message', 123)->wasThrown(new \Exception('message', 123));
     }
 
     function test_blank_if()
@@ -863,7 +863,7 @@ $var3 = function () { return \ArrayObject::class; };
         that((switchs)(1, $cases, 'undefined'))->is('value is 1');
         that((switchs)(2, $cases, 'undefined'))->is('value is 2');
         that((switchs)(3, $cases, 'undefined'))->is('undefined');
-        that(switchs)->try(9, $cases)->wasThrown('is not defined in');
+        that(switchs)(9, $cases)->wasThrown('is not defined in');
     }
 
     function test_try_null()
@@ -911,7 +911,7 @@ $var3 = function () { return \ArrayObject::class; };
 
         that(function () use ($try) {
             (try_catch)($try, function ($ex) { throw new \Exception('hoge', 0, $ex); });
-        })->try()->wasThrown(new \Exception('hoge'));
+        })()->wasThrown(new \Exception('hoge'));
 
         // あるいは throw しないで単純に返り値として欲しいことがある
         // 下記は出来ない…こともないが若干冗長

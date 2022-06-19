@@ -544,7 +544,7 @@ from
 ");
 
         // highlight exception
-        that(sql_format)->try("", ['highlight' => 'hoge'])->wasThrown('highlight must be');
+        that(sql_format)("", ['highlight' => 'hoge'])->wasThrown('highlight must be');
     }
 
     function test_sql_format_other()

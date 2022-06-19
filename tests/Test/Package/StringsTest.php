@@ -360,7 +360,7 @@ class StringsTest extends AbstractTestCase
             yield [4, 5, 6];
         })()))->is("1,2,3\n4,5,6");
 
-        that(str_putcsv)->try([], 'aa')->wasThrown('single character');
+        that(str_putcsv)([], 'aa')->wasThrown('single character');
     }
 
     function test_str_subreplace()
@@ -391,10 +391,10 @@ class StringsTest extends AbstractTestCase
         // multibyte
         that((str_subreplace)('あああああ', 'あ', [2 => 'か']))->is('ああかああ');
         // no number
-        that(str_subreplace)->try($string, 'x', ['s' => ''])->wasThrown("key must be integer");
+        that(str_subreplace)($string, 'x', ['s' => ''])->wasThrown("key must be integer");
         // out od range
-        that(str_subreplace)->try($string, 'x', [5 => 'nodef'])->wasThrown("'x' of 5th.");
-        that(str_subreplace)->try($string, 'x', [-6 => 'nodef'])->wasThrown("'x' of -6th.");
+        that(str_subreplace)($string, 'x', [5 => 'nodef'])->wasThrown("'x' of 5th.");
+        that(str_subreplace)($string, 'x', [-6 => 'nodef'])->wasThrown("'x' of -6th.");
     }
 
     function test_str_submap()
@@ -442,10 +442,10 @@ class StringsTest extends AbstractTestCase
         // multibyte
         that((str_submap)('へろーわーるど', ['ー' => [1 => '棒']]))->is('へろーわ棒るど');
         // no number
-        that(str_submap)->try($string, ['w' => ['' => '']])->wasThrown("key must be integer");
+        that(str_submap)($string, ['w' => ['' => '']])->wasThrown("key must be integer");
         // out od range
-        that(str_submap)->try($string, ['l' => [3 => 'nodef']])->wasThrown("'l' of 3th.");
-        that(str_submap)->try($string, ['l' => [-4 => 'nodef']])->wasThrown("'l' of -4th.");
+        that(str_submap)($string, ['l' => [3 => 'nodef']])->wasThrown("'l' of 3th.");
+        that(str_submap)($string, ['l' => [-4 => 'nodef']])->wasThrown("'l' of -4th.");
     }
 
     function test_str_embed()
@@ -517,8 +517,8 @@ class StringsTest extends AbstractTestCase
             'notfound' => 'notfound',
         ]))->is('xyz');
 
-        that(str_embed)->try('hoge', ['' => 'empty'])->wasThrown("src length is 0");
-        that(str_embed)->try('hoge', ['h' => [3 => 'nodef']])->wasThrown("'h' of 0th.");
+        that(str_embed)('hoge', ['' => 'empty'])->wasThrown("src length is 0");
+        that(str_embed)('hoge', ['h' => [3 => 'nodef']])->wasThrown("'h' of 0th.");
     }
 
     function test_str_between()
@@ -1094,7 +1094,7 @@ ATTRS
             'both'       => 'string',
         ]);
 
-        that(html_attr)->try(['ho ge' => 'hoge'])->wasThrown('invalid charactor');
+        that(html_attr)(['ho ge' => 'hoge'])->wasThrown('invalid charactor');
     }
 
     function test_htmltag()
@@ -1139,7 +1139,7 @@ ATTRS
 <span>plain</span>'
         );
 
-        that(htmltag)->try('#id.class')->wasThrown('tagname is empty');
+        that(htmltag)('#id.class')->wasThrown('tagname is empty');
     }
 
     function test_css_selector()
@@ -1157,10 +1157,10 @@ ATTRS
             ],
         ]);
 
-        that(css_selector)->try('a#id#id')->wasThrown('#id is multiple');
-        that(css_selector)->try('[a=1][a=2]')->wasThrown('[a] is dumplicated');
-        that(css_selector)->try('#id[id=id]')->wasThrown('[id] is dumplicated');
-        that(css_selector)->try('{width}')->wasThrown('[width] is empty');
+        that(css_selector)('a#id#id')->wasThrown('#id is multiple');
+        that(css_selector)('[a=1][a=2]')->wasThrown('[a] is dumplicated');
+        that(css_selector)('#id[id=id]')->wasThrown('[id] is dumplicated');
+        that(css_selector)('{width}')->wasThrown('[width] is empty');
     }
 
     function provideUri()
@@ -1753,7 +1753,7 @@ a3,b3,c3
         ]);
 
         // 要素数が合わないと例外
-        that(csv_import)->try("a,b,c\nhoge")->wasThrown('array_combine');
+        that(csv_import)("a,b,c\nhoge")->wasThrown('array_combine');
     }
 
     function test_json_export()
@@ -2191,7 +2191,7 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 ]');
 
         // depth
-        that(json_export)->try([[[[[[]]]]]], [
+        that(json_export)([[[[[[]]]]]], [
             JSON_ES5       => true,
             JSON_MAX_DEPTH => 3,
         ])->wasThrown('Maximum stack depth exceeded');
@@ -2211,12 +2211,12 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
         that((json_import)('{a: 123.0, b: "あ",}', []))->is(['a' => 123.0, 'b' => "あ"]);
 
         // 試行しないモードだとコケる
-        that(json_import)->try('{a: 123.0, b: "あ",}', [
+        that(json_import)('{a: 123.0, b: "あ",}', [
             JSON_ES5 => false,
         ])->wasThrown('Syntax error');
 
         // depth
-        that(json_import)->try('[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3])->wasThrown('Maximum stack depth exceeded');
+        that(json_import)('[[[[[[]]]]]]', [JSON_MAX_DEPTH => 3])->wasThrown('Maximum stack depth exceeded');
     }
 
     function test_json_import5()
@@ -2253,36 +2253,36 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 
     function test_json_import5_error()
     {
-        that(json_import)->try('123,456')->wasThrown("Mismatch");
-        that(json_import)->try('{')->wasThrown("Mismatch ']'");
-        that(json_import)->try('[')->wasThrown("Mismatch '['");
-        that(json_import)->try('[1')->wasThrown("Mismatch '['");
-        that(json_import)->try('{{}')->wasThrown("Mismatch ']'");
-        that(json_import)->try('[}')->wasThrown("Mismatch '}'");
-        that(json_import)->try(']]')->wasThrown("Mismatch ']'");
-        that(json_import)->try('[1] dummy')->wasThrown("Unexpected array value ']'");
-        that(json_import)->try('{[1]: 1}')->wasThrown("Unexpected object key '[1]'");
-        that(json_import)->try('{aaa: [1] ccc}')->wasThrown("Unexpected object value '}'");
-        that(json_import)->try('{aaa bbb}')->wasThrown("Missing object key 'aaa'");
-        that(json_import)->try('{,}')->wasThrown("Missing element");
-        that(json_import)->try('[,]')->wasThrown("Missing element");
-        that(json_import)->try('{a:1,,b:2}')->wasThrown("Missing element");
-        that(json_import)->try('[1,,2]')->wasThrown("Missing element");
+        that(json_import)('123,456')->wasThrown("Mismatch");
+        that(json_import)('{')->wasThrown("Mismatch ']'");
+        that(json_import)('[')->wasThrown("Mismatch '['");
+        that(json_import)('[1')->wasThrown("Mismatch '['");
+        that(json_import)('{{}')->wasThrown("Mismatch ']'");
+        that(json_import)('[}')->wasThrown("Mismatch '}'");
+        that(json_import)(']]')->wasThrown("Mismatch ']'");
+        that(json_import)('[1] dummy')->wasThrown("Unexpected array value ']'");
+        that(json_import)('{[1]: 1}')->wasThrown("Unexpected object key '[1]'");
+        that(json_import)('{aaa: [1] ccc}')->wasThrown("Unexpected object value '}'");
+        that(json_import)('{aaa bbb}')->wasThrown("Missing object key 'aaa'");
+        that(json_import)('{,}')->wasThrown("Missing element");
+        that(json_import)('[,]')->wasThrown("Missing element");
+        that(json_import)('{a:1,,b:2}')->wasThrown("Missing element");
+        that(json_import)('[1,,2]')->wasThrown("Missing element");
 
-        that(json_import)->try('/* ccc')->wasThrown("at line"); // for both php 7.4 and 8.1
-        that(json_import)->try('/# ccc')->wasThrown("Mismatch '['");
-        that(json_import)->try('{123 : 456}')->wasThrown("Bad identifier");
+        that(json_import)('/* ccc')->wasThrown("at line"); // for both php 7.4 and 8.1
+        that(json_import)('/# ccc')->wasThrown("Mismatch '['");
+        that(json_import)('{123 : 456}')->wasThrown("Bad identifier");
 
-        that(json_import)->try('"" \'\'')->wasThrown("Bad string");
-        that(json_import)->try('08')->wasThrown("Octal literal");
-        that(json_import)->try('0xxxx')->wasThrown("Bad hex number");
-        that(json_import)->try('+true')->wasThrown("Bad number");
-        that(json_import)->try('+Indigo')->wasThrown("Bad number");
-        that(json_import)->try('hoge')->wasThrown("Bad value");
-        that(json_import)->try('NotANumber')->wasThrown("Bad value");
+        that(json_import)('"" \'\'')->wasThrown("Bad string");
+        that(json_import)('08')->wasThrown("Octal literal");
+        that(json_import)('0xxxx')->wasThrown("Bad hex number");
+        that(json_import)('+true')->wasThrown("Bad number");
+        that(json_import)('+Indigo')->wasThrown("Bad number");
+        that(json_import)('hoge')->wasThrown("Bad value");
+        that(json_import)('NotANumber')->wasThrown("Bad value");
 
-        that(json_import)->try('[[1]]', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
-        that(json_import)->try('{"foo": {"bar": "baz"}}', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
+        that(json_import)('[[1]]', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
+        that(json_import)('{"foo": {"bar": "baz"}}', [JSON_MAX_DEPTH => 2])->wasThrown('Maximum stack');
     }
 
     function test_json_import5_misc()
@@ -2495,7 +2495,7 @@ z", quote2: "a\\\\nz"');
         that((ltsv_export)(['a' => ['x', 'y'], 'b' => 'B']))->is('a:`["x","y"]`	b:B');
         that((ltsv_export)(['a' => new Concrete('hoge'), 'b' => 'B']))->is('a:hoge	b:B');
 
-        that(ltsv_export)->try(['a:a' => 'A'])->wasThrown('label contains ":"');
+        that(ltsv_export)(['a:a' => 'A'])->wasThrown('label contains ":"');
     }
 
     function test_markdown_table()
@@ -2534,7 +2534,7 @@ z", quote2: "a\\\\nz"');
 | x   | xx  |
 ");
 
-        that(markdown_table)->try('')->wasThrown('must be array of hasharray');
+        that(markdown_table)('')->wasThrown('must be array of hasharray');
     }
 
     function test_markdown_list()
@@ -2588,8 +2588,8 @@ z", quote2: "a\\\\nz"');
         that(strlen($actual))->is(256);  // 256文字のはず
         that($actual)->matches('#abc#'); // 大抵の場合含まれるはず（極稀にコケる）
 
-        that(random_string)->try(0, 'x')->wasThrown('positive number');
-        that(random_string)->try(256, '')->wasThrown('empty');
+        that(random_string)(0, 'x')->wasThrown('positive number');
+        that(random_string)(256, '')->wasThrown('empty');
     }
 
     function test_unique_string()
@@ -2597,7 +2597,7 @@ z", quote2: "a\\\\nz"');
         that((unique_string)('hoge', 'xxx', 'X'))->is('xxxX');
         that((unique_string)('hoge', null, 'o'))->stringLengthEquals(2);
         that((unique_string)('hoge', 10))->stringLengthEquals(11);
-        that(unique_string)->try('hoge', null, '')->wasThrown('empty');
+        that(unique_string)('hoge', null, '')->wasThrown('empty');
 
         for ($i = 0; $i < 9999; $i++) {
             $unique_string = (unique_string)('hoge');
@@ -2656,7 +2656,7 @@ z", quote2: "a\\\\nz"');
         that($result)->is('123');
 
         // 存在しないキーを参照
-        that(kvsprintf)->try('%aaaaa$d %bbbbb$d', ['hoge' => 123])->wasThrown(new \OutOfBoundsException('Undefined index'));
+        that(kvsprintf)('%aaaaa$d %bbbbb$d', ['hoge' => 123])->wasThrown(new \OutOfBoundsException('Undefined index'));
     }
 
     public function test_preg_matches()
@@ -2899,7 +2899,7 @@ z", quote2: "a\\\\nz"');
             "123456",
         ], $percent))->isSame([]);
 
-        that(str_guess)->try('', [])->wasThrown('is empty');
+        that(str_guess)('', [])->wasThrown('is empty');
     }
 
     function test_mb_substr_replace()
@@ -3203,7 +3203,7 @@ z", quote2: "a\\\\nz"');
         that($actual)->is('\'"\\\'"\\');
 
         // error
-        @that(render_string)->try('$${}', [])->wasThrown('failed to eval code');
+        @that(render_string)('$${}', [])->wasThrown('failed to eval code');
     }
 
     public function test_render_file()
