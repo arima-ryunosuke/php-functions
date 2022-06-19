@@ -11,6 +11,28 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.4.26
+
+- [change][all] php8.1の暫定対応
+- [change][all] 対応バージョンを php7.4 に格上げ
+- [feature][Transporter] deprecated が定数にも伝播するように変更
+- [feature][Date] date_alter を追加
+- [feature][Classobj] class_aliases を追加
+- [feature][Classobj] type_exists を追加
+- [refactor][Network] getipaddress の改善
+- [feature][Math] calculate_formula を追加
+- [fixbug][Strings] build_uri/parse_uri に記号を渡すと誤作動する不具合を修正
+- [feature][Strings] mb_ellipsis を追加
+- [feature][Strings] mb_str_pad を追加
+- [feature][Strings] str_common_prefix を追加
+- [refactor][Strings] json_import の実装を変更
+- [feature][Strings] json_export の json5 対応とオプションを追加
+- [feature][Arrays] array_append/prepend を追加
+- [fixbug][FileSystem] file_get_arrays で知らないエンコーディングが来たらエラーになる不具合を修正
+- [feature][Vars] flagval を追加
+- [fixbug][Vars] var_pretty でリストが{}で出力される不具合を修正
+- [change][bin/exclude-internal] .idea がない表示は行わない
+
 ## 1.4.25
 
 - [feature][FileSystem] file_get_arrays を追加
