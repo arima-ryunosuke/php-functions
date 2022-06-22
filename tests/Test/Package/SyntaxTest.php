@@ -663,6 +663,12 @@ $var3 = function () { return \ArrayObject::class; };
         // 型指定
         that((optional)(new \ArrayObject([1]))->count())->is(1);
         that((optional)(new \ArrayObject([1]), 'stdClass')->count())->isNull();
+
+        // 例外
+        that((optional)(null))->try('__set', 'hoge', 'value')->wasThrown('called NullObject#');
+        that((optional)(null))->try('__unset', 'hoge')->wasThrown('called NullObject#');
+        that((optional)(null))->try('offsetSet', 'hoge', 'value')->wasThrown('called NullObject#');
+        that((optional)(null))->try('offsetUnset', 'hoge')->wasThrown('called NullObject#');
     }
 
     function test_chain()

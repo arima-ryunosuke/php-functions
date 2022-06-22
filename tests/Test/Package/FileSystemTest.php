@@ -859,7 +859,7 @@ class FileSystemTest extends AbstractTestCase
 
         foreach ($files as $name => $file) {
             that($name)->fileExists();
-            $file();
+            $file->__destruct();
             that($name)->fileNotExists();
         }
     }

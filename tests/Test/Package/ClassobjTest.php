@@ -389,6 +389,7 @@ class ClassobjTest extends AbstractTestCase
         $types[4] = '?' . \ArrayObject::class;
 
         that($types)->count(5);
+        that($types[0]->isBuiltin())->isTrue();
         that($types->getName())->is('\\ArrayObject|\\Throwable|iterable|int|null');
         that($types->getTypes())->eachIsInstanceOf(\ReflectionType::class);
         that(iterator_to_array($types))->eachIsInstanceOf(\ReflectionType::class);
