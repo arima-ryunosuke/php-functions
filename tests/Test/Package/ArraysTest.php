@@ -1947,7 +1947,7 @@ class ArraysTest extends AbstractTestCase
     {
         // 1000 rows, 26 cols, 5 order is in 1 seconds
         $data = array_fill(0, 999, array_fill_keys(range('a', 'z'), 1));
-        that(array_order)->callable(null, $data, [
+        that(array_order)->fn($data, [
             'a' => true,
             'b' => false,
             'c' => [1, 2, 3],

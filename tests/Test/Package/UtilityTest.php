@@ -1009,7 +1009,6 @@ class UtilityTest extends AbstractTestCase
 
     function test_process_parallel()
     {
-        $t = microtime(true);
         that((process_parallel)(static function ($rate = 9) {
             $result = 0;
             foreach (range(1, 10) as $n) {
@@ -1038,11 +1037,8 @@ class UtilityTest extends AbstractTestCase
                 'stderr' => 'err:495',
                 'return' => 495,
             ],
-        ]);
-        // 100ms の sleep を10回回すのを3回行うので合計3秒…ではなく並列なので1秒前後になる。まぁ誤差はあれど絶対に2秒は超えない
-        that(microtime(true) - $t)->lessThan(2.0);
+        ])->final('time')->lessThan(2.0); // 100ms の sleep を10回回すのを3回行うので合計3秒…ではなく並列なので1秒前後になる
 
-        $t = microtime(true);
         that((process_parallel)([
             static function ($rate) {
                 $result = 0;
@@ -1086,9 +1082,7 @@ class UtilityTest extends AbstractTestCase
                 'stderr' => '',
                 'return' => null,
             ],
-        ]);
-        // 100ms の sleep を10回回すのを2回行うので合計2秒…ではなく並列なので1秒前後になる。まぁ誤差はあれど絶対に2秒は超えない
-        that(microtime(true) - $t)->lessThan(2.0);
+        ])->final('time')->lessThan(2.0); // 100ms の sleep を10回回すのを2回行うので合計2秒…ではなく並列なので1秒前後になる
     }
 
     function test_arguments()
@@ -1585,26 +1579,14 @@ class UtilityTest extends AbstractTestCase
 
     function test_benchmark()
     {
-        $return = '';
-        $t = microtime(true);
-        $output = (ob_capture)(function () use (&$return) {
-            $return = (benchmark)([
-                [new \Concrete('hoge'), 'getName'],
-                fn() => 'hoge',
-            ], [], 100);
-        });
-
-        // 2関数を100でベンチするので 200ms～400ms の間のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
-        that(microtime(true) - $t)->isBetween(0.2, 0.4);
-
-        // それらしい結果が返ってきている
-        that($return[0]['name'])->isString();
-        that($return[0]['called'])->isInt();
-        that($return[0]['ratio'])->isNumeric();
-
-        // それらしい名前が振られている
-        that($output)->stringContains('Concrete::getName');
-        that($output)->stringContains(__FILE__);
+        that(benchmark)->fn([
+            [new \Concrete('hoge'), 'getName'],
+            fn() => 'hoge',
+        ], [], 100)
+            ->outputMatches('#Concrete::getName#')
+            ->outputContains(__FILE__)
+            // 2関数を100でベンチするので 200ms～400ms の間のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
+            ->final('time')->isBetween(0.2, 0.4);
 
         // return 検証
         @(benchmark)(['md5', 'sha1'], ['hoge'], 10, false);

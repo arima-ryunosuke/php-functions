@@ -3,6 +3,7 @@
 error_reporting(~E_DEPRECATED);
 
 require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/ryunosuke/phpunit-extension/inc/bootstrap.php';
 require __DIR__ . '/classes.php';
 
 // sys_get_temp_dir が返すディレクトリを変更しておく
@@ -20,8 +21,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 }
 
 \ryunosuke\PHPUnit\Actual::generateStub(__DIR__ . '/../src', __DIR__ . '/.stub');
-\ryunosuke\PHPUnit\Exporter\Exporter::insteadOf();
-// actualThat を定義
+
 \ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite {
     public function __construct($value, bool $ignoreCase = false)
     {
@@ -33,17 +33,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
         return trim($other);
     }
 };
-if (!function_exists('that')) {
-    /**
-     * @template T
-     * @param T $value
-     * @return T
-     */
-    function that($value)
-    {
-        return new \ryunosuke\PHPUnit\Actual($value);
-    }
-}
+
 file_put_contents(__DIR__ . '/annotation.php', "<?php
 namespace ryunosuke\\PHPUnit;
 " . \ryunosuke\PHPUnit\Actual::generateAnnotation() . "

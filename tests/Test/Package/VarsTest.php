@@ -894,7 +894,7 @@ class VarsTest extends AbstractTestCase
         EXPECTED
         );
 
-        that(var_export2)->callable(null, 'hoge')->outputMatches('#hoge#');
+        that(var_export2)->fn('hoge')->outputMatches('#hoge#');
     }
 
     function test_var_export2_private()
@@ -1191,7 +1191,7 @@ class VarsTest extends AbstractTestCase
 
         that(var_export3)((function () { yield 1; })())->wasThrown('is not support');
 
-        that(var_export3)->callable(null, [1, 2, 3])->outputMatches('#newInstanceWithoutConstructor#');
+        that(var_export3)->fn([1, 2, 3])->outputMatches('#newInstanceWithoutConstructor#');
     }
 
     function test_var_html()
@@ -1226,7 +1226,7 @@ class VarsTest extends AbstractTestCase
             'resource'    => STDOUT,
             'recur'       => $recur,
         ];
-        that(var_html)->callable(null, $value)->outputMatches('#<pre class=\'var_html\'>#');
+        that(var_html)->fn($value)->outputMatches('#<pre class=\'var_html\'>#');
     }
 
     function test_var_pretty()
@@ -1308,7 +1308,7 @@ class VarsTest extends AbstractTestCase
         that((var_pretty)($value, 'cli', true))->stringContains("\033");
         that((var_pretty)($value, 'html', true))->stringContains("<span");
 
-        that(var_pretty)->callable(null, $value)->outputMatches('#Concrete#');
+        that(var_pretty)->fn($value)->outputMatches('#Concrete#');
     }
 
     /**
