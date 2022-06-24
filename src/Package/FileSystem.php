@@ -573,6 +573,61 @@ class FileSystem
     }
 
     /**
+     * ツリー構造で file_set_contents する
+     *
+     * 値が配列の場合はディレクトリ、それ以外の場合はファイルとなる。
+     * 値がクロージャーの場合はコールされる。
+     * 返り値として書き込んだバイト数のフルパス配列を返す。
+     *
+     * Example:
+     * ```php
+     * // 一時ディレクトリにツリー構造でファイルを配置する
+     * $root = sys_get_temp_dir();
+     * file_set_tree($root, [
+     *     'hoge.txt' => 'HOGE',
+     *     'dir1' => [
+     *         'fuga.txt' => 'FUGA',
+     *         'dir2'     => [
+     *             'piyo.txt' => 'PIYO',
+     *         ],
+     *     ],
+     * ]);
+     * that("$root/hoge.txt")->fileEquals('HOGE');
+     * that("$root/dir1/fuga.txt")->fileEquals('FUGA');
+     * that("$root/dir1/dir2/piyo.txt")->fileEquals('PIYO');
+     * ```
+     *
+     * @param string $root ルートパス
+     * @param array $contents_tree コンテンツツリー
+     * @param int $umask umask
+     * @return array 書き込まれたバイト数配列
+     */
+    public static function file_set_tree($root, $contents_tree, $umask = 0002)
+    {
+        if (func_num_args() === 2) {
+            $umask = umask();
+        }
+
+        $result = [];
+        foreach ($contents_tree as $basename => $entry) {
+            $fullpath = $root . DIRECTORY_SEPARATOR . $basename;
+            if ($entry instanceof \Closure) {
+                $entry = $entry($fullpath, $root, $basename);
+            }
+
+            if (is_array($entry)) {
+                FileSystem::mkdir_p($fullpath, $umask);
+                $result += FileSystem::file_set_tree($fullpath, $entry, $umask);
+            }
+            else {
+                $byte = FileSystem::file_set_contents($fullpath, $entry, $umask);
+                $result[realpath($fullpath)] = $byte;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * 範囲指定でファイルを読んで位置を返す
      *
      * $needle に配列を与えると OR 的動作で一つでも見つかった時点の位置を返す。

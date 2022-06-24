@@ -399,6 +399,59 @@ class FileSystemTest extends AbstractTestCase
         }
     }
 
+    function test_file_set_tree()
+    {
+        $root = sys_get_temp_dir() . '/file_set_tree';
+        (rm_rf)($root);
+
+        that((file_set_tree)($root, [
+            'blank'      => '',
+            'empty'      => [],
+            'single.txt' => 'single',
+            'directory'  => [
+                '1.txt' => '1',
+                '2.txt' => '22',
+                '3.txt' => '333',
+            ],
+            'closure1'   => fn() => [
+                'c' => 'c',
+            ],
+            'closure2'   => fn() => str_replace('/', DIRECTORY_SEPARATOR, implode(',', func_get_args())),
+            'x'          => [
+                'y' => [
+                    'z.txt' => 'xyz',
+                ],
+            ],
+            'a/b/c1'     => 'abc1',
+            'a'          => [
+                'b/c2' => 'abc2',
+            ],
+        ]))->is([
+            realpath("$root/single.txt")      => 6,
+            realpath("$root/directory/1.txt") => 1,
+            realpath("$root/directory/2.txt") => 2,
+            realpath("$root/directory/3.txt") => 3,
+            realpath("$root/blank")           => 0,
+            realpath("$root/closure1/c")      => 1,
+            realpath("$root/closure2")        => strlen("$root/closure2") + strlen("$root") + strlen("closure2") + 2,
+            realpath("$root/x/y/z.txt")       => 3,
+            realpath("$root/a/b/c1")          => 4,
+            realpath("$root/a/b/c2")          => 4,
+        ]);
+
+        that("$root/blank")->fileEquals('');
+        that("$root/empty")->directoryExists();
+        that("$root/single.txt")->fileEquals('single');
+        that("$root/directory/1.txt")->fileEquals('1');
+        that("$root/directory/2.txt")->fileEquals('22');
+        that("$root/directory/3.txt")->fileEquals('333');
+        that("$root/closure1/c")->fileEquals('c');
+        that("$root/closure2")->fileEquals((path_normalize)("$root/closure2,$root,closure2"));
+        that("$root/x/y/z.txt")->fileEquals('xyz');
+        that("$root/a/b/c1")->fileEquals('abc1');
+        that("$root/a/b/c2")->fileEquals('abc2');
+    }
+
     function test_file_pos()
     {
         $tmpfile = sys_get_temp_dir() . '/posfile.txt';
