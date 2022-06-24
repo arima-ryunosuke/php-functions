@@ -128,6 +128,17 @@ class FileSystemTest extends AbstractTestCase
             realpath($base . '/a/b/c/abc2.log'),
         ]);
 
+        // 相対パスモード
+        $DS = DIRECTORY_SEPARATOR;
+        that((file_list)($base, ['relative' => true]))->equalsCanonicalizing([
+            "a{$DS}a1.txt",
+            "a{$DS}a2.txt",
+            "a{$DS}b{$DS}ab1.txt",
+            "a{$DS}b{$DS}ab2.log",
+            "a{$DS}b{$DS}c{$DS}abc1.log",
+            "a{$DS}b{$DS}c{$DS}abc2.log",
+        ]);
+
         // 拡張子でフィルタ
         that((file_list)($base, fn($fname) => (file_extension)($fname) === 'txt'))->equalsCanonicalizing([
             realpath($base . '/a/a1.txt'),

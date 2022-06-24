@@ -221,7 +221,8 @@ class FileSystem
             ];
         }
         $filter_condition += [
-            '!type' => 'dir',
+            'relative' => false,
+            '!type'    => 'dir',
         ];
         $match = (file_matcher)($filter_condition);
 
@@ -234,7 +235,7 @@ class FileSystem
                 continue;
             }
 
-            $result[] = $fullpath;
+            $result[] = $filter_condition['relative'] ? $it->getSubPathName() : $fullpath;
         }
         return $result;
     }
