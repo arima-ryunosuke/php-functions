@@ -831,6 +831,46 @@ class ArraysTest extends AbstractTestCase
         that((array_find)([1, 2, 3, 4, -5, -6], fn($v) => $v < 0 ? abs($v) : false, false))->is(5);
     }
 
+    function test_array_find_recursive()
+    {
+        $abc = [
+            'a' => [
+                'b' => [
+                    'c' => [1, 2, 3],
+                ],
+            ],
+        ];
+        $xyz = [
+            'x' => [
+                'y' => [
+                    'z' => [1, 2, 3],
+                ],
+            ],
+        ];
+        $abc['xyz'] = &$xyz;
+        $xyz['abc'] = &$abc;
+
+        $array = [
+            'abc' => $abc,
+            'xyz' => $xyz,
+        ];
+        that((array_find_recursive)($array, fn($v) => $v === 2, false))->is(true);
+        that((array_find_recursive)($array, fn($v) => $v === 2, true))->is(['abc', 'a', 'b', 'c', 1]);
+        that((array_find_recursive)($array, fn($v) => $v === [1, 2, 3], true))->is(['abc', 'a', 'b', 'c']);
+        that((array_find_recursive)($array, fn($v) => $v === [1, 2, 9], true))->is(false);
+        that((array_find_recursive)($array, fn($v) => $v === $xyz, true))->is(['abc', 'xyz']);
+
+        $array = [
+            'xyz' => $xyz,
+            'abc' => $abc,
+        ];
+        that((array_find_recursive)($array, fn($v) => $v === 2, false))->is(true);
+        that((array_find_recursive)($array, fn($v) => $v === 2, true))->is(['xyz', 'x', 'y', 'z', 1]);
+        that((array_find_recursive)($array, fn($v) => $v === [1, 2, 3], true))->is(['xyz', 'x', 'y', 'z']);
+        that((array_find_recursive)($array, fn($v) => $v === [1, 2, 9], true))->is(false);
+        that((array_find_recursive)($array, fn($v) => $v === $abc, true))->is(['xyz', 'abc']);
+    }
+
     function test_array_rekey()
     {
         $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
