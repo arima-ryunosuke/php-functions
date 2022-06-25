@@ -944,16 +944,15 @@ class VarsTest extends AbstractTestCase
         $robject->parent->child = new \stdClass();
         $robject->parent->child->grand = $robject;
         that((var_export2)($robject, true))->is(<<<'VAR'
-        stdClass::__set_state([
-            "parent" => stdClass::__set_state([
-                "child" => stdClass::__set_state([
+        (object) [
+            "parent" => (object) [
+                "child" => (object) [
                     "grand" => "*RECURSION*",
-                ]),
-            ]),
-        ])
+                ],
+            ],
+        ]
         VAR
         );
-
     }
 
     function test_var_export3()

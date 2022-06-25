@@ -1356,13 +1356,13 @@ class Vars
      *             ],
      *         ],
      *     ],
-     *     "robject" => stdClass::__set_state([
-     *         "a" => stdClass::__set_state([
-     *             "b" => stdClass::__set_state([
+     *     "robject" => (object) [
+     *         "a" => (object) [
+     *             "b" => (object) [
      *                 "c" => "*RECURSION*",
-     *             ]),
-     *         ]),
-     *     ]),
+     *             ],
+     *         ],
+     *     ],
      * ]');
      * ```
      *
@@ -1411,7 +1411,11 @@ class Vars
             // オブジェクトは単にプロパティを __set_state する文字列を出力する
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
+                $classname = get_class($value);
+                if ($classname === \stdClass::class) {
+                    return '(object) ' . $export((array) $value, $nest, $parents);
+                }
+                return $classname . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
             }
             // 文字列はダブルクオート
             elseif (is_string($value)) {
