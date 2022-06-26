@@ -26,6 +26,74 @@ class UtilityTest extends AbstractTestCase
         that(ini_get('disable_functions'))->isSame($disable_functions);
     }
 
+    function test_getenvs()
+    {
+        putenv('ENV_1=env1');
+        putenv('ENV_2=env2');
+        putenv('ENV_3=');
+        putenv('ENV_X');
+
+        that(getenvs)([
+            'env1'      => 'ENV_1',
+            'env2'      => 'ENV_2',
+            'env3'      => 'ENV_3',
+            'envX'      => 'ENV_X',
+            'undefined' => 'UNDEFINED',
+        ])->is([
+            'env1'      => 'env1',
+            'env2'      => 'env2',
+            'env3'      => '',
+            'envX'      => null,
+            'undefined' => null,
+        ]);
+
+        that(getenvs)([
+            'c1' => ['undefined1', 'ENV_1', 'ENV_2'],
+            'c2' => ['undefined1', 'undefined2', 'ENV_2', 'ENV_1'],
+            ['undefined1', 'undefined2', 'ENV_2', 'ENV_1'],
+            'c3' => ['undefined1', 'undefined2', 'undefined3'],
+        ])->is([
+            'c1'    => 'env1',
+            'c2'    => 'env2',
+            'ENV_2' => 'env2',
+            'c3'    => null,
+        ]);
+
+        that(getenvs)(['ENV_1', 'ENV_2', 'ENV_3', 'ENV_X', 'undefined'])->is([
+            'ENV_1'     => 'env1',
+            'ENV_2'     => 'env2',
+            'ENV_3'     => '',
+            'ENV_X'     => null,
+            'undefined' => null,
+        ]);
+
+        that(getenvs)([[]])->wasThrown('ambiguous');
+        that(getenvs)([['u1', 'u2']])->wasThrown('ambiguous');
+    }
+
+    function test_setenvs()
+    {
+        that(setenvs)([
+            'ENV_1'     => 'env1',
+            'ENV_2'     => 'env2',
+            'ENV_3'     => '',
+            'ENV_X'     => null,
+            'UNDEFINED' => null,
+        ])->is([
+            'ENV_1'     => true,
+            'ENV_2'     => true,
+            'ENV_3'     => true,
+            'ENV_X'     => true,
+            'UNDEFINED' => true,
+        ]);
+
+        that(getenv('ENV_1', true))->is('env1');
+        that(getenv('ENV_2', true))->is('env2');
+        that(getenv('ENV_3', true))->is('');
+        that(getenv('ENV_X', true))->isFalse();
+        that(getenv('undefined', true))->isFalse();
+    }
+
     function test_get_uploaded_files()
     {
         $actual = (get_uploaded_files)([
