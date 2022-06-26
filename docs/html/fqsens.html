@@ -717,6 +717,26 @@ that(array_find(['a', 'b', '9'], $ifnumeric2power, false))-&gt;isSame(81);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_find_recursive()">
+                                    ryunosuke\Functions\Package\Arrays::array_find_recursive		</a>	<small>($array, $callback, $is_key = true) : mixed</small>
+		</h4>
+	<div class="description"><p>array_find の再帰版</p>
+<p>コールバックの返り値が true 相当のものを返す。<br />
+$is_key に true を与えるとそのキー配列を返す（デフォルトの動作）。<br />
+$is_key に false を与えるとコールバックの結果を返す。</p>
+<p>この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 最初に見つかったキーを配列で返す
+that(array_find_recursive([
+    'a' =&gt; [
+        'b' =&gt; [
+            'c' =&gt; [1, 2, 3],
+        ],
+    ],
+], fn($v) =&gt; $v === 2))-&gt;isSame(['a', 'b', 'c', 1]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rekey()">
                                     ryunosuke\Functions\Package\Arrays::array_rekey		</a>	<small>($array, $keymap) : array</small>
 		</h4>
@@ -787,7 +807,7 @@ that(array_map_recursive([
 ]);
 
 // さらに、自身にも適用できる（呼び出しは子が先で、本当の意味で「すべての要素」で呼び出される）
-that((array_map_recursive)([
+that(array_map_recursive([
     'k' =&gt; 'v',
     'c' =&gt; [
         'k1' =&gt; 'v1',
@@ -1216,7 +1236,7 @@ $array = [
     ['X', 'Y', 'Z'],
     [[[['a', 'M', 'Z']]]],
 ];
-that((array_count)($array, [
+that(array_count($array, [
     'lower' =&gt; fn($v) =&gt; !is_array($v) &amp;&amp; ctype_lower($v),
     'upper' =&gt; fn($v) =&gt; !is_array($v) &amp;&amp; ctype_upper($v),
     'array' =&gt; fn($v) =&gt; is_array($v),
@@ -1452,6 +1472,39 @@ $array2 = ['c' =&gt; 'C2', 'b' =&gt; 'B2', 'a' =&gt; 'A2'];
 $array3 = ['c' =&gt; 'C3', 'dummy' =&gt; 'DUMMY'];
 // 全共通項である 'c' キーのみが生き残り、その値は最後の 'C3' になる
 that(array_shrink_key($array1, $array2, $array3))-&gt;isSame(['c' =&gt; 'C3']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_revise()">
+                                    ryunosuke\Functions\Package\Arrays::array_revise		</a>	<small>($array, ...$maps) : array</small>
+		</h4>
+	<div class="description"><p>配列要素の追加・変更・削除を行う</p>
+<p>$map の当該キー要素が・・・</p>
+<ul>
+<li>クロージャの場合: キーの有無に関わらずコールされる</li>
+<li>null の場合: キーが削除される</li>
+<li>それ以外の場合: キーが追加される（存在しない場合のみ）</li>
+</ul>
+<p>という処理を行う。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(array_revise([
+    'id'      =&gt; 123,
+    'name'    =&gt; 'hoge',
+    'age'     =&gt; 18,
+    'delete'  =&gt; '',
+], [
+    'name'    =&gt; 'ignored',            // 存在するのでスルーされる
+    'append'  =&gt; 'newkey',             // 存在しないので追加される
+    'age'     =&gt; fn($age) =&gt; $age + 1, // クロージャは現在の値を引数にしてコールされる
+    'delete'  =&gt; null,                 // null は削除される
+    'null'    =&gt; fn() =&gt; null,         // 削除の目印として null を使っているので null を追加したい場合はクロージャで包む必要がある
+]))-&gt;isSame([
+    'id'      =&gt; 123,
+    'name'    =&gt; 'hoge',
+    'age'     =&gt; 19,
+    'append'  =&gt; 'newkey',
+    'null'    =&gt; null,
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -2233,7 +2286,7 @@ that($newobject-&gt;count())-&gt;isSame(6);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::reflect_types()">
-                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="ReflectionUnionType$typespace.html#ReflectionUnionType" class="fqsen ">ReflectionUnionType</a></small>
+                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionuniontype.php" class="fqsen" target="_blank">\ReflectionUnionType</a></small>
 		</h4>
 	<div class="description"><p>ReflectionType の型配列を返す</p>
 <p>ReflectionType のインターフェース・仕様がコロコロ変わってついていけないので関数化した。</p>
@@ -2282,7 +2335,7 @@ that(count($types))-&gt;is(2);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::const_exists()">
-                                    ryunosuke\Functions\Package\Classobj::const_exists		</a>	<small>($classname, $constname = null) : bool</small>
+                                    ryunosuke\Functions\Package\Classobj::const_exists		</a>	<small>($classname, $constname = &quot;&quot;) : bool</small>
 		</h4>
 	<div class="description"><p>クラス定数が存在するか調べる</p>
 <p>グローバル定数も調べられる。ので実質的には defined とほぼ同じで違いは下記。</p>
@@ -2362,7 +2415,8 @@ that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))-&gt;isSame([
                                     ryunosuke\Functions\Package\Classobj::get_object_properties		</a>	<small>($object, &amp;$privates = []) : array</small>
 		</h4>
 	<div class="description"><p>オブジェクトのプロパティを可視・不可視を問わず取得する</p>
-<p>get_object_vars + no public プロパティを返すイメージ。</p>
+<p>get_object_vars + no public プロパティを返すイメージ。<br />
+クロージャだけは特別扱いで this + use 変数を返す。</p>
 <p>Example:</p>
 <pre><code class="language-php">$object = new \Exception('something', 42);
 $object-&gt;oreore = 'oreore';
@@ -2378,6 +2432,12 @@ that(get_object_properties($object))-&gt;arraySubset([
     'message' =&gt; 'something',
     'code'    =&gt; 42,
     'oreore'  =&gt; 'oreore',
+]);
+
+// クロージャは this と use 変数を返す
+that(get_object_properties(fn() =&gt; $object))-&gt;is([
+    'this'   =&gt; $this,
+    'object' =&gt; $object,
 ]);
 </code></pre>
 </div>
@@ -2649,6 +2709,31 @@ that($testpath)-&gt;fileEquals('pre-hoge-fix');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_set_tree()">
+                                    ryunosuke\Functions\Package\FileSystem::file_set_tree		</a>	<small>($root, $contents_tree, $umask = 2) : array</small>
+		</h4>
+	<div class="description"><p>ツリー構造で file_set_contents する</p>
+<p>値が配列の場合はディレクトリ、それ以外の場合はファイルとなる。<br />
+値がクロージャーの場合はコールされる。<br />
+返り値として書き込んだバイト数のフルパス配列を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 一時ディレクトリにツリー構造でファイルを配置する
+$root = sys_get_temp_dir();
+file_set_tree($root, [
+    'hoge.txt' =&gt; 'HOGE',
+    'dir1' =&gt; [
+        'fuga.txt' =&gt; 'FUGA',
+        'dir2'     =&gt; [
+            'piyo.txt' =&gt; 'PIYO',
+        ],
+    ],
+]);
+that("$root/hoge.txt")-&gt;fileEquals('HOGE');
+that("$root/dir1/fuga.txt")-&gt;fileEquals('FUGA');
+that("$root/dir1/dir2/piyo.txt")-&gt;fileEquals('PIYO');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_pos()">
                                     ryunosuke\Functions\Package\FileSystem::file_pos		</a>	<small>($filename, $needle, $start = 0, $end = null, $chunksize = null) : int<span class="type-separator"></span><wbr>false</small>
 		</h4>
@@ -2785,7 +2870,7 @@ that(path_resolve('/absolute/path'))-&gt;isSame("{$DS}absolute{$DS}path");
 that(path_resolve('absolute/path'))-&gt;isSame(getcwd() . "{$DS}absolute{$DS}path");
 that(path_resolve('/absolute/path/through', '../current/./path'))-&gt;isSame("{$DS}absolute{$DS}path{$DS}current{$DS}path");
 
-# 最後の引数に最列を与えるとそのパスと PATH から解決を試みる（要するに which 的な動作になる）
+# 最後の引数に配列を与えるとそのパスと PATH から解決を試みる（要するに which 的な動作になる）
 if ($DS === '/') {
     that(path_resolve('php', []))-&gt;isSame(PHP_BINARY);
 }
@@ -3104,7 +3189,7 @@ that(is_bindable_closure(static function () {}))-&gt;isFalse();
 <p>Example:</p>
 <pre><code class="language-php">class CountClass implements \Countable
 {
-    public function count() {
+    public function count(): int {
         // count 経由なら 1 を、メソッド経由なら 0 を返す
         return (int) by_builtin($this, 'count');
     }
@@ -3242,7 +3327,7 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">$closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, $default1, $default2 = 'default2', ...$misc) { return get_defined_vars(); };
-$params = (parameter_wiring)($closure, [
+$params = parameter_wiring($closure, [
     \ArrayObject::class      =&gt; $ao = new \ArrayObject([1, 2, 3]),
     \RuntimeException::class =&gt; $t = new \RuntimeException('hoge'),
     '$array'                 =&gt; fn (\ArrayObject $ao) =&gt; (array) $ao,
@@ -3648,10 +3733,8 @@ that(ping('127.0.0.1', 1234))-&gt;isFalse(); // tcp はスキームを省略で�
 <p>$urls で複数の curl を渡し、並列で実行して複数の結果をまとめて返す。<br />
 $urls の要素は単一の文字列か curl のオプションである必要がある。<br />
 リクエストの実体は http_request なので、そっちで使えるオプションは一部を除きすべて使える。</p>
-<p>返り値は $urls のキーを保持したまま、レスポンスが返ってきた順に格納して配列で返す。<br />
+<p>返り値は $urls のキーを保持したまま、レスポンスが返ってきた順にボディを格納して配列で返す。<br />
 構造は下記のサンプルを参照。</p>
-<p>$infos を渡すと返り値がボディだけになり、その他の情報はすべてこの変数に格納される。<br />
-この動作は互換性のためであり、将来的には指定の有無に関わらずボディだけを返すようになる（失敗したリクエストは null が格納される）。</p>
 <p>Example:</p>
 <pre><code class="language-php">$responses = http_requests([
     // このように [キー =&gt; CURL オプション] 形式が正しい使い方
@@ -3979,7 +4062,6 @@ that(multiexplode([',', ' ', '|'], 'a,b c|d', -2))-&gt;isSame(['a,b c', 'd']);
 		</h4>
 	<div class="description"><p>エスケープやクオートに対応した explode</p>
 <p>$enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。</p>
-<p>歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。</p>
 <p>Example:</p>
 <pre><code class="language-php">// シンプルな例
 that(quoteexplode(',', 'a,b,c\\,d,"e,f"'))-&gt;isSame([
@@ -3990,16 +4072,10 @@ that(quoteexplode(',', 'a,b,c\\,d,"e,f"'))-&gt;isSame([
 ]);
 
 // $enclosures で囲い文字の開始・終了文字を明示できる
-that(quoteexplode(',', 'a,b,{e,f}', ['{' =&gt; '}']))-&gt;isSame([
+that(quoteexplode(',', 'a,b,{e,f}', null, ['{' =&gt; '}']))-&gt;isSame([
     'a', // 普通に分割される
     'b', // 普通に分割される
     '{e,f}', // { } で囲まれているので区切り文字とみなされない
-]);
-
-// このように第3引数に $limit 引数を差し込むことができる
-that(quoteexplode(',', 'a,b,{e,f}', 2, ['{' =&gt; '}']))-&gt;isSame([
-    'a',
-    'b,{e,f}',
 ]);
 </code></pre>
 </div>
@@ -4102,12 +4178,6 @@ that(str_equals('\0abc', '\0abc'))-&gt;isTrue();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
-		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_contains()">
-                                    ryunosuke\Functions\Package\Strings::str_contains		</a>	<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false) : bool</small>
-		</h4>
-	<div class="description"><p>指定文字列を含むか返す</p>
-</div>
-    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_exists()">
                                     ryunosuke\Functions\Package\Strings::str_exists		</a>	<small>($haystack, $needle, $case_insensitivity = false, $and_flag = false) : bool</small>
 		</h4>
@@ -4121,7 +4191,7 @@ that(str_exists('abc', ['b', 'x'], false, true))-&gt;isFalse();
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_chop()">
-                                    ryunosuke\Functions\Package\Strings::str_chop		</a>	<small>($string, $prefix = null, $suffix = null, $case_insensitivity = false) : string</small>
+                                    ryunosuke\Functions\Package\Strings::str_chop		</a>	<small>($string, $prefix = &quot;&quot;, $suffix = &quot;&quot;, $case_insensitivity = false) : string</small>
 		</h4>
 	<div class="description"><p>先頭・末尾の指定文字列を削ぎ落とす</p>
 <p>Example:</p>
@@ -4143,7 +4213,7 @@ that(str_lchop("$PATH/hoge.php", "$PATH/"))-&gt;isSame('hoge.php');
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_rchop()">
-                                    ryunosuke\Functions\Package\Strings::str_rchop		</a>	<small>($string, $suffix = null, $case_insensitivity = false) : string</small>
+                                    ryunosuke\Functions\Package\Strings::str_rchop		</a>	<small>($string, $suffix, $case_insensitivity = false) : string</small>
 		</h4>
 	<div class="description"><p>末尾の指定文字列を削ぎ落とす</p>
 <p>Example:</p>
@@ -5612,7 +5682,6 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);
 <p>正確にはオプションの replacer で指定したものに置換される（デフォルト空文字なので削除になる）。<br />
 replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。<br />
 文字列を指定すると自動で出現番号が付与される。</p>
-<p>歴史的な理由によりオプションには直接 replacer を渡せるが、互換性のためでありその指定は推奨されない。</p>
 <p>$mapping 配列には「どれをどのように」と言った変換表が格納される。<br />
 典型的には strtr に渡して php コードを復元させるのに使用する。</p>
 <p>Example:</p>
@@ -5620,7 +5689,7 @@ replacer にクロージャを渡すと(phpコード, 出現番号) が渡って
 // php コードが消えている
 that(strip_php($phtml))-&gt;is('begin php code  end');
 // $mapping を使用すると元の文字列に復元できる
-$html = strip_php($phtml, null, $mapping);
+$html = strip_php($phtml, [], $mapping);
 that(strtr($html, $mapping))-&gt;is($phtml);
 </code></pre>
 </div>
@@ -5722,8 +5791,7 @@ ChainObject は大抵のグローバル関数がアノテーションされて�
 <p>下記の特殊ルールにより、特殊な呼び出し方ができる。</p>
 <ul>
 <li>array_XXX, str_XXX は省略して XXX で呼び出せる<ul>
-<li>省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない（array_優先でコールされる）</li>
-<li>ini に 'rfunc.chain_overload' 定義されていれば型で分岐させることができる</li>
+<li>省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う</li>
 </ul>
 </li>
 <li>funcE で eval される文字列のクロージャを呼べる<ul>
@@ -6030,6 +6098,55 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 		</h4>
 	<div class="description"><p>複数の php.ini の設定をまとめて設定する</p>
 <p>返り値として「もとに戻すためのクロージャ」を返すので、復元するためにはそのクロージャを呼ぶだけで良い。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::getenvs()">
+                                    ryunosuke\Functions\Package\Utility::getenvs		</a>	<small>($env_vars) : array</small>
+		</h4>
+	<div class="description"><p>連想配列を元に環境変数を取得する</p>
+<p>配列のキーで取得するキーを指定できる。<br />
+連番の場合は元の環境変数名がキーとして使用される。</p>
+<p>環境変数が存在しない場合、false ではなく null になる。<br />
+環境変数名に配列を与えた場合、順に取得を試みて、見つからなかった場合に null になる。</p>
+<p>キーが指定されておらず、さらに環境変数候補数が1以外で環境変数が見つからない場合は例外を投げる。<br />
+（返すキーが一意に定まらない場合に例外を投げる）。</p>
+<p>Example:</p>
+<pre><code class="language-php">putenv('ENV1=env_1');
+putenv('ENV2=env_2');
+putenv('ENV3=env_3');
+
+that(getenvs([
+    'ENV1',                           // キー指定がない
+    'e2' =&gt; 'ENV2',                   // キー指定がある
+    'e3' =&gt; ['ENV4', 'ENV3', 'ENV2'], // 配列の左から取得を試みる
+    'e8' =&gt; 'ENV8',                   // 存在しない環境変数
+    'e9' =&gt; ['ENV9', 'ENV8', 'ENV7'], // 存在しない環境変数配列
+]))-&gt;is([
+    'ENV1' =&gt; 'env_1', // キー指定がない場合、環境変数名がキーになる
+    'e2'   =&gt; 'env_2', // キー指定がある場合、それがキーになる
+    'e3'   =&gt; 'env_3', // ENV3 が見つかった
+    'e8'   =&gt; null,    // ENV8 が見つからないので null
+    'e9'   =&gt; null,    // ENV9, ENV8, ENV7 のどれも見つからないので null
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::setenvs()">
+                                    ryunosuke\Functions\Package\Utility::setenvs		</a>	<small>($env_vars) : array</small>
+		</h4>
+	<div class="description"><p>連想配列を元に環境変数を設定する</p>
+<p>値に null を渡すと環境変数の削除動作となる。<br />
+返り値として成否配列を返すが、この返り値の形式は互換性を維持せず、変更になる可能性がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">setenvs([
+    'ENV1' =&gt; 'e1',
+    'ENV2' =&gt; 'e2',
+    'ENV3' =&gt; null,
+]);
+that(getenv('ENV1'))-&gt;isSame('e1');
+that(getenv('ENV2'))-&gt;isSame('e2');
+that(getenv('ENV3'))-&gt;isFalse();
+</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::get_uploaded_files()">
@@ -6988,7 +7105,7 @@ that(var_type(new \Exception()))-&gt;isSame('\\Exception');
 // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
 that(var_type(new class extends \Exception{}))-&gt;isSame('\\Exception');
 that(var_type(new class implements \JsonSerializable{
-    public function jsonSerialize() { return ''; }
+    public function jsonSerialize(): string { return ''; }
 }))-&gt;isSame('\\JsonSerializable');
 </code></pre>
 </div>
@@ -7101,13 +7218,13 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
             ],
         ],
     ],
-    "robject" =&gt; stdClass::__set_state([
-        "a" =&gt; stdClass::__set_state([
-            "b" =&gt; stdClass::__set_state([
+    "robject" =&gt; (object) [
+        "a" =&gt; (object) [
+            "b" =&gt; (object) [
                 "c" =&gt; "*RECURSION*",
-            ]),
-        ]),
-    ]),
+            ],
+        ],
+    ],
 ]');
 </code></pre>
 </div>
@@ -7150,7 +7267,7 @@ set_state だけは呼ばれないので注意。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::var_pretty()">
-                                    ryunosuke\Functions\Package\Vars::var_pretty		</a>	<small>($value, $context = null, $return = false) : string</small>
+                                    ryunosuke\Functions\Package\Vars::var_pretty		</a>	<small>($value, $options = []) : string</small>
 		</h4>
 	<div class="description"><p>var_dump の出力を見やすくしたもの</p>
 <p>var_dump はとても縦に長い上見づらいので色や改行・空白を調整して見やすくした。<br />

@@ -63,7 +63,16 @@
 </div>
 
 	<h3>Construction</h3>
-                
+        	<table class="table">
+		<caption>Implements</caption>
+		<tbody>
+        			<tr>
+				<td class="type"><a href="ryunosuke-Functions-Package-Interfaces-Funchand$typespace.html#ryunosuke\Functions\Package\Interfaces\Funchand" class="fqsen "><small>ryunosuke\Functions\Package\Interfaces\</small><wbr>Funchand</a></td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+            
 	<h3>Hierarchy</h3>
 	<div class="hierarchy"></div>
 
@@ -854,7 +863,7 @@ that(is_bindable_closure(static function () {}))-&gt;isFalse();
 <p>Example:</p>
 <pre><code class="language-php">class CountClass implements \Countable
 {
-    public function count() {
+    public function count(): int {
         // count 経由なら 1 を、メソッド経由なら 0 を返す
         return (int) by_builtin($this, 'count');
     }
@@ -1183,7 +1192,7 @@ that(parameter_default($f, ['A', 'B']))-&gt;isSame(['A', 'B']);
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">$closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, $default1, $default2 = 'default2', ...$misc) { return get_defined_vars(); };
-$params = (parameter_wiring)($closure, [
+$params = parameter_wiring($closure, [
     \ArrayObject::class      =&gt; $ao = new \ArrayObject([1, 2, 3]),
     \RuntimeException::class =&gt; $t = new \RuntimeException('hoge'),
     '$array'                 =&gt; fn (\ArrayObject $ao) =&gt; (array) $ao,

@@ -15,6 +15,7 @@ interface FileSystem
     public const file_get_arrays       = ["ryunosuke\\Functions\\Package\\FileSystem", "file_get_arrays"];
     public const file_set_contents     = ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_contents"];
     public const file_rewrite_contents = ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"];
+    public const file_set_tree         = ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_tree"];
     public const file_pos              = ["ryunosuke\\Functions\\Package\\FileSystem", "file_pos"];
     public const file_mimetype         = ["ryunosuke\\Functions\\Package\\FileSystem", "file_mimetype"];
     public const mkdir_p               = ["ryunosuke\\Functions\\Package\\FileSystem", "mkdir_p"];

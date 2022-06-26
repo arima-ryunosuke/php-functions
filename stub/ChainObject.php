@@ -31,8 +31,8 @@
  * @method   \ChainObject  add_error_handler1($handler)
  *
  * @see addcslashes
- * @method   \ChainObject  addcslashes($charlist)
- * @method   \ChainObject  addcslashes1($str)
+ * @method   \ChainObject  addcslashes(string $characters)
+ * @method   \ChainObject  addcslashes1(string $string)
  *
  * @see addslashes
  * @property \ChainObject $addslashes
@@ -141,33 +141,33 @@
  *
  * @see array_change_key_case
  * @property \ChainObject $array_change_key_case
- * @method   \ChainObject  array_change_key_case($case = null)
- * @method   \ChainObject  array_change_key_case1($input)
+ * @method   \ChainObject  array_change_key_case(int $case = CASE_LOWER)
+ * @method   \ChainObject  array_change_key_case1(array $array)
  *
  * @see array_change_key_case
  * @property \ChainObject $change_key_case
- * @method   \ChainObject  change_key_case($case = null)
- * @method   \ChainObject  change_key_case1($input)
+ * @method   \ChainObject  change_key_case(int $case = CASE_LOWER)
+ * @method   \ChainObject  change_key_case1(array $array)
  *
  * @see array_chunk
- * @method   \ChainObject  array_chunk($size, $preserve_keys = null)
- * @method   \ChainObject  array_chunk1($arg, $preserve_keys = null)
- * @method   \ChainObject  array_chunk2($arg, $size)
+ * @method   \ChainObject  array_chunk(int $length, bool $preserve_keys = false)
+ * @method   \ChainObject  array_chunk1(array $array, bool $preserve_keys = false)
+ * @method   \ChainObject  array_chunk2(array $array, int $length)
  *
  * @see array_chunk
- * @method   \ChainObject  chunk($size, $preserve_keys = null)
- * @method   \ChainObject  chunk1($arg, $preserve_keys = null)
- * @method   \ChainObject  chunk2($arg, $size)
+ * @method   \ChainObject  chunk(int $length, bool $preserve_keys = false)
+ * @method   \ChainObject  chunk1(array $array, bool $preserve_keys = false)
+ * @method   \ChainObject  chunk2(array $array, int $length)
  *
  * @see array_column
- * @method   \ChainObject  array_column($column_key, $index_key = null)
- * @method   \ChainObject  array_column1($arg, $index_key = null)
- * @method   \ChainObject  array_column2($arg, $column_key)
+ * @method   \ChainObject  array_column(string|int|null $column_key, string|int|null $index_key = null)
+ * @method   \ChainObject  array_column1(array $array, string|int|null $index_key = null)
+ * @method   \ChainObject  array_column2(array $array, string|int|null $column_key)
  *
  * @see array_column
- * @method   \ChainObject  column($column_key, $index_key = null)
- * @method   \ChainObject  column1($arg, $index_key = null)
- * @method   \ChainObject  column2($arg, $column_key)
+ * @method   \ChainObject  column(string|int|null $column_key, string|int|null $index_key = null)
+ * @method   \ChainObject  column1(array $array, string|int|null $index_key = null)
+ * @method   \ChainObject  column2(array $array, string|int|null $column_key)
  *
  * @see array_columns
  * @property \ChainObject $array_columns
@@ -182,12 +182,12 @@
  * @method   \ChainObject  columns2($array, $column_keys = null)
  *
  * @see array_combine
- * @method   \ChainObject  array_combine($values)
- * @method   \ChainObject  array_combine1($keys)
+ * @method   \ChainObject  array_combine(array $values)
+ * @method   \ChainObject  array_combine1(array $keys)
  *
  * @see array_combine
- * @method   \ChainObject  combine($values)
- * @method   \ChainObject  combine1($keys)
+ * @method   \ChainObject  combine(array $values)
+ * @method   \ChainObject  combine1(array $keys)
  *
  * @see array_convert
  * @method   \ChainObject  array_convert($callback, $apply_array = false)
@@ -257,102 +257,104 @@
  * @method   \ChainObject  depth1($array)
  *
  * @see array_diff
- * @method   \ChainObject  array_diff(...$arrays)
- * @method   \ChainObject  array_diff1($arr1, ...$arrays)
- * @method   \ChainObject  array_diff2($arr1, ...$arrays)
- * @method   \ChainObject  array_diff3($arr1, ...$arrays)
- * @method   \ChainObject  array_diff4($arr1, ...$arrays)
- * @method   \ChainObject  array_diff5($arr1, ...$arrays)
- * @method   \ChainObject  array_diff6($arr1, ...$arrays)
+ * @property \ChainObject $array_diff
+ * @method   \ChainObject  array_diff(...array $arrays)
+ * @method   \ChainObject  array_diff1(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff2(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff3(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff4(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff5(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff6(array $array, ...array $arrays)
  *
  * @see array_diff
- * @method   \ChainObject  diff(...$arrays)
- * @method   \ChainObject  diff1($arr1, ...$arrays)
- * @method   \ChainObject  diff2($arr1, ...$arrays)
- * @method   \ChainObject  diff3($arr1, ...$arrays)
- * @method   \ChainObject  diff4($arr1, ...$arrays)
- * @method   \ChainObject  diff5($arr1, ...$arrays)
- * @method   \ChainObject  diff6($arr1, ...$arrays)
+ * @property \ChainObject $diff
+ * @method   \ChainObject  diff(...array $arrays)
+ * @method   \ChainObject  diff1(array $array, ...array $arrays)
+ * @method   \ChainObject  diff2(array $array, ...array $arrays)
+ * @method   \ChainObject  diff3(array $array, ...array $arrays)
+ * @method   \ChainObject  diff4(array $array, ...array $arrays)
+ * @method   \ChainObject  diff5(array $array, ...array $arrays)
+ * @method   \ChainObject  diff6(array $array, ...array $arrays)
  *
  * @see array_diff_assoc
- * @method   \ChainObject  array_diff_assoc(...$arrays)
- * @method   \ChainObject  array_diff_assoc1($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_assoc2($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_assoc3($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_assoc4($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_assoc5($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_assoc6($arr1, ...$arrays)
+ * @property \ChainObject $array_diff_assoc
+ * @method   \ChainObject  array_diff_assoc(...array $arrays)
+ * @method   \ChainObject  array_diff_assoc1(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_assoc2(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_assoc3(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_assoc4(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_assoc5(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_assoc6(array $array, ...array $arrays)
  *
  * @see array_diff_assoc
- * @method   \ChainObject  diff_assoc(...$arrays)
- * @method   \ChainObject  diff_assoc1($arr1, ...$arrays)
- * @method   \ChainObject  diff_assoc2($arr1, ...$arrays)
- * @method   \ChainObject  diff_assoc3($arr1, ...$arrays)
- * @method   \ChainObject  diff_assoc4($arr1, ...$arrays)
- * @method   \ChainObject  diff_assoc5($arr1, ...$arrays)
- * @method   \ChainObject  diff_assoc6($arr1, ...$arrays)
+ * @property \ChainObject $diff_assoc
+ * @method   \ChainObject  diff_assoc(...array $arrays)
+ * @method   \ChainObject  diff_assoc1(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_assoc2(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_assoc3(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_assoc4(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_assoc5(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_assoc6(array $array, ...array $arrays)
  *
  * @see array_diff_key
- * @method   \ChainObject  array_diff_key(...$arrays)
- * @method   \ChainObject  array_diff_key1($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_key2($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_key3($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_key4($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_key5($arr1, ...$arrays)
- * @method   \ChainObject  array_diff_key6($arr1, ...$arrays)
+ * @property \ChainObject $array_diff_key
+ * @method   \ChainObject  array_diff_key(...array $arrays)
+ * @method   \ChainObject  array_diff_key1(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_key2(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_key3(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_key4(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_key5(array $array, ...array $arrays)
+ * @method   \ChainObject  array_diff_key6(array $array, ...array $arrays)
  *
  * @see array_diff_key
- * @method   \ChainObject  diff_key(...$arrays)
- * @method   \ChainObject  diff_key1($arr1, ...$arrays)
- * @method   \ChainObject  diff_key2($arr1, ...$arrays)
- * @method   \ChainObject  diff_key3($arr1, ...$arrays)
- * @method   \ChainObject  diff_key4($arr1, ...$arrays)
- * @method   \ChainObject  diff_key5($arr1, ...$arrays)
- * @method   \ChainObject  diff_key6($arr1, ...$arrays)
+ * @property \ChainObject $diff_key
+ * @method   \ChainObject  diff_key(...array $arrays)
+ * @method   \ChainObject  diff_key1(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_key2(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_key3(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_key4(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_key5(array $array, ...array $arrays)
+ * @method   \ChainObject  diff_key6(array $array, ...array $arrays)
  *
  * @see array_diff_uassoc
- * @method   \ChainObject  array_diff_uassoc($arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_diff_uassoc1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  array_diff_uassoc2($arr1, $arr2)
- * @method   \ChainObject  array_diff_uassocP($arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_diff_uassocP1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  array_diff_uassocP2($arr1, $arr2)
- * @method   \ChainObject  array_diff_uassocE($arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_diff_uassocE1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  array_diff_uassocE2($arr1, $arr2)
+ * @property \ChainObject $array_diff_uassoc
+ * @method   \ChainObject  array_diff_uassoc(...$rest)
+ * @method   \ChainObject  array_diff_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_uassoc6(array $array, ...$rest)
  *
  * @see array_diff_uassoc
- * @method   \ChainObject  diff_uassoc($arr2, $callback_data_comp_func)
- * @method   \ChainObject  diff_uassoc1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  diff_uassoc2($arr1, $arr2)
- * @method   \ChainObject  diff_uassocP($arr2, $callback_data_comp_func)
- * @method   \ChainObject  diff_uassocP1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  diff_uassocP2($arr1, $arr2)
- * @method   \ChainObject  diff_uassocE($arr2, $callback_data_comp_func)
- * @method   \ChainObject  diff_uassocE1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  diff_uassocE2($arr1, $arr2)
+ * @property \ChainObject $diff_uassoc
+ * @method   \ChainObject  diff_uassoc(...$rest)
+ * @method   \ChainObject  diff_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  diff_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  diff_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  diff_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  diff_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  diff_uassoc6(array $array, ...$rest)
  *
  * @see array_diff_ukey
- * @method   \ChainObject  array_diff_ukey($arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_diff_ukey1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  array_diff_ukey2($arr1, $arr2)
- * @method   \ChainObject  array_diff_ukeyP($arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_diff_ukeyP1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  array_diff_ukeyP2($arr1, $arr2)
- * @method   \ChainObject  array_diff_ukeyE($arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_diff_ukeyE1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  array_diff_ukeyE2($arr1, $arr2)
+ * @property \ChainObject $array_diff_ukey
+ * @method   \ChainObject  array_diff_ukey(...$rest)
+ * @method   \ChainObject  array_diff_ukey1(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_ukey2(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_ukey3(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_ukey4(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_ukey5(array $array, ...$rest)
+ * @method   \ChainObject  array_diff_ukey6(array $array, ...$rest)
  *
  * @see array_diff_ukey
- * @method   \ChainObject  diff_ukey($arr2, $callback_key_comp_func)
- * @method   \ChainObject  diff_ukey1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  diff_ukey2($arr1, $arr2)
- * @method   \ChainObject  diff_ukeyP($arr2, $callback_key_comp_func)
- * @method   \ChainObject  diff_ukeyP1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  diff_ukeyP2($arr1, $arr2)
- * @method   \ChainObject  diff_ukeyE($arr2, $callback_key_comp_func)
- * @method   \ChainObject  diff_ukeyE1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  diff_ukeyE2($arr1, $arr2)
+ * @property \ChainObject $diff_ukey
+ * @method   \ChainObject  diff_ukey(...$rest)
+ * @method   \ChainObject  diff_ukey1(array $array, ...$rest)
+ * @method   \ChainObject  diff_ukey2(array $array, ...$rest)
+ * @method   \ChainObject  diff_ukey3(array $array, ...$rest)
+ * @method   \ChainObject  diff_ukey4(array $array, ...$rest)
+ * @method   \ChainObject  diff_ukey5(array $array, ...$rest)
+ * @method   \ChainObject  diff_ukey6(array $array, ...$rest)
  *
  * @see array_difference
  * @method   \ChainObject  array_difference($array2, $delimiter = ".")
@@ -432,14 +434,14 @@
  * @method   \ChainObject  extend6($default = [], ...$arrays)
  *
  * @see array_fill
- * @method   \ChainObject  array_fill($num, $val)
- * @method   \ChainObject  array_fill1($start_key, $val)
- * @method   \ChainObject  array_fill2($start_key, $num)
+ * @method   \ChainObject  array_fill(int $count, mixed $value)
+ * @method   \ChainObject  array_fill1(int $start_index, mixed $value)
+ * @method   \ChainObject  array_fill2(int $start_index, int $count)
  *
  * @see array_fill
- * @method   \ChainObject  fill($num, $val)
- * @method   \ChainObject  fill1($start_key, $val)
- * @method   \ChainObject  fill2($start_key, $num)
+ * @method   \ChainObject  fill(int $count, mixed $value)
+ * @method   \ChainObject  fill1(int $start_index, mixed $value)
+ * @method   \ChainObject  fill2(int $start_index, int $count)
  *
  * @see array_fill_callback
  * @method   \ChainObject  array_fill_callback($callback)
@@ -478,36 +480,36 @@
  * @method   \ChainObject  fill_gap6($array, ...$values)
  *
  * @see array_fill_keys
- * @method   \ChainObject  array_fill_keys($val)
- * @method   \ChainObject  array_fill_keys1($keys)
+ * @method   \ChainObject  array_fill_keys(mixed $value)
+ * @method   \ChainObject  array_fill_keys1(array $keys)
  *
  * @see array_fill_keys
- * @method   \ChainObject  fill_keys($val)
- * @method   \ChainObject  fill_keys1($keys)
+ * @method   \ChainObject  fill_keys(mixed $value)
+ * @method   \ChainObject  fill_keys1(array $keys)
  *
  * @see array_filter
  * @property \ChainObject $array_filter
- * @method   \ChainObject  array_filter($callback = null, $use_keys = null)
- * @method   \ChainObject  array_filter1($arg, $use_keys = null)
- * @method   \ChainObject  array_filter2($arg, $callback = null)
- * @method   \ChainObject  array_filterP($callback = null, $use_keys = null)
- * @method   \ChainObject  array_filterP1($arg, $use_keys = null)
- * @method   \ChainObject  array_filterP2($arg, $callback = null)
- * @method   \ChainObject  array_filterE($callback = null, $use_keys = null)
- * @method   \ChainObject  array_filterE1($arg, $use_keys = null)
- * @method   \ChainObject  array_filterE2($arg, $callback = null)
+ * @method   \ChainObject  array_filter(?callable $callback = null, int $mode = 0)
+ * @method   \ChainObject  array_filter1(array $array, int $mode = 0)
+ * @method   \ChainObject  array_filter2(array $array, ?callable $callback = null)
+ * @method   \ChainObject  array_filterP(?callable $callback = null, int $mode = 0)
+ * @method   \ChainObject  array_filterP1(array $array, int $mode = 0)
+ * @method   \ChainObject  array_filterP2(array $array, ?callable $callback = null)
+ * @method   \ChainObject  array_filterE(?callable $callback = null, int $mode = 0)
+ * @method   \ChainObject  array_filterE1(array $array, int $mode = 0)
+ * @method   \ChainObject  array_filterE2(array $array, ?callable $callback = null)
  *
  * @see array_filter
  * @property \ChainObject $filter
- * @method   \ChainObject  filter($callback = null, $use_keys = null)
- * @method   \ChainObject  filter1($arg, $use_keys = null)
- * @method   \ChainObject  filter2($arg, $callback = null)
- * @method   \ChainObject  filterP($callback = null, $use_keys = null)
- * @method   \ChainObject  filterP1($arg, $use_keys = null)
- * @method   \ChainObject  filterP2($arg, $callback = null)
- * @method   \ChainObject  filterE($callback = null, $use_keys = null)
- * @method   \ChainObject  filterE1($arg, $use_keys = null)
- * @method   \ChainObject  filterE2($arg, $callback = null)
+ * @method   \ChainObject  filter(?callable $callback = null, int $mode = 0)
+ * @method   \ChainObject  filter1(array $array, int $mode = 0)
+ * @method   \ChainObject  filter2(array $array, ?callable $callback = null)
+ * @method   \ChainObject  filterP(?callable $callback = null, int $mode = 0)
+ * @method   \ChainObject  filterP1(array $array, int $mode = 0)
+ * @method   \ChainObject  filterP2(array $array, ?callable $callback = null)
+ * @method   \ChainObject  filterE(?callable $callback = null, int $mode = 0)
+ * @method   \ChainObject  filterE1(array $array, int $mode = 0)
+ * @method   \ChainObject  filterE2(array $array, ?callable $callback = null)
  *
  * @see array_filter_key
  * @method   \ChainObject  array_filter_key($callback)
@@ -546,6 +548,28 @@
  * @method   \ChainObject  findE($callback, $is_key = true)
  * @method   \ChainObject  findE1($array, $is_key = true)
  * @method   \ChainObject  findE2($array, $callback)
+ *
+ * @see array_find_recursive
+ * @method   \ChainObject  array_find_recursive($callback, $is_key = true)
+ * @method   \ChainObject  array_find_recursive1($array, $is_key = true)
+ * @method   \ChainObject  array_find_recursive2($array, $callback)
+ * @method   \ChainObject  array_find_recursiveP($callback, $is_key = true)
+ * @method   \ChainObject  array_find_recursiveP1($array, $is_key = true)
+ * @method   \ChainObject  array_find_recursiveP2($array, $callback)
+ * @method   \ChainObject  array_find_recursiveE($callback, $is_key = true)
+ * @method   \ChainObject  array_find_recursiveE1($array, $is_key = true)
+ * @method   \ChainObject  array_find_recursiveE2($array, $callback)
+ *
+ * @see array_find_recursive
+ * @method   \ChainObject  find_recursive($callback, $is_key = true)
+ * @method   \ChainObject  find_recursive1($array, $is_key = true)
+ * @method   \ChainObject  find_recursive2($array, $callback)
+ * @method   \ChainObject  find_recursiveP($callback, $is_key = true)
+ * @method   \ChainObject  find_recursiveP1($array, $is_key = true)
+ * @method   \ChainObject  find_recursiveP2($array, $callback)
+ * @method   \ChainObject  find_recursiveE($callback, $is_key = true)
+ * @method   \ChainObject  find_recursiveE1($array, $is_key = true)
+ * @method   \ChainObject  find_recursiveE2($array, $callback)
  *
  * @see array_flatten
  * @property \ChainObject $array_flatten
@@ -624,105 +648,107 @@
  * @method   \ChainObject  insert2($array, $value)
  *
  * @see array_intersect
- * @method   \ChainObject  array_intersect(...$arrays)
- * @method   \ChainObject  array_intersect1($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect2($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect3($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect4($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect5($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect6($arr1, ...$arrays)
+ * @property \ChainObject $array_intersect
+ * @method   \ChainObject  array_intersect(...array $arrays)
+ * @method   \ChainObject  array_intersect1(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect2(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect3(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect4(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect5(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect6(array $array, ...array $arrays)
  *
  * @see array_intersect
- * @method   \ChainObject  intersect(...$arrays)
- * @method   \ChainObject  intersect1($arr1, ...$arrays)
- * @method   \ChainObject  intersect2($arr1, ...$arrays)
- * @method   \ChainObject  intersect3($arr1, ...$arrays)
- * @method   \ChainObject  intersect4($arr1, ...$arrays)
- * @method   \ChainObject  intersect5($arr1, ...$arrays)
- * @method   \ChainObject  intersect6($arr1, ...$arrays)
+ * @property \ChainObject $intersect
+ * @method   \ChainObject  intersect(...array $arrays)
+ * @method   \ChainObject  intersect1(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect2(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect3(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect4(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect5(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect6(array $array, ...array $arrays)
  *
  * @see array_intersect_assoc
- * @method   \ChainObject  array_intersect_assoc(...$arrays)
- * @method   \ChainObject  array_intersect_assoc1($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_assoc2($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_assoc3($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_assoc4($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_assoc5($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_assoc6($arr1, ...$arrays)
+ * @property \ChainObject $array_intersect_assoc
+ * @method   \ChainObject  array_intersect_assoc(...array $arrays)
+ * @method   \ChainObject  array_intersect_assoc1(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_assoc2(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_assoc3(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_assoc4(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_assoc5(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_assoc6(array $array, ...array $arrays)
  *
  * @see array_intersect_assoc
- * @method   \ChainObject  intersect_assoc(...$arrays)
- * @method   \ChainObject  intersect_assoc1($arr1, ...$arrays)
- * @method   \ChainObject  intersect_assoc2($arr1, ...$arrays)
- * @method   \ChainObject  intersect_assoc3($arr1, ...$arrays)
- * @method   \ChainObject  intersect_assoc4($arr1, ...$arrays)
- * @method   \ChainObject  intersect_assoc5($arr1, ...$arrays)
- * @method   \ChainObject  intersect_assoc6($arr1, ...$arrays)
+ * @property \ChainObject $intersect_assoc
+ * @method   \ChainObject  intersect_assoc(...array $arrays)
+ * @method   \ChainObject  intersect_assoc1(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_assoc2(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_assoc3(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_assoc4(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_assoc5(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_assoc6(array $array, ...array $arrays)
  *
  * @see array_intersect_key
- * @method   \ChainObject  array_intersect_key(...$arrays)
- * @method   \ChainObject  array_intersect_key1($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_key2($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_key3($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_key4($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_key5($arr1, ...$arrays)
- * @method   \ChainObject  array_intersect_key6($arr1, ...$arrays)
+ * @property \ChainObject $array_intersect_key
+ * @method   \ChainObject  array_intersect_key(...array $arrays)
+ * @method   \ChainObject  array_intersect_key1(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_key2(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_key3(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_key4(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_key5(array $array, ...array $arrays)
+ * @method   \ChainObject  array_intersect_key6(array $array, ...array $arrays)
  *
  * @see array_intersect_key
- * @method   \ChainObject  intersect_key(...$arrays)
- * @method   \ChainObject  intersect_key1($arr1, ...$arrays)
- * @method   \ChainObject  intersect_key2($arr1, ...$arrays)
- * @method   \ChainObject  intersect_key3($arr1, ...$arrays)
- * @method   \ChainObject  intersect_key4($arr1, ...$arrays)
- * @method   \ChainObject  intersect_key5($arr1, ...$arrays)
- * @method   \ChainObject  intersect_key6($arr1, ...$arrays)
+ * @property \ChainObject $intersect_key
+ * @method   \ChainObject  intersect_key(...array $arrays)
+ * @method   \ChainObject  intersect_key1(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_key2(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_key3(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_key4(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_key5(array $array, ...array $arrays)
+ * @method   \ChainObject  intersect_key6(array $array, ...array $arrays)
  *
  * @see array_intersect_uassoc
- * @method   \ChainObject  array_intersect_uassoc($arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_uassoc1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_uassoc2($arr1, $arr2)
- * @method   \ChainObject  array_intersect_uassocP($arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_uassocP1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_uassocP2($arr1, $arr2)
- * @method   \ChainObject  array_intersect_uassocE($arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_uassocE1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_uassocE2($arr1, $arr2)
+ * @property \ChainObject $array_intersect_uassoc
+ * @method   \ChainObject  array_intersect_uassoc(...$rest)
+ * @method   \ChainObject  array_intersect_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_uassoc6(array $array, ...$rest)
  *
  * @see array_intersect_uassoc
- * @method   \ChainObject  intersect_uassoc($arr2, $callback_key_compare_func)
- * @method   \ChainObject  intersect_uassoc1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  intersect_uassoc2($arr1, $arr2)
- * @method   \ChainObject  intersect_uassocP($arr2, $callback_key_compare_func)
- * @method   \ChainObject  intersect_uassocP1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  intersect_uassocP2($arr1, $arr2)
- * @method   \ChainObject  intersect_uassocE($arr2, $callback_key_compare_func)
- * @method   \ChainObject  intersect_uassocE1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  intersect_uassocE2($arr1, $arr2)
+ * @property \ChainObject $intersect_uassoc
+ * @method   \ChainObject  intersect_uassoc(...$rest)
+ * @method   \ChainObject  intersect_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  intersect_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  intersect_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  intersect_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  intersect_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  intersect_uassoc6(array $array, ...$rest)
  *
  * @see array_intersect_ukey
- * @method   \ChainObject  array_intersect_ukey($arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_ukey1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_ukey2($arr1, $arr2)
- * @method   \ChainObject  array_intersect_ukeyP($arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_ukeyP1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_ukeyP2($arr1, $arr2)
- * @method   \ChainObject  array_intersect_ukeyE($arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_ukeyE1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  array_intersect_ukeyE2($arr1, $arr2)
+ * @property \ChainObject $array_intersect_ukey
+ * @method   \ChainObject  array_intersect_ukey(...$rest)
+ * @method   \ChainObject  array_intersect_ukey1(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_ukey2(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_ukey3(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_ukey4(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_ukey5(array $array, ...$rest)
+ * @method   \ChainObject  array_intersect_ukey6(array $array, ...$rest)
  *
  * @see array_intersect_ukey
- * @method   \ChainObject  intersect_ukey($arr2, $callback_key_compare_func)
- * @method   \ChainObject  intersect_ukey1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  intersect_ukey2($arr1, $arr2)
- * @method   \ChainObject  intersect_ukeyP($arr2, $callback_key_compare_func)
- * @method   \ChainObject  intersect_ukeyP1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  intersect_ukeyP2($arr1, $arr2)
- * @method   \ChainObject  intersect_ukeyE($arr2, $callback_key_compare_func)
- * @method   \ChainObject  intersect_ukeyE1($arr1, $callback_key_compare_func)
- * @method   \ChainObject  intersect_ukeyE2($arr1, $arr2)
+ * @property \ChainObject $intersect_ukey
+ * @method   \ChainObject  intersect_ukey(...$rest)
+ * @method   \ChainObject  intersect_ukey1(array $array, ...$rest)
+ * @method   \ChainObject  intersect_ukey2(array $array, ...$rest)
+ * @method   \ChainObject  intersect_ukey3(array $array, ...$rest)
+ * @method   \ChainObject  intersect_ukey4(array $array, ...$rest)
+ * @method   \ChainObject  intersect_ukey5(array $array, ...$rest)
+ * @method   \ChainObject  intersect_ukey6(array $array, ...$rest)
  *
  * @see array_key_exists
- * @method   \ChainObject  array_key_exists($search)
+ * @method   \ChainObject  array_key_exists(array $array)
  * @method   \ChainObject  array_key_exists1($key)
  *
  * @see array_key_first
@@ -743,15 +769,15 @@
  *
  * @see array_keys
  * @property \ChainObject $array_keys
- * @method   \ChainObject  array_keys($search_value = null, $strict = null)
- * @method   \ChainObject  array_keys1($arg, $strict = null)
- * @method   \ChainObject  array_keys2($arg, $search_value = null)
+ * @method   \ChainObject  array_keys(mixed $filter_value = null, bool $strict = false)
+ * @method   \ChainObject  array_keys1(array $array, bool $strict = false)
+ * @method   \ChainObject  array_keys2(array $array, mixed $filter_value = null)
  *
  * @see array_keys
  * @property \ChainObject $keys
- * @method   \ChainObject  keys($search_value = null, $strict = null)
- * @method   \ChainObject  keys1($arg, $strict = null)
- * @method   \ChainObject  keys2($arg, $search_value = null)
+ * @method   \ChainObject  keys(mixed $filter_value = null, bool $strict = false)
+ * @method   \ChainObject  keys1(array $array, bool $strict = false)
+ * @method   \ChainObject  keys2(array $array, mixed $filter_value = null)
  *
  * @see array_keys_exist
  * @method   \ChainObject  array_keys_exist($array)
@@ -858,50 +884,56 @@
  * @method   \ChainObject  lookup2($array, $column_key = null)
  *
  * @see array_map
- * @method   \ChainObject  array_map(...$arrays)
- * @method   \ChainObject  array_map1($callback, ...$arrays)
- * @method   \ChainObject  array_map2($callback, ...$arrays)
- * @method   \ChainObject  array_map3($callback, ...$arrays)
- * @method   \ChainObject  array_map4($callback, ...$arrays)
- * @method   \ChainObject  array_map5($callback, ...$arrays)
- * @method   \ChainObject  array_map6($callback, ...$arrays)
- * @method   \ChainObject  array_mapP(...$arrays)
- * @method   \ChainObject  array_mapP1($callback, ...$arrays)
- * @method   \ChainObject  array_mapP2($callback, ...$arrays)
- * @method   \ChainObject  array_mapP3($callback, ...$arrays)
- * @method   \ChainObject  array_mapP4($callback, ...$arrays)
- * @method   \ChainObject  array_mapP5($callback, ...$arrays)
- * @method   \ChainObject  array_mapP6($callback, ...$arrays)
- * @method   \ChainObject  array_mapE(...$arrays)
- * @method   \ChainObject  array_mapE1($callback, ...$arrays)
- * @method   \ChainObject  array_mapE2($callback, ...$arrays)
- * @method   \ChainObject  array_mapE3($callback, ...$arrays)
- * @method   \ChainObject  array_mapE4($callback, ...$arrays)
- * @method   \ChainObject  array_mapE5($callback, ...$arrays)
- * @method   \ChainObject  array_mapE6($callback, ...$arrays)
+ * @method   \ChainObject  array_map(array $array, ...array $arrays)
+ * @method   \ChainObject  array_map1(?callable $callback, ...array $arrays)
+ * @method   \ChainObject  array_map2(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_map3(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_map4(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_map5(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_map6(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_map7(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP(array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP1(?callable $callback, ...array $arrays)
+ * @method   \ChainObject  array_mapP2(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP3(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP4(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP5(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP6(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapP7(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE(array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE1(?callable $callback, ...array $arrays)
+ * @method   \ChainObject  array_mapE2(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE3(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE4(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE5(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE6(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  array_mapE7(?callable $callback, array $array, ...array $arrays)
  *
  * @see array_map
- * @method   \ChainObject  map(...$arrays)
- * @method   \ChainObject  map1($callback, ...$arrays)
- * @method   \ChainObject  map2($callback, ...$arrays)
- * @method   \ChainObject  map3($callback, ...$arrays)
- * @method   \ChainObject  map4($callback, ...$arrays)
- * @method   \ChainObject  map5($callback, ...$arrays)
- * @method   \ChainObject  map6($callback, ...$arrays)
- * @method   \ChainObject  mapP(...$arrays)
- * @method   \ChainObject  mapP1($callback, ...$arrays)
- * @method   \ChainObject  mapP2($callback, ...$arrays)
- * @method   \ChainObject  mapP3($callback, ...$arrays)
- * @method   \ChainObject  mapP4($callback, ...$arrays)
- * @method   \ChainObject  mapP5($callback, ...$arrays)
- * @method   \ChainObject  mapP6($callback, ...$arrays)
- * @method   \ChainObject  mapE(...$arrays)
- * @method   \ChainObject  mapE1($callback, ...$arrays)
- * @method   \ChainObject  mapE2($callback, ...$arrays)
- * @method   \ChainObject  mapE3($callback, ...$arrays)
- * @method   \ChainObject  mapE4($callback, ...$arrays)
- * @method   \ChainObject  mapE5($callback, ...$arrays)
- * @method   \ChainObject  mapE6($callback, ...$arrays)
+ * @method   \ChainObject  map(array $array, ...array $arrays)
+ * @method   \ChainObject  map1(?callable $callback, ...array $arrays)
+ * @method   \ChainObject  map2(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  map3(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  map4(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  map5(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  map6(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  map7(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapP(array $array, ...array $arrays)
+ * @method   \ChainObject  mapP1(?callable $callback, ...array $arrays)
+ * @method   \ChainObject  mapP2(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapP3(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapP4(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapP5(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapP6(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapP7(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapE(array $array, ...array $arrays)
+ * @method   \ChainObject  mapE1(?callable $callback, ...array $arrays)
+ * @method   \ChainObject  mapE2(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapE3(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapE4(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapE5(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapE6(?callable $callback, array $array, ...array $arrays)
+ * @method   \ChainObject  mapE7(?callable $callback, array $array, ...array $arrays)
  *
  * @see array_map_filter
  * @method   \ChainObject  array_map_filter($callback, $strict = false)
@@ -1030,20 +1062,20 @@
  * @method   \ChainObject  mapsE6($array, ...$callbacks)
  *
  * @see array_merge
- * @method   \ChainObject  array_merge(...$arrays)
- * @method   \ChainObject  array_merge1(...$arrays)
- * @method   \ChainObject  array_merge2(...$arrays)
- * @method   \ChainObject  array_merge3(...$arrays)
- * @method   \ChainObject  array_merge4(...$arrays)
- * @method   \ChainObject  array_merge5(...$arrays)
+ * @method   \ChainObject  array_merge(...array $arrays)
+ * @method   \ChainObject  array_merge1(...array $arrays)
+ * @method   \ChainObject  array_merge2(...array $arrays)
+ * @method   \ChainObject  array_merge3(...array $arrays)
+ * @method   \ChainObject  array_merge4(...array $arrays)
+ * @method   \ChainObject  array_merge5(...array $arrays)
  *
  * @see array_merge
- * @method   \ChainObject  merge(...$arrays)
- * @method   \ChainObject  merge1(...$arrays)
- * @method   \ChainObject  merge2(...$arrays)
- * @method   \ChainObject  merge3(...$arrays)
- * @method   \ChainObject  merge4(...$arrays)
- * @method   \ChainObject  merge5(...$arrays)
+ * @method   \ChainObject  merge(...array $arrays)
+ * @method   \ChainObject  merge1(...array $arrays)
+ * @method   \ChainObject  merge2(...array $arrays)
+ * @method   \ChainObject  merge3(...array $arrays)
+ * @method   \ChainObject  merge4(...array $arrays)
+ * @method   \ChainObject  merge5(...array $arrays)
  *
  * @see array_merge2
  * @method   \ChainObject  array_merge2(...$arrays)
@@ -1062,20 +1094,20 @@
  * @method   \ChainObject  merge25(...$arrays)
  *
  * @see array_merge_recursive
- * @method   \ChainObject  array_merge_recursive(...$arrays)
- * @method   \ChainObject  array_merge_recursive1(...$arrays)
- * @method   \ChainObject  array_merge_recursive2(...$arrays)
- * @method   \ChainObject  array_merge_recursive3(...$arrays)
- * @method   \ChainObject  array_merge_recursive4(...$arrays)
- * @method   \ChainObject  array_merge_recursive5(...$arrays)
+ * @method   \ChainObject  array_merge_recursive(...array $arrays)
+ * @method   \ChainObject  array_merge_recursive1(...array $arrays)
+ * @method   \ChainObject  array_merge_recursive2(...array $arrays)
+ * @method   \ChainObject  array_merge_recursive3(...array $arrays)
+ * @method   \ChainObject  array_merge_recursive4(...array $arrays)
+ * @method   \ChainObject  array_merge_recursive5(...array $arrays)
  *
  * @see array_merge_recursive
- * @method   \ChainObject  merge_recursive(...$arrays)
- * @method   \ChainObject  merge_recursive1(...$arrays)
- * @method   \ChainObject  merge_recursive2(...$arrays)
- * @method   \ChainObject  merge_recursive3(...$arrays)
- * @method   \ChainObject  merge_recursive4(...$arrays)
- * @method   \ChainObject  merge_recursive5(...$arrays)
+ * @method   \ChainObject  merge_recursive(...array $arrays)
+ * @method   \ChainObject  merge_recursive1(...array $arrays)
+ * @method   \ChainObject  merge_recursive2(...array $arrays)
+ * @method   \ChainObject  merge_recursive3(...array $arrays)
+ * @method   \ChainObject  merge_recursive4(...array $arrays)
+ * @method   \ChainObject  merge_recursive5(...array $arrays)
  *
  * @see array_mix
  * @method   \ChainObject  array_mix(...$variadic)
@@ -1182,9 +1214,14 @@
  * @method   \ChainObject  order2(array $array, $orders)
  *
  * @see array_pad
- * @method   \ChainObject  array_pad($pad_size, $pad_value)
- * @method   \ChainObject  array_pad1($arg, $pad_value)
- * @method   \ChainObject  array_pad2($arg, $pad_size)
+ * @method   \ChainObject  array_pad(int $length, mixed $value)
+ * @method   \ChainObject  array_pad1(array $array, mixed $value)
+ * @method   \ChainObject  array_pad2(array $array, int $length)
+ *
+ * @see array_pad
+ * @method   \ChainObject  pad(int $length, mixed $value)
+ * @method   \ChainObject  pad1(array $array, mixed $value)
+ * @method   \ChainObject  pad2(array $array, int $length)
  *
  * @see array_pickup
  * @method   \ChainObject  array_pickup($keys)
@@ -1229,8 +1266,8 @@
  *
  * @see array_rand
  * @property \ChainObject $array_rand
- * @method   \ChainObject  array_rand($num_req = null)
- * @method   \ChainObject  array_rand1($arg)
+ * @method   \ChainObject  array_rand(int $num = 1)
+ * @method   \ChainObject  array_rand1(array $array)
  *
  * @see array_random
  * @property \ChainObject $array_random
@@ -1245,26 +1282,26 @@
  * @method   \ChainObject  random2($array, $count = null)
  *
  * @see array_reduce
- * @method   \ChainObject  array_reduce($callback, $initial = null)
- * @method   \ChainObject  array_reduce1($arg, $initial = null)
- * @method   \ChainObject  array_reduce2($arg, $callback)
- * @method   \ChainObject  array_reduceP($callback, $initial = null)
- * @method   \ChainObject  array_reduceP1($arg, $initial = null)
- * @method   \ChainObject  array_reduceP2($arg, $callback)
- * @method   \ChainObject  array_reduceE($callback, $initial = null)
- * @method   \ChainObject  array_reduceE1($arg, $initial = null)
- * @method   \ChainObject  array_reduceE2($arg, $callback)
+ * @method   \ChainObject  array_reduce(callable $callback, mixed $initial = null)
+ * @method   \ChainObject  array_reduce1(array $array, mixed $initial = null)
+ * @method   \ChainObject  array_reduce2(array $array, callable $callback)
+ * @method   \ChainObject  array_reduceP(callable $callback, mixed $initial = null)
+ * @method   \ChainObject  array_reduceP1(array $array, mixed $initial = null)
+ * @method   \ChainObject  array_reduceP2(array $array, callable $callback)
+ * @method   \ChainObject  array_reduceE(callable $callback, mixed $initial = null)
+ * @method   \ChainObject  array_reduceE1(array $array, mixed $initial = null)
+ * @method   \ChainObject  array_reduceE2(array $array, callable $callback)
  *
  * @see array_reduce
- * @method   \ChainObject  reduce($callback, $initial = null)
- * @method   \ChainObject  reduce1($arg, $initial = null)
- * @method   \ChainObject  reduce2($arg, $callback)
- * @method   \ChainObject  reduceP($callback, $initial = null)
- * @method   \ChainObject  reduceP1($arg, $initial = null)
- * @method   \ChainObject  reduceP2($arg, $callback)
- * @method   \ChainObject  reduceE($callback, $initial = null)
- * @method   \ChainObject  reduceE1($arg, $initial = null)
- * @method   \ChainObject  reduceE2($arg, $callback)
+ * @method   \ChainObject  reduce(callable $callback, mixed $initial = null)
+ * @method   \ChainObject  reduce1(array $array, mixed $initial = null)
+ * @method   \ChainObject  reduce2(array $array, callable $callback)
+ * @method   \ChainObject  reduceP(callable $callback, mixed $initial = null)
+ * @method   \ChainObject  reduceP1(array $array, mixed $initial = null)
+ * @method   \ChainObject  reduceP2(array $array, callable $callback)
+ * @method   \ChainObject  reduceE(callable $callback, mixed $initial = null)
+ * @method   \ChainObject  reduceE1(array $array, mixed $initial = null)
+ * @method   \ChainObject  reduceE2(array $array, callable $callback)
  *
  * @see array_rekey
  * @method   \ChainObject  array_rekey($keymap)
@@ -1284,53 +1321,73 @@
  *
  * @see array_replace
  * @property \ChainObject $array_replace
- * @method   \ChainObject  array_replace(...$arrays)
- * @method   \ChainObject  array_replace1($arr1, ...$arrays)
- * @method   \ChainObject  array_replace2($arr1, ...$arrays)
- * @method   \ChainObject  array_replace3($arr1, ...$arrays)
- * @method   \ChainObject  array_replace4($arr1, ...$arrays)
- * @method   \ChainObject  array_replace5($arr1, ...$arrays)
- * @method   \ChainObject  array_replace6($arr1, ...$arrays)
+ * @method   \ChainObject  array_replace(...array $replacements)
+ * @method   \ChainObject  array_replace1(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace2(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace3(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace4(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace5(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace6(array $array, ...array $replacements)
  *
  * @see array_replace
  * @property \ChainObject $replace
- * @method   \ChainObject  replace(...$arrays)
- * @method   \ChainObject  replace1($arr1, ...$arrays)
- * @method   \ChainObject  replace2($arr1, ...$arrays)
- * @method   \ChainObject  replace3($arr1, ...$arrays)
- * @method   \ChainObject  replace4($arr1, ...$arrays)
- * @method   \ChainObject  replace5($arr1, ...$arrays)
- * @method   \ChainObject  replace6($arr1, ...$arrays)
+ * @method   \ChainObject  replace(...array $replacements)
+ * @method   \ChainObject  replace1(array $array, ...array $replacements)
+ * @method   \ChainObject  replace2(array $array, ...array $replacements)
+ * @method   \ChainObject  replace3(array $array, ...array $replacements)
+ * @method   \ChainObject  replace4(array $array, ...array $replacements)
+ * @method   \ChainObject  replace5(array $array, ...array $replacements)
+ * @method   \ChainObject  replace6(array $array, ...array $replacements)
  *
  * @see array_replace_recursive
  * @property \ChainObject $array_replace_recursive
- * @method   \ChainObject  array_replace_recursive(...$arrays)
- * @method   \ChainObject  array_replace_recursive1($arr1, ...$arrays)
- * @method   \ChainObject  array_replace_recursive2($arr1, ...$arrays)
- * @method   \ChainObject  array_replace_recursive3($arr1, ...$arrays)
- * @method   \ChainObject  array_replace_recursive4($arr1, ...$arrays)
- * @method   \ChainObject  array_replace_recursive5($arr1, ...$arrays)
- * @method   \ChainObject  array_replace_recursive6($arr1, ...$arrays)
+ * @method   \ChainObject  array_replace_recursive(...array $replacements)
+ * @method   \ChainObject  array_replace_recursive1(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace_recursive2(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace_recursive3(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace_recursive4(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace_recursive5(array $array, ...array $replacements)
+ * @method   \ChainObject  array_replace_recursive6(array $array, ...array $replacements)
  *
  * @see array_replace_recursive
  * @property \ChainObject $replace_recursive
- * @method   \ChainObject  replace_recursive(...$arrays)
- * @method   \ChainObject  replace_recursive1($arr1, ...$arrays)
- * @method   \ChainObject  replace_recursive2($arr1, ...$arrays)
- * @method   \ChainObject  replace_recursive3($arr1, ...$arrays)
- * @method   \ChainObject  replace_recursive4($arr1, ...$arrays)
- * @method   \ChainObject  replace_recursive5($arr1, ...$arrays)
- * @method   \ChainObject  replace_recursive6($arr1, ...$arrays)
+ * @method   \ChainObject  replace_recursive(...array $replacements)
+ * @method   \ChainObject  replace_recursive1(array $array, ...array $replacements)
+ * @method   \ChainObject  replace_recursive2(array $array, ...array $replacements)
+ * @method   \ChainObject  replace_recursive3(array $array, ...array $replacements)
+ * @method   \ChainObject  replace_recursive4(array $array, ...array $replacements)
+ * @method   \ChainObject  replace_recursive5(array $array, ...array $replacements)
+ * @method   \ChainObject  replace_recursive6(array $array, ...array $replacements)
  *
  * @see array_reverse
  * @property \ChainObject $array_reverse
- * @method   \ChainObject  array_reverse($preserve_keys = null)
- * @method   \ChainObject  array_reverse1($input)
+ * @method   \ChainObject  array_reverse(bool $preserve_keys = false)
+ * @method   \ChainObject  array_reverse1(array $array)
  *
  * @see array_reverse
  * @property \ChainObject $reverse
- * @method   \ChainObject  reverse($preserve_keys = null)
- * @method   \ChainObject  reverse1($input)
+ * @method   \ChainObject  reverse(bool $preserve_keys = false)
+ * @method   \ChainObject  reverse1(array $array)
+ *
+ * @see array_revise
+ * @property \ChainObject $array_revise
+ * @method   \ChainObject  array_revise(...$maps)
+ * @method   \ChainObject  array_revise1($array, ...$maps)
+ * @method   \ChainObject  array_revise2($array, ...$maps)
+ * @method   \ChainObject  array_revise3($array, ...$maps)
+ * @method   \ChainObject  array_revise4($array, ...$maps)
+ * @method   \ChainObject  array_revise5($array, ...$maps)
+ * @method   \ChainObject  array_revise6($array, ...$maps)
+ *
+ * @see array_revise
+ * @property \ChainObject $revise
+ * @method   \ChainObject  revise(...$maps)
+ * @method   \ChainObject  revise1($array, ...$maps)
+ * @method   \ChainObject  revise2($array, ...$maps)
+ * @method   \ChainObject  revise3($array, ...$maps)
+ * @method   \ChainObject  revise4($array, ...$maps)
+ * @method   \ChainObject  revise5($array, ...$maps)
+ * @method   \ChainObject  revise6($array, ...$maps)
  *
  * @see array_rmap
  * @method   \ChainObject  array_rmap($callback, ...$variadic)
@@ -1405,14 +1462,14 @@
  * @method   \ChainObject  schema6($schema, ...$arrays)
  *
  * @see array_search
- * @method   \ChainObject  array_search($haystack, $strict = null)
- * @method   \ChainObject  array_search1($needle, $strict = null)
- * @method   \ChainObject  array_search2($needle, $haystack)
+ * @method   \ChainObject  array_search(array $haystack, bool $strict = false)
+ * @method   \ChainObject  array_search1(mixed $needle, bool $strict = false)
+ * @method   \ChainObject  array_search2(mixed $needle, array $haystack)
  *
  * @see array_search
- * @method   \ChainObject  search($haystack, $strict = null)
- * @method   \ChainObject  search1($needle, $strict = null)
- * @method   \ChainObject  search2($needle, $haystack)
+ * @method   \ChainObject  search(array $haystack, bool $strict = false)
+ * @method   \ChainObject  search1(mixed $needle, bool $strict = false)
+ * @method   \ChainObject  search2(mixed $needle, array $haystack)
  *
  * @see array_select
  * @method   \ChainObject  array_select($columns, $index = null)
@@ -1445,16 +1502,16 @@
  * @method   \ChainObject  array_shuffle()
  *
  * @see array_slice
- * @method   \ChainObject  array_slice($offset, $length = null, $preserve_keys = null)
- * @method   \ChainObject  array_slice1($arg, $length = null, $preserve_keys = null)
- * @method   \ChainObject  array_slice2($arg, $offset, $preserve_keys = null)
- * @method   \ChainObject  array_slice3($arg, $offset, $length = null)
+ * @method   \ChainObject  array_slice(int $offset, ?int $length = null, bool $preserve_keys = false)
+ * @method   \ChainObject  array_slice1(array $array, ?int $length = null, bool $preserve_keys = false)
+ * @method   \ChainObject  array_slice2(array $array, int $offset, bool $preserve_keys = false)
+ * @method   \ChainObject  array_slice3(array $array, int $offset, ?int $length = null)
  *
  * @see array_slice
- * @method   \ChainObject  slice($offset, $length = null, $preserve_keys = null)
- * @method   \ChainObject  slice1($arg, $length = null, $preserve_keys = null)
- * @method   \ChainObject  slice2($arg, $offset, $preserve_keys = null)
- * @method   \ChainObject  slice3($arg, $offset, $length = null)
+ * @method   \ChainObject  slice(int $offset, ?int $length = null, bool $preserve_keys = false)
+ * @method   \ChainObject  slice1(array $array, ?int $length = null, bool $preserve_keys = false)
+ * @method   \ChainObject  slice2(array $array, int $offset, bool $preserve_keys = false)
+ * @method   \ChainObject  slice3(array $array, int $offset, ?int $length = null)
  *
  * @see array_sprintf
  * @property \ChainObject $array_sprintf
@@ -1477,148 +1534,124 @@
  * @method   \ChainObject  array_sum()
  *
  * @see array_udiff
- * @method   \ChainObject  array_udiff($arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_udiff1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  array_udiff2($arr1, $arr2)
- * @method   \ChainObject  array_udiffP($arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_udiffP1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  array_udiffP2($arr1, $arr2)
- * @method   \ChainObject  array_udiffE($arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_udiffE1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  array_udiffE2($arr1, $arr2)
+ * @property \ChainObject $array_udiff
+ * @method   \ChainObject  array_udiff(...$rest)
+ * @method   \ChainObject  array_udiff1(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff2(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff3(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff4(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff5(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff6(array $array, ...$rest)
  *
  * @see array_udiff
- * @method   \ChainObject  udiff($arr2, $callback_data_comp_func)
- * @method   \ChainObject  udiff1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  udiff2($arr1, $arr2)
- * @method   \ChainObject  udiffP($arr2, $callback_data_comp_func)
- * @method   \ChainObject  udiffP1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  udiffP2($arr1, $arr2)
- * @method   \ChainObject  udiffE($arr2, $callback_data_comp_func)
- * @method   \ChainObject  udiffE1($arr1, $callback_data_comp_func)
- * @method   \ChainObject  udiffE2($arr1, $arr2)
+ * @property \ChainObject $udiff
+ * @method   \ChainObject  udiff(...$rest)
+ * @method   \ChainObject  udiff1(array $array, ...$rest)
+ * @method   \ChainObject  udiff2(array $array, ...$rest)
+ * @method   \ChainObject  udiff3(array $array, ...$rest)
+ * @method   \ChainObject  udiff4(array $array, ...$rest)
+ * @method   \ChainObject  udiff5(array $array, ...$rest)
+ * @method   \ChainObject  udiff6(array $array, ...$rest)
  *
  * @see array_udiff_assoc
- * @method   \ChainObject  array_udiff_assoc($arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_assoc1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_assoc2($arr1, $arr2)
- * @method   \ChainObject  array_udiff_assocP($arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_assocP1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_assocP2($arr1, $arr2)
- * @method   \ChainObject  array_udiff_assocE($arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_assocE1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_assocE2($arr1, $arr2)
+ * @property \ChainObject $array_udiff_assoc
+ * @method   \ChainObject  array_udiff_assoc(...$rest)
+ * @method   \ChainObject  array_udiff_assoc1(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_assoc2(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_assoc3(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_assoc4(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_assoc5(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_assoc6(array $array, ...$rest)
  *
  * @see array_udiff_assoc
- * @method   \ChainObject  udiff_assoc($arr2, $callback_key_comp_func)
- * @method   \ChainObject  udiff_assoc1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  udiff_assoc2($arr1, $arr2)
- * @method   \ChainObject  udiff_assocP($arr2, $callback_key_comp_func)
- * @method   \ChainObject  udiff_assocP1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  udiff_assocP2($arr1, $arr2)
- * @method   \ChainObject  udiff_assocE($arr2, $callback_key_comp_func)
- * @method   \ChainObject  udiff_assocE1($arr1, $callback_key_comp_func)
- * @method   \ChainObject  udiff_assocE2($arr1, $arr2)
+ * @property \ChainObject $udiff_assoc
+ * @method   \ChainObject  udiff_assoc(...$rest)
+ * @method   \ChainObject  udiff_assoc1(array $array, ...$rest)
+ * @method   \ChainObject  udiff_assoc2(array $array, ...$rest)
+ * @method   \ChainObject  udiff_assoc3(array $array, ...$rest)
+ * @method   \ChainObject  udiff_assoc4(array $array, ...$rest)
+ * @method   \ChainObject  udiff_assoc5(array $array, ...$rest)
+ * @method   \ChainObject  udiff_assoc6(array $array, ...$rest)
  *
  * @see array_udiff_uassoc
- * @method   \ChainObject  array_udiff_uassoc($arr2, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassoc1($arr1, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassoc2($arr1, $arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassoc3($arr1, $arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_udiff_uassocP($arr2, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassocP1($arr1, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassocP2($arr1, $arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassocP3($arr1, $arr2, $callback_data_comp_func)
- * @method   \ChainObject  array_udiff_uassocE($arr2, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassocE1($arr1, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassocE2($arr1, $arr2, $callback_key_comp_func)
- * @method   \ChainObject  array_udiff_uassocE3($arr1, $arr2, $callback_data_comp_func)
+ * @property \ChainObject $array_udiff_uassoc
+ * @method   \ChainObject  array_udiff_uassoc(...$rest)
+ * @method   \ChainObject  array_udiff_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  array_udiff_uassoc6(array $array, ...$rest)
  *
  * @see array_udiff_uassoc
- * @method   \ChainObject  udiff_uassoc($arr2, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassoc1($arr1, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassoc2($arr1, $arr2, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassoc3($arr1, $arr2, $callback_data_comp_func)
- * @method   \ChainObject  udiff_uassocP($arr2, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassocP1($arr1, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassocP2($arr1, $arr2, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassocP3($arr1, $arr2, $callback_data_comp_func)
- * @method   \ChainObject  udiff_uassocE($arr2, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassocE1($arr1, $callback_data_comp_func, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassocE2($arr1, $arr2, $callback_key_comp_func)
- * @method   \ChainObject  udiff_uassocE3($arr1, $arr2, $callback_data_comp_func)
+ * @property \ChainObject $udiff_uassoc
+ * @method   \ChainObject  udiff_uassoc(...$rest)
+ * @method   \ChainObject  udiff_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  udiff_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  udiff_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  udiff_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  udiff_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  udiff_uassoc6(array $array, ...$rest)
  *
  * @see array_uintersect
- * @method   \ChainObject  array_uintersect($arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect2($arr1, $arr2)
- * @method   \ChainObject  array_uintersectP($arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersectP1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersectP2($arr1, $arr2)
- * @method   \ChainObject  array_uintersectE($arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersectE1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersectE2($arr1, $arr2)
+ * @property \ChainObject $array_uintersect
+ * @method   \ChainObject  array_uintersect(...$rest)
+ * @method   \ChainObject  array_uintersect1(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect2(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect3(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect4(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect5(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect6(array $array, ...$rest)
  *
  * @see array_uintersect
- * @method   \ChainObject  uintersect($arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersect1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  uintersect2($arr1, $arr2)
- * @method   \ChainObject  uintersectP($arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersectP1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  uintersectP2($arr1, $arr2)
- * @method   \ChainObject  uintersectE($arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersectE1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  uintersectE2($arr1, $arr2)
+ * @property \ChainObject $uintersect
+ * @method   \ChainObject  uintersect(...$rest)
+ * @method   \ChainObject  uintersect1(array $array, ...$rest)
+ * @method   \ChainObject  uintersect2(array $array, ...$rest)
+ * @method   \ChainObject  uintersect3(array $array, ...$rest)
+ * @method   \ChainObject  uintersect4(array $array, ...$rest)
+ * @method   \ChainObject  uintersect5(array $array, ...$rest)
+ * @method   \ChainObject  uintersect6(array $array, ...$rest)
  *
  * @see array_uintersect_assoc
- * @method   \ChainObject  array_uintersect_assoc($arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_assoc1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_assoc2($arr1, $arr2)
- * @method   \ChainObject  array_uintersect_assocP($arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_assocP1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_assocP2($arr1, $arr2)
- * @method   \ChainObject  array_uintersect_assocE($arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_assocE1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_assocE2($arr1, $arr2)
+ * @property \ChainObject $array_uintersect_assoc
+ * @method   \ChainObject  array_uintersect_assoc(...$rest)
+ * @method   \ChainObject  array_uintersect_assoc1(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_assoc2(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_assoc3(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_assoc4(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_assoc5(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_assoc6(array $array, ...$rest)
  *
  * @see array_uintersect_assoc
- * @method   \ChainObject  uintersect_assoc($arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_assoc1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_assoc2($arr1, $arr2)
- * @method   \ChainObject  uintersect_assocP($arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_assocP1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_assocP2($arr1, $arr2)
- * @method   \ChainObject  uintersect_assocE($arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_assocE1($arr1, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_assocE2($arr1, $arr2)
+ * @property \ChainObject $uintersect_assoc
+ * @method   \ChainObject  uintersect_assoc(...$rest)
+ * @method   \ChainObject  uintersect_assoc1(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_assoc2(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_assoc3(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_assoc4(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_assoc5(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_assoc6(array $array, ...$rest)
  *
  * @see array_uintersect_uassoc
- * @method   \ChainObject  array_uintersect_uassoc($arr2, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassoc1($arr1, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassoc2($arr1, $arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassoc3($arr1, $arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_uassocP($arr2, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassocP1($arr1, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassocP2($arr1, $arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassocP3($arr1, $arr2, $callback_data_compare_func)
- * @method   \ChainObject  array_uintersect_uassocE($arr2, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassocE1($arr1, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassocE2($arr1, $arr2, $callback_key_compare_func)
- * @method   \ChainObject  array_uintersect_uassocE3($arr1, $arr2, $callback_data_compare_func)
+ * @property \ChainObject $array_uintersect_uassoc
+ * @method   \ChainObject  array_uintersect_uassoc(...$rest)
+ * @method   \ChainObject  array_uintersect_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  array_uintersect_uassoc6(array $array, ...$rest)
  *
  * @see array_uintersect_uassoc
- * @method   \ChainObject  uintersect_uassoc($arr2, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassoc1($arr1, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassoc2($arr1, $arr2, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassoc3($arr1, $arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_uassocP($arr2, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassocP1($arr1, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassocP2($arr1, $arr2, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassocP3($arr1, $arr2, $callback_data_compare_func)
- * @method   \ChainObject  uintersect_uassocE($arr2, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassocE1($arr1, $callback_data_compare_func, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassocE2($arr1, $arr2, $callback_key_compare_func)
- * @method   \ChainObject  uintersect_uassocE3($arr1, $arr2, $callback_data_compare_func)
+ * @property \ChainObject $uintersect_uassoc
+ * @method   \ChainObject  uintersect_uassoc(...$rest)
+ * @method   \ChainObject  uintersect_uassoc1(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_uassoc2(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_uassoc3(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_uassoc4(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_uassoc5(array $array, ...$rest)
+ * @method   \ChainObject  uintersect_uassoc6(array $array, ...$rest)
  *
  * @see array_uncolumns
  * @property \ChainObject $array_uncolumns
@@ -1632,13 +1665,13 @@
  *
  * @see array_unique
  * @property \ChainObject $array_unique
- * @method   \ChainObject  array_unique($flags = null)
- * @method   \ChainObject  array_unique1($arg)
+ * @method   \ChainObject  array_unique(int $flags = SORT_STRING)
+ * @method   \ChainObject  array_unique1(array $array)
  *
  * @see array_unique
  * @property \ChainObject $unique
- * @method   \ChainObject  unique($flags = null)
- * @method   \ChainObject  unique1($arg)
+ * @method   \ChainObject  unique(int $flags = SORT_STRING)
+ * @method   \ChainObject  unique1(array $array)
  *
  * @see array_values
  * @property \ChainObject $array_values
@@ -1719,21 +1752,21 @@
  *
  * @see assert
  * @property \ChainObject $assert
- * @method   \ChainObject  assert($description = null)
- * @method   \ChainObject  assert1($assertion)
+ * @method   \ChainObject  assert(\Throwable|string|null $description = null)
+ * @method   \ChainObject  assert1(mixed $assertion)
  *
  * @see assert_options
  * @property \ChainObject $assert_options
- * @method   \ChainObject  assert_options($value = null)
- * @method   \ChainObject  assert_options1($what)
+ * @method   \ChainObject  assert_options(mixed $value = null)
+ * @method   \ChainObject  assert_options1(int $option)
  *
  * @see atan
  * @property \ChainObject $atan
  * @method   \ChainObject  atan()
  *
  * @see atan2
- * @method   \ChainObject  atan2($x)
- * @method   \ChainObject  atan21($y)
+ * @method   \ChainObject  atan2(float $x)
+ * @method   \ChainObject  atan21(float $y)
  *
  * @see atanh
  * @property \ChainObject $atanh
@@ -1765,22 +1798,22 @@
  *
  * @see base64_decode
  * @property \ChainObject $base64_decode
- * @method   \ChainObject  base64_decode($strict = null)
- * @method   \ChainObject  base64_decode1($str)
+ * @method   \ChainObject  base64_decode(bool $strict = false)
+ * @method   \ChainObject  base64_decode1(string $string)
  *
  * @see base64_encode
  * @property \ChainObject $base64_encode
  * @method   \ChainObject  base64_encode()
  *
  * @see base_convert
- * @method   \ChainObject  base_convert($frombase, $tobase)
- * @method   \ChainObject  base_convert1($number, $tobase)
- * @method   \ChainObject  base_convert2($number, $frombase)
+ * @method   \ChainObject  base_convert(int $from_base, int $to_base)
+ * @method   \ChainObject  base_convert1(string $num, int $to_base)
+ * @method   \ChainObject  base_convert2(string $num, int $from_base)
  *
  * @see basename
  * @property \ChainObject $basename
- * @method   \ChainObject  basename($suffix = null)
- * @method   \ChainObject  basename1($path)
+ * @method   \ChainObject  basename(string $suffix = "")
+ * @method   \ChainObject  basename1(string $path)
  *
  * @see benchmark
  * @property \ChainObject $benchmark
@@ -1889,17 +1922,35 @@
  *
  * @see call_user_func
  * @property \ChainObject $call_user_func
- * @method   \ChainObject  call_user_func(...$parameters)
- * @method   \ChainObject  call_user_func1($function_name, ...$parameters)
- * @method   \ChainObject  call_user_func2($function_name, ...$parameters)
- * @method   \ChainObject  call_user_func3($function_name, ...$parameters)
- * @method   \ChainObject  call_user_func4($function_name, ...$parameters)
- * @method   \ChainObject  call_user_func5($function_name, ...$parameters)
- * @method   \ChainObject  call_user_func6($function_name, ...$parameters)
+ * @method   \ChainObject  call_user_func(...mixed $args)
+ * @method   \ChainObject  call_user_func1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_func2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_func3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_func4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_func5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_func6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcP(...mixed $args)
+ * @method   \ChainObject  call_user_funcP1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcP2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcP3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcP4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcP5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcP6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcE(...mixed $args)
+ * @method   \ChainObject  call_user_funcE1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcE2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcE3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcE4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcE5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  call_user_funcE6(callable $callback, ...mixed $args)
  *
  * @see call_user_func_array
- * @method   \ChainObject  call_user_func_array($parameters)
- * @method   \ChainObject  call_user_func_array1($function_name)
+ * @method   \ChainObject  call_user_func_array(array $args)
+ * @method   \ChainObject  call_user_func_array1(callable $callback)
+ * @method   \ChainObject  call_user_func_arrayP(array $args)
+ * @method   \ChainObject  call_user_func_arrayP1(callable $callback)
+ * @method   \ChainObject  call_user_func_arrayE(array $args)
+ * @method   \ChainObject  call_user_func_arrayE1(callable $callback)
  *
  * @see callable_code
  * @property \ChainObject $callable_code
@@ -1929,31 +1980,32 @@
  * @method   \ChainObject  chdir()
  *
  * @see checkdate
- * @method   \ChainObject  checkdate($day, $year)
- * @method   \ChainObject  checkdate1($month, $year)
- * @method   \ChainObject  checkdate2($month, $day)
+ * @method   \ChainObject  checkdate(int $day, int $year)
+ * @method   \ChainObject  checkdate1(int $month, int $year)
+ * @method   \ChainObject  checkdate2(int $month, int $day)
  *
  * @see checkdnsrr
  * @property \ChainObject $checkdnsrr
- * @method   \ChainObject  checkdnsrr($type = null)
- * @method   \ChainObject  checkdnsrr1($host)
+ * @method   \ChainObject  checkdnsrr(string $type = "MX")
+ * @method   \ChainObject  checkdnsrr1(string $hostname)
  *
  * @see chgrp
- * @method   \ChainObject  chgrp($group)
- * @method   \ChainObject  chgrp1($filename)
+ * @method   \ChainObject  chgrp(string|int $group)
+ * @method   \ChainObject  chgrp1(string $filename)
  *
  * @see chmod
- * @method   \ChainObject  chmod($mode)
- * @method   \ChainObject  chmod1($filename)
+ * @method   \ChainObject  chmod(int $permissions)
+ * @method   \ChainObject  chmod1(string $filename)
  *
  * @see chop
  * @property \ChainObject $chop
- * @method   \ChainObject  chop($character_mask = null)
- * @method   \ChainObject  chop1($str)
+ * @method   \ChainObject  chop(string $characters = " 
+	\000")
+ * @method   \ChainObject  chop1(string $string)
  *
  * @see chown
- * @method   \ChainObject  chown($user)
- * @method   \ChainObject  chown1($filename)
+ * @method   \ChainObject  chown(string|int $user)
+ * @method   \ChainObject  chown1(string $filename)
  *
  * @see chr
  * @property \ChainObject $chr
@@ -1965,9 +2017,11 @@
  *
  * @see chunk_split
  * @property \ChainObject $chunk_split
- * @method   \ChainObject  chunk_split($chunklen = null, $ending = null)
- * @method   \ChainObject  chunk_split1($str, $ending = null)
- * @method   \ChainObject  chunk_split2($str, $chunklen = null)
+ * @method   \ChainObject  chunk_split(int $length = 76, string $separator = "
+")
+ * @method   \ChainObject  chunk_split1(string $string, string $separator = "
+")
+ * @method   \ChainObject  chunk_split2(string $string, int $length = 76)
  *
  * @see cipher_metadata
  * @property \ChainObject $cipher_metadata
@@ -1980,9 +2034,9 @@
  * @method   \ChainObject  clamp3($value, $min, $max)
  *
  * @see class_alias
- * @method   \ChainObject  class_alias($alias_name, $autoload = null)
- * @method   \ChainObject  class_alias1($user_class_name, $autoload = null)
- * @method   \ChainObject  class_alias2($user_class_name, $alias_name)
+ * @method   \ChainObject  class_alias(string $alias, bool $autoload = true)
+ * @method   \ChainObject  class_alias1(string $class, bool $autoload = true)
+ * @method   \ChainObject  class_alias2(string $class, string $alias)
  *
  * @see class_aliases
  * @property \ChainObject $class_aliases
@@ -1990,8 +2044,8 @@
  *
  * @see class_exists
  * @property \ChainObject $class_exists
- * @method   \ChainObject  class_exists($autoload = null)
- * @method   \ChainObject  class_exists1($classname)
+ * @method   \ChainObject  class_exists(bool $autoload = true)
+ * @method   \ChainObject  class_exists1(string $class)
  *
  * @see class_extends
  * @method   \ChainObject  class_extends($methods, $fields = [], $implements = [])
@@ -2020,8 +2074,8 @@
  * @method   \ChainObject  class_uses_all1($class)
  *
  * @see clearstatcache
- * @method   \ChainObject  clearstatcache($filename = null)
- * @method   \ChainObject  clearstatcache1($clear_realpath_cache = null)
+ * @method   \ChainObject  clearstatcache(string $filename = "")
+ * @method   \ChainObject  clearstatcache1(bool $clear_realpath_cache = false)
  *
  * @see cli_set_process_title
  * @property \ChainObject $cli_set_process_title
@@ -2033,11 +2087,12 @@
  * @see compact
  * @property \ChainObject $compact
  * @method   \ChainObject  compact(...$var_names)
- * @method   \ChainObject  compact1(...$var_names)
- * @method   \ChainObject  compact2(...$var_names)
- * @method   \ChainObject  compact3(...$var_names)
- * @method   \ChainObject  compact4(...$var_names)
- * @method   \ChainObject  compact5(...$var_names)
+ * @method   \ChainObject  compact1($var_name, ...$var_names)
+ * @method   \ChainObject  compact2($var_name, ...$var_names)
+ * @method   \ChainObject  compact3($var_name, ...$var_names)
+ * @method   \ChainObject  compact4($var_name, ...$var_names)
+ * @method   \ChainObject  compact5($var_name, ...$var_names)
+ * @method   \ChainObject  compact6($var_name, ...$var_names)
  *
  * @see concat
  * @method   \ChainObject  concat(...$variadic)
@@ -2057,17 +2112,12 @@
  *
  * @see const_exists
  * @property \ChainObject $const_exists
- * @method   \ChainObject  const_exists($constname = null)
+ * @method   \ChainObject  const_exists($constname = "")
  * @method   \ChainObject  const_exists1($classname)
  *
  * @see constant
  * @property \ChainObject $constant
  * @method   \ChainObject  constant()
- *
- * @see convert_cyr_string
- * @method   \ChainObject  convert_cyr_string($from, $to)
- * @method   \ChainObject  convert_cyr_string1($str, $to)
- * @method   \ChainObject  convert_cyr_string2($str, $from)
  *
  * @see convert_uudecode
  * @property \ChainObject $convert_uudecode
@@ -2078,9 +2128,9 @@
  * @method   \ChainObject  convert_uuencode()
  *
  * @see copy
- * @method   \ChainObject  copy($destination_file, $context = null)
- * @method   \ChainObject  copy1($source_file, $context = null)
- * @method   \ChainObject  copy2($source_file, $destination_file)
+ * @method   \ChainObject  copy(string $to, $context = null)
+ * @method   \ChainObject  copy1(string $from, $context = null)
+ * @method   \ChainObject  copy2(string $from, string $to)
  *
  * @see cos
  * @property \ChainObject $cos
@@ -2092,13 +2142,13 @@
  *
  * @see count
  * @property \ChainObject $count
- * @method   \ChainObject  count($mode = null)
- * @method   \ChainObject  count1($var)
+ * @method   \ChainObject  count(int $mode = COUNT_NORMAL)
+ * @method   \ChainObject  count1(\Countable|array $value)
  *
  * @see count_chars
  * @property \ChainObject $count_chars
- * @method   \ChainObject  count_chars($mode = null)
- * @method   \ChainObject  count_chars1($input)
+ * @method   \ChainObject  count_chars(int $mode = 0)
+ * @method   \ChainObject  count_chars1(string $string)
  *
  * @see cp_rf
  * @method   \ChainObject  cp_rf($dst)
@@ -2108,14 +2158,9 @@
  * @property \ChainObject $crc32
  * @method   \ChainObject  crc32()
  *
- * @see create_function
- * @method   \ChainObject  create_function($code)
- * @method   \ChainObject  create_function1($args)
- *
  * @see crypt
- * @property \ChainObject $crypt
- * @method   \ChainObject  crypt($salt = null)
- * @method   \ChainObject  crypt1($str)
+ * @method   \ChainObject  crypt(string $salt)
+ * @method   \ChainObject  crypt1(string $string)
  *
  * @see css_selector
  * @property \ChainObject $css_selector
@@ -2145,12 +2190,12 @@
  *
  * @see date
  * @property \ChainObject $date
- * @method   \ChainObject  date($timestamp = null)
- * @method   \ChainObject  date1($format)
+ * @method   \ChainObject  date(?int $timestamp = null)
+ * @method   \ChainObject  date1(string $format)
  *
  * @see date_add
- * @method   \ChainObject  date_add($interval)
- * @method   \ChainObject  date_add1($object)
+ * @method   \ChainObject  date_add(\DateInterval $interval)
+ * @method   \ChainObject  date_add1(\DateTime $object)
  *
  * @see date_alter
  * @method   \ChainObject  date_alter($excluded_dates, $follow_count, $format = "Y-m-d")
@@ -2164,41 +2209,41 @@
  * @method   \ChainObject  date_convert1($format)
  *
  * @see date_create
- * @method   \ChainObject  date_create($timezone = null)
- * @method   \ChainObject  date_create1($time = null)
+ * @method   \ChainObject  date_create(?\DateTimeZone $timezone = null)
+ * @method   \ChainObject  date_create1(string $datetime = "now")
  *
  * @see date_create_from_format
- * @method   \ChainObject  date_create_from_format($time, ?\DateTimeZone $object = null)
- * @method   \ChainObject  date_create_from_format1($format, ?\DateTimeZone $object = null)
- * @method   \ChainObject  date_create_from_format2($format, $time)
+ * @method   \ChainObject  date_create_from_format(string $datetime, ?\DateTimeZone $timezone = null)
+ * @method   \ChainObject  date_create_from_format1(string $format, ?\DateTimeZone $timezone = null)
+ * @method   \ChainObject  date_create_from_format2(string $format, string $datetime)
  *
  * @see date_create_immutable
- * @method   \ChainObject  date_create_immutable($timezone = null)
- * @method   \ChainObject  date_create_immutable1($time = null)
+ * @method   \ChainObject  date_create_immutable(?\DateTimeZone $timezone = null)
+ * @method   \ChainObject  date_create_immutable1(string $datetime = "now")
  *
  * @see date_create_immutable_from_format
- * @method   \ChainObject  date_create_immutable_from_format($time, ?\DateTimeZone $object = null)
- * @method   \ChainObject  date_create_immutable_from_format1($format, ?\DateTimeZone $object = null)
- * @method   \ChainObject  date_create_immutable_from_format2($format, $time)
+ * @method   \ChainObject  date_create_immutable_from_format(string $datetime, ?\DateTimeZone $timezone = null)
+ * @method   \ChainObject  date_create_immutable_from_format1(string $format, ?\DateTimeZone $timezone = null)
+ * @method   \ChainObject  date_create_immutable_from_format2(string $format, string $datetime)
  *
  * @see date_date_set
- * @method   \ChainObject  date_date_set($year, $month, $day)
- * @method   \ChainObject  date_date_set1($object, $month, $day)
- * @method   \ChainObject  date_date_set2($object, $year, $day)
- * @method   \ChainObject  date_date_set3($object, $year, $month)
+ * @method   \ChainObject  date_date_set(int $year, int $month, int $day)
+ * @method   \ChainObject  date_date_set1(\DateTime $object, int $month, int $day)
+ * @method   \ChainObject  date_date_set2(\DateTime $object, int $year, int $day)
+ * @method   \ChainObject  date_date_set3(\DateTime $object, int $year, int $month)
  *
  * @see date_default_timezone_set
  * @property \ChainObject $date_default_timezone_set
  * @method   \ChainObject  date_default_timezone_set()
  *
  * @see date_diff
- * @method   \ChainObject  date_diff($object2, $absolute = null)
- * @method   \ChainObject  date_diff1($object, $absolute = null)
- * @method   \ChainObject  date_diff2($object, $object2)
+ * @method   \ChainObject  date_diff(\DateTimeInterface $targetObject, bool $absolute = false)
+ * @method   \ChainObject  date_diff1(\DateTimeInterface $baseObject, bool $absolute = false)
+ * @method   \ChainObject  date_diff2(\DateTimeInterface $baseObject, \DateTimeInterface $targetObject)
  *
  * @see date_format
- * @method   \ChainObject  date_format($format)
- * @method   \ChainObject  date_format1($object)
+ * @method   \ChainObject  date_format(string $format)
+ * @method   \ChainObject  date_format1(\DateTimeInterface $object)
  *
  * @see date_fromto
  * @method   \ChainObject  date_fromto($datetimestring)
@@ -2215,18 +2260,18 @@
  * @method   \ChainObject  date_interval_create_from_date_string()
  *
  * @see date_interval_format
- * @method   \ChainObject  date_interval_format($format)
- * @method   \ChainObject  date_interval_format1($object)
+ * @method   \ChainObject  date_interval_format(string $format)
+ * @method   \ChainObject  date_interval_format1(\DateInterval $object)
  *
  * @see date_isodate_set
- * @method   \ChainObject  date_isodate_set($year, $week, $day = null)
- * @method   \ChainObject  date_isodate_set1($object, $week, $day = null)
- * @method   \ChainObject  date_isodate_set2($object, $year, $day = null)
- * @method   \ChainObject  date_isodate_set3($object, $year, $week)
+ * @method   \ChainObject  date_isodate_set(int $year, int $week, int $dayOfWeek = 1)
+ * @method   \ChainObject  date_isodate_set1(\DateTime $object, int $week, int $dayOfWeek = 1)
+ * @method   \ChainObject  date_isodate_set2(\DateTime $object, int $year, int $dayOfWeek = 1)
+ * @method   \ChainObject  date_isodate_set3(\DateTime $object, int $year, int $week)
  *
  * @see date_modify
- * @method   \ChainObject  date_modify($modify)
- * @method   \ChainObject  date_modify1($object)
+ * @method   \ChainObject  date_modify(string $modifier)
+ * @method   \ChainObject  date_modify1(\DateTime $object)
  *
  * @see date_offset_get
  * @property \ChainObject $date_offset_get
@@ -2237,42 +2282,42 @@
  * @method   \ChainObject  date_parse()
  *
  * @see date_parse_from_format
- * @method   \ChainObject  date_parse_from_format($date)
- * @method   \ChainObject  date_parse_from_format1($format)
+ * @method   \ChainObject  date_parse_from_format(string $datetime)
+ * @method   \ChainObject  date_parse_from_format1(string $format)
  *
  * @see date_sub
- * @method   \ChainObject  date_sub($interval)
- * @method   \ChainObject  date_sub1($object)
+ * @method   \ChainObject  date_sub(\DateInterval $interval)
+ * @method   \ChainObject  date_sub1(\DateTime $object)
  *
  * @see date_sun_info
- * @method   \ChainObject  date_sun_info($latitude, $longitude)
- * @method   \ChainObject  date_sun_info1($time, $longitude)
- * @method   \ChainObject  date_sun_info2($time, $latitude)
+ * @method   \ChainObject  date_sun_info(float $latitude, float $longitude)
+ * @method   \ChainObject  date_sun_info1(int $timestamp, float $longitude)
+ * @method   \ChainObject  date_sun_info2(int $timestamp, float $latitude)
  *
  * @see date_sunrise
  * @property \ChainObject $date_sunrise
- * @method   \ChainObject  date_sunrise($format = null, $latitude = null, $longitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunrise1($time, $latitude = null, $longitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunrise2($time, $format = null, $longitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunrise3($time, $format = null, $latitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunrise4($time, $format = null, $latitude = null, $longitude = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunrise5($time, $format = null, $latitude = null, $longitude = null, $zenith = null)
+ * @method   \ChainObject  date_sunrise(int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $longitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunrise1(int $timestamp, ?float $latitude = null, ?float $longitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunrise2(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $longitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunrise3(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunrise4(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $longitude = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunrise5(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $longitude = null, ?float $zenith = null)
  *
  * @see date_sunset
  * @property \ChainObject $date_sunset
- * @method   \ChainObject  date_sunset($format = null, $latitude = null, $longitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunset1($time, $latitude = null, $longitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunset2($time, $format = null, $longitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunset3($time, $format = null, $latitude = null, $zenith = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunset4($time, $format = null, $latitude = null, $longitude = null, $gmt_offset = null)
- * @method   \ChainObject  date_sunset5($time, $format = null, $latitude = null, $longitude = null, $zenith = null)
+ * @method   \ChainObject  date_sunset(int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $longitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunset1(int $timestamp, ?float $latitude = null, ?float $longitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunset2(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $longitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunset3(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $zenith = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunset4(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $longitude = null, ?float $utcOffset = null)
+ * @method   \ChainObject  date_sunset5(int $timestamp, int $returnFormat = SUNFUNCS_RET_STRING, ?float $latitude = null, ?float $longitude = null, ?float $zenith = null)
  *
  * @see date_time_set
- * @method   \ChainObject  date_time_set($hour, $minute, $second = null, $microseconds = null)
- * @method   \ChainObject  date_time_set1($object, $minute, $second = null, $microseconds = null)
- * @method   \ChainObject  date_time_set2($object, $hour, $second = null, $microseconds = null)
- * @method   \ChainObject  date_time_set3($object, $hour, $minute, $microseconds = null)
- * @method   \ChainObject  date_time_set4($object, $hour, $minute, $second = null)
+ * @method   \ChainObject  date_time_set(int $hour, int $minute, int $second = 0, int $microsecond = 0)
+ * @method   \ChainObject  date_time_set1(\DateTime $object, int $minute, int $second = 0, int $microsecond = 0)
+ * @method   \ChainObject  date_time_set2(\DateTime $object, int $hour, int $second = 0, int $microsecond = 0)
+ * @method   \ChainObject  date_time_set3(\DateTime $object, int $hour, int $minute, int $microsecond = 0)
+ * @method   \ChainObject  date_time_set4(\DateTime $object, int $hour, int $minute, int $second = 0)
  *
  * @see date_timestamp
  * @property \ChainObject $date_timestamp
@@ -2284,33 +2329,34 @@
  * @method   \ChainObject  date_timestamp_get()
  *
  * @see date_timestamp_set
- * @method   \ChainObject  date_timestamp_set($unixtimestamp)
- * @method   \ChainObject  date_timestamp_set1($object)
+ * @method   \ChainObject  date_timestamp_set(int $timestamp)
+ * @method   \ChainObject  date_timestamp_set1(\DateTime $object)
  *
  * @see date_timezone_get
  * @property \ChainObject $date_timezone_get
  * @method   \ChainObject  date_timezone_get()
  *
  * @see date_timezone_set
- * @method   \ChainObject  date_timezone_set($timezone)
- * @method   \ChainObject  date_timezone_set1($object)
+ * @method   \ChainObject  date_timezone_set(\DateTimeZone $timezone)
+ * @method   \ChainObject  date_timezone_set1(\DateTime $object)
  *
  * @see debug_backtrace
- * @method   \ChainObject  debug_backtrace($limit = null)
- * @method   \ChainObject  debug_backtrace1($options = null)
+ * @method   \ChainObject  debug_backtrace(int $limit = 0)
+ * @method   \ChainObject  debug_backtrace1(int $options = DEBUG_BACKTRACE_PROVIDE_OBJECT)
  *
  * @see debug_print_backtrace
- * @method   \ChainObject  debug_print_backtrace($limit = null)
- * @method   \ChainObject  debug_print_backtrace1($options = null)
+ * @method   \ChainObject  debug_print_backtrace(int $limit = 0)
+ * @method   \ChainObject  debug_print_backtrace1(int $options = 0)
  *
  * @see debug_zval_dump
  * @property \ChainObject $debug_zval_dump
- * @method   \ChainObject  debug_zval_dump(...$vars)
- * @method   \ChainObject  debug_zval_dump1(...$vars)
- * @method   \ChainObject  debug_zval_dump2(...$vars)
- * @method   \ChainObject  debug_zval_dump3(...$vars)
- * @method   \ChainObject  debug_zval_dump4(...$vars)
- * @method   \ChainObject  debug_zval_dump5(...$vars)
+ * @method   \ChainObject  debug_zval_dump(...mixed $values)
+ * @method   \ChainObject  debug_zval_dump1(mixed $value, ...mixed $values)
+ * @method   \ChainObject  debug_zval_dump2(mixed $value, ...mixed $values)
+ * @method   \ChainObject  debug_zval_dump3(mixed $value, ...mixed $values)
+ * @method   \ChainObject  debug_zval_dump4(mixed $value, ...mixed $values)
+ * @method   \ChainObject  debug_zval_dump5(mixed $value, ...mixed $values)
+ * @method   \ChainObject  debug_zval_dump6(mixed $value, ...mixed $values)
  *
  * @see decbin
  * @property \ChainObject $decbin
@@ -2337,9 +2383,9 @@
  * @method   \ChainObject  decrypt3($cipherdata, $password, $ciphers = "aes-256-cbc")
  *
  * @see define
- * @method   \ChainObject  define($value, $case_insensitive = null)
- * @method   \ChainObject  define1($constant_name, $case_insensitive = null)
- * @method   \ChainObject  define2($constant_name, $value)
+ * @method   \ChainObject  define($value, bool $case_insensitive = false)
+ * @method   \ChainObject  define1(string $constant_name, bool $case_insensitive = false)
+ * @method   \ChainObject  define2(string $constant_name, $value)
  *
  * @see defined
  * @property \ChainObject $defined
@@ -2367,7 +2413,7 @@
  * @see dir
  * @property \ChainObject $dir
  * @method   \ChainObject  dir($context = null)
- * @method   \ChainObject  dir1($directory)
+ * @method   \ChainObject  dir1(string $directory)
  *
  * @see dirmtime
  * @property \ChainObject $dirmtime
@@ -2376,8 +2422,8 @@
  *
  * @see dirname
  * @property \ChainObject $dirname
- * @method   \ChainObject  dirname($levels = null)
- * @method   \ChainObject  dirname1($path)
+ * @method   \ChainObject  dirname(int $levels = 1)
+ * @method   \ChainObject  dirname1(string $path)
  *
  * @see dirname_r
  * @method   \ChainObject  dirname_r($callback)
@@ -2405,8 +2451,8 @@
  *
  * @see dns_check_record
  * @property \ChainObject $dns_check_record
- * @method   \ChainObject  dns_check_record($type = null)
- * @method   \ChainObject  dns_check_record1($host)
+ * @method   \ChainObject  dns_check_record(string $type = "MX")
+ * @method   \ChainObject  dns_check_record1(string $hostname)
  *
  * @see doubleval
  * @property \ChainObject $doubleval
@@ -2424,10 +2470,10 @@
  *
  * @see error_log
  * @property \ChainObject $error_log
- * @method   \ChainObject  error_log($message_type = null, $destination = null, $extra_headers = null)
- * @method   \ChainObject  error_log1($message, $destination = null, $extra_headers = null)
- * @method   \ChainObject  error_log2($message, $message_type = null, $extra_headers = null)
- * @method   \ChainObject  error_log3($message, $message_type = null, $destination = null)
+ * @method   \ChainObject  error_log(int $message_type = 0, ?string $destination = null, ?string $additional_headers = null)
+ * @method   \ChainObject  error_log1(string $message, ?string $destination = null, ?string $additional_headers = null)
+ * @method   \ChainObject  error_log2(string $message, int $message_type = 0, ?string $additional_headers = null)
+ * @method   \ChainObject  error_log3(string $message, int $message_type = 0, ?string $destination = null)
  *
  * @see error_reporting
  * @method   \ChainObject  error_reporting()
@@ -2461,9 +2507,9 @@
  * @method   \ChainObject  exp()
  *
  * @see explode
- * @method   \ChainObject  explode($str, $limit = null)
- * @method   \ChainObject  explode1($separator, $limit = null)
- * @method   \ChainObject  explode2($separator, $str)
+ * @method   \ChainObject  explode(string $string, int $limit = PHP_INT_MAX)
+ * @method   \ChainObject  explode1(string $separator, int $limit = PHP_INT_MAX)
+ * @method   \ChainObject  explode2(string $separator, string $string)
  *
  * @see expm1
  * @property \ChainObject $expm1
@@ -2473,13 +2519,13 @@
  * @property \ChainObject $extension_loaded
  * @method   \ChainObject  extension_loaded()
  *
- * @see ezmlm_hash
- * @property \ChainObject $ezmlm_hash
- * @method   \ChainObject  ezmlm_hash()
- *
  * @see fclose
  * @property \ChainObject $fclose
  * @method   \ChainObject  fclose()
+ *
+ * @see fdiv
+ * @method   \ChainObject  fdiv(float $num2)
+ * @method   \ChainObject  fdiv1(float $num1)
  *
  * @see feof
  * @property \ChainObject $feof
@@ -2495,28 +2541,22 @@
  *
  * @see fgetcsv
  * @property \ChainObject $fgetcsv
- * @method   \ChainObject  fgetcsv($length = null, $delimiter = null, $enclosure = null, $escape = null)
- * @method   \ChainObject  fgetcsv1($fp, $delimiter = null, $enclosure = null, $escape = null)
- * @method   \ChainObject  fgetcsv2($fp, $length = null, $enclosure = null, $escape = null)
- * @method   \ChainObject  fgetcsv3($fp, $length = null, $delimiter = null, $escape = null)
- * @method   \ChainObject  fgetcsv4($fp, $length = null, $delimiter = null, $enclosure = null)
+ * @method   \ChainObject  fgetcsv(?int $length = null, string $separator = ",", string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  fgetcsv1($stream, string $separator = ",", string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  fgetcsv2($stream, ?int $length = null, string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  fgetcsv3($stream, ?int $length = null, string $separator = ",", string $escape = "\\")
+ * @method   \ChainObject  fgetcsv4($stream, ?int $length = null, string $separator = ",", string $enclosure = "\"")
  *
  * @see fgets
  * @property \ChainObject $fgets
- * @method   \ChainObject  fgets($length = null)
- * @method   \ChainObject  fgets1($fp)
- *
- * @see fgetss
- * @property \ChainObject $fgetss
- * @method   \ChainObject  fgetss($length = null, $allowable_tags = null)
- * @method   \ChainObject  fgetss1($fp, $allowable_tags = null)
- * @method   \ChainObject  fgetss2($fp, $length = null)
+ * @method   \ChainObject  fgets(?int $length = null)
+ * @method   \ChainObject  fgets1($stream)
  *
  * @see file
  * @property \ChainObject $file
- * @method   \ChainObject  file($flags = null, $context = null)
- * @method   \ChainObject  file1($filename, $context = null)
- * @method   \ChainObject  file2($filename, $flags = null)
+ * @method   \ChainObject  file(int $flags = 0, $context = null)
+ * @method   \ChainObject  file1(string $filename, $context = null)
+ * @method   \ChainObject  file2(string $filename, int $flags = 0)
  *
  * @see file_exists
  * @property \ChainObject $file_exists
@@ -2534,11 +2574,11 @@
  *
  * @see file_get_contents
  * @property \ChainObject $file_get_contents
- * @method   \ChainObject  file_get_contents($flags = null, $context = null, $offset = null, $maxlen = null)
- * @method   \ChainObject  file_get_contents1($filename, $context = null, $offset = null, $maxlen = null)
- * @method   \ChainObject  file_get_contents2($filename, $flags = null, $offset = null, $maxlen = null)
- * @method   \ChainObject  file_get_contents3($filename, $flags = null, $context = null, $maxlen = null)
- * @method   \ChainObject  file_get_contents4($filename, $flags = null, $context = null, $offset = null)
+ * @method   \ChainObject  file_get_contents(bool $use_include_path = false, $context = null, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  file_get_contents1(string $filename, $context = null, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  file_get_contents2(string $filename, bool $use_include_path = false, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  file_get_contents3(string $filename, bool $use_include_path = false, $context = null, ?int $length = null)
+ * @method   \ChainObject  file_get_contents4(string $filename, bool $use_include_path = false, $context = null, int $offset = 0)
  *
  * @see file_list
  * @property \ChainObject $file_list
@@ -2561,10 +2601,10 @@
  * @method   \ChainObject  file_pos4($filename, $needle, $start = 0, $end = null)
  *
  * @see file_put_contents
- * @method   \ChainObject  file_put_contents($data, $flags = null, $context = null)
- * @method   \ChainObject  file_put_contents1($filename, $flags = null, $context = null)
- * @method   \ChainObject  file_put_contents2($filename, $data, $context = null)
- * @method   \ChainObject  file_put_contents3($filename, $data, $flags = null)
+ * @method   \ChainObject  file_put_contents(mixed $data, int $flags = 0, $context = null)
+ * @method   \ChainObject  file_put_contents1(string $filename, int $flags = 0, $context = null)
+ * @method   \ChainObject  file_put_contents2(string $filename, mixed $data, $context = null)
+ * @method   \ChainObject  file_put_contents3(string $filename, mixed $data, int $flags = 0)
  *
  * @see file_rewrite_contents
  * @method   \ChainObject  file_rewrite_contents($callback, $operation = 0)
@@ -2581,6 +2621,11 @@
  * @method   \ChainObject  file_set_contents($data, $umask = 2)
  * @method   \ChainObject  file_set_contents1($filename, $umask = 2)
  * @method   \ChainObject  file_set_contents2($filename, $data)
+ *
+ * @see file_set_tree
+ * @method   \ChainObject  file_set_tree($contents_tree, $umask = 2)
+ * @method   \ChainObject  file_set_tree1($root, $umask = 2)
+ * @method   \ChainObject  file_set_tree2($root, $contents_tree)
  *
  * @see file_suffix
  * @method   \ChainObject  file_suffix($suffix)
@@ -2656,13 +2701,13 @@
  * @method   \ChainObject  floor()
  *
  * @see fmod
- * @method   \ChainObject  fmod($y)
- * @method   \ChainObject  fmod1($x)
+ * @method   \ChainObject  fmod(float $num2)
+ * @method   \ChainObject  fmod1(float $num1)
  *
  * @see fnmatch
- * @method   \ChainObject  fnmatch($filename, $flags = null)
- * @method   \ChainObject  fnmatch1($pattern, $flags = null)
- * @method   \ChainObject  fnmatch2($pattern, $filename)
+ * @method   \ChainObject  fnmatch(string $filename, int $flags = 0)
+ * @method   \ChainObject  fnmatch1(string $pattern, int $flags = 0)
+ * @method   \ChainObject  fnmatch2(string $pattern, string $filename)
  *
  * @see fnmatch_and
  * @method   \ChainObject  fnmatch_and($string, $flags = 0)
@@ -2675,59 +2720,77 @@
  * @method   \ChainObject  fnmatch_or2($patterns, $string)
  *
  * @see fopen
- * @method   \ChainObject  fopen($mode, $use_include_path = null, $context = null)
- * @method   \ChainObject  fopen1($filename, $use_include_path = null, $context = null)
- * @method   \ChainObject  fopen2($filename, $mode, $context = null)
- * @method   \ChainObject  fopen3($filename, $mode, $use_include_path = null)
+ * @method   \ChainObject  fopen(string $mode, bool $use_include_path = false, $context = null)
+ * @method   \ChainObject  fopen1(string $filename, bool $use_include_path = false, $context = null)
+ * @method   \ChainObject  fopen2(string $filename, string $mode, $context = null)
+ * @method   \ChainObject  fopen3(string $filename, string $mode, bool $use_include_path = false)
  *
  * @see forward_static_call
  * @property \ChainObject $forward_static_call
- * @method   \ChainObject  forward_static_call(...$parameters)
- * @method   \ChainObject  forward_static_call1($function_name, ...$parameters)
- * @method   \ChainObject  forward_static_call2($function_name, ...$parameters)
- * @method   \ChainObject  forward_static_call3($function_name, ...$parameters)
- * @method   \ChainObject  forward_static_call4($function_name, ...$parameters)
- * @method   \ChainObject  forward_static_call5($function_name, ...$parameters)
- * @method   \ChainObject  forward_static_call6($function_name, ...$parameters)
+ * @method   \ChainObject  forward_static_call(...mixed $args)
+ * @method   \ChainObject  forward_static_call1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_call2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_call3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_call4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_call5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_call6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callP(...mixed $args)
+ * @method   \ChainObject  forward_static_callP1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callP2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callP3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callP4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callP5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callP6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callE(...mixed $args)
+ * @method   \ChainObject  forward_static_callE1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callE2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callE3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callE4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callE5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  forward_static_callE6(callable $callback, ...mixed $args)
  *
  * @see forward_static_call_array
- * @method   \ChainObject  forward_static_call_array($parameters)
- * @method   \ChainObject  forward_static_call_array1($function_name)
+ * @method   \ChainObject  forward_static_call_array(array $args)
+ * @method   \ChainObject  forward_static_call_array1(callable $callback)
+ * @method   \ChainObject  forward_static_call_arrayP(array $args)
+ * @method   \ChainObject  forward_static_call_arrayP1(callable $callback)
+ * @method   \ChainObject  forward_static_call_arrayE(array $args)
+ * @method   \ChainObject  forward_static_call_arrayE1(callable $callback)
  *
  * @see fpassthru
  * @property \ChainObject $fpassthru
  * @method   \ChainObject  fpassthru()
  *
  * @see fprintf
- * @method   \ChainObject  fprintf($format, ...$args)
- * @method   \ChainObject  fprintf1($stream, ...$args)
- * @method   \ChainObject  fprintf2($stream, $format, ...$args)
- * @method   \ChainObject  fprintf3($stream, $format, ...$args)
- * @method   \ChainObject  fprintf4($stream, $format, ...$args)
- * @method   \ChainObject  fprintf5($stream, $format, ...$args)
- * @method   \ChainObject  fprintf6($stream, $format, ...$args)
- * @method   \ChainObject  fprintf7($stream, $format, ...$args)
+ * @method   \ChainObject  fprintf(string $format, ...mixed $values)
+ * @method   \ChainObject  fprintf1($stream, ...mixed $values)
+ * @method   \ChainObject  fprintf2($stream, string $format, ...mixed $values)
+ * @method   \ChainObject  fprintf3($stream, string $format, ...mixed $values)
+ * @method   \ChainObject  fprintf4($stream, string $format, ...mixed $values)
+ * @method   \ChainObject  fprintf5($stream, string $format, ...mixed $values)
+ * @method   \ChainObject  fprintf6($stream, string $format, ...mixed $values)
+ * @method   \ChainObject  fprintf7($stream, string $format, ...mixed $values)
  *
  * @see fputcsv
- * @method   \ChainObject  fputcsv($fields, $delimiter = null, $enclosure = null, $escape_char = null)
- * @method   \ChainObject  fputcsv1($fp, $delimiter = null, $enclosure = null, $escape_char = null)
- * @method   \ChainObject  fputcsv2($fp, $fields, $enclosure = null, $escape_char = null)
- * @method   \ChainObject  fputcsv3($fp, $fields, $delimiter = null, $escape_char = null)
- * @method   \ChainObject  fputcsv4($fp, $fields, $delimiter = null, $enclosure = null)
+ * @method   \ChainObject  fputcsv(array $fields, string $separator = ",", string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  fputcsv1($stream, string $separator = ",", string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  fputcsv2($stream, array $fields, string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  fputcsv3($stream, array $fields, string $separator = ",", string $escape = "\\")
+ * @method   \ChainObject  fputcsv4($stream, array $fields, string $separator = ",", string $enclosure = "\"")
  *
  * @see fputs
- * @method   \ChainObject  fputs($str, $length = null)
- * @method   \ChainObject  fputs1($fp, $length = null)
- * @method   \ChainObject  fputs2($fp, $str)
+ * @method   \ChainObject  fputs(string $data, ?int $length = null)
+ * @method   \ChainObject  fputs1($stream, ?int $length = null)
+ * @method   \ChainObject  fputs2($stream, string $data)
  *
  * @see fread
- * @method   \ChainObject  fread($length)
- * @method   \ChainObject  fread1($fp)
+ * @method   \ChainObject  fread(int $length)
+ * @method   \ChainObject  fread1($stream)
  *
  * @see fseek
- * @method   \ChainObject  fseek($offset, $whence = null)
- * @method   \ChainObject  fseek1($fp, $whence = null)
- * @method   \ChainObject  fseek2($fp, $offset)
+ * @method   \ChainObject  fseek(int $offset, int $whence = SEEK_SET)
+ * @method   \ChainObject  fseek1($stream, int $whence = SEEK_SET)
+ * @method   \ChainObject  fseek2($stream, int $offset)
  *
  * @see fstat
  * @property \ChainObject $fstat
@@ -2738,12 +2801,12 @@
  * @method   \ChainObject  ftell()
  *
  * @see ftok
- * @method   \ChainObject  ftok($proj)
- * @method   \ChainObject  ftok1($pathname)
+ * @method   \ChainObject  ftok(string $project_id)
+ * @method   \ChainObject  ftok1(string $filename)
  *
  * @see ftruncate
- * @method   \ChainObject  ftruncate($size)
- * @method   \ChainObject  ftruncate1($fp)
+ * @method   \ChainObject  ftruncate(int $size)
+ * @method   \ChainObject  ftruncate1($stream)
  *
  * @see func_get_arg
  * @property \ChainObject $func_get_arg
@@ -2800,13 +2863,13 @@
  * @method   \ChainObject  function_shorten()
  *
  * @see fwrite
- * @method   \ChainObject  fwrite($str, $length = null)
- * @method   \ChainObject  fwrite1($fp, $length = null)
- * @method   \ChainObject  fwrite2($fp, $str)
+ * @method   \ChainObject  fwrite(string $data, ?int $length = null)
+ * @method   \ChainObject  fwrite1($stream, ?int $length = null)
+ * @method   \ChainObject  fwrite2($stream, string $data)
  *
  * @see get_browser
- * @method   \ChainObject  get_browser($return_array = null)
- * @method   \ChainObject  get_browser1($browser_name = null)
+ * @method   \ChainObject  get_browser(bool $return_array = false)
+ * @method   \ChainObject  get_browser1(?string $user_agent = null)
  *
  * @see get_cfg_var
  * @property \ChainObject $get_cfg_var
@@ -2828,6 +2891,10 @@
  * @property \ChainObject $get_class_vars
  * @method   \ChainObject  get_class_vars()
  *
+ * @see get_debug_type
+ * @property \ChainObject $get_debug_type
+ * @method   \ChainObject  get_debug_type()
+ *
  * @see get_defined_constants
  * @method   \ChainObject  get_defined_constants()
  *
@@ -2840,14 +2907,14 @@
  *
  * @see get_headers
  * @property \ChainObject $get_headers
- * @method   \ChainObject  get_headers($format = null, $context = null)
- * @method   \ChainObject  get_headers1($url, $context = null)
- * @method   \ChainObject  get_headers2($url, $format = null)
+ * @method   \ChainObject  get_headers(bool $associative = false, $context = null)
+ * @method   \ChainObject  get_headers1(string $url, $context = null)
+ * @method   \ChainObject  get_headers2(string $url, bool $associative = false)
  *
  * @see get_html_translation_table
- * @method   \ChainObject  get_html_translation_table($quote_style = null, $encoding = null)
- * @method   \ChainObject  get_html_translation_table1($table = null, $encoding = null)
- * @method   \ChainObject  get_html_translation_table2($table = null, $quote_style = null)
+ * @method   \ChainObject  get_html_translation_table(int $flags = ENT_COMPAT, string $encoding = "UTF-8")
+ * @method   \ChainObject  get_html_translation_table1(int $table = HTML_SPECIALCHARS, string $encoding = "UTF-8")
+ * @method   \ChainObject  get_html_translation_table2(int $table = HTML_SPECIALCHARS, int $flags = ENT_COMPAT)
  *
  * @see get_loaded_extensions
  * @method   \ChainObject  get_loaded_extensions()
@@ -2858,8 +2925,8 @@
  *
  * @see get_meta_tags
  * @property \ChainObject $get_meta_tags
- * @method   \ChainObject  get_meta_tags($use_include_path = null)
- * @method   \ChainObject  get_meta_tags1($filename)
+ * @method   \ChainObject  get_meta_tags(bool $use_include_path = false)
+ * @method   \ChainObject  get_meta_tags1(string $filename)
  *
  * @see get_object_vars
  * @property \ChainObject $get_object_vars
@@ -2867,6 +2934,10 @@
  *
  * @see get_parent_class
  * @method   \ChainObject  get_parent_class()
+ *
+ * @see get_resource_id
+ * @property \ChainObject $get_resource_id
+ * @method   \ChainObject  get_resource_id()
  *
  * @see get_resource_type
  * @property \ChainObject $get_resource_type
@@ -2882,8 +2953,12 @@
  * @method   \ChainObject  getdate()
  *
  * @see getenv
- * @method   \ChainObject  getenv($local_only = null)
- * @method   \ChainObject  getenv1($varname = null)
+ * @method   \ChainObject  getenv(bool $local_only = false)
+ * @method   \ChainObject  getenv1(?string $name = null)
+ *
+ * @see getenvs
+ * @property \ChainObject $getenvs
+ * @method   \ChainObject  getenvs()
  *
  * @see gethostbyaddr
  * @property \ChainObject $gethostbyaddr
@@ -2912,12 +2987,12 @@
  * @method   \ChainObject  getrusage()
  *
  * @see getservbyname
- * @method   \ChainObject  getservbyname($protocol)
- * @method   \ChainObject  getservbyname1($service)
+ * @method   \ChainObject  getservbyname(string $protocol)
+ * @method   \ChainObject  getservbyname1(string $service)
  *
  * @see getservbyport
- * @method   \ChainObject  getservbyport($protocol)
- * @method   \ChainObject  getservbyport1($port)
+ * @method   \ChainObject  getservbyport(string $protocol)
+ * @method   \ChainObject  getservbyport1(int $port)
  *
  * @see gettimeofday
  * @method   \ChainObject  gettimeofday()
@@ -2928,96 +3003,97 @@
  *
  * @see glob
  * @property \ChainObject $glob
- * @method   \ChainObject  glob($flags = null)
- * @method   \ChainObject  glob1($pattern)
+ * @method   \ChainObject  glob(int $flags = 0)
+ * @method   \ChainObject  glob1(string $pattern)
  *
  * @see gmdate
  * @property \ChainObject $gmdate
- * @method   \ChainObject  gmdate($timestamp = null)
- * @method   \ChainObject  gmdate1($format)
+ * @method   \ChainObject  gmdate(?int $timestamp = null)
+ * @method   \ChainObject  gmdate1(string $format)
  *
  * @see gmmktime
- * @method   \ChainObject  gmmktime($min = null, $sec = null, $mon = null, $day = null, $year = null)
- * @method   \ChainObject  gmmktime1($hour = null, $sec = null, $mon = null, $day = null, $year = null)
- * @method   \ChainObject  gmmktime2($hour = null, $min = null, $mon = null, $day = null, $year = null)
- * @method   \ChainObject  gmmktime3($hour = null, $min = null, $sec = null, $day = null, $year = null)
- * @method   \ChainObject  gmmktime4($hour = null, $min = null, $sec = null, $mon = null, $year = null)
- * @method   \ChainObject  gmmktime5($hour = null, $min = null, $sec = null, $mon = null, $day = null)
+ * @property \ChainObject $gmmktime
+ * @method   \ChainObject  gmmktime(?int $minute = null, ?int $second = null, ?int $month = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  gmmktime1(int $hour, ?int $second = null, ?int $month = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  gmmktime2(int $hour, ?int $minute = null, ?int $month = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  gmmktime3(int $hour, ?int $minute = null, ?int $second = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  gmmktime4(int $hour, ?int $minute = null, ?int $second = null, ?int $month = null, ?int $year = null)
+ * @method   \ChainObject  gmmktime5(int $hour, ?int $minute = null, ?int $second = null, ?int $month = null, ?int $day = null)
  *
  * @see gmstrftime
  * @property \ChainObject $gmstrftime
- * @method   \ChainObject  gmstrftime($timestamp = null)
- * @method   \ChainObject  gmstrftime1($format)
+ * @method   \ChainObject  gmstrftime(?int $timestamp = null)
+ * @method   \ChainObject  gmstrftime1(string $format)
  *
  * @see hash
- * @method   \ChainObject  hash($data, $raw_output = null)
- * @method   \ChainObject  hash1($algo, $raw_output = null)
- * @method   \ChainObject  hash2($algo, $data)
+ * @method   \ChainObject  hash(string $data, bool $binary = false)
+ * @method   \ChainObject  hash1(string $algo, bool $binary = false)
+ * @method   \ChainObject  hash2(string $algo, string $data)
  *
  * @see hash_copy
  * @property \ChainObject $hash_copy
  * @method   \ChainObject  hash_copy()
  *
  * @see hash_equals
- * @method   \ChainObject  hash_equals($user_string)
- * @method   \ChainObject  hash_equals1($known_string)
+ * @method   \ChainObject  hash_equals(string $user_string)
+ * @method   \ChainObject  hash_equals1(string $known_string)
  *
  * @see hash_file
- * @method   \ChainObject  hash_file($filename, $raw_output = null)
- * @method   \ChainObject  hash_file1($algo, $raw_output = null)
- * @method   \ChainObject  hash_file2($algo, $filename)
+ * @method   \ChainObject  hash_file(string $filename, bool $binary = false)
+ * @method   \ChainObject  hash_file1(string $algo, bool $binary = false)
+ * @method   \ChainObject  hash_file2(string $algo, string $filename)
  *
  * @see hash_final
  * @property \ChainObject $hash_final
- * @method   \ChainObject  hash_final($raw_output = null)
- * @method   \ChainObject  hash_final1($context)
+ * @method   \ChainObject  hash_final(bool $binary = false)
+ * @method   \ChainObject  hash_final1(\HashContext $context)
  *
  * @see hash_hkdf
- * @method   \ChainObject  hash_hkdf($algo, $length = null, $string = null, $salt = null)
- * @method   \ChainObject  hash_hkdf1($ikm, $length = null, $string = null, $salt = null)
- * @method   \ChainObject  hash_hkdf2($ikm, $algo, $string = null, $salt = null)
- * @method   \ChainObject  hash_hkdf3($ikm, $algo, $length = null, $salt = null)
- * @method   \ChainObject  hash_hkdf4($ikm, $algo, $length = null, $string = null)
+ * @method   \ChainObject  hash_hkdf(string $key, int $length = 0, string $info = "", string $salt = "")
+ * @method   \ChainObject  hash_hkdf1(string $algo, int $length = 0, string $info = "", string $salt = "")
+ * @method   \ChainObject  hash_hkdf2(string $algo, string $key, string $info = "", string $salt = "")
+ * @method   \ChainObject  hash_hkdf3(string $algo, string $key, int $length = 0, string $salt = "")
+ * @method   \ChainObject  hash_hkdf4(string $algo, string $key, int $length = 0, string $info = "")
  *
  * @see hash_hmac
- * @method   \ChainObject  hash_hmac($data, $key, $raw_output = null)
- * @method   \ChainObject  hash_hmac1($algo, $key, $raw_output = null)
- * @method   \ChainObject  hash_hmac2($algo, $data, $raw_output = null)
- * @method   \ChainObject  hash_hmac3($algo, $data, $key)
+ * @method   \ChainObject  hash_hmac(string $data, string $key, bool $binary = false)
+ * @method   \ChainObject  hash_hmac1(string $algo, string $key, bool $binary = false)
+ * @method   \ChainObject  hash_hmac2(string $algo, string $data, bool $binary = false)
+ * @method   \ChainObject  hash_hmac3(string $algo, string $data, string $key)
  *
  * @see hash_hmac_file
- * @method   \ChainObject  hash_hmac_file($filename, $key, $raw_output = null)
- * @method   \ChainObject  hash_hmac_file1($algo, $key, $raw_output = null)
- * @method   \ChainObject  hash_hmac_file2($algo, $filename, $raw_output = null)
- * @method   \ChainObject  hash_hmac_file3($algo, $filename, $key)
+ * @method   \ChainObject  hash_hmac_file(string $data, string $key, bool $binary = false)
+ * @method   \ChainObject  hash_hmac_file1(string $algo, string $key, bool $binary = false)
+ * @method   \ChainObject  hash_hmac_file2(string $algo, string $data, bool $binary = false)
+ * @method   \ChainObject  hash_hmac_file3(string $algo, string $data, string $key)
  *
  * @see hash_init
  * @property \ChainObject $hash_init
- * @method   \ChainObject  hash_init($options = null, $key = null)
- * @method   \ChainObject  hash_init1($algo, $key = null)
- * @method   \ChainObject  hash_init2($algo, $options = null)
+ * @method   \ChainObject  hash_init(int $flags = 0, string $key = "")
+ * @method   \ChainObject  hash_init1(string $algo, string $key = "")
+ * @method   \ChainObject  hash_init2(string $algo, int $flags = 0)
  *
  * @see hash_pbkdf2
- * @method   \ChainObject  hash_pbkdf2($password, $salt, $iterations, $length = null, $raw_output = null)
- * @method   \ChainObject  hash_pbkdf21($algo, $salt, $iterations, $length = null, $raw_output = null)
- * @method   \ChainObject  hash_pbkdf22($algo, $password, $iterations, $length = null, $raw_output = null)
- * @method   \ChainObject  hash_pbkdf23($algo, $password, $salt, $length = null, $raw_output = null)
- * @method   \ChainObject  hash_pbkdf24($algo, $password, $salt, $iterations, $raw_output = null)
- * @method   \ChainObject  hash_pbkdf25($algo, $password, $salt, $iterations, $length = null)
+ * @method   \ChainObject  hash_pbkdf2(string $password, string $salt, int $iterations, int $length = 0, bool $binary = false)
+ * @method   \ChainObject  hash_pbkdf21(string $algo, string $salt, int $iterations, int $length = 0, bool $binary = false)
+ * @method   \ChainObject  hash_pbkdf22(string $algo, string $password, int $iterations, int $length = 0, bool $binary = false)
+ * @method   \ChainObject  hash_pbkdf23(string $algo, string $password, string $salt, int $length = 0, bool $binary = false)
+ * @method   \ChainObject  hash_pbkdf24(string $algo, string $password, string $salt, int $iterations, bool $binary = false)
+ * @method   \ChainObject  hash_pbkdf25(string $algo, string $password, string $salt, int $iterations, int $length = 0)
  *
  * @see hash_update
- * @method   \ChainObject  hash_update($data)
- * @method   \ChainObject  hash_update1($context)
+ * @method   \ChainObject  hash_update(string $data)
+ * @method   \ChainObject  hash_update1(\HashContext $context)
  *
  * @see hash_update_file
- * @method   \ChainObject  hash_update_file($filename, $stream_context = null)
- * @method   \ChainObject  hash_update_file1($context, $stream_context = null)
- * @method   \ChainObject  hash_update_file2($context, $filename)
+ * @method   \ChainObject  hash_update_file(string $filename, $stream_context = null)
+ * @method   \ChainObject  hash_update_file1(\HashContext $context, $stream_context = null)
+ * @method   \ChainObject  hash_update_file2(\HashContext $context, string $filename)
  *
  * @see hash_update_stream
- * @method   \ChainObject  hash_update_stream($handle, $length = null)
- * @method   \ChainObject  hash_update_stream1($context, $length = null)
- * @method   \ChainObject  hash_update_stream2($context, $handle)
+ * @method   \ChainObject  hash_update_stream($stream, int $length = -1)
+ * @method   \ChainObject  hash_update_stream1(\HashContext $context, int $length = -1)
+ * @method   \ChainObject  hash_update_stream2(\HashContext $context, $stream)
  *
  * @see hashvar
  * @method   \ChainObject  hashvar(...$vars)
@@ -3029,9 +3105,9 @@
  *
  * @see header
  * @property \ChainObject $header
- * @method   \ChainObject  header($replace = null, $http_response_code = null)
- * @method   \ChainObject  header1($header, $http_response_code = null)
- * @method   \ChainObject  header2($header, $replace = null)
+ * @method   \ChainObject  header(bool $replace = true, int $response_code = 0)
+ * @method   \ChainObject  header1(string $header, int $response_code = 0)
+ * @method   \ChainObject  header2(string $header, bool $replace = true)
  *
  * @see header_register_callback
  * @property \ChainObject $header_register_callback
@@ -3044,13 +3120,8 @@
  *
  * @see hebrev
  * @property \ChainObject $hebrev
- * @method   \ChainObject  hebrev($max_chars_per_line = null)
- * @method   \ChainObject  hebrev1($str)
- *
- * @see hebrevc
- * @property \ChainObject $hebrevc
- * @method   \ChainObject  hebrevc($max_chars_per_line = null)
- * @method   \ChainObject  hebrevc1($str)
+ * @method   \ChainObject  hebrev(int $max_chars_per_line = 0)
+ * @method   \ChainObject  hebrev1(string $string)
  *
  * @see hex2bin
  * @property \ChainObject $hex2bin
@@ -3062,8 +3133,8 @@
  *
  * @see highlight_file
  * @property \ChainObject $highlight_file
- * @method   \ChainObject  highlight_file($return = null)
- * @method   \ChainObject  highlight_file1($file_name)
+ * @method   \ChainObject  highlight_file(bool $return = false)
+ * @method   \ChainObject  highlight_file1(string $filename)
  *
  * @see highlight_php
  * @property \ChainObject $highlight_php
@@ -3072,11 +3143,10 @@
  *
  * @see highlight_string
  * @property \ChainObject $highlight_string
- * @method   \ChainObject  highlight_string($return = null)
- * @method   \ChainObject  highlight_string1($string)
+ * @method   \ChainObject  highlight_string(bool $return = false)
+ * @method   \ChainObject  highlight_string1(string $string)
  *
  * @see hrtime
- * @property \ChainObject $hrtime
  * @method   \ChainObject  hrtime()
  *
  * @see html_attr
@@ -3086,9 +3156,9 @@
  *
  * @see html_entity_decode
  * @property \ChainObject $html_entity_decode
- * @method   \ChainObject  html_entity_decode($quote_style = null, $encoding = null)
- * @method   \ChainObject  html_entity_decode1($string, $encoding = null)
- * @method   \ChainObject  html_entity_decode2($string, $quote_style = null)
+ * @method   \ChainObject  html_entity_decode(int $flags = ENT_COMPAT, ?string $encoding = null)
+ * @method   \ChainObject  html_entity_decode1(string $string, ?string $encoding = null)
+ * @method   \ChainObject  html_entity_decode2(string $string, int $flags = ENT_COMPAT)
  *
  * @see html_strip
  * @property \ChainObject $html_strip
@@ -3097,22 +3167,22 @@
  *
  * @see htmlentities
  * @property \ChainObject $htmlentities
- * @method   \ChainObject  htmlentities($quote_style = null, $encoding = null, $double_encode = null)
- * @method   \ChainObject  htmlentities1($string, $encoding = null, $double_encode = null)
- * @method   \ChainObject  htmlentities2($string, $quote_style = null, $double_encode = null)
- * @method   \ChainObject  htmlentities3($string, $quote_style = null, $encoding = null)
+ * @method   \ChainObject  htmlentities(int $flags = ENT_COMPAT, ?string $encoding = null, bool $double_encode = true)
+ * @method   \ChainObject  htmlentities1(string $string, ?string $encoding = null, bool $double_encode = true)
+ * @method   \ChainObject  htmlentities2(string $string, int $flags = ENT_COMPAT, bool $double_encode = true)
+ * @method   \ChainObject  htmlentities3(string $string, int $flags = ENT_COMPAT, ?string $encoding = null)
  *
  * @see htmlspecialchars
  * @property \ChainObject $htmlspecialchars
- * @method   \ChainObject  htmlspecialchars($quote_style = null, $encoding = null, $double_encode = null)
- * @method   \ChainObject  htmlspecialchars1($string, $encoding = null, $double_encode = null)
- * @method   \ChainObject  htmlspecialchars2($string, $quote_style = null, $double_encode = null)
- * @method   \ChainObject  htmlspecialchars3($string, $quote_style = null, $encoding = null)
+ * @method   \ChainObject  htmlspecialchars(int $flags = ENT_COMPAT, ?string $encoding = null, bool $double_encode = true)
+ * @method   \ChainObject  htmlspecialchars1(string $string, ?string $encoding = null, bool $double_encode = true)
+ * @method   \ChainObject  htmlspecialchars2(string $string, int $flags = ENT_COMPAT, bool $double_encode = true)
+ * @method   \ChainObject  htmlspecialchars3(string $string, int $flags = ENT_COMPAT, ?string $encoding = null)
  *
  * @see htmlspecialchars_decode
  * @property \ChainObject $htmlspecialchars_decode
- * @method   \ChainObject  htmlspecialchars_decode($quote_style = null)
- * @method   \ChainObject  htmlspecialchars_decode1($string)
+ * @method   \ChainObject  htmlspecialchars_decode(int $flags = ENT_COMPAT)
+ * @method   \ChainObject  htmlspecialchars_decode1(string $string)
  *
  * @see htmltag
  * @property \ChainObject $htmltag
@@ -3120,43 +3190,44 @@
  *
  * @see http_build_query
  * @property \ChainObject $http_build_query
- * @method   \ChainObject  http_build_query($prefix = null, $arg_separator = null, $enc_type = null)
- * @method   \ChainObject  http_build_query1($formdata, $arg_separator = null, $enc_type = null)
- * @method   \ChainObject  http_build_query2($formdata, $prefix = null, $enc_type = null)
- * @method   \ChainObject  http_build_query3($formdata, $prefix = null, $arg_separator = null)
+ * @method   \ChainObject  http_build_query(string $numeric_prefix = "", ?string $arg_separator = null, int $encoding_type = PHP_QUERY_RFC1738)
+ * @method   \ChainObject  http_build_query1(object|array $data, ?string $arg_separator = null, int $encoding_type = PHP_QUERY_RFC1738)
+ * @method   \ChainObject  http_build_query2(object|array $data, string $numeric_prefix = "", int $encoding_type = PHP_QUERY_RFC1738)
+ * @method   \ChainObject  http_build_query3(object|array $data, string $numeric_prefix = "", ?string $arg_separator = null)
  *
  * @see http_response_code
  * @method   \ChainObject  http_response_code()
  *
  * @see hypot
- * @method   \ChainObject  hypot($num2)
- * @method   \ChainObject  hypot1($num1)
+ * @method   \ChainObject  hypot(float $y)
+ * @method   \ChainObject  hypot1(float $x)
  *
  * @see idate
  * @property \ChainObject $idate
- * @method   \ChainObject  idate($timestamp = null)
- * @method   \ChainObject  idate1($format)
+ * @method   \ChainObject  idate(?int $timestamp = null)
+ * @method   \ChainObject  idate1(string $format)
  *
  * @see ignore_user_abort
  * @method   \ChainObject  ignore_user_abort()
  *
  * @see image_type_to_extension
  * @property \ChainObject $image_type_to_extension
- * @method   \ChainObject  image_type_to_extension($include_dot = null)
- * @method   \ChainObject  image_type_to_extension1($imagetype)
+ * @method   \ChainObject  image_type_to_extension(bool $include_dot = true)
+ * @method   \ChainObject  image_type_to_extension1(int $image_type)
  *
  * @see image_type_to_mime_type
  * @property \ChainObject $image_type_to_mime_type
  * @method   \ChainObject  image_type_to_mime_type()
  *
  * @see implode
- * @method   \ChainObject  implode($pieces)
- * @method   \ChainObject  implode1($glue)
+ * @property \ChainObject $implode
+ * @method   \ChainObject  implode(?array $array = null)
+ * @method   \ChainObject  implode1(array|string $separator)
  *
  * @see in_array
- * @method   \ChainObject  in_array($haystack, $strict = null)
- * @method   \ChainObject  in_array1($needle, $strict = null)
- * @method   \ChainObject  in_array2($needle, $haystack)
+ * @method   \ChainObject  in_array(array $haystack, bool $strict = false)
+ * @method   \ChainObject  in_array1(mixed $needle, bool $strict = false)
+ * @method   \ChainObject  in_array2(mixed $needle, array $haystack)
  *
  * @see in_array_and
  * @method   \ChainObject  in_array_and($haystack, $strict = false)
@@ -3191,8 +3262,8 @@
  * @method   \ChainObject  inet_pton()
  *
  * @see ini_alter
- * @method   \ChainObject  ini_alter($newvalue)
- * @method   \ChainObject  ini_alter1($varname)
+ * @method   \ChainObject  ini_alter(string $value)
+ * @method   \ChainObject  ini_alter1(string $option)
  *
  * @see ini_export
  * @property \ChainObject $ini_export
@@ -3204,8 +3275,8 @@
  * @method   \ChainObject  ini_get()
  *
  * @see ini_get_all
- * @method   \ChainObject  ini_get_all($details = null)
- * @method   \ChainObject  ini_get_all1($extension = null)
+ * @method   \ChainObject  ini_get_all(bool $details = true)
+ * @method   \ChainObject  ini_get_all1(?string $extension = null)
  *
  * @see ini_import
  * @property \ChainObject $ini_import
@@ -3217,44 +3288,44 @@
  * @method   \ChainObject  ini_restore()
  *
  * @see ini_set
- * @method   \ChainObject  ini_set($newvalue)
- * @method   \ChainObject  ini_set1($varname)
+ * @method   \ChainObject  ini_set(string $value)
+ * @method   \ChainObject  ini_set1(string $option)
  *
  * @see ini_sets
  * @property \ChainObject $ini_sets
  * @method   \ChainObject  ini_sets()
  *
  * @see intdiv
- * @method   \ChainObject  intdiv($divisor)
- * @method   \ChainObject  intdiv1($dividend)
+ * @method   \ChainObject  intdiv(int $num2)
+ * @method   \ChainObject  intdiv1(int $num1)
  *
  * @see interface_exists
  * @property \ChainObject $interface_exists
- * @method   \ChainObject  interface_exists($autoload = null)
- * @method   \ChainObject  interface_exists1($classname)
+ * @method   \ChainObject  interface_exists(bool $autoload = true)
+ * @method   \ChainObject  interface_exists1(string $interface)
  *
  * @see intval
  * @property \ChainObject $intval
- * @method   \ChainObject  intval($base = null)
- * @method   \ChainObject  intval1($var)
+ * @method   \ChainObject  intval(int $base = 10)
+ * @method   \ChainObject  intval1(mixed $value)
  *
  * @see ip2long
  * @property \ChainObject $ip2long
  * @method   \ChainObject  ip2long()
  *
  * @see iptcembed
- * @method   \ChainObject  iptcembed($jpeg_file_name, $spool = null)
- * @method   \ChainObject  iptcembed1($iptcdata, $spool = null)
- * @method   \ChainObject  iptcembed2($iptcdata, $jpeg_file_name)
+ * @method   \ChainObject  iptcembed(string $filename, int $spool = 0)
+ * @method   \ChainObject  iptcembed1(string $iptc_data, int $spool = 0)
+ * @method   \ChainObject  iptcembed2(string $iptc_data, string $filename)
  *
  * @see iptcparse
  * @property \ChainObject $iptcparse
  * @method   \ChainObject  iptcparse()
  *
  * @see is_a
- * @method   \ChainObject  is_a($class_name, $allow_string = null)
- * @method   \ChainObject  is_a1($object, $allow_string = null)
- * @method   \ChainObject  is_a2($object, $class_name)
+ * @method   \ChainObject  is_a(string $class, bool $allow_string = false)
+ * @method   \ChainObject  is_a1(mixed $object_or_class, bool $allow_string = false)
+ * @method   \ChainObject  is_a2(mixed $object_or_class, string $class)
  *
  * @see is_ansi
  * @property \ChainObject $is_ansi
@@ -3367,10 +3438,6 @@
  * @property \ChainObject $is_readable
  * @method   \ChainObject  is_readable()
  *
- * @see is_real
- * @property \ChainObject $is_real
- * @method   \ChainObject  is_real()
- *
  * @see is_recursive
  * @property \ChainObject $is_recursive
  * @method   \ChainObject  is_recursive()
@@ -3392,9 +3459,9 @@
  * @method   \ChainObject  is_stringable()
  *
  * @see is_subclass_of
- * @method   \ChainObject  is_subclass_of($class_name, $allow_string = null)
- * @method   \ChainObject  is_subclass_of1($object, $allow_string = null)
- * @method   \ChainObject  is_subclass_of2($object, $class_name)
+ * @method   \ChainObject  is_subclass_of(string $class, bool $allow_string = true)
+ * @method   \ChainObject  is_subclass_of1(mixed $object_or_class, bool $allow_string = true)
+ * @method   \ChainObject  is_subclass_of2(mixed $object_or_class, string $class)
  *
  * @see is_uploaded_file
  * @property \ChainObject $is_uploaded_file
@@ -3409,8 +3476,9 @@
  * @method   \ChainObject  is_writeable()
  *
  * @see join
- * @method   \ChainObject  join($pieces)
- * @method   \ChainObject  join1($glue)
+ * @property \ChainObject $join
+ * @method   \ChainObject  join(?array $array = null)
+ * @method   \ChainObject  join1(array|string $separator)
  *
  * @see json_export
  * @property \ChainObject $json_export
@@ -3427,7 +3495,7 @@
  * @method   \ChainObject  key()
  *
  * @see key_exists
- * @method   \ChainObject  key_exists($search)
+ * @method   \ChainObject  key_exists(array $array)
  * @method   \ChainObject  key_exists1($key)
  *
  * @see kvsort
@@ -3483,36 +3551,36 @@
  * @method   \ChainObject  lcfirst()
  *
  * @see lchgrp
- * @method   \ChainObject  lchgrp($group)
- * @method   \ChainObject  lchgrp1($filename)
+ * @method   \ChainObject  lchgrp(string|int $group)
+ * @method   \ChainObject  lchgrp1(string $filename)
  *
  * @see lchown
- * @method   \ChainObject  lchown($user)
- * @method   \ChainObject  lchown1($filename)
+ * @method   \ChainObject  lchown(string|int $user)
+ * @method   \ChainObject  lchown1(string $filename)
  *
  * @see levenshtein
- * @method   \ChainObject  levenshtein($str2, $cost_ins = null, $cost_rep = null, $cost_del = null)
- * @method   \ChainObject  levenshtein1($str1, $cost_ins = null, $cost_rep = null, $cost_del = null)
- * @method   \ChainObject  levenshtein2($str1, $str2, $cost_rep = null, $cost_del = null)
- * @method   \ChainObject  levenshtein3($str1, $str2, $cost_ins = null, $cost_del = null)
- * @method   \ChainObject  levenshtein4($str1, $str2, $cost_ins = null, $cost_rep = null)
+ * @method   \ChainObject  levenshtein(string $string2, int $insertion_cost = 1, int $replacement_cost = 1, int $deletion_cost = 1)
+ * @method   \ChainObject  levenshtein1(string $string1, int $insertion_cost = 1, int $replacement_cost = 1, int $deletion_cost = 1)
+ * @method   \ChainObject  levenshtein2(string $string1, string $string2, int $replacement_cost = 1, int $deletion_cost = 1)
+ * @method   \ChainObject  levenshtein3(string $string1, string $string2, int $insertion_cost = 1, int $deletion_cost = 1)
+ * @method   \ChainObject  levenshtein4(string $string1, string $string2, int $insertion_cost = 1, int $replacement_cost = 1)
  *
  * @see link
- * @method   \ChainObject  link($link)
- * @method   \ChainObject  link1($target)
+ * @method   \ChainObject  link(string $link)
+ * @method   \ChainObject  link1(string $target)
  *
  * @see linkinfo
  * @property \ChainObject $linkinfo
  * @method   \ChainObject  linkinfo()
  *
  * @see localtime
- * @method   \ChainObject  localtime($associative_array = null)
- * @method   \ChainObject  localtime1($timestamp = null)
+ * @method   \ChainObject  localtime(bool $associative = false)
+ * @method   \ChainObject  localtime1(?int $timestamp = null)
  *
  * @see log
  * @property \ChainObject $log
- * @method   \ChainObject  log($base = null)
- * @method   \ChainObject  log1($number)
+ * @method   \ChainObject  log(float $base = M_E)
+ * @method   \ChainObject  log1(float $num)
  *
  * @see log10
  * @property \ChainObject $log10
@@ -3532,8 +3600,9 @@
  *
  * @see ltrim
  * @property \ChainObject $ltrim
- * @method   \ChainObject  ltrim($character_mask = null)
- * @method   \ChainObject  ltrim1($str)
+ * @method   \ChainObject  ltrim(string $characters = " 
+	\000")
+ * @method   \ChainObject  ltrim1(string $string)
  *
  * @see ltsv_export
  * @property \ChainObject $ltsv_export
@@ -3546,11 +3615,11 @@
  * @method   \ChainObject  ltsv_import1($ltsvstring)
  *
  * @see mail
- * @method   \ChainObject  mail($subject, $message, $additional_headers = null, $additional_parameters = null)
- * @method   \ChainObject  mail1($to, $message, $additional_headers = null, $additional_parameters = null)
- * @method   \ChainObject  mail2($to, $subject, $additional_headers = null, $additional_parameters = null)
- * @method   \ChainObject  mail3($to, $subject, $message, $additional_parameters = null)
- * @method   \ChainObject  mail4($to, $subject, $message, $additional_headers = null)
+ * @method   \ChainObject  mail(string $subject, string $message, array|string $additional_headers = [], string $additional_params = "")
+ * @method   \ChainObject  mail1(string $to, string $message, array|string $additional_headers = [], string $additional_params = "")
+ * @method   \ChainObject  mail2(string $to, string $subject, array|string $additional_headers = [], string $additional_params = "")
+ * @method   \ChainObject  mail3(string $to, string $subject, string $message, string $additional_params = "")
+ * @method   \ChainObject  mail4(string $to, string $subject, string $message, array|string $additional_headers = [])
  *
  * @see markdown_list
  * @property \ChainObject $markdown_list
@@ -3564,12 +3633,13 @@
  *
  * @see max
  * @property \ChainObject $max
- * @method   \ChainObject  max(...$args)
- * @method   \ChainObject  max1(...$args)
- * @method   \ChainObject  max2(...$args)
- * @method   \ChainObject  max3(...$args)
- * @method   \ChainObject  max4(...$args)
- * @method   \ChainObject  max5(...$args)
+ * @method   \ChainObject  max(...mixed $values)
+ * @method   \ChainObject  max1(mixed $value, ...mixed $values)
+ * @method   \ChainObject  max2(mixed $value, ...mixed $values)
+ * @method   \ChainObject  max3(mixed $value, ...mixed $values)
+ * @method   \ChainObject  max4(mixed $value, ...mixed $values)
+ * @method   \ChainObject  max5(mixed $value, ...mixed $values)
+ * @method   \ChainObject  max6(mixed $value, ...mixed $values)
  *
  * @see maximum
  * @method   \ChainObject  maximum(...$variadic)
@@ -3580,45 +3650,44 @@
  * @method   \ChainObject  maximum5(...$variadic)
  *
  * @see mb_check_encoding
- * @method   \ChainObject  mb_check_encoding($encoding = null)
- * @method   \ChainObject  mb_check_encoding1($var = null)
+ * @method   \ChainObject  mb_check_encoding(?string $encoding = null)
+ * @method   \ChainObject  mb_check_encoding1(array|string|null $value = null)
  *
  * @see mb_chr
  * @property \ChainObject $mb_chr
- * @method   \ChainObject  mb_chr($encoding = null)
- * @method   \ChainObject  mb_chr1($cp)
+ * @method   \ChainObject  mb_chr(?string $encoding = null)
+ * @method   \ChainObject  mb_chr1(int $codepoint)
  *
  * @see mb_convert_case
- * @method   \ChainObject  mb_convert_case($mode, $encoding = null)
- * @method   \ChainObject  mb_convert_case1($sourcestring, $encoding = null)
- * @method   \ChainObject  mb_convert_case2($sourcestring, $mode)
+ * @method   \ChainObject  mb_convert_case(int $mode, ?string $encoding = null)
+ * @method   \ChainObject  mb_convert_case1(string $string, ?string $encoding = null)
+ * @method   \ChainObject  mb_convert_case2(string $string, int $mode)
  *
  * @see mb_convert_encoding
- * @method   \ChainObject  mb_convert_encoding($to, $from = null)
- * @method   \ChainObject  mb_convert_encoding1($str, $from = null)
- * @method   \ChainObject  mb_convert_encoding2($str, $to)
+ * @method   \ChainObject  mb_convert_encoding(string $to_encoding, array|string|null $from_encoding = null)
+ * @method   \ChainObject  mb_convert_encoding1(array|string $string, array|string|null $from_encoding = null)
+ * @method   \ChainObject  mb_convert_encoding2(array|string $string, string $to_encoding)
  *
  * @see mb_convert_kana
  * @property \ChainObject $mb_convert_kana
- * @method   \ChainObject  mb_convert_kana($option = null, $encoding = null)
- * @method   \ChainObject  mb_convert_kana1($str, $encoding = null)
- * @method   \ChainObject  mb_convert_kana2($str, $option = null)
+ * @method   \ChainObject  mb_convert_kana(string $mode = "KV", ?string $encoding = null)
+ * @method   \ChainObject  mb_convert_kana1(string $string, ?string $encoding = null)
+ * @method   \ChainObject  mb_convert_kana2(string $string, string $mode = "KV")
  *
  * @see mb_decode_mimeheader
  * @property \ChainObject $mb_decode_mimeheader
  * @method   \ChainObject  mb_decode_mimeheader()
  *
  * @see mb_decode_numericentity
- * @method   \ChainObject  mb_decode_numericentity($convmap, $encoding = null, $is_hex = null)
- * @method   \ChainObject  mb_decode_numericentity1($string, $encoding = null, $is_hex = null)
- * @method   \ChainObject  mb_decode_numericentity2($string, $convmap, $is_hex = null)
- * @method   \ChainObject  mb_decode_numericentity3($string, $convmap, $encoding = null)
+ * @method   \ChainObject  mb_decode_numericentity(array $map, ?string $encoding = null)
+ * @method   \ChainObject  mb_decode_numericentity1(string $string, ?string $encoding = null)
+ * @method   \ChainObject  mb_decode_numericentity2(string $string, array $map)
  *
  * @see mb_detect_encoding
  * @property \ChainObject $mb_detect_encoding
- * @method   \ChainObject  mb_detect_encoding($encoding_list = null, $strict = null)
- * @method   \ChainObject  mb_detect_encoding1($str, $strict = null)
- * @method   \ChainObject  mb_detect_encoding2($str, $encoding_list = null)
+ * @method   \ChainObject  mb_detect_encoding(array|string|null $encodings = null, bool $strict = false)
+ * @method   \ChainObject  mb_detect_encoding1(string $string, bool $strict = false)
+ * @method   \ChainObject  mb_detect_encoding2(string $string, array|string|null $encodings = null)
  *
  * @see mb_detect_order
  * @method   \ChainObject  mb_detect_order()
@@ -3631,74 +3700,78 @@
  *
  * @see mb_encode_mimeheader
  * @property \ChainObject $mb_encode_mimeheader
- * @method   \ChainObject  mb_encode_mimeheader($charset = null, $transfer = null, $linefeed = null, $indent = null)
- * @method   \ChainObject  mb_encode_mimeheader1($str, $transfer = null, $linefeed = null, $indent = null)
- * @method   \ChainObject  mb_encode_mimeheader2($str, $charset = null, $linefeed = null, $indent = null)
- * @method   \ChainObject  mb_encode_mimeheader3($str, $charset = null, $transfer = null, $indent = null)
- * @method   \ChainObject  mb_encode_mimeheader4($str, $charset = null, $transfer = null, $linefeed = null)
+ * @method   \ChainObject  mb_encode_mimeheader(?string $charset = null, ?string $transfer_encoding = null, string $newline = "
+", int $indent = 0)
+ * @method   \ChainObject  mb_encode_mimeheader1(string $string, ?string $transfer_encoding = null, string $newline = "
+", int $indent = 0)
+ * @method   \ChainObject  mb_encode_mimeheader2(string $string, ?string $charset = null, string $newline = "
+", int $indent = 0)
+ * @method   \ChainObject  mb_encode_mimeheader3(string $string, ?string $charset = null, ?string $transfer_encoding = null, int $indent = 0)
+ * @method   \ChainObject  mb_encode_mimeheader4(string $string, ?string $charset = null, ?string $transfer_encoding = null, string $newline = "
+")
  *
  * @see mb_encode_numericentity
- * @method   \ChainObject  mb_encode_numericentity($convmap, $encoding = null, $is_hex = null)
- * @method   \ChainObject  mb_encode_numericentity1($string, $encoding = null, $is_hex = null)
- * @method   \ChainObject  mb_encode_numericentity2($string, $convmap, $is_hex = null)
- * @method   \ChainObject  mb_encode_numericentity3($string, $convmap, $encoding = null)
+ * @method   \ChainObject  mb_encode_numericentity(array $map, ?string $encoding = null, bool $hex = false)
+ * @method   \ChainObject  mb_encode_numericentity1(string $string, ?string $encoding = null, bool $hex = false)
+ * @method   \ChainObject  mb_encode_numericentity2(string $string, array $map, bool $hex = false)
+ * @method   \ChainObject  mb_encode_numericentity3(string $string, array $map, ?string $encoding = null)
  *
  * @see mb_encoding_aliases
  * @property \ChainObject $mb_encoding_aliases
  * @method   \ChainObject  mb_encoding_aliases()
  *
  * @see mb_ereg_match
- * @method   \ChainObject  mb_ereg_match($string, $option = null)
- * @method   \ChainObject  mb_ereg_match1($pattern, $option = null)
- * @method   \ChainObject  mb_ereg_match2($pattern, $string)
+ * @method   \ChainObject  mb_ereg_match(string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_match1(string $pattern, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_match2(string $pattern, string $string)
  *
  * @see mb_ereg_replace
- * @method   \ChainObject  mb_ereg_replace($replacement, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace1($pattern, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace2($pattern, $replacement, $option = null)
- * @method   \ChainObject  mb_ereg_replace3($pattern, $replacement, $string)
+ * @method   \ChainObject  mb_ereg_replace(string $replacement, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace1(string $pattern, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace2(string $pattern, string $replacement, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace3(string $pattern, string $replacement, string $string)
  *
  * @see mb_ereg_replace_callback
- * @method   \ChainObject  mb_ereg_replace_callback($callback, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callback1($pattern, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callback2($pattern, $callback, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callback3($pattern, $callback, $string)
- * @method   \ChainObject  mb_ereg_replace_callbackP($callback, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callbackP1($pattern, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callbackP2($pattern, $callback, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callbackP3($pattern, $callback, $string)
- * @method   \ChainObject  mb_ereg_replace_callbackE($callback, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callbackE1($pattern, $string, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callbackE2($pattern, $callback, $option = null)
- * @method   \ChainObject  mb_ereg_replace_callbackE3($pattern, $callback, $string)
+ * @method   \ChainObject  mb_ereg_replace_callback(callable $callback, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callback1(string $pattern, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callback2(string $pattern, callable $callback, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callback3(string $pattern, callable $callback, string $string)
+ * @method   \ChainObject  mb_ereg_replace_callbackP(callable $callback, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callbackP1(string $pattern, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callbackP2(string $pattern, callable $callback, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callbackP3(string $pattern, callable $callback, string $string)
+ * @method   \ChainObject  mb_ereg_replace_callbackE(callable $callback, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callbackE1(string $pattern, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callbackE2(string $pattern, callable $callback, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_replace_callbackE3(string $pattern, callable $callback, string $string)
  *
  * @see mb_ereg_search
- * @method   \ChainObject  mb_ereg_search($option = null)
- * @method   \ChainObject  mb_ereg_search1($pattern = null)
+ * @method   \ChainObject  mb_ereg_search(?string $options = null)
+ * @method   \ChainObject  mb_ereg_search1(?string $pattern = null)
  *
  * @see mb_ereg_search_init
  * @property \ChainObject $mb_ereg_search_init
- * @method   \ChainObject  mb_ereg_search_init($pattern = null, $option = null)
- * @method   \ChainObject  mb_ereg_search_init1($string, $option = null)
- * @method   \ChainObject  mb_ereg_search_init2($string, $pattern = null)
+ * @method   \ChainObject  mb_ereg_search_init(?string $pattern = null, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_search_init1(string $string, ?string $options = null)
+ * @method   \ChainObject  mb_ereg_search_init2(string $string, ?string $pattern = null)
  *
  * @see mb_ereg_search_pos
- * @method   \ChainObject  mb_ereg_search_pos($option = null)
- * @method   \ChainObject  mb_ereg_search_pos1($pattern = null)
+ * @method   \ChainObject  mb_ereg_search_pos(?string $options = null)
+ * @method   \ChainObject  mb_ereg_search_pos1(?string $pattern = null)
  *
  * @see mb_ereg_search_regs
- * @method   \ChainObject  mb_ereg_search_regs($option = null)
- * @method   \ChainObject  mb_ereg_search_regs1($pattern = null)
+ * @method   \ChainObject  mb_ereg_search_regs(?string $options = null)
+ * @method   \ChainObject  mb_ereg_search_regs1(?string $pattern = null)
  *
  * @see mb_ereg_search_setpos
  * @property \ChainObject $mb_ereg_search_setpos
  * @method   \ChainObject  mb_ereg_search_setpos()
  *
  * @see mb_eregi_replace
- * @method   \ChainObject  mb_eregi_replace($replacement, $string, $option = null)
- * @method   \ChainObject  mb_eregi_replace1($pattern, $string, $option = null)
- * @method   \ChainObject  mb_eregi_replace2($pattern, $replacement, $option = null)
- * @method   \ChainObject  mb_eregi_replace3($pattern, $replacement, $string)
+ * @method   \ChainObject  mb_eregi_replace(string $replacement, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_eregi_replace1(string $pattern, string $string, ?string $options = null)
+ * @method   \ChainObject  mb_eregi_replace2(string $pattern, string $replacement, ?string $options = null)
+ * @method   \ChainObject  mb_eregi_replace3(string $pattern, string $replacement, string $string)
  *
  * @see mb_get_info
  * @method   \ChainObject  mb_get_info()
@@ -3717,12 +3790,12 @@
  *
  * @see mb_ord
  * @property \ChainObject $mb_ord
- * @method   \ChainObject  mb_ord($encoding = null)
- * @method   \ChainObject  mb_ord1($str)
+ * @method   \ChainObject  mb_ord(?string $encoding = null)
+ * @method   \ChainObject  mb_ord1(string $string)
  *
  * @see mb_output_handler
- * @method   \ChainObject  mb_output_handler($status)
- * @method   \ChainObject  mb_output_handler1($contents)
+ * @method   \ChainObject  mb_output_handler(int $status)
+ * @method   \ChainObject  mb_output_handler1(string $string)
  *
  * @see mb_preferred_mime_name
  * @property \ChainObject $mb_preferred_mime_name
@@ -3736,20 +3809,20 @@
  *
  * @see mb_scrub
  * @property \ChainObject $mb_scrub
- * @method   \ChainObject  mb_scrub($encoding = null)
- * @method   \ChainObject  mb_scrub1($str)
+ * @method   \ChainObject  mb_scrub(?string $encoding = null)
+ * @method   \ChainObject  mb_scrub1(string $string)
  *
  * @see mb_send_mail
- * @method   \ChainObject  mb_send_mail($subject, $message, $additional_headers = null, $additional_parameters = null)
- * @method   \ChainObject  mb_send_mail1($to, $message, $additional_headers = null, $additional_parameters = null)
- * @method   \ChainObject  mb_send_mail2($to, $subject, $additional_headers = null, $additional_parameters = null)
- * @method   \ChainObject  mb_send_mail3($to, $subject, $message, $additional_parameters = null)
- * @method   \ChainObject  mb_send_mail4($to, $subject, $message, $additional_headers = null)
+ * @method   \ChainObject  mb_send_mail(string $subject, string $message, array|string $additional_headers = [], ?string $additional_params = null)
+ * @method   \ChainObject  mb_send_mail1(string $to, string $message, array|string $additional_headers = [], ?string $additional_params = null)
+ * @method   \ChainObject  mb_send_mail2(string $to, string $subject, array|string $additional_headers = [], ?string $additional_params = null)
+ * @method   \ChainObject  mb_send_mail3(string $to, string $subject, string $message, ?string $additional_params = null)
+ * @method   \ChainObject  mb_send_mail4(string $to, string $subject, string $message, array|string $additional_headers = [])
  *
  * @see mb_split
- * @method   \ChainObject  mb_split($string, $limit = null)
- * @method   \ChainObject  mb_split1($pattern, $limit = null)
- * @method   \ChainObject  mb_split2($pattern, $string)
+ * @method   \ChainObject  mb_split(string $string, int $limit = -1)
+ * @method   \ChainObject  mb_split1(string $pattern, int $limit = -1)
+ * @method   \ChainObject  mb_split2(string $pattern, string $string)
  *
  * @see mb_str_pad
  * @method   \ChainObject  mb_str_pad($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
@@ -3759,104 +3832,104 @@
  *
  * @see mb_str_split
  * @property \ChainObject $mb_str_split
- * @method   \ChainObject  mb_str_split($split_length = null, $encoding = null)
- * @method   \ChainObject  mb_str_split1($str, $encoding = null)
- * @method   \ChainObject  mb_str_split2($str, $split_length = null)
+ * @method   \ChainObject  mb_str_split(int $length = 1, ?string $encoding = null)
+ * @method   \ChainObject  mb_str_split1(string $string, ?string $encoding = null)
+ * @method   \ChainObject  mb_str_split2(string $string, int $length = 1)
  *
  * @see mb_strcut
- * @method   \ChainObject  mb_strcut($start, $length = null, $encoding = null)
- * @method   \ChainObject  mb_strcut1($str, $length = null, $encoding = null)
- * @method   \ChainObject  mb_strcut2($str, $start, $encoding = null)
- * @method   \ChainObject  mb_strcut3($str, $start, $length = null)
+ * @method   \ChainObject  mb_strcut(int $start, ?int $length = null, ?string $encoding = null)
+ * @method   \ChainObject  mb_strcut1(string $string, ?int $length = null, ?string $encoding = null)
+ * @method   \ChainObject  mb_strcut2(string $string, int $start, ?string $encoding = null)
+ * @method   \ChainObject  mb_strcut3(string $string, int $start, ?int $length = null)
  *
  * @see mb_strimwidth
- * @method   \ChainObject  mb_strimwidth($start, $width, $trimmarker = null, $encoding = null)
- * @method   \ChainObject  mb_strimwidth1($str, $width, $trimmarker = null, $encoding = null)
- * @method   \ChainObject  mb_strimwidth2($str, $start, $trimmarker = null, $encoding = null)
- * @method   \ChainObject  mb_strimwidth3($str, $start, $width, $encoding = null)
- * @method   \ChainObject  mb_strimwidth4($str, $start, $width, $trimmarker = null)
+ * @method   \ChainObject  mb_strimwidth(int $start, int $width, string $trim_marker = "", ?string $encoding = null)
+ * @method   \ChainObject  mb_strimwidth1(string $string, int $width, string $trim_marker = "", ?string $encoding = null)
+ * @method   \ChainObject  mb_strimwidth2(string $string, int $start, string $trim_marker = "", ?string $encoding = null)
+ * @method   \ChainObject  mb_strimwidth3(string $string, int $start, int $width, ?string $encoding = null)
+ * @method   \ChainObject  mb_strimwidth4(string $string, int $start, int $width, string $trim_marker = "")
  *
  * @see mb_stripos
- * @method   \ChainObject  mb_stripos($needle, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_stripos1($haystack, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_stripos2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_stripos3($haystack, $needle, $offset = null)
+ * @method   \ChainObject  mb_stripos(string $needle, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_stripos1(string $haystack, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_stripos2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_stripos3(string $haystack, string $needle, int $offset = 0)
  *
  * @see mb_stristr
- * @method   \ChainObject  mb_stristr($needle, $part = null, $encoding = null)
- * @method   \ChainObject  mb_stristr1($haystack, $part = null, $encoding = null)
- * @method   \ChainObject  mb_stristr2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_stristr3($haystack, $needle, $part = null)
+ * @method   \ChainObject  mb_stristr(string $needle, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_stristr1(string $haystack, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_stristr2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_stristr3(string $haystack, string $needle, bool $before_needle = false)
  *
  * @see mb_strlen
  * @property \ChainObject $mb_strlen
- * @method   \ChainObject  mb_strlen($encoding = null)
- * @method   \ChainObject  mb_strlen1($str)
+ * @method   \ChainObject  mb_strlen(?string $encoding = null)
+ * @method   \ChainObject  mb_strlen1(string $string)
  *
  * @see mb_strpos
- * @method   \ChainObject  mb_strpos($needle, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_strpos1($haystack, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_strpos2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_strpos3($haystack, $needle, $offset = null)
+ * @method   \ChainObject  mb_strpos(string $needle, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_strpos1(string $haystack, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_strpos2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_strpos3(string $haystack, string $needle, int $offset = 0)
  *
  * @see mb_strrchr
- * @method   \ChainObject  mb_strrchr($needle, $part = null, $encoding = null)
- * @method   \ChainObject  mb_strrchr1($haystack, $part = null, $encoding = null)
- * @method   \ChainObject  mb_strrchr2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_strrchr3($haystack, $needle, $part = null)
+ * @method   \ChainObject  mb_strrchr(string $needle, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrchr1(string $haystack, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrchr2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrchr3(string $haystack, string $needle, bool $before_needle = false)
  *
  * @see mb_strrichr
- * @method   \ChainObject  mb_strrichr($needle, $part = null, $encoding = null)
- * @method   \ChainObject  mb_strrichr1($haystack, $part = null, $encoding = null)
- * @method   \ChainObject  mb_strrichr2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_strrichr3($haystack, $needle, $part = null)
+ * @method   \ChainObject  mb_strrichr(string $needle, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrichr1(string $haystack, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrichr2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrichr3(string $haystack, string $needle, bool $before_needle = false)
  *
  * @see mb_strripos
- * @method   \ChainObject  mb_strripos($needle, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_strripos1($haystack, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_strripos2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_strripos3($haystack, $needle, $offset = null)
+ * @method   \ChainObject  mb_strripos(string $needle, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_strripos1(string $haystack, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_strripos2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_strripos3(string $haystack, string $needle, int $offset = 0)
  *
  * @see mb_strrpos
- * @method   \ChainObject  mb_strrpos($needle, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_strrpos1($haystack, $offset = null, $encoding = null)
- * @method   \ChainObject  mb_strrpos2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_strrpos3($haystack, $needle, $offset = null)
+ * @method   \ChainObject  mb_strrpos(string $needle, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrpos1(string $haystack, int $offset = 0, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrpos2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_strrpos3(string $haystack, string $needle, int $offset = 0)
  *
  * @see mb_strstr
- * @method   \ChainObject  mb_strstr($needle, $part = null, $encoding = null)
- * @method   \ChainObject  mb_strstr1($haystack, $part = null, $encoding = null)
- * @method   \ChainObject  mb_strstr2($haystack, $needle, $encoding = null)
- * @method   \ChainObject  mb_strstr3($haystack, $needle, $part = null)
+ * @method   \ChainObject  mb_strstr(string $needle, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_strstr1(string $haystack, bool $before_needle = false, ?string $encoding = null)
+ * @method   \ChainObject  mb_strstr2(string $haystack, string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_strstr3(string $haystack, string $needle, bool $before_needle = false)
  *
  * @see mb_strtolower
  * @property \ChainObject $mb_strtolower
- * @method   \ChainObject  mb_strtolower($encoding = null)
- * @method   \ChainObject  mb_strtolower1($sourcestring)
+ * @method   \ChainObject  mb_strtolower(?string $encoding = null)
+ * @method   \ChainObject  mb_strtolower1(string $string)
  *
  * @see mb_strtoupper
  * @property \ChainObject $mb_strtoupper
- * @method   \ChainObject  mb_strtoupper($encoding = null)
- * @method   \ChainObject  mb_strtoupper1($sourcestring)
+ * @method   \ChainObject  mb_strtoupper(?string $encoding = null)
+ * @method   \ChainObject  mb_strtoupper1(string $string)
  *
  * @see mb_strwidth
  * @property \ChainObject $mb_strwidth
- * @method   \ChainObject  mb_strwidth($encoding = null)
- * @method   \ChainObject  mb_strwidth1($str)
+ * @method   \ChainObject  mb_strwidth(?string $encoding = null)
+ * @method   \ChainObject  mb_strwidth1(string $string)
  *
  * @see mb_substitute_character
  * @method   \ChainObject  mb_substitute_character()
  *
  * @see mb_substr
- * @method   \ChainObject  mb_substr($start, $length = null, $encoding = null)
- * @method   \ChainObject  mb_substr1($str, $length = null, $encoding = null)
- * @method   \ChainObject  mb_substr2($str, $start, $encoding = null)
- * @method   \ChainObject  mb_substr3($str, $start, $length = null)
+ * @method   \ChainObject  mb_substr(int $start, ?int $length = null, ?string $encoding = null)
+ * @method   \ChainObject  mb_substr1(string $string, ?int $length = null, ?string $encoding = null)
+ * @method   \ChainObject  mb_substr2(string $string, int $start, ?string $encoding = null)
+ * @method   \ChainObject  mb_substr3(string $string, int $start, ?int $length = null)
  *
  * @see mb_substr_count
- * @method   \ChainObject  mb_substr_count($needle, $encoding = null)
- * @method   \ChainObject  mb_substr_count1($haystack, $encoding = null)
- * @method   \ChainObject  mb_substr_count2($haystack, $needle)
+ * @method   \ChainObject  mb_substr_count(string $needle, ?string $encoding = null)
+ * @method   \ChainObject  mb_substr_count1(string $haystack, ?string $encoding = null)
+ * @method   \ChainObject  mb_substr_count2(string $haystack, string $needle)
  *
  * @see mb_substr_replace
  * @method   \ChainObject  mb_substr_replace($replacement, $start, $length = null)
@@ -3868,62 +3941,15 @@
  * @property \ChainObject $mb_trim
  * @method   \ChainObject  mb_trim()
  *
- * @see mbereg_match
- * @method   \ChainObject  mbereg_match($string, $option = null)
- * @method   \ChainObject  mbereg_match1($pattern, $option = null)
- * @method   \ChainObject  mbereg_match2($pattern, $string)
- *
- * @see mbereg_replace
- * @method   \ChainObject  mbereg_replace($replacement, $string, $option = null)
- * @method   \ChainObject  mbereg_replace1($pattern, $string, $option = null)
- * @method   \ChainObject  mbereg_replace2($pattern, $replacement, $option = null)
- * @method   \ChainObject  mbereg_replace3($pattern, $replacement, $string)
- *
- * @see mbereg_search
- * @method   \ChainObject  mbereg_search($option = null)
- * @method   \ChainObject  mbereg_search1($pattern = null)
- *
- * @see mbereg_search_init
- * @property \ChainObject $mbereg_search_init
- * @method   \ChainObject  mbereg_search_init($pattern = null, $option = null)
- * @method   \ChainObject  mbereg_search_init1($string, $option = null)
- * @method   \ChainObject  mbereg_search_init2($string, $pattern = null)
- *
- * @see mbereg_search_pos
- * @method   \ChainObject  mbereg_search_pos($option = null)
- * @method   \ChainObject  mbereg_search_pos1($pattern = null)
- *
- * @see mbereg_search_regs
- * @method   \ChainObject  mbereg_search_regs($option = null)
- * @method   \ChainObject  mbereg_search_regs1($pattern = null)
- *
- * @see mbereg_search_setpos
- * @property \ChainObject $mbereg_search_setpos
- * @method   \ChainObject  mbereg_search_setpos()
- *
- * @see mberegi_replace
- * @method   \ChainObject  mberegi_replace($replacement, $string, $option = null)
- * @method   \ChainObject  mberegi_replace1($pattern, $string, $option = null)
- * @method   \ChainObject  mberegi_replace2($pattern, $replacement, $option = null)
- * @method   \ChainObject  mberegi_replace3($pattern, $replacement, $string)
- *
- * @see mbregex_encoding
- * @method   \ChainObject  mbregex_encoding()
- *
- * @see mbsplit
- * @method   \ChainObject  mbsplit($string, $limit = null)
- * @method   \ChainObject  mbsplit1($pattern, $limit = null)
- * @method   \ChainObject  mbsplit2($pattern, $string)
- *
  * @see md5
  * @property \ChainObject $md5
- * @method   \ChainObject  md5($raw_output = null)
- * @method   \ChainObject  md51($str)
+ * @method   \ChainObject  md5(bool $binary = false)
+ * @method   \ChainObject  md51(string $string)
  *
  * @see md5_file
  * @property \ChainObject $md5_file
- * @method   \ChainObject  md5_file($raw_output = null)
- * @method   \ChainObject  md5_file1($filename)
+ * @method   \ChainObject  md5_file(bool $binary = false)
+ * @method   \ChainObject  md5_file1(string $filename)
  *
  * @see mean
  * @method   \ChainObject  mean(...$variadic)
@@ -3953,17 +3979,17 @@
  *
  * @see metaphone
  * @property \ChainObject $metaphone
- * @method   \ChainObject  metaphone($phones = null)
- * @method   \ChainObject  metaphone1($text)
+ * @method   \ChainObject  metaphone(int $max_phonemes = 0)
+ * @method   \ChainObject  metaphone1(string $string)
  *
  * @see method_exists
- * @method   \ChainObject  method_exists($method)
- * @method   \ChainObject  method_exists1($object)
+ * @method   \ChainObject  method_exists(string $method)
+ * @method   \ChainObject  method_exists1($object_or_class)
  *
  * @see mhash
- * @method   \ChainObject  mhash($data, $key = null)
- * @method   \ChainObject  mhash1($hash, $key = null)
- * @method   \ChainObject  mhash2($hash, $data)
+ * @method   \ChainObject  mhash(string $data, ?string $key = null)
+ * @method   \ChainObject  mhash1(int $algo, ?string $key = null)
+ * @method   \ChainObject  mhash2(int $algo, string $data)
  *
  * @see mhash_get_block_size
  * @property \ChainObject $mhash_get_block_size
@@ -3974,22 +4000,23 @@
  * @method   \ChainObject  mhash_get_hash_name()
  *
  * @see mhash_keygen_s2k
- * @method   \ChainObject  mhash_keygen_s2k($input_password, $salt, $bytes)
- * @method   \ChainObject  mhash_keygen_s2k1($hash, $salt, $bytes)
- * @method   \ChainObject  mhash_keygen_s2k2($hash, $input_password, $bytes)
- * @method   \ChainObject  mhash_keygen_s2k3($hash, $input_password, $salt)
+ * @method   \ChainObject  mhash_keygen_s2k(string $password, string $salt, int $length)
+ * @method   \ChainObject  mhash_keygen_s2k1(int $algo, string $salt, int $length)
+ * @method   \ChainObject  mhash_keygen_s2k2(int $algo, string $password, int $length)
+ * @method   \ChainObject  mhash_keygen_s2k3(int $algo, string $password, string $salt)
  *
  * @see microtime
  * @method   \ChainObject  microtime()
  *
  * @see min
  * @property \ChainObject $min
- * @method   \ChainObject  min(...$args)
- * @method   \ChainObject  min1(...$args)
- * @method   \ChainObject  min2(...$args)
- * @method   \ChainObject  min3(...$args)
- * @method   \ChainObject  min4(...$args)
- * @method   \ChainObject  min5(...$args)
+ * @method   \ChainObject  min(...mixed $values)
+ * @method   \ChainObject  min1(mixed $value, ...mixed $values)
+ * @method   \ChainObject  min2(mixed $value, ...mixed $values)
+ * @method   \ChainObject  min3(mixed $value, ...mixed $values)
+ * @method   \ChainObject  min4(mixed $value, ...mixed $values)
+ * @method   \ChainObject  min5(mixed $value, ...mixed $values)
+ * @method   \ChainObject  min6(mixed $value, ...mixed $values)
  *
  * @see minimum
  * @method   \ChainObject  minimum(...$variadic)
@@ -4001,10 +4028,10 @@
  *
  * @see mkdir
  * @property \ChainObject $mkdir
- * @method   \ChainObject  mkdir($mode = null, $recursive = null, $context = null)
- * @method   \ChainObject  mkdir1($pathname, $recursive = null, $context = null)
- * @method   \ChainObject  mkdir2($pathname, $mode = null, $context = null)
- * @method   \ChainObject  mkdir3($pathname, $mode = null, $recursive = null)
+ * @method   \ChainObject  mkdir(int $permissions = 511, bool $recursive = false, $context = null)
+ * @method   \ChainObject  mkdir1(string $directory, bool $recursive = false, $context = null)
+ * @method   \ChainObject  mkdir2(string $directory, int $permissions = 511, $context = null)
+ * @method   \ChainObject  mkdir3(string $directory, int $permissions = 511, bool $recursive = false)
  *
  * @see mkdir_p
  * @property \ChainObject $mkdir_p
@@ -4012,12 +4039,13 @@
  * @method   \ChainObject  mkdir_p1($dirname)
  *
  * @see mktime
- * @method   \ChainObject  mktime($min = null, $sec = null, $mon = null, $day = null, $year = null)
- * @method   \ChainObject  mktime1($hour = null, $sec = null, $mon = null, $day = null, $year = null)
- * @method   \ChainObject  mktime2($hour = null, $min = null, $mon = null, $day = null, $year = null)
- * @method   \ChainObject  mktime3($hour = null, $min = null, $sec = null, $day = null, $year = null)
- * @method   \ChainObject  mktime4($hour = null, $min = null, $sec = null, $mon = null, $year = null)
- * @method   \ChainObject  mktime5($hour = null, $min = null, $sec = null, $mon = null, $day = null)
+ * @property \ChainObject $mktime
+ * @method   \ChainObject  mktime(?int $minute = null, ?int $second = null, ?int $month = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  mktime1(int $hour, ?int $second = null, ?int $month = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  mktime2(int $hour, ?int $minute = null, ?int $month = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  mktime3(int $hour, ?int $minute = null, ?int $second = null, ?int $day = null, ?int $year = null)
+ * @method   \ChainObject  mktime4(int $hour, ?int $minute = null, ?int $second = null, ?int $month = null, ?int $year = null)
+ * @method   \ChainObject  mktime5(int $hour, ?int $minute = null, ?int $second = null, ?int $month = null, ?int $day = null)
  *
  * @see mode
  * @method   \ChainObject  mode(...$variadic)
@@ -4027,21 +4055,17 @@
  * @method   \ChainObject  mode4(...$variadic)
  * @method   \ChainObject  mode5(...$variadic)
  *
- * @see money_format
- * @method   \ChainObject  money_format($value)
- * @method   \ChainObject  money_format1($format)
- *
  * @see move_uploaded_file
- * @method   \ChainObject  move_uploaded_file($new_path)
- * @method   \ChainObject  move_uploaded_file1($path)
+ * @method   \ChainObject  move_uploaded_file(string $to)
+ * @method   \ChainObject  move_uploaded_file1(string $from)
  *
  * @see mt_rand
- * @method   \ChainObject  mt_rand($max = null)
- * @method   \ChainObject  mt_rand1($min = null)
+ * @method   \ChainObject  mt_rand(int $max = null)
+ * @method   \ChainObject  mt_rand1(int $min = null)
  *
  * @see mt_srand
- * @method   \ChainObject  mt_srand($mode = null)
- * @method   \ChainObject  mt_srand1($seed = null)
+ * @method   \ChainObject  mt_srand(int $mode = MT_RAND_MT19937)
+ * @method   \ChainObject  mt_srand1(int $seed = 0)
  *
  * @see multiexplode
  * @method   \ChainObject  multiexplode($string, $limit = PHP_INT_MAX)
@@ -4099,8 +4123,8 @@
  *
  * @see nl2br
  * @property \ChainObject $nl2br
- * @method   \ChainObject  nl2br($is_xhtml = null)
- * @method   \ChainObject  nl2br1($str)
+ * @method   \ChainObject  nl2br(bool $use_xhtml = true)
+ * @method   \ChainObject  nl2br1(string $string)
  *
  * @see nl_langinfo
  * @property \ChainObject $nl_langinfo
@@ -4118,10 +4142,10 @@
  *
  * @see number_format
  * @property \ChainObject $number_format
- * @method   \ChainObject  number_format($num_decimal_places = null, $dec_separator = null, $thousands_separator = null)
- * @method   \ChainObject  number_format1($number, $dec_separator = null, $thousands_separator = null)
- * @method   \ChainObject  number_format2($number, $num_decimal_places = null, $thousands_separator = null)
- * @method   \ChainObject  number_format3($number, $num_decimal_places = null, $dec_separator = null)
+ * @method   \ChainObject  number_format(int $decimals = 0, ?string $decimal_separator = ".", ?string $thousands_separator = ",")
+ * @method   \ChainObject  number_format1(float $num, ?string $decimal_separator = ".", ?string $thousands_separator = ",")
+ * @method   \ChainObject  number_format2(float $num, int $decimals = 0, ?string $thousands_separator = ",")
+ * @method   \ChainObject  number_format3(float $num, int $decimals = 0, ?string $decimal_separator = ".")
  *
  * @see number_serial
  * @property \ChainObject $number_serial
@@ -4176,9 +4200,15 @@
  * @method   \ChainObject  ob_include1($include_file)
  *
  * @see ob_start
- * @method   \ChainObject  ob_start($chunk_size = null, $flags = null)
- * @method   \ChainObject  ob_start1($user_function = null, $flags = null)
- * @method   \ChainObject  ob_start2($user_function = null, $chunk_size = null)
+ * @method   \ChainObject  ob_start(int $chunk_size = 0, int $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
+ * @method   \ChainObject  ob_start1($callback = null, int $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
+ * @method   \ChainObject  ob_start2($callback = null, int $chunk_size = 0)
+ * @method   \ChainObject  ob_startP(int $chunk_size = 0, int $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
+ * @method   \ChainObject  ob_startP1($callback = null, int $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
+ * @method   \ChainObject  ob_startP2($callback = null, int $chunk_size = 0)
+ * @method   \ChainObject  ob_startE(int $chunk_size = 0, int $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
+ * @method   \ChainObject  ob_startE1($callback = null, int $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
+ * @method   \ChainObject  ob_startE2($callback = null, int $chunk_size = 0)
  *
  * @see object_dive
  * @method   \ChainObject  object_dive($path, $default = null, $delimiter = ".")
@@ -4203,12 +4233,12 @@
  * @see opendir
  * @property \ChainObject $opendir
  * @method   \ChainObject  opendir($context = null)
- * @method   \ChainObject  opendir1($path)
+ * @method   \ChainObject  opendir1(string $directory)
  *
  * @see openlog
- * @method   \ChainObject  openlog($option, $facility)
- * @method   \ChainObject  openlog1($ident, $facility)
- * @method   \ChainObject  openlog2($ident, $option)
+ * @method   \ChainObject  openlog(int $flags, int $facility)
+ * @method   \ChainObject  openlog1(string $prefix, int $facility)
+ * @method   \ChainObject  openlog2(string $prefix, int $flags)
  *
  * @see optional
  * @property \ChainObject $optional
@@ -4220,18 +4250,18 @@
  * @method   \ChainObject  ord()
  *
  * @see output_add_rewrite_var
- * @method   \ChainObject  output_add_rewrite_var($value)
- * @method   \ChainObject  output_add_rewrite_var1($name)
+ * @method   \ChainObject  output_add_rewrite_var(string $value)
+ * @method   \ChainObject  output_add_rewrite_var1(string $name)
  *
  * @see pack
  * @property \ChainObject $pack
- * @method   \ChainObject  pack(...$args)
- * @method   \ChainObject  pack1($format, ...$args)
- * @method   \ChainObject  pack2($format, ...$args)
- * @method   \ChainObject  pack3($format, ...$args)
- * @method   \ChainObject  pack4($format, ...$args)
- * @method   \ChainObject  pack5($format, ...$args)
- * @method   \ChainObject  pack6($format, ...$args)
+ * @method   \ChainObject  pack(...mixed $values)
+ * @method   \ChainObject  pack1(string $format, ...mixed $values)
+ * @method   \ChainObject  pack2(string $format, ...mixed $values)
+ * @method   \ChainObject  pack3(string $format, ...mixed $values)
+ * @method   \ChainObject  pack4(string $format, ...mixed $values)
+ * @method   \ChainObject  pack5(string $format, ...mixed $values)
+ * @method   \ChainObject  pack6(string $format, ...mixed $values)
  *
  * @see paml_export
  * @property \ChainObject $paml_export
@@ -4280,15 +4310,15 @@
  *
  * @see parse_ini_file
  * @property \ChainObject $parse_ini_file
- * @method   \ChainObject  parse_ini_file($process_sections = null, $scanner_mode = null)
- * @method   \ChainObject  parse_ini_file1($filename, $scanner_mode = null)
- * @method   \ChainObject  parse_ini_file2($filename, $process_sections = null)
+ * @method   \ChainObject  parse_ini_file(bool $process_sections = false, int $scanner_mode = INI_SCANNER_NORMAL)
+ * @method   \ChainObject  parse_ini_file1(string $filename, int $scanner_mode = INI_SCANNER_NORMAL)
+ * @method   \ChainObject  parse_ini_file2(string $filename, bool $process_sections = false)
  *
  * @see parse_ini_string
  * @property \ChainObject $parse_ini_string
- * @method   \ChainObject  parse_ini_string($process_sections = null, $scanner_mode = null)
- * @method   \ChainObject  parse_ini_string1($ini_string, $scanner_mode = null)
- * @method   \ChainObject  parse_ini_string2($ini_string, $process_sections = null)
+ * @method   \ChainObject  parse_ini_string(bool $process_sections = false, int $scanner_mode = INI_SCANNER_NORMAL)
+ * @method   \ChainObject  parse_ini_string1(string $ini_string, int $scanner_mode = INI_SCANNER_NORMAL)
+ * @method   \ChainObject  parse_ini_string2(string $ini_string, bool $process_sections = false)
  *
  * @see parse_namespace
  * @property \ChainObject $parse_namespace
@@ -4311,8 +4341,8 @@
  *
  * @see parse_url
  * @property \ChainObject $parse_url
- * @method   \ChainObject  parse_url($component = null)
- * @method   \ChainObject  parse_url1($url)
+ * @method   \ChainObject  parse_url(int $component = -1)
+ * @method   \ChainObject  parse_url1(string $url)
  *
  * @see pascal_case
  * @property \ChainObject $pascal_case
@@ -4324,18 +4354,18 @@
  * @method   \ChainObject  password_get_info()
  *
  * @see password_hash
- * @method   \ChainObject  password_hash($algo, $options = null)
- * @method   \ChainObject  password_hash1($password, $options = null)
- * @method   \ChainObject  password_hash2($password, $algo)
+ * @method   \ChainObject  password_hash(string|int|null $algo, array $options = [])
+ * @method   \ChainObject  password_hash1(string $password, array $options = [])
+ * @method   \ChainObject  password_hash2(string $password, string|int|null $algo)
  *
  * @see password_needs_rehash
- * @method   \ChainObject  password_needs_rehash($algo, $options = null)
- * @method   \ChainObject  password_needs_rehash1($hash, $options = null)
- * @method   \ChainObject  password_needs_rehash2($hash, $algo)
+ * @method   \ChainObject  password_needs_rehash(string|int|null $algo, array $options = [])
+ * @method   \ChainObject  password_needs_rehash1(string $hash, array $options = [])
+ * @method   \ChainObject  password_needs_rehash2(string $hash, string|int|null $algo)
  *
  * @see password_verify
- * @method   \ChainObject  password_verify($hash)
- * @method   \ChainObject  password_verify1($password)
+ * @method   \ChainObject  password_verify(string $hash)
+ * @method   \ChainObject  password_verify1(string $password)
  *
  * @see path_is_absolute
  * @property \ChainObject $path_is_absolute
@@ -4363,8 +4393,8 @@
  *
  * @see pathinfo
  * @property \ChainObject $pathinfo
- * @method   \ChainObject  pathinfo($options = null)
- * @method   \ChainObject  pathinfo1($path)
+ * @method   \ChainObject  pathinfo(int $flags = PATHINFO_ALL)
+ * @method   \ChainObject  pathinfo1(string $path)
  *
  * @see pclose
  * @property \ChainObject $pclose
@@ -4392,16 +4422,16 @@
  * @method   \ChainObject  phpversion()
  *
  * @see popen
- * @method   \ChainObject  popen($mode)
- * @method   \ChainObject  popen1($command)
+ * @method   \ChainObject  popen(string $mode)
+ * @method   \ChainObject  popen1(string $command)
  *
  * @see pos
  * @property \ChainObject $pos
  * @method   \ChainObject  pos()
  *
  * @see pow
- * @method   \ChainObject  pow($exponent)
- * @method   \ChainObject  pow1($base)
+ * @method   \ChainObject  pow(mixed $exponent)
+ * @method   \ChainObject  pow1(mixed $num)
  *
  * @see preg_capture
  * @method   \ChainObject  preg_capture($subject, $default)
@@ -4409,9 +4439,9 @@
  * @method   \ChainObject  preg_capture2($pattern, $subject)
  *
  * @see preg_grep
- * @method   \ChainObject  preg_grep($input, $flags = null)
- * @method   \ChainObject  preg_grep1($regex, $flags = null)
- * @method   \ChainObject  preg_grep2($regex, $input)
+ * @method   \ChainObject  preg_grep(array $array, int $flags = 0)
+ * @method   \ChainObject  preg_grep1(string $pattern, int $flags = 0)
+ * @method   \ChainObject  preg_grep2(string $pattern, array $array)
  *
  * @see preg_matches
  * @method   \ChainObject  preg_matches($subject, $flags = 0, $offset = 0)
@@ -4421,14 +4451,14 @@
  *
  * @see preg_quote
  * @property \ChainObject $preg_quote
- * @method   \ChainObject  preg_quote($delim_char = null)
- * @method   \ChainObject  preg_quote1($str)
+ * @method   \ChainObject  preg_quote(?string $delimiter = null)
+ * @method   \ChainObject  preg_quote1(string $str)
  *
  * @see preg_split
- * @method   \ChainObject  preg_split($subject, $limit = null, $flags = null)
- * @method   \ChainObject  preg_split1($pattern, $limit = null, $flags = null)
- * @method   \ChainObject  preg_split2($pattern, $subject, $flags = null)
- * @method   \ChainObject  preg_split3($pattern, $subject, $limit = null)
+ * @method   \ChainObject  preg_split(string $subject, int $limit = -1, int $flags = 0)
+ * @method   \ChainObject  preg_split1(string $pattern, int $limit = -1, int $flags = 0)
+ * @method   \ChainObject  preg_split2(string $pattern, string $subject, int $flags = 0)
+ * @method   \ChainObject  preg_split3(string $pattern, string $subject, int $limit = -1)
  *
  * @see prev_key
  * @method   \ChainObject  prev_key($key)
@@ -4436,18 +4466,18 @@
  *
  * @see print_r
  * @property \ChainObject $print_r
- * @method   \ChainObject  print_r($return = null)
- * @method   \ChainObject  print_r1($var)
+ * @method   \ChainObject  print_r(bool $return = false)
+ * @method   \ChainObject  print_r1(mixed $value)
  *
  * @see printf
  * @property \ChainObject $printf
- * @method   \ChainObject  printf(...$args)
- * @method   \ChainObject  printf1($format, ...$args)
- * @method   \ChainObject  printf2($format, ...$args)
- * @method   \ChainObject  printf3($format, ...$args)
- * @method   \ChainObject  printf4($format, ...$args)
- * @method   \ChainObject  printf5($format, ...$args)
- * @method   \ChainObject  printf6($format, ...$args)
+ * @method   \ChainObject  printf(...mixed $values)
+ * @method   \ChainObject  printf1(string $format, ...mixed $values)
+ * @method   \ChainObject  printf2(string $format, ...mixed $values)
+ * @method   \ChainObject  printf3(string $format, ...mixed $values)
+ * @method   \ChainObject  printf4(string $format, ...mixed $values)
+ * @method   \ChainObject  printf5(string $format, ...mixed $values)
+ * @method   \ChainObject  printf6(string $format, ...mixed $values)
  *
  * @see probability
  * @property \ChainObject $probability
@@ -4468,7 +4498,7 @@
  *
  * @see proc_terminate
  * @property \ChainObject $proc_terminate
- * @method   \ChainObject  proc_terminate($signal = null)
+ * @method   \ChainObject  proc_terminate(int $signal = 15)
  * @method   \ChainObject  proc_terminate1($process)
  *
  * @see process_parallel
@@ -4483,7 +4513,7 @@
  * @method   \ChainObject  profiler()
  *
  * @see property_exists
- * @method   \ChainObject  property_exists($property_name)
+ * @method   \ChainObject  property_exists(string $property)
  * @method   \ChainObject  property_exists1($object_or_class)
  *
  * @see putenv
@@ -4514,8 +4544,8 @@
  * @method   \ChainObject  rad2deg()
  *
  * @see rand
- * @method   \ChainObject  rand($max = null)
- * @method   \ChainObject  rand1($min = null)
+ * @method   \ChainObject  rand(int $max = null)
+ * @method   \ChainObject  rand1(int $min = null)
  *
  * @see random_at
  * @method   \ChainObject  random_at(...$args)
@@ -4530,17 +4560,17 @@
  * @method   \ChainObject  random_bytes()
  *
  * @see random_int
- * @method   \ChainObject  random_int($max)
- * @method   \ChainObject  random_int1($min)
+ * @method   \ChainObject  random_int(int $max)
+ * @method   \ChainObject  random_int1(int $min)
  *
  * @see random_string
  * @method   \ChainObject  random_string($charlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
  * @method   \ChainObject  random_string1($length = 8)
  *
  * @see range
- * @method   \ChainObject  range($high, $step = null)
- * @method   \ChainObject  range1($low, $step = null)
- * @method   \ChainObject  range2($low, $high)
+ * @method   \ChainObject  range($end, int|float $step = 1)
+ * @method   \ChainObject  range1($start, int|float $step = 1)
+ * @method   \ChainObject  range2($start, $end)
  *
  * @see rawurldecode
  * @property \ChainObject $rawurldecode
@@ -4579,9 +4609,9 @@
  *
  * @see readfile
  * @property \ChainObject $readfile
- * @method   \ChainObject  readfile($flags = null, $context = null)
- * @method   \ChainObject  readfile1($filename, $context = null)
- * @method   \ChainObject  readfile2($filename, $flags = null)
+ * @method   \ChainObject  readfile(bool $use_include_path = false, $context = null)
+ * @method   \ChainObject  readfile1(string $filename, $context = null)
+ * @method   \ChainObject  readfile2(string $filename, bool $use_include_path = false)
  *
  * @see readlink
  * @property \ChainObject $readlink
@@ -4602,28 +4632,56 @@
  *
  * @see register_shutdown_function
  * @property \ChainObject $register_shutdown_function
- * @method   \ChainObject  register_shutdown_function(...$parameters)
- * @method   \ChainObject  register_shutdown_function1($function_name, ...$parameters)
- * @method   \ChainObject  register_shutdown_function2($function_name, ...$parameters)
- * @method   \ChainObject  register_shutdown_function3($function_name, ...$parameters)
- * @method   \ChainObject  register_shutdown_function4($function_name, ...$parameters)
- * @method   \ChainObject  register_shutdown_function5($function_name, ...$parameters)
- * @method   \ChainObject  register_shutdown_function6($function_name, ...$parameters)
+ * @method   \ChainObject  register_shutdown_function(...mixed $args)
+ * @method   \ChainObject  register_shutdown_function1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_function2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_function3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_function4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_function5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_function6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP(...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionP6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE(...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_shutdown_functionE6(callable $callback, ...mixed $args)
  *
  * @see register_tick_function
  * @property \ChainObject $register_tick_function
- * @method   \ChainObject  register_tick_function(...$parameters)
- * @method   \ChainObject  register_tick_function1($function_name, ...$parameters)
- * @method   \ChainObject  register_tick_function2($function_name, ...$parameters)
- * @method   \ChainObject  register_tick_function3($function_name, ...$parameters)
- * @method   \ChainObject  register_tick_function4($function_name, ...$parameters)
- * @method   \ChainObject  register_tick_function5($function_name, ...$parameters)
- * @method   \ChainObject  register_tick_function6($function_name, ...$parameters)
+ * @method   \ChainObject  register_tick_function(...mixed $args)
+ * @method   \ChainObject  register_tick_function1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_function2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_function3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_function4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_function5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_function6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionP(...mixed $args)
+ * @method   \ChainObject  register_tick_functionP1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionP2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionP3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionP4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionP5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionP6(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionE(...mixed $args)
+ * @method   \ChainObject  register_tick_functionE1(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionE2(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionE3(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionE4(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionE5(callable $callback, ...mixed $args)
+ * @method   \ChainObject  register_tick_functionE6(callable $callback, ...mixed $args)
  *
  * @see rename
- * @method   \ChainObject  rename($new_name, $context = null)
- * @method   \ChainObject  rename1($old_name, $context = null)
- * @method   \ChainObject  rename2($old_name, $new_name)
+ * @method   \ChainObject  rename(string $to, $context = null)
+ * @method   \ChainObject  rename1(string $from, $context = null)
+ * @method   \ChainObject  rename2(string $from, string $to)
  *
  * @see render_file
  * @method   \ChainObject  render_file($array)
@@ -4657,24 +4715,25 @@
  * @see rmdir
  * @property \ChainObject $rmdir
  * @method   \ChainObject  rmdir($context = null)
- * @method   \ChainObject  rmdir1($dirname)
+ * @method   \ChainObject  rmdir1(string $directory)
  *
  * @see round
  * @property \ChainObject $round
- * @method   \ChainObject  round($precision = null, $mode = null)
- * @method   \ChainObject  round1($number, $mode = null)
- * @method   \ChainObject  round2($number, $precision = null)
+ * @method   \ChainObject  round(int $precision = 0, int $mode = PHP_ROUND_HALF_UP)
+ * @method   \ChainObject  round1(int|float $num, int $mode = PHP_ROUND_HALF_UP)
+ * @method   \ChainObject  round2(int|float $num, int $precision = 0)
  *
  * @see rtrim
  * @property \ChainObject $rtrim
- * @method   \ChainObject  rtrim($character_mask = null)
- * @method   \ChainObject  rtrim1($str)
+ * @method   \ChainObject  rtrim(string $characters = " 
+	\000")
+ * @method   \ChainObject  rtrim1(string $string)
  *
  * @see scandir
  * @property \ChainObject $scandir
- * @method   \ChainObject  scandir($sorting_order = null, $context = null)
- * @method   \ChainObject  scandir1($dir, $context = null)
- * @method   \ChainObject  scandir2($dir, $sorting_order = null)
+ * @method   \ChainObject  scandir(int $sorting_order = SCANDIR_SORT_ASCENDING, $context = null)
+ * @method   \ChainObject  scandir1(string $directory, $context = null)
+ * @method   \ChainObject  scandir2(string $directory, int $sorting_order = SCANDIR_SORT_ASCENDING)
  *
  * @see serialize
  * @property \ChainObject $serialize
@@ -4682,16 +4741,22 @@
  *
  * @see set_error_handler
  * @property \ChainObject $set_error_handler
- * @method   \ChainObject  set_error_handler($error_types = null)
- * @method   \ChainObject  set_error_handler1($error_handler)
+ * @method   \ChainObject  set_error_handler(int $error_levels = E_ALL)
+ * @method   \ChainObject  set_error_handler1(?callable $callback)
+ * @method   \ChainObject  set_error_handlerP(int $error_levels = E_ALL)
+ * @method   \ChainObject  set_error_handlerP1(?callable $callback)
+ * @method   \ChainObject  set_error_handlerE(int $error_levels = E_ALL)
+ * @method   \ChainObject  set_error_handlerE1(?callable $callback)
  *
  * @see set_exception_handler
  * @property \ChainObject $set_exception_handler
  * @method   \ChainObject  set_exception_handler()
+ * @method   \ChainObject  set_exception_handlerP()
+ * @method   \ChainObject  set_exception_handlerE()
  *
  * @see set_file_buffer
- * @method   \ChainObject  set_file_buffer($buffer)
- * @method   \ChainObject  set_file_buffer1($fp)
+ * @method   \ChainObject  set_file_buffer(int $size)
+ * @method   \ChainObject  set_file_buffer1($stream)
  *
  * @see set_include_path
  * @property \ChainObject $set_include_path
@@ -4703,42 +4768,47 @@
  *
  * @see setcookie
  * @property \ChainObject $setcookie
- * @method   \ChainObject  setcookie($value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie1($name, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie2($name, $value = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie3($name, $value = null, $expires_or_options = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie4($name, $value = null, $expires_or_options = null, $path = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setcookie5($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $httponly = null)
- * @method   \ChainObject  setcookie6($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null)
+ * @method   \ChainObject  setcookie(string $value = "", array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setcookie1(string $name, array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setcookie2(string $name, string $value = "", string $path = "", string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setcookie3(string $name, string $value = "", array|int $expires_or_options = 0, string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setcookie4(string $name, string $value = "", array|int $expires_or_options = 0, string $path = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setcookie5(string $name, string $value = "", array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $httponly = false)
+ * @method   \ChainObject  setcookie6(string $name, string $value = "", array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false)
+ *
+ * @see setenvs
+ * @property \ChainObject $setenvs
+ * @method   \ChainObject  setenvs()
  *
  * @see setlocale
- * @method   \ChainObject  setlocale(...$locales)
- * @method   \ChainObject  setlocale1($category, ...$locales)
- * @method   \ChainObject  setlocale2($category, ...$locales)
- * @method   \ChainObject  setlocale3($category, ...$locales)
- * @method   \ChainObject  setlocale4($category, ...$locales)
- * @method   \ChainObject  setlocale5($category, ...$locales)
- * @method   \ChainObject  setlocale6($category, ...$locales)
+ * @method   \ChainObject  setlocale($locales, ...$rest)
+ * @method   \ChainObject  setlocale1(int $category, ...$rest)
+ * @method   \ChainObject  setlocale2(int $category, $locales, ...$rest)
+ * @method   \ChainObject  setlocale3(int $category, $locales, ...$rest)
+ * @method   \ChainObject  setlocale4(int $category, $locales, ...$rest)
+ * @method   \ChainObject  setlocale5(int $category, $locales, ...$rest)
+ * @method   \ChainObject  setlocale6(int $category, $locales, ...$rest)
+ * @method   \ChainObject  setlocale7(int $category, $locales, ...$rest)
  *
  * @see setrawcookie
  * @property \ChainObject $setrawcookie
- * @method   \ChainObject  setrawcookie($value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie1($name, $expires_or_options = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie2($name, $value = null, $path = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie3($name, $value = null, $expires_or_options = null, $domain = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie4($name, $value = null, $expires_or_options = null, $path = null, $secure = null, $httponly = null)
- * @method   \ChainObject  setrawcookie5($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $httponly = null)
- * @method   \ChainObject  setrawcookie6($name, $value = null, $expires_or_options = null, $path = null, $domain = null, $secure = null)
+ * @method   \ChainObject  setrawcookie(string $value = "", array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setrawcookie1(string $name, array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setrawcookie2(string $name, string $value = "", string $path = "", string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setrawcookie3(string $name, string $value = "", array|int $expires_or_options = 0, string $domain = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setrawcookie4(string $name, string $value = "", array|int $expires_or_options = 0, string $path = "", bool $secure = false, bool $httponly = false)
+ * @method   \ChainObject  setrawcookie5(string $name, string $value = "", array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $httponly = false)
+ * @method   \ChainObject  setrawcookie6(string $name, string $value = "", array|int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false)
  *
  * @see sha1
  * @property \ChainObject $sha1
- * @method   \ChainObject  sha1($raw_output = null)
- * @method   \ChainObject  sha11($str)
+ * @method   \ChainObject  sha1(bool $binary = false)
+ * @method   \ChainObject  sha11(string $string)
  *
  * @see sha1_file
  * @property \ChainObject $sha1_file
- * @method   \ChainObject  sha1_file($raw_output = null)
- * @method   \ChainObject  sha1_file1($filename)
+ * @method   \ChainObject  sha1_file(bool $binary = false)
+ * @method   \ChainObject  sha1_file1(string $filename)
  *
  * @see shell_exec
  * @property \ChainObject $shell_exec
@@ -4746,8 +4816,8 @@
  *
  * @see show_source
  * @property \ChainObject $show_source
- * @method   \ChainObject  show_source($return = null)
- * @method   \ChainObject  show_source1($file_name)
+ * @method   \ChainObject  show_source(bool $return = false)
+ * @method   \ChainObject  show_source1(string $filename)
  *
  * @see si_prefix
  * @property \ChainObject $si_prefix
@@ -4770,8 +4840,8 @@
  *
  * @see sizeof
  * @property \ChainObject $sizeof
- * @method   \ChainObject  sizeof($mode = null)
- * @method   \ChainObject  sizeof1($var)
+ * @method   \ChainObject  sizeof(int $mode = COUNT_NORMAL)
+ * @method   \ChainObject  sizeof1(\Countable|array $value)
  *
  * @see sleep
  * @property \ChainObject $sleep
@@ -4787,13 +4857,13 @@
  * @method   \ChainObject  socket_get_status()
  *
  * @see socket_set_blocking
- * @method   \ChainObject  socket_set_blocking($mode)
- * @method   \ChainObject  socket_set_blocking1($socket)
+ * @method   \ChainObject  socket_set_blocking(bool $enable)
+ * @method   \ChainObject  socket_set_blocking1($stream)
  *
  * @see socket_set_timeout
- * @method   \ChainObject  socket_set_timeout($seconds, $microseconds = null)
- * @method   \ChainObject  socket_set_timeout1($stream, $microseconds = null)
- * @method   \ChainObject  socket_set_timeout2($stream, $seconds)
+ * @method   \ChainObject  socket_set_timeout(int $seconds, int $microseconds = 0)
+ * @method   \ChainObject  socket_set_timeout1($stream, int $microseconds = 0)
+ * @method   \ChainObject  socket_set_timeout2($stream, int $seconds)
  *
  * @see soundex
  * @property \ChainObject $soundex
@@ -4806,13 +4876,13 @@
  *
  * @see sprintf
  * @property \ChainObject $sprintf
- * @method   \ChainObject  sprintf(...$args)
- * @method   \ChainObject  sprintf1($format, ...$args)
- * @method   \ChainObject  sprintf2($format, ...$args)
- * @method   \ChainObject  sprintf3($format, ...$args)
- * @method   \ChainObject  sprintf4($format, ...$args)
- * @method   \ChainObject  sprintf5($format, ...$args)
- * @method   \ChainObject  sprintf6($format, ...$args)
+ * @method   \ChainObject  sprintf(...mixed $values)
+ * @method   \ChainObject  sprintf1(string $format, ...mixed $values)
+ * @method   \ChainObject  sprintf2(string $format, ...mixed $values)
+ * @method   \ChainObject  sprintf3(string $format, ...mixed $values)
+ * @method   \ChainObject  sprintf4(string $format, ...mixed $values)
+ * @method   \ChainObject  sprintf5(string $format, ...mixed $values)
+ * @method   \ChainObject  sprintf6(string $format, ...mixed $values)
  *
  * @see sql_bind
  * @method   \ChainObject  sql_bind($values)
@@ -4832,8 +4902,8 @@
  * @method   \ChainObject  sqrt()
  *
  * @see srand
- * @method   \ChainObject  srand($mode = null)
- * @method   \ChainObject  srand1($seed = null)
+ * @method   \ChainObject  srand(int $mode = MT_RAND_MT19937)
+ * @method   \ChainObject  srand1(int $seed = 0)
  *
  * @see stacktrace
  * @method   \ChainObject  stacktrace($option = [])
@@ -4873,10 +4943,10 @@
  *
  * @see str_chop
  * @property \ChainObject $str_chop
- * @method   \ChainObject  str_chop($prefix = null, $suffix = null, $case_insensitivity = false)
- * @method   \ChainObject  str_chop1($string, $suffix = null, $case_insensitivity = false)
- * @method   \ChainObject  str_chop2($string, $prefix = null, $case_insensitivity = false)
- * @method   \ChainObject  str_chop3($string, $prefix = null, $suffix = null)
+ * @method   \ChainObject  str_chop($prefix = "", $suffix = "", $case_insensitivity = false)
+ * @method   \ChainObject  str_chop1($string, $suffix = "", $case_insensitivity = false)
+ * @method   \ChainObject  str_chop2($string, $prefix = "", $case_insensitivity = false)
+ * @method   \ChainObject  str_chop3($string, $prefix = "", $suffix = "")
  *
  * @see str_chunk
  * @property \ChainObject $str_chunk
@@ -4905,16 +4975,12 @@
  * @method   \ChainObject  common_prefix5(...$strings)
  *
  * @see str_contains
- * @method   \ChainObject  str_contains($needle, $case_insensitivity = false, $and_flag = false)
- * @method   \ChainObject  str_contains1($haystack, $case_insensitivity = false, $and_flag = false)
- * @method   \ChainObject  str_contains2($haystack, $needle, $and_flag = false)
- * @method   \ChainObject  str_contains3($haystack, $needle, $case_insensitivity = false)
+ * @method   \ChainObject  str_contains(string $needle)
+ * @method   \ChainObject  str_contains1(string $haystack)
  *
  * @see str_contains
- * @method   \ChainObject  contains($needle, $case_insensitivity = false, $and_flag = false)
- * @method   \ChainObject  contains1($haystack, $case_insensitivity = false, $and_flag = false)
- * @method   \ChainObject  contains2($haystack, $needle, $and_flag = false)
- * @method   \ChainObject  contains3($haystack, $needle, $case_insensitivity = false)
+ * @method   \ChainObject  contains(string $needle)
+ * @method   \ChainObject  contains1(string $haystack)
  *
  * @see str_diff
  * @method   \ChainObject  str_diff($ystring, $options = [])
@@ -4945,6 +5011,10 @@
  * @method   \ChainObject  embed2($string, $replacemap, $escape = "\\")
  * @method   \ChainObject  embed3($string, $replacemap, $enclosure = "'\"")
  *
+ * @see str_ends_with
+ * @method   \ChainObject  str_ends_with(string $needle)
+ * @method   \ChainObject  str_ends_with1(string $haystack)
+ *
  * @see str_equals
  * @method   \ChainObject  str_equals($str2, $case_insensitivity = false)
  * @method   \ChainObject  str_equals1($str1, $case_insensitivity = false)
@@ -4969,17 +5039,17 @@
  *
  * @see str_getcsv
  * @property \ChainObject $str_getcsv
- * @method   \ChainObject  str_getcsv($delimiter = null, $enclosure = null, $escape = null)
- * @method   \ChainObject  str_getcsv1($string, $enclosure = null, $escape = null)
- * @method   \ChainObject  str_getcsv2($string, $delimiter = null, $escape = null)
- * @method   \ChainObject  str_getcsv3($string, $delimiter = null, $enclosure = null)
+ * @method   \ChainObject  str_getcsv(string $separator = ",", string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  str_getcsv1(string $string, string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  str_getcsv2(string $string, string $separator = ",", string $escape = "\\")
+ * @method   \ChainObject  str_getcsv3(string $string, string $separator = ",", string $enclosure = "\"")
  *
  * @see str_getcsv
  * @property \ChainObject $getcsv
- * @method   \ChainObject  getcsv($delimiter = null, $enclosure = null, $escape = null)
- * @method   \ChainObject  getcsv1($string, $enclosure = null, $escape = null)
- * @method   \ChainObject  getcsv2($string, $delimiter = null, $escape = null)
- * @method   \ChainObject  getcsv3($string, $delimiter = null, $enclosure = null)
+ * @method   \ChainObject  getcsv(string $separator = ",", string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  getcsv1(string $string, string $enclosure = "\"", string $escape = "\\")
+ * @method   \ChainObject  getcsv2(string $string, string $separator = ",", string $escape = "\\")
+ * @method   \ChainObject  getcsv3(string $string, string $separator = ",", string $enclosure = "\"")
  *
  * @see str_lchop
  * @method   \ChainObject  str_lchop($prefix, $case_insensitivity = false)
@@ -4992,16 +5062,10 @@
  * @method   \ChainObject  lchop2($string, $prefix)
  *
  * @see str_pad
- * @method   \ChainObject  str_pad($pad_length, $pad_string = null, $pad_type = null)
- * @method   \ChainObject  str_pad1($input, $pad_string = null, $pad_type = null)
- * @method   \ChainObject  str_pad2($input, $pad_length, $pad_type = null)
- * @method   \ChainObject  str_pad3($input, $pad_length, $pad_string = null)
- *
- * @see str_pad
- * @method   \ChainObject  pad($pad_length, $pad_string = null, $pad_type = null)
- * @method   \ChainObject  pad1($input, $pad_string = null, $pad_type = null)
- * @method   \ChainObject  pad2($input, $pad_length, $pad_type = null)
- * @method   \ChainObject  pad3($input, $pad_length, $pad_string = null)
+ * @method   \ChainObject  str_pad(int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT)
+ * @method   \ChainObject  str_pad1(string $string, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT)
+ * @method   \ChainObject  str_pad2(string $string, int $length, int $pad_type = STR_PAD_RIGHT)
+ * @method   \ChainObject  str_pad3(string $string, int $length, string $pad_string = " ")
  *
  * @see str_putcsv
  * @property \ChainObject $str_putcsv
@@ -5018,24 +5082,22 @@
  * @method   \ChainObject  putcsv3($array, $delimiter = ",", $enclosure = "\"")
  *
  * @see str_rchop
- * @property \ChainObject $str_rchop
- * @method   \ChainObject  str_rchop($suffix = null, $case_insensitivity = false)
+ * @method   \ChainObject  str_rchop($suffix, $case_insensitivity = false)
  * @method   \ChainObject  str_rchop1($string, $case_insensitivity = false)
- * @method   \ChainObject  str_rchop2($string, $suffix = null)
+ * @method   \ChainObject  str_rchop2($string, $suffix)
  *
  * @see str_rchop
- * @property \ChainObject $rchop
- * @method   \ChainObject  rchop($suffix = null, $case_insensitivity = false)
+ * @method   \ChainObject  rchop($suffix, $case_insensitivity = false)
  * @method   \ChainObject  rchop1($string, $case_insensitivity = false)
- * @method   \ChainObject  rchop2($string, $suffix = null)
+ * @method   \ChainObject  rchop2($string, $suffix)
  *
  * @see str_repeat
- * @method   \ChainObject  str_repeat($mult)
- * @method   \ChainObject  str_repeat1($input)
+ * @method   \ChainObject  str_repeat(int $times)
+ * @method   \ChainObject  str_repeat1(string $string)
  *
  * @see str_repeat
- * @method   \ChainObject  repeat($mult)
- * @method   \ChainObject  repeat1($input)
+ * @method   \ChainObject  repeat(int $times)
+ * @method   \ChainObject  repeat1(string $string)
  *
  * @see str_rot13
  * @property \ChainObject $str_rot13
@@ -5055,13 +5117,17 @@
  *
  * @see str_split
  * @property \ChainObject $str_split
- * @method   \ChainObject  str_split($split_length = null)
- * @method   \ChainObject  str_split1($str)
+ * @method   \ChainObject  str_split(int $length = 1)
+ * @method   \ChainObject  str_split1(string $string)
  *
  * @see str_split
  * @property \ChainObject $split
- * @method   \ChainObject  split($split_length = null)
- * @method   \ChainObject  split1($str)
+ * @method   \ChainObject  split(int $length = 1)
+ * @method   \ChainObject  split1(string $string)
+ *
+ * @see str_starts_with
+ * @method   \ChainObject  str_starts_with(string $needle)
+ * @method   \ChainObject  str_starts_with1(string $haystack)
  *
  * @see str_submap
  * @method   \ChainObject  str_submap($replaces, $case_insensitivity = false)
@@ -5087,19 +5153,19 @@
  *
  * @see str_word_count
  * @property \ChainObject $str_word_count
- * @method   \ChainObject  str_word_count($format = null, $charlist = null)
- * @method   \ChainObject  str_word_count1($str, $charlist = null)
- * @method   \ChainObject  str_word_count2($str, $format = null)
+ * @method   \ChainObject  str_word_count(int $format = 0, ?string $characters = null)
+ * @method   \ChainObject  str_word_count1(string $string, ?string $characters = null)
+ * @method   \ChainObject  str_word_count2(string $string, int $format = 0)
  *
  * @see str_word_count
  * @property \ChainObject $word_count
- * @method   \ChainObject  word_count($format = null, $charlist = null)
- * @method   \ChainObject  word_count1($str, $charlist = null)
- * @method   \ChainObject  word_count2($str, $format = null)
+ * @method   \ChainObject  word_count(int $format = 0, ?string $characters = null)
+ * @method   \ChainObject  word_count1(string $string, ?string $characters = null)
+ * @method   \ChainObject  word_count2(string $string, int $format = 0)
  *
  * @see strcasecmp
- * @method   \ChainObject  strcasecmp($str2)
- * @method   \ChainObject  strcasecmp1($str1)
+ * @method   \ChainObject  strcasecmp(string $string2)
+ * @method   \ChainObject  strcasecmp1(string $string1)
  *
  * @see strcat
  * @method   \ChainObject  strcat(...$variadic)
@@ -5110,26 +5176,26 @@
  * @method   \ChainObject  strcat5(...$variadic)
  *
  * @see strchr
- * @method   \ChainObject  strchr($needle, $part = null)
- * @method   \ChainObject  strchr1($haystack, $part = null)
- * @method   \ChainObject  strchr2($haystack, $needle)
+ * @method   \ChainObject  strchr(string $needle, bool $before_needle = false)
+ * @method   \ChainObject  strchr1(string $haystack, bool $before_needle = false)
+ * @method   \ChainObject  strchr2(string $haystack, string $needle)
  *
  * @see strcmp
- * @method   \ChainObject  strcmp($str2)
- * @method   \ChainObject  strcmp1($str1)
+ * @method   \ChainObject  strcmp(string $string2)
+ * @method   \ChainObject  strcmp1(string $string1)
  *
  * @see strcoll
- * @method   \ChainObject  strcoll($str2)
- * @method   \ChainObject  strcoll1($str1)
+ * @method   \ChainObject  strcoll(string $string2)
+ * @method   \ChainObject  strcoll1(string $string1)
  *
  * @see strcspn
- * @method   \ChainObject  strcspn($mask, $start = null, $len = null)
- * @method   \ChainObject  strcspn1($str, $start = null, $len = null)
- * @method   \ChainObject  strcspn2($str, $mask, $len = null)
- * @method   \ChainObject  strcspn3($str, $mask, $start = null)
+ * @method   \ChainObject  strcspn(string $characters, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  strcspn1(string $string, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  strcspn2(string $string, string $characters, ?int $length = null)
+ * @method   \ChainObject  strcspn3(string $string, string $characters, int $offset = 0)
  *
  * @see stream_bucket_append
- * @method   \ChainObject  stream_bucket_append($bucket)
+ * @method   \ChainObject  stream_bucket_append(object $bucket)
  * @method   \ChainObject  stream_bucket_append1($brigade)
  *
  * @see stream_bucket_make_writeable
@@ -5137,16 +5203,16 @@
  * @method   \ChainObject  stream_bucket_make_writeable()
  *
  * @see stream_bucket_new
- * @method   \ChainObject  stream_bucket_new($buffer)
+ * @method   \ChainObject  stream_bucket_new(string $buffer)
  * @method   \ChainObject  stream_bucket_new1($stream)
  *
  * @see stream_bucket_prepend
- * @method   \ChainObject  stream_bucket_prepend($bucket)
+ * @method   \ChainObject  stream_bucket_prepend(object $bucket)
  * @method   \ChainObject  stream_bucket_prepend1($brigade)
  *
  * @see stream_context_create
- * @method   \ChainObject  stream_context_create($params = null)
- * @method   \ChainObject  stream_context_create1($options = null)
+ * @method   \ChainObject  stream_context_create(?array $params = null)
+ * @method   \ChainObject  stream_context_create1(?array $options = null)
  *
  * @see stream_context_get_default
  * @method   \ChainObject  stream_context_get_default()
@@ -5164,36 +5230,36 @@
  * @method   \ChainObject  stream_context_set_default()
  *
  * @see stream_context_set_option
- * @method   \ChainObject  stream_context_set_option($wrappername, $optionname = null, $value = null)
- * @method   \ChainObject  stream_context_set_option1($stream_or_context, $optionname = null, $value = null)
- * @method   \ChainObject  stream_context_set_option2($stream_or_context, $wrappername, $value = null)
- * @method   \ChainObject  stream_context_set_option3($stream_or_context, $wrappername, $optionname = null)
+ * @method   \ChainObject  stream_context_set_option(array|string $wrapper_or_options, ?string $option_name = null, mixed $value = null)
+ * @method   \ChainObject  stream_context_set_option1($context, ?string $option_name = null, mixed $value = null)
+ * @method   \ChainObject  stream_context_set_option2($context, array|string $wrapper_or_options, mixed $value = null)
+ * @method   \ChainObject  stream_context_set_option3($context, array|string $wrapper_or_options, ?string $option_name = null)
  *
  * @see stream_context_set_params
- * @method   \ChainObject  stream_context_set_params($options)
- * @method   \ChainObject  stream_context_set_params1($stream_or_context)
+ * @method   \ChainObject  stream_context_set_params(array $params)
+ * @method   \ChainObject  stream_context_set_params1($context)
  *
  * @see stream_copy_to_stream
- * @method   \ChainObject  stream_copy_to_stream($dest, $maxlen = null, $pos = null)
- * @method   \ChainObject  stream_copy_to_stream1($source, $maxlen = null, $pos = null)
- * @method   \ChainObject  stream_copy_to_stream2($source, $dest, $pos = null)
- * @method   \ChainObject  stream_copy_to_stream3($source, $dest, $maxlen = null)
+ * @method   \ChainObject  stream_copy_to_stream($to, ?int $length = null, int $offset = 0)
+ * @method   \ChainObject  stream_copy_to_stream1($from, ?int $length = null, int $offset = 0)
+ * @method   \ChainObject  stream_copy_to_stream2($from, $to, int $offset = 0)
+ * @method   \ChainObject  stream_copy_to_stream3($from, $to, ?int $length = null)
  *
  * @see stream_filter_append
- * @method   \ChainObject  stream_filter_append($filtername, $read_write = null, $filterparams = null)
- * @method   \ChainObject  stream_filter_append1($stream, $read_write = null, $filterparams = null)
- * @method   \ChainObject  stream_filter_append2($stream, $filtername, $filterparams = null)
- * @method   \ChainObject  stream_filter_append3($stream, $filtername, $read_write = null)
+ * @method   \ChainObject  stream_filter_append(string $filter_name, int $mode = 0, mixed $params = null)
+ * @method   \ChainObject  stream_filter_append1($stream, int $mode = 0, mixed $params = null)
+ * @method   \ChainObject  stream_filter_append2($stream, string $filter_name, mixed $params = null)
+ * @method   \ChainObject  stream_filter_append3($stream, string $filter_name, int $mode = 0)
  *
  * @see stream_filter_prepend
- * @method   \ChainObject  stream_filter_prepend($filtername, $read_write = null, $filterparams = null)
- * @method   \ChainObject  stream_filter_prepend1($stream, $read_write = null, $filterparams = null)
- * @method   \ChainObject  stream_filter_prepend2($stream, $filtername, $filterparams = null)
- * @method   \ChainObject  stream_filter_prepend3($stream, $filtername, $read_write = null)
+ * @method   \ChainObject  stream_filter_prepend(string $filter_name, int $mode = 0, mixed $params = null)
+ * @method   \ChainObject  stream_filter_prepend1($stream, int $mode = 0, mixed $params = null)
+ * @method   \ChainObject  stream_filter_prepend2($stream, string $filter_name, mixed $params = null)
+ * @method   \ChainObject  stream_filter_prepend3($stream, string $filter_name, int $mode = 0)
  *
  * @see stream_filter_register
- * @method   \ChainObject  stream_filter_register($classname)
- * @method   \ChainObject  stream_filter_register1($filtername)
+ * @method   \ChainObject  stream_filter_register(string $class)
+ * @method   \ChainObject  stream_filter_register1(string $filter_name)
  *
  * @see stream_filter_remove
  * @property \ChainObject $stream_filter_remove
@@ -5201,14 +5267,14 @@
  *
  * @see stream_get_contents
  * @property \ChainObject $stream_get_contents
- * @method   \ChainObject  stream_get_contents($maxlen = null, $offset = null)
- * @method   \ChainObject  stream_get_contents1($source, $offset = null)
- * @method   \ChainObject  stream_get_contents2($source, $maxlen = null)
+ * @method   \ChainObject  stream_get_contents(?int $length = null, int $offset = -1)
+ * @method   \ChainObject  stream_get_contents1($stream, int $offset = -1)
+ * @method   \ChainObject  stream_get_contents2($stream, ?int $length = null)
  *
  * @see stream_get_line
- * @method   \ChainObject  stream_get_line($maxlen, $ending = null)
- * @method   \ChainObject  stream_get_line1($stream, $ending = null)
- * @method   \ChainObject  stream_get_line2($stream, $maxlen)
+ * @method   \ChainObject  stream_get_line(int $length, string $ending = "")
+ * @method   \ChainObject  stream_get_line1($stream, string $ending = "")
+ * @method   \ChainObject  stream_get_line2($stream, int $length)
  *
  * @see stream_get_meta_data
  * @property \ChainObject $stream_get_meta_data
@@ -5223,58 +5289,58 @@
  * @method   \ChainObject  stream_isatty()
  *
  * @see stream_register_wrapper
- * @method   \ChainObject  stream_register_wrapper($classname, $flags = null)
- * @method   \ChainObject  stream_register_wrapper1($protocol, $flags = null)
- * @method   \ChainObject  stream_register_wrapper2($protocol, $classname)
+ * @method   \ChainObject  stream_register_wrapper(string $class, int $flags = 0)
+ * @method   \ChainObject  stream_register_wrapper1(string $protocol, int $flags = 0)
+ * @method   \ChainObject  stream_register_wrapper2(string $protocol, string $class)
  *
  * @see stream_resolve_include_path
  * @property \ChainObject $stream_resolve_include_path
  * @method   \ChainObject  stream_resolve_include_path()
  *
  * @see stream_set_blocking
- * @method   \ChainObject  stream_set_blocking($mode)
- * @method   \ChainObject  stream_set_blocking1($socket)
+ * @method   \ChainObject  stream_set_blocking(bool $enable)
+ * @method   \ChainObject  stream_set_blocking1($stream)
  *
  * @see stream_set_chunk_size
- * @method   \ChainObject  stream_set_chunk_size($chunk_size)
- * @method   \ChainObject  stream_set_chunk_size1($fp)
+ * @method   \ChainObject  stream_set_chunk_size(int $size)
+ * @method   \ChainObject  stream_set_chunk_size1($stream)
  *
  * @see stream_set_read_buffer
- * @method   \ChainObject  stream_set_read_buffer($buffer)
- * @method   \ChainObject  stream_set_read_buffer1($fp)
+ * @method   \ChainObject  stream_set_read_buffer(int $size)
+ * @method   \ChainObject  stream_set_read_buffer1($stream)
  *
  * @see stream_set_timeout
- * @method   \ChainObject  stream_set_timeout($seconds, $microseconds = null)
- * @method   \ChainObject  stream_set_timeout1($stream, $microseconds = null)
- * @method   \ChainObject  stream_set_timeout2($stream, $seconds)
+ * @method   \ChainObject  stream_set_timeout(int $seconds, int $microseconds = 0)
+ * @method   \ChainObject  stream_set_timeout1($stream, int $microseconds = 0)
+ * @method   \ChainObject  stream_set_timeout2($stream, int $seconds)
  *
  * @see stream_set_write_buffer
- * @method   \ChainObject  stream_set_write_buffer($buffer)
- * @method   \ChainObject  stream_set_write_buffer1($fp)
+ * @method   \ChainObject  stream_set_write_buffer(int $size)
+ * @method   \ChainObject  stream_set_write_buffer1($stream)
  *
  * @see stream_socket_enable_crypto
- * @method   \ChainObject  stream_socket_enable_crypto($enable, $cryptokind = null, $sessionstream = null)
- * @method   \ChainObject  stream_socket_enable_crypto1($stream, $cryptokind = null, $sessionstream = null)
- * @method   \ChainObject  stream_socket_enable_crypto2($stream, $enable, $sessionstream = null)
- * @method   \ChainObject  stream_socket_enable_crypto3($stream, $enable, $cryptokind = null)
+ * @method   \ChainObject  stream_socket_enable_crypto(bool $enable, ?int $crypto_method = null, $session_stream = null)
+ * @method   \ChainObject  stream_socket_enable_crypto1($stream, ?int $crypto_method = null, $session_stream = null)
+ * @method   \ChainObject  stream_socket_enable_crypto2($stream, bool $enable, $session_stream = null)
+ * @method   \ChainObject  stream_socket_enable_crypto3($stream, bool $enable, ?int $crypto_method = null)
  *
  * @see stream_socket_get_name
- * @method   \ChainObject  stream_socket_get_name($want_peer)
- * @method   \ChainObject  stream_socket_get_name1($stream)
+ * @method   \ChainObject  stream_socket_get_name(bool $remote)
+ * @method   \ChainObject  stream_socket_get_name1($socket)
  *
  * @see stream_socket_pair
- * @method   \ChainObject  stream_socket_pair($type, $protocol)
- * @method   \ChainObject  stream_socket_pair1($domain, $protocol)
- * @method   \ChainObject  stream_socket_pair2($domain, $type)
+ * @method   \ChainObject  stream_socket_pair(int $type, int $protocol)
+ * @method   \ChainObject  stream_socket_pair1(int $domain, int $protocol)
+ * @method   \ChainObject  stream_socket_pair2(int $domain, int $type)
  *
  * @see stream_socket_sendto
- * @method   \ChainObject  stream_socket_sendto($data, $flags = null, $target_addr = null)
- * @method   \ChainObject  stream_socket_sendto1($stream, $flags = null, $target_addr = null)
- * @method   \ChainObject  stream_socket_sendto2($stream, $data, $target_addr = null)
- * @method   \ChainObject  stream_socket_sendto3($stream, $data, $flags = null)
+ * @method   \ChainObject  stream_socket_sendto(string $data, int $flags = 0, string $address = "")
+ * @method   \ChainObject  stream_socket_sendto1($socket, int $flags = 0, string $address = "")
+ * @method   \ChainObject  stream_socket_sendto2($socket, string $data, string $address = "")
+ * @method   \ChainObject  stream_socket_sendto3($socket, string $data, int $flags = 0)
  *
  * @see stream_socket_shutdown
- * @method   \ChainObject  stream_socket_shutdown($how)
+ * @method   \ChainObject  stream_socket_shutdown(int $mode)
  * @method   \ChainObject  stream_socket_shutdown1($stream)
  *
  * @see stream_supports_lock
@@ -5282,9 +5348,9 @@
  * @method   \ChainObject  stream_supports_lock()
  *
  * @see stream_wrapper_register
- * @method   \ChainObject  stream_wrapper_register($classname, $flags = null)
- * @method   \ChainObject  stream_wrapper_register1($protocol, $flags = null)
- * @method   \ChainObject  stream_wrapper_register2($protocol, $classname)
+ * @method   \ChainObject  stream_wrapper_register(string $class, int $flags = 0)
+ * @method   \ChainObject  stream_wrapper_register1(string $protocol, int $flags = 0)
+ * @method   \ChainObject  stream_wrapper_register2(string $protocol, string $class)
  *
  * @see stream_wrapper_restore
  * @property \ChainObject $stream_wrapper_restore
@@ -5296,8 +5362,8 @@
  *
  * @see strftime
  * @property \ChainObject $strftime
- * @method   \ChainObject  strftime($timestamp = null)
- * @method   \ChainObject  strftime1($format)
+ * @method   \ChainObject  strftime(?int $timestamp = null)
+ * @method   \ChainObject  strftime1(string $format)
  *
  * @see stringify
  * @property \ChainObject $stringify
@@ -5305,57 +5371,57 @@
  *
  * @see strip_tags
  * @property \ChainObject $strip_tags
- * @method   \ChainObject  strip_tags($allowable_tags = null)
- * @method   \ChainObject  strip_tags1($str)
+ * @method   \ChainObject  strip_tags(array|string|null $allowed_tags = null)
+ * @method   \ChainObject  strip_tags1(string $string)
  *
  * @see stripcslashes
  * @property \ChainObject $stripcslashes
  * @method   \ChainObject  stripcslashes()
  *
  * @see stripos
- * @method   \ChainObject  stripos($needle, $offset = null)
- * @method   \ChainObject  stripos1($haystack, $offset = null)
- * @method   \ChainObject  stripos2($haystack, $needle)
+ * @method   \ChainObject  stripos(string $needle, int $offset = 0)
+ * @method   \ChainObject  stripos1(string $haystack, int $offset = 0)
+ * @method   \ChainObject  stripos2(string $haystack, string $needle)
  *
  * @see stripslashes
  * @property \ChainObject $stripslashes
  * @method   \ChainObject  stripslashes()
  *
  * @see stristr
- * @method   \ChainObject  stristr($needle, $part = null)
- * @method   \ChainObject  stristr1($haystack, $part = null)
- * @method   \ChainObject  stristr2($haystack, $needle)
+ * @method   \ChainObject  stristr(string $needle, bool $before_needle = false)
+ * @method   \ChainObject  stristr1(string $haystack, bool $before_needle = false)
+ * @method   \ChainObject  stristr2(string $haystack, string $needle)
  *
  * @see strlen
  * @property \ChainObject $strlen
  * @method   \ChainObject  strlen()
  *
  * @see strnatcasecmp
- * @method   \ChainObject  strnatcasecmp($s2)
- * @method   \ChainObject  strnatcasecmp1($s1)
+ * @method   \ChainObject  strnatcasecmp(string $string2)
+ * @method   \ChainObject  strnatcasecmp1(string $string1)
  *
  * @see strnatcmp
- * @method   \ChainObject  strnatcmp($s2)
- * @method   \ChainObject  strnatcmp1($s1)
+ * @method   \ChainObject  strnatcmp(string $string2)
+ * @method   \ChainObject  strnatcmp1(string $string1)
  *
  * @see strncasecmp
- * @method   \ChainObject  strncasecmp($str2, $len)
- * @method   \ChainObject  strncasecmp1($str1, $len)
- * @method   \ChainObject  strncasecmp2($str1, $str2)
+ * @method   \ChainObject  strncasecmp(string $string2, int $length)
+ * @method   \ChainObject  strncasecmp1(string $string1, int $length)
+ * @method   \ChainObject  strncasecmp2(string $string1, string $string2)
  *
  * @see strncmp
- * @method   \ChainObject  strncmp($str2, $len)
- * @method   \ChainObject  strncmp1($str1, $len)
- * @method   \ChainObject  strncmp2($str1, $str2)
+ * @method   \ChainObject  strncmp(string $string2, int $length)
+ * @method   \ChainObject  strncmp1(string $string1, int $length)
+ * @method   \ChainObject  strncmp2(string $string1, string $string2)
  *
  * @see strpbrk
- * @method   \ChainObject  strpbrk($char_list)
- * @method   \ChainObject  strpbrk1($haystack)
+ * @method   \ChainObject  strpbrk(string $characters)
+ * @method   \ChainObject  strpbrk1(string $string)
  *
  * @see strpos
- * @method   \ChainObject  strpos($needle, $offset = null)
- * @method   \ChainObject  strpos1($haystack, $offset = null)
- * @method   \ChainObject  strpos2($haystack, $needle)
+ * @method   \ChainObject  strpos(string $needle, int $offset = 0)
+ * @method   \ChainObject  strpos1(string $haystack, int $offset = 0)
+ * @method   \ChainObject  strpos2(string $haystack, string $needle)
  *
  * @see strpos_array
  * @method   \ChainObject  strpos_array($needles, $offset = 0)
@@ -5370,26 +5436,26 @@
  * @method   \ChainObject  strpos_quoted4($haystack, $needle, $offset = 0, $enclosure = "'\"")
  *
  * @see strptime
- * @method   \ChainObject  strptime($format)
- * @method   \ChainObject  strptime1($timestamp)
+ * @method   \ChainObject  strptime(string $format)
+ * @method   \ChainObject  strptime1(string $timestamp)
  *
  * @see strrchr
- * @method   \ChainObject  strrchr($needle)
- * @method   \ChainObject  strrchr1($haystack)
+ * @method   \ChainObject  strrchr(string $needle)
+ * @method   \ChainObject  strrchr1(string $haystack)
  *
  * @see strrev
  * @property \ChainObject $strrev
  * @method   \ChainObject  strrev()
  *
  * @see strripos
- * @method   \ChainObject  strripos($needle, $offset = null)
- * @method   \ChainObject  strripos1($haystack, $offset = null)
- * @method   \ChainObject  strripos2($haystack, $needle)
+ * @method   \ChainObject  strripos(string $needle, int $offset = 0)
+ * @method   \ChainObject  strripos1(string $haystack, int $offset = 0)
+ * @method   \ChainObject  strripos2(string $haystack, string $needle)
  *
  * @see strrpos
- * @method   \ChainObject  strrpos($needle, $offset = null)
- * @method   \ChainObject  strrpos1($haystack, $offset = null)
- * @method   \ChainObject  strrpos2($haystack, $needle)
+ * @method   \ChainObject  strrpos(string $needle, int $offset = 0)
+ * @method   \ChainObject  strrpos1(string $haystack, int $offset = 0)
+ * @method   \ChainObject  strrpos2(string $haystack, string $needle)
  *
  * @see strrstr
  * @method   \ChainObject  strrstr($needle, $after_needle = true)
@@ -5397,20 +5463,20 @@
  * @method   \ChainObject  strrstr2($haystack, $needle)
  *
  * @see strspn
- * @method   \ChainObject  strspn($mask, $start = null, $len = null)
- * @method   \ChainObject  strspn1($str, $start = null, $len = null)
- * @method   \ChainObject  strspn2($str, $mask, $len = null)
- * @method   \ChainObject  strspn3($str, $mask, $start = null)
+ * @method   \ChainObject  strspn(string $characters, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  strspn1(string $string, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  strspn2(string $string, string $characters, ?int $length = null)
+ * @method   \ChainObject  strspn3(string $string, string $characters, int $offset = 0)
  *
  * @see strstr
- * @method   \ChainObject  strstr($needle, $part = null)
- * @method   \ChainObject  strstr1($haystack, $part = null)
- * @method   \ChainObject  strstr2($haystack, $needle)
+ * @method   \ChainObject  strstr(string $needle, bool $before_needle = false)
+ * @method   \ChainObject  strstr1(string $haystack, bool $before_needle = false)
+ * @method   \ChainObject  strstr2(string $haystack, string $needle)
  *
  * @see strtok
  * @property \ChainObject $strtok
- * @method   \ChainObject  strtok($token = null)
- * @method   \ChainObject  strtok1($str)
+ * @method   \ChainObject  strtok(?string $token = null)
+ * @method   \ChainObject  strtok1(string $string)
  *
  * @see strtolower
  * @property \ChainObject $strtolower
@@ -5418,45 +5484,45 @@
  *
  * @see strtotime
  * @property \ChainObject $strtotime
- * @method   \ChainObject  strtotime($now = null)
- * @method   \ChainObject  strtotime1($time)
+ * @method   \ChainObject  strtotime(?int $baseTimestamp = null)
+ * @method   \ChainObject  strtotime1(string $datetime)
  *
  * @see strtoupper
  * @property \ChainObject $strtoupper
  * @method   \ChainObject  strtoupper()
  *
  * @see strtr
- * @method   \ChainObject  strtr($from, $to = null)
- * @method   \ChainObject  strtr1($str, $to = null)
- * @method   \ChainObject  strtr2($str, $from)
+ * @method   \ChainObject  strtr(array|string $from, ?string $to = null)
+ * @method   \ChainObject  strtr1(string $string, ?string $to = null)
+ * @method   \ChainObject  strtr2(string $string, array|string $from)
  *
  * @see strval
  * @property \ChainObject $strval
  * @method   \ChainObject  strval()
  *
  * @see substr
- * @method   \ChainObject  substr($start, $length = null)
- * @method   \ChainObject  substr1($str, $length = null)
- * @method   \ChainObject  substr2($str, $start)
+ * @method   \ChainObject  substr(int $offset, ?int $length = null)
+ * @method   \ChainObject  substr1(string $string, ?int $length = null)
+ * @method   \ChainObject  substr2(string $string, int $offset)
  *
  * @see substr_compare
- * @method   \ChainObject  substr_compare($str, $offset, $length = null, $case_sensitivity = null)
- * @method   \ChainObject  substr_compare1($main_str, $offset, $length = null, $case_sensitivity = null)
- * @method   \ChainObject  substr_compare2($main_str, $str, $length = null, $case_sensitivity = null)
- * @method   \ChainObject  substr_compare3($main_str, $str, $offset, $case_sensitivity = null)
- * @method   \ChainObject  substr_compare4($main_str, $str, $offset, $length = null)
+ * @method   \ChainObject  substr_compare(string $needle, int $offset, ?int $length = null, bool $case_insensitive = false)
+ * @method   \ChainObject  substr_compare1(string $haystack, int $offset, ?int $length = null, bool $case_insensitive = false)
+ * @method   \ChainObject  substr_compare2(string $haystack, string $needle, ?int $length = null, bool $case_insensitive = false)
+ * @method   \ChainObject  substr_compare3(string $haystack, string $needle, int $offset, bool $case_insensitive = false)
+ * @method   \ChainObject  substr_compare4(string $haystack, string $needle, int $offset, ?int $length = null)
  *
  * @see substr_count
- * @method   \ChainObject  substr_count($needle, $offset = null, $length = null)
- * @method   \ChainObject  substr_count1($haystack, $offset = null, $length = null)
- * @method   \ChainObject  substr_count2($haystack, $needle, $length = null)
- * @method   \ChainObject  substr_count3($haystack, $needle, $offset = null)
+ * @method   \ChainObject  substr_count(string $needle, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  substr_count1(string $haystack, int $offset = 0, ?int $length = null)
+ * @method   \ChainObject  substr_count2(string $haystack, string $needle, ?int $length = null)
+ * @method   \ChainObject  substr_count3(string $haystack, string $needle, int $offset = 0)
  *
  * @see substr_replace
- * @method   \ChainObject  substr_replace($replace, $start, $length = null)
- * @method   \ChainObject  substr_replace1($str, $start, $length = null)
- * @method   \ChainObject  substr_replace2($str, $replace, $length = null)
- * @method   \ChainObject  substr_replace3($str, $replace, $start)
+ * @method   \ChainObject  substr_replace(array|string $replace, array|int $offset, array|int|null $length = null)
+ * @method   \ChainObject  substr_replace1(array|string $string, array|int $offset, array|int|null $length = null)
+ * @method   \ChainObject  substr_replace2(array|string $string, array|string $replace, array|int|null $length = null)
+ * @method   \ChainObject  substr_replace3(array|string $string, array|string $replace, array|int $offset)
  *
  * @see sum
  * @method   \ChainObject  sum(...$variadic)
@@ -5472,12 +5538,12 @@
  * @method   \ChainObject  switchs2($value, $cases)
  *
  * @see symlink
- * @method   \ChainObject  symlink($link)
- * @method   \ChainObject  symlink1($target)
+ * @method   \ChainObject  symlink(string $link)
+ * @method   \ChainObject  symlink1(string $target)
  *
  * @see syslog
- * @method   \ChainObject  syslog($message)
- * @method   \ChainObject  syslog1($priority)
+ * @method   \ChainObject  syslog(string $message)
+ * @method   \ChainObject  syslog1(int $priority)
  *
  * @see tan
  * @property \ChainObject $tan
@@ -5488,8 +5554,8 @@
  * @method   \ChainObject  tanh()
  *
  * @see tempnam
- * @method   \ChainObject  tempnam($prefix)
- * @method   \ChainObject  tempnam1($dir)
+ * @method   \ChainObject  tempnam(string $prefix)
+ * @method   \ChainObject  tempnam1(string $directory)
  *
  * @see throw_if
  * @method   \ChainObject  throw_if($ex, ...$ex_args)
@@ -5506,8 +5572,8 @@
  * @method   \ChainObject  throws()
  *
  * @see time_nanosleep
- * @method   \ChainObject  time_nanosleep($nanoseconds)
- * @method   \ChainObject  time_nanosleep1($seconds)
+ * @method   \ChainObject  time_nanosleep(int $nanoseconds)
+ * @method   \ChainObject  time_nanosleep1(int $seconds)
  *
  * @see time_sleep_until
  * @property \ChainObject $time_sleep_until
@@ -5523,8 +5589,8 @@
  * @method   \ChainObject  timerE1(callable $callable)
  *
  * @see timezone_identifiers_list
- * @method   \ChainObject  timezone_identifiers_list($country = null)
- * @method   \ChainObject  timezone_identifiers_list1($what = null)
+ * @method   \ChainObject  timezone_identifiers_list(?string $countryCode = null)
+ * @method   \ChainObject  timezone_identifiers_list1(int $timezoneGroup = DateTimeZone::ALL)
  *
  * @see timezone_location_get
  * @property \ChainObject $timezone_location_get
@@ -5532,9 +5598,9 @@
  *
  * @see timezone_name_from_abbr
  * @property \ChainObject $timezone_name_from_abbr
- * @method   \ChainObject  timezone_name_from_abbr($gmtoffset = null, $isdst = null)
- * @method   \ChainObject  timezone_name_from_abbr1($abbr, $isdst = null)
- * @method   \ChainObject  timezone_name_from_abbr2($abbr, $gmtoffset = null)
+ * @method   \ChainObject  timezone_name_from_abbr(int $utcOffset = -1, int $isDST = -1)
+ * @method   \ChainObject  timezone_name_from_abbr1(string $abbr, int $isDST = -1)
+ * @method   \ChainObject  timezone_name_from_abbr2(string $abbr, int $utcOffset = -1)
  *
  * @see timezone_name_get
  * @property \ChainObject $timezone_name_get
@@ -5550,9 +5616,9 @@
  *
  * @see timezone_transitions_get
  * @property \ChainObject $timezone_transitions_get
- * @method   \ChainObject  timezone_transitions_get($timestamp_begin = null, $timestamp_end = null)
- * @method   \ChainObject  timezone_transitions_get1($object, $timestamp_end = null)
- * @method   \ChainObject  timezone_transitions_get2($object, $timestamp_begin = null)
+ * @method   \ChainObject  timezone_transitions_get(int $timestampBegin = PHP_INT_MIN, int $timestampEnd = PHP_INT_MAX)
+ * @method   \ChainObject  timezone_transitions_get1(\DateTimeZone $object, int $timestampEnd = PHP_INT_MAX)
+ * @method   \ChainObject  timezone_transitions_get2(\DateTimeZone $object, int $timestampBegin = PHP_INT_MIN)
  *
  * @see tmpname
  * @method   \ChainObject  tmpname($dir = null)
@@ -5560,24 +5626,25 @@
  *
  * @see touch
  * @property \ChainObject $touch
- * @method   \ChainObject  touch($time = null, $atime = null)
- * @method   \ChainObject  touch1($filename, $atime = null)
- * @method   \ChainObject  touch2($filename, $time = null)
+ * @method   \ChainObject  touch(?int $mtime = null, ?int $atime = null)
+ * @method   \ChainObject  touch1(string $filename, ?int $atime = null)
+ * @method   \ChainObject  touch2(string $filename, ?int $mtime = null)
  *
  * @see trait_exists
  * @property \ChainObject $trait_exists
- * @method   \ChainObject  trait_exists($autoload = null)
- * @method   \ChainObject  trait_exists1($traitname)
+ * @method   \ChainObject  trait_exists(bool $autoload = true)
+ * @method   \ChainObject  trait_exists1(string $trait)
  *
  * @see trigger_error
  * @property \ChainObject $trigger_error
- * @method   \ChainObject  trigger_error($error_type = null)
- * @method   \ChainObject  trigger_error1($message)
+ * @method   \ChainObject  trigger_error(int $error_level = E_USER_NOTICE)
+ * @method   \ChainObject  trigger_error1(string $message)
  *
  * @see trim
  * @property \ChainObject $trim
- * @method   \ChainObject  trim($character_mask = null)
- * @method   \ChainObject  trim1($str)
+ * @method   \ChainObject  trim(string $characters = " 
+	\000")
+ * @method   \ChainObject  trim1(string $string)
  *
  * @see try_catch
  * @property \ChainObject $try_catch
@@ -5644,15 +5711,16 @@
  *
  * @see ucwords
  * @property \ChainObject $ucwords
- * @method   \ChainObject  ucwords($delimiters = null)
- * @method   \ChainObject  ucwords1($str)
+ * @method   \ChainObject  ucwords(string $separators = " 	
+")
+ * @method   \ChainObject  ucwords1(string $string)
  *
  * @see umask
  * @method   \ChainObject  umask()
  *
  * @see uniqid
- * @method   \ChainObject  uniqid($more_entropy = null)
- * @method   \ChainObject  uniqid1($prefix = null)
+ * @method   \ChainObject  uniqid(bool $more_entropy = false)
+ * @method   \ChainObject  uniqid1(string $prefix = "")
  *
  * @see unique_string
  * @property \ChainObject $unique_string
@@ -5663,21 +5731,23 @@
  * @see unlink
  * @property \ChainObject $unlink
  * @method   \ChainObject  unlink($context = null)
- * @method   \ChainObject  unlink1($filename)
+ * @method   \ChainObject  unlink1(string $filename)
  *
  * @see unpack
- * @method   \ChainObject  unpack($input, $offset = null)
- * @method   \ChainObject  unpack1($format, $offset = null)
- * @method   \ChainObject  unpack2($format, $input)
+ * @method   \ChainObject  unpack(string $string, int $offset = 0)
+ * @method   \ChainObject  unpack1(string $format, int $offset = 0)
+ * @method   \ChainObject  unpack2(string $format, string $string)
  *
  * @see unregister_tick_function
  * @property \ChainObject $unregister_tick_function
  * @method   \ChainObject  unregister_tick_function()
+ * @method   \ChainObject  unregister_tick_functionP()
+ * @method   \ChainObject  unregister_tick_functionE()
  *
  * @see unserialize
  * @property \ChainObject $unserialize
- * @method   \ChainObject  unserialize($allowed_classes = null)
- * @method   \ChainObject  unserialize1($variable_representation)
+ * @method   \ChainObject  unserialize(array $options = [])
+ * @method   \ChainObject  unserialize1(string $data)
  *
  * @see urldecode
  * @property \ChainObject $urldecode
@@ -5689,8 +5759,8 @@
  *
  * @see user_error
  * @property \ChainObject $user_error
- * @method   \ChainObject  user_error($error_type = null)
- * @method   \ChainObject  user_error1($message)
+ * @method   \ChainObject  user_error(int $error_level = E_USER_NOTICE)
+ * @method   \ChainObject  user_error1(string $message)
  *
  * @see usleep
  * @property \ChainObject $usleep
@@ -5758,17 +5828,18 @@
  *
  * @see var_dump
  * @property \ChainObject $var_dump
- * @method   \ChainObject  var_dump(...$vars)
- * @method   \ChainObject  var_dump1(...$vars)
- * @method   \ChainObject  var_dump2(...$vars)
- * @method   \ChainObject  var_dump3(...$vars)
- * @method   \ChainObject  var_dump4(...$vars)
- * @method   \ChainObject  var_dump5(...$vars)
+ * @method   \ChainObject  var_dump(...mixed $values)
+ * @method   \ChainObject  var_dump1(mixed $value, ...mixed $values)
+ * @method   \ChainObject  var_dump2(mixed $value, ...mixed $values)
+ * @method   \ChainObject  var_dump3(mixed $value, ...mixed $values)
+ * @method   \ChainObject  var_dump4(mixed $value, ...mixed $values)
+ * @method   \ChainObject  var_dump5(mixed $value, ...mixed $values)
+ * @method   \ChainObject  var_dump6(mixed $value, ...mixed $values)
  *
  * @see var_export
  * @property \ChainObject $var_export
- * @method   \ChainObject  var_export($return = null)
- * @method   \ChainObject  var_export1($var)
+ * @method   \ChainObject  var_export(bool $return = false)
+ * @method   \ChainObject  var_export1(mixed $value)
  *
  * @see var_export2
  * @property \ChainObject $var_export2
@@ -5792,9 +5863,8 @@
  *
  * @see var_pretty
  * @property \ChainObject $var_pretty
- * @method   \ChainObject  var_pretty($context = null, $return = false)
- * @method   \ChainObject  var_pretty1($value, $return = false)
- * @method   \ChainObject  var_pretty2($value, $context = null)
+ * @method   \ChainObject  var_pretty($options = [])
+ * @method   \ChainObject  var_pretty1($value)
  *
  * @see var_type
  * @property \ChainObject $var_type
@@ -5808,29 +5878,32 @@
  * @method   \ChainObject  varcmp3($a, $b, $mode = null)
  *
  * @see version_compare
- * @method   \ChainObject  version_compare($ver2, $oper = null)
- * @method   \ChainObject  version_compare1($ver1, $oper = null)
- * @method   \ChainObject  version_compare2($ver1, $ver2)
+ * @method   \ChainObject  version_compare(string $version2, ?string $operator = null)
+ * @method   \ChainObject  version_compare1(string $version1, ?string $operator = null)
+ * @method   \ChainObject  version_compare2(string $version1, string $version2)
  *
  * @see vfprintf
- * @method   \ChainObject  vfprintf($format, $args)
- * @method   \ChainObject  vfprintf1($stream, $args)
- * @method   \ChainObject  vfprintf2($stream, $format)
+ * @method   \ChainObject  vfprintf(string $format, array $values)
+ * @method   \ChainObject  vfprintf1($stream, array $values)
+ * @method   \ChainObject  vfprintf2($stream, string $format)
  *
  * @see vprintf
- * @method   \ChainObject  vprintf($args)
- * @method   \ChainObject  vprintf1($format)
+ * @method   \ChainObject  vprintf(array $values)
+ * @method   \ChainObject  vprintf1(string $format)
  *
  * @see vsprintf
- * @method   \ChainObject  vsprintf($args)
- * @method   \ChainObject  vsprintf1($format)
+ * @method   \ChainObject  vsprintf(array $values)
+ * @method   \ChainObject  vsprintf1(string $format)
  *
  * @see wordwrap
  * @property \ChainObject $wordwrap
- * @method   \ChainObject  wordwrap($width = null, $break = null, $cut = null)
- * @method   \ChainObject  wordwrap1($str, $break = null, $cut = null)
- * @method   \ChainObject  wordwrap2($str, $width = null, $cut = null)
- * @method   \ChainObject  wordwrap3($str, $width = null, $break = null)
+ * @method   \ChainObject  wordwrap(int $width = 75, string $break = "
+", bool $cut_long_words = false)
+ * @method   \ChainObject  wordwrap1(string $string, string $break = "
+", bool $cut_long_words = false)
+ * @method   \ChainObject  wordwrap2(string $string, int $width = 75, bool $cut_long_words = false)
+ * @method   \ChainObject  wordwrap3(string $string, int $width = 75, string $break = "
+")
  *
  * {/annotation}
  */

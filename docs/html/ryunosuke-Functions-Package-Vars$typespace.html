@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L2490" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L5-L2484" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Vars</span></h2>
@@ -63,7 +63,16 @@
 </div>
 
 	<h3>Construction</h3>
-                
+        	<table class="table">
+		<caption>Implements</caption>
+		<tbody>
+        			<tr>
+				<td class="type"><a href="ryunosuke-Functions-Package-Interfaces-Vars$typespace.html#ryunosuke\Functions\Package\Interfaces\Vars" class="fqsen "><small>ryunosuke\Functions\Package\Interfaces\</small><wbr>Vars</a></td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+            
 	<h3>Hierarchy</h3>
 	<div class="hierarchy"></div>
 
@@ -1565,7 +1574,7 @@ that(var_type(new \Exception()))-&gt;isSame('\\Exception');
 // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
 that(var_type(new class extends \Exception{}))-&gt;isSame('\\Exception');
 that(var_type(new class implements \JsonSerializable{
-    public function jsonSerialize() { return ''; }
+    public function jsonSerialize(): string { return ''; }
 }))-&gt;isSame('\\JsonSerializable');
 </code></pre>
 </div>
@@ -1836,7 +1845,7 @@ that($var)-&gt;is('');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1320-L1436" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1320-L1440" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_export2()" tabindex="-1" class="structure-title ">
                         var_export2                        	<small>($value, $return = false) : string<span class="type-separator"></span><wbr>null</small>
@@ -1878,13 +1887,13 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
             ],
         ],
     ],
-    "robject" =&gt; stdClass::__set_state([
-        "a" =&gt; stdClass::__set_state([
-            "b" =&gt; stdClass::__set_state([
+    "robject" =&gt; (object) [
+        "a" =&gt; (object) [
+            "b" =&gt; (object) [
                 "c" =&gt; "*RECURSION*",
-            ]),
-        ]),
-    ]),
+            ],
+        ],
+    ],
 ]');
 </code></pre>
 </div>
@@ -1933,7 +1942,7 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1438-L1870" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1442-L1874" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_export3()" tabindex="-1" class="structure-title ">
                         var_export3                        	<small>($value, $return = false) : string</small>
@@ -2004,7 +2013,7 @@ set_state だけは呼ばれないので注意。</p>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1872-L1942" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1876-L1946" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_html()" tabindex="-1" class="structure-title ">
                         var_html                        	<small>($value) : void</small>
@@ -2057,10 +2066,10 @@ set_state だけは呼ばれないので注意。</p>
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1944-L2362" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L1948-L2356" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::var_pretty()" tabindex="-1" class="structure-title ">
-                        var_pretty                        	<small>($value, $context = null, $return = false) : string</small>
+                        var_pretty                        	<small>($value, $options = []) : string</small>
 						</h4>
 					<div class="inner-item">
 						<div class="description"><p>var_dump の出力を見やすくしたもの</p>
@@ -2115,15 +2124,9 @@ var_pretty([
 </td>
 			</tr>
         			<tr>
-				<td class="type">array<span class="type-separator"></span><wbr>string<span class="type-separator"></span><wbr>null</td>
-				<td class="rest">$context = null</td>
-				<td class="desc"><p>出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される</p>
-</td>
-			</tr>
-        			<tr>
-				<td class="type">bool</td>
-				<td class="rest">$return = false</td>
-				<td class="desc"><p>出力するのではなく値を返すなら true</p>
+				<td class="type">array</td>
+				<td class="rest">$options = []</td>
+				<td class="desc"><p>出力オプション</p>
 </td>
 			</tr>
         		</tbody>
@@ -2133,7 +2136,7 @@ var_pretty([
 		<tbody>
 		<tr>
 			<td class="type">string</td>
-			<td class="desc"><p>$return: true なら値の出力結果</p>
+			<td class="desc"><p>return: true なら値の出力結果</p>
 </td>
 			<td class="rest"></td>
 		</tr>
@@ -2156,7 +2159,7 @@ var_pretty([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L2364-L2402" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L2358-L2396" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::console_log()" tabindex="-1" class="structure-title ">
                         console_log                        	<small>(...$values) : void</small>
@@ -2215,7 +2218,7 @@ var_pretty([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L2404-L2489" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Vars.php#L2398-L2483" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Vars::hashvar()" tabindex="-1" class="structure-title ">
                         hashvar                        	<small>(...$vars) : array</small>
