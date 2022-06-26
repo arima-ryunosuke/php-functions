@@ -572,5 +572,19 @@ class ClassobjTest extends AbstractTestCase
             'protected' => 2,
             'public'    => 3,
         ]);
+
+        // クロージャは this と use 変数を返す
+        $a = 123;
+        $b = 456;
+        that((get_object_properties)(fn() => $a + $b))->is([
+            'this' => $this,
+            'a'    => 123,
+            'b'    => 456,
+        ]);
+        that((get_object_properties)(static fn() => $a + $b))->is([
+            'this' => null,
+            'a'    => 123,
+            'b'    => 456,
+        ]);
     }
 }
