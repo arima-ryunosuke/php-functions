@@ -2043,6 +2043,31 @@ class ArraysTest extends AbstractTestCase
         that((array_shrink_key)($object, $object1, $object2, $object3))->isSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3']);
     }
 
+    function test_array_revise()
+    {
+        that((array_revise)([
+            'id'      => 123,
+            'name'    => 'hoge',
+            'age'     => 18,
+            'delete'  => '',
+            'options' => 'a,b,c',
+        ], [
+            'name'    => 'ignored',
+            'append'  => 'newkey',
+            'null'    => fn() => null,
+            'age'     => fn($age) => $age + 1,
+            'options' => fn($options) => explode(',', $options),
+            'delete'  => null,
+        ]))->isSame([
+            'id'      => 123,
+            'name'    => 'hoge',
+            'age'     => 19,
+            'options' => ["a", "b", "c"],
+            'append'  => 'newkey',
+            'null'    => null,
+        ]);
+    }
+
     function test_array_extend()
     {
         $default = [
