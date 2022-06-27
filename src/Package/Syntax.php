@@ -283,8 +283,6 @@ class Syntax
      * replacer にクロージャを渡すと(phpコード, 出現番号) が渡ってくるので、それに応じて値を返せばそれに置換される。
      * 文字列を指定すると自動で出現番号が付与される。
      *
-     * 歴史的な理由によりオプションには直接 replacer を渡せるが、互換性のためでありその指定は推奨されない。
-     *
      * $mapping 配列には「どれをどのように」と言った変換表が格納される。
      * 典型的には strtr に渡して php コードを復元させるのに使用する。
      *
@@ -294,28 +292,21 @@ class Syntax
      * // php コードが消えている
      * that(strip_php($phtml))->is('begin php code  end');
      * // $mapping を使用すると元の文字列に復元できる
-     * $html = strip_php($phtml, null, $mapping);
+     * $html = strip_php($phtml, [], $mapping);
      * that(strtr($html, $mapping))->is($phtml);
      * ```
      *
      * @param string $phtml php コードを含む文字列
-     * @param array|string|\Closure $option オプション配列
+     * @param array $option オプション配列
      * @param array $mapping 変換表が格納される参照変数
      * @return string php コードが除かれた文字列
      */
     public static function strip_php($phtml, $option = [], &$mapping = [])
     {
-        // for compatible
-        if (!is_array($option)) {
-            $option = [
-                'replacer' => $option,
-            ];
-        }
-
         $option = array_replace([
             'short_open_tag' => true,
             'trailing_break' => true,
-            'replacer'       => '',
+            'replacer'       => func_num_args() === 3 ? null : '',
         ], $option, [
             //'flags'  => TOKEN_NAME,
             //'cache'  => false,
@@ -793,8 +784,7 @@ class Syntax
      * 下記の特殊ルールにより、特殊な呼び出し方ができる。
      *
      * - array_XXX, str_XXX は省略して XXX で呼び出せる
-     *   - 省略した結果、他の関数と被るようであれば短縮呼び出しは出来ない（array_優先でコールされる）
-     *   - ini に 'rfunc.chain_overload' 定義されていれば型で分岐させることができる
+     *   - 省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う
      * - funcE で eval される文字列のクロージャを呼べる
      *   - 変数名は `$_` 固定だが、 `$_` が無いときに限り 最左に自動付与される
      * - funcP で配列指定オペレータのクロージャを呼べる
@@ -944,25 +934,25 @@ class Syntax
 
             private function _resolve($name)
             {
-                $overload = get_cfg_var('rfunc.chain_overload') ?: false; // for compatible
-                $isiterable = !$overload || is_iterable($this->data);
+                $isiterable = is_iterable($this->data);
+                $isstringable = (is_stringable)($this->data);
                 if (false
                     // for global
                     || (function_exists($fname = $name))
                     || ($isiterable && function_exists($fname = "array_$name"))
-                    || (function_exists($fname = "str_$name"))
+                    || ($isstringable && function_exists($fname = "str_$name"))
                     // for package
                     || (defined($cname = $name) && is_callable($fname = constant($cname)))
                     || ($isiterable && defined($cname = "array_$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    || ($isstringable && defined($cname = "str_$name") && is_callable($fname = constant($cname)))
                     // for namespace
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
                     || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                    || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
                     // for class
                     || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
                     || ($isiterable && defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
-                    || (defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
+                    || ($isstringable && defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     return $fname;
                 }

@@ -140,14 +140,14 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // 拡張子でフィルタ
-        that((file_list)($base, fn($fname) => (file_extension)($fname) === 'txt'))->equalsCanonicalizing([
+        that((file_list)($base, ['extension' => 'txt']))->equalsCanonicalizing([
             realpath($base . '/a/a1.txt'),
             realpath($base . '/a/a2.txt'),
             realpath($base . '/a/b/ab1.txt'),
         ]);
 
         // ファイルサイズでフィルタ
-        that((file_list)($base, fn($fname) => filesize($fname) > 0))->equalsCanonicalizing([
+        that((file_list)($base, ['size' => [1]]))->equalsCanonicalizing([
             realpath($base . '/a/b/ab2.log'),
             realpath($base . '/a/b/c/abc1.log'),
             realpath($base . '/a/b/c/abc2.log'),
@@ -188,20 +188,21 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // 拡張子でフィルタ
-        that((file_tree)($base, fn($fname) => (file_extension)($fname) === 'txt'))->isSame([
+        that((file_tree)($base, ['extension' => 'txt']))->isSame([
             'tree' => [
                 'a' => [
                     'a1.txt' => realpath($base . '/a/a1.txt'),
                     'a2.txt' => realpath($base . '/a/a2.txt'),
                     'b'      => [
                         'ab1.txt' => realpath($base . '/a/b/ab1.txt'),
+                        'c'       => [],
                     ],
                 ],
             ],
         ]);
 
         // ファイルサイズでフィルタ
-        that((file_tree)($base, fn($fname) => filesize($fname) > 0))->isSame([
+        that((file_tree)($base, ['size' => [1]]))->isSame([
             'tree' => [
                 'a' => [
                     'b' => [

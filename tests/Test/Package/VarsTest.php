@@ -1230,7 +1230,7 @@ class VarsTest extends AbstractTestCase
 
     function test_var_pretty()
     {
-        that(var_pretty)(null, 'hoge')->wasThrown('is not supported');
+        that(var_pretty)(null, ['context' => 'hoge'])->wasThrown('is not supported');
 
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
@@ -1304,8 +1304,8 @@ class VarsTest extends AbstractTestCase
         ]))
             ->stringContains("R: this is custom resource(1)");
 
-        that((var_pretty)($value, 'cli', true))->stringContains("\033");
-        that((var_pretty)($value, 'html', true))->stringContains("<span");
+        that((var_pretty)($value, ['context' => 'cli', 'return' => true]))->stringContains("\033");
+        that((var_pretty)($value, ['context' => 'html', 'return' => true]))->stringContains("<span");
 
         that(var_pretty)->fn($value)->outputMatches('#Concrete#');
     }

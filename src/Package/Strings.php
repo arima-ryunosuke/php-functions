@@ -153,8 +153,6 @@ class Strings
      *
      * $enclosures は配列で開始・終了文字が別々に指定できるが、実装上の都合で今のところ1文字ずつのみ。
      *
-     * 歴史的な理由により第3引数は $limit でも $enclosures でもどちらでも渡すことができる。
-     *
      * Example:
      * ```php
      * // シンプルな例
@@ -166,16 +164,10 @@ class Strings
      * ]);
      *
      * // $enclosures で囲い文字の開始・終了文字を明示できる
-     * that(quoteexplode(',', 'a,b,{e,f}', ['{' => '}']))->isSame([
+     * that(quoteexplode(',', 'a,b,{e,f}', null, ['{' => '}']))->isSame([
      *     'a', // 普通に分割される
      *     'b', // 普通に分割される
      *     '{e,f}', // { } で囲まれているので区切り文字とみなされない
-     * ]);
-     *
-     * // このように第3引数に $limit 引数を差し込むことができる
-     * that(quoteexplode(',', 'a,b,{e,f}', 2, ['{' => '}']))->isSame([
-     *     'a',
-     *     'b,{e,f}',
      * ]);
      * ```
      *
@@ -188,15 +180,6 @@ class Strings
      */
     public static function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\')
     {
-        // for compatible 1.3.x
-        if (!is_int($limit) && $limit !== null) {
-            if (func_num_args() > 3) {
-                $escape = $enclosures;
-            }
-            $enclosures = $limit;
-            $limit = PHP_INT_MAX;
-        }
-
         if ($limit === null) {
             $limit = PHP_INT_MAX;
         }
@@ -491,27 +474,6 @@ class Strings
         }
 
         return $str1 === $str2;
-    }
-
-    /**
-     * 指定文字列を含むか返す
-     *
-     * @see str_exists
-     *
-     * @polyfill
-     * @deprecated
-     * @codeCoverageIgnore
-     *
-     * @param string $haystack 対象文字列
-     * @param string|array $needle 調べる文字列
-     * @param bool $case_insensitivity 大文字小文字を無視するか
-     * @param bool $and_flag すべて含む場合に true を返すか
-     * @return bool $needle を含むなら true
-     */
-    public static function str_contains($haystack, $needle, $case_insensitivity = false, $and_flag = false)
-    {
-        trigger_error('this function(' . __FUNCTION__ . ') is deprecated, use str_exists', E_USER_DEPRECATED);
-        return (str_exists)($haystack, $needle, $case_insensitivity, $and_flag);
     }
 
     /**

@@ -241,11 +241,8 @@ class Network
      * $urls の要素は単一の文字列か curl のオプションである必要がある。
      * リクエストの実体は http_request なので、そっちで使えるオプションは一部を除きすべて使える。
      *
-     * 返り値は $urls のキーを保持したまま、レスポンスが返ってきた順に格納して配列で返す。
+     * 返り値は $urls のキーを保持したまま、レスポンスが返ってきた順にボディを格納して配列で返す。
      * 構造は下記のサンプルを参照。
-     *
-     * $infos を渡すと返り値がボディだけになり、その他の情報はすべてこの変数に格納される。
-     * この動作は互換性のためであり、将来的には指定の有無に関わらずボディだけを返すようになる（失敗したリクエストは null が格納される）。
      *
      * Example:
      * ```php
@@ -305,7 +302,7 @@ class Network
      * @param array $single_options 全 $urls に適用されるデフォルトオプション
      * @param array $multi_options 並列リクエストとしてのオプション
      * @param array $infos curl 情報やヘッダなどが格納される受け変数
-     * @return array レスポンス配列。取得した順番でキーを保持しつつ追加される
+     * @return array レスポンスボディ配列。取得した順番でキーを保持しつつ追加される
      */
     public static function http_requests($urls, $single_options = [], $multi_options = [], &$infos = [])
     {
@@ -339,16 +336,9 @@ class Network
         $resultmap = [];
         $infos = [];
 
-        // for compatible
-        $compatible_mode = func_num_args() !== 4;
-        $set_response = function ($key, $body, $header, $info) use ($compatible_mode, &$responses, &$infos) {
-            if ($compatible_mode) {
-                $responses[$key] = [$body, $header, $info];
-            }
-            else {
-                $responses[$key] = $body;
-                $infos[$key] = [$header, $info];
-            }
+        $set_response = function ($key, $body, $header, $info) use (&$responses, &$infos) {
+            $responses[$key] = $body;
+            $infos[$key] = [$header, $info];
         };
 
         $mh = curl_multi_init();
@@ -424,12 +414,7 @@ class Network
                         if ($multi_options['throw']) {
                             throw new \UnexpectedValueException("'{$info['url']}' curl_errno({$info['errno']}).");
                         }
-                        if ($compatible_mode) {
-                            $responses[$key] = $info['errno'];
-                        }
-                        else {
-                            $set_response($key, null, [], $info);
-                        }
+                        $set_response($key, null, [], $info);
                     }
                     else {
                         $set_response($key, ...$responser($response, $info));

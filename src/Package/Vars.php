@@ -1993,13 +1993,12 @@ class Vars
      * ```
      *
      * @param mixed $value 出力する値
-     * @param array|string|null $context 出力コンテキスト（[null, "plain", "cli", "html"]）。 null を渡すと自動判別される
-     * @param bool $return 出力するのではなく値を返すなら true
-     * @return string $return: true なら値の出力結果
+     * @param array $options 出力オプション
+     * @return string return: true なら値の出力結果
      */
-    public static function var_pretty($value, $context = null, $return = false)
+    public static function var_pretty($value, $options = [])
     {
-        $options = [
+        $options += [
             'indent'    => 2,     // インデントの空白数
             'context'   => null,  // html なコンテキストか cli なコンテキストか
             'return'    => false, // 値を戻すか出力するか
@@ -2012,15 +2011,6 @@ class Vars
             'maxlength' => null,  // スカラー・非複合配列の文字数
             'limit'     => null,  // 最終出力の文字数
         ];
-
-        // for compatible
-        if (!is_array($context)) {
-            $context = [
-                'context' => $context,
-                'return'  => $return,
-            ];
-        }
-        $options = array_replace($options, $context);
 
         if ($options['context'] === null) {
             $options['context'] = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある

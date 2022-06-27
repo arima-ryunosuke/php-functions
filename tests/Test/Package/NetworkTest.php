@@ -252,32 +252,6 @@ class NetworkTest extends AbstractTestCase
         that(array_unique($stocks))->count(12);
     }
 
-    function test_http_requests_compatible()
-    {
-        if (!defined('TESTWEBSERVER')) {
-            return;
-        }
-        $server = TESTWEBSERVER;
-
-        $time = microtime(true);
-        $responses = (http_requests)([
-            'w3' => "$server/delay/3",
-            'w4' => "$server/delay/4",
-            'to' => [
-                CURLOPT_URL     => "$server/delay/10",
-                CURLOPT_TIMEOUT => 3,
-            ],
-        ], [
-            CURLOPT_TIMEOUT => 10,
-        ]);
-        $time = microtime(true) - $time;
-
-        // 普通に投げると(3+4+3)秒かかるがそんなにかかっていないはず
-        that($time)->lessThan(7);
-        that($responses['to'])->is(CURLE_OPERATION_TIMEOUTED);
-
-    }
-
     function test_http_request()
     {
         if (!defined('TESTWEBSERVER')) {
@@ -504,6 +478,7 @@ class NetworkTest extends AbstractTestCase
             return;
         }
         $server = TESTWEBSERVER;
+        $infos = [];
 
         $cachedir = sys_get_temp_dir() . '/http-cache';
         @mkdir($cachedir);
@@ -541,13 +516,13 @@ class NetworkTest extends AbstractTestCase
                 'cachedir'  => $cachedir,
             ],
             'nocache' => "$server/get?k=v2",
-        ]);
-        that($responses['oncache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['oncache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['oncache'][2]['no_request'])->isFalse();
-        that($responses['nocache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['nocache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['nocache'][2]['no_request'])->isFalse();
+        ], [], [], $infos);
+        that($responses['oncache']['args'])->is(['k' => 'v2']);
+        that($responses['nocache']['args'])->is(['k' => 'v2']);
+        that($infos['oncache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['oncache'][1]['no_request'])->isFalse();
+        that($infos['nocache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['nocache'][1]['no_request'])->isFalse();
 
         $responses = (http_requests)([
             'oncache' => [
@@ -555,13 +530,13 @@ class NetworkTest extends AbstractTestCase
                 'cachedir'  => $cachedir,
             ],
             'nocache' => "$server/get?k=v2",
-        ]);
-        that($responses['oncache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['oncache'][1][0])->is('HTTP/1.1 304 NOT MODIFIED');
-        that($responses['oncache'][2]['no_request'])->isFalse();
-        that($responses['nocache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['nocache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['nocache'][2]['no_request'])->isFalse();
+        ], [], [], $infos);
+        that($responses['oncache']['args'])->is(['k' => 'v2']);
+        that($responses['nocache']['args'])->is(['k' => 'v2']);
+        that($infos['oncache'][0][0])->is('HTTP/1.1 304 NOT MODIFIED');
+        that($infos['oncache'][1]['no_request'])->isFalse();
+        that($infos['nocache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['nocache'][1]['no_request'])->isFalse();
 
         $responses = (http_requests)([
             'oncache' => [
@@ -569,13 +544,13 @@ class NetworkTest extends AbstractTestCase
                 'cachedir'  => $cachedir,
             ],
             'nocache' => "$server/get?k=v2",
-        ]);
-        that($responses['oncache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['oncache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['oncache'][2]['no_request'])->isFalse();
-        that($responses['nocache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['nocache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['nocache'][2]['no_request'])->isFalse();
+        ], [], [], $infos);
+        that($responses['oncache']['args'])->is(['k' => 'v2']);
+        that($responses['nocache']['args'])->is(['k' => 'v2']);
+        that($infos['oncache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['oncache'][1]['no_request'])->isFalse();
+        that($infos['nocache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['nocache'][1]['no_request'])->isFalse();
 
         $responses = (http_requests)([
             'oncache' => [
@@ -583,12 +558,12 @@ class NetworkTest extends AbstractTestCase
                 'cachedir'  => $cachedir,
             ],
             'nocache' => "$server/get?k=v2",
-        ]);
-        that($responses['oncache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['oncache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['oncache'][2]['no_request'])->isTrue();
-        that($responses['nocache'][0]['args'])->is(['k' => 'v2']);
-        that($responses['nocache'][1][0])->is('HTTP/1.1 200 OK');
-        that($responses['nocache'][2]['no_request'])->isFalse();
+        ], [], [], $infos);
+        that($responses['oncache']['args'])->is(['k' => 'v2']);
+        that($responses['nocache']['args'])->is(['k' => 'v2']);
+        that($infos['oncache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['oncache'][1]['no_request'])->isTrue();
+        that($infos['nocache'][0][0])->is('HTTP/1.1 200 OK');
+        that($infos['nocache'][1]['no_request'])->isFalse();
     }
 }

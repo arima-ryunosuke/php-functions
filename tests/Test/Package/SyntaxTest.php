@@ -289,11 +289,11 @@ plain text
 aplain text
         plain text
      and ');
-        that((strip_php)($code, 'xxx'))->is('?>
+        that((strip_php)($code, ['replacer' => 'xxx']))->is('?>
 axxx6plain text
 xxx5    xxx4    plain text
     xxx3 and xxx2xxx1xxx0');
-        that((strip_php)($code, fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"))->is('?>
+        that((strip_php)($code, ['replacer' => fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"]))->is('?>
 a6thplain text
 foreach    4th    plain text
     3th and 2thforeach0th');
@@ -306,7 +306,7 @@ aplain text
 ');
 
         $mapping = [];
-        $html = (strip_php)($code, null, $mapping);
+        $html = (strip_php)($code, [], $mapping);
         that(strtr($html, $mapping))->is($code);
     }
 

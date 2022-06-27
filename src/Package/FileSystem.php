@@ -204,7 +204,7 @@ class FileSystem
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
-     * @param callable|array $filter_condition フィルタ条件
+     * @param array $filter_condition フィルタ条件
      * @return array|false ファイルの配列
      */
     public static function file_list($dirname, $filter_condition = [])
@@ -214,12 +214,6 @@ class FileSystem
             return false;
         }
 
-        // for compatible
-        if (is_callable($filter_condition)) {
-            $filter_condition = [
-                'filter' => fn(\SplFileInfo $file) => $filter_condition($file->getPathname()),
-            ];
-        }
         $filter_condition += [
             'relative' => false,
             '!type'    => 'dir',
@@ -267,7 +261,7 @@ class FileSystem
      * ```
      *
      * @param string $dirname 調べるディレクトリ名
-     * @param callable|array $filter_condition フィルタ条件
+     * @param array $filter_condition フィルタ条件
      * @return array|false ツリー構造の配列
      */
     public static function file_tree($dirname, $filter_condition = [])
@@ -277,12 +271,6 @@ class FileSystem
             return false;
         }
 
-        // for compatible
-        if (is_callable($filter_condition)) {
-            $filter_condition = [
-                'filter' => fn(\SplFileInfo $file) => $filter_condition($file->getPathname()),
-            ];
-        }
         $filter_condition += [
             '!type' => 'dir',
         ];
@@ -307,10 +295,6 @@ class FileSystem
                     $result[$basedir][$item->getBasename()] = $item->getPathname();
                 }
             }
-        }
-        // for compatible. 空エントリは削除（この動作は将来的になくしたい）
-        if (!$result[$basedir]) {
-            unset($result[$basedir]);
         }
         return $result;
     }
@@ -971,7 +955,7 @@ class FileSystem
      * that(path_resolve('absolute/path'))->isSame(getcwd() . "{$DS}absolute{$DS}path");
      * that(path_resolve('/absolute/path/through', '../current/./path'))->isSame("{$DS}absolute{$DS}path{$DS}current{$DS}path");
      *
-     * # 最後の引数に最列を与えるとそのパスと PATH から解決を試みる（要するに which 的な動作になる）
+     * # 最後の引数に配列を与えるとそのパスと PATH から解決を試みる（要するに which 的な動作になる）
      * if ($DS === '/') {
      *     that(path_resolve('php', []))->isSame(PHP_BINARY);
      * }
@@ -993,7 +977,6 @@ class FileSystem
         $path = implode($DS, $paths);
 
         if (!(path_is_absolute)($path)) {
-            // for compatible
             if ($resolver) {
                 foreach ($resolver as $p) {
                     foreach (explode(PATH_SEPARATOR, $p) as $dir) {

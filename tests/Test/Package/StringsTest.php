@@ -118,14 +118,6 @@ class StringsTest extends AbstractTestCase
             '\'e,f\'',
         ]);
 
-        that((quoteexplode)(',', 'a,"x,y",["y", "z"],c\\,d,\'e,f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
-            'a',
-            '"x,y"',
-            '["y", "z"]',
-            'c\,d',
-            "'e,f'",
-        ]);
-
         that((quoteexplode)([" ", "\t"], "a b\tc 'd e\tf'"))->is([
             'a',
             'b',
@@ -133,13 +125,13 @@ class StringsTest extends AbstractTestCase
             "'d e\tf'",
         ]);
 
-        that((quoteexplode)(',', 'a,b,{e,f}', ['{' => '}']))->is([
+        that((quoteexplode)(',', 'a,b,{e,f}', null, ['{' => '}']))->is([
             'a',
             'b',
             '{e,f}',
         ]);
 
-        that((quoteexplode)('---', 'a---"x---y"---["y" --- "z"]---c\\---d---\'e---f\'', ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
+        that((quoteexplode)('---', 'a---"x---y"---["y" --- "z"]---c\\---d---\'e---f\'', null, ['[' => ']', '"' => '"', "'" => "'"], '\\'))->is([
             'a',
             '"x---y"',
             '["y" --- "z"]',
@@ -147,17 +139,17 @@ class StringsTest extends AbstractTestCase
             "'e---f'",
         ]);
 
-        that((quoteexplode)(' ', 'a "b c" \'d e\'', '"\''))->is([
+        that((quoteexplode)(' ', 'a "b c" \'d e\'', null, '"\''))->is([
             'a',
             '"b c"',
             "'d e'",
         ]);
 
-        that((quoteexplode)(' ', 'a"bc"', '"'))->is([
+        that((quoteexplode)(' ', 'a"bc"', null, '"'))->is([
             'a"bc"',
         ]);
 
-        that((quoteexplode)(' ', 'a"bc " ', '"'))->is([
+        that((quoteexplode)(' ', 'a"bc " ', null, '"'))->is([
             'a"bc "',
             '',
         ]);
