@@ -11,7 +11,10 @@ $tmpdir = __DIR__ . DIRECTORY_SEPARATOR . 'temporary' . DIRECTORY_SEPARATOR . 't
 @mkdir($tmpdir, 0777, true);
 if (DIRECTORY_SEPARATOR === '\\') {
     if (getenv('TMP') !== $tmpdir) {
-        \ryunosuke\Functions\Package\FileSystem::rm_rf($tmpdir, false);
+        $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpdir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($entries as $entry) {
+            ($entry->isDir() ? 'rmdir' : 'unlink')($entry->getRealPath());
+        }
     }
     putenv("TMP=$tmpdir");
 }
@@ -62,8 +65,11 @@ register_tick_function(function () {
 $env = getenv('TEST_TARGET') ?: 'package';
 putenv("TEST_TARGET=$env");
 switch ($env) {
+    default:
+        throw new LogicException('TEST_TARGET is not specified');
+
     case 'global':
-        file_put_contents(__DIR__ . '/temporary/global.php', \ryunosuke\Functions\Transporter::exportNamespace(null));
+        file_put_contents(__DIR__ . '/temporary/global.php', \ryunosuke\Functions\Transporter::exportGlobal());
         require_once(__DIR__ . '/temporary/global.php');
         assert(constant('arrayize') === 'arrayize');
         break;
@@ -75,18 +81,8 @@ switch ($env) {
         break;
 
     case 'package':
-        file_put_contents(__DIR__ . '/temporary/package.php', \ryunosuke\Functions\Transporter::exportNamespace(null, true));
+        file_put_contents(__DIR__ . '/temporary/package.php', \ryunosuke\Functions\Transporter::exportPackage());
         require_once(__DIR__ . '/temporary/package.php');
         assert(constant('arrayize') === ['ryunosuke\\Functions\\Package\\Arrays', 'arrayize']);
-        break;
-
-    case 'class':
-        $classname = '\\Utility\\Klass';
-        file_put_contents(__DIR__ . '/temporary/Klass.php', \ryunosuke\Functions\Transporter::exportClass($classname));
-        require_once(__DIR__ . '/temporary/Klass.php');
-        assert(constant("$classname::arrayize") === [$classname, 'arrayize']);
-        foreach ((new \ReflectionClass($classname))->getConstants() as $name => $value) {
-            define($name, $value);
-        }
         break;
 }

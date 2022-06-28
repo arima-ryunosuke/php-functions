@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * 配列関連のユーティリティ
  */
-class Arrays
+class Arrays implements Interfaces\Arrays
 {
     /**
      * 配列をシーケンシャルに走査するジェネレータを返す
@@ -63,7 +63,7 @@ class Arrays
             if (!is_array($arg)) {
                 $result[] = $arg;
             }
-            elseif (!(is_hasharray)($arg)) {
+            elseif (!Arrays::is_hasharray($arg)) {
                 $result = array_merge($result, $arg);
             }
             else {
@@ -146,11 +146,11 @@ class Arrays
      */
     public static function first_key($array, $default = null)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        [$k, $v] = (first_keyvalue)($array);
+        [$k, $v] = Arrays::first_keyvalue($array);
         return $k;
     }
 
@@ -171,11 +171,11 @@ class Arrays
      */
     public static function first_value($array, $default = null)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        [$k, $v] = (first_keyvalue)($array);
+        [$k, $v] = Arrays::first_keyvalue($array);
         return $v;
     }
 
@@ -219,11 +219,11 @@ class Arrays
      */
     public static function last_key($array, $default = null)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        [$k, $v] = (last_keyvalue)($array);
+        [$k, $v] = Arrays::last_keyvalue($array);
         return $k;
     }
 
@@ -244,11 +244,11 @@ class Arrays
      */
     public static function last_value($array, $default = null)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
-        [$k, $v] = (last_keyvalue)($array);
+        [$k, $v] = Arrays::last_keyvalue($array);
         return $v;
     }
 
@@ -269,7 +269,7 @@ class Arrays
      */
     public static function last_keyvalue($array, $default = null)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
         if (is_array($array)) {
@@ -397,7 +397,7 @@ class Arrays
     public static function in_array_and($needle, $haystack, $strict = false)
     {
         $needle = is_iterable($needle) ? $needle : [$needle];
-        if ((is_empty)($needle)) {
+        if (Vars::is_empty($needle)) {
             return false;
         }
 
@@ -432,7 +432,7 @@ class Arrays
     public static function in_array_or($needle, $haystack, $strict = false)
     {
         $needle = is_iterable($needle) ? $needle : [$needle];
-        if ((is_empty)($needle)) {
+        if (Vars::is_empty($needle)) {
             return false;
         }
 
@@ -495,7 +495,7 @@ class Arrays
     {
         if ($comparator === null || is_int($comparator)) {
             $sort_flg = $comparator;
-            $comparator = fn($av, $bv, $ak, $bk) => (varcmp)($av, $bv, $sort_flg);
+            $comparator = fn($av, $bv, $ak, $bk) => Vars::varcmp($av, $bv, $sort_flg);
         }
 
         $n = 0;
@@ -744,14 +744,14 @@ class Arrays
 
         // キー保持処理がかなり遅いので純粋な配列しかないのなら array_map(null) の方が（チェックを加味しても）速くなる
         foreach ($arrays as $a) {
-            if ((is_hasharray)($a)) {
+            if (Arrays::is_hasharray($a)) {
                 $yielders = array_map(function ($array) { yield from $array; }, $arrays);
 
                 $result = [];
                 for ($i = 0, $limit = max(array_map('count', $arrays)); $i < $limit; $i++) {
                     $e = [];
                     foreach ($yielders as $yielder) {
-                        (array_put)($e, $yielder->current(), $yielder->key());
+                        Arrays::array_put($e, $yielder->current(), $yielder->key());
                         $yielder->next();
                     }
                     $result[] = $e;
@@ -776,7 +776,7 @@ class Arrays
         foreach ($mi as $k => $v) {
             $e = [];
             for ($i = 0; $i < $count; $i++) {
-                (array_put)($e, $v[$i], $k[$i]);
+                Arrays::array_put($e, $v[$i], $k[$i]);
             }
             $result[] = $e;
         }
@@ -853,7 +853,7 @@ class Arrays
     {
         // 第1引数が回せない場合は引数を入れ替えて可変引数パターン
         if (!is_array($array) && !$array instanceof \Traversable) {
-            return (array_implode)(array_slice(func_get_args(), 1), $array);
+            return Arrays::array_implode(array_slice(func_get_args(), 1), $array);
         }
 
         $result = [];
@@ -899,12 +899,12 @@ class Arrays
      */
     public static function array_explode($array, $condition, $limit = \PHP_INT_MAX)
     {
-        $array = (arrayval)($array, false);
+        $array = Vars::arrayval($array, false);
 
         $limit = (int) $limit;
         if ($limit < 0) {
             // キーまで考慮するとかなりややこしくなるので富豪的にやる
-            $reverse = (array_explode)(array_reverse($array, true), $condition, -$limit);
+            $reverse = Arrays::array_explode(array_reverse($array, true), $condition, -$limit);
             $reverse = array_map(fn($v) => array_reverse($v, true), $reverse);
             return array_reverse($reverse);
         }
@@ -979,7 +979,7 @@ class Arrays
     public static function array_sprintf($array, $format = null, $glue = null)
     {
         if (is_callable($format)) {
-            $callback = (func_user_func_array)($format);
+            $callback = Funchand::func_user_func_array($format);
         }
         elseif ($format === null) {
             $callback = fn($v, $k, $n) => vsprintf($k, is_array($v) ? $v : [$v]);
@@ -1146,7 +1146,7 @@ class Arrays
     public static function array_of($key, $default = null)
     {
         $nodefault = func_num_args() === 1;
-        return fn(array $array) => $nodefault ? (array_get)($array, $key) : (array_get)($array, $key, $default);
+        return fn(array $array) => $nodefault ? Arrays::array_get($array, $key) : Arrays::array_get($array, $key, $default);
     }
 
     /**
@@ -1191,7 +1191,7 @@ class Arrays
             $result = [];
             foreach ($key as $k) {
                 // 深遠な事情で少しでも高速化したかったので isset || array_keys_exist にしてある
-                if (isset($array[$k]) || (array_keys_exist)($k, $array)) {
+                if (isset($array[$k]) || Arrays::array_keys_exist($k, $array)) {
                     $result[$k] = $array[$k];
                 }
             }
@@ -1222,7 +1222,7 @@ class Arrays
             return $result;
         }
 
-        if ((array_keys_exist)($key, $array)) {
+        if (Arrays::array_keys_exist($key, $array)) {
             return $array[$key];
         }
         return $default;
@@ -1263,17 +1263,17 @@ class Arrays
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return (array_set)(...[&$array[$k], $value, $key, $require_return]);
+                return Arrays::array_set(...[&$array[$k], $value, $key, $require_return]);
             }
             else {
-                return (array_set)(...[&$array, $value, $k, $require_return]);
+                return Arrays::array_set(...[&$array, $value, $k, $require_return]);
             }
         }
 
         if ($key === null) {
             $array[] = $value;
             if ($require_return === true) {
-                $key = (last_key)($array);
+                $key = Arrays::last_key($array);
             }
         }
         else {
@@ -1333,10 +1333,10 @@ class Arrays
                 if (is_array($array) && array_key_exists($k, $array) && !is_array($array[$k])) {
                     throw new \InvalidArgumentException('$array[$k] is not array.');
                 }
-                return (array_put)(...[&$array[$k], $value, $key, $condition]);
+                return Arrays::array_put(...[&$array[$k], $value, $key, $condition]);
             }
             else {
-                return (array_put)(...[&$array, $value, $k, $condition]);
+                return Arrays::array_put(...[&$array, $value, $k, $condition]);
             }
         }
 
@@ -1404,7 +1404,7 @@ class Arrays
         if (is_array($key)) {
             $result = [];
             foreach ($key as $rk => $ak) {
-                if ((array_keys_exist)($ak, $array)) {
+                if (Arrays::array_keys_exist($ak, $array)) {
                     $result[$rk] = $array[$ak];
                     unset($array[$ak]);
                 }
@@ -1434,7 +1434,7 @@ class Arrays
             return $result;
         }
 
-        if ((array_keys_exist)($key, $array)) {
+        if (Arrays::array_keys_exist($key, $array)) {
             $result = $array[$key];
             unset($array[$key]);
             return $result;
@@ -1472,10 +1472,10 @@ class Arrays
     {
         $keys = is_array($path) ? $path : explode($delimiter, $path);
         foreach ($keys as $key) {
-            if (!(is_arrayable)($array)) {
+            if (!Vars::is_arrayable($array)) {
                 return $default;
             }
-            if (!(array_keys_exist)($key, $array)) {
+            if (!Arrays::array_keys_exist($key, $array)) {
                 return $default;
             }
             $array = $array[$key];
@@ -1509,7 +1509,7 @@ class Arrays
     public static function array_keys_exist($keys, $array)
     {
         $keys = is_iterable($keys) ? $keys : [$keys];
-        if ((is_empty)($keys)) {
+        if (Vars::is_empty($keys)) {
             throw new \InvalidArgumentException('$keys is empty.');
         }
 
@@ -1518,11 +1518,11 @@ class Arrays
         foreach ($keys as $k => $key) {
             if (is_array($key)) {
                 // まずそのキーをチェックして
-                if (!(array_keys_exist)($k, $array)) {
+                if (!Arrays::array_keys_exist($k, $array)) {
                     return false;
                 }
                 // あるなら再帰する
-                if (!(array_keys_exist)($key, $array[$k])) {
+                if (!Arrays::array_keys_exist($key, $array[$k])) {
                     return false;
                 }
             }
@@ -1564,7 +1564,7 @@ class Arrays
      */
     public static function array_find($array, $callback, $is_key = true)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         $n = 0;
         foreach ($array as $k => $v) {
@@ -1667,7 +1667,7 @@ class Arrays
         // 互換性のため callable は配列以外に限定する
         $callable = ($keymap instanceof \Closure) || (!is_array($keymap) && is_callable($keymap));
         if ($callable) {
-            $keymap = (func_user_func_array)($keymap);
+            $keymap = Funchand::func_user_func_array($keymap);
         }
 
         $result = [];
@@ -1759,7 +1759,7 @@ class Arrays
      * ]);
      *
      * // さらに、自身にも適用できる（呼び出しは子が先で、本当の意味で「すべての要素」で呼び出される）
-     * that((array_map_recursive)([
+     * that(array_map_recursive([
      *     'k' => 'v',
      *     'c' => [
      *         'k1' => 'v1',
@@ -1785,7 +1785,7 @@ class Arrays
      */
     public static function array_map_recursive($array, $callback, $iterable = true, $apply_array = false)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         // ↑の変換を再帰ごとにやるのは現実的ではないのでクロージャに閉じ込めて再帰する
         $main = static function ($array, $parent) use (&$main, $callback, $iterable, $apply_array) {
@@ -1825,7 +1825,7 @@ class Arrays
      */
     public static function array_map_key($array, $callback)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
         $result = [];
         $n = 0;
         foreach ($array as $k => $v) {
@@ -1855,7 +1855,7 @@ class Arrays
      */
     public static function array_filter_key($array, $callback)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
         $result = [];
         $n = 0;
         foreach ($array as $k => $v) {
@@ -1938,7 +1938,7 @@ class Arrays
 
         $is_array = is_array($column);
         if ($is_array) {
-            if ((is_hasharray)($column)) {
+            if (Arrays::is_hasharray($column)) {
                 if ($callback !== null && !is_bool($callback)) {
                     throw new \InvalidArgumentException('if hash array $column, $callback must be bool.');
                 }
@@ -1967,7 +1967,7 @@ class Arrays
             }
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         $result = [];
         foreach ($array as $k => $v) {
@@ -2009,7 +2009,7 @@ class Arrays
      */
     public static function array_map_filter($array, $callback, $strict = false)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
         $result = [];
         $n = 0;
         foreach ($array as $k => $v) {
@@ -2050,14 +2050,14 @@ class Arrays
     public static function array_map_method($array, $method, $args = [], $ignore = false)
     {
         if ($ignore === true) {
-            $array = array_filter((arrayval)($array, false), fn($object) => is_callable([$object, $method]));
+            $array = array_filter(Vars::arrayval($array, false), fn($object) => is_callable([$object, $method]));
         }
         return array_map(function ($object) use ($method, $args, $ignore) {
             if ($ignore === null && !is_callable([$object, $method])) {
                 return $object;
             }
             return ([$object, $method])(...$args);
-        }, (arrayval)($array, false));
+        }, Vars::arrayval($array, false));
     }
 
     /**
@@ -2091,7 +2091,7 @@ class Arrays
      */
     public static function array_maps($array, ...$callbacks)
     {
-        $result = (arrayval)($array, false);
+        $result = Vars::arrayval($array, false);
         foreach ($callbacks as $callback) {
             if (is_string($callback) && $callback[0] === '@') {
                 $margs = [];
@@ -2111,7 +2111,7 @@ class Arrays
             else {
                 $margs = null;
                 $vargs = false;
-                $callback = (func_user_func_array)($callback);
+                $callback = Funchand::func_user_func_array($callback);
             }
             $n = 0;
             foreach ($result as $k => $v) {
@@ -2258,7 +2258,7 @@ class Arrays
      */
     public static function array_kmap($array, $callback)
     {
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         $n = 0;
         $result = [];
@@ -2303,7 +2303,7 @@ class Arrays
             if (empty($n)) {
                 throw new \InvalidArgumentException('array $n is empty.');
             }
-            [$kn, $vn] = (first_keyvalue)($n);
+            [$kn, $vn] = Arrays::first_keyvalue($n);
 
             // array_insert は負数も受け入れられるが、それを考慮しだすともう収拾がつかない
             if ($kn < 0 || $vn < 0) {
@@ -2312,16 +2312,16 @@ class Arrays
 
             // どちらが大きいかで順番がズレるので分岐しなければならない
             if ($kn <= $vn) {
-                $args = (array_insert)($args, null, $kn);
-                $args = (array_insert)($args, null, ++$vn);// ↑で挿入してるので+1
+                $args = Arrays::array_insert($args, null, $kn);
+                $args = Arrays::array_insert($args, null, ++$vn);// ↑で挿入してるので+1
             }
             else {
-                $args = (array_insert)($args, null, $vn);
-                $args = (array_insert)($args, null, ++$kn);// ↑で挿入してるので+1
+                $args = Arrays::array_insert($args, null, $vn);
+                $args = Arrays::array_insert($args, null, ++$kn);// ↑で挿入してるので+1
             }
         }
         else {
-            $args = (array_insert)($args, null, $n);
+            $args = Arrays::array_insert($args, null, $n);
         }
 
         $result = [];
@@ -2356,7 +2356,7 @@ class Arrays
      */
     public static function array_lmap($array, $callback, ...$variadic)
     {
-        return (array_nmap)(...(array_insert)(func_get_args(), 0, 2));
+        return Arrays::array_nmap(...Arrays::array_insert(func_get_args(), 0, 2));
     }
 
     /**
@@ -2375,7 +2375,7 @@ class Arrays
      */
     public static function array_rmap($array, $callback, ...$variadic)
     {
-        return (array_nmap)(...(array_insert)(func_get_args(), func_num_args() - 2, 2));
+        return Arrays::array_nmap(...Arrays::array_insert(func_get_args(), func_num_args() - 2, 2));
     }
 
     /**
@@ -2440,7 +2440,7 @@ class Arrays
     {
         if (func_num_args() === 2) {
             /** @var \ReflectionFunction $ref */
-            $ref = (reflect_callable)($callback);
+            $ref = Funchand::reflect_callable($callback);
             $params = $ref->getParameters();
             if ($params[0]->isDefaultValueAvailable()) {
                 $default = $params[0]->getDefaultValue();
@@ -2571,7 +2571,7 @@ class Arrays
     {
         $result = array_fill_keys(array_keys($rules), []);
         foreach ($rules as $name => $rule) {
-            $rule = (func_user_func_array)($rule);
+            $rule = Funchand::func_user_func_array($rule);
             $n = 0;
             foreach ($array as $k => $v) {
                 if ($rule($v, $k, $n++)) {
@@ -2615,7 +2615,7 @@ class Arrays
      *     ['X', 'Y', 'Z'],
      *     [[[['a', 'M', 'Z']]]],
      * ];
-     * that((array_count)($array, [
+     * that(array_count($array, [
      *     'lower' => fn($v) => !is_array($v) && ctype_lower($v),
      *     'upper' => fn($v) => !is_array($v) && ctype_upper($v),
      *     'array' => fn($v) => is_array($v),
@@ -2637,21 +2637,21 @@ class Arrays
         if (is_array($callback) && !is_callable($callback)) {
             $result = array_fill_keys(array_keys($callback), 0);
             foreach ($callback as $name => $rule) {
-                $rule = (func_user_func_array)($rule);
+                $rule = Funchand::func_user_func_array($rule);
                 $n = 0;
                 foreach ($array as $k => $v) {
                     if ($rule($v, $k, $n++)) {
                         $result[$name]++;
                     }
                     if ($recursive && is_iterable($v)) {
-                        $result[$name] += (array_count)($v, $rule, $recursive);
+                        $result[$name] += Arrays::array_count($v, $rule, $recursive);
                     }
                 }
             }
             return $result;
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
         $result = 0;
         $n = 0;
         foreach ($array as $k => $v) {
@@ -2659,7 +2659,7 @@ class Arrays
                 $result++;
             }
             if ($recursive && is_iterable($v)) {
-                $result += (array_count)($v, $callback, $recursive);
+                $result += Arrays::array_count($v, $callback, $recursive);
             }
         }
         return $result;
@@ -2704,9 +2704,9 @@ class Arrays
     public static function array_group($array, $callback = null, $preserve_keys = false)
     {
         if ($callback !== null && !is_callable($callback)) {
-            $callback = (array_of)($callback);
+            $callback = Arrays::array_of($callback);
         }
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         $result = [];
         $n = 0;
@@ -2810,15 +2810,15 @@ class Arrays
         }
         elseif (is_string($key)) {
             $nest_level = 1;
-            $key = (array_of)($key);
+            $key = Arrays::array_of($key);
         }
         else {
             $nest_level = count($key);
-            $key = (array_of)($key);
+            $key = Arrays::array_of($key);
         }
 
         if ($key === null) {
-            $group = (arrayval)($array);
+            $group = Vars::arrayval($array);
         }
         else {
             $group = [];
@@ -2841,7 +2841,7 @@ class Arrays
         }
 
         if (!is_callable($columns)) {
-            $columns = array_map(func_user_func_array, $columns);
+            $columns = array_map(Funchand::func_user_func_array, $columns);
         }
 
         $dive = function ($array, $level) use (&$dive, $columns) {
@@ -2883,11 +2883,11 @@ class Arrays
      */
     public static function array_all($array, $callback = null, $default = true)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         $n = 0;
         foreach ($array as $k => $v) {
@@ -2917,11 +2917,11 @@ class Arrays
      */
     public static function array_any($array, $callback = null, $default = false)
     {
-        if ((is_empty)($array)) {
+        if (Vars::is_empty($array)) {
             return $default;
         }
 
-        $callback = (func_user_func_array)($callback);
+        $callback = Funchand::func_user_func_array($callback);
 
         $n = 0;
         foreach ($array as $k => $v) {
@@ -2972,7 +2972,7 @@ class Arrays
     public static function array_distinct($array, $comparator = null)
     {
         // 配列化と個数チェック（1以下は重複のしようがないので不要）
-        $array = (arrayval)($array, false);
+        $array = Vars::arrayval($array, false);
         if (count($array) <= 1) {
             return $array;
         }
@@ -2983,17 +2983,17 @@ class Arrays
         }
         // 数字が来たら varcmp とする
         elseif (is_int($comparator)) {
-            $comparator = static fn($a, $b) => (varcmp)($a, $b, $comparator);
+            $comparator = static fn($a, $b) => Vars::varcmp($a, $b, $comparator);
         }
         // 文字列・配列が来たらキーアクセス/メソッドコールとする
         elseif (is_string($comparator) || is_array($comparator)) {
             $comparator = static function ($a, $b) use ($comparator) {
-                foreach ((arrayize)($comparator) as $method => $args) {
+                foreach (Arrays::arrayize($comparator) as $method => $args) {
                     if (is_int($method)) {
                         $delta = $a[$args] <=> $b[$args];
                     }
                     else {
-                        $args = (arrayize)($args);
+                        $args = Arrays::arrayize($args);
                         $delta = $a->$method(...$args) <=> $b->$method(...$args);
                     }
                     if ($delta !== 0) {
@@ -3060,7 +3060,7 @@ class Arrays
             return $array;
         }
 
-        if (!is_array($orders) || !(is_hasharray)($orders)) {
+        if (!is_array($orders) || !Arrays::is_hasharray($orders)) {
             $orders = [$orders];
         }
 
@@ -3127,7 +3127,7 @@ class Arrays
                 // でないなら通した値で比較
                 else {
                     $arg = array_map($order, $columns);
-                    $type = (reflect_types)($ref->getReturnType())->allows('string') ? 'string' : gettype(reset($arg));
+                    $type = Classobj::reflect_types($ref->getReturnType())->allows('string') ? 'string' : gettype(reset($arg));
                     $args[] = $arg;
                     $args[] = SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
@@ -3251,7 +3251,7 @@ class Arrays
         $result = [];
         foreach ($variadic as $n => $array) {
             if (!is_array($array)) {
-                $variadic[$n] = (arrayval)($array, false);
+                $variadic[$n] = Vars::arrayval($array, false);
             }
             $result = array_replace($result, $variadic[$n]);
         }
@@ -3297,7 +3297,7 @@ class Arrays
      */
     public static function array_revise($array, ...$maps)
     {
-        $result = (arrayval)($array, false);
+        $result = Vars::arrayval($array, false);
         foreach ($maps as $map) {
             foreach ($map as $k => $v) {
                 if ($v instanceof \Closure) {
@@ -3409,11 +3409,11 @@ class Arrays
                 $current = $result[$k];
                 if ($deep && is_array($current)) {
                     if (is_array($v)) {
-                        if ((is_indexarray)($current)) {
+                        if (Arrays::is_indexarray($current)) {
                             $v = array_merge($current, $v);
                             $current = array_fill_keys(array_keys($v), null);
                         }
-                        $v = (array_extend)($deep, $current, $v);
+                        $v = Arrays::array_extend($deep, $current, $v);
                     }
                     elseif ($v instanceof \Closure) {
                         $v = $v($current);
@@ -3561,8 +3561,8 @@ class Arrays
      */
     public static function array_fill_callback($keys, $callback)
     {
-        $keys = (arrayval)($keys, false);
-        return array_combine($keys, array_map((func_user_func_array)($callback), $keys));
+        $keys = Vars::arrayval($keys, false);
+        return array_combine($keys, array_map(Funchand::func_user_func_array($callback), $keys));
     }
 
     /**
@@ -3590,10 +3590,10 @@ class Arrays
      */
     public static function array_pickup($array, $keys)
     {
-        $array = (arrayval)($array, false);
+        $array = Vars::arrayval($array, false);
 
         $result = [];
-        foreach ((arrayval)($keys, false) as $k => $key) {
+        foreach (Vars::arrayval($keys, false) as $k => $key) {
             if (is_int($k)) {
                 if (array_key_exists($key, $array)) {
                     $result[$key] = $array[$key];
@@ -3629,7 +3629,7 @@ class Arrays
      */
     public static function array_remove($array, $keys)
     {
-        foreach ((arrayval)($keys, false) as $k) {
+        foreach (Vars::arrayval($keys, false) as $k) {
             unset($array[$k]);
         }
         return $array;
@@ -3672,10 +3672,10 @@ class Arrays
      */
     public static function array_lookup($array, $column_key = null, $index_key = null)
     {
-        $array = (arrayval)($array, false);
+        $array = Vars::arrayval($array, false);
 
         if ($index_key instanceof \Closure) {
-            return array_combine((array_kmap)($array, $index_key), array_column($array, $column_key));
+            return array_combine(Arrays::array_kmap($array, $index_key), array_column($array, $column_key));
         }
         if (func_num_args() === 3) {
             return array_column($array, $column_key, $index_key);
@@ -3728,7 +3728,7 @@ class Arrays
     public static function array_select($array, $columns, $index = null)
     {
         if (!is_iterable($columns) && !$columns instanceof \Closure) {
-            return (array_lookup)(...func_get_args());
+            return Arrays::array_lookup(...func_get_args());
         }
 
         if ($columns instanceof \Closure) {
@@ -3738,7 +3738,7 @@ class Arrays
             $callbacks = [];
             foreach ($columns as $alias => $column) {
                 if ($column instanceof \Closure) {
-                    $callbacks[$alias] = (func_user_func_array)($column);
+                    $callbacks[$alias] = Funchand::func_user_func_array($column);
                 }
             }
         }
@@ -3758,10 +3758,10 @@ class Arrays
                     }
 
                     if (isset($callbacks[$alias])) {
-                        $row[$alias] = $callbacks[$alias]((attr_get)($alias, $v, null), $v, $k);
+                        $row[$alias] = $callbacks[$alias](Vars::attr_get($alias, $v, null), $v, $k);
                     }
-                    elseif ((attr_exists)($column, $v)) {
-                        $row[$alias] = (attr_get)($column, $v);
+                    elseif (Vars::attr_exists($column, $v)) {
+                        $row[$alias] = Vars::attr_get($column, $v);
                     }
                     else {
                         throw new \InvalidArgumentException("$column is not exists.");
@@ -3778,8 +3778,8 @@ class Arrays
             elseif (array_key_exists($index, $row)) {
                 $result[$row[$index]] = $row;
             }
-            elseif ((attr_exists)($index, $v)) {
-                $result[(attr_get)($index, $v)] = $row;
+            elseif (Vars::attr_exists($index, $v)) {
+                $result[Vars::attr_get($index, $v)] = $row;
             }
             else {
                 throw new \InvalidArgumentException("$index is not exists.");
@@ -3854,7 +3854,7 @@ class Arrays
         }
         // null なら最初の要素のキー・null
         if ($template === null) {
-            $template = array_fill_keys(array_keys((first_value)($array)), null);
+            $template = array_fill_keys(array_keys(Arrays::first_value($array)), null);
         }
 
         $result = [];
@@ -4202,8 +4202,8 @@ class Arrays
         return call_user_func($f = static function ($array1, $array2, $key = null) use (&$f, $rule, $udiff, $delimiter) {
             $result = [];
 
-            $array1 = (array_assort)($array1, $rule);
-            $array2 = (array_assort)($array2, $rule);
+            $array1 = Arrays::array_assort($array1, $rule);
+            $array2 = Arrays::array_assort($array2, $rule);
 
             $list1 = array_values(array_udiff($array1['list'], $array2['list'], $udiff));
             $list2 = array_values(array_udiff($array2['list'], $array1['list'], $udiff));
@@ -4298,7 +4298,7 @@ class Arrays
     public static function array_schema($schema, ...$arrays)
     {
         $throw = function ($key, $value, $message) {
-            $value = (str_ellipsis)((stringify)($value), 32);
+            $value = Strings::str_ellipsis(Vars::stringify($value), 32);
             throw new \DomainException("invalid value $key. $value must be $message");
         };
         // 検証兼フィルタ郡
@@ -4335,7 +4335,7 @@ class Arrays
                 return $definition['closure']($value, $definition);
             },
             'unique'    => function ($definition, $value, $key) use ($throw) {
-                return array_values((array_distinct)($value, $definition['unique']));
+                return array_values(Arrays::array_distinct($value, $definition['unique']));
             },
             'min'       => function ($definition, $value, $key) use ($throw) {
                 if (is_string($value)) {
@@ -4434,7 +4434,7 @@ class Arrays
 
         $main = function ($schema, $path, ...$arrays) use (&$main, $validate) {
             if (is_string($schema)) {
-                $schema = (paml_import)($schema);
+                $schema = Strings::paml_import($schema);
             }
             if (!array_key_exists('type', $schema)) {
                 throw new \InvalidArgumentException("$path not have type key");
@@ -4448,9 +4448,9 @@ class Arrays
 
             [$maintype, $subtype] = explode('@', implode('', (array) $schema['type']), 2) + [1 => null];
             if ($maintype === 'list') {
-                $result = array_merge(...(array_lmap)($arrays, $validate, $schema, $path));
+                $result = array_merge(...Arrays::array_lmap($arrays, $validate, $schema, $path));
                 if (isset($subtype)) {
-                    $subschema = ['type' => $subtype] + (array_map_key)($schema, fn($k) => $k[0] === '@' ? substr($k, 1) : null);
+                    $subschema = ['type' => $subtype] + Arrays::array_map_key($schema, fn($k) => $k[0] === '@' ? substr($k, 1) : null);
                     foreach ($result as $k => $v) {
                         $result[$k] = $main($subschema, "$path/$k", $v);
                     }

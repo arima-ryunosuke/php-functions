@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * 構文関連のユーティリティ
  */
-class Syntax
+class Syntax implements Interfaces\Syntax
 {
     /** parse_php 関数でトークン名変換をするか */
     const TOKEN_NAME = 2;
@@ -42,7 +42,7 @@ class Syntax
     {
         $cachefile = null;
         if ($cachesize && strlen($phpcode) >= $cachesize) {
-            $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+            $cachefile = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
             if (!file_exists($cachefile)) {
                 file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
             }
@@ -140,7 +140,7 @@ class Syntax
         ];
         $option += $default;
 
-        $cachekey = (var_hash)($phpcode) . $option['flags'] . '-' . $option['phptag'] . '-' . var_export($option['short_open_tag'], true);
+        $cachekey = Vars::var_hash($phpcode) . $option['flags'] . '-' . $option['phptag'] . '-' . var_export($option['short_open_tag'], true);
         static $cache = [];
         if (!($option['cache'] && isset($cache[$cachekey]))) {
             $phptag = $option['phptag'] ? '<?php ' : '';
@@ -195,7 +195,7 @@ class Syntax
                 // @codeCoverageIgnoreEnd
 
                 $token[] = $position;
-                if ($option['flags'] & TOKEN_NAME) {
+                if ($option['flags'] & Syntax::TOKEN_NAME) {
                     $token[] = token_name($token[0]);
                 }
 
@@ -308,7 +308,7 @@ class Syntax
             'trailing_break' => true,
             'replacer'       => func_num_args() === 3 ? null : '',
         ], $option, [
-            //'flags'  => TOKEN_NAME,
+            //'flags'  => Syntax::TOKEN_NAME,
             //'cache'  => false,
             'phptag' => false,
         ]);
@@ -318,10 +318,10 @@ class Syntax
             $replacer = fn($phptag, $n) => '';
         }
         if ($replacer === null) {
-            $replacer = (unique_string)($phtml, 64);
+            $replacer = Strings::unique_string($phtml, 64);
         }
 
-        $tmp = (parse_php)($phtml, $option);
+        $tmp = Syntax::parse_php($phtml, $option);
 
         if ($option['trailing_break']) {
             $tokens = $tmp;
@@ -550,7 +550,7 @@ class Syntax
         if ($context === null) {
             $context = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
             if (PHP_SAPI === 'cli') {
-                $context = (is_ansi)(STDOUT) ? 'cli' : 'plain';
+                $context = Utility::is_ansi(STDOUT) ? 'cli' : 'plain';
             }
         }
 
@@ -561,7 +561,7 @@ class Syntax
                 case 'plain':
                     return $value;
                 case 'cli':
-                    return (ansi_colorize)($value, $style);
+                    return Utility::ansi_colorize($value, $style);
                 case 'html':
                     $names = array_flip(preg_split('#[^a-z]#i', $style));
                     $keys = [
@@ -888,7 +888,7 @@ class Syntax
                 if ($func_num_args > 0) {
                     $result = [];
                     foreach ($source as $s) {
-                        $chain = (chain)($s);
+                        $chain = Syntax::chain($s);
                         foreach ($this->stack as $stack) {
                             $chain->{$stack[0]}(...$stack[1]);
                         }
@@ -935,7 +935,7 @@ class Syntax
             private function _resolve($name)
             {
                 $isiterable = is_iterable($this->data);
-                $isstringable = (is_stringable)($this->data);
+                $isstringable = Vars::is_stringable($this->data);
                 if (false
                     // for global
                     || (function_exists($fname = $name))
@@ -949,10 +949,6 @@ class Syntax
                     || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
                     || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
                     || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
-                    // for class
-                    || (defined($cname = __CLASS__ . "::$name") && is_callable($fname = constant($cname)))
-                    || ($isiterable && defined($cname = __CLASS__ . "::array_$name") && is_callable($fname = constant($cname)))
-                    || ($isstringable && defined($cname = __CLASS__ . "::str_$name") && is_callable($fname = constant($cname)))
                 ) {
                     return $fname;
                 }
@@ -977,7 +973,7 @@ class Syntax
                 }
                 // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
                 if (preg_match('#(.+?)(\d+)$#', $name, $match) && $fname = $this->_resolve($match[1])) {
-                    $this->data = $fname(...(array_insert)($arguments, [$this->data], $match[2]));
+                    $this->data = $fname(...Arrays::array_insert($arguments, [$this->data], $match[2]));
                     return $this;
                 }
 
@@ -985,7 +981,7 @@ class Syntax
                 if (preg_match('#(.+?)E$#', $name, $match)) {
                     $expr = array_pop($arguments);
                     $expr = strpos($expr, '$_') === false ? '$_ ' . $expr : $expr;
-                    $arguments[] = (eval_func)($expr, '_');
+                    $arguments[] = Funchand::eval_func($expr, '_');
                     return $this->{$match[1]}(...$arguments);
                 }
                 // 接尾呼び出し2: P で終わる呼び出しは演算子を callback とする
@@ -1000,7 +996,7 @@ class Syntax
                             if (!is_array($rand)) {
                                 $rand = [$rand];
                             }
-                            $v = (ope_func)($ope)($v, ...$rand);
+                            $v = Funchand::ope_func($ope)($v, ...$rand);
                         }
                         return $v;
                     };
@@ -1137,7 +1133,7 @@ class Syntax
     {
         if (is_object($var)) {
             // 文字列化できるかが優先
-            if ((is_stringable)($var)) {
+            if (Vars::is_stringable($var)) {
                 return strlen($var) ? $var : $default;
             }
             // 次点で countable
@@ -1207,7 +1203,7 @@ class Syntax
             }
         }
         elseif (is_callable($condition)) {
-            $condition = ((func_user_func_array)($condition))();
+            $condition = (Funchand::func_user_func_array($condition))();
         }
 
         if ($condition) {
@@ -1336,7 +1332,7 @@ class Syntax
      */
     public static function try_catch($try, $catch = null, ...$variadic)
     {
-        return (try_catch_finally)($try, $catch, null, ...$variadic);
+        return Syntax::try_catch_finally($try, $catch, null, ...$variadic);
     }
 
     /**
@@ -1365,7 +1361,7 @@ class Syntax
      */
     public static function try_finally($try, $finally = null, ...$variadic)
     {
-        return (try_catch_finally)($try, throws, $finally, ...$variadic);
+        return Syntax::try_catch_finally($try, Syntax::throws, $finally, ...$variadic);
     }
 
     /**

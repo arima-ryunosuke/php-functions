@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * ファイルシステム関連のユーティリティ
  */
-class FileSystem
+class FileSystem implements Interfaces\FileSystem
 {
     /**
      * 各種属性を指定してファイルのマッチングを行うクロージャを返す
@@ -55,10 +55,10 @@ class FileSystem
         ];
 
         foreach ([
-            'mtime'  => date_timestamp,
-            '!mtime' => date_timestamp,
-            'size'   => si_unprefix,
-            '!size'  => si_unprefix,
+            'mtime'  => Date::date_timestamp,
+            '!mtime' => Date::date_timestamp,
+            'size'   => Vars::si_unprefix,
+            '!size'  => Vars::si_unprefix,
         ] as $key => $map) {
             if (isset($filter_condition[$key])) {
                 $range = $filter_condition[$key];
@@ -174,7 +174,7 @@ class FileSystem
                 }
             }
             foreach (['contains' => false, '!contains' => true] as $key => $cond) {
-                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === ((file_pos)($file->getPathname(), $filter_condition[$key]) !== false))) {
+                if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === (FileSystem::file_pos($file->getPathname(), $filter_condition[$key]) !== false))) {
                     return false;
                 }
             }
@@ -218,7 +218,7 @@ class FileSystem
             'relative' => false,
             '!type'    => 'dir',
         ];
-        $match = (file_matcher)($filter_condition);
+        $match = FileSystem::file_matcher($filter_condition);
 
         $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
         $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
@@ -274,7 +274,7 @@ class FileSystem
         $filter_condition += [
             '!type' => 'dir',
         ];
-        $match = (file_matcher)($filter_condition);
+        $match = FileSystem::file_matcher($filter_condition);
 
         $basedir = basename($dirname);
 
@@ -288,7 +288,7 @@ class FileSystem
         });
         foreach ($items as $item) {
             if ($item->isDir()) {
-                $result[$basedir] += (file_tree)($item->getPathname(), $filter_condition);
+                $result[$basedir] += FileSystem::file_tree($item->getPathname(), $filter_condition);
             }
             else {
                 if ($match($item)) {
@@ -437,20 +437,20 @@ class FileSystem
             case 'php':
                 return (array) require $filename;
             case 'csv':
-                return (array) (csv_import)($mb_convert_encoding($encoding, file_get_contents($filename)), $options + ['structure' => true]);
+                return (array) Strings::csv_import($mb_convert_encoding($encoding, file_get_contents($filename)), $options + ['structure' => true]);
             case 'json':
             case 'json5':
-                return (array) (json_import)($mb_convert_encoding($encoding, file_get_contents($filename)), $options);
+                return (array) Strings::json_import($mb_convert_encoding($encoding, file_get_contents($filename)), $options);
             case 'jsonl':
             case 'jsonl5':
-                return (array) array_map(fn($json) => (json_import)($json, $options), $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
+                return (array) array_map(fn($json) => Strings::json_import($json, $options), $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
             case 'yml':
             case 'yaml':
                 return (array) yaml_parse($mb_convert_encoding($encoding, file_get_contents($filename)), 0, $ndocs, $options);
             case 'xml':
                 throw new \DomainException("ext '$extension' is supported in the future.");
             case 'ltsv':
-                return (array) array_map(fn($ltsv) => (ltsv_import)($ltsv, $options), $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
+                return (array) array_map(fn($ltsv) => Strings::ltsv_import($ltsv, $options), $mb_convert_encoding($encoding, array_filter(file($filename, FILE_IGNORE_NEW_LINES), 'strlen')));
         }
     }
 
@@ -476,10 +476,10 @@ class FileSystem
             $umask = umask();
         }
 
-        $filename = (path_normalize)($filename);
+        $filename = FileSystem::path_normalize($filename);
 
         if (!is_dir($dirname = dirname($filename))) {
-            if (!@(mkdir_p)($dirname, $umask)) {
+            if (!@FileSystem::mkdir_p($dirname, $umask)) {
                 throw new \RuntimeException("failed to mkdir($dirname)");
             }
         }
@@ -518,29 +518,29 @@ class FileSystem
         /** @var resource $fp */
         try {
             // 開いて
-            $fp = fopen($filename, 'c+b') ?: (throws)(new \UnexpectedValueException('failed to fopen.'));
+            $fp = fopen($filename, 'c+b') ?: Syntax::throws(new \UnexpectedValueException('failed to fopen.'));
             if ($operation) {
-                flock($fp, $operation) ?: (throws)(new \UnexpectedValueException('failed to flock.'));
+                flock($fp, $operation) ?: Syntax::throws(new \UnexpectedValueException('failed to flock.'));
             }
 
             // 読み込んで
-            rewind($fp) ?: (throws)(new \UnexpectedValueException('failed to rewind.'));
-            $contents = false !== ($t = stream_get_contents($fp)) ? $t : (throws)(new \UnexpectedValueException('failed to stream_get_contents.'));
+            rewind($fp) ?: Syntax::throws(new \UnexpectedValueException('failed to rewind.'));
+            $contents = false !== ($t = stream_get_contents($fp)) ? $t : Syntax::throws(new \UnexpectedValueException('failed to stream_get_contents.'));
 
             // 変更して
-            rewind($fp) ?: (throws)(new \UnexpectedValueException('failed to rewind.'));
-            ftruncate($fp, 0) ?: (throws)(new \UnexpectedValueException('failed to ftruncate.'));
+            rewind($fp) ?: Syntax::throws(new \UnexpectedValueException('failed to rewind.'));
+            ftruncate($fp, 0) ?: Syntax::throws(new \UnexpectedValueException('failed to ftruncate.'));
             $contents = $callback($contents, $fp);
 
             // 書き込んで
-            $return = ($r = fwrite($fp, $contents)) !== false ? $r : (throws)(new \UnexpectedValueException('failed to fwrite.'));
-            fflush($fp) ?: (throws)(new \UnexpectedValueException('failed to fflush.'));
+            $return = ($r = fwrite($fp, $contents)) !== false ? $r : Syntax::throws(new \UnexpectedValueException('failed to fwrite.'));
+            fflush($fp) ?: Syntax::throws(new \UnexpectedValueException('failed to fflush.'));
 
             // 閉じて
             if ($operation) {
-                flock($fp, LOCK_UN) ?: (throws)(new \UnexpectedValueException('failed to flock.'));
+                flock($fp, LOCK_UN) ?: Syntax::throws(new \UnexpectedValueException('failed to flock.'));
             }
-            fclose($fp) ?: (throws)(new \UnexpectedValueException('failed to fclose.'));
+            fclose($fp) ?: Syntax::throws(new \UnexpectedValueException('failed to fclose.'));
 
             // 返す
             return $return;
@@ -643,7 +643,7 @@ class FileSystem
             throw new \InvalidArgumentException("'$filename' is not found.");
         }
 
-        $needle = (arrayval)($needle, false);
+        $needle = Vars::arrayval($needle, false);
         $maxlength = max(array_map('strlen', $needle));
 
         if ($start < 0) {
@@ -671,12 +671,12 @@ class FileSystem
                 }
                 $last = $part ?? '';
                 $part = fread($fp, $chunksize);
-                if (($p = (strpos_array)($part, $needle))) {
+                if (($p = Strings::strpos_array($part, $needle))) {
                     $min = min($p);
                     $result = $start + $min;
                     return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
                 }
-                if (($p = (strpos_array)($last . $part, $needle))) {
+                if (($p = Strings::strpos_array($last . $part, $needle))) {
                     $min = min($p);
                     $result = $start + $min - strlen($last);
                     return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
@@ -719,7 +719,7 @@ class FileSystem
             case 'http':
             case 'https':
                 $r = $c = [];
-                (http_head)($filename, [], ['throw' => false], $r, $c);
+                Network::http_head($filename, [], ['throw' => false], $r, $c);
                 if ($c['http_code'] === 200) {
                     return $c['content_type'] ?? null;
                 }
@@ -779,7 +779,7 @@ class FileSystem
         if ($dirname === $path) {
             return false;
         }
-        return (dirname_r)($dirname, $callback);
+        return FileSystem::dirname_r($dirname, $callback);
     }
 
     /**
@@ -820,7 +820,7 @@ class FileSystem
             /** @var \SplFileInfo $path */
             $mtime = $path->getMTime();
             if ($path->isDir() && $recursive) {
-                $mtime = max($mtime, (dirmtime)($path->getPathname(), $recursive));
+                $mtime = max($mtime, FileSystem::dirmtime($path->getPathname(), $recursive));
             }
             if ($dirtime < $mtime) {
                 $dirtime = $mtime;
@@ -851,7 +851,7 @@ class FileSystem
     public static function fnmatch_and($patterns, $string, $flags = 0)
     {
         $patterns = is_iterable($patterns) ? $patterns : [$patterns];
-        if ((is_empty)($patterns)) {
+        if (Vars::is_empty($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
 
@@ -885,7 +885,7 @@ class FileSystem
     public static function fnmatch_or($patterns, $string, $flags = 0)
     {
         $patterns = is_iterable($patterns) ? $patterns : [$patterns];
-        if ((is_empty)($patterns)) {
+        if (Vars::is_empty($patterns)) {
             throw new \InvalidArgumentException('$patterns must be not empty.');
         }
 
@@ -976,12 +976,12 @@ class FileSystem
 
         $path = implode($DS, $paths);
 
-        if (!(path_is_absolute)($path)) {
+        if (!FileSystem::path_is_absolute($path)) {
             if ($resolver) {
                 foreach ($resolver as $p) {
                     foreach (explode(PATH_SEPARATOR, $p) as $dir) {
                         if (file_exists("$dir/$path")) {
-                            return (path_normalize)("$dir/$path");
+                            return FileSystem::path_normalize("$dir/$path");
                         }
                     }
                 }
@@ -992,7 +992,7 @@ class FileSystem
             }
         }
 
-        return (path_normalize)($path);
+        return FileSystem::path_normalize($path);
     }
 
     /**
@@ -1016,8 +1016,8 @@ class FileSystem
     {
         $DS = DIRECTORY_SEPARATOR;
 
-        $fa = array_filter(explode($DS, (path_resolve)($from)), 'strlen');
-        $ta = array_filter(explode($DS, (path_resolve)($to)), 'strlen');
+        $fa = array_filter(explode($DS, FileSystem::path_resolve($from)), 'strlen');
+        $ta = array_filter(explode($DS, FileSystem::path_resolve($to)), 'strlen');
 
         $compare = fn($a, $b) => $DS === '\\' ? strcasecmp($a, $b) : strcmp($a, $b);
         $ca = array_udiff_assoc($fa, $ta, $compare);
@@ -1112,7 +1112,7 @@ class FileSystem
             'basename'  => null,
             'filename'  => null,
             'extension' => null,
-        ], pathinfo((path_normalize)($path)));
+        ], pathinfo(FileSystem::path_normalize($path)));
 
         $localname = $pathinfo['filename'];
         $extensions = (array) $pathinfo['extension'];
@@ -1123,11 +1123,11 @@ class FileSystem
         }
 
         return [
-            'dirname'      => (path_normalize)($pathinfo['dirname']),
+            'dirname'      => FileSystem::path_normalize($pathinfo['dirname']),
             'basename'     => $pathinfo['basename'],
             'filename'     => $pathinfo['filename'],
             'extension'    => $pathinfo['extension'],
-            'dirlocalname' => (path_normalize)($pathinfo['dirname'] . "/$localname"),
+            'dirlocalname' => FileSystem::path_normalize($pathinfo['dirname'] . "/$localname"),
             'localname'    => $localname,
             'extensions'   => $extensions,
         ];
@@ -1176,24 +1176,24 @@ class FileSystem
         // ディレクトリでないなら copy へ移譲
         if (!is_dir($src)) {
             if ($dirmode) {
-                (mkdir_p)($dst);
+                FileSystem::mkdir_p($dst);
                 return copy($src, $dst . basename($src));
             }
             else {
-                (mkdir_p)(dirname($dst));
+                FileSystem::mkdir_p(dirname($dst));
                 return copy($src, $dst);
             }
         }
 
         if ($dirmode) {
-            return (cp_rf)($src, $dst . basename($src));
+            return FileSystem::cp_rf($src, $dst . basename($src));
         }
 
-        (mkdir_p)($dst);
+        FileSystem::mkdir_p($dst);
 
         foreach (glob("$src/*") as $file) {
             if (is_dir($file)) {
-                (cp_rf)($file, "$dst/" . basename($file));
+                FileSystem::cp_rf($file, "$dst/" . basename($file));
             }
             else {
                 copy($file, "$dst/" . basename($file));
@@ -1262,7 +1262,7 @@ class FileSystem
     public static function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
-        $dir = $dir ?: (cachedir)();
+        $dir = $dir ?: Utility::cachedir();
         $tempfile = tempnam($dir, $prefix);
 
         // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？

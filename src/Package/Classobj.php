@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * クラス・オブジェクト関連のユーティリティ
  */
-class Classobj
+class Classobj implements Interfaces\Classobj
 {
     /** 自分自身を表す定数 */
     const IS_OWNSELF = 1 << 1;
@@ -107,7 +107,7 @@ class Classobj
 
         // 指定パスの兄弟ファイルを調べた後、親ディレクトリを辿っていく
         $basenames = [];
-        return (dirname_r)($location, function ($directory) use ($detectNS, &$basenames) {
+        return FileSystem::dirname_r($location, function ($directory) use ($detectNS, &$basenames) {
             foreach (array_filter(glob("$directory/*.php"), 'is_file') as $file) {
                 $namespace = $detectNS($file);
                 if ($namespace !== null) {
@@ -116,7 +116,7 @@ class Classobj
                 }
             }
             $basenames[] = pathinfo($directory, PATHINFO_FILENAME);
-        }) ?: (throws)(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
+        }) ?: Syntax::throws(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
     }
 
     /**
@@ -221,8 +221,8 @@ class Classobj
      */
     public static function auto_loader($startdir = null)
     {
-        return (cache)("path-$startdir", function () use ($startdir) {
-            $cache = (dirname_r)($startdir ?: __DIR__, function ($dir) {
+        return Utility::cache("path-$startdir", function () use ($startdir) {
+            $cache = FileSystem::dirname_r($startdir ?: __DIR__, function ($dir) {
                 if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
                     return $file;
                 }
@@ -249,7 +249,7 @@ class Classobj
      */
     public static function class_loader($startdir = null)
     {
-        return require (auto_loader)($startdir);
+        return require Classobj::auto_loader($startdir);
     }
 
     /**
@@ -417,8 +417,8 @@ class Classobj
         }
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
-        $classfile = (class_loader)()->findFile($class);
-        $fname = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
+        $classfile = Classobj::class_loader()->findFile($class);
+        $fname = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
         if (!file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
@@ -462,14 +462,14 @@ class Classobj
         // 配列はメソッド定義のクロージャ配列とする
         if (is_array($newclass)) {
             $content = file_get_contents($fname);
-            $origspace = (parse_php)($content, [
+            $origspace = Syntax::parse_php($content, [
                 'begin' => T_NAMESPACE,
                 'end'   => ';',
             ]);
             array_shift($origspace);
             array_pop($origspace);
 
-            $origclass = (parse_php)($content, [
+            $origclass = Syntax::parse_php($content, [
                 'begin'  => T_CLASS,
                 'end'    => T_STRING,
                 'offset' => count($origspace),
@@ -487,29 +487,29 @@ class Classobj
                     }
                 }
                 else {
-                    [$declare, $codeblock] = (callable_code)($member);
+                    [$declare, $codeblock] = Funchand::callable_code($member);
                     $parentclass = new \ReflectionClass("\\$origspace\\$origclass");
                     // 元クラスに定義されているならオーバーライドとして特殊な処理を行う
                     if ($parentclass->hasMethod($name)) {
                         /** @var \ReflectionFunctionAbstract $refmember */
-                        $refmember = (reflect_callable)($member);
+                        $refmember = Funchand::reflect_callable($member);
                         $refmethod = $parentclass->getMethod($name);
                         // 指定クロージャに引数が無くて、元メソッドに有るなら継承
                         if (!$refmember->getNumberOfParameters() && $refmethod->getNumberOfParameters()) {
-                            $declare = 'function (' . implode(', ', (function_parameter)($refmethod)) . ')';
+                            $declare = 'function (' . implode(', ', Funchand::function_parameter($refmethod)) . ')';
                         }
                         // 同上。返り値版
                         if (!$refmember->hasReturnType() && $refmethod->hasReturnType()) {
-                            $declare .= ':' . (reflect_types)($refmethod->getReturnType())->getName();
+                            $declare .= ':' . Classobj::reflect_types($refmethod->getReturnType())->getName();
                         }
                     }
-                    $mname = (preg_replaces)('#function(\\s*)\\(#u', " $name", $declare);
+                    $mname = Strings::preg_replaces('#function(\\s*)\\(#u', " $name", $declare);
                     $classcode .= "public $mname $codeblock\n";
                 }
             }
 
             $newclass = "\\$origspace\\{$origclass}_";
-            (evaluate)("namespace $origspace;\nclass {$origclass}_ extends {$origclass}\n{\n$classcode}");
+            Syntax::evaluate("namespace $origspace;\nclass {$origclass}_ extends {$origclass}\n{\n$classcode}");
         }
 
         class_alias($newclass, $class);
@@ -638,7 +638,7 @@ class Classobj
 
         $getReturnType = function (\ReflectionFunctionAbstract $reffunc) {
             if ($reffunc->hasReturnType()) {
-                $type = (reflect_types)($reffunc->getReturnType())->getName();
+                $type = Classobj::reflect_types($reffunc->getReturnType())->getName();
                 if ($type !== 'void') {
                     return ": $type";
                 }
@@ -651,14 +651,14 @@ class Classobj
                 $receiver = ($reffunc->isStatic() ? 'self::$__originalClass::' : '$this->__original->') . $name;
             }
             else {
-                $bindable = (is_bindable_closure)($reffunc->getClosure());
+                $bindable = Funchand::is_bindable_closure($reffunc->getClosure());
                 $modifier = $bindable ? '' : 'static ';
                 $receiver = ($bindable ? '$this->__methods' : 'self::$__staticMethods') . "[" . var_export($name, true) . "]";
             }
 
             $ref = $reffunc->returnsReference() ? '&' : '';
 
-            $params = (function_parameter)($reffunc);
+            $params = Funchand::function_parameter($reffunc);
             $prms = implode(', ', $params);
             $args = implode(', ', array_keys($params));
 
@@ -685,7 +685,7 @@ class Classobj
                 }
             }
 
-            $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            $cachefile = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
             if (!file_exists($cachefile)) {
                 $declares = "";
                 foreach ($classmethods as $name => $method) {
@@ -716,11 +716,11 @@ class Classobj
 
             // シグネチャエラーが出てしまうので、指定がない場合は強制的に合わせる
             $refmember = new \ReflectionFunction($override);
-            $params = (function_parameter)(!$refmember->getNumberOfParameters() && $method->getNumberOfParameters() ? $method : $override);
+            $params = Funchand::function_parameter(!$refmember->getNumberOfParameters() && $method->getNumberOfParameters() ? $method : $override);
             $rtype = $getReturnType(!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember);
 
-            [, $codeblock] = (callable_code)($override);
-            $tokens = (parse_php)($codeblock);
+            [, $codeblock] = Funchand::callable_code($override);
+            $tokens = Syntax::parse_php($codeblock);
             array_shift($tokens);
             $parented = null;
             foreach ($tokens as $n => $token) {
@@ -745,7 +745,7 @@ class Classobj
 
         $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
         $implements = $implements ? 'implements ' . implode(',', $implements) : '';
-        (evaluate)("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}", [], 10);
+        Syntax::evaluate("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}", [], 10);
         return new $newclassname($spawners[$classname]['original'], $object, $fields, $methods);
     }
 
@@ -1172,18 +1172,18 @@ class Classobj
     public static function get_class_constants($class, $filter = null)
     {
         $class = ltrim(is_object($class) ? get_class($class) : $class, '\\');
-        $filter ??= (IS_PUBLIC | IS_PROTECTED | IS_PRIVATE);
+        $filter ??= (Classobj::IS_PUBLIC | Classobj::IS_PROTECTED | Classobj::IS_PRIVATE);
 
         $result = [];
         foreach ((new \ReflectionClass($class))->getReflectionConstants() as $constant) {
-            if (($filter & IS_OWNSELF) && $constant->getDeclaringClass()->name !== $class) {
+            if (($filter & Classobj::IS_OWNSELF) && $constant->getDeclaringClass()->name !== $class) {
                 continue;
             }
             $modifiers = $constant->getModifiers();
             $modifiers2 = 0;
-            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PUBLIC) ? IS_PUBLIC : 0;
-            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PROTECTED) ? IS_PROTECTED : 0;
-            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PRIVATE) ? IS_PRIVATE : 0;
+            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PUBLIC) ? Classobj::IS_PUBLIC : 0;
+            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PROTECTED) ? Classobj::IS_PROTECTED : 0;
+            $modifiers2 |= ($modifiers & \ReflectionProperty::IS_PRIVATE) ? Classobj::IS_PRIVATE : 0;
             if ($modifiers2 & $filter) {
                 $result[$constant->name] = $constant->getValue();
             }

@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * 日付・時刻関連のユーティリティ
  */
-class Date
+class Date implements Interfaces\Date
 {
     /** 和暦 */
     const JP_ERA = [
@@ -48,10 +48,10 @@ class Date
         $datetimedata = preg_replace("/\A{$chars}++|{$chars}++\z/u", '', $datetimedata);
 
         // 和暦を西暦に置換
-        $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
+        $jpnames = array_merge(array_column(Date::JP_ERA, 'name'), array_column(Date::JP_ERA, 'abbr'));
         $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
             [, $era, $year] = $matches;
-            $eratime = (array_find)(JP_ERA, function ($v) use ($era) {
+            $eratime = Arrays::array_find(Date::JP_ERA, function ($v) use ($era) {
                 if (in_array($era, [$v['name'], $v['abbr']], true)) {
                     return $v['since'];
                 }
@@ -167,7 +167,7 @@ class Date
             $timestamp = (float) $datetimedata->format('U.u');
         }
         else {
-            $timestamp = (date_timestamp)($datetimedata);
+            $timestamp = Date::date_timestamp($datetimedata);
             if ($timestamp === null) {
                 throw new \InvalidArgumentException("parse failed '$datetimedata'");
             }
@@ -179,7 +179,7 @@ class Date
         };
 
         if (preg_match('/[JbKk]/', $format)) {
-            $era = (array_find)(JP_ERA, function ($v) use ($timestamp) {
+            $era = Arrays::array_find(Date::JP_ERA, function ($v) use ($timestamp) {
                 if ($v['since'] <= $timestamp) {
                     return $v;
                 }
@@ -340,7 +340,7 @@ class Date
             }
         }
         else {
-            $limit = $map[$limit_type] ?? (throws)(new \InvalidArgumentException("limit_type:$limit_type is undefined."));
+            $limit = $map[$limit_type] ?? Syntax::throws(new \InvalidArgumentException("limit_type:$limit_type is undefined."));
         }
 
         // 各単位を導出
@@ -388,7 +388,7 @@ class Date
                         $pos = [];
                         for ($i = 0; $i < $limit_type; $i++) {
                             if (isset($ymdhisv[$n + $i])) {
-                                if (($p = (array_pos_key)($format, $ymdhisv[$n + $i], -1)) >= 0) {
+                                if (($p = Arrays::array_pos_key($format, $ymdhisv[$n + $i], -1)) >= 0) {
                                     $pos[] = $p;
                                 }
                             }
@@ -413,8 +413,8 @@ class Date
                         $tmp[] = ['', '', ''];
                         continue;
                     }
-                    $fmt = (arrayize)($fmt);
-                    $fmt = (switchs)(count($fmt), [
+                    $fmt = Arrays::arrayize($fmt);
+                    $fmt = Syntax::switchs(count($fmt), [
                         1 => static fn() => ['', $fmt[0], ''],
                         2 => static fn() => ['', $fmt[0], $fmt[1]],
                         3 => static fn() => array_values($fmt),
@@ -457,7 +457,7 @@ class Date
                 elseif ($prevempty || $nextempty) {
                     $fmt = '';
                 }
-                $tmp2 = array_merge($tmp2, (arrayize)($fmt));
+                $tmp2 = array_merge($tmp2, Arrays::arrayize($fmt));
             }
             $format = implode('', $tmp2);
         }
@@ -488,7 +488,7 @@ class Date
      */
     public static function date_alter($datetime, $excluded_dates, $follow_count, $format = 'Y-m-d')
     {
-        $timestamp = (date_timestamp)($datetime);
+        $timestamp = Date::date_timestamp($datetime);
         if (!array_key_exists($date = date($format, $timestamp), $excluded_dates)) {
             return $date;
         }
@@ -497,10 +497,10 @@ class Date
         }
         $follow_count = (int) $follow_count;
         if ($follow_count < 0) {
-            return (date_alter)($timestamp - 24 * 3600, $excluded_dates, $follow_count + 1);
+            return Date::date_alter($timestamp - 24 * 3600, $excluded_dates, $follow_count + 1);
         }
         if ($follow_count > 0) {
-            return (date_alter)($timestamp + 24 * 3600, $excluded_dates, $follow_count - 1);
+            return Date::date_alter($timestamp + 24 * 3600, $excluded_dates, $follow_count - 1);
         }
         return null;
     }

@@ -54,7 +54,7 @@ require_once "$BASEDIR/vendor/autoload.php";
 
 if ($srcfile) {
     echo("$srcfile was written.\n");
-    file_put_contents($srcfile, \ryunosuke\Functions\Transporter::exportNamespace($namespace, false, dirname($srcfile)));
+    file_put_contents($srcfile, \ryunosuke\Functions\Transporter::exportNamespace($namespace, dirname($srcfile)));
 }
 if ($devfile) {
     echo("$devfile was written.\n");

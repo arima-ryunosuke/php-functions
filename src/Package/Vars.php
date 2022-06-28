@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * 変数関連のユーティリティ
  */
-class Vars
+class Vars implements Interfaces\Vars
 {
     /** SI 接頭辞 */
     const SI_UNITS = [
@@ -48,7 +48,7 @@ class Vars
             case 'boolean':
                 return $var ? 'true' : 'false';
             case 'array':
-                return (var_export2)($var, true);
+                return Vars::var_export2($var, true);
             case 'object':
                 if (method_exists($var, '__toString')) {
                     return (string) $var;
@@ -240,14 +240,14 @@ class Vars
             return $var;
         }
 
-        if ((is_primitive)($var)) {
+        if (Vars::is_primitive($var)) {
             return (array) $var;
         }
 
         $result = [];
         foreach ($var as $k => $v) {
-            if ($recursive && !(is_primitive)($v)) {
-                $v = (arrayval)($v, $recursive);
+            if ($recursive && !Vars::is_primitive($v)) {
+                $v = Vars::arrayval($v, $recursive);
             }
             $result[$k] = $v;
         }
@@ -288,7 +288,7 @@ class Vars
 
         set_error_handler(function () { });
         try {
-            return (evaluate)("return $var;", $contextvars);
+            return Syntax::evaluate("return $var;", $contextvars);
         }
         catch (\Throwable $t) {
             return $var;
@@ -331,10 +331,10 @@ class Vars
     public static function arrayable_key_exists($key, $arrayable)
     {
         if (is_array($arrayable) || $arrayable instanceof \ArrayAccess) {
-            return (attr_exists)($key, $arrayable);
+            return Vars::attr_exists($key, $arrayable);
         }
 
-        throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', (var_type)($arrayable)));
+        throw new \InvalidArgumentException(sprintf('%s must be array or ArrayAccess (%s).', '$arrayable', Vars::var_type($arrayable)));
     }
 
     /**
@@ -367,7 +367,7 @@ class Vars
      */
     public static function attr_exists($key, $value)
     {
-        return (attr_get)($key, $value, $dummy = new \stdClass()) !== $dummy;
+        return Vars::attr_get($key, $value, $dummy = new \stdClass()) !== $dummy;
     }
 
     /**
@@ -437,7 +437,7 @@ class Vars
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('%s must be array or object (%s).', '$value', (var_type)($value)));
+        throw new \InvalidArgumentException(sprintf('%s must be array or object (%s).', '$value', Vars::var_type($value)));
     }
 
     /**
@@ -501,10 +501,10 @@ class Vars
                 $var /= $unit;
             }
         }
-        if (!isset(SI_UNITS[$n])) {
+        if (!isset(Vars::SI_UNITS[$n])) {
             throw new \InvalidArgumentException("$original is too large or small ($n).");
         }
-        return $result($format, ($original > 0 ? 1 : -1) * $var, SI_UNITS[$n][0] ?? '');
+        return $result($format, ($original > 0 ? 1 : -1) * $var, Vars::SI_UNITS[$n][0] ?? '');
     }
 
     /**
@@ -537,15 +537,15 @@ class Vars
 
         $var = trim($var);
 
-        foreach (SI_UNITS as $exp => $sis) {
+        foreach (Vars::SI_UNITS as $exp => $sis) {
             foreach ($sis as $si) {
                 if (strpos($var, $si) === (strlen($var) - strlen($si))) {
-                    return (numval)($var) * pow($unit, $exp);
+                    return Vars::numval($var) * pow($unit, $exp);
                 }
             }
         }
 
-        return (numval)($var);
+        return Vars::numval($var);
     }
 
     /**
@@ -662,7 +662,7 @@ class Vars
     {
         $core = function ($var, $parents) use (&$core) {
             // 複合型でないなら間違いなく false
-            if ((is_primitive)($var)) {
+            if (Vars::is_primitive($var)) {
                 return false;
             }
 
@@ -806,7 +806,7 @@ class Vars
         $jsondata = json_encode($plaindata, JSON_UNESCAPED_UNICODE);
         $zlibdata = gzdeflate($jsondata, 9);
 
-        $metadata = (cipher_metadata)($cipher);
+        $metadata = Vars::cipher_metadata($cipher);
         if (!$metadata) {
             throw new \InvalidArgumentException("undefined cipher algorithm('$cipher')");
         }
@@ -840,7 +840,7 @@ class Vars
 
         if ($version === 2) {
             [$cipher, $ivtagpayload] = explode(':', $cipherdata, 2) + [1 => null];
-            $metadata = (cipher_metadata)($cipher);
+            $metadata = Vars::cipher_metadata($cipher);
             if (!$metadata) {
                 return null;
             }
@@ -904,7 +904,7 @@ class Vars
             $var = serialize($var);
         }
 
-        $algos = (arrayize)($algos);
+        $algos = Arrays::arrayize($algos);
         assert($algos);
 
         $hash = '';
@@ -994,7 +994,7 @@ class Vars
             }
             return $reverse * strnatcmp($a, $b);
         }
-        if ($mode === SORT_STRICT) {
+        if ($mode === Vars::SORT_STRICT) {
             return $reverse * ($a === $b ? 0 : ($a > $b ? 1 : -1));
         }
 
@@ -1097,7 +1097,7 @@ class Vars
         if ($iterable) {
             $result = [];
             foreach ($var as $k => $v) {
-                $result[$k] = (var_apply)($v, $callback, ...$args);
+                $result[$k] = Vars::var_apply($v, $callback, ...$args);
             }
             return $result;
         }
@@ -1388,10 +1388,10 @@ class Vars
                 $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
                 $spacer2 = str_repeat(' ', $nest * $INDENT);
 
-                $hashed = (is_hasharray)($value);
+                $hashed = Arrays::is_hasharray($value);
 
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (!$hashed && (array_all)($value, is_primitive)) {
+                if (!$hashed && Arrays::array_all($value, Vars::is_primitive)) {
                     return '[' . implode(', ', array_map($export, $value)) . ']';
                 }
 
@@ -1415,7 +1415,7 @@ class Vars
                 if ($classname === \stdClass::class) {
                     return '(object) ' . $export((array) $value, $nest, $parents);
                 }
-                return $classname . '::__set_state(' . $export((get_object_properties)($value), $nest, $parents) . ')';
+                return $classname . '::__set_state(' . $export(Classobj::get_object_properties($value), $nest, $parents) . ')';
             }
             // 文字列はダブルクオート
             elseif (is_string($value)) {
@@ -1555,13 +1555,13 @@ class Vars
             $resolveSymbol = function ($token, $prev, $next, $filename) {
                 if ($token[0] === T_STRING) {
                     if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
-                        $token[1] = (resolve_symbol)($token[1], $filename, 'alias') ?? $token[1];
+                        $token[1] = Utility::resolve_symbol($token[1], $filename, 'alias') ?? $token[1];
                     }
                     elseif ($next[1] === '(') {
-                        $token[1] = (resolve_symbol)($token[1], $filename, 'function') ?? $token[1];
+                        $token[1] = Utility::resolve_symbol($token[1], $filename, 'function') ?? $token[1];
                     }
                     else {
-                        $token[1] = (resolve_symbol)($token[1], $filename, 'const') ?? $token[1];
+                        $token[1] = Utility::resolve_symbol($token[1], $filename, 'const') ?? $token[1];
                     }
                 }
                 return $token;
@@ -1579,8 +1579,8 @@ class Vars
             }
 
             if (is_array($value)) {
-                $hashed = (is_hasharray)($value);
-                if (!$hashed && (array_all)($value, is_primitive)) {
+                $hashed = Arrays::is_hasharray($value);
+                if (!$hashed && Arrays::array_all($value, Vars::is_primitive)) {
                     [$begin, $middle, $end] = ["", ", ", ""];
                 }
                 else {
@@ -1613,7 +1613,7 @@ class Vars
                     return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
                 }
 
-                $tokens = array_slice((parse_php)(implode(' ', (callable_code)($value)) . ';', TOKEN_PARSE), 1, -1);
+                $tokens = array_slice(Syntax::parse_php(implode(' ', Funchand::callable_code($value)) . ';', TOKEN_PARSE), 1, -1);
                 $uses = "";
                 $context = [
                     'use'   => false,
@@ -1666,7 +1666,7 @@ class Vars
                     $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
                 }
 
-                $code = (indent_php)(implode('', array_column($tokens, 1)), [
+                $code = Syntax::indent_php(implode('', array_column($tokens, 1)), [
                     'indent'   => $spacer1,
                     'baseline' => -1,
                 ]);
@@ -1674,7 +1674,7 @@ class Vars
                     $scope = $var_export($class === 'Closure' ? 'static' : $class);
                     $code = "\Closure::bind($code, {$export($bind, $nest + 1)}, $scope)";
                 }
-                elseif (!(is_bindable_closure)($value)) {
+                elseif (!Funchand::is_bindable_closure($value)) {
                     $code = "static $code";
                 }
 
@@ -1694,7 +1694,7 @@ class Vars
                     $fname = $ref->getFileName();
                     $sline = $ref->getStartLine();
                     $eline = $ref->getEndLine();
-                    $tokens = (parse_php)(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+                    $tokens = Syntax::parse_php(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                     $block = [];
                     $starting = false;
@@ -1748,7 +1748,7 @@ class Vars
                         }
                     }
 
-                    $code = (indent_php)(implode('', array_column($block, 1)), [
+                    $code = Syntax::indent_php(implode('', array_column($block, 1)), [
                         'indent'   => $spacer1,
                         'baseline' => -1,
                     ]);
@@ -1766,11 +1766,11 @@ class Vars
                 }
                 // __sleep があるならそれをプロパティとする
                 elseif (method_exists($value, '__sleep')) {
-                    $fields = array_intersect_key((get_object_properties)($value, $privates), array_flip($value->__sleep()));
+                    $fields = array_intersect_key(Classobj::get_object_properties($value, $privates), array_flip($value->__sleep()));
                 }
                 // それ以外は適当に漁る
                 else {
-                    $fields = (get_object_properties)($value, $privates);
+                    $fields = Classobj::get_object_properties($value, $privates);
                 }
 
                 return "\$this->new(\$this->$vid, $classname, (function () {\n{$spacer1}return {$export([$fields, $privates], $nest + 1)};\n{$spacer0}}))";
@@ -1855,7 +1855,7 @@ class Vars
 })';
 
         if ($options['format'] === 'minify') {
-            $tmp = (memory_path)('var_export3.php');
+            $tmp = FileSystem::memory_path('var_export3.php');
             file_put_contents($tmp, "<?php $result;");
             $result = substr(php_strip_whitespace($tmp), 6, -1);
         }
@@ -1921,7 +1921,7 @@ class Vars
             }
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . '::' . $export((get_object_properties)($value), $parents);
+                return get_class($value) . '::' . $export(Classobj::get_object_properties($value), $parents);
             }
             elseif (is_null($value)) {
                 return 'null';
@@ -2015,7 +2015,7 @@ class Vars
         if ($options['context'] === null) {
             $options['context'] = 'html'; // SAPI でテストカバレッジが辛いので if else ではなくデフォルト代入にしてある
             if (PHP_SAPI === 'cli') {
-                $options['context'] = (is_ansi)(STDOUT) && !$options['return'] ? 'cli' : 'plain';
+                $options['context'] = Utility::is_ansi(STDOUT) && !$options['return'] ? 'cli' : 'plain';
             }
         }
 
@@ -2063,12 +2063,12 @@ class Vars
                     $this->content .= $value;
                 }
                 elseif ($this->options['context'] === 'cli') {
-                    $this->content .= (ansi_colorize)($value, $style);
+                    $this->content .= Utility::ansi_colorize($value, $style);
                 }
                 elseif ($this->options['context'] === 'html') {
                     // 今のところ bold しか使っていないのでこれでよい
                     $style = $style === 'bold' ? 'font-weight:bold' : "color:$style";
-                    $dataattr = (array_sprintf)($data, 'data-%2$s="%1$s"', ' ');
+                    $dataattr = Arrays::array_sprintf($data, 'data-%2$s="%1$s"', ' ');
                     $this->content .= "<span style='$style' $dataattr>" . htmlspecialchars($value, ENT_QUOTES) . '</span>';
                 }
                 else {
@@ -2136,7 +2136,7 @@ class Vars
                 }
                 elseif (is_string($token)) {
                     if ($this->options['maxlength']) {
-                        $token = (str_ellipsis)($token, $this->options['maxlength'], '...(too length)...');
+                        $token = Strings::str_ellipsis($token, $this->options['maxlength'], '...(too length)...');
                     }
                     return var_export($token, true);
                 }
@@ -2184,8 +2184,8 @@ class Vars
                         $value = array_slice($value, 0, $this->options['maxcount'], true);
                     }
 
-                    $is_hasharray = (is_hasharray)($value);
-                    $primitive_only = (array_all)($value, is_primitive);
+                    $is_hasharray = Arrays::is_hasharray($value);
+                    $primitive_only = Arrays::array_all($value, Vars::is_primitive);
                     $assoc = $is_hasharray || !$primitive_only;
 
                     $spacer1 = str_repeat(' ', ($nest + 1) * $this->options['indent']);
@@ -2205,8 +2205,8 @@ class Vars
                         while (count($lengths) > 0 && array_sum($lengths) > $this->options['maxlength']) {
                             $middle = (int) (count($lengths) / 2);
                             $unpos = fn($v, $k, $n) => $n === $middle;
-                            (array_unset)($value, $unpos);
-                            (array_unset)($lengths, $unpos);
+                            Arrays::array_unset($value, $unpos);
+                            Arrays::array_unset($lengths, $unpos);
                             $key = (int) (count($lengths) / 2);
                         }
                     }
@@ -2247,7 +2247,7 @@ class Vars
                         }
                     }
                     else {
-                        $lastkey = (last_key)($value);
+                        $lastkey = Arrays::last_key($value);
                         $n = 0;
                         $this->plain('[');
                         if (!$value) {
@@ -2270,7 +2270,7 @@ class Vars
                 }
                 elseif ($value instanceof \Closure) {
                     /** @var \ReflectionFunctionAbstract $ref */
-                    $ref = (reflect_callable)($value);
+                    $ref = Funchand::reflect_callable($value);
                     $that = $ref->getClosureThis();
                     $properties = $ref->getStaticVariables();
 
@@ -2301,7 +2301,7 @@ class Vars
                         }
                     }
                     else {
-                        $properties = (get_object_properties)($value);
+                        $properties = Classobj::get_object_properties($value);
                     }
 
                     $this->value($value)->plain(" ");
@@ -2340,7 +2340,7 @@ class Vars
         // 結果を返したり出力したり
         $traces = [];
         if ($options['trace']) {
-            $traces = (stacktrace)(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]);
+            $traces = Utility::stacktrace(null, ['format' => "%s:%s", 'args' => false, 'delimiter' => null]);
             $traces = array_reverse(array_slice($traces, 0, $options['trace'] === true ? null : $options['trace']));
             $traces[] = '';
         }
@@ -2417,9 +2417,9 @@ class Vars
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $file = $trace['file'];
         $line = $trace['line'];
-        $function = (function_shorten)($trace['function']);
+        $function = Funchand::function_shorten($trace['function']);
 
-        $cache = (cache)($file . '#' . $line, function () use ($file, $line, $function) {
+        $cache = Utility::cache($file . '#' . $line, function () use ($file, $line, $function) {
             // 呼び出し元の1行を取得
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             $target = $lines[$line - 1];

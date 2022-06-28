@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * callable 関連のユーティリティ
  */
-class Funchand
+class Funchand implements Interfaces\Funchand
 {
     /**
      * 指定 callable を指定クロージャで実行するクロージャを返す
@@ -19,11 +19,11 @@ class Funchand
      */
     public static function delegate($invoker, $callable, $arity = null)
     {
-        $arity ??= (parameter_length)($callable, true, true);
+        $arity ??= Funchand::parameter_length($callable, true, true);
 
-        if ((reflect_callable)($callable)->isInternal()) {
+        if (Funchand::reflect_callable($callable)->isInternal()) {
             static $cache = [];
-            $cache[$arity] ??= (evaluate)('return new class()
+            $cache[$arity] ??= Syntax::evaluate('return new class()
             {
                 private $invoker, $callable;
 
@@ -83,9 +83,9 @@ class Funchand
      */
     public static function abind($callable, $default_args)
     {
-        return (delegate)(function ($callable, $args) use ($default_args) {
-            return $callable(...(array_fill_gap)($default_args, ...$args));
-        }, $callable, (parameter_length)($callable, true, true) - count($default_args));
+        return Funchand::delegate(function ($callable, $args) use ($default_args) {
+            return $callable(...Arrays::array_fill_gap($default_args, ...$args));
+        }, $callable, Funchand::parameter_length($callable, true, true) - count($default_args));
     }
 
     /**
@@ -104,9 +104,9 @@ class Funchand
      */
     public static function nbind($callable, $n, ...$variadic)
     {
-        return (delegate)(function ($callable, $args) use ($variadic, $n) {
-            return $callable(...(array_insert)($args, $variadic, $n));
-        }, $callable, (parameter_length)($callable, true, true) - count($variadic));
+        return Funchand::delegate(function ($callable, $args) use ($variadic, $n) {
+            return $callable(...Arrays::array_insert($args, $variadic, $n));
+        }, $callable, Funchand::parameter_length($callable, true, true) - count($variadic));
     }
 
     /**
@@ -124,7 +124,7 @@ class Funchand
      */
     public static function lbind($callable, ...$variadic)
     {
-        return (nbind)(...(array_insert)(func_get_args(), 0, 1));
+        return Funchand::nbind(...Arrays::array_insert(func_get_args(), 0, 1));
     }
 
     /**
@@ -142,7 +142,7 @@ class Funchand
      */
     public static function rbind($callable, ...$variadic)
     {
-        return (nbind)(...(array_insert)(func_get_args(), null, 1));
+        return Funchand::nbind(...Arrays::array_insert(func_get_args(), null, 1));
     }
 
     /**
@@ -215,7 +215,7 @@ class Funchand
             'clone'      => static fn($v1) => clone $v1,
         ];
 
-        $opefunc = $operators[trim($operator)] ?? (throws)(new \InvalidArgumentException("$operator is not defined Operator."));
+        $opefunc = $operators[trim($operator)] ?? Syntax::throws(new \InvalidArgumentException("$operator is not defined Operator."));
 
         if ($operands) {
             return static fn($v1) => $opefunc($v1, ...$operands);
@@ -239,7 +239,7 @@ class Funchand
      */
     public static function not_func($callable)
     {
-        return (delegate)(fn($callable, $args) => !$callable(...$args), $callable);
+        return Funchand::delegate(fn($callable, $args) => !$callable(...$args), $callable);
     }
 
     /**
@@ -261,7 +261,7 @@ class Funchand
     public static function eval_func($expression, ...$variadic)
     {
         static $cache = [];
-        $args = (array_sprintf)($variadic, '$%s', ',');
+        $args = Arrays::array_sprintf($variadic, '$%s', ',');
         $declare = "return function($args) { return $expression; };";
         if (!isset($cache[$declare])) {
             $cache[$declare] = eval($declare);
@@ -324,22 +324,22 @@ class Funchand
      */
     public static function callable_code($callable)
     {
-        $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : (reflect_callable)($callable);
+        $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : Funchand::reflect_callable($callable);
         $contents = file($ref->getFileName());
         $start = $ref->getStartLine();
         $end = $ref->getEndLine();
         $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
 
-        $meta = (parse_php)("<?php $codeblock", [
+        $meta = Syntax::parse_php("<?php $codeblock", [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
         array_pop($meta);
 
-        $body = (parse_php)("<?php $codeblock", [
+        $body = Syntax::parse_php("<?php $codeblock", [
             'begin'  => '{',
             'end'    => '}',
-            'offset' => (last_key)($meta),
+            'offset' => Arrays::last_key($meta),
         ]);
 
         return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
@@ -569,7 +569,7 @@ class Funchand
         $dummy_arg ??= new \stdClass();
 
         /** @var \ReflectionFunctionAbstract $reffunc */
-        $reffunc = (reflect_callable)($callable);
+        $reffunc = Funchand::reflect_callable($callable);
         $refparams = $reffunc->getParameters();
 
         $defargs = [];
@@ -603,7 +603,7 @@ class Funchand
         }
 
         return function ($params = []) use ($reffunc, $defargs, $argnames, $variadicname, $dummy_arg) {
-            $params = (array_map_key)($params, fn($k) => is_int($k) ? $argnames[$k] : $k);
+            $params = Arrays::array_map_key($params, fn($k) => is_int($k) ? $argnames[$k] : $k);
             $params = array_replace($defargs, $params);
 
             // 勝手に突っ込んだ $dummy_class がいるのはおかしい。指定されていないと思われる
@@ -658,7 +658,7 @@ class Funchand
         // クロージャの $call_name には一意性がないのでキャッシュできない（spl_object_hash でもいいが、かなり重複するので完全ではない）
         if ($callable instanceof \Closure) {
             /** @var \ReflectionFunctionAbstract $ref */
-            $ref = (reflect_callable)($callable);
+            $ref = Funchand::reflect_callable($callable);
             if ($thought_variadic && $ref->isVariadic()) {
                 return INF;
             }
@@ -673,9 +673,9 @@ class Funchand
         // $call_name 取得
         is_callable($callable, false, $call_name);
 
-        $cache = (cache)($call_name, function () use ($callable) {
+        $cache = Utility::cache($call_name, function () use ($callable) {
             /** @var \ReflectionFunctionAbstract $ref */
-            $ref = (reflect_callable)($callable);
+            $ref = Funchand::reflect_callable($callable);
             return [
                 '00' => $ref->getNumberOfParameters(),
                 '01' => $ref->isVariadic() ? INF : $ref->getNumberOfParameters(),
@@ -715,7 +715,7 @@ class Funchand
         is_callable($callable, true, $call_name);
         if (!isset($cache[$call_name]) || $callable instanceof \Closure) {
             /** @var \ReflectionFunctionAbstract $refunc */
-            $refunc = (reflect_callable)($callable);
+            $refunc = Funchand::reflect_callable($callable);
             assert($refunc->isUserDefined(), 'no support internal callable.');
             $cache[$call_name] = [
                 'length'  => $refunc->getNumberOfParameters(),
@@ -741,7 +741,7 @@ class Funchand
             $args2[$n] = $arg;
         }
 
-        return (array_merge2)($cache[$call_name]['default'], $args2);
+        return Arrays::array_merge2($cache[$call_name]['default'], $args2);
     }
 
     /**
@@ -761,7 +761,7 @@ class Funchand
      * Example:
      * ```php
      * $closure = function (\ArrayObject $ao, \Throwable $t, $array, $none, $default1, $default2 = 'default2', ...$misc) { return get_defined_vars(); };
-     * $params = (parameter_wiring)($closure, [
+     * $params = parameter_wiring($closure, [
      *     \ArrayObject::class      => $ao = new \ArrayObject([1, 2, 3]),
      *     \RuntimeException::class => $t = new \RuntimeException('hoge'),
      *     '$array'                 => fn (\ArrayObject $ao) => (array) $ao,
@@ -788,7 +788,7 @@ class Funchand
     public static function parameter_wiring($callable, $dependency)
     {
         /** @var \ReflectionFunctionAbstract $ref */
-        $ref = (reflect_callable)($callable);
+        $ref = Funchand::reflect_callable($callable);
         $result = [];
 
         foreach ($ref->getParameters() as $n => $parameter) {
@@ -797,7 +797,7 @@ class Funchand
             }
             elseif (isset($dependency[$pname = '$' . $parameter->getName()])) {
                 if ($parameter->isVariadic()) {
-                    foreach (array_values((arrayize)($dependency[$pname])) as $i => $v) {
+                    foreach (array_values(Arrays::arrayize($dependency[$pname])) as $i => $v) {
                         $result[$n + $i] = $v;
                     }
                 }
@@ -805,7 +805,7 @@ class Funchand
                     $result[$n] = $dependency[$pname];
                 }
             }
-            elseif (($typename = (string) (reflect_types)($parameter->getType()))) {
+            elseif (($typename = (string) Classobj::reflect_types($parameter->getType()))) {
                 if (isset($dependency[$typename])) {
                     $result[$n] = $dependency[$typename];
                 }
@@ -837,7 +837,7 @@ class Funchand
                 if ((new \ReflectionFunction($arg))->getShortName() === '{closure}') {
                     $arg = $arg->bindTo($dependency);
                 }
-                return $arg(...(parameter_wiring)($arg, $dependency));
+                return $arg(...Funchand::parameter_wiring($arg, $dependency));
             }
             return $arg;
         }, $result);
@@ -883,14 +883,14 @@ class Funchand
         // クロージャはユーザ定義しかありえないので調べる必要がない
         if ($callback instanceof \Closure) {
             // と思ったが、\Closure::fromCallable で作成されたクロージャは内部属性が伝播されるようなので除外
-            if ((reflect_callable)($callback)->isUserDefined()) {
+            if (Funchand::reflect_callable($callback)->isUserDefined()) {
                 return $callback;
             }
         }
 
         // 上記以外は「引数ぴったりで削ぎ落としてコールするクロージャ」を返す
-        $plength = (parameter_length)($callback, true, true);
-        return (delegate)(function ($callback, $args) use ($plength) {
+        $plength = Funchand::parameter_length($callback, true, true);
+        return Funchand::delegate(function ($callback, $args) use ($plength) {
             if (is_infinite($plength)) {
                 return $callback(...$args);
             }
@@ -924,7 +924,7 @@ class Funchand
      */
     public static function func_wiring($callable, $dependency)
     {
-        $params = (parameter_wiring)($callable, $dependency);
+        $params = Funchand::parameter_wiring($callable, $dependency);
         return fn(...$args) => $callable(...$args + $params);
     }
 
@@ -1023,7 +1023,7 @@ class Funchand
         // callname の取得と非静的のチェック
         is_callable($original, true, $calllname);
         $calllname = ltrim($calllname, '\\');
-        $ref = (reflect_callable)($original);
+        $ref = Funchand::reflect_callable($original);
         if ($ref instanceof \ReflectionMethod && !$ref->isStatic()) {
             throw new \InvalidArgumentException("$calllname is non-static method.");
         }
@@ -1033,14 +1033,14 @@ class Funchand
         }
 
         // キャッシュ指定有りなら読み込むだけで eval しない
-        $cachefile = (cachedir)() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
+        $cachefile = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
         if (!file_exists($cachefile)) {
             $parts = explode('\\', ltrim($alias, '\\'));
             $reference = $ref->returnsReference() ? '&' : '';
             $funcname = $reference . array_pop($parts);
             $namespace = implode('\\', $parts);
 
-            $params = (function_parameter)($ref);
+            $params = Funchand::function_parameter($ref);
             $prms = implode(', ', array_values($params));
             $args = implode(', ', array_keys($params));
             if ($ref->isInternal()) {
@@ -1075,14 +1075,14 @@ class Funchand
     {
         $reffunc = $eitherReffuncOrCallable instanceof \ReflectionFunctionAbstract
             ? $eitherReffuncOrCallable
-            : (reflect_callable)($eitherReffuncOrCallable);
+            : Funchand::reflect_callable($eitherReffuncOrCallable);
 
         $result = [];
         foreach ($reffunc->getParameters() as $parameter) {
             $declare = '';
 
             if ($parameter->hasType()) {
-                $declare .= (reflect_types)($parameter->getType())->getName() . ' ';
+                $declare .= Classobj::reflect_types($parameter->getType())->getName() . ' ';
             }
 
             $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
@@ -1098,7 +1098,7 @@ class Funchand
                         $defval = $parameter->getDefaultValueConstantName();
                     }
                     else {
-                        $defval = (var_export2)($parameter->getDefaultValue(), true);
+                        $defval = Vars::var_export2($parameter->getDefaultValue(), true);
                     }
                 }
                 // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ

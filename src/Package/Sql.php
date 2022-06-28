@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * Sql 関連のユーティリティ
  */
-class Sql
+class Sql implements Interfaces\Sql
 {
     // @formatter:off
     /** SQL キーワード（全 RDBMS ごちゃまぜ） */
@@ -77,16 +77,16 @@ class Sql
     public static function sql_bind($sql, $values)
     {
         $embed = [];
-        foreach ((arrayval)($values, false) as $k => $v) {
+        foreach (Vars::arrayval($values, false) as $k => $v) {
             if (is_int($k)) {
-                $embed['?'][] = (sql_quote)($v);
+                $embed['?'][] = Sql::sql_quote($v);
             }
             else {
-                $embed[":$k"] = (sql_quote)($v);
+                $embed[":$k"] = Sql::sql_quote($v);
             }
         }
 
-        return (str_embed)($sql, $embed, [
+        return Strings::str_embed($sql, $embed, [
             "'"   => "'",
             '"'   => '"',
             '-- ' => "\n",
@@ -110,7 +110,7 @@ class Sql
     public static function sql_format($sql, $options = [])
     {
         static $keywords;
-        $keywords ??= array_flip(KEYWORDS);
+        $keywords ??= array_flip(Sql::KEYWORDS);
 
         $options += [
             // インデント文字
@@ -149,7 +149,7 @@ class Sql
                     'NUMBER'  => fn($token) => "<span style='color:#0000BB;'>" . htmlspecialchars($token, ENT_QUOTES) . "</span>",
                 ],
             ];
-            $rule = $rules[$options['highlight']] ?? (throws)(new \InvalidArgumentException('highlight must be "cli" or "html".'));
+            $rule = $rules[$options['highlight']] ?? Syntax::throws(new \InvalidArgumentException('highlight must be "cli" or "html".'));
             $options['highlight'] = function ($token, $ttype) use ($keywords, $rule) {
                 switch (true) {
                     case isset($keywords[strtoupper($token)]):
@@ -175,7 +175,7 @@ class Sql
         };
 
         // 構文解析も先読みもない素朴な実装なので、特定文字列をあとから置換するための目印文字列
-        $MARK = (unique_string)($sql, 8);
+        $MARK = Strings::unique_string($sql, 8);
         $MARK_R = "{$MARK}_R:}";   // \r マーク
         $MARK_N = "{$MARK}_N:}";   // \n マーク
         $MARK_BR = "{$MARK}_BR:}"; // 改行マーク
@@ -512,7 +512,7 @@ class Sql
         };
 
         $result = $interpret();
-        $result = (preg_replaces)("#" . implode('|', [
+        $result = Strings::preg_replaces("#" . implode('|', [
                 // 改行文字＋インデント文字をインデントとみなす（改行＋連続スペースもついでに）
                 "(?<indent>$MARK_BR(($MARK_NT|$MARK_SP)+))",
                 // 行末コメントと単一コメント

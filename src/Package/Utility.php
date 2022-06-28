@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * 汎用的なユーティリティ
  */
-class Utility
+class Utility implements Interfaces\Utility
 {
     /**
      * 複数の php.ini の設定をまとめて設定する
@@ -25,7 +25,7 @@ class Utility
             }
         }
         return static function () use ($currents) {
-            (ini_sets)($currents);
+            Utility::ini_sets($currents);
             return $currents;
         };
     }
@@ -70,7 +70,7 @@ class Utility
     {
         $result = [];
         foreach ($env_vars as $key => $varname) {
-            $varname = (arrayize)($varname);
+            $varname = Arrays::arrayize($varname);
             foreach ($varname as $name) {
                 $alias = is_int($key) ? $name : $key;
                 $val = getenv($name, true);
@@ -145,8 +145,8 @@ class Utility
         $result = [];
         foreach (($files ?: $_FILES) as $name => $file) {
             if (is_array($file['name'])) {
-                $file = (get_uploaded_files)((array_each)($file['name'], function (&$carry, $dummy, $subkey) use ($file) {
-                    $carry[$subkey] = (array_lookup)($file, $subkey);
+                $file = Utility::get_uploaded_files(Arrays::array_each($file['name'], function (&$carry, $dummy, $subkey) use ($file) {
+                    $carry[$subkey] = Arrays::array_lookup($file, $subkey);
                 }, []));
             }
             $result[$name] = $file;
@@ -183,14 +183,14 @@ class Utility
         $step = $step + 0;
 
         if ($doSort) {
-            $numbers = (kvsort)($numbers, $step < 0 ? -SORT_NUMERIC : SORT_NUMERIC);
+            $numbers = Arrays::kvsort($numbers, $step < 0 ? -SORT_NUMERIC : SORT_NUMERIC);
         }
 
         $build = function ($from, $to) use ($separator, $precision) {
             if ($separator instanceof \Closure) {
                 return $separator($from, $to);
             }
-            if ((varcmp)($from, $to, SORT_NUMERIC, $precision) === 0) {
+            if (Vars::varcmp($from, $to, SORT_NUMERIC, $precision) === 0) {
                 if ($separator === null) {
                     return [$from, $to];
                 }
@@ -211,7 +211,7 @@ class Utility
                 $from = $to = $number;
                 continue;
             }
-            if ((varcmp)($to + $step, $number, SORT_NUMERIC, $precision) !== 0) {
+            if (Vars::varcmp($to + $step, $number, SORT_NUMERIC, $precision) !== 0) {
                 $result[] = $build($from, $to);
                 $from = $number;
             }
@@ -334,8 +334,8 @@ class Utility
                 }
 
                 $this->entries[$key] = [time() + $ttl, $value];
-                $code = (var_export3)($this->entries[$key], ['outmode' => 'file']);
-                return !!(file_set_contents)($this->_getFilename($key), $code);
+                $code = Vars::var_export3($this->entries[$key], ['outmode' => 'file']);
+                return !!FileSystem::file_set_contents($this->_getFilename($key), $code);
             }
 
             public function delete($key)
@@ -349,26 +349,26 @@ class Utility
             public function clear()
             {
                 $this->entries = [];
-                return (rm_rf)($this->directory, false);
+                return FileSystem::rm_rf($this->directory, false);
             }
 
             public function getMultiple($keys, $default = null)
             {
-                return (array_each)($keys, function (&$result, $v) use ($default) {
+                return Arrays::array_each($keys, function (&$result, $v) use ($default) {
                     $result[$v] = $this->get($v, $default);
                 }, []);
             }
 
             public function setMultiple($values, $ttl = null)
             {
-                return (array_each)($values, function (&$result, $v, $k) use ($ttl) {
+                return Arrays::array_each($values, function (&$result, $v, $k) use ($ttl) {
                     $result = $this->set($k, $v, $ttl) && $result;
                 }, true);
             }
 
             public function deleteMultiple($keys)
             {
-                return (array_each)($keys, function (&$result, $v) {
+                return Arrays::array_each($keys, function (&$result, $v) {
                     $result = $this->delete($v) && $result;
                 }, true);
             }
@@ -414,7 +414,7 @@ class Utility
         static $cachedir;
         if ($cachedir === null) {
             $cachedir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
-            (cachedir)($cachedir); // for mkdir
+            Utility::cachedir($cachedir); // for mkdir
         }
 
         if ($dirname === null) {
@@ -458,7 +458,7 @@ class Utility
     public static function cache($key, $provider, $namespace = null)
     {
         static $cacheobject;
-        $cacheobject ??= new class((cachedir)()) {
+        $cacheobject ??= new class(Utility::cachedir()) {
             const CACHE_EXT = '.php-cache';
 
             /** @var string キャッシュディレクトリ */
@@ -634,9 +634,9 @@ class Utility
             'cache' => true,
         ];
         if (!$options['cache']) {
-            (cache)(realpath($filename), null, __FUNCTION__);
+            Utility::cache(realpath($filename), null, __FUNCTION__);
         }
-        return (cache)(realpath($filename), function () use ($filename) {
+        return Utility::cache(realpath($filename), function () use ($filename) {
             $stringify = function ($tokens) {
                 // @codeCoverageIgnoreStart
                 if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
@@ -666,11 +666,11 @@ class Utility
             $tokens = [-1 => null];
             $result = [];
             while (true) {
-                $tokens = (parse_php)($contents, [
+                $tokens = Syntax::parse_php($contents, [
                     'flags'  => TOKEN_PARSE,
                     'begin'  => ["define", T_NAMESPACE, T_USE, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
                     'end'    => ['{', ';', '(', T_EXTENDS, T_IMPLEMENTS],
-                    'offset' => (last_key)($tokens) + 1,
+                    'offset' => Arrays::last_key($tokens) + 1,
                 ]);
                 if (!$tokens) {
                     break;
@@ -678,14 +678,14 @@ class Utility
                 $token = reset($tokens);
                 // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
                 if ($token[0] === T_STRING && $token[1] === "define") {
-                    $tokens = (parse_php)($contents, [
+                    $tokens = Syntax::parse_php($contents, [
                         'flags'  => TOKEN_PARSE,
                         'begin'  => [T_CONSTANT_ENCAPSED_STRING],
                         'end'    => [T_CONSTANT_ENCAPSED_STRING],
-                        'offset' => (last_key)($tokens),
+                        'offset' => Arrays::last_key($tokens),
                     ]);
                     $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
-                    [$ns, $nm] = (namespace_split)($define);
+                    [$ns, $nm] = Strings::namespace_split($define);
                     if (!isset($result[$ns])) {
                         $result[$ns] = [
                             'const'    => [],
@@ -705,29 +705,29 @@ class Utility
                         ];
                         break;
                     case T_USE:
-                        $tokenCorF = (array_find)($tokens, fn($token) => ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0, false);
+                        $tokenCorF = Arrays::array_find($tokens, fn($token) => ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0, false);
 
                         $prefix = '';
                         if (end($tokens)[1] === '{') {
                             $prefix = $stringify($tokens);
-                            $tokens = (parse_php)($contents, [
+                            $tokens = Syntax::parse_php($contents, [
                                 'flags'  => TOKEN_PARSE,
                                 'begin'  => ['{'],
                                 'end'    => ['}'],
-                                'offset' => (last_key)($tokens),
+                                'offset' => Arrays::last_key($tokens),
                             ]);
                         }
 
-                        $multi = (array_explode)($tokens, fn($token) => $token[1] === ',');
+                        $multi = Arrays::array_explode($tokens, fn($token) => $token[1] === ',');
                         foreach ($multi as $ttt) {
-                            $as = (array_explode)($ttt, fn($token) => $token[0] === T_AS);
+                            $as = Arrays::array_explode($ttt, fn($token) => $token[0] === T_AS);
 
                             $alias = $stringify($as[0]);
                             if (isset($as[1])) {
-                                $result[$namespace][$keys[$tokenCorF]][$stringify($as[1])] = (concat)($prefix, '\\') . $alias;
+                                $result[$namespace][$keys[$tokenCorF]][$stringify($as[1])] = Strings::concat($prefix, '\\') . $alias;
                             }
                             else {
-                                $result[$namespace][$keys[$tokenCorF]][(namespace_split)($alias)[1]] = (concat)($prefix, '\\') . $alias;
+                                $result[$namespace][$keys[$tokenCorF]][Strings::namespace_split($alias)[1]] = Strings::concat($prefix, '\\') . $alias;
                             }
                         }
                         break;
@@ -738,15 +738,15 @@ class Utility
                     case T_TRAIT:
                         $alias = $stringify($tokens);
                         if (strlen($alias)) {
-                            $result[$namespace][$keys[$token[0]]][$alias] = (concat)($namespace, '\\') . $alias;
+                            $result[$namespace][$keys[$token[0]]][$alias] = Strings::concat($namespace, '\\') . $alias;
                         }
                         // ブロック内に興味はないので進めておく（function 内 function などはあり得るが考慮しない）
                         if ($token[0] !== T_CONST) {
-                            $tokens = (parse_php)($contents, [
+                            $tokens = Syntax::parse_php($contents, [
                                 'flags'  => TOKEN_PARSE,
                                 'begin'  => ['{'],
                                 'end'    => ['}'],
-                                'offset' => (last_key)($tokens),
+                                'offset' => Arrays::last_key($tokens),
                             ]);
                             break;
                         }
@@ -804,7 +804,7 @@ class Utility
         $targets = (array) $targets;
         foreach ($nsfiles as $filename => $namespaces) {
             $namespaces = array_flip(array_map(fn($n) => trim($n, '\\'), (array) $namespaces));
-            foreach ((parse_namespace)($filename) as $namespace => $ns) {
+            foreach (Utility::parse_namespace($filename) as $namespace => $ns) {
                 /** @noinspection PhpIllegalArrayKeyTypeInspection */
                 if (!$namespaces || isset($namespaces[$namespace])) {
                     if (isset($ns['alias'][$prefix])) {
@@ -922,7 +922,7 @@ class Utility
             $nsfiles[$reflector->getFileName()] = $nsfiles[$reflector->getFileName()] ?? $namespaces;
 
             // doccomment 特有のインデントを削除する
-            $annotation = preg_replace('#(\\R)[ \\t]+\\*[ \\t]?#u', '$1', (str_chop)($annotation, '/**', '*/'));
+            $annotation = preg_replace('#(\\R)[ \\t]+\\*[ \\t]?#u', '$1', Strings::str_chop($annotation, '/**', '*/'));
         }
 
         $result = [];
@@ -934,28 +934,28 @@ class Utility
             '[' => ']',
         ];
         for ($i = 0, $l = strlen($annotation); $i < $l; $i++) {
-            $i = (strpos_quoted)($annotation, '@', $i);
+            $i = Strings::strpos_quoted($annotation, '@', $i);
             if ($i === false) {
                 break;
             }
 
-            $seppos = min((strpos_array)($annotation, [" ", "\t", "\n", '[', '{', '('], $i + 1) ?: [false]);
+            $seppos = min(Strings::strpos_array($annotation, [" ", "\t", "\n", '[', '{', '('], $i + 1) ?: [false]);
             $name = substr($annotation, $i + 1, $seppos - $i - 1);
             $i += strlen($name);
             $name = trim($name);
 
             $key = null;
-            $brkpos = (strpos_quoted)($annotation, "\n", $seppos) ?: strlen($annotation);
+            $brkpos = Strings::strpos_quoted($annotation, "\n", $seppos) ?: strlen($annotation);
             if (isset($brace[$annotation[$brkpos - 1]])) {
                 $s = $annotation[$brkpos - 1];
                 $e = $brace[$s];
                 $brkpos--;
                 $key = trim(substr($annotation, $seppos, $brkpos - $seppos));
-                $value = $s . (str_between)($annotation, $s, $e, $brkpos) . $e;
+                $value = $s . Strings::str_between($annotation, $s, $e, $brkpos) . $e;
                 $i = $brkpos;
             }
             else {
-                $endpos = (strpos_quoted)($annotation, "@", $seppos) ?: strlen($annotation);
+                $endpos = Strings::strpos_quoted($annotation, "@", $seppos) ?: strlen($annotation);
                 $value = substr($annotation, $seppos, $endpos - $seppos);
                 $i += strlen($value);
                 $value = trim($value);
@@ -984,14 +984,14 @@ class Utility
                     $value = null;
                 }
                 elseif (in_array($value[0] ?? null, ['('], true)) {
-                    $class = (resolve_symbol)($name, $nsfiles, 'alias') ?? $name;
-                    $value = new $class(...(paml_import)(substr($value, 1, -1)));
+                    $class = Utility::resolve_symbol($name, $nsfiles, 'alias') ?? $name;
+                    $value = new $class(...Strings::paml_import(substr($value, 1, -1)));
                 }
                 elseif (in_array($value[0] ?? null, ['{', '['], true)) {
-                    $value = (array) (paml_import)($value)[0];
+                    $value = (array) Strings::paml_import($value)[0];
                 }
                 else {
-                    $value = array_values(array_filter((quoteexplode)([" ", "\t"], $value), "strlen"));
+                    $value = array_values(array_filter(Strings::quoteexplode([" ", "\t"], $value), "strlen"));
                 }
             }
 
@@ -1145,7 +1145,7 @@ class Utility
      */
     public static function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
     {
-        $rc = (process_async)($command, $args, $stdin, $stdout, $stderr, $cwd, $env)();
+        $rc = Utility::process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env)();
         if ($rc === -1) {
             // どうしたら失敗するのかわからない
             throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
@@ -1371,22 +1371,22 @@ class Utility
         }
 
         // 引数配列は単一の値でも良い
-        $args = array_map(arrayize, $args);
+        $args = array_map(Arrays::arrayize, $args);
 
         // 実行すれば "ArgumentCountError: Too few arguments" で怒られるがもっと早い段階で気づきたい
         foreach ($tasks as $key => $task) {
-            assert((parameter_length)($task, true) <= count($args[$key] ?? []), "task $key's arguments are mismatch.");
+            assert(Funchand::parameter_length($task, true) <= count($args[$key] ?? []), "task $key's arguments are mismatch.");
         }
 
         // 変数や環境の準備
-        $autoload = (arrayize)($autoload ?? (auto_loader)());
+        $autoload = Arrays::arrayize($autoload ?? Classobj::auto_loader());
         $workdir ??= (sys_get_temp_dir() . '/rfpp');
-        (mkdir_p)($workdir);
+        FileSystem::mkdir_p($workdir);
 
         // 実行バイナリとコード本体
-        $phpbin = (path_resolve)('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
+        $phpbin = FileSystem::path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
         $maincode = '<?php
-            $context = ' . (var_export3)([$autoload, $tasks], true) . ';
+            $context = ' . Vars::var_export3([$autoload, $tasks], true) . ';
             foreach ($context[0] as $file) {
                 require_once $file;
             }
@@ -1402,7 +1402,7 @@ class Utility
             unset($stdout, $stderr);
             $stdout = $stderr = '';
             $return = tempnam($workdir, 'return');
-            $processes[$key] = (process_async)($phpbin, [$mainscript, $return, $key], serialize($args[$key] ?? []), $stdout, $stderr, $workdir, $env);
+            $processes[$key] = Utility::process_async($phpbin, [$mainscript, $return, $key], serialize($args[$key] ?? []), $stdout, $stderr, $workdir, $env);
             $processes[$key]->return = static fn() => strlen($result = file_get_contents($return)) ? unserialize($result) : null;
         }
 
@@ -1492,7 +1492,7 @@ class Utility
      */
     public static function arguments($rule, $argv = null)
     {
-        $opt = (array_unset)($rule, '', []);
+        $opt = Arrays::array_unset($rule, '', []);
         if (is_bool($opt)) {
             $opt = ['thrown' => $opt];
         }
@@ -1504,7 +1504,7 @@ class Utility
             $argv = array_slice($_SERVER['argv'], 1); // @codeCoverageIgnore
         }
         if (is_string($argv)) {
-            $argv = (quoteexplode)([" ", "\t"], $argv);
+            $argv = Strings::quoteexplode([" ", "\t"], $argv);
             $argv = array_filter($argv, 'strlen');
         }
         $argv = array_values($argv);
@@ -1544,7 +1544,7 @@ class Utility
                 }
                 else {
                     $shortname = substr($token, 1);
-                    if (!$opt['thrown'] && !(array_keys_exist)(str_split($shortname, 1), $shortmap)) {
+                    if (!$opt['thrown'] && !Arrays::array_keys_exist(str_split($shortname, 1), $shortmap)) {
                         $result[$n++] = $token;
                         continue;
                     }
@@ -1667,7 +1667,7 @@ class Utility
                 // オブジェクトは単にプロパティを配列的に出力する
                 elseif (is_object($value)) {
                     $parents[] = $value;
-                    return get_class($value) . $export((get_object_properties)($value), $nest, $parents);
+                    return get_class($value) . $export(Classobj::get_object_properties($value), $nest, $parents);
                 }
                 // 文字列は改行削除
                 elseif (is_string($value)) {
@@ -1679,7 +1679,7 @@ class Utility
                 }
                 // それ以外は stringify
                 else {
-                    return (stringify)($value);
+                    return Vars::stringify($value);
                 }
             };
 
@@ -2075,7 +2075,7 @@ class Utility
         static $persistences = [];
 
         $time = date('d-M-Y H:i:s e');
-        $content = (stringify)($message);
+        $content = Vars::stringify($message);
         $location = '';
         if (!($message instanceof \Exception || $message instanceof \Throwable)) {
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
@@ -2088,7 +2088,7 @@ class Utility
         $line = "[$time] PHP Log:  $content$location\n";
 
         if ($destination === null) {
-            $destination = (blank_if)(ini_get('error_log'), 'php://stderr');
+            $destination = Syntax::blank_if(ini_get('error_log'), 'php://stderr');
         }
 
         if ($destination === 'syslog') {
@@ -2211,7 +2211,7 @@ class Utility
     public static function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     {
         $benchset = [];
-        foreach ((arrayize)($suite) as $name => $caller) {
+        foreach (Arrays::arrayize($suite) as $name => $caller) {
             if (!is_callable($caller, false, $callname)) {
                 throw new \InvalidArgumentException('caller is not callable.');
             }
@@ -2238,13 +2238,13 @@ class Utility
 
         // opcache を利用するようなベンチはこの辺を切っておかないと正確な結果にならない
         // ウォームアップで mtime が更新され、その1秒以内にベンチが走るので一切 opcache が効かなくなるため
-        $restore = (ini_sets)([
+        $restore = Utility::ini_sets([
             'opcache.validate_timestamps'    => 0,
             'opcache.file_update_protection' => "0",
         ]);
 
         // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-        $assertions = (call_safely)(function ($benchset, $args) {
+        $assertions = Funchand::call_safely(function ($benchset, $args) {
             $result = [];
             $args2 = $args;
             foreach ($benchset as $name => $caller) {
@@ -2258,8 +2258,8 @@ class Utility
         foreach ($assertions as $name1 => $return1) {
             foreach ($assertions as $name2 => $return2) {
                 if ($return1 !== null && $return2 !== null && $return1 !== $return2) {
-                    $returns1 = (stringify)($return1);
-                    $returns2 = (stringify)($return2);
+                    $returns1 = Vars::stringify($return1);
+                    $returns2 = Vars::stringify($return2);
                     trigger_error("Results of $name1 and $name2 are different. ($returns1, $returns2)");
                 }
             }
@@ -2294,7 +2294,7 @@ class Utility
         // 出力するなら出力
         if ($output) {
             printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
-            echo (markdown_table)(array_map(function ($v) {
+            echo Strings::markdown_table(array_map(function ($v) {
                 return [
                     'name'       => $v['name'],
                     'called'     => number_format($v['called'], 0),

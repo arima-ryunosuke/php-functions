@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * 数学関連のユーティリティ
  */
-class Math
+class Math implements Interfaces\Math
 {
     /**
      * 引数の最小値を返す
@@ -23,7 +23,7 @@ class Math
      */
     public static function minimum(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = Arrays::array_flatten($variadic) or Syntax::throws(new \LengthException("argument's length is 0."));
         return min($args);
     }
 
@@ -43,7 +43,7 @@ class Math
      */
     public static function maximum(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = Arrays::array_flatten($variadic) or Syntax::throws(new \LengthException("argument's length is 0."));
         return max($args);
     }
 
@@ -65,7 +65,7 @@ class Math
      */
     public static function mode(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = Arrays::array_flatten($variadic) or Syntax::throws(new \LengthException("argument's length is 0."));
         $vals = array_map(function ($v) {
             if (is_object($v)) {
                 // ここに特別扱いのオブジェクトを列挙していく
@@ -73,7 +73,7 @@ class Math
                     return $v->getTimestamp();
                 }
                 // それ以外は stringify へ移譲（__toString もここに含まれている）
-                return (stringify)($v);
+                return Vars::stringify($v);
             }
             return (string) $v;
         }, $args);
@@ -102,8 +102,8 @@ class Math
      */
     public static function mean(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
-        $args = array_filter($args, 'is_numeric') or (throws)(new \LengthException("argument's must be contain munber."));
+        $args = Arrays::array_flatten($variadic) or Syntax::throws(new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or Syntax::throws(new \LengthException("argument's must be contain munber."));
         return array_sum($args) / count($args);
     }
 
@@ -129,7 +129,7 @@ class Math
      */
     public static function median(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
+        $args = Arrays::array_flatten($variadic) or Syntax::throws(new \LengthException("argument's length is 0."));
         $count = count($args);
         $center = (int) ($count / 2);
         sort($args);
@@ -178,8 +178,8 @@ class Math
      */
     public static function sum(...$variadic)
     {
-        $args = (array_flatten)($variadic) or (throws)(new \LengthException("argument's length is 0."));
-        $args = array_filter($args, 'is_numeric') or (throws)(new \LengthException("argument's must be contain munber."));
+        $args = Arrays::array_flatten($variadic) or Syntax::throws(new \LengthException("argument's length is 0."));
+        $args = array_filter($args, 'is_numeric') or Syntax::throws(new \LengthException("argument's must be contain munber."));
         return array_sum($args);
     }
 
@@ -290,7 +290,7 @@ class Math
         }
 
         $k = 10 ** $precision;
-        return (decimal)($value * $k, 0, $mode) / $k;
+        return Math::decimal($value * $k, 0, $mode) / $k;
     }
 
     /**
@@ -410,7 +410,7 @@ class Math
     public static function calculate_formula($formula)
     {
         // TOKEN_PARSE を渡せばシンタックスチェックも行ってくれる
-        $tokens = (parse_php)("<?php ($formula);", [
+        $tokens = Syntax::parse_php("<?php ($formula);", [
             'phptag' => false,
             'flags'  => TOKEN_PARSE,
         ]);
@@ -447,6 +447,6 @@ class Math
                 throw new \ParseError(sprintf("syntax error, unexpected '%s' in  on line %d", $token[1], $token[2]));
             }
         }
-        return (evaluate)("return $expression;");
+        return Syntax::evaluate("return $expression;");
     }
 }

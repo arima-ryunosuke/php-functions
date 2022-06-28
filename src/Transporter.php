@@ -5,6 +5,49 @@ namespace ryunosuke\Functions;
 class Transporter
 {
     /**
+     * リリース用のビルドコマンド
+     *
+     * @internal
+     * @codeCoverageIgnore
+     */
+    public static function build()
+    {
+        $ve = function ($v) { return self::exportVar($v); };
+        $_ = function ($v) { return $v; };
+
+        $symbols = self::parseSymbol();
+
+        // callable インターフェースの作成
+        foreach ($symbols['callable'] as $class => $methods) {
+            if ($methods) {
+                $maxlen = max(array_map('strlen', array_keys($methods)));
+                $callables = [];
+                foreach ($methods as $name => $callable) {
+                    $callables[] = sprintf("    public const %-{$maxlen}s = {$ve($callable)};", $name);
+                }
+                file_put_contents(__DIR__ . "/Package/Interfaces/$class.php", <<<CONSTS
+                <?php
+                
+                # Don't touch this code. This is auto generated.
+                
+                namespace {$_(__NAMESPACE__)}\\Package\\Interfaces;
+                
+                interface $class
+                {
+                    # callable constants
+                    {$_(trim(implode("\n", $callables)))}
+                }
+                
+                CONSTS
+                );
+            }
+        }
+
+        file_put_contents(__DIR__ . "/../include/global.php", self::exportNamespace(null));
+        file_put_contents(__DIR__ . "/../include/namespace.php", self::exportNamespace(__NAMESPACE__));
+    }
+
+    /**
      * グローバルに関数をインポートする
      *
      * @param array $excluded_functions 定義したくない関数名を配列で指定する
@@ -27,40 +70,51 @@ class Transporter
     }
 
     /**
-     * クラス定数のみインポートする
-     */
-    public static function importAsClass()
-    {
-        require_once __DIR__ . '/../include/package.php';
-    }
-
-    /**
-     * グローバル・名前空間にエクスポートする
+     * グローバルにエクスポートする
      *
-     * test, composer 用で、明示的には呼ばれない
-     *
-     * @param ?string $dir エクスポートするディレクトリ
+     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @return string php コード
      */
-    public static function exportAll($dir = null)
+    public static function exportGlobal($funcname = null)
     {
-        $dir = is_object($dir) || $dir === null ? __DIR__ . '/../include' : $dir;
-
-        file_put_contents("$dir/global.php", self::exportNamespace(null));
-        file_put_contents("$dir/namespace.php", self::exportNamespace(__NAMESPACE__));
-        file_put_contents("$dir/package.php", self::exportNamespace(__NAMESPACE__ . '\\Package', true));
+        return self::export(null, $funcname, false);
     }
 
     /**
      * 名前空間にエクスポートする
      *
      * @param string $namespace 吐き出す名前空間
-     * @param bool $classmode メソッドモード（内部用）
      * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
-    public static function exportNamespace($namespace, $classmode = false, $funcname = null)
+    public static function exportNamespace($namespace, $funcname = null)
     {
-        $ve = function ($v) { return self::exportVar($v); };
+        return self::export($namespace, $funcname, false);
+    }
+
+    /**
+     * 定数のみエクスポートする
+     *
+     * @param string $namespace 吐き出す名前空間
+     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @return string php コード
+     */
+    public static function exportPackage($namespace = null, $funcname = null)
+    {
+        return self::export($namespace, $funcname, true);
+    }
+
+    /**
+     * 名前空間にエクスポートする
+     *
+     * @param string $namespace 吐き出す名前空間
+     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param bool $classmode メソッドモード（内部用）
+     * @return string php コード
+     */
+    private static function export($namespace, $funcname = null, $classmode = false)
+    {
+        $ve = function ($v, $nest = 0) { return self::exportVar($v, $nest); };
         $_ = function ($v) { return $v; };
 
         // 関数が指定されているときは依存関係を解決する
@@ -82,9 +136,15 @@ class Transporter
             if ($funcname !== null && !isset($funcname['constant'][$name])) {
                 continue;
             }
+            if ($classmode) {
+                $cname = $ve("{$nameprefix}$name");
+                $cvalue = $ve($const->getValue(), 0);
+                $consts[] = "define($cname, $cvalue);";
+                continue;
+            }
             $doccomment = $const->getDocComment();
             $cname = $ve("{$nameprefix}$name");
-            $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
+            $cvalue = $ve($const->getValue(), 1);
             $consts[] = <<<CONSTANT
             if (!defined($cname)) {
                 $doccomment
@@ -101,40 +161,39 @@ class Transporter
             if ($funcname !== null && !isset($funcname['function'][$name])) {
                 continue;
             }
-
             if ($classmode) {
                 $cname = $ve("{$nameprefix}$name");
-                $id = '[' . $ve($method->class) . ', ' . $ve($name) . ']';
+                $id = $ve([$method->class, $name]);
                 $funcs[] = "define($cname, $id);";
+                continue;
             }
-            else {
-                $doccomment = $method->getDocComment();
-                $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
-                $deprecated = !!preg_match('#@deprecated#us', $doccomment);
 
-                $block = $symbols['phpblock'][$name];
-                $block = self::replaceConstant($block, '');
-                $block = preg_replace('#public static #', '', $block, 1);
-                $block = trim($block);
+            $doccomment = $method->getDocComment();
+            $polyfill = $ve(!!preg_match('#@polyfill#', $doccomment));
+            $deprecated = !!preg_match('#@deprecated#us', $doccomment);
 
-                $cname = $ve("{$nameprefix}$name");
-                $id = $ve("{$nameprefix}$name");
-                $funcs[] = <<<FUNCTION
-                if (!isset(\$excluded_functions[{$ve($name)}]) && (!function_exists($id) || (!$polyfill && (new \\ReflectionFunction($id))->isInternal()))) {
-                    $doccomment
-                    $block
-                }
-                FUNCTION;
-                $funcs[] = <<<CONSTANT
-                if (function_exists($id) && !defined($cname)) {
-                    /**
-                     *{$_($deprecated ? ' @deprecated' : '')}
-                     */
-                    define($cname, $id);
-                }
-                
-                CONSTANT;
+            $block = $symbols['phpblock'][$name];
+            $block = self::replaceConstant($block);
+            $block = preg_replace('#public static #', '', $block, 1);
+            $block = trim($block);
+
+            $cname = $ve("{$nameprefix}$name");
+            $id = $ve("{$nameprefix}$name");
+            $funcs[] = <<<FUNCTION
+            if (!isset(\$excluded_functions[{$ve($name)}]) && (!function_exists($id) || (!$polyfill && (new \\ReflectionFunction($id))->isInternal()))) {
+                $doccomment
+                $block
             }
+            FUNCTION;
+            $funcs[] = <<<CONSTANT
+            if (function_exists($id) && !defined($cname)) {
+                /**
+                 *{$_($deprecated ? ' @deprecated' : '')}
+                 */
+                define($cname, $id);
+            }
+            
+            CONSTANT;
         }
 
         // 完全な php コードを返す
@@ -153,89 +212,6 @@ class Transporter
     }
 
     /**
-     * 単一の静的クラスにエクスポートする
-     *
-     * @param string $classname 吐き出すクラス名（完全修飾名）
-     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
-     * @return string php コード
-     */
-    public static function exportClass($classname, $funcname = null)
-    {
-        $ve = function ($v) { return self::exportVar($v); };
-        $_ = function ($v) { return $v; };
-
-        // 関数が指定されているときは依存関係を解決する
-        if ($funcname !== null) {
-            $funcname = self::detectDependent($funcname);
-        }
-
-        $classname = trim($classname, '\\');
-        $shortname = $classname;
-        $namespace = '';
-        $parts = explode('\\', $classname);
-        if (count($parts) > 1) {
-            $shortname = array_pop($parts);
-            $namespace = implode('\\', $parts);
-        }
-
-        $symbols = self::parseSymbol();
-
-        // 定数コードの取得
-        $consts = [];
-        foreach ($symbols['constant'] as $name => $const) {
-            /** @var \ReflectionClassConstant $const */
-            if ($funcname !== null && !isset($funcname['constant'][$name])) {
-                continue;
-            }
-            $doccomment = $const->getDocComment();
-            $cvalue = trim(substr($ve([$const->getValue()]), 1, -1), " \n\t,");
-            $consts[] = <<<CONSTANT
-                $doccomment
-                const $name = $cvalue;
-            
-            CONSTANT;
-        }
-
-        // 関数コードの取得
-        $funcs = [];
-        foreach ($symbols['function'] as $name => $method) {
-            /** @var \ReflectionMethod $method */
-            if ($funcname !== null && !isset($funcname['function'][$name])) {
-                continue;
-            }
-
-            $doccomment = $method->getDocComment();
-
-            $block = $symbols['phpblock'][$name];
-            $block = self::replaceConstant($block, "\\$classname");
-            $block = trim($block);
-
-            $consts[] = <<<CONSTANT
-                const $name = {$_($ve(["\\$classname", $name]))};
-            CONSTANT;
-            $funcs[] = <<<FUNCTION
-                $doccomment
-                $block
-            FUNCTION;
-        }
-
-        // 完全な php コードを返す
-        return <<<CONTENTS
-        <?php
-        
-        # Don't touch this code. This is auto generated.
-        
-        {$_($namespace ? "namespace $namespace;\n" : "")}
-        class $shortname
-        {
-        {$_(implode("\n", $consts))}
-        
-        {$_(implode("\n\n", $funcs))}
-        }
-        CONTENTS;
-    }
-
-    /**
      * 配下の Package からエクスポートすべき定数・関数を抽出する
      *
      * @param bool $nocache キャッシュ破棄フラグ
@@ -249,22 +225,30 @@ class Transporter
         }
         if (!isset($cache)) {
             $cache = [
+                'classes'  => [],
                 'constant' => [],
+                'callable' => [],
                 'function' => [],
                 'phpblock' => [],
             ];
             foreach (glob(__DIR__ . '/Package/*.php') as $fn) {
                 $refclass = new \ReflectionClass(__NAMESPACE__ . "\\Package\\" . basename($fn, '.php'));
+                $class = $refclass->getShortName();
                 $lines = file($refclass->getFileName());
 
-                foreach ($refclass->getReflectionConstants() as $const) {
-                    $cache['constant'][$const->getName()] = $const;
-                }
                 foreach ($refclass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC) as $method) {
                     $sl = $method->getStartLine();
                     $el = $method->getEndLine();
-                    $cache['function'][$method->getName()] = $method;
-                    $cache['phpblock'][$method->getName()] = implode('', array_slice($lines, $sl - 1, $el - $sl + 1));
+                    $cache['classes'][$class][$method->name] = $method;
+                    $cache['function'][$method->name] = $method;
+                    $cache['phpblock'][$method->name] = implode('', array_slice($lines, $sl - 1, $el - $sl + 1));
+                    $cache['callable'][$class][$method->name] = [$method->class, $method->name];
+                }
+                foreach ($refclass->getReflectionConstants() as $const) {
+                    if (!$const->getDeclaringClass()->isInterface()) {
+                        $cache['classes'][$class][$const->name] = $const;
+                        $cache['constant'][$const->name] = $const;
+                    }
                 }
             }
         }
@@ -348,34 +332,26 @@ class Transporter
     }
 
     /**
-     * 関数のコードブロックの定数呼び出し箇所を単純呼び出しに変更する
+     * 内部パッケージ参照をグローバル参照に変更する
      *
      * @param string $code コードブロック
-     * @param string $classname クラス名
      * @return string
      */
-    private static function replaceConstant($code, $classname)
+    private static function replaceConstant($code)
     {
         $symbols = self::parseSymbol();
 
-        $classname = str_replace('\\', '\\\\', $classname);
-        $prefix = strlen($classname) ? "$classname::" : '';
-        $codes = explode("\n", $code);
         $tokens = token_get_all("<?php $code");
-        foreach ($tokens as $n => $token) {
-            if ($token[0] === T_STRING) {
-                if (isset($symbols['function'][$token[1]]) && $tokens[$n - 1] === '(' && $tokens[$n + 1] === ')') {
-                    $codes[$token[2] - 1] = preg_replace('#\((' . $token[1] . ')\)#', $prefix . '$1', $codes[$token[2] - 1], 1);
-                }
-                if ($prefix && isset($symbols['constant'][$token[1]])) {
-                    $codes[$token[2] - 1] = preg_replace('#(?<!::)(' . $token[1] . ')#', $prefix . '$1', $codes[$token[2] - 1], 1);
-                }
+        array_shift($tokens);
+        foreach ($tokens as $n => &$token) {
+            if (!is_array($token)) {
+                $token = ['', $token];
             }
-            if ($prefix && $token[0] === T_CLASS_C) {
-                $codes[$token[2] - 1] = preg_replace('#(' . $token[1] . ')#', var_export($classname, true), $codes[$token[2] - 1], 1);
+            if ($token[0] === T_DOUBLE_COLON && isset($symbols['classes'][$tokens[$n - 1][1]][$tokens[$n + 1][1]])) {
+                unset($tokens[$n - 1], $tokens[$n]);
             }
         }
-        return implode("\n", $codes);
+        return implode("", array_column($tokens, 1));
     }
 
     /**

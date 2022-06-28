@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 /**
  * ネットワーク関連のユーティリティ
  */
-class Network
+class Network implements Interfaces\Network
 {
     /**
      * 接続元となる IP を返す
@@ -26,7 +26,7 @@ class Network
      */
     public static function getipaddress($target = null)
     {
-        $net_get_interfaces = (cache)("net_get_interfaces", fn() => net_get_interfaces(), __FUNCTION__);
+        $net_get_interfaces = Utility::cache("net_get_interfaces", fn() => net_get_interfaces(), __FUNCTION__);
 
         // int, null 時は最初のエントリを返す（ループバックは除く）
         if ($target === null || is_int($target)) {
@@ -102,7 +102,7 @@ class Network
         }
         $iplong = ip2long($ipaddr);
 
-        foreach ((arrayize)($cidr) as $cidr) {
+        foreach (Arrays::arrayize($cidr) as $cidr) {
             [$subnet, $length] = explode('/', $cidr, 2) + [1 => '32'];
 
             if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -163,7 +163,7 @@ class Network
         if ($protocol === 'icmp' && DIRECTORY_SEPARATOR === '/' && !is_readable('/root')) {
             // @codeCoverageIgnoreStart
             $stdout = null;
-            (process)('ping', [
+            Utility::process('ping', [
                 '-c' => 1,
                 '-W' => (int) $timeout,
                 $host,
@@ -192,7 +192,7 @@ class Network
 
         $mtime = microtime(true);
         try {
-            (call_safely)(function ($socket, $protocol, $host, $port, $timeout) {
+            Funchand::call_safely(function ($socket, $protocol, $host, $port, $timeout) {
                 socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => $timeout, 'usec' => 0]);
                 socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
                 if (!socket_connect($socket, $host, $port)) {
@@ -359,7 +359,7 @@ class Network
 
                 $rheader = null;
                 $info = null;
-                $res = (http_request)($default + $opt + $single_options, $rheader, $info);
+                $res = Network::http_request($default + $opt + $single_options, $rheader, $info);
                 if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
                     curl_multi_add_handle($mh, $res[0]);
                     $resultmap[$handle_id] = [$key, $res[1], $res[2], microtime(true), 0];
@@ -526,8 +526,8 @@ class Network
             'cachedir'             => null,
             'parser'               => [
                 'application/json' => [
-                    'request'  => json_export,
-                    'response' => json_import,
+                    'request'  => Strings::json_export,
+                    'response' => Strings::json_import,
                 ],
             ],
         ];
@@ -544,7 +544,7 @@ class Network
         }
 
         // ヘッダは後段の判定に頻出するので正規化して取得しておく
-        $request_header = (array_kvmap)($options[CURLOPT_HTTPHEADER], function ($k, $v) {
+        $request_header = Arrays::array_kvmap($options[CURLOPT_HTTPHEADER], function ($k, $v) {
             if (is_int($k)) {
                 [$k, $v] = explode(':', $v, 2);
             }
@@ -558,9 +558,9 @@ class Network
 
         // response クロージャ
         $response_parse = function ($response, $info) use ($options) {
-            [$head, $body] = (str_chunk)($response, $info['header_size']);
+            [$head, $body] = Strings::str_chunk($response, $info['header_size']);
 
-            $head = (str_array)($head, ':', true);
+            $head = Strings::str_array($head, ':', true);
             $info['no_request'] = false;
             $info['response_size'] = strlen($response);
             $info['content_type'] = $info['content_type'] ?? null;
@@ -568,7 +568,7 @@ class Network
             $info['last_modified'] = $head['Last-Modified'] ?? null;
             $info['etag'] = $head['ETag'] ?? null;
             if (isset($info['request_header']) && is_string($info['request_header'])) {
-                $info['request_header'] = (str_array)($info['request_header'], ':', true);
+                $info['request_header'] = Strings::str_array($info['request_header'], ':', true);
             }
 
             if (!($options[CURLOPT_NOBODY] ?? false)) {
@@ -620,7 +620,7 @@ class Network
         $cache = function ($response, $info) use ($filekey, $response_parse) {
             if (isset($filekey)) {
                 if ($info['http_code'] === 200 && stripos($info['cache_control'], 'no-store') === false) {
-                    (file_set_contents)($filekey, json_encode($info, JSON_UNESCAPED_SLASHES) . "\n" . $response);
+                    FileSystem::file_set_contents($filekey, json_encode($info, JSON_UNESCAPED_SLASHES) . "\n" . $response);
                 }
                 if ($info['http_code'] === 304 && file_exists($filekey)) {
                     touch($filekey);
@@ -634,25 +634,25 @@ class Network
         if (is_array($options[CURLOPT_POSTFIELDS])) {
             // の、前に @ 付きキーを CURLFile に変換
             if ($options['atfile']) {
-                $options[CURLOPT_POSTFIELDS] = (array_kvmap)($options[CURLOPT_POSTFIELDS], function ($k, $v, $callback) {
+                $options[CURLOPT_POSTFIELDS] = Arrays::array_kvmap($options[CURLOPT_POSTFIELDS], function ($k, $v, $callback) {
                     $atfile = ($k[0] ?? null) === '@';
                     if ($atfile) {
                         $k = substr($k, 1);
                         if (is_array($v)) {
-                            $v = (array_kvmap)($v, fn($k, $v) => [is_int($k) ? "@$k" : $k => $v]);
+                            $v = Arrays::array_kvmap($v, fn($k, $v) => [is_int($k) ? "@$k" : $k => $v]);
                         }
                         else {
                             $v = new \CURLFile($v);
                         }
                     }
                     if (is_array($v)) {
-                        $v = (array_kvmap)($v, $callback);
+                        $v = Arrays::array_kvmap($v, $callback);
                     }
                     return [$k => $v];
                 });
             }
             // CURLFile が含まれているかもしれないので http_build_query は使えない
-            $options[CURLOPT_POSTFIELDS] = (array_flatten)($options[CURLOPT_POSTFIELDS], fn($keys) => array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : ''));
+            $options[CURLOPT_POSTFIELDS] = Arrays::array_flatten($options[CURLOPT_POSTFIELDS], fn($keys) => array_shift($keys) . ($keys ? '[' . implode('][', $keys) . ']' : ''));
         }
 
         // 単一ファイルは単一アップロードとする
@@ -668,11 +668,11 @@ class Network
         }
 
         // CURLOPT_HTTPHEADER は素の配列しか受け入れてくれないので連想配列を k: v 形式に変換
-        $options[CURLOPT_HTTPHEADER] = (array_sprintf)($options[CURLOPT_HTTPHEADER], fn($v, $k) => is_int($k) ? $v : "$k: $v");
+        $options[CURLOPT_HTTPHEADER] = Arrays::array_sprintf($options[CURLOPT_HTTPHEADER], fn($v, $k) => is_int($k) ? $v : "$k: $v");
 
         // 同上： CURLOPT_COOKIE
         if ($options[CURLOPT_COOKIE] && is_array($options[CURLOPT_COOKIE])) {
-            $options[CURLOPT_COOKIE] = (array_sprintf)($options[CURLOPT_COOKIE], fn($v, $k) => is_int($k) ? $v : rawurlencode($k) . "=" . rawurlencode($v), '; ');
+            $options[CURLOPT_COOKIE] = Arrays::array_sprintf($options[CURLOPT_COOKIE], fn($v, $k) => is_int($k) ? $v : rawurlencode($k) . "=" . rawurlencode($v), '; ');
         }
 
         assert(is_callable($options['retry']) || is_array($options['retry']));
@@ -750,7 +750,7 @@ class Network
             'method'       => 'HEAD',
             CURLOPT_NOBODY => true,
         ];
-        (http_get)($url, $data, $options + $default, $response_header, $info);
+        Network::http_get($url, $data, $options + $default, $response_header, $info);
         return $response_header;
     }
 
@@ -765,14 +765,14 @@ class Network
      */
     public static function http_get($url, $data = [], $options = [], &$response_header = [], &$info = [])
     {
-        if (!(is_empty)($data, true)) {
+        if (!Vars::is_empty($data, true)) {
             $url .= (strrpos($url, '?') === false ? '?' : '&') . (is_array($data) || is_object($data) ? http_build_query($data) : $data);
         }
         $default = [
             'url'    => $url,
             'method' => 'GET',
         ];
-        return (http_request)($options + $default, $response_header, $info);
+        return Network::http_request($options + $default, $response_header, $info);
     }
 
     /**
@@ -791,7 +791,7 @@ class Network
             'method' => 'POST',
             'body'   => $data,
         ];
-        return (http_request)($options + $default, $response_header, $info);
+        return Network::http_request($options + $default, $response_header, $info);
     }
 
     /**
@@ -810,7 +810,7 @@ class Network
             'method' => 'PUT',
             'body'   => $data,
         ];
-        return (http_request)($options + $default, $response_header, $info);
+        return Network::http_request($options + $default, $response_header, $info);
     }
 
     /**
@@ -829,7 +829,7 @@ class Network
             'method' => 'PATCH',
             'body'   => $data,
         ];
-        return (http_request)($options + $default, $response_header, $info);
+        return Network::http_request($options + $default, $response_header, $info);
     }
 
     /**
@@ -848,6 +848,6 @@ class Network
             'method' => 'DELETE',
             'body'   => $data,
         ];
-        return (http_request)($options + $default, $response_header, $info);
+        return Network::http_request($options + $default, $response_header, $info);
     }
 }
