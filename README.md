@@ -25,8 +25,6 @@ require __DIR__ . '/vendor/autoload.php';
 \ryunosuke\Functions\Transporter::importAsGlobal();
 // 名前空間へ展開
 \ryunosuke\Functions\Transporter::importAsNamespace();
-// クラス定数のみインポート
-\ryunosuke\Functions\Transporter::importAsClass();
 ```
 
 `importAsGlobal` はまさにグローバルへ展開されます。
@@ -52,9 +50,6 @@ require __DIR__ . '/vendor/autoload.php';
 また、 `importAsGlobal` `importAsNamespace` の第2引数でインポートしない関数を指定できます。
 万が一標準関数で同じ名前のものが定義されたら個別指定で除外することが可能です。
 
-`importAsClass` はクラス定数のみインポートします。
-関数ベースではなく、 `Arrays::arrayize` のような静的メソッドでの使用になります。
-
 ### export
 
 下記のようにすると指定名前空間でファイル自体が吐き出されます。
@@ -70,22 +65,22 @@ file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::expo
 これの利点は名前空間を変更できる点と、管理下のディレクトリに吐き出せることでカスタムができる点です。
 逆に言えば既存の処理しか使わないなら任意名前空間に吐き出すメリットはあまりありません。
 
-下記のように第3引数を指定すると指定した関数と依存関係にある関数のみが吐き出されます。
+下記のように第2引数を指定すると指定した関数と依存関係にある関数のみが吐き出されます。
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
 // 'funcA', 'funcB' だけを出力
-file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', false, ['funcA', 'funcB']));
+file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', ['funcA', 'funcB']));
 ```
 
-さらに第3引数にファイル名やディレクトリ名を与えるとそれらを php とみなして実際に使用されている関数のみが吐き出されます。
+さらに第2引数にファイル名やディレクトリ名を与えるとそれらを php とみなして実際に使用されている関数のみが吐き出されます。
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
 // /path/to/project 内で使われている関数だけを出力
-file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', false, '/path/to/project'));
+file_put_contents('path/to/function.php', \ryunosuke\Functions\Transporter::exportNamespace('namespace', '/path/to/project'));
 ```
 
 依存関係も解決するので、例えば `funcA` や `funcB` が `funcC` に依存していれば `funcC` も吐き出されます。
@@ -99,15 +94,6 @@ vendor/bin/export-function
 ```
 
 ただし、ほとんど内部用です。
-
-一応、上記の関数版ではなくクラス版もあります。
-
-```php
-require __DIR__ . '/vendor/autoload.php';
-
-// /path/to/project 内で使われている関数だけをクラスに出力
-file_put_contents('path/to/Utils.php', \ryunosuke\Functions\Transporter::exportClass('hoge\\Utils', '/path/to/project'));
-```
 
 ### constant
 
@@ -142,7 +128,5 @@ composer subcommand として下記が定義されています。
   - src/package を元に自動生成ファイルを吐き出します
 - composer test
   - phpunit を実行します
-- composer test-coverage
-  - カバレッジ付きで phpunit を実行します
 - composer document
   - docs/html 以下にドキュメントを生成します

@@ -11,6 +11,19 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.5.0
+
+- [*change] php8.1 対応
+- [*change] クラスのエクスポート機能を削除
+- [*change] 互換性のために残していたコードを削除
+- [feature][Arrays] array_revise を追加
+- [feature][Arrays] array_find_recursive を追加
+- [feature][FileSystem] file_set_tree を追加
+- [feature][FileSystem] file_list に相対パスオプションを追加
+- [feature][Utility] getenvs/setenvs を追加
+- [fixbug][Vars] var_export2 で stdclass を出したときに set_state になっていた不具合を修正
+- [fixbug][Classobj] get_object_properties に Closure を与えると意図しない結果になっていた不具合を修正
+
 ## 1.4.26
 
 - [change][all] php8.1の暫定対応
