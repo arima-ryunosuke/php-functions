@@ -149,11 +149,11 @@ class Network implements Interfaces\Network
 
         $parts = parse_url($host);
         if (!isset($parts['scheme'])) {
-            if (strlen($port)) {
-                $parts['scheme'] = 'tcp';
+            if ($port === null) {
+                $parts['scheme'] = 'icmp';
             }
             else {
-                $parts['scheme'] = 'icmp';
+                $parts['scheme'] = 'tcp';
             }
         }
         $protocol = strtolower($parts['scheme']);
@@ -593,7 +593,7 @@ class Network implements Interfaces\Network
                 $fp = fopen($filekey, 'r');
                 try {
                     $info = json_decode(fgets($fp), true);
-                    if (stripos($info['cache_control'], 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'], $matches)) {
+                    if (stripos($info['cache_control'] ?? '', 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'] ?? '', $matches)) {
                         clearstatcache(true, $filekey);
                         if (time() - filemtime($filekey) < $matches[1]) {
                             $info['no_request'] = true;
@@ -619,7 +619,7 @@ class Network implements Interfaces\Network
         // http cache クロージャ
         $cache = function ($response, $info) use ($filekey, $response_parse) {
             if (isset($filekey)) {
-                if ($info['http_code'] === 200 && stripos($info['cache_control'], 'no-store') === false) {
+                if ($info['http_code'] === 200 && stripos($info['cache_control'] ?? '', 'no-store') === false) {
                     FileSystem::file_set_contents($filekey, json_encode($info, JSON_UNESCAPED_SLASHES) . "\n" . $response);
                 }
                 if ($info['http_code'] === 304 && file_exists($filekey)) {

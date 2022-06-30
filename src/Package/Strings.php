@@ -314,7 +314,7 @@ class Strings implements Interfaces\Strings
      */
     public static function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\')
     {
-        if (is_string($enclosure) || is_null($enclosure)) {
+        if (is_string($enclosure)) {
             if (strlen($enclosure)) {
                 $chars = str_split($enclosure);
                 $enclosure = array_combine($chars, $chars);
@@ -529,12 +529,12 @@ class Strings implements Interfaces\Strings
      * ```
      *
      * @param string $string 対象文字列
-     * @param ?string $prefix 削ぎ落とす先頭文字列
-     * @param ?string $suffix 削ぎ落とす末尾文字列
+     * @param string $prefix 削ぎ落とす先頭文字列
+     * @param string $suffix 削ぎ落とす末尾文字列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
-    public static function str_chop($string, $prefix = null, $suffix = null, $case_insensitivity = false)
+    public static function str_chop($string, $prefix = '', $suffix = '', $case_insensitivity = false)
     {
         $pattern = [];
         if (strlen($prefix)) {
@@ -564,7 +564,7 @@ class Strings implements Interfaces\Strings
      */
     public static function str_lchop($string, $prefix, $case_insensitivity = false)
     {
-        return Strings::str_chop($string, $prefix, null, $case_insensitivity);
+        return Strings::str_chop($string, $prefix, '', $case_insensitivity);
     }
 
     /**
@@ -578,13 +578,13 @@ class Strings implements Interfaces\Strings
      * ```
      *
      * @param string $string 対象文字列
-     * @param ?string $suffix 削ぎ落とす末尾文字列
+     * @param string $suffix 削ぎ落とす末尾文字列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return string 削ぎ落とした文字列
      */
-    public static function str_rchop($string, $suffix = null, $case_insensitivity = false)
+    public static function str_rchop($string, $suffix, $case_insensitivity = false)
     {
-        return Strings::str_chop($string, null, $suffix, $case_insensitivity);
+        return Strings::str_chop($string, '', $suffix, $case_insensitivity);
     }
 
     /**
@@ -994,7 +994,7 @@ class Strings implements Interfaces\Strings
         }
 
         $length = $width - $markerlen;
-        $pos ??= $length / 2;
+        $pos ??= (int) ($length / 2);
         if ($pos < 0) {
             $pos += $length;
         }
@@ -1420,7 +1420,7 @@ class Strings implements Interfaces\Strings
                     '+' => [2 => 'ins'],
                     '-' => [1 => 'del'],
                     '*' => [1 => 'del', 2 => 'ins'],
-                    '=' => [1 => null],
+                    '=' => [1 => ''],
                 ];
                 $result = [];
                 foreach ($diffs as $diff) {
@@ -2928,7 +2928,7 @@ class Strings implements Interfaces\Strings
         ];
         $es5 = Arrays::array_unset($options, Strings::JSON_ES5, false);
         $comma = Arrays::array_unset($options, Strings::JSON_TRAILING_COMMA, false);
-        $comment = Arrays::array_unset($options, Strings::JSON_COMMENT_PREFIX, null);
+        $comment = Arrays::array_unset($options, Strings::JSON_COMMENT_PREFIX, '');
         $depth = Arrays::array_unset($options, Strings::JSON_MAX_DEPTH, 512);
         $indent = Arrays::array_unset($options, Strings::JSON_INDENT, null);
         $closure = Arrays::array_unset($options, Strings::JSON_CLOSURE, false);
@@ -3554,7 +3554,7 @@ class Strings implements Interfaces\Strings
                 $value = constant($value);
                 return true;
             }
-            [$class, $cname] = explode('::', $value, 2) + [1 => null];
+            [$class, $cname] = explode('::', $value, 2) + [1 => ''];
             if (class_exists($class) && strtolower($cname) === 'class') {
                 $value = ltrim($class, '\\');
                 return true;

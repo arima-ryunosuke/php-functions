@@ -488,9 +488,9 @@ class FileSystemTest extends AbstractTestCase
         that((file_pos)($tmpfile, 'xab', 99, -2))->is(false);
         that((file_pos)($tmpfile, 'xab', 99, -3))->is(false);
 
-        that((file_pos)($tmpfile, 'abc', null, null, 3))->is(100);
-        that((file_pos)($tmpfile, 'abc', null, null, 4))->is(100);
-        that((file_pos)($tmpfile, 'abc', null, null, 5))->is(100);
+        that((file_pos)($tmpfile, 'abc', 0, null, 3))->is(100);
+        that((file_pos)($tmpfile, 'abc', 0, null, 4))->is(100);
+        that((file_pos)($tmpfile, 'abc', 0, null, 5))->is(100);
 
         file_put_contents($tmpfile, "0123|4567|89AB|CDEF|GHIJ|KLMN|OPQR|STUV|WXYZ|abcd|efgh|ijkl|mnop|qrst|uvwx|yz");
 
@@ -915,9 +915,9 @@ class FileSystemTest extends AbstractTestCase
         (rm_rf)(sys_get_temp_dir() . '/tmpname', false);
 
         $list = [
-            (tmpname)(null, $wd),
-            (tmpname)(null, $wd),
-            (tmpname)(null, $wd),
+            (tmpname)('', $wd),
+            (tmpname)('', $wd),
+            (tmpname)('', $wd),
         ];
         $files = ((reflect_callable)(tmpname))->getStaticVariables()['files'];
         that(array_keys($files))->is($list);

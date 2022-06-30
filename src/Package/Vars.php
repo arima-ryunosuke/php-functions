@@ -765,7 +765,7 @@ class Vars implements Interfaces\Vars
         @openssl_encrypt('dummy', $cipher, 'password', 0, str_repeat('x', $ivlen), $tag);
         return $cache[$cipher] = [
             'ivlen'  => $ivlen,
-            'taglen' => strlen($tag),
+            'taglen' => strlen($tag ?? ''),
         ];
     }
 
@@ -1026,7 +1026,7 @@ class Vars implements Interfaces\Vars
      * // 無名クラスは継承元の型名を返す（インターフェース実装だけのときはインターフェース名）
      * that(var_type(new class extends \Exception{}))->isSame('\\Exception');
      * that(var_type(new class implements \JsonSerializable{
-     *     public function jsonSerialize() { return ''; }
+     *     public function jsonSerialize(): string { return ''; }
      * }))->isSame('\\JsonSerializable');
      * ```
      *

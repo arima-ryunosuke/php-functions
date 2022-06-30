@@ -603,6 +603,11 @@ class Classobj implements Interfaces\Classobj
                         }
                     }
 
+                    public function __clone()
+                    {
+                        $this->__original = clone $this->__original;
+                    }
+
                     public function __get($name)
                     {
                         if (array_key_exists($name, $this->__fields)) {
@@ -633,7 +638,7 @@ class Classobj implements Interfaces\Classobj
             // @codeCoverageIgnoreEnd
             $sl = $template_reflection->getStartLine();
             $el = $template_reflection->getEndLine();
-            $template_source = implode("", array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1));
+            $template_source = array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1, true);
         }
 
         $getReturnType = function (\ReflectionFunctionAbstract $reffunc) {
@@ -665,7 +670,7 @@ class Classobj implements Interfaces\Classobj
             $rtype = $getReturnType($reffunc);
 
             return [
-                "$modifier function $ref$name($prms)$rtype",
+                "#[\ReturnTypeWillChange]\n$modifier function $ref$name($prms)$rtype",
                 "{ \$return = $ref$receiver(...[$args]);return \$return; }\n",
             ];
         };
@@ -677,11 +682,21 @@ class Classobj implements Interfaces\Classobj
         $classalias = str_replace('\\', '__', $classname);
 
         if (!isset($spawners[$classname])) {
+            $template = $template_source;
+            $template_methods = get_class_methods($template_reflection->getName());
             $refclass = new \ReflectionClass($classname);
             $classmethods = [];
             foreach ($refclass->getMethods() as $method) {
-                if (!$method->isFinal() && !$method->isAbstract() && !in_array($method->getName(), get_class_methods($template_reflection->getName()))) {
-                    $classmethods[$method->name] = $method;
+                if (in_array($method->getName(), $template_methods)) {
+                    if ($method->isFinal()) {
+                        $template_method = $template_reflection->getMethod($method->name);
+                        Arrays::array_unset($template, range($template_method->getStartLine() - 1, $template_method->getEndLine()));
+                    }
+                }
+                else {
+                    if (!$method->isFinal() && !$method->isAbstract()) {
+                        $classmethods[$method->name] = $method;
+                    }
                 }
             }
 
@@ -691,7 +706,7 @@ class Classobj implements Interfaces\Classobj
                 foreach ($classmethods as $name => $method) {
                     $declares .= implode(' ', $parse($name, $method));
                 }
-                $traitcode = "trait X{$classalias}Trait\n{\n{$template_source}{$declares}}";
+                $traitcode = "trait X{$classalias}Trait\n{\n" . implode('', $template) . "{$declares}}";
                 file_put_contents($cachefile, "<?php\n" . $traitcode, LOCK_EX);
             }
 
@@ -740,7 +755,7 @@ class Classobj implements Interfaces\Classobj
             $codeblock = implode('', array_column($tokens, 1));
 
             $prms = implode(', ', $params);
-            $declares .= "$modifier function $ref$name($prms)$rtype $codeblock\n";
+            $declares .= "#[\ReturnTypeWillChange]\n$modifier function $ref$name($prms)$rtype $codeblock\n";
         }
 
         $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
@@ -1067,10 +1082,10 @@ class Classobj implements Interfaces\Classobj
      * ```
      *
      * @param string|object $classname 調べるクラス
-     * @param ?string $constname 調べるクラス定数
+     * @param string $constname 調べるクラス定数
      * @return bool 定数が存在するなら true
      */
-    public static function const_exists($classname, $constname = null)
+    public static function const_exists($classname, $constname = '')
     {
         $colonp = strpos($classname, '::');
         if ($colonp === false && strlen($constname) === 0) {

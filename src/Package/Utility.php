@@ -684,7 +684,8 @@ class Utility implements Interfaces\Utility
                         'end'    => [T_CONSTANT_ENCAPSED_STRING],
                         'offset' => Arrays::last_key($tokens),
                     ]);
-                    $define = trim(json_decode(implode('', array_column($tokens, 1))), '\\');
+                    $cname = substr(implode('', array_column($tokens, 1)), 1, -1);
+                    $define = trim(json_decode("\"$cname\""), '\\');
                     [$ns, $nm] = Strings::namespace_split($define);
                     if (!isset($result[$ns])) {
                         $result[$ns] = [
@@ -999,7 +1000,7 @@ class Utility implements Interfaces\Utility
                 $multiples[$name] = true;
                 $result[$name] = [$result[$name]];
             }
-            if (strlen($key)) {
+            if (strlen($key ?? '')) {
                 $multiples[$name] = true;
                 $result[$name][$key] = $value;
             }
@@ -1517,7 +1518,7 @@ class Utility implements Interfaces\Utility
                 $argsdefaults[$name] = $default;
                 continue;
             }
-            [$longname, $shortname] = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => null];
+            [$longname, $shortname] = preg_split('#\s+#u', $name, -1, PREG_SPLIT_NO_EMPTY) + [1 => ''];
             if (strlen($shortname)) {
                 if (array_key_exists($shortname, $shortmap)) {
                     throw new \InvalidArgumentException("duplicated short option name '$shortname'");

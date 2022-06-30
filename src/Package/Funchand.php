@@ -23,7 +23,7 @@ class Funchand implements Interfaces\Funchand
 
         if (Funchand::reflect_callable($callable)->isInternal()) {
             static $cache = [];
-            $cache[$arity] ??= Syntax::evaluate('return new class()
+            $cache[(string) $arity] ??= Syntax::evaluate('return new class()
             {
                 private $invoker, $callable;
 
@@ -43,7 +43,7 @@ class Funchand implements Interfaces\Funchand
                     return ($this->invoker)($this->callable, func_get_args());
                 }
             };');
-            return $cache[$arity]->spawn($invoker, $callable);
+            return $cache[(string) $arity]->spawn($invoker, $callable);
         }
 
         switch (true) {
@@ -437,7 +437,7 @@ class Funchand implements Interfaces\Funchand
      * ```php
      * class CountClass implements \Countable
      * {
-     *     public function count() {
+     *     public function count(): int {
      *         // count 経由なら 1 を、メソッド経由なら 0 を返す
      *         return (int) by_builtin($this, 'count');
      *     }

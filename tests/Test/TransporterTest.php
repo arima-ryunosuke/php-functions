@@ -76,7 +76,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
 
     function test_exportPackage()
     {
-        that(Transporter::exportPackage(null, __DIR__ . '/Transporter/'))
+        that(Transporter::exportPackage('', __DIR__ . '/Transporter/'))
             ->stringContains('parse_uri')      // file1 が含まれている
             ->stringContains('sql_format')     // file2 が含まれている
             ->stringContains('KEYWORDS')       // file2 に依存している定数が含まれている

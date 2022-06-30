@@ -1,7 +1,5 @@
 <?php
 
-error_reporting(~E_DEPRECATED);
-
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../vendor/ryunosuke/phpunit-extension/inc/bootstrap.php';
 require __DIR__ . '/classes.php';
@@ -25,7 +23,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 
 \ryunosuke\PHPUnit\Actual::generateStub(__DIR__ . '/../src', __DIR__ . '/.stub');
 
-\ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class(null) extends \ryunosuke\PHPUnit\Constraint\Composite {
+\ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class('') extends \ryunosuke\PHPUnit\Constraint\Composite {
     public function __construct($value, bool $ignoreCase = false)
     {
         parent::__construct(new \PHPUnit\Framework\Constraint\IsEqual($this->filter($value), 0.0, 10, $ignoreCase));

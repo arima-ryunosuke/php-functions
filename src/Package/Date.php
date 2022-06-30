@@ -188,14 +188,14 @@ class Date implements Interfaces\Date
                 throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'");
             }
 
-            $y = idate('Y', $timestamp) - idate('Y', $era['since']) + 1;
+            $y = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
             $format = $replace($format, 'J', $era['name']);
             $format = $replace($format, 'b', $era['abbr']);
             $format = $replace($format, 'K', $y === 1 ? '元' : $y);
             $format = $replace($format, 'k', $y);
         }
 
-        $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', $timestamp)]);
+        $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)]);
 
         if (is_float($timestamp)) {
             // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
@@ -242,11 +242,11 @@ class Date implements Interfaces\Date
         [$h, $i, $s] = preg_split('#[^\d]+#u', $time, -1, PREG_SPLIT_NO_EMPTY) + [0 => null, 1 => null, 2 => null];
 
         // "2014/12" と "12/24" の区別はつかないので字数で判断
-        if (strlen($y) <= 2) {
+        if (strlen($y ?? '') <= 2) {
             [$y, $m, $d] = [null, $y, $m];
         }
         // 時刻区切りなし
-        if (strlen($h) > 2) {
+        if (strlen($h ?? '') > 2) {
             [$h, $i, $s] = str_split($h, 2) + [0 => null, 1 => null, 2 => null];
         }
 
@@ -357,13 +357,13 @@ class Date implements Interfaces\Date
         /** @noinspection PhpUndefinedFieldInspection */
         {
             $interval = new \DateInterval('PT1S');
-            $interval->c = $limit < $map['c'] ? 0 : $centurys % 1000;
-            $interval->y = $limit < $map['y'] ? 0 : ($limit === $map['y'] ? $years : $years % 100);
-            $interval->m = $limit < $map['m'] ? 0 : ($limit === $map['m'] ? $months : $months % 12);
-            $interval->d = $limit < $map['d'] ? 0 : ($limit === $map['d'] ? $days : intval(($days * 100000000) % (365 / 12 * 100000000) / 100000000));
-            $interval->h = $limit < $map['h'] ? 0 : ($limit === $map['h'] ? $hours : $hours % 24);
-            $interval->i = $limit < $map['i'] ? 0 : ($limit === $map['i'] ? $minutes : $minutes % 60);
-            $interval->s = $limit < $map['s'] ? 0 : ($limit === $map['s'] ? $seconds : $seconds % 60);
+            $interval->c = $limit < $map['c'] ? 0 : (int) $centurys % 1000;
+            $interval->y = $limit < $map['y'] ? 0 : (int) ($limit === $map['y'] ? $years : (int) $years % 100);
+            $interval->m = $limit < $map['m'] ? 0 : (int) ($limit === $map['m'] ? $months : (int) $months % 12);
+            $interval->d = $limit < $map['d'] ? 0 : (int) ($limit === $map['d'] ? $days : (int) ((int) ($days * 100000000) % (int) (365 / 12 * 100000000) / 100000000));
+            $interval->h = $limit < $map['h'] ? 0 : (int) ($limit === $map['h'] ? $hours : (int) $hours % 24);
+            $interval->i = $limit < $map['i'] ? 0 : (int) ($limit === $map['i'] ? $minutes : (int) $minutes % 60);
+            $interval->s = $limit < $map['s'] ? 0 : (int) ($limit === $map['s'] ? $seconds : (int) $seconds % 60);
             $interval->v = $mills % 1000;
         }
 
@@ -482,7 +482,7 @@ class Date implements Interfaces\Date
      *
      * @param string|int|\DateTimeInterface $datetime 調べる日付
      * @param array $excluded_dates 除外日（いわゆる祝休日リスト）
-     * @param int $follow_count ずらす範囲
+     * @param ?int $follow_count ずらす範囲
      * @param string $format 日付フォーマット（$excluded_dates の形式＋返り値の形式）
      * @return string|null 代替日。除外日 null
      */
@@ -492,7 +492,7 @@ class Date implements Interfaces\Date
         if (!array_key_exists($date = date($format, $timestamp), $excluded_dates)) {
             return $date;
         }
-        if (!strlen($follow_count)) {
+        if ($follow_count === null) {
             return $date;
         }
         $follow_count = (int) $follow_count;

@@ -322,14 +322,14 @@ class StringsTest extends AbstractTestCase
     function test_str_chop()
     {
         that((str_chop)('aaaMMMzzz', 'aaa'))->is("MMMzzz");
-        that((str_chop)('aaaMMMzzz', null, 'zzz'))->is("aaaMMM");
+        that((str_chop)('aaaMMMzzz', '', 'zzz'))->is("aaaMMM");
         that((str_chop)('aaaMMMzzz', 'aaa', 'zzz'))->is("MMM");
         that((str_chop)('aaaMMMzzz', 'aaaa', 'zzzz'))->is("aaaMMMzzz");
         that((str_chop)(' aaaMMMzzz ', 'aaa', 'zzz'))->is(" aaaMMMzzz ");
         that((str_chop)('aaaMMMzzz', 'AAA', 'ZZZ'))->is("aaaMMMzzz");
         that((str_chop)('aaaMMMzzz', 'AAA', 'ZZZ', true))->is("MMM");
         that((str_chop)("\naaazzz", 'aaa'))->is("\naaazzz");
-        that((str_chop)("aaazzz\n", null, 'zzz'))->is("aaazzz\n");
+        that((str_chop)("aaazzz\n", '', 'zzz'))->is("aaazzz\n");
         that((str_chop)("\naaazzz\n", "\n", "\n"))->is("aaazzz");
         that((str_chop)('[#^.\\$]', "[", "]"))->is('#^.\\$');
 
@@ -567,9 +567,9 @@ class StringsTest extends AbstractTestCase
 
         // enclosure も escape もしない単純な場合
         $n = 0;
-        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null))->isSame('first');
-        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null))->isSame('second');
-        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, null, null))->isSame('third\\');
+        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, '', ''))->isSame('first');
+        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, '', ''))->isSame('second');
+        that((str_between)('{first}"{second}"\\{third\\}', '{', '}', $n, '', ''))->isSame('third\\');
 
         // ネストしている場合
         that((str_between)('{nest1{nest2{nest3}}}', '{', '}'))->isSame('nest1{nest2{nest3}}');
@@ -2482,7 +2482,7 @@ z", quote2: "a\\\\nz"');
         that((ltsv_export)(['a' => 'A', 'b' => 'B', 'c' => 'C']))->is("a:A	b:B	c:C");
         that((ltsv_export)(["a\ta" => "a", "b" => "b\tb", "c\\t" => 'C\\C']))->is('a\ta:a	b:b\tb	c\\\\t:C\\\\C');
         that((ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => '%']))->is("a%ta:a	b:b%tb");
-        that((ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => null]))->is("a	a:a	b:b	b");
+        that((ltsv_export)(["a\ta" => "a", "b" => "b\tb"], ['escape' => '']))->is("a	a:a	b:b	b");
 
         that((ltsv_export)(['a' => ['x', 'y'], 'b' => 'B']))->is('a:`["x","y"]`	b:B');
         that((ltsv_export)(['a' => new Concrete('hoge'), 'b' => 'B']))->is('a:hoge	b:B');

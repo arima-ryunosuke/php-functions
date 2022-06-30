@@ -1123,11 +1123,11 @@ class FileSystem implements Interfaces\FileSystem
         }
 
         return [
-            'dirname'      => FileSystem::path_normalize($pathinfo['dirname']),
+            'dirname'      => FileSystem::path_normalize($pathinfo['dirname'] ?? ''),
             'basename'     => $pathinfo['basename'],
             'filename'     => $pathinfo['filename'],
             'extension'    => $pathinfo['extension'],
-            'dirlocalname' => FileSystem::path_normalize($pathinfo['dirname'] . "/$localname"),
+            'dirlocalname' => FileSystem::path_normalize(($pathinfo['dirname'] ?? '') . "/$localname"),
             'localname'    => $localname,
             'extensions'   => $extensions,
         ];
@@ -1392,7 +1392,7 @@ class FileSystem implements Interfaces\FileSystem
                 public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
                 {
                     assert(is_int($options));
-                    assert(!strlen($opened_path));
+                    assert(is_null($opened_path) || !strlen($opened_path));
                     $this->id = parse_url($path, PHP_URL_HOST);
 
                     // t フラグはクソなので実装しない（デフォルトで b フラグとする）

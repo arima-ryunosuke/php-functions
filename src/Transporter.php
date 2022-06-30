@@ -43,7 +43,7 @@ class Transporter
             }
         }
 
-        file_put_contents(__DIR__ . "/../include/global.php", self::exportNamespace(null));
+        file_put_contents(__DIR__ . "/../include/global.php", self::exportNamespace(''));
         file_put_contents(__DIR__ . "/../include/namespace.php", self::exportNamespace(__NAMESPACE__));
     }
 
@@ -72,22 +72,22 @@ class Transporter
     /**
      * グローバルにエクスポートする
      *
-     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param array|string|null $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
     public static function exportGlobal($funcname = null)
     {
-        return self::export(null, $funcname, false);
+        return self::export('', $funcname, false);
     }
 
     /**
      * 名前空間にエクスポートする
      *
      * @param string $namespace 吐き出す名前空間
-     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param array|string|null $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
-    public static function exportNamespace($namespace, $funcname = null)
+    public static function exportNamespace(string $namespace = '', $funcname = null)
     {
         return self::export($namespace, $funcname, false);
     }
@@ -96,10 +96,10 @@ class Transporter
      * 定数のみエクスポートする
      *
      * @param string $namespace 吐き出す名前空間
-     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param array|string|null $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @return string php コード
      */
-    public static function exportPackage($namespace = null, $funcname = null)
+    public static function exportPackage(string $namespace = '', $funcname = null)
     {
         return self::export($namespace, $funcname, true);
     }
@@ -108,11 +108,11 @@ class Transporter
      * 名前空間にエクスポートする
      *
      * @param string $namespace 吐き出す名前空間
-     * @param ?array $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
+     * @param array|string|null $funcname 吐き出す関数名。ファイル名っぽい文字列は中身で検出する
      * @param bool $classmode メソッドモード（内部用）
      * @return string php コード
      */
-    private static function export($namespace, $funcname = null, $classmode = false)
+    private static function export(string $namespace, $funcname = null, bool $classmode = false)
     {
         $ve = function ($v, $nest = 0) { return self::exportVar($v, $nest); };
         $_ = function ($v) { return $v; };
