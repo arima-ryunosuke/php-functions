@@ -28,7 +28,7 @@ class Transporter
                 file_put_contents(__DIR__ . "/Package/Interfaces/$class.php", <<<CONSTS
                 <?php
                 
-                # Don't touch this code. This is auto generated.
+                # Don't touch this interface. This is auto generated.
                 
                 namespace {$_(__NAMESPACE__)}\\Package\\Interfaces;
                 
