@@ -22,6 +22,8 @@ class StringsTest extends AbstractTestCase
         that((concat)('', 'middle', '-suffix'))->isSame('');
         that((concat)('prefix-', '', '-suffix'))->isSame('');
         that((concat)('prefix-', 'middle', ''))->isSame('');
+        that((concat)('null', null))->isSame('');
+        that((concat)(null, 'null'))->isSame('');
     }
 
     function test_split_noempty()
