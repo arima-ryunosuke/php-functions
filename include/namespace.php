@@ -13002,7 +13002,7 @@ if (!isset($excluded_functions["concat"]) && (!function_exists("ryunosuke\\Funct
     {
         $result = '';
         foreach ($variadic as $s) {
-            if (strlen($s) === 0) {
+            if (strlen($s = (string) $s) === 0) {
                 return '';
             }
             $result .= $s;
