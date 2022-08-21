@@ -2057,12 +2057,11 @@ class Strings implements Interfaces\Strings
         $html = static fn($string) => htmlspecialchars($string, ENT_QUOTES);
 
         $build = static function ($selector, $content, $escape) use ($html) {
-            $p = min(Strings::strpos_array($selector, ['#', '.', '[', '{']) ?: [strlen($selector)]);
-            $tag = substr($selector, 0, $p);
+            $attrs = Strings::css_selector($selector);
+            $tag = Arrays::array_unset($attrs, '');
             if (!strlen($tag)) {
                 throw new \InvalidArgumentException('tagname is empty.');
             }
-            $attrs = Strings::css_selector(substr($selector, $p));
             if (isset($attrs['class'])) {
                 $attrs['class'] = implode(' ', $attrs['class']);
             }
@@ -2138,6 +2137,7 @@ class Strings implements Interfaces\Strings
      */
     public static function css_selector($selector)
     {
+        $tag = '';
         $id = '';
         $classes = [];
         $styles = [];
@@ -2152,45 +2152,53 @@ class Strings implements Interfaces\Strings
                 $escaping = $escaping === $char ? null : $char;
             }
 
-            if (!$escaping && $char === '#') {
-                if (strlen($id)) {
-                    throw new \InvalidArgumentException('#id is multiple.');
+            if (!$escaping) {
+                if ($context !== '{' && $context !== '[') {
+                    if ($char === '#') {
+                        if (strlen($id)) {
+                            throw new \InvalidArgumentException('#id is multiple.');
+                        }
+                        $context = $char;
+                        continue;
+                    }
+                    if ($char === '.') {
+                        $context = $char;
+                        $classes[] = '';
+                        continue;
+                    }
                 }
-                $context = $char;
-                continue;
-            }
-            if (!$escaping && $char === '.') {
-                $context = $char;
-                $classes[] = '';
-                continue;
-            }
-            if (!$escaping && $char === '{') {
-                $context = $char;
-                $styles[] = '';
-                continue;
-            }
-            if (!$escaping && $char === ';') {
-                $styles[] = '';
-                continue;
-            }
-            if (!$escaping && $char === '}') {
-                $context = null;
-                continue;
-            }
-            if (!$escaping && $char === '[') {
-                $context = $char;
-                $attrs[] = '';
-                continue;
-            }
-            if (!$escaping && $char === ']') {
-                $context = null;
-                continue;
+                if ($char === '{') {
+                    $context = $char;
+                    $styles[] = '';
+                    continue;
+                }
+                if ($char === ';') {
+                    $styles[] = '';
+                    continue;
+                }
+                if ($char === '}') {
+                    $context = null;
+                    continue;
+                }
+                if ($char === '[') {
+                    $context = $char;
+                    $attrs[] = '';
+                    continue;
+                }
+                if ($char === ']') {
+                    $context = null;
+                    continue;
+                }
             }
 
             if ($char === '\\') {
                 $char = $chars[++$i];
             }
 
+            if ($context === null) {
+                $tag .= $char;
+                continue;
+            }
             if ($context === '#') {
                 $id .= $char;
                 continue;
@@ -2210,6 +2218,9 @@ class Strings implements Interfaces\Strings
         }
 
         $attrkv = [];
+        if (strlen($tag)) {
+            $attrkv[''] = $tag;
+        }
         if (strlen($id)) {
             $attrkv['id'] = $id;
         }

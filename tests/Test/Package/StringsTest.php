@@ -1138,7 +1138,8 @@ ATTRS
 
     function test_css_selector()
     {
-        that((css_selector)('.c1#hoge.c2[target=hoge\[\]][href="http://hoge[]"][hidden][!readonly]{width:123px!important;height:456px;}'))->is([
+        that((css_selector)('tagname.c1#hoge.c2[target=hoge\[\]][href="http://hoge[]"][hidden][!readonly]{color:#123!important;height:45.6em;}'))->is([
+            ''         => 'tagname',
             'id'       => 'hoge',
             'class'    => ['c1', 'c2'],
             'href'     => 'http://hoge[]',
@@ -1146,8 +1147,8 @@ ATTRS
             'hidden'   => true,
             'readonly' => false,
             'style'    => [
-                'width'  => '123px!important',
-                'height' => '456px',
+                'color'  => '#123!important',
+                'height' => '45.6em',
             ],
         ]);
 
