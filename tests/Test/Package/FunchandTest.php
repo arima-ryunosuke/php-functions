@@ -698,6 +698,8 @@ class FunchandTest extends AbstractTestCase
 
     function test_function_parameter()
     {
+        $default = version_compare(PHP_VERSION, 8.0) < 0 ? ' = null' : '';
+
         // reflection
         $params = (function_parameter)((reflect_callable)(function ($a, &$b, $c = 123, &$d = 456, ...$x) { }));
         that($params)->isSame([
@@ -705,7 +707,7 @@ class FunchandTest extends AbstractTestCase
             '&$b' => '&$b',
             '$c'  => '$c = 123',
             '&$d' => '&$d = 456',
-            '$x'  => '...$x',
+            '$x'  => '...$x' . $default,
         ]);
 
         // callable
@@ -715,7 +717,13 @@ class FunchandTest extends AbstractTestCase
             '&$b' => '&$b',
             '$c'  => '$c = 123',
             '&$d' => '&$d = 456',
-            '$x'  => '...$x',
+            '$x'  => '...$x' . $default,
+        ]);
+
+        // reference variadic
+        $params = (function_parameter)(function (&...$args) { });
+        that($params)->isSame([
+            '&$args' => '&...$args' . $default,
         ]);
 
         // type hint

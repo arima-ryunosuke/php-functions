@@ -1085,12 +1085,19 @@ class Funchand implements Interfaces\Funchand
                 $declare .= Classobj::reflect_types($parameter->getType())->getName() . ' ';
             }
 
-            $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+            if ($parameter->isPassedByReference()) {
+                $declare .= '&';
+            }
 
             if ($parameter->isVariadic()) {
-                $declare = '...' . $declare;
+                $declare .= '...';
             }
-            elseif ($parameter->isOptional()) {
+
+            $declare .= '$' . $parameter->getName();
+
+            if ($parameter->isOptional()) {
+                $defval = null;
+
                 // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
                 if ($parameter->isDefaultValueAvailable()) {
                     // 修飾なしでデフォルト定数が使われているとその名前空間で解決してしまうので場合分けが必要
@@ -1098,15 +1105,28 @@ class Funchand implements Interfaces\Funchand
                         $defval = $parameter->getDefaultValueConstantName();
                     }
                     else {
-                        $defval = Vars::var_export2($parameter->getDefaultValue(), true);
+                        $default = $parameter->getDefaultValue();
+                        $defval = Vars::var_export2($default, true);
+                        if (is_string($default)) {
+                            $defval = strtr($defval, [
+                                "\r" => "\\r",
+                                "\n" => "\\n",
+                                "\t" => "\\t",
+                                "\f" => "\\f",
+                                "\v" => "\\v",
+                            ]);
+                        }
                     }
                 }
                 // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
                 // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
-                else {
+                elseif (version_compare(PHP_VERSION, 8.0) < 0) {
                     $defval = 'null';
                 }
-                $declare .= ' = ' . $defval;
+
+                if (isset($defval)) {
+                    $declare .= ' = ' . $defval;
+                }
             }
 
             $name = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
