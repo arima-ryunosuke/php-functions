@@ -55,6 +55,15 @@ if (!function_exists('posix_getgrnam')) {
     function posix_getgrnam() { return ['gid' => 27]; }
 }
 
+// ダミー関数
+function nullsafe_int_func(int $x, int $y)
+{
+    return $x - $y;
+}
+
+// プレースホルダー
+define('_', tmpfile() ?: [] ?: '' ?: 0 ?: null ?: false);
+
 // ファイルシステム系テストで clearstatcache を呼ぶのを忘れて「？？？」となることが多かったのでいっその事 tick を利用して無効化する
 register_tick_function(function () {
     clearstatcache();

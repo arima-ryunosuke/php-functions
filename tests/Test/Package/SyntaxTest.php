@@ -763,6 +763,24 @@ $var3 = function () { return \ArrayObject::class; };
         that($chain())()->wasThrown('nonempty stack and no parameter given');
         that($chain('hoge'))(null)->wasThrown('empty stack and parameter given > 0');
 
+        /** @noinspection PhpUndefinedMethodInspection */
+        {
+            that($chain(6)->nullsafe_int_func(3)())->is(3);
+            that($chain(3)->nullsafe_int_func1(6)())->is(3);
+            that($chain(null)->nullsafe_int_func(6)())->isNull();
+            that($chain(null)->nullsafe_int_func1(3)())->isNull();
+        }
+
+        that($chain('abc')->replace(_, 'XYZ', 'abcdef')())->is('XYZdef');
+        that($chain('XYZ')->replace('abc', _, 'abcdef')())->is('XYZdef');
+        that($chain('abcdef')->replace('abc', 'XYZ', _)())->is('XYZdef');
+
+        // for coverage (under 8.0 is unsupport named arguments)
+        $actual = that($chain('XYZ'))->_apply('str_replace', ['abc', 'subject' => 'abcdef'])();
+        if (version_compare(PHP_VERSION, 8.0) >= 0) {
+            $actual->is('XYZdef');
+        }
+
         // for compatible
         if (get_cfg_var('rfunc.chain_overload')) {
             that($chain('hello')->replace2('l', 'L')())->is('heLLo');

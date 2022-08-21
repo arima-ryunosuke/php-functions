@@ -783,8 +783,11 @@ class Syntax implements Interfaces\Syntax
      *
      * 下記の特殊ルールにより、特殊な呼び出し方ができる。
      *
+     * - nullsafe 設定にすると「値が null の場合は呼び出し自体を行わない」という動作になり null をそのまま返す
      * - array_XXX, str_XXX は省略して XXX で呼び出せる
      *   - 省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う
+     * - func(..., _, ...) で _ で「値があたる位置」を明示できる
+     *   - `str_replace('from', 'to', _)` のように呼び出せる
      * - funcE で eval される文字列のクロージャを呼べる
      *   - 変数名は `$_` 固定だが、 `$_` が無いときに限り 最左に自動付与される
      * - funcP で配列指定オペレータのクロージャを呼べる
@@ -863,6 +866,8 @@ class Syntax implements Interfaces\Syntax
     public static function chain($source = null)
     {
         return new class(...func_get_args()) implements \IteratorAggregate {
+            private static $nullables = [];
+
             private $data;
             private $stack;
 
@@ -938,18 +943,25 @@ class Syntax implements Interfaces\Syntax
                 $isstringable = Vars::is_stringable($this->data);
                 if (false
                     // for global
-                    || (function_exists($fname = $name))
-                    || ($isiterable && function_exists($fname = "array_$name"))
-                    || ($isstringable && function_exists($fname = "str_$name"))
+                    || (is_callable($name, false, $fname))
+                    || ($isiterable && is_callable("array_$name", false, $fname))
+                    || ($isstringable && is_callable("str_$name", false, $fname))
                     // for package
-                    || (defined($cname = $name) && is_callable($fname = constant($cname)))
-                    || ($isiterable && defined($cname = "array_$name") && is_callable($fname = constant($cname)))
-                    || ($isstringable && defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = $name) && is_callable(constant($cname), false, $fname))
+                    || ($isiterable && defined($cname = "array_$name") && is_callable(constant($cname), false, $fname))
+                    || ($isstringable && defined($cname = "str_$name") && is_callable(constant($cname), false, $fname))
                     // for namespace
-                    || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
-                    || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
-                    || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable(constant($cname), false, $fname))
+                    || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable(constant($cname), false, $fname))
+                    || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable(constant($cname), false, $fname))
                 ) {
+                    if (!array_key_exists($fname, self::$nullables)) {
+                        foreach (Funchand::reflect_callable($fname)->getParameters() as $parameter) {
+                            $type = $parameter->getType();
+                            self::$nullables[$fname][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
+                        }
+                    }
+
                     return $fname;
                 }
             }
@@ -968,12 +980,32 @@ class Syntax implements Interfaces\Syntax
 
                 // 実際の呼び出し1: 存在する関数はそのまま移譲する
                 if ($fname = $this->_resolve($name)) {
+                    // for nullsafe call
+                    if ($this->data === null && !(self::$nullables[$fname][0] ?? true)) {
+                        $this->data = null;
+                        return $this;
+                    }
+                    // for placeholder call
+                    if (defined('_') && $placeholders = array_keys($arguments, _, true)) {
+                        $this->data = $fname(...(array_replace($arguments, array_fill_keys($placeholders, $this->data))));
+                        return $this;
+                    }
+                    // for named call
+                    if (Arrays::is_hasharray($arguments)) {
+                        $this->data = $fname(...(Arrays::array_insert($arguments, [$this->data], Arrays::next_key($arguments))));
+                        return $this; // @codeCoverageIgnore
+                    }
                     $this->data = $fname($this->data, ...$arguments);
                     return $this;
                 }
                 // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
                 if (preg_match('#(.+?)(\d+)$#', $name, $match) && $fname = $this->_resolve($match[1])) {
-                    $this->data = $fname(...Arrays::array_insert($arguments, [$this->data], $match[2]));
+                    $position = (int) $match[2];
+                    if ($this->data === null && !(self::$nullables[$fname][$position] ?? true)) {
+                        $this->data = null;
+                        return $this;
+                    }
+                    $this->data = $fname(...Arrays::array_insert($arguments, [$this->data], $position));
                     return $this;
                 }
 
