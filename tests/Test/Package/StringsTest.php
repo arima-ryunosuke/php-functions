@@ -219,6 +219,15 @@ class StringsTest extends AbstractTestCase
         that((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '', ''))->isSame(11);
     }
 
+    function test_str_bytes()
+    {
+        that((str_bytes)('abc'))->isSame([97, 98, 99]);
+        that((str_bytes)('abc', 16))->isSame(["61", "62", "63"]);
+        that((str_bytes)("\x00\x80\xff"))->isSame([0x00, 0x80, 0xff]);
+        that((str_bytes)('あいう', "16"))->isSame(["e3", "81", "82", "e3", "81", "84", "e3", "81", "86"]);
+        that((str_bytes)(mb_convert_encoding('あいう', 'SJIS', 'UTF-8'), "16"))->isSame(["82", "a0", "82", "a2", "82", "a4"]);
+    }
+
     function test_str_chunk()
     {
         that((str_chunk)('abc', 1))->isSame(['a', 'bc']);
