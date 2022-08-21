@@ -3136,6 +3136,7 @@ z", quote2: "a\\\\nz"');
         that((str_common_prefix)('ab', 'ab', 'abc'))->isSame('ab');
         that((str_common_prefix)('abc', 'ab', 'ab'))->isSame('ab');
         that((str_common_prefix)('abc', 'abc', 'abc'))->isSame('abc');
+        that((str_common_prefix)('abcLxyz', 'abcMxyz', 'abcNxyz'))->isSame('abc');
 
         that((str_common_prefix)('x', 'a', 'ab', 'abc'))->isSame('');
         that((str_common_prefix)('', 'a', 'ab', 'abc'))->isSame('');
@@ -3145,6 +3146,7 @@ z", quote2: "a\\\\nz"');
         that((str_common_prefix)('あい', 'あい', 'あいう'))->isSame('あい');
         that((str_common_prefix)('あいう', 'あい', 'あい'))->isSame('あい');
         that((str_common_prefix)('あいう', 'あいう', 'あいう'))->isSame('あいう');
+        that((str_common_prefix)('あいうＸわをん', 'あいうＹわをん', 'あいうＺわをん'))->isSame('あいう');
 
         that((str_common_prefix)('ん', 'あ', 'あい', 'あいう'))->isSame('');
         that((str_common_prefix)('', 'あいう', 'あい', 'あ'))->isSame('');

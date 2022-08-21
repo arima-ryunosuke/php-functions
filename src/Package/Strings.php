@@ -4620,18 +4620,17 @@ class Strings implements Interfaces\Strings
         if (count($strings) < 2) {
             return null;
         }
-        $common = array_shift($strings);
-        foreach ($strings as $string) {
-            for ($i = min(mb_strlen($common), mb_strlen($string)); $i >= 1; $i--) {
-                $part = mb_substr($common, 0, $i);
-                if ($part === mb_substr($string, 0, $i)) {
-                    $common = $part;
-                    continue 2;
-                }
+
+        $n = 0;
+        $result = '';
+        $arrays = array_map(fn($string) => mb_str_split($string), $strings);
+        foreach (array_intersect_assoc(...$arrays) as $i => $c) {
+            if ($i !== $n++) {
+                break;
             }
-            return '';
+            $result .= $c;
         }
-        return $common;
+        return $result;
     }
 
     /**
