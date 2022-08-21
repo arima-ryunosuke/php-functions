@@ -11,6 +11,20 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.5.2
+
+- [change][bin] stub 生成を修正
+- [feature][Arrays] array_rank を追加
+- [feature][Utility] function_configure で様々な挙動を変える機能
+- [feature][Syntax] chain の機能改善
+- [refactor][Strings] str_common_prefix がO(n^2)になっていたのを改善
+- [feature][Strings] str_bytes を追加
+- [feature][Strings] json_import のテンプレートリテラル対応
+- [fixbug][Strings] css_selector の修正
+- [fixbug][Funchand] function_parameter を修正
+- [fixbug][Network] http_request の parser でセミコロンを含むときに呼ばれない不具合を修正
+- [fixbug][Date] date_alter で $format が引き継がれない不具合を修正
+
 ## 1.5.1
 
 - [fixbug][Strings] concat に null が来たときに非推奨エラーになる不具合を修正
