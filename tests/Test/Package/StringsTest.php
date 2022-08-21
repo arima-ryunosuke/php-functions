@@ -2240,6 +2240,20 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
         that((json_import)('12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
         that((json_import)('-12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
 
+        that((json_import)('`
+            1
+              2
+                3
+        `', [JSON_ES5 => true, JSON_TEMPLATE_LITERAL => true]))->is("1\n  2\n    3");
+
+        that((json_import)('`1
+            2
+            3
+        `', [JSON_ES5 => true, JSON_TEMPLATE_LITERAL => true]))->is("1
+            2
+            3
+        ");
+
         that((json_import)(chr(0xC2) . chr(0xA0) . ' 3 ', [JSON_ES5 => true]))->isSame(3);
         that((json_import)(chr(0xA0) . ' 3 ', [JSON_ES5 => true]))->isSame(3);
         that((json_import)('0xff', [JSON_ES5 => true]))->isSame(255);

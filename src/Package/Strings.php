@@ -27,6 +27,8 @@ class Strings implements Interfaces\Strings
     const JSON_TRAILING_COMMA = -103;
     /** json_*** 関数でコメントを判定するプレフィックス定数 */
     const JSON_COMMENT_PREFIX = -104;
+    /** json_*** 関数でテンプレートリテラルを有効にするかの定数 */
+    const JSON_TEMPLATE_LITERAL = -105;
 
     /**
      * 文字列結合の関数版
@@ -3080,6 +3082,9 @@ class Strings implements Interfaces\Strings
      *
      * - JSON_INT_AS_STRING: 常に整数を文字列で返す
      * - JSON_FLOAT_AS_STRING: 常に小数を文字列で返す
+     * - JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる
+     *   - あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない
+     *   - 冒頭のインデントがすべて除去され、最終段階で trim される
      *
      * Example:
      * ```php
@@ -3090,6 +3095,15 @@ class Strings implements Interfaces\Strings
      *
      * // json5 が使える
      * that(json_import('{a: "A", b: "B", }'))->is(['a' => 'A', 'b' => 'B']);
+     *
+     * // テンプレートリテラル
+     * that(json_import('`
+     *     1
+     *     2
+     *     3
+     * `', [
+     *     JSON_TEMPLATE_LITERAL => true,
+     * ]))->is("1\n2\n3");
      * ```
      *
      * @param string $value JSON 文字列
@@ -3099,18 +3113,19 @@ class Strings implements Interfaces\Strings
     public static function json_import($value, $options = [])
     {
         $specials = [
-            JSON_OBJECT_AS_ARRAY          => true, // 個人的嗜好だが連想配列のほうが扱いやすい
-            Strings::JSON_MAX_DEPTH       => 512,
-            Strings::JSON_ES5             => null,
-            Strings::JSON_INT_AS_STRING   => false,
-            Strings::JSON_FLOAT_AS_STRING => false,
+            JSON_OBJECT_AS_ARRAY           => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+            Strings::JSON_MAX_DEPTH        => 512,
+            Strings::JSON_ES5              => null,
+            Strings::JSON_INT_AS_STRING    => false,
+            Strings::JSON_FLOAT_AS_STRING  => false,
+            Strings::JSON_TEMPLATE_LITERAL => false,
         ];
         foreach ($specials as $key => $default) {
             $specials[$key] = $options[$key] ?? $default;
             unset($options[$key]);
         }
         $specials[JSON_BIGINT_AS_STRING] = $options[JSON_BIGINT_AS_STRING] ?? false;
-        if ($specials[Strings::JSON_INT_AS_STRING] || $specials[Strings::JSON_FLOAT_AS_STRING]) {
+        if ($specials[Strings::JSON_INT_AS_STRING] || $specials[Strings::JSON_FLOAT_AS_STRING] || $specials[Strings::JSON_TEMPLATE_LITERAL]) {
             $specials[Strings::JSON_ES5] = true;
         }
 
@@ -3295,12 +3310,16 @@ class Strings implements Interfaces\Strings
                     }
                     return null;
                 };
-                $stringify = function ($token) {
-                    if (strlen($token) > 1 && ($token[0] === '"' || $token[0] === "'")) {
+                $stringify = function ($token) use ($options) {
+                    if (strlen($token) > 1 && ($token[0] === '"' || $token[0] === "'" || ($options[Strings::JSON_TEMPLATE_LITERAL] && $token[0] === "`"))) {
                         if ($token[0] !== $token[-1]) {
                             throw $this->exception("Bad string", $this);
                         }
+                        $quotation = $token[0];
                         $token = substr($token, 1, -1);
+                        if ($quotation === "`" && preg_match('#^\n( +)#u', $token, $match)) {
+                            $token = trim(preg_replace("#^{$match[1]}#um", '', $token));
+                        }
                         $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', function ($m) { return json_decode('"' . $m[0] . '"'); }, $token);
                         $token = strtr($token, [
                             "\\'"    => "'",
