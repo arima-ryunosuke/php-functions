@@ -526,8 +526,8 @@ class Network implements Interfaces\Network
             'cachedir'             => null,
             'parser'               => [
                 'application/json' => [
-                    'request'  => Strings::json_export,
-                    'response' => Strings::json_import,
+                    'request'  => fn($contents) => Strings::json_export($contents),
+                    'response' => fn($contents) => Strings::json_import($contents),
                 ],
             ],
         ];
@@ -552,8 +552,9 @@ class Network implements Interfaces\Network
         });
 
         // request body 変換
-        if ($convert = ($options['parser'][$request_header['content-type'] ?? null]['request'] ?? null)) {
-            $options[CURLOPT_POSTFIELDS] = $convert($options[CURLOPT_POSTFIELDS]);
+        $content_type = Strings::split_noempty(';', $request_header['content-type'] ?? '');
+        if ($convert = ($options['parser'][strtolower($content_type[0] ?? '')]['request'] ?? null)) {
+            $options[CURLOPT_POSTFIELDS] = $convert($options[CURLOPT_POSTFIELDS], ...$content_type);
         }
 
         // response クロージャ
@@ -572,8 +573,9 @@ class Network implements Interfaces\Network
             }
 
             if (!($options[CURLOPT_NOBODY] ?? false)) {
-                if ($convert = ($options['parser'][$info['content_type']]['response'] ?? null)) {
-                    $body = $convert($body);
+                $content_type = Strings::split_noempty(';', $info['content_type'] ?? '');
+                if ($convert = ($options['parser'][strtolower($content_type[0] ?? '')]['response'] ?? null)) {
+                    $body = $convert($body, ...$content_type);
                 }
             }
 

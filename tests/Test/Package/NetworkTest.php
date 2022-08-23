@@ -283,6 +283,24 @@ class NetworkTest extends AbstractTestCase
         that($response['data'])->is('{"x":{"y":{"z":[1,2,3]}}}');
         that($response['json'])->is(['x' => ['y' => ['z' => [1, 2, 3]]]]);
 
+        $response = (http_request)([
+            'url'    => "$server/html",
+            'method' => "GET",
+            'parser' => [
+                'text/html' => [
+                    'response' => function ($contents, $type, $charset) {
+                        that($type)->is('text/html');
+                        that($charset)->is('charset=utf-8');
+                        $dom = new \DOMDocument();
+                        $dom->loadHTML($contents);
+                        return $dom;
+                    },
+                ],
+            ],
+        ]);
+        that($response)->isInstanceOf(\DOMDocument::class);
+
+
         $cookie_file = sys_get_temp_dir() . '/cookie.txt';
         @unlink($cookie_file);
         $response = (http_request)([
