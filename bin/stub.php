@@ -2,36 +2,48 @@
 
 require __DIR__ . '/../include/global.php';
 
-$implode = 'implode';
-$export = function ($value) use (&$export) {
-    return is_array($value)
-        ? '[' . array_sprintf($value, function ($v, $k) use ($export) { return $export($k) . ' => ' . $export($v); }, ', ') . ']'
-        : var_export2($value, true);
-};
+$V = fn($v) => $v;
 
-// 全対象だといくらなんでも多すぎるので拡張で適当に差っ引くルール
+$targetDirectory = __DIR__ . '/../stub';
+rm_rf("$targetDirectory/extenstions");
+@mkdir("$targetDirectory/extenstions");
+
 $targetExtension = [
-    'Core'     => '',
-    'date'     => '',
-    'hash'     => '',
-    'pcre'     => '',
-    'standard' => '',
-    'mbstring' => '',
-    ''         => '',
+    'date'     => [
+        'timezone*',
+    ],
+    'hash'     => [],
+    'pcre'     => [],
+    'standard' => [
+        'chroot',
+        'lchgrp',
+        'lchown',
+        'nl_langinfo',
+        'ob_*',
+        'proc_*',
+        'sapi_*',
+        'socket_*',
+        'stream_*',
+        'strptime',
+    ],
+    'mbstring' => [],
+    'user'     => [],
 ];
 
-/** @var \ReflectionFunction[] $reffuncs */
-/// 対象となる関数を掻き集める必要があるが、数パスかかる
+/** @var \ReflectionFunction[][] $reffuncs */
 
 // 明らかに不要なものは対象外
 $reffuncs = [];
 foreach (get_defined_functions(true) as $type => $functions) {
     foreach ($functions as $funcname) {
-        $reffunc = new \ReflectionFunction($funcname);
+        $reffunc = new ReflectionFunction($funcname);
+        $extension = (string) $reffunc->getExtensionName() ?: 'user';
 
-        // 指定された拡張以外は除外
-        if (!isset($targetExtension[(string) $reffunc->getExtensionName()])) {
-            continue;
+        // 指定された物以外は除外
+        foreach ($targetExtension[$extension] ?? ['*'] as $exclude) {
+            if (fnmatch($exclude, $funcname)) {
+                continue 2;
+            }
         }
         // 名前空間付きは呼びづらいので除外
         if ($reffunc->inNamespace()) {
@@ -45,89 +57,96 @@ foreach (get_defined_functions(true) as $type => $functions) {
         if ($reffunc->returnsReference()) {
             continue;
         }
-        // 参照渡し関数は実質呼べないに等しいので除外
-        foreach ($reffunc->getParameters() as $p) {
-            if ($p->isPassedByReference()) {
-                continue 2;
-            }
+        // 参照渡しだけの関数は実質呼べないに等しいので除外
+        if (array_all($reffunc->getParameters(), fn(ReflectionParameter $p) => $p->isPassedByReference())) {
+            continue;
         }
 
-        $reffuncs[$funcname] = $reffunc;
+        $reffuncs[$extension][$funcname] = $reffunc;
     }
 }
 
-// 特定プレフィックスを除去したエイリアスを追加
-foreach ($reffuncs as $funcname => $reffunc) {
-    foreach (['#^array_#', '#^str_#'] as $regex) {
-        $newname = preg_splice($regex, '', $funcname);
-        if (!isset($reffuncs[$newname])) {
-            $reffuncs[$newname] = $reffunc;
-            break;
+// 特別扱いしてるもの
+$reffuncs['user']['map'] = new class(fn(array $array, ?callable $callback) => null) extends ReflectionFunction {
+    public function getName() { return 'array_map'; }
+};
+
+// ここから本懐。trait を書き出してその trait 名を得る
+$traits = [];
+foreach ($reffuncs as $extension => $funcs) {
+    // 除去やエイリアスで飛び飛びになるので本当の名前でソートする
+    uasort($funcs, function ($a, $b) { return strcmp($a->getName(), $b->getName()); });
+
+    // アノテーション文字列を生成する
+    $anotations = [];
+    foreach ($funcs as $funcname => $reffunc) {
+        $fieldable = $reffunc->getNumberOfRequiredParameters() === 1;
+        $parameters = array_values(function_parameter($reffunc));
+        $hasCallback = array_find($reffunc->getParameters(), function (\ReflectionParameter $p) {
+            // package 内部は型宣言が追いついていないので名前でも判定（型宣言が済んだら不要）
+            return str_exists($p->getName(), ['callable', 'callback']) || str_exists(reflect_types($p->getType()), ['callable', 'Closure']);
+        }, false);
+
+        // エイリアス分生成
+        $aliasname = preg_replace('#^(array_|str_)#', '', $funcname);
+        $callnames = [$funcname];
+        if ($aliasname !== $funcname) {
+            $callnames[] = $aliasname;
         }
-    }
-}
+        foreach ($callnames as $callname) {
+            $anotation = [];
+            $anotation[] = "    /** @see \\{$reffunc->getName()}() */";
 
-// ↑の除去やエイリアスで飛び飛びになるので本当の名前でソートする
-$reffuncs = kvsort($reffuncs, function ($a, $b) { return strcmp($a->name, $b->name); });
-
-// ここから本懐。アノテーション文字列を生成する
-$anotations = [];
-foreach ($reffuncs as $funcname => $reffunc) {
-    $anotations[] = " * @see " . $reffunc->name;
-
-    // 実質引数が1つならフィールド呼び出しが可能
-    if ($reffunc->getNumberOfRequiredParameters() === 1) {
-        $anotations[] = " * @property \ChainObject \$$funcname";
-    }
-
-    // 仮引数文字列を構築
-    $hasCallback = array_find($reffunc->getParameters(), function (\ReflectionParameter $p) {
-        if ($p->hasType()) {
-            $type = $p->getType();
-            if ($type instanceof \ReflectionNamedType && (strpos($type->getName(), 'callable') !== false || strpos($type->getName(), 'Closure') !== false)) {
-                return true;
+            // 実質引数が1つならフィールド呼び出しが可能
+            if ($fieldable) {
+                $anotation[] = "    public self \$$callname;";
             }
-        }
-        // 組み込み関数は大抵の場合 $callback で登録されているようだ（ここは結構な頻度でいじると思う）
-        if (strpos($p->getName(), 'callback') !== false || strpos($p->getName(), 'callable') !== false) {
-            return true;
-        }
-    }, false);
-    $params = array_values(function_parameter($reffunc));
 
-    // callback を受け取る関数なら P, E も登録
-    $funcs = [$funcname];
-    if ($hasCallback) {
-        $funcs[] = "{$funcname}P";
-        $funcs[] = "{$funcname}E";
-    }
-    foreach ($funcs as $f) {
-        for ($i = null, $l = $reffunc->getNumberOfParameters(); $i < $l; $i++) {
-            $args = $params;
-            // 可変引数は5件程度水増しする
-            if ($reffunc->getParameters()[(int) $i]->isVariadic()) {
-                for ($j = $i; $j <= $i + 5; $j++) {
-                    $anotations[] = " * @method   \ChainObject  $f{$j}({$implode(', ', $args)})";
+            // callback を受け取る関数なら P, E も登録
+            $variation = [''];
+            if ($hasCallback) {
+                $variation[] = 'P';
+                $variation[] = 'E';
+            }
+            foreach ($variation as $v) {
+                $anotation[] = "    public function $callname{$v}({$V(implode(', ', $parameters))}): self { }";
+                foreach (range(0, $reffunc->getNumberOfParameters() - 1) as $i) {
+                    $anotation[] = "    public function $callname{$i}{$v}({$V(implode(', ', array_remove($parameters, [$i])))}): self { }";
                 }
-                continue;
             }
-            array_splice($args, $i, 1);
-            $anotations[] = " * @method   \ChainObject  $f{$i}({$implode(', ', $args)})";
+
+            $anotations[] = implode("\n", $anotation) . "\n";
         }
     }
-    $anotations[] = " *";
-}
 
-$vars = [
-    'annotation' => $implode("\n", $anotations),
-];
+    // trait の書き出し（phpstorm がフリーズするので小分けにする）
+    foreach (array_chunk($anotations, 64) as $n => $chunks) {
+        $traitname = "{$extension}_{$n}";
+        $contents = <<<TRAIT
+        <?php
+        {$V('// @' . 'formatter:off')}
+        
+        /**
+         * @noinspection PhpLanguageLevelInspection
+         * @noinspection PhpUnusedParameterInspection
+         * @noinspection PhpUndefinedClassInspection
+         */
+        trait $traitname
+        {
+        {$V(implode("\n", $chunks))}
+        }
+        
+        TRAIT;
+        file_put_contents("$targetDirectory/extenstions/$traitname.php", $contents);
 
-foreach (glob(__DIR__ . '/../stub/*.php') as $phpfile) {
-    $contents = file_get_contents($phpfile);
-    foreach ($vars as $tagname => $tagvalue) {
-        $contents = preg_replace_callback("#(\\{{$tagname}\\})(.+)(\{\/{$tagname}\\})#smu", function ($m) use ($tagvalue) {
-            return "{$m[1]}\n{$tagvalue}\n * {$m[3]}";
-        }, $contents);
+        $traits[] = "    use $traitname;";
     }
-    file_put_contents($phpfile, $contents);
 }
+
+$mainclass = file_get_contents("$targetDirectory/ChainObject.php");
+$mainclass = preg_replace_callback("#(^\s*// \\{annotation\\})(.+)(^\s*// \\{/annotation\\})#smu", fn($m) => <<<USE
+    $m[1]
+    {$V(implode("\n", $traits))}
+    {$m[3]}
+    USE, $mainclass);
+file_put_contents("$targetDirectory/ChainObject.php", $mainclass);
