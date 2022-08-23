@@ -7,6 +7,7 @@ namespace ryunosuke\Functions\Package\Interfaces;
 interface Utility
 {
     # callable constants
+    public const function_configure = ["ryunosuke\\Functions\\Package\\Utility", "function_configure"];
     public const ini_sets           = ["ryunosuke\\Functions\\Package\\Utility", "ini_sets"];
     public const getenvs            = ["ryunosuke\\Functions\\Package\\Utility", "getenvs"];
     public const setenvs            = ["ryunosuke\\Functions\\Package\\Utility", "setenvs"];

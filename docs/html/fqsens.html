@@ -1204,6 +1204,23 @@ that(array_assort(['1', '2', '3'], [
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_rank()">
+                                    ryunosuke\Functions\Package\Arrays::array_rank		</a>	<small>($array, $length, $rankfunction = null) : array</small>
+		</h4>
+	<div class="description"><p>配列をランク付けしてその順番でN件返す</p>
+<p>同ランクはすべて返す。<br />
+つまり $length=10 でも10件以上を返すこともある。</p>
+<p>$length が負数の場合、降順ソートして後ろから取り出す。<br />
+端的に言えば</p>
+<ul>
+<li>正数: 下位N件</li>
+<li>負数: 上位N件</li>
+</ul>
+<p>という動作になる。</p>
+<p>ソートの型は最初の要素で決まる。<br />
+文字列なら SORT_STRING で、違うなら SORT_NUMERIC</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_count()">
                                     ryunosuke\Functions\Package\Arrays::array_count		</a>	<small>($array, $callback, $recursive = false) : int<span class="type-separator"></span><wbr>array</small>
 		</h4>
@@ -4000,6 +4017,11 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
                                     ryunosuke\Functions\Package\Strings::JSON_COMMENT_PREFIX		</a>	</h4>
 	<div class="description"><p>json_*** 関数でコメントを判定するプレフィックス定数</p>
 </div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_TEMPLATE_LITERAL">
+                                    ryunosuke\Functions\Package\Strings::JSON_TEMPLATE_LITERAL		</a>	</h4>
+	<div class="description"><p>json_*** 関数でテンプレートリテラルを有効にするかの定数</p>
+</div>
             	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()">
                                     ryunosuke\Functions\Package\Strings::strcat		</a>	<small>(...$variadic) : string</small>
@@ -4128,6 +4150,21 @@ that(strpos_array('hello world', ['notfound', 'world']))-&gt;isSame([
 that(strpos_quoted('hello "this" is world', 'is'))-&gt;isSame(13);
 // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
 that(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))-&gt;isSame(20);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::str_bytes()">
+                                    ryunosuke\Functions\Package\Strings::str_bytes		</a>	<small>($string, $base = 10) : array</small>
+		</h4>
+	<div class="description"><p>文字列のバイト配列を得る</p>
+<p>$base 引数で基数を変更できる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 10進配列で返す
+that(str_bytes('abc'))-&gt;isSame([97, 98, 99]);
+// 16進配列で返す
+that(str_bytes('abc', 16))-&gt;isSame(["61", "62", "63"]);
+// マルチバイトで余計なことはしない（php としての文字列のバイト配列をそのまま返す）
+that(str_bytes('あいう', 16))-&gt;isSame(["e3", "81", "82", "e3", "81", "84", "e3", "81", "86"]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5027,6 +5064,11 @@ that(json_export(['a' =&gt; 'A', '#comment' =&gt; 'this is comment', 'b' =&gt; '
 <ul>
 <li>JSON_INT_AS_STRING: 常に整数を文字列で返す</li>
 <li>JSON_FLOAT_AS_STRING: 常に小数を文字列で返す</li>
+<li>JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる<ul>
+<li>あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない</li>
+<li>冒頭のインデントがすべて除去され、最終段階で trim される</li>
+</ul>
+</li>
 </ul>
 <p>Example:</p>
 <pre><code class="language-php">// オプションはこのように [定数 =&gt; bool] で渡す。false は指定されていないとみなされる（JSON_MAX_DEPTH 以外）
@@ -5036,6 +5078,15 @@ that(json_import('{"a":"A","b":"B"}', [
 
 // json5 が使える
 that(json_import('{a: "A", b: "B", }'))-&gt;is(['a' =&gt; 'A', 'b' =&gt; 'B']);
+
+// テンプレートリテラル
+that(json_import('`
+    1
+    2
+    3
+`', [
+    JSON_TEMPLATE_LITERAL =&gt; true,
+]))-&gt;is("1\n2\n3");
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5790,8 +5841,13 @@ ChainObject は大抵のグローバル関数がアノテーションされて�
 呼び出しは「第1引数に現在の値が適用」されて実行される（下記の func1 コールで任意の位置に適用されることもできる）。</p>
 <p>下記の特殊ルールにより、特殊な呼び出し方ができる。</p>
 <ul>
+<li>nullsafe 設定にすると「値が null の場合は呼び出し自体を行わない」という動作になり null をそのまま返す</li>
 <li>array_XXX, str_XXX は省略して XXX で呼び出せる<ul>
 <li>省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う</li>
+</ul>
+</li>
+<li>func(..., <em>, ...) で </em> で「値があたる位置」を明示できる<ul>
+<li><code>str_replace('from', 'to', _)</code> のように呼び出せる</li>
 </ul>
 </li>
 <li>funcE で eval される文字列のクロージャを呼べる<ul>
@@ -6093,6 +6149,13 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている
 	<div class="description"><p>汎用的なユーティリティ</p>
 </div>
                 	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::function_configure()">
+                                    ryunosuke\Functions\Package\Utility::function_configure		</a>	<small>($option) : array<span class="type-separator"></span><wbr>string</small>
+		</h4>
+	<div class="description"><p>本ライブラリの設定を行う</p>
+<p>各関数の挙動を変えたり、デフォルトオプションを設定できる。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::ini_sets()">
                                     ryunosuke\Functions\Package\Utility::ini_sets		</a>	<small>($values) : callable</small>
 		</h4>
@@ -6193,7 +6256,7 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cachedir()">
-                                    ryunosuke\Functions\Package\Utility::cachedir		</a>	<small>($dirname = null) : string</small>
+                                    ryunosuke\Functions\Package\Utility::cachedir		</a>	<small>($dirname = null) : void</small>
 		</h4>
 	<div class="description"><p>本ライブラリで使用するキャッシュディレクトリを設定する</p>
 </div>

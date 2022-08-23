@@ -62,6 +62,7 @@ interface Arrays
     public const array_depth          = ["ryunosuke\\Functions\\Package\\Arrays", "array_depth"];
     public const array_insert         = ["ryunosuke\\Functions\\Package\\Arrays", "array_insert"];
     public const array_assort         = ["ryunosuke\\Functions\\Package\\Arrays", "array_assort"];
+    public const array_rank           = ["ryunosuke\\Functions\\Package\\Arrays", "array_rank"];
     public const array_count          = ["ryunosuke\\Functions\\Package\\Arrays", "array_count"];
     public const array_group          = ["ryunosuke\\Functions\\Package\\Arrays", "array_group"];
     public const array_aggregate      = ["ryunosuke\\Functions\\Package\\Arrays", "array_aggregate"];

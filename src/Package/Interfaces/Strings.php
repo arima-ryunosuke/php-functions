@@ -15,6 +15,7 @@ interface Strings
     public const strrstr             = ["ryunosuke\\Functions\\Package\\Strings", "strrstr"];
     public const strpos_array        = ["ryunosuke\\Functions\\Package\\Strings", "strpos_array"];
     public const strpos_quoted       = ["ryunosuke\\Functions\\Package\\Strings", "strpos_quoted"];
+    public const str_bytes           = ["ryunosuke\\Functions\\Package\\Strings", "str_bytes"];
     public const str_chunk           = ["ryunosuke\\Functions\\Package\\Strings", "str_chunk"];
     public const str_anyof           = ["ryunosuke\\Functions\\Package\\Strings", "str_anyof"];
     public const str_equals          = ["ryunosuke\\Functions\\Package\\Strings", "str_equals"];

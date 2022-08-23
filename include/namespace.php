@@ -730,6 +730,11 @@ if (!defined("ryunosuke\\Functions\\JSON_COMMENT_PREFIX")) {
     define("ryunosuke\\Functions\\JSON_COMMENT_PREFIX", -104);
 }
 
+if (!defined("ryunosuke\\Functions\\JSON_TEMPLATE_LITERAL")) {
+    /** json_*** 関数でテンプレートリテラルを有効にするかの定数 */
+    define("ryunosuke\\Functions\\JSON_TEMPLATE_LITERAL", -105);
+}
+
 if (!defined("ryunosuke\\Functions\\TOKEN_NAME")) {
     /** parse_php 関数でトークン名変換をするか */
     define("ryunosuke\\Functions\\TOKEN_NAME", 2);
@@ -3780,6 +3785,77 @@ if (function_exists("ryunosuke\\Functions\\array_assort") && !defined("ryunosuke
     define("ryunosuke\\Functions\\array_assort", "ryunosuke\\Functions\\array_assort");
 }
 
+if (!isset($excluded_functions["array_rank"]) && (!function_exists("ryunosuke\\Functions\\array_rank") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_rank"))->isInternal()))) {
+    /**
+     * 配列をランク付けしてその順番でN件返す
+     *
+     * 同ランクはすべて返す。
+     * つまり $length=10 でも10件以上を返すこともある。
+     *
+     * $length が負数の場合、降順ソートして後ろから取り出す。
+     * 端的に言えば
+     *
+     * - 正数: 下位N件
+     * - 負数: 上位N件
+     *
+     * という動作になる。
+     *
+     * ソートの型は最初の要素で決まる。
+     * 文字列なら SORT_STRING で、違うなら SORT_NUMERIC
+     *
+     * @param iterable $array 対象配列
+     * @param int $length 取り出す件数
+     * @param ?callable $rankfunction ランク付けクロージャ
+     * @return array 上位N件の配列
+     */
+    function array_rank($array, $length, $rankfunction = null)
+    {
+        $array = arrayval($array, false);
+
+        $ranks = $array;
+        if ($rankfunction !== null) {
+            $n = 0;
+            foreach ($ranks as $k => $v) {
+                $ranks[$k] = $rankfunction($v, $k, $n++);
+            }
+        }
+
+        $type = null;
+        $buckets = [];
+        foreach ($ranks as $k => $v) {
+            if (!isset($type)) {
+                $type = gettype($v);
+            }
+            $buckets[$v][$k] = $array[$k];
+        }
+
+        if ($length < 0) {
+            $length = -$length;
+            krsort($buckets, $type === 'string' ? SORT_STRING : SORT_NUMERIC);
+        }
+        else {
+            ksort($buckets, $type === 'string' ? SORT_STRING : SORT_NUMERIC);
+        }
+
+        $result = [];
+        foreach ($buckets as $bucket) {
+            if (count($result) >= $length) {
+                break;
+            }
+            foreach ($bucket as $k => $v) {
+                $result[$k] = $v;
+            }
+        }
+        return $result;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\array_rank") && !defined("ryunosuke\\Functions\\array_rank")) {
+    /**
+     *
+     */
+    define("ryunosuke\\Functions\\array_rank", "ryunosuke\\Functions\\array_rank");
+}
+
 if (!isset($excluded_functions["array_count"]) && (!function_exists("ryunosuke\\Functions\\array_count") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\array_count"))->isInternal()))) {
     /**
      * 配列をコールバックに従ってカウントする
@@ -6345,7 +6421,7 @@ if (!isset($excluded_functions["class_replace"]) && (!function_exists("ryunosuke
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
         $classfile = class_loader()->findFile($class);
-        $fname = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
+        $fname = function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
         if (!file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
@@ -6635,7 +6711,7 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
                 }
             }
 
-            $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            $cachefile = function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
             if (!file_exists($cachefile)) {
                 $declares = "";
                 foreach ($classmethods as $name => $method) {
@@ -7777,10 +7853,10 @@ if (!isset($excluded_functions["date_alter"]) && (!function_exists("ryunosuke\\F
         }
         $follow_count = (int) $follow_count;
         if ($follow_count < 0) {
-            return date_alter($timestamp - 24 * 3600, $excluded_dates, $follow_count + 1);
+            return date_alter($timestamp - 24 * 3600, $excluded_dates, $follow_count + 1, $format);
         }
         if ($follow_count > 0) {
-            return date_alter($timestamp + 24 * 3600, $excluded_dates, $follow_count - 1);
+            return date_alter($timestamp + 24 * 3600, $excluded_dates, $follow_count - 1, $format);
         }
         return null;
     }
@@ -9232,7 +9308,7 @@ if (!isset($excluded_functions["tmpname"]) && (!function_exists("ryunosuke\\Func
     function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
-        $dir = $dir ?: cachedir();
+        $dir = $dir ?: function_configure('cachedir');
         $tempfile = tempnam($dir, $prefix);
 
         // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？
@@ -9304,7 +9380,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
     {
         static $STREAM_NAME, $registered = false;
         if (!$registered) {
-            $STREAM_NAME = $STREAM_NAME ?: get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000';
+            $STREAM_NAME = $STREAM_NAME ?: function_configure('memory_stream');
             if (in_array($STREAM_NAME, stream_get_wrappers())) {
                 throw new \DomainException("$STREAM_NAME is registered already.");
             }
@@ -10830,7 +10906,7 @@ if (!isset($excluded_functions["function_alias"]) && (!function_exists("ryunosuk
         }
 
         // キャッシュ指定有りなら読み込むだけで eval しない
-        $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
+        $cachefile = function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
         if (!file_exists($cachefile)) {
             $parts = explode('\\', ltrim($alias, '\\'));
             $reference = $ref->returnsReference() ? '&' : '';
@@ -10890,12 +10966,19 @@ if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryun
                 $declare .= reflect_types($parameter->getType())->getName() . ' ';
             }
 
-            $declare .= ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
+            if ($parameter->isPassedByReference()) {
+                $declare .= '&';
+            }
 
             if ($parameter->isVariadic()) {
-                $declare = '...' . $declare;
+                $declare .= '...';
             }
-            elseif ($parameter->isOptional()) {
+
+            $declare .= '$' . $parameter->getName();
+
+            if ($parameter->isOptional()) {
+                $defval = null;
+
                 // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
                 if ($parameter->isDefaultValueAvailable()) {
                     // 修飾なしでデフォルト定数が使われているとその名前空間で解決してしまうので場合分けが必要
@@ -10903,15 +10986,28 @@ if (!isset($excluded_functions["function_parameter"]) && (!function_exists("ryun
                         $defval = $parameter->getDefaultValueConstantName();
                     }
                     else {
-                        $defval = var_export2($parameter->getDefaultValue(), true);
+                        $default = $parameter->getDefaultValue();
+                        $defval = var_export2($default, true);
+                        if (is_string($default)) {
+                            $defval = strtr($defval, [
+                                "\r" => "\\r",
+                                "\n" => "\\n",
+                                "\t" => "\\t",
+                                "\f" => "\\f",
+                                "\v" => "\\v",
+                            ]);
+                        }
                     }
                 }
                 // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
                 // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
-                else {
+                elseif (version_compare(PHP_VERSION, 8.0) < 0) {
                     $defval = 'null';
                 }
-                $declare .= ' = ' . $defval;
+
+                if (isset($defval)) {
+                    $declare .= ' = ' . $defval;
+                }
             }
 
             $name = ($parameter->isPassedByReference() ? '&' : '') . '$' . $parameter->getName();
@@ -12027,8 +12123,8 @@ if (!isset($excluded_functions["http_request"]) && (!function_exists("ryunosuke\
             'cachedir'             => null,
             'parser'               => [
                 'application/json' => [
-                    'request'  => json_export,
-                    'response' => json_import,
+                    'request'  => fn($contents) => json_export($contents),
+                    'response' => fn($contents) => json_import($contents),
                 ],
             ],
         ];
@@ -12053,8 +12149,9 @@ if (!isset($excluded_functions["http_request"]) && (!function_exists("ryunosuke\
         });
 
         // request body 変換
-        if ($convert = ($options['parser'][$request_header['content-type'] ?? null]['request'] ?? null)) {
-            $options[CURLOPT_POSTFIELDS] = $convert($options[CURLOPT_POSTFIELDS]);
+        $content_type = split_noempty(';', $request_header['content-type'] ?? '');
+        if ($convert = ($options['parser'][strtolower($content_type[0] ?? '')]['request'] ?? null)) {
+            $options[CURLOPT_POSTFIELDS] = $convert($options[CURLOPT_POSTFIELDS], ...$content_type);
         }
 
         // response クロージャ
@@ -12073,8 +12170,9 @@ if (!isset($excluded_functions["http_request"]) && (!function_exists("ryunosuke\
             }
 
             if (!($options[CURLOPT_NOBODY] ?? false)) {
-                if ($convert = ($options['parser'][$info['content_type']]['response'] ?? null)) {
-                    $body = $convert($body);
+                $content_type = split_noempty(';', $info['content_type'] ?? '');
+                if ($convert = ($options['parser'][strtolower($content_type[0] ?? '')]['response'] ?? null)) {
+                    $body = $convert($body, ...$content_type);
                 }
             }
 
@@ -13352,6 +13450,50 @@ if (function_exists("ryunosuke\\Functions\\strpos_quoted") && !defined("ryunosuk
      *
      */
     define("ryunosuke\\Functions\\strpos_quoted", "ryunosuke\\Functions\\strpos_quoted");
+}
+
+if (!isset($excluded_functions["str_bytes"]) && (!function_exists("ryunosuke\\Functions\\str_bytes") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_bytes"))->isInternal()))) {
+    /**
+     * 文字列のバイト配列を得る
+     *
+     * $base 引数で基数を変更できる。
+     *
+     * Example:
+     * ```php
+     * // 10進配列で返す
+     * that(str_bytes('abc'))->isSame([97, 98, 99]);
+     * // 16進配列で返す
+     * that(str_bytes('abc', 16))->isSame(["61", "62", "63"]);
+     * // マルチバイトで余計なことはしない（php としての文字列のバイト配列をそのまま返す）
+     * that(str_bytes('あいう', 16))->isSame(["e3", "81", "82", "e3", "81", "84", "e3", "81", "86"]);
+     * ```
+     *
+     * @param string $string 対象文字列
+     * @param int $base 基数
+     * @return array 文字のバイト配列
+     */
+    function str_bytes($string, $base = 10)
+    {
+        // return array_values(unpack('C*', $string));
+
+        $base = intval($base);
+        $strlen = strlen($string);
+        $result = [];
+        for ($i = 0; $i < $strlen; $i++) {
+            $ord = ord($string[$i]);
+            if ($base !== 10) {
+                $ord = base_convert($ord, 10, $base);
+            }
+            $result[] = $ord;
+        }
+        return $result;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\str_bytes") && !defined("ryunosuke\\Functions\\str_bytes")) {
+    /**
+     *
+     */
+    define("ryunosuke\\Functions\\str_bytes", "ryunosuke\\Functions\\str_bytes");
 }
 
 if (!isset($excluded_functions["str_chunk"]) && (!function_exists("ryunosuke\\Functions\\str_chunk") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\str_chunk"))->isInternal()))) {
@@ -15234,12 +15376,11 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("ryunosuke\\Func
         $html = static fn($string) => htmlspecialchars($string, ENT_QUOTES);
 
         $build = static function ($selector, $content, $escape) use ($html) {
-            $p = min(strpos_array($selector, ['#', '.', '[', '{']) ?: [strlen($selector)]);
-            $tag = substr($selector, 0, $p);
+            $attrs = css_selector($selector);
+            $tag = array_unset($attrs, '');
             if (!strlen($tag)) {
                 throw new \InvalidArgumentException('tagname is empty.');
             }
-            $attrs = css_selector(substr($selector, $p));
             if (isset($attrs['class'])) {
                 $attrs['class'] = implode(' ', $attrs['class']);
             }
@@ -15323,6 +15464,7 @@ if (!isset($excluded_functions["css_selector"]) && (!function_exists("ryunosuke\
      */
     function css_selector($selector)
     {
+        $tag = '';
         $id = '';
         $classes = [];
         $styles = [];
@@ -15337,45 +15479,53 @@ if (!isset($excluded_functions["css_selector"]) && (!function_exists("ryunosuke\
                 $escaping = $escaping === $char ? null : $char;
             }
 
-            if (!$escaping && $char === '#') {
-                if (strlen($id)) {
-                    throw new \InvalidArgumentException('#id is multiple.');
+            if (!$escaping) {
+                if ($context !== '{' && $context !== '[') {
+                    if ($char === '#') {
+                        if (strlen($id)) {
+                            throw new \InvalidArgumentException('#id is multiple.');
+                        }
+                        $context = $char;
+                        continue;
+                    }
+                    if ($char === '.') {
+                        $context = $char;
+                        $classes[] = '';
+                        continue;
+                    }
                 }
-                $context = $char;
-                continue;
-            }
-            if (!$escaping && $char === '.') {
-                $context = $char;
-                $classes[] = '';
-                continue;
-            }
-            if (!$escaping && $char === '{') {
-                $context = $char;
-                $styles[] = '';
-                continue;
-            }
-            if (!$escaping && $char === ';') {
-                $styles[] = '';
-                continue;
-            }
-            if (!$escaping && $char === '}') {
-                $context = null;
-                continue;
-            }
-            if (!$escaping && $char === '[') {
-                $context = $char;
-                $attrs[] = '';
-                continue;
-            }
-            if (!$escaping && $char === ']') {
-                $context = null;
-                continue;
+                if ($char === '{') {
+                    $context = $char;
+                    $styles[] = '';
+                    continue;
+                }
+                if ($char === ';') {
+                    $styles[] = '';
+                    continue;
+                }
+                if ($char === '}') {
+                    $context = null;
+                    continue;
+                }
+                if ($char === '[') {
+                    $context = $char;
+                    $attrs[] = '';
+                    continue;
+                }
+                if ($char === ']') {
+                    $context = null;
+                    continue;
+                }
             }
 
             if ($char === '\\') {
                 $char = $chars[++$i];
             }
 
+            if ($context === null) {
+                $tag .= $char;
+                continue;
+            }
             if ($context === '#') {
                 $id .= $char;
                 continue;
@@ -15395,6 +15545,9 @@ if (!isset($excluded_functions["css_selector"]) && (!function_exists("ryunosuke\
         }
 
         $attrkv = [];
+        if (strlen($tag)) {
+            $attrkv[''] = $tag;
+        }
         if (strlen($id)) {
             $attrkv['id'] = $id;
         }
@@ -16334,6 +16487,9 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
      *
      * - JSON_INT_AS_STRING: 常に整数を文字列で返す
      * - JSON_FLOAT_AS_STRING: 常に小数を文字列で返す
+     * - JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる
+     *   - あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない
+     *   - 冒頭のインデントがすべて除去され、最終段階で trim される
      *
      * Example:
      * ```php
@@ -16344,6 +16500,15 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
      *
      * // json5 が使える
      * that(json_import('{a: "A", b: "B", }'))->is(['a' => 'A', 'b' => 'B']);
+     *
+     * // テンプレートリテラル
+     * that(json_import('`
+     *     1
+     *     2
+     *     3
+     * `', [
+     *     JSON_TEMPLATE_LITERAL => true,
+     * ]))->is("1\n2\n3");
      * ```
      *
      * @param string $value JSON 文字列
@@ -16353,18 +16518,19 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
     function json_import($value, $options = [])
     {
         $specials = [
-            JSON_OBJECT_AS_ARRAY          => true, // 個人的嗜好だが連想配列のほうが扱いやすい
-            JSON_MAX_DEPTH       => 512,
-            JSON_ES5             => null,
-            JSON_INT_AS_STRING   => false,
-            JSON_FLOAT_AS_STRING => false,
+            JSON_OBJECT_AS_ARRAY           => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+            JSON_MAX_DEPTH        => 512,
+            JSON_ES5              => null,
+            JSON_INT_AS_STRING    => false,
+            JSON_FLOAT_AS_STRING  => false,
+            JSON_TEMPLATE_LITERAL => false,
         ];
         foreach ($specials as $key => $default) {
             $specials[$key] = $options[$key] ?? $default;
             unset($options[$key]);
         }
         $specials[JSON_BIGINT_AS_STRING] = $options[JSON_BIGINT_AS_STRING] ?? false;
-        if ($specials[JSON_INT_AS_STRING] || $specials[JSON_FLOAT_AS_STRING]) {
+        if ($specials[JSON_INT_AS_STRING] || $specials[JSON_FLOAT_AS_STRING] || $specials[JSON_TEMPLATE_LITERAL]) {
             $specials[JSON_ES5] = true;
         }
 
@@ -16549,12 +16715,16 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("ryunosuke\\
                     }
                     return null;
                 };
-                $stringify = function ($token) {
-                    if (strlen($token) > 1 && ($token[0] === '"' || $token[0] === "'")) {
+                $stringify = function ($token) use ($options) {
+                    if (strlen($token) > 1 && ($token[0] === '"' || $token[0] === "'" || ($options[JSON_TEMPLATE_LITERAL] && $token[0] === "`"))) {
                         if ($token[0] !== $token[-1]) {
                             throw $this->exception("Bad string", $this);
                         }
+                        $quotation = $token[0];
                         $token = substr($token, 1, -1);
+                        if ($quotation === "`" && preg_match('#^\n( +)#u', $token, $match)) {
+                            $token = trim(preg_replace("#^{$match[1]}#um", '', $token));
+                        }
                         $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', function ($m) { return json_decode('"' . $m[0] . '"'); }, $token);
                         $token = strtr($token, [
                             "\\'"    => "'",
@@ -17963,18 +18133,17 @@ if (!isset($excluded_functions["str_common_prefix"]) && (!function_exists("ryuno
         if (count($strings) < 2) {
             return null;
         }
-        $common = array_shift($strings);
-        foreach ($strings as $string) {
-            for ($i = min(mb_strlen($common), mb_strlen($string)); $i >= 1; $i--) {
-                $part = mb_substr($common, 0, $i);
-                if ($part === mb_substr($string, 0, $i)) {
-                    $common = $part;
-                    continue 2;
-                }
+
+        $n = 0;
+        $result = '';
+        $arrays = array_map(fn($string) => mb_str_split($string), $strings);
+        foreach (array_intersect_assoc(...$arrays) as $i => $c) {
+            if ($i !== $n++) {
+                break;
             }
-            return '';
+            $result .= $c;
         }
-        return $common;
+        return $result;
     }
 }
 if (function_exists("ryunosuke\\Functions\\str_common_prefix") && !defined("ryunosuke\\Functions\\str_common_prefix")) {
@@ -18488,7 +18657,7 @@ if (!isset($excluded_functions["evaluate"]) && (!function_exists("ryunosuke\\Fun
     {
         $cachefile = null;
         if ($cachesize && strlen($phpcode) >= $cachesize) {
-            $cachefile = cachedir() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+            $cachefile = function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
             if (!file_exists($cachefile)) {
                 file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
             }
@@ -19277,8 +19446,11 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
      *
      * 下記の特殊ルールにより、特殊な呼び出し方ができる。
      *
+     * - nullsafe 設定にすると「値が null の場合は呼び出し自体を行わない」という動作になり null をそのまま返す
      * - array_XXX, str_XXX は省略して XXX で呼び出せる
      *   - 省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う
+     * - func(..., _, ...) で _ で「値があたる位置」を明示できる
+     *   - `str_replace('from', 'to', _)` のように呼び出せる
      * - funcE で eval される文字列のクロージャを呼べる
      *   - 変数名は `$_` 固定だが、 `$_` が無いときに限り 最左に自動付与される
      * - funcP で配列指定オペレータのクロージャを呼べる
@@ -19357,6 +19529,8 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
     function chain($source = null)
     {
         return new class(...func_get_args()) implements \IteratorAggregate {
+            private static $nullables = [];
+
             private $data;
             private $stack;
 
@@ -19432,18 +19606,27 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
                 $isstringable = is_stringable($this->data);
                 if (false
                     // for global
-                    || (function_exists($fname = $name))
-                    || ($isiterable && function_exists($fname = "array_$name"))
-                    || ($isstringable && function_exists($fname = "str_$name"))
+                    || (is_callable($name, false, $fname))
+                    || ($isiterable && is_callable("array_$name", false, $fname))
+                    || ($isstringable && is_callable("str_$name", false, $fname))
                     // for package
-                    || (defined($cname = $name) && is_callable($fname = constant($cname)))
-                    || ($isiterable && defined($cname = "array_$name") && is_callable($fname = constant($cname)))
-                    || ($isstringable && defined($cname = "str_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = $name) && is_callable(constant($cname), false, $fname))
+                    || ($isiterable && defined($cname = "array_$name") && is_callable(constant($cname), false, $fname))
+                    || ($isstringable && defined($cname = "str_$name") && is_callable(constant($cname), false, $fname))
                     // for namespace
-                    || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable($fname = constant($cname)))
-                    || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable($fname = constant($cname)))
-                    || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable($fname = constant($cname)))
+                    || (defined($cname = __NAMESPACE__ . "\\$name") && is_callable(constant($cname), false, $fname))
+                    || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable(constant($cname), false, $fname))
+                    || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable(constant($cname), false, $fname))
                 ) {
+                    if (function_configure('chain.nullsafe')) {
+                        if (!array_key_exists($fname, self::$nullables)) {
+                            foreach (reflect_callable($fname)->getParameters() as $parameter) {
+                                $type = $parameter->getType();
+                                self::$nullables[$fname][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
+                            }
+                        }
+                    }
+
                     return $fname;
                 }
             }
@@ -19462,12 +19645,32 @@ if (!isset($excluded_functions["chain"]) && (!function_exists("ryunosuke\\Functi
 
                 // 実際の呼び出し1: 存在する関数はそのまま移譲する
                 if ($fname = $this->_resolve($name)) {
+                    // for nullsafe call
+                    if ($this->data === null && !(self::$nullables[$fname][0] ?? true)) {
+                        $this->data = null;
+                        return $this;
+                    }
+                    // for placeholder call
+                    if (($placeholder = function_configure('placeholder')) && $placeholders = array_keys($arguments, constant($placeholder), true)) {
+                        $this->data = $fname(...(array_replace($arguments, array_fill_keys($placeholders, $this->data))));
+                        return $this;
+                    }
+                    // for named call
+                    if (is_hasharray($arguments)) {
+                        $this->data = $fname(...(array_insert($arguments, [$this->data], next_key($arguments))));
+                        return $this; // @codeCoverageIgnore
+                    }
                     $this->data = $fname($this->data, ...$arguments);
                     return $this;
                 }
                 // 実際の呼び出し2: 数値で終わる呼び出しは引数埋め込み位置を指定して移譲する
                 if (preg_match('#(.+?)(\d+)$#', $name, $match) && $fname = $this->_resolve($match[1])) {
-                    $this->data = $fname(...array_insert($arguments, [$this->data], $match[2]));
+                    $position = (int) $match[2];
+                    if ($this->data === null && !(self::$nullables[$fname][$position] ?? true)) {
+                        $this->data = null;
+                        return $this;
+                    }
+                    $this->data = $fname(...array_insert($arguments, [$this->data], $position));
                     return $this;
                 }
 
@@ -19994,6 +20197,83 @@ if (function_exists("ryunosuke\\Functions\\try_catch_finally") && !defined("ryun
     define("ryunosuke\\Functions\\try_catch_finally", "ryunosuke\\Functions\\try_catch_finally");
 }
 
+if (!isset($excluded_functions["function_configure"]) && (!function_exists("ryunosuke\\Functions\\function_configure") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\function_configure"))->isInternal()))) {
+    /**
+     * 本ライブラリの設定を行う
+     *
+     * 各関数の挙動を変えたり、デフォルトオプションを設定できる。
+     *
+     * @param array|string $option 設定。文字列指定時はその値を返す
+     * @return array|string 設定値
+     */
+    function function_configure($option)
+    {
+        static $config = [];
+
+        // default
+        $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
+        $config['placeholder'] ??= '';
+        $config['var_stream'] ??= get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';          // for compatible
+        $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
+        $config['chain.nullsafe'] ??= false;
+
+        // setting
+        if (is_array($option)) {
+            foreach ($option as $name => $entry) {
+                $option[$name] = $config[$name] ?? null;
+                switch ($name) {
+                    default:
+                        $config[$name] = $entry;
+                        break;
+                    case 'cachedir':
+                        $entry ??= $config[$name];
+                        if (!file_exists($entry)) {
+                            @mkdir($entry, 0777 & (~umask()), true);
+                        }
+                        $config[$name] = realpath($entry);
+                        break;
+                    case 'placeholder':
+                        if (strlen($entry)) {
+                            $entry = ltrim($entry[0] === '\\' ? $entry : __NAMESPACE__ . '\\' . $entry, '\\');
+                            if (!defined($entry)) {
+                                define($entry, tmpfile() ?: [] ?: '' ?: 0.0 ?: null ?: false);
+                            }
+                            if (!is_resource(constant($entry))) {
+                                // もしリソースじゃないと一意性が保てず致命的になるので例外を投げる
+                                throw new \RuntimeException('placeholder is not resource'); // @codeCoverageIgnore
+                            }
+                            $config[$name] = $entry;
+                        }
+                        break;
+                }
+            }
+            return $option;
+        }
+
+        // getting
+        if (is_string($option)) {
+            switch ($option) {
+                default:
+                    return $config[$option] ?? null;
+                case 'cachedir':
+                    $dirname = $config[$option];
+                    if (!file_exists($dirname)) {
+                        @mkdir($dirname, 0777 & (~umask()), true); // @codeCoverageIgnore
+                    }
+                    return realpath($dirname);
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('$option is unknown type(%s)', gettype($option)));
+    }
+}
+if (function_exists("ryunosuke\\Functions\\function_configure") && !defined("ryunosuke\\Functions\\function_configure")) {
+    /**
+     *
+     */
+    define("ryunosuke\\Functions\\function_configure", "ryunosuke\\Functions\\function_configure");
+}
+
 if (!isset($excluded_functions["ini_sets"]) && (!function_exists("ryunosuke\\Functions\\ini_sets") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\ini_sets"))->isInternal()))) {
     /**
      * 複数の php.ini の設定をまとめて設定する
@@ -20442,32 +20722,16 @@ if (!isset($excluded_functions["cachedir"]) && (!function_exists("ryunosuke\\Fun
     /**
      * 本ライブラリで使用するキャッシュディレクトリを設定する
      *
-     * @param string|null $dirname キャッシュディレクトリ。省略時は返すのみ
-     * @return string 設定前のキャッシュディレクトリ
+     * @deprecated use function_configure
      */
     function cachedir($dirname = null)
     {
-        static $cachedir;
-        if ($cachedir === null) {
-            $cachedir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
-            cachedir($cachedir); // for mkdir
-        }
-
-        if ($dirname === null) {
-            return $cachedir;
-        }
-
-        if (!file_exists($dirname)) {
-            @mkdir($dirname, 0777 & (~umask()), true);
-        }
-        $result = $cachedir;
-        $cachedir = realpath($dirname);
-        return $result;
+        return function_configure(['cachedir' => $dirname])['cachedir'];
     }
 }
 if (function_exists("ryunosuke\\Functions\\cachedir") && !defined("ryunosuke\\Functions\\cachedir")) {
     /**
-     *
+     * @deprecated
      */
     define("ryunosuke\\Functions\\cachedir", "ryunosuke\\Functions\\cachedir");
 }
@@ -20502,7 +20766,7 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("ryunosuke\\Functi
     function cache($key, $provider, $namespace = null)
     {
         static $cacheobject;
-        $cacheobject ??= new class(cachedir()) {
+        $cacheobject ??= new class(function_configure('cachedir')) {
             const CACHE_EXT = '.php-cache';
 
             /** @var string キャッシュディレクトリ */
@@ -23828,7 +24092,7 @@ if (!isset($excluded_functions["var_stream"]) && (!function_exists("ryunosuke\\F
     {
         static $STREAM_NAME, $stream_class, $registered = false;
         if (!$registered) {
-            $STREAM_NAME = $STREAM_NAME ?: get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';
+            $STREAM_NAME = $STREAM_NAME ?: function_configure('var_stream');
             if (in_array($STREAM_NAME, stream_get_wrappers())) {
                 throw new \DomainException("$STREAM_NAME is registered already.");
             }
