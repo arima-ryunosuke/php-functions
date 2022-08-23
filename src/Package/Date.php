@@ -497,10 +497,10 @@ class Date implements Interfaces\Date
         }
         $follow_count = (int) $follow_count;
         if ($follow_count < 0) {
-            return Date::date_alter($timestamp - 24 * 3600, $excluded_dates, $follow_count + 1);
+            return Date::date_alter($timestamp - 24 * 3600, $excluded_dates, $follow_count + 1, $format);
         }
         if ($follow_count > 0) {
-            return Date::date_alter($timestamp + 24 * 3600, $excluded_dates, $follow_count - 1);
+            return Date::date_alter($timestamp + 24 * 3600, $excluded_dates, $follow_count - 1, $format);
         }
         return null;
     }
