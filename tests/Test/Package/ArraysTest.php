@@ -1346,6 +1346,35 @@ class ArraysTest extends AbstractTestCase
         ]);
     }
 
+    function test_array_rank()
+    {
+        that((array_rank)([], 0))->same([]);
+        that((array_rank)([1, 1, 1, 1, 1], 1))->same([1, 1, 1, 1, 1]);
+
+        that((array_rank)([1, 2, 3, 4, 5], 3))->same([1, 2, 3]);
+        that((array_rank)([1, 2, 3, 3, 5], 3))->same([1, 2, 3, 3]);
+
+        that((array_rank)([1, 2, 3, 4, 5], -3))->same([4 => 5, 3 => 4, 2 => 3]);
+        that((array_rank)([1, 3, 3, 4, 5], -3))->same([4 => 5, 3 => 4, 2 => 3, 1 => 3]);
+
+        that((array_rank)([1.1, 2.2, 3.3, 3.3, 5.5], 3))->same([1.1, 2.2, 3.3, 3.3]);
+        that((array_rank)([1.1, 3.3, 3.3, 4.4, 5.5], -3))->same([4 => 5.5, 3 => 4.4, 2 => 3.3, 1 => 3.3]);
+
+        that((array_rank)(['10000', '2000', '300', '40', '5'], 3))->same(['10000', '2000', '300']);
+        that((array_rank)(['10000', '2000', '300', '40', '5'], -3))->same([4 => '5', 3 => '40', 2 => '300']);
+
+        $row1 = ['id' => 1, 'name' => 'A', 'score' => 10];
+        $row2 = ['id' => 2, 'name' => 'B', 'score' => 20];
+        $row3 = ['id' => 3, 'name' => 'B', 'score' => 30];
+        $array = [
+            'id1' => $row1,
+            'id2' => $row2,
+            'id3' => $row3,
+        ];
+        that((array_rank)($array, 2, fn($row) => $row['score']))->same(['id1' => $row1, 'id2' => $row2]);
+        that((array_rank)($array, -2, fn($row) => $row['score']))->same(['id3' => $row3, 'id2' => $row2]);
+    }
+
     function test_array_count()
     {
         $array = ['a', 'b', 'c'];
