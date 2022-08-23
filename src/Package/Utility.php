@@ -8,6 +8,75 @@ namespace ryunosuke\Functions\Package;
 class Utility implements Interfaces\Utility
 {
     /**
+     * 本ライブラリの設定を行う
+     *
+     * 各関数の挙動を変えたり、デフォルトオプションを設定できる。
+     *
+     * @param array|string $option 設定。文字列指定時はその値を返す
+     * @return array|string 設定値
+     */
+    public static function function_configure($option)
+    {
+        static $config = [];
+
+        // default
+        $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
+        $config['placeholder'] ??= '';
+        $config['var_stream'] ??= get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';          // for compatible
+        $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
+        $config['chain.nullsafe'] ??= false;
+
+        // setting
+        if (is_array($option)) {
+            foreach ($option as $name => $entry) {
+                $option[$name] = $config[$name] ?? null;
+                switch ($name) {
+                    default:
+                        $config[$name] = $entry;
+                        break;
+                    case 'cachedir':
+                        $entry ??= $config[$name];
+                        if (!file_exists($entry)) {
+                            @mkdir($entry, 0777 & (~umask()), true);
+                        }
+                        $config[$name] = realpath($entry);
+                        break;
+                    case 'placeholder':
+                        if (strlen($entry)) {
+                            $entry = ltrim($entry[0] === '\\' ? $entry : __NAMESPACE__ . '\\' . $entry, '\\');
+                            if (!defined($entry)) {
+                                define($entry, tmpfile() ?: [] ?: '' ?: 0.0 ?: null ?: false);
+                            }
+                            if (!is_resource(constant($entry))) {
+                                // もしリソースじゃないと一意性が保てず致命的になるので例外を投げる
+                                throw new \RuntimeException('placeholder is not resource'); // @codeCoverageIgnore
+                            }
+                            $config[$name] = $entry;
+                        }
+                        break;
+                }
+            }
+            return $option;
+        }
+
+        // getting
+        if (is_string($option)) {
+            switch ($option) {
+                default:
+                    return $config[$option] ?? null;
+                case 'cachedir':
+                    $dirname = $config[$option];
+                    if (!file_exists($dirname)) {
+                        @mkdir($dirname, 0777 & (~umask()), true); // @codeCoverageIgnore
+                    }
+                    return realpath($dirname);
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('$option is unknown type(%s)', gettype($option)));
+    }
+
+    /**
      * 複数の php.ini の設定をまとめて設定する
      *
      * 返り値として「もとに戻すためのクロージャ」を返すので、復元するためにはそのクロージャを呼ぶだけで良い。
@@ -406,27 +475,11 @@ class Utility implements Interfaces\Utility
     /**
      * 本ライブラリで使用するキャッシュディレクトリを設定する
      *
-     * @param string|null $dirname キャッシュディレクトリ。省略時は返すのみ
-     * @return string 設定前のキャッシュディレクトリ
+     * @deprecated use function_configure
      */
     public static function cachedir($dirname = null)
     {
-        static $cachedir;
-        if ($cachedir === null) {
-            $cachedir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
-            Utility::cachedir($cachedir); // for mkdir
-        }
-
-        if ($dirname === null) {
-            return $cachedir;
-        }
-
-        if (!file_exists($dirname)) {
-            @mkdir($dirname, 0777 & (~umask()), true);
-        }
-        $result = $cachedir;
-        $cachedir = realpath($dirname);
-        return $result;
+        return Utility::function_configure(['cachedir' => $dirname])['cachedir'];
     }
 
     /**
@@ -458,7 +511,7 @@ class Utility implements Interfaces\Utility
     public static function cache($key, $provider, $namespace = null)
     {
         static $cacheobject;
-        $cacheobject ??= new class(Utility::cachedir()) {
+        $cacheobject ??= new class(Utility::function_configure('cachedir')) {
             const CACHE_EXT = '.php-cache';
 
             /** @var string キャッシュディレクトリ */

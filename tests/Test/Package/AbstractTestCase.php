@@ -12,7 +12,7 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
 
         self::$TMPDIR = sys_get_temp_dir() . '/';
 
-        (cachedir)(self::$TMPDIR . getenv('TEST_TARGET'));
+        (function_configure)(['cachedir' => self::$TMPDIR . getenv('TEST_TARGET')]);
         (cache)('dummy', function () { });
         (cache)(null, null);
     }

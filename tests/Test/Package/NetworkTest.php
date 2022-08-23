@@ -11,8 +11,7 @@ class NetworkTest extends AbstractTestCase
         }
 
         // cachedir を設定することで擬似的にインジェクションする
-        $cachedir = (cachedir)();
-        (cachedir)(sys_get_temp_dir() . '/' . __FUNCTION__);
+        $backup = (function_configure)(['cachedir' => sys_get_temp_dir() . '/' . __FUNCTION__]);
         (cache)('net_get_interfaces', null, 'getipaddress');
         (cache)('net_get_interfaces', fn() => [
             'lo'   => [
@@ -85,7 +84,7 @@ class NetworkTest extends AbstractTestCase
         that((getipaddress)())->isNull();
         that(getipaddress)('256.256.256.256')->wasThrown('is invalid ip address');
 
-        (cachedir)($cachedir);
+        (function_configure)($backup);
     }
 
     function test_incidr()

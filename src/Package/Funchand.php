@@ -1033,7 +1033,7 @@ class Funchand implements Interfaces\Funchand
         }
 
         // キャッシュ指定有りなら読み込むだけで eval しない
-        $cachefile = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
+        $cachefile = Utility::function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__ . '-' . $calllname . '-' . $alias) . '.php';
         if (!file_exists($cachefile)) {
             $parts = explode('\\', ltrim($alias, '\\'));
             $reference = $ref->returnsReference() ? '&' : '';

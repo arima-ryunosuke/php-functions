@@ -1180,7 +1180,7 @@ class Vars implements Interfaces\Vars
     {
         static $STREAM_NAME, $stream_class, $registered = false;
         if (!$registered) {
-            $STREAM_NAME = $STREAM_NAME ?: get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';
+            $STREAM_NAME = $STREAM_NAME ?: Utility::function_configure('var_stream');
             if (in_array($STREAM_NAME, stream_get_wrappers())) {
                 throw new \DomainException("$STREAM_NAME is registered already.");
             }

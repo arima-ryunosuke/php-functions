@@ -42,7 +42,7 @@ class Syntax implements Interfaces\Syntax
     {
         $cachefile = null;
         if ($cachesize && strlen($phpcode) >= $cachesize) {
-            $cachefile = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+            $cachefile = Utility::function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
             if (!file_exists($cachefile)) {
                 file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
             }
@@ -955,10 +955,12 @@ class Syntax implements Interfaces\Syntax
                     || ($isiterable && defined($cname = __NAMESPACE__ . "\\array_$name") && is_callable(constant($cname), false, $fname))
                     || ($isstringable && defined($cname = __NAMESPACE__ . "\\str_$name") && is_callable(constant($cname), false, $fname))
                 ) {
-                    if (!array_key_exists($fname, self::$nullables)) {
-                        foreach (Funchand::reflect_callable($fname)->getParameters() as $parameter) {
-                            $type = $parameter->getType();
-                            self::$nullables[$fname][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
+                    if (Utility::function_configure('chain.nullsafe')) {
+                        if (!array_key_exists($fname, self::$nullables)) {
+                            foreach (Funchand::reflect_callable($fname)->getParameters() as $parameter) {
+                                $type = $parameter->getType();
+                                self::$nullables[$fname][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
+                            }
                         }
                     }
 
@@ -986,7 +988,7 @@ class Syntax implements Interfaces\Syntax
                         return $this;
                     }
                     // for placeholder call
-                    if (defined('_') && $placeholders = array_keys($arguments, _, true)) {
+                    if (($placeholder = Utility::function_configure('placeholder')) && $placeholders = array_keys($arguments, constant($placeholder), true)) {
                         $this->data = $fname(...(array_replace($arguments, array_fill_keys($placeholders, $this->data))));
                         return $this;
                     }

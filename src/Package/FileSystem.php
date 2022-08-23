@@ -1262,7 +1262,7 @@ class FileSystem implements Interfaces\FileSystem
     public static function tmpname($prefix = 'rft', $dir = null)
     {
         // デフォルト付きで tempnam を呼ぶ
-        $dir = $dir ?: Utility::cachedir();
+        $dir = $dir ?: Utility::function_configure('cachedir');
         $tempfile = tempnam($dir, $prefix);
 
         // tempnam が何をしても false を返してくれないんだがどうしたら返してくれるんだろうか？
@@ -1326,7 +1326,7 @@ class FileSystem implements Interfaces\FileSystem
     {
         static $STREAM_NAME, $registered = false;
         if (!$registered) {
-            $STREAM_NAME = $STREAM_NAME ?: get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000';
+            $STREAM_NAME = $STREAM_NAME ?: Utility::function_configure('memory_stream');
             if (in_array($STREAM_NAME, stream_get_wrappers())) {
                 throw new \DomainException("$STREAM_NAME is registered already.");
             }

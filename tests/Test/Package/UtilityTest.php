@@ -6,6 +6,15 @@ use function tmpfile;
 
 class UtilityTest extends AbstractTestCase
 {
+    function test_function_configure()
+    {
+        that((function_configure)('hoge'))->is(null);
+        that((function_configure)(['other' => 'hoge']))->is(['other' => null]);
+        that((function_configure)(['other' => 'fuga']))->is(['other' => 'hoge']);
+
+        that(function_configure)(null)->wasThrown('unknown type(NULL)');
+    }
+
     function test_ini_sets()
     {
         $precision = ini_get('precision');
@@ -419,9 +428,12 @@ class UtilityTest extends AbstractTestCase
     {
         $tmpdir = sys_get_temp_dir() . '/test';
         (rm_rf)($tmpdir);
-        that((cachedir)($tmpdir))->is((path_normalize)(self::$TMPDIR . getenv('TEST_TARGET')));
-        that((cachedir)())->is((path_normalize)($tmpdir));
-        that((cachedir)(sys_get_temp_dir()))->is((path_normalize)($tmpdir));
+        /** @noinspection PhpDeprecationInspection */
+        {
+            that((cachedir)($tmpdir))->is((path_normalize)(self::$TMPDIR . getenv('TEST_TARGET')));
+            that((cachedir)())->is((path_normalize)($tmpdir));
+            that((cachedir)(sys_get_temp_dir()))->is((path_normalize)($tmpdir));
+        }
     }
 
     function test_cache()
@@ -449,7 +461,7 @@ class UtilityTest extends AbstractTestCase
 
         $tmpdir = self::$TMPDIR . '/cache_object';
         (rm_rf)($tmpdir);
-        (cachedir)($tmpdir);
+        (function_configure)(['cachedir' => $tmpdir]);
         (cache)('key', fn() => $value, 'hoge');
         (cache)(null, 'dummy');
         that("$tmpdir/hoge.php-cache")->fileExists();

@@ -418,7 +418,7 @@ class Classobj implements Interfaces\Classobj
 
         // 対象クラス名をちょっとだけ変えたクラスを用意して読み込む
         $classfile = Classobj::class_loader()->findFile($class);
-        $fname = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
+        $fname = Utility::function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__ . '-' . $class) . '.php';
         if (!file_exists($fname)) {
             $content = file_get_contents($classfile);
             $content = preg_replace("#class\\s+[a-z0-9_]+#ui", '$0_', $content);
@@ -700,7 +700,7 @@ class Classobj implements Interfaces\Classobj
                 }
             }
 
-            $cachefile = Utility::cachedir() . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
+            $cachefile = Utility::function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__ . '-' . $classname) . '.php';
             if (!file_exists($cachefile)) {
                 $declares = "";
                 foreach ($classmethods as $name => $method) {
