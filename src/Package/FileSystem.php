@@ -1227,11 +1227,11 @@ class FileSystem implements Interfaces\FileSystem
             $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
 
             foreach ($rii as $it) {
-                if ($it->isDir()) {
-                    rmdir($it->getPathname());
+                if ($it->isFile() || $it->isLink()) {
+                    unlink($it->getPathname());
                 }
                 else {
-                    unlink($it->getPathname());
+                    rmdir($it->getPathname());
                 }
             }
 
