@@ -2622,7 +2622,7 @@ class Arrays implements Interfaces\Arrays
             if (!isset($type)) {
                 $type = gettype($v);
             }
-            $buckets[$v][$k] = $array[$k];
+            $buckets[(string) $v][$k] = $array[$k];
         }
 
         if ($length < 0) {
