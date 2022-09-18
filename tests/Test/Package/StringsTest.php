@@ -217,6 +217,14 @@ class StringsTest extends AbstractTestCase
         that((strpos_quoted)('1:hoge, 2:\\*hoge*, 3:hoge', 'hoge', 5, '*'))->isSame(12);
 
         that((strpos_quoted)('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '', ''))->isSame(11);
+
+        $found = null;
+        that((strpos_quoted)("this is a 'special word' that special word", ['word', 'special'], 0, "'", "\\", $found))->isSame(30);
+        that($found)->is("special");
+        that((strpos_quoted)("this is a 'special word' that sPecial word", ['word', 'special'], 0, "'", "\\", $found))->isSame(38);
+        that($found)->is("word");
+        that((strpos_quoted)("this is a 'special word' that sPecial wOrd", ['word', 'special'], 0, "'", "\\", $found))->isSame(false);
+        that($found)->isNull();
     }
 
     function test_str_bytes()

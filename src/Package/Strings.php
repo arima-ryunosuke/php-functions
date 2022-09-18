@@ -312,9 +312,10 @@ class Strings implements Interfaces\Strings
      * @param int $offset 開始位置
      * @param string|array $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
      * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+     * @param ?string $found $needle の内、見つかった文字列が格納される
      * @return false|int $needle の位置
      */
-    public static function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\')
+    public static function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\', &$found = null)
     {
         if (is_string($enclosure)) {
             if (strlen($enclosure)) {
@@ -333,6 +334,7 @@ class Strings implements Interfaces\Strings
             $offset += $strlen;
         }
 
+        $found = null;
         $enclosing = [];
         for ($i = $offset; $i < $strlen; $i++) {
             if ($i !== 0 && $haystack[$i - 1] === $escape) {
@@ -356,6 +358,7 @@ class Strings implements Interfaces\Strings
             if (empty($enclosing)) {
                 foreach ($needles as $needle) {
                     if (substr_compare($haystack, $needle, $i, strlen($needle)) === 0) {
+                        $found = $needle;
                         return $i;
                     }
                 }
