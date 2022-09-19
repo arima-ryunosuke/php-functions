@@ -1274,8 +1274,8 @@ class VarsTest extends AbstractTestCase
             ->stringContains("  A: ['str', 1, 2, 3, true, null]")
             ->stringContains("ryunosuke\\Test\\Package\\VarsTest#")
             ->stringContains("    recur: {")
-            ->stringContains("    Closure#")
-            ->stringContains("    Closure#")
+            ->stringContains("    Closure@")
+            ->stringContains("    Closure@")
             ->stringContains("  R: Resource id #2 of type (stream)")
             ->stringContains("          (too deep)")
             ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16\n\t   (more 4 elements)]")
@@ -1303,6 +1303,18 @@ class VarsTest extends AbstractTestCase
             },
         ]))
             ->stringContains("R: this is custom resource(1)");
+
+        that((var_pretty)($value, [
+            'context' => 'plain',
+            'return'  => true,
+            'minify'  => true,
+        ]))
+            ->stringNotContains("\n")
+            ->stringNotContains("0:stdClass#")
+            ->stringContains("E:Concrete#")
+            ->stringContains("A:['str', 1, 2, 3, true, null]")
+            ->stringContains("R:Resource id #2 of type (stream)")
+            ->stringContains("empty:[]");
 
         that((var_pretty)($value, ['context' => 'cli', 'return' => true]))->stringContains("\033");
         that((var_pretty)($value, ['context' => 'html', 'return' => true]))->stringContains("<span");

@@ -1999,6 +1999,7 @@ class Vars implements Interfaces\Vars
     public static function var_pretty($value, $options = [])
     {
         $options += [
+            'minify'    => false, // 短縮形で返す（実質的には情報を減らして1行で返す）
             'indent'    => 2,     // インデントの空白数
             'context'   => null,  // html なコンテキストか cli なコンテキストか
             'return'    => false, // 値を戻すか出力するか
@@ -2019,6 +2020,11 @@ class Vars implements Interfaces\Vars
             }
         }
 
+        if ($options['minify']) {
+            $options['indent'] = null;
+            $options['trace'] = false;
+        }
+
         $appender = new class($options) {
             private $options;
             private $objects;
@@ -2035,8 +2041,12 @@ class Vars implements Interfaces\Vars
                 $this->column = 0;
             }
 
-            private function _append($value, $style = null, $data = [])
+            private function _append($value, $style = null, $data = []): self
             {
+                if ($this->options['minify']) {
+                    $value = strtr($value, ["\n" => ' ']);
+                }
+
                 $strlen = strlen($value);
 
                 if ($this->options['limit'] && $this->options['limit'] < $this->length += $strlen) {
@@ -2077,12 +2087,12 @@ class Vars implements Interfaces\Vars
                 return $this;
             }
 
-            public function plain($token)
+            public function plain($token): self
             {
                 return $this->_append($token);
             }
 
-            public function index($token)
+            public function index($token): self
             {
                 if (is_int($token)) {
                     return $this->_append($token, 'bold');
@@ -2098,7 +2108,7 @@ class Vars implements Interfaces\Vars
                 }
             }
 
-            public function value($token)
+            public function value($token): self
             {
                 if (is_null($token)) {
                     return $this->_append($this->string($token), 'bold', ['type' => 'null']);
@@ -2123,12 +2133,22 @@ class Vars implements Interfaces\Vars
                 }
             }
 
-            public function string($token)
+            public function string($token): string
             {
                 if (is_null($token)) {
                     return 'null';
                 }
                 elseif (is_object($token)) {
+                    if ($token instanceof \Closure) {
+                        $ref = new \ReflectionFunction($token);
+                        $fname = $ref->getFileName();
+                        $sline = $ref->getStartLine();
+                        $eline = $ref->getEndLine();
+                        if ($fname && $sline && $eline) {
+                            $lines = $sline === $eline ? $sline : "$sline~$eline";
+                            return get_class($token) . "@$fname:$lines#" . spl_object_id($token);
+                        }
+                    }
                     return get_class($token) . "#" . spl_object_id($token);
                 }
                 elseif (is_resource($token)) {
@@ -2186,10 +2206,10 @@ class Vars implements Interfaces\Vars
 
                     $is_hasharray = Arrays::is_hasharray($value);
                     $primitive_only = Arrays::array_all($value, Vars::is_primitive);
-                    $assoc = $is_hasharray || !$primitive_only;
+                    $assoc = !$this->options['minify'] && ($is_hasharray || !$primitive_only);
 
-                    $spacer1 = str_repeat(' ', ($nest + 1) * $this->options['indent']);
-                    $spacer2 = str_repeat(' ', ($nest + 0) * $this->options['indent']);
+                    $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
+                    $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
                     $key = null;
                     if ($primitive_only && $this->options['maxlength']) {
@@ -2254,13 +2274,17 @@ class Vars implements Interfaces\Vars
                             $this->plain('...(too length)...')->plain(', ');
                         }
                         foreach ($value as $k => $v) {
-                            if ($key === $n++) {
+                            if ($key === $n) {
                                 $this->plain('...(too length)...')->plain(', ');
+                            }
+                            if ($is_hasharray && $n !== $k) {
+                                $this->index($k)->plain(':');
                             }
                             $this->export($v, $nest, $parents, true);
                             if ($k !== $lastkey) {
                                 $this->plain(', ');
                             }
+                            $n++;
                         }
                         if ($omitted > 0) {
                             $this->plain(" (more $omitted elements)");
@@ -2269,12 +2293,17 @@ class Vars implements Interfaces\Vars
                     }
                 }
                 elseif ($value instanceof \Closure) {
-                    /** @var \ReflectionFunctionAbstract $ref */
+                    $this->value($value);
+
+                    if ($this->options['minify']) {
+                        goto FINALLY_;
+                    }
+
                     $ref = Funchand::reflect_callable($value);
                     $that = $ref->getClosureThis();
                     $properties = $ref->getStaticVariables();
 
-                    $this->value($value)->plain("(");
+                    $this->plain("(");
                     if ($that) {
                         $this->index($that);
                     }
@@ -2290,6 +2319,12 @@ class Vars implements Interfaces\Vars
                     }
                 }
                 elseif (is_object($value)) {
+                    $this->value($value);
+
+                    if ($this->options['minify']) {
+                        goto FINALLY_;
+                    }
+
                     if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
                         $properties = [];
                         foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
@@ -2304,7 +2339,7 @@ class Vars implements Interfaces\Vars
                         $properties = Classobj::get_object_properties($value);
                     }
 
-                    $this->value($value)->plain(" ");
+                    $this->plain(" ");
                     if ($properties) {
                         $this->export($properties, $nest, $parents, false);
                     }
