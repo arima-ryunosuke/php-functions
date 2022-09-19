@@ -422,6 +422,22 @@ class UtilityTest extends AbstractTestCase
         that($cache)->get('{dummy}')->wasThrown('reserved character');
         that($cache)->getMultiple(new \ArrayObject(['']))->wasThrown('empty string');
         that($cache)->set('ttl', 'value', 'hoge')->wasThrown('ttl must be');
+
+        // clean
+
+        that($cache->set('dir.expired', 'value', 1))->isTrue();
+        sleep(2);
+        that("$tmpdir/dir/expired.php")->fileExists();
+        $cache = (cacheobject)($tmpdir, 1);
+        that("$tmpdir/dir/expired.php")->fileNotExists();
+        that("$tmpdir/dir")->directoryNotExists();
+        that($cache->has('expired'))->isFalse();
+
+        that($cache->keys('fetch*'))->hasKeyAll(['fetch', 'fetchM']);
+
+        touch("$tmpdir/dummy.php");
+        $cache->clean();
+        that("$tmpdir/dummy.php")->fileExists();
     }
 
     function test_cachedir()

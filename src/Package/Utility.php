@@ -304,14 +304,20 @@ class Utility implements Interfaces\Utility
      * - clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない
      * - psr-16 にはない getOrSet が生えている（利便性が非常に高く使用頻度が多いため）
      *
+     * 性質上、参照されない期限切れキャッシュが溜まり続けるが $clean_probability を渡すと一定確率で削除される。
+     * $clean_probability は 1 が 100%（必ず削除）、 0 が 0%（削除しない）である。
+     * 削除処理は軽くはないため高頻度な実行は避けなければならない。
+     * clean メソッドが生えているので明示的に呼ぶことも可能。
+     *
      * psr/simple-cache （\Psr\SimpleCache\CacheInterface）が存在するなら implement される。
      * 存在しないなら素の無名クラスで返す。
      * 動作に違いはないが instanceoof や class_implements に違いが出てくるので注意。
      *
      * @param string $directory キャッシュ保存ディレクトリ
+     * @param float $clean_probability 不要キャッシュの削除確率
      * @return \Psr16CacheInterface psr-16 実装オブジェクト
      */
-    public static function cacheobject($directory)
+    public static function cacheobject($directory, $clean_probability = 0)
     {
         $cacheobject = new class($directory) {
             private $directory;
@@ -359,6 +365,59 @@ class Utility implements Interfaces\Utility
                 return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php";
             }
 
+            private function _getMetadata(string $filename): ?array
+            {
+                $fp = fopen($filename, "r");
+                try {
+                    $first = fgets($fp);
+                    $meta = @json_decode(substr($first, strpos($first, '#') + 1), true);
+                    return $meta ?: null;
+                }
+                finally {
+                    fclose($fp);
+                }
+            }
+
+            public function keys(?string $pattern = null)
+            {
+                $files = FileSystem::file_list($this->directory, [
+                    '!type' => ['dir', 'link'],
+                ]);
+
+                $now = time();
+                $result = [];
+                foreach ($files as $file) {
+                    $meta = $this->_getMetadata($file);
+                    if ($meta && ($pattern === null || fnmatch($pattern, $meta['key']))) {
+                        $result[$meta['key']] = [
+                            'realpath' => $file,
+                            'size'     => filesize($file),
+                            'ttl'      => $meta['expire'] - $now,
+                        ];
+                    }
+                }
+                return $result;
+            }
+
+            public function clean()
+            {
+                $files = FileSystem::file_list($this->directory, [
+                    '!type' => 'link',
+                ]);
+
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        $meta = $this->_getMetadata($file);
+                        if (isset($meta['expire']) && $meta['expire'] < time()) {
+                            @unlink($file);
+                        }
+                    }
+                    elseif (is_dir($file)) {
+                        @rmdir($file);
+                    }
+                }
+            }
+
             public function fetch($key, $provider, $ttl = null)
             {
                 $value = $this->get($key);
@@ -402,9 +461,11 @@ class Utility implements Interfaces\Utility
                     return $this->delete($key);
                 }
 
-                $this->entries[$key] = [time() + $ttl, $value];
-                $code = Vars::var_export3($this->entries[$key], ['outmode' => 'file']);
-                return !!FileSystem::file_set_contents($this->_getFilename($key), $code);
+                $expire = time() + $ttl;
+                $this->entries[$key] = [$expire, $value];
+                $meta = json_encode(['key' => $key, 'expire' => $expire]);
+                $code = Vars::var_export3($this->entries[$key], ['outmode' => 'eval']);
+                return !!FileSystem::file_set_contents($this->_getFilename($key), "<?php # $meta\n$code\n");
             }
 
             public function delete($key)
@@ -448,6 +509,14 @@ class Utility implements Interfaces\Utility
             }
         };
 
+        static $cleaned = [];
+        if ($clean_probability !== 0 && !($cleaned[$directory] ?? false)) {
+            $cleaned[$directory] = true;
+            if ($clean_probability * 100 >= rand(1, 100)) {
+                $cacheobject->clean();
+            }
+        }
+
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return !interface_exists(\Psr\SimpleCache\CacheInterface::class) ? $cacheobject : new class($cacheobject) implements \Psr\SimpleCache\CacheInterface {
             private $cacheobject;
@@ -458,6 +527,8 @@ class Utility implements Interfaces\Utility
             }
 
             // @formatter:off
+            public function clean()                                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function keys($pattern = null)                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             public function fetch($key, $provider, $ttl = null)    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             public function fetchMultiple($providers, $ttl = null) { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             public function get($key, $default = null)             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
