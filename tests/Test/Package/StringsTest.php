@@ -2257,6 +2257,12 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
         that((json_import)('12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
         that((json_import)('-12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
 
+        that((json_import)('{a: A, abc: A B C, xyz: [X, Y, Z]}', [JSON_ES5 => true, JSON_BARE_AS_STRING => true]))->is([
+            "a"   => "A",
+            "abc" => "A B C",
+            "xyz" => ["X", "Y", "Z"],
+        ]);
+
         that((json_import)('`
             1
               2
@@ -2279,6 +2285,8 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 
     function test_json_import5_error()
     {
+        that(json_import)('syntax error', [JSON_THROW_ON_ERROR => false])->isNull();
+
         that(json_import)('123,456')->wasThrown("Mismatch");
         that(json_import)('{')->wasThrown("Mismatch ']'");
         that(json_import)('[')->wasThrown("Mismatch '['");

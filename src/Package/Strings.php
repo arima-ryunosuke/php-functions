@@ -29,6 +29,8 @@ class Strings implements Interfaces\Strings
     const JSON_COMMENT_PREFIX = -104;
     /** json_*** 関数でテンプレートリテラルを有効にするかの定数 */
     const JSON_TEMPLATE_LITERAL = -105;
+    /** json_*** 関数で bare string を文字列として扱うか */
+    const JSON_BARE_AS_STRING = -106;
 
     /**
      * 文字列結合の関数版
@@ -3114,13 +3116,14 @@ class Strings implements Interfaces\Strings
     /**
      * json_decode のプロキシ関数
      *
-     * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
+     * 引数体系とデフォルト値を変更してある。
      *
      * JSON_ES5 に null か true を渡すと json5 としてでデコードする（null はまず json_decode で試みる、true は json5 のみ）。
      * その場合拡張オプションとして下記がある。
      *
      * - JSON_INT_AS_STRING: 常に整数を文字列で返す
      * - JSON_FLOAT_AS_STRING: 常に小数を文字列で返す
+     * - JSON_BARE_AS_STRING: bare string を文字列として扱う
      * - JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる
      *   - あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない
      *   - 冒頭のインデントがすべて除去され、最終段階で trim される
@@ -3158,13 +3161,15 @@ class Strings implements Interfaces\Strings
             Strings::JSON_INT_AS_STRING    => false,
             Strings::JSON_FLOAT_AS_STRING  => false,
             Strings::JSON_TEMPLATE_LITERAL => false,
+            Strings::JSON_BARE_AS_STRING   => false,
         ];
         foreach ($specials as $key => $default) {
             $specials[$key] = $options[$key] ?? $default;
             unset($options[$key]);
         }
+        $specials[JSON_THROW_ON_ERROR] = $options[JSON_THROW_ON_ERROR] ?? true;
         $specials[JSON_BIGINT_AS_STRING] = $options[JSON_BIGINT_AS_STRING] ?? false;
-        if ($specials[Strings::JSON_INT_AS_STRING] || $specials[Strings::JSON_FLOAT_AS_STRING] || $specials[Strings::JSON_TEMPLATE_LITERAL]) {
+        if ($specials[Strings::JSON_INT_AS_STRING] || $specials[Strings::JSON_FLOAT_AS_STRING] || $specials[Strings::JSON_TEMPLATE_LITERAL] || $specials[Strings::JSON_BARE_AS_STRING]) {
             $specials[Strings::JSON_ES5] = true;
         }
 
@@ -3427,6 +3432,9 @@ class Strings implements Interfaces\Strings
                         if (($string = $stringify($token)) !== null) {
                             return $string;
                         }
+                        if ($options[Strings::JSON_BARE_AS_STRING]) {
+                            return $token;
+                        }
                         throw $this->exception("Bad value", $this);
                 }
             }
@@ -3448,7 +3456,16 @@ class Strings implements Interfaces\Strings
             }
         };
 
-        return $parser->parse($specials);
+        try {
+            return $parser->parse($specials);
+        }
+        catch (\Throwable $t){
+            if ($specials[JSON_THROW_ON_ERROR]) {
+                throw $t;
+            }
+            // json_last_error を設定する術はないので強制的に Syntax error にする（return することで返り値も統一される）
+            return @json_decode('invalid json');
+        }
     }
 
     /**
