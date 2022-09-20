@@ -734,6 +734,11 @@ if (!defined("JSON_TEMPLATE_LITERAL")) {
     define("JSON_TEMPLATE_LITERAL", -105);
 }
 
+if (!defined("JSON_BARE_AS_STRING")) {
+    /** json_*** 関数で bare string を文字列として扱うか */
+    define("JSON_BARE_AS_STRING", -106);
+}
+
 if (!defined("TOKEN_NAME")) {
     /** parse_php 関数でトークン名変換をするか */
     define("TOKEN_NAME", 2);
@@ -3825,7 +3830,7 @@ if (!isset($excluded_functions["array_rank"]) && (!function_exists("array_rank")
             if (!isset($type)) {
                 $type = gettype($v);
             }
-            $buckets[$v][$k] = $array[$k];
+            $buckets[(string) $v][$k] = $array[$k];
         }
 
         if ($length < 0) {
@@ -9264,11 +9269,11 @@ if (!isset($excluded_functions["rm_rf"]) && (!function_exists("rm_rf") || (!fals
             $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
 
             foreach ($rii as $it) {
-                if ($it->isDir()) {
-                    rmdir($it->getPathname());
+                if ($it->isFile() || $it->isLink()) {
+                    unlink($it->getPathname());
                 }
                 else {
-                    unlink($it->getPathname());
+                    rmdir($it->getPathname());
                 }
             }
 
@@ -13392,9 +13397,10 @@ if (!isset($excluded_functions["strpos_quoted"]) && (!function_exists("strpos_qu
      * @param int $offset 開始位置
      * @param string|array $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
      * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+     * @param ?string $found $needle の内、見つかった文字列が格納される
      * @return false|int $needle の位置
      */
-    function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\')
+    function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\', &$found = null)
     {
         if (is_string($enclosure)) {
             if (strlen($enclosure)) {
@@ -13413,6 +13419,7 @@ if (!isset($excluded_functions["strpos_quoted"]) && (!function_exists("strpos_qu
             $offset += $strlen;
         }
 
+        $found = null;
         $enclosing = [];
         for ($i = $offset; $i < $strlen; $i++) {
             if ($i !== 0 && $haystack[$i - 1] === $escape) {
@@ -13436,6 +13443,7 @@ if (!isset($excluded_functions["strpos_quoted"]) && (!function_exists("strpos_qu
             if (empty($enclosing)) {
                 foreach ($needles as $needle) {
                     if (substr_compare($haystack, $needle, $i, strlen($needle)) === 0) {
+                        $found = $needle;
                         return $i;
                     }
                 }
@@ -16479,13 +16487,14 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
     /**
      * json_decode のプロキシ関数
      *
-     * 引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。
+     * 引数体系とデフォルト値を変更してある。
      *
      * JSON_ES5 に null か true を渡すと json5 としてでデコードする（null はまず json_decode で試みる、true は json5 のみ）。
      * その場合拡張オプションとして下記がある。
      *
      * - JSON_INT_AS_STRING: 常に整数を文字列で返す
      * - JSON_FLOAT_AS_STRING: 常に小数を文字列で返す
+     * - JSON_BARE_AS_STRING: bare string を文字列として扱う
      * - JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる
      *   - あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない
      *   - 冒頭のインデントがすべて除去され、最終段階で trim される
@@ -16523,13 +16532,15 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
             JSON_INT_AS_STRING    => false,
             JSON_FLOAT_AS_STRING  => false,
             JSON_TEMPLATE_LITERAL => false,
+            JSON_BARE_AS_STRING   => false,
         ];
         foreach ($specials as $key => $default) {
             $specials[$key] = $options[$key] ?? $default;
             unset($options[$key]);
         }
+        $specials[JSON_THROW_ON_ERROR] = $options[JSON_THROW_ON_ERROR] ?? true;
         $specials[JSON_BIGINT_AS_STRING] = $options[JSON_BIGINT_AS_STRING] ?? false;
-        if ($specials[JSON_INT_AS_STRING] || $specials[JSON_FLOAT_AS_STRING] || $specials[JSON_TEMPLATE_LITERAL]) {
+        if ($specials[JSON_INT_AS_STRING] || $specials[JSON_FLOAT_AS_STRING] || $specials[JSON_TEMPLATE_LITERAL] || $specials[JSON_BARE_AS_STRING]) {
             $specials[JSON_ES5] = true;
         }
 
@@ -16792,6 +16803,9 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
                         if (($string = $stringify($token)) !== null) {
                             return $string;
                         }
+                        if ($options[JSON_BARE_AS_STRING]) {
+                            return $token;
+                        }
                         throw $this->exception("Bad value", $this);
                 }
             }
@@ -16813,7 +16827,16 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
             }
         };
 
-        return $parser->parse($specials);
+        try {
+            return $parser->parse($specials);
+        }
+        catch (\Throwable $t){
+            if ($specials[JSON_THROW_ON_ERROR]) {
+                throw $t;
+            }
+            // json_last_error を設定する術はないので強制的に Syntax error にする（return することで返り値も統一される）
+            return @json_decode('invalid json');
+        }
     }
 }
 if (function_exists("json_import") && !defined("json_import")) {
@@ -20542,14 +20565,20 @@ if (!isset($excluded_functions["cacheobject"]) && (!function_exists("cacheobject
      * - clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない
      * - psr-16 にはない getOrSet が生えている（利便性が非常に高く使用頻度が多いため）
      *
+     * 性質上、参照されない期限切れキャッシュが溜まり続けるが $clean_probability を渡すと一定確率で削除される。
+     * $clean_probability は 1 が 100%（必ず削除）、 0 が 0%（削除しない）である。
+     * 削除処理は軽くはないため高頻度な実行は避けなければならない。
+     * clean メソッドが生えているので明示的に呼ぶことも可能。
+     *
      * psr/simple-cache （\Psr\SimpleCache\CacheInterface）が存在するなら implement される。
      * 存在しないなら素の無名クラスで返す。
      * 動作に違いはないが instanceoof や class_implements に違いが出てくるので注意。
      *
      * @param string $directory キャッシュ保存ディレクトリ
+     * @param float $clean_probability 不要キャッシュの削除確率
      * @return \Psr16CacheInterface psr-16 実装オブジェクト
      */
-    function cacheobject($directory)
+    function cacheobject($directory, $clean_probability = 0)
     {
         $cacheobject = new class($directory) {
             private $directory;
@@ -20597,6 +20626,59 @@ if (!isset($excluded_functions["cacheobject"]) && (!function_exists("cacheobject
                 return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php";
             }
 
+            private function _getMetadata(string $filename): ?array
+            {
+                $fp = fopen($filename, "r");
+                try {
+                    $first = fgets($fp);
+                    $meta = @json_decode(substr($first, strpos($first, '#') + 1), true);
+                    return $meta ?: null;
+                }
+                finally {
+                    fclose($fp);
+                }
+            }
+
+            public function keys(?string $pattern = null)
+            {
+                $files = file_list($this->directory, [
+                    '!type' => ['dir', 'link'],
+                ]);
+
+                $now = time();
+                $result = [];
+                foreach ($files as $file) {
+                    $meta = $this->_getMetadata($file);
+                    if ($meta && ($pattern === null || fnmatch($pattern, $meta['key']))) {
+                        $result[$meta['key']] = [
+                            'realpath' => $file,
+                            'size'     => filesize($file),
+                            'ttl'      => $meta['expire'] - $now,
+                        ];
+                    }
+                }
+                return $result;
+            }
+
+            public function clean()
+            {
+                $files = file_list($this->directory, [
+                    '!type' => 'link',
+                ]);
+
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        $meta = $this->_getMetadata($file);
+                        if (isset($meta['expire']) && $meta['expire'] < time()) {
+                            @unlink($file);
+                        }
+                    }
+                    elseif (is_dir($file)) {
+                        @rmdir($file);
+                    }
+                }
+            }
+
             public function fetch($key, $provider, $ttl = null)
             {
                 $value = $this->get($key);
@@ -20640,9 +20722,11 @@ if (!isset($excluded_functions["cacheobject"]) && (!function_exists("cacheobject
                     return $this->delete($key);
                 }
 
-                $this->entries[$key] = [time() + $ttl, $value];
-                $code = var_export3($this->entries[$key], ['outmode' => 'file']);
-                return !!file_set_contents($this->_getFilename($key), $code);
+                $expire = time() + $ttl;
+                $this->entries[$key] = [$expire, $value];
+                $meta = json_encode(['key' => $key, 'expire' => $expire]);
+                $code = var_export3($this->entries[$key], ['outmode' => 'eval']);
+                return !!file_set_contents($this->_getFilename($key), "<?php # $meta\n$code\n");
             }
 
             public function delete($key)
@@ -20686,6 +20770,14 @@ if (!isset($excluded_functions["cacheobject"]) && (!function_exists("cacheobject
             }
         };
 
+        static $cleaned = [];
+        if ($clean_probability !== 0 && !($cleaned[$directory] ?? false)) {
+            $cleaned[$directory] = true;
+            if ($clean_probability * 100 >= rand(1, 100)) {
+                $cacheobject->clean();
+            }
+        }
+
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return !interface_exists(\Psr\SimpleCache\CacheInterface::class) ? $cacheobject : new class($cacheobject) implements \Psr\SimpleCache\CacheInterface {
             private $cacheobject;
@@ -20696,6 +20788,8 @@ if (!isset($excluded_functions["cacheobject"]) && (!function_exists("cacheobject
             }
 
             // @formatter:off
+            public function clean()                                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function keys($pattern = null)                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             public function fetch($key, $provider, $ttl = null)    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             public function fetchMultiple($providers, $ttl = null) { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             public function get($key, $default = null)             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
@@ -24942,6 +25036,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
     function var_pretty($value, $options = [])
     {
         $options += [
+            'minify'    => false, // 短縮形で返す（実質的には情報を減らして1行で返す）
             'indent'    => 2,     // インデントの空白数
             'context'   => null,  // html なコンテキストか cli なコンテキストか
             'return'    => false, // 値を戻すか出力するか
@@ -24962,6 +25057,11 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
             }
         }
 
+        if ($options['minify']) {
+            $options['indent'] = null;
+            $options['trace'] = false;
+        }
+
         $appender = new class($options) {
             private $options;
             private $objects;
@@ -24978,8 +25078,12 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                 $this->column = 0;
             }
 
-            private function _append($value, $style = null, $data = [])
+            private function _append($value, $style = null, $data = []): self
             {
+                if ($this->options['minify']) {
+                    $value = strtr($value, ["\n" => ' ']);
+                }
+
                 $strlen = strlen($value);
 
                 if ($this->options['limit'] && $this->options['limit'] < $this->length += $strlen) {
@@ -25020,12 +25124,12 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                 return $this;
             }
 
-            public function plain($token)
+            public function plain($token): self
             {
                 return $this->_append($token);
             }
 
-            public function index($token)
+            public function index($token): self
             {
                 if (is_int($token)) {
                     return $this->_append($token, 'bold');
@@ -25041,7 +25145,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                 }
             }
 
-            public function value($token)
+            public function value($token): self
             {
                 if (is_null($token)) {
                     return $this->_append($this->string($token), 'bold', ['type' => 'null']);
@@ -25066,12 +25170,22 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                 }
             }
 
-            public function string($token)
+            public function string($token): string
             {
                 if (is_null($token)) {
                     return 'null';
                 }
                 elseif (is_object($token)) {
+                    if ($token instanceof \Closure) {
+                        $ref = new \ReflectionFunction($token);
+                        $fname = $ref->getFileName();
+                        $sline = $ref->getStartLine();
+                        $eline = $ref->getEndLine();
+                        if ($fname && $sline && $eline) {
+                            $lines = $sline === $eline ? $sline : "$sline~$eline";
+                            return get_class($token) . "@$fname:$lines#" . spl_object_id($token);
+                        }
+                    }
                     return get_class($token) . "#" . spl_object_id($token);
                 }
                 elseif (is_resource($token)) {
@@ -25129,10 +25243,10 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
 
                     $is_hasharray = is_hasharray($value);
                     $primitive_only = array_all($value, is_primitive);
-                    $assoc = $is_hasharray || !$primitive_only;
+                    $assoc = !$this->options['minify'] && ($is_hasharray || !$primitive_only);
 
-                    $spacer1 = str_repeat(' ', ($nest + 1) * $this->options['indent']);
-                    $spacer2 = str_repeat(' ', ($nest + 0) * $this->options['indent']);
+                    $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
+                    $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
                     $key = null;
                     if ($primitive_only && $this->options['maxlength']) {
@@ -25197,13 +25311,17 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                             $this->plain('...(too length)...')->plain(', ');
                         }
                         foreach ($value as $k => $v) {
-                            if ($key === $n++) {
+                            if ($key === $n) {
                                 $this->plain('...(too length)...')->plain(', ');
+                            }
+                            if ($is_hasharray && $n !== $k) {
+                                $this->index($k)->plain(':');
                             }
                             $this->export($v, $nest, $parents, true);
                             if ($k !== $lastkey) {
                                 $this->plain(', ');
                             }
+                            $n++;
                         }
                         if ($omitted > 0) {
                             $this->plain(" (more $omitted elements)");
@@ -25212,12 +25330,17 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                     }
                 }
                 elseif ($value instanceof \Closure) {
-                    /** @var \ReflectionFunctionAbstract $ref */
+                    $this->value($value);
+
+                    if ($this->options['minify']) {
+                        goto FINALLY_;
+                    }
+
                     $ref = reflect_callable($value);
                     $that = $ref->getClosureThis();
                     $properties = $ref->getStaticVariables();
 
-                    $this->value($value)->plain("(");
+                    $this->plain("(");
                     if ($that) {
                         $this->index($that);
                     }
@@ -25233,6 +25356,12 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                     }
                 }
                 elseif (is_object($value)) {
+                    $this->value($value);
+
+                    if ($this->options['minify']) {
+                        goto FINALLY_;
+                    }
+
                     if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
                         $properties = [];
                         foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
@@ -25247,7 +25376,7 @@ if (!isset($excluded_functions["var_pretty"]) && (!function_exists("var_pretty")
                         $properties = get_object_properties($value);
                     }
 
-                    $this->value($value)->plain(" ");
+                    $this->plain(" ");
                     if ($properties) {
                         $this->export($properties, $nest, $parents, false);
                     }

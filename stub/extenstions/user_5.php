@@ -399,11 +399,12 @@ trait user_5
     public function strpos_array2($haystack, $needles): self { }
 
     /** @see \strpos_quoted() */
-    public function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\"): self { }
-    public function strpos_quoted0($needle, $offset = 0, $enclosure = "'\"", $escape = "\\"): self { }
-    public function strpos_quoted1($haystack, $offset = 0, $enclosure = "'\"", $escape = "\\"): self { }
-    public function strpos_quoted2($haystack, $needle, $enclosure = "'\"", $escape = "\\"): self { }
-    public function strpos_quoted3($haystack, $needle, $offset = 0, $escape = "\\"): self { }
-    public function strpos_quoted4($haystack, $needle, $offset = 0, $enclosure = "'\""): self { }
+    public function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted0($needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted1($haystack, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted2($haystack, $needle, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted3($haystack, $needle, $offset = 0, $escape = "\\", &$found = null): self { }
+    public function strpos_quoted4($haystack, $needle, $offset = 0, $enclosure = "'\"", &$found = null): self { }
+    public function strpos_quoted5($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\"): self { }
 
 }

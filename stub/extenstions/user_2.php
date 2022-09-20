@@ -164,8 +164,9 @@ trait user_2
 
     /** @see \cacheobject() */
     public self $cacheobject;
-    public function cacheobject($directory): self { }
-    public function cacheobject0(): self { }
+    public function cacheobject($directory, $clean_probability = 0): self { }
+    public function cacheobject0($clean_probability = 0): self { }
+    public function cacheobject1($directory): self { }
 
     /** @see \calculate_formula() */
     public self $calculate_formula;

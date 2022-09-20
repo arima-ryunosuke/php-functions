@@ -4022,6 +4022,11 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
                                     ryunosuke\Functions\Package\Strings::JSON_TEMPLATE_LITERAL		</a>	</h4>
 	<div class="description"><p>json_*** 関数でテンプレートリテラルを有効にするかの定数</p>
 </div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_BARE_AS_STRING">
+                                    ryunosuke\Functions\Package\Strings::JSON_BARE_AS_STRING		</a>	</h4>
+	<div class="description"><p>json_*** 関数で bare string を文字列として扱うか</p>
+</div>
             	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strcat()">
                                     ryunosuke\Functions\Package\Strings::strcat		</a>	<small>(...$variadic) : string</small>
@@ -4142,7 +4147,7 @@ that(strpos_array('hello world', ['notfound', 'world']))-&gt;isSame([
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strpos_quoted()">
-                                    ryunosuke\Functions\Package\Strings::strpos_quoted		</a>	<small>($haystack, $needle, $offset = 0, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;) : false<span class="type-separator"></span><wbr>int</small>
+                                    ryunosuke\Functions\Package\Strings::strpos_quoted		</a>	<small>($haystack, $needle, $offset = 0, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;, &amp;$found = null) : false<span class="type-separator"></span><wbr>int</small>
 		</h4>
 	<div class="description"><p>クオートを考慮して strpos する</p>
 <p>Example:</p>
@@ -5058,12 +5063,13 @@ that(json_export(['a' =&gt; 'A', '#comment' =&gt; 'this is comment', 'b' =&gt; '
                                     ryunosuke\Functions\Package\Strings::json_import		</a>	<small>($value, $options = []) : mixed</small>
 		</h4>
 	<div class="description"><p>json_decode のプロキシ関数</p>
-<p>引数体系とデフォルト値を変更してある。また、エラー時に例外が飛ぶ。</p>
+<p>引数体系とデフォルト値を変更してある。</p>
 <p>JSON_ES5 に null か true を渡すと json5 としてでデコードする（null はまず json_decode で試みる、true は json5 のみ）。<br />
 その場合拡張オプションとして下記がある。</p>
 <ul>
 <li>JSON_INT_AS_STRING: 常に整数を文字列で返す</li>
 <li>JSON_FLOAT_AS_STRING: 常に小数を文字列で返す</li>
+<li>JSON_BARE_AS_STRING: bare string を文字列として扱う</li>
 <li>JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる<ul>
 <li>あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない</li>
 <li>冒頭のインデントがすべて除去され、最終段階で trim される</li>
@@ -6239,7 +6245,7 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cacheobject()">
-                                    ryunosuke\Functions\Package\Utility::cacheobject		</a>	<small>($directory) : <a href="Psr16CacheInterface$typespace.html#Psr16CacheInterface" class="fqsen ">Psr16CacheInterface</a></small>
+                                    ryunosuke\Functions\Package\Utility::cacheobject		</a>	<small>($directory, $clean_probability = 0) : <a href="Psr16CacheInterface$typespace.html#Psr16CacheInterface" class="fqsen ">Psr16CacheInterface</a></small>
 		</h4>
 	<div class="description"><p>psr-16 を実装したキャッシュオブジェクトを返す</p>
 <p>このオブジェクトはあくまで「他のパッケージに依存したくない」場合のデフォルト実装としての使用を想定している。</p>
@@ -6250,6 +6256,10 @@ that(number_serial([-9, 0.2, 0.5, -0.3, 0.1, 0, -0.2, 9], -0.1, '~'))-&gt;is([9,
 <li>clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない</li>
 <li>psr-16 にはない getOrSet が生えている（利便性が非常に高く使用頻度が多いため）</li>
 </ul>
+<p>性質上、参照されない期限切れキャッシュが溜まり続けるが $clean_probability を渡すと一定確率で削除される。<br />
+$clean_probability は 1 が 100%（必ず削除）、 0 が 0%（削除しない）である。<br />
+削除処理は軽くはないため高頻度な実行は避けなければならない。<br />
+clean メソッドが生えているので明示的に呼ぶことも可能。</p>
 <p>psr/simple-cache （\Psr\SimpleCache\CacheInterface）が存在するなら implement される。<br />
 存在しないなら素の無名クラスで返す。<br />
 動作に違いはないが instanceoof や class_implements に違いが出てくるので注意。</p>
