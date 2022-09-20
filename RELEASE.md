@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.5.3
+
+- [feature][Strings] json_import の特殊フラグ対応
+- [feature][Strings] strpos_quoted に見つかった文字を格納する参照引数を追加
+- [feature][Vars] var_pretty に minify オプションを追加
+- [feature][Utility] cacheobject に keys/clean メソッドを実装
+- [fixbug][Arrays] array_rank が 8.1 で deprecated になる不具合を修正
+- [fixbug][FileSystem] rm_rf でリンク先まで消えてしまう不具合を修正
+
 ## 1.5.2
 
 - [change][bin] stub 生成を修正
