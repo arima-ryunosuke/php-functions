@@ -831,6 +831,20 @@ class ArraysTest extends AbstractTestCase
         that((array_find)([1, 2, 3, 4, -5, -6], fn($v) => $v < 0 ? abs($v) : false, false))->is(5);
     }
 
+    function test_array_find_last()
+    {
+        that((array_find_last)(['a', '8', '9'], 'ctype_digit'))->is(2);
+
+        that((array_find_last)(new \ArrayIterator(['a', '8', '9']), 'ctype_digit'))->is(2);
+        that((array_find_last)(new \ArrayIterator(['a' => 'A', 'b1' => 'B', 'b2' => 'B']), fn($v) => $v === 'B'))->is('b2');
+        that((array_find_last)(new \ArrayIterator(['8', '9', 'c']), 'ctype_digit'))->isSame(1);
+        that((array_find_last)(new \ArrayIterator(['a', 'b', 'c']), fn($v) => null))->isSame(false);
+
+        that((array_find_last)(new \ArrayIterator(['a', 'b', '9']), fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('B');
+        that((array_find_last)(new \ArrayIterator(['9', 'b', 'c']), fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('C');
+        that((array_find_last)(new \ArrayIterator([1, 2, 3, 4, -5, -6]), fn($v) => $v < 0 ? abs($v) : false, false))->is(6);
+    }
+
     function test_array_find_recursive()
     {
         $abc = [
