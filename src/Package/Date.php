@@ -127,14 +127,25 @@ class Date implements Interfaces\Date
             $parts['second'] += $relative['second'];
         }
 
-        // ドキュメントに「引数が不正な場合、 この関数は FALSE を返します」とあるが、 date_parse の結果を与える分には失敗しないはず
-        $time = mktime($parts['hour'], $parts['minute'], $parts['second'], $parts['month'], $parts['day'], $parts['year']);
-        if ($parts['fraction']) {
-            // 1970 以前なら減算、以降なら加算じゃないと帳尻が合わなくなる
-            $time += $time >= 0 ? $parts['fraction'] : -$parts['fraction'];
+        $offset = 0;
+        $timezone = null;
+        if ($parts['is_localtime']) {
+            if ($parts['zone_type'] === 1) {
+                $timezone = new \DateTimeZone('UTC');
+                $offset = $parts['zone'];
+            }
+            elseif ($parts['zone_type'] === 2) {
+                $timezone = new \DateTimeZone($parts['tz_abbr']);
+            }
+            elseif ($parts['zone_type'] === 3) {
+                $timezone = new \DateTimeZone($parts['tz_id']);
+            }
         }
 
-        return $time;
+        $dt = new \DateTime('', $timezone);
+        $dt->setDate($parts['year'], $parts['month'], $parts['day']);
+        $dt->setTime($parts['hour'], $parts['minute'], $parts['second'] - $offset, ($parts['fraction'] ?: 0) * 1000 * 1000);
+        return $parts['fraction'] ? (float) $dt->format('U.u') : $dt->getTimestamp();
     }
 
     /**
