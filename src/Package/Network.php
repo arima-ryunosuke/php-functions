@@ -8,6 +8,29 @@ namespace ryunosuke\Functions\Package;
 class Network implements Interfaces\Network
 {
     /**
+     * cidr を分割する
+     *
+     * ※ 内部向け
+     *
+     * @param string $cidr
+     * @return array [$address, $networkBit, $localBit]
+     */
+    public static function cidr_parse($cidr)
+    {
+        [$address, $subnet] = explode('/', trim($cidr), 2) + [1 => 32];
+
+        if (!filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("subnet addr '$address' is invalid.");
+        }
+        if (!(ctype_digit("$subnet") && (0 <= $subnet && $subnet <= 32))) {
+            throw new \InvalidArgumentException("subnet mask '$subnet' is invalid.");
+        }
+
+        $subnet = (int) $subnet;
+        return [$address, $subnet, 32 - $subnet];
+    }
+
+    /**
      * 接続元となる IP を返す
      *
      * IP を指定してそこへ接続する際の SourceIP を返す（省略すると最初のエントリを返す）。
@@ -72,6 +95,87 @@ class Network implements Interfaces\Network
     }
 
     /**
+     * IP アドレスを含みうる cidr を返す
+     *
+     * from, to の大小関係には言及しないので、from > to を与えると空配列を返す。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * that(ip2cidr('192.168.1.1', '192.168.2.64'))->isSame([
+     *     '192.168.1.1/32',
+     *     '192.168.1.2/31',
+     *     '192.168.1.4/30',
+     *     '192.168.1.8/29',
+     *     '192.168.1.16/28',
+     *     '192.168.1.32/27',
+     *     '192.168.1.64/26',
+     *     '192.168.1.128/25',
+     *     '192.168.2.0/26',
+     *     '192.168.2.64/32',
+     * ]);
+     * ```
+     *
+     * @param string $fromipaddr ipaddrs
+     * @param string $toipaddr ipaddrs
+     * @return array cidr
+     */
+    public static function ip2cidr($fromipaddr, $toipaddr)
+    {
+        if (!filter_var($fromipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("ipaddr '$fromipaddr' is invalid.");
+        }
+        if (!filter_var($toipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("ipaddr '$toipaddr' is invalid.");
+        }
+        $minlong = ip2long($fromipaddr);
+        $maxlong = ip2long($toipaddr);
+
+        $bit_length = fn($number) => strlen(ltrim(sprintf('%032b', $number), '0'));
+
+        $result = [];
+        for ($long = $minlong; $long <= $maxlong; $long += 1 << $nbits) {
+            $current_bits = $bit_length(~$long & ($long - 1));
+            $target_bits = $bit_length($maxlong - $long + 1) - 1;
+            $nbits = min($current_bits, $target_bits);
+
+            $result[] = long2ip($long) . '/' . (32 - $nbits);
+        }
+        return $result;
+    }
+
+    /**
+     * cidr 内の IP アドレスを返す
+     *
+     * すべての IP アドレスを返すため、`/1` のような極端な値を投げてはならない。
+     * （Generator の方がいいかもしれない）。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * that(cidr2ip('192.168.0.0/30'))->isSame(['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']);
+     * that(cidr2ip('192.168.0.255/30'))->isSame(['192.168.0.252', '192.168.0.253', '192.168.0.254', '192.168.0.255']);
+     * ```
+     *
+     * @param string $cidr cidr
+     * @return array IP アドレス
+     */
+    public static function cidr2ip($cidr)
+    {
+        [$prefix, , $mask] = Network::cidr_parse($cidr);
+
+        $prefix = ip2long($prefix) >> $mask << $mask;
+
+        $result = [];
+        for ($i = 0, $l = 1 << $mask; $i < $l; $i++) {
+            $result[] = long2ip($prefix + $i);
+        }
+        return $result;
+    }
+
+    /**
      * ipv4 の cidr チェック
      *
      * $ipaddr が $cidr のレンジ内なら true を返す。
@@ -91,28 +195,24 @@ class Network implements Interfaces\Network
      * that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))->isFalse();
      * ```
      *
-     * @param string $ipaddr 調べられる IP アドレス
+     * @param string $ipaddr 調べられる IP/cidr アドレス
      * @param string|array $cidr 調べる cidr アドレス
      * @return bool $ipaddr が $cidr 内なら true
      */
     public static function incidr($ipaddr, $cidr)
     {
-        if (!filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            throw new \InvalidArgumentException("ipaddr '$ipaddr' is invalid.");
-        }
+        [$ipaddr, , $ipmask] = Network::cidr_parse($ipaddr);
+
         $iplong = ip2long($ipaddr);
 
         foreach (Arrays::arrayize($cidr) as $cidr) {
-            [$subnet, $length] = explode('/', $cidr, 2) + [1 => '32'];
+            [$netaddress, , $netmask] = Network::cidr_parse($cidr);
 
-            if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                throw new \InvalidArgumentException("subnet addr '$subnet' is invalid.");
-            }
-            if (!(ctype_digit($length) && (0 <= $length && $length <= 32))) {
-                throw new \InvalidArgumentException("subnet mask '$length' is invalid.");
+            if ($ipmask > $netmask) {
+                continue;
             }
 
-            if (substr_compare(sprintf('%032b', $iplong), sprintf('%032b', ip2long($subnet)), 0, $length) === 0) {
+            if ((ip2long($netaddress) >> $netmask) == ($iplong >> $netmask)) {
                 return true;
             }
         }

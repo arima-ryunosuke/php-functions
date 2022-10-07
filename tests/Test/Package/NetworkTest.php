@@ -87,31 +87,98 @@ class NetworkTest extends AbstractTestCase
         (function_configure)($backup);
     }
 
+    function test_ip2cidr()
+    {
+        that((ip2cidr)("0.0.0.0", "0.0.0.0"))->isSame(["0.0.0.0/32"]);
+
+        that((ip2cidr)("0.0.0.0", "0.0.0.1"))->isSame(["0.0.0.0/31"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.2"))->isSame(["0.0.0.0/31", "0.0.0.2/32"]);
+
+        that((ip2cidr)("0.0.0.0", "0.0.0.3"))->isSame(["0.0.0.0/30"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.4"))->isSame(["0.0.0.0/30", "0.0.0.4/32"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.5"))->isSame(["0.0.0.0/30", "0.0.0.4/31"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.6"))->isSame(["0.0.0.0/30", "0.0.0.4/31", "0.0.0.6/32"]);
+
+        that((ip2cidr)("0.0.0.0", "0.0.0.7"))->isSame(["0.0.0.0/29"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.8"))->isSame(["0.0.0.0/29", "0.0.0.8/32"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.9"))->isSame(["0.0.0.0/29", "0.0.0.8/31"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.10"))->isSame(["0.0.0.0/29", "0.0.0.8/31", "0.0.0.10/32"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.11"))->isSame(["0.0.0.0/29", "0.0.0.8/30"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.12"))->isSame(["0.0.0.0/29", "0.0.0.8/30", "0.0.0.12/32"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.13"))->isSame(["0.0.0.0/29", "0.0.0.8/30", "0.0.0.12/31"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.14"))->isSame(["0.0.0.0/29", "0.0.0.8/30", "0.0.0.12/31", "0.0.0.14/32"]);
+
+        that((ip2cidr)("0.0.0.0", "0.0.0.15"))->isSame(["0.0.0.0/28"]);
+        that((ip2cidr)("0.0.0.0", "0.0.0.16"))->isSame(["0.0.0.0/28", "0.0.0.16/32"]);
+
+        that((ip2cidr)("255.255.255.250", "255.255.255.255"))->isSame(["255.255.255.250/31", "255.255.255.252/30"]);
+
+        that((ip2cidr)("0.0.0.0", "255.255.255.255"))->isSame(["0.0.0.0/0"]);
+
+        that((ip2cidr)("0.0.0.1", "0.0.0.0"))->isSame([]);
+        that((ip2cidr)("0.0.1.0", "0.0.0.1"))->isSame([]);
+        that((ip2cidr)("0.0.1.1", "0.0.1.0"))->isSame([]);
+
+        that(ip2cidr)('256.256.256.256', 'hogera')->wasThrown('is invalid');
+        that(ip2cidr)('127.0.0.0', 'hogera')->wasThrown('is invalid');
+        that(ip2cidr)('256.256.256.256', '127.0.0.0')->wasThrown('is invalid');
+    }
+
+    function test_cidr2ip()
+    {
+        that((cidr2ip)("0.0.0.0/29"))->isSame(["0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.3", "0.0.0.4", "0.0.0.5", "0.0.0.6", "0.0.0.7"]);
+        that((cidr2ip)("0.0.0.0/30"))->isSame(["0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.3"]);
+        that((cidr2ip)("0.0.0.0/31"))->isSame(["0.0.0.0", "0.0.0.1"]);
+        that((cidr2ip)("0.0.0.0/32"))->isSame(["0.0.0.0"]);
+        that((cidr2ip)("0.0.0.255/29"))->isSame(["0.0.0.248", "0.0.0.249", "0.0.0.250", "0.0.0.251", "0.0.0.252", "0.0.0.253", "0.0.0.254", "0.0.0.255"]);
+        that((cidr2ip)("0.0.0.255/30"))->isSame(["0.0.0.252", "0.0.0.253", "0.0.0.254", "0.0.0.255"]);
+        that((cidr2ip)("0.0.0.255/31"))->isSame(["0.0.0.254", "0.0.0.255"]);
+        that((cidr2ip)("0.0.0.255/32"))->isSame(["0.0.0.255"]);
+
+        that(cidr2ip)('hogera')->wasThrown('subnet addr');
+        that(cidr2ip)('256.256.256.256')->wasThrown('subnet addr');
+        that(cidr2ip)('127.0.0.0/hogera')->wasThrown('subnet mask');
+        that(cidr2ip)('127.0.0.0/33')->wasThrown('subnet mask');
+    }
+
+    function test_cidrip_verification_of_accounts()
+    {
+        $list = [
+            ['0.0.0.0', '0.0.0.14'],
+            ['10.0.0.0', '10.0.0.255'],
+            ['192.0.2.0', '192.0.2.130'],
+            ['192.168.1.1', '192.168.2.64'],
+            ['255.255.255.127', '255.255.255.255'],
+        ];
+        foreach ($list as [$min, $max]) {
+            $expected = array_map('long2ip', range(ip2long($min), ip2long($max)));
+            $actual = (array_flatten)(array_map(cidr2ip, (ip2cidr)($min, $max)));
+            that($actual)->isSame($expected);
+        }
+    }
+
     function test_incidr()
     {
-        $validdata = [
-            [true, '192.168.1.1', '192.168.1.1'],
-            [true, '192.168.1.1', '192.168.1.1/1'],
-            [true, '192.168.1.1', '192.168.1.0/24'],
-            [false, '192.168.1.1', '1.2.3.4/1'],
-            [true, '192.168.1.1', ['1.2.3.4/1', '192.168.1.0/24']],
-            [true, '192.168.1.1', ['192.168.1.0/24', '1.2.3.4/1']],
-            [false, '192.168.1.1', ['1.2.3.4/1', '4.3.2.1/1']],
-            [true, '1.2.3.4', '0.0.0.0/0'],
-            [true, '1.2.3.4', '192.168.1.0/0'],
-        ];
-        foreach ($validdata as $v) {
-            that((incidr)($v[1], $v[2]))->isSame($v[0]);
-        }
+        that((incidr)("192.168.1.1", "192.168.1.1"))->isSame(true);
+        that((incidr)("192.168.1.1", "192.168.1.1/1"))->isSame(true);
+        that((incidr)("192.168.1.1", "192.168.1.0/24"))->isSame(true);
+        that((incidr)("192.168.1.1", "1.2.3.4/1"))->isSame(false);
+        that((incidr)("192.168.1.1", ["1.2.3.4/1", "192.168.1.0/24"],))->isSame(true);
+        that((incidr)("192.168.1.1", ["192.168.1.0/24", "1.2.3.4/1"],))->isSame(true);
+        that((incidr)("192.168.1.1", ["1.2.3.4/1", "4.3.2.1/1"],))->isSame(false);
+        that((incidr)("1.2.3.4", "0.0.0.0/0"))->isSame(true);
+        that((incidr)("1.2.3.4", "192.168.1.0/0"))->isSame(true);
 
-        $invaliddata = [
-            ['subnet mask', '192.168.1.1', '192.168.1.1/33'],
-            ['subnet addr', '1.2.3.4', '256.256.256/0'],
-            ['ipaddr', 'an_invalid_ip', '192.168.1.0/24'],
-        ];
-        foreach ($invaliddata as $v) {
-            that(incidr)($v[1], $v[2])->wasThrown($v[0]);
-        }
+        that((incidr)("192.168.0.0/16", "192.168.0.0/16"))->isSame(true);
+        that((incidr)("192.168.0.0/24", "192.168.0.0/16"))->isSame(true);
+        that((incidr)("192.168.0.0/16", "192.168.0.0/24"))->isSame(false);
+        that((incidr)("192.168.0.0/16", "192.168.0.32/27"))->isSame(false);
+        that((incidr)("192.168.0.32/27", "192.168.0.0/16"))->isSame(true);
+
+        that(incidr)('192.168.1.1', '192.168.1.1/33')->wasThrown('subnet mask');
+        that(incidr)('192.168.1.1', '192.168.1.1/x')->wasThrown('subnet mask');
+        that(incidr)('1.2.3.4', '256.256.256/0')->wasThrown('subnet addr');
+        that(incidr)('an_invalid_ip', '192.168.1.0/24')->wasThrown('subnet addr');
     }
 
     function test_ping()
