@@ -11,6 +11,16 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 
+## 1.5.4
+
+- [refactor][Date] date_timestamp の効率が悪かったので改善
+- [feature][Date] date_fromto のミリ秒対応
+- [feature][Date] date_timestamp の DatetimeInterface 対応
+- [fixbug][Date] date_timestamp がタイムゾーンに対応していなかった不具合を修正
+- [fixbug][Strings] htmltag が php8.1 で deprecated を出す不具合を修正
+- [feature][Arrays] array_find_last を実装
+- [feature][Network] cidr の強化
+
 ## 1.5.3
 
 - [feature][Strings] json_import の特殊フラグ対応
