@@ -2598,11 +2598,11 @@ if (!isset($excluded_functions["array_find"]) && (!function_exists("array_find")
      * Example:
      * ```php
      * // 最初に見つかったキーを返す
-     * that(array_find(['a', 'b', '9'], 'ctype_digit'))->isSame(2);
-     * that(array_find(['a', 'b', '9'], fn($v) => $v === 'b'))->isSame(1);
+     * that(array_find(['a', '8', '9'], 'ctype_digit'))->isSame(1);
+     * that(array_find(['a', 'b', 'b'], fn($v) => $v === 'b'))->isSame(1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
      * $ifnumeric2power = fn($v) => ctype_digit($v) ? $v * $v : false;
-     * that(array_find(['a', 'b', '9'], $ifnumeric2power, false))->isSame(81);
+     * that(array_find(['a', '8', '9'], $ifnumeric2power, false))->isSame(64);
      * ```
      *
      * @param iterable $array 調べる配列
@@ -2632,6 +2632,59 @@ if (function_exists("array_find") && !defined("array_find")) {
      *
      */
     define("array_find", "array_find");
+}
+
+if (!isset($excluded_functions["array_find_last"]) && (!function_exists("array_find_last") || (!false && (new \ReflectionFunction("array_find_last"))->isInternal()))) {
+    /**
+     * array_find の後ろから探す版
+     *
+     * コールバックの返り値が true 相当のものを返す。
+     * $is_key に true を与えるとそのキーを返す（デフォルトの動作）。
+     * $is_key に false を与えるとコールバックの結果を返す。
+     *
+     * この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。
+     *
+     * Example:
+     * ```php
+     * // 最後に見つかったキーを返す
+     * that(array_find_last(['a', '8', '9'], 'ctype_digit'))->isSame(2);
+     * that(array_find_last(['a', 'b', 'b'], fn($v) => $v === 'b'))->isSame(2);
+     * // 最後に見つかったコールバック結果を返す（最初の数字の2乗を返す）
+     * $ifnumeric2power = fn($v) => ctype_digit($v) ? $v * $v : false;
+     * that(array_find_last(['a', '8', '9'], $ifnumeric2power, false))->isSame(81);
+     * ```
+     *
+     * @param iterable $array 調べる配列
+     * @param callable $callback 評価コールバック
+     * @param bool $is_key キーを返すか否か
+     * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
+     */
+    function array_find_last($array, $callback, $is_key = true)
+    {
+        // 配列なら reverse すればよい
+        if (is_array($array)) {
+            return array_find(array_reverse($array, true), $callback, $is_key);
+        }
+
+        $callback = func_user_func_array($callback);
+
+        // イテレータは全ループするしかない
+        $return = $notfound = new \stdClass();
+        $n = 0;
+        foreach ($array as $k => $v) {
+            $result = $callback($v, $k, $n++);
+            if ($result) {
+                $return = $is_key ? $k : $result;
+            }
+        }
+        return $return === $notfound ? false : $return;
+    }
+}
+if (function_exists("array_find_last") && !defined("array_find_last")) {
+    /**
+     *
+     */
+    define("array_find_last", "array_find_last");
 }
 
 if (!isset($excluded_functions["array_find_recursive"]) && (!function_exists("array_find_recursive") || (!false && (new \ReflectionFunction("array_find_recursive"))->isInternal()))) {
@@ -7345,7 +7398,7 @@ if (function_exists("get_object_properties") && !defined("get_object_properties"
 
 if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("date_timestamp") || (!false && (new \ReflectionFunction("date_timestamp"))->isInternal()))) {
     /**
-     * 日時文字列をよしなにタイムスタンプに変換する
+     * 日時的なものをよしなにタイムスタンプに変換する
      *
      * マイクロ秒にも対応している。つまり返り値は int か float になる。
      * また、相対指定の +1 month の月末問題は起きないようにしてある。
@@ -7371,34 +7424,40 @@ if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("date_tim
      */
     function date_timestamp($datetimedata, $baseTimestamp = null)
     {
-        // 全角を含めた trim
-        $chars = "[\\x0-\x20\x7f\xc2\xa0\xe3\x80\x80]";
-        $datetimedata = preg_replace("/\A{$chars}++|{$chars}++\z/u", '', $datetimedata);
+        if ($datetimedata instanceof \DateTimeInterface) {
+            return (float) $datetimedata->format('U.u');
+        }
 
-        // 和暦を西暦に置換
-        $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
-        $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
-            [, $era, $year] = $matches;
-            $eratime = array_find(JP_ERA, function ($v) use ($era) {
-                if (in_array($era, [$v['name'], $v['abbr']], true)) {
-                    return $v['since'];
-                }
-            }, false);
-            return idate('Y', $eratime) + ($year === '元' ? 1 : $year) - 1;
-        }, $datetimedata);
+        if (is_string($datetimedata) || (is_object($datetimedata) && method_exists($datetimedata, '__toString'))) {
+            // 全角を含めた trim
+            $chars = "[\\x0-\x20\x7f\xc2\xa0\xe3\x80\x80]";
+            $datetimedata = preg_replace("/\A{$chars}++|{$chars}++\z/u", '', $datetimedata);
 
-        // 単位文字列を置換
-        $datetimedata = strtr($datetimedata, [
-            '　'  => ' ',
-            '西暦' => '',
-            '年'  => '/',
-            '月'  => '/',
-            '日'  => ' ',
-            '時'  => ':',
-            '分'  => ':',
-            '秒'  => '',
-        ]);
-        $datetimedata = trim($datetimedata, " \t\n\r\0\x0B:/");
+            // 和暦を西暦に置換
+            $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
+            $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
+                [, $era, $year] = $matches;
+                $eratime = array_find(JP_ERA, function ($v) use ($era) {
+                    if (in_array($era, [$v['name'], $v['abbr']], true)) {
+                        return $v['since'];
+                    }
+                }, false);
+                return idate('Y', $eratime) + ($year === '元' ? 1 : $year) - 1;
+            }, $datetimedata);
+
+            // 単位文字列を置換
+            $datetimedata = strtr($datetimedata, [
+                '　'    => ' ',
+                '西暦' => '',
+                '年'   => '/',
+                '月'   => '/',
+                '日'   => ' ',
+                '時'   => ':',
+                '分'   => ':',
+                '秒'   => '',
+            ]);
+            $datetimedata = trim($datetimedata, " \t\n\r\0\x0B:/");
+        }
 
         // 数値4桁は年と解釈されるように
         if (preg_match('/^[0-9]{4}$/', $datetimedata)) {
@@ -7455,14 +7514,25 @@ if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("date_tim
             $parts['second'] += $relative['second'];
         }
 
-        // ドキュメントに「引数が不正な場合、 この関数は FALSE を返します」とあるが、 date_parse の結果を与える分には失敗しないはず
-        $time = mktime($parts['hour'], $parts['minute'], $parts['second'], $parts['month'], $parts['day'], $parts['year']);
-        if ($parts['fraction']) {
-            // 1970 以前なら減算、以降なら加算じゃないと帳尻が合わなくなる
-            $time += $time >= 0 ? $parts['fraction'] : -$parts['fraction'];
+        $offset = 0;
+        $timezone = null;
+        if ($parts['is_localtime']) {
+            if ($parts['zone_type'] === 1) {
+                $timezone = new \DateTimeZone('UTC');
+                $offset = $parts['zone'];
+            }
+            elseif ($parts['zone_type'] === 2) {
+                $timezone = new \DateTimeZone($parts['tz_abbr']);
+            }
+            elseif ($parts['zone_type'] === 3) {
+                $timezone = new \DateTimeZone($parts['tz_id']);
+            }
         }
 
-        return $time;
+        $dt = new \DateTime('', $timezone);
+        $dt->setDate($parts['year'], $parts['month'], $parts['day']);
+        $dt->setTime($parts['hour'], $parts['minute'], $parts['second'] - $offset, ($parts['fraction'] ?: 0) * 1000 * 1000);
+        return $parts['fraction'] ? (float) $dt->format('U.u') : $dt->getTimestamp();
     }
 }
 if (function_exists("date_timestamp") && !defined("date_timestamp")) {
@@ -7604,12 +7674,12 @@ if (!isset($excluded_functions["date_fromto"]) && (!function_exists("date_fromto
         $y ??= idate('Y');
         $ld = $d ?? idate('t', mktime(0, 0, 0, $m ?? 12, 1, $y));
 
-        $min = mktime($h ?? 0, $i ?? 0, $s ?? 0, $m ?? 1, $d ?? 1, $y);
+        $min = mktime($h ?? 0, $i ?? 0, $s ?? 0, $m ?? 1, $d ?? 1, $y) + $parsed['fraction'];
         $max = mktime($h ?? 23, $i ?? 59, $s ?? 59, $m ?? 12, $d ?? $ld, $y) + 1;
         if ($format === null) {
             return [$min, $max];
         }
-        return [date($format, $min), date($format, $max)];
+        return [date_convert($format, $min), date_convert($format, $max)];
     }
 }
 if (function_exists("date_fromto") && !defined("date_fromto")) {
@@ -11575,6 +11645,37 @@ if (function_exists("calculate_formula") && !defined("calculate_formula")) {
     define("calculate_formula", "calculate_formula");
 }
 
+if (!isset($excluded_functions["cidr_parse"]) && (!function_exists("cidr_parse") || (!false && (new \ReflectionFunction("cidr_parse"))->isInternal()))) {
+    /**
+     * cidr を分割する
+     *
+     * ※ 内部向け
+     *
+     * @param string $cidr
+     * @return array [$address, $networkBit, $localBit]
+     */
+    function cidr_parse($cidr)
+    {
+        [$address, $subnet] = explode('/', trim($cidr), 2) + [1 => 32];
+
+        if (!filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("subnet addr '$address' is invalid.");
+        }
+        if (!(ctype_digit("$subnet") && (0 <= $subnet && $subnet <= 32))) {
+            throw new \InvalidArgumentException("subnet mask '$subnet' is invalid.");
+        }
+
+        $subnet = (int) $subnet;
+        return [$address, $subnet, 32 - $subnet];
+    }
+}
+if (function_exists("cidr_parse") && !defined("cidr_parse")) {
+    /**
+     *
+     */
+    define("cidr_parse", "cidr_parse");
+}
+
 if (!isset($excluded_functions["getipaddress"]) && (!function_exists("getipaddress") || (!false && (new \ReflectionFunction("getipaddress"))->isInternal()))) {
     /**
      * 接続元となる IP を返す
@@ -11647,6 +11748,103 @@ if (function_exists("getipaddress") && !defined("getipaddress")) {
     define("getipaddress", "getipaddress");
 }
 
+if (!isset($excluded_functions["ip2cidr"]) && (!function_exists("ip2cidr") || (!false && (new \ReflectionFunction("ip2cidr"))->isInternal()))) {
+    /**
+     * IP アドレスを含みうる cidr を返す
+     *
+     * from, to の大小関係には言及しないので、from > to を与えると空配列を返す。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * that(ip2cidr('192.168.1.1', '192.168.2.64'))->isSame([
+     *     '192.168.1.1/32',
+     *     '192.168.1.2/31',
+     *     '192.168.1.4/30',
+     *     '192.168.1.8/29',
+     *     '192.168.1.16/28',
+     *     '192.168.1.32/27',
+     *     '192.168.1.64/26',
+     *     '192.168.1.128/25',
+     *     '192.168.2.0/26',
+     *     '192.168.2.64/32',
+     * ]);
+     * ```
+     *
+     * @param string $fromipaddr ipaddrs
+     * @param string $toipaddr ipaddrs
+     * @return array cidr
+     */
+    function ip2cidr($fromipaddr, $toipaddr)
+    {
+        if (!filter_var($fromipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("ipaddr '$fromipaddr' is invalid.");
+        }
+        if (!filter_var($toipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("ipaddr '$toipaddr' is invalid.");
+        }
+        $minlong = ip2long($fromipaddr);
+        $maxlong = ip2long($toipaddr);
+
+        $bit_length = fn($number) => strlen(ltrim(sprintf('%032b', $number), '0'));
+
+        $result = [];
+        for ($long = $minlong; $long <= $maxlong; $long += 1 << $nbits) {
+            $current_bits = $bit_length(~$long & ($long - 1));
+            $target_bits = $bit_length($maxlong - $long + 1) - 1;
+            $nbits = min($current_bits, $target_bits);
+
+            $result[] = long2ip($long) . '/' . (32 - $nbits);
+        }
+        return $result;
+    }
+}
+if (function_exists("ip2cidr") && !defined("ip2cidr")) {
+    /**
+     *
+     */
+    define("ip2cidr", "ip2cidr");
+}
+
+if (!isset($excluded_functions["cidr2ip"]) && (!function_exists("cidr2ip") || (!false && (new \ReflectionFunction("cidr2ip"))->isInternal()))) {
+    /**
+     * cidr 内の IP アドレスを返す
+     *
+     * すべての IP アドレスを返すため、`/1` のような極端な値を投げてはならない。
+     * （Generator の方がいいかもしれない）。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * that(cidr2ip('192.168.0.0/30'))->isSame(['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']);
+     * that(cidr2ip('192.168.0.255/30'))->isSame(['192.168.0.252', '192.168.0.253', '192.168.0.254', '192.168.0.255']);
+     * ```
+     *
+     * @param string $cidr cidr
+     * @return array IP アドレス
+     */
+    function cidr2ip($cidr)
+    {
+        [$prefix, , $mask] = cidr_parse($cidr);
+
+        $prefix = ip2long($prefix) >> $mask << $mask;
+
+        $result = [];
+        for ($i = 0, $l = 1 << $mask; $i < $l; $i++) {
+            $result[] = long2ip($prefix + $i);
+        }
+        return $result;
+    }
+}
+if (function_exists("cidr2ip") && !defined("cidr2ip")) {
+    /**
+     *
+     */
+    define("cidr2ip", "cidr2ip");
+}
+
 if (!isset($excluded_functions["incidr"]) && (!function_exists("incidr") || (!false && (new \ReflectionFunction("incidr"))->isInternal()))) {
     /**
      * ipv4 の cidr チェック
@@ -11668,28 +11866,24 @@ if (!isset($excluded_functions["incidr"]) && (!function_exists("incidr") || (!fa
      * that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))->isFalse();
      * ```
      *
-     * @param string $ipaddr 調べられる IP アドレス
+     * @param string $ipaddr 調べられる IP/cidr アドレス
      * @param string|array $cidr 調べる cidr アドレス
      * @return bool $ipaddr が $cidr 内なら true
      */
     function incidr($ipaddr, $cidr)
     {
-        if (!filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            throw new \InvalidArgumentException("ipaddr '$ipaddr' is invalid.");
-        }
+        [$ipaddr, , $ipmask] = cidr_parse($ipaddr);
+
         $iplong = ip2long($ipaddr);
 
         foreach (arrayize($cidr) as $cidr) {
-            [$subnet, $length] = explode('/', $cidr, 2) + [1 => '32'];
+            [$netaddress, , $netmask] = cidr_parse($cidr);
 
-            if (!filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                throw new \InvalidArgumentException("subnet addr '$subnet' is invalid.");
-            }
-            if (!(ctype_digit($length) && (0 <= $length && $length <= 32))) {
-                throw new \InvalidArgumentException("subnet mask '$length' is invalid.");
+            if ($ipmask > $netmask) {
+                continue;
             }
 
-            if (substr_compare(sprintf('%032b', $iplong), sprintf('%032b', ip2long($subnet)), 0, $length) === 0) {
+            if ((ip2long($netaddress) >> $netmask) == ($iplong >> $netmask)) {
                 return true;
             }
         }
@@ -15384,7 +15578,7 @@ if (!isset($excluded_functions["htmltag"]) && (!function_exists("htmltag") || (!
 
         $build = static function ($selector, $content, $escape) use ($html) {
             $attrs = css_selector($selector);
-            $tag = array_unset($attrs, '');
+            $tag = array_unset($attrs, '', '');
             if (!strlen($tag)) {
                 throw new \InvalidArgumentException('tagname is empty.');
             }
@@ -16830,7 +17024,7 @@ if (!isset($excluded_functions["json_import"]) && (!function_exists("json_import
         try {
             return $parser->parse($specials);
         }
-        catch (\Throwable $t){
+        catch (\Throwable $t) {
             if ($specials[JSON_THROW_ON_ERROR]) {
                 throw $t;
             }
@@ -20852,7 +21046,7 @@ if (!isset($excluded_functions["cache"]) && (!function_exists("cache") || (!fals
      * ```
      *
      * @param string $key キャッシュのキー
-     * @param callable $provider キャッシュがない場合にコールされる callable
+     * @param ?callable $provider キャッシュがない場合にコールされる callable
      * @param ?string $namespace 名前空間
      * @return mixed キャッシュ
      */

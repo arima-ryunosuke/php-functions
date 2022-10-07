@@ -709,11 +709,29 @@ $is_key に false を与えるとコールバックの結果を返す。</p>
 <p>この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 最初に見つかったキーを返す
-that(array_find(['a', 'b', '9'], 'ctype_digit'))-&gt;isSame(2);
-that(array_find(['a', 'b', '9'], fn($v) =&gt; $v === 'b'))-&gt;isSame(1);
+that(array_find(['a', '8', '9'], 'ctype_digit'))-&gt;isSame(1);
+that(array_find(['a', 'b', 'b'], fn($v) =&gt; $v === 'b'))-&gt;isSame(1);
 // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
 $ifnumeric2power = fn($v) =&gt; ctype_digit($v) ? $v * $v : false;
-that(array_find(['a', 'b', '9'], $ifnumeric2power, false))-&gt;isSame(81);
+that(array_find(['a', '8', '9'], $ifnumeric2power, false))-&gt;isSame(64);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_find_last()">
+                                    ryunosuke\Functions\Package\Arrays::array_find_last		</a>	<small>($array, $callback, $is_key = true) : mixed</small>
+		</h4>
+	<div class="description"><p>array_find の後ろから探す版</p>
+<p>コールバックの返り値が true 相当のものを返す。<br />
+$is_key に true を与えるとそのキーを返す（デフォルトの動作）。<br />
+$is_key に false を与えるとコールバックの結果を返す。</p>
+<p>この関数は論理値 FALSE を返す可能性がありますが、FALSE として評価される値を返す可能性もあります。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 最後に見つかったキーを返す
+that(array_find_last(['a', '8', '9'], 'ctype_digit'))-&gt;isSame(2);
+that(array_find_last(['a', 'b', 'b'], fn($v) =&gt; $v === 'b'))-&gt;isSame(2);
+// 最後に見つかったコールバック結果を返す（最初の数字の2乗を返す）
+$ifnumeric2power = fn($v) =&gt; ctype_digit($v) ? $v * $v : false;
+that(array_find_last(['a', '8', '9'], $ifnumeric2power, false))-&gt;isSame(81);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -2472,7 +2490,7 @@ that(get_object_properties(fn() =&gt; $object))-&gt;is([
 		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_timestamp()">
                                     ryunosuke\Functions\Package\Date::date_timestamp		</a>	<small>($datetimedata, $baseTimestamp = null) : int<span class="type-separator"></span><wbr>float<span class="type-separator"></span><wbr>null</small>
 		</h4>
-	<div class="description"><p>日時文字列をよしなにタイムスタンプに変換する</p>
+	<div class="description"><p>日時的なものをよしなにタイムスタンプに変換する</p>
 <p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
 また、相対指定の +1 month の月末問題は起きないようにしてある。</p>
 <p>かなり適当に和暦にも対応している。</p>
@@ -3693,6 +3711,13 @@ that(calculate_formula('PHP_INT_SIZE * 3'))-&gt;isSame(PHP_INT_SIZE * 3);
 	<div class="description"><p>ネットワーク関連のユーティリティ</p>
 </div>
                 	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::cidr_parse()">
+                                    ryunosuke\Functions\Package\Network::cidr_parse		</a>	<small>($cidr) : array</small>
+		</h4>
+	<div class="description"><p>cidr を分割する</p>
+<p>※ 内部向け</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::getipaddress()">
                                     ryunosuke\Functions\Package\Network::getipaddress		</a>	<small>($target = null) : ?string</small>
 		</h4>
@@ -3704,6 +3729,41 @@ that(calculate_formula('PHP_INT_SIZE * 3'))-&gt;isSame(PHP_INT_SIZE * 3);
 that(getipaddress())-&gt;isValidIpv4();
 // 自分への接続元は自分なので 127.0.0.1 を返す
 that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::ip2cidr()">
+                                    ryunosuke\Functions\Package\Network::ip2cidr		</a>	<small>($fromipaddr, $toipaddr) : array</small>
+		</h4>
+	<div class="description"><p>IP アドレスを含みうる cidr を返す</p>
+<p>from, to の大小関係には言及しないので、from &gt; to を与えると空配列を返す。</p>
+<p>ipv6 は今のところ未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(ip2cidr('192.168.1.1', '192.168.2.64'))-&gt;isSame([
+    '192.168.1.1/32',
+    '192.168.1.2/31',
+    '192.168.1.4/30',
+    '192.168.1.8/29',
+    '192.168.1.16/28',
+    '192.168.1.32/27',
+    '192.168.1.64/26',
+    '192.168.1.128/25',
+    '192.168.2.0/26',
+    '192.168.2.64/32',
+]);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Network$typespace.html#ryunosuke\Functions\Package\Network::cidr2ip()">
+                                    ryunosuke\Functions\Package\Network::cidr2ip		</a>	<small>($cidr) : array</small>
+		</h4>
+	<div class="description"><p>cidr 内の IP アドレスを返す</p>
+<p>すべての IP アドレスを返すため、<code>/1</code> のような極端な値を投げてはならない。<br />
+（Generator の方がいいかもしれない）。</p>
+<p>ipv6 は今のところ未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(cidr2ip('192.168.0.0/30'))-&gt;isSame(['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']);
+that(cidr2ip('192.168.0.255/30'))-&gt;isSame(['192.168.0.252', '192.168.0.253', '192.168.0.254', '192.168.0.255']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>

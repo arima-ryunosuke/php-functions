@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L5-L507" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L5-L524" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Date</span></h2>
@@ -135,13 +135,13 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L19-L138" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L19-L155" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_timestamp()" tabindex="-1" class="structure-title ">
                         date_timestamp                        	<small>($datetimedata, $baseTimestamp = null) : int<span class="type-separator"></span><wbr>float<span class="type-separator"></span><wbr>null</small>
 						</h4>
 					<div class="inner-item">
-						<div class="description"><p>日時文字列をよしなにタイムスタンプに変換する</p>
+						<div class="description"><p>日時的なものをよしなにタイムスタンプに変換する</p>
 <p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
 また、相対指定の +1 month の月末問題は起きないようにしてある。</p>
 <p>かなり適当に和暦にも対応している。</p>
@@ -202,7 +202,7 @@ that(date_timestamp('2014/12/24 12:34:56.789'))-&gt;isSame(1419392096.789);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L140-L207" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L157-L224" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_convert()" tabindex="-1" class="structure-title ">
                         date_convert                        	<small>($format, $datetimedata = null) : string</small>
@@ -264,7 +264,7 @@ that(date_convert('Y/m/d H:i:s.u', $now))-&gt;isSame('2009/02/14 08:31:30.123000
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L209-L269" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L226-L286" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_fromto()" tabindex="-1" class="structure-title ">
                         date_fromto                        	<small>($format, $datetimestring) : array<span class="type-separator"></span><wbr>null</small>
@@ -325,7 +325,7 @@ that(date_fromto('Y/m/d H:i:s', '2010/11/24 13:24'))-&gt;isSame(["2010/11/24 13:
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L271-L470" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L288-L487" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_interval()" tabindex="-1" class="structure-title ">
                         date_interval                        	<small>($sec, $format = null, $limit_type = &quot;y&quot;) : string<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.dateinterval.php" class="fqsen" target="_blank">\DateInterval</a></small>
@@ -431,7 +431,7 @@ that(date_interval(123.456))-&gt;isInstanceOf(\DateInterval::class);
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L472-L506" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Date.php#L489-L523" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Date::date_alter()" tabindex="-1" class="structure-title ">
                         date_alter                        	<small>($datetime, $excluded_dates, $follow_count, $format = &quot;Y-m-d&quot;) : string<span class="type-separator"></span><wbr>null</small>

@@ -8,6 +8,37 @@
  */
 trait user_6
 {
+    /** @see \strcat() */
+    public function strcat(...$variadic): self { }
+    public function strcat0(): self { }
+
+    /** @see \stringify() */
+    public self $stringify;
+    public function stringify($var): self { }
+    public function stringify0(): self { }
+
+    /** @see \strip_php() */
+    public self $strip_php;
+    public function strip_php($phtml, $option = [], &$mapping = []): self { }
+    public function strip_php0($option = [], &$mapping = []): self { }
+    public function strip_php1($phtml, &$mapping = []): self { }
+    public function strip_php2($phtml, $option = []): self { }
+
+    /** @see \strpos_array() */
+    public function strpos_array($haystack, $needles, $offset = 0): self { }
+    public function strpos_array0($needles, $offset = 0): self { }
+    public function strpos_array1($haystack, $offset = 0): self { }
+    public function strpos_array2($haystack, $needles): self { }
+
+    /** @see \strpos_quoted() */
+    public function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted0($needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted1($haystack, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted2($haystack, $needle, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted3($haystack, $needle, $offset = 0, $escape = "\\", &$found = null): self { }
+    public function strpos_quoted4($haystack, $needle, $offset = 0, $enclosure = "'\"", &$found = null): self { }
+    public function strpos_quoted5($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\"): self { }
+
     /** @see \strrstr() */
     public function strrstr($haystack, $needle, $after_needle = true): self { }
     public function strrstr0($needle, $after_needle = true): self { }

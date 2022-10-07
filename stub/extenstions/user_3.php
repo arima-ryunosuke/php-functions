@@ -8,6 +8,36 @@
  */
 trait user_3
 {
+    /** @see \dirname_r() */
+    public function dirname_r($path, $callback): self { }
+    public function dirname_r0($callback): self { }
+    public function dirname_r1($path): self { }
+    public function dirname_rP($path, $callback): self { }
+    public function dirname_r0P($callback): self { }
+    public function dirname_r1P($path): self { }
+    public function dirname_rE($path, $callback): self { }
+    public function dirname_r0E($callback): self { }
+    public function dirname_r1E($path): self { }
+
+    /** @see \encrypt() */
+    public function encrypt($plaindata, $password, $cipher = "aes-256-gcm", &$tag = ""): self { }
+    public function encrypt0($password, $cipher = "aes-256-gcm", &$tag = ""): self { }
+    public function encrypt1($plaindata, $cipher = "aes-256-gcm", &$tag = ""): self { }
+    public function encrypt2($plaindata, $password, &$tag = ""): self { }
+    public function encrypt3($plaindata, $password, $cipher = "aes-256-gcm"): self { }
+
+    /** @see \ends_with() */
+    public function ends_with($string, $with, $case_insensitivity = false): self { }
+    public function ends_with0($with, $case_insensitivity = false): self { }
+    public function ends_with1($string, $case_insensitivity = false): self { }
+    public function ends_with2($string, $with): self { }
+
+    /** @see \error() */
+    public self $error;
+    public function error($message, $destination = null): self { }
+    public function error0($destination = null): self { }
+    public function error1($message): self { }
+
     /** @see \eval_func() */
     public self $eval_func;
     public function eval_func($expression, ...$variadic): self { }
@@ -348,6 +378,11 @@ trait user_3
     public function ini_sets($values): self { }
     public function ini_sets0(): self { }
 
+    /** @see \ip2cidr() */
+    public function ip2cidr($fromipaddr, $toipaddr): self { }
+    public function ip2cidr0($toipaddr): self { }
+    public function ip2cidr1($fromipaddr): self { }
+
     /** @see \is_ansi() */
     public self $is_ansi;
     public function is_ansi($stream): self { }
@@ -382,32 +417,5 @@ trait user_3
     public self $is_indexarray;
     public function is_indexarray($array): self { }
     public function is_indexarray0(): self { }
-
-    /** @see \is_primitive() */
-    public self $is_primitive;
-    public function is_primitive($var): self { }
-    public function is_primitive0(): self { }
-
-    /** @see \is_recursive() */
-    public self $is_recursive;
-    public function is_recursive($var): self { }
-    public function is_recursive0(): self { }
-
-    /** @see \is_stringable() */
-    public self $is_stringable;
-    public function is_stringable($var): self { }
-    public function is_stringable0(): self { }
-
-    /** @see \json_export() */
-    public self $json_export;
-    public function json_export($value, $options = []): self { }
-    public function json_export0($options = []): self { }
-    public function json_export1($value): self { }
-
-    /** @see \json_import() */
-    public self $json_import;
-    public function json_import($value, $options = []): self { }
-    public function json_import0($options = []): self { }
-    public function json_import1($value): self { }
 
 }

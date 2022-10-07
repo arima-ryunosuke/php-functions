@@ -400,6 +400,34 @@ trait user_0
     public function find1E($array, $is_key = true): self { }
     public function find2E($array, $callback): self { }
 
+    /** @see \array_find_last() */
+    public function array_find_last($array, $callback, $is_key = true): self { }
+    public function array_find_last0($callback, $is_key = true): self { }
+    public function array_find_last1($array, $is_key = true): self { }
+    public function array_find_last2($array, $callback): self { }
+    public function array_find_lastP($array, $callback, $is_key = true): self { }
+    public function array_find_last0P($callback, $is_key = true): self { }
+    public function array_find_last1P($array, $is_key = true): self { }
+    public function array_find_last2P($array, $callback): self { }
+    public function array_find_lastE($array, $callback, $is_key = true): self { }
+    public function array_find_last0E($callback, $is_key = true): self { }
+    public function array_find_last1E($array, $is_key = true): self { }
+    public function array_find_last2E($array, $callback): self { }
+
+    /** @see \array_find_last() */
+    public function find_last($array, $callback, $is_key = true): self { }
+    public function find_last0($callback, $is_key = true): self { }
+    public function find_last1($array, $is_key = true): self { }
+    public function find_last2($array, $callback): self { }
+    public function find_lastP($array, $callback, $is_key = true): self { }
+    public function find_last0P($callback, $is_key = true): self { }
+    public function find_last1P($array, $is_key = true): self { }
+    public function find_last2P($array, $callback): self { }
+    public function find_lastE($array, $callback, $is_key = true): self { }
+    public function find_last0E($callback, $is_key = true): self { }
+    public function find_last1E($array, $is_key = true): self { }
+    public function find_last2E($array, $callback): self { }
+
     /** @see \array_find_recursive() */
     public function array_find_recursive($array, $callback, $is_key = true): self { }
     public function array_find_recursive0($callback, $is_key = true): self { }
@@ -525,27 +553,5 @@ trait user_0
     public function keys_exist($keys, $array): self { }
     public function keys_exist0($array): self { }
     public function keys_exist1($keys): self { }
-
-    /** @see \array_kmap() */
-    public function array_kmap($array, $callback): self { }
-    public function array_kmap0($callback): self { }
-    public function array_kmap1($array): self { }
-    public function array_kmapP($array, $callback): self { }
-    public function array_kmap0P($callback): self { }
-    public function array_kmap1P($array): self { }
-    public function array_kmapE($array, $callback): self { }
-    public function array_kmap0E($callback): self { }
-    public function array_kmap1E($array): self { }
-
-    /** @see \array_kmap() */
-    public function kmap($array, $callback): self { }
-    public function kmap0($callback): self { }
-    public function kmap1($array): self { }
-    public function kmapP($array, $callback): self { }
-    public function kmap0P($callback): self { }
-    public function kmap1P($array): self { }
-    public function kmapE($array, $callback): self { }
-    public function kmap0E($callback): self { }
-    public function kmap1E($array): self { }
 
 }

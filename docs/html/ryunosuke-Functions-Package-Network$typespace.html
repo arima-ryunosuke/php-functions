@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L855" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L955" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Network</span></h2>
@@ -92,7 +92,54 @@
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L72" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L10-L31" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Network::cidr_parse()" tabindex="-1" class="structure-title ">
+                        cidr_parse                        	<small>($cidr) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>cidr を分割する</p>
+<p>※ 内部向け</p>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$cidr</td>
+				<td class="desc"></td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>[$address, $networkBit, $localBit]</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L33-L95" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::getipaddress()" tabindex="-1" class="structure-title ">
                         getipaddress                        	<small>($target = null) : ?string</small>
@@ -147,7 +194,130 @@ that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L74-L120" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L97-L146" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Network::ip2cidr()" tabindex="-1" class="structure-title ">
+                        ip2cidr                        	<small>($fromipaddr, $toipaddr) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>IP アドレスを含みうる cidr を返す</p>
+<p>from, to の大小関係には言及しないので、from &gt; to を与えると空配列を返す。</p>
+<p>ipv6 は今のところ未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(ip2cidr('192.168.1.1', '192.168.2.64'))-&gt;isSame([
+    '192.168.1.1/32',
+    '192.168.1.2/31',
+    '192.168.1.4/30',
+    '192.168.1.8/29',
+    '192.168.1.16/28',
+    '192.168.1.32/27',
+    '192.168.1.64/26',
+    '192.168.1.128/25',
+    '192.168.2.0/26',
+    '192.168.2.64/32',
+]);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$fromipaddr</td>
+				<td class="desc"><p>ipaddrs</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$toipaddr</td>
+				<td class="desc"><p>ipaddrs</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>cidr</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L148-L176" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Network::cidr2ip()" tabindex="-1" class="structure-title ">
+                        cidr2ip                        	<small>($cidr) : array</small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>cidr 内の IP アドレスを返す</p>
+<p>すべての IP アドレスを返すため、<code>/1</code> のような極端な値を投げてはならない。<br />
+（Generator の方がいいかもしれない）。</p>
+<p>ipv6 は今のところ未対応。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(cidr2ip('192.168.0.0/30'))-&gt;isSame(['192.168.0.0', '192.168.0.1', '192.168.0.2', '192.168.0.3']);
+that(cidr2ip('192.168.0.255/30'))-&gt;isSame(['192.168.0.252', '192.168.0.253', '192.168.0.254', '192.168.0.255']);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">string</td>
+				<td class="rest">$cidr</td>
+				<td class="desc"><p>cidr</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type">array</td>
+			<td class="desc"><p>IP アドレス</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L178-L220" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::incidr()" tabindex="-1" class="structure-title ">
                         incidr                        	<small>($ipaddr, $cidr) : bool</small>
@@ -174,7 +344,7 @@ that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))-&gt;isFalse();
         			<tr>
 				<td class="type">string</td>
 				<td class="rest">$ipaddr</td>
-				<td class="desc"><p>調べられる IP アドレス</p>
+				<td class="desc"><p>調べられる IP/cidr アドレス</p>
 </td>
 			</tr>
         			<tr>
@@ -213,7 +383,7 @@ that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))-&gt;isFalse();
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L122-L235" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L222-L335" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::ping()" tabindex="-1" class="structure-title ">
                         ping                        	<small>($host, $port = null, $timeout = 1, &amp;$errstr = &quot;&quot;) : float<span class="type-separator"></span><wbr>bool</small>
@@ -289,7 +459,7 @@ that(ping('127.0.0.1', 1234))-&gt;isFalse(); // tcp はスキームを省略で�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L237-L433" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L337-L533" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_requests()" tabindex="-1" class="structure-title ">
                         http_requests                        	<small>($urls, $single_options = [], $multi_options = [], &amp;$infos = []) : array</small>
@@ -411,7 +581,7 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L435-L738" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L535-L838" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_request()" tabindex="-1" class="structure-title ">
                         http_request                        	<small>($options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -531,7 +701,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L740-L757" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L840-L857" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_head()" tabindex="-1" class="structure-title ">
                         http_head                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : array</small>
@@ -602,7 +772,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L759-L778" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L859-L878" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_get()" tabindex="-1" class="structure-title ">
                         http_get                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -673,7 +843,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L780-L797" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L880-L897" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_post()" tabindex="-1" class="structure-title ">
                         http_post                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -744,7 +914,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L799-L816" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L899-L916" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_put()" tabindex="-1" class="structure-title ">
                         http_put                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -815,7 +985,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L818-L835" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L918-L935" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_patch()" tabindex="-1" class="structure-title ">
                         http_patch                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -886,7 +1056,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L837-L854" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L937-L954" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_delete()" tabindex="-1" class="structure-title ">
                         http_delete                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>

@@ -8,6 +8,19 @@
  */
 trait user_2
 {
+    /** @see \array_sprintf() */
+    public self $sprintf;
+    public function sprintf($array, $format = null, $glue = null): self { }
+    public function sprintf0($format = null, $glue = null): self { }
+    public function sprintf1($array, $glue = null): self { }
+    public function sprintf2($array, $format = null): self { }
+
+    /** @see \array_strpad() */
+    public function array_strpad($array, $key_prefix, $val_prefix = ""): self { }
+    public function array_strpad0($key_prefix, $val_prefix = ""): self { }
+    public function array_strpad1($array, $val_prefix = ""): self { }
+    public function array_strpad2($array, $key_prefix): self { }
+
     /** @see \array_strpad() */
     public function strpad($array, $key_prefix, $val_prefix = ""): self { }
     public function strpad0($key_prefix, $val_prefix = ""): self { }
@@ -224,6 +237,16 @@ trait user_2
     public function chain_case0($delimiter = "-"): self { }
     public function chain_case1($string): self { }
 
+    /** @see \cidr2ip() */
+    public self $cidr2ip;
+    public function cidr2ip($cidr): self { }
+    public function cidr2ip0(): self { }
+
+    /** @see \cidr_parse() */
+    public self $cidr_parse;
+    public function cidr_parse($cidr): self { }
+    public function cidr_parse0(): self { }
+
     /** @see \cipher_metadata() */
     public self $cipher_metadata;
     public function cipher_metadata($cipher): self { }
@@ -387,35 +410,5 @@ trait user_2
     public function dirmtime($dirname, $recursive = true): self { }
     public function dirmtime0($recursive = true): self { }
     public function dirmtime1($dirname): self { }
-
-    /** @see \dirname_r() */
-    public function dirname_r($path, $callback): self { }
-    public function dirname_r0($callback): self { }
-    public function dirname_r1($path): self { }
-    public function dirname_rP($path, $callback): self { }
-    public function dirname_r0P($callback): self { }
-    public function dirname_r1P($path): self { }
-    public function dirname_rE($path, $callback): self { }
-    public function dirname_r0E($callback): self { }
-    public function dirname_r1E($path): self { }
-
-    /** @see \encrypt() */
-    public function encrypt($plaindata, $password, $cipher = "aes-256-gcm", &$tag = ""): self { }
-    public function encrypt0($password, $cipher = "aes-256-gcm", &$tag = ""): self { }
-    public function encrypt1($plaindata, $cipher = "aes-256-gcm", &$tag = ""): self { }
-    public function encrypt2($plaindata, $password, &$tag = ""): self { }
-    public function encrypt3($plaindata, $password, $cipher = "aes-256-gcm"): self { }
-
-    /** @see \ends_with() */
-    public function ends_with($string, $with, $case_insensitivity = false): self { }
-    public function ends_with0($with, $case_insensitivity = false): self { }
-    public function ends_with1($string, $case_insensitivity = false): self { }
-    public function ends_with2($string, $with): self { }
-
-    /** @see \error() */
-    public self $error;
-    public function error($message, $destination = null): self { }
-    public function error0($destination = null): self { }
-    public function error1($message): self { }
 
 }

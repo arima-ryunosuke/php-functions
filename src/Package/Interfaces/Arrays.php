@@ -43,6 +43,7 @@ interface Arrays
     public const array_dive           = ["ryunosuke\\Functions\\Package\\Arrays", "array_dive"];
     public const array_keys_exist     = ["ryunosuke\\Functions\\Package\\Arrays", "array_keys_exist"];
     public const array_find           = ["ryunosuke\\Functions\\Package\\Arrays", "array_find"];
+    public const array_find_last      = ["ryunosuke\\Functions\\Package\\Arrays", "array_find_last"];
     public const array_find_recursive = ["ryunosuke\\Functions\\Package\\Arrays", "array_find_recursive"];
     public const array_rekey          = ["ryunosuke\\Functions\\Package\\Arrays", "array_rekey"];
     public const array_grep_key       = ["ryunosuke\\Functions\\Package\\Arrays", "array_grep_key"];

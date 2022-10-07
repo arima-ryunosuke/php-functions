@@ -8,6 +8,28 @@
  */
 trait user_1
 {
+    /** @see \array_kmap() */
+    public function array_kmap($array, $callback): self { }
+    public function array_kmap0($callback): self { }
+    public function array_kmap1($array): self { }
+    public function array_kmapP($array, $callback): self { }
+    public function array_kmap0P($callback): self { }
+    public function array_kmap1P($array): self { }
+    public function array_kmapE($array, $callback): self { }
+    public function array_kmap0E($callback): self { }
+    public function array_kmap1E($array): self { }
+
+    /** @see \array_kmap() */
+    public function kmap($array, $callback): self { }
+    public function kmap0($callback): self { }
+    public function kmap1($array): self { }
+    public function kmapP($array, $callback): self { }
+    public function kmap0P($callback): self { }
+    public function kmap1P($array): self { }
+    public function kmapE($array, $callback): self { }
+    public function kmap0E($callback): self { }
+    public function kmap1E($array): self { }
+
     /** @see \array_kvmap() */
     public function array_kvmap($array, $callback): self { }
     public function array_kvmap0($callback): self { }
@@ -499,18 +521,5 @@ trait user_1
     public function array_sprintf0($format = null, $glue = null): self { }
     public function array_sprintf1($array, $glue = null): self { }
     public function array_sprintf2($array, $format = null): self { }
-
-    /** @see \array_sprintf() */
-    public self $sprintf;
-    public function sprintf($array, $format = null, $glue = null): self { }
-    public function sprintf0($format = null, $glue = null): self { }
-    public function sprintf1($array, $glue = null): self { }
-    public function sprintf2($array, $format = null): self { }
-
-    /** @see \array_strpad() */
-    public function array_strpad($array, $key_prefix, $val_prefix = ""): self { }
-    public function array_strpad0($key_prefix, $val_prefix = ""): self { }
-    public function array_strpad1($array, $val_prefix = ""): self { }
-    public function array_strpad2($array, $key_prefix): self { }
 
 }

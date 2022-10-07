@@ -8,6 +8,48 @@
  */
 trait user_5
 {
+    /** @see \prev_key() */
+    public function prev_key($array, $key): self { }
+    public function prev_key0($key): self { }
+    public function prev_key1($array): self { }
+
+    /** @see \probability() */
+    public self $probability;
+    public function probability($probability, $divisor = 100): self { }
+    public function probability0($divisor = 100): self { }
+    public function probability1($probability): self { }
+
+    /** @see \process() */
+    public self $process;
+    public function process($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process0($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process1($command, $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process2($command, $args = [], &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process3($command, $args = [], $stdin = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process4($command, $args = [], $stdin = "", &$stdout = "", $cwd = null, ?array $env = null): self { }
+    public function process5($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", ?array $env = null): self { }
+    public function process6($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null): self { }
+
+    /** @see \process_async() */
+    public self $process_async;
+    public function process_async($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process_async0($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process_async1($command, $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process_async2($command, $args = [], &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process_async3($command, $args = [], $stdin = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process_async4($command, $args = [], $stdin = "", &$stdout = "", $cwd = null, ?array $env = null): self { }
+    public function process_async5($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", ?array $env = null): self { }
+    public function process_async6($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null): self { }
+
+    /** @see \process_parallel() */
+    public self $process_parallel;
+    public function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null): self { }
+    public function process_parallel0($args = [], $autoload = null, $workdir = null, $env = null): self { }
+    public function process_parallel1($tasks, $autoload = null, $workdir = null, $env = null): self { }
+    public function process_parallel2($tasks, $args = [], $workdir = null, $env = null): self { }
+    public function process_parallel3($tasks, $args = [], $autoload = null, $env = null): self { }
+    public function process_parallel4($tasks, $args = [], $autoload = null, $workdir = null): self { }
+
     /** @see \profiler() */
     public function profiler($options = []): self { }
     public function profiler0(): self { }
@@ -375,36 +417,5 @@ trait user_5
     public function subreplace1($subject, $replaces, $case_insensitivity = false): self { }
     public function subreplace2($subject, $search, $case_insensitivity = false): self { }
     public function subreplace3($subject, $search, $replaces): self { }
-
-    /** @see \strcat() */
-    public function strcat(...$variadic): self { }
-    public function strcat0(): self { }
-
-    /** @see \stringify() */
-    public self $stringify;
-    public function stringify($var): self { }
-    public function stringify0(): self { }
-
-    /** @see \strip_php() */
-    public self $strip_php;
-    public function strip_php($phtml, $option = [], &$mapping = []): self { }
-    public function strip_php0($option = [], &$mapping = []): self { }
-    public function strip_php1($phtml, &$mapping = []): self { }
-    public function strip_php2($phtml, $option = []): self { }
-
-    /** @see \strpos_array() */
-    public function strpos_array($haystack, $needles, $offset = 0): self { }
-    public function strpos_array0($needles, $offset = 0): self { }
-    public function strpos_array1($haystack, $offset = 0): self { }
-    public function strpos_array2($haystack, $needles): self { }
-
-    /** @see \strpos_quoted() */
-    public function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
-    public function strpos_quoted0($needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
-    public function strpos_quoted1($haystack, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
-    public function strpos_quoted2($haystack, $needle, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
-    public function strpos_quoted3($haystack, $needle, $offset = 0, $escape = "\\", &$found = null): self { }
-    public function strpos_quoted4($haystack, $needle, $offset = 0, $enclosure = "'\"", &$found = null): self { }
-    public function strpos_quoted5($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\"): self { }
 
 }

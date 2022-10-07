@@ -8,6 +8,33 @@
  */
 trait user_4
 {
+    /** @see \is_primitive() */
+    public self $is_primitive;
+    public function is_primitive($var): self { }
+    public function is_primitive0(): self { }
+
+    /** @see \is_recursive() */
+    public self $is_recursive;
+    public function is_recursive($var): self { }
+    public function is_recursive0(): self { }
+
+    /** @see \is_stringable() */
+    public self $is_stringable;
+    public function is_stringable($var): self { }
+    public function is_stringable0(): self { }
+
+    /** @see \json_export() */
+    public self $json_export;
+    public function json_export($value, $options = []): self { }
+    public function json_export0($options = []): self { }
+    public function json_export1($value): self { }
+
+    /** @see \json_import() */
+    public self $json_import;
+    public function json_import($value, $options = []): self { }
+    public function json_import0($options = []): self { }
+    public function json_import1($value): self { }
+
     /** @see \kvsort() */
     public self $kvsort;
     public function kvsort($array, $comparator = null): self { }
@@ -401,47 +428,5 @@ trait user_4
     public function preg_splice1($pattern, $subject, &$matches = []): self { }
     public function preg_splice2($pattern, $replacement, &$matches = []): self { }
     public function preg_splice3($pattern, $replacement, $subject): self { }
-
-    /** @see \prev_key() */
-    public function prev_key($array, $key): self { }
-    public function prev_key0($key): self { }
-    public function prev_key1($array): self { }
-
-    /** @see \probability() */
-    public self $probability;
-    public function probability($probability, $divisor = 100): self { }
-    public function probability0($divisor = 100): self { }
-    public function probability1($probability): self { }
-
-    /** @see \process() */
-    public self $process;
-    public function process($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process0($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process1($command, $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process2($command, $args = [], &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process3($command, $args = [], $stdin = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process4($command, $args = [], $stdin = "", &$stdout = "", $cwd = null, ?array $env = null): self { }
-    public function process5($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", ?array $env = null): self { }
-    public function process6($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null): self { }
-
-    /** @see \process_async() */
-    public self $process_async;
-    public function process_async($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process_async0($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process_async1($command, $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process_async2($command, $args = [], &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process_async3($command, $args = [], $stdin = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process_async4($command, $args = [], $stdin = "", &$stdout = "", $cwd = null, ?array $env = null): self { }
-    public function process_async5($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", ?array $env = null): self { }
-    public function process_async6($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null): self { }
-
-    /** @see \process_parallel() */
-    public self $process_parallel;
-    public function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null): self { }
-    public function process_parallel0($args = [], $autoload = null, $workdir = null, $env = null): self { }
-    public function process_parallel1($tasks, $autoload = null, $workdir = null, $env = null): self { }
-    public function process_parallel2($tasks, $args = [], $workdir = null, $env = null): self { }
-    public function process_parallel3($tasks, $args = [], $autoload = null, $env = null): self { }
-    public function process_parallel4($tasks, $args = [], $autoload = null, $workdir = null): self { }
 
 }

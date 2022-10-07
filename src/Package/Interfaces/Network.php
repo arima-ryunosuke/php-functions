@@ -7,7 +7,10 @@ namespace ryunosuke\Functions\Package\Interfaces;
 interface Network
 {
     # callable constants
+    public const cidr_parse    = ["ryunosuke\\Functions\\Package\\Network", "cidr_parse"];
     public const getipaddress  = ["ryunosuke\\Functions\\Package\\Network", "getipaddress"];
+    public const ip2cidr       = ["ryunosuke\\Functions\\Package\\Network", "ip2cidr"];
+    public const cidr2ip       = ["ryunosuke\\Functions\\Package\\Network", "cidr2ip"];
     public const incidr        = ["ryunosuke\\Functions\\Package\\Network", "incidr"];
     public const ping          = ["ryunosuke\\Functions\\Package\\Network", "ping"];
     public const http_requests = ["ryunosuke\\Functions\\Package\\Network", "http_requests"];
