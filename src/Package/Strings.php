@@ -2101,7 +2101,7 @@ class Strings implements Interfaces\Strings
 
         $build = static function ($selector, $content, $escape) use ($html) {
             $attrs = Strings::css_selector($selector);
-            $tag = Arrays::array_unset($attrs, '');
+            $tag = Arrays::array_unset($attrs, '', '');
             if (!strlen($tag)) {
                 throw new \InvalidArgumentException('tagname is empty.');
             }
