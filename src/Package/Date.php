@@ -275,12 +275,12 @@ class Date implements Interfaces\Date
         $y ??= idate('Y');
         $ld = $d ?? idate('t', mktime(0, 0, 0, $m ?? 12, 1, $y));
 
-        $min = mktime($h ?? 0, $i ?? 0, $s ?? 0, $m ?? 1, $d ?? 1, $y);
+        $min = mktime($h ?? 0, $i ?? 0, $s ?? 0, $m ?? 1, $d ?? 1, $y) + $parsed['fraction'];
         $max = mktime($h ?? 23, $i ?? 59, $s ?? 59, $m ?? 12, $d ?? $ld, $y) + 1;
         if ($format === null) {
             return [$min, $max];
         }
-        return [date($format, $min), date($format, $max)];
+        return [Date::date_convert($format, $min), Date::date_convert($format, $max)];
     }
 
     /**
