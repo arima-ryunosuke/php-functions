@@ -44,6 +44,9 @@ class DateTest extends AbstractTestCase
         that($test('1234567890.789'))->is('2009/02/14 08:31:30.789');
         that($test('2014/12/24 12:34:56.789'))->is('2014/12/24 12:34:56.789');
         that($test('昭和31年12月24日 12時34分56.789秒'))->is('1956/12/24 12:34:56.789');
+        // DateTimeInterface
+        that($test(new \DateTime('2014/12/24 12:34:56')))->is('2014/12/24 12:34:56.000000');
+        that($test(\DateTime::createFromFormat('U.u', 1234567890.789)))->is('2009/02/14 08:31:30.789');
         // 相対指定（ベース指定）
         that($test('+1 month'))->is($test('+1 month', time()));
         that($test('+1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/29 00:00:00.000000');

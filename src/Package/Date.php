@@ -17,7 +17,7 @@ class Date implements Interfaces\Date
     ];
 
     /**
-     * 日時文字列をよしなにタイムスタンプに変換する
+     * 日時的なものをよしなにタイムスタンプに変換する
      *
      * マイクロ秒にも対応している。つまり返り値は int か float になる。
      * また、相対指定の +1 month の月末問題は起きないようにしてある。
@@ -43,6 +43,10 @@ class Date implements Interfaces\Date
      */
     public static function date_timestamp($datetimedata, $baseTimestamp = null)
     {
+        if ($datetimedata instanceof \DateTimeInterface) {
+            return (float) $datetimedata->format('U.u');
+        }
+
         // 全角を含めた trim
         $chars = "[\\x0-\x20\x7f\xc2\xa0\xe3\x80\x80]";
         $datetimedata = preg_replace("/\A{$chars}++|{$chars}++\z/u", '', $datetimedata);
