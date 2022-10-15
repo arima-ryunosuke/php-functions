@@ -85,10 +85,10 @@ class MathTest extends AbstractTestCase
     function test_mean()
     {
         $data = self::provideData();
-        that((mean)($data['int_evn']))->is(0.5999999999999999);
-        that((mean)($data['int_odd']))->is(0.5555555555555555);
-        that((mean)($data['float_evn']))->is(0.7333333333333333);
-        that((mean)($data['float_odd']))->is(0.6600000000000000);
+        that((mean)($data['int_evn']))->is(0.6);
+        that((mean)($data['int_odd']))->is(0.55555555555);
+        that((mean)($data['float_evn']))->is(0.73333333333);
+        that((mean)($data['float_odd']))->is(0.66);
         that(mean)($data['string_evn'])->wasThrown('must be contain');
         that(mean)($data['string_odd'])->wasThrown('must be contain');
         that(mean)($data['datetime_evn'])->wasThrown('must be contain');

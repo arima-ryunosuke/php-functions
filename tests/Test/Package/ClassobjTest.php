@@ -500,25 +500,22 @@ class ClassobjTest extends AbstractTestCase
             'P'               => 2,
         ]);
 
-        /** @var \ryunosuke\Functions\Package\Classobj $class */
-        $class = \ryunosuke\Functions\Package\Classobj::class;
-
-        that((get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED | $class::IS_PRIVATE))->is([
+        that((get_class_constants)($concrete, IS_OWNSELF | IS_PUBLIC | IS_PROTECTED | IS_PRIVATE))->is([
             'PPP' => 0,
             'PP'  => 1,
             'P'   => 2,
         ]);
 
-        that((get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC | $class::IS_PROTECTED))->is([
+        that((get_class_constants)($concrete, IS_OWNSELF | IS_PUBLIC | IS_PROTECTED))->is([
             'PP' => 1,
             'P'  => 2,
         ]);
 
-        that((get_class_constants)($concrete, $class::IS_OWNSELF | $class::IS_PUBLIC))->is([
+        that((get_class_constants)($concrete, IS_OWNSELF | IS_PUBLIC))->is([
             'P' => 2,
         ]);
 
-        that((get_class_constants)($concrete, $class::IS_PUBLIC))->is([
+        that((get_class_constants)($concrete, IS_PUBLIC))->is([
             'P'            => 2,
             'PUBLIC_CONST' => null,
         ]);

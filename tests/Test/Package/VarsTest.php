@@ -7,7 +7,6 @@ use ArrayObject;
 use Concrete;
 use Exception as Ex;
 use Invoker;
-use ryunosuke\Functions\Package\Vars;
 use SerialMethod;
 use SleepWakeupMethod;
 use stdClass;
@@ -343,7 +342,7 @@ class VarsTest extends AbstractTestCase
 
     function test_si_prefix()
     {
-        foreach (Vars::SI_UNITS as $exp => $units) {
+        foreach (SI_UNITS as $exp => $units) {
             $unit = $units[0] ?? ' ';
             that((si_prefix)(+pow(1000, $exp)))
                 ->stringContains('1.000')
@@ -381,7 +380,7 @@ class VarsTest extends AbstractTestCase
 
     function test_si_unprefix()
     {
-        foreach (Vars::SI_UNITS as $exp => $units) {
+        foreach (SI_UNITS as $exp => $units) {
             foreach ($units as $unit) {
                 that((si_unprefix)("1$unit"))->is(+pow(1000, $exp));
                 that((si_unprefix)("-1$unit"))->is(-pow(1000, $exp));
@@ -595,9 +594,9 @@ class VarsTest extends AbstractTestCase
     function test_varcmp()
     {
         // strict
-        that((varcmp)(['b' => 'B', 'a' => 'A'], ['a' => 'A', 'b' => 'B'], \ryunosuke\Functions\Package\Vars::SORT_STRICT))->lessThan(0); // 推移律が成り立ってない
-        that((varcmp)(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], \ryunosuke\Functions\Package\Vars::SORT_STRICT))->lessThan(0);
-        that((varcmp)(['a' => 'A', 'b' => 'B'], ['a' => 'A', 'b' => 'B'], \ryunosuke\Functions\Package\Vars::SORT_STRICT))->is(0);
+        that((varcmp)(['b' => 'B', 'a' => 'A'], ['a' => 'A', 'b' => 'B'], SORT_STRICT))->lessThan(0); // 推移律が成り立ってない
+        that((varcmp)(['a' => 'A', 'b' => 'B'], ['b' => 'B', 'a' => 'A'], SORT_STRICT))->lessThan(0);
+        that((varcmp)(['a' => 'A', 'b' => 'B'], ['a' => 'A', 'b' => 'B'], SORT_STRICT))->is(0);
 
         // regular int
         that((varcmp)(1, 0))->greaterThan(0);
@@ -1130,12 +1129,12 @@ class VarsTest extends AbstractTestCase
                     return $this->object->method();
                 }
             },
-            'resolve'   => new class ( ) extends Vars { },
+            'resolve'   => new class ( ) extends ArrayObject { },
         ];
         $exported = (var_export3)($objects, ['outmode' => 'eval']);
         $objects2 = eval($exported);
         that($objects2['anonymous']())->is([1, 2, 3]);
-        that($objects2['resolve'])->isInstanceOf(Vars::class);
+        that($objects2['resolve'])->isInstanceOf(ArrayObject::class);
     }
 
     function test_var_export3_reference()

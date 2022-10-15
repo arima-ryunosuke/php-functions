@@ -987,7 +987,7 @@ class UtilityTest extends AbstractTestCase
                 'conceal',
             ];
             foreach ($styles as $style) {
-                printf("%10s: %s\n", $style, ansi_colorize("test", $style));
+                printf("%10s: %s\n", $style, (ansi_colorize)("test", $style));
             }
         };
     }

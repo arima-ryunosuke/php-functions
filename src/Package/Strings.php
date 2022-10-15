@@ -3459,7 +3459,7 @@ class Strings implements Interfaces\Strings
         try {
             return $parser->parse($specials);
         }
-        catch (\Throwable $t){
+        catch (\Throwable $t) {
             if ($specials[JSON_THROW_ON_ERROR]) {
                 throw $t;
             }

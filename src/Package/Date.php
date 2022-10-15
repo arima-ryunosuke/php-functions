@@ -66,14 +66,14 @@ class Date implements Interfaces\Date
 
             // 単位文字列を置換
             $datetimedata = strtr($datetimedata, [
-                '　'  => ' ',
+                '　'    => ' ',
                 '西暦' => '',
-                '年'  => '/',
-                '月'  => '/',
-                '日'  => ' ',
-                '時'  => ':',
-                '分'  => ':',
-                '秒'  => '',
+                '年'   => '/',
+                '月'   => '/',
+                '日'   => ' ',
+                '時'   => ':',
+                '分'   => ':',
+                '秒'   => '',
             ]);
             $datetimedata = trim($datetimedata, " \t\n\r\0\x0B:/");
         }
