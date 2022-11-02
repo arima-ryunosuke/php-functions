@@ -4,6 +4,81 @@ namespace ryunosuke\Test\Package;
 
 class DateTest extends AbstractTestCase
 {
+    function test_date_validate()
+    {
+        error_clear_last();
+
+        // valid datetime
+        that((date_validate)('2014', 'Y'))->is(true);
+        that((date_validate)('2014-12', 'Y-m'))->is(true);
+        that((date_validate)('2014-12-24', 'Y-m-d'))->is(true);
+        that((date_validate)('2014-12-24T12', 'Y-m-d\\TH'))->is(true);
+        that((date_validate)('2014-12-24T12:34', 'Y-m-d\\TH:i'))->is(true);
+        that((date_validate)('2014-12-24T12:34:56', 'Y-m-d\\TH:i:s'))->is(true);
+        that((date_validate)('2014-12-24T12:34:56.789', 'Y-m-d\\TH:i:s.v'))->is(true);
+        that((date_validate)('2014-12-24T12:34:56.789012', 'Y-m-d\\TH:i:s.u'))->is(true);
+
+        // valid date
+        that((date_validate)('9999', 'Y'))->is(true);
+        that((date_validate)('12', 'm'))->is(true);
+        that((date_validate)('31', 'd'))->is(true);
+
+        // valid time
+        that((date_validate)('23', 'H'))->is(true);
+        that((date_validate)('59', 'i'))->is(true);
+        that((date_validate)('59', 's'))->is(true);
+        that((date_validate)('789', 'v'))->is(true);
+        that((date_validate)('789012', 'u'))->is(true);
+
+        // invalid
+        that((date_validate)('hogera'))->is(false);
+        that(error_get_last()['message'])->contains("Data missing");
+
+        // invalid datetime
+        that((date_validate)('2014-12-24T12:34:56.78901X', 'Y-m-d\\TH:i:s.u'))->is(false);
+        that(error_get_last()['message'])->contains("Trailing data");
+        that((date_validate)('2014-12-24T12:34:56.7891', 'Y-m-d\\TH:i:s.v'))->is(false);
+        that(error_get_last()['message'])->contains("Trailing data");
+        that((date_validate)('2014/12/24 12:34:60', 'Y/m/d H:i:s'))->is(false);
+        that(error_get_last()['message'])->contains("invalid second '60'");
+        that((date_validate)('2014/12/24 12:60', 'Y/m/d H:i'))->is(false);
+        that(error_get_last()['message'])->contains("invalid minute '60'");
+        that((date_validate)('2014/12/24 24', 'Y/m/d H'))->is(false);
+        that(error_get_last()['message'])->contains("invalid hour '24'");
+        that((date_validate)('2014/2/29', 'Y/m/d'))->is(false);
+        that(error_get_last()['message'])->contains("invalid date '2014-2-29'");
+
+        // invalid date
+        //that((date_validate)('10000', 'Y'))->is(false);
+        //that(error_get_last()['message'])->contains("invalid year '10000'");
+        that((date_validate)('13', 'm'))->is(false);
+        that(error_get_last()['message'])->contains("invalid month '13'");
+        that((date_validate)('32', 'd'))->is(false);
+        that(error_get_last()['message'])->contains("invalid day '32'");
+
+        // invalid time
+        that((date_validate)('24', 'H'))->is(false);
+        that(error_get_last()['message'])->contains("invalid hour '24'");
+        that((date_validate)('60', 'i'))->is(false);
+        that(error_get_last()['message'])->contains("invalid minute '60'");
+        that((date_validate)('60', 's'))->is(false);
+        that(error_get_last()['message'])->contains("invalid second '60'");
+
+        // invalid microtime
+        that((date_validate)('78901X', 'u'))->is(false);
+        that(error_get_last()['message'])->contains("Trailing data");
+        that((date_validate)('7891', 'v'))->is(false);
+        that(error_get_last()['message'])->contains("Trailing data");
+
+        // overhour
+        that((date_validate)('24', 'H', 1))->is(true);
+        that((date_validate)('25', 'H', 1))->is(false);
+
+        // text
+        that((date_validate)('May 20th, 2021', 'F jS, Y'))->is(true);
+        that((date_validate)('Thursday, May 20th, 2021', 'l, F jS, Y'))->is(true);
+    }
+
     function test_date_timestamp()
     {
         // テストがコケてタイムスタンプが出力されても分かりにくすぎるので文字列化してテストする
