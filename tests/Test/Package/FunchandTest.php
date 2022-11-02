@@ -301,6 +301,23 @@ class FunchandTest extends AbstractTestCase
         that(ob_get_level())->is($current);
     }
 
+    function test_is_callback()
+    {
+        that((is_callback)('strtoupper'))->isFalse();
+        that((is_callback)('my_function_name'))->isFalse();
+
+        that((is_callback)(__METHOD__))->isTrue();
+        that((is_callback)([__CLASS__, __FUNCTION__]))->isTrue();
+        that((is_callback)([__CLASS__, __METHOD__]))->isTrue();
+        that((is_callback)([$this, __FUNCTION__]))->isTrue();
+        that((is_callback)([$this, __METHOD__]))->isTrue();
+        that((is_callback)([$this, __METHOD__, 'dummy']))->isFalse();
+
+        that((is_callback)(new class { }))->isFalse();
+        that((is_callback)(new class { function __invoke() { } }))->isTrue();
+        that((is_callback)(fn($v) => strtoupper($v)))->isTrue();
+    }
+
     function test_is_bindable_closure()
     {
         function _global_nostatic_closure() { return fn() => get_class($this); }
