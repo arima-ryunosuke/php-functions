@@ -190,29 +190,20 @@ class Date implements Interfaces\Date
             }
         }
 
-        $replace = function ($string, $char, $replace) {
-            $string = preg_replace('/(?<!\\\)' . $char . '/', '${1}' . $replace, $string);
-            return preg_replace('/\\\\' . $char . '/', $char, preg_replace('/(?<!\\\)' . $char . '/', '${1}' . $replace, $string));
-        };
-
-        if (preg_match('/[JbKk]/', $format)) {
-            $era = Arrays::array_find(Date::JP_ERA, function ($v) use ($timestamp) {
-                if ($v['since'] <= $timestamp) {
-                    return $v;
-                }
-            }, false);
-            if ($era === false) {
-                throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'");
+        $era = Arrays::array_find(Date::JP_ERA, function ($era) use ($timestamp) {
+            if ($era['since'] <= $timestamp) {
+                $era['year'] = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
+                $era['gann'] = $era['year'] === 1 ? '元' : $era['year'];
+                return $era;
             }
-
-            $y = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
-            $format = $replace($format, 'J', $era['name']);
-            $format = $replace($format, 'b', $era['abbr']);
-            $format = $replace($format, 'K', $y === 1 ? '元' : $y);
-            $format = $replace($format, 'k', $y);
-        }
-
-        $format = $replace($format, 'x', ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)]);
+        }, false);
+        $format = Strings::strtr_escaped($format, [
+            'J' => fn() => $era ? $era['name'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+            'b' => fn() => $era ? $era['abbr'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+            'k' => fn() => $era ? $era['year'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+            'K' => fn() => $era ? $era['gann'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+            'x' => fn() => ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)],
+        ], '\\');
 
         if (is_float($timestamp)) {
             // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します

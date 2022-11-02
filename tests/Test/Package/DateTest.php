@@ -134,6 +134,8 @@ class DateTest extends AbstractTestCase
         that((date_convert)('x曜日', '2019/12/24 00:00:00'))->is('火曜日');
         that((date_convert)('x曜日', '2019/12/24 00:00:00 -1 second'))->is('月曜日');
         that((date_convert)('\\Y\\J\\K\\k\\b\\x', '2019/12/24'))->is('YJKkbx');
+        that((date_convert)('\\J\\\\J\\\\\\J', '2019/12/24'))->is("J\\令和\\J");
+        that((date_convert)('JJJ', '2019/12/24'))->is("令和令和令和");
 
         that(date_convert)('Y/m/d H:i:s.u', 'hogera')->wasThrown('parse failed');
         that(date_convert)('JY/m/d H:i:s.u', '1200/12/23')->wasThrown('notfound JP_ERA');
