@@ -467,10 +467,10 @@ class Date implements Interfaces\Date
             $format = implode('', $tmp2);
         }
 
-        {
-            $format = preg_replace('#(^|[^%])%c#u', '${1}' . $interval->c, $format);
-            $format = preg_replace('#(^|[^%])%v#u', '${1}' . $interval->v, $format);
-        }
+        $format = Strings::strtr_escaped($format, [
+            '%c' => $interval->c,
+            '%v' => $interval->v,
+        ], '%');
         return $interval->format($format);
     }
 

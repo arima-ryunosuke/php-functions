@@ -191,8 +191,9 @@ class DateTest extends AbstractTestCase
         that((date_interval)($HOUR_1 + 0, '%H:%I:%S'))->is('01:00:00');
         that((date_interval)($HOUR_1 + 1, '%H:%I:%S'))->is('01:00:01');
 
-        that((date_interval)(123.456, '%v'))->is('456');
-        that((date_interval)(123.456, '%%v%%'))->is('%v%');
+        that((date_interval)($YEAR_1 * 123 + 4.567, '%c century, %v millisecond', 'c'))->is('1 century, 567 millisecond');
+        that((date_interval)($YEAR_1 * 123 + 4.567, '%%c century, %%v millisecond', 'c'))->is('%c century, %v millisecond');
+        that((date_interval)($YEAR_1 * 123 + 4.567, '%%%c century, %%%v millisecond', 'c'))->is('%1 century, %567 millisecond');
 
         that((date_interval)($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'y'))->is('01/01/09 03:25:45.678');
         that((date_interval)($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))->is('00/13/09 03:25:45.678');
