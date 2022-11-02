@@ -197,6 +197,70 @@ class StringsTest extends AbstractTestCase
         ]);
     }
 
+    function test_strpos_escaped()
+    {
+        $found = null;
+
+        that((strpos_escaped)('%%T-T', '%%', 0, '%', $found))->isSame(0);
+        that($found)->isSame('%%');
+        that((strpos_escaped)('%%%T-T', 'T', 0, '%', $found))->isSame(5);
+        that($found)->isSame('T');
+
+        that((strpos_escaped)('%T-T', 'T', 0, '%', $found))->isSame(3);
+        that($found)->isSame('T');
+        that((strpos_escaped)('%%T-T', 'T', 0, '%', $found))->isSame(2);
+        that($found)->isSame('T');
+
+        that((strpos_escaped)('%T-T', '%T', 0, '%', $found))->isSame(0);
+        that($found)->isSame('%T');
+        that((strpos_escaped)('T-%T', '%T', 0, '%', $found))->isSame(2);
+        that($found)->isSame('%T');
+        that((strpos_escaped)('%%T-T', '%T', 0, '%', $found))->isSame(false);
+        that($found)->isSame(null);
+
+        that((strpos_escaped)('%xyz', ['xyz'], 0, '%', $found))->isSame(false);
+        that($found)->isSame(null);
+        that((strpos_escaped)('%xyz', ['%xyz'], 0, '%', $found))->isSame(0);
+        that($found)->isSame('%xyz');
+        that((strpos_escaped)('%%xyz', ['xyz'], 0, '%', $found))->isSame(2);
+        that($found)->isSame('xyz');
+        that((strpos_escaped)('x%yz', ['x%yz'], 0, '%', $found))->isSame(0);
+        that($found)->isSame('x%yz');
+        that((strpos_escaped)('x%%yz', ['x%%yz'], 0, '%', $found))->isSame(0);
+        that($found)->isSame('x%%yz');
+
+        that((strpos_escaped)('%%xyz', ['xyz'], 0, '%%', $found))->isSame(false);
+        that($found)->isSame(null);
+        that((strpos_escaped)('%%xyz', ['%%xyz'], 0, '%%', $found))->isSame(0);
+        that($found)->isSame('%%xyz');
+        that((strpos_escaped)('%%%%xyz', ['xyz'], 0, '%%', $found))->isSame(4);
+        that($found)->isSame('xyz');
+        that((strpos_escaped)('x%%yz', ['x%%yz'], 0, '%%', $found))->isSame(0);
+        that($found)->isSame('x%%yz');
+        that((strpos_escaped)('x%%%%yz', ['x%%%%yz'], 0, '%%', $found))->isSame(0);
+        that($found)->isSame('x%%%%yz');
+
+        that((strpos_escaped)('%%g-%g', 'asdf%g', 0, '%', $found))->isSame(4);
+        that($found)->isSame('%g');
+        that((strpos_escaped)('%a-asdf', 'asdf%g', 0, '%', $found))->isSame(3);
+        that($found)->isSame('a');
+        that((strpos_escaped)('%s-sdf', 'asdf%g', 0, '%', $found))->isSame(3);
+        that($found)->isSame('s');
+        that((strpos_escaped)('%d-df', 'asdf%g', 0, '%', $found))->isSame(3);
+        that($found)->isSame('d');
+        that((strpos_escaped)('%f-f', 'asdf%g', 0, '%', $found))->isSame(3);
+        that($found)->isSame('f');
+        that((strpos_escaped)('%-X', 'asdf%g', 0, '%', $found))->isSame(false);
+        that($found)->isSame(null);
+
+        that((strpos_escaped)('%%T', 'T', 1, '%', $found))->isSame(false);
+        that((strpos_escaped)('%%T', 'T', 2, '%', $found))->isSame(2);
+        that((strpos_escaped)('%%T', 'T', 3, '%', $found))->isSame(false);
+        that((strpos_escaped)('%%%T', '%T', 1, '%', $found))->isSame(false);
+        that((strpos_escaped)('%%%T', '%T', 2, '%', $found))->isSame(2);
+        that((strpos_escaped)('%%%T', '%T', 3, '%', $found))->isSame(false);
+    }
+
     function test_strpos_quoted()
     {
         that((strpos_quoted)("this is a 'special word' that special word", ['notfound']))->isSame(false);
