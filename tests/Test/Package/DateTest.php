@@ -47,12 +47,39 @@ class DateTest extends AbstractTestCase
         // DateTimeInterface
         that($test(new \DateTime('2014/12/24 12:34:56')))->is('2014/12/24 12:34:56.000000');
         that($test(\DateTime::createFromFormat('U.u', 1234567890.789)))->is('2009/02/14 08:31:30.789');
+        // 序数指定（日付）
+        that($test('1st day of this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/01/01 12:34:56.000000');
+        that($test('2nd day of last month', strtotime('2012/01/31 12:34:56.000000')))->is('2011/12/02 12:34:56.000000');
+        that($test('3rd day of next month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/03 12:34:56.000000');
+        that($test('4th day of previous month', strtotime('2012/01/31 12:34:56.000000')))->is('2011/12/04 12:34:56.000000');
+        // 序数指定（曜日）
+        that($test('1st friday    this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/03 00:00:00.000000');
+        that($test('2nd thursday  this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/09 00:00:00.000000');
+        that($test('3rd wednesday this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/15 00:00:00.000000');
+        that($test('4th tuesday   this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/28 00:00:00.000000');
+        that($test('5th monday    this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/03/05 00:00:00.000000');
+        that($test('6th sunday    this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/03/11 00:00:00.000000');
+        that($test('7th saturday  this month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/03/17 00:00:00.000000');
+        // 隔週指定（奇数）
+        that($test('last sunday odd  week', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/05 00:00:00.000000');
+        that($test('     sunday odd  week', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/05 00:00:00.000000');
+        that($test('next sunday odd  week', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/05 00:00:00.000000');
+        that($test('last sunday odd  week', strtotime('2012/02/07 12:34:56.000000')))->is('2012/02/05 00:00:00.000000');
+        that($test('     sunday odd  week', strtotime('2012/02/07 12:34:56.000000')))->is('2012/02/19 00:00:00.000000');
+        that($test('next sunday odd  week', strtotime('2012/02/07 12:34:56.000000')))->is('2012/02/19 00:00:00.000000');
+        // 隔週指定（偶数）
+        that($test('last sunday even week', strtotime('2012/01/31 12:34:56.000000')))->is('2012/01/29 00:00:00.000000');
+        that($test('     sunday even week', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/12 00:00:00.000000');
+        that($test('next sunday even week', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/12 00:00:00.000000');
+        that($test('last sunday even week', strtotime('2012/02/07 12:34:56.000000')))->is('2012/02/12 00:00:00.000000');
+        that($test('     sunday even week', strtotime('2012/02/07 12:34:56.000000')))->is('2012/02/12 00:00:00.000000');
+        that($test('next sunday even week', strtotime('2012/02/07 12:34:56.000000')))->is('2012/02/12 00:00:00.000000');
         // 相対指定（ベース指定）
         that($test('+1 month'))->is($test('+1 month', time()));
-        that($test('+1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/29 00:00:00.000000');
-        that($test('+1 month', strtotime('2012/02/28 12:34:56.000000')))->is('2012/03/28 00:00:00.000000');
-        that($test('-1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2011/12/31 00:00:00.000000');
-        that($test('-1 month', strtotime('2012/02/28 12:34:56.000000')))->is('2012/01/28 00:00:00.000000');
+        that($test('+1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2012/02/29 12:34:56.000000');
+        that($test('+1 month', strtotime('2012/02/28 12:34:56.000000')))->is('2012/03/28 12:34:56.000000');
+        that($test('-1 month', strtotime('2012/01/31 12:34:56.000000')))->is('2011/12/31 12:34:56.000000');
+        that($test('-1 month', strtotime('2012/02/28 12:34:56.000000')))->is('2012/01/28 12:34:56.000000');
         // 相対指定
         that($test('2012/01/28 12:34:56 +1 month'))->is('2012/02/28 12:34:56.000000');
         that($test('2012/01/29 12:34:56 +1 month'))->is('2012/02/29 12:34:56.000000');
@@ -109,6 +136,14 @@ class DateTest extends AbstractTestCase
         that($test('9999/99/99'))->is(null);           // 明らかにヤバイ2
         that($test('2014/2/29'))->is(null);            // 閏日でない
         that($test('2014/12/24 12:34:70'))->is(null);  // 秒が不正
+        that($test('1nd of this month'))->is(null);    // 序数が不正
+        that($test('2rd of this month'))->is(null);    // 序数が不正
+        that($test('3th of this month'))->is(null);    // 序数が不正
+        that($test('4st of this month'))->is(null);    // 序数が不正
+        that($test('1nd sunday'))->is(null);           // 序数が不正
+        that($test('2rd monday'))->is(null);           // 序数が不正
+        that($test('3th tuesday'))->is(null);          // 序数が不正
+        that($test('4st wednesday'))->is(null);        // 序数が不正
     }
 
     function test_date_convert()
