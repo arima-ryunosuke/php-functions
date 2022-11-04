@@ -29,7 +29,7 @@ abstract class AbstractConcrete
 /**
  * 汎用テスト用クラス
  */
-class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggregate
+class Concrete extends AbstractConcrete implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable
 {
     private $privateField = 'Concrete';
 
@@ -157,6 +157,18 @@ class Concrete extends AbstractConcrete implements \ArrayAccess, IteratorAggrega
     public function getPrivate()
     {
         return parent::getPrivate() . '/' . $this->privateField;
+    }
+
+    public function count(): int
+    {
+        return strlen($this->name);
+    }
+
+    /** @noinspection PhpLanguageLevelInspection */
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return $this->value;
     }
 }
 

@@ -635,7 +635,11 @@ $var3 = function () { return \ArrayObject::class; };
         // offsetGet
         that((optional)($o)['hoge'])->isSame('hoge');
         // iterator
-        that((optional)($o))->isNotEmpty();
+        that(iterator_to_array((optional)($o)))->isNotEmpty();
+        // count
+        that(count((optional)($o)))->is(4);
+        // json
+        that(json_encode((optional)($o)))->is("\"hoge\"");
 
         $o = null;
 
@@ -659,10 +663,14 @@ $var3 = function () { return \ArrayObject::class; };
         that((optional)($o)['hoge'])->isSame(null);
         // iterator
         that(iterator_to_array((optional)($o)))->isEmpty();
+        // count
+        that(count((optional)($o)))->is(0);
+        // json
+        that(json_encode((optional)($o)))->is("{}");
 
         // 型指定
         that((optional)(new \ArrayObject([1]))->count())->is(1);
-        that((optional)(new \ArrayObject([1]), 'stdClass')->count())->isNull();
+        that((optional)(new \ArrayObject([1]), 'stdClass')->count())->is(0);
 
         // 例外
         that((optional)(null))->try('__set', 'hoge', 'value')->wasThrown('called NullObject#');

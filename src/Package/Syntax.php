@@ -736,7 +736,7 @@ class Syntax implements Interfaces\Syntax
      * that(iterator_to_array(optional($getobject())))->isSame([]);
      *
      * // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
-     * that(optional(new \ArrayObject([1]), 'stdClass')->count())->isSame(null);
+     * that(optional(new \ArrayObject([1]), 'stdClass')->count())->is(0);
      * ```
      *
      * @template T
@@ -754,7 +754,7 @@ class Syntax implements Interfaces\Syntax
 
         static $nullobject = null;
         if ($nullobject === null) {
-            $nullobject = new class implements \ArrayAccess, \IteratorAggregate {
+            $nullobject = new class implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
                 // @formatter:off
                 public function __isset($name) { return false; }
                 public function __get($name) { return null; }
@@ -763,11 +763,13 @@ class Syntax implements Interfaces\Syntax
                 public function __call($name, $arguments) { return null; }
                 public function __invoke() { return null; }
                 public function __toString() { return ''; }
+                public function count(): int { return 0; }
                 public function offsetExists($offset): bool { return false; }
                 public function offsetGet($offset): ?string { return null; }
                 public function offsetSet($offset, $value): void { throw new \DomainException('called NullObject#' . __FUNCTION__); }
                 public function offsetUnset($offset): void { throw new \DomainException('called NullObject#' . __FUNCTION__); }
                 public function getIterator(): \Traversable { return new \ArrayIterator([]); }
+                public function jsonSerialize(): \stdClass { return (object)[]; }
                 // @formatter:on
             };
         }
