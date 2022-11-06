@@ -1224,7 +1224,7 @@ class Classobj implements Interfaces\Classobj
      * // var_dump((array) $object);
      *
      * // この関数を使えば不可視プロパティも取得できる
-     * that(get_object_properties($object))->arraySubset([
+     * that(get_object_properties($object))->subsetEquals([
      *     'message' => 'something',
      *     'code'    => 42,
      *     'oreore'  => 'oreore',

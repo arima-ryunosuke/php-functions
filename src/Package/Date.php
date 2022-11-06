@@ -37,7 +37,7 @@ class Date implements Interfaces\Date
      * that(date_timestamp('2014/12/24 12:34:56.789'))->isSame(1419392096.789);
      * ```
      *
-     * @param string|int|float $datetimedata 日時データ
+     * @param string|int|float|\DateTimeInterface $datetimedata 日時データ
      * @param int|null $baseTimestamp 日時データ
      * @return int|float|null タイムスタンプ。パース失敗時は null
      */
@@ -371,18 +371,15 @@ class Date implements Interfaces\Date
         $centurys = $years / 100;
 
         // $limit に従って値を切り捨てて DateInterval を作成
-        /** @noinspection PhpUndefinedFieldInspection */
-        {
-            $interval = new \DateInterval('PT1S');
-            $interval->c = $limit < $map['c'] ? 0 : (int) $centurys % 1000;
-            $interval->y = $limit < $map['y'] ? 0 : (int) ($limit === $map['y'] ? $years : (int) $years % 100);
-            $interval->m = $limit < $map['m'] ? 0 : (int) ($limit === $map['m'] ? $months : (int) $months % 12);
-            $interval->d = $limit < $map['d'] ? 0 : (int) ($limit === $map['d'] ? $days : (int) ((int) ($days * 100000000) % (int) (365 / 12 * 100000000) / 100000000));
-            $interval->h = $limit < $map['h'] ? 0 : (int) ($limit === $map['h'] ? $hours : (int) $hours % 24);
-            $interval->i = $limit < $map['i'] ? 0 : (int) ($limit === $map['i'] ? $minutes : (int) $minutes % 60);
-            $interval->s = $limit < $map['s'] ? 0 : (int) ($limit === $map['s'] ? $seconds : (int) $seconds % 60);
-            $interval->v = $mills % 1000;
-        }
+        $interval = new \DateInterval('PT1S');
+        $interval->c = $limit < $map['c'] ? 0 : (int) $centurys % 1000;
+        $interval->y = $limit < $map['y'] ? 0 : (int) ($limit === $map['y'] ? $years : (int) $years % 100);
+        $interval->m = $limit < $map['m'] ? 0 : (int) ($limit === $map['m'] ? $months : (int) $months % 12);
+        $interval->d = $limit < $map['d'] ? 0 : (int) ($limit === $map['d'] ? $days : (int) ((int) ($days * 100000000) % (int) (365 / 12 * 100000000) / 100000000));
+        $interval->h = $limit < $map['h'] ? 0 : (int) ($limit === $map['h'] ? $hours : (int) $hours % 24);
+        $interval->i = $limit < $map['i'] ? 0 : (int) ($limit === $map['i'] ? $minutes : (int) $minutes % 60);
+        $interval->s = $limit < $map['s'] ? 0 : (int) ($limit === $map['s'] ? $seconds : (int) $seconds % 60);
+        $interval->v = $mills % 1000;
 
         // null は DateInterval をそのまま返す
         if ($format === null) {

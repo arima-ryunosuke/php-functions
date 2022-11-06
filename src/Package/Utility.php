@@ -1281,7 +1281,7 @@ class Utility implements Interfaces\Utility
     /**
      * proc_open ～ proc_close の一連の処理を行う（非同期版）
      *
-     * @see process
+     * @see process()
      *
      * @param string $command 実行コマンド
      * @param array|string $args コマンドライン引数。文字列はそのまま結合され、配列は escapeshellarg された上でキーと結合される
@@ -1876,10 +1876,10 @@ class Utility implements Interfaces\Utility
      * // limit 指定してるので2個
      * that($traces)->count(2);
      * // 「function が f002 以降」を返す
-     * that($traces[0])->arraySubset([
+     * that($traces[0])->subsetEquals([
      *     'function' => __NAMESPACE__ . '\\f002'
      * ]);
-     * that($traces[1])->arraySubset([
+     * that($traces[1])->subsetEquals([
      *     'function' => __NAMESPACE__ . '\\f003'
      * ]);
      * ```
@@ -2087,7 +2087,7 @@ class Utility implements Interfaces\Utility
                 }
             }
 
-            public function stream_cast($cast_as) { /* @todo I'm not sure */ }
+            public function stream_cast($cast_as) { /* @todo I'm not sure */ } // @codeCoverageIgnore
         };
 
         $profiler = new class(get_class($declareProtocol), $options) implements \IteratorAggregate {

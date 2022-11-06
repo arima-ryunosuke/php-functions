@@ -446,9 +446,9 @@ class UtilityTest extends AbstractTestCase
         (rm_rf)($tmpdir);
         /** @noinspection PhpDeprecationInspection */
         {
-            that((cachedir)($tmpdir))->is((path_normalize)(self::$TMPDIR . getenv('TEST_TARGET')));
-            that((cachedir)())->is((path_normalize)($tmpdir));
-            that((cachedir)(sys_get_temp_dir()))->is((path_normalize)($tmpdir));
+            (cachedir)($tmpdir);
+            that((cachedir)())->is(realpath($tmpdir));
+            that((cachedir)(sys_get_temp_dir()))->is(realpath($tmpdir));
         }
     }
 
@@ -1475,12 +1475,12 @@ class UtilityTest extends AbstractTestCase
         $traces = $mock->m3([
             'function' => 'm2',
         ]);
-        that($traces[0])->arraySubset([
+        that($traces[0])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ]);
-        that($traces[1])->arraySubset([
+        that($traces[1])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
@@ -1489,17 +1489,17 @@ class UtilityTest extends AbstractTestCase
         $traces = $mock->m3([
             'class' => fn($v) => (str_exists)($v, 'class@anonymous'),
         ]);
-        that($traces[0])->arraySubset([
+        that($traces[0])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm1',
             'class'    => get_class($mock),
         ]);
-        that($traces[1])->arraySubset([
+        that($traces[1])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ]);
-        that($traces[2])->arraySubset([
+        that($traces[2])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),
@@ -1521,17 +1521,17 @@ class UtilityTest extends AbstractTestCase
             'limit'  => 3,
         ]);
         that($traces)->count(3);
-        that($traces[0])->arraySubset([
+        that($traces[0])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm1',
             'class'    => get_class($mock),
         ]);
-        that($traces[1])->arraySubset([
+        that($traces[1])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm2',
             'class'    => get_class($mock),
         ]);
-        that($traces[2])->arraySubset([
+        that($traces[2])->subsetEquals([
             'file'     => __FILE__,
             'function' => 'm3',
             'class'    => get_class($mock),

@@ -1570,10 +1570,9 @@ class Strings implements Interfaces\Strings
      */
     public static function starts_with($string, $with, $case_insensitivity = false)
     {
-        assert(is_string($string));
+        assert(Vars::is_stringable($string));
 
         foreach ((array) $with as $w) {
-            assert(is_string($w));
             assert(strlen($w));
 
             if (Strings::str_equals(substr($string, 0, strlen($w)), $w, $case_insensitivity)) {
@@ -1604,10 +1603,9 @@ class Strings implements Interfaces\Strings
      */
     public static function ends_with($string, $with, $case_insensitivity = false)
     {
-        assert(is_string($string));
+        assert(Vars::is_stringable($string));
 
         foreach ((array) $with as $w) {
-            assert(is_string($w));
             assert(strlen($w));
 
             if (Strings::str_equals(substr($string, -strlen($w)), $w, $case_insensitivity)) {

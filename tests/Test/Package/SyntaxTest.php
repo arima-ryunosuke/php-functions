@@ -782,9 +782,9 @@ $var3 = function () { return \ArrayObject::class; };
         (function_configure)($backup);
 
         // for coverage (under 8.0 is unsupport named arguments)
-        $actual = that($chain('XYZ'))->_apply('str_replace', ['abc', 'subject' => 'abcdef'])();
+        $actual = that($chain('XYZ'))->_apply('str_replace', ['abc', 'subject' => 'abcdef'])->isObject();
         if (version_compare(PHP_VERSION, 8.0) >= 0) {
-            $actual->is('XYZdef');
+            $actual()->is('XYZdef');
         }
 
         // for compatible

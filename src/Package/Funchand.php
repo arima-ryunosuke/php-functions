@@ -716,7 +716,6 @@ class Funchand implements Interfaces\Funchand
         if (!isset($cache[$call_name]) || $callable instanceof \Closure) {
             /** @var \ReflectionFunctionAbstract $refunc */
             $refunc = Funchand::reflect_callable($callable);
-            assert($refunc->isUserDefined(), 'no support internal callable.');
             $cache[$call_name] = [
                 'length'  => $refunc->getNumberOfParameters(),
                 'default' => [],
