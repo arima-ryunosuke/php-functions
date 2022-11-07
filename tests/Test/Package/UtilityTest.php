@@ -1717,7 +1717,7 @@ class UtilityTest extends AbstractTestCase
 
         // return 検証
         @(benchmark)(['md5', 'sha1'], ['hoge'], 10, false);
-        that(error_get_last()['message'])->stringContains('Results of sha1 and md5 are different');
+        that(error_get_last()['message'])->stringContains('Results of md5 & sha1 are different');
 
         // 1000 ミリ秒間の usleep(50000) の呼び出し回数は 20 回のはず（Windows での分解能がめちゃくちゃ？なので余裕を持たしてる）
         $output = (benchmark)(['usleep'], [50 * 1000], 1000, false);

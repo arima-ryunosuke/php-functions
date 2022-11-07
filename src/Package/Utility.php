@@ -2419,13 +2419,29 @@ class Utility implements Interfaces\Utility
 
         // 返り値の検証（ベンチマークという性質上、基本的に戻り値が一致しないのはおかしい）
         // rand/mt_rand, md5/sha1 のような例外はあるが、そんなのベンチしないし、クロージャでラップすればいいし、それでも邪魔なら @ で黙らせればいい
-        foreach ($assertions as $name1 => $return1) {
-            foreach ($assertions as $name2 => $return2) {
-                if ($return1 !== null && $return2 !== null && $return1 !== $return2) {
-                    $returns1 = Vars::stringify($return1);
-                    $returns2 = Vars::stringify($return2);
-                    trigger_error("Results of $name1 and $name2 are different. ($returns1, $returns2)");
-                }
+        $context = Utility::is_ansi(STDOUT) ? 'cli' : 'plain';
+        $diffs = [];
+        foreach ($assertions as $name => $return) {
+            $diffs[Vars::var_pretty($return, [
+                'context' => $context,
+                'limit'   => 1024,
+                'return'  => true,
+            ])][] = $name;
+        }
+        if (count($diffs) > 1) {
+            $head = $body = [];
+            foreach ($diffs as $return => $names) {
+                $head[] = count($names) === 1 ? $names[0] : '(' . implode(' | ', $names) . ')';
+                $body[implode("\n", $names)] = ['return' => $return];
+            }
+            trigger_error(sprintf("Results of %s are different.\n", implode(' & ', $head)));
+            if (error_reporting() & E_USER_NOTICE) {
+                // @codeCoverageIgnoreStart
+                echo Strings::markdown_table($body, [
+                    'context'  => $context,
+                    'keylabel' => 'name',
+                ]);
+                // @codeCoverageIgnoreEnd
             }
         }
 
