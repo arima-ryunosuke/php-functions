@@ -1295,8 +1295,8 @@ class VarsTest extends AbstractTestCase
             ->stringContains("  0: stdClass#")
             ->stringContains("      X: stdClass#")
             ->stringContains("  E: Concrete#")
-            ->stringContains("    info: 'this is __debugInfo'")
-            ->stringContains("  A: ['str', 1, 2, 3, true, null]")
+            ->stringContains("    info: \"this is __debugInfo\"")
+            ->stringContains("  A: [\"str\", 1, 2, 3, true, null]")
             ->stringContains("ryunosuke\\Test\\Package\\VarsTest#")
             ->stringContains("    recur: {")
             ->stringContains("    Closure@")
@@ -1337,7 +1337,7 @@ class VarsTest extends AbstractTestCase
             ->stringNotContains("\n")
             ->stringNotContains("0:stdClass#")
             ->stringContains("E:Concrete#")
-            ->stringContains("A:['str', 1, 2, 3, true, null]")
+            ->stringContains("A:[\"str\", 1, 2, 3, true, null]")
             ->stringContains("R:Resource id #2 of type (stream)")
             ->stringContains("empty:[]");
 

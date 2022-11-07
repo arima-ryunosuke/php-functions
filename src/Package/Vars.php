@@ -2194,7 +2194,7 @@ class Vars implements Interfaces\Vars
                     if ($this->options['maxlength']) {
                         $token = Strings::str_ellipsis($token, $this->options['maxlength'], '...(too length)...');
                     }
-                    return var_export($token, true);
+                    return json_encode($token, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                 }
                 elseif (is_scalar($token)) {
                     return var_export($token, true);
