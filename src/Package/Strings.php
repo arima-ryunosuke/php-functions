@@ -3983,9 +3983,11 @@ class Strings implements Interfaces\Strings
         }
 
         $option += [
-            'keylabel' => null, // 指定すると一番左端にキーの列が生える
+            'keylabel' => null,   // 指定すると一番左端にキーの列が生える
+            'context'  => 'html', // html:改行がbrになる（html 以外は未定義）
         ];
 
+        $rows = [];
         $defaults = [];
         $numerics = [];
         $lengths = [];
@@ -3994,21 +3996,30 @@ class Strings implements Interfaces\Strings
             if ($option['keylabel'] !== null) {
                 $fields = [$option['keylabel'] => $n] + $fields;
             }
+            if ($option['context'] === 'html') {
+                $fields = array_map(fn($v) => (array) str_replace(["\r\n", "\r", "\n"], '<br>', $v), $fields);
+            }
+            else {
+                $fields = array_map(fn($v) => explode("\n", trim($v)), $fields);
+            }
             foreach ($fields as $k => $v) {
-                $v = str_replace(["\r\n", "\r", "\n"], '<br>', $v);
-                $array[$n][$k] = $v;
                 $defaults[$k] = '';
-                $numerics[$k] = ($numerics[$k] ?? true) && is_numeric($v);
-                $lengths[$k] = max($lengths[$k] ?? 3, strlen($k), strlen($v)); // 3 は markdown の最低見出し長
+                foreach ($v as $i => $t) {
+                    $e = Utility::ansi_strip($t);
+                    $rows["{$n}_{$i}"][$k] = $t;
+                    $numerics[$k] = ($numerics[$k] ?? true) && (is_numeric($e) || strlen($e) === 0);
+                    $lengths[$k] = max($lengths[$k] ?? 3, mb_strwidth(Utility::ansi_strip($k)), mb_strwidth($e)); // 3 は markdown の最低見出し長
+                }
             }
         }
 
-        $linebuilder = function ($array, $padstr) use ($numerics, $lengths) {
+        $linebuilder = function ($fields, $padstr) use ($numerics, $lengths) {
             $line = [];
-            foreach ($array as $k => $v) {
-                $pad = str_pad($v, strlen($v) - mb_strwidth($v) + $lengths[$k], $padstr, $numerics[$k] ? STR_PAD_LEFT : STR_PAD_RIGHT);
+            foreach ($fields as $k => $v) {
+                $ws = str_repeat($padstr, $lengths[$k] - (mb_strwidth(Utility::ansi_strip($v))));
+                $pad = $numerics[$k] ? "$ws$v" : "$v$ws";
                 if ($padstr === '-' && $numerics[$k]) {
-                    $pad[strlen($pad) - 1] = ':';
+                    $pad[-1] = ':';
                 }
                 $line[] = $pad;
             }
@@ -4019,7 +4030,7 @@ class Strings implements Interfaces\Strings
 
         $result[] = $linebuilder(array_combine($keys = array_keys($defaults), $keys), ' ');
         $result[] = $linebuilder($defaults, '-');
-        foreach ($array as $fields) {
+        foreach ($rows as $fields) {
             $result[] = $linebuilder(array_replace($defaults, $fields), ' ');
         }
 

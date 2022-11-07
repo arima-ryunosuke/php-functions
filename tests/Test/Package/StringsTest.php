@@ -2653,6 +2653,20 @@ z", quote2: "a\\\\nz"');
 | x   | xx  |
 ");
 
+        that("\n" . (markdown_table)(["1\n2\n3" => ['a' => "a1\na2"], "4\n5" => ['a' => "a3\na4\na5"]], [
+                'keylabel' => 'key',
+                'context'  => 'plain',
+            ]))->is("
+| key | a   |
+| --: | --- |
+|   1 | a1  |
+|   2 | a2  |
+|   3 |     |
+|   4 | a3  |
+|   5 | a4  |
+|     | a5  |
+");
+
         that(markdown_table)('')->wasThrown('must be array of hasharray');
     }
 
