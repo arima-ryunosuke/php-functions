@@ -992,6 +992,21 @@ class UtilityTest extends AbstractTestCase
         };
     }
 
+    function test_ansi_strip()
+    {
+        $ansi_string = (ansi_colorize)('hoge', 'green');
+        that((ansi_strip)($ansi_string))->isSame('hoge');
+
+        $ansi_string = (ansi_colorize)('hoge', 'bold green');
+        that((ansi_strip)($ansi_string))->isSame('hoge');
+
+        $ansi_string = (ansi_colorize)('hoge', 'RED bold green');
+        that((ansi_strip)($ansi_string))->isSame('hoge');
+
+        that((ansi_strip)("prefix\e[a;b;cMsuffix"))->isSame('prefixsuffix');
+        that((ansi_strip)("prefix\e[a;b;Msuffix"))->isSame('prefixuffix');
+    }
+
     function test_process()
     {
         $str_resource = function ($string) {
