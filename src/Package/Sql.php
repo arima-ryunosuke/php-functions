@@ -115,6 +115,8 @@ class Sql implements Interfaces\Sql
         $options += [
             // インデント文字
             'indent'    => "  ",
+            // インラインレベル
+            'inline'    => 999,
             // 括弧の展開レベル
             'nestlevel' => 1,
             // キーワードの大文字/小文字可変換（true だと大文字化。false だと小文字化。あるいは 'ucfirst' 等の文字列関数を直接指定する。クロージャでも良い）
@@ -124,6 +126,7 @@ class Sql implements Interfaces\Sql
             // 最大折返し文字数（未実装）
             'wrapsize'  => false,
         ];
+
         if ($options['case'] === true) {
             $options['case'] = 'strtoupper';
         }
@@ -165,19 +168,28 @@ class Sql implements Interfaces\Sql
             };
         }
         $options['syntaxer'] = function ($token, $ttype) use ($options, $keywords) {
-            if ($options['case'] && isset($keywords[strtoupper($token)])) {
-                $token = $options['case']($token);
+            if (in_array($ttype, [T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING], true)) {
+                $tokens = [$token];
             }
-            if ($options['highlight']) {
-                $token = $options['highlight']($token, $ttype);
+            else {
+                $tokens = explode(' ', $token);
             }
-            return $token;
+
+            $result = [];
+            foreach ($tokens as $token) {
+                if ($options['case'] && isset($keywords[strtoupper($token)])) {
+                    $token = $options['case']($token);
+                }
+                if ($options['highlight']) {
+                    $token = $options['highlight']($token, $ttype);
+                }
+                $result[] = $token;
+            }
+            return implode(' ', $result);
         };
 
         // 構文解析も先読みもない素朴な実装なので、特定文字列をあとから置換するための目印文字列
         $MARK = Strings::unique_string($sql, 8);
-        $MARK_R = "{$MARK}_R:}";   // \r マーク
-        $MARK_N = "{$MARK}_N:}";   // \n マーク
         $MARK_BR = "{$MARK}_BR:}"; // 改行マーク
         $MARK_CS = "{$MARK}_CS:}"; // コメント開始マーク
         $MARK_CE = "{$MARK}_CE:}"; // コメント終了マーク
@@ -188,6 +200,7 @@ class Sql implements Interfaces\Sql
         // 字句にバラす（シンタックスが php に似ているので token_get_all で大幅にサボることができる）
         $tokens = [];
         $comment = '';
+        $last = [];
         foreach (token_get_all("<?php $sql") as $token) {
             // トークンは配列だったり文字列だったりするので -1 トークンとして配列に正規化
             if (is_string($token)) {
@@ -198,8 +211,9 @@ class Sql implements Interfaces\Sql
             if ($token[0] === T_OPEN_TAG) {
                 continue;
             }
+
             // '--' は php ではデクリメントだが sql ではコメントなので特別扱いする
-            elseif ($token[0] === T_DEC) {
+            if ($token[0] === T_DEC) {
                 $comment = $token[1];
             }
             // 改行は '--' コメントの終わり
@@ -211,6 +225,10 @@ class Sql implements Interfaces\Sql
             elseif ($comment) {
                 $comment .= $token[1];
             }
+            // END IF, END LOOP などは一つのトークンとする
+            elseif (strtoupper($last[1] ?? '') === 'END' && in_array(strtoupper($token[1]), ['CASE', 'IF', 'LOOP', 'REPEAT', 'WHILE'], true)) {
+                $tokens[array_key_last($tokens)][1] .= " " . $token[1];
+            }
             // 上記以外はただのトークンとして格納する
             else {
                 // `string` のような文字列は T_ENCAPSED_AND_WHITESPACE として得られる（ただし ` がついていないので付与）
@@ -220,6 +238,10 @@ class Sql implements Interfaces\Sql
                 elseif ($token[0] !== T_WHITESPACE && $token[1] !== '`') {
                     $tokens[] = [$token[0], $token[1]];
                 }
+            }
+
+            if ($token[0] !== T_WHITESPACE) {
+                $last = $token;
             }
         }
 
@@ -242,27 +264,21 @@ class Sql implements Interfaces\Sql
             return [$start, '', $comments];
         };
 
-        $interpret = function (&$index = -1) use (&$interpret, $MARK_R, $MARK_N, $MARK_BR, $MARK_CS, $MARK_CE, $MARK_NT, $MARK_SP, $MARK_PT, $tokens, $options, $seek) {
+        $interpret = function (&$index = -1, $context = '', $breaker = '', $nest = 0) use (&$interpret, $MARK_BR, $MARK_CS, $MARK_CE, $MARK_NT, $MARK_SP, $MARK_PT, $tokens, $options, $seek) {
             $index++;
             $beginning = true; // クエリの冒頭か
-            $context = '';     // SELECT, INSERT などの大分類
             $subcontext = '';  // SET, VALUES などのサブ分類
             $modifier = '';    // RIGHT などのキーワード修飾語
             $firstcol = null;  // SELECT における最初の列か
 
             $result = [];
             for ($token_length = count($tokens); $index < $token_length; $index++) {
-                $ttype = $tokens[$index][0];
-                $token = trim($tokens[$index][1]);
+                $token = $tokens[$index];
+                $ttype = $token[0];
 
-                $virttoken = $options['syntaxer']($token, $ttype);
-                $uppertoken = strtoupper($token);
-
-                // 最終的なインデントは「改行＋スペース」で行うのでリテラル内に改行があるとそれもインデントされてしまうので置換して逃がす
-                $token = strtr($token, [
-                    "\r" => $MARK_R,
-                    "\n" => $MARK_N,
-                ]);
+                $rawtoken = trim($token[1]);
+                $virttoken = $options['syntaxer']($rawtoken, $ttype);
+                $uppertoken = strtoupper($rawtoken);
 
                 // SELECT の直後には DISTINCT などのオプションが来ることがあるので特別扱い
                 if ($context === 'SELECT' && $firstcol) {
@@ -277,18 +293,17 @@ class Sql implements Interfaces\Sql
                     $result[] = ($beginning ? '' : $MARK_CS) . $virttoken . $MARK_CE . $MARK_BR;
                     continue;
                 }
-                $beginning = false;
+
+                $prev = $seek($index, -1);
+                $next = $seek($index, +1);
 
                 switch ($uppertoken) {
                     default:
                         _DEFAULT:
-                        $prev = $seek($index, -1)[1];
-                        $next = $seek($index, +1)[1];
-
                         // "tablename. columnname" になってしまう
                         // "@ var" になってしまう
                         // ": holder" になってしまう
-                        if ($prev !== '.' && $prev !== '@' && $prev !== ':' && $prev !== ';') {
+                        if (!in_array($prev[1], ['.', '@', ':', ';'])) {
                             $result[] = $MARK_SP;
                         }
 
@@ -298,7 +313,7 @@ class Sql implements Interfaces\Sql
                         // "columnname ," になってしまう
                         // mysql において関数呼び出し括弧の前に空白は許されない
                         // ただし、関数呼び出しではなく記号の場合はスペースを入れたい（ colname = (SELECT ～) など）
-                        if (($next !== '.' && $next !== ',' && $next !== '(') || ($next === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $token))) {
+                        if (!in_array($next[1], ['.', ',', '(', ';']) || ($next[1] === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $rawtoken))) {
                             $result[] = $MARK_SP;
                         }
                         break;
@@ -306,18 +321,22 @@ class Sql implements Interfaces\Sql
                     case ":":
                         $result[] = $MARK_SP . $virttoken;
                         break;
-                    case ";":
-                        $result[] = $MARK_BR . $virttoken . $MARK_BR;
-                        break;
                     case ".":
                         $result[] = $virttoken;
                         break;
                     case ",":
+                        if ($subcontext === 'LIMIT') {
+                            $result[] = $virttoken . $MARK_SP;
+                            break;
+                        }
+                        $result[] = $virttoken . $MARK_BR;
+                        break;
+                    case ";":
                         $result[] = $virttoken . $MARK_BR;
                         break;
                     case "WITH":
-                        $result[] = $MARK_BR . $virttoken . $MARK_SP;
-                        $subcontext = $uppertoken;
+                        $result[] = $virttoken;
+                        $result[] = $MARK_BR;
                         break;
                     /** @noinspection PhpMissingBreakStatementInspection */
                     case "BETWEEN":
@@ -332,8 +351,8 @@ class Sql implements Interfaces\Sql
                     case "TABLE":
                         // CREATE TABLE tablename は括弧があるので何もしなくて済むが、
                         // ALTER TABLE tablename は括弧がなく ADD などで始まるので特別分岐
-                        [$index, $name, $comments] = $seek($index, +1);
-                        $result[] = $MARK_SP . $virttoken . $MARK_SP . ($MARK_SP . implode('', $comments) . $MARK_CE) . $name . $MARK_SP;
+                        $index = $next[0];
+                        $result[] = $MARK_SP . $virttoken . $MARK_SP . ($MARK_SP . implode('', $next[2]) . $MARK_CE) . $next[1] . $MARK_SP;
                         if ($context !== 'CREATE' && $context !== 'DROP') {
                             $result[] = $MARK_BR;
                         }
@@ -342,12 +361,21 @@ class Sql implements Interfaces\Sql
                     case "AND":
                         // BETWEEN A AND B と論理演算子の AND が競合するので分岐後にフォールスルー
                         if ($subcontext === 'BETWEEN') {
-                            $result[] = $MARK_SP . $virttoken . $MARK_SP;
                             $subcontext = '';
+                            $result[] = $MARK_SP . $virttoken . $MARK_SP;
                             break;
                         }
+                        goto _BINARY_OPERATOR_;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case "OR":
+                        // CREATE OR REPLACE
+                        if ($context === 'CREATE') {
+                            $result[] = $MARK_SP . $virttoken . $MARK_SP;
+                            break;
+                        }
+                        goto _BINARY_OPERATOR_;
                     case "XOR":
+                        _BINARY_OPERATOR_:
                         // WHEN の条件はカッコがない限り改行しない
                         if ($subcontext === 'WHEN') {
                             $result[] = $MARK_SP . $virttoken . $MARK_SP;
@@ -363,10 +391,11 @@ class Sql implements Interfaces\Sql
                         break;
                     case "BY":
                     case "ALL":
-                        $result[] = $MARK_SP . $virttoken . array_pop($result);
+                    case "RECURSIVE":
+                        $result[] = $MARK_SP . $virttoken . $MARK_SP . array_pop($result);
                         break;
                     case "SELECT":
-                        if ($context === 'INSERT') {
+                        if (!$beginning) {
                             $result[] = $MARK_BR;
                         }
                         $result[] = $virttoken;
@@ -377,7 +406,7 @@ class Sql implements Interfaces\Sql
                         /** @noinspection PhpMissingBreakStatementInspection */
                     case "RIGHT":
                         // 例えば LEFT や RIGHT は関数呼び出しの場合もあるので分岐後にフォールスルー
-                        if ($seek($index, +1)[1] === '(') {
+                        if ($next[1] === '(') {
                             goto _DEFAULT;
                         }
                     case "CROSS":
@@ -393,6 +422,7 @@ class Sql implements Interfaces\Sql
                     case "ORDER":
                     case "LIMIT":
                     case "OFFSET":
+                        $subcontext = $uppertoken;
                         $result[] = $MARK_BR . $modifier . $virttoken;
                         $result[] = $MARK_BR; // のちの BY のために結合はせず後ろに入れるだけにする
                         $modifier = '';
@@ -403,10 +433,8 @@ class Sql implements Interfaces\Sql
                         break;
                     case "ON":
                         // ON は ON でも mysql の ON DUPLICATED かもしれない（pgsql の ON CONFLICT も似たようなコンテキスト）
-                        $name = $seek($index, +1)[1];
-                        if (in_array(strtoupper($name), ['DUPLICATE', 'CONFLICT'], true)) {
+                        if (in_array(strtoupper($next[1]), ['DUPLICATE', 'CONFLICT'], true)) {
                             $result[] = $MARK_BR;
-                            $subcontext = '';
                         }
                         else {
                             $result[] = $MARK_SP;
@@ -414,8 +442,16 @@ class Sql implements Interfaces\Sql
                         $result[] = $virttoken . $MARK_SP;
                         break;
                     case "SET":
-                        $result[] = $MARK_BR . $virttoken . $MARK_BR;
-                        $subcontext = $uppertoken;
+                        if ($context === "INSERT" || $context === "UPDATE") {
+                            $subcontext = $uppertoken;
+                            $result[] = $MARK_BR . $virttoken . $MARK_BR;
+                        }
+                        elseif ($context === "ALTER" || $subcontext === "REFERENCES") {
+                            $result[] = $MARK_SP . $virttoken;
+                        }
+                        else {
+                            $result[] = $virttoken;
+                        }
                         break;
                     case "INSERT":
                     case "REPLACE":
@@ -423,6 +459,9 @@ class Sql implements Interfaces\Sql
                         $context = "INSERT"; // 構文的には INSERT と同じ
                         break;
                     case "INTO":
+                        if ($context === "SELECT") {
+                            $result[] = $MARK_BR;
+                        }
                         $result[] = $virttoken;
                         if ($context === "INSERT") {
                             $result[] = $MARK_BR;
@@ -443,69 +482,99 @@ class Sql implements Interfaces\Sql
                     case "UPDATE":
                     case "DELETE":
                         $result[] = $virttoken;
-                        if ($subcontext !== 'REFERENCES') {
+                        if ($context !== 'CREATE' && $subcontext !== 'REFERENCES') {
                             $result[] = $MARK_BR;
                             $context = $uppertoken;
                         }
                         break;
+                    case "IF":
+                        $subcontext = $uppertoken;
+                        $result[] = $virttoken;
+                        break;
                     /** @noinspection PhpMissingBreakStatementInspection */
                     case "WHEN":
                         $subcontext = $uppertoken;
-                    case "ELSE":
                         $result[] = $MARK_BR . $MARK_NT . $virttoken . $MARK_SP;
                         break;
-                    case "THEN":
-                        $subcontext = '';
-                        $result[] = $MARK_SP . $virttoken;
+                    case "ELSE":
+                        if ($context === 'CASE') {
+                            $result[] = $MARK_BR . $MARK_NT . $virttoken . $MARK_SP;
+                            break;
+                        }
+                        $result[] = $virttoken . $MARK_SP;
                         break;
                     case "CASE":
-                        $parts = $interpret($index);
+                        $parts = $interpret($index, $uppertoken, 'END', $nest + 1);
                         $parts = str_replace($MARK_BR, $MARK_BR . $MARK_NT, $parts);
                         $result[] = $MARK_NT . $virttoken . $MARK_SP . $parts;
                         break;
+                    case "BEGIN":
+                        if ($next[1] === ';') {
+                            $result[] = $virttoken;
+                        }
+                        else {
+                            $parts = $interpret($index, $uppertoken, 'END', $nest + 1);
+                            $parts = preg_replace("#^($MARK_SP)+#u", "", $parts);
+                            $parts = preg_replace("#$MARK_BR#u", $MARK_BR . $MARK_NT, $parts, substr_count($parts, $MARK_BR) - 1);
+                            $result[] = $MARK_BR . $virttoken . $MARK_BR . $MARK_NT . $parts;
+                        }
+                        break;
                     case "END":
-                        $result[] = $MARK_BR . $virttoken;
-                        break 2;
+                        if ($context === 'CASE') {
+                            $result[] = $MARK_BR;
+                        }
+                        $result[] = $virttoken;
+                        break;
                     case "(":
-                        $current = $index;
-                        $parts = $MARK_BR . $interpret($index);
+                        if ($next[1] === ')') {
+                            $result[] = $virttoken . implode('', $next[2]) . ')';
+                            $index = $next[0];
+                            break;
+                        }
 
-                        // コメントを含まない指定ネストレベル以下なら改行とインデントを吹き飛ばす
-                        if (strpos($parts, $MARK_CE) === false && substr_count($parts, $MARK_PT) < $options['nestlevel']) {
+                        $parts = $uppertoken . $MARK_BR . $interpret($index, $uppertoken, ')', $nest + 1);
+
+                        // コメントを含まない指定ネストレベルなら改行とインデントを吹き飛ばす
+                        if (strpos($parts, $MARK_CE) === false && ($nest >= $options['inline'] || substr_count($parts, $MARK_PT) < $options['nestlevel'])) {
                             $parts = strtr($parts, [
                                 $MARK_BR => "",
                                 $MARK_NT => "",
                             ]);
-                            $parts = preg_replace("#^($MARK_SP)|($MARK_SP)+$#u", '', $parts);
+                            $parts = preg_replace("#\\(($MARK_SP)+#u", '(', $parts);
+                            $parts = preg_replace("#($MARK_SP)+\\)#u", ')', $parts);
                         }
                         elseif ($context === 'CREATE') {
-                            $parts = $parts . $MARK_BR;
+                            // ???
+                            assert($context === 'CREATE');
                         }
                         else {
-                            $lastnt = $subcontext === 'WITH' ? '' : $MARK_NT;
+                            $lastnt = $MARK_NT;
                             $brnt = $MARK_BR . $MARK_NT;
-                            if ($subcontext !== 'WITH' && strtoupper($seek($current, +1)[1]) === 'SELECT') {
-                                $brnt .= $MARK_NT;
+                            if (strtoupper($next[1]) === 'SELECT') {
+                                $brnt .= $lastnt;
                             }
-                            $parts = preg_replace("#($MARK_BR)+#u", $brnt, $parts) . $MARK_BR . $lastnt;
+                            $parts = preg_replace("#($MARK_BR(?!\\)))+#u", $brnt, $parts) . $lastnt;
+                            $parts = preg_replace("#($MARK_BR(\\)))+#u", "$MARK_BR$MARK_NT)", $parts) . $lastnt;
                             $parts = preg_replace("#$MARK_CS#u", "", $parts);
                         }
 
                         // IN や数式はネストとみなさない
-                        $prev = $seek($current, -1)[1];
                         $suffix = $MARK_PT;
-                        if (strtoupper($prev) === 'IN' || !preg_match('#^[a-z0-9_]+$#i', $prev)) {
+                        if (strtoupper($prev[1]) === 'IN' || !preg_match('#^[a-z0-9_]+$#i', $prev[1])) {
                             $suffix = '';
                         }
-                        if ($subcontext === 'WITH') {
-                            $subcontext = '';
-                            $suffix .= $MARK_BR;
-                        }
 
-                        $result[] = $MARK_NT . "($parts)" . $suffix;
+                        $result[] = $MARK_NT . $parts . $suffix;
                         break;
                     case ")":
-                        break 2;
+                        $result[] = $MARK_BR . $virttoken;
+                        break;
+                }
+
+                $beginning = false;
+
+                if ($uppertoken === $breaker) {
+                    break;
                 }
             }
             return implode('', $result);
@@ -515,6 +584,8 @@ class Sql implements Interfaces\Sql
         $result = Strings::preg_replaces("#" . implode('|', [
                 // 改行文字＋インデント文字をインデントとみなす（改行＋連続スペースもついでに）
                 "(?<indent>$MARK_BR(($MARK_NT|$MARK_SP)+))",
+                // 末尾スペースは除去
+                "(?<spbr>($MARK_SP)+(?=$MARK_BR))",
                 // 行末コメントと単一コメント
                 "(?<cs1>$MARK_BR$MARK_CS)",
                 "(?<cs2>$MARK_CS)",
@@ -526,10 +597,9 @@ class Sql implements Interfaces\Sql
                 "(?<ce>$MARK_CE)",
                 "(?<nt>$MARK_NT)",
                 "(?<pt>$MARK_PT)",
-                "(?<R>$MARK_R)",
-                "(?<N>$MARK_N)",
             ]) . "#u", [
             'indent' => fn($str) => "\n" . str_repeat($options['indent'], (substr_count($str, $MARK_NT) + substr_count($str, $MARK_SP))),
+            'spbr'   => "",
             'cs1'    => "\n" . $options['indent'],
             'cs2'    => "",
             'br'     => "\n",
@@ -537,8 +607,6 @@ class Sql implements Interfaces\Sql
             'ce'     => "",
             'nt'     => "",
             'pt'     => "",
-            'R'      => "\r",
-            'N'      => "\n",
         ], $result);
 
         return trim($result);

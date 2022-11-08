@@ -40,11 +40,11 @@ class SqlTest extends AbstractTestCase
     {
         that((sql_format)('
 CREATE TABLE t_table (
-  id   INT(10) UNSIGNED NOT NULL COMMENT "primary",
-  name VARCHAR(32)      NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
+  id   INT(10)     UNSIGNED           NOT NULL COMMENT "primary",
+  name VARCHAR(32) CHARACTER SET utf8 NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
   PRIMARY KEY (id),
   INDEX idx_name (name),
-  CONSTRAINT fk_name FOREIGN KEY (name) REFERENCES t_other (other_name) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT fk_name FOREIGN KEY (name) REFERENCES t_other (other_name) ON UPDATE CASCADE ON DELETE SET NULL
 )
 COMMENT="TableComment"
 COLLATE="utf8_bin"
@@ -53,21 +53,54 @@ ROW_FORMAT=DYNAMIC
 '))->IsEqualTrimming('
 CREATE TABLE t_table (
   id INT(10) UNSIGNED NOT NULL COMMENT "primary",
-  name VARCHAR(32) NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
+  name VARCHAR(32) CHARACTER SET utf8 NOT NULL COMMENT "table_name" COLLATE "utf8_bin",
   PRIMARY KEY(id),
   INDEX idx_name(name),
-  CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE CASCADE 
+  CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE SET NULL
 ) COMMENT = "TableComment" COLLATE = "utf8_bin" ENGINE = InnoDB ROW_FORMAT = DYNAMIC
 ');
 
         that((sql_format)('CREATE TABLE IF NOT EXISTS t_table (id INT(10) UNSIGNED NOT NULL COMMENT "primary")'))->IsEqualTrimming('
 CREATE TABLE IF NOT EXISTS t_table(
-  id INT(10) UNSIGNED NOT NULL COMMENT "primary" 
+  id INT(10) UNSIGNED NOT NULL COMMENT "primary"
 )
 ');
 
         that((sql_format)('CREATE INDEX part_of_name ON customer (name, id)'))->IsEqualTrimming('
 CREATE INDEX part_of_name ON customer(name, id)
+');
+
+        that((sql_format)('
+CREATE FUNCTION f1(p1 int) RETURNS tinyint(1) NOT DETERMINISTIC READS SQL DATA COMMENT ""
+BEGIN
+    DECLARE v_count INT;
+    SELECT
+        COUNT(id)
+    INTO v_count 
+    FROM
+        t_table 
+    WHERE
+        id < 100;
+    IF v_count > 0 THEN RETURN TRUE;
+    ELSE RETURN FALSE;
+    END IF;
+END;
+'))->IsEqualTrimming('
+CREATE FUNCTION f1(p1 int) RETURNS tinyint(1) NOT DETERMINISTIC READS SQL DATA COMMENT ""
+BEGIN
+  DECLARE v_count INT;
+  
+  SELECT
+    COUNT(id)
+  INTO v_count
+  FROM
+    t_table
+  WHERE
+    id < 100;
+  IF v_count > 0 THEN RETURN TRUE;
+  ELSE RETURN FALSE;
+  END IF;
+END;
 ');
     }
 
@@ -92,13 +125,19 @@ drop table IF EXISTS tbl
   ADD INDEX idx_name(name),
   add CONSTRAINT fk_name FOREIGN KEY (name) REFERENCES t_other (other_name) ON UPDATE CASCADE ON DELETE CASCADE
 '))->IsEqualTrimming('
-ALTER TABLE TABLE_NAME 
+ALTER TABLE TABLE_NAME
   ADD COLUMN colA INT(11) NULL DEFAULT NULL COMMENT "comment1" AFTER hoge,
   ADD COLUMN colB DATETIME NULL DEFAULT NULL COMMENT "comment2" AFTER fuga,
   DROP COLUMN colC,
   CHANGE COLUMN colD colD TINYINT(1) DEFAULT 0 NOT NULL COMMENT "comment4",
   ADD INDEX idx_name(name),
   add CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE CASCADE
+');
+
+        that((sql_format)('create or replace view as select 1'))->IsEqualTrimming('
+create or replace view as
+select
+  1
 ');
     }
 
@@ -113,39 +152,39 @@ ALTER TABLE TABLE_NAME
   left outer join t_join1 on t_join1.id = t_table.id
   right join t_join2 on t_join2.id = (select max(id) from t_sub where (A and B))
   inner join t_join3 using (id)
-  where (a and (b and (c and (d in (1,2,3)))))
+  where (a and (b and (c and (d in (1,2,3, NOW())))))
   group by id having count(misc) > 10 order by id desc limit 10 offset 5'))->IsEqualTrimming('
 select
   T.*,
   exists(
     select
-      * 
+      *
     from
-      t_sub S 
+      t_sub S
     where
       (S.id = T.id)
   ) as e,
   greatest(
     ifnull(a, 9),
     ifnull(b, 9)
-  ) as g 
+  ) as g
 from
   (
     select
-      * 
+      *
     from
-      t_table 
+      t_table
     where
       (status = "active")
-  ) T 
+  ) T
 left outer join
-  t_join1 on t_join1.id = t_table.id 
+  t_join1 on t_join1.id = t_table.id
 right join
   t_join2 on t_join2.id = (
     select
       max(id)
     from
-      t_sub 
+      t_sub
     where
       (A and B)
   )
@@ -153,50 +192,60 @@ inner join
   t_join3 using(id)
 where
   (
-    a 
+    a
     and (
-      b 
+      b
       and (
-        c 
-        and (d in(1, 2, 3))
+        c
+        and (d in(1, 2, 3, NOW()))
       )
     )
   )
 group by
-  id 
+  id
 having
-  count(misc) > 10 
+  count(misc) > 10
 order by
-  id desc 
+  id desc
 limit
-  10 
+  10
 offset
   5
+');
+
+        // limit
+        that((sql_format)('select * from t_table limit 10, 20'))->IsEqualTrimming('
+select
+  *
+from
+  t_table
+limit
+  10, 20
 ');
 
         // for update
         that((sql_format)('select * from t_table for update'))->IsEqualTrimming('
 select
-  * 
+  *
 from
-  t_table 
+  t_table
 for update
 ');
 
         // lock in share mode
         that((sql_format)('select * from t_table lock in share mode'))->IsEqualTrimming('
 select
-  * 
+  *
 from
-  t_table 
+  t_table
 lock in share mode
 ');
 
         // select option
         that((sql_format)('select distinct straight_join t.a, t.b from table t'))->IsEqualTrimming('
-select distinct straight_join 
+select distinct straight_join
   t.a,
-  t.b 
+  t.b
 from
   table t
 ');
@@ -216,7 +265,7 @@ values
         // insert set
         that((sql_format)('insert into t_table set a=1, b=2, c=3'))->IsEqualTrimming('
 insert into
-  t_table 
+  t_table
 set
   a = 1,
   b = 2,
@@ -230,7 +279,7 @@ insert into
 select
   a,
   b,
-  c 
+  c
 from
   t_table2 T2
 ');
@@ -238,11 +287,11 @@ from
         // insert duplicate key
         that((sql_format)('insert OPTIONS into t_table set a=1, b=2, c=3 on duplicate key update x=values(a)'))->IsEqualTrimming('
 insert OPTIONS into
-  t_table 
+  t_table
 set
   a = 1,
   b = 2,
-  c = 3 
+  c = 3
 on duplicate key update
   x = values(a)
 ');
@@ -262,7 +311,7 @@ values
         // insert set
         that((sql_format)('replace into t_table set a=1, b=2, c=3'))->IsEqualTrimming('
 replace into
-  t_table 
+  t_table
 set
   a = 1,
   b = 2,
@@ -276,7 +325,7 @@ replace into
 select
   a,
   b,
-  c 
+  c
 from
   t_table2 T2
 ');
@@ -284,11 +333,11 @@ from
         // insert duplicate key
         that((sql_format)('replace DELAYED into t_table set a=1, b=2, c=3 on duplicate key update x=values(a)'))->IsEqualTrimming('
 replace DELAYED into
-  t_table 
+  t_table
 set
   a = 1,
   b = 2,
-  c = 3 
+  c = 3
 on duplicate key update
   x = values(a)
 ');
@@ -299,11 +348,11 @@ on duplicate key update
         // update
         that((sql_format)('update t_table set a=1, b=2, c=3 where x IN (1,2,3)'))->IsEqualTrimming('
 update
-  t_table 
+  t_table
 set
   a = 1,
   b = 2,
-  c = 3 
+  c = 3
 where
   x IN(1, 2, 3)
 ');
@@ -312,10 +361,10 @@ where
         that((sql_format)('update t1, t2 as D set t1.a=D.a, t1.b=D.b where t1.id=D.id'))->IsEqualTrimming('
 update
   t1,
-  t2 as D 
+  t2 as D
 set
   t1.a = D.a,
-  t1.b = D.b 
+  t1.b = D.b
 where
   t1.id = D.id
 ');
@@ -323,13 +372,13 @@ where
         // update multi2
         that((sql_format)('update t_table T join t_join J using(id) set T.v = J.v where A and B'))->IsEqualTrimming('
 update
-  t_table T 
+  t_table T
 join
   t_join J using(id)
 set
-  T.v = J.v 
+  T.v = J.v
 where
-  A 
+  A
   and B
 ');
     }
@@ -340,7 +389,7 @@ where
         that((sql_format)('delete from t_table where x IN (1,2,3)'))->IsEqualTrimming('
 delete
 from
-  t_table 
+  t_table
 where
   x IN(1, 2, 3)
 ');
@@ -349,15 +398,15 @@ where
         that((sql_format)('DELETE t1, t2 FROM t1 INNER JOIN t2 INNER JOIN t3 WHERE t1.id=t2.id AND t2.id=t3.id'))->IsEqualTrimming('
 DELETE
   t1,
-  t2 
+  t2
 FROM
-  t1 
+  t1
 INNER JOIN
-  t2 
+  t2
 INNER JOIN
-  t3 
+  t3
 WHERE
-  t1.id = t2.id 
+  t1.id = t2.id
   AND t2.id = t3.id
 ');
     }
@@ -373,9 +422,9 @@ INSERT INTO
   test(id, name)
 SELECT
   100,
-  "aaa" 
+  "aaa"
 FROM
-  dual 
+  dual
 WHERE
   (
     NOT EXISTS(SELECT * FROM test WHERE id = 100)
@@ -419,7 +468,7 @@ from
     select
       * -- this is trailing comment
     from
-      table_name 
+      table_name
   ) as t -- this is inner comment
 order by
   null
@@ -456,7 +505,7 @@ from
   comment1
 */
 select
-  * 
+  *
 from
   /*
     this
@@ -472,21 +521,34 @@ from
       comment3
     */
     select
-      * 
+      *
     from
-      table_name 
+      table_name
   )
 ');
     }
 
     function test_sql_format_options()
     {
-        // misc
-        that((sql_format)("select (A and (B and (C and (D and (E)))))", ['indent' => "\t", 'nestlevel' => 4]))->IsEqualTrimming("
+        // nest
+        that((sql_format)("select (A and (B and (C and (D and (E)))))", ['indent' => "\t", 'nestlevel' => 3]))->IsEqualTrimming("
 select
 	(
-		A 
-		and (B and (C and (D and (E))))
+		A
+		and (
+			B
+			and (C and (D and (E)))
+		)
+	)
+");
+        that((sql_format)("select (A and (B and (C and (D and (E)))))", ['indent' => "\t", 'inline' => 2]))->IsEqualTrimming("
+select
+	(
+		A
+		and (
+			B
+			and (C and (D and (E)))
+		)
 	)
 ");
 
@@ -496,7 +558,7 @@ select
 SELECT
   'abc' str,
   123 AS num,
-  t.xxx 
+  t.xxx
 FROM
   t_table t
 ");
@@ -505,7 +567,7 @@ FROM
 select
   'abc' str,
   123 as num,
-  t.xxx 
+  t.xxx
 from
   t_table t
 ");
@@ -516,7 +578,7 @@ from
 \e[1mSelect\e[m
   \e[31m'<abc>'\e[m str,
   \e[36m123\e[m \e[1mAs\e[m num,
-  t.xxx 
+  t.xxx
 \e[1mFrom\e[m
   t_table t
 ");
@@ -527,7 +589,7 @@ from
 \e[1mselect\e[m
   \e[31m'<abc>'\e[m str,
   \e[36m123\e[m \e[1mas\e[m num,
-  t.xxx 
+  t.xxx
 \e[1mfrom\e[m
   t_table t
 ");
@@ -538,7 +600,7 @@ from
 <span style='font-weight:bold;'>select</span>
   <span style='color:#DD0000;'>&#039;&lt;abc&gt;&#039;</span> str,
   <span style='color:#0000BB;'>123</span> <span style='font-weight:bold;'>as</span> num,
-  t.xxx 
+  t.xxx
 <span style='font-weight:bold;'>from</span>
   t_table t
 ");
@@ -550,7 +612,8 @@ from
     function test_sql_format_other()
     {
         // mysql set variable
-        that((sql_format)("set @hoge=123,@fuga=456"))->IsEqualTrimming("
+        that((sql_format)("insert ttt set @hoge=123,@fuga=456"))->IsEqualTrimming("
+insert ttt
 set
   @hoge = 123,
   @fuga = 456
@@ -567,9 +630,9 @@ select
 where :id and :status"))->IsEqualTrimming("
 select
   ?,
-  ? 
+  ?
 where
-  :id 
+  :id
   and :status
 ");
 
@@ -577,7 +640,7 @@ where
         that((sql_format)("select '\n ' from `dual`"))->IsEqualTrimming("
 select
   '
- ' 
+ '
 from
   `dual`
 ");
@@ -585,11 +648,11 @@ from
         // between
         that((sql_format)('select (id between A and B) as bw from t_table where status or id between A and B'))->IsEqualTrimming('
 select
-  (id between A and B) as bw 
+  (id between A and B) as bw
 from
-  t_table 
+  t_table
 where
-  status 
+  status
   or id between A and B
 ');
 
@@ -603,42 +666,42 @@ from t_table
 where exists(select * from T where case a when 1 then 10 when 2 then 20 end = 99 and (other_cond))
 '))->IsEqualTrimming('
 select
-  case a 
-    when 1 then 10 
-    when 2 then 20 
+  case a
+    when 1 then 10
+    when 2 then 20
   end as x,
-  case 
-    when a = 1 then 10 
-    when a = 2 then 20 
-    else null 
+  case
+    when a = 1 then 10
+    when a = 2 then 20
+    else null
   end as y,
-  case 
+  case
     when count(
       ifnull(a, 1)
     )
   end z,
-  case 
-    when a = 1 and b = 2 and c = 3 then 123 
+  case
+    when a = 1 and b = 2 and c = 3 then 123
     when (
-      (a = 4) 
-      and (b = 5) 
+      (a = 4)
+      and (b = 5)
       and (c = 6)
-    ) then 456 
-    else 789 
-  end as mul 
+    ) then 456
+    else 789
+  end as mul
 from
-  t_table 
+  t_table
 where
   exists(
     select
-      * 
+      *
     from
-      T 
+      T
     where
-      case a 
-        when 1 then 10 
-        when 2 then 20 
-      end = 99 
+      case a
+        when 1 then 10
+        when 2 then 20
+      end = 99
       and (other_cond)
   )
 ');
@@ -648,40 +711,34 @@ where
 select * from t_table where id in (1,2,3);
 update t_table set name = "hoge" where id in (1,2,3);
 commit;'))->IsEqualTrimming('
-begin 
-;
+begin;
 select
-  * 
+  *
 from
-  t_table 
+  t_table
 where
-  id in(1, 2, 3)
-;
+  id in(1, 2, 3);
 update
-  t_table 
+  t_table
 set
-  name = "hoge" 
+  name = "hoge"
 where
-  id in(1, 2, 3)
-;
-commit 
-;
+  id in(1, 2, 3);
+commit;
 ');
 
         // semicoron
         that((sql_format)('select 1; select 2;'))->IsEqualTrimming('
 select
-  1 
-;
+  1;
 select
-  2 
-;
+  2;
 ');
 
         // union
         that((sql_format)('select 1 union all select 2'))->IsEqualTrimming('
 select
-  1 
+  1
 union all
 select
   2
@@ -689,49 +746,52 @@ select
 
         that((sql_format)('select * from ((select *  from T1) union (select *  from T2)) as T'))->IsEqualTrimming('
 select
-  * 
+  *
 from
   (
     (select * from T1)
-  union 
+  union
     (select * from T2)
   ) as T
 ');
 
         // for mysql load data
         that((sql_format)('LOAD DATA INFILE "/tmp/test.txt" INTO TABLE test FIELDS TERMINATED BY ","  LINES STARTING BY "xxx"'))->IsEqualTrimming('
-LOAD DATA INFILE "/tmp/test.txt" INTO TABLE test 
+LOAD DATA INFILE "/tmp/test.txt" INTO TABLE test
   FIELDS TERMINATED BY "," LINES STARTING BY "xxx"
 ');
 
         // with
         that((sql_format)('
-WITH RECURSIVE cte AS
+WITH RECURSIVE cte1 AS
 (
   SELECT * from t_something1 where (A and B)
   UNION ALL
   SELECT * from t_something2 where (C and D)
-)
-SELECT (1 + 2) as t FROM cte'))->IsEqualTrimming('
-WITH RECURSIVE cte AS(
-  SELECT
-    * 
-  from
-    t_something1 
-  where
-    (A and B)
-  UNION ALL
-  SELECT
-    * 
-  from
-    t_something2 
-  where
-    (C and D)
-)
+),cte2 as (select 1)
+SELECT (1 + 2) as t FROM cte1, cte2'))->IsEqualTrimming('
+WITH RECURSIVE
+  cte1 AS(
+    SELECT
+      *
+    from
+      t_something1
+    where
+      (A and B)
+    UNION ALL
+    SELECT
+      *
+    from
+      t_something2
+    where
+      (C and D)
+  ),
+  cte2 as(select 1)
 SELECT
-  (1 + 2) as t 
+  (1 + 2) as t
 FROM
-  cte
+  cte1,
+  cte2
 ');
 
         // keyword function
@@ -740,9 +800,9 @@ select
   left(a, 1),
   right(b, 1)
 from
-  t_from 
+  t_from
 left join
-  t_left on 1 
+  t_left on 1
 right join
   t_right using(x)
 ');
@@ -753,11 +813,11 @@ select
   (
     /* comment */
     select
-      a 
+      a
     from
-      tt 
+      tt
     where
-      A 
+      A
       and (B and C)
   ) as x
 ');
