@@ -5,8 +5,8 @@ require __DIR__ . '/../include/global.php';
 $V = fn($v) => $v;
 
 $targetDirectory = __DIR__ . '/../stub';
-rm_rf("$targetDirectory/extenstions");
-@mkdir("$targetDirectory/extenstions");
+rm_rf("$targetDirectory/ChainObject");
+mkdir("$targetDirectory/ChainObject");
 
 $targetExtension = [
     'date'     => [
@@ -30,10 +30,7 @@ $targetExtension = [
     'user'     => [],
 ];
 
-/** @var \ReflectionFunction[][] $reffuncs */
-
-// 明らかに不要なものは対象外
-$reffuncs = [];
+$anotations = [];
 foreach (get_defined_functions(true) as $type => $functions) {
     foreach ($functions as $funcname) {
         $reffunc = new ReflectionFunction($funcname);
@@ -62,30 +59,28 @@ foreach (get_defined_functions(true) as $type => $functions) {
             continue;
         }
 
-        $reffuncs[$extension][$funcname] = $reffunc;
-    }
-}
-
-// 特別扱いしてるもの
-$reffuncs['user']['map'] = new class(fn(array $array, ?callable $callback) => null) extends ReflectionFunction {
-    public function getName() { return 'array_map'; }
-};
-
-// ここから本懐。trait を書き出してその trait 名を得る
-$traits = [];
-foreach ($reffuncs as $extension => $funcs) {
-    // 除去やエイリアスで飛び飛びになるので本当の名前でソートする
-    uasort($funcs, function ($a, $b) { return strcmp($a->getName(), $b->getName()); });
-
-    // アノテーション文字列を生成する
-    $anotations = [];
-    foreach ($funcs as $funcname => $reffunc) {
-        $fieldable = $reffunc->getNumberOfRequiredParameters() === 1;
-        $parameters = array_values(function_parameter($reffunc));
-        $hasCallback = array_find($reffunc->getParameters(), function (\ReflectionParameter $p) {
-            // package 内部は型宣言が追いついていないので名前でも判定（型宣言が済んだら不要）
-            return str_exists($p->getName(), ['callable', 'callback']) || str_exists(reflect_types($p->getType()), ['callable', 'Closure']);
-        }, false);
+        $parameters = function_parameter($reffunc);
+        // 特別扱い1（昔の名残か必須を表すためか、可変引数の引数が分かれている標準関数がある（min,max,array_intersect 等））
+        $params = $reffunc->getParameters();
+        if (true
+            && $reffunc->isVariadic() && count($params) === 2
+            && $params[0]->hasType() && $params[1]->hasType()
+            && $params[0]->getType()->getName() === $params[1]->getType()->getName()
+        ) {
+            // echo "{$reffunc->name}({$V(implode(', ', $parameters))})\n";
+            array_shift($parameters);
+        }
+        // 特別扱い2（package 内部は型宣言が追いついていないので名前でも判定（型宣言が済んだら不要））
+        foreach ($params as $param) {
+            $key = ($param->isPassedByReference() ? '&' : '') . '$' . $param->getName();
+            if (!$param->hasType() && str_exists($param->getName(), ['callable', 'callback'])) {
+                $parameters[$key] = 'callable ' . $parameters[$key];
+            }
+            if (!$param->hasType() && str_exists($param->getName(), ['array', 'iterable'])) {
+                $parameters[$key] = 'iterable ' . $parameters[$key];
+            }
+        }
+        $parameters = array_values($parameters);
 
         // エイリアス分生成
         $aliasname = preg_replace('#^(array_|str_)#', '', $funcname);
@@ -94,53 +89,41 @@ foreach ($reffuncs as $extension => $funcs) {
             $callnames[] = $aliasname;
         }
         foreach ($callnames as $callname) {
-            $anotation = [];
-            $anotation[] = "    /** @see \\{$reffunc->getName()}() */";
-
-            // 実質引数が1つならフィールド呼び出しが可能
-            if ($fieldable) {
-                $anotation[] = "    public self \$$callname;";
-            }
-
-            // callback を受け取る関数なら P, E も登録
-            $variation = [''];
-            if ($hasCallback) {
-                $variation[] = 'P';
-                $variation[] = 'E';
-            }
-            foreach ($variation as $v) {
-                $anotation[] = "    public function $callname{$v}({$V(implode(', ', $parameters))}): self { }";
-                foreach (range(0, $reffunc->getNumberOfParameters() - 1) as $i) {
-                    $anotation[] = "    public function $callname{$i}{$v}({$V(implode(', ', array_remove($parameters, [$i])))}): self { }";
-                }
-            }
-
-            $anotations[] = implode("\n", $anotation) . "\n";
+            // 多重定義（他言語で言うオーバーロード）になるが、別に実行されないし phpstorm はこれでもよしなに判定してくれる
+            $anotations[strtoupper($funcname[0])][] = <<<STUB
+                /** @see \\{$reffunc->getName()}() */
+                public self \$$callname;
+                public function $callname({$V(implode(', ', $parameters))}): self { }
+                public function $callname({$V(implode(', ', array_remove($parameters, [0])))}): self { }
+            
+            STUB;
         }
     }
+}
+ksort($anotations);
 
-    // trait の書き出し（phpstorm がフリーズするので小分けにする）
-    foreach (array_chunk($anotations, 64) as $n => $chunks) {
-        $traitname = "{$extension}_{$n}";
-        $contents = <<<TRAIT
-        <?php
-        {$V('// @' . 'formatter:off')}
-        
-        /**
-         * @noinspection PhpLanguageLevelInspection
-         * @noinspection PhpUnusedParameterInspection
-         * @noinspection PhpUndefinedClassInspection
-         */
-        trait $traitname
-        {
-        {$V(implode("\n", $chunks))}
-        }
-        
-        TRAIT;
-        file_put_contents("$targetDirectory/extenstions/$traitname.php", $contents);
-
-        $traits[] = "    use $traitname;";
+// trait の書き出し（phpstorm がフリーズするので小分けにする）
+$traits = [];
+foreach ($anotations as $initial => $chunks) {
+    $traitname = "ChainObject$initial";
+    $contents = <<<TRAIT
+    <?php
+    {$V('// @' . 'formatter:off')}
+    
+    /**
+     * @noinspection PhpLanguageLevelInspection
+     * @noinspection PhpUnusedParameterInspection
+     * @noinspection PhpUndefinedClassInspection
+     */
+    trait $traitname
+    {
+    {$V(implode("\n", $chunks))}
     }
+    
+    TRAIT;
+    file_put_contents("$targetDirectory/ChainObject/$traitname.php", $contents);
+
+    $traits[] = "    use $traitname;";
 }
 
 $mainclass = file_get_contents("$targetDirectory/ChainObject.php");
