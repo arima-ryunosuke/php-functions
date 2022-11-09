@@ -67,6 +67,11 @@ function nullsafe_int_func(int $x, int $y)
     return $x - $y;
 }
 
+function concat_abc_z(string $a, string $b, string $c, string ...$z)
+{
+    return $a . $b . $c . "(" . implode(',', $z) . ")";
+}
+
 // ファイルシステム系テストで clearstatcache を呼ぶのを忘れて「？？？」となることが多かったのでいっその事 tick を利用して無効化する
 register_tick_function(function () {
     clearstatcache();

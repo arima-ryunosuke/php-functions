@@ -681,6 +681,139 @@ $var3 = function () { return \ArrayObject::class; };
 
     function test_chain()
     {
+        $restorer = $this->restorer(fn($v) => (function_configure)(['chain.version' => $v]), [2], [1]);
+
+        // (chain)呼び出しだとコード補完が効かないのでラップする
+        $chain = function (...$v) {
+            /** @var \ChainObject $co */
+            $co = (chain)(...$v);
+            return $co;
+        };
+
+        // maps/filter/funcE
+        $array = [1, 2, 3, 4, 5];
+        that($chain($array)->maps['E']('-$1')())->is([-1, -2, -3, -4, -5]);
+        that($chain($array)->maps['E']('$1 - 1')->maps['E']('$1 ? 5 : 0')())->is([0, 5, 5, 5, 5]);
+        that($chain($array)->filter['E']('$1 >= 3')->maps['E']('$1 + 5')())->is([2 => 8, 9, 10]);
+        that($chain($array)->maps['E']('*2')->filter['E']('>5')())->is([2 => 6, 8, 10]);
+        that($chain($array)->maps['E']('$1 * $2')->vsprintf[1]('%d,%d,%d,%d,%d')())->is('0,2,6,12,20');
+
+        // apply
+        $string = 'a12345z';
+        that($chain($string)
+            ->apply(fn($v) => ltrim($v, 'a'))
+            ->apply(fn($v) => rtrim($v, 'z'))
+            ->apply(fn($v) => number_format($v, 3))
+        )()->is('12,345.000');
+
+        // iterator
+        $hash = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        that(iterator_to_array($chain($hash)))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+
+        // string
+        $string = 'hello';
+        that($chain($string)->ucfirst->str_split->implode[1](',')())->is('H,e,l,l,o');
+        that((string) $chain($string))->is($string);
+
+        // internal
+        $list = '1,2,3,4,5';
+        that($chain($list)->multiexplode[1](',')->filter_key(fn($v) => $v >= 2)->maps(fn($v) => $v * 2)->values()())->is([6, 8, 10]);
+
+        // exception
+        that($chain(null))->try('undefined_function')->wasThrown('is not defined');
+
+        // use case
+        $rows = [
+            ['id' => 1, 'name' => 'hoge', 'sex' => 'F', 'age' => 17, 'salary' => 230000],
+            ['id' => 3, 'name' => 'fuga', 'sex' => 'M', 'age' => 43, 'salary' => 480000],
+            ['id' => 7, 'name' => 'piyo', 'sex' => 'M', 'age' => 21, 'salary' => 270000],
+            ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
+        ];
+
+        // misc
+        $hoge = $chain(['hoge', 'fuga', 1])->filter(fn($v) => is_string($v));
+        that(count($hoge))->is(2);
+        that(json_encode($hoge))->is('["hoge","fuga"]');
+
+        // e.g. 男性の平均給料
+        that($chain($rows)->where('sex', fn($v) => $v === 'M')->column('salary')->mean()())->is(375000);
+
+        // e.g. 女性の平均年齢
+        that($chain($rows)->where('sex', fn($v) => $v === 'F')->column('age')->mean()())->is(23.5);
+
+        // e.g. 30歳以上の平均給料
+        that($chain($rows)->where('age', fn($v) => $v >= 30)->column('salary')->mean()())->is(400000);
+
+        // e.g. 20～30歳の平均給料
+        that($chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
+
+        // e.g. 男性の最小年齢
+        that($chain($rows)->where('sex', fn($v) => $v === 'M')->column('age')->min()())->is(21);
+
+        // e.g. 女性の最大給料
+        that($chain($rows)->where('sex', fn($v) => $v === 'F')->column('salary')->max()())->is(320000);
+
+        // e.g. 30歳以上の id => name
+        that($chain($rows)->where('age', fn($v) => $v >= 30)->column('name', 'id')())->is([
+            3 => 'fuga',
+            9 => 'hage',
+        ]);
+
+//        if (version_compare(PHP_VERSION, 8.0) >= 0) {
+//            //that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');
+//        }
+
+        $backup = (function_configure)([
+            'chain.nullsafe' => true,
+            'placeholder'    => '_',
+        ]);
+        $placeholder = constant((function_configure)('placeholder'));
+        /** @noinspection PhpUndefinedMethodInspection */
+        {
+            that($chain(6)->nullsafe_int_func(3)())->is(3);
+            that($chain(3)->nullsafe_int_func[1](6)())->is(3);
+            that($chain(null)->nullsafe_int_func(6)())->isNull();
+            that($chain(null)->nullsafe_int_func[1](3)())->isNull();
+
+            that($chain('A')->concat_abc_z('B', 'C')())->is("ABC()");
+            that($chain('A')->concat_abc_z[0]('B', 'C')())->is("ABC()");
+            that($chain('B')->concat_abc_z[1]('A', 'C')())->is("ABC()");
+            that($chain('C')->concat_abc_z[2]('A', 'B')())->is("ABC()");
+            that($chain('Z')->concat_abc_z[2]('A', 'B', 'C')())->is("ABZ(C)");
+            that($chain('Z')->concat_abc_z[3]('A', 'B', 'C')())->is("ABC(Z)");
+            that($chain('Z')->concat_abc_z[9]('A', 'B', 'C')())->is("ABC(Z)");
+            that($chain(['X', 'Y', 'Z'])->concat_abc_z[9]('A', 'B', 'C')())->is("ABC(X,Y,Z)");
+            that($chain('A')->concat_abc_z['a']('B', 'C')())->is("ABC()");
+            that($chain('B')->concat_abc_z['b']('A', 'C')())->is("ABC()");
+            that($chain('C')->concat_abc_z['c']('A', 'B')())->is("ABC()");
+            that($chain('Z')->concat_abc_z['z']('A', 'B', 'C')())->is("ABC(Z)");
+            that($chain(['X', 'Y', 'Z'])->concat_abc_z['z']('A', 'B', 'C')())->is("ABC(X,Y,Z)");
+            that($chain(null)->concat_abc_z[0]('B', 'C')())->isNull();
+            that($chain(null)->concat_abc_z[1]('A', 'C')())->isNull();
+            that($chain(null)->concat_abc_z[2]('A', 'B')())->isNull();
+            that($chain(null)->concat_abc_z['a']('B', 'C')())->isNull();
+            that($chain(null)->concat_abc_z['b']('A', 'C')())->isNull();
+            that($chain(null)->concat_abc_z['c']('A', 'B')())->isNull();
+
+            that($chain(''))->concat_abc_z['N']('A', 'B', 'C')->isThrowable('does not exist');
+        }
+
+        that($chain('abc')->replace($placeholder, 'XYZ', 'abcdef')())->is('XYZdef');
+        that($chain('XYZ')->replace('abc', $placeholder, 'abcdef')())->is('XYZdef');
+        that($chain('abcdef')->replace('abc', 'XYZ', $placeholder)())->is('XYZdef');
+        (function_configure)($backup);
+
+        unset($restorer);
+    }
+
+    /**
+     * @noinspection PhpUndefinedMethodInspection
+     * @noinspection PhpMethodParametersCountMismatchInspection
+     */
+    function test_chain_old()
+    {
+        $restorer = $this->restorer(fn($v) => (function_configure)('chain.version', $v), [1]);
+
         // (chain)呼び出しだとコード補完が効かないのでラップする
         $chain = function (...$v) {
             /** @var \ChainObject $co */
@@ -800,6 +933,8 @@ $var3 = function () { return \ArrayObject::class; };
             that($chain('hello')->replace2('l', 'L')())->is('heLLo');
             that($chain([1, 2, 3])->replace([7, 8])())->is([7, 8, 3]);
         }
+
+        unset($restorer);
     }
 
     function test_throws()
