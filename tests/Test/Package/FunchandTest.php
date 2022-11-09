@@ -162,6 +162,7 @@ class FunchandTest extends AbstractTestCase
     {
         that((eval_func)('4')())->is(4);
         that((eval_func)('$a + $b', 'a', 'b')(3, 4))->is(7);
+        that((eval_func)('$1 + $2')(3, 4))->is(7);
 
         $a1 = (eval_func)('$a', 'a');
         $a2 = (eval_func)('$a', 'a');
