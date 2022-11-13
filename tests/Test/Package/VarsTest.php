@@ -493,6 +493,32 @@ class VarsTest extends AbstractTestCase
         that((is_recursive)($rnestobject))->isTrue();
     }
 
+    function test_is_decimal()
+    {
+        that((is_decimal)(''))->isFalse();
+        that((is_decimal)(null))->isFalse();
+        that((is_decimal)('hoge'))->isFalse();
+        that((is_decimal)('1f'))->isFalse();
+        that((is_decimal)('12.'))->isFalse();
+        that((is_decimal)('.12'))->isFalse();
+        that((is_decimal)('1e2'))->isFalse();
+        that((is_decimal)('012'))->isFalse();
+        that((is_decimal)(' 12'))->isFalse();
+        that((is_decimal)('12 '))->isFalse();
+        that((is_decimal)('-+12'))->isFalse();
+        that((is_decimal)('+1-2'))->isFalse();
+
+        that((is_decimal)('0'))->isTrue();
+        that((is_decimal)('0.00'))->isTrue();
+        that((is_decimal)('12.34'))->isTrue();
+        that((is_decimal)('12.30'))->isTrue();
+        that((is_decimal)('-12.30'))->isTrue();
+        that((is_decimal)('+12.30'))->isTrue();
+
+        that((is_decimal)('12.3', false))->isFalse();
+        that((is_decimal)('12', false))->isTrue();
+    }
+
     function test_is_stringable()
     {
         that((is_stringable)(null))->isTrue();
