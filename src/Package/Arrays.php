@@ -3780,6 +3780,7 @@ class Arrays implements Interfaces\Arrays
      * 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。
      *
      * $keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。
+     * さらにその時クロージャを渡すと($key, $value)でコールされた結果が新しいキーになる。
      *
      * Example:
      * ```php
@@ -3790,6 +3791,8 @@ class Arrays implements Interfaces\Arrays
      * that(array_pickup($array, ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
      * // 連想配列を渡すと読み替えて返す
      * that(array_pickup($array, ['c' => 'cX', 'a' => 'aX']))->isSame(['cX' => 'C', 'aX' => 'A']);
+     * // コールバックを渡せる
+     * that(array_pickup($array, ['c' => fn($k, $v) => "$k-$v"]))->isSame(['c-C' => 'C']);
      * ```
      *
      * @param iterable $array 対象配列
@@ -3809,6 +3812,9 @@ class Arrays implements Interfaces\Arrays
             }
             else {
                 if (array_key_exists($k, $array)) {
+                    if (Funchand::is_callback($key)) {
+                        $key = $key($k, $array[$k]);
+                    }
                     $result[$key] = $array[$k];
                 }
             }

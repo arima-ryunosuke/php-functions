@@ -2269,6 +2269,8 @@ class ArraysTest extends AbstractTestCase
 
         that((array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']))->isSame(['AAA' => 'A']);
         that((array_pickup)(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']))->isSame(['BBB' => ['b' => 'B']]);
+
+        that((array_pickup)(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c' => fn($k, $v) => "$k-$v"]))->isSame(['c-C' => 'C']);
     }
 
     function test_array_remove()
