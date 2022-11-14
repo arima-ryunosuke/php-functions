@@ -202,14 +202,27 @@ class Date implements Interfaces\Date
      * // 単純に「マイクロ秒が使える date」としても使える
      * $now = 1234567890.123; // テストがしづらいので固定時刻にする
      * that(date_convert('Y/m/d H:i:s.u', $now))->isSame('2009/02/14 08:31:30.122999');
+     * // $format に DateTimeInterface 実装クラス名を与えるとそのインスタンスを返す
+     * that(date_convert(\DateTimeImmutable::class, $now))->isInstanceOf(\DateTimeImmutable::class);
+     * // null は DateTime を意味する
+     * that(date_convert(null, $now))->isInstanceOf(\DateTime::class);
      * ```
      *
-     * @param string $format フォーマット
-     * @param string|int|float|\DateTime|null $datetimedata 日時データ。省略時は microtime
-     * @return string 日時文字列
+     * @todo 引数を入れ替えたほうが自然な気がする
+     *
+     * @param ?string $format フォーマット
+     * @param string|int|float|\DateTimeInterface|null $datetimedata 日時データ。省略時は microtime
+     * @return string|\DateTimeInterface 日時文字列。$format が null の場合は DateTime
      */
     public static function date_convert($format, $datetimedata = null)
     {
+        $format ??= \DateTime::class;
+        $return_object = class_exists($format) && is_subclass_of($format, \DateTimeInterface::class);
+
+        if ($return_object && $datetimedata instanceof \DateTimeInterface) {
+            return $datetimedata;
+        }
+
         // 省略時は microtime
         if ($datetimedata === null) {
             $timestamp = microtime(true);
@@ -221,30 +234,40 @@ class Date implements Interfaces\Date
             }
         }
 
-        $era = Arrays::array_find(Date::JP_ERA, function ($era) use ($timestamp) {
-            if ($era['since'] <= $timestamp) {
-                $era['year'] = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
-                $era['gann'] = $era['year'] === 1 ? '元' : $era['year'];
-                return $era;
-            }
-        }, false);
-        $format = Strings::strtr_escaped($format, [
-            'J' => fn() => $era ? $era['name'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'b' => fn() => $era ? $era['abbr'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'k' => fn() => $era ? $era['year'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'K' => fn() => $era ? $era['gann'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'x' => fn() => ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)],
-        ], '\\');
+        if (!$return_object) {
+            $era = Arrays::array_find(Date::JP_ERA, function ($era) use ($timestamp) {
+                if ($era['since'] <= $timestamp) {
+                    $era['year'] = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
+                    $era['gann'] = $era['year'] === 1 ? '元' : $era['year'];
+                    return $era;
+                }
+            }, false);
+            $format = Strings::strtr_escaped($format, [
+                'J' => fn() => $era ? $era['name'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+                'b' => fn() => $era ? $era['abbr'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+                'k' => fn() => $era ? $era['year'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+                'K' => fn() => $era ? $era['gann'] : Syntax::throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+                'x' => fn() => ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)],
+            ], '\\');
+        }
+
+        if (is_int($timestamp) && !$return_object) {
+            return date($format, $timestamp);
+        }
+
+        $class = $return_object ? $format : \DateTime::class;
+        $dt = new $class();
+        $dt = $dt->setTimestamp((int) $timestamp);
 
         if (is_float($timestamp)) {
-            // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
-            static $dtz = null;
-            $dtz ??= new \DateTimeZone(date_default_timezone_get());
-
-            $dt = \DateTime::createFromFormat('U', (int) $timestamp)->setTimezone($dtz)->modify(intval(($timestamp - (int) $timestamp) * 1000 * 1000) . ' microsecond');
-            return $dt->format($format);
+            $diff = (int) (($timestamp - (int) $timestamp) * 1000 * 1000);
+            $dt = $dt->modify("$diff microsecond");
         }
-        return date($format, $timestamp);
+
+        if ($return_object) {
+            return $dt;
+        }
+        return $dt->format($format);
     }
 
     /**

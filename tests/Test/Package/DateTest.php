@@ -152,6 +152,16 @@ class DateTest extends AbstractTestCase
 
     function test_date_convert()
     {
+        /** @noinspection PhpUndefinedMethodInspection */
+        {
+            that((date_convert)(\DateTimeImmutable::class, -0.1))
+                ->isInstanceOf(\DateTimeImmutable::class)
+                ->format('Y/m/d H:i:s.u')->is('1970/01/01 08:59:59.900000');
+            that((date_convert)(null, \DateTime::createFromFormat('U', 0)))
+                ->isInstanceOf(\DateTime::class)
+                ->format('Y/m/d H:i:s.u')->is('1970/01/01 00:00:00.000000');
+        }
+
         that((date_convert)('Y/m/d H:i:s.u', 0.1))->is('1970/01/01 09:00:00.100000');
         that((date_convert)('Y/m/d H:i:s.u', 1.1))->is('1970/01/01 09:00:01.100000');
         that((date_convert)('Y/m/d H:i:s.u', -0.1))->is('1970/01/01 08:59:59.900000');
