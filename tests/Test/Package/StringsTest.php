@@ -2287,6 +2287,19 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
   },
 ]');
 
+        that((json_export)([
+            'a' => ['b' => ['c' => "aaa\nzzz"]],
+        ], [JSON_TEMPLATE_LITERAL => true] + $es5_opt))->is('{
+  a: {
+    b: {
+      c: `
+        aaa
+        zzz
+        `,
+    },
+  },
+}');
+
         // depth
         that(json_export)([[[[[[]]]]]], [
             JSON_ES5       => true,
@@ -2352,7 +2365,7 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
             1
               2
                 3
-        `', [JSON_ES5 => true, JSON_TEMPLATE_LITERAL => true]))->is("1\n  2\n    3");
+        `', [JSON_ES5 => true, JSON_TEMPLATE_LITERAL => true]))->is("    1\n      2\n        3");
 
         that((json_import)('`1
             2

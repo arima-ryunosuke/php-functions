@@ -13,10 +13,12 @@ class Strings implements Interfaces\Strings
     const JSON_INDENT = -71;
     /** json_*** 関数でクロージャをサポートするかの定数 */
     const JSON_CLOSURE = -72;
+    /** json_*** 関数で初期ネストレベルを指定する定数 */
+    const JSON_NEST_LEVEL = -73;
     /** json_*** 関数で一定以上の階層をインライン化するかの定数 */
-    const JSON_INLINE_LEVEL = -73;
+    const JSON_INLINE_LEVEL = -74;
     /** json_*** 関数でスカラーのみのリストをインライン化するかの定数 */
-    const JSON_INLINE_SCALARLIST = -74;
+    const JSON_INLINE_SCALARLIST = -75;
     /** json_*** 関数で json5 を取り扱うかの定数 */
     const JSON_ES5 = -100;
     /** json_*** 関数で整数を常に文字列で返すかの定数 */
@@ -3058,6 +3060,7 @@ class Strings implements Interfaces\Strings
      * JSON_ES5 を与えると JSON5 互換でエンコードされる。
      * その際下記のプションも使用可能になる。
      *
+     * - JSON_TEMPLATE_LITERAL: 改行を含む文字列をテンプレートリテラルで出力する
      * - JSON_TRAILING_COMMA: 末尾カンマを強制する
      * - JSON_COMMENT_PREFIX: コメントとして埋め込まれるキープレフィックスを指定する
      *   - そのキーで始まる要素が文字列なら // コメントになる
@@ -3099,13 +3102,16 @@ class Strings implements Interfaces\Strings
         $depth = Arrays::array_unset($options, Strings::JSON_MAX_DEPTH, 512);
         $indent = Arrays::array_unset($options, Strings::JSON_INDENT, null);
         $closure = Arrays::array_unset($options, Strings::JSON_CLOSURE, false);
+        $nest_level = Arrays::array_unset($options, Strings::JSON_NEST_LEVEL, 0);
         $inline_level = Arrays::array_unset($options, Strings::JSON_INLINE_LEVEL, 0);
+        $template_literal = Arrays::array_unset($options, Strings::JSON_TEMPLATE_LITERAL, false);
         $inline_scalarlist = Arrays::array_unset($options, Strings::JSON_INLINE_SCALARLIST, false);
 
         $option = array_sum(array_keys(array_filter($options)));
 
-        $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $inline_scalarlist, $inline_level, $es5, $comma, $comment) {
-            $nest = count($parents);
+        $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $template_literal, $inline_scalarlist, $nest_level, $inline_level, $es5, $comma, $comment) {
+            $nest = $nest_level + count($parents);
+            $indent = $indent ?: 4;
 
             if ($depth < $nest) {
                 throw new \ErrorException('Maximum stack depth exceeded', JSON_ERROR_DEPTH);
@@ -3155,7 +3161,6 @@ class Strings implements Interfaces\Strings
                 if ($pretty_print && !$inline) {
                     $break = "\n";
                     $separator = ' ';
-                    $indent = $indent ?: 4;
                     $indent0 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 0) * $indent) : str_repeat($indent, ($nest + 0));
                     $indent1 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 1) * $indent) : str_repeat($indent, ($nest + 1));
                     $indent2 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 2) * $indent) : str_repeat($indent, ($nest + 2));
@@ -3213,12 +3218,22 @@ class Strings implements Interfaces\Strings
                 if (is_float($value) && is_infinite($value) && $value < 0) {
                     return '-Infinity';
                 }
+                if ($template_literal && is_string($value) && strpos($value, "\n") !== false) {
+                    $indent1 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 1) * $indent) : str_repeat($indent, ($nest + 1));
+                    $jsonstr = json_encode(str_replace(["\r\n", "\r"], "\n", $value), $option, $depth);
+                    $jsonstr = substr($jsonstr, 1, -1);
+                    $jsonstr = Strings::strtr_escaped($jsonstr, [
+                        '\\n' => "\n$indent1",
+                        '`'   => '\\`',
+                    ]);
+                    return "`\n$indent1$jsonstr\n$indent1`";
+                }
             }
             return json_encode($value, $option, $depth);
         };
 
         // 特別な状況（クロージャを使うとか ES5 でないとか）以外は 標準を使用したほうが遥かに速い
-        if ($indent || $closure || $inline_scalarlist || $inline_level || $es5 || $comma || $comment) {
+        if ($indent || $closure || $inline_scalarlist || $inline_level || $es5 || $comma || $comment || $template_literal) {
             return $encode($value, [], false);
         }
         else {
@@ -3239,7 +3254,7 @@ class Strings implements Interfaces\Strings
      * - JSON_BARE_AS_STRING: bare string を文字列として扱う
      * - JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる
      *   - あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない
-     *   - 冒頭のインデントがすべて除去され、最終段階で trim される
+     *   - 末尾のインデントと同じインデントがすべて除去され、前後の改行は取り除かれる
      *
      * Example:
      * ```php
@@ -3256,7 +3271,7 @@ class Strings implements Interfaces\Strings
      *     1
      *     2
      *     3
-     * `', [
+     *     `', [
      *     JSON_TEMPLATE_LITERAL => true,
      * ]))->is("1\n2\n3");
      * ```
@@ -3469,17 +3484,18 @@ class Strings implements Interfaces\Strings
                 };
                 $stringify = function ($token) use ($options) {
                     if (strlen($token) > 1 && ($token[0] === '"' || $token[0] === "'" || ($options[Strings::JSON_TEMPLATE_LITERAL] && $token[0] === "`"))) {
-                        if ($token[0] !== $token[-1]) {
+                        if (strlen($token) < 2 || $token[0] !== $token[-1]) {
                             throw $this->exception("Bad string", $this);
                         }
-                        $quotation = $token[0];
+                        $rawtoken = $token;
                         $token = substr($token, 1, -1);
-                        if ($quotation === "`" && preg_match('#^\n( +)#u', $token, $match)) {
-                            $token = trim(preg_replace("#^{$match[1]}#um", '', $token));
+                        if ($rawtoken[0] === "`" && $rawtoken[1] === "\n" && preg_match('#\n( +)`#u', $rawtoken, $match)) {
+                            $token = substr(preg_replace("#\n{$match[1]}#u", "\n", $token), 1, -1);
                         }
                         $token = preg_replace_callback('/(?:\\\\u[0-9A-Fa-f]{4})+/u', function ($m) { return json_decode('"' . $m[0] . '"'); }, $token);
                         $token = strtr($token, [
                             "\\'"    => "'",
+                            "\\`"    => "`",
                             '\\"'    => '"',
                             '\\\\'   => '\\',
                             '\\/'    => '/',
