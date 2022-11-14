@@ -387,6 +387,66 @@ class DateTest extends AbstractTestCase
         that(date_interval)(1, [], 2)->wasThrown('$format is empty');
     }
 
+    function test_date_interval_second()
+    {
+        that((date_interval_second)('+80'))->is(80);
+        that((date_interval_second)('-80'))->is(-80);
+        that((date_interval_second)('+PT80S'))->is(80);
+        that((date_interval_second)('-PT80S'))->is(-80);
+
+        $s = 1;
+        $m = 60 * $s;
+        $h = 60 * $m;
+        $D = 24 * $h;
+        $Y = 365 * $D;
+
+        that((date_interval_second)('PT80S'))->is(80 * $s);
+        that((date_interval_second)('PT70M80S'))->is(70 * $m + 80 * $s);
+        that((date_interval_second)('PT30H70M80S'))->is(30 * $h + 70 * $m + 80 * $s);
+        that((date_interval_second)('P40DT30H70M80S'))->is(40 * $D + 30 * $h + 70 * $m + 80 * $s);
+        that((date_interval_second)('P2Y40DT30H70M80S'))->is(2 * $Y + 40 * $D + 30 * $h + 70 * $m + 80 * $s);
+
+        that((date_interval_second)('-PT80S'))->is(-(80 * $s));
+        that((date_interval_second)('-PT70M80S'))->is(-(70 * $m + 80 * $s));
+        that((date_interval_second)('-PT30H70M80S'))->is(-(30 * $h + 70 * $m + 80 * $s));
+        that((date_interval_second)('-P40DT30H70M80S'))->is(-(40 * $D + 30 * $h + 70 * $m + 80 * $s));
+        that((date_interval_second)('-P2Y40DT30H70M80S'))->is(-($D + 2 * $Y + 40 * $D + 30 * $h + 70 * $m + 80 * $s));
+
+        that((date_interval_second)('PT20.123S'))->is(20.123, 0.00001);
+        that((date_interval_second)('PT20.123S', 3600))->is(20.123, 0.00001);
+        that((date_interval_second)('-PT20.123S'))->is(-20.123, 0.00001);
+        that((date_interval_second)('-PT20.123S', 3600))->is(-20.123, 0.00001);
+
+        that((date_interval_second)('P24M', '1970/01/01 00:00:00'))->is(array_sum([
+            31 * $D * 2,
+            28 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+        ]));
+        that((date_interval_second)('P24M', '1972/01/01 00:00:00'))->is(array_sum([
+            31 * $D * 2,
+            28 * $D * 1 + 29 * $D * 1,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+            30 * $D * 2,
+            31 * $D * 2,
+        ]));
+    }
+
     function test_date_alter()
     {
         // 順番に依存しないようにシャッフルしておく
