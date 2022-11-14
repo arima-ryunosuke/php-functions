@@ -103,6 +103,9 @@ class Concrete extends AbstractConcrete implements \Countable, \ArrayAccess, \It
     public function getName($prefix = '', $upper = false)
     {
         $name = $this->name;
+        if ($name === null) {
+            return null;
+        }
         if (strlen($prefix)) {
             $name = $prefix . $name;
         }

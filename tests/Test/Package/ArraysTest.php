@@ -1203,6 +1203,38 @@ class ArraysTest extends AbstractTestCase
         that((array_maps)($objs, ['getName' => ['p-', true]]))->is(['P-A', 'P-B', 'P-C']);
     }
 
+    function test_array_filters()
+    {
+        function is_not_null(...$args)
+        {
+            foreach ($args as $arg) {
+                if ($arg === null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // 'C' は ctype_lower, 'f' => 'f' は is_int, 'x' は ctype_xdigit で除去され、 'a', 'b' が残る
+        that((array_filters)(['a', 'b', 'C', 'f' => 'f', 'x'], fn($v, $k) => is_int($k), 'ctype_lower', 'ctype_xdigit'))->is(['a', 'b']);
+
+        // 可変引数モード
+        that((array_filters)([[null], [1, null], [1, 2]], '...' . __NAMESPACE__ . "\\is_not_null"))->isSame([2 => [1, 2]]);
+
+        // メソッドモード
+        $ex0 = new \Exception('msg0', 0);
+        $ex1 = new \Exception('', 1);
+        $ex2 = new \Exception('msg2', 2);
+        that((array_filters)([$ex0, $ex1, $ex2], '@getCode'))->isSame([1 => $ex1, 2 => $ex2]);
+        that((array_filters)([$ex0, $ex1, $ex2], '@getCode', '@getMessage'))->is([2 => $ex2]);
+
+        $obj0 = new \Concrete(null);
+        $obj1 = new \Concrete('');
+        $obj2 = new \Concrete('hoge');
+        that((array_filters)([$obj0, $obj1, $obj2], ['getName' => ['p-']]))->isSame([1 => $obj1, 2 => $obj2]);
+        that((array_filters)(new \ArrayObject([$obj0, $obj1, $obj2]), ['getName' => ['p-']]))->isSame([1 => $obj1, 2 => $obj2]);
+    }
+
     function test_array_kmap()
     {
         $array = [
