@@ -985,6 +985,40 @@ class FileSystemTest extends AbstractTestCase
         }
     }
 
+    function test_get_modified_files()
+    {
+        $dir = sys_get_temp_dir() . '/get_modified_files/';
+        (file_set_contents)("$dir/required.php", <<<PHP
+            <?php
+            require(__DIR__ . "/required1.php");
+            require(__DIR__ . "/required2.tpl");
+            require(__DIR__ . "/required3.php");
+            PHP);
+        (file_set_contents)("$dir/required1.php", '<?php return 1;');
+        (file_set_contents)("$dir/required2.tpl", '<?php return 2;');
+        (file_set_contents)("$dir/required3.php", '<?php return 3;');
+
+        $file1 = realpath("$dir/required1.php");
+        $file2 = realpath("$dir/required2.tpl");
+        $file3 = realpath("$dir/required3.php");
+
+        require "$dir/required.php";
+        that((get_modified_files)('*.php', '*.tpl'))->notContainsAll([$file1, $file2, $file3]);
+
+        touch($file1, time() + 2);
+        touch($file2, time() + 2);
+        that((get_modified_files)('*.php', '*.tpl'))->containsAll([$file1])->notContainsAll([$file2, $file3]);
+        touch($file2, time() + 3);
+        that((get_modified_files)('*.tpl', '*.dmy'))->containsAll([$file2])->notContainsAll([$file1, $file3]);
+
+        sleep(1);
+        unlink($file3);
+        that((get_modified_files)('*.php', '*.tpl'))->containsAll([$file1, $file3])->notContainsAll([$file2]);
+
+        touch($file3, time() + 2);
+        that((get_modified_files)('*.php', '*.tpl'))->containsAll([$file1, $file3])->notContainsAll([$file2]);
+    }
+
     function test_memory_path()
     {
         $hoge = (memory_path)('hoge');
