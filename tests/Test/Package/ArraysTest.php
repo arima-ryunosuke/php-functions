@@ -1160,6 +1160,26 @@ class ArraysTest extends AbstractTestCase
         that((array_map_filter)([1, 2, 3, 4, 5], fn($v) => $v === 3 ? null : $v - 3, true))->is([-2, -1, '3' => 1, 2]);
     }
 
+    function test_array_filter_map()
+    {
+        // 値を2乗して奇数だけを取り出す
+        that((array_filter_map)([1, 2, 3, 4, 5], function (&$v) {
+            $v = $v ** 2;
+            return $v % 2 === 1;
+        }))->is([0 => 1, 2 => 9, 4 => 25]);
+
+        // 値が奇数だったら2乗して返す
+        that((array_filter_map)([1, 2, 3, 4, 5], function (&$v) {
+            if ($v % 2 === 0) {
+                return false;
+            }
+            $v = $v ** 2;
+        }))->is([0 => 1, 2 => 9, 4 => 25]);
+
+        // prefix とキーを付与して返す。ただし null は除外する
+        that((array_filter_map)([null, 'hoge', 'fuga', null, 'piyo'], fn(&$v, $k) => $v !== null ? $v = "prefix-$k:$v" : false))->is([1 => 'prefix-1:hoge', 2 => 'prefix-2:fuga', 4 => 'prefix-4:piyo']);
+    }
+
     function test_array_map_method()
     {
         $o1 = new \Concrete('a');
