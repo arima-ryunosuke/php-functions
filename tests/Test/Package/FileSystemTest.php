@@ -514,6 +514,62 @@ class FileSystemTest extends AbstractTestCase
         that(file_pos)('not found', 'hoge')->wasThrown('is not found');
     }
 
+    function test_file_slice()
+    {
+        $tmpfile = sys_get_temp_dir() . '/file_slice.txt';
+        file_put_contents($tmpfile, implode("\n", array_map(fn($n) => $n % 2 ? $n : "", range(1, 20))));
+
+        // 1行だけサクッと読む
+        that((file_slice)($tmpfile, 1, 1))->is([
+            1 => "1\n",
+        ]);
+
+        // normal
+        that((file_slice)($tmpfile, 2, 5))->count(5)->is([
+            2 => "\n",
+            3 => "3\n",
+            4 => "\n",
+            5 => "5\n",
+            6 => "\n",
+        ]);
+
+        // end_line
+        that((file_slice)($tmpfile, 4, -9))->is([
+            4  => "\n",
+            5  => "5\n",
+            6  => "\n",
+            7  => "7\n",
+            8  => "\n",
+            9  => "9\n",
+        ]);
+
+        // end_line
+        that((file_slice)($tmpfile, 15, null))->is([
+            15 => "15\n",
+            16 => "\n",
+            17 => "17\n",
+            18 => "\n",
+            19 => "19\n",
+        ]);
+
+        // flags
+        that((file_slice)($tmpfile, 2, 5, FILE_IGNORE_NEW_LINES))->is([
+            2 => "",
+            3 => "3",
+            4 => "",
+            5 => "5",
+            6 => "",
+        ]);
+        that((file_slice)($tmpfile, 2, 5, FILE_SKIP_EMPTY_LINES))->is([
+            3 => "3\n",
+            5 => "5\n",
+        ]);
+        that((file_slice)($tmpfile, 2, 5, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES))->is([
+            3 => "3",
+            5 => "5",
+        ]);
+    }
+
     function test_file_mimetype()
     {
         that((file_mimetype)(__FILE__))->is('text/x-php');
