@@ -52,7 +52,7 @@ class Date implements Interfaces\Date
     public static function date_timestamp($datetimedata, $baseTimestamp = null)
     {
         if ($datetimedata instanceof \DateTimeInterface) {
-            return (float) $datetimedata->format('U.u');
+            return $datetimedata->getTimestamp() + $datetimedata->format('u') / 1000 / 1000;
         }
 
         $DAY1 = 60 * 60 * 24;
@@ -201,7 +201,7 @@ class Date implements Interfaces\Date
      * that(date_convert('Y/m/d H:i:s', '昭和31年12月24日 12時34分56秒'))->isSame('1956/12/24 12:34:56');
      * // 単純に「マイクロ秒が使える date」としても使える
      * $now = 1234567890.123; // テストがしづらいので固定時刻にする
-     * that(date_convert('Y/m/d H:i:s.u', $now))->isSame('2009/02/14 08:31:30.123000');
+     * that(date_convert('Y/m/d H:i:s.u', $now))->isSame('2009/02/14 08:31:30.122999');
      * ```
      *
      * @param string $format フォーマット
@@ -213,10 +213,6 @@ class Date implements Interfaces\Date
         // 省略時は microtime
         if ($datetimedata === null) {
             $timestamp = microtime(true);
-        }
-        elseif ($datetimedata instanceof \DateTimeInterface) {
-            // @fixme DateTime オブジェクトって timestamp を float で得られないの？
-            $timestamp = (float) $datetimedata->format('U.u');
         }
         else {
             $timestamp = Date::date_timestamp($datetimedata);
@@ -244,7 +240,9 @@ class Date implements Interfaces\Date
             // datetime パラメータが UNIX タイムスタンプ (例: 946684800) だったり、タイムゾーンを含んでいたり (例: 2010-01-28T15:00:00+02:00) する場合は、 timezone パラメータや現在のタイムゾーンは無視します
             static $dtz = null;
             $dtz ??= new \DateTimeZone(date_default_timezone_get());
-            return \DateTime::createFromFormat('U.u', sprintf('%f', $timestamp))->setTimezone($dtz)->format($format);
+
+            $dt = \DateTime::createFromFormat('U', (int) $timestamp)->setTimezone($dtz)->modify(intval(($timestamp - (int) $timestamp) * 1000 * 1000) . ' microsecond');
+            return $dt->format($format);
         }
         return date($format, $timestamp);
     }

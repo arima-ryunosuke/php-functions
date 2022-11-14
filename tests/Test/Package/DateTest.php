@@ -16,6 +16,10 @@ class DateTest extends AbstractTestCase
             return date('Y/m/d H:i:s', $second) . ".$micro";
         };
 
+        // 過去
+        that((date_timestamp)(\DateTime::createFromFormat('U', '0')->modify('+1 millisecond')))->is(0.001);
+        that((date_timestamp)(\DateTime::createFromFormat('U', '0')->modify('-1 millisecond')))->is(-0.001);
+
         // 割と普通のやつ
         that($test('2014/12/24 12:34:56'))->is('2014/12/24 12:34:56.000000');
         that($test('2014/12/24'))->is('2014/12/24 00:00:00.000000');
@@ -148,15 +152,20 @@ class DateTest extends AbstractTestCase
 
     function test_date_convert()
     {
+        that((date_convert)('Y/m/d H:i:s.u', 0.1))->is('1970/01/01 09:00:00.100000');
+        that((date_convert)('Y/m/d H:i:s.u', 1.1))->is('1970/01/01 09:00:01.100000');
+        that((date_convert)('Y/m/d H:i:s.u', -0.1))->is('1970/01/01 08:59:59.900000');
+        that((date_convert)('Y/m/d H:i:s.u', -1.1))->is('1970/01/01 08:59:58.900000');
+
         that((date_convert)('Y/m/d H:i:s', 1234567890))->is('2009/02/14 08:31:30');
         that((date_convert)('Y/m/d H:i:s', 1234567890.123))->is('2009/02/14 08:31:30');
         that((date_convert)('Y/m/d H:i:s.u', 1234567890))->is('2009/02/14 08:31:30.000000');
-        that((date_convert)('Y/m/d H:i:s.u', 1234567890.123))->is('2009/02/14 08:31:30.123000');
+        that((date_convert)('Y/m/d H:i:s.u', 1234567890.123))->is('2009/02/14 08:31:30.122999');
         that((date_convert)('Y/m/d H:i:s.u', "1234567890.000"))->is('2009/02/14 08:31:30.000000');
-        that((date_convert)('Y/m/d H:i:s.u', '2014/12/24 12:34:56.123'))->is('2014/12/24 12:34:56.123000');
-        that((date_convert)('Y/m/d H:i:s.u', '令和元年12月24日 12時34分56.123秒'))->is('2019/12/24 12:34:56.123000');
-        that((date_convert)('Y/m/d H:i:s.u', \DateTime::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.123000');
-        that((date_convert)('Y/m/d H:i:s.u', \DateTimeImmutable::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.123000');
+        that((date_convert)('Y/m/d H:i:s.u', '2014/12/24 12:34:56.123'))->is('2014/12/24 12:34:56.122999');
+        that((date_convert)('Y/m/d H:i:s.u', '令和元年12月24日 12時34分56.123秒'))->is('2019/12/24 12:34:56.122999');
+        that((date_convert)('Y/m/d H:i:s.u', \DateTime::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.122999');
+        that((date_convert)('Y/m/d H:i:s.u', \DateTimeImmutable::createFromFormat('Y/m/d H:i:s.u', '2019/12/24 12:34:56.123')))->is('2019/12/24 12:34:56.122999');
 
         that((date_convert)('Y/m/d H:i:s'))->is(date('Y/m/d H:i:s')); // microtime はテストがつらすぎるので u を付けない
 
