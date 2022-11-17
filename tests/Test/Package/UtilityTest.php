@@ -488,6 +488,22 @@ class UtilityTest extends AbstractTestCase
         that("$tmpdir/hoge.php-cache")->fileNotExists();
     }
 
+    function test_cache_fetch()
+    {
+        /** @var \Psr16CacheInterface $cache */
+        $tmpdir = sys_get_temp_dir() . '/cache_fetch';
+        (rm_rf)($tmpdir);
+        $cache = (cacheobject)($tmpdir);
+
+        $value = sha1(uniqid(mt_rand(), true));
+
+        that($cache->get('sha1random'))->isNull();
+        that((cache_fetch)($cache, 'sha1random', fn() => $value, 1))->is($value);
+        that($cache->get('sha1random'))->is($value);
+        sleep(2);
+        that($cache->get('sha1random'))->isNull();
+    }
+
     function test_parse_namespace()
     {
         $actual = (parse_namespace)(__DIR__ . '/Utility/namespace-standard.php');

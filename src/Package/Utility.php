@@ -692,6 +692,25 @@ class Utility implements Interfaces\Utility
     }
 
     /**
+     * psr-16 cache で「無かったらコールバックを実行して set」する
+     *
+     * @param \Psr\SimpleCache\CacheInterface $cacher キャッシュオブジェクト
+     * @param string $key キャッシュキー
+     * @param callable $provider データプロバイダ
+     * @param ?int $ttl キャッシュ時間
+     * @return mixed キャッシュデータ
+     */
+    public static function cache_fetch($cacher, $key, $provider, $ttl = null)
+    {
+        $data = $cacher->get($key);
+        if ($data === null) {
+            $data = $provider();
+            $cacher->set($key, $data, $ttl);
+        }
+        return $data;
+    }
+
+    /**
      * php ファイルをパースして名前空間配列を返す
      *
      * ファイル内で use/use const/use function していたり、シンボルを定義していたりする箇所を検出して名前空間単位で返す。
