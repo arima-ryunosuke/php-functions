@@ -1427,7 +1427,7 @@ class Vars implements Interfaces\Vars
                 $hashed = Arrays::is_hasharray($value);
 
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (!$hashed && Arrays::array_all($value, Vars::is_primitive)) {
+                if (!$hashed && Arrays::array_all($value, fn(...$args) => Vars::is_primitive(...$args))) {
                     return '[' . implode(', ', array_map($export, $value)) . ']';
                 }
 
@@ -1616,7 +1616,7 @@ class Vars implements Interfaces\Vars
 
             if (is_array($value)) {
                 $hashed = Arrays::is_hasharray($value);
-                if (!$hashed && Arrays::array_all($value, Vars::is_primitive)) {
+                if (!$hashed && Arrays::array_all($value, fn(...$args) => Vars::is_primitive(...$args))) {
                     [$begin, $middle, $end] = ["", ", ", ""];
                 }
                 else {
@@ -2237,7 +2237,7 @@ class Vars implements Interfaces\Vars
                     }
 
                     $is_hasharray = Arrays::is_hasharray($value);
-                    $primitive_only = Arrays::array_all($value, Vars::is_primitive);
+                    $primitive_only = Arrays::array_all($value, fn(...$args) => Vars::is_primitive(...$args));
                     $assoc = !$this->options['minify'] && ($is_hasharray || !$primitive_only);
 
                     $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);

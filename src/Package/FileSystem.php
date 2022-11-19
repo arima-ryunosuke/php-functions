@@ -55,10 +55,10 @@ class FileSystem implements Interfaces\FileSystem
         ];
 
         foreach ([
-            'mtime'  => Date::date_timestamp,
-            '!mtime' => Date::date_timestamp,
-            'size'   => Vars::si_unprefix,
-            '!size'  => Vars::si_unprefix,
+            'mtime'  => fn(...$args) => Date::date_timestamp(...$args),
+            '!mtime' => fn(...$args) => Date::date_timestamp(...$args),
+            'size'   => fn(...$args) => Vars::si_unprefix(...$args),
+            '!size'  => fn(...$args) => Vars::si_unprefix(...$args),
         ] as $key => $map) {
             if (isset($filter_condition[$key])) {
                 $range = $filter_condition[$key];

@@ -1580,7 +1580,7 @@ class Syntax implements Interfaces\Syntax
      */
     public static function try_finally($try, $finally = null, ...$variadic)
     {
-        return Syntax::try_catch_finally($try, Syntax::throws, $finally, ...$variadic);
+        return Syntax::try_catch_finally($try, fn(...$args) => Syntax::throws(...$args), $finally, ...$variadic);
     }
 
     /**

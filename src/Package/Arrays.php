@@ -3049,7 +3049,7 @@ class Arrays implements Interfaces\Arrays
         }
 
         if (!is_callable($columns)) {
-            $columns = array_map(Funchand::func_user_func_array, $columns);
+            $columns = array_map(fn(...$args) => Funchand::func_user_func_array(...$args), $columns);
         }
 
         $dive = function ($array, $level) use (&$dive, $columns) {

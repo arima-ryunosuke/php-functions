@@ -1536,7 +1536,7 @@ class Utility implements Interfaces\Utility
         }
 
         // 引数配列は単一の値でも良い
-        $args = array_map(Arrays::arrayize, $args);
+        $args = array_map(fn(...$args) => Arrays::arrayize(...$args), $args);
 
         // 実行すれば "ArgumentCountError: Too few arguments" で怒られるがもっと早い段階で気づきたい
         foreach ($tasks as $key => $task) {
