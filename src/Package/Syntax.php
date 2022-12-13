@@ -257,16 +257,18 @@ class Syntax implements Interfaces\Syntax
 
             $result[$i] = $token;
 
-            foreach ($end_tokens as $t) {
-                if (isset($nest_tokens[$t])) {
-                    $nest_token = $nest_tokens[$t];
-                    if ($token[0] === $nest_token || $token[1] === $nest_token) {
-                        $nesting++;
-                    }
+            foreach ($nest_tokens as $end_nest => $start_nest) {
+                if ($token[0] === $start_nest || $token[1] === $start_nest) {
+                    $nesting++;
                 }
-                if ($t === $token[0] || $t === $token[1]) {
+                if ($token[0] === $end_nest || $token[1] === $end_nest) {
                     $nesting--;
-                    if ($nesting <= 0) {
+                }
+            }
+
+            foreach ($end_tokens as $t) {
+                if ($t === $token[0] || $t === $token[1]) {
+                    if ($nesting <= 0 || ($nesting === 1 && in_array($t, $nest_tokens, true))) {
                         break 2;
                     }
                     break;

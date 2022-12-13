@@ -211,18 +211,23 @@ syntax error
         ]);
         // @formatter:on
 
-        $code = 'function(...$args)use($usevar){if(false)return function(){};}';
+        $code = 'function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}';
+        $tokens = (parse_php)($code, [
+            'begin' => T_FUNCTION,
+            'end'   => ',',
+        ]);
+        that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
         $tokens = (parse_php)($code, [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
-        that(implode('', array_column($tokens, 1)))->is('function(...$args)use($usevar){');
+        that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){');
         $tokens = (parse_php)($code, [
             'begin'  => '{',
             'end'    => '}',
             'offset' => count($tokens),
         ]);
-        that(implode('', array_column($tokens, 1)))->is('{if(false)return function(){};}');
+        that(implode('', array_column($tokens, 1)))->is('{if(false)return fn()=>[1,2,3];}');
 
         $code = 'namespace hoge\\fuga\\piyo;class C {function m(){if(false)return function(){};}}';
         $tokens = (parse_php)($code, [
