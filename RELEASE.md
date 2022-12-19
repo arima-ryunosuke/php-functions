@@ -10,6 +10,41 @@
 
 - Utility が増えてきたから然るべき場所へ移動する
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
+- sql_format がカオスなのでリファクタしないとまずい
+
+## 1.5.5
+
+- [feature][Vars] var_export3 のアロー関数対応
+- [feature][Funchand] 限定的に collable_code のアロー関数対応
+- [feature][Syntax] parse_php に greedy オプションを追加
+- [fixbug][Syntax] parse_php で nest 内 end が無視されない不具合を修正
+- [feature][Arrays] array_pickup のクロージャ対応
+- [feature][Arrays] array_filter_map を追加
+- [feature][Arrays] array_filters を追加
+- [feature][Syntax] chain のバージョン2を追加
+- [change][Syntax] optional の NullObject に count,jsonSerialize を実装
+- [fixbug][Utility] benchmark で結果が異なるときの表示が見づらかったので修正
+- [feature][Date] date_interval_second を追加
+- [feature][Date] date_validate を追加
+- [feature][Date] date_convert の DateTime 対応
+- [fixbug][Date] 1970/01/01 以前の日付で1秒増える不具合を修正
+- [fixbug][Date] date_timestamp の不具合を修正
+- [fixbug][Date] date_interval の不具合を修正
+- [fixbug][Date] date_convert の不具合を修正
+- [change][Vars] var_pretty の string 出力を json に変更
+- [feature][Vars] is_decimal を追加
+- [fixbug][Sql] sql_format のリファクタ && 形式が乱れる不具合を修正
+- [feature][Strings] json_import/export テンプレートリテラルのインデント削除に対応
+- [feature][Strings] markdown_table の context オプション対応
+- [feature][Strings] glob2regex を追加
+- [feature][Strings] strtr_escaped を追加
+- [feature][Strings] strpos_escaped を追加
+- [feature][FileSystem] get_modified_files を追加
+- [feature][FileSystem] file_slice を追加
+- [feature][Funchand] eval_func の連番引数対応
+- [feature][Funchand] is_callback を追加
+- [feature][Utility] cache_fetch を追加
+- [feature][Utility] ansi_strip を追加
 
 ## 1.5.4
 

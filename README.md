@@ -95,24 +95,6 @@ vendor/bin/export-function
 
 ただし、ほとんど内部用です。
 
-### constant
-
-少し変わった仕様として、関数名と同名の定数も定義されます。
-グローバル展開はともかく、名前空間展開していると `array_map` などに文字列として渡すのがとてもしんどくなりますが、この定数を使えば IDE による補完＋チェック付きで渡すことが出来ます。
-
-```php
-require __DIR__ . '/vendor/autoload.php';
-
-use const ryunosuke\Functions\strcat;
-
-\ryunosuke\Functions\Transporter::importAsNamespace();
-
-// しんどい
-array_map('\\ryunosuke\\Functions\\strcat', ['something array']);
-// らくちん
-array_map(strcat, ['something array']);
-```
-
 ## Development
 
 基本的に触るのは `src/Package` 以下のみです。他の似たようなファイルは自動生成です。
