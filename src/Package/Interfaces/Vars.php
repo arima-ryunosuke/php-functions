@@ -21,6 +21,7 @@ interface Vars
     public const is_empty             = ["ryunosuke\\Functions\\Package\\Vars", "is_empty"];
     public const is_primitive         = ["ryunosuke\\Functions\\Package\\Vars", "is_primitive"];
     public const is_recursive         = ["ryunosuke\\Functions\\Package\\Vars", "is_recursive"];
+    public const is_decimal           = ["ryunosuke\\Functions\\Package\\Vars", "is_decimal"];
     public const is_stringable        = ["ryunosuke\\Functions\\Package\\Vars", "is_stringable"];
     public const is_arrayable         = ["ryunosuke\\Functions\\Package\\Vars", "is_arrayable"];
     public const cipher_metadata      = ["ryunosuke\\Functions\\Package\\Vars", "cipher_metadata"];

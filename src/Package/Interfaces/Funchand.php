@@ -19,6 +19,7 @@ interface Funchand
     public const callable_code        = ["ryunosuke\\Functions\\Package\\Funchand", "callable_code"];
     public const call_safely          = ["ryunosuke\\Functions\\Package\\Funchand", "call_safely"];
     public const ob_capture           = ["ryunosuke\\Functions\\Package\\Funchand", "ob_capture"];
+    public const is_callback          = ["ryunosuke\\Functions\\Package\\Funchand", "is_callback"];
     public const is_bindable_closure  = ["ryunosuke\\Functions\\Package\\Funchand", "is_bindable_closure"];
     public const by_builtin           = ["ryunosuke\\Functions\\Package\\Funchand", "by_builtin"];
     public const namedcallize         = ["ryunosuke\\Functions\\Package\\Funchand", "namedcallize"];

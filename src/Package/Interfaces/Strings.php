@@ -14,7 +14,9 @@ interface Strings
     public const quoteexplode        = ["ryunosuke\\Functions\\Package\\Strings", "quoteexplode"];
     public const strrstr             = ["ryunosuke\\Functions\\Package\\Strings", "strrstr"];
     public const strpos_array        = ["ryunosuke\\Functions\\Package\\Strings", "strpos_array"];
+    public const strpos_escaped      = ["ryunosuke\\Functions\\Package\\Strings", "strpos_escaped"];
     public const strpos_quoted       = ["ryunosuke\\Functions\\Package\\Strings", "strpos_quoted"];
+    public const strtr_escaped       = ["ryunosuke\\Functions\\Package\\Strings", "strtr_escaped"];
     public const str_bytes           = ["ryunosuke\\Functions\\Package\\Strings", "str_bytes"];
     public const str_chunk           = ["ryunosuke\\Functions\\Package\\Strings", "str_chunk"];
     public const str_anyof           = ["ryunosuke\\Functions\\Package\\Strings", "str_anyof"];
@@ -60,6 +62,7 @@ interface Strings
     public const random_string       = ["ryunosuke\\Functions\\Package\\Strings", "random_string"];
     public const unique_string       = ["ryunosuke\\Functions\\Package\\Strings", "unique_string"];
     public const kvsprintf           = ["ryunosuke\\Functions\\Package\\Strings", "kvsprintf"];
+    public const glob2regex          = ["ryunosuke\\Functions\\Package\\Strings", "glob2regex"];
     public const preg_matches        = ["ryunosuke\\Functions\\Package\\Strings", "preg_matches"];
     public const preg_capture        = ["ryunosuke\\Functions\\Package\\Strings", "preg_capture"];
     public const preg_splice         = ["ryunosuke\\Functions\\Package\\Strings", "preg_splice"];

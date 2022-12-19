@@ -52,8 +52,10 @@ interface Arrays
     public const array_filter_key     = ["ryunosuke\\Functions\\Package\\Arrays", "array_filter_key"];
     public const array_where          = ["ryunosuke\\Functions\\Package\\Arrays", "array_where"];
     public const array_map_filter     = ["ryunosuke\\Functions\\Package\\Arrays", "array_map_filter"];
+    public const array_filter_map     = ["ryunosuke\\Functions\\Package\\Arrays", "array_filter_map"];
     public const array_map_method     = ["ryunosuke\\Functions\\Package\\Arrays", "array_map_method"];
     public const array_maps           = ["ryunosuke\\Functions\\Package\\Arrays", "array_maps"];
+    public const array_filters        = ["ryunosuke\\Functions\\Package\\Arrays", "array_filters"];
     public const array_kvmap          = ["ryunosuke\\Functions\\Package\\Arrays", "array_kvmap"];
     public const array_kmap           = ["ryunosuke\\Functions\\Package\\Arrays", "array_kmap"];
     public const array_nmap           = ["ryunosuke\\Functions\\Package\\Arrays", "array_nmap"];

@@ -16,11 +16,13 @@ interface Utility
     public const cacheobject        = ["ryunosuke\\Functions\\Package\\Utility", "cacheobject"];
     public const cachedir           = ["ryunosuke\\Functions\\Package\\Utility", "cachedir"];
     public const cache              = ["ryunosuke\\Functions\\Package\\Utility", "cache"];
+    public const cache_fetch        = ["ryunosuke\\Functions\\Package\\Utility", "cache_fetch"];
     public const parse_namespace    = ["ryunosuke\\Functions\\Package\\Utility", "parse_namespace"];
     public const resolve_symbol     = ["ryunosuke\\Functions\\Package\\Utility", "resolve_symbol"];
     public const parse_annotation   = ["ryunosuke\\Functions\\Package\\Utility", "parse_annotation"];
     public const is_ansi            = ["ryunosuke\\Functions\\Package\\Utility", "is_ansi"];
     public const ansi_colorize      = ["ryunosuke\\Functions\\Package\\Utility", "ansi_colorize"];
+    public const ansi_strip         = ["ryunosuke\\Functions\\Package\\Utility", "ansi_strip"];
     public const process            = ["ryunosuke\\Functions\\Package\\Utility", "process"];
     public const process_async      = ["ryunosuke\\Functions\\Package\\Utility", "process_async"];
     public const process_parallel   = ["ryunosuke\\Functions\\Package\\Utility", "process_parallel"];

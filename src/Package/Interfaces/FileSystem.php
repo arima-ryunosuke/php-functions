@@ -17,6 +17,7 @@ interface FileSystem
     public const file_rewrite_contents = ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"];
     public const file_set_tree         = ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_tree"];
     public const file_pos              = ["ryunosuke\\Functions\\Package\\FileSystem", "file_pos"];
+    public const file_slice            = ["ryunosuke\\Functions\\Package\\FileSystem", "file_slice"];
     public const file_mimetype         = ["ryunosuke\\Functions\\Package\\FileSystem", "file_mimetype"];
     public const mkdir_p               = ["ryunosuke\\Functions\\Package\\FileSystem", "mkdir_p"];
     public const dirname_r             = ["ryunosuke\\Functions\\Package\\FileSystem", "dirname_r"];
@@ -31,5 +32,6 @@ interface FileSystem
     public const cp_rf                 = ["ryunosuke\\Functions\\Package\\FileSystem", "cp_rf"];
     public const rm_rf                 = ["ryunosuke\\Functions\\Package\\FileSystem", "rm_rf"];
     public const tmpname               = ["ryunosuke\\Functions\\Package\\FileSystem", "tmpname"];
+    public const get_modified_files    = ["ryunosuke\\Functions\\Package\\FileSystem", "get_modified_files"];
     public const memory_path           = ["ryunosuke\\Functions\\Package\\FileSystem", "memory_path"];
 }

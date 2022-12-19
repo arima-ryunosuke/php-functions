@@ -433,7 +433,7 @@ class MathTest extends AbstractTestCase
         $decimal(9007199254740991.0, -1, $ZERO)->isSame(9007199254740990.0);
 
         that(decimal)(1, 1, 'hoge')->wasThrown('$precision must be either');
-        that(decimal)(9007199254740991.0, 1, $NINF)->wasThrown('it exceeds the valid values');
+        that(decimal)(9007199254740991.0, 1, $NINF)->wasErrored('it exceeds the valid values');
     }
 
     function test_random_at()
@@ -522,9 +522,9 @@ class MathTest extends AbstractTestCase
         that((calculate_formula)('NS\\NINE + ArrayObject::ARRAY_AS_PROPS * 3 + \\ArrayObject::ARRAY_AS_PROPS'))->is(9 + \ArrayObject::ARRAY_AS_PROPS * 4);
 
         define('NS\\STR', 'evil');
-        that(calculate_formula)('NS\\STR + 1')->wasThrown();
-        that(calculate_formula)('NS\\STR (1)')->wasThrown();
-        that(calculate_formula)('UNDEFINED(1)')->wasThrown();
-        that(calculate_formula)('1 + "aaa"')->wasThrown();
+        that(calculate_formula)('NS\\STR + 1')->wasErrored();
+        that(calculate_formula)('NS\\STR (1)')->wasErrored();
+        that(calculate_formula)('UNDEFINED(1)')->wasErrored();
+        that(calculate_formula)('1 + "aaa"')->wasErrored();
     }
 }

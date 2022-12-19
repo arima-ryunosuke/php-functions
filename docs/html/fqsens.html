@@ -935,6 +935,18 @@ that(array_map_filter([' a ', ' b ', ''], 'trim', true))-&gt;isSame(['a', 'b', '
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filter_map()">
+                                    ryunosuke\Functions\Package\Arrays::array_filter_map		</a>	<small>($array, $callback) : array</small>
+		</h4>
+	<div class="description"><p>array_filter + array_map する</p>
+<p>コールバックを適用して、結果が !false 要素のみ取り出す。<br />
+コールバックの第1引数を参照にして書き換えると結果にも反映される。</p>
+<p>$callback が要求するならキーも渡ってくる。</p>
+<p>Example:</p>
+<pre><code class="language-php">that(array_filter_map([' a ', ' b ', ''], fn(&amp;$v) =&gt; strlen($v) ? $v = trim($v) : false))-&gt;isSame(['a', 'b']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_map_method()">
                                     ryunosuke\Functions\Package\Arrays::array_map_method		</a>	<small>($array, $method, $args = [], $ignore = false) : array</small>
 		</h4>
@@ -976,6 +988,27 @@ that(array_maps([[1, 3], [1, 5, 2]], '...range'))-&gt;isSame([[1, 2, 3], [1, 3, 
 // メソッドコールもできる（引数不要なら `@method` でも同じ）
 that(array_maps([new \Exception('a'), new \Exception('b')], ['getMessage' =&gt; []]))-&gt;isSame(['a', 'b']);
 that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;isSame(['a', 'b']);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::array_filters()">
+                                    ryunosuke\Functions\Package\Arrays::array_filters		</a>	<small>($array, ...$callbacks) : array</small>
+		</h4>
+	<div class="description"><p>複数コールバックを指定できる array_filter</p>
+<p>指定したコールバックで複数回回してフィルタする。<br />
+<code>array_filter($array, $f, $g)</code> は <code>array_filter(array_filter($array, $f), $g)</code> とほぼ等しい。<br />
+コールバックが要求するならキーも渡ってくる。<br />
+さらに文字列関数で "..." から始まっているなら可変引数としてコールする。</p>
+<p>少し変わった仕様として、コールバックに [$method =&gt; $args] を付けるとそれはメソッド呼び出しになる。<br />
+つまり各要素 $v に対して <code>$v-&gt;$method(...$args)</code> がフィルタ結果になる。<br />
+さらに引数が不要なら <code>@method</code> とするだけで良い。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 非 null かつ小文字かつ16進数
+that(array_filters(['abc', 'XYZ', null, 'ABC', 'ff', '3e7'],
+    fn($v) =&gt; $v !== null,
+    fn($v) =&gt; ctype_lower("$v"),
+    fn($v) =&gt; ctype_xdigit("$v"),
+))-&gt;isSame([0 =&gt; 'abc', 4 =&gt; 'ff']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -1697,7 +1730,8 @@ that(array_fill_callback($abc, fn($v) =&gt; strtoupper(sha1($v))))-&gt;isSame([
 	<div class="description"><p>キーを指定してそれだけの配列にする</p>
 <p><code>array_intersect_key($array, array_flip($keys))</code> とほぼ同義。<br />
 違いは Traversable を渡せることと、結果配列の順番が $keys に従うこと。</p>
-<p>$keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。</p>
+<p>$keys に連想配列を渡すとキーを読み替えて動作する（Example を参照）。<br />
+さらにその時クロージャを渡すと($key, $value)でコールされた結果が新しいキーになる。</p>
 <p>Example:</p>
 <pre><code class="language-php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 // a と c を取り出す
@@ -1706,6 +1740,8 @@ that(array_pickup($array, ['a', 'c']))-&gt;isSame(['a' =&gt; 'A', 'c' =&gt; 'C']
 that(array_pickup($array, ['c', 'a']))-&gt;isSame(['c' =&gt; 'C', 'a' =&gt; 'A']);
 // 連想配列を渡すと読み替えて返す
 that(array_pickup($array, ['c' =&gt; 'cX', 'a' =&gt; 'aX']))-&gt;isSame(['cX' =&gt; 'C', 'aX' =&gt; 'A']);
+// コールバックを渡せる
+that(array_pickup($array, ['c' =&gt; fn($k, $v) =&gt; "$k-$v"]))-&gt;isSame(['c-C' =&gt; 'C']);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -2463,7 +2499,7 @@ $object-&gt;oreore = 'oreore';
 // var_dump((array) $object);
 
 // この関数を使えば不可視プロパティも取得できる
-that(get_object_properties($object))-&gt;arraySubset([
+that(get_object_properties($object))-&gt;subsetEquals([
     'message' =&gt; 'something',
     'code'    =&gt; 42,
     'oreore'  =&gt; 'oreore',
@@ -2487,13 +2523,26 @@ that(get_object_properties(fn() =&gt; $object))-&gt;is([
 	<div class="description"><p>和暦</p>
 </div>
             	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_validate()">
+                                    ryunosuke\Functions\Package\Date::date_validate		</a>	<small>($datetime_string, $format = &quot;Y/m/d H:i:s&quot;, $overhour = 0) : bool</small>
+		</h4>
+	<div class="description"><p>日時文字列のバリデーション</p>
+<p>存在しない日付・時刻・相対指定などは全て不可。<br />
+あくまで「2014/12/24 12:34:56」のような形式と妥当性だけでチェックする。<br />
+$overhour 引数で 27:00 のような拡張時刻も許容させることができる（6 を指定すればいわゆる30時間制になる）。</p>
+<p>日時形式は結構複雑なので「正しいはずだがなぜか false になる」という事象が頻発する。<br />
+その時、調査が大変（どの段階で false になっているか分からない）なので＠で抑制しつつも内部的には user_error を投げている。<br />
+このエラーは error_get_last で取得可能だが、行儀の悪い（＠抑制を見ない）エラーハンドラが設定されていると例外として送出されることがあるので注意。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_timestamp()">
                                     ryunosuke\Functions\Package\Date::date_timestamp		</a>	<small>($datetimedata, $baseTimestamp = null) : int<span class="type-separator"></span><wbr>float<span class="type-separator"></span><wbr>null</small>
 		</h4>
 	<div class="description"><p>日時的なものをよしなにタイムスタンプに変換する</p>
 <p>マイクロ秒にも対応している。つまり返り値は int か float になる。<br />
 また、相対指定の +1 month の月末問題は起きないようにしてある。</p>
-<p>かなり適当に和暦にも対応している。</p>
+<p>かなり適当に和暦にも対応している。<br />
+さらに必要に迫られてかなり特殊な対応を行っているので Example を参照。</p>
 <p>Example:</p>
 <pre><code class="language-php">// 普通の日時文字列
 that(date_timestamp('2014/12/24 12:34:56'))-&gt;isSame(strtotime('2014/12/24 12:34:56'));
@@ -2504,11 +2553,18 @@ that(date_timestamp('2012/01/31 +1 month'))-&gt;isSame(strtotime('2012/02/29'));
 that(date_timestamp('2012/03/31 -1 month'))-&gt;isSame(strtotime('2012/02/29'));
 // マイクロ秒
 that(date_timestamp('2014/12/24 12:34:56.789'))-&gt;isSame(1419392096.789);
+
+// ベース日時
+$baseTimestamp = strtotime('2012/01/31');
+// ベース日時の25日（strtotime の序数日付は first/last しか対応していないが、この関数は対応している）
+that(date_timestamp('25th of this month', $baseTimestamp))-&gt;isSame(strtotime('2012/01/25'));
+// ベース日時の第2月曜（strtotime の序数曜日は 1st のような表記に対応していないが、この関数は対応している）
+that(date_timestamp('2nd monday of this month', $baseTimestamp))-&gt;isSame(strtotime('2012/01/09'));
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_convert()">
-                                    ryunosuke\Functions\Package\Date::date_convert		</a>	<small>($format, $datetimedata = null) : string</small>
+                                    ryunosuke\Functions\Package\Date::date_convert		</a>	<small>($format, $datetimedata = null) : string<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.datetimeinterface.php" class="fqsen" target="_blank">\DateTimeInterface</a></small>
 		</h4>
 	<div class="description"><p>日時文字列をよしなに別のフォーマットに変換する</p>
 <p>マイクロ秒にも対応している。<br />
@@ -2518,7 +2574,11 @@ that(date_timestamp('2014/12/24 12:34:56.789'))-&gt;isSame(1419392096.789);
 that(date_convert('Y/m/d H:i:s', '昭和31年12月24日 12時34分56秒'))-&gt;isSame('1956/12/24 12:34:56');
 // 単純に「マイクロ秒が使える date」としても使える
 $now = 1234567890.123; // テストがしづらいので固定時刻にする
-that(date_convert('Y/m/d H:i:s.u', $now))-&gt;isSame('2009/02/14 08:31:30.123000');
+that(date_convert('Y/m/d H:i:s.u', $now))-&gt;isSame('2009/02/14 08:31:30.122999');
+// $format に DateTimeInterface 実装クラス名を与えるとそのインスタンスを返す
+that(date_convert(\DateTimeImmutable::class, $now))-&gt;isInstanceOf(\DateTimeImmutable::class);
+// null は DateTime を意味する
+that(date_convert(null, $now))-&gt;isInstanceOf(\DateTime::class);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -2586,6 +2646,32 @@ that(date_interval(1234, $format, 3))-&gt;isSame('0時間20分34秒');
 
 // 書式指定なし（DateInterval を返す）
 that(date_interval(123.456))-&gt;isInstanceOf(\DateInterval::class);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Date$typespace.html#ryunosuke\Functions\Package\Date::date_interval_second()">
+                                    ryunosuke\Functions\Package\Date::date_interval_second		</a>	<small>($interval, $basetime = 0) : float<span class="type-separator"></span><wbr>int</small>
+		</h4>
+	<div class="description"><p>DateInterval を秒に変換する</p>
+<p>1ヶ月の間隔は時期によって異なるため、 $basetime 次第で結果が変わることがあるので注意。<br />
+$interval は DateInterval だけでなく ISO8601 文字列も与えることができる。<br />
+その際、下記の拡張仕様がある。</p>
+<ul>
+<li>先頭の正負記号（-+）を受け入れる（DateInterval-&gt;invert で表現される）</li>
+<li>秒だけは小数表記を受け入れる（DateInterval-&gt;f で表現される。元々 ISO8601 の仕様だが DateInterval は対応していないっぽい）</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">// 1分30秒は90秒
+that(date_interval_second('PT1M30S'))-&gt;isSame(90);
+// 負数が使える
+that(date_interval_second('-PT1M30S'))-&gt;isSame(-90);
+// 秒は小数が使える
+that(date_interval_second('-PT1M30.5S'))-&gt;isSame(-90.5);
+
+// 1980/01/01 からの3ヶ月は 7862400 秒（うるう年なので 91 日）
+that(date_interval_second('P3M', '1980/01/01'))-&gt;isSame(7862400);
+// 1981/01/01 からの3ヶ月は 7776000 秒（うるう年じゃないので 90 日）
+that(date_interval_second('P3M', '1981/01/01'))-&gt;isSame(7776000);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -2785,6 +2871,67 @@ that(file_pos($testpath, 'fuga'))-&gt;is(5);
 that(file_pos($testpath, 'fuga', 6))-&gt;is(15);
 // 見つからない場合は false を返す
 that(file_pos($testpath, 'hogera'))-&gt;is(false);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_slice()">
+                                    ryunosuke\Functions\Package\FileSystem::file_slice		</a>	<small>($filename, $start_line = 1, $length = null, $flags = 0, $context = null) : array</small>
+		</h4>
+	<div class="description"><p>file の行範囲を指定できる板</p>
+<p>原則 file をベースに作成しているが、一部独自仕様がある。</p>
+<ul>
+<li>結果配列は行番号がキーになる<ul>
+<li>あくまで行番号なので 1 オリジン</li>
+<li>スキップされた行は歯抜けになる</li>
+</ul>
+</li>
+<li>FILE_SKIP_EMPTY_LINES の動作が FILE_IGNORE_NEW_LINES ありきではない<ul>
+<li>file における FILE_SKIP_EMPTY_LINES の単独指定は意味を成さないっぽい<ul>
+<li>FILE_IGNORE_NEW_LINES しないと空文字ではなく改行文字が含まれるので空判定にならないようだ</li>
+</ul>
+</li>
+<li>この関数はその動作を撤廃しており、単独で FILE_SKIP_EMPTY_LINES を指定しても空行が飛ばされる動作になっている</li>
+</ul>
+</li>
+<li>$end_line に負数を指定すると行番号の直指定となる<ul>
+<li><code>file_slice($filename, 120, -150)</code> で 120行目から150行目までを読む</li>
+<li>負数なのは気持ち悪いが、範囲指定のハイフン（120-150）だと思えば割と自然</li>
+</ul>
+</li>
+</ul>
+<p>使用用途としては</p>
+<ol>
+<li>巨大ファイルの前半だけ読みたい</li>
+<li>1行だけサクッと読みたい</li>
+</ol>
+<p>が挙げられる。</p>
+<p>1 は自明（file は全行読む）だが、終端付近を読む場合は file の方が若干速い。<br />
+ただし、期待値としてはこの関数の方が格段に低い（file は下手すると何十倍も遅い）。</p>
+<p>2 は典型的には「1行目だけ読みたい」場合、fopen+fgets+fclose(finally)という手順を踏む必要があり煩雑になる。<br />
+この関数を使えばサクッと取得することができる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 適当にファイルを用意（奇数行は行番号、偶数行は空行）
+$testpath = sys_get_temp_dir() . '/file_slice.txt';
+file_put_contents($testpath, implode("\n", array_map(fn($n) =&gt; $n % 2 ? $n : "", range(1, 20))));
+// 3行目から4行を返す
+that(file_slice($testpath, 3, 4))-&gt;is([
+    3 =&gt; "3\n",
+    4 =&gt; "\n",
+    5 =&gt; "5\n",
+    6 =&gt; "\n",
+]);
+// 3行目から6行目までを返す
+that(file_slice($testpath, 3, -6))-&gt;is([
+    3 =&gt; "3\n",
+    4 =&gt; "\n",
+    5 =&gt; "5\n",
+    6 =&gt; "\n",
+]);
+// 改行文字や空行を含めない（キーは保持される）
+that(file_slice($testpath, 3, 4, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES))-&gt;is([
+    3 =&gt; "3",
+    5 =&gt; "5",
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -3024,6 +3171,33 @@ that(file_exists(sys_get_temp_dir() . '/new'))-&gt;isSame(false);
 </ul>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::get_modified_files()">
+                                    ryunosuke\Functions\Package\FileSystem::get_modified_files		</a>	<small>($target_pattern = &quot;*.php&quot;, $ignore_pattern = &quot;*.phtml&quot;) : array</small>
+		</h4>
+	<div class="description"><p>初回読み込み時から変更のあったファイル配列を返す</p>
+<p>初回呼び出し時は必ず空配列を返し、以後の呼び出しで変更のあったファイルを返す。<br />
+削除されたファイルも変更とみなす。</p>
+<p>用途的には「php で書かれたデーモンで、変更感知して自動で再起動する（systemd に任せる）」がある。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 別プロセスで3秒後に自分自身を触る
+$p = process_async(PHP_BINARY, ['-r' =&gt; 'sleep(3);touch($argv[1]);', __FILE__]);
+
+$time = microtime(true);
+foreach (range(1, 10) as $i) {
+    // 何らかのデーモン（完全に wait する系ではなく時々処理が戻ってくる必要がある）
+    sleep(1);
+
+    // 自身の変更を感知したら break なり exit なりで抜ける（大抵はそのまま終了する。起動は systemd に丸投げする）
+    if (get_modified_files(__FILE__)) {
+        break;
+    }
+}
+// 全ループすると10秒かかるが、大体3秒程度で抜けているはず
+that(microtime(true) - $time)-&gt;lt(3.9);
+unset($p);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::memory_path()">
                                     ryunosuke\Functions\Package\FileSystem::memory_path		</a>	<small>($path) : string</small>
 		</h4>
@@ -3142,8 +3316,13 @@ that($not_strlen(''))-&gt;isTrue();
 	<div class="description"><p>指定コードで eval するクロージャを返す</p>
 <p>create_function のクロージャ版みたいなもの。<br />
 参照渡しは未対応。</p>
+<p>コード中の <code>$1</code>, <code>$2</code> 等の文字は <code>func_get_arg(1)</code> のような引数関数に変換される。</p>
 <p>Example:</p>
 <pre><code class="language-php">$evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
+that($evalfunc(1, 2, 3))-&gt;isSame(6);
+
+// $X による参照
+$evalfunc = eval_func('$1 + $2 + $3');
 that($evalfunc(1, 2, 3))-&gt;isSame(6);
 </code></pre>
 </div>
@@ -3204,6 +3383,27 @@ bare string2
 &lt;?php
 }))-&gt;isSame("bare string1\nbare string2\n");
 </code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::is_callback()">
+                                    ryunosuke\Functions\Package\Funchand::is_callback		</a>	<small>($callable) : bool</small>
+		</h4>
+	<div class="description"><p>callable のうち、関数文字列を false で返す</p>
+<p>歴史的な経緯で php の callable は多岐に渡る。</p>
+<ol>
+<li>単純なコールバック: <code>"strtolower"</code></li>
+<li>staticメソッドのコール: <code>["ClassName", "method"]</code></li>
+<li>オブジェクトメソッドのコール: <code>[$object, "method"]</code></li>
+<li>staticメソッドのコール: <code>"ClassName::method"</code></li>
+<li>相対指定によるstaticメソッドのコール: <code>["ClassName", "parent::method"]</code></li>
+<li>__invoke実装オブジェクト: <code>$object</code></li>
+<li>クロージャ: <code>fn() =&gt; something()</code></li>
+</ol>
+<p>上記のうち 1 を callable とはみなさず false を返す。<br />
+現代的には <code>Closure::fromCallable</code>, <code>$object-&gt;method(...)</code> などで callable == Closure という概念が浸透しているが、そうでないこともある。<br />
+本ライブラリでも <code>preg_splice</code> や <code>array_sprintf</code> などで頻出しているので関数として定義する。</p>
+<p>副作用はなく、クラスのロードや関数の存在チェックなどは行わない。あくまで型と形式で判定する。<br />
+引数は callable でなくても構わない。その場合単に false を返す。</p>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Funchand$typespace.html#ryunosuke\Functions\Package\Funchand::is_bindable_closure()">
@@ -4043,6 +4243,11 @@ AND と &amp;&amp; は微妙に処理が異なる。 AND は改行されるが &
 	<div class="description"><p>json_*** 関数でクロージャをサポートするかの定数</p>
 </div>
     	<h4 class="fqsen-title">classconstant		<small>integer</small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_NEST_LEVEL">
+                                    ryunosuke\Functions\Package\Strings::JSON_NEST_LEVEL		</a>	</h4>
+	<div class="description"><p>json_*** 関数で初期ネストレベルを指定する定数</p>
+</div>
+    	<h4 class="fqsen-title">classconstant		<small>integer</small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::JSON_INLINE_LEVEL">
                                     ryunosuke\Functions\Package\Strings::JSON_INLINE_LEVEL		</a>	</h4>
 	<div class="description"><p>json_*** 関数で一定以上の階層をインライン化するかの定数</p>
@@ -4206,6 +4411,38 @@ that(strpos_array('hello world', ['notfound', 'world']))-&gt;isSame([
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strpos_escaped()">
+                                    ryunosuke\Functions\Package\Strings::strpos_escaped		</a>	<small>($haystack, $needle, $offset = 0, $escape = &quot;\\&quot;, &amp;$found = null) : false<span class="type-separator"></span><wbr>int</small>
+		</h4>
+	<div class="description"><p>エスケープを考慮して strpos する</p>
+<p>文字列中のエスケープ中でない生の文字を検索する。<br />
+例えば <code>"abc\nxyz"</code> という文字列で <code>"n"</code> という文字は存在しないとみなす。<br />
+<code>"\n"</code> は改行のエスケープシーケンスであり、 <code>"n"</code> という文字ではない（エスケープシーケンスとして "n" を流用しているだけ）。<br />
+逆に <code>"\\n"</code> はバックスラッシュと <code>"n"</code> という文字であり <code>"n"</code> が存在する。<br />
+簡単に言えば「直前にバックスラッシュがある場合はヒットしない strpos」である。<br />
+バックスラッシュは $escape 引数で指定可能。</p>
+<p>$needle 自体にエスケープ文字を含む場合、反対の意味で検索する。<br />
+つまり、「直前にバックスラッシュがある場合のみヒットする strpos」になる。</p>
+<p>$offset 引数を指定するとその位置から探索を開始するが、戻り読みはしないのでエスケープ文字の真っ只中を指定する場合は注意。<br />
+例えば <code>"\n"</code> は改行文字だけであるが、offset に 1 に指定して "n" を探すとマッチする。</p>
+<p>Example:</p>
+<pre><code class="language-php"># 分かりにくいので \ ではなく % をエスケープ文字とする
+$defargs = [0, '%'];
+
+// これは false である（"%d" という文字の列であるため "d" という文字は存在しない）
+that(strpos_escaped('%d', 'd', ...$defargs))-&gt;isSame(false);
+// これは 2 である（"%" "d" という文字の列であるため（d の前の % は更にその前の % に呑まれておりメタ文字ではない））
+that(strpos_escaped('%%d', 'd', ...$defargs))-&gt;isSame(2);
+
+// これは 0 である（% をつけて検索するとそのエスケープシーケンス的なものそのものを探すため）
+that(strpos_escaped('%d', '%d', ...$defargs))-&gt;isSame(0);
+// これは false である（"%" "d" という文字の列であるため "%d" という文字は存在しない）
+that(strpos_escaped('%%d', '%d', ...$defargs))-&gt;isSame(false);
+// これは 2 である（"%" "%d" という文字の列であるため）
+that(strpos_escaped('%%%d', '%d', ...$defargs))-&gt;isSame(2);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strpos_quoted()">
                                     ryunosuke\Functions\Package\Strings::strpos_quoted		</a>	<small>($haystack, $needle, $offset = 0, $enclosure = &quot;&#039;\&quot;&quot;, $escape = &quot;\\&quot;, &amp;$found = null) : false<span class="type-separator"></span><wbr>int</small>
 		</h4>
@@ -4215,6 +4452,27 @@ that(strpos_array('hello world', ['notfound', 'world']))-&gt;isSame([
 that(strpos_quoted('hello "this" is world', 'is'))-&gt;isSame(13);
 // 開始位置やクオート文字は指定できる（5文字目以降の \* に囲まれていない hoge の位置を返す）
 that(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))-&gt;isSame(20);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::strtr_escaped()">
+                                    ryunosuke\Functions\Package\Strings::strtr_escaped		</a>	<small>($string, $replace_pairs, $escape = &quot;\\&quot;) : string</small>
+		</h4>
+	<div class="description"><p>エスケープを考慮して strtr する</p>
+<p>「エスケープ」についての詳細は strpos_escaped を参照。</p>
+<p>$replace_pairs は [from =&gt; to] な配列を指定する。<br />
+to がクロージャの場合はキーとオフセットでコールバックされる。</p>
+<p>strtr と同様、最も長いキーから置換を行い、置換後の文字列は対象にならない。</p>
+<p>Example:</p>
+<pre><code class="language-php"># 分かりにくいので \ ではなく % をエスケープ文字とする
+that((strtr_escaped)('XYZ ab %% %s', [
+    'ab'  =&gt; 'AB',  // 2. 1 で置換された文字は対象にならない
+    'A'   =&gt; '%a',  // 使われない
+    'Z'   =&gt; '%z',  // 使われない
+    '%%'  =&gt; 'p',   // 普通に置換される
+    's'   =&gt; 'S',   // エスケープが対象なので置換されない（%s は文字 "s" ではない（\n が文字 "n" ではないのと同じ））
+    'XYZ' =&gt; 'abc', // 1. 後ろにあるがまず置換される
+], '%'))-&gt;isSame('abc AB p %s');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5093,6 +5351,7 @@ scalar,list[],list[],hash[a],hash[b]
 <p>JSON_ES5 を与えると JSON5 互換でエンコードされる。<br />
 その際下記のプションも使用可能になる。</p>
 <ul>
+<li>JSON_TEMPLATE_LITERAL: 改行を含む文字列をテンプレートリテラルで出力する</li>
 <li>JSON_TRAILING_COMMA: 末尾カンマを強制する</li>
 <li>JSON_COMMENT_PREFIX: コメントとして埋め込まれるキープレフィックスを指定する<ul>
 <li>そのキーで始まる要素が文字列なら // コメントになる</li>
@@ -5132,7 +5391,7 @@ that(json_export(['a' =&gt; 'A', '#comment' =&gt; 'this is comment', 'b' =&gt; '
 <li>JSON_BARE_AS_STRING: bare string を文字列として扱う</li>
 <li>JSON_TEMPLATE_LITERAL: テンプレートリテラルが使用可能になる<ul>
 <li>あくまで「文字列の括りに ` が使えるようになる」というものでテンプレートリテラルそのものではない</li>
-<li>冒頭のインデントがすべて除去され、最終段階で trim される</li>
+<li>末尾のインデントと同じインデントがすべて除去され、前後の改行は取り除かれる</li>
 </ul>
 </li>
 </ul>
@@ -5150,7 +5409,7 @@ that(json_import('`
     1
     2
     3
-`', [
+    `', [
     JSON_TEMPLATE_LITERAL =&gt; true,
 ]))-&gt;is("1\n2\n3");
 </code></pre>
@@ -5389,6 +5648,52 @@ that(unique_string('hello, world', 'prefix-'))-&gt;stringStartsWith('prefix');
 <p>sprintf の順序指定構文('%1$d')にキーを指定できる。</p>
 <p>Example:</p>
 <pre><code class="language-php">that(kvsprintf('%hoge$s %fuga$d', ['hoge' =&gt; 'ThisIs', 'fuga' =&gt; '3.14']))-&gt;isSame('ThisIs 3');
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::glob2regex()">
+                                    ryunosuke\Functions\Package\Strings::glob2regex		</a>	<small>($pattern, $flags = 0) : string</small>
+		</h4>
+	<div class="description"><p>glob 記法を正規表現に変換する</p>
+<p>glob/fnmatch における「パスとしてのマッチ（ディレクトリ区切りの特別扱い）」という性質は失われ、あくまで文字列として扱う。<br />
+サポートしている記法は下記（ <a href="https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%AD%E3%83%96">https://ja.wikipedia.org/wiki/グロブ</a> ）。</p>
+<ul>
+<li><code>*</code>: 0文字以上の任意の文字列にマッチ</li>
+<li><code>?</code>: 任意の1文字にマッチ</li>
+<li><code>[...]</code>: 括弧内で列挙されたどれか1文字にマッチ</li>
+<li><code>[!...]</code>: 括弧内で列挙されていない何かの1文字にマッチ</li>
+<li><code>[0-9]</code>: 括弧内で指定された範囲内の1文字にマッチ</li>
+<li><code>[!0-9]</code>: 括弧内で指定されていない範囲内の1文字にマッチ</li>
+<li><code>{a,b,c}</code>: 「a」、「b」あるいは「c」のいずれかにマッチ（要 GLOB_BRACE）</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">$files = ['hoge.jpg', 'test1.jpg', 'test12.jpg', 'test123.png', 'testA.jpg', 'testAB.jpg', 'testABC.png', 'test.jpg', 'test.jpeg'];
+// 先頭一致する jpg
+that(preg_grep('#' . glob2regex('test*.jpg') . '#', $files))-&gt;isSame([
+    1 =&gt; 'test1.jpg',
+    2 =&gt; 'test12.jpg',
+    4 =&gt; 'testA.jpg',
+    5 =&gt; 'testAB.jpg',
+    7 =&gt; 'test.jpg',
+]);
+// 先頭一致した2文字の jpg
+that(preg_grep('#' . glob2regex('test??.jpg') . '#', $files))-&gt;isSame([
+    2 =&gt; 'test12.jpg',
+    5 =&gt; 'testAB.jpg',
+]);
+// 先頭一致した数値1桁の jpg
+that(preg_grep('#' . glob2regex('test[0-9].jpg') . '#', $files))-&gt;isSame([
+    1 =&gt; 'test1.jpg',
+]);
+// 先頭一致した数値1桁でない jpg
+that(preg_grep('#' . glob2regex('test[!0-9].jpg') . '#', $files))-&gt;isSame([
+    4 =&gt; 'testA.jpg',
+]);
+// jpeg, jpg のどちらにもマッチ（GLOB_BRACE 使用）
+that(preg_grep('#' . glob2regex('test.jp{e,}g', GLOB_BRACE) . '#', $files))-&gt;isSame([
+    7 =&gt; 'test.jpg',
+    8 =&gt; 'test.jpeg',
+]);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5894,7 +6199,7 @@ that(optional($getobject())['hoge'])-&gt;isSame(null);
 that(iterator_to_array(optional($getobject())))-&gt;isSame([]);
 
 // $expected を与えるとその型以外は NullObject を返す（\ArrayObject はオブジェクトだが stdClass ではない）
-that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;isSame(null);
+that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;is(0);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5904,7 +6209,7 @@ that(optional(new \ArrayObject([1]), 'stdClass')-&gt;count())-&gt;isSame(null);
 	<div class="description"><p>関数をメソッドチェーンできるオブジェクトを返す</p>
 <p>ChainObject という関数をチェーンできるオブジェクトを返す。<br />
 ChainObject は大抵のグローバル関数がアノテーションされており、コード補完することが出来る（利便性のためであり、IDE がエラーなどを出しても呼び出し自体は可能）。<br />
-呼び出しは「第1引数に現在の値が適用」されて実行される（下記の func1 コールで任意の位置に適用されることもできる）。</p>
+呼び出しは「第1引数に現在の値が適用」されて実行される（下記の func[X] コールで任意の位置に適用されることもできる）。</p>
 <p>下記の特殊ルールにより、特殊な呼び出し方ができる。</p>
 <ul>
 <li>nullsafe 設定にすると「値が null の場合は呼び出し自体を行わない」という動作になり null をそのまま返す</li>
@@ -5916,52 +6221,40 @@ ChainObject は大抵のグローバル関数がアノテーションされて�
 <li><code>str_replace('from', 'to', _)</code> のように呼び出せる</li>
 </ul>
 </li>
-<li>funcE で eval される文字列のクロージャを呼べる<ul>
-<li>変数名は <code>$_</code> 固定だが、 <code>$_</code> が無いときに限り 最左に自動付与される</li>
+<li>func[1] で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる<ul>
+<li>func[2], func[3] 等も呼び出し可能</li>
 </ul>
 </li>
-<li>funcP で配列指定オペレータのクロージャを呼べる<ul>
-<li>複数指定した場合は順次呼ばれる。つまり map はともかく filter 用途では使えない</li>
-</ul>
-</li>
-<li>func1 で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる<ul>
-<li>func2, func3 等も呼び出し可能</li>
+<li>func['E'] で eval される文字列のクロージャを呼べる<ul>
+<li>引数名は <code>$1</code>, <code>$2</code> のような文字列で指定できる</li>
+<li><code>$X</code> が無いときに限り 最左に <code>$1</code> が自動付与される</li>
 </ul>
 </li>
 <li>引数が1つの呼び出しは () を省略できる</li>
 </ul>
 <p>この特殊ルールは普通に使う分にはそこまで気にしなくて良い。<br />
 map や filter を駆使しようとすると必要になるが、イテレーション目的ではなく文字列のチェインなどが目的であればほぼ使うことはない。</p>
-<p>特殊なメソッドとして下記がある。</p>
-<ul>
-<li>apply($callback, ...$cbargs): 任意のコールバックを現在の値に適用する</li>
-</ul>
 <p>上記を含むメソッド呼び出しはすべて自分自身を返すので、最終結果を得たい場合は <code>invoke</code> を実行する必要がある。<br />
 ただし、 IteratorAggregate が実装されているので、配列の場合に限り foreach で直接回すことができる。<br />
-さらに、 __toString も実装されているので、文字列的値の場合に限り自動で文字列化される。</p>
+その他、 Stringable や Countable, JsonSerializable など「値が必要になりそうなインターフェース」が実装されている。</p>
 <p>用途は配列のイテレーションを想定しているが、あくまで「チェイン可能にする」が目的なので、ソースが文字列だろうとオブジェクトだろうと何でも呼び出しが可能。<br />
 ただし、遅延評価も最適化も何もしていないので、 chain するだけでも動作は相当遅くなることに注意。</p>
-<p>なお、最初の引数を省略するとスタックモードになり、一切の処理が適用されなくなる。<br />
-その代わり <code>invoke</code> で遅延的に値を渡すことができるようになる。<br />
-「処理の流れだけ決めておいて後で適用する」イメージ。</p>
 <p>Example:</p>
 <pre><code class="language-php"># 1～9 のうち「5以下を抽出」して「値を2倍」して「合計」を出すシチュエーション
 $n1_9 = range(1, 9);
 // 素の php で処理したもの。パッと見で何してるか分からないし、処理の順番が思考と逆なので混乱する
 that(array_sum(array_map(fn($v) =&gt; $v * 2, array_filter($n1_9, fn($v) =&gt; $v &lt;= 5))))-&gt;isSame(30);
 // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 fn() が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
-that(chain($n1_9)-&gt;filter(fn($v) =&gt; $v &lt;= 5)-&gt;map(fn($v) =&gt; $v * 2)-&gt;sum()())-&gt;isSame(30);
-// funcP を介して fn() をなくしたもの。ここまで来ると若干読みやすい
-that(chain($n1_9)-&gt;filterP(['&lt;=' =&gt; 5])-&gt;mapP(['*' =&gt; 2])-&gt;sum()())-&gt;isSame(30);
-// funcE を介したもの。かなり直感的だが eval なので少し不安
-that(chain($n1_9)-&gt;filterE('&lt;= 5')-&gt;mapE('* 2')-&gt;sum()())-&gt;isSame(30);
+that(chain($n1_9)-&gt;filter(fn($v) =&gt; $v &lt;= 5)-&gt;maps(fn($v) =&gt; $v * 2)-&gt;sum()())-&gt;isSame(30);
+// func['E'] を介したもの。かなり直感的だが eval なので少し不安
+that(chain($n1_9)-&gt;filter['E']('&lt;= 5')-&gt;maps['E']('* 2')-&gt;sum()())-&gt;isSame(30);
 
 # "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
 $string = 'hello   world';
 // 素の php で処理したもの。もはやなにがなんだか分からない
 that(strtoupper(md5(str_rot13(implode('/', array_map('ucfirst', array_filter(explode(' ', $string))))))))-&gt;isSame('10AF4DAF67D0D666FCEA0A8C6EF57EE7');
-// chain だとかなりそれっぽくできる。 explode/implode の第1引数は区切り文字なので func1 構文を使用している。また、 rot13 以降は引数がないので () を省略している
-that(chain($string)-&gt;explode1(' ')-&gt;filter()-&gt;map('ucfirst')-&gt;implode1('/')-&gt;rot13-&gt;md5-&gt;strtoupper()())-&gt;isSame('10AF4DAF67D0D666FCEA0A8C6EF57EE7');
+// chain だとかなりそれっぽくできる。 explode/implode の第1引数は区切り文字なので func[1] 構文を使用している。また、 rot13 以降は引数がないので () を省略している
+that(chain($string)-&gt;explode[1](' ')-&gt;filter()-&gt;maps('ucfirst')-&gt;implode[1]('/')-&gt;rot13-&gt;md5-&gt;strtoupper()())-&gt;isSame('10AF4DAF67D0D666FCEA0A8C6EF57EE7');
 
  # よくある DB レコードをあれこれするシチュエーション
 $rows = [
@@ -5971,22 +6264,17 @@ $rows = [
     ['id' =&gt; 9, 'name' =&gt; 'hage', 'sex' =&gt; 'F', 'age' =&gt; 30, 'salary' =&gt; 320000],
 ];
 // e.g. 男性の平均給料
-that(chain($rows)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()())-&gt;isSame(375000);
+that(chain($rows)-&gt;where['E']('sex', '=== "M"')-&gt;column('salary')-&gt;mean()())-&gt;isSame(375000);
 // e.g. 女性の平均年齢
-that(chain($rows)-&gt;whereE('sex', '=== "F"')-&gt;column('age')-&gt;mean()())-&gt;isSame(23.5);
+that(chain($rows)-&gt;where['E']('sex', '=== "F"')-&gt;column('age')-&gt;mean()())-&gt;isSame(23.5);
 // e.g. 30歳以上の平均給料
-that(chain($rows)-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()())-&gt;isSame(400000);
+that(chain($rows)-&gt;where['E']('age', '&gt;= 30')-&gt;column('salary')-&gt;mean()())-&gt;isSame(400000);
 // e.g. 20～30歳の平均給料
-that(chain($rows)-&gt;whereP('age', ['&gt;=' =&gt; 20])-&gt;whereE('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()())-&gt;isSame(295000);
+that(chain($rows)-&gt;where['E']('age', '&gt;= 20')-&gt;where['E']('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()())-&gt;isSame(295000);
 // e.g. 男性の最小年齢
-that(chain($rows)-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()())-&gt;isSame(21);
+that(chain($rows)-&gt;where['E']('sex', '=== "M"')-&gt;column('age')-&gt;min()())-&gt;isSame(21);
 // e.g. 女性の最大給料
-that(chain($rows)-&gt;whereE('sex', '=== "F"')-&gt;column('salary')-&gt;max()())-&gt;isSame(320000);
-
-# 上記の引数遅延モード（結果は同じなのでいくつかピックアップ）
-that(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('salary')-&gt;mean()($rows))-&gt;isSame(375000);
-that(chain()-&gt;whereP('age', ['&gt;=' =&gt; 30])-&gt;column('salary')-&gt;mean()($rows))-&gt;isSame(400000);
-that(chain()-&gt;whereP('sex', ['===' =&gt; 'M'])-&gt;column('age')-&gt;min()($rows))-&gt;isSame(21);
+that(chain($rows)-&gt;where['E']('sex', '=== "F"')-&gt;column('salary')-&gt;max()())-&gt;isSame(320000);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -6351,6 +6639,12 @@ that($rand1)-&gt;isNotSame($rand3);
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::cache_fetch()">
+                                    ryunosuke\Functions\Package\Utility::cache_fetch		</a>	<small>($cacher, $key, $provider, $ttl = null) : mixed</small>
+		</h4>
+	<div class="description"><p>psr-16 cache で「無かったらコールバックを実行して set」する</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::parse_namespace()">
                                     ryunosuke\Functions\Package\Utility::parse_namespace		</a>	<small>($filename, $options = []) : array</small>
 		</h4>
@@ -6497,6 +6791,19 @@ that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))-&gt;isSam
 </ul>
 <p>という動作になる（記号で区切られていれば形式はどうでも良いということ）。<br />
 ただ、この指定方法は変更が入る可能性が高いのでスペースあたりで区切っておくのがもっとも無難。</p>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::ansi_strip()">
+                                    ryunosuke\Functions\Package\Utility::ansi_strip		</a>	<small>($string) : string</small>
+		</h4>
+	<div class="description"><p>ANSI エスケープ文字を取り除く</p>
+<p>Example:</p>
+<pre><code class="language-php">$ansi_string = ansi_colorize('hoge', 'bold red');
+// エスケープ文字も含めて 19 文字
+that(strlen($ansi_string))-&gt;isSame(19);
+// ansi_strip すると本来の hoge がえられる
+that(ansi_strip($ansi_string))-&gt;isSame('hoge');
+</code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process()">
@@ -6708,10 +7015,10 @@ $traces = f003();
 // limit 指定してるので2個
 that($traces)-&gt;count(2);
 // 「function が f002 以降」を返す
-that($traces[0])-&gt;arraySubset([
+that($traces[0])-&gt;subsetEquals([
     'function' =&gt; __NAMESPACE__ . '\\f002'
 ]);
-that($traces[1])-&gt;arraySubset([
+that($traces[1])-&gt;subsetEquals([
     'function' =&gt; __NAMESPACE__ . '\\f003'
 ]);
 </code></pre>
@@ -7097,6 +7404,25 @@ that(is_recursive($array))-&gt;isTrue();
 $object = new \stdClass();
 $object-&gt;recursive = $object;
 that(is_recursive($object))-&gt;isTrue();
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Vars$typespace.html#ryunosuke\Functions\Package\Vars::is_decimal()">
+                                    ryunosuke\Functions\Package\Vars::is_decimal		</a>	<small>($var, $allow_float = true) : bool</small>
+		</h4>
+	<div class="description"><p>値が10進的か調べる</p>
+<p>is_numeric を少しキツめにしたような関数で、なるべく「一般人の感覚」で数値とみなせるものを true で返す。</p>
+<p>なお、 0 始まりは false だが 0 終わり小数は許容される。<br />
+<code>1.20000</code> を false にするような動作だと <code>1.0</code> も false にしなければ一貫性がない。<br />
+しかし <code>1.0</code> が false になるのはあまり一般的とはいえない。</p>
+<p>空白込みが false なのは空白許可は呼び元に委ねたいため（trim すればいいだけなので）。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 以下は is_numeric と違い false を返す
+that(is_decimal('.12'))-&gt;isFalse();  // 整数部省略
+that(is_decimal('12.'))-&gt;isFalse();  // 小数部省略
+that(is_decimal('1e2'))-&gt;isFalse();  // 指数記法
+that(is_decimal(' 12 '))-&gt;isFalse(); // 空白あり
+that(is_decimal('012'))-&gt;isFalse();  // 0 始まり
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
