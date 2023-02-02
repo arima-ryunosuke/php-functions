@@ -17,6 +17,11 @@ class SqlTest extends AbstractTestCase
         that((sql_quote)("ho'ge"))->is("'ho\'ge'");
         that((sql_quote)('ho"ge'))->is("'ho\"ge'");
         that((sql_quote)("ho\r\n\tge"))->is("'ho\\r\\n\\tge'");
+
+        that((sql_quote)([]))->is("");
+        that((sql_quote)(['a', [null, [true, ["ho'ge"]]]]))->is("'a',NULL,1,'ho\'ge'");
+        that((sql_quote)(new \ArrayObject([1, 2, 3])))->is("1,2,3");
+        that((sql_quote)(new \Concrete("ho'ge")))->is("'ho\'ge'");
     }
 
     function test_sql_bind()

@@ -28,6 +28,8 @@ class Sql implements Interfaces\Sql
      * - null は NULL になる
      * - 数字はそのまま数字になる
      * - bool は 0 or 1 になる
+     * - 配列は再帰的にカンマ区切りになる
+     *   - この実装はエラー回避の意味合いが強く、実装は変更される可能性がある
      * - それ以外は addcslashes される
      *
      * Example:
@@ -36,6 +38,7 @@ class Sql implements Interfaces\Sql
      * that(sql_quote(123))->isSame(123);
      * that(sql_quote(true))->isSame(1);
      * that(sql_quote("hoge"))->isSame("'hoge'");
+     * that(sql_quote([1, 2, 3]))->isSame("1,2,3");
      * ```
      *
      * @param mixed $value クオートする値
@@ -51,6 +54,9 @@ class Sql implements Interfaces\Sql
         }
         if (is_bool($value)) {
             return (int) $value;
+        }
+        if (is_iterable($value) && !Vars::is_stringable($value)) {
+            return implode(',', array_map(fn($v) => Sql::sql_quote($v), Vars::arrayval($value)));
         }
         return "'" . addcslashes((string) $value, "\0\e\f\n\r\t\v'\\") . "'";
     }
