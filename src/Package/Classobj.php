@@ -641,16 +641,7 @@ class Classobj implements Interfaces\Classobj
             $template_source = array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1, true);
         }
 
-        $getReturnType = function (\ReflectionFunctionAbstract $reffunc) {
-            if ($reffunc->hasReturnType()) {
-                $type = Classobj::reflect_types($reffunc->getReturnType())->getName();
-                if ($type !== 'void') {
-                    return ": $type";
-                }
-            }
-        };
-
-        $parse = static function ($name, \ReflectionFunctionAbstract $reffunc) use ($getReturnType) {
+        $parse = static function ($name, \ReflectionFunctionAbstract $reffunc) {
             if ($reffunc instanceof \ReflectionMethod) {
                 $modifier = implode(' ', \Reflection::getModifierNames($reffunc->getModifiers()));
                 $receiver = ($reffunc->isStatic() ? 'self::$__originalClass::' : '$this->__original->') . $name;
@@ -667,11 +658,13 @@ class Classobj implements Interfaces\Classobj
             $prms = implode(', ', $params);
             $args = implode(', ', array_keys($params));
 
-            $rtype = $getReturnType($reffunc);
+            $rtype = Classobj::reflect_types($reffunc->getReturnType())->getName();
+            $return = $rtype === 'void' ? '' : 'return $return;';
+            $rtype = $rtype ? ": $rtype" : '';
 
             return [
                 "#[\ReturnTypeWillChange]\n$modifier function $ref$name($prms)$rtype",
-                "{ \$return = $ref$receiver(...[$args]);return \$return; }\n",
+                "{ \$return = $ref$receiver(...[$args]);$return }\n",
             ];
         };
 
@@ -732,7 +725,8 @@ class Classobj implements Interfaces\Classobj
             // シグネチャエラーが出てしまうので、指定がない場合は強制的に合わせる
             $refmember = new \ReflectionFunction($override);
             $params = Funchand::function_parameter(!$refmember->getNumberOfParameters() && $method->getNumberOfParameters() ? $method : $override);
-            $rtype = $getReturnType(!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember);
+            $rtype = Classobj::reflect_types(!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember)->getName();
+            $rtype = $rtype ? ": $rtype" : '';
 
             [, $codeblock] = Funchand::callable_code($override);
             $tokens = Syntax::parse_php($codeblock);

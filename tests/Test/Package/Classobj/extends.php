@@ -2,11 +2,16 @@
 
 namespace ryunosuke\Test\Package\Classobj;
 
+class ParentClass
+{
+    protected function voidMethod(): void { noop(); }
+}
+
 /**
  * @property int $fuga
  * @method array hoge($arg)
  */
-class ClassExtends
+class ClassExtends extends ParentClass
 {
     use Fields;
 
