@@ -2588,48 +2588,66 @@ class Strings implements Interfaces\Strings
      * これは `$v=[[1], [2]]` のような値になるが、この場合 `$v=[[1, 2]]` という値が欲しい、という事が多い。
      * そのためには `v[0][]=1&v[0][]=2` のようにする必要があるための数値指定である。
      *
+     * $brackets で配列ブラケット文字を指定できるが、現実的には下記の3択だろう。
+     * - ['%5B','%5D']: デフォルトのパーセントエンコーディング文字
+     * - ['[', ']']: [] のままにする（ブラケットは必ずしもパーセントエンコーディングが必須ではない）
+     * - ['', '']: ブラケットを削除する（他言語のために配列パラメータを抑止したいことがある）
+     *
      * @param array|object $data クエリデータ
      * @param string|int|null $numeric_prefix 数値キープレフィックス
      * @param string|null $arg_separator クエリセパレータ
      * @param int $encoding_type エンコードタイプ
+     * @param string[]|string|null $brackets 配列ブラケット文字
      * @return string クエリ文字列
      */
-    public static function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738)
+    public static function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null)
     {
-        $arg_separator ??= ini_get('arg_separator.output');
+        $data = Vars::arrayval($data, false);
+        if (!$data) {
+            return '';
+        }
 
+        $arg_separator ??= ini_get('arg_separator.output');
+        $brackets ??= ['%5B', '%5D'];
+
+        if (!is_array($brackets)) {
+            $brackets = [$brackets, ''];
+        }
+        $brackets = array_values($brackets);
+
+        $REGEX = '%5B\d+%5D';
+        $NOSEQ = implode('', $brackets);
         if ($numeric_prefix === null || ctype_digit(trim($numeric_prefix, '-+'))) {
-            $REGEX = '%5B\d+%5D';
-            $NOSEQ = '%5B%5D';
-            $numeric_prefix = $numeric_prefix === null ? null : (int) $numeric_prefix;
-            $query = http_build_query($data, '', $arg_separator, $encoding_type);
-            // 0は置換しないを意味する
-            if ($numeric_prefix === 0) {
-                return $query;
-            }
-            // null は無制限置換
-            if ($numeric_prefix === null) {
-                return preg_replace("#($REGEX)#u", $NOSEQ, $query);
-            }
-            // 正数は残す数とする
-            if ($numeric_prefix > 0) {
-                return preg_replace_callback("#(?:$REGEX)+#u", function ($m) use ($numeric_prefix) {
-                    $braces = explode('%5D', $m[0]);
-                    foreach (array_slice($braces, $numeric_prefix, null, true) as $n => $brace) {
-                        $braces[$n] = rtrim($brace, '0123456789');
-                    }
-                    return implode('%5D', $braces);
-                }, $query);
-            }
-            // 負数は後ろから n 個目まで
-            $pattern = str_repeat("($REGEX)?", abs($numeric_prefix) - 1);
-            return preg_replace_callback("#$pattern($REGEX=)#u", function ($m) use ($NOSEQ) {
-                return str_repeat($NOSEQ, count(array_filter($m, 'strlen')) - 2) . "$NOSEQ=";
-            }, $query);
+            $queries = explode($arg_separator, http_build_query($data, '', $arg_separator, $encoding_type));
         }
         else {
-            return http_build_query($data, $numeric_prefix ?? '', $arg_separator, $encoding_type);
+            $queries = explode($arg_separator, http_build_query($data, $numeric_prefix, $arg_separator, $encoding_type));
         }
+        foreach ($queries as &$q) {
+            [$k, $v] = explode('=', $q, 2);
+
+            // 0は置換しないを意味する
+            if ($numeric_prefix === 0) {
+                // do nothing
+                assert($numeric_prefix === 0);
+            }
+            // null は無制限置換
+            elseif ($numeric_prefix === null) {
+                $k = preg_replace("#$REGEX#u", $NOSEQ, $k);
+            }
+            else {
+                $count = $numeric_prefix > 0 ? 0 : -preg_match_all("#$REGEX#u", $k);
+                $k = preg_replace_callback("#$REGEX#u", function ($m) use (&$count, $numeric_prefix, $NOSEQ) {
+                    return $count++ >= $numeric_prefix ? $NOSEQ : $m[0];
+                }, $k);
+            }
+
+            $k = str_replace(['%5B', '%5D'], $brackets, $k);
+
+            $q = "$k=$v";
+        }
+
+        return implode($arg_separator, $queries);
     }
 
     /**

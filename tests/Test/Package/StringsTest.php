@@ -1509,6 +1509,15 @@ ATTRS
         that((build_query)($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
         that((parse_query)($expected))->is(['x' => [[1], [[2]], [[[3]]]]]);
 
+        $data = [
+            'x' => ['y' => ['z' => '[]']],
+        ];
+
+        that((build_query)($data, null, '&', PHP_QUERY_RFC1738, ['[', ']']))->is('x[y][z]=%5B%5D');
+        that((build_query)($data, null, '&', PHP_QUERY_RFC1738, ['.', '']))->is('x.y.z=%5B%5D');
+        that((build_query)($data, null, '&', PHP_QUERY_RFC1738, ['', '']))->is('xyz=%5B%5D');
+        that((build_query)($data, null, '&', PHP_QUERY_RFC1738, '-'))->is('x-y-z=%5B%5D');
+
         that((build_query)([1, 2, 3], 'pre-'))->is('pre-0=1&pre-1=2&pre-2=3');
     }
 
