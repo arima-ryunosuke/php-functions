@@ -1314,6 +1314,10 @@ ATTRS
                 'uri'   => '',
                 'parts' => $gen(),
             ],
+            'array query'   => [
+                'uri'   => 'scheme://user:pass@127.0.0.1:12345/path/to/hoge?op%5B0%5D=1&op%5B1%5D=2#hash',
+                'parts' => $gen('scheme', 'user', 'pass', '127.0.0.1', '12345', '/path/to/hoge', ['op' => [1, 2]], 'hash'),
+            ],
             'signed auth'   => [
                 'uri'   => 'scheme://user%2313:pass%40word@127.0.0.1:12345/path/to/hoge?op1=1&op2=2#hash',
                 'parts' => $gen('scheme', 'user#13', 'pass@word', '127.0.0.1', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
