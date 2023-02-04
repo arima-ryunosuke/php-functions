@@ -2441,9 +2441,10 @@ class Strings implements Interfaces\Strings
      * ```
      *
      * @param array $parts URI の各パーツ配列
+     * @param array $options オプション
      * @return string URI 文字列
      */
-    public static function build_uri($parts)
+    public static function build_uri($parts, $options = [])
     {
         $parts += [
             'scheme'   => '',
@@ -2455,12 +2456,27 @@ class Strings implements Interfaces\Strings
             'query'    => '',
             'fragment' => '',
         ];
+        $options = array_replace_recursive([
+            'query' => [
+                'index'     => 0,
+                'bracket'   => null,
+                'separator' => ini_get('arg_separator.output'),
+            ],
+        ], $options);
 
         $parts['user'] = rawurlencode($parts['user']);
         $parts['pass'] = rawurlencode($parts['pass']);
         $parts['host'] = filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? "[{$parts['host']}]" : $parts['host'];
         $parts['path'] = ltrim($parts['path'], '/');
-        $parts['query'] = is_array($parts['query']) ? http_build_query($parts['query'], '', '&') : $parts['query'];
+        if (is_array($parts['query'])) {
+            $parts['query'] = Strings::build_query(
+                $parts['query'],
+                $options['query']['index'],
+                $options['query']['separator'],
+                \PHP_QUERY_RFC1738,
+                $options['query']['bracket'],
+            );
+        }
 
         $uri = '';
         $uri .= Strings::concat($parts['scheme'], '://');

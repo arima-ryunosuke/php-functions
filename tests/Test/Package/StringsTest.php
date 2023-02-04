@@ -1342,6 +1342,34 @@ ATTRS
         foreach ($this->provideUri() as $title => $data) {
             that((build_uri)($data['parts']))->as($title)->is($data['uri']);
         }
+
+        // options:query
+        $query = [
+            'a' => [
+                'b' => [
+                    'c' => ['[', ']'],
+                ],
+            ],
+        ];
+        that((build_uri)([
+            'query' => $query,
+        ], [
+        ]))->is('?a%5Bb%5D%5Bc%5D%5B0%5D=%5B&a%5Bb%5D%5Bc%5D%5B1%5D=%5D');
+        that((build_uri)([
+            'query' => $query,
+        ], [
+            'query' => [
+                'bracket' => ['[', ']'],
+            ],
+        ]))->is('?a[b][c][0]=%5B&a[b][c][1]=%5D');
+        that((build_uri)([
+            'query' => $query,
+        ], [
+            'query' => [
+                'bracket' => ['[', ']'],
+                'index'   => null,
+            ],
+        ]))->is('?a[b][c][]=%5B&a[b][c][]=%5D');
     }
 
     function test_parse_uri()
