@@ -130,6 +130,13 @@ class FileSystemTest extends AbstractTestCase
             "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
 
+        // 非再帰モード
+        that((file_list)("$base{$DS}a", ["recursive" => false, "!type" => null]))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}a1.txt",
+            "$base{$DS}a{$DS}a2.txt",
+            "$base{$DS}a{$DS}b",
+        ]);
+
         // 相対パスモード
         $DS = DIRECTORY_SEPARATOR;
         that((file_list)($base, ["relative" => true]))->equalsCanonicalizing([

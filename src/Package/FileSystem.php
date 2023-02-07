@@ -215,16 +215,23 @@ class FileSystem implements Interfaces\FileSystem
         }
 
         $filter_condition += [
-            'relative' => false,
-            '!type'    => 'dir',
+            'recursive' => true,
+            'relative'  => false,
+            '!type'     => 'dir',
         ];
         $match = FileSystem::file_matcher($filter_condition);
 
         $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
-        $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+
+        if ($filter_condition['recursive']) {
+            $iterator = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+        }
+        else {
+            $iterator = $rdi;
+        }
 
         $result = [];
-        foreach ($rii as $fullpath => $it) {
+        foreach ($iterator as $fullpath => $it) {
             if (!$match($it)) {
                 continue;
             }
