@@ -1478,8 +1478,6 @@ class FileSystem implements Interfaces\FileSystem
      * stream wrapper を用いて実装しており、そのプロトコルは初回呼び出し時に1度だけ登録される。
      * プロトコル名は決め打ちだが、 php.ini に "rfunc.memory_stream" というキーで文字列を指定するとそれが使用される。
      *
-     * ファイル操作はある程度できるが、ディレクトリ操作は未対応（そこまでしたいなら vfsStream とか /dev/shm とかを使えば良い）。
-     *
      * Example:
      * ```php
      * // ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
@@ -1501,7 +1499,7 @@ class FileSystem implements Interfaces\FileSystem
      * @param string $path パス名（実質的に一意なファイル名）
      * @return string メモリ上のパス
      */
-    public static function memory_path($path)
+    public static function memory_path($path = '')
     {
         static $STREAM_NAME, $registered = false;
         if (!$registered) {
@@ -1521,18 +1519,26 @@ class FileSystem implements Interfaces\FileSystem
 
                 public $context;
 
-                private static function create()
+                private static function id($path)
+                {
+                    $parts = parse_url($path) ?: [];
+                    $id = ($parts['host'] ?? '') . ($parts['path'] ?? '');
+                    $id = strtr($id, ['\\' => '/']);
+                    return rtrim($id, '/');
+                }
+
+                private static function create($id, $mode)
                 {
                     // @todo time 系は一応用意しているだけでほとんど未実装（read/write のたびに更新する？）
                     $now = time();
-                    return (object) [
-                        'permission' => 0777 & ~umask(),
-                        'owner'      => function_exists('posix_getuid') ? posix_getuid() : 0,
-                        'group'      => function_exists('posix_getgid') ? posix_getgid() : 0,
-                        'atime'      => $now,
-                        'mtime'      => $now,
-                        'ctime'      => $now,
-                        'content'    => '',
+                    self::$entries[$id] = (object) [
+                        'mode'    => $mode | (0777 & ~umask()),
+                        'owner'   => function_exists('posix_getuid') ? posix_getuid() : 0,
+                        'group'   => function_exists('posix_getgid') ? posix_getgid() : 0,
+                        'atime'   => $now,
+                        'mtime'   => $now,
+                        'ctime'   => $now,
+                        'content' => '',
                     ];
                 }
 
@@ -1542,24 +1548,18 @@ class FileSystem implements Interfaces\FileSystem
                     return [
                         'dev'     => 0,
                         'ino'     => 0,
-                        'mode'    => $that->permission,
+                        'mode'    => $that->mode,
                         'nlink'   => 0,
                         'uid'     => $that->owner,
                         'gid'     => $that->group,
                         'rdev'    => 0,
-                        'size'    => strlen($that->content),
+                        'size'    => array_reduce((array) $that->content, fn($carry, $item) => $carry + strlen($item), 0),
                         'atime'   => $that->atime,
                         'mtime'   => $that->mtime,
                         'ctime'   => $that->ctime,
                         'blksize' => -1,
                         'blocks'  => -1,
                     ];
-                }
-
-                public function __call($name, $arguments)
-                {
-                    // 対応して無くても標準では警告止まりなので例外に変える
-                    throw new \DomainException("$name is not supported.");
                 }
 
                 /** @noinspection PhpUnusedParameterInspection */
@@ -1572,7 +1572,7 @@ class FileSystem implements Interfaces\FileSystem
                 {
                     assert(is_int($options));
                     assert(is_null($opened_path) || !strlen($opened_path));
-                    $this->id = parse_url($path, PHP_URL_HOST);
+                    $this->id = self::id($path);
 
                     // t フラグはクソなので実装しない（デフォルトで b フラグとする）
                     if (strpos($mode, 'r') !== false) {
@@ -1586,7 +1586,7 @@ class FileSystem implements Interfaces\FileSystem
                     elseif (strpos($mode, 'w') !== false) {
                         // ファイルポインタをファイルの先頭に置き、ファイルサイズをゼロにします。
                         // ファイルが存在しない場合には、作成を試みます。
-                        self::$entries[$this->id] = self::create();
+                        self::create($this->id, 010_0000);
                         $this->position = 0;
                         $this->appendable = false;
                     }
@@ -1594,7 +1594,7 @@ class FileSystem implements Interfaces\FileSystem
                         // ファイルポインタをファイルの終端に置きます。
                         // ファイルが存在しない場合には、作成を試みます。
                         if (!isset(self::$entries[$this->id])) {
-                            self::$entries[$this->id] = self::create();
+                            self::create($this->id, 010_0000);
                         }
                         $this->position = 0;
                         $this->appendable = true;
@@ -1606,7 +1606,7 @@ class FileSystem implements Interfaces\FileSystem
                         if (isset(self::$entries[$this->id])) {
                             throw new \InvalidArgumentException("'$path' is exist already.");
                         }
-                        self::$entries[$this->id] = self::create();
+                        self::create($this->id, 010_0000);
                         $this->position = 0;
                         $this->appendable = false;
                     }
@@ -1615,7 +1615,7 @@ class FileSystem implements Interfaces\FileSystem
                         // ファイルが既に存在する場合でもそれを ('w' のように) 切り詰めたりせず、 また ('x' のように) 関数のコールが失敗することもありません。
                         // ファイルポインタをファイルの先頭に置きます。
                         if (!isset(self::$entries[$this->id])) {
-                            self::$entries[$this->id] = self::create();
+                            self::create($this->id, 010_0000);
                         }
                         $this->position = 0;
                         $this->appendable = false;
@@ -1723,11 +1723,11 @@ class FileSystem implements Interfaces\FileSystem
 
                 public function stream_metadata($path, $option, $var)
                 {
-                    $id = parse_url($path, PHP_URL_HOST);
+                    $id = self::id($path);
                     switch ($option) {
                         case STREAM_META_TOUCH:
                             if (!isset(self::$entries[$id])) {
-                                self::$entries[$id] = self::create();
+                                self::create($id, 010_0000);
                             }
                             $mtime = $var[0] ?? time();
                             $atime = $var[1] ?? $mtime;
@@ -1739,7 +1739,8 @@ class FileSystem implements Interfaces\FileSystem
                             if (!isset(self::$entries[$id])) {
                                 return false;
                             }
-                            self::$entries[$id]->permission = $var;
+                            self::$entries[$id]->mode &= 077_0000;
+                            self::$entries[$id]->mode |= $var & ~umask();
                             self::$entries[$id]->ctime = time();
                             break;
 
@@ -1774,7 +1775,7 @@ class FileSystem implements Interfaces\FileSystem
                 public function url_stat(string $path, int $flags)
                 {
                     assert(is_int($flags));
-                    $id = parse_url($path, PHP_URL_HOST);
+                    $id = self::id($path);
                     if (!isset(self::$entries[$id])) {
                         return false;
                     }
@@ -1784,11 +1785,11 @@ class FileSystem implements Interfaces\FileSystem
                 public function rename(string $path_from, string $path_to): bool
                 {
                     // rename は同じプロトコルじゃないと使えない制約があるのでプロトコルは見ないで OK
-                    $id_from = parse_url($path_from, PHP_URL_HOST);
+                    $id_from = self::id($path_from);
                     if (!isset(self::$entries[$id_from])) {
                         return false;
                     }
-                    $id_to = parse_url($path_to, PHP_URL_HOST);
+                    $id_to = self::id($path_to);
                     self::$entries[$id_to] = self::$entries[$id_from];
                     unset(self::$entries[$id_from]);
                     // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
@@ -1798,7 +1799,7 @@ class FileSystem implements Interfaces\FileSystem
 
                 public function unlink(string $path): bool
                 {
-                    $id = parse_url($path, PHP_URL_HOST);
+                    $id = self::id($path);
                     if (!isset(self::$entries[$id])) {
                         return false;
                     }
@@ -1807,9 +1808,85 @@ class FileSystem implements Interfaces\FileSystem
                     clearstatcache(true, $path);
                     return true;
                 }
+
+                public function mkdir($path, $mode, $options)
+                {
+                    $id = self::id($path);
+                    if (isset(self::$entries[$id])) {
+                        return false;
+                    }
+                    $parts = explode('/', $id);
+                    if (count($parts) > 1 && !($options & STREAM_MKDIR_RECURSIVE)) {
+                        if (!isset(self::$entries[implode('/', array_slice($parts, 0, -1))])) {
+                            return false;
+                        }
+                    }
+                    $dirpath = '';
+                    foreach ($parts as $part) {
+                        $dirpath .= "$part/";
+                        self::create(rtrim($dirpath, '/'), 004_0000 | $mode);
+                    }
+                    return true;
+                }
+
+                public function rmdir($path, $options)
+                {
+                    assert(is_int($options));
+                    $id = self::id($path);
+                    if (!isset(self::$entries[$id])) {
+                        return false;
+                    }
+                    foreach (self::$entries as $eid => $entry) {
+                        if (preg_match('#^' . preg_quote("$id/", '#') . '([^/]+)$#u', $eid)) {
+                            return false;
+                        }
+                    }
+                    unset(self::$entries[$id]);
+                    clearstatcache(true, $path);
+                    return true;
+                }
+
+                public function dir_opendir(string $path, int $options)
+                {
+                    assert(is_int($options));
+                    $id = self::id($path);
+                    if (!isset(self::$entries[$id])) {
+                        return false;
+                    }
+
+                    $files = ['.', '..'];
+                    foreach (self::$entries as $eid => $entry) {
+                        if (preg_match('#^' . preg_quote("$id/", '#') . '([^/]+)$#u', $eid, $m)) {
+                            $files[] = $m[1];
+                        }
+                    }
+
+                    $this->entry = self::$entries[$id];
+                    $this->entry->content = $files;
+                    return true;
+                }
+
+                public function dir_readdir()
+                {
+                    $result = current($this->entry->content);
+                    next($this->entry->content);
+                    return $result;
+                }
+
+                public function dir_rewinddir()
+                {
+                    reset($this->entry->content);
+                    return true;
+                }
+
+                public function dir_closedir()
+                {
+                    unset($this->entry);
+                    return true;
+                }
             }));
         }
 
-        return "$STREAM_NAME://$path";
+        return "$STREAM_NAME://" . trim($path, '\\/');
     }
 }

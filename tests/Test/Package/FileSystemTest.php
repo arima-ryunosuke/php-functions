@@ -1076,8 +1076,6 @@ class FileSystemTest extends AbstractTestCase
         that(rename($hoge, $piyo))->is(true);
         that(file_exists($hoge))->is(false);
         that(file_exists($piyo))->is(true);
-
-        that('mkdir')($hoge)->wasThrown('is not supported');
     }
 
     function test_memory_path_open()
@@ -1157,13 +1155,11 @@ class FileSystemTest extends AbstractTestCase
         that(chown($path, 48))->is(false);
         that(chgrp($path, 48))->is(false);
 
-        umask(0077);
+        umask(0);
         that(touch($path))->is(true);
-        if (DIRECTORY_SEPARATOR === '/') {
-            that(fileperms($path))->is(0700);
-            that(chmod($path, 0777))->is(true);
-            that(fileperms($path))->is(0777);
-        }
+        that(fileperms($path))->is(010_0777);
+        that(chmod($path, 0755))->is(true);
+        that(fileperms($path))->is(010_0755);
 
         that(chown($path, 48))->is(true);
         that(fileowner($path))->is(48);
@@ -1176,10 +1172,47 @@ class FileSystemTest extends AbstractTestCase
         that(filegroup($path))->is(27);
 
         that(chmod($path, 0700))->is(true);
-        if (DIRECTORY_SEPARATOR === '/') {
+        if (getmyuid() !== 0) {
             that(is_readable($path))->is(false);
             that(is_writable($path))->is(false);
         }
+    }
+
+    function test_memory_path_dir()
+    {
+        $dir1 = (memory_path)('root');
+
+        that(mkdir($dir1))->isTrue();
+        that(mkdir($dir1))->isFalse();
+
+        that(mkdir("$dir1/aaa/bbb"))->isFalse();
+        that(mkdir("$dir1/aaa/bbb", 0777, true))->isTrue();
+
+        that(touch("$dir1/aaa/xxx"))->isTrue();
+        that(touch("$dir1/aaa/bbb/yyy"))->isTrue();
+
+        that(@opendir("$dir1/aaa/unknown"))->isFalse();
+        $dir = opendir("$dir1/aaa");
+        $files = [];
+        while ($file = readdir($dir)) {
+            $files[] = $file;
+        }
+        that(readdir($dir))->isFalse();
+        rewinddir($dir);
+        that(readdir($dir))->is('.');
+        closedir($dir);
+        that(scandir("$dir1/aaa"))->is(['.', '..', 'bbb', 'xxx'])->is($files);
+
+        that(rmdir("$dir1/aaa/bbb/unknown"))->isFalse();
+        that(rmdir("$dir1/aaa/bbb"))->isFalse();
+        that(rmdir("$dir1/aaa"))->isFalse();
+        that(rmdir("$dir1"))->isFalse();
+        that(unlink("$dir1/aaa/xxx"))->isTrue();
+        that(unlink("$dir1/aaa/bbb/yyy"))->isTrue();
+        that(rmdir("$dir1/aaa/bbb"))->isTrue();
+        that(rmdir("$dir1/aaa"))->isTrue();
+        that(rmdir("$dir1"))->isTrue();
+        that(rmdir("$dir1/aaa/bbb/unknown"))->isFalse();
     }
 
     function test_memory_path_leak()
