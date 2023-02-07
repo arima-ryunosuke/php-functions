@@ -209,7 +209,7 @@ class FileSystem implements Interfaces\FileSystem
      */
     public static function file_list($dirname, $filter_condition = [])
     {
-        $dirname = realpath($dirname);
+        $dirname = FileSystem::path_normalize($dirname);
         if (!file_exists($dirname)) {
             return false;
         }
@@ -266,7 +266,7 @@ class FileSystem implements Interfaces\FileSystem
      */
     public static function file_tree($dirname, $filter_condition = [])
     {
-        $dirname = realpath($dirname);
+        $dirname = FileSystem::path_normalize($dirname);
         if (!file_exists($dirname)) {
             return false;
         }
@@ -605,7 +605,7 @@ class FileSystem implements Interfaces\FileSystem
             }
             else {
                 $byte = FileSystem::file_set_contents($fullpath, $entry, $umask);
-                $result[realpath($fullpath)] = $byte;
+                $result[FileSystem::path_normalize($fullpath)] = $byte;
             }
         }
         return $result;

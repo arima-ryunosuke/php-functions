@@ -107,7 +107,9 @@ class FileSystemTest extends AbstractTestCase
 
     function test_file_list()
     {
-        $base = sys_get_temp_dir() . '/tree';
+        $DS = DIRECTORY_SEPARATOR;
+
+        $base = sys_get_temp_dir() . $DS . 'list';
         (rm_rf)($base);
         (file_set_contents)($base . '/a/a1.txt', '');
         (file_set_contents)($base . '/a/a2.txt', '');
@@ -120,17 +122,17 @@ class FileSystemTest extends AbstractTestCase
 
         // 単純列挙
         that((file_list)($base))->equalsCanonicalizing([
-            realpath($base . '/a/a1.txt'),
-            realpath($base . '/a/a2.txt'),
-            realpath($base . '/a/b/ab1.txt'),
-            realpath($base . '/a/b/ab2.log'),
-            realpath($base . '/a/b/c/abc1.log'),
-            realpath($base . '/a/b/c/abc2.log'),
+            "$base{$DS}a{$DS}a1.txt",
+            "$base{$DS}a{$DS}a2.txt",
+            "$base{$DS}a{$DS}b{$DS}ab1.txt",
+            "$base{$DS}a{$DS}b{$DS}ab2.log",
+            "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
+            "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
 
         // 相対パスモード
         $DS = DIRECTORY_SEPARATOR;
-        that((file_list)($base, ['relative' => true]))->equalsCanonicalizing([
+        that((file_list)($base, ["relative" => true]))->equalsCanonicalizing([
             "a{$DS}a1.txt",
             "a{$DS}a2.txt",
             "a{$DS}b{$DS}ab1.txt",
@@ -140,23 +142,25 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // 拡張子でフィルタ
-        that((file_list)($base, ['extension' => 'txt']))->equalsCanonicalizing([
-            realpath($base . '/a/a1.txt'),
-            realpath($base . '/a/a2.txt'),
-            realpath($base . '/a/b/ab1.txt'),
+        that((file_list)($base, ["extension" => "txt"]))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}a1.txt",
+            "$base{$DS}a{$DS}a2.txt",
+            "$base{$DS}a{$DS}b{$DS}ab1.txt",
         ]);
 
         // ファイルサイズでフィルタ
-        that((file_list)($base, ['size' => [1]]))->equalsCanonicalizing([
-            realpath($base . '/a/b/ab2.log'),
-            realpath($base . '/a/b/c/abc1.log'),
-            realpath($base . '/a/b/c/abc2.log'),
+        that((file_list)($base, ["size" => [1]]))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}b{$DS}ab2.log",
+            "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
+            "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
     }
 
     function test_file_tree()
     {
-        $base = sys_get_temp_dir() . '/tree';
+        $DS = DIRECTORY_SEPARATOR;
+
+        $base = sys_get_temp_dir() . $DS . 'tree';
         (rm_rf)($base);
         (file_set_contents)($base . '/a/a1.txt', '');
         (file_set_contents)($base . '/a/a2.txt', '');
@@ -170,17 +174,17 @@ class FileSystemTest extends AbstractTestCase
 
         // 単純列挙
         that((file_tree)($base))->isSame([
-            'tree' => [
-                'x.ext' => realpath($base . '/x.ext'),
-                'a'     => [
-                    'a1.txt' => realpath($base . '/a/a1.txt'),
-                    'a2.txt' => realpath($base . '/a/a2.txt'),
-                    'b'      => [
-                        'ab1.txt' => realpath($base . '/a/b/ab1.txt'),
-                        'ab2.log' => realpath($base . '/a/b/ab2.log'),
-                        'c'       => [
-                            'abc1.log' => realpath($base . '/a/b/c/abc1.log'),
-                            'abc2.log' => realpath($base . '/a/b/c/abc2.log'),
+            "tree" => [
+                "x.ext" => "$base{$DS}x.ext",
+                "a"     => [
+                    "a1.txt" => "$base{$DS}a{$DS}a1.txt",
+                    "a2.txt" => "$base{$DS}a{$DS}a2.txt",
+                    "b"      => [
+                        "ab1.txt" => "$base{$DS}a{$DS}b{$DS}ab1.txt",
+                        "ab2.log" => "$base{$DS}a{$DS}b{$DS}ab2.log",
+                        "c"       => [
+                            "abc1.log" => "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
+                            "abc2.log" => "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
                         ],
                     ],
                 ],
@@ -188,28 +192,28 @@ class FileSystemTest extends AbstractTestCase
         ]);
 
         // 拡張子でフィルタ
-        that((file_tree)($base, ['extension' => 'txt']))->isSame([
-            'tree' => [
-                'a' => [
-                    'a1.txt' => realpath($base . '/a/a1.txt'),
-                    'a2.txt' => realpath($base . '/a/a2.txt'),
-                    'b'      => [
-                        'ab1.txt' => realpath($base . '/a/b/ab1.txt'),
-                        'c'       => [],
+        that((file_tree)($base, ["extension" => "txt"]))->isSame([
+            "tree" => [
+                "a" => [
+                    "a1.txt" => "$base{$DS}a{$DS}a1.txt",
+                    "a2.txt" => "$base{$DS}a{$DS}a2.txt",
+                    "b"      => [
+                        "ab1.txt" => "$base{$DS}a{$DS}b{$DS}ab1.txt",
+                        "c"       => [],
                     ],
                 ],
             ],
         ]);
 
         // ファイルサイズでフィルタ
-        that((file_tree)($base, ['size' => [1]]))->isSame([
-            'tree' => [
-                'a' => [
-                    'b' => [
-                        'ab2.log' => realpath($base . '/a/b/ab2.log'),
-                        'c'       => [
-                            'abc1.log' => realpath($base . '/a/b/c/abc1.log'),
-                            'abc2.log' => realpath($base . '/a/b/c/abc2.log'),
+        that((file_tree)($base, ["size" => [1]]))->isSame([
+            "tree" => [
+                "a" => [
+                    "b" => [
+                        "ab2.log" => "$base{$DS}a{$DS}b{$DS}ab2.log",
+                        "c"       => [
+                            "abc1.log" => "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
+                            "abc2.log" => "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
                         ],
                     ],
                 ],
@@ -402,7 +406,9 @@ class FileSystemTest extends AbstractTestCase
 
     function test_file_set_tree()
     {
-        $root = sys_get_temp_dir() . '/file_set_tree';
+        $DS = DIRECTORY_SEPARATOR;
+
+        $root = sys_get_temp_dir() . $DS . 'file_set_tree';
         (rm_rf)($root);
 
         that((file_set_tree)($root, [
@@ -417,7 +423,7 @@ class FileSystemTest extends AbstractTestCase
             'closure1'   => fn() => [
                 'c' => 'c',
             ],
-            'closure2'   => fn() => str_replace('/', DIRECTORY_SEPARATOR, implode(',', func_get_args())),
+            'closure2'   => fn() => str_replace('/', $DS, implode(',', func_get_args())),
             'x'          => [
                 'y' => [
                     'z.txt' => 'xyz',
@@ -428,29 +434,29 @@ class FileSystemTest extends AbstractTestCase
                 'b/c2' => 'abc2',
             ],
         ]))->is([
-            realpath("$root/single.txt")      => 6,
-            realpath("$root/directory/1.txt") => 1,
-            realpath("$root/directory/2.txt") => 2,
-            realpath("$root/directory/3.txt") => 3,
-            realpath("$root/blank")           => 0,
-            realpath("$root/closure1/c")      => 1,
-            realpath("$root/closure2")        => strlen("$root/closure2") + strlen("$root") + strlen("closure2") + 2,
-            realpath("$root/x/y/z.txt")       => 3,
-            realpath("$root/a/b/c1")          => 4,
-            realpath("$root/a/b/c2")          => 4,
+            "$root{$DS}single.txt"          => 6,
+            "$root{$DS}directory{$DS}1.txt" => 1,
+            "$root{$DS}directory{$DS}2.txt" => 2,
+            "$root{$DS}directory{$DS}3.txt" => 3,
+            "$root{$DS}blank"               => 0,
+            "$root{$DS}closure1{$DS}c"      => 1,
+            "$root{$DS}closure2"            => strlen("$root{$DS}closure2") + strlen("$root") + strlen("closure2") + 2,
+            "$root{$DS}x{$DS}y{$DS}z.txt"   => 3,
+            "$root{$DS}a{$DS}b{$DS}c1"      => 4,
+            "$root{$DS}a{$DS}b{$DS}c2"      => 4,
         ]);
 
-        that("$root/blank")->fileEquals('');
-        that("$root/empty")->directoryExists();
-        that("$root/single.txt")->fileEquals('single');
-        that("$root/directory/1.txt")->fileEquals('1');
-        that("$root/directory/2.txt")->fileEquals('22');
-        that("$root/directory/3.txt")->fileEquals('333');
-        that("$root/closure1/c")->fileEquals('c');
-        that("$root/closure2")->fileEquals((path_normalize)("$root/closure2,$root,closure2"));
-        that("$root/x/y/z.txt")->fileEquals('xyz');
-        that("$root/a/b/c1")->fileEquals('abc1');
-        that("$root/a/b/c2")->fileEquals('abc2');
+        that("$root{$DS}blank")->fileEquals('');
+        that("$root{$DS}empty")->directoryExists();
+        that("$root{$DS}single.txt")->fileEquals('single');
+        that("$root{$DS}directory{$DS}1.txt")->fileEquals('1');
+        that("$root{$DS}directory{$DS}2.txt")->fileEquals('22');
+        that("$root{$DS}directory{$DS}3.txt")->fileEquals('333');
+        that("$root{$DS}closure1{$DS}c")->fileEquals('c');
+        that("$root{$DS}closure2")->fileEquals((path_normalize)("$root{$DS}closure2,$root,closure2"));
+        that("$root{$DS}x{$DS}y{$DS}z.txt")->fileEquals('xyz');
+        that("$root{$DS}a{$DS}b{$DS}c1")->fileEquals('abc1');
+        that("$root{$DS}a{$DS}b{$DS}c2")->fileEquals('abc2');
     }
 
     function test_file_pos()
