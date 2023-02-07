@@ -404,6 +404,10 @@ class FileSystemTest extends AbstractTestCase
 
         that(file_set_contents)('/dev/null/::::::/a', '')->wasThrown('failed to mkdir');
 
+        $mpath = (memory_path)(__FUNCTION__);
+        (file_set_contents)("$mpath/hoge.txt", 'hoge');
+        that('hoge')->equalsFile("$mpath/hoge.txt");
+
         if (DIRECTORY_SEPARATOR === '\\') {
             error_clear_last();
             @(file_set_contents)('/dev/null/::::::', '');
