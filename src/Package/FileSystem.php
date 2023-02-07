@@ -1149,13 +1149,24 @@ class FileSystem implements Interfaces\FileSystem
      */
     public static function path_normalize($path)
     {
-        $ds = '/';
-        if (DIRECTORY_SEPARATOR === '\\') {
-            $ds .= '\\\\';
+        $DS = DIRECTORY_SEPARATOR;
+
+        // スキームの保護
+        $with_scheme = false;
+        $scheme = parse_url($path, PHP_URL_SCHEME);
+        if (!($scheme === null || $scheme === 'file') && substr($path, strlen($scheme), 3) === '://') {
+            $path = substr($path, strlen($scheme) + 3);
+            $DS = '/';
+            $with_scheme = true;
+        }
+
+        $delimiter = '/';
+        if ($DS === '\\') {
+            $delimiter .= '\\\\';
         }
 
         $result = [];
-        foreach (preg_split("#[$ds]+#u", $path) as $part) {
+        foreach (preg_split("#[$delimiter]+#u", $path) as $part) {
             if ($part === '.') {
                 continue;
             }
@@ -1171,7 +1182,14 @@ class FileSystem implements Interfaces\FileSystem
         if (count($result) > 2 && $result[count($result) - 1] === '') {
             array_pop($result);
         }
-        return implode(DIRECTORY_SEPARATOR, $result);
+
+        $path = implode($DS, $result);
+
+        if ($with_scheme) {
+            $path = "$scheme://$path";
+        }
+
+        return $path;
     }
 
     /**

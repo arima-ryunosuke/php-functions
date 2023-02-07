@@ -767,6 +767,8 @@ class FileSystemTest extends AbstractTestCase
             // 連続区切り
             that((path_normalize)('\\/a/\\\\/\\b'))->is("{$DS}a{$DS}b");
         }
+        // スキームは保持される
+        that((path_normalize)('dummy://a/b'))->is("dummy://a/b");
         // いきなり親をたどると例外
         that(path_normalize)('../')->wasThrown('is invalid');
         // 辿りすぎも例外
