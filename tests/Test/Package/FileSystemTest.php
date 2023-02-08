@@ -470,6 +470,54 @@ class FileSystemTest extends AbstractTestCase
         that("$root{$DS}a{$DS}b{$DS}c2")->fileEquals('abc2');
     }
 
+    function test_file_equals()
+    {
+        $root1 = sys_get_temp_dir() . '/file_equals1';
+        $root2 = sys_get_temp_dir() . '/file_equals2';
+        (rm_rf)($root1);
+        (rm_rf)($root2);
+
+        (file_set_tree)($root1, [
+            'file1'      => 'file',
+            'file2'      => 'file2',
+            'file3'      => 'file3',
+            'directory1' => [
+                'hoge' => 'hoge',
+                'fuga' => 'fuga',
+                'piyo' => 'piyo',
+            ],
+            'directory2' => [
+                'hoge' => 'hoge',
+                'fuga' => 'fuga',
+            ],
+        ]);
+
+        (file_set_tree)($root2, [
+            'file1'      => 'file',
+            'file2'      => 'file9',
+            'file3'      => 'file999',
+            'directory1' => [
+                'hoge' => 'hoge',
+                'fuga' => 'fuga',
+            ],
+            'directory2' => [
+                'hoge' => 'hoge',
+                'fuga' => 'fuga',
+                'piyo' => 'piyo',
+            ],
+        ]);
+
+        that((file_equals)($root1, $root2))->isTrue();
+        that((file_equals)("$root1/file1", "$root2/file1"))->isTrue();
+        that((file_equals)("$root1/file2", "$root2/file2"))->isFalse();
+        that((file_equals)("$root1/file3", "$root2/file3"))->isFalse();
+        that((file_equals)("$root1/directory1", "$root2/directory1"))->isFalse();
+        that((file_equals)("$root1/directory2", "$root2/directory2"))->isFalse();
+        that((file_equals)("$root1/file1", "$root2/directory1"))->isFalse();
+
+        that(file_equals)("$root1/file1", "$root2/unknown")->wasThrown('not exist');
+    }
+
     function test_file_pos()
     {
         $tmpfile = sys_get_temp_dir() . '/posfile.txt';
