@@ -650,6 +650,118 @@ class FileSystemTest extends AbstractTestCase
         that(error_get_last()['message'])->contains('404');
     }
 
+    function test_dir_diff()
+    {
+        $root1 = (memory_path)('dir_diff1');
+        $root2 = (memory_path)('dir_diff2');
+        (rm_rf)($root1);
+        (rm_rf)($root2);
+
+        (file_set_tree)($root1, [
+            'file1'     => 'file',
+            'file2'     => 'file2',
+            'file3'     => 'file3',
+            'empty'     => [],
+            'empty1'    => [],
+            'samedir'   => [
+                'file' => 'file',
+            ],
+            'directory' => [
+                'file1' => 'file',
+                'file2' => 'file2',
+                'file3' => 'file3',
+            ],
+            'casedir'   => [
+                'file1' => 'file',
+                'file2' => 'file2',
+                'file3' => 'file3',
+            ],
+        ]);
+
+        (file_set_tree)($root2, [
+            'file1'     => 'file',
+            'file2'     => 'fileEX',
+            'file4'     => 'file4',
+            'empty'     => [],
+            'empty2'    => [],
+            'samedir'   => [
+                'file' => 'file',
+            ],
+            'directory' => [
+                'file1' => 'file',
+                'file2' => 'fileEX',
+                'file4' => 'file4',
+            ],
+            'CASEDIR'   => [
+                'file1' => 'file',
+                'file2' => 'fileEX',
+                'file4' => 'file4',
+            ],
+        ]);
+
+        $DS = DIRECTORY_SEPARATOR;
+        that((dir_diff)($root1, $root2, [
+            'case-sensitive' => true,
+        ]))->is([
+            "CASEDIR"             => false,
+            "CASEDIR{$DS}file1"   => false,
+            "CASEDIR{$DS}file2"   => false,
+            "CASEDIR{$DS}file4"   => false,
+            "casedir"             => true,
+            "casedir{$DS}file1"   => true,
+            "casedir{$DS}file2"   => true,
+            "casedir{$DS}file3"   => true,
+            "directory{$DS}file2" => "",
+            "directory{$DS}file3" => true,
+            "directory{$DS}file4" => false,
+            "empty1"              => true,
+            "empty2"              => false,
+            "file2"               => "",
+            "file3"               => true,
+            "file4"               => false,
+        ]);
+        that((dir_diff)($root1, $root2, [
+            'case-sensitive' => false,
+        ]))->is([
+            "CASEDIR{$DS}file4"   => false,
+            "casedir{$DS}file2"   => "",
+            "casedir{$DS}file3"   => true,
+            "directory{$DS}file2" => "",
+            "directory{$DS}file3" => true,
+            "directory{$DS}file4" => false,
+            "empty1"              => true,
+            "empty2"              => false,
+            "file2"               => "",
+            "file3"               => true,
+            "file4"               => false,
+        ]);
+
+        that((dir_diff)($root1, $root2, [
+            'case-sensitive' => true,
+            'recursive'      => false,
+        ]))->is([
+            "CASEDIR" => false,
+            "casedir" => true,
+            "empty1"  => true,
+            "empty2"  => false,
+            "file2"   => "",
+            "file3"   => true,
+            "file4"   => false,
+        ]);
+
+        that((dir_diff)($root1, $root2, [
+            'case-sensitive' => false,
+            'recursive'      => false,
+            'differ'         => fn($file1, $file2) => file_get_contents($file1) . '<>' . file_get_contents($file2),
+        ]))->is([
+            "empty1" => true,
+            "empty2" => false,
+            "file2"  => "file2<>fileEX",
+            "file3"  => true,
+            "file4"  => false,
+        ]);
+    }
+
     function test_dirname_r()
     {
         // composer.json が見つかるまで親を辿って見つかったらそのパスを返す
