@@ -253,6 +253,11 @@ trait ChainObjectI
     public function in_array_or($needle, $haystack, $strict = false): self { }
     public function in_array_or($haystack, $strict = false): self { }
 
+    /** @see \iterator_chunk() */
+    public self $iterator_chunk;
+    public function iterator_chunk($iterator, $length, $preserve_keys = false): self { }
+    public function iterator_chunk($length, $preserve_keys = false): self { }
+
     /** @see \is_callback() */
     public self $is_callback;
     public function is_callback(callable $callable): self { }

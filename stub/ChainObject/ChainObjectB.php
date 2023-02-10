@@ -50,13 +50,13 @@ trait ChainObjectB
 
     /** @see \build_uri() */
     public self $build_uri;
-    public function build_uri($parts): self { }
-    public function build_uri(): self { }
+    public function build_uri($parts, $options = []): self { }
+    public function build_uri($options = []): self { }
 
     /** @see \build_query() */
     public self $build_query;
-    public function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738): self { }
-    public function build_query($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738): self { }
+    public function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
+    public function build_query($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
 
     /** @see \blank_if() */
     public self $blank_if;

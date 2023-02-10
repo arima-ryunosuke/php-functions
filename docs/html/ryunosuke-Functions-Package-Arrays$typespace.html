@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L4691" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L5-L4770" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Arrays</span></h2>
@@ -6262,6 +6262,97 @@ that(array_difference([
 		<tr>
 			<td class="type">array</td>
 			<td class="desc"><p>正規化された配列</p>
+</td>
+			<td class="rest"></td>
+		</tr>
+		</tbody>
+	</table>
+                                                                            					</div>
+					<div class="attribute">
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+            				<li class="structure-item">
+					<div class="attribute">
+						<span class="label label-danger"></span>
+						<span class="label label-default">static</span>
+						<span class="label label-magic"></span>
+						<span class="label label-danger"></span>
+						<span class="label label-default"></span>
+						<span class="label label-default"></span>
+						<span class="label label-deprecated"></span>
+						<span class="label label-public">public</span>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Arrays.php#L4692-L4769" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                                    					</div>
+					<h4 id="ryunosuke\Functions\Package\Arrays::iterator_chunk()" tabindex="-1" class="structure-title ">
+                        iterator_chunk                        	<small>($iterator, $length, $preserve_keys = false) : <a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a>[]<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a></small>
+						</h4>
+					<div class="inner-item">
+						<div class="description"><p>イテレータも使える array_chunk</p>
+<p>Generator を返す Generator を返す。<br />
+foreach で使う分には普通の配列と遜色なく使うことができる。</p>
+<p>大本 Generator は return 値として総数を返す。<br />
+各種 Generator は return 値として要素数を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 要素7の Generator を3つに分割
+$generator = (function () {
+    yield 'a';
+    yield 'b';
+    yield 'c';
+    yield 'd';
+    yield 'e';
+    yield 'f';
+    yield 'g';
+})();
+$generators = iterator_chunk($generator, 3);
+
+// 3要素
+that(iterator_to_array($generators-&gt;current()))-&gt;is(['a', 'b', 'c']);
+that($generators-&gt;current()-&gt;getReturn())-&gt;is(3);
+// 3要素
+$generators-&gt;next();
+that(iterator_to_array($generators-&gt;current()))-&gt;is(['d', 'e', 'f']);
+that($generators-&gt;current()-&gt;getReturn())-&gt;is(3);
+// 1要素
+$generators-&gt;next();
+that(iterator_to_array($generators-&gt;current()))-&gt;is(['g']);
+that($generators-&gt;current()-&gt;getReturn())-&gt;is(1);
+// 大本の Generator は総数を返す
+$generators-&gt;next();
+that($generators-&gt;getReturn())-&gt;is(7);
+</code></pre>
+</div>
+                        	<table class="table">
+		<caption>Parameters</caption>
+		<tbody>
+        			<tr>
+				<td class="type">iterable</td>
+				<td class="rest">$iterator</td>
+				<td class="desc"><p>イテレータ</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">int</td>
+				<td class="rest">$length</td>
+				<td class="desc"><p>チャンクサイズ</p>
+</td>
+			</tr>
+        			<tr>
+				<td class="type">bool</td>
+				<td class="rest">$preserve_keys = false</td>
+				<td class="desc"><p>キーの保存フラグ</p>
+</td>
+			</tr>
+        		</tbody>
+	</table>
+                            	<table class="table">
+		<caption>Return</caption>
+		<tbody>
+		<tr>
+			<td class="type"><a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a>[]<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a></td>
+			<td class="desc"><p>チャンク化された Generator</p>
 </td>
 			<td class="rest"></td>
 		</tr>

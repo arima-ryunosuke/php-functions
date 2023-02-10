@@ -2104,6 +2104,44 @@ that(array_difference([
 後ろの配列で上書きされた値や unique で減った配列などは以下に違反していても valid と判断される。</p>
 <p>素直に json schema を使えという内なる声が聞こえなくもない。</p>
 </div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-Arrays$typespace.html#ryunosuke\Functions\Package\Arrays::iterator_chunk()">
+                                    ryunosuke\Functions\Package\Arrays::iterator_chunk		</a>	<small>($iterator, $length, $preserve_keys = false) : <a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a>[]<span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.generator.php" class="fqsen" target="_blank">\Generator</a></small>
+		</h4>
+	<div class="description"><p>イテレータも使える array_chunk</p>
+<p>Generator を返す Generator を返す。<br />
+foreach で使う分には普通の配列と遜色なく使うことができる。</p>
+<p>大本 Generator は return 値として総数を返す。<br />
+各種 Generator は return 値として要素数を返す。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 要素7の Generator を3つに分割
+$generator = (function () {
+    yield 'a';
+    yield 'b';
+    yield 'c';
+    yield 'd';
+    yield 'e';
+    yield 'f';
+    yield 'g';
+})();
+$generators = iterator_chunk($generator, 3);
+
+// 3要素
+that(iterator_to_array($generators-&gt;current()))-&gt;is(['a', 'b', 'c']);
+that($generators-&gt;current()-&gt;getReturn())-&gt;is(3);
+// 3要素
+$generators-&gt;next();
+that(iterator_to_array($generators-&gt;current()))-&gt;is(['d', 'e', 'f']);
+that($generators-&gt;current()-&gt;getReturn())-&gt;is(3);
+// 1要素
+$generators-&gt;next();
+that(iterator_to_array($generators-&gt;current()))-&gt;is(['g']);
+that($generators-&gt;current()-&gt;getReturn())-&gt;is(1);
+// 大本の Generator は総数を返す
+$generators-&gt;next();
+that($generators-&gt;getReturn())-&gt;is(7);
+</code></pre>
+</div>
             	<h4 class="fqsen-title">class		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj">
                                     ryunosuke\Functions\Package::Classobj		</a>	</h4>
@@ -2855,6 +2893,27 @@ that("$root/dir1/dir2/piyo.txt")-&gt;fileEquals('PIYO');
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_equals()">
+                                    ryunosuke\Functions\Package\FileSystem::file_equals		</a>	<small>($file1, $file2, $chunk_size = null) : bool</small>
+		</h4>
+	<div class="description"><p>ファイルが同じ内容か返す</p>
+<p>ファイルサイズで比較して一致したら更に内容を読んで判定する。<br />
+ディレクトリ同士の場合は直下のファイル群を内容とみなして判定する。</p>
+<p>Example:</p>
+<pre><code class="language-php">// 適当にファイルを用意
+$testpath1 = sys_get_temp_dir() . '/file_equals1.txt';
+$testpath2 = sys_get_temp_dir() . '/file_equals2.txt';
+$testpath3 = sys_get_temp_dir() . '/file_equals3.txt';
+file_put_contents($testpath1, "hoge");
+file_put_contents($testpath2, "foo");
+file_put_contents($testpath3, "hoge");
+// 異なるなら false
+that(file_equals($testpath1, $testpath2))-&gt;isFalse();
+// 同じなら true
+that(file_equals($testpath1, $testpath3))-&gt;isTrue();
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::file_pos()">
                                     ryunosuke\Functions\Package\FileSystem::file_pos		</a>	<small>($filename, $needle, $start = 0, $end = null, $chunksize = null) : int<span class="type-separator"></span><wbr>false</small>
 		</h4>
@@ -2991,6 +3050,27 @@ that(dirmtime($dirname))-&gt;isBetween(time() - 2, time());
 // ファイルを作って更新するとその時刻
 touch("$dirname/tmp", time() + 10);
 that(dirmtime($dirname))-&gt;isSame(time() + 10);
+</code></pre>
+</div>
+    	<h4 class="fqsen-title">method		<small></small>
+		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::dir_diff()">
+                                    ryunosuke\Functions\Package\FileSystem::dir_diff		</a>	<small>($path1, $path2, $options = []) : array</small>
+		</h4>
+	<div class="description"><p>ファイルツリーを比較して配列で返す</p>
+<p>ファイル名をキーとし、</p>
+<ul>
+<li>$path1 にしかないファイルは false</li>
+<li>$path2 にしかないファイルは true</li>
+<li>両方にあり、内容が異なる場合はなんらかの文字列（comparator オプション）</li>
+<li>両方にあり、内容が同じ場合は結果に含まれない</li>
+</ul>
+<p>comparator オプションは両方に存在した場合にコールされるので差分を返したり更新日時を返したリできる。<br />
+comparator が null を返した場合、その要素は内容が同じとみなされ、結果配列に含まれなくなる。</p>
+<p>Example:</p>
+<pre><code class="language-php">// すべてにマッチするので true
+that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'))-&gt;isTrue();
+// aaa にはマッチするが bbb にはマッチしないので false
+that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'))-&gt;isFalse();
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -3199,13 +3279,12 @@ unset($p);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-FileSystem$typespace.html#ryunosuke\Functions\Package\FileSystem::memory_path()">
-                                    ryunosuke\Functions\Package\FileSystem::memory_path		</a>	<small>($path) : string</small>
+                                    ryunosuke\Functions\Package\FileSystem::memory_path		</a>	<small>($path = &quot;&quot;) : string</small>
 		</h4>
 	<div class="description"><p>ファイルのように扱えるメモリ上のパスを返す</p>
 <p>劣化 vfsStream のようなもの。<br />
 stream wrapper を用いて実装しており、そのプロトコルは初回呼び出し時に1度だけ登録される。<br />
 プロトコル名は決め打ちだが、 php.ini に "rfunc.memory_stream" というキーで文字列を指定するとそれが使用される。</p>
-<p>ファイル操作はある程度できるが、ディレクトリ操作は未対応（そこまでしたいなら vfsStream とか /dev/shm とかを使えば良い）。</p>
 <p>Example:</p>
 <pre><code class="language-php">// ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
 $memory_path = memory_path('filename.txt');
@@ -4189,6 +4268,10 @@ that($response['form'])-&gt;is([
 <li>null は NULL になる</li>
 <li>数字はそのまま数字になる</li>
 <li>bool は 0 or 1 になる</li>
+<li>配列は再帰的にカンマ区切りになる<ul>
+<li>この実装はエラー回避の意味合いが強く、実装は変更される可能性がある</li>
+</ul>
+</li>
 <li>それ以外は addcslashes される</li>
 </ul>
 <p>Example:</p>
@@ -4196,6 +4279,7 @@ that($response['form'])-&gt;is([
 that(sql_quote(123))-&gt;isSame(123);
 that(sql_quote(true))-&gt;isSame(1);
 that(sql_quote("hoge"))-&gt;isSame("'hoge'");
+that(sql_quote([1, 2, 3]))-&gt;isSame("1,2,3");
 </code></pre>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
@@ -5085,7 +5169,7 @@ that(
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::build_uri()">
-                                    ryunosuke\Functions\Package\Strings::build_uri		</a>	<small>($parts) : string</small>
+                                    ryunosuke\Functions\Package\Strings::build_uri		</a>	<small>($parts, $options = []) : string</small>
 		</h4>
 	<div class="description"><p>parse_uri の逆</p>
 <p>URI のパーツを与えると URI として構築する。<br />
@@ -5156,7 +5240,7 @@ that(parse_uri('localhost/path/to/file', [
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::build_query()">
-                                    ryunosuke\Functions\Package\Strings::build_query		</a>	<small>($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738) : string</small>
+                                    ryunosuke\Functions\Package\Strings::build_query		</a>	<small>($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null) : string</small>
 		</h4>
 	<div class="description"><p>数値キーを削除する http_build_query</p>
 <p>php の世界において配列のクエリ表現は <code>var[]=1&amp;var[]=2</code> で事足りる。<br />
@@ -5176,6 +5260,12 @@ that(parse_uri('localhost/path/to/file', [
 <p>この仕様は <code>v[][]=1&amp;v[][]=2</code> のようなときにおいしくないためである。<br />
 これは <code>$v=[[1], [2]]</code> のような値になるが、この場合 <code>$v=[[1, 2]]</code> という値が欲しい、という事が多い。<br />
 そのためには <code>v[0][]=1&amp;v[0][]=2</code> のようにする必要があるための数値指定である。</p>
+<p>$brackets で配列ブラケット文字を指定できるが、現実的には下記の3択だろう。</p>
+<ul>
+<li></li>
+<li>['[', ']']: [] のままにする（ブラケットは必ずしもパーセントエンコーディングが必須ではない）</li>
+<li></li>
+</ul>
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Strings$typespace.html#ryunosuke\Functions\Package\Strings::parse_query()">

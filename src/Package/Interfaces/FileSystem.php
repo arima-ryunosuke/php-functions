@@ -16,12 +16,14 @@ interface FileSystem
     public const file_set_contents     = ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_contents"];
     public const file_rewrite_contents = ["ryunosuke\\Functions\\Package\\FileSystem", "file_rewrite_contents"];
     public const file_set_tree         = ["ryunosuke\\Functions\\Package\\FileSystem", "file_set_tree"];
+    public const file_equals           = ["ryunosuke\\Functions\\Package\\FileSystem", "file_equals"];
     public const file_pos              = ["ryunosuke\\Functions\\Package\\FileSystem", "file_pos"];
     public const file_slice            = ["ryunosuke\\Functions\\Package\\FileSystem", "file_slice"];
     public const file_mimetype         = ["ryunosuke\\Functions\\Package\\FileSystem", "file_mimetype"];
     public const mkdir_p               = ["ryunosuke\\Functions\\Package\\FileSystem", "mkdir_p"];
     public const dirname_r             = ["ryunosuke\\Functions\\Package\\FileSystem", "dirname_r"];
     public const dirmtime              = ["ryunosuke\\Functions\\Package\\FileSystem", "dirmtime"];
+    public const dir_diff              = ["ryunosuke\\Functions\\Package\\FileSystem", "dir_diff"];
     public const fnmatch_and           = ["ryunosuke\\Functions\\Package\\FileSystem", "fnmatch_and"];
     public const fnmatch_or            = ["ryunosuke\\Functions\\Package\\FileSystem", "fnmatch_or"];
     public const path_is_absolute      = ["ryunosuke\\Functions\\Package\\FileSystem", "path_is_absolute"];

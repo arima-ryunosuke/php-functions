@@ -263,6 +263,11 @@ trait ChainObjectD
     public function dirmtime($dirname, $recursive = true): self { }
     public function dirmtime($recursive = true): self { }
 
+    /** @see \dir_diff() */
+    public self $dir_diff;
+    public function dir_diff($path1, $path2, $options = []): self { }
+    public function dir_diff($path2, $options = []): self { }
+
     /** @see \delegate() */
     public self $delegate;
     public function delegate($invoker, callable $callable, $arity = null): self { }

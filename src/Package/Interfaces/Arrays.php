@@ -91,4 +91,5 @@ interface Arrays
     public const array_nest           = ["ryunosuke\\Functions\\Package\\Arrays", "array_nest"];
     public const array_difference     = ["ryunosuke\\Functions\\Package\\Arrays", "array_difference"];
     public const array_schema         = ["ryunosuke\\Functions\\Package\\Arrays", "array_schema"];
+    public const iterator_chunk       = ["ryunosuke\\Functions\\Package\\Arrays", "iterator_chunk"];
 }

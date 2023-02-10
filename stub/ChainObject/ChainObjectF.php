@@ -273,6 +273,11 @@ trait ChainObjectF
     public function file_set_tree($root, $contents_tree, $umask = 2): self { }
     public function file_set_tree($contents_tree, $umask = 2): self { }
 
+    /** @see \file_equals() */
+    public self $file_equals;
+    public function file_equals($file1, $file2, $chunk_size = null): self { }
+    public function file_equals($file2, $chunk_size = null): self { }
+
     /** @see \file_pos() */
     public self $file_pos;
     public function file_pos($filename, $needle, $start = 0, $end = null, $chunksize = null): self { }

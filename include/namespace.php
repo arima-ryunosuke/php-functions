@@ -6134,6 +6134,93 @@ if (function_exists("ryunosuke\\Functions\\array_schema") && !defined("ryunosuke
     define("ryunosuke\\Functions\\array_schema", "ryunosuke\\Functions\\array_schema");
 }
 
+if (!isset($excluded_functions["iterator_chunk"]) && (!function_exists("ryunosuke\\Functions\\iterator_chunk") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\iterator_chunk"))->isInternal()))) {
+    /**
+     * イテレータも使える array_chunk
+     *
+     * Generator を返す Generator を返す。
+     * foreach で使う分には普通の配列と遜色なく使うことができる。
+     *
+     * 大本 Generator は return 値として総数を返す。
+     * 各種 Generator は return 値として要素数を返す。
+     *
+     * Example:
+     * ```php
+     * // 要素7の Generator を3つに分割
+     * $generator = (function () {
+     *     yield 'a';
+     *     yield 'b';
+     *     yield 'c';
+     *     yield 'd';
+     *     yield 'e';
+     *     yield 'f';
+     *     yield 'g';
+     * })();
+     * $generators = iterator_chunk($generator, 3);
+     *
+     * // 3要素
+     * that(iterator_to_array($generators->current()))->is(['a', 'b', 'c']);
+     * that($generators->current()->getReturn())->is(3);
+     * // 3要素
+     * $generators->next();
+     * that(iterator_to_array($generators->current()))->is(['d', 'e', 'f']);
+     * that($generators->current()->getReturn())->is(3);
+     * // 1要素
+     * $generators->next();
+     * that(iterator_to_array($generators->current()))->is(['g']);
+     * that($generators->current()->getReturn())->is(1);
+     * // 大本の Generator は総数を返す
+     * $generators->next();
+     * that($generators->getReturn())->is(7);
+     * ```
+     *
+     * @param iterable $iterator イテレータ
+     * @param int $length チャンクサイズ
+     * @param bool $preserve_keys キーの保存フラグ
+     * @return \Generator[]|\Generator チャンク化された Generator
+     */
+    function iterator_chunk($iterator, $length, $preserve_keys = false)
+    {
+        if ($length <= 0) {
+            throw new \InvalidArgumentException("\$length must be > 0 ($length)");
+        }
+
+        // Generator は Iterator であるが Iterator は Generator ではないので変換する
+        if (is_iterable($iterator)) {
+            $iterator = (function () use ($iterator) { yield from $iterator; })();
+        }
+
+        $total = 0;
+        while ($iterator->valid()) {
+            yield $g = (function () use ($iterator, $length, $preserve_keys) {
+                for ($count = 0; $count < $length && $iterator->valid(); $count++, $iterator->next()) {
+                    if ($preserve_keys) {
+                        yield $iterator->key() => $iterator->current();
+                    }
+                    else {
+                        yield $iterator->current();
+                    }
+                }
+                return $count;
+            })();
+
+            // 回しきらないと無限ループする
+            while ($g->valid()) {
+                $g->next();
+            }
+            $total += $g->getReturn();
+        }
+
+        return $total;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\iterator_chunk") && !defined("ryunosuke\\Functions\\iterator_chunk")) {
+    /**
+     *
+     */
+    define("ryunosuke\\Functions\\iterator_chunk", "ryunosuke\\Functions\\iterator_chunk");
+}
+
 if (!isset($excluded_functions["stdclass"]) && (!function_exists("ryunosuke\\Functions\\stdclass") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\stdclass"))->isInternal()))) {
     /**
      * 初期フィールド値を与えて stdClass を生成する
@@ -6837,16 +6924,7 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
             $template_source = array_slice(file($template_reflection->getFileName()), $sl, $el - $sl - 1, true);
         }
 
-        $getReturnType = function (\ReflectionFunctionAbstract $reffunc) {
-            if ($reffunc->hasReturnType()) {
-                $type = reflect_types($reffunc->getReturnType())->getName();
-                if ($type !== 'void') {
-                    return ": $type";
-                }
-            }
-        };
-
-        $parse = static function ($name, \ReflectionFunctionAbstract $reffunc) use ($getReturnType) {
+        $parse = static function ($name, \ReflectionFunctionAbstract $reffunc) {
             if ($reffunc instanceof \ReflectionMethod) {
                 $modifier = implode(' ', \Reflection::getModifierNames($reffunc->getModifiers()));
                 $receiver = ($reffunc->isStatic() ? 'self::$__originalClass::' : '$this->__original->') . $name;
@@ -6863,11 +6941,13 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
             $prms = implode(', ', $params);
             $args = implode(', ', array_keys($params));
 
-            $rtype = $getReturnType($reffunc);
+            $rtype = reflect_types($reffunc->getReturnType())->getName();
+            $return = $rtype === 'void' ? '' : 'return $return;';
+            $rtype = $rtype ? ": $rtype" : '';
 
             return [
                 "#[\ReturnTypeWillChange]\n$modifier function $ref$name($prms)$rtype",
-                "{ \$return = $ref$receiver(...[$args]);return \$return; }\n",
+                "{ \$return = $ref$receiver(...[$args]);$return }\n",
             ];
         };
 
@@ -6928,7 +7008,8 @@ if (!isset($excluded_functions["class_extends"]) && (!function_exists("ryunosuke
             // シグネチャエラーが出てしまうので、指定がない場合は強制的に合わせる
             $refmember = new \ReflectionFunction($override);
             $params = function_parameter(!$refmember->getNumberOfParameters() && $method->getNumberOfParameters() ? $method : $override);
-            $rtype = $getReturnType(!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember);
+            $rtype = reflect_types(!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember)->getName();
+            $rtype = $rtype ? ": $rtype" : '';
 
             [, $codeblock] = callable_code($override);
             $tokens = parse_php($codeblock);
@@ -8464,22 +8545,29 @@ if (!isset($excluded_functions["file_list"]) && (!function_exists("ryunosuke\\Fu
      */
     function file_list($dirname, $filter_condition = [])
     {
-        $dirname = realpath($dirname);
+        $dirname = path_normalize($dirname);
         if (!file_exists($dirname)) {
             return false;
         }
 
         $filter_condition += [
-            'relative' => false,
-            '!type'    => 'dir',
+            'recursive' => true,
+            'relative'  => false,
+            '!type'     => 'dir',
         ];
         $match = file_matcher($filter_condition);
 
         $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
-        $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+
+        if ($filter_condition['recursive']) {
+            $iterator = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+        }
+        else {
+            $iterator = $rdi;
+        }
 
         $result = [];
-        foreach ($rii as $fullpath => $it) {
+        foreach ($iterator as $fullpath => $it) {
             if (!$match($it)) {
                 continue;
             }
@@ -8529,7 +8617,7 @@ if (!isset($excluded_functions["file_tree"]) && (!function_exists("ryunosuke\\Fu
      */
     function file_tree($dirname, $filter_condition = [])
     {
-        $dirname = realpath($dirname);
+        $dirname = path_normalize($dirname);
         if (!file_exists($dirname)) {
             return false;
         }
@@ -8779,7 +8867,13 @@ if (!isset($excluded_functions["file_set_contents"]) && (!function_exists("ryuno
             }
         }
 
-        $tempnam = tempnam($dirname, 'tmp');
+        error_clear_last();
+        $tempnam = @tempnam($dirname, 'tmp');
+        if (strpos(error_get_last()['message'] ?? '', "file created in the system's temporary directory") !== false) {
+            $result = file_put_contents($filename, $data);
+            @chmod($filename, 0666 & ~$umask);
+            return $result;
+        }
         if (($result = file_put_contents($tempnam, $data)) !== false) {
             if (rename($tempnam, $filename)) {
                 @chmod($filename, 0666 & ~$umask);
@@ -8916,7 +9010,7 @@ if (!isset($excluded_functions["file_set_tree"]) && (!function_exists("ryunosuke
             }
             else {
                 $byte = file_set_contents($fullpath, $entry, $umask);
-                $result[realpath($fullpath)] = $byte;
+                $result[path_normalize($fullpath)] = $byte;
             }
         }
         return $result;
@@ -8927,6 +9021,90 @@ if (function_exists("ryunosuke\\Functions\\file_set_tree") && !defined("ryunosuk
      *
      */
     define("ryunosuke\\Functions\\file_set_tree", "ryunosuke\\Functions\\file_set_tree");
+}
+
+if (!isset($excluded_functions["file_equals"]) && (!function_exists("ryunosuke\\Functions\\file_equals") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_equals"))->isInternal()))) {
+    /**
+     * ファイルが同じ内容か返す
+     *
+     * ファイルサイズで比較して一致したら更に内容を読んで判定する。
+     * ディレクトリ同士の場合は直下のファイル群を内容とみなして判定する。
+     *
+     * Example:
+     * ```php
+     * // 適当にファイルを用意
+     * $testpath1 = sys_get_temp_dir() . '/file_equals1.txt';
+     * $testpath2 = sys_get_temp_dir() . '/file_equals2.txt';
+     * $testpath3 = sys_get_temp_dir() . '/file_equals3.txt';
+     * file_put_contents($testpath1, "hoge");
+     * file_put_contents($testpath2, "foo");
+     * file_put_contents($testpath3, "hoge");
+     * // 異なるなら false
+     * that(file_equals($testpath1, $testpath2))->isFalse();
+     * // 同じなら true
+     * that(file_equals($testpath1, $testpath3))->isTrue();
+     * ```
+     *
+     * @param string $file1 ファイル名1
+     * @param string $file2 ファイル名2
+     * @param ?int $chunk_size 読み込みチャンクサイズ
+     * @return bool ファイルが同じ内容なら true
+     */
+    function file_equals($file1, $file2, $chunk_size = null)
+    {
+        $chunk_size ??= 4096;
+
+        if (!file_exists($file1) || !file_exists($file2)) {
+            $files = array_filter([$file1, $file2], 'file_exists');
+            throw new \InvalidArgumentException(implode(',', $files) . " does not exist.");
+        }
+
+        if (is_dir($file1) xor is_dir($file2)) {
+            return false;
+        }
+
+        if (is_dir($file1) && is_dir($file2)) {
+            $opt = ['relative' => true, 'recursive' => false];
+            return file_list($file1, $opt) === file_list($file2, $opt);
+        }
+
+        // ファイルサイズが異なるなら異なるファイルなのは間違いない
+        if (filesize($file1) !== filesize($file2)) {
+            return false;
+        }
+
+        // 結局ファイルをすべて読むし衝突の可能性もなくはないのでハッシュ比較は不採用
+        //return sha1_file($file1) === sha1_file($file2);
+
+        // 少しづつ読んで比較する
+        try {
+            $fp1 = fopen($file1, 'r');
+            $fp2 = fopen($file2, 'r');
+
+            while (!(feof($fp1) || feof($fp2))) {
+                $line1 = fread($fp1, $chunk_size);
+                $line2 = fread($fp2, $chunk_size);
+                if ($line1 !== $line2) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        finally {
+            if (isset($fp1)) {
+                fclose($fp1);
+            }
+            if (isset($fp2)) {
+                fclose($fp2);
+            }
+        }
+    }
+}
+if (function_exists("ryunosuke\\Functions\\file_equals") && !defined("ryunosuke\\Functions\\file_equals")) {
+    /**
+     *
+     */
+    define("ryunosuke\\Functions\\file_equals", "ryunosuke\\Functions\\file_equals");
 }
 
 if (!isset($excluded_functions["file_pos"]) && (!function_exists("ryunosuke\\Functions\\file_pos") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\file_pos"))->isInternal()))) {
@@ -9299,6 +9477,86 @@ if (function_exists("ryunosuke\\Functions\\dirmtime") && !defined("ryunosuke\\Fu
     define("ryunosuke\\Functions\\dirmtime", "ryunosuke\\Functions\\dirmtime");
 }
 
+if (!isset($excluded_functions["dir_diff"]) && (!function_exists("ryunosuke\\Functions\\dir_diff") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\dir_diff"))->isInternal()))) {
+    /**
+     * ファイルツリーを比較して配列で返す
+     *
+     * ファイル名をキーとし、
+     * - $path1 にしかないファイルは false
+     * - $path2 にしかないファイルは true
+     * - 両方にあり、内容が異なる場合はなんらかの文字列（comparator オプション）
+     * - 両方にあり、内容が同じ場合は結果に含まれない
+     *
+     * comparator オプションは両方に存在した場合にコールされるので差分を返したり更新日時を返したリできる。
+     * comparator が null を返した場合、その要素は内容が同じとみなされ、結果配列に含まれなくなる。
+     *
+     * Example:
+     * ```php
+     * // すべてにマッチするので true
+     * that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'))->isTrue();
+     * // aaa にはマッチするが bbb にはマッチしないので false
+     * that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'))->isFalse();
+     * ```
+     *
+     * @param string $path1 パス1
+     * @param string $path2 パス2
+     * @param array $options オプション
+     * @return array 比較配列
+     */
+    function dir_diff($path1, $path2, $options = [])
+    {
+        $DS = DIRECTORY_SEPARATOR;
+
+        $options += [
+            'case-sensitive' => $DS === '/',
+        ];
+        $filter_condition = ['relative' => true, '!type' => null] + $options;
+
+        $chunksize = $options['chunksize'] ?? null;
+        $differ = $options['differ'] ?? fn($file1, $file2) => '';
+
+        $list1 = file_list($path1, $filter_condition);
+        $list2 = file_list($path2, $filter_condition);
+
+        $files1 = array_combine($list1, $list1);
+        $files2 = array_combine($list2, $list2);
+
+        if (!$options['case-sensitive']) {
+            $files1 = array_change_key_case($files1, CASE_UPPER);
+            $files2 = array_change_key_case($files2, CASE_UPPER);
+        }
+
+        $diff1 = array_diff_key($files1, $files2);
+        $diff2 = array_diff_key($files2, $files1);
+        $commons = array_intersect_key($files1, $files2);
+
+        $result = [];
+        $result += array_fill_keys($diff1, true);
+        $result += array_fill_keys($diff2, false);
+
+        foreach ($commons as $key => $name) {
+            $file1 = "$path1{$DS}" . $files1[$key];
+            $file2 = "$path2{$DS}" . $files2[$key];
+
+            if (!(is_dir($file1) && is_dir($file2)) && !file_equals($file1, $file2, $chunksize)) {
+                $diff = $differ($file1, $file2);
+                if ($diff !== null) {
+                    $result[$name] = $diff;
+                }
+            }
+        }
+
+        ksort($result);
+        return $result;
+    }
+}
+if (function_exists("ryunosuke\\Functions\\dir_diff") && !defined("ryunosuke\\Functions\\dir_diff")) {
+    /**
+     *
+     */
+    define("ryunosuke\\Functions\\dir_diff", "ryunosuke\\Functions\\dir_diff");
+}
+
 if (!isset($excluded_functions["fnmatch_and"]) && (!function_exists("ryunosuke\\Functions\\fnmatch_and") || (!false && (new \ReflectionFunction("ryunosuke\\Functions\\fnmatch_and"))->isInternal()))) {
     /**
      * fnmatch の AND 版
@@ -9556,13 +9814,24 @@ if (!isset($excluded_functions["path_normalize"]) && (!function_exists("ryunosuk
      */
     function path_normalize($path)
     {
-        $ds = '/';
-        if (DIRECTORY_SEPARATOR === '\\') {
-            $ds .= '\\\\';
+        $DS = DIRECTORY_SEPARATOR;
+
+        // スキームの保護
+        $with_scheme = false;
+        $scheme = parse_url($path, PHP_URL_SCHEME);
+        if (!($scheme === null || $scheme === 'file') && substr($path, strlen($scheme), 3) === '://') {
+            $path = substr($path, strlen($scheme) + 3);
+            $DS = '/';
+            $with_scheme = true;
+        }
+
+        $delimiter = '/';
+        if ($DS === '\\') {
+            $delimiter .= '\\\\';
         }
 
         $result = [];
-        foreach (preg_split("#[$ds]+#u", $path) as $part) {
+        foreach (preg_split("#[$delimiter]+#u", $path) as $part) {
             if ($part === '.') {
                 continue;
             }
@@ -9578,7 +9847,14 @@ if (!isset($excluded_functions["path_normalize"]) && (!function_exists("ryunosuk
         if (count($result) > 2 && $result[count($result) - 1] === '') {
             array_pop($result);
         }
-        return implode(DIRECTORY_SEPARATOR, $result);
+
+        $path = implode($DS, $result);
+
+        if ($with_scheme) {
+            $path = "$scheme://$path";
+        }
+
+        return $path;
     }
 }
 if (function_exists("ryunosuke\\Functions\\path_normalize") && !defined("ryunosuke\\Functions\\path_normalize")) {
@@ -9915,8 +10191,6 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
      * stream wrapper を用いて実装しており、そのプロトコルは初回呼び出し時に1度だけ登録される。
      * プロトコル名は決め打ちだが、 php.ini に "rfunc.memory_stream" というキーで文字列を指定するとそれが使用される。
      *
-     * ファイル操作はある程度できるが、ディレクトリ操作は未対応（そこまでしたいなら vfsStream とか /dev/shm とかを使えば良い）。
-     *
      * Example:
      * ```php
      * // ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
@@ -9938,7 +10212,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
      * @param string $path パス名（実質的に一意なファイル名）
      * @return string メモリ上のパス
      */
-    function memory_path($path)
+    function memory_path($path = '')
     {
         static $STREAM_NAME, $registered = false;
         if (!$registered) {
@@ -9958,18 +10232,26 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
 
                 public $context;
 
-                private static function create()
+                private static function id($path)
+                {
+                    $parts = parse_url($path) ?: [];
+                    $id = ($parts['host'] ?? '') . ($parts['path'] ?? '');
+                    $id = strtr($id, ['\\' => '/']);
+                    return rtrim($id, '/');
+                }
+
+                private static function create($id, $mode)
                 {
                     // @todo time 系は一応用意しているだけでほとんど未実装（read/write のたびに更新する？）
                     $now = time();
-                    return (object) [
-                        'permission' => 0777 & ~umask(),
-                        'owner'      => function_exists('posix_getuid') ? posix_getuid() : 0,
-                        'group'      => function_exists('posix_getgid') ? posix_getgid() : 0,
-                        'atime'      => $now,
-                        'mtime'      => $now,
-                        'ctime'      => $now,
-                        'content'    => '',
+                    self::$entries[$id] = (object) [
+                        'mode'    => $mode | (0777 & ~umask()),
+                        'owner'   => function_exists('posix_getuid') ? posix_getuid() : 0,
+                        'group'   => function_exists('posix_getgid') ? posix_getgid() : 0,
+                        'atime'   => $now,
+                        'mtime'   => $now,
+                        'ctime'   => $now,
+                        'content' => '',
                     ];
                 }
 
@@ -9979,24 +10261,18 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                     return [
                         'dev'     => 0,
                         'ino'     => 0,
-                        'mode'    => $that->permission,
+                        'mode'    => $that->mode,
                         'nlink'   => 0,
                         'uid'     => $that->owner,
                         'gid'     => $that->group,
                         'rdev'    => 0,
-                        'size'    => strlen($that->content),
+                        'size'    => array_reduce((array) $that->content, fn($carry, $item) => $carry + strlen($item), 0),
                         'atime'   => $that->atime,
                         'mtime'   => $that->mtime,
                         'ctime'   => $that->ctime,
                         'blksize' => -1,
                         'blocks'  => -1,
                     ];
-                }
-
-                public function __call($name, $arguments)
-                {
-                    // 対応して無くても標準では警告止まりなので例外に変える
-                    throw new \DomainException("$name is not supported.");
                 }
 
                 /** @noinspection PhpUnusedParameterInspection */
@@ -10009,7 +10285,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                 {
                     assert(is_int($options));
                     assert(is_null($opened_path) || !strlen($opened_path));
-                    $this->id = parse_url($path, PHP_URL_HOST);
+                    $this->id = self::id($path);
 
                     // t フラグはクソなので実装しない（デフォルトで b フラグとする）
                     if (strpos($mode, 'r') !== false) {
@@ -10023,7 +10299,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                     elseif (strpos($mode, 'w') !== false) {
                         // ファイルポインタをファイルの先頭に置き、ファイルサイズをゼロにします。
                         // ファイルが存在しない場合には、作成を試みます。
-                        self::$entries[$this->id] = self::create();
+                        self::create($this->id, 010_0000);
                         $this->position = 0;
                         $this->appendable = false;
                     }
@@ -10031,7 +10307,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                         // ファイルポインタをファイルの終端に置きます。
                         // ファイルが存在しない場合には、作成を試みます。
                         if (!isset(self::$entries[$this->id])) {
-                            self::$entries[$this->id] = self::create();
+                            self::create($this->id, 010_0000);
                         }
                         $this->position = 0;
                         $this->appendable = true;
@@ -10043,7 +10319,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                         if (isset(self::$entries[$this->id])) {
                             throw new \InvalidArgumentException("'$path' is exist already.");
                         }
-                        self::$entries[$this->id] = self::create();
+                        self::create($this->id, 010_0000);
                         $this->position = 0;
                         $this->appendable = false;
                     }
@@ -10052,7 +10328,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                         // ファイルが既に存在する場合でもそれを ('w' のように) 切り詰めたりせず、 また ('x' のように) 関数のコールが失敗することもありません。
                         // ファイルポインタをファイルの先頭に置きます。
                         if (!isset(self::$entries[$this->id])) {
-                            self::$entries[$this->id] = self::create();
+                            self::create($this->id, 010_0000);
                         }
                         $this->position = 0;
                         $this->appendable = false;
@@ -10160,11 +10436,11 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
 
                 public function stream_metadata($path, $option, $var)
                 {
-                    $id = parse_url($path, PHP_URL_HOST);
+                    $id = self::id($path);
                     switch ($option) {
                         case STREAM_META_TOUCH:
                             if (!isset(self::$entries[$id])) {
-                                self::$entries[$id] = self::create();
+                                self::create($id, 010_0000);
                             }
                             $mtime = $var[0] ?? time();
                             $atime = $var[1] ?? $mtime;
@@ -10176,7 +10452,8 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                             if (!isset(self::$entries[$id])) {
                                 return false;
                             }
-                            self::$entries[$id]->permission = $var;
+                            self::$entries[$id]->mode &= 077_0000;
+                            self::$entries[$id]->mode |= $var & ~umask();
                             self::$entries[$id]->ctime = time();
                             break;
 
@@ -10211,7 +10488,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                 public function url_stat(string $path, int $flags)
                 {
                     assert(is_int($flags));
-                    $id = parse_url($path, PHP_URL_HOST);
+                    $id = self::id($path);
                     if (!isset(self::$entries[$id])) {
                         return false;
                     }
@@ -10221,11 +10498,11 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                 public function rename(string $path_from, string $path_to): bool
                 {
                     // rename は同じプロトコルじゃないと使えない制約があるのでプロトコルは見ないで OK
-                    $id_from = parse_url($path_from, PHP_URL_HOST);
+                    $id_from = self::id($path_from);
                     if (!isset(self::$entries[$id_from])) {
                         return false;
                     }
-                    $id_to = parse_url($path_to, PHP_URL_HOST);
+                    $id_to = self::id($path_to);
                     self::$entries[$id_to] = self::$entries[$id_from];
                     unset(self::$entries[$id_from]);
                     // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
@@ -10235,7 +10512,7 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
 
                 public function unlink(string $path): bool
                 {
-                    $id = parse_url($path, PHP_URL_HOST);
+                    $id = self::id($path);
                     if (!isset(self::$entries[$id])) {
                         return false;
                     }
@@ -10244,10 +10521,86 @@ if (!isset($excluded_functions["memory_path"]) && (!function_exists("ryunosuke\\
                     clearstatcache(true, $path);
                     return true;
                 }
+
+                public function mkdir($path, $mode, $options)
+                {
+                    $id = self::id($path);
+                    if (isset(self::$entries[$id])) {
+                        return false;
+                    }
+                    $parts = explode('/', $id);
+                    if (count($parts) > 1 && !($options & STREAM_MKDIR_RECURSIVE)) {
+                        if (!isset(self::$entries[implode('/', array_slice($parts, 0, -1))])) {
+                            return false;
+                        }
+                    }
+                    $dirpath = '';
+                    foreach ($parts as $part) {
+                        $dirpath .= "$part/";
+                        self::create(rtrim($dirpath, '/'), 004_0000 | $mode);
+                    }
+                    return true;
+                }
+
+                public function rmdir($path, $options)
+                {
+                    assert(is_int($options));
+                    $id = self::id($path);
+                    if (!isset(self::$entries[$id])) {
+                        return false;
+                    }
+                    foreach (self::$entries as $eid => $entry) {
+                        if (preg_match('#^' . preg_quote("$id/", '#') . '([^/]+)$#u', $eid)) {
+                            return false;
+                        }
+                    }
+                    unset(self::$entries[$id]);
+                    clearstatcache(true, $path);
+                    return true;
+                }
+
+                public function dir_opendir(string $path, int $options)
+                {
+                    assert(is_int($options));
+                    $id = self::id($path);
+                    if (!isset(self::$entries[$id])) {
+                        return false;
+                    }
+
+                    $files = ['.', '..'];
+                    foreach (self::$entries as $eid => $entry) {
+                        if (preg_match('#^' . preg_quote("$id/", '#') . '([^/]+)$#u', $eid, $m)) {
+                            $files[] = $m[1];
+                        }
+                    }
+
+                    $this->entry = self::$entries[$id];
+                    $this->entry->content = $files;
+                    return true;
+                }
+
+                public function dir_readdir()
+                {
+                    $result = current($this->entry->content);
+                    next($this->entry->content);
+                    return $result;
+                }
+
+                public function dir_rewinddir()
+                {
+                    reset($this->entry->content);
+                    return true;
+                }
+
+                public function dir_closedir()
+                {
+                    unset($this->entry);
+                    return true;
+                }
             }));
         }
 
-        return "$STREAM_NAME://$path";
+        return "$STREAM_NAME://" . trim($path, '\\/');
     }
 }
 if (function_exists("ryunosuke\\Functions\\memory_path") && !defined("ryunosuke\\Functions\\memory_path")) {
@@ -13290,6 +13643,8 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("ryunosuke\\Fu
      * - null は NULL になる
      * - 数字はそのまま数字になる
      * - bool は 0 or 1 になる
+     * - 配列は再帰的にカンマ区切りになる
+     *   - この実装はエラー回避の意味合いが強く、実装は変更される可能性がある
      * - それ以外は addcslashes される
      *
      * Example:
@@ -13298,6 +13653,7 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("ryunosuke\\Fu
      * that(sql_quote(123))->isSame(123);
      * that(sql_quote(true))->isSame(1);
      * that(sql_quote("hoge"))->isSame("'hoge'");
+     * that(sql_quote([1, 2, 3]))->isSame("1,2,3");
      * ```
      *
      * @param mixed $value クオートする値
@@ -13313,6 +13669,9 @@ if (!isset($excluded_functions["sql_quote"]) && (!function_exists("ryunosuke\\Fu
         }
         if (is_bool($value)) {
             return (int) $value;
+        }
+        if (is_iterable($value) && !is_stringable($value)) {
+            return implode(',', array_map(fn($v) => sql_quote($v), arrayval($value)));
         }
         return "'" . addcslashes((string) $value, "\0\e\f\n\r\t\v'\\") . "'";
     }
@@ -16593,9 +16952,10 @@ if (!isset($excluded_functions["build_uri"]) && (!function_exists("ryunosuke\\Fu
      * ```
      *
      * @param array $parts URI の各パーツ配列
+     * @param array $options オプション
      * @return string URI 文字列
      */
-    function build_uri($parts)
+    function build_uri($parts, $options = [])
     {
         $parts += [
             'scheme'   => '',
@@ -16607,12 +16967,27 @@ if (!isset($excluded_functions["build_uri"]) && (!function_exists("ryunosuke\\Fu
             'query'    => '',
             'fragment' => '',
         ];
+        $options = array_replace_recursive([
+            'query' => [
+                'index'     => 0,
+                'bracket'   => null,
+                'separator' => ini_get('arg_separator.output'),
+            ],
+        ], $options);
 
         $parts['user'] = rawurlencode($parts['user']);
         $parts['pass'] = rawurlencode($parts['pass']);
         $parts['host'] = filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? "[{$parts['host']}]" : $parts['host'];
         $parts['path'] = ltrim($parts['path'], '/');
-        $parts['query'] = is_array($parts['query']) ? http_build_query($parts['query'], '', '&') : $parts['query'];
+        if (is_array($parts['query'])) {
+            $parts['query'] = build_query(
+                $parts['query'],
+                $options['query']['index'],
+                $options['query']['separator'],
+                \PHP_QUERY_RFC1738,
+                $options['query']['bracket'],
+            );
+        }
 
         $uri = '';
         $uri .= concat($parts['scheme'], '://');
@@ -16690,8 +17065,8 @@ if (!isset($excluded_functions["parse_uri"]) && (!function_exists("ryunosuke\\Fu
             (?<host>((?:\\[[0-9a-f:]+\\]) | (?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=]))*)
             (?::(?<port>\d{0,5}))?
             (?<path>(?:/(?: [-.~\\w!$&'()*+,;=:@] | %[0-9a-f]{2} )* )*)?
-            (?:\\?(?<query>   (?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=/:?@])*))?
-            (?:\\#(?<fragment>(?:[-.~\\w]|%[0-9a-f][0-9a-f]|[!$&-,;=/:?@])*))?
+            (?:\\?(?<query>[^\\#]*))?
+            (?:\\#(?<fragment>.*))?
         ";
 
         $default_default = [
@@ -16756,48 +17131,66 @@ if (!isset($excluded_functions["build_query"]) && (!function_exists("ryunosuke\\
      * これは `$v=[[1], [2]]` のような値になるが、この場合 `$v=[[1, 2]]` という値が欲しい、という事が多い。
      * そのためには `v[0][]=1&v[0][]=2` のようにする必要があるための数値指定である。
      *
+     * $brackets で配列ブラケット文字を指定できるが、現実的には下記の3択だろう。
+     * - ['%5B','%5D']: デフォルトのパーセントエンコーディング文字
+     * - ['[', ']']: [] のままにする（ブラケットは必ずしもパーセントエンコーディングが必須ではない）
+     * - ['', '']: ブラケットを削除する（他言語のために配列パラメータを抑止したいことがある）
+     *
      * @param array|object $data クエリデータ
      * @param string|int|null $numeric_prefix 数値キープレフィックス
      * @param string|null $arg_separator クエリセパレータ
      * @param int $encoding_type エンコードタイプ
+     * @param string[]|string|null $brackets 配列ブラケット文字
      * @return string クエリ文字列
      */
-    function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738)
+    function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null)
     {
-        $arg_separator ??= ini_get('arg_separator.output');
+        $data = arrayval($data, false);
+        if (!$data) {
+            return '';
+        }
 
+        $arg_separator ??= ini_get('arg_separator.output');
+        $brackets ??= ['%5B', '%5D'];
+
+        if (!is_array($brackets)) {
+            $brackets = [$brackets, ''];
+        }
+        $brackets = array_values($brackets);
+
+        $REGEX = '%5B\d+%5D';
+        $NOSEQ = implode('', $brackets);
         if ($numeric_prefix === null || ctype_digit(trim($numeric_prefix, '-+'))) {
-            $REGEX = '%5B\d+%5D';
-            $NOSEQ = '%5B%5D';
-            $numeric_prefix = $numeric_prefix === null ? null : (int) $numeric_prefix;
-            $query = http_build_query($data, '', $arg_separator, $encoding_type);
-            // 0は置換しないを意味する
-            if ($numeric_prefix === 0) {
-                return $query;
-            }
-            // null は無制限置換
-            if ($numeric_prefix === null) {
-                return preg_replace("#($REGEX)#u", $NOSEQ, $query);
-            }
-            // 正数は残す数とする
-            if ($numeric_prefix > 0) {
-                return preg_replace_callback("#(?:$REGEX)+#u", function ($m) use ($numeric_prefix) {
-                    $braces = explode('%5D', $m[0]);
-                    foreach (array_slice($braces, $numeric_prefix, null, true) as $n => $brace) {
-                        $braces[$n] = rtrim($brace, '0123456789');
-                    }
-                    return implode('%5D', $braces);
-                }, $query);
-            }
-            // 負数は後ろから n 個目まで
-            $pattern = str_repeat("($REGEX)?", abs($numeric_prefix) - 1);
-            return preg_replace_callback("#$pattern($REGEX=)#u", function ($m) use ($NOSEQ) {
-                return str_repeat($NOSEQ, count(array_filter($m, 'strlen')) - 2) . "$NOSEQ=";
-            }, $query);
+            $queries = explode($arg_separator, http_build_query($data, '', $arg_separator, $encoding_type));
         }
         else {
-            return http_build_query($data, $numeric_prefix ?? '', $arg_separator, $encoding_type);
+            $queries = explode($arg_separator, http_build_query($data, $numeric_prefix, $arg_separator, $encoding_type));
         }
+        foreach ($queries as &$q) {
+            [$k, $v] = explode('=', $q, 2);
+
+            // 0は置換しないを意味する
+            if ($numeric_prefix === 0) {
+                // do nothing
+                assert($numeric_prefix === 0);
+            }
+            // null は無制限置換
+            elseif ($numeric_prefix === null) {
+                $k = preg_replace("#$REGEX#u", $NOSEQ, $k);
+            }
+            else {
+                $count = $numeric_prefix > 0 ? 0 : -preg_match_all("#$REGEX#u", $k);
+                $k = preg_replace_callback("#$REGEX#u", function ($m) use (&$count, $numeric_prefix, $NOSEQ) {
+                    return $count++ >= $numeric_prefix ? $NOSEQ : $m[0];
+                }, $k);
+            }
+
+            $k = str_replace(['%5B', '%5D'], $brackets, $k);
+
+            $q = "$k=$v";
+        }
+
+        return implode($arg_separator, $queries);
     }
 }
 if (function_exists("ryunosuke\\Functions\\build_query") && !defined("ryunosuke\\Functions\\build_query")) {

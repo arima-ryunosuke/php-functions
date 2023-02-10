@@ -385,7 +385,7 @@ trait ChainObjectM
 
     /** @see \memory_path() */
     public self $memory_path;
-    public function memory_path($path): self { }
+    public function memory_path($path = ""): self { }
     public function memory_path(): self { }
 
     /** @see \minimum() */
