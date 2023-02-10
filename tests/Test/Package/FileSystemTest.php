@@ -600,12 +600,12 @@ class FileSystemTest extends AbstractTestCase
 
         // end_line
         that((file_slice)($tmpfile, 4, -9))->is([
-            4  => "\n",
-            5  => "5\n",
-            6  => "\n",
-            7  => "7\n",
-            8  => "\n",
-            9  => "9\n",
+            4 => "\n",
+            5 => "5\n",
+            6 => "\n",
+            7 => "7\n",
+            8 => "\n",
+            9 => "9\n",
         ]);
 
         // end_line
@@ -1172,7 +1172,8 @@ class FileSystemTest extends AbstractTestCase
             require(__DIR__ . "/required1.php");
             require(__DIR__ . "/required2.tpl");
             require(__DIR__ . "/required3.php");
-            PHP);
+            PHP
+        );
         (file_set_contents)("$dir/required1.php", '<?php return 1;');
         (file_set_contents)("$dir/required2.tpl", '<?php return 2;');
         (file_set_contents)("$dir/required3.php", '<?php return 3;');
