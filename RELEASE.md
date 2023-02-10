@@ -12,6 +12,22 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.5.6
+
+- [feature][Arrays] iterator_chunk を追加
+- [feature][FileSystem] dir_diff を追加
+- [feature][FileSystem] file_equals を追加
+- [fixbug][FileSystem] file_set_contents で tempnam に対応していないプロトコルに対応
+- [feature][FileSystem] file_list に recursive オプションを追加
+- [feature][FileSystem] memory_path のディレクトリ対応
+- [change][FileSystem] ストリームラッパーと相性が悪いので realpath を normalize に変更
+- [fixbug][FileSystem] path_normalize でスキームが吹き飛んでいた不具合を修正
+- [feature][Strings] build_uri にオプションを追加
+- [fixbug][Strings] build_query が値部分まで書き換えていた不具合を修正
+- [fixbug][Strings] parse_uri が配列形式に対応していなかった不具合を修正
+- [fixbug][Sql] sql_quote に配列を渡すとエラーが出る不具合を修正
+- [fixbug][ClassObj] class_extends で親が void だとシグネチャエラーが発生する不具合を修正
+
 ## 1.5.5
 
 - [feature][Vars] var_export3 のアロー関数対応
