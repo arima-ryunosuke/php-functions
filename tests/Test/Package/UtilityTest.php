@@ -1136,7 +1136,7 @@ class UtilityTest extends AbstractTestCase
 
     function test_process_parallel()
     {
-        that((process_parallel)(static function ($rate = 9) {
+        that(process_parallel)(static function ($rate = 9) {
             $result = 0;
             foreach (range(1, 10) as $n) {
                 usleep(100 * 1000);
@@ -1145,7 +1145,7 @@ class UtilityTest extends AbstractTestCase
             fwrite(STDOUT, "out:$result");
             fwrite(STDERR, "err:$result");
             return $result;
-        }, ['x' => 1, [2], []]))->isSame([
+        }, ['x' => 1, [2], []])->isSame([
             'x' => [
                 'status' => 0,
                 'stdout' => 'out:55',
@@ -1164,9 +1164,9 @@ class UtilityTest extends AbstractTestCase
                 'stderr' => 'err:495',
                 'return' => 495,
             ],
-        ])->final('time')->lessThan(2.0); // 100ms の sleep を10回回すのを3回行うので合計3秒…ではなく並列なので1秒前後になる
+        ])->break()->inElapsedTime(1.9); // 100ms の sleep を10回回すのを3回行うので合計3秒…ではなく並列なので1秒前後になる
 
-        that((process_parallel)([
+        that(process_parallel)([
             static function ($rate) {
                 $result = 0;
                 foreach (range(1, 10) as $n) {
@@ -1190,7 +1190,7 @@ class UtilityTest extends AbstractTestCase
             'e' => static function () {
                 exit(127);
             },
-        ], [1, 'y' => []]))->isSame([
+        ], [1, 'y' => []])->isSame([
             [
                 'status' => 0,
                 'stdout' => 'out:55',
@@ -1209,7 +1209,7 @@ class UtilityTest extends AbstractTestCase
                 'stderr' => '',
                 'return' => null,
             ],
-        ])->final('time')->lessThan(2.0); // 100ms の sleep を10回回すのを2回行うので合計2秒…ではなく並列なので1秒前後になる
+        ])->break()->inElapsedTime(1.9); // 100ms の sleep を10回回すのを2回行うので合計2秒…ではなく並列なので1秒前後になる
     }
 
     function test_arguments()
@@ -1713,7 +1713,7 @@ class UtilityTest extends AbstractTestCase
             ->outputMatches('#Concrete::getName#')
             ->outputContains(__FILE__)
             // 2関数を100でベンチするので 200ms～400ms の間のはず（カバレッジが有効だとすごく遅いので余裕を持たしてる）
-            ->final('time')->isBetween(0.2, 0.4);
+            ->final('time')->break()->isBetween(0.2, 0.4);
 
         // return 検証
         @(benchmark)(['md5', 'sha1'], ['hoge'], 10, false);
@@ -1721,7 +1721,7 @@ class UtilityTest extends AbstractTestCase
 
         // 1000 ミリ秒間の usleep(50000) の呼び出し回数は 20 回のはず（Windows での分解能がめちゃくちゃ？なので余裕を持たしてる）
         $output = (benchmark)(['usleep'], [50 * 1000], 1000, false);
-        that($output[0]['called'])->isBetween(17, 20);
+        that($output[0]['called'])->break()->isBetween(17, 20);
 
         // 参照渡しも呼べる
         (benchmark)(['reset', 'end'], [['hoge']], 10, false);

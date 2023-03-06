@@ -1605,7 +1605,7 @@ class FileSystem implements Interfaces\FileSystem
      *     }
      * }
      * // 全ループすると10秒かかるが、大体3秒程度で抜けているはず
-     * that(microtime(true) - $time)->lt(3.9);
+     * that(microtime(true) - $time)->break()->lt(3.9);
      * unset($p);
      * ```
      *
