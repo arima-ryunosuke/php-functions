@@ -7847,7 +7847,10 @@ if (!isset($excluded_functions["date_timestamp"]) && (!function_exists("ryunosuk
             }
         }
 
-        return $parts['fraction'] ? $timestamp + $parts['fraction'] : $timestamp;
+        if ($parts['fraction']) {
+            $timestamp += ($timestamp >= 0 ? +$parts['fraction'] : -$parts['fraction']);
+        }
+        return $timestamp;
     }
 }
 if (function_exists("ryunosuke\\Functions\\date_timestamp") && !defined("ryunosuke\\Functions\\date_timestamp")) {
@@ -10143,7 +10146,7 @@ if (!isset($excluded_functions["get_modified_files"]) && (!function_exists("ryun
      *     }
      * }
      * // 全ループすると10秒かかるが、大体3秒程度で抜けているはず
-     * that(microtime(true) - $time)->lt(3.9);
+     * that(microtime(true) - $time)->break()->lt(3.9);
      * unset($p);
      * ```
      *
@@ -23502,7 +23505,7 @@ if (!isset($excluded_functions["process_parallel"]) && (!function_exists("ryunos
      *     return $arg1 + $arg2;
      * }, ['a' => [1, 2], 'b' => [2, 3], [3, 4]]);
      * // 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-     * that(microtime(true) - $t)->lessThan(2.0);
+     * that(microtime(true) - $t)->break()->lessThan(2.0);
      * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
      * that($result)->isSame([
      *     'a' => [
@@ -23541,7 +23544,7 @@ if (!isset($excluded_functions["process_parallel"]) && (!function_exists("ryunos
      *     },
      * ], ['a' => [1, 2], 'b' => [2, 3], [127]]);
      * // 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-     * that(microtime(true) - $t)->lessThan(1.5);
+     * that(microtime(true) - $t)->break()->lessThan(1.5);
      * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
      * that($result)->isSame([
      *     'a' => [

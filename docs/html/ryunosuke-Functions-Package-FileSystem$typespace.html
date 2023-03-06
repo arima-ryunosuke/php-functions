@@ -1947,7 +1947,7 @@ foreach (range(1, 10) as $i) {
     }
 }
 // 全ループすると10秒かかるが、大体3秒程度で抜けているはず
-that(microtime(true) - $time)-&gt;lt(3.9);
+that(microtime(true) - $time)-&gt;break()-&gt;lt(3.9);
 unset($p);
 </code></pre>
 </div>

@@ -3273,7 +3273,7 @@ foreach (range(1, 10) as $i) {
     }
 }
 // 全ループすると10秒かかるが、大体3秒程度で抜けているはず
-that(microtime(true) - $time)-&gt;lt(3.9);
+that(microtime(true) - $time)-&gt;break()-&gt;lt(3.9);
 unset($p);
 </code></pre>
 </div>
@@ -6942,7 +6942,7 @@ $result = process_parallel(static function ($arg1, $arg2) {
     return $arg1 + $arg2;
 }, ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [3, 4]]);
 // 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-that(microtime(true) - $t)-&gt;lessThan(2.0);
+that(microtime(true) - $t)-&gt;break()-&gt;lessThan(2.0);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
 that($result)-&gt;isSame([
     'a' =&gt; [
@@ -6981,7 +6981,7 @@ $result = process_parallel([
     },
 ], ['a' =&gt; [1, 2], 'b' =&gt; [2, 3], [127]]);
 // 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
-that(microtime(true) - $t)-&gt;lessThan(1.5);
+that(microtime(true) - $t)-&gt;break()-&gt;lessThan(1.5);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
 that($result)-&gt;isSame([
     'a' =&gt; [
