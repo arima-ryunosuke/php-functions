@@ -249,7 +249,10 @@ class Date implements Interfaces\Date
             }
         }
 
-        return $parts['fraction'] ? $timestamp + $parts['fraction'] : $timestamp;
+        if ($parts['fraction']) {
+            $timestamp += ($timestamp >= 0 ? +$parts['fraction'] : -$parts['fraction']);
+        }
+        return $timestamp;
     }
 
     /**
