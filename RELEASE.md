@@ -12,6 +12,11 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.5.8
+
+- [tests] 負荷状態によってコケやすいテストに break を付与
+- [fixbug][Date] date_timestamp で 1970 以前のミリ秒が逆数になる不具合を修正
+
 ## 1.5.6
 
 - [feature][Arrays] iterator_chunk を追加
