@@ -657,6 +657,10 @@ class FileSystemTest extends AbstractTestCase
         (rm_rf)($root1);
         (rm_rf)($root2);
 
+        that(dir_diff)($root1, $root2)->wasThrown('does not exists');
+        mkdir($root1, 0777, true);
+        that(dir_diff)($root1, $root2)->notWasThrown('does not exists');
+
         (file_set_tree)($root1, [
             'file1'     => 'file',
             'file2'     => 'file2',

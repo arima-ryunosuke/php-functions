@@ -1060,7 +1060,13 @@ class FileSystem implements Interfaces\FileSystem
         $differ = $options['differ'] ?? fn($file1, $file2) => '';
 
         $list1 = FileSystem::file_list($path1, $filter_condition);
+        if ($list1 === false) {
+            throw new \UnexpectedValueException("$path1 does not exists");
+        }
         $list2 = FileSystem::file_list($path2, $filter_condition);
+        if ($list2 === false) {
+            $list2 = [];
+        }
 
         $files1 = array_combine($list1, $list1);
         $files2 = array_combine($list2, $list2);
