@@ -1123,16 +1123,17 @@ class FileSystemTest extends AbstractTestCase
 
         $dir = sys_get_temp_dir() . '/rm_rf';
         (file_set_contents)("$dir/a/x.txt", '');
+        (file_set_contents)("$dir/a/aa/xx.txt", '');
         (file_set_contents)("$dir/b/x.txt", '');
         (file_set_contents)("$dir/c/x.txt", '');
         (file_set_contents)("$dir/.dotfile", '');
 
         that((rm_rf)("$dir/a", false))->isTrue();
-        that("$dir/a")->directoryExists();     // x は残る
+        that("$dir/a")->directoryExists();     // a は残る
         that("$dir/a/x.txt")->fileNotExists(); // x は消える
 
         that((rm_rf)("$dir/b", true))->isTrue();
-        that("$dir/b")->directoryNotExists();  // y は消える
+        that("$dir/b")->directoryNotExists();  // b は消える
         that("$dir/b/x.txt")->fileNotExists(); // x は消える
 
         that((rm_rf)("$dir/*", false))->isTrue();
@@ -1145,6 +1146,9 @@ class FileSystemTest extends AbstractTestCase
 
         that((rm_rf)("$dir/*", true))->isFalse();
         that("$dir/.dotfile")->fileExists();
+
+        that((rm_rf)("$dir/.dotfile", true))->isTrue();
+        that("$dir/.dotfile")->fileNotExists(); // ファイルも消せる
     }
 
     function test_tmpname()

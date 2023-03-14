@@ -1527,6 +1527,10 @@ class FileSystem implements Interfaces\FileSystem
             return !$self || rmdir($dirname);
         };
 
+        if (is_file($dirname) || is_link($dirname)) {
+            return unlink($dirname);
+        }
+
         $result = true;
         $targets = glob($dirname, GLOB_BRACE | GLOB_NOCHECK | ($self ? 0 : GLOB_ONLYDIR));
         foreach ($targets as $target) {
