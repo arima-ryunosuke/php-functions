@@ -774,13 +774,19 @@ class Utility implements Interfaces\Utility
      */
     public static function parse_namespace($filename, $options = [])
     {
+        $filename = realpath($filename);
+        $filemtime = filemtime($filename);
         $options += [
-            'cache' => true,
+            'cache' => null,
         ];
-        if (!$options['cache']) {
-            Utility::cache(realpath($filename), null, __FUNCTION__);
+        if ($options['cache'] === null) {
+            $options['cache'] = Utility::cache($filename, fn() => $filemtime, 'filemtime') >= $filemtime;
         }
-        return Utility::cache(realpath($filename), function () use ($filename) {
+        if (!$options['cache']) {
+            Utility::cache($filename, null, 'filemtime');
+            Utility::cache($filename, null, __FUNCTION__);
+        }
+        return Utility::cache($filename, function () use ($filename) {
             $stringify = function ($tokens) {
                 // @codeCoverageIgnoreStart
                 if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
