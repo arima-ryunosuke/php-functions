@@ -1583,6 +1583,7 @@ class Vars implements Interfaces\Vars
         $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
             $spacer0 = str_repeat(" ", 4 * ($nest + 0));
             $spacer1 = str_repeat(" ", 4 * ($nest + 1));
+            $raw_export = fn($v) => $v;
             $var_export = fn($v) => var_export($v, true);
             $neighborToken = function ($n, $d, $tokens) {
                 for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
@@ -1664,7 +1665,7 @@ class Vars implements Interfaces\Vars
                 $arrow = Strings::starts_with($meta, 'fn') ? ' => ' : ' ';
                 $tokens = array_slice(Syntax::parse_php("$meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
 
-                $uses = "";
+                $uses = [];
                 $context = [
                     'class' => 0,
                     'brace' => 0,
@@ -1700,9 +1701,9 @@ class Vars implements Interfaces\Vars
                     if ($token[0] === T_VARIABLE) {
                         $varname = substr($token[1], 1);
                         // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
-                        if (array_key_exists($varname, $statics)) {
+                        if (array_key_exists($varname, $statics) && !isset($uses[$varname])) {
                             $recurself = $statics[$varname] === $value ? '&' : '';
-                            $uses .= "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                            $uses[$varname] = "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
                         }
                     }
 
@@ -1721,7 +1722,7 @@ class Vars implements Interfaces\Vars
                     $code = "static $code";
                 }
 
-                return "\$this->$vid = (function () {\n{$uses}{$spacer1}return $code;\n$spacer0})->call(\$this)";
+                return "\$this->$vid = (function () {\n{$raw_export(implode('', $uses))}{$spacer1}return $code;\n$spacer0})->call(\$this)";
             }
             if (is_object($value)) {
                 $ref = new \ReflectionObject($value);
