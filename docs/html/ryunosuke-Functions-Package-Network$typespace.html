@@ -54,7 +54,7 @@
 		<span class="label label-info"></span>
 		<span class="label label-info"></span>
 		<span class="label label-deprecated"></span>
-        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L955" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L5-L972" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                     	</div>
 
 	<h2>class <span class="category-name">ryunosuke\Functions\Package\Network</span></h2>
@@ -581,7 +581,7 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L535-L838" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L535-L855" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_request()" tabindex="-1" class="structure-title ">
                         http_request                        	<small>($options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -601,6 +601,10 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 <ul>
 <li><code>raw</code> (bool): curl インスタンスと変換クロージャを返すだけになる<ul>
 <li>ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず</li>
+</ul>
+</li>
+<li><code>nobody</code> (bool): ヘッダーの受信が完了したらただちに処理を返す<ul>
+<li>ボディは空文字になる（CURLOPT_NOBODY とは全く性質が異なるので注意）</li>
 </ul>
 </li>
 <li><code>throw</code> (bool): ステータスコードが 400 以上のときに例外を投げる<ul>
@@ -701,7 +705,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L840-L857" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L857-L874" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_head()" tabindex="-1" class="structure-title ">
                         http_head                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : array</small>
@@ -772,7 +776,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L859-L878" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L876-L895" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_get()" tabindex="-1" class="structure-title ">
                         http_get                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -843,7 +847,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L880-L897" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L897-L914" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_post()" tabindex="-1" class="structure-title ">
                         http_post                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -914,7 +918,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L899-L916" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L916-L933" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_put()" tabindex="-1" class="structure-title ">
                         http_put                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -985,7 +989,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L918-L935" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L935-L952" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_patch()" tabindex="-1" class="structure-title ">
                         http_patch                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>
@@ -1056,7 +1060,7 @@ that($response['form'])-&gt;is([
 						<span class="label label-default"></span>
 						<span class="label label-deprecated"></span>
 						<span class="label label-public">public</span>
-                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L937-L954" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
+                        			<a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/Network.php#L954-L971" class="source-link glyphicon glyphicon-new-window" target="_blank"></a>
                                     					</div>
 					<h4 id="ryunosuke\Functions\Package\Network::http_delete()" tabindex="-1" class="structure-title ">
                         http_delete                        	<small>($url, $data = [], $options = [], &amp;$response_header = [], &amp;$info = []) : mixed</small>

@@ -2395,7 +2395,7 @@ that($newobject-&gt;count())-&gt;isSame(6);
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Classobj$typespace.html#ryunosuke\Functions\Package\Classobj::reflect_types()">
-                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="http://php.net/manual/ja/class.traversable.php" class="fqsen" target="_blank">\Traversable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.arrayaccess.php" class="fqsen" target="_blank">\ArrayAccess</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.countable.php" class="fqsen" target="_blank">\Countable</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionnamedtype.php" class="fqsen" target="_blank">\ReflectionNamedType</a><span class="type-separator"></span><wbr><a href="http://php.net/manual/ja/class.reflectionuniontype.php" class="fqsen" target="_blank">\ReflectionUnionType</a></small>
+                                    ryunosuke\Functions\Package\Classobj::reflect_types		</a>	<small>($reflection_type = null) : <a href="ReflectionAnyType$typespace.html#ReflectionAnyType" class="fqsen ">ReflectionAnyType</a><span class="type-separator"></span><wbr>object</small>
 		</h4>
 	<div class="description"><p>ReflectionType の型配列を返す</p>
 <p>ReflectionType のインターフェース・仕様がコロコロ変わってついていけないので関数化した。</p>
@@ -4162,6 +4162,10 @@ $urls の要素は単一の文字列か curl のオプションである必要�
 <ul>
 <li><code>raw</code> (bool): curl インスタンスと変換クロージャを返すだけになる<ul>
 <li>ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず</li>
+</ul>
+</li>
+<li><code>nobody</code> (bool): ヘッダーの受信が完了したらただちに処理を返す<ul>
+<li>ボディは空文字になる（CURLOPT_NOBODY とは全く性質が異なるので注意）</li>
 </ul>
 </li>
 <li><code>throw</code> (bool): ステータスコードが 400 以上のときに例外を投げる<ul>
@@ -6922,7 +6926,7 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 </div>
     	<h4 class="fqsen-title">method		<small></small>
 		<a href="ryunosuke-Functions-Package-Utility$typespace.html#ryunosuke\Functions\Package\Utility::process_async()">
-                                    ryunosuke\Functions\Package\Utility::process_async		</a>	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : callable</small>
+                                    ryunosuke\Functions\Package\Utility::process_async		</a>	<small>($command, $args = [], $stdin = &quot;&quot;, &amp;$stdout = &quot;&quot;, &amp;$stderr = &quot;&quot;, $cwd = null, $env = null) : <a href="ProcessAsync$typespace.html#ProcessAsync" class="fqsen ">ProcessAsync</a><span class="type-separator"></span><wbr>object</small>
 		</h4>
 	<div class="description"><p>proc_open ～ proc_close の一連の処理を行う（非同期版）</p>
 </div>
