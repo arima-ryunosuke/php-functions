@@ -1581,6 +1581,9 @@ class Vars implements Interfaces\Vars
         // 再帰用クロージャ
         $vars = [];
         $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
+            $spacer0 = str_repeat(" ", 4 * ($nest + 0));
+            $spacer1 = str_repeat(" ", 4 * ($nest + 1));
+            $var_export = fn($v) => var_export($v, true);
             $neighborToken = function ($n, $d, $tokens) {
                 for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
                     if ($tokens[$i][0] !== T_WHITESPACE) {
@@ -1588,23 +1591,31 @@ class Vars implements Interfaces\Vars
                     }
                 }
             };
-            $resolveSymbol = function ($token, $prev, $next, $filename) {
+            $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
                 if ($token[0] === T_STRING) {
                     if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
-                        $token[1] = Utility::resolve_symbol($token[1], $filename, 'alias') ?? $token[1];
+                        $token[1] = Utility::resolve_symbol($token[1], $ref->getFileName(), 'alias') ?? $token[1];
                     }
                     elseif ($next[1] === '(') {
-                        $token[1] = Utility::resolve_symbol($token[1], $filename, 'function') ?? $token[1];
+                        $token[1] = Utility::resolve_symbol($token[1], $ref->getFileName(), 'function') ?? $token[1];
                     }
                     else {
-                        $token[1] = Utility::resolve_symbol($token[1], $filename, 'const') ?? $token[1];
+                        $token[1] = Utility::resolve_symbol($token[1], $ref->getFileName(), 'const') ?? $token[1];
                     }
+                }
+
+                // マジック定数の解決（__CLASS__, __TRAIT__ も書き換えなければならないが、非常に大変なので下記のみ）
+                if ($token[0] === T_FILE) {
+                    $token[1] = $var_export($ref->getFileName());
+                }
+                if ($token[0] === T_DIR) {
+                    $token[1] = $var_export(dirname($ref->getFileName()));
+                }
+                if ($token[0] === T_NS_C) {
+                    $token[1] = $var_export($ref->getNamespaceName());
                 }
                 return $token;
             };
-            $var_export = fn($v) => var_export($v, true);
-            $spacer0 = str_repeat(" ", 4 * ($nest + 0));
-            $spacer1 = str_repeat(" ", 4 * ($nest + 1));
 
             $vid = $var_manager->varId($value);
             if ($vid) {
@@ -1695,7 +1706,7 @@ class Vars implements Interfaces\Vars
                         }
                     }
 
-                    $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
+                    $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref);
                 }
 
                 $code = Syntax::indent_php(implode('', array_column($tokens, 1)), [
@@ -1767,7 +1778,7 @@ class Vars implements Interfaces\Vars
                             $token[1] = "replaced__construct";
                         }
 
-                        $block[] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
+                        $block[] = $resolveSymbol($token, $prev, $next, $ref);
 
                         if ($token[1] === '{') {
                             $nesting++;

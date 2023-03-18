@@ -1051,6 +1051,7 @@ class VarsTest extends AbstractTestCase
             'declare'   => static function (?Ex $e = null, $c = SR): Ex { return $e; },
             'alias'     => static function () { return [SR, Ex::class, gt(123)]; },
             'use'       => static function () use ($object) { return $object; },
+            'const'     => static function () { return [__NAMESPACE__, __DIR__, __FILE__]; },
             'arrow'     => static fn($format): string => $object->format($format),
             'bind'      => \Closure::bind(function () { return $this; }, $object),
             'internal1' => \Closure::fromCallable('strlen'),
@@ -1064,6 +1065,7 @@ class VarsTest extends AbstractTestCase
         that($closures['declare'](new \Exception('yyy')))->is(new \Exception('yyy'));
         that($closures['alias']())->is([SR, Ex::class, 'integer']);
         that($closures['use']())->is($object);
+        that($closures['const']())->is([__NAMESPACE__, __DIR__, __FILE__]);
         that($closures['arrow']('Y-m-dTH:i:s'))->is('2014-12-24T12:34:56');
         that($closures['bind']())->is($object);
         that($closures['internal1']('hoge'))->is(4);
