@@ -350,21 +350,13 @@ class Funchand implements Interfaces\Funchand
         $end = $ref->getEndLine();
         $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
 
-        $arrow = true;
         $meta = Syntax::parse_php("<?php $codeblock", [
-            'begin' => T_FN,
-            'end'   => T_DOUBLE_ARROW,
+            'begin' => [T_FN, T_FUNCTION],
+            'end'   => ['{', T_DOUBLE_ARROW],
         ]);
-        if (!$meta) {
-            $arrow = false;
-            $meta = Syntax::parse_php("<?php $codeblock", [
-                'begin' => T_FUNCTION,
-                'end'   => '{',
-            ]);
-        }
-        array_pop($meta);
+        $end = array_pop($meta);
 
-        if ($arrow) {
+        if ($end[0] === T_DOUBLE_ARROW) {
             $body = Syntax::parse_php("<?php $codeblock", [
                 'begin'  => T_DOUBLE_ARROW,
                 'end'    => [';', ',', ')'],

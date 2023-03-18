@@ -259,6 +259,18 @@ class FunchandTest extends AbstractTestCase
         }',
         ]);
 
+        $code = (callable_code)(function ($a, $b) {
+            $x = fn() => $a + $b;
+            return $x();
+        });
+        that($code)->is([
+            'function ($a, $b)',
+            '{
+            $x = fn() => $a + $b;
+            return $x();
+        }',
+        ]);
+
         $code = (callable_code)(fn($a, $b) => $a + $b);
         that($code)->is([
             'fn($a, $b)',
