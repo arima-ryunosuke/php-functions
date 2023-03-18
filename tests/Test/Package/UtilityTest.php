@@ -1129,7 +1129,13 @@ class UtilityTest extends AbstractTestCase
         that($process->stderr)->isSame('STDERR!');
 
         $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+        that($process->terminate())->isTrue();
+        $status = $process->status();
+        that($status['command'])->contains('rf-process_async.php');
+        that($status['pid'])->isInt();
+        that($status['running'])->isFalse();
 
+        $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
         unset($process);
         gc_collect_cycles();
     }

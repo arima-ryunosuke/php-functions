@@ -1371,10 +1371,13 @@ class Utility implements Interfaces\Utility
 
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
+        stream_set_read_buffer($pipes[1], 4096);
+        stream_set_read_buffer($pipes[2], 4096);
 
         return new class($proc, $pipes, $stdout, $stderr) {
             private $proc;
             private $pipes;
+            private $status;
             public  $stdout;
             public  $stderr;
 
@@ -1398,47 +1401,76 @@ class Utility implements Interfaces\Utility
             public function __invoke()
             {
                 try {
-                    while (feof($this->pipes[1]) === false || feof($this->pipes[2]) === false) {
-                        $read = [$this->pipes[1], $this->pipes[2]];
-                        $write = $except = null;
-                        if (stream_select($read, $write, $except, 1) === false) {
-                            // （システムコールが別のシグナルによって中断された場合などに起こりえます）
-                            throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
-                        }
-                        foreach ($read as $fp) {
-                            $buffer = fread($fp, 1024);
-                            if ($fp === $this->pipes[1]) {
-                                if (!is_resource($this->stdout)) {
-                                    $this->stdout .= $buffer;
-                                }
-                                else {
-                                    fwrite($this->stdout, $buffer);
-                                }
-                            }
-                            elseif ($fp === $this->pipes[2]) {
-                                if (!is_resource($this->stderr)) {
-                                    $this->stderr .= $buffer;
-                                }
-                                else {
-                                    fwrite($this->stderr, $buffer);
-                                }
-                            }
-                        }
+                    /** @noinspection PhpStatementHasEmptyBodyInspection */
+                    while ($this->update()) {
+                        // noop
                     }
                 }
                 finally {
+                    $this->status = proc_get_status($this->proc);
                     fclose($this->pipes[1]);
                     fclose($this->pipes[2]);
                     $rc = proc_close($this->proc);
                     $this->proc = null;
                 }
 
-                return $rc;
+                return $this->status['running'] ? $rc : $this->status['exitcode'];
+            }
+
+            public function update()
+            {
+                if ($this->proc === null || (feof($this->pipes[1]) && feof($this->pipes[2]))) {
+                    return false;
+                }
+
+                $read = [$this->pipes[1], $this->pipes[2]];
+                $write = $except = null;
+                if (stream_select($read, $write, $except, 1) === false) {
+                    // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                    throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
+                }
+                foreach ($read as $fp) {
+                    $buffer = fread($fp, 1024);
+                    if ($fp === $this->pipes[1]) {
+                        if (!is_resource($this->stdout)) {
+                            $this->stdout .= $buffer;
+                        }
+                        else {
+                            fwrite($this->stdout, $buffer);
+                        }
+                    }
+                    elseif ($fp === $this->pipes[2]) {
+                        if (!is_resource($this->stderr)) {
+                            $this->stderr .= $buffer;
+                        }
+                        else {
+                            fwrite($this->stderr, $buffer);
+                        }
+                    }
+                }
+                return true;
             }
 
             public function status()
             {
-                return proc_get_status($this->proc);
+                $this->update();
+                return $this->status ?? proc_get_status($this->proc);
+            }
+
+            public function terminate()
+            {
+                fclose($this->pipes[1]);
+                fclose($this->pipes[2]);
+                proc_terminate($this->proc);
+                // terminate はシグナルを送るだけなので終了を待つ（さらに SIGTERM なので終わらないかもしれないので1秒ほどで打ち切る）
+                for ($i = 0; $i < 100; $i++, usleep(10_000)) {
+                    $this->status = proc_get_status($this->proc);
+                    if (!$this->status['running']) {
+                        break;
+                    }
+                }
+                $this->proc = null;
+                return !$this->status['running'];
             }
         };
     }
