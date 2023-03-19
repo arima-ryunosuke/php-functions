@@ -812,7 +812,7 @@ class Classobj implements Interfaces\Classobj
      * ```
      *
      * @param \ReflectionFunctionAbstract|\ReflectionType|\ReflectionType[]|null $reflection_type getType 等で得られるインスタンス
-     * @return \Traversable|\ArrayAccess|\Countable|\ReflectionNamedType|\ReflectionUnionType
+     * @return \ReflectionAnyType|object
      */
     public static function reflect_types($reflection_type = null)
     {

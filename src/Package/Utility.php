@@ -1336,7 +1336,7 @@ class Utility implements Interfaces\Utility
      * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param ?string $cwd 作業ディレクトリ
      * @param ?array $env 環境変数
-     * @return callable プロセスオブジェクト
+     * @return \ProcessAsync|object プロセスオブジェクト
      */
     public static function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
     {
