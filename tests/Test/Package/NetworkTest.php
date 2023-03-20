@@ -397,6 +397,29 @@ class NetworkTest extends AbstractTestCase
         ])->wasThrown('Failed to connect');
     }
 
+    function test_http_request_nobody()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+        $response_header = null;
+        $info = null;
+
+        $response = (http_request)([
+            CURLOPT_URL     => "$server/stream-bytes/128",
+            'nobody' => true,
+        ], $response_header, $info);
+        that($response)->is('');
+        that($response_header[0])->is('HTTP/1.1 200 OK');
+        that($info['errno'])->is(CURLE_WRITE_ERROR);
+
+        that(http_request)([
+            CURLOPT_URL     => "http://0.0.0.0:801",
+            'nobody' => true,
+        ], $response_header, $info)->wasThrown('Failed to connect');
+    }
+
     function test_http_request_retry()
     {
         if (!defined('TESTWEBSERVER')) {

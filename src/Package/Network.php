@@ -549,6 +549,8 @@ class Network implements Interfaces\Network
      *
      * - `raw` (bool): curl インスタンスと変換クロージャを返すだけになる
      *     - ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず
+     * - `nobody` (bool): ヘッダーの受信が完了したらただちに処理を返す
+     *     - ボディは空文字になる（CURLOPT_NOBODY とは全く性質が異なるので注意）
      * - `throw` (bool): ステータスコードが 400 以上のときに例外を投げる
      *     - `CURLOPT_FAILONERROR` は原則使わないほうがいいと思う
      * - `retry` (float[]|callable): エラーが出た場合にリトライする
@@ -620,6 +622,7 @@ class Network implements Interfaces\Network
 
             // custom options
             'raw'                  => false,
+            'nobody'               => false,
             'throw'                => true,
             'retry'                => [],
             'atfile'               => true,
@@ -641,6 +644,16 @@ class Network implements Interfaces\Network
         if (isset($options['cookie_file'])) {
             $options[CURLOPT_COOKIEJAR] = $options['cookie_file'];
             $options[CURLOPT_COOKIEFILE] = $options['cookie_file'];
+        }
+        if ($options['nobody']) {
+            $headers = '';
+            $options[CURLOPT_HEADERFUNCTION] = function ($curl, $header) use (&$headers) {
+                if (trim($header) === '') {
+                    return -1;
+                }
+                $headers .= $header;
+                return strlen($header);
+            };
         }
 
         // ヘッダは後段の判定に頻出するので正規化して取得しておく
@@ -672,7 +685,7 @@ class Network implements Interfaces\Network
                 $info['request_header'] = Strings::str_array($info['request_header'], ':', true);
             }
 
-            if (!($options[CURLOPT_NOBODY] ?? false)) {
+            if (!($options[CURLOPT_NOBODY] ?? false) && !$options['nobody']) {
                 $content_type = Strings::split_noempty(';', $info['content_type'] ?? '');
                 if ($convert = ($options['parser'][strtolower($content_type[0] ?? '')]['response'] ?? null)) {
                     $body = $convert($body, ...$content_type);
@@ -813,7 +826,11 @@ class Network implements Interfaces\Network
         try {
             $retry_count = 0;
             do {
+                $headers = '';
                 $response = curl_exec($ch);
+                if ($options['nobody']) {
+                    $response = $headers;
+                }
                 $info = curl_getinfo($ch);
                 $info['retry'] = $retry_count++;
                 $info['errno'] = curl_errno($ch);
@@ -821,7 +838,7 @@ class Network implements Interfaces\Network
                 usleep($time * 1000 * 1000);
             } while ($time);
 
-            if ($response === false) {
+            if (!($info['errno'] === CURLE_OK || ($options['nobody'] && $info['errno'] === CURLE_WRITE_ERROR))) {
                 throw new \RuntimeException(curl_error($ch), curl_errno($ch));
             }
         }
