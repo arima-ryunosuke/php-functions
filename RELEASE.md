@@ -12,6 +12,15 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.5.9
+
+- [feature][Network] http_request にヘッダだけを取得する nobody オプションを追加
+- [fixbug][Vars] var_export3 で use 変数が増殖する不具合を修正
+- [feature][Vars] var_export3 でマジック定数の読み替え機能
+- [feature][Utility] parse_namespace で cache:null にすると更新日時を見て自動判別する機能
+- [feature][Utility] process_async の改善
+- [fixbug][Funchand] callable_code で内部の fn に反応してしまう不具合を修正
+
 ## 1.5.8
 
 - [tests] 負荷状態によってコケやすいテストに break を付与
