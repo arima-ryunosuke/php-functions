@@ -153,6 +153,24 @@ class FileSystemTest extends AbstractTestCase
             "a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
 
+        // glob モード
+        that((file_list)("$base/*/*.txt"))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}a1.txt",
+            "$base{$DS}a{$DS}a2.txt",
+        ]);
+        that((file_list)("$base/a/*.txt"))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}a1.txt",
+            "$base{$DS}a{$DS}a2.txt",
+        ]);
+        that((file_list)("$base/*/*/*.log"))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}b{$DS}ab2.log",
+        ]);
+        that((file_list)("$base/**.log"))->equalsCanonicalizing([
+            "$base{$DS}a{$DS}b{$DS}ab2.log",
+            "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
+            "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
+        ]);
+
         // 拡張子でフィルタ
         that((file_list)($base, ["extension" => "txt"]))->equalsCanonicalizing([
             "$base{$DS}a{$DS}a1.txt",
@@ -166,6 +184,8 @@ class FileSystemTest extends AbstractTestCase
             "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
             "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
+
+        that(file_list)('hoge/*', ['subpath' => 'fuga'])->wasThrown('both subpath and subpattern are specified');
     }
 
     function test_file_tree()

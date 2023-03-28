@@ -225,16 +225,32 @@ class FileSystem implements Interfaces\FileSystem
      */
     public static function file_list($dirname, $filter_condition = [])
     {
-        $dirname = FileSystem::path_normalize($dirname);
-        if (!file_exists($dirname)) {
-            return false;
-        }
-
         $filter_condition += [
             'recursive' => true,
             'relative'  => false,
             '!type'     => 'dir',
         ];
+
+        $dirname = FileSystem::path_normalize($dirname);
+
+        $subpath = '';
+        while (!is_dir($dirname)) {
+            $subpath = basename($dirname) . (strlen($subpath) ? '/' : '') . $subpath;
+            $dirname = dirname($dirname);
+        }
+
+        if (strlen($subpath)) {
+            if (strlen($filter_condition['subpath'] ?? '')) {
+                throw new \InvalidArgumentException("both subpath and subpattern are specified");
+            }
+            $filter_condition['subpath'] = $subpath;
+            $filter_condition['fnmflag'] = FNM_PATHNAME;
+        }
+
+        if (!file_exists($dirname) || $dirname === dirname($dirname)) {
+            return false;
+        }
+
         $match = FileSystem::file_matcher($filter_condition);
 
         $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
