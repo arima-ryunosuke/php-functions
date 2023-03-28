@@ -22,6 +22,7 @@ class FileSystem implements Interfaces\FileSystem
             'dotfile'    => null,  // switch startWith "."
             'unixpath'   => true,  // convert "\\" -> "/"
             'casefold'   => false, // ignore case
+            'fnmflag'    => 0,     // FNM_*
             // by getType (string or [string])
             'type'       => null,
             '!type'      => null,
@@ -37,6 +38,9 @@ class FileSystem implements Interfaces\FileSystem
             // by getPathname (glob or regex)
             'path'       => null,
             '!path'      => null,
+            // by getSubPath (glob or regex)
+            'subpath'    => null,
+            '!subpath'   => null,
             // by getPath or getSubpath (glob or regex)
             'dir'        => null,
             '!dir'       => null,
@@ -90,12 +94,14 @@ class FileSystem implements Interfaces\FileSystem
         }
 
         foreach ([
-            'path'  => null,
-            '!path' => null,
-            'dir'   => null,
-            '!dir'  => null,
-            'name'  => null,
-            '!name' => null,
+            'path'     => null,
+            '!path'    => null,
+            'subpath'  => null,
+            '!subpath' => null,
+            'dir'      => null,
+            '!dir'     => null,
+            'name'     => null,
+            '!name'    => null,
         ] as $key => $convert) {
             if (isset($filter_condition[$key])) {
                 $pattern = $filter_condition[$key];
@@ -109,9 +115,13 @@ class FileSystem implements Interfaces\FileSystem
                 }
                 else {
                     $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
-                        $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
-                        $flags = 0;
+                        if ($filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\') {
+                            $pattern = str_replace('\\', '/', $pattern);
+                            $string = str_replace('\\', '/', $string);
+                        }
+                        $flags = $filter_condition['fnmflag'];
                         $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
+                        $flags &= ~((strpos($pattern, '**') !== false) ? FNM_PATHNAME : 0);
                         return fnmatch($pattern, $string, $flags);
                     };
                 }
@@ -149,6 +159,12 @@ class FileSystem implements Interfaces\FileSystem
             }
             foreach (['path' => false, '!path' => true] as $key => $cond) {
                 if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getPathname())) {
+                    return false;
+                }
+            }
+            foreach (['subpath' => false, '!subpath' => true] as $key => $cond) {
+                $subpath = $file instanceof \RecursiveDirectoryIterator ? $file->getSubPathname() : $file->getPathname();
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($subpath)) {
                     return false;
                 }
             }
