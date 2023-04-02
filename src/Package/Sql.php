@@ -351,7 +351,10 @@ class Sql implements Interfaces\Sql
                     case "CREATE":
                     case "ALTER":
                     case "DROP":
-                        $result[] = $MARK_SP . $virttoken . $MARK_SP;
+                        if (!$beginning) {
+                            $result[] = $MARK_SP;
+                        }
+                        $result[] = $virttoken . $MARK_SP;
                         $context = $uppertoken;
                         break;
                     case "TABLE":

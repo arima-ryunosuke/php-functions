@@ -107,6 +107,11 @@ BEGIN
   END IF;
 END;
 ');
+
+        that((sql_format)('/* comment */CREATE INDEX part_of_name ON customer (name, id)'))->IsEqualTrimming('
+/* comment */
+CREATE INDEX part_of_name ON customer(name, id)
+');
     }
 
     function test_sql_format_drop()
@@ -115,7 +120,8 @@ END;
 drop table tbl
 ');
 
-        that((sql_format)('drop table IF EXISTS  tbl'))->IsEqualTrimming('
+        that((sql_format)('/* comment */drop table IF EXISTS  tbl'))->IsEqualTrimming('
+/* comment */
 drop table IF EXISTS tbl
 ');
     }
@@ -139,7 +145,8 @@ ALTER TABLE TABLE_NAME
   add CONSTRAINT fk_name FOREIGN KEY(name) REFERENCES t_other(other_name) ON UPDATE CASCADE ON DELETE CASCADE
 ');
 
-        that((sql_format)('create or replace view as select 1'))->IsEqualTrimming('
+        that((sql_format)('/* comment */create or replace view as select 1'))->IsEqualTrimming('
+/* comment */
 create or replace view as
 select
   1
