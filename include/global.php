@@ -8352,6 +8352,7 @@ if (!isset($excluded_functions["file_matcher"]) && (!function_exists("file_match
             'dotfile'    => null,  // switch startWith "."
             'unixpath'   => true,  // convert "\\" -> "/"
             'casefold'   => false, // ignore case
+            'fnmflag'    => 0,     // FNM_*
             // by getType (string or [string])
             'type'       => null,
             '!type'      => null,
@@ -8367,6 +8368,9 @@ if (!isset($excluded_functions["file_matcher"]) && (!function_exists("file_match
             // by getPathname (glob or regex)
             'path'       => null,
             '!path'      => null,
+            // by getSubPath (glob or regex)
+            'subpath'    => null,
+            '!subpath'   => null,
             // by getPath or getSubpath (glob or regex)
             'dir'        => null,
             '!dir'       => null,
@@ -8420,12 +8424,14 @@ if (!isset($excluded_functions["file_matcher"]) && (!function_exists("file_match
         }
 
         foreach ([
-            'path'  => null,
-            '!path' => null,
-            'dir'   => null,
-            '!dir'  => null,
-            'name'  => null,
-            '!name' => null,
+            'path'     => null,
+            '!path'    => null,
+            'subpath'  => null,
+            '!subpath' => null,
+            'dir'      => null,
+            '!dir'     => null,
+            'name'     => null,
+            '!name'    => null,
         ] as $key => $convert) {
             if (isset($filter_condition[$key])) {
                 $pattern = $filter_condition[$key];
@@ -8439,9 +8445,13 @@ if (!isset($excluded_functions["file_matcher"]) && (!function_exists("file_match
                 }
                 else {
                     $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
-                        $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
-                        $flags = 0;
+                        if ($filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\') {
+                            $pattern = str_replace('\\', '/', $pattern);
+                            $string = str_replace('\\', '/', $string);
+                        }
+                        $flags = $filter_condition['fnmflag'];
                         $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
+                        $flags &= ~((strpos($pattern, '**') !== false) ? FNM_PATHNAME : 0);
                         return fnmatch($pattern, $string, $flags);
                     };
                 }
@@ -8479,6 +8489,12 @@ if (!isset($excluded_functions["file_matcher"]) && (!function_exists("file_match
             }
             foreach (['path' => false, '!path' => true] as $key => $cond) {
                 if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getPathname())) {
+                    return false;
+                }
+            }
+            foreach (['subpath' => false, '!subpath' => true] as $key => $cond) {
+                $subpath = $file instanceof \RecursiveDirectoryIterator ? $file->getSubPathname() : $file->getPathname();
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($subpath)) {
                     return false;
                 }
             }
@@ -8547,16 +8563,32 @@ if (!isset($excluded_functions["file_list"]) && (!function_exists("file_list") |
      */
     function file_list($dirname, $filter_condition = [])
     {
-        $dirname = path_normalize($dirname);
-        if (!file_exists($dirname)) {
-            return false;
-        }
-
         $filter_condition += [
             'recursive' => true,
             'relative'  => false,
             '!type'     => 'dir',
         ];
+
+        $dirname = path_normalize($dirname);
+
+        $subpath = '';
+        while (!is_dir($dirname)) {
+            $subpath = basename($dirname) . (strlen($subpath) ? '/' : '') . $subpath;
+            $dirname = dirname($dirname);
+        }
+
+        if (strlen($subpath)) {
+            if (strlen($filter_condition['subpath'] ?? '')) {
+                throw new \InvalidArgumentException("both subpath and subpattern are specified");
+            }
+            $filter_condition['subpath'] = $subpath;
+            $filter_condition['fnmflag'] = FNM_PATHNAME;
+        }
+
+        if (!file_exists($dirname) || $dirname === dirname($dirname)) {
+            return false;
+        }
+
         $match = file_matcher($filter_condition);
 
         $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
@@ -14003,7 +14035,10 @@ if (!isset($excluded_functions["sql_format"]) && (!function_exists("sql_format")
                     case "CREATE":
                     case "ALTER":
                     case "DROP":
-                        $result[] = $MARK_SP . $virttoken . $MARK_SP;
+                        if (!$beginning) {
+                            $result[] = $MARK_SP;
+                        }
+                        $result[] = $virttoken . $MARK_SP;
                         $context = $uppertoken;
                         break;
                     case "TABLE":
