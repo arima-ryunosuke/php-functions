@@ -12,6 +12,12 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.5.10
+
+- [fixbug][Sql] sql_format で冒頭にコメントがあると位置がズレる不具合を修正
+- [feature][FileSystem] file_list の glob 対応
+- [feature][FileSystem] file_matcher に subpath フィルタを追加
+
 ## 1.5.9
 
 - [feature][Network] http_request にヘッダだけを取得する nobody オプションを追加
