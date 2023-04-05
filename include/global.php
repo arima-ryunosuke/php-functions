@@ -8572,7 +8572,7 @@ if (!isset($excluded_functions["file_list"]) && (!function_exists("file_list") |
         $dirname = path_normalize($dirname);
 
         $subpath = '';
-        while (!is_dir($dirname)) {
+        while (!is_dir($dirname) && str_exists(basename($dirname), ['*', '?', '!', '{', '}', '[', ']'])) {
             $subpath = basename($dirname) . (strlen($subpath) ? '/' : '') . $subpath;
             $dirname = dirname($dirname);
         }
