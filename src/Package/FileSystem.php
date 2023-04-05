@@ -234,7 +234,7 @@ class FileSystem implements Interfaces\FileSystem
         $dirname = FileSystem::path_normalize($dirname);
 
         $subpath = '';
-        while (!is_dir($dirname)) {
+        while (!is_dir($dirname) && Strings::str_exists(basename($dirname), ['*', '?', '!', '{', '}', '[', ']'])) {
             $subpath = basename($dirname) . (strlen($subpath) ? '/' : '') . $subpath;
             $dirname = dirname($dirname);
         }
