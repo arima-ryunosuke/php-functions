@@ -23476,6 +23476,7 @@ if (!isset($excluded_functions["process_async"]) && (!function_exists("ryunosuke
             private $proc;
             private $pipes;
             private $status;
+            private $destructAction;
             public  $stdout;
             public  $stderr;
 
@@ -23485,19 +23486,25 @@ if (!isset($excluded_functions["process_async"]) && (!function_exists("ryunosuke
                 $this->pipes = $pipes;
                 $this->stdout = &$stdout;
                 $this->stderr = &$stderr;
+                $this->destructAction = 'close';
             }
 
             public function __destruct()
             {
-                if ($this->proc !== null) {
-                    fclose($this->pipes[1]);
-                    fclose($this->pipes[2]);
-                    proc_close($this->proc);
+                if ($this->destructAction === 'close') {
+                    $this->__invoke();
+                }
+                if ($this->destructAction === 'terminate') {
+                    $this->terminate();
                 }
             }
 
             public function __invoke()
             {
+                if ($this->proc === null) {
+                    return $this->status['exitcode'];
+                }
+
                 try {
                     /** @noinspection PhpStatementHasEmptyBodyInspection */
                     while ($this->update()) {
@@ -23513,6 +23520,12 @@ if (!isset($excluded_functions["process_async"]) && (!function_exists("ryunosuke
                 }
 
                 return $this->status['running'] ? $rc : $this->status['exitcode'];
+            }
+
+            public function setDestructAction($action)
+            {
+                $this->destructAction = $action;
+                return $this;
             }
 
             public function update()
@@ -23557,6 +23570,10 @@ if (!isset($excluded_functions["process_async"]) && (!function_exists("ryunosuke
 
             public function terminate()
             {
+                if ($this->proc === null) {
+                    return !$this->status['running'];
+                }
+
                 fclose($this->pipes[1]);
                 fclose($this->pipes[2]);
                 proc_terminate($this->proc);
