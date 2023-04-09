@@ -1125,18 +1125,38 @@ class UtilityTest extends AbstractTestCase
         that($status['exitcode'])->isSame(-1);
 
         that($process())->isSame(123);
+        that($process())->isSame(123); // 2回呼んでも同じ値が返る
         that($process->stdout)->isSame('STDIN!');
         that($process->stderr)->isSame('STDERR!');
 
         $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
         that($process->terminate())->isTrue();
+        that($process->terminate())->isTrue(); // 2回呼んでもエラーにならない
         $status = $process->status();
         that($status['command'])->contains('rf-process_async.php');
         that($status['pid'])->isInt();
         that($status['running'])->isFalse();
 
+        file_put_contents($file, '<?php
+            for ($i=0; $i<3; $i++) {
+                sleep(1);
+            }
+        ');
+
+        // close だと3秒かかる
         $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+        $process->setDestructAction('close');
+        $time = microtime(true);
         unset($process);
+        that(microtime(true) - $time)->gte(3);
+
+        // terminate だと1秒もかからない
+        $process = (process_async)(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+        $process->setDestructAction('terminate');
+        $time = microtime(true);
+        unset($process);
+        that(microtime(true) - $time)->lte(1.5);
+
         gc_collect_cycles();
     }
 

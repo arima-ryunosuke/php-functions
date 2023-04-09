@@ -8,6 +8,8 @@ class ProcessAsync
     public string $stdout;
     public string $stderr;
 
+    public function setDestructAction($action) { }
+
     public function update() { }
 
     public function status() { }

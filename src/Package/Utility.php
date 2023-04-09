@@ -1384,6 +1384,7 @@ class Utility implements Interfaces\Utility
             private $proc;
             private $pipes;
             private $status;
+            private $destructAction;
             public  $stdout;
             public  $stderr;
 
@@ -1393,19 +1394,25 @@ class Utility implements Interfaces\Utility
                 $this->pipes = $pipes;
                 $this->stdout = &$stdout;
                 $this->stderr = &$stderr;
+                $this->destructAction = 'close';
             }
 
             public function __destruct()
             {
-                if ($this->proc !== null) {
-                    fclose($this->pipes[1]);
-                    fclose($this->pipes[2]);
-                    proc_close($this->proc);
+                if ($this->destructAction === 'close') {
+                    $this->__invoke();
+                }
+                if ($this->destructAction === 'terminate') {
+                    $this->terminate();
                 }
             }
 
             public function __invoke()
             {
+                if ($this->proc === null) {
+                    return $this->status['exitcode'];
+                }
+
                 try {
                     /** @noinspection PhpStatementHasEmptyBodyInspection */
                     while ($this->update()) {
@@ -1421,6 +1428,12 @@ class Utility implements Interfaces\Utility
                 }
 
                 return $this->status['running'] ? $rc : $this->status['exitcode'];
+            }
+
+            public function setDestructAction($action)
+            {
+                $this->destructAction = $action;
+                return $this;
             }
 
             public function update()
@@ -1465,6 +1478,10 @@ class Utility implements Interfaces\Utility
 
             public function terminate()
             {
+                if ($this->proc === null) {
+                    return !$this->status['running'];
+                }
+
                 fclose($this->pipes[1]);
                 fclose($this->pipes[2]);
                 proc_terminate($this->proc);
