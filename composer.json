@@ -39,8 +39,7 @@
     "build": [
       "@export",
       "@stub",
-      "@test",
-      "@document"
+      "@test"
     ],
     "stub": [
       "php bin/stub.php"
@@ -52,9 +51,6 @@
       "env TEST_TARGET=package   php -d short_open_tag=0 vendor/bin/phpunit --configuration=tests/phpunit.xml",
       "env TEST_TARGET=global    php -d short_open_tag=0 vendor/bin/phpunit --configuration=tests/phpunit.xml",
       "env TEST_TARGET=namespace php -d short_open_tag=1 vendor/bin/phpunit --configuration=tests/phpunit.xml"
-    ],
-    "document": [
-      "@php bin/documentize.phar generate src/Package docs --ansi --force --no-virtual --contain ryunosuke\\\\Functions\\\\Package --except ryunosuke\\\\Functions\\\\Package\\\\Interfaces --template-config docconfig.php"
     ]
   }
 }

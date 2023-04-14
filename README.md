@@ -110,5 +110,3 @@ composer subcommand として下記が定義されています。
   - src/package を元に自動生成ファイルを吐き出します
 - composer test
   - phpunit を実行します
-- composer document
-  - docs/html 以下にドキュメントを生成します
