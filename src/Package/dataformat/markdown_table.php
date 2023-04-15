@@ -1,0 +1,96 @@
+<?php
+namespace ryunosuke\Functions\Package;
+
+// @codeCoverageIgnoreStart
+require_once __DIR__ . '/../info/ansi_strip.php';
+require_once __DIR__ . '/../var/is_empty.php';
+// @codeCoverageIgnoreEnd
+
+/**
+ * 連想配列の配列を markdown テーブル文字列にする
+ *
+ * 見出しはキーの和集合で生成され、改行は `<br>` に置換される。
+ * 要素が全て数値の場合は右寄せになる。
+ *
+ * Example:
+ * ```php
+ * // 最初の "\n" に意味はない（ズレると見づらいので冒頭に足しているだけ）
+ * that("\n" . markdown_table([
+ *    ['a' => 'a1', 'b' => 'b1'],
+ *    ['b' => 'b2', 'c' => '2'],
+ *    ['a' => 'a3', 'c' => '3'],
+ * ]))->is("
+ * | a   | b   |   c |
+ * | --- | --- | --: |
+ * | a1  | b1  |     |
+ * |     | b2  |   2 |
+ * | a3  |     |   3 |
+ * ");
+ * ```
+ *
+ * @package ryunosuke\Functions\Package\dataformat
+ *
+ * @param array $array 連想配列の配列
+ * @param array $option オプション配列
+ * @return string markdown テーブル文字列
+ */
+function markdown_table($array, $option = [])
+{
+    if (!is_array($array) || is_empty($array)) {
+        throw new \InvalidArgumentException('$array must be array of hasharray.');
+    }
+
+    $option += [
+        'keylabel' => null,   // 指定すると一番左端にキーの列が生える
+        'context'  => 'html', // html:改行がbrになる（html 以外は未定義）
+    ];
+
+    $rows = [];
+    $defaults = [];
+    $numerics = [];
+    $lengths = [];
+    foreach ($array as $n => $fields) {
+        assert(is_array($fields), '$array must be array of hasharray.');
+        if ($option['keylabel'] !== null) {
+            $fields = [$option['keylabel'] => $n] + $fields;
+        }
+        if ($option['context'] === 'html') {
+            $fields = array_map(fn($v) => (array) str_replace(["\r\n", "\r", "\n"], '<br>', $v), $fields);
+        }
+        else {
+            $fields = array_map(fn($v) => explode("\n", trim($v)), $fields);
+        }
+        foreach ($fields as $k => $v) {
+            $defaults[$k] = '';
+            foreach ($v as $i => $t) {
+                $e = ansi_strip($t);
+                $rows["{$n}_{$i}"][$k] = $t;
+                $numerics[$k] = ($numerics[$k] ?? true) && (is_numeric($e) || strlen($e) === 0);
+                $lengths[$k] = max($lengths[$k] ?? 3, mb_strwidth(ansi_strip($k)), mb_strwidth($e)); // 3 は markdown の最低見出し長
+            }
+        }
+    }
+
+    $linebuilder = function ($fields, $padstr) use ($numerics, $lengths) {
+        $line = [];
+        foreach ($fields as $k => $v) {
+            $ws = str_repeat($padstr, $lengths[$k] - (mb_strwidth(ansi_strip($v))));
+            $pad = $numerics[$k] ? "$ws$v" : "$v$ws";
+            if ($padstr === '-' && $numerics[$k]) {
+                $pad[-1] = ':';
+            }
+            $line[] = $pad;
+        }
+        return '| ' . implode(' | ', $line) . ' |';
+    };
+
+    $result = [];
+
+    $result[] = $linebuilder(array_combine($keys = array_keys($defaults), $keys), ' ');
+    $result[] = $linebuilder($defaults, '-');
+    foreach ($rows as $fields) {
+        $result[] = $linebuilder(array_replace($defaults, $fields), ' ');
+    }
+
+    return implode("\n", $result) . "\n";
+}
