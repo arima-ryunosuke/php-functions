@@ -1,4 +1,7 @@
 <?php
+
+use ryunosuke\Test\Package\AbstractTestCase;
+
 /**
  * @noinspection PhpUnusedPrivateMethodInspection
  * @noinspection PhpUnusedPrivateFieldInspection
@@ -296,7 +299,7 @@ class BuiltIn implements \Countable
 {
     public function count(): int
     {
-        return (int) \ryunosuke\Functions\Package\Funchand::by_builtin($this, 'count');
+        return AbstractTestCase::resolveFunction('by_builtin')($this, 'count');
     }
 }
 

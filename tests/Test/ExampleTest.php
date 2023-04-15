@@ -10,16 +10,12 @@ class ExampleTest extends \ryunosuke\Test\AbstractTestCase
      */
     function test_all()
     {
-        if (getenv('TEST_TARGET') !== 'package') {
-            return;
-        }
-
         $header = <<<EVAL
 <?php
 namespace Example;
 
-require_once __DIR__ . '/../../include/global.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../include/global.php';
 
 defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
@@ -37,15 +33,16 @@ if (!function_exists('Example\\that')) {
 
 EVAL;
 
-        foreach (glob(__DIR__ . '/../../src/Package/*.php') as $file) {
-            preg_match_all('#```php(.*?)```.*?function (.+?)\\(#us', file_get_contents($file), $matches, PREG_SET_ORDER);
+        foreach (glob(__DIR__ . '/../../src/Package/*', GLOB_ONLYDIR) as $package) {
             $contents = '';
-            foreach ($matches as $match) {
-                $content = trim(preg_replace('#^ {5}\* ?#um', '', $match[1]));
-                $contents .= "// {$match[2]}\n(function () {\n{$content}\n})();\n\n";
+            foreach (glob("$package/*.php") as $file) {
+                if (preg_match('#```php(.*?)```#us', file_get_contents($file), $matches)) {
+                    $fn = basename($file);
+                    $content = trim(preg_replace('#^ \* ?#um', '', $matches[1]));
+                    $contents .= "// {$fn}\n(function () {\n{$content}\n})();\n\n";
+                }
             }
-
-            $exfile = __DIR__ . '/../examples/' . basename($file);
+            $exfile = __DIR__ . "/../examples/" . basename($package) . '.php';
             file_put_contents($exfile, "$header\n$contents");
             ob_start();
             include $exfile;

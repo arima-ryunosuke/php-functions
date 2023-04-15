@@ -4,6 +4,11 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../vendor/ryunosuke/phpunit-extension/inc/bootstrap.php';
 require __DIR__ . '/classes.php';
 
+require_once(__DIR__ . '/../src/Package/constants.php');
+foreach (glob(__DIR__ . '/../src/Package/*/*.php') as $fn) {
+    require_once($fn);
+}
+
 if (false) {
     define('TESTWEBSERVER', null);
     define('TESTPINGSERVER', null);
@@ -27,7 +32,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
     setlocale(LC_CTYPE, 'C');
 }
 
-\ryunosuke\PHPUnit\Actual::generateStub(__DIR__ . '/../src', __DIR__ . '/.stub');
+\ryunosuke\PHPUnit\Actual::generateStub(__DIR__ . '/../src/Transporter.php', __DIR__ . '/.stub');
 
 \ryunosuke\PHPUnit\Actual::$constraintVariations['isEqualTrimming'] = new class('') extends \ryunosuke\PHPUnit\Constraint\Composite {
     public function __construct($value, bool $ignoreCase = false)
@@ -76,28 +81,3 @@ function concat_abc_z(string $a, string $b, string $c, string ...$z)
 register_tick_function(function () {
     clearstatcache();
 });
-
-$env = getenv('TEST_TARGET') ?: 'package';
-putenv("TEST_TARGET=$env");
-switch ($env) {
-    default:
-        throw new LogicException('TEST_TARGET is not specified');
-
-    case 'global':
-        file_put_contents(__DIR__ . '/temporary/global.php', \ryunosuke\Functions\Transporter::exportGlobal());
-        require_once(__DIR__ . '/temporary/global.php');
-        assert(constant('arrayize') === 'arrayize');
-        break;
-
-    case 'namespace':
-        file_put_contents(__DIR__ . '/temporary/namespace.php', \ryunosuke\Functions\Transporter::exportNamespace('ryunosuke\\Test\\Package'));
-        require_once(__DIR__ . '/temporary/namespace.php');
-        assert(constant('ryunosuke\\Test\\Package\\arrayize') === 'ryunosuke\\Test\\Package\\arrayize');
-        break;
-
-    case 'package':
-        file_put_contents(__DIR__ . '/temporary/package.php', \ryunosuke\Functions\Transporter::exportPackage());
-        require_once(__DIR__ . '/temporary/package.php');
-        assert(constant('arrayize') === ['ryunosuke\\Functions\\Package\\Arrays', 'arrayize']);
-        break;
-}

@@ -15,5 +15,8 @@
         <include>
             <directory suffix=".php">../src</directory>
         </include>
+        <exclude>
+            <file>../src/Package/constants.php</file>
+        </exclude>
     </coverage>
 </phpunit>
