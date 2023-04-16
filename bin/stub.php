@@ -90,7 +90,7 @@ foreach (get_defined_functions(true) as $type => $functions) {
         }
         foreach ($callnames as $callname) {
             // 多重定義（他言語で言うオーバーロード）になるが、別に実行されないし phpstorm はこれでもよしなに判定してくれる
-            $anotations[strtoupper($funcname[0])][] = <<<STUB
+            $anotations[base_convert(substr(md5($reffunc->getName()), 0, 2), 16, 10) % 10][] = <<<STUB
                 /** @see \\{$reffunc->getName()}() */
                 public self \$$callname;
                 public function $callname({$V(implode(', ', $parameters))}): self { }
