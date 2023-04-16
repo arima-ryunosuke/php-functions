@@ -6,29 +6,16 @@
 class ChainObject implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable
 {
     // {annotation}
-    use ChainObjectA;
-    use ChainObjectB;
-    use ChainObjectC;
-    use ChainObjectD;
-    use ChainObjectE;
-    use ChainObjectF;
-    use ChainObjectG;
-    use ChainObjectH;
-    use ChainObjectI;
-    use ChainObjectJ;
-    use ChainObjectK;
-    use ChainObjectL;
-    use ChainObjectM;
-    use ChainObjectN;
-    use ChainObjectO;
-    use ChainObjectP;
-    use ChainObjectQ;
-    use ChainObjectR;
-    use ChainObjectS;
-    use ChainObjectT;
-    use ChainObjectU;
-    use ChainObjectV;
-    use ChainObjectW;
+    use ChainObject0;
+    use ChainObject1;
+    use ChainObject2;
+    use ChainObject3;
+    use ChainObject4;
+    use ChainObject5;
+    use ChainObject6;
+    use ChainObject7;
+    use ChainObject8;
+    use ChainObject9;
     // {/annotation}
 
     public function __invoke(): mixed { }
