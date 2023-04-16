@@ -12,6 +12,41 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.0
+
+- [*feature] mb_monospace を追加
+- [feature] var_pretty にテーブル表示する table オプションを追加
+- [feature] markdown_table に構造データが来た場合の stringify オプションを追加
+- [feature] csv_import にプレフィックスでグルーピングする grouping オプションを追加
+- [*feature] dir_diff に unixpath オプションを追加
+- [*change] dir_diff の differ の扱いを差分導出から差分検出そのものに変更
+- [*feature] file_list に unixpath オプションを追加
+- [*change] file_list でディレクトリに DIRECTORY_SEPARATOR を付与するように変更
+- [*fixbug] cp_rf で隠しファイルが対象外になっていた不具合を修正
+- [refactor] dir_diff のドキュメントが間違っていたので修正
+- [*change] file_set_tree のインターフェースを変更
+- [fixbug] rm_rf で glob が空振りしてリモートファイルを削除できない不具合を修正
+- [refactor] http_request で httpbin にアクセスしていたので修正
+- [refactor] ngram が非常に遅かったので是正
+- [feature] parse_query に独自実装を追加
+- [feature] groupsort を追加
+- [feature] strmode/strmode2oct を追加
+- [feature] mb_wordwrap を追加
+- [feature] now を追加
+- [feature] iterator_split を追加
+- [feature] iterator_join を追加
+- [feature] register_autoload_function を追加
+- [feature] include_stream を追加
+- [feature] str_diff のリソース対応とバイナリオプション
+- [feature] str_diff に split(side-by-side) 形式を追加
+- [feature] glob2regex にパスモードを追加
+- [feature] str_embed のクロージャ対応と $replaced レシーバを追加
+- [feature] var_pretty に通常配列でも折り返すオプションを追加
+- [change] sql KEYWORD がデカくて邪魔な上、定数の意味がないので関数内に移動
+- [*src] 関数毎にファイルに分割
+  - 関数名定数が無くなった
+  - クラス経由の直接呼び出しができなくなった
+
 ## 1.5.12
 
 - [feature][Utility] process_async で終了処理の変更と何度でも終了処理が呼べるように修正
