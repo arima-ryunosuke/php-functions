@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+$verbose = in_array('-v', $argv) || in_array('--verbose', $argv);
 
 function buildChild(\DOMElement $parent, $xpathes)
 {
@@ -70,7 +71,7 @@ $workXml = "$BASEDIR/.idea/workspace.xml";
 if (!file_exists($workXml)) {
     exit(0);
 }
-$version = (function ($filename) use ($dom, $BASEDIR) {
+$version = (function ($filename) use ($verbose, $dom, $BASEDIR) {
     $dom->load($filename);
     $node = buildChild($dom->documentElement, 'component[@name="ExcludedPharFiles"]/excludedPaths');
 
@@ -81,10 +82,17 @@ $version = (function ($filename) use ($dom, $BASEDIR) {
         }
         return true;
     });
+    $count = 0;
     foreach ($pathes as $fullpath => $subpath) {
+        $count++;
         $value = "\$PROJECT_DIR$/vendor/ryunosuke/$subpath/";
-        echo "$fullpath was excluded (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        if ($verbose) {
+            echo "$fullpath was excluded (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        }
         $targets[$value] = true;
+    }
+    if (!$verbose) {
+        echo "$count files were excluded.\n";
     }
     foreach ($targets as $target => $true) {
         appendChild($node, 'path', ['value' => $target]);
@@ -104,12 +112,15 @@ if (!file_exists($miscXml)) {
 XML
     );
 }
-(function ($filename) use ($dom, $BASEDIR, $devMode) {
+(function ($filename) use ($verbose, $dom, $BASEDIR, $devMode) {
     $dom->load($filename);
     $node = buildChild($dom->documentElement, 'component[@name="ProjectPlainTextFileTypeManager"]');
 
     $targets = array_fill_keys(removeChildren($node, 'url'), true);
     $pathes = each_files("$BASEDIR/vendor/ryunosuke", function (\RecursiveDirectoryIterator $it) use ($devMode) {
+        if (fnmatch('functions/src/Package/*.php', str_replace('\\', '/', $it->getSubPathname()), FNM_NOESCAPE)) {
+            return true;
+        }
         if ($it->getExtension() !== 'php') {
             return false;
         }
@@ -121,10 +132,17 @@ XML
         }
         return true;
     });
+    $count = 0;
     foreach ($pathes as $fullpath => $subpath) {
+        $count++;
         $value = "file://\$PROJECT_DIR$/vendor/ryunosuke/$subpath";
-        echo "$fullpath was mark as text (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        if ($verbose) {
+            echo "$fullpath was marked as text (" . (isset($targets[$value]) ? 'already' : 'added') . ").\n";
+        }
         $targets[$value] = true;
+    }
+    if (!$verbose) {
+        echo "$count files were marked as text.\n";
     }
     foreach ($targets as $target => $true) {
         appendChild($node, 'file', ['url' => $target]);
