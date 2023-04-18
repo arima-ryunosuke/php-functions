@@ -72,18 +72,19 @@ require_once __DIR__ . '/../var/is_primitive.php';
 function var_pretty($value, $options = [])
 {
     $options += [
-        'minify'    => false, // 短縮形で返す（実質的には情報を減らして1行で返す）
-        'indent'    => 2,     // インデントの空白数
-        'context'   => null,  // html なコンテキストか cli なコンテキストか
-        'return'    => false, // 値を戻すか出力するか
-        'trace'     => false, // スタックトレースの表示
-        'callback'  => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
-        'debuginfo' => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
-        'maxcolumn' => null,  // 1行あたりの文字数
-        'maxcount'  => null,  // 複合型の要素の数
-        'maxdepth'  => null,  // 複合型の深さ
-        'maxlength' => null,  // スカラー・非複合配列の文字数
-        'limit'     => null,  // 最終出力の文字数
+        'minify'        => false, // 短縮形で返す（実質的には情報を減らして1行で返す）
+        'indent'        => 2,     // インデントの空白数
+        'context'       => null,  // html なコンテキストか cli なコンテキストか
+        'return'        => false, // 値を戻すか出力するか
+        'trace'         => false, // スタックトレースの表示
+        'callback'      => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
+        'debuginfo'     => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
+        'maxcolumn'     => null,  // 1行あたりの文字数
+        'maxcount'      => null,  // 複合型の要素の数
+        'maxdepth'      => null,  // 複合型の深さ
+        'maxlength'     => null,  // スカラー・非複合配列の文字数
+        'maxlistcolumn' => 120,   // 通常配列を1行化する文字数
+        'limit'         => null,  // 最終出力の文字数
     ];
 
     if ($options['context'] === null) {
@@ -285,7 +286,7 @@ function var_pretty($value, $options = [])
                 $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
                 $key = null;
-                if ($primitive_only && $this->options['maxlength']) {
+                if ($primitive_only) {
                     $lengths = [];
                     foreach ($value as $k => $v) {
                         if ($assoc) {
@@ -295,12 +296,18 @@ function var_pretty($value, $options = [])
                             $lengths[] = strlen($this->string($v)) + 2;
                         }
                     }
-                    while (count($lengths) > 0 && array_sum($lengths) > $this->options['maxlength']) {
-                        $middle = (int) (count($lengths) / 2);
-                        $unpos = fn($v, $k, $n) => $n === $middle;
-                        array_unset($value, $unpos);
-                        array_unset($lengths, $unpos);
-                        $key = (int) (count($lengths) / 2);
+                    if ($this->options['maxlength']) {
+                        while (count($lengths) > 0 && array_sum($lengths) > $this->options['maxlength']) {
+                            $middle = (int) (count($lengths) / 2);
+                            $unpos = fn($v, $k, $n) => $n === $middle;
+                            array_unset($value, $unpos);
+                            array_unset($lengths, $unpos);
+                            $key = (int) (count($lengths) / 2);
+                        }
+                    }
+                    // 要素が1つなら複数行化するメリットがないので2以上とする
+                    if (count($lengths) >= 2 && ($this->options['maxlistcolumn'] ?? PHP_INT_MAX) <= array_sum($lengths)) {
+                        $assoc = !$this->options['minify'] && true;
                     }
                 }
 

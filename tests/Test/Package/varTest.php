@@ -1118,23 +1118,12 @@ class varTest extends AbstractTestCase
             'C'     => $closure,
             'c1'    => [$sclosure, $sclosure],
             'R'     => STDOUT,
-            'deep'  => [[[[[[[[['X']]]]]]]]],
-            'more1' => range(1, 20),
-            'more2' => array_combine(range(1, 20), range(1, 20)),
-            'more3' => array_fill_keys(range(0, 19), 'ssssssssss'),
-            'more4' => str_repeat('ssssssssss', 32),
-            'more5' => [str_repeat('long-string', 64)],
-            'more6' => ['x' => str_repeat('long-string', 64)],
             'empty' => [],
         ];
         that(var_pretty($value, [
-            'context'   => 'plain',
-            'return'    => true,
-            'maxcolumn' => 80,
-            'maxdepth'  => 5,
-            'maxcount'  => 16,
-            'maxlength' => 128,
-            'trace'     => 3,
+            'context' => 'plain',
+            'return'  => true,
+            'trace'   => 3,
         ]))
             ->stringContains(__FILE__)
             ->stringContains("  0: stdClass#")
@@ -1147,14 +1136,70 @@ class varTest extends AbstractTestCase
             ->stringContains("    Closure@")
             ->stringContains("    Closure@")
             ->stringContains("  R: Resource id #2 of type (stream)")
-            ->stringContains("          (too deep)")
-            ->stringContains("  more1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16\n\t   (more 4 elements)]")
-            ->stringContains("    (more 4 elements)")
-            ->stringContains(", \n\t  ...(too length)..., ")
-            ->stringContains("s...(too length)...s")
-            ->stringContains("  more5: [...(too length)..., ]")
-            ->stringContains("  more6: {\n    ...")
             ->stringContains("  empty: []");
+
+        that(var_pretty([
+            'list' => [str_repeat('s', 20), str_repeat('s', 20)],
+            'hash' => ['a' => str_repeat('s', 20), 'b' => str_repeat('s', 20)],
+        ], [
+            'context'   => 'plain',
+            'return'    => true,
+            'maxcolumn' => 30,
+        ]))
+            ->stringContains('	  "ssss');
+
+        that(var_pretty([
+            'list' => range(1, 10),
+            'hash' => array_combine(range(1, 10), range(1, 10)),
+        ], [
+            'context'  => 'plain',
+            'return'   => true,
+            'maxcount' => 5,
+        ]))
+            ->stringContains('  list: [1, 2, 3, 4, 5 (more 5 elements)],')
+            ->stringContains('    (more 5 elements)');
+
+        that(var_pretty([
+            'list' => [[[[[[[[['Z']]]]]]]]],
+            'hash' => ['a' => ['b' => ['c' => ['d' => ['e' => ['f' => ['g' => ['h' => ['i' => 'Z']]]]]]]]],
+        ], [
+            'context'  => 'plain',
+            'return'   => true,
+            'maxdepth' => 5,
+        ]))
+            ->stringContains('          (too deep),')
+            ->stringContains('          d: (too deep),');
+
+        that(var_pretty([
+            'list1'  => [str_repeat('s', 10)],
+            'list2'  => [str_repeat('s', 20), str_repeat('s', 20)],
+            'list5'  => [str_repeat('s', 50)],
+            'hash1'  => ['a' => str_repeat('s', 10), 'b' => str_repeat('s', 10)],
+            'hash2'  => ['a' => str_repeat('d', 20), 'b' => str_repeat('d', 20)],
+            'string' => str_repeat('s', 40),
+        ], [
+            'context'   => 'plain',
+            'return'    => true,
+            'maxlength' => 30,
+        ]))
+            ->stringContains('  list1: ["ssssssssss"],')
+            ->stringContains('  list2: [...(too length)..., "ssssssssssssssssssss"],')
+            ->stringContains('  list5: [...(too length)..., ],')
+            ->stringContains('    ...(too length)...,')
+            ->stringContains('    a: "ssssssssss",')
+            ->stringNotContains('    a: "dddddddddd",')
+            ->stringContains('  string: "ssssss...(too length)...ssssss",');
+
+        that(var_pretty([
+            'list' => [str_repeat('s', 20), str_repeat('s', 20)],
+            'hash' => ['a' => str_repeat('s', 20), 'b' => str_repeat('s', 20)],
+        ], [
+            'context'       => 'plain',
+            'return'        => true,
+            'maxlistcolumn' => 30,
+        ]))
+            ->stringContains('    "ssssssssssssssssssss",')
+            ->stringContains('    a: "ssssssssssssssssssss",');
 
         that(var_pretty($value, [
             'context' => 'plain',
