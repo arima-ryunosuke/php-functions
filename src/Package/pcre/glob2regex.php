@@ -4,12 +4,13 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../strings/strpos_escaped.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
+require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
 /**
  * glob 記法を正規表現に変換する
  *
- * glob/fnmatch における「パスとしてのマッチ（ディレクトリ区切りの特別扱い）」という性質は失われ、あくまで文字列として扱う。
+ * 原則的に glob/fnmatch における「パスとしてのマッチ（ディレクトリ区切りの特別扱い）」という性質は失われ、あくまで文字列として扱う。
  * サポートしている記法は下記（ https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%AD%E3%83%96 ）。
  * - `*`: 0文字以上の任意の文字列にマッチ
  * - `?`: 任意の1文字にマッチ
@@ -18,6 +19,12 @@ require_once __DIR__ . '/../strings/strtr_escaped.php';
  * - `[0-9]`: 括弧内で指定された範囲内の1文字にマッチ
  * - `[!0-9]`: 括弧内で指定されていない範囲内の1文字にマッチ
  * - `{a,b,c}`: 「a」、「b」あるいは「c」のいずれかにマッチ（要 GLOB_BRACE）
+ *
+ * GLOB_RECURSIVE を与えた場合、挙動が下記のように変化する。
+ * - `*`: "/" を含まない0文字以上の文字列にマッチ
+ * - `**`: "/" を含む任意の0文字以上の文字列にマッチ
+ *
+ * いわゆる double star での再帰パターンのためだが、ディレクトリセパレータは "/" 固定とする（glob の "\" エスケープと絡んで非常にややこしいため）。
  *
  * Example:
  * ```php
@@ -48,12 +55,22 @@ require_once __DIR__ . '/../strings/strtr_escaped.php';
  *     7 => 'test.jpg',
  *     8 => 'test.jpeg',
  * ]);
+ * // 深い階層を含めたすべての png にマッチ（GLOB_RECURSIVE 使用）
+ * that(preg_grep('#^' . glob2regex('/**.png', GLOB_RECURSIVE) . '$#', [
+ *     '/path/a.png',
+ *     '/path/to/b.png',
+ *     '/path/to/dir/c.png',
+ * ]))->isSame([
+ *     '/path/a.png',
+ *     '/path/to/b.png',
+ *     '/path/to/dir/c.png',
+ * ]);
  * ```
  *
  * @package ryunosuke\Functions\Package\pcre
  *
  * @param string $pattern glob パターン文字列
- * @param int $flags glob フラグ。現在のところ GLOB_BRACE だけが有効
+ * @param int $flags glob フラグ
  * @return string 正規表現パターン文字列
  */
 function glob2regex($pattern, $flags = 0)
@@ -86,6 +103,11 @@ function glob2regex($pattern, $flags = 0)
         //'-' => '\\-',
         '#'  => '\\#',
     ];
+
+    if ($flags & GLOB_RECURSIVE) {
+        $replacer['**'] = '.*';
+        $replacer['*'] = '[^/]*';
+    }
 
     if (!($flags & GLOB_BRACE)) {
         $replacer += [

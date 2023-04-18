@@ -42,6 +42,9 @@ const JP_ERA = [
     ],
 ];
 
+/** glob 系関数で ** を有効にするか */
+const GLOB_RECURSIVE = 1 << 16;
+
 /** json_*** 関数で $depth 引数を表す定数 */
 const JSON_MAX_DEPTH = -1;
 

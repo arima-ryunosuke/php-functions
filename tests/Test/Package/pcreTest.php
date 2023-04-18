@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\preg_capture;
 use function ryunosuke\Functions\Package\preg_matches;
 use function ryunosuke\Functions\Package\preg_replaces;
 use function ryunosuke\Functions\Package\preg_splice;
+use const ryunosuke\Functions\Package\GLOB_RECURSIVE;
 
 class pcreTest extends AbstractTestCase
 {
@@ -17,47 +18,57 @@ class pcreTest extends AbstractTestCase
         that(glob2regex('noclose brace{jp{e,\\}g,png', GLOB_BRACE))->is('noclose brace{jp{e,\\}g,png');
 
         $cases = [
-            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'Atest.jpgZ', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => '*.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 't*.*jp', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => '*', 'flags' => 0],
+            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'Atest.jpgZ', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => '*.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 't*.*jp', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => '*', 'flags' => 0, 'Az' => false],
 
-            ['expected' => 1, 'haystack' => 'test1.jpg', 'pattern' => 'test?.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test2.jpg', 'pattern' => 'test?.jpg', 'flags' => 0],
-            ['expected' => 0, 'haystack' => 'test33.jpg', 'pattern' => 'test?.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test33.jpg', 'pattern' => 'test??.jpg', 'flags' => 0],
+            ['expected' => 1, 'haystack' => 'test1.jpg', 'pattern' => 'test?.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test2.jpg', 'pattern' => 'test?.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test33.jpg', 'pattern' => 'test?.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test33.jpg', 'pattern' => 'test??.jpg', 'flags' => 0, 'Az' => false],
 
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[t].jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[At].jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[tZ].jpg', 'flags' => 0],
-            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'tes[AZ].jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[!AZ].jpg', 'flags' => 0],
-            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'tes[!AtZ].jpg', 'flags' => 0],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[t].jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[At].jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[tZ].jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'tes[AZ].jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes[!AZ].jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'tes[!AtZ].jpg', 'flags' => 0, 'Az' => false],
 
-            ['expected' => 0, 'haystack' => 'test.jpeg', 'pattern' => 'test.jp{e,}g', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'test.jpeg', 'pattern' => 'test.jp{e,}g', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test.jp{e,}g', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test{.jpg,.gif,.png}', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test.{jpg,gif,png}', 'flags' => GLOB_BRACE],
-            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'test.{bmp,gif,png}', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => '{test.jpg,test.gif,test.png}', 'flags' => GLOB_BRACE],
-            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => '{test.bmp,test.gif,test.png}', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test11.jpg', 'pattern' => 'test{??.jpg,??.gif,??.png}', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test11.jpg', 'pattern' => 'test{??.jpg,?.gif,???.png}', 'flags' => GLOB_BRACE],
-            ['expected' => 0, 'haystack' => 'test11.jpg', 'pattern' => 'test{?.jpg,??.gif,???.png}', 'flags' => GLOB_BRACE],
-            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes{[At].jpg,[t].gif,[t].png}', 'flags' => GLOB_BRACE],
-            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'tes{[A].jpg,[t].gif,[t].png}', 'flags' => GLOB_BRACE],
+            ['expected' => 0, 'haystack' => 'test.jpeg', 'pattern' => 'test.jp{e,}g', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpeg', 'pattern' => 'test.jp{e,}g', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test.jp{e,}g', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test{.jpg,.gif,.png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'test.{jpg,gif,png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'test.{bmp,gif,png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => '{test.jpg,test.gif,test.png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => '{test.bmp,test.gif,test.png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test11.jpg', 'pattern' => 'test{??.jpg,??.gif,??.png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test11.jpg', 'pattern' => 'test{??.jpg,?.gif,???.png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test11.jpg', 'pattern' => 'test{?.jpg,??.gif,???.png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'test.jpg', 'pattern' => 'tes{[At].jpg,[t].gif,[t].png}', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'test.jpg', 'pattern' => 'tes{[A].jpg,[t].gif,[t].png}', 'flags' => GLOB_BRACE, 'Az' => false],
 
-            ['expected' => 1, 'haystack' => 'te\\st.jpg', 'pattern' => 'te\\\\st.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'te{}st.jpg', 'pattern' => 'te{}st.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'te\\{\\}st.jpg', 'pattern' => 'te\\\\{\\\\}st.jpg', 'flags' => 0],
-            ['expected' => 1, 'haystack' => 'te\\{\\}st.jpg', 'pattern' => 'te\\\\\\{\\\\\\}st.jpg', 'flags' => GLOB_BRACE],
-            ['expected' => 0, 'haystack' => 'te\\{\\}st.jpg', 'pattern' => 'te\\\\{\\\\}st.jpg', 'flags' => GLOB_BRACE],
+            ['expected' => 1, 'haystack' => 'te\\st.jpg', 'pattern' => 'te\\\\st.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'te{}st.jpg', 'pattern' => 'te{}st.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'te\\{\\}st.jpg', 'pattern' => 'te\\\\{\\\\}st.jpg', 'flags' => 0, 'Az' => false],
+            ['expected' => 1, 'haystack' => 'te\\{\\}st.jpg', 'pattern' => 'te\\\\\\{\\\\\\}st.jpg', 'flags' => GLOB_BRACE, 'Az' => false],
+            ['expected' => 0, 'haystack' => 'te\\{\\}st.jpg', 'pattern' => 'te\\\\{\\\\}st.jpg', 'flags' => GLOB_BRACE, 'Az' => false],
+
+            ['expected' => 1, 'haystack' => '/path/to/test.jpg', 'pattern' => '/*/test.jpg', 'flags' => 0, 'Az' => true],
+            ['expected' => 0, 'haystack' => '/path/to/test.jpg', 'pattern' => '/*/test.jpg', 'flags' => GLOB_RECURSIVE, 'Az' => true],
+            ['expected' => 1, 'haystack' => '/path/to/test.jpg', 'pattern' => '/**/test.jpg', 'flags' => GLOB_RECURSIVE, 'Az' => true],
+            ['expected' => 1, 'haystack' => '/path/to/test.jpg', 'pattern' => '/**.jpg', 'flags' => GLOB_RECURSIVE, 'Az' => true],
+            ['expected' => 1, 'haystack' => '/path/to/.test.jpg', 'pattern' => '/**/.test.jpg', 'flags' => GLOB_RECURSIVE, 'Az' => true],
+            ['expected' => 1, 'haystack' => '/path/to/dir/', 'pattern' => '/**/dir/', 'flags' => GLOB_RECURSIVE, 'Az' => true],
         ];
 
         foreach ($cases as $case) {
             $regexp = glob2regex($case['pattern'], $case['flags']);
+            if ($case['Az']) {
+                $regexp = "\\A$regexp\\z";
+            }
             that(preg_match("#$regexp#", $case['haystack']))->as("{$case['pattern']} => $regexp")->is($case['expected']);
         }
     }
