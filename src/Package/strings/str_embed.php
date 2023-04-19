@@ -10,9 +10,10 @@ require_once __DIR__ . '/../var/arrayval.php';
  * エスケープ付きで文字列を置換する
  *
  * $replacemap で from -> to 文字列を指定する。
- * to は文字列と配列を受け付ける。
+ * to は文字列と配列とクロージャを受け付ける。
  * 文字列の場合は普通に想起される動作で単純な置換となる。
  * 配列の場合は順次置換していく。要素が足りなくなったら例外を投げる。
+ * クロージャの場合は(from, from 内の連番, トータル置換回数)でコールバックされる。null を返すと置換されない。
  *
  * strtr と同様、最も長いキーから置換を行い、置換後の文字列は対象にならない。
  *
@@ -30,6 +31,11 @@ require_once __DIR__ . '/../var/arrayval.php';
  *     'a' => 'A',          // 全ての a が A になる
  *     'b' => ['B1', 'B2'], // 1番目の b が B1, 2番目の b が B2 になる
  * ]))->isSame('A, A, B1, B2');
+ * // クロージャを渡すと(from, from 内の連番, トータル置換回数)でコールバックされる
+ * that(str_embed('a, a, b, b', [
+ *     'a' => fn($src, $n, $l) => "$src,$n,$l",
+ *     'b' => fn($src, $n, $l) => null,
+ * ]))->isSame('a,0,0, a,1,1, b, b');
  * // 最も重要な性質として "' で囲まれていると対象にならない
  * that(str_embed('a, "a", b, "b", b', [
  *     'a' => 'A',
@@ -43,9 +49,10 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param array $replacemap 置換文字列
  * @param string|array $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
  * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
+ * @param ?array $replaced 置換されたペアがタプルで格納される
  * @return string 置換された文字列
  */
-function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\')
+function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\', &$replaced = null)
 {
     assert(is_iterable($replacemap));
 
@@ -55,6 +62,8 @@ function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\')
     $replacemap = arrayval($replacemap, false);
     uksort($replacemap, fn($a, $b) => strlen($b) - strlen($a));
     $srcs = array_keys($replacemap);
+
+    $replaced = [];
 
     $counter = array_fill_keys(array_keys($replacemap), 0);
     for ($i = 0; $i < strlen($string); $i++) {
@@ -69,13 +78,20 @@ function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\')
                 throw new \InvalidArgumentException("src length is 0.");
             }
             if (substr_compare($string, $src, $i, $srclen) === 0) {
+                $n = $counter[$src]++;
+                if ($dst instanceof \Closure) {
+                    $dst = $dst($src, $n, count($replaced));
+                    if ($dst === null) {
+                        continue;
+                    }
+                }
                 if (is_array($dst)) {
-                    $n = $counter[$src]++;
                     if (!isset($dst[$n])) {
                         throw new \InvalidArgumentException("notfound search string '$src' of {$n}th.");
                     }
                     $dst = $dst[$n];
                 }
+                $replaced[] = [$src, $dst];
                 $string = substr_replace($string, $dst, $i, $srclen);
                 $i += strlen($dst) - 1;
                 break;

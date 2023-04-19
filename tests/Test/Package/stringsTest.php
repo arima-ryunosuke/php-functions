@@ -1025,10 +1025,19 @@ that is <del>a</del><ins>the</ins> pen
             'hello' => 'HELLO',
             'world' => 'WORLD',
         ]))->is('HELLO, WORLD and "hello", \'world\' and \\"HELLO, \\\'WORLD');
+
+        // 配列指定
         that(str_embed($string, [
             'hello' => ['hello1', 'hello2'],
             'world' => ['world1', 'world2'],
         ]))->is('hello1, world1 and "hello", \'world\' and \\"hello2, \\\'world2');
+
+        // クロージャ指定
+        that(str_embed($string, [
+            'hello' => fn($src, $n, $l) => strtoupper($src) . ":$n,$l",
+            'world' => fn($src, $n, $l) => strtoupper($src) . ":$n,$l",
+            'and'   => fn() => null,
+        ]))->is('HELLO:0,0, WORLD:0,1 and "hello", \'world\' and \\"HELLO:1,2, \\\'WORLD:1,3');
 
         // 隣り合う境界
         that(str_embed('aaaaa', [
