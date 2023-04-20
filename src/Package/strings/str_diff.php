@@ -2,6 +2,9 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/array_zip.php';
+require_once __DIR__ . '/../strings/mb_str_pad.php';
+require_once __DIR__ . '/../strings/mb_wordwrap.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -16,6 +19,8 @@ namespace ryunosuke\Functions\Package;
  * - context: コンテキスト形式（context=3 のような形式で diff の -C 3 に相当する）
  * - unified: ユニファイド形式（unified=3 のような形式で diff の -U 3 に相当する）
  *     - unified のみを指定するとヘッダを含まない +- のみの差分を出す
+ * - split: サイドバイサイド形式（split=3,120 のような形式で diff の -y -W 120 に相当する）
+ *     - diff -y と互換性はなく、あくまでそれっぽくしているのみ
  * - html: ins, del の html タグ形式
  *     - html=perline とすると行レベルでの差分も出す
  *
@@ -129,6 +134,11 @@ function str_diff($xstring, $ystring, $options = [])
             if (is_string($stringfy) && preg_match('#unified(=(\d+))?#', $stringfy, $m)) {
                 $block_size = isset($m[2]) ? (int) $m[2] : null;
                 $stringfy = fn($diff) => $this->unified($diff, $block_size);
+            }
+            if (is_string($stringfy) && preg_match('#split(=(\d+),?(\d+)?)?#', $stringfy, $m)) {
+                $block_size = (int) ($m[2] ?? 3);
+                $column_size = (int) ($m[3] ?? 100);
+                $stringfy = fn($diff) => $this->split($diff, $column_size);
             }
             if (is_string($stringfy) && preg_match('#html(=(.+))?#', $stringfy, $m)) {
                 $mode = $m[2] ?? null;
@@ -409,6 +419,32 @@ function str_diff($xstring, $ystring, $options = [])
             foreach ($diffs as $diff) {
                 foreach ($rule[$diff[0]] as $n => $sign) {
                     $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                }
+            }
+            return implode("\n", $result);
+        }
+
+        private function split($diffs, $column_size)
+        {
+            $columns = floor(($column_size - 3) / 2);
+
+            $result = [];
+
+            $rules = [
+                '+' => ['>', 1 => null, 2 => 2],
+                '-' => ['<', 1 => 1, 2 => null],
+                '*' => ['*', 1 => 1, 2 => 2],
+                '=' => ['|', 1 => 1, 2 => 2],
+            ];
+            foreach ($diffs as $diff) {
+                $rule = $rules[$diff[0]];
+                foreach (array_zip($diff[$rule[1]] ?? [], $diff[$rule[2]] ?? []) as $d) {
+                    $d0 = mb_wordwrap($d[0] ?? '', $columns, null);
+                    $d1 = mb_wordwrap($d[1] ?? '', $columns, null);
+                    foreach (array_zip($d0, $d1) as $n => $dd) {
+                        $gutter = $n === 0 ? $rule[0] : " ";
+                        $result[] = mb_str_pad($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
+                    }
                 }
             }
             return implode("\n", $result);

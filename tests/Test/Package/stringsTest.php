@@ -838,15 +838,26 @@ zero is index 0.
 
     function test_str_diff()
     {
-        that(str_diff("e\nd\ne\ne\nc", "e\ne\na\ne\nC", ['stringify' => null]))->is(
-            [
-                ['=', ['e'], ['e'],],
-                ['-', [1 => 'd'], 0,],
-                ['=', [2 => 'e'], [1 => 'e'],],
-                ['+', 2, [2 => 'a'],],
-                ['=', [3 => 'e'], [3 => 'e'],],
-                ['*', [4 => 'c'], [4 => 'C'],],
-            ]);
+        that(str_diff("e\nd\ne\ne\nc", "e\ne\na\ne\nC", ['stringify' => null]))->is([
+            ['=', ['e'], ['e'],],
+            ['-', [1 => 'd'], 0,],
+            ['=', [2 => 'e'], [1 => 'e'],],
+            ['+', 2, [2 => 'a'],],
+            ['=', [3 => 'e'], [3 => 'e'],],
+            ['*', [4 => 'c'], [4 => 'C'],],
+        ]);
+
+        that(str_diff("同\n左\n同\n同\n異1\n長い行長い行長い行長い行", "同\n同\n右\n同\n異2\n長い行長い行長い行長い行", ['stringify' => 'split=10,32']))->is(<<<SIDEBYSIDE
+            同             | 同
+            左             < 
+            同             | 同
+                           > 右
+            同             | 同
+            異1            * 異2
+            長い行長い行長 | 長い行長い行長
+            い行長い行       い行長い行
+            SIDEBYSIDE
+        );
 
         that(str_diff("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']))->is('e
 <del>d</del>
