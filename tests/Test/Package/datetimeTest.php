@@ -10,6 +10,7 @@ use function ryunosuke\Functions\Package\date_interval;
 use function ryunosuke\Functions\Package\date_interval_second;
 use function ryunosuke\Functions\Package\date_timestamp;
 use function ryunosuke\Functions\Package\date_validate;
+use function ryunosuke\Functions\Package\now;
 
 class datetimeTest extends AbstractTestCase
 {
@@ -576,5 +577,13 @@ class datetimeTest extends AbstractTestCase
         // text
         that(date_validate('May 20th, 2021', 'F jS, Y'))->is(true);
         that(date_validate('Thursday, May 20th, 2021', 'l, F jS, Y'))->is(true);
+    }
+
+    function test_now()
+    {
+        $now = now();
+        usleep(1000_00);
+        that(now())->is($now);
+        that(now(false))->isNot($now);
     }
 }
