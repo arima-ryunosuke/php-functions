@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\iterator_chunk;
+use function ryunosuke\Functions\Package\iterator_join;
 
 class iteratorTest extends AbstractTestCase
 {
@@ -55,5 +56,32 @@ class iteratorTest extends AbstractTestCase
 
         $gens = iterator_chunk($data, 0);
         that($gens)->send(null)->wasThrown('$length must be');
+    }
+
+    function test_iterator_join()
+    {
+        that(iterator_to_array(iterator_join([
+            ['A'],
+            new \ArrayIterator(['B']),
+            (fn() => yield 'C')(),
+        ], false)))->is(['A', 'B', 'C']);
+
+        that(iterator_to_array(iterator_join([
+            ['A'],
+            new \ArrayIterator(['B']),
+            (fn() => yield 'C')(),
+        ], true)))->is(['C']);
+
+        that(iterator_to_array(iterator_join([
+            ['a' => 'A'],
+            new \ArrayIterator(['b' => 'B']),
+            (fn() => yield 'c' => 'C')(),
+        ], false)))->is(['A', 'B', 'C']);
+
+        that(iterator_to_array(iterator_join([
+            ['a' => 'A'],
+            new \ArrayIterator(['b' => 'B']),
+            (fn() => yield 'c' => 'C')(),
+        ], true)))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
     }
 }
