@@ -30,10 +30,11 @@ function ngram($string, $N, $encoding = 'UTF-8')
         $encoding = mb_internal_encoding();
     }
 
-    $result = [];
-    for ($i = 0, $l = mb_strlen($string, $encoding); $i < $l; ++$i) {
-        $result[] = mb_substr($string, $i, $N, $encoding);
-    }
+    $chars = mb_str_split($string, 1, $encoding);
 
+    $result = [];
+    foreach ($chars as $i => $char) {
+        $result[] = implode('', array_slice($chars, $i, $N));
+    }
     return $result;
 }
