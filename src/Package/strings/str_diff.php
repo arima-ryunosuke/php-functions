@@ -10,8 +10,9 @@ require_once __DIR__ . '/../strings/mb_wordwrap.php';
 /**
  * テキストの diff を得る
  *
- * `$options['iignore-case'] = true` で大文字小文字を無視する。
- * `$options['ignore-space-change'] = true` 空白文字の数を無視する。
+ * `$options['allow-binary']` でバイナリ文字列の扱いを指定する（false: 例外, null: null を返す）。
+ * `$options['ignore-case'] = true` で大文字小文字を無視する。
+ * `$options['ignore-space-change'] = true` で空白文字の数を無視する。
  * `$options['ignore-all-space'] = true` ですべての空白文字を無視する
  * `$options['stringify']` で差分データを文字列化するクロージャを指定する。
  *
@@ -85,10 +86,10 @@ require_once __DIR__ . '/../strings/mb_wordwrap.php';
  *
  * @package ryunosuke\Functions\Package\strings
  *
- * @param string|array $xstring 元文字列
- * @param string|array $ystring 比較文字列
+ * @param string|array|resource $xstring 元文字列
+ * @param string|array|resource $ystring 比較文字列
  * @param array $options オプション配列
- * @return string|array 差分テキスト。 stringify が null の場合は raw な差分配列
+ * @return string|array|null 差分テキスト。 stringify が null の場合は raw な差分配列
  */
 function str_diff($xstring, $ystring, $options = [])
 {
@@ -98,6 +99,7 @@ function str_diff($xstring, $ystring, $options = [])
         public function __construct($options)
         {
             $options += [
+                'allow-binary'        => true,
                 'ignore-case'         => false,
                 'ignore-space-change' => false,
                 'ignore-all-space'    => false,
@@ -108,17 +110,46 @@ function str_diff($xstring, $ystring, $options = [])
 
         public function __invoke($xstring, $ystring)
         {
-            $xstring = is_array($xstring) ? array_values($xstring) : preg_split('#\R#u', $xstring);
-            $ystring = is_array($ystring) ? array_values($ystring) : preg_split('#\R#u', $ystring);
+            $arrayize = function ($string) {
+                $binary_check = function ($string) {
+                    if ($this->options['allow-binary'] === true || !preg_match('#\0#', $string)) {
+                        return $string;
+                    }
+                    throw new \InvalidArgumentException('detected binary string');
+                };
 
-            $trailingN = "";
-            if ($xstring[count($xstring) - 1] === '' && $ystring[count($ystring) - 1] === '') {
-                $trailingN = "\n";
-                array_pop($xstring);
-                array_pop($ystring);
+                if (is_resource($string)) {
+                    $array = [];
+                    while (!feof($string)) {
+                        $array[] = $binary_check(rtrim(fgets($string), "\r\n"));
+                    }
+                    return $array;
+                }
+                if (is_array($string)) {
+                    return array_values(array_map($binary_check, $string));
+                }
+                return preg_split('#\R#u', $binary_check($string));
+            };
+
+            try {
+                $xarray = $arrayize($xstring);
+                $yarray = $arrayize($ystring);
+            }
+            catch (\InvalidArgumentException $ex) {
+                if ($this->options['allow-binary'] === false) {
+                    throw $ex;
+                }
+                return null;
             }
 
-            $diffs = $this->diff($xstring, $ystring);
+            $trailingN = "";
+            if ($xarray[count($xarray) - 1] === '' && $yarray[count($yarray) - 1] === '') {
+                $trailingN = "\n";
+                array_pop($xarray);
+                array_pop($yarray);
+            }
+
+            $diffs = $this->diff($xarray, $yarray);
 
             $stringfy = $this->options['stringify'];
             if (!$stringfy) {

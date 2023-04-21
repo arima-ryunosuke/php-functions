@@ -915,6 +915,26 @@ this is <del>a</del><ins>the</ins> pen
 that is <del>a</del><ins>the</ins> pen
 
 ');
+
+        $x = tmpfile();
+        $y = "hoge";
+        fwrite($x, "\0");
+
+        rewind($x);
+        that(str_diff($x, $y, ['allow-binary' => null]))->is(null);
+
+        rewind($x);
+        that(self::resolveFunction('str_diff'))($x, $y, ['allow-binary' => false])->wasThrown("binary string");
+
+        $x = tmpfile();
+        $y = "\0";
+        fwrite($x, "hoge");
+
+        rewind($x);
+        that(str_diff($x, $y, ['allow-binary' => null]))->is(null);
+
+        rewind($x);
+        that(self::resolveFunction('str_diff'))($x, $y, ['allow-binary' => false])->wasThrown("binary string");
     }
 
     function test_str_diff_native()
