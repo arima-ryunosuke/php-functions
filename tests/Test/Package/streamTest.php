@@ -2,12 +2,46 @@
 
 namespace ryunosuke\Test\Package;
 
+use function ryunosuke\Functions\Package\include_stream;
 use function ryunosuke\Functions\Package\memory_path;
 use function ryunosuke\Functions\Package\profiler;
 use function ryunosuke\Functions\Package\var_stream;
 
 class streamTest extends AbstractTestCase
 {
+    function test_include_stream()
+    {
+        $stream = include_stream();
+
+        // もろもろのストリーム操作
+        opcache_reset();
+        $stream->register(fn($filename) => strtr(file_get_contents($filename), ['# ' => '']));
+        $actual = include __DIR__ . '/files/php/fake.php';
+        $stream->restore();
+        that($actual)->is('123');
+
+        // 全体を小文字化して読み込み
+        opcache_reset();
+        $stream->register(fn($filename) => strtolower(file_get_contents($filename)));
+        $actual = include __DIR__ . '/files/php/include_stream.php';
+        $stream->restore();
+        that($actual)->is('hijkxyz');
+
+        // 完全に置換して読み込み
+        opcache_reset();
+        $stream->register(fn($filename) => "<?php return 123;");
+        $actual = include __DIR__ . '/files/php/include_stream.php';
+        $stream->restore();
+        that($actual)->is('123');
+
+        // 存在しない場合
+        opcache_reset();
+        $stream->register(fn($filename) => file_get_contents($filename));
+        @include __DIR__ . '/files/php/notfound.php';
+        that(error_get_last()['message'])->stringContains('include(): Failed opening');
+        $stream->restore();
+    }
+
     function test_memory_path()
     {
         $hoge = memory_path('hoge');
@@ -224,7 +258,7 @@ class streamTest extends AbstractTestCase
             'callee'   => fn($callee) => $callee !== 'X',
             'location' => '#profile#',
         ]);
-        require_once __DIR__ . '/files/php/profile.php';
+        require __DIR__ . '/files/php/profile.php';
         $result = iterator_to_array($profiler);
         that($result)->is($profiler());
         that($result['A'])->count(3);
@@ -232,7 +266,7 @@ class streamTest extends AbstractTestCase
         that($result['C'])->count(1);
         that($result)->notHasKey('X');
 
-        $result = require_once __DIR__ . '/files/php/fake.php';
+        $result = require __DIR__ . '/files/php/fake.php';
         that($result['scandir'])->is(array_merge(scandir(__DIR__ . '/files/php'), scandir(__DIR__ . '/files/php'), scandir(__DIR__ . '/files/php')));
         if (DIRECTORY_SEPARATOR === '/') {
             that($result['meta'])->is([
@@ -248,6 +282,9 @@ class streamTest extends AbstractTestCase
         that($result['dir'])->is([
             'mkdir' => true,
             'rmdir' => true,
+        ]);
+        that($result['cast'])->is([
+            'mime' => 'text/plain',
         ]);
         that($result['misc'])->is([
             'flock'       => 4,

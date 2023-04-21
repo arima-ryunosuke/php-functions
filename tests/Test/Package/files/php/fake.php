@@ -56,9 +56,19 @@ return (static function () {
     $result['dir'] = (function () {
         $result = [];
 
-        $dirname = sys_get_temp_dir() . '/misc';
+        unlink($dirname = tempnam(sys_get_temp_dir(), 'dir'));
         $result['mkdir'] = @mkdir($dirname);
         $result['rmdir'] = rmdir($dirname);
+
+        return $result;
+    })();
+
+    $result['cast'] = (function () {
+        $result = [];
+
+        $tmpname = tempnam(sys_get_temp_dir(), 'cast');
+        file_put_contents($tmpname, 'plain text');
+        $result['mime'] = mime_content_type($tmpname);
 
         return $result;
     })();
@@ -74,5 +84,6 @@ return (static function () {
         return $result;
     })();
 
+    # return 123;
     return $result;
 })();
