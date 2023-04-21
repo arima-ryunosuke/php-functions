@@ -91,6 +91,15 @@ class filesystemTest extends AbstractTestCase
         that(array_keys($dsttree['dst']['src']['a']['b']))->is(array_keys($srctree['src']['a']['b']));
         that(array_keys($dsttree['dst']['src']['a']['b']['c1']))->is(array_keys($srctree['src']['a']['b']['c1']));
         that(array_keys($dsttree['dst']['src']['a']['b']['c2']))->is(array_keys($srctree['src']['a']['b']['c2']));
+
+        // 隠しファイルとカスタムプロトコル
+        $src = memory_path('cp_rf_src');
+        $dst = memory_path('cp_rf_dst');
+        file_set_contents("$src/a.txt", '');
+        file_set_contents("$src/dir/a.txt", '');
+        cp_rf("$src/", $dst);
+        that("$dst/a.txt")->fileExists();
+        that("$dst/dir/a.txt")->fileExists();
     }
 
     function test_dir_diff()

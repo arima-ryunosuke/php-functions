@@ -65,7 +65,9 @@ function cp_rf($src, $dst)
 
     mkdir_p($dst);
 
-    foreach (glob("$src/*") as $file) {
+    $rdi = new \FilesystemIterator($src, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_PATHNAME);
+
+    foreach ($rdi as $file) {
         if (is_dir($file)) {
             cp_rf($file, "$dst/" . basename($file));
         }
