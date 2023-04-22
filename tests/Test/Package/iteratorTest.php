@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\iterator_chunk;
 use function ryunosuke\Functions\Package\iterator_join;
+use function ryunosuke\Functions\Package\iterator_split;
 
 class iteratorTest extends AbstractTestCase
 {
@@ -83,5 +84,59 @@ class iteratorTest extends AbstractTestCase
             new \ArrayIterator(['b' => 'B']),
             (fn() => yield 'c' => 'C')(),
         ], true)))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+    }
+
+    function test_iterator_split()
+    {
+        $its = iterator_split((function () {
+            yield 'A';
+            yield 'B';
+            yield 'C';
+            yield 'D';
+        })(), [1, 2]);
+        that($its[0])->is(['A']);
+        that($its[1])->is(['B', 'C']);
+        that($its[2])->isInstanceOf(\Iterator::class);
+        that(iterator_to_array($its[2]))->is([3 => 'D']);
+
+        $its = iterator_split((function () {
+            yield 'A';
+            yield 'B';
+            yield 'C';
+            yield 'D';
+        })(), ['one' => 1, 'two' => 2], true);
+        that($its['one'])->is(['A']);
+        that($its['two'])->is([1 => 'B', 2 => 'C']);
+        that($its[0])->isInstanceOf(\Iterator::class);
+        that(iterator_to_array($its[0]))->is([3 => 'D']);
+
+        // NoRewind の件（php のバージョンで yield from や foreach で rewind されるかどうかが異なる？）
+        that(iterator_to_array(iterator_join(iterator_split((function () {
+            yield 'A';
+            yield 'B';
+            yield 'C';
+            yield 'D';
+        })(), [1, 2], false))))->is(['B', 'C', 3 => 'D']);
+
+        that(iterator_to_array(iterator_join(iterator_split((function () {
+            yield 'a' => 'A';
+            yield 'b' => 'B';
+            yield 'c' => 'C';
+            yield 'd' => 'D';
+        })(), [1, 2], false), false)))->is(['A', 'B', 'C', 'D']);
+
+        that(iterator_to_array(iterator_join(iterator_split((function () {
+            yield 'a' => 'A';
+            yield 'b' => 'B';
+            yield 'c' => 'C';
+            yield 'd' => 'D';
+        })(), [1, 2], true))))->is(['a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D']);
+
+        that(iterator_to_array(iterator_join(iterator_split((function () {
+            yield 'A';
+            yield 'B';
+            yield 'C';
+            yield 'D';
+        })(), [1, 2], true))))->is(['A', 'B', 'C', 'D']);
     }
 }
