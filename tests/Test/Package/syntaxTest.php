@@ -156,7 +156,7 @@ class syntaxTest extends AbstractTestCase
 
     function test_try_catch_finally()
     {
-        $workingdir = sys_get_temp_dir() . '/rf-working';
+        $workingdir = self::$TMPDIR . '/rf-working';
         rm_rf($workingdir);
 
         try_catch_finally(function () use ($workingdir) {

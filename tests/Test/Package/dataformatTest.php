@@ -219,13 +219,13 @@ x"
         ]);
 
         // ファイルポインタ
-        file_put_contents(sys_get_temp_dir() . '/test.csv', 'a,b,c
+        file_put_contents(self::$TMPDIR . '/test.csv', 'a,b,c
 "a1,x",b1,c1
 
 a3,b3,"c3
 x"
 ');
-        that(csv_import(fopen(sys_get_temp_dir() . '/test.csv', 'r')))->is([
+        that(csv_import(fopen(self::$TMPDIR . '/test.csv', 'r')))->is([
             ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
             ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
         ]);

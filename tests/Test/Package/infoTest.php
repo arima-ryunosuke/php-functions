@@ -219,7 +219,7 @@ class infoTest extends AbstractTestCase
 
     function test_get_modified_files()
     {
-        $dir = sys_get_temp_dir() . '/get_modified_files/';
+        $dir = self::$TMPDIR . '/get_modified_files/';
         file_set_contents("$dir/required.php", <<<PHP
             <?php
             require(__DIR__ . "/required1.php");

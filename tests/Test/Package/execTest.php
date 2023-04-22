@@ -16,7 +16,7 @@ class execTest extends AbstractTestCase
             return $handle;
         };
 
-        $file = sys_get_temp_dir() . '/rf-process.php';
+        $file = self::$TMPDIR . '/rf-process.php';
         $stdout = null;
         $stderr = null;
 
@@ -89,7 +89,7 @@ class execTest extends AbstractTestCase
 
     function test_process_async()
     {
-        $file = sys_get_temp_dir() . '/rf-process_async.php';
+        $file = self::$TMPDIR . '/rf-process_async.php';
         $stdout = null;
         $stderr = null;
 

@@ -1,5 +1,18 @@
 <?php
 
+// sys_get_temp_dir が返すディレクトリを変更しておく
+$tmpdir = __DIR__ . DIRECTORY_SEPARATOR . 'temporary' . DIRECTORY_SEPARATOR . 'tmp';
+@mkdir($tmpdir, 0777, true);
+if (DIRECTORY_SEPARATOR === '\\') {
+    if (getenv('TMP') !== $tmpdir) {
+        $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpdir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($entries as $entry) {
+            ($entry->isDir() ? 'rmdir' : 'unlink')($entry->getRealPath());
+        }
+    }
+    putenv("TMP=$tmpdir");
+}
+
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../vendor/ryunosuke/phpunit-extension/inc/bootstrap.php';
 require __DIR__ . '/classes.php';
@@ -13,19 +26,6 @@ if (false) {
     define('TESTWEBSERVER', null);
     define('TESTPINGSERVER', null);
     define('DIFF', null);
-}
-
-// sys_get_temp_dir が返すディレクトリを変更しておく
-$tmpdir = __DIR__ . DIRECTORY_SEPARATOR . 'temporary' . DIRECTORY_SEPARATOR . 'tmp';
-@mkdir($tmpdir, 0777, true);
-if (DIRECTORY_SEPARATOR === '\\') {
-    if (getenv('TMP') !== $tmpdir) {
-        $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpdir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($entries as $entry) {
-            ($entry->isDir() ? 'rmdir' : 'unlink')($entry->getRealPath());
-        }
-    }
-    putenv("TMP=$tmpdir");
 }
 
 if (DIRECTORY_SEPARATOR === '\\') {

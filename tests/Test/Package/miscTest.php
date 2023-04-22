@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\console_log;
 use function ryunosuke\Functions\Package\evaluate;
+use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\highlight_php;
 use function ryunosuke\Functions\Package\indent_php;
 use function ryunosuke\Functions\Package\parse_annotation;
@@ -39,7 +40,7 @@ class miscTest extends AbstractTestCase
 
     function test_evaluate()
     {
-        $tmpdir = self::$TMPDIR;
+        $tmpdir = function_configure('cachedir');
         @rm_rf($tmpdir, false);
         that(evaluate('return $x * $x;', ['x' => 1]))->is(1);
         that(evaluate('return $x * $x;', ['x' => 2]))->is(4);
@@ -886,7 +887,7 @@ $colA
             ],
         ]);
 
-        $file = sys_get_temp_dir() . '/rf-parse_namespace.php';
+        $file = self::$TMPDIR . '/rf-parse_namespace.php';
         file_put_contents($file, '<?php namespace hoge;');
         that(parse_namespace($file, ['cache' => false]))->hasKey('hoge');
         file_put_contents($file, '<?php namespace fuga;');

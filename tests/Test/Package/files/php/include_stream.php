@@ -1,7 +1,9 @@
 <?php
 
 // この中での file:// の操作も可能なことを担保
-$fp = fopen(sys_get_temp_dir() . '/include_stream.txt', 'w+');
+$file1 = tempnam(sys_get_temp_dir(), 'is1');
+$file2 = tempnam(sys_get_temp_dir(), 'is2');
+$fp = fopen($file1, 'w+');
 flock($fp, constant(strtoupper('LOCK_EX')));
 fwrite($fp, 'ABCDEFG');
 rewind($fp);
@@ -13,8 +15,8 @@ $result = stream_get_contents($fp);
 flock($fp, constant(strtoupper('LOCK_UN')));
 fclose($fp);
 
-rename(sys_get_temp_dir() . '/include_stream.txt', sys_get_temp_dir() . '/include_stream2.txt');
-file_exists(sys_get_temp_dir() . '/include_stream2.txt');
-unlink(sys_get_temp_dir() . '/include_stream2.txt');
+rename($file1, $file2);
+file_exists($file2);
+unlink($file2);
 
 return $result;

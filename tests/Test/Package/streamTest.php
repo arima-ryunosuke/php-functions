@@ -171,7 +171,7 @@ class streamTest extends AbstractTestCase
         };
 
         foreach (['r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'] as $mode) {
-            @unlink($expectedFile = sys_get_temp_dir() . "/tmp$mode.txt");
+            @unlink($expectedFile = self::$TMPDIR . "/tmp$mode.txt");
             @unlink($actualFile = memory_path("/tmp$mode.txt"));
             if ($mode[0] !== 'x') {
                 file_put_contents($expectedFile, 'abcde');
@@ -249,7 +249,7 @@ class streamTest extends AbstractTestCase
             that(rewind($expected) === rewind($actual))->isTrue();
             that(fread($expected, 1000) === fread($actual, 1000))->isTrue();
         };
-        $test(sys_get_temp_dir() . '/tmp.txt', memory_path('tmp.txt'));
+        $test(self::$TMPDIR . '/tmp.txt', memory_path('tmp.txt'));
     }
 
     function test_profiler()

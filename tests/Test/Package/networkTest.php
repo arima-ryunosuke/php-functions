@@ -58,7 +58,7 @@ class networkTest extends AbstractTestCase
     function test_getipaddress()
     {
         // cachedir を設定することで擬似的にインジェクションする
-        $backup = function_configure(['cachedir' => sys_get_temp_dir() . '/' . __FUNCTION__]);
+        $backup = function_configure(['cachedir' => self::$TMPDIR . '/' . __FUNCTION__]);
         cache('net_get_interfaces', null, self::resolveFunction('getipaddress'));
         cache('net_get_interfaces', fn() => [
             'lo'   => [
@@ -142,7 +142,7 @@ class networkTest extends AbstractTestCase
         $server = TESTWEBSERVER;
         $infos = [];
 
-        $cachedir = sys_get_temp_dir() . '/http-cache';
+        $cachedir = self::$TMPDIR . '/http-cache';
         @mkdir($cachedir);
         rm_rf($cachedir, false);
         $response_header = null;
@@ -378,7 +378,7 @@ class networkTest extends AbstractTestCase
         that($response)->isInstanceOf(\DOMDocument::class);
 
 
-        $cookie_file = sys_get_temp_dir() . '/cookie.txt';
+        $cookie_file = self::$TMPDIR . '/cookie.txt';
         @unlink($cookie_file);
         $response = http_request([
             CURLOPT_URL   => "$server/cookies/set/hoge/fuga",

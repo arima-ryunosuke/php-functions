@@ -43,7 +43,7 @@ class filesystemTest extends AbstractTestCase
 {
     function test_cp_rf()
     {
-        $tmpdir = sys_get_temp_dir() . '/cp_rf';
+        $tmpdir = self::$TMPDIR . '/cp_rf';
 
         $src = "$tmpdir/src";
         rm_rf($src);
@@ -260,7 +260,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_dirmtime()
     {
-        $dir = sys_get_temp_dir() . '/mtime';
+        $dir = self::$TMPDIR . '/mtime';
         mkdir_p($dir);
         rm_rf($dir, false);
         $base = strtotime('2036/12/31 12:34:56');
@@ -317,8 +317,8 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_equals()
     {
-        $root1 = sys_get_temp_dir() . '/file_equals1';
-        $root2 = sys_get_temp_dir() . '/file_equals2';
+        $root1 = self::$TMPDIR . '/file_equals1';
+        $root2 = self::$TMPDIR . '/file_equals2';
         rm_rf($root1);
         rm_rf($root2);
 
@@ -422,7 +422,7 @@ class filesystemTest extends AbstractTestCase
             ],
         ];
 
-        $tmpdir = sys_get_temp_dir();
+        $tmpdir = self::$TMPDIR;
         file_put_contents($php_utf8 = "$tmpdir/data.php", '<?php return ' . var_export($array, true) . ';');
         file_put_contents($csv_utf8 = "$tmpdir/data.csv", csv_export($array, ['structure' => true]));
         file_put_contents($csv_sjis = "$tmpdir/data.sjis.csv", mb_convert_encoding(csv_export($array, ['structure' => true]), 'sjis'));
@@ -468,8 +468,8 @@ class filesystemTest extends AbstractTestCase
         file_put_contents($csv_undefined = "$tmpdir/data.undefined.csv", "a,i,u,e,o\nあ,い,う,え,お");
         that(file_get_arrays($csv_undefined))->is([['a' => 'あ', 'i' => 'い', 'u' => 'う', 'e' => 'え', 'o' => 'お']]);
 
-        touch($txt = sys_get_temp_dir() . '/hoge.txt');
-        touch($xml = sys_get_temp_dir() . '/hoge.xml');
+        touch($txt = self::$TMPDIR . '/hoge.txt');
+        touch($xml = self::$TMPDIR . '/hoge.xml');
         that(self::resolveFunction('file_get_arrays'))('notfoundfile')->wasThrown('is not exists');
         that(self::resolveFunction('file_get_arrays'))($txt)->wasThrown('is not supported');
         that(self::resolveFunction('file_get_arrays'))($xml)->wasThrown('in the future');
@@ -478,8 +478,7 @@ class filesystemTest extends AbstractTestCase
     function test_file_list()
     {
         $DS = DIRECTORY_SEPARATOR;
-
-        $base = sys_get_temp_dir() . $DS . 'list';
+        $base = self::$TMPDIR . $DS . 'list';
         rm_rf($base);
         file_set_contents($base . '/a/a1.txt', '');
         file_set_contents($base . '/a/a2.txt', '');
@@ -564,7 +563,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_matcher()
     {
-        $base = sys_get_temp_dir() . '/tree';
+        $base = self::$TMPDIR . '/tree';
         file_set_contents($base . '/a/a1.txt', 'xxx');
         file_set_contents($base . '/a/a2.txt', str_repeat("y\n", 30000));
 
@@ -684,7 +683,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_pos()
     {
-        $tmpfile = sys_get_temp_dir() . '/posfile.txt';
+        $tmpfile = self::$TMPDIR . '/posfile.txt';
         file_put_contents($tmpfile, str_repeat('x', 100) . "abc");
 
         that(file_pos($tmpfile, 'x'))->is(0);
@@ -745,7 +744,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_rewrite_contents()
     {
-        $testpath = sys_get_temp_dir() . '/rewrite/test.txt';
+        $testpath = self::$TMPDIR . '/rewrite/test.txt';
         file_set_contents($testpath, 'dummy');
 
         // standard
@@ -785,7 +784,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_set_contents()
     {
-        $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
+        $dir = self::$TMPDIR . '/dir1/dir2/dir3/';
         rm_rf($dir);
 
         file_set_contents("$dir/hoge.txt", 'hoge');
@@ -811,7 +810,7 @@ class filesystemTest extends AbstractTestCase
     {
         $DS = DIRECTORY_SEPARATOR;
 
-        $root = sys_get_temp_dir() . $DS . 'file_set_tree';
+        $root = self::$TMPDIR . $DS . 'file_set_tree';
         rm_rf($root);
 
         that(file_set_tree([
@@ -866,7 +865,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_slice()
     {
-        $tmpfile = sys_get_temp_dir() . '/file_slice.txt';
+        $tmpfile = self::$TMPDIR . '/file_slice.txt';
         file_put_contents($tmpfile, implode("\n", array_map(fn($n) => $n % 2 ? $n : "", range(1, 20))));
 
         // 1行だけサクッと読む
@@ -936,7 +935,7 @@ class filesystemTest extends AbstractTestCase
     {
         $DS = DIRECTORY_SEPARATOR;
 
-        $base = sys_get_temp_dir() . $DS . 'tree';
+        $base = self::$TMPDIR . $DS . 'tree';
         rm_rf($base);
         file_set_contents($base . '/a/a1.txt', '');
         file_set_contents($base . '/a/a2.txt', '');
@@ -1015,7 +1014,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_mkdir_p()
     {
-        $dir = sys_get_temp_dir() . '/dir1/dir2/dir3/';
+        $dir = self::$TMPDIR . '/dir1/dir2/dir3/';
         rm_rf($dir);
         that(mkdir_p($dir))->isTrue();
         that($dir)->fileExists();
@@ -1228,7 +1227,7 @@ class filesystemTest extends AbstractTestCase
 
     function test_rm_rf()
     {
-        $dir = sys_get_temp_dir() . '/dir1/dir2/dir3';
+        $dir = self::$TMPDIR . '/dir1/dir2/dir3';
         $dir2 = dirname($dir);
         $dir1 = dirname($dir2);
 
@@ -1243,7 +1242,7 @@ class filesystemTest extends AbstractTestCase
         that($dir1)->fileExists();    // 自身は残る
         that($dir2)->fileNotExists(); // 子は消える
 
-        $dir = sys_get_temp_dir() . '/rm_rf';
+        $dir = self::$TMPDIR . '/rm_rf';
         file_set_contents("$dir/a/x.txt", '');
         file_set_contents("$dir/a/aa/xx.txt", '');
         file_set_contents("$dir/b/x.txt", '');
@@ -1318,9 +1317,9 @@ class filesystemTest extends AbstractTestCase
 
     function test_tmpname()
     {
-        $wd = sys_get_temp_dir() . '/tmpname';
-        mkdir_p(sys_get_temp_dir() . '/tmpname');
-        rm_rf(sys_get_temp_dir() . '/tmpname', false);
+        $wd = self::$TMPDIR . '/tmpname';
+        mkdir_p(self::$TMPDIR . '/tmpname');
+        rm_rf(self::$TMPDIR . '/tmpname', false);
 
         $list = [
             tmpname('', $wd),

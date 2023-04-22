@@ -69,7 +69,7 @@ class utilityTest extends AbstractTestCase
     function test_cache_fetch()
     {
         /** @var \Psr16CacheInterface $cache */
-        $tmpdir = sys_get_temp_dir() . '/cache_fetch';
+        $tmpdir = self::$TMPDIR . '/cache_fetch';
         rm_rf($tmpdir);
         $cache = cacheobject($tmpdir);
 
@@ -102,20 +102,20 @@ class utilityTest extends AbstractTestCase
 
     function test_cachedir()
     {
-        $tmpdir = sys_get_temp_dir() . '/test';
+        $tmpdir = self::$TMPDIR . '/test';
         rm_rf($tmpdir);
         /** @noinspection PhpDeprecationInspection */
         {
             cachedir($tmpdir);
             that(cachedir())->is(realpath($tmpdir));
-            that(cachedir(sys_get_temp_dir()))->is(realpath($tmpdir));
+            that(cachedir(self::$TMPDIR))->is(realpath($tmpdir));
         }
     }
 
     function test_cacheobject()
     {
         /** @var \Psr16CacheInterface $cache */
-        $tmpdir = sys_get_temp_dir() . '/cacheobject';
+        $tmpdir = self::$TMPDIR . '/cacheobject';
         rm_rf($tmpdir);
         $cache = cacheobject($tmpdir);
 
