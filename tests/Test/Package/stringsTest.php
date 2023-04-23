@@ -14,6 +14,7 @@ use function ryunosuke\Functions\Package\mb_ellipsis;
 use function ryunosuke\Functions\Package\mb_str_pad;
 use function ryunosuke\Functions\Package\mb_substr_replace;
 use function ryunosuke\Functions\Package\mb_trim;
+use function ryunosuke\Functions\Package\mb_wordwrap;
 use function ryunosuke\Functions\Package\multiexplode;
 use function ryunosuke\Functions\Package\namespace_split;
 use function ryunosuke\Functions\Package\ngram;
@@ -344,6 +345,57 @@ This is VARIABLE.
 '))->is(('あああ　 　
  　 いいい
  　 ううう'));
+    }
+
+    function test_mb_wordwrap()
+    {
+        that(mb_wordwrap("", 10))->is("");
+        that(mb_wordwrap("", 10, null))->is([""]);
+
+        that(mb_wordwrap("\n\n", 10))->is("\n\n");
+        that(mb_wordwrap("\n\n", 10, null))->is(["", "", ""]);
+
+        that(mb_wordwrap("line1\nline2\ntommorow never knows", 10))->is(<<<ACTUAL
+            line1
+            line2
+            tommorow n
+            ever knows
+            ACTUAL
+        );
+        that(mb_wordwrap("line1\nline2\ntommorow never knows", 10, null))->is([
+            'line1',
+            'line2',
+            'tommorow n',
+            'ever knows',
+        ]);
+
+        that(mb_wordwrap("line1\nline2\ntodayは晴天なり", 10))->is(<<<ACTUAL
+            line1
+            line2
+            todayは晴
+            天なり
+            ACTUAL
+        );
+        that(mb_wordwrap("line1\nline2\ntodayは晴天なり", 10, null))->is([
+            'line1',
+            'line2',
+            'todayは晴',
+            '天なり',
+        ]);
+
+        that(mb_wordwrap("line1\nline2\ntommorowは雨天なり", 10))->is(<<<ACTUAL
+            line1
+            line2
+            tommorowは
+            雨天なり
+            ACTUAL
+        );
+        that(mb_wordwrap("line1\nline2\ntommorowは雨天なり", 10, null))->is([
+            'line1',
+            'line2',
+            'tommorowは',
+            '雨天なり',
+        ]);
     }
 
     function test_multiexplode()
