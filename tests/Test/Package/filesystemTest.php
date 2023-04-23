@@ -34,6 +34,8 @@ use function ryunosuke\Functions\Package\path_relative;
 use function ryunosuke\Functions\Package\path_resolve;
 use function ryunosuke\Functions\Package\reflect_callable;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\strmode;
+use function ryunosuke\Functions\Package\strmode2oct;
 use function ryunosuke\Functions\Package\tmpname;
 use function ryunosuke\Functions\Package\var_pretty;
 
@@ -1208,6 +1210,43 @@ class filesystemTest extends AbstractTestCase
 
         that(rm_rf("$dir/.dotfile", true))->isTrue();
         that("$dir/.dotfile")->fileNotExists(); // ファイルも消せる
+    }
+
+    function test_strmode()
+    {
+        $cases = [
+            [004_0777, 'drwxrwxrwx'],
+            [010_0700, '-rwx------'],
+            [012_0070, 'l---rwx---'],
+            [000_0007, '------rwx'],
+
+            [0001, '--------x'],
+            [0002, '-------w-'],
+            [0003, '-------wx'],
+            [0004, '------r--'],
+            [0005, '------r-x'],
+            [0006, '------rw-'],
+            [0007, '------rwx'],
+
+            [0_0000, '---------'],
+            [0_1000, '--------T'],
+            [0_1001, '--------t'],
+            [0_2000, '-----S---'],
+            [0_2010, '-----s---'],
+            [0_4000, '--S------'],
+            [0_4100, '--s------'],
+        ];
+
+        foreach ($cases as [$octet, $perms]) {
+            that(strmode($octet))->as(sprintf('%05o<=>%s', $octet, $perms))->is($perms);
+        }
+        that(self::resolveFunction('strmode'))('hoge')->wasThrown('must be int');
+        that(self::resolveFunction('strmode'))(077_0000)->wasThrown('unknown type');
+
+        foreach ($cases as [$octet, $perms]) {
+            that(strmode2oct($perms))->as(sprintf('%05o<=>%s', $octet, $perms))->is($octet);
+        }
+        that(self::resolveFunction('strmode2oct'))('hoge')->wasThrown('invalid permission');
     }
 
     function test_tmpname()
