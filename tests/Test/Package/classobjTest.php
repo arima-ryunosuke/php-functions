@@ -18,6 +18,7 @@ use function ryunosuke\Functions\Package\get_object_properties;
 use function ryunosuke\Functions\Package\object_dive;
 use function ryunosuke\Functions\Package\optional;
 use function ryunosuke\Functions\Package\phpval;
+use function ryunosuke\Functions\Package\register_autoload_function;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\stdclass;
 use function ryunosuke\Functions\Package\type_exists;
@@ -539,6 +540,46 @@ class classobjTest extends AbstractTestCase
         that(optional(null))->try('__unset', 'hoge')->wasThrown('called NullObject#');
         that(optional(null))->try('offsetSet', 'hoge', 'value')->wasThrown('called NullObject#');
         that(optional(null))->try('offsetUnset', 'hoge')->wasThrown('called NullObject#');
+    }
+
+    function test_register_autoload_function()
+    {
+        that(class_exists(\PHPUnit\Util\TestDox\TestDoxPrinter::class, false))->isFalse();
+        that(class_exists(\PHPUnit\Util\TestDox\CliTestDoxPrinter::class, false))->isFalse();
+        that(class_exists(\PHPUnit\Util\TestDox\XmlResultPrinter::class, false))->isFalse();
+
+        register_autoload_function(
+        // 読み込み前に static フィールド名を書き換える
+            function ($classname, $filename, $contents) {
+                if ($classname === files\classes\InitializedClass::class) {
+                    // この中でオートロードしても問題ないことを担保（php-parser とかで書き換える事が多いので）
+                    class_exists(\PHPUnit\Util\TestDox\TestDoxPrinter::class);
+                    class_exists(\PHPUnit\Util\TestDox\CliTestDoxPrinter::class);
+                    class_exists(\PHPUnit\Util\TestDox\XmlResultPrinter::class);
+                    return strtr($contents ?? file_get_contents($filename), ['$initialized' => '$initialized2']);
+                }
+            },
+            null
+        );
+        // 多重登録も可能
+        register_autoload_function(
+        // 読み込み前に static フィールド名を書き換える
+            function ($classname, $filename, $contents) {
+                if ($classname === files\classes\InitializedClass::class) {
+                    return strtr($contents ?? file_get_contents($filename), ['$initialized2' => '$initialized3']);
+                }
+            },
+            // 読み込み後に __initialize を呼ぶ
+            function ($classname) {
+                if (method_exists($classname, '__initialize')) {
+                    $classname::__initialize();
+                }
+            }
+        );
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        // フィールド名は変わっているし、初期化もされている
+        that(files\classes\InitializedClass::$initialized3)->isTrue();
     }
 
     /** @noinspection PhpUnusedPrivateFieldInspection */
