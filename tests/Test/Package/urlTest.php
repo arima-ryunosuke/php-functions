@@ -93,57 +93,66 @@ class urlTest extends AbstractTestCase
         ];
 
         that(build_query($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
-        that(parse_query($expected))->is(['x' => [[1, 2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
         that(build_query($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
-        that(parse_query($expected))->is(['x' => [[1, 2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
         that(build_query($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
-        that(parse_query($expected))->is(['x' => [[1, 2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
 
         that(build_query($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
-        that(parse_query($expected))->is(['x' => [[1, 2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
         that(build_query($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
-        that(parse_query($expected))->is(['x' => [[1, 2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
         that(build_query($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected))->is(['x' => [[1], [2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
         that(build_query($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected))->is(['x' => [[1], [2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
         that(build_query($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected))->is(['x' => [[1], [2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
         that(build_query($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected))->is(['x' => [[1], [2]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
 
         $data = [
             'x' => [[1, [2], [[3]]]],
         ];
 
         that(build_query($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
         that(build_query($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
         that(build_query($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
 
         that(build_query($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
         that(build_query($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
         that(build_query($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [2], [[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
         that(build_query($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1, [[3]]], [[2]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1, [[3]]], [[2]]]]);
         that(build_query($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1], [[2]], [[[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1], [[2]], [[[3]]]]]);
         that(build_query($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected))->is(['x' => [[1], [[2]], [[[3]]]]]);
+        that(parse_query($expected, '&'))->is(['x' => [[1], [[2]], [[[3]]]]]);
 
         $data = [
             'x' => ['y' => ['z' => '[]']],
         ];
 
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['[', ']']))->is('x[y][z]=%5B%5D');
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['.', '']))->is('x.y.z=%5B%5D');
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['', '']))->is('xyz=%5B%5D');
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, '-'))->is('x-y-z=%5B%5D');
+        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['[', ']']))->is($expected = 'x[y][z]=%5B%5D');
+        that(parse_query($expected, '&'))->is(['x' => ['y' => ['z' => '[]']]]);
+        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['.', '']))->is($expected = 'x.y.z=%5B%5D');
+        that(parse_query($expected, '&'))->is(['x.y.z' => '[]']);
+        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['', '']))->is($expected = 'xyz=%5B%5D');
+        that(parse_query($expected, '&'))->is(['xyz' => '[]']);
+        that(build_query($data, null, '&', PHP_QUERY_RFC1738, '-'))->is($expected = 'x-y-z=%5B%5D');
+        that(parse_query($expected, '&'))->is(['x-y-z' => '[]']);
+
+        that(build_query(['x y z' => 'xyz'], null, '&', PHP_QUERY_RFC1738))->is($expected = 'x+y+z=xyz');
+        that(parse_query($expected, '&', PHP_QUERY_RFC1738))->is(['x y z' => 'xyz']);
+        that(build_query(['x y z' => 'xyz'], null, '&', PHP_QUERY_RFC3986))->is($expected = 'x%20y%20z=xyz');
+        that(parse_query($expected, '&', PHP_QUERY_RFC3986))->is(['x y z' => 'xyz']);
 
         that(build_query([1, 2, 3], 'pre-'))->is('pre-0=1&pre-1=2&pre-2=3');
     }
