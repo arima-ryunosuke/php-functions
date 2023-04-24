@@ -78,7 +78,8 @@ function file_list($dirname, $filter_condition = [])
             continue;
         }
 
-        $result[] = $filter_condition['relative'] ? $it->getSubPathName() : $fullpath;
+        $path = $filter_condition['relative'] ? $it->getSubPathName() : $fullpath;
+        $result[] = is_dir($fullpath) ? $path . DIRECTORY_SEPARATOR : $path;
     }
     return $result;
 }

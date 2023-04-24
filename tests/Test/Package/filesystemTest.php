@@ -133,6 +133,9 @@ class filesystemTest extends AbstractTestCase
                     'file2' => 'file2',
                     'file3' => 'file3',
                 ],
+                'entry'     => [
+                    'file1' => 'file1',
+                ],
             ],
             $root2 => [
                 'file1'     => 'file',
@@ -153,6 +156,7 @@ class filesystemTest extends AbstractTestCase
                     'file2' => 'fileEX',
                     'file4' => 'file4',
                 ],
+                'entry'     => 'file',
             ],
         ]);
 
@@ -160,19 +164,22 @@ class filesystemTest extends AbstractTestCase
         that(dir_diff($root1, $root2, [
             'case-sensitive' => true,
         ]))->is([
-            "CASEDIR"             => false,
+            "CASEDIR{$DS}"        => false,
             "CASEDIR{$DS}file1"   => false,
             "CASEDIR{$DS}file2"   => false,
             "CASEDIR{$DS}file4"   => false,
-            "casedir"             => true,
+            "casedir{$DS}"        => true,
             "casedir{$DS}file1"   => true,
             "casedir{$DS}file2"   => true,
             "casedir{$DS}file3"   => true,
             "directory{$DS}file2" => "",
             "directory{$DS}file3" => true,
             "directory{$DS}file4" => false,
-            "empty1"              => true,
-            "empty2"              => false,
+            "empty1{$DS}"         => true,
+            "empty2{$DS}"         => false,
+            "entry"               => false,
+            "entry{$DS}"          => true,
+            "entry{$DS}file1"     => true,
             "file2"               => "",
             "file3"               => true,
             "file4"               => false,
@@ -186,8 +193,11 @@ class filesystemTest extends AbstractTestCase
             "directory{$DS}file2" => "",
             "directory{$DS}file3" => true,
             "directory{$DS}file4" => false,
-            "empty1"              => true,
-            "empty2"              => false,
+            "empty1{$DS}"         => true,
+            "empty2{$DS}"         => false,
+            "entry"               => false,
+            "entry{$DS}"          => true,
+            "entry{$DS}file1"     => true,
             "file2"               => "",
             "file3"               => true,
             "file4"               => false,
@@ -197,13 +207,15 @@ class filesystemTest extends AbstractTestCase
             'case-sensitive' => true,
             'recursive'      => false,
         ]))->is([
-            "CASEDIR" => false,
-            "casedir" => true,
-            "empty1"  => true,
-            "empty2"  => false,
-            "file2"   => "",
-            "file3"   => true,
-            "file4"   => false,
+            "CASEDIR{$DS}" => false,
+            "casedir{$DS}" => true,
+            "empty1{$DS}"  => true,
+            "empty2{$DS}"  => false,
+            "entry"        => false,
+            "entry{$DS}"   => true,
+            "file2"        => "",
+            "file3"        => true,
+            "file4"        => false,
         ]);
 
         that(dir_diff($root1, $root2, [
@@ -211,11 +223,13 @@ class filesystemTest extends AbstractTestCase
             'recursive'      => false,
             'differ'         => fn($file1, $file2) => file_get_contents($file1) . '<>' . file_get_contents($file2),
         ]))->is([
-            "empty1" => true,
-            "empty2" => false,
-            "file2"  => "file2<>fileEX",
-            "file3"  => true,
-            "file4"  => false,
+            "empty1{$DS}" => true,
+            "empty2{$DS}" => false,
+            "entry"       => false,
+            "entry{$DS}"  => true,
+            "file2"       => "file2<>fileEX",
+            "file3"       => true,
+            "file4"       => false,
         ]);
     }
 
@@ -465,7 +479,7 @@ class filesystemTest extends AbstractTestCase
         that(file_list("$base{$DS}a", ["recursive" => false, "!type" => null]))->equalsCanonicalizing([
             "$base{$DS}a{$DS}a1.txt",
             "$base{$DS}a{$DS}a2.txt",
-            "$base{$DS}a{$DS}b",
+            "$base{$DS}a{$DS}b{$DS}",
         ]);
 
         // 相対パスモード
