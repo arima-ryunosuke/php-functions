@@ -77,6 +77,7 @@ use function ryunosuke\Functions\Package\attr_get;
 use function ryunosuke\Functions\Package\first_key;
 use function ryunosuke\Functions\Package\first_keyvalue;
 use function ryunosuke\Functions\Package\first_value;
+use function ryunosuke\Functions\Package\groupsort;
 use function ryunosuke\Functions\Package\in_array_and;
 use function ryunosuke\Functions\Package\in_array_or;
 use function ryunosuke\Functions\Package\is_hasharray;
@@ -3037,6 +3038,37 @@ class arrayTest extends AbstractTestCase
         that(first_value(['a', 'b', 'c'], 'def'))->is('a');
         that(first_value([], 'def'))->is('def');
         that(first_value([]))->is(null);
+    }
+
+    function test_groupsort()
+    {
+        $array = [
+            ['id' => 1, 'group' => 'A', 'name' => 'q'],
+            ['id' => 2, 'group' => 'A', 'name' => 'a'],
+            ['id' => 3, 'group' => 'A', 'name' => 'z'],
+            ['id' => 4, 'group' => null, 'name' => 'noise'],
+            ['id' => 5, 'group' => 'B', 'name' => 'w'],
+            ['id' => 6, 'group' => 'B', 'name' => 's'],
+            ['id' => 7, 'group' => 'B', 'name' => 'x'],
+            ['id' => 8, 'group' => 'C', 'name' => 'e'],
+            ['id' => 9, 'group' => 'C', 'name' => 'd'],
+            ['id' => 10, 'group' => null, 'name' => 'noise'],
+            ['id' => 11, 'group' => 'C', 'name' => 'c'],
+        ];
+        $sorted = groupsort($array, fn($v, $k) => $v['group'], fn($a, $b) => $a['name'] <=> $b['name']);
+        that($sorted)->is([
+            1  => ["id" => 2, "group" => "A", "name" => "a"],
+            0  => ["id" => 1, "group" => "A", "name" => "q"],
+            2  => ["id" => 3, "group" => "A", "name" => "z"],
+            3  => ["id" => 4, "group" => null, "name" => "noise"],
+            5  => ["id" => 6, "group" => "B", "name" => "s"],
+            4  => ["id" => 5, "group" => "B", "name" => "w"],
+            6  => ["id" => 7, "group" => "B", "name" => "x"],
+            10 => ["id" => 11, "group" => "C", "name" => "c"],
+            8  => ["id" => 9, "group" => "C", "name" => "d"],
+            7  => ["id" => 8, "group" => "C", "name" => "e"],
+            9  => ["id" => 10, "group" => null, "name" => "noise"],
+        ]);
     }
 
     function test_in_array_and()
