@@ -36,6 +36,7 @@ require_once __DIR__ . '/../strings/str_exists.php';
 function file_list($dirname, $filter_condition = [])
 {
     $filter_condition += [
+        'unixpath'  => false,
         'recursive' => true,
         'relative'  => false,
         '!type'     => 'dir',
@@ -55,6 +56,7 @@ function file_list($dirname, $filter_condition = [])
         }
         $filter_condition['subpath'] = $subpath;
         $filter_condition['fnmflag'] = FNM_PATHNAME;
+        $filter_condition['unixpath'] = true;
     }
 
     if (!file_exists($dirname) || $dirname === dirname($dirname)) {
@@ -63,7 +65,15 @@ function file_list($dirname, $filter_condition = [])
 
     $match = file_matcher($filter_condition);
 
-    $rdi = new \RecursiveDirectoryIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF);
+    $DS = DIRECTORY_SEPARATOR;
+    $opt = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF;
+
+    if ($filter_condition['unixpath']) {
+        $DS = '/';
+        $opt |= \FilesystemIterator::UNIX_PATHS;
+    }
+
+    $rdi = new \RecursiveDirectoryIterator($dirname, $opt);
 
     if ($filter_condition['recursive']) {
         $iterator = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
@@ -79,7 +89,7 @@ function file_list($dirname, $filter_condition = [])
         }
 
         $path = $filter_condition['relative'] ? $it->getSubPathName() : $fullpath;
-        $result[] = is_dir($fullpath) ? $path . DIRECTORY_SEPARATOR : $path;
+        $result[] = strtr(is_dir($fullpath) ? $path . $DS : $path, [DIRECTORY_SEPARATOR => $DS]);
     }
     return $result;
 }

@@ -483,7 +483,6 @@ class filesystemTest extends AbstractTestCase
         ]);
 
         // 相対パスモード
-        $DS = DIRECTORY_SEPARATOR;
         that(file_list($base, ["relative" => true]))->equalsCanonicalizing([
             "a{$DS}a1.txt",
             "a{$DS}a2.txt",
@@ -493,22 +492,32 @@ class filesystemTest extends AbstractTestCase
             "a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
 
+        // unixpath モード
+        that(file_list($base, ['unixpath' => true]))->equalsCanonicalizing([
+            strtr($base, [$DS => '/']) . "/a/a1.txt",
+            strtr($base, [$DS => '/']) . "/a/a2.txt",
+            strtr($base, [$DS => '/']) . "/a/b/ab1.txt",
+            strtr($base, [$DS => '/']) . "/a/b/ab2.log",
+            strtr($base, [$DS => '/']) . "/a/b/c/abc1.log",
+            strtr($base, [$DS => '/']) . "/a/b/c/abc2.log",
+        ]);
+
         // glob モード
         that(file_list("$base/*/*.txt"))->equalsCanonicalizing([
-            "$base{$DS}a{$DS}a1.txt",
-            "$base{$DS}a{$DS}a2.txt",
+            strtr($base, [$DS => '/']) . "/a/a1.txt",
+            strtr($base, [$DS => '/']) . "/a/a2.txt",
         ]);
         that(file_list("$base/a/*.txt"))->equalsCanonicalizing([
-            "$base{$DS}a{$DS}a1.txt",
-            "$base{$DS}a{$DS}a2.txt",
+            strtr($base, [$DS => '/']) . "/a/a1.txt",
+            strtr($base, [$DS => '/']) . "/a/a2.txt",
         ]);
         that(file_list("$base/*/*/*.log"))->equalsCanonicalizing([
-            "$base{$DS}a{$DS}b{$DS}ab2.log",
+            strtr($base, [$DS => '/']) . "/a/b/ab2.log",
         ]);
         that(file_list("$base/**.log"))->equalsCanonicalizing([
-            "$base{$DS}a{$DS}b{$DS}ab2.log",
-            "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
-            "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
+            strtr($base, [$DS => '/']) . "/a/b/ab2.log",
+            strtr($base, [$DS => '/']) . "/a/b/c/abc1.log",
+            strtr($base, [$DS => '/']) . "/a/b/c/abc2.log",
         ]);
 
         // 拡張子でフィルタ
