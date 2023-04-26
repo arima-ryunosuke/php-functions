@@ -63,6 +63,7 @@ function dir_diff($path1, $path2, $options = [])
     $DS = DIRECTORY_SEPARATOR;
 
     $options += [
+        'unixpath'       => false,
         'case-sensitive' => $DS === '/',
     ];
     $filter_condition = ['relative' => true, '!type' => null] + $options;
@@ -76,6 +77,12 @@ function dir_diff($path1, $path2, $options = [])
     $list2 = file_list($path2, $filter_condition);
     if ($list2 === false) {
         $list2 = [];
+    }
+
+    if ($options['unixpath']) {
+        $DS = '/';
+        $list1 = array_map(fn($file) => strtr($file, [DIRECTORY_SEPARATOR => $DS]), $list1);
+        $list2 = array_map(fn($file) => strtr($file, [DIRECTORY_SEPARATOR => $DS]), $list2);
     }
 
     $files1 = array_combine($list1, $list1);
@@ -95,8 +102,8 @@ function dir_diff($path1, $path2, $options = [])
     $result += array_fill_keys($diff2, false);
 
     foreach ($commons as $key => $name) {
-        $file1 = "$path1{$DS}" . $files1[$key];
-        $file2 = "$path2{$DS}" . $files2[$key];
+        $file1 = $path1 . $DS . $files1[$key];
+        $file2 = $path2 . $DS . $files2[$key];
 
         if (!(is_dir($file1) && is_dir($file2)) && ($diff = $differ($file1, $file2)) !== null) {
             $result[$name] = $diff;

@@ -160,6 +160,31 @@ class filesystemTest extends AbstractTestCase
             ],
         ]);
 
+        that(dir_diff($root1, $root2, [
+            'unixpath'       => true,
+            'case-sensitive' => true,
+        ]))->is([
+            "CASEDIR/"        => false,
+            "CASEDIR/file1"   => false,
+            "CASEDIR/file2"   => false,
+            "CASEDIR/file4"   => false,
+            "casedir/"        => true,
+            "casedir/file1"   => true,
+            "casedir/file2"   => true,
+            "casedir/file3"   => true,
+            "directory/file2" => "",
+            "directory/file3" => true,
+            "directory/file4" => false,
+            "empty1/"         => true,
+            "empty2/"         => false,
+            "entry"           => false,
+            "entry/"          => true,
+            "entry/file1"     => true,
+            "file2"           => "",
+            "file3"           => true,
+            "file4"           => false,
+        ]);
+
         $DS = DIRECTORY_SEPARATOR;
         that(dir_diff($root1, $root2, [
             'case-sensitive' => true,
