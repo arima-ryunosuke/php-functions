@@ -221,7 +221,7 @@ class filesystemTest extends AbstractTestCase
         that(dir_diff($root1, $root2, [
             'case-sensitive' => false,
             'recursive'      => false,
-            'differ'         => fn($file1, $file2) => file_get_contents($file1) . '<>' . file_get_contents($file2),
+            'differ'         => fn($file1, $file2) => file_equals($file1, $file2) ? null : file_get_contents($file1) . '<>' . file_get_contents($file2),
         ]))->is([
             "empty1{$DS}" => true,
             "empty2{$DS}" => false,

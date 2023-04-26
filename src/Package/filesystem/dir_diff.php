@@ -67,8 +67,7 @@ function dir_diff($path1, $path2, $options = [])
     ];
     $filter_condition = ['relative' => true, '!type' => null] + $options;
 
-    $chunksize = $options['chunksize'] ?? null;
-    $differ = $options['differ'] ?? fn($file1, $file2) => '';
+    $differ = $options['differ'] ?? fn($file1, $file2) => file_equals($file1, $file2) ? null : "";
 
     $list1 = file_list($path1, $filter_condition);
     if ($list1 === false) {
@@ -99,11 +98,8 @@ function dir_diff($path1, $path2, $options = [])
         $file1 = "$path1{$DS}" . $files1[$key];
         $file2 = "$path2{$DS}" . $files2[$key];
 
-        if (!(is_dir($file1) && is_dir($file2)) && !file_equals($file1, $file2, $chunksize)) {
-            $diff = $differ($file1, $file2);
-            if ($diff !== null) {
-                $result[$name] = $diff;
-            }
+        if (!(is_dir($file1) && is_dir($file2)) && ($diff = $differ($file1, $file2)) !== null) {
+            $result[$name] = $diff;
         }
     }
 
