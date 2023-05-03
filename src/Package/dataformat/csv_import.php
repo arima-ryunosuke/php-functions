@@ -7,6 +7,7 @@ require_once __DIR__ . '/../array/array_map_recursive.php';
 require_once __DIR__ . '/../array/array_pickup.php';
 require_once __DIR__ . '/../array/is_indexarray.php';
 require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../url/parse_query.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -95,6 +96,7 @@ function csv_import($csvstring, $options = [])
         'headers'   => [],
         'headermap' => null,
         'structure' => false,
+        'grouping'  => null,
         'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
     ];
 
@@ -114,7 +116,7 @@ function csv_import($csvstring, $options = [])
     }
 
     try {
-        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $callback) {
+        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) {
             $mb_internal_encoding = mb_internal_encoding();
             $result = [];
             $n = -1;
@@ -134,9 +136,9 @@ function csv_import($csvstring, $options = [])
                 if ($structure) {
                     $query = [];
                     foreach ($headers as $i => $header) {
-                        $query[] = $header . "=" . rawurlencode($row[$i]);
+                        $query[] =  rawurlencode($header). "=" . rawurlencode($row[$i]);
                     }
-                    parse_str(implode('&', $query), $row);
+                    $row = parse_query(implode('&', $query), '&', PHP_QUERY_RFC3986);
                     // csv の仕様上、空文字を置かざるを得ないが、数値配列の場合は空にしたいことがある
                     $row = array_map_recursive($row, function ($v) {
                         if (is_array($v) && is_indexarray($v)) {
@@ -161,10 +163,29 @@ function csv_import($csvstring, $options = [])
                         continue;
                     }
                 }
-                $result[] = $row;
+
+                if ($grouping !== null) {
+                    foreach ($row as $column => $value) {
+                        $parts = explode($grouping, $column, 2);
+                        if (count($parts) === 1) {
+                            array_unshift($parts, "");
+                        }
+                        $result[$parts[0]][$n][$parts[1]] = $value;
+                    }
+                }
+                else {
+                    $result[] = $row;
+                }
             }
+
+            if ($grouping !== null) {
+                foreach ($result as $g => $rows) {
+                    $result[$g] = array_values(array_unique($rows, SORT_REGULAR));
+                }
+            }
+
             return $result;
-        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['callback']);
+        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
     }
     finally {
         fclose($fp);

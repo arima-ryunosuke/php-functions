@@ -293,6 +293,37 @@ a3,b3,c3
             ['scalar' => '', 'list' => [], 'hash' => ['x' => '', 'y' => ''], 'nest' => []],
         ]);
 
+        // グルーピング
+        that(csv_import("A.hoge,B.hoge,B.fuga,A.fuga,other[],other[]
+Ahoge,Bhoge1,Bfuga1,Afuga,other11,other12
+Ahoge,Bhoge2,Bfuga2,Afuga,other21,other22
+", ['grouping' => '.', 'structure' => true]))->is([
+            "A" => [
+                [
+                    "hoge" => "Ahoge",
+                    "fuga" => "Afuga",
+                ],
+            ],
+            "B" => [
+                [
+                    "hoge" => "Bhoge1",
+                    "fuga" => "Bfuga1",
+                ],
+                [
+                    "hoge" => "Bhoge2",
+                    "fuga" => "Bfuga2",
+                ],
+            ],
+            ""  => [
+                [
+                    "other" => ["other11", "other12"],
+                ],
+                [
+                    "other" => ["other21", "other22"],
+                ],
+            ],
+        ]);
+
         // 要素数が合わないと例外
         that(self::resolveFunction('csv_import'))("a,b,c\nhoge")->wasThrown('array_combine');
     }
