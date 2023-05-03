@@ -3,11 +3,13 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_all.php';
+require_once __DIR__ . '/../array/array_any.php';
 require_once __DIR__ . '/../array/array_sprintf.php';
 require_once __DIR__ . '/../array/array_unset.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../array/last_key.php';
 require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../dataformat/markdown_table.php';
 require_once __DIR__ . '/../errorfunc/stacktrace.php';
 require_once __DIR__ . '/../info/ansi_colorize.php';
 require_once __DIR__ . '/../info/is_ansi.php';
@@ -79,6 +81,7 @@ function var_pretty($value, $options = [])
         'trace'         => false, // スタックトレースの表示
         'callback'      => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
         'debuginfo'     => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
+        'table'         => true,  // 連想配列の配列の場合にテーブル表示するか（現状はマークダウン風味固定）
         'maxcolumn'     => null,  // 1行あたりの文字数
         'maxcount'      => null,  // 複合型の要素の数
         'maxdepth'      => null,  // 複合型の深さ
@@ -161,9 +164,9 @@ function var_pretty($value, $options = [])
             return $this;
         }
 
-        public function plain($token): self
+        public function plain($token, $style = null): self
         {
-            return $this->_append($token);
+            return $this->_append($token, $style);
         }
 
         public function index($token): self
@@ -242,6 +245,29 @@ function var_pretty($value, $options = [])
             }
         }
 
+        public function array($value): array
+        {
+            if (is_array($value)) {
+                return $value;
+            }
+            if (is_object($value)) {
+                if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
+                    $properties = [];
+                    foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
+                        $p = strrpos($k, "\0");
+                        if ($p !== false) {
+                            $k = substr($k, $p + 1);
+                        }
+                        $properties[$k] = $v;
+                    }
+                }
+                else {
+                    $properties = get_object_properties($value);
+                }
+                return $properties;
+            }
+        }
+
         public function export($value, $nest, $parents, $callback)
         {
             $position = strlen($this->content);
@@ -281,6 +307,39 @@ function var_pretty($value, $options = [])
                 $is_hasharray = is_hasharray($value);
                 $primitive_only = array_all($value, fn(...$args) => is_primitive(...$args));
                 $assoc = !$this->options['minify'] && ($is_hasharray || !$primitive_only);
+                $tableofarray = (function () use ($count, $value) {
+                    if ($this->options['minify'] || !$this->options['table'] || $count <= 1) {
+                        return null;
+                    }
+
+                    $first = reset($value);
+                    $objective = is_object($first);
+                    if ((!is_array($first) && !$objective) || empty($first)) {
+                        return null;
+                    }
+
+                    // オブジェクトの一致性は完全同一クラス（継承や実装は見ない）、配列はキーが同じものとする
+                    if ($objective) {
+                        $first_condition = get_class($first);
+                    }
+                    else {
+                        $first_condition = array_keys($first);
+                        if (array_any($first_condition, 'is_int')) {
+                            return null;
+                        }
+                    }
+
+                    foreach ($value as $v) {
+                        if (true
+                            && !(is_array($v) && array_keys($v) === $first_condition)
+                            && !(is_object($v) && get_class($v) === $first_condition)
+                        ) {
+                            return null;
+                        }
+                    }
+
+                    return $objective ? "{$first_condition}[]" : 'array[]';
+                })();
 
                 $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
                 $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
@@ -313,6 +372,16 @@ function var_pretty($value, $options = [])
 
                 if ($count === 0) {
                     $this->plain('[]');
+                }
+                elseif ($tableofarray) {
+                    $markdown = markdown_table(array_map(fn($v) => $this->array($v), $value), [
+                        'keylabel' => "",
+                        'context'  => $this->options['context'],
+                    ]);
+                    $this->plain($tableofarray, 'green');
+                    $this->plain("\n");
+                    $this->plain(preg_replace('#^#um', $spacer1, $markdown));
+                    $this->plain($spacer2);
                 }
                 elseif ($assoc) {
                     $n = 0;
@@ -405,19 +474,7 @@ function var_pretty($value, $options = [])
                     goto FINALLY_;
                 }
 
-                if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
-                    $properties = [];
-                    foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
-                        $p = strrpos($k, "\0");
-                        if ($p !== false) {
-                            $k = substr($k, $p + 1);
-                        }
-                        $properties[$k] = $v;
-                    }
-                }
-                else {
-                    $properties = get_object_properties($value);
-                }
+                $properties = $this->array($value);
 
                 $this->plain(" ");
                 if ($properties) {

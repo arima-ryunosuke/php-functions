@@ -1124,6 +1124,7 @@ class varTest extends AbstractTestCase
             'context' => 'plain',
             'return'  => true,
             'trace'   => 3,
+            'table'   => false,
         ]))
             ->stringContains(__FILE__)
             ->stringContains("  0: stdClass#")
@@ -1200,6 +1201,90 @@ class varTest extends AbstractTestCase
         ]))
             ->stringContains('    "ssssssssssssssssssss",')
             ->stringContains('    a: "ssssssssssssssssssss",');
+
+        that(var_pretty([
+            'arrays'  => [
+                ['a' => 'A1', 'b' => 'B1', 'c' => 'C1', 'x' => ['y' => ['z' => 1]]],
+                ['a' => 'A2', 'b' => 'B2', 'c' => 'C2', 'x' => ['y' => ['z' => 2]]],
+                ['a' => 'A3', 'b' => 'B3', 'c' => 'C3', 'x' => ['y' => ['z' => 3]]],
+            ],
+            'objects' => [
+                'h' => (object) ['a' => 'A1', 'b' => 'B1', 'c' => 'C1', 'x' => ['y' => ['z' => 1]]],
+                'f' => (object) ['a' => 'A2', 'b' => 'B2', 'c' => 'C2', 'x' => ['y' => ['z' => 2]]],
+                'p' => (object) ['a' => 'A3', 'b' => 'B3', 'c' => 'C3', 'x' => ['y' => ['z' => 3]]],
+            ],
+            'onerow'  => [
+                ['a' => 'A1', 'b' => 'B1', 'c' => 'C1', 'x' => ['y' => ['z' => 1]]],
+            ],
+            'intkey'  => [
+                ['A1', 'B1', 'C1'],
+                ['A2', 'B2', 'C2'],
+            ],
+        ], [
+            'context' => 'plain',
+            'return'  => true,
+            'table'   => true,
+        ]))
+            ->stringContains(<<<MD
+              arrays: array[]
+                |     | a   | b   | c   | x         |
+                | --: | --- | --- | --- | --------- |
+                |   0 | A1  | B1  | C1  | {         |
+                |     |     |     |     |   y: {    |
+                |     |     |     |     |     z: 1, |
+                |     |     |     |     |   },      |
+                |     |     |     |     | }         |
+                |   1 | A2  | B2  | C2  | {         |
+                |     |     |     |     |   y: {    |
+                |     |     |     |     |     z: 2, |
+                |     |     |     |     |   },      |
+                |     |     |     |     | }         |
+                |   2 | A3  | B3  | C3  | {         |
+                |     |     |     |     |   y: {    |
+                |     |     |     |     |     z: 3, |
+                |     |     |     |     |   },      |
+                |     |     |     |     | }         |
+            MD,)
+            ->stringContains(<<<MD
+              objects: stdClass[]
+                |     | a   | b   | c   | x         |
+                | --- | --- | --- | --- | --------- |
+                | h   | A1  | B1  | C1  | {         |
+                |     |     |     |     |   y: {    |
+                |     |     |     |     |     z: 1, |
+                |     |     |     |     |   },      |
+                |     |     |     |     | }         |
+                | f   | A2  | B2  | C2  | {         |
+                |     |     |     |     |   y: {    |
+                |     |     |     |     |     z: 2, |
+                |     |     |     |     |   },      |
+                |     |     |     |     | }         |
+                | p   | A3  | B3  | C3  | {         |
+                |     |     |     |     |   y: {    |
+                |     |     |     |     |     z: 3, |
+                |     |     |     |     |   },      |
+                |     |     |     |     | }         |
+            MD,)
+            ->stringContains(<<<MD
+              onerow: [
+                {
+                  a: "A1",
+                  b: "B1",
+                  c: "C1",
+                  x: {
+                    y: {
+                      z: 1,
+                    },
+                  },
+                },
+              ],
+            MD,)
+            ->stringContains(<<<MD
+              intkey: [
+                ["A1", "B1", "C1"],
+                ["A2", "B2", "C2"],
+              ],
+            MD,);
 
         that(var_pretty($value, [
             'context' => 'plain',
