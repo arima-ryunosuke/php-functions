@@ -1438,6 +1438,22 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 |     | a5  |
 ");
 
+        that("\n" . markdown_table(["1\n2\n3" => ['a' => "a1\na2"], "4\n5" => ['a' => ["a3", "a4", 'x' => "a9"]]], [
+                'keylabel' => 'key',
+                'context'  => 'plain',
+            ]))->is('
+| key | a          |
+| --: | ---------- |
+|   1 | a1         |
+|   2 | a2         |
+|   3 |            |
+|   4 | {          |
+|   5 |   0: "a3", |
+|     |   1: "a4", |
+|     |   x: "a9", |
+|     | }          |
+');
+
         that(self::resolveFunction('markdown_table'))('')->wasThrown('must be array of hasharray');
     }
 

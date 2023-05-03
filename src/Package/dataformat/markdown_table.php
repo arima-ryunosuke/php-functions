@@ -4,6 +4,8 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../info/ansi_strip.php';
 require_once __DIR__ . '/../var/is_empty.php';
+require_once __DIR__ . '/../var/is_stringable.php';
+require_once __DIR__ . '/../var/var_pretty.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -41,9 +43,12 @@ function markdown_table($array, $option = [])
     }
 
     $option += [
-        'keylabel' => null,   // 指定すると一番左端にキーの列が生える
-        'context'  => 'html', // html:改行がbrになる（html 以外は未定義）
+        'keylabel'  => null,   // 指定すると一番左端にキーの列が生える
+        'context'   => 'html', // html:改行がbrになる（html 以外は未定義）
+        'stringify' => fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]),
     ];
+
+    $stringify = fn($v) => strtr(trim(is_stringable($v) ? $v : $option['stringify']($v)), ["\t" => '    ']);
 
     $rows = [];
     $defaults = [];
@@ -55,10 +60,10 @@ function markdown_table($array, $option = [])
             $fields = [$option['keylabel'] => $n] + $fields;
         }
         if ($option['context'] === 'html') {
-            $fields = array_map(fn($v) => (array) str_replace(["\r\n", "\r", "\n"], '<br>', $v), $fields);
+            $fields = array_map(fn($v) => (array) str_replace(["\r\n", "\r", "\n"], '<br>', $stringify($v)), $fields);
         }
         else {
-            $fields = array_map(fn($v) => explode("\n", trim($v)), $fields);
+            $fields = array_map(fn($v) => preg_split("#\r?\n#u", $stringify($v)), $fields);
         }
         foreach ($fields as $k => $v) {
             $defaults[$k] = '';
