@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\ends_with;
 use function ryunosuke\Functions\Package\include_string;
 use function ryunosuke\Functions\Package\kvsprintf;
 use function ryunosuke\Functions\Package\mb_ellipsis;
+use function ryunosuke\Functions\Package\mb_monospace;
 use function ryunosuke\Functions\Package\mb_str_pad;
 use function ryunosuke\Functions\Package\mb_substr_replace;
 use function ryunosuke\Functions\Package\mb_trim;
@@ -235,6 +236,21 @@ This is VARIABLE.
         that(mb_ellipsis('', 1, '...', null))->isSame('');
         that(mb_ellipsis('1234567890', 1, '...', null))->isSame('...');
         that(mb_ellipsis('1234567890', 1000, '...', null))->isSame('1234567890');
+    }
+
+    function test_mb_monospace()
+    {
+        that(mb_monospace('※★▼…'))->isSame(8);
+        that(mb_monospace('123456７8８'))->isSame(11);
+        that(mb_monospace('Σ(ﾟДﾟ)え!！'))->isSame(15);
+        that(mb_monospace('Σ(ﾟДﾟ)え!！', [
+            "Σ"    => 1,
+            "Ѐ-ӿ"  => 1,
+            0xFF9F => 1,
+        ]))->isSame(11);
+        that(mb_monospace('あいうえおかきくけこさしすせそたちつてとなにぬねの', [
+            "あいうえおさ-そな-の" => 1,
+        ]))->isSame(35);
     }
 
     function test_mb_str_pad()

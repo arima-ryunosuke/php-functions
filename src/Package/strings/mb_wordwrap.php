@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../strings/mb_monospace.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -39,7 +40,7 @@ function mb_wordwrap($string, $width, $break = "\n")
     $result = [];
     foreach ($lines as $line) {
         $chars = mb_str_split($line);
-        $widths = array_map(fn($c) => mb_strwidth($c), $chars);
+        $widths = array_map(fn($c) => mb_monospace($c), $chars);
 
         $sum = 0;
         $buffer = '';

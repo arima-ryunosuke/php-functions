@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../info/ansi_strip.php';
+require_once __DIR__ . '/../strings/mb_monospace.php';
 require_once __DIR__ . '/../var/is_empty.php';
 require_once __DIR__ . '/../var/is_stringable.php';
 require_once __DIR__ . '/../var/var_pretty.php';
@@ -71,7 +72,7 @@ function markdown_table($array, $option = [])
                 $e = ansi_strip($t);
                 $rows["{$n}_{$i}"][$k] = $t;
                 $numerics[$k] = ($numerics[$k] ?? true) && (is_numeric($e) || strlen($e) === 0);
-                $lengths[$k] = max($lengths[$k] ?? 3, mb_strwidth(ansi_strip($k)), mb_strwidth($e)); // 3 は markdown の最低見出し長
+                $lengths[$k] = max($lengths[$k] ?? 3, mb_monospace(ansi_strip($k)), mb_monospace($e)); // 3 は markdown の最低見出し長
             }
         }
     }
@@ -79,7 +80,7 @@ function markdown_table($array, $option = [])
     $linebuilder = function ($fields, $padstr) use ($numerics, $lengths) {
         $line = [];
         foreach ($fields as $k => $v) {
-            $ws = str_repeat($padstr, $lengths[$k] - (mb_strwidth(ansi_strip($v))));
+            $ws = str_repeat($padstr, $lengths[$k] - (mb_monospace(ansi_strip($v))));
             $pad = $numerics[$k] ? "$ws$v" : "$v$ws";
             if ($padstr === '-' && $numerics[$k]) {
                 $pad[-1] = ':';

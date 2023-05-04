@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../strings/mb_monospace.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -35,12 +36,12 @@ function mb_ellipsis($string, $width, $trimmarker = '...', $pos = null)
 {
     $string = (string) $string;
 
-    $strwidth = mb_strwidth($string);
+    $strwidth = mb_monospace($string);
     if ($strwidth <= $width) {
         return $string;
     }
 
-    $markerwidth = mb_strwidth($trimmarker);
+    $markerwidth = mb_monospace($trimmarker);
     if ($markerwidth >= $width) {
         return $trimmarker;
     }
@@ -53,7 +54,7 @@ function mb_ellipsis($string, $width, $trimmarker = '...', $pos = null)
     $pos = ceil(max(0, min($pos, $maxwidth)));
     $end = $pos + $strwidth - $maxwidth;
 
-    $widths = array_map('mb_strwidth', mb_str_split($string));
+    $widths = array_map(fn($s) => mb_monospace($s), mb_str_split($string));
     $s = $e = null;
     $sum = 0;
     foreach ($widths as $n => $w) {
