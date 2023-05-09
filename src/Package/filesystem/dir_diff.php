@@ -10,8 +10,8 @@ require_once __DIR__ . '/../filesystem/file_list.php';
  * ファイルツリーを比較して配列で返す
  *
  * ファイル名をキーとし、
- * - $path1 にしかないファイルは false
- * - $path2 にしかないファイルは true
+ * - $path1 にしかないファイルは true
+ * - $path2 にしかないファイルは false
  * - 両方にあり、内容が異なる場合はなんらかの文字列（comparator オプション）
  * - 両方にあり、内容が同じ場合は結果に含まれない
  *
@@ -20,10 +20,35 @@ require_once __DIR__ . '/../filesystem/file_list.php';
  *
  * Example:
  * ```php
- * // すべてにマッチするので true
- * that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaXbbbX'))->isTrue();
- * // aaa にはマッチするが bbb にはマッチしないので false
- * that(fnmatch_and(['*aaa*', '*bbb*'], 'aaaX'))->isFalse();
+ * // 適当にファイルツリーを用意
+ * $dir1 = sys_get_temp_dir() . '/diff1';
+ * $dir2 = sys_get_temp_dir() . '/diff2';
+ * file_set_tree([
+ *     $dir1 => [
+ *         'file1.txt' => 'file1',
+ *         'file2.txt' => 'file2',
+ *         'sub1' => [
+ *             'file.txt' => 'sub1file',
+ *         ],
+ *         'sub2' => [],
+ *     ],
+ *     $dir2 => [
+ *         'file1.txt' => 'file1',
+ *         'file2.txt' => 'FILE2',
+ *         'sub1' => [],
+ *         'sub2' => [
+ *             'file.txt' => 'sub2file',
+ *         ],
+ *     ],
+ * ]);
+ * // dir_diff すると下記のような差分が得られる
+ * $DS = DIRECTORY_SEPARATOR;
+ * that(dir_diff($dir1, $dir2))->is([
+ *     // "file1.txt" => "",         // 差分がないので含まれない
+ *     "file2.txt" => "",            // 両方に存在して差分あり
+ *     "sub1{$DS}file.txt" => true,  // dir1 にのみ存在する
+ *     "sub2{$DS}file.txt" => false, // dir2 にのみ存在する
+ * ]);
  * ```
  *
  * @package ryunosuke\Functions\Package\filesystem
