@@ -104,45 +104,46 @@ class filesystemTest extends AbstractTestCase
         mkdir($root1, 0777, true);
         that(self::resolveFunction('dir_diff'))($root1, $root2)->notWasThrown('does not exists');
 
-        file_set_tree($root1, [
-            'file1'     => 'file',
-            'file2'     => 'file2',
-            'file3'     => 'file3',
-            'empty'     => [],
-            'empty1'    => [],
-            'samedir'   => [
-                'file' => 'file',
+        file_set_tree([
+            $root1 => [
+                'file1'     => 'file',
+                'file2'     => 'file2',
+                'file3'     => 'file3',
+                'empty'     => [],
+                'empty1'    => [],
+                'samedir'   => [
+                    'file' => 'file',
+                ],
+                'directory' => [
+                    'file1' => 'file',
+                    'file2' => 'file2',
+                    'file3' => 'file3',
+                ],
+                'casedir'   => [
+                    'file1' => 'file',
+                    'file2' => 'file2',
+                    'file3' => 'file3',
+                ],
             ],
-            'directory' => [
-                'file1' => 'file',
-                'file2' => 'file2',
-                'file3' => 'file3',
-            ],
-            'casedir'   => [
-                'file1' => 'file',
-                'file2' => 'file2',
-                'file3' => 'file3',
-            ],
-        ]);
-
-        file_set_tree($root2, [
-            'file1'     => 'file',
-            'file2'     => 'fileEX',
-            'file4'     => 'file4',
-            'empty'     => [],
-            'empty2'    => [],
-            'samedir'   => [
-                'file' => 'file',
-            ],
-            'directory' => [
-                'file1' => 'file',
-                'file2' => 'fileEX',
-                'file4' => 'file4',
-            ],
-            'CASEDIR'   => [
-                'file1' => 'file',
-                'file2' => 'fileEX',
-                'file4' => 'file4',
+            $root2 => [
+                'file1'     => 'file',
+                'file2'     => 'fileEX',
+                'file4'     => 'file4',
+                'empty'     => [],
+                'empty2'    => [],
+                'samedir'   => [
+                    'file' => 'file',
+                ],
+                'directory' => [
+                    'file1' => 'file',
+                    'file2' => 'fileEX',
+                    'file4' => 'file4',
+                ],
+                'CASEDIR'   => [
+                    'file1' => 'file',
+                    'file2' => 'fileEX',
+                    'file4' => 'file4',
+                ],
             ],
         ]);
 
@@ -273,33 +274,34 @@ class filesystemTest extends AbstractTestCase
         rm_rf($root1);
         rm_rf($root2);
 
-        file_set_tree($root1, [
-            'file1'      => 'file',
-            'file2'      => 'file2',
-            'file3'      => 'file3',
-            'directory1' => [
-                'hoge' => 'hoge',
-                'fuga' => 'fuga',
-                'piyo' => 'piyo',
+        file_set_tree([
+            $root1 => [
+                'file1'      => 'file',
+                'file2'      => 'file2',
+                'file3'      => 'file3',
+                'directory1' => [
+                    'hoge' => 'hoge',
+                    'fuga' => 'fuga',
+                    'piyo' => 'piyo',
+                ],
+                'directory2' => [
+                    'hoge' => 'hoge',
+                    'fuga' => 'fuga',
+                ],
             ],
-            'directory2' => [
-                'hoge' => 'hoge',
-                'fuga' => 'fuga',
-            ],
-        ]);
-
-        file_set_tree($root2, [
-            'file1'      => 'file',
-            'file2'      => 'file9',
-            'file3'      => 'file999',
-            'directory1' => [
-                'hoge' => 'hoge',
-                'fuga' => 'fuga',
-            ],
-            'directory2' => [
-                'hoge' => 'hoge',
-                'fuga' => 'fuga',
-                'piyo' => 'piyo',
+            $root2 => [
+                'file1'      => 'file',
+                'file2'      => 'file9',
+                'file3'      => 'file999',
+                'directory1' => [
+                    'hoge' => 'hoge',
+                    'fuga' => 'fuga',
+                ],
+                'directory2' => [
+                    'hoge' => 'hoge',
+                    'fuga' => 'fuga',
+                    'piyo' => 'piyo',
+                ],
             ],
         ]);
 
@@ -755,27 +757,29 @@ class filesystemTest extends AbstractTestCase
         $root = sys_get_temp_dir() . $DS . 'file_set_tree';
         rm_rf($root);
 
-        that(file_set_tree($root, [
-            'blank'      => '',
-            'empty'      => [],
-            'single.txt' => 'single',
-            'directory'  => [
-                '1.txt' => '1',
-                '2.txt' => '22',
-                '3.txt' => '333',
-            ],
-            'closure1'   => fn() => [
-                'c' => 'c',
-            ],
-            'closure2'   => fn() => str_replace('/', $DS, implode(',', func_get_args())),
-            'x'          => [
-                'y' => [
-                    'z.txt' => 'xyz',
+        that(file_set_tree([
+            $root => [
+                'blank'      => '',
+                'empty'      => [],
+                'single.txt' => 'single',
+                'directory'  => [
+                    '1.txt' => '1',
+                    '2.txt' => '22',
+                    '3.txt' => '333',
                 ],
-            ],
-            'a/b/c1'     => 'abc1',
-            'a'          => [
-                'b/c2' => 'abc2',
+                'closure1'   => fn() => [
+                    'c' => 'c',
+                ],
+                'closure2'   => fn() => str_replace('/', $DS, implode(',', func_get_args())),
+                'x'          => [
+                    'y' => [
+                        'z.txt' => 'xyz',
+                    ],
+                ],
+                'a/b/c1'     => 'abc1',
+                'a'          => [
+                    'b/c2' => 'abc2',
+                ],
             ],
         ]))->is([
             "$root{$DS}single.txt"          => 6,

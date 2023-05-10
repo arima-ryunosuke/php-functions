@@ -18,12 +18,14 @@ require_once __DIR__ . '/../filesystem/path_normalize.php';
  * ```php
  * // 一時ディレクトリにツリー構造でファイルを配置する
  * $root = sys_get_temp_dir();
- * file_set_tree($root, [
- *     'hoge.txt' => 'HOGE',
- *     'dir1' => [
- *         'fuga.txt' => 'FUGA',
- *         'dir2'     => [
- *             'piyo.txt' => 'PIYO',
+ * file_set_tree([
+ *     $root => [
+ *         'hoge.txt' => 'HOGE',
+ *         'dir1' => [
+ *             'fuga.txt' => 'FUGA',
+ *             'dir2'     => [
+ *                 'piyo.txt' => 'PIYO',
+ *             ],
  *         ],
  *     ],
  * ]);
@@ -34,32 +36,40 @@ require_once __DIR__ . '/../filesystem/path_normalize.php';
  *
  * @package ryunosuke\Functions\Package\filesystem
  *
- * @param string $root ルートパス
  * @param array $contents_tree コンテンツツリー
- * @param int $umask umask
+ * @param ?int $umask umask
  * @return array 書き込まれたバイト数配列
  */
-function file_set_tree($root, $contents_tree, $umask = 0002)
+function file_set_tree($contents_tree, $umask = null)
 {
-    if (func_num_args() === 2) {
-        $umask = umask();
+    // for compatible
+    // @codeCoverageIgnoreStart
+    if (is_string($contents_tree)) {
+        $contents_tree = [$contents_tree => $umask];
+        $umask = func_get_args()[2] ?? null;
     }
+    // @codeCoverageIgnoreEnd
 
-    $result = [];
-    foreach ($contents_tree as $basename => $entry) {
-        $fullpath = $root . DIRECTORY_SEPARATOR . $basename;
-        if ($entry instanceof \Closure) {
-            $entry = $entry($fullpath, $root, $basename);
-        }
+    $umask ??= umask();
 
-        if (is_array($entry)) {
-            mkdir_p($fullpath, $umask);
-            $result += file_set_tree($fullpath, $entry, $umask);
+    $main = function ($contents_tree, $parent) use (&$main, $umask) {
+        $result = [];
+        foreach ($contents_tree as $basename => $entry) {
+            $fullpath = isset($parent) ? $parent . DIRECTORY_SEPARATOR . $basename : $basename;
+            if ($entry instanceof \Closure) {
+                $entry = $entry($fullpath, $parent, $basename);
+            }
+
+            if (is_array($entry)) {
+                mkdir_p($fullpath, $umask);
+                $result += $main($entry, $fullpath);
+            }
+            else {
+                $byte = file_set_contents($fullpath, $entry, $umask);
+                $result[path_normalize($fullpath)] = $byte;
+            }
         }
-        else {
-            $byte = file_set_contents($fullpath, $entry, $umask);
-            $result[path_normalize($fullpath)] = $byte;
-        }
-    }
-    return $result;
+        return $result;
+    };
+    return $main($contents_tree, null);
 }
