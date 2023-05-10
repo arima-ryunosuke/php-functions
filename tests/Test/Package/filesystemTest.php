@@ -1210,6 +1210,12 @@ class filesystemTest extends AbstractTestCase
 
         that(rm_rf("$dir/.dotfile", true))->isTrue();
         that("$dir/.dotfile")->fileNotExists(); // ファイルも消せる
+
+        $dir = memory_path('rm_rf');
+        file_set_contents("$dir/a/x.txt", '');
+        file_set_contents("$dir/a.txt", '');
+        that(rm_rf($dir))->isTrue();
+        that($dir)->fileNotExists();
     }
 
     function test_strmode()

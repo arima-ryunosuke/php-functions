@@ -45,6 +45,10 @@ function rm_rf($dirname, $self = true)
     if (is_file($dirname) || is_link($dirname)) {
         return unlink($dirname);
     }
+    // ↓で glob してるので、ディレクトリ判定しないとリモートファイルに対応できない
+    if (is_dir($dirname)) {
+        return $main($dirname, $self);
+    }
 
     $result = true;
     $targets = glob($dirname, GLOB_BRACE | GLOB_NOCHECK | ($self ? 0 : GLOB_ONLYDIR));
