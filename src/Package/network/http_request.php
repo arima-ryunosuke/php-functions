@@ -57,7 +57,7 @@ require_once __DIR__ . '/../strings/str_chunk.php';
  * Example:
  * ```php
  * $response = http_request([
- *     'url'    => 'http://httpbin.org/post?name=value',
+ *     'url'    => TESTWEBSERVER . '/post?name=value',
  *     'method' => 'POST',
  *     'body'   => ['k1' => 'v1', 'k2' => 'v2'],
  * ]);
