@@ -26858,6 +26858,7 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
             'maxlength'     => null,  // スカラー・非複合配列の文字数
             'maxlistcolumn' => 120,   // 通常配列を1行化する文字数
             'limit'         => null,  // 最終出力の文字数
+            'excludeclass'  => [],    // 除外するクラス名
         ];
 
         if ($options['context'] === null) {
@@ -27239,6 +27240,12 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                 }
                 elseif (is_object($value)) {
                     $this->value($value);
+
+                    foreach ((array) $this->options['excludeclass'] as $class) {
+                        if ($value instanceof $class) {
+                            goto FINALLY_;
+                        }
+                    }
 
                     if ($this->options['minify']) {
                         goto FINALLY_;
