@@ -1119,12 +1119,14 @@ class varTest extends AbstractTestCase
             'c1'    => [$sclosure, $sclosure],
             'R'     => STDOUT,
             'empty' => [],
+            'ex'    => new \Exception(),
         ];
         that(var_pretty($value, [
-            'context' => 'plain',
-            'return'  => true,
-            'trace'   => 3,
-            'table'   => false,
+            'context'      => 'plain',
+            'return'       => true,
+            'trace'        => 3,
+            'table'        => false,
+            'excludeclass' => [\Exception::class],
         ]))
             ->stringContains(__FILE__)
             ->stringContains("  0: stdClass#")
@@ -1137,7 +1139,8 @@ class varTest extends AbstractTestCase
             ->stringContains("    Closure@")
             ->stringContains("    Closure@")
             ->stringContains("  R: Resource id #2 of type (stream)")
-            ->stringContains("  empty: []");
+            ->stringContains("  empty: []")
+            ->stringNotContains("trace: [");
 
         that(var_pretty([
             'list' => [str_repeat('s', 20), str_repeat('s', 20)],
