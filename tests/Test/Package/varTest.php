@@ -1230,7 +1230,7 @@ class varTest extends AbstractTestCase
         ]))
             ->stringContains(<<<MD
               arrays: array[]
-                |     | a   | b   | c   | x         |
+                |   # | a   | b   | c   | x         |
                 | --: | --- | --- | --- | --------- |
                 |   0 | A1  | B1  | C1  | {         |
                 |     |     |     |     |   y: {    |
@@ -1250,7 +1250,7 @@ class varTest extends AbstractTestCase
             MD,)
             ->stringContains(<<<MD
               objects: stdClass[]
-                |     | a   | b   | c   | x         |
+                | #   | a   | b   | c   | x         |
                 | --- | --- | --- | --- | --------- |
                 | h   | A1  | B1  | C1  | {         |
                 |     |     |     |     |   y: {    |

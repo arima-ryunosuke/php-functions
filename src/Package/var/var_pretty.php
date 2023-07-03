@@ -376,7 +376,7 @@ function var_pretty($value, $options = [])
                 }
                 elseif ($tableofarray) {
                     $markdown = markdown_table(array_map(fn($v) => $this->array($v), $value), [
-                        'keylabel' => "",
+                        'keylabel' => "#",
                         'context'  => $this->options['context'],
                     ]);
                     $this->plain($tableofarray, 'green');
