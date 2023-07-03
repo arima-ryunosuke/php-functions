@@ -10,6 +10,7 @@ use function ryunosuke\Functions\Package\damerau_levenshtein;
 use function ryunosuke\Functions\Package\ends_with;
 use function ryunosuke\Functions\Package\include_string;
 use function ryunosuke\Functions\Package\kvsprintf;
+use function ryunosuke\Functions\Package\mb_compatible_encoding;
 use function ryunosuke\Functions\Package\mb_ellipsis;
 use function ryunosuke\Functions\Package\mb_monospace;
 use function ryunosuke\Functions\Package\mb_str_pad;
@@ -199,6 +200,39 @@ This is VARIABLE.
 
         // 存在しないキーを参照
         that(self::resolveFunction('kvsprintf'))('%aaaaa$d %bbbbb$d', ['hoge' => 123])->wasThrown(new \OutOfBoundsException('Undefined index'));
+    }
+
+    function test_mb_compatible_encoding()
+    {
+        that(mb_compatible_encoding('ascii', 'ascii'))->isTrue();
+        that(mb_compatible_encoding('ascii', 'utf8'))->isTrue();
+        that(mb_compatible_encoding('ascii', 'utf-8'))->isTrue();
+        that(mb_compatible_encoding('ascii', 'sjis'))->isTrue();
+        that(mb_compatible_encoding('ascii', 'shift_jis'))->isTrue();
+        that(mb_compatible_encoding('ascii', 'eucjp'))->isTrue();
+        that(mb_compatible_encoding('ascii', 'ucs2'))->isFalse();
+        that(mb_compatible_encoding('ascii', 'utf32'))->isFalse();
+
+        that(mb_compatible_encoding('utf8', 'utf-8'))->isTrue();
+        that(mb_compatible_encoding('utf8', 'utf-8-docomo'))->isTrue();
+        that(mb_compatible_encoding('utf8', 'utf-7'))->isFalse();
+        that(mb_compatible_encoding('utf8', 'ascii'))->isFalse();
+        that(mb_compatible_encoding('utf-8-docomo', 'utf8'))->isFalse();
+
+        that(mb_compatible_encoding('sjis', 'sjis'))->isTrue();
+        that(mb_compatible_encoding('sjis', 'sjis-win'))->isTrue();
+        that(mb_compatible_encoding('sjis', 'windows-31j'))->isTrue();
+        that(mb_compatible_encoding('sjis', 'cp932'))->isTrue();
+        that(mb_compatible_encoding('sjis', 'utf8'))->isFalse();
+        that(mb_compatible_encoding('sjis', 'ascii'))->isFalse();
+        that(mb_compatible_encoding('windows-31j', 'sjis'))->isFalse();
+
+        that(mb_compatible_encoding('8bit', '8bit'))->isTrue();
+        that(mb_compatible_encoding('8bit', 'binary'))->isTrue();
+        that(mb_compatible_encoding('sjis', '8bit'))->isNull();
+        that(mb_compatible_encoding('8bit', 'utf8'))->isNull();
+
+        that(self::resolveFunction('mb_compatible_encoding'))('unknown', 'unknown')->wasThrown("is not supported");
     }
 
     function test_mb_ellipsis()
