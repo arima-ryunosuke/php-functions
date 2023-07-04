@@ -4,6 +4,8 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\build_query;
 use function ryunosuke\Functions\Package\build_uri;
+use function ryunosuke\Functions\Package\dataurl_decode;
+use function ryunosuke\Functions\Package\dataurl_encode;
 use function ryunosuke\Functions\Package\parse_query;
 use function ryunosuke\Functions\Package\parse_uri;
 
@@ -190,6 +192,62 @@ class urlTest extends AbstractTestCase
                 'index'   => null,
             ],
         ]))->is('?a[b][c][]=%5B&a[b][c][]=%5D');
+    }
+
+    function test_dataurl()
+    {
+        $dataurl = dataurl_encode("hello, world");
+        $plaindata = dataurl_decode($dataurl, $metadata);
+        that($dataurl)->is("data:text/plain;charset=US-ASCII;base64,aGVsbG8sIHdvcmxk");
+        that($plaindata)->is("hello, world");
+        that($metadata)->is([
+            "mimetype" => "text/plain",
+            "charset"  => "US-ASCII",
+            "base64"   => true,
+        ]);
+
+        $dataurl = dataurl_encode("hello,\0world");
+        $plaindata = dataurl_decode($dataurl, $metadata);
+        that($dataurl)->is("data:application/octet-stream;charset=8bit;base64,aGVsbG8sAHdvcmxk");
+        that($plaindata)->is("hello,\0world");
+        that($metadata)->is([
+            "mimetype" => "application/octet-stream",
+            "charset"  => "8bit",
+            "base64"   => true,
+        ]);
+
+        $dataurl = dataurl_encode("hello, world", ['base64' => false]);
+        $plaindata = dataurl_decode($dataurl, $metadata);
+        that($dataurl)->is("data:text/plain;charset=US-ASCII,hello%2C%20world");
+        that($plaindata)->is("hello, world");
+        that($metadata)->is([
+            "mimetype" => "text/plain",
+            "charset"  => "US-ASCII",
+            "base64"   => false,
+        ]);
+
+        $dataurl = dataurl_encode("aGVsbG8sIHdvcmxk", ['mimetype' => '', 'charset' => '', 'base64' => null]);
+        $plaindata = dataurl_decode($dataurl, $metadata);
+        that($dataurl)->is("data:;base64,aGVsbG8sIHdvcmxk");
+        that($plaindata)->is("hello, world");
+        that($metadata)->is([
+            "mimetype" => null,
+            "charset"  => null,
+            "base64"   => true,
+        ]);
+
+        $dataurl = dataurl_encode(mb_convert_encoding("あ,い,う", "sjis"), ['mimetype' => 'text/csv', 'charset' => 'sjis', 'base64' => true]);
+        $plaindata = dataurl_decode($dataurl, $metadata);
+        that($dataurl)->is("data:text/csv;charset=sjis;base64,gqAsgqIsgqQ=");
+        that($plaindata)->is("あ,い,う");
+        that($metadata)->is([
+            "mimetype" => "text/csv",
+            "charset"  => "sjis",
+            "base64"   => true,
+        ]);
+
+        that(dataurl_decode('invalid dataurl'))->isNull();
+        that(dataurl_decode('data:;base64,invalid & base64 & string'))->isNull();
     }
 
     function test_parse_query()
