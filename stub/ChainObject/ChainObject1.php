@@ -508,6 +508,11 @@ trait ChainObject1
     public function switchs($value, $cases, $default = null): self { }
     public function switchs($cases, $default = null): self { }
 
+    /** @see \dataurl_decode() */
+    public self $dataurl_decode;
+    public function dataurl_decode($url, &$metadata = []): self { }
+    public function dataurl_decode(&$metadata = []): self { }
+
     /** @see \attr_exists() */
     public self $attr_exists;
     public function attr_exists($key, $value): self { }

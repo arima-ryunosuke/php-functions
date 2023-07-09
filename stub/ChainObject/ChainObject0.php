@@ -408,6 +408,11 @@ trait ChainObject0
     public function ends_with($string, $with, $case_insensitivity = false): self { }
     public function ends_with($with, $case_insensitivity = false): self { }
 
+    /** @see \mb_compatible_encoding() */
+    public self $mb_compatible_encoding;
+    public function mb_compatible_encoding($from, $to): self { }
+    public function mb_compatible_encoding($to): self { }
+
     /** @see \str_anyof() */
     public self $str_anyof;
     public function str_anyof($needle, $haystack, $case_insensitivity = false): self { }

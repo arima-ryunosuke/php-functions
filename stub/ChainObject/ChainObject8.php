@@ -398,6 +398,11 @@ trait ChainObject8
     public function strtr_escaped($string, $replace_pairs, $escape = "\\"): self { }
     public function strtr_escaped($replace_pairs, $escape = "\\"): self { }
 
+    /** @see \dataurl_encode() */
+    public self $dataurl_encode;
+    public function dataurl_encode($data, $metadata = []): self { }
+    public function dataurl_encode($metadata = []): self { }
+
     /** @see \cacheobject() */
     public self $cacheobject;
     public function cacheobject($directory, $clean_probability = 0): self { }

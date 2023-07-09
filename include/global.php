@@ -20663,6 +20663,102 @@ if (!function_exists('kvsprintf')) {
     }
 }
 
+assert(!function_exists('mb_compatible_encoding') || (new \ReflectionFunction('mb_compatible_encoding'))->isUserDefined());
+if (!function_exists('mb_compatible_encoding')) {
+    /**
+     * 指定エンコーディング間に互換性があるかを返す
+     *
+     * ※ ユースケースとして多い utf8,sjis 以外はほぼ実装していないので注意（かなり適当なのでそれすらも怪しい）
+     *
+     * mb_convert_encoding/mb_convert_variables は実際に変換が行われなくても処理が走ってしまうので、それを避けるための関数。
+     * エンコーディングはただでさえカオスなのに utf8, UTF-8, sjis, sjis-win, cp932 などの表記揺れやエイリアスがあるので判定が結構しんどい。
+     *
+     * Example:
+     * ```php
+     * // ほぼ唯一のユースケース（互換性があるなら変換しない）
+     * if (!mb_compatible_encoding(mb_internal_encoding(), 'utf8')) {
+     *     mb_convert_encoding('utf8 string', 'utf8');
+     * }
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $from 変換元エンコーディング
+     * @param string $to 変換先エンコーディング
+     * @return ?bool from が to に対して互換性があるなら true（8bit binary の時のみ例外的に null を返す）
+     */
+    function mb_compatible_encoding($from, $to)
+    {
+        static $encmap = [];
+        if (!$encmap) {
+            foreach (mb_list_encodings() as $encoding) {
+                $encmap[strtolower($encoding)] = [
+                    'aliases'  => array_flip(array_map('strtolower', mb_encoding_aliases($encoding))),
+                    'mimename' => strtolower((string) @mb_preferred_mime_name($encoding)),
+                ];
+            }
+        }
+
+        // php 世界のエンコーディング名に正規化
+        $normalize = function ($encoding) use ($encmap) {
+            $encoding = strtolower($encoding);
+
+            static $cache = [];
+
+            if (isset($cache[$encoding])) {
+                return $cache[$encoding];
+            }
+
+            if (isset($encmap[$encoding])) {
+                return $cache[$encoding] = $encoding;
+            }
+            foreach ($encmap as $encname => ['aliases' => $aliases]) {
+                if (isset($aliases[$encoding])) {
+                    return $cache[$encoding] = $encname;
+                }
+            }
+            foreach ($encmap as $encname => ['mimename' => $mimename]) {
+                if ($mimename === $encoding) {
+                    return $cache[$encoding] = $encname;
+                }
+            }
+
+            throw new \InvalidArgumentException("$encoding is not supported encoding");
+        };
+
+        $from = $normalize($from);
+        $to = $normalize($to);
+
+        // 他方が 8bit(binary) は全く互換性がない（互換性がないというか、そもそもテキストではない）
+        // false を返すべきだが呼び元で特殊な処理をしたいことがあると思うので null にする
+        if ($from === '8bit' xor $to === '8bit') {
+            return null;
+        }
+
+        // 同じなら完全互換だろう
+        if ($from === $to) {
+            return true;
+        }
+
+        // ucs 系以外は大抵は ASCII 互換
+        if ($from === 'ascii' && !preg_match('#^(ucs-2|ucs-4|utf-16|utf-32)#', $to)) {
+            return true;
+        }
+
+        // utf8 派生
+        if ($from === 'utf-8' && strpos($to, 'utf-8') === 0) {
+            return true;
+        }
+
+        // sjis 派生
+        if ($from === 'sjis' && (strpos($to, 'sjis') === 0 || $to === 'cp932')) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
 assert(!function_exists('mb_ellipsis') || (new \ReflectionFunction('mb_ellipsis'))->isUserDefined());
 if (!function_exists('mb_ellipsis')) {
     /**
@@ -23988,6 +24084,133 @@ if (!function_exists('build_uri')) {
     }
 }
 
+assert(!function_exists('dataurl_decode') || (new \ReflectionFunction('dataurl_decode'))->isUserDefined());
+if (!function_exists('dataurl_decode')) {
+    /**
+     * DataURL をデコードする
+     *
+     * Example:
+     * ```php
+     * that(dataurl_decode("data:text/plain;charset=US-ASCII,hello%2C%20world"))->isSame('hello, world');
+     * that(dataurl_decode("data:text/plain;charset=US-ASCII;base64,aGVsbG8sIHdvcmxk", $metadata))->isSame('hello, world');
+     * that($metadata)->is([
+     *     "mimetype" => "text/plain",
+     *     "charset"  => "US-ASCII",
+     *     "base64"   => true,
+     * ]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\url
+     *
+     * @param string $url DataURL
+     * @param array $metadata スキームのメタ情報が格納される
+     * @return ?string 元データ。失敗時は null
+     */
+    function dataurl_decode($url, &$metadata = [])
+    {
+        $pos = strpos($url, ',');
+        $head = substr($url, 0, $pos);
+        $body = substr($url, $pos + 1);
+
+        if (!preg_match('#^data:(?<mimetype>[^;]+?)?(;charset=(?<charset>[^;]+?))?(;(?<base64>[^;]+?))?$#iu', $head, $matches, PREG_UNMATCHED_AS_NULL)) {
+            return null;
+        }
+
+        $metadata = [
+            'mimetype' => $matches['mimetype'] ?? null,
+            'charset'  => $matches['charset'] ?? null,
+            'base64'   => isset($matches['base64']),
+        ];
+
+        $decoder = function ($data) use ($metadata) {
+            if ($metadata['base64']) {
+                return base64_decode($data, true);
+            }
+            else {
+                return rawurldecode($data);
+            }
+        };
+
+        $decoded = $decoder($body);
+        if ($decoded === false) {
+            return null;
+        }
+
+        if ($metadata['charset'] !== null) {
+            if (!(mb_compatible_encoding($metadata['charset'], mb_internal_encoding()) ?? true)) {
+                $decoded = mb_convert_encoding($decoded, mb_internal_encoding(), $metadata['charset']);
+            }
+        }
+
+        return $decoded;
+    }
+}
+
+assert(!function_exists('dataurl_encode') || (new \ReflectionFunction('dataurl_encode'))->isUserDefined());
+if (!function_exists('dataurl_encode')) {
+    /**
+     * DataURL をエンコードする
+     *
+     * $metadata で mimetype や エンコード等を指定できる。
+     * 指定されていない場合、自動検出して埋め込まれる。
+     *
+     * - mimetype(?string): 特筆無し
+     * - charset(?string): 自動検出は mime 名になる。明示指定はそのまま埋め込まれる
+     * - base64(?bool): true:base64encode, false:urlencode, null: raw
+     *   - null の raw はスキームとしては base64 となる。つまり既に base64 の文字列が手元にある場合（変換したくない場合）に指定する
+     *
+     * Example:
+     * ```php
+     * that(dataurl_encode("hello, world", ['base64' => false]))->isSame("data:text/plain;charset=US-ASCII,hello%2C%20world");
+     * that(dataurl_encode("hello, world", ['mimetype' => 'text/csv', 'charset' => 'hoge']))->isSame("data:text/csv;charset=hoge;base64,aGVsbG8sIHdvcmxk");
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\url
+     *
+     * @param string $data エンコードするデータ
+     * @param array $metadata エンコードオプション
+     * @return string DataURL
+     */
+    function dataurl_encode($data, $metadata = [])
+    {
+        if (!isset($metadata['mimetype'], $metadata['charset'])) {
+            try {
+                $finfo = finfo_open();
+                [$mimetype, $charset] = preg_split('#;\\s#', finfo_buffer($finfo, $data, FILEINFO_MIME), 2, PREG_SPLIT_NO_EMPTY);
+
+                $metadata['mimetype'] ??= $mimetype;
+                $metadata['charset'] ??= mb_preferred_mime_name(explode('=', $charset, 2)[1]);
+            }
+            finally {
+                finfo_close($finfo);
+            }
+        }
+
+        if (!array_key_exists('base64', $metadata)) {
+            $metadata['base64'] = true;
+        }
+
+        $encoder = function ($data) use ($metadata) {
+            if ($metadata['base64'] === null) {
+                return $data;
+            }
+
+            if ($metadata['base64']) {
+                return base64_encode($data);
+            }
+            else {
+                return rawurlencode($data);
+            }
+        };
+
+        return "data:"
+            . $metadata['mimetype']
+            . (strlen($metadata['charset']) ? ";charset=" . $metadata['charset'] : "")
+            . (($metadata['base64'] ?? true) ? ';base64' : '')
+            . "," . $encoder($data);
+    }
+}
+
 assert(!function_exists('parse_query') || (new \ReflectionFunction('parse_query'))->isUserDefined());
 if (!function_exists('parse_query')) {
     /**
@@ -27145,7 +27368,7 @@ if (!function_exists('var_pretty')) {
                     }
                     elseif ($tableofarray) {
                         $markdown = markdown_table(array_map(fn($v) => $this->array($v), $value), [
-                            'keylabel' => "",
+                            'keylabel' => "#",
                             'context'  => $this->options['context'],
                         ]);
                         $this->plain($tableofarray, 'green');
