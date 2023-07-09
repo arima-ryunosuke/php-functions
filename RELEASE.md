@@ -12,6 +12,12 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.2
+
+- [feature] dataurl_encode/dataurl_decode を追加
+- [feature] mb_compatible_encoding を追加
+- [change] var_pretty の markdown でキーラベルを "#" で明示
+
 ## 1.6.1
 
 - [feature] var_pretty で特定クラスを除外する機能
