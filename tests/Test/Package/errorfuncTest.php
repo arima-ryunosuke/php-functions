@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\backtrace;
 use function ryunosuke\Functions\Package\error;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\reflect_callable;
+use function ryunosuke\Functions\Package\set_trace_logger;
 use function ryunosuke\Functions\Package\stacktrace;
 use function ryunosuke\Functions\Package\stdclass;
 use function ryunosuke\Functions\Package\str_exists;
@@ -155,6 +156,31 @@ class errorfuncTest extends AbstractTestCase
         [$t]->isResource();
 
         that(self::resolveFunction('error'))('int', 1)->wasThrown('must be resource or string');
+    }
+
+    function test_set_trace_logger()
+    {
+        $_SERVER['UNIQUE_ID'] = 'thisisid';
+
+        $logfile = tmpfile();
+        $loader = set_trace_logger($logfile, null, "#TraceTarget#");
+
+        \ryunosuke\Test\Package\files\errorfunc\TraceTarget::run([
+            'a' => ['b' => ['c' => ['d' => ['e' => ['f' => ['g' => ['h' => ['i' => ['j' => ['k' => ['l' => ['m' => ['n' => []]]]]]]]]]]]]],
+        ], new \stdClass(), $logfile, 123, "string");
+
+        spl_autoload_unregister($loader);
+
+        rewind($logfile);
+        $log = stream_get_contents($logfile);
+        that($log)->contains('thisisid');
+        that($log)->contains('TraceTarget::run');
+        that($log)->contains('TraceTarget::__construct');
+        that($log)->contains('TraceTarget::initialize');
+        that($log)->contains('j:[...]');
+        that($log)->contains('stdClass#');
+        that($log)->contains('Resource id #');
+        that($log)->contains('123, "string"');
     }
 
     function test_stacktrace()
