@@ -501,6 +501,7 @@ This is VARIABLE.
         that(pascal_case('this-is-a-pen', '-'))->is('ThisIsAPen');
         that(pascal_case('this_is_a_pen'))->is('ThisIsAPen');
         that(pascal_case('_this_is_a_pen_'))->is('ThisIsAPen');
+        that(pascal_case('this-is/a_pen', '_-/'))->is('ThisIsAPen');
     }
 
     function test_quoteexplode()
