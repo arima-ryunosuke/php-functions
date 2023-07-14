@@ -682,6 +682,14 @@ zero is index 0.
         that(snake_case('ThisIsAPen'))->is('this_is_a_pen');
         that(snake_case('ABC'))->is('a_b_c');
         that(snake_case('_ABC_'))->is('a_b_c_');
+        that(snake_case('URLEncode'))->is('u_r_l_encode');
+
+        that(snake_case('', '-', true))->is('');
+        that(snake_case('ThisIsAPen', '-', true))->is('this-is-a-pen');
+        that(snake_case('ThisIsAPen', '_', true))->is('this_is_a_pen');
+        that(snake_case('ABC', '_', true))->is('abc');
+        that(snake_case('_ABC_', '_', true))->is('abc_');
+        that(snake_case('URLEncode', '-', true))->is('url-encode');
     }
 
     function test_split_noempty()
