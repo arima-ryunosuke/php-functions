@@ -358,6 +358,11 @@ trait ChainObject0
     public function date_timestamp($datetimedata, $baseTimestamp = null): self { }
     public function date_timestamp($baseTimestamp = null): self { }
 
+    /** @see \set_trace_logger() */
+    public self $set_trace_logger;
+    public function set_trace_logger($logfile, $liner, string $target): self { }
+    public function set_trace_logger($liner, string $target): self { }
+
     /** @see \process() */
     public self $process;
     public function process($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }

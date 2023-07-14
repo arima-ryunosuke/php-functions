@@ -480,8 +480,8 @@ trait ChainObject1
 
     /** @see \snake_case() */
     public self $snake_case;
-    public function snake_case($string, $delimiter = "_"): self { }
-    public function snake_case($delimiter = "_"): self { }
+    public function snake_case($string, $delimiter = "_", $keep_abbr = false): self { }
+    public function snake_case($delimiter = "_", $keep_abbr = false): self { }
 
     /** @see \str_lchop() */
     public self $str_lchop;

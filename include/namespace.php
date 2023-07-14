@@ -10800,6 +10800,80 @@ if (!function_exists('ryunosuke\\Functions\\error')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\set_trace_logger') || (new \ReflectionFunction('ryunosuke\\Functions\\set_trace_logger'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\set_trace_logger')) {
+    /**
+     * メソッド呼び出しロガーを仕込む
+     *
+     * この関数はかなり実験的なもので、互換性を考慮しない。
+     *
+     * @package ryunosuke\Functions\Package\errorfunc
+     *
+     * @param resource|string $logfile 書き出すファイル名
+     * @param string $target 仕込むクラスの正規表現
+     * @return mixed
+     */
+    function set_trace_logger($logfile, $liner, string $target)
+    {
+        $logfile = is_string($logfile) ? fopen($logfile, 'a') : $logfile; // for testing
+        $liner ??= function ($values) {
+            $stringify = function ($value, &$total = 0) use (&$stringify) {
+                if (is_array($value)) {
+                    $result = [];
+                    $n = 0;
+                    foreach ($value as $k => $v) {
+                        if (++$total > 10) {
+                            $result[] = '...';
+                            break;
+                        }
+                        $v = $stringify($v, $total);
+                        if ($k === $n) {
+                            $result[] = $v;
+                        }
+                        else {
+                            $result[] = "$k:$v";
+                        }
+                        $n++;
+                    }
+                    return "[" . implode(",", $result) . "]";
+                }
+                if (is_object($value)) {
+                    return get_class($value) . "#" . spl_object_id($value);
+                }
+                if (is_resource($value)) {
+                    return (string) $value;
+                }
+                return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            };
+            $values['time'] = $values['time']->format('Y-m-d\TH:i:s.v');
+            $values['args'] = implode(', ', array_map($stringify, $values['args']));
+            return vsprintf("[%s] %s %s::%s(%s);%s:%d\n", $values);
+        };
+
+        $GLOBALS['___trace_log_internal'] = function (string $file, int $line, string $class, string $method) use ($logfile, $liner) {
+            fwrite($logfile, $liner([
+                'id'     => $_SERVER['UNIQUE_ID'] ?? str_pad($_SERVER['REQUEST_TIME_FLOAT'], 15, STR_PAD_RIGHT),
+                'time'   => new \DateTime(),
+                'class'  => $class,
+                'method' => $method,
+                'args'   => debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1]['args'] ?? [],
+                'file'   => $file,
+                'line'   => $line,
+            ]));
+        };
+
+        return register_autoload_function(function ($classname, $filename, $contents) use ($target) {
+            if (preg_match($target, $classname)) {
+                $contents ??= file_get_contents($filename);
+                $contents = preg_replace_callback('#((final|public|protected|private|static)\s+){0,3}function\s+[_0-9a-z]+?\([^{]+\{#usmi', function ($m) {
+                    return $m[0] . "(\$GLOBALS['___trace_log_internal'] ?? fn() => null)(__FILE__, __LINE__ - 1, __CLASS__, __FUNCTION__);";
+                }, $contents);
+                return $contents;
+            }
+        });
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\stacktrace') || (new \ReflectionFunction('ryunosuke\\Functions\\stacktrace'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\stacktrace')) {
     /**
@@ -13473,7 +13547,8 @@ if (!function_exists('ryunosuke\\Functions\\chain')) {
     function chain($source = null)
     {
         if (function_configure('chain.version') === 2) {
-            return new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
+            $chain_object = new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
+                public static  $__CLASS__;
                 private static $metadata = [];
 
                 private $data;
@@ -13572,6 +13647,10 @@ if (!function_exists('ryunosuke\\Functions\\chain')) {
                         || (is_callable(__NAMESPACE__ . "\\$name", false, $fname))
                         || ($isiterable && is_callable(__NAMESPACE__ . "\\array_$name", false, $fname))
                         || ($isstringable && is_callable(__NAMESPACE__ . "\\str_$name", false, $fname))
+                        // for class
+                        || (is_callable([self::$__CLASS__, $name], false, $fname))
+                        || ($isiterable && is_callable([self::$__CLASS__, "array_$name"], false, $fname))
+                        || ($isstringable && is_callable([self::$__CLASS__, "str_$name"], false, $fname))
                     ) {
                         return $fname;
                     }
@@ -13657,6 +13736,8 @@ if (!function_exists('ryunosuke\\Functions\\chain')) {
                     return $callback(...$realargs);
                 }
             };
+            $chain_object::$__CLASS__ = __CLASS__;
+            return $chain_object;
         }
 
         // @codeCoverageIgnoreStart
@@ -21208,17 +21289,19 @@ if (!function_exists('ryunosuke\\Functions\\pascal_case')) {
      * Example:
      * ```php
      * that(pascal_case('this_is_a_pen'))->isSame('ThisIsAPen');
+     * that(pascal_case('this_is-a-pen', '-_'))->isSame('ThisIsAPen');
      * ```
      *
      * @package ryunosuke\Functions\Package\strings
      *
      * @param string $string 対象文字列
-     * @param string $delimiter デリミタ
+     * @param string $delimiter デリミタ（複数可）
      * @return string 変換した文字列
      */
     function pascal_case($string, $delimiter = '_')
     {
-        return strtr(ucwords(strtr($string, [$delimiter => ' '])), [' ' => '']);
+        $replacemap = array_combine(str_split($delimiter), array_pad([], strlen($delimiter), ' '));
+        return strtr(ucwords(strtr($string, $replacemap)), [' ' => '']);
     }
 }
 
@@ -21488,17 +21571,21 @@ if (!function_exists('ryunosuke\\Functions\\snake_case')) {
      * Example:
      * ```php
      * that(snake_case('ThisIsAPen'))->isSame('this_is_a_pen');
+     * that(snake_case('URLEncode', '-'))->isSame('u-r-l-encode');     // デフォルトでは略語も分割される
+     * that(snake_case('URLEncode', '-', true))->isSame('url-encode'); // 第3引数 true で略語は維持される
      * ```
      *
      * @package ryunosuke\Functions\Package\strings
      *
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
+     * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
      * @return string 変換した文字列
      */
-    function snake_case($string, $delimiter = '_')
+    function snake_case($string, $delimiter = '_', $keep_abbr = false)
     {
-        return ltrim(strtolower(preg_replace('/[A-Z]/', $delimiter . '\0', $string)), $delimiter);
+        $pattern = $keep_abbr ? '/[A-Z]([A-Z](?![a-z]))*/' : '/[A-Z]/';
+        return ltrim(strtolower(preg_replace($pattern, $delimiter . '\0', $string)), $delimiter);
     }
 }
 
