@@ -86,6 +86,18 @@ vendor/bin/export-function
 
 ただし、ほとんど内部用です。
 
+下記のように exportClass を使用すると単一静的クラスとして吐き出せます。
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+
+// name\space\Utils に単一クラスとして出力
+file_put_contents('src/Utils.php', \ryunosuke\Functions\Transporter::exportNamespace('name\\space\\Utils', ['吐き出したい関数など']));
+```
+
+用途はいわゆる Utils 静的クラスです。
+ただし、ほとんど内部用です。
+
 ## Development
 
 基本的に触るのは `src/Package` 以下のみです。他の似たようなファイルは自動生成です。

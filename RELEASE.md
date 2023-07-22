@@ -12,6 +12,13 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.3
+
+- [feature] Transporter にクラス出力機能を追加
+- [feature] set_trace_logger を追加
+- [feature] snake_case で略語を維持できる機能
+- [feature] pascal_case で複数のデリミタ文字を指定できる機能
+
 ## 1.6.2
 
 - [feature] dataurl_encode/dataurl_decode を追加
