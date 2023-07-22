@@ -90,7 +90,8 @@ require_once __DIR__ . '/../var/is_stringable.php';
 function chain($source = null)
 {
     if (function_configure('chain.version') === 2) {
-        return new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
+        $chain_object = new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
+            public static  $__CLASS__;
             private static $metadata = [];
 
             private $data;
@@ -189,6 +190,10 @@ function chain($source = null)
                     || (is_callable(__NAMESPACE__ . "\\$name", false, $fname))
                     || ($isiterable && is_callable(__NAMESPACE__ . "\\array_$name", false, $fname))
                     || ($isstringable && is_callable(__NAMESPACE__ . "\\str_$name", false, $fname))
+                    // for class
+                    || (is_callable([self::$__CLASS__, $name], false, $fname))
+                    || ($isiterable && is_callable([self::$__CLASS__, "array_$name"], false, $fname))
+                    || ($isstringable && is_callable([self::$__CLASS__, "str_$name"], false, $fname))
                 ) {
                     return $fname;
                 }
@@ -274,6 +279,8 @@ function chain($source = null)
                 return $callback(...$realargs);
             }
         };
+        $chain_object::$__CLASS__ = __CLASS__;
+        return $chain_object;
     }
 
     // @codeCoverageIgnoreStart

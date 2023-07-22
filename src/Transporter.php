@@ -166,6 +166,77 @@ class Transporter
     }
 
     /**
+     * クラスにエクスポートする
+     *
+     * @param string $classname 吐き出すクラス名（FQSEN）
+     * @param array|string $funcname 吐き出す関数名
+     * @return string php コード
+     */
+    public static function exportClass($classname, $funcname)
+    {
+        $_ = function ($v) { return $v; };
+
+        $funcname = self::detectDependent($funcname);
+
+        require_once __DIR__ . '/Package/misc/indent_php.php';
+        require_once __DIR__ . '/Package/var/var_export2.php';
+
+        $classname = trim($classname, "\\");
+        $constants = self::getAllConstant();
+        $functions = self::getAllFunction();
+
+        $consts = [];
+        foreach ($constants as $name => $constant) {
+            if (!isset($funcname['constant'][$name])) {
+                continue;
+            }
+
+            $consts[] = <<<CONSTANT
+                public const $name = {$_(trim(indent_php("\n" . var_export2($constant['value'], true), ['baseline' => 0, 'indent' => 4])))};
+            CONSTANT;
+        }
+
+        $funcs = [];
+        foreach ($functions as $name => $function) {
+            if (!isset($funcname['function'][$name])) {
+                continue;
+            }
+
+            $tokens = self::getDependentTokens($name);
+            foreach ($tokens as $i => $token) {
+                if (isset($token['dependent'])) {
+                    $tokens[$i][1] = "\\$classname::" . $token[1];
+                }
+            }
+            $body = substr_replace(implode('', array_column($tokens, 1)), 'public static ', $function['funcstart'], 0);
+            $funcs[] = <<<FUNCTION
+                {$_(trim(indent_php("\n" . $body, ['baseline' => 0, 'indent' => 4])))}
+            FUNCTION;
+        }
+
+        // 完全な php コードを返す
+        $parts = explode("\\", $classname);
+        $shortname = array_pop($parts);
+        $namespace = implode("\\", $parts);
+        return <<<CONTENTS
+        <?php
+        # Don't touch this code. This is auto generated.
+        namespace $namespace;
+        
+        /**
+         * @codeCoverageIgnore
+         */
+        class $shortname
+        {
+        {$_(implode("\n\n", $consts))}
+        
+        {$_(implode("\n\n", $funcs))}
+        }
+        
+        CONTENTS;
+    }
+
+    /**
      * エクスポートすべき定数を抽出する
      *
      * @param bool $nocache キャッシュ破棄フラグ
@@ -214,15 +285,48 @@ class Transporter
         if (!isset($cache)) {
             $cache = [];
             foreach (glob(__DIR__ . '/Package/*/*.php') as $fn) {
+                $name = basename($fn, '.php');
                 $contents = file_get_contents($fn);
-                $cache[basename($fn, '.php')] = [
+                $docstart = strpos($contents, "/**\n");
+                $codeblock = substr($contents, $docstart);
+                $funcstart = strpos($codeblock, " */\nfunction $name(", $docstart) + 4;
+                $cache[$name] = [
                     'filename'  => $fn,
                     'directory' => basename(dirname($fn)),
-                    'codeblock' => substr($contents, strpos($contents, "/**\n")),
+                    'funcstart' => $funcstart,
+                    'codeblock' => $codeblock,
                 ];
             }
         }
         return $cache;
+    }
+
+    /**
+     * 指定関数のトークン（依存トークンを特殊化したもの）配列を返す
+     *
+     * @param string $funcname 関数名
+     * @return array
+     */
+    private static function getDependentTokens($funcname)
+    {
+        $constants = self::getAllConstant();
+        $functions = self::getAllFunction();
+
+        $tokens = token_get_all("<?php {$functions[$funcname]['codeblock']}");
+        array_shift($tokens);
+        for ($i = 0; $i < count($tokens); $i++) {
+            $token = is_array($tokens[$i]) ? $tokens[$i] : [null, $tokens[$i], null];
+            if ($token[0] === T_STRING) {
+                if (isset($constants[$token[1]])) {
+                    $token['dependent'] = 'constant';
+                }
+                if (isset($functions[$token[1]]) && ($tokens[$i - 2][0] ?? '') !== T_FUNCTION && ($tokens[$i + 1] ?? '') === '(') {
+                    $token['dependent'] = 'function';
+                }
+            }
+            $tokens[$i] = $token;
+        }
+        return $tokens;
     }
 
     /**
@@ -233,23 +337,14 @@ class Transporter
      */
     private static function detectDependent($funcname)
     {
-        $constants = self::getAllConstant();
-        $functions = self::getAllFunction();
-
-        $depends = array_fill_keys(array_keys($functions), [
-            'constant' => [],
-            'function' => [],
-        ]);
-        foreach ($functions as $name => $function) {
-            $tokens = token_get_all("<?php {$function['codeblock']}");
-            for ($i = 0; $i < count($tokens); $i++) {
-                $token = $tokens[$i];
-                if ($token[0] === T_STRING) {
-                    if (isset($constants[$token[1]])) {
-                        $depends[$name]['constant'][$token[1]] = true;
-                    }
-                    if (isset($functions[$token[1]]) && ($tokens[$i + 1] ?? '') === '(') {
-                        $depends[$name]['function'][$token[1]] = true;
+        static $depends = null;
+        if (!isset($depends)) {
+            foreach (self::getAllFunction() as $name => $function) {
+                $depends[$name] = array_fill_keys(['constant', 'function'], []);
+                $tokens = self::getDependentTokens($name);
+                foreach ($tokens as $token) {
+                    if (isset($token['dependent'])) {
+                        $depends[$name][$token['dependent']][$token[1]] = true;
                     }
                 }
             }
@@ -259,17 +354,15 @@ class Transporter
             return $depends;
         }
 
-        $depends = array_map(function ($v) { return array_map('array_keys', $v); }, $depends);
-
         $main = function ($funcname, &$result) use (&$main, $depends) {
-            foreach ($depends[$funcname]['constant'] ?? [] as $const) {
+            foreach ($depends[$funcname]['constant'] ?? [] as $const => $true) {
                 $result['constant'][$const] = true;
             }
 
             if (isset($depends[$funcname]['function'])) {
                 $result['function'][$funcname] = true;
             }
-            foreach ($depends[$funcname]['function'] ?? [] as $func) {
+            foreach ($depends[$funcname]['function'] ?? [] as $func => $true) {
                 if (!isset($result['function'][$func])) {
                     $main($func, $result);
                 }

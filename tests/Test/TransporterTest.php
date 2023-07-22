@@ -39,6 +39,18 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         ;
     }
 
+    function test_exportClass()
+    {
+        that(Transporter::exportClass('name\\space\\ClassName', ['date_convert']))
+            ->stringContains('public const JP_ERA')                    // 定数が含まれている
+            ->stringContains('static function date_convert')           // 自身が含まれている
+            ->stringContains('static function date_timestamp')         // 依存している関数が含まれている
+            ->stringContains('static function throws')                 // 依存が依存している関数が含まれている
+            ->stringContains('name\\space\\ClassName::date_timestamp') // self::で修飾されている
+            ->stringNotContains('parse_uri')                           // 依存していない関数が含まれていない
+        ;
+    }
+
     function test_getAllConstant()
     {
         that(Transporter::class)::getAllConstant(true)
