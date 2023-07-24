@@ -12,6 +12,10 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.4
+
+- [change] exportClass に formatter:off を付与
+
 ## 1.6.3
 
 - [feature] Transporter にクラス出力機能を追加
