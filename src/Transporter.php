@@ -223,6 +223,8 @@ class Transporter
         # Don't touch this code. This is auto generated.
         namespace $namespace;
         
+        // @formatter:off
+        
         /**
          * @codeCoverageIgnore
          */
