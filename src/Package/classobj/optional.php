@@ -42,7 +42,7 @@ namespace ryunosuke\Functions\Package;
  *
  * @template T
  * @param T|null $object オブジェクト
- * @param ?string $expected 期待するクラス名。指定した場合は is_a される
+ * @param null|string|T $expected 期待するクラス名。指定した場合は is_a される
  * @return T $object がオブジェクトならそのまま返し、違うなら NullObject を返す
  */
 function optional($object, $expected = null)
