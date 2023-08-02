@@ -83,6 +83,6 @@ function build_uri($parts, $options = [])
     $uri .= concat(':', $parts['port']);
     $uri .= concat('/', $parts['path']);
     $uri .= concat('?', $parts['query']);
-    $uri .= concat('#', $parts['fragment']);
+    $uri .= concat('#', rawurlencode($parts['fragment']));
     return $uri;
 }

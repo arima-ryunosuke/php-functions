@@ -81,9 +81,13 @@ class urlTest extends AbstractTestCase
                 'uri'   => 'scheme://user:pass@[2001:db8::1234:0:0:9abc]:12345/path/to/hoge?op1=1&op2=2#hash',
                 'parts' => $gen('scheme', 'user', 'pass', '2001:db8::1234:0:0:9abc', '12345', '/path/to/hoge', ['op1' => 1, 'op2' => 2], 'hash'),
             ],
+            'encoded'       => [
+                'uri'   => 'scheme://user:pass@127.0.0.1:12345/path/to/hoge?a=%3D%26%23#x%3D%26%23',
+                'parts' => $gen('scheme', 'user', 'pass', '127.0.0.1', '12345', '/path/to/hoge', ['a' => '=&#'], 'x=&#'),
+            ],
             'multibyte'     => [
-                'uri'   => 'scheme://local.host/path/to/hoge?aaa=' . rawurlencode('あああ'),
-                'parts' => $gen('scheme', '', '', 'local.host', '', '/path/to/hoge', ['aaa' => 'あああ'], ''),
+                'uri'   => 'scheme://local.host/path/to/hoge?aaa=' . rawurlencode('あああ') . '#' . rawurlencode('いいい'),
+                'parts' => $gen('scheme', '', '', 'local.host', '', '/path/to/hoge', ['aaa' => 'あああ'], 'いいい'),
             ],
         ];
     }
@@ -295,6 +299,27 @@ class urlTest extends AbstractTestCase
             'path'     => '/defpath',
             'query'    => ['defquery' => ''],
             'fragment' => 'deffragment',
+        ]);
+
+        // keep null
+        that(parse_uri('', [
+            'scheme'   => null,
+            'user'     => null,
+            'pass'     => null,
+            'host'     => null,
+            'port'     => null,
+            'path'     => null,
+            'query'    => null,
+            'fragment' => null,
+        ]))->is([
+            'scheme'   => null,
+            'user'     => null,
+            'pass'     => null,
+            'host'     => null,
+            'port'     => null,
+            'path'     => null,
+            'query'    => null,
+            'fragment' => null,
         ]);
     }
 
