@@ -6321,7 +6321,7 @@ if (!function_exists('ryunosuke\\Functions\\optional')) {
      *
      * @template T
      * @param T|null $object オブジェクト
-     * @param ?string $expected 期待するクラス名。指定した場合は is_a される
+     * @param null|string|T $expected 期待するクラス名。指定した場合は is_a される
      * @return T $object がオブジェクトならそのまま返し、違うなら NullObject を返す
      */
     function optional($object, $expected = null)
@@ -8174,7 +8174,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
                     if ($structure) {
                         $query = [];
                         foreach ($headers as $i => $header) {
-                            $query[] =  rawurlencode($header). "=" . rawurlencode($row[$i]);
+                            $query[] = rawurlencode($header) . "=" . rawurlencode($row[$i]);
                         }
                         $row = parse_query(implode('&', $query), '&', PHP_QUERY_RFC3986);
                         // csv の仕様上、空文字を置かざるを得ないが、数値配列の場合は空にしたいことがある
@@ -24167,7 +24167,7 @@ if (!function_exists('ryunosuke\\Functions\\build_uri')) {
         $uri .= concat(':', $parts['port']);
         $uri .= concat('/', $parts['path']);
         $uri .= concat('?', $parts['query']);
-        $uri .= concat('#', $parts['fragment']);
+        $uri .= concat('#', rawurlencode($parts['fragment']));
         return $uri;
     }
 }
@@ -24461,10 +24461,12 @@ if (!function_exists('ryunosuke\\Functions\\parse_uri')) {
         $parts = preg_capture("#^$regex\$#ix", $uri, $default + $default_default);
 
         // 諸々調整（認証エンコード、IPv6、パス / の正規化、クエリ配列化）
-        $parts['user'] = rawurldecode($parts['user']);
-        $parts['pass'] = rawurldecode($parts['pass']);
-        $parts['host'] = preg_splice('#^\\[(.+)]$#', '$1', $parts['host']);
-        $parts['path'] = concat('/', ltrim($parts['path'], '/'));
+        $parts['user'] = $parts['user'] === null ? null : rawurldecode($parts['user']);
+        $parts['pass'] = $parts['pass'] === null ? null : rawurldecode($parts['pass']);
+        $parts['host'] = $parts['host'] === null ? null : preg_splice('#^\\[(.+)]$#', '$1', $parts['host']);
+        $parts['path'] = $parts['host'] === null ? null : rawurldecode(concat('/', ltrim($parts['path'], '/')));
+        $parts['fragment'] = $parts['fragment'] === null ? null : rawurldecode($parts['fragment']);
+
         if (is_string($parts['query'])) {
             parse_str($parts['query'], $parts['query']);
         }
