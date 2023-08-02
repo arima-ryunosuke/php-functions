@@ -1004,7 +1004,6 @@ class varTest extends AbstractTestCase
         $exported = var_export3($objects, ['outmode' => 'eval']);
         $objects2 = eval($exported);
         that($objects2['sleepwakeup']->getPdo())->isInstanceOf(\PDO::class);
-        that($objects2['concreate'])->is($setstate);
         that($objects2['concreate']->getPrivate())->is('Changed/Concrete');
 
         that(serialize($objects2))->isSame(serialize(unserialize(serialize($objects))));

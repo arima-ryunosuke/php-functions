@@ -136,7 +136,7 @@ function csv_import($csvstring, $options = [])
                 if ($structure) {
                     $query = [];
                     foreach ($headers as $i => $header) {
-                        $query[] =  rawurlencode($header). "=" . rawurlencode($row[$i]);
+                        $query[] = rawurlencode($header) . "=" . rawurlencode($row[$i]);
                     }
                     $row = parse_query(implode('&', $query), '&', PHP_QUERY_RFC3986);
                     // csv の仕様上、空文字を置かざるを得ないが、数値配列の場合は空にしたいことがある
