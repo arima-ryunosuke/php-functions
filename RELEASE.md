@@ -12,6 +12,11 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.5
+
+- [fixbug] parse_uri の不具合修正
+- [refactor] optional で $expected を与えたときに phpstorm が警告を出すことがあるので修正
+
 ## 1.6.4
 
 - [change] exportClass に formatter:off を付与
