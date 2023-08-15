@@ -260,6 +260,45 @@ class urlTest extends AbstractTestCase
             'a' => 1,
             'b' => [2],
         ]);
+
+        $query = implode('&', [
+            'single=1',
+            'multiple[]=1',
+            'multiple[]=2',
+            'same2[]=1',
+            'same1=1',
+            'same1=2',
+            'same1[]=3',
+            'same2=2',
+            'same2=3',
+            'nest[key1][key2][]=123',
+            'nest[key1][key2][]=456',
+            'nameonly',
+            '=valueonly',
+            'foo[bar]baz=invalid',
+            '&&&&&',
+        ]);
+        parse_str($query, $expected);
+        that(parse_query($query, '&'))->is($expected);
+
+        $query = implode('&', [
+            'plusmark=+',
+            'atmark=@',
+            '%40mark1=@',
+            'dot.name=1',
+            'hyphen-name=1',
+            'space name1=1',
+            'space%20name2=2',
+        ]);
+        that(parse_query($query, '&', PHP_QUERY_RFC3986))->is([
+            "plusmark"    => "+",
+            "atmark"      => "@",
+            "@mark1"      => "@",
+            "dot.name"    => "1",
+            "hyphen-name" => "1",
+            "space name1" => "1",
+            "space name2" => "2",
+        ]);
     }
 
     function test_parse_uri()

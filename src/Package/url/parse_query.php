@@ -47,7 +47,10 @@ function parse_query($query, $arg_separator = null, $encoding_type = null)
     $params = multiexplode(str_split($arg_separator), $query);
     $result = [];
     foreach ($params as $param) {
-        [$name, $value] = explode("=", $param, 2);
+        [$name, $value] = explode("=", trim($param), 2) + [1 => ''];
+        if ($name === '') {
+            continue;
+        }
         if ($encoding_type === PHP_QUERY_RFC1738) {
             $name = urldecode($name);
             $value = urldecode($value);
@@ -64,6 +67,9 @@ function parse_query($query, $arg_separator = null, $encoding_type = null)
             $receiver = &$result[$name];
             foreach ($keys as $key) {
                 if (strlen($key) === 0) {
+                    if (!is_array($receiver)) {
+                        $receiver = [];
+                    }
                     $key = max(array_filter(array_keys($receiver ?? []), 'is_int') ?: [-1]) + 1;
                 }
                 $receiver = &$receiver[$key];
