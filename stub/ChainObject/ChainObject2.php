@@ -403,6 +403,11 @@ trait ChainObject2
     public function markdown_list(iterable $array, $option = []): self { }
     public function markdown_list($option = []): self { }
 
+    /** @see \path_info() */
+    public self $path_info;
+    public function path_info($path): self { }
+    public function path_info(): self { }
+
     /** @see \path_resolve() */
     public self $path_resolve;
     public function path_resolve(...$paths): self { }
