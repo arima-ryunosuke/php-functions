@@ -94,7 +94,7 @@ function parse_uri($uri, $default = [])
     $parts['user'] = $parts['user'] === null ? null : rawurldecode($parts['user']);
     $parts['pass'] = $parts['pass'] === null ? null : rawurldecode($parts['pass']);
     $parts['host'] = $parts['host'] === null ? null : preg_splice('#^\\[(.+)]$#', '$1', $parts['host']);
-    $parts['path'] = $parts['host'] === null ? null : rawurldecode(concat('/', ltrim($parts['path'], '/')));
+    $parts['path'] = $parts['path'] === null ? null : rawurldecode(concat('/', ltrim($parts['path'], '/')));
     $parts['fragment'] = $parts['fragment'] === null ? null : rawurldecode($parts['fragment']);
 
     if (is_string($parts['query'])) {
