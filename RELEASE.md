@@ -12,6 +12,13 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.6
+
+- [refactor] var_export3 の memory_path 依存を削除
+- [feature] path_info を追加
+- [fixbug] parse_uri のスペルミスを修正
+- [fixbug] parse_query の不具合を修正
+
 ## 1.6.5
 
 - [fixbug] parse_uri の不具合修正
