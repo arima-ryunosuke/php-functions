@@ -10,7 +10,6 @@ require_once __DIR__ . '/../misc/indent_php.php';
 require_once __DIR__ . '/../misc/parse_php.php';
 require_once __DIR__ . '/../misc/resolve_symbol.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
-require_once __DIR__ . '/../stream/memory_path.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 // @codeCoverageIgnoreEnd
@@ -441,7 +440,7 @@ function var_export3($value, $return = false)
 })';
 
     if ($options['format'] === 'minify') {
-        $tmp = memory_path('var_export3.php');
+        $tmp = tempnam(sys_get_temp_dir(), 've3');
         file_put_contents($tmp, "<?php $result;");
         $result = substr(php_strip_whitespace($tmp), 6, -1);
     }
