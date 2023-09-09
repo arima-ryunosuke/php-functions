@@ -86,51 +86,56 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     $diffs = [];
     foreach ($assertions as $name => $return) {
         $diffs[var_pretty($return, [
-            'context' => $context,
-            'limit'   => 1024,
-            'return'  => true,
+            'context'   => $context,
+            'limit'     => 1024,
+            'maxcolumn' => 80,
+            'return'    => true,
         ])][] = $name;
     }
     if (count($diffs) > 1) {
         $head = $body = [];
         foreach ($diffs as $return => $names) {
             $head[] = count($names) === 1 ? $names[0] : '(' . implode(' | ', $names) . ')';
-            $body[implode("\n", $names)] = ['return' => $return];
+            $body[implode(" & ", $names)] = $return;
         }
         trigger_error(sprintf("Results of %s are different.\n", implode(' & ', $head)));
         if (error_reporting() & E_USER_NOTICE) {
             // @codeCoverageIgnoreStart
-            echo markdown_table($body, [
-                'context'  => $context,
-                'keylabel' => 'name',
+            echo markdown_table([$body], [
+                'context' => $context,
             ]);
             // @codeCoverageIgnoreEnd
         }
     }
 
     // ベンチ
-    $counts = [];
+    $stats = [];
     foreach ($benchset as $name => $caller) {
-        $end = microtime(true) + $millisec / 1000;
+        $microtime = microtime(true);
+        $stats[$name]['elapsed'] = $microtime;
+        $end = $microtime + $millisec / 1000;
         $args2 = $args;
-        for ($n = 0; microtime(true) <= $end; $n++) {
+        for ($n = 0; ($t = microtime(true)) <= $end; $n++) {
             $caller(...$args2);
+            $stats[$name]['fastest'] = min($stats[$name]['fastest'] ?? PHP_FLOAT_MAX, microtime(true) - $t);
         }
-        $counts[$name] = $n;
+        $stats[$name]['count'] = $n;
+        $stats[$name]['elapsed'] = microtime(true) - $stats[$name]['elapsed'];
     }
 
     $restore();
 
     // 結果配列
     $result = [];
-    $maxcount = max($counts);
-    arsort($counts);
-    foreach ($counts as $name => $count) {
+    $maxcount = max(array_column($stats, 'count'));
+    uasort($stats, fn($a, $b) => $b['count'] <=> $a['count']);
+    foreach ($stats as $name => $stat) {
         $result[] = [
-            'name'   => $name,
-            'called' => $count,
-            'mills'  => $millisec / $count,
-            'ratio'  => $maxcount / $count,
+            'name'    => $name,
+            'called'  => $stat['count'],
+            'fastest' => $stat['fastest'],
+            'mills'   => $stat['elapsed'] / $stat['count'],
+            'ratio'   => $maxcount / $stat['count'],
         ];
     }
 
@@ -139,10 +144,11 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
         printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
         echo markdown_table(array_map(function ($v) {
             return [
-                'name'       => $v['name'],
-                'called'     => number_format($v['called'], 0),
-                '1 call(ms)' => number_format($v['mills'], 6),
-                'ratio'      => number_format($v['ratio'], 3),
+                'name'        => $v['name'],
+                'called'      => number_format($v['called'], 0),
+                'fastest(ms)' => number_format($v['fastest'] * 1000, 6),
+                '1 call(ms)'  => number_format($v['mills'] * 1000, 6),
+                'ratio'       => number_format($v['ratio'], 3),
             ];
         }, $result));
     }
