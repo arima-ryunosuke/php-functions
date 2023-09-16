@@ -1295,16 +1295,57 @@ class varTest extends AbstractTestCase
         ]))
             ->stringContains("      X: (...omitted)");
 
+        $ckeys = [];
         that(var_pretty($value, [
             'context'  => 'plain',
             'return'   => true,
-            'callback' => function (&$string, $var, $nest) {
+            'callback' => function (&$string, $var, $nest, $keys) use (&$ckeys) {
+                if (array_slice($keys, 0, 2) === ["ex", "trace"]) {
+                    return;
+                }
+                $ckeys[] = $keys;
                 if (is_resource($var)) {
                     $string = "this is custom resource($nest)";
                 }
             },
         ]))
             ->stringContains("R: this is custom resource(1)");
+        that($ckeys)->is([
+            [0, "A", "X"],
+            [0, "A"],
+            [0],
+            ["E", "privateField"],
+            ["E", "proptectedField"],
+            ["E", "name"],
+            ["E", "value"],
+            ["E", "info"],
+            ["E"],
+            ["A", 0],
+            ["A", 1],
+            ["A", 2],
+            ["A", 3],
+            ["A", 4],
+            ["A", 5],
+            ["A"],
+            ["H", "a"],
+            ["H", "b"],
+            ["H"],
+            ["C", "recur", "a"],
+            ["C", "recur", "r"],
+            ["C", "recur"],
+            ["C"],
+            ["c1"],
+            ["R"],
+            ["empty"],
+            ["ex", "message"],
+            ["ex", "code"],
+            ["ex", "file"],
+            ["ex", "line"],
+            ["ex", "string"],
+            ["ex", "previous"],
+            ["ex"],
+            [],
+        ]);
 
         that(var_pretty($value, [
             'context' => 'plain',

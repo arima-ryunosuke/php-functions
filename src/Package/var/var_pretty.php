@@ -269,7 +269,7 @@ function var_pretty($value, $options = [])
             }
         }
 
-        public function export($value, $nest, $parents, $callback)
+        public function export($value, $nest, $parents, $keys, $callback)
         {
             $position = strlen($this->content);
 
@@ -403,7 +403,7 @@ function var_pretty($value, $options = [])
                         if ($is_hasharray) {
                             $this->index($k)->plain(': ');
                         }
-                        $this->export($v, $nest + 1, $parents, true);
+                        $this->export($v, $nest + 1, $parents, array_merge($keys, [$k]), true);
                         $this->plain(",\n");
                     }
                     if ($omitted > 0) {
@@ -430,7 +430,7 @@ function var_pretty($value, $options = [])
                         if ($is_hasharray && $n !== $k) {
                             $this->index($k)->plain(':');
                         }
-                        $this->export($v, $nest, $parents, true);
+                        $this->export($v, $nest, $parents, array_merge($keys, [$k]), true);
                         if ($k !== $lastkey) {
                             $this->plain(', ');
                         }
@@ -462,7 +462,7 @@ function var_pretty($value, $options = [])
                 }
                 $this->plain(') use ');
                 if ($properties) {
-                    $this->export($properties, $nest, $parents, false);
+                    $this->export($properties, $nest, $parents, $keys, false);
                 }
                 else {
                     $this->plain('{}');
@@ -485,7 +485,7 @@ function var_pretty($value, $options = [])
 
                 $this->plain(" ");
                 if ($properties) {
-                    $this->export($properties, $nest, $parents, false);
+                    $this->export($properties, $nest, $parents, $keys, false);
                 }
                 else {
                     $this->plain('{}');
@@ -498,7 +498,7 @@ function var_pretty($value, $options = [])
             FINALLY_:
             $content = substr($this->content, $position);
             if ($callback && $this->options['callback']) {
-                ($this->options['callback'])($content, $value, $nest);
+                ($this->options['callback'])($content, $value, $nest, $keys);
                 $this->content = substr_replace($this->content, $content, $position);
             }
             return $content;
@@ -506,14 +506,14 @@ function var_pretty($value, $options = [])
     };
 
     try {
-        $content = $appender->export($value, 0, [], false);
+        $content = $appender->export($value, 0, [], [], false);
     }
     catch (\LengthException $ex) {
         $content = $ex->getMessage() . '(...omitted)';
     }
 
     if ($options['callback']) {
-        ($options['callback'])($content, $value, 0);
+        ($options['callback'])($content, $value, 0, []);
     }
 
     // 結果を返したり出力したり
