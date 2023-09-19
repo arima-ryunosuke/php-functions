@@ -22,12 +22,9 @@ namespace ryunosuke\Functions\Package;
  */
 function array_grep_key($array, $regex, $not = false)
 {
-    $result = [];
-    foreach ($array as $k => $v) {
-        $match = preg_match($regex, $k);
-        if ((!$not && $match) || ($not && !$match)) {
-            $result[$k] = $v;
-        }
-    }
-    return $result;
+    $array = is_array($array) ? $array : iterator_to_array($array);
+    $keys = array_keys($array);
+    $greped = preg_grep($regex, $keys, $not ? PREG_GREP_INVERT : 0);
+    $flipped = array_flip($greped);
+    return array_intersect_key($array, $flipped);
 }
