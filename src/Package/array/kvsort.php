@@ -67,11 +67,10 @@ function kvsort($array, $comparator = null)
         $tmp[$k] = [$n++, $k, $v];
     }
 
-    uasort($tmp, fn($a, $b) => $comparator($a[2], $b[2], $a[1], $b[1]) ?: ($a[0] - $b[0]));
+    uasort($tmp, function ($a, $b) use ($comparator) {
+        $com = $comparator($a[2], $b[2], $a[1], $b[1]);
+        return $com !== 0 ? $com : ($a[0] - $b[0]);
+    });
 
-    foreach ($tmp as $k => $v) {
-        $tmp[$k] = $v[2];
-    }
-
-    return $tmp;
+    return array_column($tmp, 2, 1);
 }
