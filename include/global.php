@@ -1993,14 +1993,11 @@ if (!function_exists('array_grep_key')) {
      */
     function array_grep_key($array, $regex, $not = false)
     {
-        $result = [];
-        foreach ($array as $k => $v) {
-            $match = preg_match($regex, $k);
-            if ((!$not && $match) || ($not && !$match)) {
-                $result[$k] = $v;
-            }
-        }
-        return $result;
+        $array = is_array($array) ? $array : iterator_to_array($array);
+        $keys = array_keys($array);
+        $greped = preg_grep($regex, $keys, $not ? PREG_GREP_INVERT : 0);
+        $flipped = array_flip($greped);
+        return array_intersect_key($array, $flipped);
     }
 }
 
@@ -5115,13 +5112,12 @@ if (!function_exists('kvsort')) {
             $tmp[$k] = [$n++, $k, $v];
         }
 
-        uasort($tmp, fn($a, $b) => $comparator($a[2], $b[2], $a[1], $b[1]) ?: ($a[0] - $b[0]));
+        uasort($tmp, function ($a, $b) use ($comparator) {
+            $com = $comparator($a[2], $b[2], $a[1], $b[1]);
+            return $com !== 0 ? $com : ($a[0] - $b[0]);
+        });
 
-        foreach ($tmp as $k => $v) {
-            $tmp[$k] = $v[2];
-        }
-
-        return $tmp;
+        return array_column($tmp, 2, 1);
     }
 }
 
@@ -24705,51 +24701,56 @@ if (!function_exists('benchmark')) {
         $diffs = [];
         foreach ($assertions as $name => $return) {
             $diffs[var_pretty($return, [
-                'context' => $context,
-                'limit'   => 1024,
-                'return'  => true,
+                'context'   => $context,
+                'limit'     => 1024,
+                'maxcolumn' => 80,
+                'return'    => true,
             ])][] = $name;
         }
         if (count($diffs) > 1) {
             $head = $body = [];
             foreach ($diffs as $return => $names) {
                 $head[] = count($names) === 1 ? $names[0] : '(' . implode(' | ', $names) . ')';
-                $body[implode("\n", $names)] = ['return' => $return];
+                $body[implode(" & ", $names)] = $return;
             }
             trigger_error(sprintf("Results of %s are different.\n", implode(' & ', $head)));
             if (error_reporting() & E_USER_NOTICE) {
                 // @codeCoverageIgnoreStart
-                echo markdown_table($body, [
-                    'context'  => $context,
-                    'keylabel' => 'name',
+                echo markdown_table([$body], [
+                    'context' => $context,
                 ]);
                 // @codeCoverageIgnoreEnd
             }
         }
 
         // ベンチ
-        $counts = [];
+        $stats = [];
         foreach ($benchset as $name => $caller) {
-            $end = microtime(true) + $millisec / 1000;
+            $microtime = microtime(true);
+            $stats[$name]['elapsed'] = $microtime;
+            $end = $microtime + $millisec / 1000;
             $args2 = $args;
-            for ($n = 0; microtime(true) <= $end; $n++) {
+            for ($n = 0; ($t = microtime(true)) <= $end; $n++) {
                 $caller(...$args2);
+                $stats[$name]['fastest'] = min($stats[$name]['fastest'] ?? PHP_FLOAT_MAX, microtime(true) - $t);
             }
-            $counts[$name] = $n;
+            $stats[$name]['count'] = $n;
+            $stats[$name]['elapsed'] = microtime(true) - $stats[$name]['elapsed'];
         }
 
         $restore();
 
         // 結果配列
         $result = [];
-        $maxcount = max($counts);
-        arsort($counts);
-        foreach ($counts as $name => $count) {
+        $maxcount = max(array_column($stats, 'count'));
+        uasort($stats, fn($a, $b) => $b['count'] <=> $a['count']);
+        foreach ($stats as $name => $stat) {
             $result[] = [
-                'name'   => $name,
-                'called' => $count,
-                'mills'  => $millisec / $count,
-                'ratio'  => $maxcount / $count,
+                'name'    => $name,
+                'called'  => $stat['count'],
+                'fastest' => $stat['fastest'],
+                'mills'   => $stat['elapsed'] / $stat['count'],
+                'ratio'   => $maxcount / $stat['count'],
             ];
         }
 
@@ -24758,10 +24759,11 @@ if (!function_exists('benchmark')) {
             printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
             echo markdown_table(array_map(function ($v) {
                 return [
-                    'name'       => $v['name'],
-                    'called'     => number_format($v['called'], 0),
-                    '1 call(ms)' => number_format($v['mills'], 6),
-                    'ratio'      => number_format($v['ratio'], 3),
+                    'name'        => $v['name'],
+                    'called'      => number_format($v['called'], 0),
+                    'fastest(ms)' => number_format($v['fastest'] * 1000, 6),
+                    '1 call(ms)'  => number_format($v['mills'] * 1000, 6),
+                    'ratio'       => number_format($v['ratio'], 3),
                 ];
             }, $result));
         }
@@ -27503,7 +27505,7 @@ if (!function_exists('var_pretty')) {
                 }
             }
 
-            public function export($value, $nest, $parents, $callback)
+            public function export($value, $nest, $parents, $keys, $callback)
             {
                 $position = strlen($this->content);
 
@@ -27637,7 +27639,7 @@ if (!function_exists('var_pretty')) {
                             if ($is_hasharray) {
                                 $this->index($k)->plain(': ');
                             }
-                            $this->export($v, $nest + 1, $parents, true);
+                            $this->export($v, $nest + 1, $parents, array_merge($keys, [$k]), true);
                             $this->plain(",\n");
                         }
                         if ($omitted > 0) {
@@ -27664,7 +27666,7 @@ if (!function_exists('var_pretty')) {
                             if ($is_hasharray && $n !== $k) {
                                 $this->index($k)->plain(':');
                             }
-                            $this->export($v, $nest, $parents, true);
+                            $this->export($v, $nest, $parents, array_merge($keys, [$k]), true);
                             if ($k !== $lastkey) {
                                 $this->plain(', ');
                             }
@@ -27696,7 +27698,7 @@ if (!function_exists('var_pretty')) {
                     }
                     $this->plain(') use ');
                     if ($properties) {
-                        $this->export($properties, $nest, $parents, false);
+                        $this->export($properties, $nest, $parents, $keys, false);
                     }
                     else {
                         $this->plain('{}');
@@ -27719,7 +27721,7 @@ if (!function_exists('var_pretty')) {
 
                     $this->plain(" ");
                     if ($properties) {
-                        $this->export($properties, $nest, $parents, false);
+                        $this->export($properties, $nest, $parents, $keys, false);
                     }
                     else {
                         $this->plain('{}');
@@ -27732,7 +27734,7 @@ if (!function_exists('var_pretty')) {
                 FINALLY_:
                 $content = substr($this->content, $position);
                 if ($callback && $this->options['callback']) {
-                    ($this->options['callback'])($content, $value, $nest);
+                    ($this->options['callback'])($content, $value, $nest, $keys);
                     $this->content = substr_replace($this->content, $content, $position);
                 }
                 return $content;
@@ -27740,14 +27742,14 @@ if (!function_exists('var_pretty')) {
         };
 
         try {
-            $content = $appender->export($value, 0, [], false);
+            $content = $appender->export($value, 0, [], [], false);
         }
         catch (\LengthException $ex) {
             $content = $ex->getMessage() . '(...omitted)';
         }
 
         if ($options['callback']) {
-            ($options['callback'])($content, $value, 0);
+            ($options['callback'])($content, $value, 0, []);
         }
 
         // 結果を返したり出力したり
