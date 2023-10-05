@@ -12,6 +12,13 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.7
+
+- [fixbug] kvsort で負数が true 判定されているバグを修正
+- [refactor] array_grep_key の速度改善
+- [feature] var_pretty の callback に辿ってきたキー配列引数を追加
+- [change] benchmark の改善
+
 ## 1.6.6
 
 - [refactor] var_export3 の memory_path 依存を削除
