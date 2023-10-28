@@ -12,6 +12,10 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.8
+
+- [feature] var_pretty の table に callback を指定可能にした
+
 ## 1.6.7
 
 - [fixbug] kvsort で負数が true 判定されているバグを修正
