@@ -1288,6 +1288,111 @@ class varTest extends AbstractTestCase
               ],
             MD,);
 
+        that(var_pretty([
+            'arrays'  => [
+                ['a' => 'A1', 'b' => 'B1', 'c' => 'C1', 'x' => ['y' => ['z' => 1]]],
+                ['a' => 'A2', 'b' => 'B2', 'c' => 'C2', 'x' => ['y' => ['z' => 2]]],
+                ['a' => 'A3', 'b' => 'B3', 'c' => 'C3', 'x' => ['y' => ['z' => 3]]],
+            ],
+            'objects' => [
+                'h' => (object) ['a' => 'A1', 'b' => 'B1', 'c' => 'C1', 'x' => ['y' => ['z' => 1]]],
+                'f' => (object) ['a' => 'A2', 'b' => 'B2', 'c' => 'C2', 'x' => ['y' => ['z' => 2]]],
+                'p' => (object) ['a' => 'A3', 'b' => 'B3', 'c' => 'C3', 'x' => ['y' => ['z' => 3]]],
+            ],
+        ], [
+            'context' => 'plain',
+            'return'  => true,
+            'table'   => fn($v) => var_export($v, true),
+        ]))
+            ->stringContains(<<<MD
+              arrays: array[]
+            array (
+              0 => 
+              array (
+                'a' => 'A1',
+                'b' => 'B1',
+                'c' => 'C1',
+                'x' => 
+                array (
+                  'y' => 
+                  array (
+                    'z' => 1,
+                  ),
+                ),
+              ),
+              1 => 
+              array (
+                'a' => 'A2',
+                'b' => 'B2',
+                'c' => 'C2',
+                'x' => 
+                array (
+                  'y' => 
+                  array (
+                    'z' => 2,
+                  ),
+                ),
+              ),
+              2 => 
+              array (
+                'a' => 'A3',
+                'b' => 'B3',
+                'c' => 'C3',
+                'x' => 
+                array (
+                  'y' => 
+                  array (
+                    'z' => 3,
+                  ),
+                ),
+              ),
+            )  ,
+            MD,)
+            ->stringContains(<<<MD
+              objects: stdClass[]
+            array (
+              'h' => 
+              array (
+                'a' => 'A1',
+                'b' => 'B1',
+                'c' => 'C1',
+                'x' => 
+                array (
+                  'y' => 
+                  array (
+                    'z' => 1,
+                  ),
+                ),
+              ),
+              'f' => 
+              array (
+                'a' => 'A2',
+                'b' => 'B2',
+                'c' => 'C2',
+                'x' => 
+                array (
+                  'y' => 
+                  array (
+                    'z' => 2,
+                  ),
+                ),
+              ),
+              'p' => 
+              array (
+                'a' => 'A3',
+                'b' => 'B3',
+                'c' => 'C3',
+                'x' => 
+                array (
+                  'y' => 
+                  array (
+                    'z' => 3,
+                  ),
+                ),
+              ),
+            )  ,
+            MD,);
+
         that(var_pretty($value, [
             'context' => 'plain',
             'return'  => true,
