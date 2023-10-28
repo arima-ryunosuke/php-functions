@@ -27318,7 +27318,7 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
             'trace'         => false, // スタックトレースの表示
             'callback'      => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
             'debuginfo'     => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
-            'table'         => true,  // 連想配列の配列の場合にテーブル表示するか（現状はマークダウン風味固定）
+            'table'         => true,  // 連想配列の配列の場合にテーブル表示するか（コールバック。true はマークダウン風味固定）
             'maxcolumn'     => null,  // 1行あたりの文字数
             'maxcount'      => null,  // 複合型の要素の数
             'maxdepth'      => null,  // 複合型の深さ
@@ -27612,13 +27612,17 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                         $this->plain('[]');
                     }
                     elseif ($tableofarray) {
-                        $markdown = markdown_table(array_map(fn($v) => $this->array($v), $value), [
-                            'keylabel' => "#",
-                            'context'  => $this->options['context'],
-                        ]);
                         $this->plain($tableofarray, 'green');
                         $this->plain("\n");
-                        $this->plain(preg_replace('#^#um', $spacer1, $markdown));
+                        if ($this->options['table'] === true) {
+                            $this->plain(preg_replace('#^#um', $spacer1, markdown_table(array_map(fn($v) => $this->array($v), $value), [
+                                'keylabel' => "#",
+                                'context'  => $this->options['context'],
+                            ])));
+                        }
+                        else {
+                            $this->plain(($this->options['table'])(array_map(fn($v) => $this->array($v), $value), $nest));
+                        }
                         $this->plain($spacer2);
                     }
                     elseif ($assoc) {
