@@ -130,6 +130,13 @@ a2,b2,c2
 a3,b3,c3
 ");
 
+        // BOM 指定
+        that(csv_export($csvarrays, ['initial' => "\xEF\xBB\xBF"]))->is("\xEF\xBB\xBFa,b,c
+a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+");
+
         // callback 指定
         that(csv_export($csvarrays, [
             'callback' => function (&$row, $n) {

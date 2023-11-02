@@ -79,6 +79,7 @@ function csv_export($csvarrays, $options = [])
         'enclosure' => '"',
         'escape'    => '\\',
         'encoding'  => mb_internal_encoding(),
+        'initial'   => '', // "\xEF\xBB\xBF"
         'headers'   => null,
         'structure' => false,
         'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
@@ -94,7 +95,7 @@ function csv_export($csvarrays, $options = [])
         $fp = fopen('php://temp', 'rw+');
     }
     try {
-        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $headers, $structure, $callback) {
+        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback) {
             $size = 0;
             $mb_internal_encoding = mb_internal_encoding();
             if ($structure) {
@@ -102,6 +103,9 @@ function csv_export($csvarrays, $options = [])
                     $query = strtr(http_build_query($array, ''), ['%5B' => '[', '%5D' => ']']);
                     $csvarrays[$n] = array_map('rawurldecode', str_array(explode('&', $query), '=', true));
                 }
+            }
+            if (strlen($initial)) {
+                fwrite($fp, $initial);
             }
             if (!$headers) {
                 $tmp = [];
@@ -165,7 +169,7 @@ function csv_export($csvarrays, $options = [])
                 $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
             }
             return $size;
-        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['structure'], $options['callback']);
+        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
         if ($output) {
             return $size;
         }
