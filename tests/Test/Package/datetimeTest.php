@@ -8,6 +8,7 @@ use function ryunosuke\Functions\Package\date_convert;
 use function ryunosuke\Functions\Package\date_fromto;
 use function ryunosuke\Functions\Package\date_interval;
 use function ryunosuke\Functions\Package\date_interval_second;
+use function ryunosuke\Functions\Package\date_match;
 use function ryunosuke\Functions\Package\date_timestamp;
 use function ryunosuke\Functions\Package\date_validate;
 use function ryunosuke\Functions\Package\now;
@@ -379,6 +380,140 @@ class datetimeTest extends AbstractTestCase
             30 * $D * 2,
             31 * $D * 2,
         ]));
+    }
+
+    function test_date_match()
+    {
+        // 2014年の12月にマッチする
+        that(date_match('2014/12/24 12:34:56', '2014/12/*'))->isTrue();
+        that(date_match('2014/11/24 12:34:56', '2014/12/*'))->isFalse();
+        that(date_match('2015/12/24 12:34:56', '2014/12/*'))->isFalse();
+
+        // 2014年の12月の20日～25日にマッチする
+        that(date_match('2014/12/24 12:34:56', '2014/12/20-25'))->isTrue();
+        that(date_match('2014/12/26 12:34:56', '2014/12/20-25'))->isFalse();
+        that(date_match('2015/12/24 12:34:56', '2014/12/20-25'))->isFalse();
+
+        // 2014年の12月の10,20,30日にマッチする
+        that(date_match('2014/12/20 12:34:56', '2014/12/10,20,30'))->isTrue();
+        that(date_match('2014/12/24 12:34:56', '2014/12/10,20,30'))->isFalse();
+        that(date_match('2015/12/30 12:34:56', '2014/12/10,20,30'))->isFalse();
+
+        // 末日にマッチする
+        that(date_match('2014/02/28 12:34:56', '2014/02/L'))->isTrue();
+        that(date_match('2014/03/31 12:34:56', '2014/03/L'))->isTrue();
+        that(date_match('2012/02/29 12:34:56', '2012/02/99'))->isTrue();
+        that(date_match('2014/12/30 12:34:56', '2014/12/L'))->isFalse();
+        that(date_match('2012/02/28 12:34:56', '2012/02/L'))->isFalse();
+
+        that(date_match('2012/02/09 12:34:56', '2012/02/09'))->isTrue(); //一桁9は末日ではない
+        that(date_match('2011/12/31 12:34:56', '2012/*/L'))->isFalse();
+        that(date_match('2012/01/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/02/29 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/03/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/04/30 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/05/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/06/30 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/07/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/08/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/09/30 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/10/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/11/30 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2012/12/31 12:34:56', '2012/*/L'))->isTrue();
+        that(date_match('2013/01/31 12:34:56', '2012/*/L'))->isFalse();
+
+        // 2014年の12月の10,20~25,30日にマッチする
+        that(date_match('2014/12/24 12:34:56', '2014/12/10,20-25,30'))->isTrue();
+        that(date_match('2014/12/26 12:34:56', '2014/12/10,20-25,30'))->isFalse();
+        that(date_match('2015/12/26 12:34:56', '2014/12/10,20-25,30'))->isFalse();
+
+        // 2014年の12月の水曜日にマッチする
+        that(date_match('2014/12/03 12:34:56', '****/**/**(3)'))->isTrue();
+        that(date_match('2014/12/10 12:34:56', '****/**/**(水)'))->isTrue();
+        that(date_match('2014/12/17 12:34:56', '****/**/**(水曜日)'))->isTrue();
+        that(date_match('2014/12/24 12:34:56', '****/**/**(wed)'))->isTrue();
+        that(date_match('2014/12/31 12:34:56', '****/**/**(wednesday)'))->isTrue();
+        that(date_match('2014/12/14 12:34:56', '****/**/**(3)'))->isFalse();
+        that(date_match('2014/12/09 12:34:56', '****/**/**(3)'))->isFalse();
+
+        // 2014年の12月の平日（月～金）にマッチする
+        that(date_match('2014/12/14 12:34:56', '****/**/**(1-5)'))->isFalse();
+        that(date_match('2014/12/15 12:34:56', '****/**/**(1-5)'))->isTrue();
+        that(date_match('2014/12/16 12:34:56', '****/**/**(1-5)'))->isTrue();
+        that(date_match('2014/12/17 12:34:56', '****/**/**(1-5)'))->isTrue();
+        that(date_match('2014/12/18 12:34:56', '****/**/**(1-5)'))->isTrue();
+        that(date_match('2014/12/19 12:34:56', '****/**/**(1-5)'))->isTrue();
+        that(date_match('2014/12/20 12:34:56', '****/**/**(1-5)'))->isFalse();
+
+        // 2014年の12月の第1,3水曜日にマッチする
+        that(date_match('2014/12/03 12:34:56', '****/**/**(水#1,水曜日#3)'))->isTrue();
+        that(date_match('2014/12/10 12:34:56', '****/**/**(3#1,3#3)'))->isFalse();
+        that(date_match('2014/12/17 12:34:56', '****/**/**(wed#1,wednesday#3)'))->isTrue();
+        that(date_match('2014/12/24 12:34:56', '****/**/**(3#1,3#3)'))->isFalse();
+        that(date_match('2014/12/31 12:34:56', '****/**/**(3#1,3#3)'))->isFalse();
+
+        // 2014年の12月の最終水曜日にマッチする
+        that(date_match('2014/12/03 12:34:56', '****/**/**(3#L)'))->isFalse();
+        that(date_match('2014/12/10 12:34:56', '****/**/**(3#L)'))->isFalse();
+        that(date_match('2014/12/17 12:34:56', '****/**/**(3#L)'))->isFalse();
+        that(date_match('2014/12/24 12:34:56', '****/**/**(3#L)'))->isFalse();
+        that(date_match('2014/12/31 12:34:56', '****/**/**(3#L)'))->isTrue();
+        that(date_match('2014/12/31 12:34:56', '****/**/**(3#9)'))->isTrue();
+
+        // 任意の13日の金曜日にマッチする
+        that(date_match('2014/06/13 12:34:56', '****/**/13(fri)'))->isTrue();
+        that(date_match('2014/06/14 12:34:56', '****/**/13(5)'))->isFalse();
+        that(date_match('2015/06/13 12:34:56', '****/**/13(5)'))->isFalse();
+
+        // 隔週水曜日（奇）
+        that(date_match('2014/12/17 12:34:56', '****/**/**(水#o)'))->isFalse();
+        that(date_match('2014/12/24 12:34:56', '****/**/**(水#o)'))->isTrue();
+        that(date_match('2014/12/31 12:34:56', '****/**/**(水#o)'))->isFalse();
+        that(date_match('2015/01/07 12:34:56', '****/**/**(水#o)'))->isTrue();
+        that(date_match('2015/01/14 12:34:56', '****/**/**(水#o)'))->isFalse();
+
+        // 隔週水曜日（偶）
+        that(date_match('2014/12/17 12:34:56', '****/**/**(水#e)'))->isTrue();
+        that(date_match('2014/12/24 12:34:56', '****/**/**(水#e)'))->isFalse();
+        that(date_match('2014/12/31 12:34:56', '****/**/**(水#e)'))->isTrue();
+        that(date_match('2015/01/07 12:34:56', '****/**/**(水#e)'))->isFalse();
+        that(date_match('2015/01/14 12:34:56', '****/**/**(水#e)'))->isTrue();
+
+        // 閏年隔週火曜日（偶奇）
+        that(date_match('2000/02/01 12:34:56', '****/**/**(火#e)'))->isTrue();
+        that(date_match('2000/02/08 12:34:56', '****/**/**(火#o)'))->isTrue();
+        that(date_match('2000/02/15 12:34:56', '****/**/**(火#e)'))->isTrue();
+        that(date_match('2000/02/22 12:34:56', '****/**/**(火#o)'))->isTrue();
+        that(date_match('2000/02/29 12:34:56', '****/**/**(火#e)'))->isTrue();
+
+        // 任意の12:34にマッチする
+        that(date_match('2014/12/24 12:34:56', '****/**/** 12:34'))->isTrue();
+        that(date_match('2014/12/25 12:33:56', '****/**/** 12:34'))->isFalse();
+        that(date_match('2014/12/26 12:35:56', '****/**/** 12:34'))->isFalse();
+
+        // 2014年の最終金曜日
+        that(date_match('2014/01/31', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/02/28', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/03/28', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/04/25', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/05/30', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/06/27', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/07/25', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/08/29', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/09/26', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/10/31', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/11/28', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2014/12/26', '2014/**/**(5#9)'))->isTrue();
+
+        // 最終週
+        that(date_match('2014/02/22', '2014/**/**(6#9)'))->isTrue();
+        that(date_match('2014/02/28', '2014/**/**(5#9)'))->isTrue();
+        that(date_match('2024/02/22', '2024/**/**(4#9)'))->isFalse();
+        that(date_match('2024/02/29', '2024/**/**(4#9)'))->isTrue();
+
+        that(self::resolveFunction('date_match'))('hoge', '****/**/**')->wasThrown('failed to parse');
+        that(self::resolveFunction('date_match'))('2014/12/24 12:35:56', 'hoge')->wasThrown('failed to parse');
+        that(self::resolveFunction('date_match'))('2014/12/24 12:35:56', '****/13/**')->wasThrown('13(1~12)');
     }
 
     function test_date_timestamp()
