@@ -173,6 +173,29 @@ class datetimeTest extends AbstractTestCase
         that(date_convert('\\Y\\J\\K\\k\\b\\x', '2019/12/24'))->is('YJKkbx');
         that(date_convert('\\J\\\\J\\\\\\J', '2019/12/24'))->is("J\\令和\\J");
         that(date_convert('JJJ', '2019/12/24'))->is("令和令和令和");
+        that(date_convert('Q', '2014/03/01'))->is("6");
+        that(date_convert('Q', '2014/03/02'))->is("0");
+        that(date_convert('Q', '2014/03/03'))->is("1");
+        that(date_convert('Q', '2014/03/04'))->is("2");
+        that(date_convert('Q', '2014/03/05'))->is("3");
+        that(date_convert('Q', '2014/03/06'))->is("4");
+        that(date_convert('Q', '2014/03/07'))->is("5");
+        that(date_convert('Q', '2014/03/08'))->is("13");
+        that(date_convert('Q', '2014/03/09'))->is("7");
+        that(date_convert('Q', '2014/03/10'))->is("8");
+        that(date_convert('Q', '2014/03/29'))->is("34");
+        that(date_convert('Q', '2014/03/30'))->is("28");
+        that(date_convert('Q', '2014/03/31'))->is("29");
+        that(date_convert('Q', '2000/02/01'))->is("2");
+        that(date_convert('Q', '2000/02/28'))->is("22");
+        that(date_convert('Q', '2000/02/29'))->is("30");
+        that(date_convert('Q', '2004/02/01'))->is("0");
+        that(date_convert('Q', '2004/02/28'))->is("27");
+        that(date_convert('Q', '2004/02/29'))->is("28");
+
+        foreach (range(1, 28) as $n => $day) {
+            that(date_convert('Q', "2015/02/$day"))->is($n);
+        }
 
         that(self::resolveFunction('date_convert'))('Y/m/d H:i:s.u', 'hogera')->wasThrown('parse failed');
         that(self::resolveFunction('date_convert'))('JY/m/d H:i:s.u', '1200/12/23')->wasThrown('notfound JP_ERA');

@@ -15,6 +15,28 @@ require_once __DIR__ . '/../constants.php';
  * マイクロ秒にも対応している。
  * かなり適当に和暦にも対応している。
  *
+ * 拡張書式は下記。
+ * - J: 日本元号
+ *   - e.g. 平成
+ *   - e.g. 令和
+ * - b: 日本元号略称
+ *   - e.g. H
+ *   - e.g. R
+ * - k: 日本元号年
+ *   - e.g. 平成7年
+ *   - e.g. 令和1年
+ * - K: 日本元号年（1年が元年）
+ *   - e.g. 平成7年
+ *   - e.g. 令和元年
+ * - x: 日本語曜日
+ *   - e.g. 日
+ *   - e.g. 月
+ * - Q: 月内週番号（商が第N、余が曜日）
+ *   - e.g. 6（7 * 0 + 6 第1土曜日）
+ *   - e.g. 15（7 * 2 + 1 第3月曜日）
+ *
+ * php8.2 から x,X が追加されたため上記はあくまで参考となる。
+ *
  * Example:
  * ```php
  * // 和暦を Y/m/d H:i:s に変換
@@ -70,6 +92,7 @@ function date_convert($format, $datetimedata = null)
             'k' => fn() => $era ? $era['year'] : throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
             'K' => fn() => $era ? $era['gann'] : throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
             'x' => fn() => ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)],
+            'Q' => fn() => idate('w', $timestamp) + intdiv(idate('j', $timestamp) - 1, 7) * 7,
         ], '\\');
     }
 
