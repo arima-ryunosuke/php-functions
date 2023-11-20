@@ -12,6 +12,14 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.9
+
+- [feature] date_match を追加
+- [feature] date_convert の書式に Q を追加
+- [feature] csv_export の iterator 対応
+- [feature] csv_export のヘッダコールバック対応
+- [feature] csv_export の BOM(initial) 対応
+
 ## 1.6.8
 
 - [feature] var_pretty の table に callback を指定可能にした
