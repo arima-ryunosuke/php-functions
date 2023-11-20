@@ -75,15 +75,16 @@ require_once __DIR__ . '/../strings/str_array.php';
 function csv_export($csvarrays, $options = [])
 {
     $options += [
-        'delimiter' => ',',
-        'enclosure' => '"',
-        'escape'    => '\\',
-        'encoding'  => mb_internal_encoding(),
-        'initial'   => '', // "\xEF\xBB\xBF"
-        'headers'   => null,
-        'structure' => false,
-        'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
-        'output'    => null,
+        'delimiter'       => ',',
+        'enclosure'       => '"',
+        'escape'          => '\\',
+        'encoding'        => mb_internal_encoding(),
+        'initial'         => '', // "\xEF\xBB\xBF"
+        'headers'         => null,
+        'structure'       => false,
+        'callback'        => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+        'callback_header' => false, // callback に header 行も渡ってくるか？（互換性のためであり将来的に削除される）
+        'output'          => null,
     ];
 
     $output = $options['output'];
@@ -95,7 +96,7 @@ function csv_export($csvarrays, $options = [])
         $fp = fopen('php://temp', 'rw+');
     }
     try {
-        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback) {
+        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
             $size = 0;
             $mb_internal_encoding = mb_internal_encoding();
             if ($structure) {
@@ -145,6 +146,12 @@ function csv_export($csvarrays, $options = [])
                 $headers = array_combine($headers, $headers);
             }
             else {
+                if ($callback_header && $callback) {
+                    if ($callback($headers, null) === false) {
+                        goto BODY;
+                    }
+                }
+
                 $headerline = $headers;
                 if ($encoding !== $mb_internal_encoding) {
                     mb_convert_variables($encoding, $mb_internal_encoding, $headerline);
@@ -154,6 +161,9 @@ function csv_export($csvarrays, $options = [])
                 }
                 $size += fputcsv($fp, $headerline, $delimiter, $enclosure, $escape);
             }
+
+            BODY:
+
             $default = array_fill_keys(array_keys($headers), '');
 
             foreach ($csvarrays as $n => $array) {
@@ -169,7 +179,7 @@ function csv_export($csvarrays, $options = [])
                 $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
             }
             return $size;
-        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
+        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
         if ($output) {
             return $size;
         }

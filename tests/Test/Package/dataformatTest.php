@@ -148,6 +148,24 @@ a1,B1,c1
 a3,B3,c3
 ");
 
+        // callback 指定（ヘッダ込み）
+        that(csv_export($csvarrays, [
+            'callback'        => function (&$row, $n) {
+                if ($n === null) {
+                    $row['b'] = strtoupper($row['b']);
+                    return;
+                }
+                else {
+                    $row['b'] = strtoupper($row['b']);
+                    return $n !== 1;
+                }
+            },
+            'callback_header' => true,
+        ]))->is("a,B,c
+a1,B1,c1
+a3,B3,c3
+");
+
         // output 指定
         $receiver = fopen('php://memory', 'r+b');
         that(csv_export($csvarrays, ['output' => $receiver]))->is(33);
