@@ -4,6 +4,8 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../iterator/iterator_join.php';
+require_once __DIR__ . '/../iterator/iterator_split.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../strings/str_array.php';
 // @codeCoverageIgnoreEnd
@@ -68,7 +70,7 @@ require_once __DIR__ . '/../strings/str_array.php';
  *
  * @package ryunosuke\Functions\Package\dataformat
  *
- * @param array $csvarrays 連想配列の配列
+ * @param iterable $csvarrays 連想配列の配列
  * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
  * @return string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
  */
@@ -99,6 +101,11 @@ function csv_export($csvarrays, $options = [])
         $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
             $size = 0;
             $mb_internal_encoding = mb_internal_encoding();
+
+            if (!is_array($csvarrays)) {
+                [$csvarrays, $csvarrays2] = iterator_split($csvarrays, [1], true);
+            }
+
             if ($structure) {
                 foreach ($csvarrays as $n => $array) {
                     $query = strtr(http_build_query($array, ''), ['%5B' => '[', '%5D' => ']']);
@@ -165,6 +172,10 @@ function csv_export($csvarrays, $options = [])
             BODY:
 
             $default = array_fill_keys(array_keys($headers), '');
+
+            if (isset($csvarrays2)) {
+                $csvarrays = iterator_join([$csvarrays, $csvarrays2]);
+            }
 
             foreach ($csvarrays as $n => $array) {
                 if ($callback) {

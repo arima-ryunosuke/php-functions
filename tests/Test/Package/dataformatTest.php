@@ -218,6 +218,23 @@ a3 b3 c3
 1,x1,y1,11,,,
 1,x1,y1,,a2,b2,22
 ");
+
+        // Generator
+        that(csv_export((function () {
+            yield 1 => ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'];
+            yield 2 => ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'];
+            yield 3 => ['a' => 'a3', 'b' => 'b3', 'c' => 'c3'];
+        })(), [
+            'callback'        => function (&$row, $n) {
+                $row = array_merge(['prefix'], $row, ['suffix']);
+                $row['b'] = strtoupper($row['b']);
+            },
+            'callback_header' => true,
+        ]))->is("prefix,a,B,c,suffix
+prefix,a1,B1,c1,suffix
+prefix,a2,B2,c2,suffix
+prefix,a3,B3,c3,suffix
+");
     }
 
     function test_csv_import()
