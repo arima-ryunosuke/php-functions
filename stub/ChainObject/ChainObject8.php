@@ -308,6 +308,11 @@ trait ChainObject8
     public function date_fromto($format, $datetimestring): self { }
     public function date_fromto($datetimestring): self { }
 
+    /** @see \date_match() */
+    public self $date_match;
+    public function date_match($datetime, $cronlike): self { }
+    public function date_match($cronlike): self { }
+
     /** @see \backtrace() */
     public self $backtrace;
     public function backtrace($flags = DEBUG_BACKTRACE_PROVIDE_OBJECT, $options = []): self { }
