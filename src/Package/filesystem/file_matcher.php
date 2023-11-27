@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/arrayize.php';
 require_once __DIR__ . '/../datetime/date_timestamp.php';
 require_once __DIR__ . '/../filesystem/file_pos.php';
 require_once __DIR__ . '/../var/si_unprefix.php';
@@ -106,27 +107,36 @@ function file_matcher(array $filter_condition)
         '!name'    => null,
     ] as $key => $convert) {
         if (isset($filter_condition[$key])) {
-            $pattern = $filter_condition[$key];
-            preg_match('##', ''); // clear preg_last_error
-            @preg_match($pattern, '');
-            if (preg_last_error() === PREG_NO_ERROR) {
-                $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
-                    $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
-                    return !!preg_match($pattern, $string);
-                };
+            $callback = fn() => false;
+            foreach (arrayize($filter_condition[$key]) as $pattern) {
+                preg_match('##', ''); // clear preg_last_error
+                @preg_match($pattern, '');
+                if (preg_last_error() === PREG_NO_ERROR) {
+                    $callback = static function ($string) use ($callback, $pattern, $filter_condition) {
+                        if ($callback($string)) {
+                            return true;
+                        }
+                        $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
+                        return !!preg_match($pattern, $string);
+                    };
+                }
+                else {
+                    $callback = static function ($string) use ($callback, $pattern, $filter_condition) {
+                        if ($callback($string)) {
+                            return true;
+                        }
+                        if ($filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\') {
+                            $pattern = str_replace('\\', '/', $pattern);
+                            $string = str_replace('\\', '/', $string);
+                        }
+                        $flags = $filter_condition['fnmflag'];
+                        $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
+                        $flags &= ~((strpos($pattern, '**') !== false) ? FNM_PATHNAME : 0);
+                        return fnmatch($pattern, $string, $flags);
+                    };
+                }
             }
-            else {
-                $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
-                    if ($filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\') {
-                        $pattern = str_replace('\\', '/', $pattern);
-                        $string = str_replace('\\', '/', $string);
-                    }
-                    $flags = $filter_condition['fnmflag'];
-                    $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
-                    $flags &= ~((strpos($pattern, '**') !== false) ? FNM_PATHNAME : 0);
-                    return fnmatch($pattern, $string, $flags);
-                };
-            }
+            $filter_condition[$key] = $callback;
         }
     }
 
