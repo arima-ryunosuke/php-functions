@@ -4,6 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../filesystem/file_matcher.php';
 require_once __DIR__ . '/../filesystem/path_normalize.php';
+require_once __DIR__ . '/../strings/multiexplode.php';
 require_once __DIR__ . '/../strings/str_exists.php';
 // @codeCoverageIgnoreEnd
 
@@ -36,10 +37,12 @@ require_once __DIR__ . '/../strings/str_exists.php';
 function file_list($dirname, $filter_condition = [])
 {
     $filter_condition += [
-        'unixpath'  => false,
+        'unixpath' => false,
+        '!type'    => 'dir',
+
         'recursive' => true,
         'relative'  => false,
-        '!type'     => 'dir',
+        'nesting'   => false,
     ];
 
     $dirname = path_normalize($dirname);
@@ -89,7 +92,23 @@ function file_list($dirname, $filter_condition = [])
         }
 
         $path = $filter_condition['relative'] ? $it->getSubPathName() : $fullpath;
-        $result[] = strtr(is_dir($fullpath) ? $path . $DS : $path, [DIRECTORY_SEPARATOR => $DS]);
+        $path = strtr(is_dir($fullpath) ? $path . $DS : $path, [DIRECTORY_SEPARATOR => $DS]);
+
+        if ($filter_condition['nesting']) {
+            $tmp = &$result;
+            foreach (array_filter(multiexplode(['/', DIRECTORY_SEPARATOR], $it->getSubPath()), 'strlen') as $subdir) {
+                $tmp = &$tmp[$subdir];
+            }
+            if ($it->isDir()) {
+                $tmp[$it->getFilename()] = $tmp[$it->getFilename()] ?? [];
+            }
+            else {
+                $tmp[$it->getFilename()] = $path;
+            }
+        }
+        else {
+            $result[] = $path;
+        }
     }
     return $result;
 }

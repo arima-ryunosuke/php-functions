@@ -500,6 +500,22 @@ class filesystemTest extends AbstractTestCase
             "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
         ]);
 
+        // ツリー構造
+        that(file_list($base, ["nesting" => true, '!type' => null]))->equalsCanonicalizing([
+            [
+                "a1.txt" => "$base{$DS}a{$DS}a1.txt",
+                "a2.txt" => "$base{$DS}a{$DS}a2.txt",
+                "b"      => [
+                    "ab1.txt" => "$base{$DS}a{$DS}b{$DS}ab1.txt",
+                    "ab2.log" => "$base{$DS}a{$DS}b{$DS}ab2.log",
+                    "c"       => [
+                        "abc1.log" => "$base{$DS}a{$DS}b{$DS}c{$DS}abc1.log",
+                        "abc2.log" => "$base{$DS}a{$DS}b{$DS}c{$DS}abc2.log",
+                    ],
+                ],
+            ],
+        ]);
+
         // 非再帰モード
         that(file_list("$base{$DS}a", ["recursive" => false, "!type" => null]))->equalsCanonicalizing([
             "$base{$DS}a{$DS}a1.txt",
