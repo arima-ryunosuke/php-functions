@@ -1024,7 +1024,9 @@ class filesystemTest extends AbstractTestCase
 
     function test_path_info()
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
+        $DS = DIRECTORY_SEPARATOR;
+
+        if ($DS === '\\') {
             that(path_info('C:\\dir1\\dir2\\\\file.sjis.min.js'))->is([
                 "dirname"    => "C:\\dir1\dir2",
                 "basename"   => "file.sjis.min.js",
@@ -1035,6 +1037,7 @@ class filesystemTest extends AbstractTestCase
                 "parents"    => ["dir1", "dir2"],
                 "dirnames"   => ["dir1", "dir2"],
                 "localname"  => "file",
+                "localpath"  => "C:\\dir1\\dir2\\file",
                 "extensions" => ["sjis", "min", "js"],
             ]);
             that(path_info('\\dir1\\dir2\\\\file.sjis.min.js'))->is([
@@ -1047,6 +1050,7 @@ class filesystemTest extends AbstractTestCase
                 "parents"    => ["dir1", "dir2"],
                 "dirnames"   => ["dir1", "dir2"],
                 "localname"  => "file",
+                "localpath"  => "\\dir1\\dir2\\file",
                 "extensions" => ["sjis", "min", "js"],
             ]);
             that(path_info('dir1\\dir2\\\\file.sjis.min.js'))->is([
@@ -1059,6 +1063,7 @@ class filesystemTest extends AbstractTestCase
                 "parents"    => ["dir1", "dir2"],
                 "dirnames"   => ["dir1", "dir2"],
                 "localname"  => "file",
+                "localpath"  => "dir1\\dir2\\file",
                 "extensions" => ["sjis", "min", "js"],
             ]);
             // 下記2ケースのオリジナルの pathinfo の結果が明らかに不穏
@@ -1072,6 +1077,7 @@ class filesystemTest extends AbstractTestCase
                 "parents"    => [],
                 "dirnames"   => [],
                 "localname"  => "",
+                "localpath"  => "C:\\",
                 "extensions" => [],
             ]);
             that(path_info('C:\\C'))->is([
@@ -1084,6 +1090,7 @@ class filesystemTest extends AbstractTestCase
                 "parents"    => [],
                 "dirnames"   => [],
                 "localname"  => "C",
+                "localpath"  => "C:\\\\C",
                 "extensions" => [],
             ]);
         }
@@ -1097,6 +1104,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => ["dir1", "dir2"],
             "dirnames"   => ["dir1", "dir2"],
             "localname"  => "file",
+            "localpath"  => "C:/dir1/dir2{$DS}file",
             "extensions" => ["sjis", "min", "js"],
         ]);
         that(path_info('/dir1/dir2//file.sjis.min.js'))->is([
@@ -1109,6 +1117,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => ["dir1", "dir2"],
             "dirnames"   => ["dir1", "dir2"],
             "localname"  => "file",
+            "localpath"  => "/dir1/dir2{$DS}file",
             "extensions" => ["sjis", "min", "js"],
         ]);
         that(path_info('dir1/dir2//file.sjis.min.js'))->is([
@@ -1121,6 +1130,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => ["dir1", "dir2"],
             "dirnames"   => ["dir1", "dir2"],
             "localname"  => "file",
+            "localpath"  => "dir1/dir2{$DS}file",
             "extensions" => ["sjis", "min", "js"],
         ]);
         that(path_info('dir1.dot/./dir2.dot/file.ext'))->is([
@@ -1133,6 +1143,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => ["dir1.dot", "dir2.dot"],
             "dirnames"   => ["dir1.dot", ".", "dir2.dot"],
             "localname"  => "file",
+            "localpath"  => "dir1.dot/./dir2.dot{$DS}file",
             "extensions" => ["ext"],
         ]);
         that(path_info('dir1.dot/../dir2.dot/file.ext'))->is([
@@ -1145,6 +1156,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => ["dir2.dot"],
             "dirnames"   => ["dir1.dot", "..", "dir2.dot"],
             "localname"  => "file",
+            "localpath"  => "dir1.dot/../dir2.dot{$DS}file",
             "extensions" => ["ext"],
         ]);
         that(path_info('no.dir'))->is([
@@ -1157,6 +1169,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => [],
             "dirnames"   => [],
             "localname"  => "no",
+            "localpath"  => "no",
             "extensions" => ["dir"],
         ]);
         that(path_info('localonly'))->is([
@@ -1169,6 +1182,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => [],
             "dirnames"   => [],
             "localname"  => "localonly",
+            "localpath"  => "localonly",
             "extensions" => [],
         ]);
         that(path_info('.ext.only'))->is([
@@ -1181,6 +1195,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => [],
             "dirnames"   => [],
             "localname"  => "",
+            "localpath"  => "",
             "extensions" => ["ext", "only"],
         ]);
         that(path_info('...'))->is([
@@ -1193,6 +1208,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => [],
             "dirnames"   => [],
             "localname"  => "",
+            "localpath"  => "",
             "extensions" => ["", "", ""],
         ]);
         that(path_info(''))->is([
@@ -1205,6 +1221,7 @@ class filesystemTest extends AbstractTestCase
             "parents"    => [],
             "dirnames"   => [],
             "localname"  => "",
+            "localpath"  => "",
             "extensions" => [],
         ]);
     }

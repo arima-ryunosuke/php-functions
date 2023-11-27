@@ -13,6 +13,7 @@ namespace ryunosuke\Functions\Package;
  * - parents: 正規化したディレクトリ名の配列
  * - dirnames: ディレクトリ名の配列（余計なことはしない）
  * - localname: 複数拡張子を考慮した本当のファイル名部分
+ * - localpath: ディレクトリ名（余計なことはしない）＋複数拡張子を考慮した本当のファイル名部分（フルパス - 拡張子）
  * - extensions: 複数拡張子の配列（余計なことはしない）
  *
  * 「余計なことはしない」とは空文字をフィルタしたりパスを正規化したりを指す。
@@ -22,6 +23,7 @@ namespace ryunosuke\Functions\Package;
  *
  * Example:
  * ```php
+ * $DS = DIRECTORY_SEPARATOR;
  * // 色々混ぜたサンプル
  * that(path_info('C:/dir1/.././dir2/file.sjis..min.js'))->is([
  *     "dirname"    => "C:/dir1/.././dir2",
@@ -30,11 +32,12 @@ namespace ryunosuke\Functions\Package;
  *     "filename"   => "file.sjis..min",
  *     // ここまでオリジナルの pathinfo 結果
  *     "drive"      => "C:",
- *     "root"       => "/",                         // 環境依存しない元のルートパス
- *     "parents"    => ["dir2"],                    // 正規化されたディレクトリ配列
- *     "dirnames"   => ["dir1", "..", ".", "dir2"], // 余計なことをしていないディレクトリ配列
- *     "localname"  => "file",
- *     "extensions" => ["sjis", "", "min", "js"],   // 余計なことをしていない拡張子配列
+ *     "root"       => "/",                          // 環境依存しない元のルートパス
+ *     "parents"    => ["dir2"],                     // 正規化されたディレクトリ配列
+ *     "dirnames"   => ["dir1", "..", ".", "dir2"],  // 余計なことをしていないディレクトリ配列
+ *     "localname"  => "file",                       // 複数拡張子を考慮した本当のファイル名部分
+ *     "localpath"  => "C:/dir1/.././dir2{$DS}file", // ↑にディレクトリ名を付与したもの
+ *     "extensions" => ["sjis", "", "min", "js"],    // 余計なことをしていない拡張子配列
  * ]);
  * // linux における絶対パス
  * that(path_info('/dir1/dir2/file.sjis.min.js'))->is([
@@ -48,6 +51,7 @@ namespace ryunosuke\Functions\Package;
  *     "parents"    => ["dir1", "dir2"],      // ..等がないので dirnames と同じ
  *     "dirnames"   => ["dir1", "dir2"],      // ディレクトリ配列
  *     "localname"  => "file",
+ *     "localpath"  => "/dir1/dir2{$DS}file",
  *     "extensions" => ["sjis", "min", "js"], // 余計なことをしていない拡張子配列
  * ]);
  * // linux における相対パス
@@ -62,6 +66,7 @@ namespace ryunosuke\Functions\Package;
  *     "parents"    => ["dir1", "dir2"],
  *     "dirnames"   => ["dir1", "dir2"],
  *     "localname"  => "file",
+ *     "localpath"  => "dir1/dir2{$DS}file",
  *     "extensions" => ["sjis", "min", "js"],
  * ]);
  * // ディレクトリ無し
@@ -76,6 +81,7 @@ namespace ryunosuke\Functions\Package;
  *     "parents"    => [], // オリジナルの pathinfo のようにドットが紛れ込んだりはしない
  *     "dirnames"   => [], // オリジナルの pathinfo のようにドットが紛れ込んだりはしない
  *     "localname"  => "file",
+ *     "localpath"  => "file",
  *     "extensions" => ["sjis", "min", "js"],
  * ]);
  * ```
@@ -143,6 +149,7 @@ function path_info($path)
     }, []);
 
     $result['localname'] = array_shift($basenames);
+    $result['localpath'] = implode(DIRECTORY_SEPARATOR, array_filter([$pathinfo['dirname'], $result['localname']], 'strlen'));
     $result['extensions'] = $basenames;
 
     return $result;
