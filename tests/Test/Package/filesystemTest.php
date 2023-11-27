@@ -654,6 +654,11 @@ class filesystemTest extends AbstractTestCase
         that(file_matcher(['name' => '#fail#i'])('/a/b/c/file'))->isFalse();
         that(file_matcher(['!name' => '#fail#i'])('/a/b/c/file'))->isTrue();
 
+        that(file_matcher(['basename' => '#^file$#i'])('/a/b/c/file.ext'))->isTrue();
+        that(file_matcher(['!basename' => '#^file$#i'])('/a/b/c/file.ext'))->isFalse();
+        that(file_matcher(['basename' => '#^fail$#i'])('/a/b/c/file.ext'))->isFalse();
+        that(file_matcher(['!basename' => '#^fail$#i'])('/a/b/c/file.ext'))->isTrue();
+
         that(file_matcher(['extension' => 'ext'])('/a/b/c/file.ext'))->isTrue();
         that(file_matcher(['!extension' => 'ext'])('/a/b/c/file.ext'))->isFalse();
         that(file_matcher(['extension' => 'not'])('/a/b/c/file.ext'))->isFalse();

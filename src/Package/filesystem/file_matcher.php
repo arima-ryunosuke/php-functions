@@ -5,6 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/arrayize.php';
 require_once __DIR__ . '/../datetime/date_timestamp.php';
 require_once __DIR__ . '/../filesystem/file_pos.php';
+require_once __DIR__ . '/../strings/concat.php';
 require_once __DIR__ . '/../var/si_unprefix.php';
 // @codeCoverageIgnoreEnd
 
@@ -50,6 +51,9 @@ function file_matcher(array $filter_condition)
         // by getFilename (glob or regex)
         'name'       => null,
         '!name'      => null,
+        // by getBasename (glob or regex)
+        'basename'   => null,
+        '!basename'  => null,
         // by getExtension (string or [string])
         'extension'  => null,
         '!extension' => null,
@@ -97,14 +101,16 @@ function file_matcher(array $filter_condition)
     }
 
     foreach ([
-        'path'     => null,
-        '!path'    => null,
-        'subpath'  => null,
-        '!subpath' => null,
-        'dir'      => null,
-        '!dir'     => null,
-        'name'     => null,
-        '!name'    => null,
+        'path'      => null,
+        '!path'     => null,
+        'subpath'   => null,
+        '!subpath'  => null,
+        'dir'       => null,
+        '!dir'      => null,
+        'name'      => null,
+        '!name'     => null,
+        'basename'  => null,
+        '!basename' => null,
     ] as $key => $convert) {
         if (isset($filter_condition[$key])) {
             $callback = fn() => false;
@@ -188,6 +194,11 @@ function file_matcher(array $filter_condition)
         }
         foreach (['name' => false, '!name' => true] as $key => $cond) {
             if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getFilename())) {
+                return false;
+            }
+        }
+        foreach (['basename' => false, '!basename' => true] as $key => $cond) {
+            if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getBasename(concat('.', $file->getExtension())))) {
                 return false;
             }
         }
