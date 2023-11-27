@@ -1428,7 +1428,16 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
     - 3
 ");
 
-        that("\n" . markdown_list(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 2, 3]], [
+        that("\n" . markdown_list(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [10 => 1, 20 => 2, 30 => 3]]))->is("
+- a: A
+- b: B
+- ls: LS
+    - 10: 1
+    - 20: 2
+    - 30: 3
+");
+
+        that("\n" . markdown_list(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 'a' => 2, 3]], [
                 'indent'    => "\t",
                 'separator' => ' = ',
                 'liststyle' => '*',
@@ -1438,8 +1447,25 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 * b = B
 * ls = LS
 	1. 1
-	2. 2
-	3. 3
+	* a = 2
+	2. 3
+"
+        );
+
+        that("\n" . markdown_list(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 'a' => 2, 3]], [
+                'indent'    => "\t",
+                'separator' => ' = ',
+                'liststyle' => '*',
+                'ordered'   => true,
+                'indexed'   => false,
+            ]))->is("
+* a = A
+* b = B
+* ls = LS
+* 0 = 
+	* 0 = 1
+	* a = 2
+	* 1 = 3
 "
         );
     }

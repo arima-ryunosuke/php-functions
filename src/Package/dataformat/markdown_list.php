@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/arrays.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -50,27 +49,30 @@ function markdown_list($array, $option = [])
         'separator' => ': ',
         'liststyle' => '-',
         'ordered'   => false,
+        'indexed'   => null,
     ];
 
     $f = function ($array, $nest) use (&$f, $option) {
         $spacer = str_repeat($option['indent'], $nest);
         $result = [];
-        foreach (arrays($array) as $n => [$k, $v]) {
+        $seq = 0;
+        foreach ($array as $k => $v) {
+            $indexed = $option['indexed'] ?? is_int($k) && $k === $seq++;
             if (is_iterable($v)) {
-                if (!is_int($k)) {
+                if (!$indexed) {
                     $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];
                 }
                 $result = array_merge($result, $f($v, $nest + 1));
             }
             else {
-                if (!is_int($k)) {
+                if (!$indexed) {
                     $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'] . $v;
                 }
                 elseif (!$option['ordered']) {
                     $result[] = $spacer . $option['liststyle'] . ' ' . $v;
                 }
                 else {
-                    $result[] = $spacer . ($n + 1) . '. ' . $v;
+                    $result[] = $spacer . $seq . '. ' . $v;
                 }
             }
         }
