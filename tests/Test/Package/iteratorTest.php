@@ -39,6 +39,44 @@ class iteratorTest extends AbstractTestCase
         }
         that($gens->getReturn())->is(count($data));
 
+        $kvs = [];
+        $double = 0;
+        $gens = iterator_chunk($generatorF(), function ($v, $k, $n, $chunk) use (&$kvs, &$double) {
+            $kvs[$k] = $v;
+            if ($n < 2 ** $double) {
+                return true;
+            }
+            $double++;
+            return false;
+        }, true);
+        $expected = [
+            [
+                'a' => 'A',
+            ],
+            [
+                'b' => 'B',
+                'c' => 'C',
+            ],
+            [
+                'd' => 'D',
+                'e' => 'E',
+                'f' => 'F',
+                'g' => 'G',
+            ],
+            [
+                'h' => 'H',
+                'i' => 'I',
+                'j' => 'J',
+                'k' => 'K',
+            ],
+        ];
+        foreach ($gens as $n => $gen) {
+            that(iterator_to_array($gen))->is($expected[$n]);
+            that($gen->getReturn())->is(count($expected[$n]));
+        }
+        that($gens->getReturn())->is(count($data));
+        that($kvs)->is($data);
+
         $gens = iterator_chunk($generatorF(), 4, true);
         $expected = array_chunk($data, 4, true);
         foreach ($gens as $n => $gen) {

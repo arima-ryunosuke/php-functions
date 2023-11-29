@@ -41,19 +41,48 @@ namespace ryunosuke\Functions\Package;
  * // 大本の Generator は総数を返す
  * $generators->next();
  * that($generators->getReturn())->is(7);
+ *
+ * // ハイフンが来るたびに分割（クロージャ内で next しているため、ハイフン自体は結果に含まれない）
+ * $generator = (function () {
+ *     yield 'a';
+ *     yield 'b';
+ *     yield '-';
+ *     yield 'c';
+ *     yield 'd';
+ *     yield 'e';
+ *     yield 'f';
+ *     yield '-';
+ *     yield 'g';
+ * })();
+ * $generators = iterator_chunk($generator, function ($v, $k, $n, $c, $it) {
+ *     if ($v === '-') {
+ *         $it->next();
+ *         return false;
+ *     }
+ *     return true;
+ * });
+ *
+ * that(iterator_to_array($generators->current()))->is(['a', 'b']);
+ * $generators->next();
+ * that(iterator_to_array($generators->current()))->is(['c', 'd', 'e', 'f']);
+ * $generators->next();
+ * that(iterator_to_array($generators->current()))->is(['g']);
  * ```
  *
  * @package ryunosuke\Functions\Package\iterator
  *
  * @param iterable $iterator イテレータ
- * @param int $length チャンクサイズ
+ * @param int|\Closure $length チャンクサイズ。クロージャを渡すと毎ループ(値, キー, ステップ, チャンク番号, イテレータ)でコールされて false を返すと1チャンク終了となる
  * @param bool $preserve_keys キーの保存フラグ
  * @return \Generator[]|\Generator チャンク化された Generator
  */
 function iterator_chunk($iterator, $length, $preserve_keys = false)
 {
-    if ($length <= 0) {
-        throw new \InvalidArgumentException("\$length must be > 0 ($length)");
+    if (!$length instanceof \Closure) {
+        if ($length <= 0) {
+            throw new \InvalidArgumentException("\$length must be > 0 ($length)");
+        }
+        $length = fn($v, $k, $n, $chunk, $iterator) => $n < $length;
     }
 
     // Generator は Iterator であるが Iterator は Generator ではないので変換する
@@ -61,19 +90,32 @@ function iterator_chunk($iterator, $length, $preserve_keys = false)
         $iterator = (function () use ($iterator) { yield from $iterator; })();
     }
 
+    $chunk = 0;
     $total = 0;
     while ($iterator->valid()) {
-        yield $g = (function () use ($iterator, $length, $preserve_keys) {
-            for ($count = 0; $count < $length && $iterator->valid(); $count++, $iterator->next()) {
+        yield $g = (function () use ($iterator, $length, $preserve_keys, $chunk) {
+            $n = 0;
+            while ($iterator->valid()) {
+                $k = $iterator->key();
+                $v = $iterator->current();
+
+                if (!$length($v, $k, $n, $chunk, $iterator)) {
+                    break;
+                }
+
                 if ($preserve_keys) {
-                    yield $iterator->key() => $iterator->current();
+                    yield $k => $v;
                 }
                 else {
-                    yield $iterator->current();
+                    yield $v;
                 }
+
+                $n++;
+                $iterator->next();
             }
-            return $count;
+            return $n;
         })();
+        $chunk++;
 
         // 回しきらないと無限ループする
         while ($g->valid()) {
