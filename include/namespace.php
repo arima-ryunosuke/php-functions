@@ -9546,27 +9546,30 @@ if (!function_exists('ryunosuke\\Functions\\markdown_list')) {
             'separator' => ': ',
             'liststyle' => '-',
             'ordered'   => false,
+            'indexed'   => null,
         ];
 
         $f = function ($array, $nest) use (&$f, $option) {
             $spacer = str_repeat($option['indent'], $nest);
             $result = [];
-            foreach (arrays($array) as $n => [$k, $v]) {
+            $seq = 0;
+            foreach ($array as $k => $v) {
+                $indexed = $option['indexed'] ?? is_int($k) && $k === $seq++;
                 if (is_iterable($v)) {
-                    if (!is_int($k)) {
+                    if (!$indexed) {
                         $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'];
                     }
                     $result = array_merge($result, $f($v, $nest + 1));
                 }
                 else {
-                    if (!is_int($k)) {
+                    if (!$indexed) {
                         $result[] = $spacer . $option['liststyle'] . ' ' . $k . $option['separator'] . $v;
                     }
                     elseif (!$option['ordered']) {
                         $result[] = $spacer . $option['liststyle'] . ' ' . $v;
                     }
                     else {
-                        $result[] = $spacer . ($n + 1) . '. ' . $v;
+                        $result[] = $spacer . $seq . '. ' . $v;
                     }
                 }
             }
@@ -12166,10 +12169,12 @@ if (!function_exists('ryunosuke\\Functions\\file_list')) {
     function file_list($dirname, $filter_condition = [])
     {
         $filter_condition += [
-            'unixpath'  => false,
+            'unixpath' => false,
+            '!type'    => 'dir',
+
             'recursive' => true,
             'relative'  => false,
-            '!type'     => 'dir',
+            'nesting'   => false,
         ];
 
         $dirname = path_normalize($dirname);
@@ -12219,7 +12224,23 @@ if (!function_exists('ryunosuke\\Functions\\file_list')) {
             }
 
             $path = $filter_condition['relative'] ? $it->getSubPathName() : $fullpath;
-            $result[] = strtr(is_dir($fullpath) ? $path . $DS : $path, [DIRECTORY_SEPARATOR => $DS]);
+            $path = strtr(is_dir($fullpath) ? $path . $DS : $path, [DIRECTORY_SEPARATOR => $DS]);
+
+            if ($filter_condition['nesting']) {
+                $tmp = &$result;
+                foreach (array_filter(multiexplode(['/', DIRECTORY_SEPARATOR], $it->getSubPath()), 'strlen') as $subdir) {
+                    $tmp = &$tmp[$subdir];
+                }
+                if ($it->isDir()) {
+                    $tmp[$it->getFilename()] = $tmp[$it->getFilename()] ?? [];
+                }
+                else {
+                    $tmp[$it->getFilename()] = $path;
+                }
+            }
+            else {
+                $result[] = $path;
+            }
         }
         return $result;
     }
@@ -12269,6 +12290,9 @@ if (!function_exists('ryunosuke\\Functions\\file_matcher')) {
             // by getFilename (glob or regex)
             'name'       => null,
             '!name'      => null,
+            // by getBasename (glob or regex)
+            'basename'   => null,
+            '!basename'  => null,
             // by getExtension (string or [string])
             'extension'  => null,
             '!extension' => null,
@@ -12316,37 +12340,48 @@ if (!function_exists('ryunosuke\\Functions\\file_matcher')) {
         }
 
         foreach ([
-            'path'     => null,
-            '!path'    => null,
-            'subpath'  => null,
-            '!subpath' => null,
-            'dir'      => null,
-            '!dir'     => null,
-            'name'     => null,
-            '!name'    => null,
+            'path'      => null,
+            '!path'     => null,
+            'subpath'   => null,
+            '!subpath'  => null,
+            'dir'       => null,
+            '!dir'      => null,
+            'name'      => null,
+            '!name'     => null,
+            'basename'  => null,
+            '!basename' => null,
         ] as $key => $convert) {
             if (isset($filter_condition[$key])) {
-                $pattern = $filter_condition[$key];
-                preg_match('##', ''); // clear preg_last_error
-                @preg_match($pattern, '');
-                if (preg_last_error() === PREG_NO_ERROR) {
-                    $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
-                        $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
-                        return !!preg_match($pattern, $string);
-                    };
+                $callback = fn() => false;
+                foreach (arrayize($filter_condition[$key]) as $pattern) {
+                    preg_match('##', ''); // clear preg_last_error
+                    @preg_match($pattern, '');
+                    if (preg_last_error() === PREG_NO_ERROR) {
+                        $callback = static function ($string) use ($callback, $pattern, $filter_condition) {
+                            if ($callback($string)) {
+                                return true;
+                            }
+                            $string = $filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\' ? str_replace('\\', '/', $string) : $string;
+                            return !!preg_match($pattern, $string);
+                        };
+                    }
+                    else {
+                        $callback = static function ($string) use ($callback, $pattern, $filter_condition) {
+                            if ($callback($string)) {
+                                return true;
+                            }
+                            if ($filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\') {
+                                $pattern = str_replace('\\', '/', $pattern);
+                                $string = str_replace('\\', '/', $string);
+                            }
+                            $flags = $filter_condition['fnmflag'];
+                            $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
+                            $flags &= ~((strpos($pattern, '**') !== false) ? FNM_PATHNAME : 0);
+                            return fnmatch($pattern, $string, $flags);
+                        };
+                    }
                 }
-                else {
-                    $filter_condition[$key] = static function ($string) use ($pattern, $filter_condition) {
-                        if ($filter_condition['unixpath'] && DIRECTORY_SEPARATOR === '\\') {
-                            $pattern = str_replace('\\', '/', $pattern);
-                            $string = str_replace('\\', '/', $string);
-                        }
-                        $flags = $filter_condition['fnmflag'];
-                        $flags |= $filter_condition['casefold'] ? FNM_CASEFOLD : 0;
-                        $flags &= ~((strpos($pattern, '**') !== false) ? FNM_PATHNAME : 0);
-                        return fnmatch($pattern, $string, $flags);
-                    };
-                }
+                $filter_condition[$key] = $callback;
             }
         }
 
@@ -12398,6 +12433,11 @@ if (!function_exists('ryunosuke\\Functions\\file_matcher')) {
             }
             foreach (['name' => false, '!name' => true] as $key => $cond) {
                 if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getFilename())) {
+                    return false;
+                }
+            }
+            foreach (['basename' => false, '!basename' => true] as $key => $cond) {
+                if (isset($filter_condition[$key]) && $cond === $filter_condition[$key]($file->getBasename(concat('.', $file->getExtension())))) {
                     return false;
                 }
             }
@@ -12921,6 +12961,9 @@ if (!function_exists('ryunosuke\\Functions\\file_tree')) {
      */
     function file_tree($dirname, $filter_condition = [])
     {
+        // for compatible in future scope
+        //return file_list($dirname, ['nesting' => true] + $filter_condition);
+
         $dirname = path_normalize($dirname);
         if (!file_exists($dirname)) {
             return false;
@@ -13071,6 +13114,7 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
      * - parents: 正規化したディレクトリ名の配列
      * - dirnames: ディレクトリ名の配列（余計なことはしない）
      * - localname: 複数拡張子を考慮した本当のファイル名部分
+     * - localpath: ディレクトリ名（余計なことはしない）＋複数拡張子を考慮した本当のファイル名部分（フルパス - 拡張子）
      * - extensions: 複数拡張子の配列（余計なことはしない）
      *
      * 「余計なことはしない」とは空文字をフィルタしたりパスを正規化したりを指す。
@@ -13080,6 +13124,7 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
      *
      * Example:
      * ```php
+     * $DS = DIRECTORY_SEPARATOR;
      * // 色々混ぜたサンプル
      * that(path_info('C:/dir1/.././dir2/file.sjis..min.js'))->is([
      *     "dirname"    => "C:/dir1/.././dir2",
@@ -13088,11 +13133,12 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
      *     "filename"   => "file.sjis..min",
      *     // ここまでオリジナルの pathinfo 結果
      *     "drive"      => "C:",
-     *     "root"       => "/",                         // 環境依存しない元のルートパス
-     *     "parents"    => ["dir2"],                    // 正規化されたディレクトリ配列
-     *     "dirnames"   => ["dir1", "..", ".", "dir2"], // 余計なことをしていないディレクトリ配列
-     *     "localname"  => "file",
-     *     "extensions" => ["sjis", "", "min", "js"],   // 余計なことをしていない拡張子配列
+     *     "root"       => "/",                          // 環境依存しない元のルートパス
+     *     "parents"    => ["dir2"],                     // 正規化されたディレクトリ配列
+     *     "dirnames"   => ["dir1", "..", ".", "dir2"],  // 余計なことをしていないディレクトリ配列
+     *     "localname"  => "file",                       // 複数拡張子を考慮した本当のファイル名部分
+     *     "localpath"  => "C:/dir1/.././dir2{$DS}file", // ↑にディレクトリ名を付与したもの
+     *     "extensions" => ["sjis", "", "min", "js"],    // 余計なことをしていない拡張子配列
      * ]);
      * // linux における絶対パス
      * that(path_info('/dir1/dir2/file.sjis.min.js'))->is([
@@ -13106,6 +13152,7 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
      *     "parents"    => ["dir1", "dir2"],      // ..等がないので dirnames と同じ
      *     "dirnames"   => ["dir1", "dir2"],      // ディレクトリ配列
      *     "localname"  => "file",
+     *     "localpath"  => "/dir1/dir2{$DS}file",
      *     "extensions" => ["sjis", "min", "js"], // 余計なことをしていない拡張子配列
      * ]);
      * // linux における相対パス
@@ -13120,6 +13167,7 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
      *     "parents"    => ["dir1", "dir2"],
      *     "dirnames"   => ["dir1", "dir2"],
      *     "localname"  => "file",
+     *     "localpath"  => "dir1/dir2{$DS}file",
      *     "extensions" => ["sjis", "min", "js"],
      * ]);
      * // ディレクトリ無し
@@ -13134,6 +13182,7 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
      *     "parents"    => [], // オリジナルの pathinfo のようにドットが紛れ込んだりはしない
      *     "dirnames"   => [], // オリジナルの pathinfo のようにドットが紛れ込んだりはしない
      *     "localname"  => "file",
+     *     "localpath"  => "file",
      *     "extensions" => ["sjis", "min", "js"],
      * ]);
      * ```
@@ -13201,6 +13250,7 @@ if (!function_exists('ryunosuke\\Functions\\path_info')) {
         }, []);
 
         $result['localname'] = array_shift($basenames);
+        $result['localpath'] = implode(DIRECTORY_SEPARATOR, array_filter([$pathinfo['dirname'], $result['localname']], 'strlen'));
         $result['extensions'] = $basenames;
 
         return $result;
@@ -15664,19 +15714,48 @@ if (!function_exists('ryunosuke\\Functions\\iterator_chunk')) {
      * // 大本の Generator は総数を返す
      * $generators->next();
      * that($generators->getReturn())->is(7);
+     *
+     * // ハイフンが来るたびに分割（クロージャ内で next しているため、ハイフン自体は結果に含まれない）
+     * $generator = (function () {
+     *     yield 'a';
+     *     yield 'b';
+     *     yield '-';
+     *     yield 'c';
+     *     yield 'd';
+     *     yield 'e';
+     *     yield 'f';
+     *     yield '-';
+     *     yield 'g';
+     * })();
+     * $generators = iterator_chunk($generator, function ($v, $k, $n, $c, $it) {
+     *     if ($v === '-') {
+     *         $it->next();
+     *         return false;
+     *     }
+     *     return true;
+     * });
+     *
+     * that(iterator_to_array($generators->current()))->is(['a', 'b']);
+     * $generators->next();
+     * that(iterator_to_array($generators->current()))->is(['c', 'd', 'e', 'f']);
+     * $generators->next();
+     * that(iterator_to_array($generators->current()))->is(['g']);
      * ```
      *
      * @package ryunosuke\Functions\Package\iterator
      *
      * @param iterable $iterator イテレータ
-     * @param int $length チャンクサイズ
+     * @param int|\Closure $length チャンクサイズ。クロージャを渡すと毎ループ(値, キー, ステップ, チャンク番号, イテレータ)でコールされて false を返すと1チャンク終了となる
      * @param bool $preserve_keys キーの保存フラグ
      * @return \Generator[]|\Generator チャンク化された Generator
      */
     function iterator_chunk($iterator, $length, $preserve_keys = false)
     {
-        if ($length <= 0) {
-            throw new \InvalidArgumentException("\$length must be > 0 ($length)");
+        if (!$length instanceof \Closure) {
+            if ($length <= 0) {
+                throw new \InvalidArgumentException("\$length must be > 0 ($length)");
+            }
+            $length = fn($v, $k, $n, $chunk, $iterator) => $n < $length;
         }
 
         // Generator は Iterator であるが Iterator は Generator ではないので変換する
@@ -15684,19 +15763,32 @@ if (!function_exists('ryunosuke\\Functions\\iterator_chunk')) {
             $iterator = (function () use ($iterator) { yield from $iterator; })();
         }
 
+        $chunk = 0;
         $total = 0;
         while ($iterator->valid()) {
-            yield $g = (function () use ($iterator, $length, $preserve_keys) {
-                for ($count = 0; $count < $length && $iterator->valid(); $count++, $iterator->next()) {
+            yield $g = (function () use ($iterator, $length, $preserve_keys, $chunk) {
+                $n = 0;
+                while ($iterator->valid()) {
+                    $k = $iterator->key();
+                    $v = $iterator->current();
+
+                    if (!$length($v, $k, $n, $chunk, $iterator)) {
+                        break;
+                    }
+
                     if ($preserve_keys) {
-                        yield $iterator->key() => $iterator->current();
+                        yield $k => $v;
                     }
                     else {
-                        yield $iterator->current();
+                        yield $v;
                     }
+
+                    $n++;
+                    $iterator->next();
                 }
-                return $count;
+                return $n;
             })();
+            $chunk++;
 
             // 回しきらないと無限ループする
             while ($g->valid()) {
