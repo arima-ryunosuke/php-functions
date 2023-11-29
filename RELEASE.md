@@ -12,6 +12,15 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.10
+
+- [feature] iterator_chunk に動的チャンクサイズを渡せる機能
+- [feature] file_list の nesting 対応
+- [feature] file_matcher に basename フィルタを追加
+- [feature] file_matcher のパターンの配列対応
+- [feature] path_info に localpath キーを追加
+- [fixbug] markdown_list で整数キーがリスト配列だと誤判定される不具合を修正
+
 ## 1.6.9
 
 - [feature] date_match を追加
