@@ -165,6 +165,20 @@ a3,B3,c3
 a1,B1,c1
 a3,B3,c3
 ");
+        that(csv_export($csvarrays, [
+            'callback'        => function (&$row, $n) {
+                if ($n === null) {
+                    return false;
+                }
+                else {
+                    $row['b'] = strtoupper($row['b']);
+                    return $n !== 1;
+                }
+            },
+            'callback_header' => true,
+        ]))->is("a1,B1,c1
+a3,B3,c3
+");
 
         // output 指定
         $receiver = fopen('php://memory', 'r+b');
