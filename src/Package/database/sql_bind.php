@@ -26,17 +26,20 @@ require_once __DIR__ . '/../var/arrayval.php';
  *
  * @param string $sql 値を埋め込む SQL
  * @param array|mixed $values 埋め込む値
+ * @param ?callable $quote 値をクォートするクロージャ
  * @return mixed 値が埋め込まれた SQL
  */
-function sql_bind($sql, $values)
+function sql_bind($sql, $values, $quote = null)
 {
+    $quote ??= fn($v) => sql_quote($v);
+
     $embed = [];
     foreach (arrayval($values, false) as $k => $v) {
         if (is_int($k)) {
-            $embed['?'][] = sql_quote($v);
+            $embed['?'][] = $quote($v);
         }
         else {
-            $embed[":$k"] = sql_quote($v);
+            $embed[":$k"] = $quote($v);
         }
     }
 

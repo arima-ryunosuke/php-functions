@@ -11,6 +11,7 @@ class databaseTest extends AbstractTestCase
     function test_sql_bind()
     {
         that(sql_bind('select ?', 1))->is('select 1');
+        that(sql_bind('select ?', 1, fn($v) => "`$v`"))->is('select `1`');
         that(sql_bind('select ?, ?', [1, 2]))->is('select 1, 2');
         that(sql_bind('select :name', ['name' => 1]))->is('select 1');
         that(sql_bind('select ":name", :name, :name', ['name' => 1]))->is('select ":name", 1, 1');
