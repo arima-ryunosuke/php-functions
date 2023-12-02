@@ -55,6 +55,7 @@ use function ryunosuke\Functions\Package\array_pos_key;
 use function ryunosuke\Functions\Package\array_prepend;
 use function ryunosuke\Functions\Package\array_put;
 use function ryunosuke\Functions\Package\array_random;
+use function ryunosuke\Functions\Package\array_range;
 use function ryunosuke\Functions\Package\array_rank;
 use function ryunosuke\Functions\Package\array_rekey;
 use function ryunosuke\Functions\Package\array_remove;
@@ -2324,6 +2325,98 @@ class arrayTest extends AbstractTestCase
         that(self::resolveFunction('array_random'))($array, 4)->wasThrown('number of elements');
         that(self::resolveFunction('array_random'))([], +1)->wasThrown('number of elements');
         that(self::resolveFunction('array_random'))([], -1)->wasThrown('number of elements');
+    }
+
+    function test_array_range()
+    {
+        // 数値モード
+        that(array_range(1, 3))->isSame([1, 2, 3]);
+        that(array_range(1, 3, 2))->isSame([1, 3]);
+        that(array_range(1, 3, 3))->isSame([1]);
+        that(array_range(1, 3, -1))->isSame([]);
+        that(array_range(1.0, 3.0))->isSame([1.0, 2.0, 3.0]);
+        that(array_range(1.0, 3.0, 2.0))->isSame([1.0, 3.0]);
+        that(array_range(1.0, 3.0, 3.0))->isSame([1.0]);
+        that(array_range(1.0, 3.0, -1.0))->isSame([]);
+
+        that(array_range(3, 1))->isSame([3, 2, 1]);
+        that(array_range(3, 1, -2))->isSame([3, 1]);
+        that(array_range(3, 1, -3))->isSame([3]);
+        that(array_range(3, 1, 1))->isSame([]);
+        that(array_range(3.0, 1.0))->isSame([3.0, 2.0, 1.0]);
+        that(array_range(3.0, 1.0, -2.0))->isSame([3.0, 1.0]);
+        that(array_range(3.0, 1.0, -3.0))->isSame([3.0]);
+        that(array_range(3.0, 1.0, 1.0))->isSame([]);
+
+        // 文字列モード
+        that(array_range('a', 'c'))->isSame(['a', 'b', 'c']);
+        that(array_range('a', 'c', 2))->isSame(['a', 'c']);
+        that(array_range('a', 'c', 3))->isSame(['a']);
+        that(array_range('Y', 'b', 1))->isSame(['Y', 'Z']);
+        that(array_range('y', 'B', 1))->isSame([]);
+        that(array_range('A', 'ZZ', 1))->count(26 * 26 + 26);
+        that(array_range('a', 'zz', 1))->count(26 * 26 + 26);
+
+        that(array_range('c', 'a'))->isSame(['c', 'b', 'a']);
+        that(array_range('c', 'a', -2))->isSame(['c', 'a']);
+        that(array_range('c', 'a', -3))->isSame(['c']);
+        that(array_range('b', 'Y', -1))->isSame(['Z', 'Y']);
+        that(array_range('B', 'y', -1))->isSame([]);
+        that(array_range('ZZ', 'A', -1))->count(26 * 26 + 26);
+        that(array_range('zz', 'a', -1))->count(26 * 26 + 26);
+
+        // 日時モード
+        that(array_range('2014/12/24', '2014/12/26', '1day', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/24 00:00:00.000',
+            '2014/12/25 00:00:00.000',
+            '2014/12/26 00:00:00.000',
+        ]);
+        that(array_range('2014/12/24', '2014/12/26', 'P2D', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/24 00:00:00.000',
+            '2014/12/26 00:00:00.000',
+        ]);
+        that(array_range('2014/12/24', '2014/12/26', 'P3D', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/24 00:00:00.000',
+        ]);
+        that(array_range('2014/12/24', '2014/12/26', 'P-1D', ['format' => 'Y/m/d H:i:s.v']))->is([]);
+        that(array_range('2014/12/24 00:00:00.2', '2014/12/24 00:00:10.2', 'PT1.5S', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/24 00:00:00.200',
+            '2014/12/24 00:00:01.700',
+            '2014/12/24 00:00:03.200',
+            '2014/12/24 00:00:04.700',
+            '2014/12/24 00:00:06.200',
+            '2014/12/24 00:00:07.700',
+            '2014/12/24 00:00:09.200',
+        ]);
+
+        that(array_range('2014/12/26', '2014/12/24', '-1day', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/26 00:00:00.000',
+            '2014/12/25 00:00:00.000',
+            '2014/12/24 00:00:00.000',
+        ]);
+        that(array_range('2014/12/26', '2014/12/24', 'P-2D', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/26 00:00:00.000',
+            '2014/12/24 00:00:00.000',
+        ]);
+        that(array_range('2014/12/26', '2014/12/24', 'P-3D', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/26 00:00:00.000',
+        ]);
+        that(array_range('2014/12/26', '2014/12/24', 'P1D', ['format' => 'Y/m/d H:i:s.v']))->is([]);
+        that(array_range('2014/12/24 00:00:10.2', '2014/12/24 00:00:00.2', 'PT-1.5S', ['format' => 'Y/m/d H:i:s.v']))->is([
+            '2014/12/24 00:00:10.200',
+            '2014/12/24 00:00:08.700',
+            '2014/12/24 00:00:07.200',
+            '2014/12/24 00:00:05.700',
+            '2014/12/24 00:00:04.200',
+            '2014/12/24 00:00:02.700',
+            '2014/12/24 00:00:01.200',
+        ]);
+
+        // 例外
+        that(self::resolveFunction('array_range'))('1', '3', 0)->wasThrown("step is empty(0)");
+        that(self::resolveFunction('array_range'))('a', 'c', 0)->wasThrown("step is empty(0)");
+        that(self::resolveFunction('array_range'))('2014/12/24', '2014/12/27', 'P0Y')->wasThrown("step is empty(+P00-00-00T00:00:00.000000)");
+        that(self::resolveFunction('array_range'))('', '', '')->wasThrown("failed to detect mode");
     }
 
     function test_array_rank()
