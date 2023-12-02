@@ -12,6 +12,12 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.11
+
+- [feature] array_range を追加
+- [feature] date_interval にパース機能を付与
+- [feature] sql_bind にクォートクロージャ引数を追加
+
 ## 1.6.10
 
 - [feature] iterator_chunk に動的チャンクサイズを渡せる機能
