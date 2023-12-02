@@ -465,8 +465,8 @@ trait ChainObject3
 
     /** @see \sql_bind() */
     public self $sql_bind;
-    public function sql_bind($sql, $values): self { }
-    public function sql_bind($values): self { }
+    public function sql_bind($sql, $values, $quote = null): self { }
+    public function sql_bind($values, $quote = null): self { }
 
     /** @see \css_selector() */
     public self $css_selector;

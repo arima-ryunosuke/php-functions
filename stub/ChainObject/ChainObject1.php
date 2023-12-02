@@ -388,6 +388,16 @@ trait ChainObject1
     public function kvmap(iterable $array, callable $callback): self { }
     public function kvmap(callable $callback): self { }
 
+    /** @see \array_range() */
+    public self $array_range;
+    public function array_range($start, $end, $step = null, $options = []): self { }
+    public function array_range($end, $step = null, $options = []): self { }
+
+    /** @see \array_range() */
+    public self $range;
+    public function range($start, $end, $step = null, $options = []): self { }
+    public function range($end, $step = null, $options = []): self { }
+
     /** @see \is_indexarray() */
     public self $is_indexarray;
     public function is_indexarray(iterable $array): self { }

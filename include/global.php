@@ -3482,6 +3482,227 @@ if (!function_exists('array_random')) {
     }
 }
 
+assert(!function_exists('array_range') || (new \ReflectionFunction('array_range'))->isUserDefined());
+if (!function_exists('array_range')) {
+    /**
+     * range を少し改良したもの
+     *
+     * - 文字列に対応
+     * - 日時に対応
+     * - $start, $end から $step の自動算出
+     * - $start < $end で $step < 0 の場合、空配列を返す
+     * - $start > $end で $step > 0 の場合、空配列を返す
+     *
+     * 逆に言うと $start, $end の大小を意識しないと正しい値は返らないことになる。
+     * 標準 range の下記の挙動が個人的に違和感があるので実装した。
+     *
+     * - range(1, 3, -1); // [1, 2, 3]
+     * - range(3, 1, +1); // [3, 2, 1]
+     *
+     * Example:
+     * ```php
+     * // 文字列（具体的にはデクリメント）
+     * that(array_range('a', 'c', +1))->isSame(['a', 'b', 'c']);
+     * that(array_range('c', 'a', -1))->isSame(['c', 'b', 'a']);
+     *
+     * // 日時
+     * that(array_range('2014/12/24 12:34:56', '2014/12/26 12:34:56', 'P1D', ['format' => 'Y/m/d H:i:s']))->isSame([
+     *     '2014/12/24 12:34:56',
+     *     '2014/12/25 12:34:56',
+     *     '2014/12/26 12:34:56',
+     * ]);
+     * that(array_range('2014/12/26 12:34:56', '2014/12/24 12:34:56', 'P-1D', ['format' => 'Y/m/d H:i:s']))->isSame([
+     *     '2014/12/26 12:34:56',
+     *     '2014/12/25 12:34:56',
+     *     '2014/12/24 12:34:56',
+     * ]);
+     *
+     * // step は省略可能（+/-1 になる）
+     * that(array_range(1, 3))->isSame([1, 2, 3]);
+     * that(array_range(3, 1))->isSame([3, 2, 1]);
+     * that(array_range('a', 'c'))->isSame(['a', 'b', 'c']);
+     * that(array_range('c', 'a'))->isSame(['c', 'b', 'a']);
+     *
+     * // 範囲外は空配列を返す
+     * that(array_range(1, 3, -1))->isSame([]);
+     * that(array_range(3, 1, +1))->isSame([]);
+     * that(array_range('a', 'c', -1))->isSame([]);
+     * that(array_range('c', 'a', +1))->isSame([]);
+     * that(array_range('2014/12/24', '2014/12/27', 'P-1D'))->isSame([]);
+     * that(array_range('2014/12/27', '2014/12/24', 'P1D'))->isSame([]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param int|float|string|\DateTimeInterface $start 最初の値
+     * @param int|float|string|\DateTimeInterface $end 最後の値
+     * @param int|float|string|null|\DateInterval $step 増分
+     * @return array $start ~ $end の配列
+     */
+    function array_range($start, $end, $step = null, $options = [])
+    {
+        $options += [
+            'format' => null,
+        ];
+
+        // 数値モード
+        if (true
+            && is_decimal($start)
+            && is_decimal($end)
+            && ($step === null || is_decimal($step))
+        ) {
+            if ($step === null) {
+                if ($start < $end) {
+                    $step = (is_float($start) || is_float($end)) ? +1.0 : +1;
+                }
+                if ($start >= $end) {
+                    $step = (is_float($start) || is_float($end)) ? -1.0 : -1;
+                }
+            }
+            if (empty($step)) {
+                throw new \InvalidArgumentException("\$step is empty($step)");
+            }
+
+            if (is_float($step)) {
+                $start = (float) $start;
+                $end = (float) $end;
+                $step = (float) $step;
+            }
+            else {
+                $start = (int) $start;
+                $end = (int) $end;
+                $step = (int) $step;
+            }
+
+            $result = [];
+            if ($step > 0) {
+                for ($i = $start; $i <= $end; $i += $step) {
+                    $result[] = $i;
+                }
+            }
+            if ($step < 0) {
+                for ($i = $start; $i >= $end; $i += $step) {
+                    $result[] = $i;
+                }
+            }
+            return $result;
+        }
+
+        // 文字列モード
+        if (true
+            && (is_string($start) && strlen($start))
+            && (is_string($end) && strlen($end))
+            && ($step === null || is_decimal($step, false))
+        ) {
+            if ($step === null) {
+                $step = ($start <=> $end) < 0 ? +1 : -1;
+            }
+            if (empty($step)) {
+                throw new \InvalidArgumentException("\$step is empty($step)");
+            }
+
+            // 単純な比較ではない（Z <=> aa < 1 のように中身によらず字数が大きい方が常に大きい）
+            $compare = function ($a, $b) {
+                if (($d = strlen($a) - strlen($b)) !== 0) {
+                    return $d;
+                }
+                for ($i = 0; $i < strlen($a); $i++) {
+                    if (($d = ($a[$i] <=> $b[$i])) !== 0) {
+                        return $d;
+                    }
+                }
+                return 0;
+            };
+
+            // 1以上のインクリメントは対応していない
+            $increment = function ($string, $step) {
+                for ($i = 0; $i < $step; $i++) {
+                    $string++;
+                }
+                return $string;
+            };
+
+            $invert = $step < 0;
+
+            // 文字列デクリメントは出来ないので reverse で対応する
+            if ($invert) {
+                $step = -$step;
+                [$start, $end] = [$end, $start];
+            }
+
+            $result = [];
+            if ($step > 0) {
+                for ($i = $start; $compare($i, $end) <= 0; $i = $increment($i, $step)) {
+                    $result[] = $i;
+                }
+            }
+
+            // 文字列デクリメントは（略）
+            if ($invert) {
+                if (count($result) === 1) {
+                    $result = [$end];
+                }
+                else {
+                    $result = array_reverse($result);
+                }
+            }
+
+            return $result;
+        }
+
+        // 日時モード
+        if (true
+            && ($start instanceof \DateTimeInterface || (is_string($start) && strlen($start)))
+            && ($end instanceof \DateTimeInterface || (is_string($end) && strlen($end)))
+            && ($step instanceof \DateInterval || is_string($step))
+        ) {
+            try {
+                if (is_string($start)) {
+                    $start = date_convert(\DateTimeImmutable::class, $start);
+                }
+                if (is_string($end)) {
+                    $end = date_convert(\DateTimeImmutable::class, $end);
+                }
+                if (is_string($step)) {
+                    $step = @\DateInterval::createFromDateString($step) ?: date_interval($step);
+                }
+
+                $now = new \DateTimeImmutable();
+                $new = $now->add($step);
+
+                if ($now == $new) {
+                    throw new \InvalidArgumentException("\$step is empty({$step->format('%RP%Y-%M-%DT%H:%I:%S.%F')})");
+                }
+
+                // $result = iterator_to_array(new \DatePeriod($start, $step, $end)); // happen too many bugs
+                $result = [];
+                if ($now > $new) {
+                    for ($i = $start; $i >= $end; $i = $i->add($step)) {
+                        $result[] = $i;
+                    }
+                }
+                if ($now < $new) {
+                    for ($i = $start; $i <= $end; $i = $i->add($step)) {
+                        $result[] = $i;
+                    }
+                }
+                if (isset($options['format'])) {
+                    $result = array_map(fn($dt) => $dt->format($options['format']), $result);
+                }
+                return $result;
+            }
+            catch (\Exception $e) {
+                // through
+            }
+        }
+
+        if (isset($e)) {
+            throw $e;
+        }
+        throw new \InvalidArgumentException("failed to detect mode", 0, $e ?? null);
+    }
+}
+
 assert(!function_exists('array_rank') || (new \ReflectionFunction('array_rank'))->isUserDefined());
 if (!function_exists('array_rank')) {
     /**
@@ -6528,17 +6749,20 @@ if (!function_exists('sql_bind')) {
      *
      * @param string $sql 値を埋め込む SQL
      * @param array|mixed $values 埋め込む値
+     * @param ?callable $quote 値をクォートするクロージャ
      * @return mixed 値が埋め込まれた SQL
      */
-    function sql_bind($sql, $values)
+    function sql_bind($sql, $values, $quote = null)
     {
+        $quote ??= fn($v) => sql_quote($v);
+
         $embed = [];
         foreach (arrayval($values, false) as $k => $v) {
             if (is_int($k)) {
-                $embed['?'][] = sql_quote($v);
+                $embed['?'][] = $quote($v);
             }
             else {
-                $embed[":$k"] = sql_quote($v);
+                $embed[":$k"] = $quote($v);
             }
         }
 
@@ -10124,6 +10348,10 @@ if (!function_exists('date_interval')) {
     /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
      *
+     * @memo $sec に P から始まる iso8601継続時間を渡すと DateInterval のパーサーとして働く。
+     * そのとき、各要素には負数を与えることができる。
+     *
+     * P で始まらない場合、秒の分解機能になる。
      * 例えば `60 * 60 * 24 * 900 + 12345.678` （約900日12345秒）は・・・
      *
      * - 2 年（約900日なので）
@@ -10178,13 +10406,48 @@ if (!function_exists('date_interval')) {
      *
      * @package ryunosuke\Functions\Package\datetime
      *
-     * @param int|float $sec タイムスタンプ
+     * @param int|float|string $sec タイムスタンプ|ISO8601継続時間文字列
      * @param string|array|null $format 時刻フォーマット
      * @param string|int $limit_type どこまで換算するか（[c|y|m|d|h|i|s]）
      * @return string|\DateInterval 時間差文字列 or DateInterval オブジェクト
      */
     function date_interval($sec, $format = null, $limit_type = 'y')
     {
+        // for compatible
+        if (is_string($sec) && preg_match('#^(?P<S>[\-+])?P((?P<Y>-?\d+)Y)?((?P<M>-?\d+)M)?((?P<D>-?\d+)D)?(T((?P<h>-?\d+)H)?((?P<m>-?\d+)M)?((?P<s>-?\d+(\.\d+)?)S)?)?$#', $sec, $matches, PREG_UNMATCHED_AS_NULL)) {
+            $interval = new \DateInterval('P0Y');
+            $interval->y = (int) $matches['Y'];
+            $interval->m = (int) $matches['M'];
+            $interval->d = (int) $matches['D'];
+            $interval->h = (int) $matches['h'];
+            $interval->i = (int) $matches['m'];
+            $interval->s = (int) $matches['s'];
+            $interval->f = (float) $matches['s'] - $interval->s;
+
+            if ($matches['S'] === '-') {
+                $interval->y = -$interval->y;
+                $interval->m = -$interval->m;
+                $interval->d = -$interval->d;
+                $interval->h = -$interval->h;
+                $interval->i = -$interval->i;
+                $interval->s = -$interval->s;
+                $interval->f = -$interval->f;
+            }
+
+            $now = new \DateTimeImmutable();
+            if ($now > $now->add($interval)) {
+                $interval->invert = 1;
+                $interval->y = -$interval->y;
+                $interval->m = -$interval->m;
+                $interval->d = -$interval->d;
+                $interval->h = -$interval->h;
+                $interval->i = -$interval->i;
+                $interval->s = -$interval->s;
+                $interval->f = -$interval->f;
+            }
+            return $interval;
+        }
+
         $ymdhisv = ['c', 'y', 'm', 'd', 'h', 'i', 's', 'v'];
         $map = ['c' => 7, 'y' => 6, 'm' => 5, 'd' => 4, 'h' => 3, 'i' => 2, 's' => 1];
         if (ctype_digit("$limit_type")) {
@@ -10361,23 +10624,7 @@ if (!function_exists('date_interval_second')) {
         }
 
         if (!$interval instanceof \DateInterval) {
-            $interval = (string) $interval;
-            $invert = 0;
-            if ($interval[0] === '+') {
-                $invert = 0;
-                $interval = substr($interval, 1);
-            }
-            if ($interval[0] === '-') {
-                $invert = 1;
-                $interval = substr($interval, 1);
-            }
-            $interval = preg_splice('#(\.\d+)S#', 'S', $interval, $m);
-
-            $interval = new \DateInterval($interval);
-            $interval->invert = $invert;
-            if (isset($m[1])) {
-                $interval->f = (float) $m[1];
-            }
+            $interval = date_interval($interval);
         }
 
         $datetime = date_convert(\DateTimeImmutable::class, $basetime);
