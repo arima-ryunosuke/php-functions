@@ -229,6 +229,54 @@ class datetimeTest extends AbstractTestCase
 
     function test_date_interval()
     {
+        // create モード（ゼロ）
+        that(date_interval('P0Y'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+00-00-00T00:00:00.0');
+        that(date_interval('P-0Y'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+00-00-00T00:00:00.0');
+        that(date_interval('P-0Y-0M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+00-00-00T00:00:00.0');
+
+        // create モード（正数）
+        that(date_interval('P1Y'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-00-00T00:00:00.0');
+        that(date_interval('P1Y2M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-00T00:00:00.0');
+        that(date_interval('P1Y2M3D'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T00:00:00.0');
+        that(date_interval('P1Y2M3DT4H'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:00:00.0');
+        that(date_interval('P1Y2M3DT4H5M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:05:00.0');
+        that(date_interval('P1Y2M3DT4H5M6S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:05:06.0');
+        that(date_interval('P1Y2M3DT4H5M6.789S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:05:06.788999');
+
+        // create モード（負数）
+        that(date_interval('P-1Y'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-00-00T00:00:00.0');
+        that(date_interval('P-1Y-2M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-00T00:00:00.0');
+        that(date_interval('P-1Y-2M-3D'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T00:00:00.0');
+        that(date_interval('P-1Y-2M-3DT-4H'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:00:00.0');
+        that(date_interval('P-1Y-2M-3DT-4H-5M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:05:00.0');
+        that(date_interval('P-1Y-2M-3DT-4H-5M-6S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:05:06.0');
+        that(date_interval('P-1Y-2M-3DT-4H-5M-6.789S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:05:06.788999');
+
+        // create モード（全体負数）
+        that(date_interval('-P-1Y'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-00-00T00:00:00.0');
+        that(date_interval('-P-1Y-2M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-00T00:00:00.0');
+        that(date_interval('-P-1Y-2M-3D'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T00:00:00.0');
+        that(date_interval('-P-1Y-2M-3DT-4H'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:00:00.0');
+        that(date_interval('-P-1Y-2M-3DT-4H-5M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:05:00.0');
+        that(date_interval('-P-1Y-2M-3DT-4H-5M-6S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:05:06.0');
+        that(date_interval('-P-1Y-2M-3DT-4H-5M-6.789S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+01-02-03T04:05:06.788999');
+        that(date_interval('-P1Y'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-00-00T00:00:00.0');
+        that(date_interval('-P1Y2M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-00T00:00:00.0');
+        that(date_interval('-P1Y2M3D'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T00:00:00.0');
+        that(date_interval('-P1Y2M3DT4H'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:00:00.0');
+        that(date_interval('-P1Y2M3DT4H5M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:05:00.0');
+        that(date_interval('-P1Y2M3DT4H5M6S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:05:06.0');
+        that(date_interval('-P1Y2M3DT4H5M6.789S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01-02-03T04:05:06.788999');
+        that(date_interval('-P-9Y-2M3DT-4H5M-6.789S'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+09-02--3T04:-5:06.788999');
+
+        // create モード（混在）
+        that(date_interval('P-1Y11M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01--11-00T00:00:00.0');
+        that(date_interval('P-1Y13M'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+-1-13-00T00:00:00.0');
+        $base = new \DateTimeImmutable('2014/12/24 12:34:56');
+        that($base->add(date_interval('P-1Y11M')))->format('Y/m/d H:i:s.v')->is('2014/11/24 12:34:56.000');
+        that($base->add(date_interval('P-1Y13M')))->format('Y/m/d H:i:s.v')->is('2015/01/24 12:34:56.000');
+        that($base->add(date_interval('P1Y-12MT-1.234S')))->format('Y/m/d H:i:s.v')->is('2014/12/24 12:34:54.766');
+
         $HOUR_1 = 60 * 60;
         $DAY_1 = $HOUR_1 * 24;
         $MONTH_1 = $DAY_1 * (365 / 12);

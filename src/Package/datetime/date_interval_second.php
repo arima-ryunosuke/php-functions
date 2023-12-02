@@ -3,8 +3,8 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../datetime/date_convert.php';
+require_once __DIR__ . '/../datetime/date_interval.php';
 require_once __DIR__ . '/../datetime/date_timestamp.php';
-require_once __DIR__ . '/../pcre/preg_splice.php';
 require_once __DIR__ . '/../var/is_decimal.php';
 // @codeCoverageIgnoreEnd
 
@@ -45,23 +45,7 @@ function date_interval_second($interval, $basetime = 0)
     }
 
     if (!$interval instanceof \DateInterval) {
-        $interval = (string) $interval;
-        $invert = 0;
-        if ($interval[0] === '+') {
-            $invert = 0;
-            $interval = substr($interval, 1);
-        }
-        if ($interval[0] === '-') {
-            $invert = 1;
-            $interval = substr($interval, 1);
-        }
-        $interval = preg_splice('#(\.\d+)S#', 'S', $interval, $m);
-
-        $interval = new \DateInterval($interval);
-        $interval->invert = $invert;
-        if (isset($m[1])) {
-            $interval->f = (float) $m[1];
-        }
+        $interval = date_interval($interval);
     }
 
     $datetime = date_convert(\DateTimeImmutable::class, $basetime);

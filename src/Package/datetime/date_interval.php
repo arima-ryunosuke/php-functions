@@ -12,6 +12,10 @@ require_once __DIR__ . '/../syntax/throws.php';
 /**
  * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
  *
+ * @memo $sec に P から始まる iso8601継続時間を渡すと DateInterval のパーサーとして働く。
+ * そのとき、各要素には負数を与えることができる。
+ *
+ * P で始まらない場合、秒の分解機能になる。
  * 例えば `60 * 60 * 24 * 900 + 12345.678` （約900日12345秒）は・・・
  *
  * - 2 年（約900日なので）
@@ -66,13 +70,48 @@ require_once __DIR__ . '/../syntax/throws.php';
  *
  * @package ryunosuke\Functions\Package\datetime
  *
- * @param int|float $sec タイムスタンプ
+ * @param int|float|string $sec タイムスタンプ|ISO8601継続時間文字列
  * @param string|array|null $format 時刻フォーマット
  * @param string|int $limit_type どこまで換算するか（[c|y|m|d|h|i|s]）
  * @return string|\DateInterval 時間差文字列 or DateInterval オブジェクト
  */
 function date_interval($sec, $format = null, $limit_type = 'y')
 {
+    // for compatible
+    if (is_string($sec) && preg_match('#^(?P<S>[\-+])?P((?P<Y>-?\d+)Y)?((?P<M>-?\d+)M)?((?P<D>-?\d+)D)?(T((?P<h>-?\d+)H)?((?P<m>-?\d+)M)?((?P<s>-?\d+(\.\d+)?)S)?)?$#', $sec, $matches, PREG_UNMATCHED_AS_NULL)) {
+        $interval = new \DateInterval('P0Y');
+        $interval->y = (int) $matches['Y'];
+        $interval->m = (int) $matches['M'];
+        $interval->d = (int) $matches['D'];
+        $interval->h = (int) $matches['h'];
+        $interval->i = (int) $matches['m'];
+        $interval->s = (int) $matches['s'];
+        $interval->f = (float) $matches['s'] - $interval->s;
+
+        if ($matches['S'] === '-') {
+            $interval->y = -$interval->y;
+            $interval->m = -$interval->m;
+            $interval->d = -$interval->d;
+            $interval->h = -$interval->h;
+            $interval->i = -$interval->i;
+            $interval->s = -$interval->s;
+            $interval->f = -$interval->f;
+        }
+
+        $now = new \DateTimeImmutable();
+        if ($now > $now->add($interval)) {
+            $interval->invert = 1;
+            $interval->y = -$interval->y;
+            $interval->m = -$interval->m;
+            $interval->d = -$interval->d;
+            $interval->h = -$interval->h;
+            $interval->i = -$interval->i;
+            $interval->s = -$interval->s;
+            $interval->f = -$interval->f;
+        }
+        return $interval;
+    }
+
     $ymdhisv = ['c', 'y', 'm', 'd', 'h', 'i', 's', 'v'];
     $map = ['c' => 7, 'y' => 6, 'm' => 5, 'd' => 4, 'h' => 3, 'i' => 2, 's' => 1];
     if (ctype_digit("$limit_type")) {
