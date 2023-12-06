@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\iterator_chunk;
+use function ryunosuke\Functions\Package\iterator_combine;
 use function ryunosuke\Functions\Package\iterator_join;
 use function ryunosuke\Functions\Package\iterator_map;
 use function ryunosuke\Functions\Package\iterator_maps;
@@ -97,6 +98,21 @@ class iteratorTest extends AbstractTestCase
 
         $gens = iterator_chunk($data, 0);
         that($gens)->send(null)->wasThrown('$length must be');
+    }
+
+    function test_iterator_combine()
+    {
+        // 配列から key => value なイテレータを作る
+        $it = iterator_combine(['a', 'b', 'c'], [1, 2, 3]);
+        that(iterator_to_array($it))->isSame(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // generator から key => value な generator を作る
+        $it = iterator_combine((fn() => yield from ['a', 'b', 'c'])(), (fn() => yield from [1, 2, 3])());
+        that(iterator_to_array($it))->isSame(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // 数が一致しなければ例外
+        $this->expectException(\InvalidArgumentException::class);
+        iterator_to_array(iterator_combine([1, 2], [3, 4, 5]));
     }
 
     function test_iterator_join()
