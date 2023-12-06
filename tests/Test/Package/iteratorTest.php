@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\iterator_chunk;
 use function ryunosuke\Functions\Package\iterator_join;
 use function ryunosuke\Functions\Package\iterator_map;
+use function ryunosuke\Functions\Package\iterator_maps;
 use function ryunosuke\Functions\Package\iterator_split;
 
 class iteratorTest extends AbstractTestCase
@@ -165,6 +166,17 @@ class iteratorTest extends AbstractTestCase
             [2, "b", 8, "h"],
             [3, "c", null, null],
         ]);
+    }
+
+    function test_iterator_maps()
+    {
+        // Generator の値を2乗してから3を足す
+        $it = iterator_maps((function () {
+            yield 1;
+            yield 2;
+            yield 3;
+        })(), fn($v) => $v ** 2, fn($v) => $v + 3);
+        that(iterator_to_array($it))->isSame([4, 7, 12]);
     }
 
     function test_iterator_split()
