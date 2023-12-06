@@ -25,8 +25,8 @@ namespace ryunosuke\Functions\Package;
  */
 function iterator_combine($keys, $values)
 {
-    $itK = is_array($keys) ? new \ArrayIterator($keys) : $keys;
-    $itV = is_array($values) ? new \ArrayIterator($values) : $values;
+    $itK = is_array($keys) ? (fn() => yield from $keys)() : $keys;
+    $itV = is_array($values) ? (fn() => yield from $values)() : $values;
 
     $multi = new \MultipleIterator(\MultipleIterator::MIT_KEYS_NUMERIC | \MultipleIterator::MIT_NEED_ALL);
     $multi->attachIterator($itK);

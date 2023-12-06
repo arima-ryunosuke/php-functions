@@ -53,7 +53,7 @@ function iterator_map($callback, ...$iterables)
 {
     $multi = new \MultipleIterator(\MultipleIterator::MIT_KEYS_NUMERIC | \MultipleIterator::MIT_NEED_ANY);
     foreach ($iterables as $iterable) {
-        $multi->attachIterator(is_array($iterable) ? new \ArrayIterator($iterable) : $iterable);
+        $multi->attachIterator(is_array($iterable) ? (fn() => yield from $iterable)() : $iterable);
     }
 
     foreach ($multi as $keys => $values) {

@@ -29,7 +29,7 @@ function iterator_join($iterables, $preserve_keys = true)
 {
     $iterator = new \AppendIterator();
     foreach ($iterables as $iterable) {
-        $iterator->append(is_array($iterable) ? new \ArrayIterator($iterable) : $iterable);
+        $iterator->append(is_array($iterable) ? (fn() => yield from $iterable)() : $iterable);
     }
 
     $n = 0;

@@ -51,7 +51,7 @@ namespace ryunosuke\Functions\Package;
  */
 function iterator_split($iterable, $chunk_sizes, $preserve_keys = false)
 {
-    $iterable = new \NoRewindIterator(is_array($iterable) ? new \ArrayIterator($iterable) : $iterable);
+    $iterable = new \NoRewindIterator(is_array($iterable) ? (fn() => yield from $iterable)() : $iterable);
 
     $results = [];
 
