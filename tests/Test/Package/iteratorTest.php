@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\iterator_chunk;
 use function ryunosuke\Functions\Package\iterator_join;
+use function ryunosuke\Functions\Package\iterator_map;
 use function ryunosuke\Functions\Package\iterator_split;
 
 class iteratorTest extends AbstractTestCase
@@ -122,6 +123,48 @@ class iteratorTest extends AbstractTestCase
             new \ArrayIterator(['b' => 'B']),
             (fn() => yield 'c' => 'C')(),
         ], true)))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+    }
+
+    function test_iterator_map()
+    {
+        // いわゆる zip 操作
+        $it = iterator_map(null, (function () {
+            yield 1;
+            yield 2;
+            yield 3;
+        })(), (function () {
+            yield 7;
+            yield 8;
+            yield 9;
+        })());
+        that(iterator_to_array($it))->isSame([[1, 7], [2, 8], [3, 9]]);
+
+        // キーも渡ってくる
+        $it = iterator_map(fn($v1, $v2, $k1, $k2) => "$k1:$v1, $k2:$v2", (function () {
+            yield 'a' => 1;
+            yield 'b' => 2;
+            yield 'c' => 3;
+        })(), (function () {
+            yield 'g' => 7;
+            yield 'h' => 8;
+            yield 'i' => 9;
+        })());
+        that(iterator_to_array($it))->isSame(["a:1, g:7", "b:2, h:8", "c:3, i:9"]);
+
+        // 不一致
+        $it = iterator_map(fn($v1, $v2, $k1, $k2) => [$v1, $k1, $v2, $k2], (function () {
+            yield 'a' => 1;
+            yield 'b' => 2;
+            yield 'c' => 3;
+        })(), (function () {
+            yield 'g' => 7;
+            yield 'h' => 8;
+        })());
+        that(iterator_to_array($it))->isSame([
+            [1, "a", 7, "g"],
+            [2, "b", 8, "h"],
+            [3, "c", null, null],
+        ]);
     }
 
     function test_iterator_split()
