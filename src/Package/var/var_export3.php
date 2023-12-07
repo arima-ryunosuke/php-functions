@@ -25,9 +25,9 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * - Generator クラス
  * - 特定の内部クラス（PDO など）
  * - リソース
- * - アロー関数によるクロージャ
  *
  * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
+ * ただしコンストラクタが必須引数無しの場合はコールされる。
  * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
  * sleep, wakeup, Serializable などが実装されているとそれはそのまま機能する。
  * set_state だけは呼ばれないので注意。
@@ -121,9 +121,9 @@ function var_export3($value, $return = false)
 
     // 再帰用クロージャ
     $vars = [];
-    $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
-        $spacer0 = str_repeat(" ", 4 * ($nest + 0));
-        $spacer1 = str_repeat(" ", 4 * ($nest + 1));
+    $export = function ($value, $nest = 0, $raw = false) use (&$export, &$vars, $var_manager) {
+        $spacer0 = str_repeat(" ", 4 * max(0, $nest + 0));
+        $spacer1 = str_repeat(" ", 4 * max(0, $nest + 1));
         $raw_export = fn($v) => $v;
         $var_export = fn($v) => var_export($v, true);
         $neighborToken = function ($n, $d, $tokens) {
@@ -315,8 +315,8 @@ function var_export3($value, $return = false)
                         }
                     }
 
-                    // コンストラクタは呼ばないのでリネームしておく
-                    if ($token[1] === '__construct') {
+                    // 引数ありコンストラクタは呼ばないのでリネームしておく
+                    if ($token[1] === '__construct' && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
                         $token[1] = "replaced__construct";
                     }
 
@@ -337,6 +337,9 @@ function var_export3($value, $return = false)
                     'indent'   => $spacer1,
                     'baseline' => -1,
                 ]);
+                if ($raw) {
+                    return $code;
+                }
                 $classname = "(function () {\n{$spacer1}return $code;\n{$spacer0}})";
             }
             else {
@@ -365,79 +368,99 @@ function var_export3($value, $return = false)
     };
 
     $exported = $export($value, 1);
-    $others = "";
+    $others = [];
     $vars = [];
     foreach ($var_manager->orphan() as $rid => [$isref, $vid, $var]) {
         $declare = $isref ? "&\$this->$vid" : $export($var, 1);
-        $others .= "    \$this->$rid = $declare;\n";
-    }
-    $result = "(function () {
-{$others}    return $exported;
-" . '})->call(new class() {
-    public function new(&$object, $class, $provider)
-    {
-        if ($class instanceof \\Closure) {
-            $object = $class();
-            $reflection = $this->reflect(get_class($object));
-        }
-        else {
-            $reflection = $this->reflect($class);
-            $object = $reflection["self"]->newInstanceWithoutConstructor();
-        }
-        [$fields, $privates] = $provider();
-
-        if ($reflection["unserialize"]) {
-            $object->__unserialize($fields);
-            return $object;
-        }
-
-        foreach ($reflection["parents"] as $parent) {
-            foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
-                if (isset($privates[$parent->name][$name])) {
-                    $property->setValue($object, $privates[$parent->name][$name]);
-                }
-                if (isset($fields[$name]) || array_key_exists($name, $fields)) {
-                    $property->setValue($object, $fields[$name]);
-                    unset($fields[$name]);
-                }
-            }
-        }
-        foreach ($fields as $name => $value) {
-            $object->$name = $value;
-        }
-
-        if ($reflection["wakeup"]) {
-            $object->__wakeup();
-        }
-
-        return $object;
+        $others[] = "\$this->$rid = $declare;";
     }
 
-    private function reflect($class)
-    {
-        static $cache = [];
-        if (!isset($cache[$class])) {
-            $refclass = new \ReflectionClass($class);
-            $cache[$class] = [
-                "self"        => $refclass,
-                "parents"     => [],
-                "properties"  => [],
-                "unserialize" => $refclass->hasMethod("__unserialize"),
-                "wakeup"      => $refclass->hasMethod("__wakeup"),
-            ];
-            for ($current = $refclass; $current; $current = $current->getParentClass()) {
-                $cache[$class]["parents"][$current->name] = $current;
-            }
-            foreach ($refclass->getProperties() as $property) {
-                if (!$property->isStatic()) {
-                    $property->setAccessible(true);
-                    $cache[$class]["properties"][$property->name] = $property;
+    static $factory = null;
+    if ($factory === null) {
+        // @codeCoverageIgnoreStart
+        $factory = $export(new class() {
+            public function new(&$object, $class, $provider)
+            {
+                if ($class instanceof \Closure) {
+                    $object = $class();
+                    $reflection = $this->reflect(get_class($object));
                 }
+                else {
+                    $reflection = $this->reflect($class);
+                    if ($reflection["constructor"] && $reflection["constructor"]->getNumberOfRequiredParameters() === 0) {
+                        $object = $reflection["self"]->newInstance();
+                    }
+                    else {
+                        $object = $reflection["self"]->newInstanceWithoutConstructor();
+                    }
+                }
+                [$fields, $privates] = $provider();
+
+                if ($reflection["unserialize"]) {
+                    $object->__unserialize($fields);
+                    return $object;
+                }
+
+                foreach ($reflection["parents"] as $parent) {
+                    foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
+                        if (isset($privates[$parent->name][$name])) {
+                            $property->setValue($object, $privates[$parent->name][$name]);
+                        }
+                        if (isset($fields[$name]) || array_key_exists($name, $fields)) {
+                            if (!$property->isInitialized($object) || $property->getValue($object) === null) {
+                                $property->setValue($object, $fields[$name]);
+                            }
+                            unset($fields[$name]);
+                        }
+                    }
+                }
+                foreach ($fields as $name => $value) {
+                    $object->$name = $value;
+                }
+
+                if ($reflection["wakeup"]) {
+                    $object->__wakeup();
+                }
+
+                return $object;
             }
-        }
-        return $cache[$class];
+
+            private function reflect($class)
+            {
+                static $cache = [];
+                if (!isset($cache[$class])) {
+                    $refclass = new \ReflectionClass($class);
+                    $cache[$class] = [
+                        "self"        => $refclass,
+                        "constructor" => $refclass->getConstructor(),
+                        "parents"     => [],
+                        "properties"  => [],
+                        "unserialize" => $refclass->hasMethod("__unserialize"),
+                        "wakeup"      => $refclass->hasMethod("__wakeup"),
+                    ];
+                    for ($current = $refclass; $current; $current = $current->getParentClass()) {
+                        $cache[$class]["parents"][$current->name] = $current;
+                    }
+                    foreach ($refclass->getProperties() as $property) {
+                        if (!$property->isStatic()) {
+                            $property->setAccessible(true);
+                            $cache[$class]["properties"][$property->name] = $property;
+                        }
+                    }
+                }
+                return $cache[$class];
+            }
+        }, -1, true);
+        // @codeCoverageIgnoreEnd
     }
-})';
+
+    $E = fn($v) => $v;
+    $result = <<<PHP
+        (function () {
+            {$E(implode("\n    ", $others))}
+            return $exported;
+        })->call($factory)
+        PHP;
 
     if ($options['format'] === 'minify') {
         $tmp = tempnam(sys_get_temp_dir(), 've3');
