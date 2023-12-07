@@ -1116,6 +1116,14 @@ class varTest extends AbstractTestCase
             'H'     => ['a' => 'A', 'b' => 'B'],
             'C'     => $closure,
             'c1'    => [$sclosure, $sclosure],
+            'g'     => [
+                (function () {
+                    yield 1 => 'scalar';
+                    yield [1] => ['array'];
+                    yield (object) ['a' => 'A'] => (object) ['p' => 'object'];
+                    yield 'x';
+                })(),
+            ],
             'R'     => STDOUT,
             'empty' => [],
             'ex'    => new \Exception(),
@@ -1135,8 +1143,13 @@ class varTest extends AbstractTestCase
             ->stringContains("  A: [\"str\", 1, 2, 3, true, null]")
             ->stringContains("ryunosuke\\Test\\Package\\varTest#")
             ->stringContains("    recur: {")
-            ->stringContains("    Closure@")
-            ->stringContains("    Closure@")
+            ->stringContains("    Closure#")
+            ->stringContains("    Generator#")
+            ->stringContains('      yield 1 => "scalar"')
+            ->stringContains('      yield [1] => ["array"]')
+            ->stringContains('      yield stdClass#')
+            ->stringContains('        p: "object"')
+            ->stringContains('      (more yields)')
             ->stringContains("  R: Resource id #2 of type (stream)")
             ->stringContains("  empty: []")
             ->stringNotContains("trace: [");
@@ -1440,6 +1453,9 @@ class varTest extends AbstractTestCase
             ["C", "recur"],
             ["C"],
             ["c1"],
+            ["g", 0, 2],
+            ["g", 0],
+            ["g"],
             ["R"],
             ["empty"],
             ["ex", "message"],

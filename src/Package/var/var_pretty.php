@@ -178,6 +178,9 @@ function var_pretty($value, $options = [])
             elseif (is_string($token)) {
                 return $this->_append($token, 'red');
             }
+            elseif (is_array($token)) {
+                return $this->_append($this->string($token), 'cyan');
+            }
             elseif (is_object($token)) {
                 return $this->_append($this->string($token), 'green', ['type' => 'object-index', 'id' => spl_object_id($token)]);
             }
@@ -216,7 +219,21 @@ function var_pretty($value, $options = [])
             if (is_null($token)) {
                 return 'null';
             }
+            elseif (is_array($token)) {
+                return json_encode($token, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
             elseif (is_object($token)) {
+                if ($token instanceof \Generator) {
+                    try {
+                        $ref = new \ReflectionGenerator($token);
+                        $ename = $ref->getExecutingFile();
+                        $eline = $ref->getExecutingLine();
+                        return get_class($token) . "#" . spl_object_id($token) . "@$ename:$eline";
+                    }
+                    catch (\ReflectionException $e) {
+                        return get_class($token) . "#" . spl_object_id($token);
+                    }
+                }
                 if ($token instanceof \Closure) {
                     $ref = new \ReflectionFunction($token);
                     $fname = $ref->getFileName();
@@ -224,7 +241,7 @@ function var_pretty($value, $options = [])
                     $eline = $ref->getEndLine();
                     if ($fname && $sline && $eline) {
                         $lines = $sline === $eline ? $sline : "$sline~$eline";
-                        return get_class($token) . "@$fname:$lines#" . spl_object_id($token);
+                        return get_class($token) . "#" . spl_object_id($token) . "@$fname:$lines";
                     }
                 }
                 return get_class($token) . "#" . spl_object_id($token);
@@ -272,6 +289,9 @@ function var_pretty($value, $options = [])
         public function export($value, $nest, $parents, $keys, $callback)
         {
             $position = strlen($this->content);
+
+            $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
+            $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
             // オブジェクトは一度処理してれば無駄なので参照表示
             if (is_object($value)) {
@@ -341,9 +361,6 @@ function var_pretty($value, $options = [])
 
                     return $objective ? "{$first_condition}[]" : 'array[]';
                 })();
-
-                $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
-                $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
                 $key = null;
                 if ($primitive_only) {
@@ -445,6 +462,25 @@ function var_pretty($value, $options = [])
                     }
                     $this->plain(']');
                 }
+            }
+            elseif ($value instanceof \Generator) {
+                $this->value($value);
+
+                if ($this->options['minify']) {
+                    goto FINALLY_;
+                }
+
+                $this->plain(" {\n");
+                for ($i = 0; $i < 3 && $value->valid(); $i++, $value->next()) {
+                    $this->plain("{$spacer1}yield ");
+                    $this->index($value->key())->plain(' => ');
+                    $this->export($value->current(), $nest + 1, $parents, array_merge($keys, [$value->key()]), true);
+                    $this->plain(";\n");
+                }
+                if ($value->valid()) {
+                    $this->plain("$spacer1(more yields)\n");
+                }
+                $this->plain("{$spacer2}}");
             }
             elseif ($value instanceof \Closure) {
                 $this->value($value);
