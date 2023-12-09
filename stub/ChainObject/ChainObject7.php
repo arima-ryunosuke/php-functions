@@ -388,6 +388,11 @@ trait ChainObject7
     public function iterator_chunk($iterator, $length, $preserve_keys = false): self { }
     public function iterator_chunk($length, $preserve_keys = false): self { }
 
+    /** @see \iterator_maps() */
+    public self $iterator_maps;
+    public function iterator_maps(iterable $iterable, callable ...$callbacks): self { }
+    public function iterator_maps(callable ...$callbacks): self { }
+
     /** @see \minimum() */
     public self $minimum;
     public function minimum(...$variadic): self { }

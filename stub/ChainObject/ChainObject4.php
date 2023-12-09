@@ -348,6 +348,11 @@ trait ChainObject4
     public function getenvs($env_vars): self { }
     public function getenvs(): self { }
 
+    /** @see \iterator_combine() */
+    public self $iterator_combine;
+    public function iterator_combine($keys, $values): self { }
+    public function iterator_combine($values): self { }
+
     /** @see \iterator_join() */
     public self $iterator_join;
     public function iterator_join(iterable $iterables, $preserve_keys = true): self { }

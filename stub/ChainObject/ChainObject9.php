@@ -558,6 +558,16 @@ trait ChainObject9
     public function equals($str1, $str2, $case_insensitivity = false): self { }
     public function equals($str2, $case_insensitivity = false): self { }
 
+    /** @see \str_patch() */
+    public self $str_patch;
+    public function str_patch($string, $patch, $options = []): self { }
+    public function str_patch($patch, $options = []): self { }
+
+    /** @see \str_patch() */
+    public self $patch;
+    public function patch($string, $patch, $options = []): self { }
+    public function patch($patch, $options = []): self { }
+
     /** @see \call_if() */
     public self $call_if;
     public function call_if($condition, callable $callable, ...$arguments): self { }

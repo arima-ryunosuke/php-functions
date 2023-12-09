@@ -16004,9 +16004,9 @@ if (!function_exists('iterator_chunk')) {
             $length = fn($v, $k, $n, $chunk, $iterator) => $n < $length;
         }
 
-        // Generator は Iterator であるが Iterator は Generator ではないので変換する
-        if (is_iterable($iterator)) {
-            $iterator = (function () use ($iterator) { yield from $iterator; })();
+        // Traversable は Iterator ではないので変換する（例えば ArrayObject は IteratorAggregate であり Iterator ではない）
+        if (!$iterator instanceof \Iterator) {
+            $iterator = (fn() => yield from $iterator)();
         }
 
         $chunk = 0;
@@ -16047,6 +16047,48 @@ if (!function_exists('iterator_chunk')) {
     }
 }
 
+assert(!function_exists('iterator_combine') || (new \ReflectionFunction('iterator_combine'))->isUserDefined());
+if (!function_exists('iterator_combine')) {
+    /**
+     * キーと値のイテレータから キー => 値 なイテレータを作る
+     *
+     * 要するに array_combine のイテレータ版。
+     * 数が一致しないと array_combine と同様例外を投げるが、呼び出し時点では投げられず、ループ後に呼ばれることに注意。
+     *
+     * Example:
+     * ```php
+     * // 配列から key => value なイテレータを作る
+     * $it = iterator_combine(['a', 'b', 'c'], [1, 2, 3]);
+     * that(iterator_to_array($it))->isSame(['a' => 1, 'b' => 2, 'c' => 3]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\iterator
+     *
+     * @param iterable $keys キー
+     * @param iterable $values 値
+     * @return \Iterator $key => $value なイテレータ
+     */
+    function iterator_combine($keys, $values)
+    {
+        $itK = is_array($keys) ? (fn() => yield from $keys)() : $keys;
+        $itV = is_array($values) ? (fn() => yield from $values)() : $values;
+
+        $multi = new \MultipleIterator(\MultipleIterator::MIT_KEYS_NUMERIC | \MultipleIterator::MIT_NEED_ALL);
+        $multi->attachIterator($itK);
+        $multi->attachIterator($itV);
+
+        foreach ($multi as $it) {
+            yield $it[0] => $it[1];
+        }
+
+        // どちらかが回し切れていない≒数が一致していない
+        if ($itK->valid() || $itV->valid()) {
+            // throw new \ValueError("Both parameters should have an equal number of iterators");
+            throw new \InvalidArgumentException("Both parameters should have an equal number of iterators");
+        }
+    }
+}
+
 assert(!function_exists('iterator_join') || (new \ReflectionFunction('iterator_join'))->isUserDefined());
 if (!function_exists('iterator_join')) {
     /**
@@ -16074,7 +16116,7 @@ if (!function_exists('iterator_join')) {
     {
         $iterator = new \AppendIterator();
         foreach ($iterables as $iterable) {
-            $iterator->append(is_array($iterable) ? new \ArrayIterator($iterable) : $iterable);
+            $iterator->append(is_array($iterable) ? (fn() => yield from $iterable)() : $iterable);
         }
 
         $n = 0;
@@ -16087,6 +16129,110 @@ if (!function_exists('iterator_join')) {
             }
         }
         return $iterator;
+    }
+}
+
+assert(!function_exists('iterator_map') || (new \ReflectionFunction('iterator_map'))->isUserDefined());
+if (!function_exists('iterator_map')) {
+    /**
+     * array_map の iterator 版
+     *
+     * 基本的に array_map と同じ動作にしてあるが、下記の点が異なる。
+     *
+     * - $callback に null, $iterables に1つだけ渡したときも zip 的動作をする
+     *   - array_map は1つの時の一貫性がなく、やや非直感的な動作をする
+     * - 値だけではなくキーも渡ってくる
+     *   - 例えば $iterables が2つの場合 `($v1, $v2, $k1, $k2)` の4引数が渡ってくる
+     *
+     * 数が不一致の場合、(v, k) の組が共に null で渡ってくる。
+     *
+     * Example:
+     * ```php
+     * // いわゆる zip 操作
+     * $it = iterator_map(null, (function () {
+     *     yield 1;
+     *     yield 2;
+     *     yield 3;
+     * })(), (function () {
+     *     yield 7;
+     *     yield 8;
+     *     yield 9;
+     * })());
+     * that(iterator_to_array($it))->isSame([[1, 7], [2, 8], [3, 9]]);
+     *
+     * // キーも渡ってくる
+     * $it = iterator_map(fn($v1, $v2, $k1, $k2) => "$k1:$v1, $k2:$v2", (function () {
+     *     yield 'a' => 1;
+     *     yield 'b' => 2;
+     *     yield 'c' => 3;
+     * })(), (function () {
+     *     yield 'g' => 7;
+     *     yield 'h' => 8;
+     *     yield 'i' => 9;
+     * })());
+     * that(iterator_to_array($it))->isSame(["a:1, g:7", "b:2, h:8", "c:3, i:9"]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\iterator
+     *
+     * @param ?callable $callback コールバック
+     * @param iterable ...$iterables iterable
+     * @return \Iterator コールバックを適用した iterable
+     */
+    function iterator_map($callback, ...$iterables)
+    {
+        $multi = new \MultipleIterator(\MultipleIterator::MIT_KEYS_NUMERIC | \MultipleIterator::MIT_NEED_ANY);
+        foreach ($iterables as $iterable) {
+            $multi->attachIterator(is_array($iterable) ? (fn() => yield from $iterable)() : $iterable);
+        }
+
+        foreach ($multi as $keys => $values) {
+            if ($callback === null) {
+                yield $values;
+            }
+            else {
+                yield $callback(...$values, ...$keys);
+            }
+        }
+    }
+}
+
+assert(!function_exists('iterator_maps') || (new \ReflectionFunction('iterator_maps'))->isUserDefined());
+if (!function_exists('iterator_maps')) {
+    /**
+     * iterable にコールバック（複数）を適用した Iterator を返す
+     *
+     * 指定したコールバックで複数回回してマップする。
+     * 引数は (値, キー, 連番) が渡ってくる。
+     *
+     * Example:
+     * ```php
+     * // Generator の値を2乗してから3を足す
+     * $it = iterator_maps((function () {
+     *     yield 1;
+     *     yield 2;
+     *     yield 3;
+     * })(), fn($v) => $v ** 2, fn($v) => $v + 3);
+     * that(iterator_to_array($it))->isSame([4, 7, 12]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\iterator
+     *
+     * @param iterable $iterable iterable
+     * @param callable ...$callbacks コールバック
+     * @return \Iterator コールバックを適用した iterable
+     */
+    function iterator_maps($iterable, ...$callbacks)
+    {
+        $n = 0;
+        foreach ($iterable as $k => $v) {
+            foreach ($callbacks as $callback) {
+                $callback = func_user_func_array($callback);
+                $v = $callback($v, $k, $n);
+            }
+            yield $k => $v;
+            $n++;
+        }
     }
 }
 
@@ -16139,7 +16285,7 @@ if (!function_exists('iterator_split')) {
      */
     function iterator_split($iterable, $chunk_sizes, $preserve_keys = false)
     {
-        $iterable = new \NoRewindIterator(is_array($iterable) ? new \ArrayIterator($iterable) : $iterable);
+        $iterable = new \NoRewindIterator(is_array($iterable) ? (fn() => yield from $iterable)() : $iterable);
 
         $results = [];
 
@@ -23700,6 +23846,199 @@ if (!function_exists('str_lchop')) {
     }
 }
 
+assert(!function_exists('str_patch') || (new \ReflectionFunction('str_patch'))->isUserDefined());
+if (!function_exists('str_patch')) {
+    /**
+     * テキストに patch を当てる
+     *
+     * diff 形式は現在のところ unified のみ。
+     * reject の仕様はなく、ハンクが一つでも検出・適用不可なら例外を投げる。
+     *
+     * Example:
+     * ```php
+     * $xstring = <<<HERE
+     * equal line
+     * delete line
+     * equal line
+     * HERE;
+     * $ystring = <<<HERE
+     * equal line
+     * equal line
+     * append line
+     * HERE;
+     * // xstring から ystring へのパッチ
+     * $patch = str_diff($xstring, $ystring, ['stringify' => 'unified=3']);
+     * // xstring に適用すれば ystring になる
+     * that(str_patch($xstring, $patch))->isSame($ystring);
+     * // ystring に reverse で適用すれば xstring に戻る
+     * that(str_patch($ystring, $patch, ['reverse' => true]))->isSame($xstring);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $string 文字列
+     * @param string $patch パッチ文字列
+     * @param array $options オプション配列
+     * @return string パッチ適用結果
+     */
+    function str_patch($string, $patch, $options = [])
+    {
+        $options += [
+            'format'  => 'unified', // パッチ形式（未実装。現在は unified のみ）
+            'fuzz'    => 0,         // ハンク検出失敗時に同一行を伏せる量（未実装でおそらく実装しない。diff 側でせっかく出力してるのに無視するのはもったいない）
+            'reverse' => false,     // 逆パッチフラグ
+            'forward' => false,     // 既に当たっているなら例外を投げずにスルーする
+        ];
+
+        // 空文字の時は特別扱いで「差分なし」とみなす（差分がないなら diff 結果が空文字になるので必然的に渡ってくる機会が多くなる）
+        if (!strlen($patch)) {
+            return $string;
+        }
+
+        if (!preg_match_all('#^@@\s+-(?<oldpos>\d+)(,(?<oldlen>\d+))?\s+\+(?<newpos>\d+)(,(?<newlen>\d+))?\s+@@\r?\n(?<diff>[^@][^@]*)#ums', $patch, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL)) {
+            throw new \InvalidArgumentException('$patch is invalid');
+        }
+
+        $hunks = [];
+        foreach ($matches as $match) {
+            $hunk = new class($match['oldpos'], $match['oldlen'], $match['newpos'], $match['newlen'], $match['diff']) {
+                private int $oldOffset;
+                private int $oldLength;
+
+                private int $newOffset;
+                private int $newLength;
+
+                private array $diffs;
+
+                private int   $oldOriginalOffset;
+                private int   $newOriginalOffset;
+                private array $oldContents = [];
+                private array $newContents = [];
+
+                public function __construct($oldpos, $oldlen, $newpos, $newlen, $diff)
+                {
+                    $this->oldOffset = $oldpos - 1;
+                    $this->oldLength = $oldlen ?? 1;
+                    $this->newOffset = $newpos - 1;
+                    $this->newLength = $newlen ?? 1;
+                    $this->diffs = preg_split('#\\R#u', $diff, -1, PREG_SPLIT_NO_EMPTY);
+
+                    $this->oldOriginalOffset = $this->oldOffset;
+                    $this->newOriginalOffset = $this->newOffset;
+
+                    foreach ($this->diffs as $diff) {
+                        switch ($diff[0]) {
+                            case ' ':
+                                $this->oldContents[] = $this->newContents[] = substr($diff, 1);
+                                break;
+                            case '-':
+                                $this->oldContents[] = substr($diff, 1);
+                                break;
+                            case '+':
+                                $this->newContents[] = substr($diff, 1);
+                                break;
+                        }
+                    }
+
+                    assert($this->oldLength === count($this->oldContents));
+                    assert($this->newLength === count($this->newContents));
+                }
+
+                public function reverse()
+                {
+                    [
+                        $this->oldOriginalOffset,
+                        $this->oldOffset,
+                        $this->oldLength,
+                        $this->oldContents,
+                        $this->newOriginalOffset,
+                        $this->newOffset,
+                        $this->newLength,
+                        $this->newContents,
+                    ] = [
+                        $this->newOriginalOffset,
+                        $this->newOriginalOffset, // ミスではない
+                        $this->newLength,
+                        $this->newContents,
+                        $this->oldOriginalOffset,
+                        $this->oldOriginalOffset, // ミスではない
+                        $this->oldLength,
+                        $this->oldContents,
+                    ];
+                }
+
+                public function detect(array $lines, int $delta)
+                {
+                    $nearest = static function (int $start, int $min, int $max) {
+                        yield 0;
+                        for ($delta = 1, $limit = max($start - $min, $max - $start); $delta <= $limit; $delta++) {
+                            if (($start - $delta) >= $min) {
+                                yield -$delta;
+                            }
+                            if (($start + $delta) <= $max) {
+                                yield +$delta;
+                            }
+                        }
+                    };
+
+                    foreach ($nearest($this->oldOffset + $delta, 0, count($lines) - $this->oldLength) as $offset) {
+                        if ($this->oldContents === array_slice($lines, $this->oldOffset + $offset, $this->oldLength)) {
+                            $this->oldOffset += $offset;
+                            return $offset;
+                        }
+                    }
+
+                    throw new \UnexpectedValueException("not found hunk block\n" . implode("\n", $this->diffs));
+                }
+
+                public function apply(int &$current, array $lines)
+                {
+                    $result = array_merge(array_slice($lines, $current, $this->oldOffset - $current), $this->newContents);
+                    $current = $this->oldOffset + $this->oldLength;
+
+                    return $result;
+                }
+            };
+
+            if ($options['reverse']) {
+                $hunk->reverse();
+            }
+
+            $hunks[] = $hunk;
+        }
+
+        $apply = function ($hunks, $lines) {
+            $delta = 0;
+            $current = 0;
+            $result = [];
+            foreach ($hunks as $hunk) {
+                $delta = $hunk->detect($lines, $delta);
+
+                $result = array_merge($result, $hunk->apply($current, $lines));
+            }
+            $result = array_merge($result, array_slice($lines, $current));
+
+            return implode("\n", $result);
+        };
+
+        try {
+            $lines = preg_split('#\\R#u', $string);
+            return $apply($hunks, $lines);
+        }
+        catch (\Exception $e) {
+            // reverse で当ててみて例外が飛ばないなら元の文字列を返す
+            if ($options['forward']) {
+                foreach ($hunks as $hunk) {
+                    $hunk->reverse();
+                }
+                $apply($hunks, $lines);
+                return $string;
+            }
+            throw $e;
+        }
+    }
+}
+
 assert(!function_exists('str_putcsv') || (new \ReflectionFunction('str_putcsv'))->isUserDefined());
 if (!function_exists('str_putcsv')) {
     /**
@@ -27289,15 +27628,17 @@ if (!function_exists('var_export3')) {
      * 各種オブジェクトやクロージャ、循環参照を含む配列など様々なものが出力できる。
      * ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。
      *
-     * - Generator クラス
      * - 特定の内部クラス（PDO など）
      * - リソース
-     * - アロー関数によるクロージャ
      *
      * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
+     * ただしコンストラクタが必須引数無しの場合はコールされる。
      * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
      * sleep, wakeup, Serializable などが実装されているとそれはそのまま機能する。
      * set_state だけは呼ばれないので注意。
+     *
+     * Generator は元となった関数/メソッドを再コールすることで復元される。
+     * その仕様上、引数があると呼べないし、実行位置はリセットされる。
      *
      * クロージャはコード自体を引っ張ってきて普通に function (){} として埋め込む。
      * クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。
@@ -27347,9 +27688,9 @@ if (!function_exists('var_export3')) {
 
             public function varId($var)
             {
-                // オブジェクトは明確な ID が取れる（closure/object の区分けに処理的な意味はない）
+                // オブジェクトは明確な ID が取れる（generator/closure/object の区分けに処理的な意味はない）
                 if (is_object($var)) {
-                    $id = ($var instanceof \Closure ? 'closure' : 'object') . (spl_object_id($var) + 1);
+                    $id = ($var instanceof \Generator ? 'generator' : ($var instanceof \Closure ? 'closure' : 'object')) . (spl_object_id($var) + 1);
                     $this->vars[$id] = $var;
                     return $id;
                 }
@@ -27388,9 +27729,9 @@ if (!function_exists('var_export3')) {
 
         // 再帰用クロージャ
         $vars = [];
-        $export = function ($value, $nest = 0) use (&$export, &$vars, $var_manager) {
-            $spacer0 = str_repeat(" ", 4 * ($nest + 0));
-            $spacer1 = str_repeat(" ", 4 * ($nest + 1));
+        $export = function ($value, $nest = 0, $raw = false) use (&$export, &$vars, $var_manager) {
+            $spacer0 = str_repeat(" ", 4 * max(0, $nest + 0));
+            $spacer1 = str_repeat(" ", 4 * max(0, $nest + 1));
             $raw_export = fn($v) => $v;
             $var_export = fn($v) => var_export($v, true);
             $neighborToken = function ($n, $d, $tokens) {
@@ -27455,6 +27796,33 @@ if (!function_exists('var_export3')) {
                 $kvl = implode($middle, $kvl);
                 $declare = $vid ? "\$this->$vid = " : "";
                 return "{$declare}[$begin{$kvl}$end]";
+            }
+            if ($value instanceof \Generator) {
+                $ref = new \ReflectionGenerator($value);
+                $reffunc = $ref->getFunction();
+
+                if ($reffunc->getNumberOfRequiredParameters() > 0) {
+                    throw new \DomainException('required argument Generator is not support.');
+                }
+
+                $caller = null;
+                if ($reffunc instanceof \ReflectionFunction) {
+                    if ($reffunc->isClosure()) {
+                        $caller = "({$export($reffunc->getClosure(), $nest)})";
+                    }
+                    else {
+                        $caller = $reffunc->name;
+                    }
+                }
+                if ($reffunc instanceof \ReflectionMethod) {
+                    if ($reffunc->isStatic()) {
+                        $caller = "{$reffunc->class}::{$reffunc->name}";
+                    }
+                    else {
+                        $caller = "{$export($ref->getThis(), $nest)}->{$reffunc->name}";
+                    }
+                }
+                return "\$this->$vid = {$caller}()";
             }
             if ($value instanceof \Closure) {
                 $ref = new \ReflectionFunction($value);
@@ -27535,11 +27903,6 @@ if (!function_exists('var_export3')) {
             if (is_object($value)) {
                 $ref = new \ReflectionObject($value);
 
-                // ジェネレータはどう頑張っても無理
-                if ($value instanceof \Generator) {
-                    throw new \DomainException('Generator Class is not support.');
-                }
-
                 // 無名クラスは定義がないのでパースが必要
                 // さらにコンストラクタを呼ぶわけには行かない（引数を検出するのは不可能）ので潰す必要もある
                 if ($ref->isAnonymous()) {
@@ -27582,8 +27945,8 @@ if (!function_exists('var_export3')) {
                             }
                         }
 
-                        // コンストラクタは呼ばないのでリネームしておく
-                        if ($token[1] === '__construct') {
+                        // 引数ありコンストラクタは呼ばないのでリネームしておく
+                        if ($token[1] === '__construct' && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
                             $token[1] = "replaced__construct";
                         }
 
@@ -27604,6 +27967,9 @@ if (!function_exists('var_export3')) {
                         'indent'   => $spacer1,
                         'baseline' => -1,
                     ]);
+                    if ($raw) {
+                        return $code;
+                    }
                     $classname = "(function () {\n{$spacer1}return $code;\n{$spacer0}})";
                 }
                 else {
@@ -27632,79 +27998,99 @@ if (!function_exists('var_export3')) {
         };
 
         $exported = $export($value, 1);
-        $others = "";
+        $others = [];
         $vars = [];
         foreach ($var_manager->orphan() as $rid => [$isref, $vid, $var]) {
             $declare = $isref ? "&\$this->$vid" : $export($var, 1);
-            $others .= "    \$this->$rid = $declare;\n";
-        }
-        $result = "(function () {
-{$others}    return $exported;
-" . '})->call(new class() {
-    public function new(&$object, $class, $provider)
-    {
-        if ($class instanceof \\Closure) {
-            $object = $class();
-            $reflection = $this->reflect(get_class($object));
-        }
-        else {
-            $reflection = $this->reflect($class);
-            $object = $reflection["self"]->newInstanceWithoutConstructor();
-        }
-        [$fields, $privates] = $provider();
-
-        if ($reflection["unserialize"]) {
-            $object->__unserialize($fields);
-            return $object;
+            $others[] = "\$this->$rid = $declare;";
         }
 
-        foreach ($reflection["parents"] as $parent) {
-            foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
-                if (isset($privates[$parent->name][$name])) {
-                    $property->setValue($object, $privates[$parent->name][$name]);
+        static $factory = null;
+        if ($factory === null) {
+            // @codeCoverageIgnoreStart
+            $factory = $export(new class() {
+                public function new(&$object, $class, $provider)
+                {
+                    if ($class instanceof \Closure) {
+                        $object = $class();
+                        $reflection = $this->reflect(get_class($object));
+                    }
+                    else {
+                        $reflection = $this->reflect($class);
+                        if ($reflection["constructor"] && $reflection["constructor"]->getNumberOfRequiredParameters() === 0) {
+                            $object = $reflection["self"]->newInstance();
+                        }
+                        else {
+                            $object = $reflection["self"]->newInstanceWithoutConstructor();
+                        }
+                    }
+                    [$fields, $privates] = $provider();
+
+                    if ($reflection["unserialize"]) {
+                        $object->__unserialize($fields);
+                        return $object;
+                    }
+
+                    foreach ($reflection["parents"] as $parent) {
+                        foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
+                            if (isset($privates[$parent->name][$name])) {
+                                $property->setValue($object, $privates[$parent->name][$name]);
+                            }
+                            if (isset($fields[$name]) || array_key_exists($name, $fields)) {
+                                if (!$property->isInitialized($object) || $property->getValue($object) === null) {
+                                    $property->setValue($object, $fields[$name]);
+                                }
+                                unset($fields[$name]);
+                            }
+                        }
+                    }
+                    foreach ($fields as $name => $value) {
+                        $object->$name = $value;
+                    }
+
+                    if ($reflection["wakeup"]) {
+                        $object->__wakeup();
+                    }
+
+                    return $object;
                 }
-                if (isset($fields[$name]) || array_key_exists($name, $fields)) {
-                    $property->setValue($object, $fields[$name]);
-                    unset($fields[$name]);
+
+                private function reflect($class)
+                {
+                    static $cache = [];
+                    if (!isset($cache[$class])) {
+                        $refclass = new \ReflectionClass($class);
+                        $cache[$class] = [
+                            "self"        => $refclass,
+                            "constructor" => $refclass->getConstructor(),
+                            "parents"     => [],
+                            "properties"  => [],
+                            "unserialize" => $refclass->hasMethod("__unserialize"),
+                            "wakeup"      => $refclass->hasMethod("__wakeup"),
+                        ];
+                        for ($current = $refclass; $current; $current = $current->getParentClass()) {
+                            $cache[$class]["parents"][$current->name] = $current;
+                        }
+                        foreach ($refclass->getProperties() as $property) {
+                            if (!$property->isStatic()) {
+                                $property->setAccessible(true);
+                                $cache[$class]["properties"][$property->name] = $property;
+                            }
+                        }
+                    }
+                    return $cache[$class];
                 }
-            }
-        }
-        foreach ($fields as $name => $value) {
-            $object->$name = $value;
+            }, -1, true);
+            // @codeCoverageIgnoreEnd
         }
 
-        if ($reflection["wakeup"]) {
-            $object->__wakeup();
-        }
-
-        return $object;
-    }
-
-    private function reflect($class)
-    {
-        static $cache = [];
-        if (!isset($cache[$class])) {
-            $refclass = new \ReflectionClass($class);
-            $cache[$class] = [
-                "self"        => $refclass,
-                "parents"     => [],
-                "properties"  => [],
-                "unserialize" => $refclass->hasMethod("__unserialize"),
-                "wakeup"      => $refclass->hasMethod("__wakeup"),
-            ];
-            for ($current = $refclass; $current; $current = $current->getParentClass()) {
-                $cache[$class]["parents"][$current->name] = $current;
-            }
-            foreach ($refclass->getProperties() as $property) {
-                if (!$property->isStatic()) {
-                    $property->setAccessible(true);
-                    $cache[$class]["properties"][$property->name] = $property;
-                }
-            }
-        }
-        return $cache[$class];
-    }
-})';
+        $E = fn($v) => $v;
+        $result = <<<PHP
+            (function () {
+                {$E(implode("\n    ", $others))}
+                return $exported;
+            })->call($factory)
+            PHP;
 
         if ($options['format'] === 'minify') {
             $tmp = tempnam(sys_get_temp_dir(), 've3');
@@ -28011,6 +28397,9 @@ if (!function_exists('var_pretty')) {
                 elseif (is_string($token)) {
                     return $this->_append($token, 'red');
                 }
+                elseif (is_array($token)) {
+                    return $this->_append($this->string($token), 'cyan');
+                }
                 elseif (is_object($token)) {
                     return $this->_append($this->string($token), 'green', ['type' => 'object-index', 'id' => spl_object_id($token)]);
                 }
@@ -28049,7 +28438,21 @@ if (!function_exists('var_pretty')) {
                 if (is_null($token)) {
                     return 'null';
                 }
+                elseif (is_array($token)) {
+                    return json_encode($token, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                }
                 elseif (is_object($token)) {
+                    if ($token instanceof \Generator) {
+                        try {
+                            $ref = new \ReflectionGenerator($token);
+                            $ename = $ref->getExecutingFile();
+                            $eline = $ref->getExecutingLine();
+                            return get_class($token) . "#" . spl_object_id($token) . "@$ename:$eline";
+                        }
+                        catch (\ReflectionException $e) {
+                            return get_class($token) . "#" . spl_object_id($token);
+                        }
+                    }
                     if ($token instanceof \Closure) {
                         $ref = new \ReflectionFunction($token);
                         $fname = $ref->getFileName();
@@ -28057,7 +28460,7 @@ if (!function_exists('var_pretty')) {
                         $eline = $ref->getEndLine();
                         if ($fname && $sline && $eline) {
                             $lines = $sline === $eline ? $sline : "$sline~$eline";
-                            return get_class($token) . "@$fname:$lines#" . spl_object_id($token);
+                            return get_class($token) . "#" . spl_object_id($token) . "@$fname:$lines";
                         }
                     }
                     return get_class($token) . "#" . spl_object_id($token);
@@ -28105,6 +28508,9 @@ if (!function_exists('var_pretty')) {
             public function export($value, $nest, $parents, $keys, $callback)
             {
                 $position = strlen($this->content);
+
+                $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
+                $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
                 // オブジェクトは一度処理してれば無駄なので参照表示
                 if (is_object($value)) {
@@ -28174,9 +28580,6 @@ if (!function_exists('var_pretty')) {
 
                         return $objective ? "{$first_condition}[]" : 'array[]';
                     })();
-
-                    $spacer1 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 1) * $this->options['indent']);
-                    $spacer2 = $this->options['indent'] === null ? '' : str_repeat(' ', ($nest + 0) * $this->options['indent']);
 
                     $key = null;
                     if ($primitive_only) {
@@ -28278,6 +28681,25 @@ if (!function_exists('var_pretty')) {
                         }
                         $this->plain(']');
                     }
+                }
+                elseif ($value instanceof \Generator) {
+                    $this->value($value);
+
+                    if ($this->options['minify']) {
+                        goto FINALLY_;
+                    }
+
+                    $this->plain(" {\n");
+                    for ($i = 0; $i < 3 && $value->valid(); $i++, $value->next()) {
+                        $this->plain("{$spacer1}yield ");
+                        $this->index($value->key())->plain(' => ');
+                        $this->export($value->current(), $nest + 1, $parents, array_merge($keys, [$value->key()]), true);
+                        $this->plain(";\n");
+                    }
+                    if ($value->valid()) {
+                        $this->plain("$spacer1(more yields)\n");
+                    }
+                    $this->plain("{$spacer2}}");
                 }
                 elseif ($value instanceof \Closure) {
                     $this->value($value);

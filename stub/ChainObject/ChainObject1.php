@@ -458,6 +458,11 @@ trait ChainObject1
     public function ansi_colorize($string, $color): self { }
     public function ansi_colorize($color): self { }
 
+    /** @see \iterator_map() */
+    public self $iterator_map;
+    public function iterator_map(callable $callback, iterable ...$iterables): self { }
+    public function iterator_map(iterable ...$iterables): self { }
+
     /** @see \maximum() */
     public self $maximum;
     public function maximum(...$variadic): self { }
