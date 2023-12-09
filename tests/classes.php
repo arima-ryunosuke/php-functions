@@ -176,6 +176,25 @@ class Concrete extends AbstractConcrete implements \Countable, \ArrayAccess, \It
     {
         return $this->value;
     }
+
+    public static function staticGenerate()
+    {
+        yield 's1';
+        yield 's2';
+    }
+
+    public function instanceGenerate()
+    {
+        yield 'i1';
+        yield 'i2';
+    }
+
+    public function closureGenerate()
+    {
+        return function () {
+            yield from $this->instanceGenerate();
+        };
+    }
 }
 
 class PrivateClass

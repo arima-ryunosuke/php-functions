@@ -913,7 +913,29 @@ class varTest extends AbstractTestCase
         that(serialize($values2 = eval($exported)))->isSame(serialize($values));
         $values2['recur1'][1] = 9;
         that($values2['recur1'][1])->is(9);
-        that($values2['recur1'][1])->is(9);
+        that($values2['recur2'][1])->is(9);
+    }
+
+    function test_var_export3_generator()
+    {
+        $object = new Concrete('hoge');
+        $values = [
+            'byFunction'       => range1_9(),
+            'byClosure'        => (static function () {
+                yield 'c1';
+                yield 'c2';
+            })(),
+            'byStaticMethod'   => Concrete::staticGenerate(),
+            'byInstanceMethod' => $object->instanceGenerate(),
+            'byClosureMethod'  => $object->closureGenerate()(),
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+        that(iterator_to_array($values2['byFunction']))->is(range(1, 9));
+        that(iterator_to_array($values2['byClosure']))->is(['c1', 'c2']);
+        that(iterator_to_array($values2['byStaticMethod']))->is(['s1', 's2']);
+        that(iterator_to_array($values2['byInstanceMethod']))->is(['i1', 'i2']);
+        that(iterator_to_array($values2['byClosureMethod']))->is(['i1', 'i2']);
     }
 
     function test_var_export3_closure()
@@ -996,7 +1018,8 @@ class varTest extends AbstractTestCase
         that(var_export3([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function () {');
         that(var_export3([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
-        that(self::resolveFunction('var_export3'))((function () { yield 1; })())->wasThrown('is not support');
+        $generator = (function ($a) { yield $a; })(1);
+        that(self::resolveFunction('var_export3'))($generator)->wasThrown('is not support');
 
         that(self::resolveFunction('var_export3'))->fn([1, 2, 3])->outputMatches('#newInstanceWithoutConstructor#');
     }

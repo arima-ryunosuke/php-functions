@@ -22,7 +22,6 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * 各種オブジェクトやクロージャ、循環参照を含む配列など様々なものが出力できる。
  * ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。
  *
- * - Generator クラス
  * - 特定の内部クラス（PDO など）
  * - リソース
  *
@@ -31,6 +30,9 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
  * sleep, wakeup, Serializable などが実装されているとそれはそのまま機能する。
  * set_state だけは呼ばれないので注意。
+ *
+ * Generator は元となった関数/メソッドを再コールすることで復元される。
+ * その仕様上、引数があると呼べないし、実行位置はリセットされる。
  *
  * クロージャはコード自体を引っ張ってきて普通に function (){} として埋め込む。
  * クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。
@@ -80,9 +82,9 @@ function var_export3($value, $return = false)
 
         public function varId($var)
         {
-            // オブジェクトは明確な ID が取れる（closure/object の区分けに処理的な意味はない）
+            // オブジェクトは明確な ID が取れる（generator/closure/object の区分けに処理的な意味はない）
             if (is_object($var)) {
-                $id = ($var instanceof \Closure ? 'closure' : 'object') . (spl_object_id($var) + 1);
+                $id = ($var instanceof \Generator ? 'generator' : ($var instanceof \Closure ? 'closure' : 'object')) . (spl_object_id($var) + 1);
                 $this->vars[$id] = $var;
                 return $id;
             }
@@ -189,6 +191,33 @@ function var_export3($value, $return = false)
             $declare = $vid ? "\$this->$vid = " : "";
             return "{$declare}[$begin{$kvl}$end]";
         }
+        if ($value instanceof \Generator) {
+            $ref = new \ReflectionGenerator($value);
+            $reffunc = $ref->getFunction();
+
+            if ($reffunc->getNumberOfRequiredParameters() > 0) {
+                throw new \DomainException('required argument Generator is not support.');
+            }
+
+            $caller = null;
+            if ($reffunc instanceof \ReflectionFunction) {
+                if ($reffunc->isClosure()) {
+                    $caller = "({$export($reffunc->getClosure(), $nest)})";
+                }
+                else {
+                    $caller = $reffunc->name;
+                }
+            }
+            if ($reffunc instanceof \ReflectionMethod) {
+                if ($reffunc->isStatic()) {
+                    $caller = "{$reffunc->class}::{$reffunc->name}";
+                }
+                else {
+                    $caller = "{$export($ref->getThis(), $nest)}->{$reffunc->name}";
+                }
+            }
+            return "\$this->$vid = {$caller}()";
+        }
         if ($value instanceof \Closure) {
             $ref = new \ReflectionFunction($value);
             $bind = $ref->getClosureThis();
@@ -267,11 +296,6 @@ function var_export3($value, $return = false)
         }
         if (is_object($value)) {
             $ref = new \ReflectionObject($value);
-
-            // ジェネレータはどう頑張っても無理
-            if ($value instanceof \Generator) {
-                throw new \DomainException('Generator Class is not support.');
-            }
 
             // 無名クラスは定義がないのでパースが必要
             // さらにコンストラクタを呼ぶわけには行かない（引数を検出するのは不可能）ので潰す必要もある
