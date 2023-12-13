@@ -218,6 +218,12 @@ syntax error
         ]);
         that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
         $tokens = (parse_php)($code, [
+            'begin'  => T_FUNCTION,
+            'end'    => ')',
+            'greedy' => true,
+        ]);
+        that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
+        $tokens = (parse_php)($code, [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);

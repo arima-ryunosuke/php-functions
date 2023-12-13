@@ -132,6 +132,7 @@ class Syntax implements Interfaces\Syntax
             'offset'         => 0,    // 開始トークン位置
             'flags'          => 0,    // token_get_all の $flags. TOKEN_PARSE を与えると ParseError が出ることがあるのでデフォルト 0
             'cache'          => true, // キャッシュするか否か
+            'greedy'         => false,// end と nest か一致したときに処理を継続するか
             'nest_token'     => [
                 ')' => '(',
                 '}' => '{',
@@ -222,6 +223,7 @@ class Syntax implements Interfaces\Syntax
         $begin_tokens = (array) $option['begin'];
         $end_tokens = (array) $option['end'];
         $nest_tokens = $option['nest_token'];
+        $greedy = $option['greedy'];
 
         $result = [];
         $starting = !$begin_tokens;
@@ -269,6 +271,9 @@ class Syntax implements Interfaces\Syntax
             foreach ($end_tokens as $t) {
                 if ($t === $token[0] || $t === $token[1]) {
                     if ($nesting <= 0 || ($nesting === 1 && in_array($t, $nest_tokens, true))) {
+                        if ($nesting === 0 && $greedy && isset($nest_tokens[$t])) {
+                            break;
+                        }
                         break 2;
                     }
                     break;
