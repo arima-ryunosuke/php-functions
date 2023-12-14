@@ -43,6 +43,7 @@ use function ryunosuke\Functions\Package\str_equals;
 use function ryunosuke\Functions\Package\str_exists;
 use function ryunosuke\Functions\Package\str_guess;
 use function ryunosuke\Functions\Package\str_lchop;
+use function ryunosuke\Functions\Package\str_patch;
 use function ryunosuke\Functions\Package\str_putcsv;
 use function ryunosuke\Functions\Package\str_rchop;
 use function ryunosuke\Functions\Package\str_submap;
@@ -1119,6 +1120,101 @@ that is <del>a</del><ins>the</ins> pen
                 $actual = str_diff(file_get_contents($x), file_get_contents($y), ['stringify' => $levelopt]);
                 that($actual)->as("$x <=> $y: $levelopt:\nExpected: $expected\nActual: $actual")->is($expected);
             }
+        }
+    }
+
+    function test_str_patch()
+    {
+        $xstring = <<<S
+        a
+        b
+        c
+        x
+        y
+        z
+        S;
+        $ystring = <<<S
+        a
+        c
+        y
+        z
+        S;
+        $patch = str_diff($xstring, $ystring, ['stringify' => 'unified=3']);
+
+        // 差分なし
+        that(str_patch($xstring, ''))->is($xstring);
+        that(str_patch($ystring, '', ['reverse' => true]))->is($ystring);
+
+        // ズレなし
+        that(str_patch($xstring, $patch))->is($ystring);
+        that(str_patch($ystring, $patch, ['reverse' => true]))->is($xstring);
+
+        // 冒頭のズレ
+        $diff = "1\n2\n3\n";
+        that(str_patch($diff . $xstring, $patch))->is($diff . $ystring);
+        that(str_patch($diff . $ystring, $patch, ['reverse' => true]))->is($diff . $xstring);
+
+        // 末尾のズレ
+        $diff = "\n1\n2\n3\n";
+        that(str_patch($xstring . $diff, $patch))->is($ystring . $diff);
+        that(str_patch($ystring . $diff, $patch, ['reverse' => true]))->is($xstring . $diff);
+
+        // 当たっているならスルー
+        that(str_patch($ystring, $patch, ['forward' => true]))->is($ystring);
+        that(self::resolveFunction('str_patch'))($ystring, $patch, ['forward' => false])->wasThrown("not found hunk block");
+
+        // ハンク中のズレ（適用不可）
+        that(self::resolveFunction('str_patch'))(str_replace('b', 'B', $xstring), $patch)->wasThrown("not found hunk block");
+        that(self::resolveFunction('str_patch'))(str_replace('b', 'B', $xstring), $patch, ['forward' => true])->wasThrown("not found hunk block");
+
+        // 不正パッチ
+        that(self::resolveFunction('str_patch'))($xstring, 'hoge')->wasThrown("patch is invalid");
+
+        // unified:0
+        $xstring = <<<S
+        a
+        b
+        c
+        S;
+        $ystring = <<<S
+        a
+        b
+        C
+        S;
+        $patch = str_diff($xstring, $ystring, ['stringify' => 'unified=0']);
+        that(str_patch($xstring, $patch))->is($ystring);
+        that(str_patch($ystring, $patch, ['reverse' => true]))->is($xstring);
+        that(str_patch(substr($xstring, 2), $patch))->is(substr($ystring, 2));
+        that(str_patch(substr($ystring, 2), $patch, ['reverse' => true]))->is(substr($xstring, 2));
+
+        // 全行差分
+        $xstring = "";
+        $ystring = <<<S
+        A
+        B
+        C
+        S;
+        $patch = str_diff($xstring, $ystring, ['stringify' => 'unified=0']);
+        that(str_patch($xstring, $patch))->is($ystring);
+        that(str_patch($ystring, $patch, ['reverse' => true]))->is($xstring);
+
+        $dataset = [
+            [__DIR__ . '/files/diff/diff-x.txt', __DIR__ . '/files/diff/diff-y.txt'],
+            [__DIR__ . '/files/diff/diff-empty.txt', __DIR__ . '/files/diff/diff-x.txt'],
+            [__DIR__ . '/files/diff/diff-y.txt', __DIR__ . '/files/diff/diff-empty.txt'],
+            [__DIR__ . '/files/diff/diff-x.txt', __DIR__ . '/files/diff/diff-y.txt'],
+            [__DIR__ . '/files/diff/diff-even-x.txt', __DIR__ . '/files/diff/diff-even-y.txt'],
+            [__DIR__ . '/files/diff/diff-even-x.txt', __DIR__ . '/files/diff/diff-odd-y.txt'],
+            [__DIR__ . '/files/diff/diff-odd-x.txt', __DIR__ . '/files/diff/diff-odd-y.txt'],
+            [__DIR__ . '/files/diff/diff-odd-x.txt', __DIR__ . '/files/diff/diff-even-y.txt'],
+            [__DIR__ . '/files/diff/diff-very-x.txt', __DIR__ . '/files/diff/diff-very-y.txt'],
+            [__DIR__ . '/files/diff/diff-very-y.txt', __DIR__ . '/files/diff/diff-very-x.txt'],
+        ];
+
+        foreach ($dataset as [$x, $y]) {
+            $patchXtoY = str_diff(file_get_contents($x), file_get_contents($y), ['stringify' => 'unified=3']);
+            that(str_patch(file_get_contents($x), $patchXtoY))->is(file_get_contents($y));
+            that(str_patch(file_get_contents($y), $patchXtoY, ['reverse' => true]))->is(file_get_contents($x));
         }
     }
 
