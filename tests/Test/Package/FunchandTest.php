@@ -258,6 +258,51 @@ class FunchandTest extends AbstractTestCase
             }
         }',
         ]);
+
+        $code = (callable_code)(fn($a, $b) => $a + $b);
+        that($code)->is([
+            'fn($a, $b)',
+            '$a + $b',
+        ]);
+
+        $code = (callable_code)(fn($a, $b) => min($a, $b));
+        that($code)->is([
+            'fn($a, $b)',
+            'min($a, $b)',
+        ]);
+
+        $code = (callable_code)(fn($a, $b) => [[$a + $b]]);
+        that($code)->is([
+            'fn($a, $b)',
+            '[[$a + $b]]',
+        ]);
+
+        $code = (callable_code)(fn($a, $b) => [[$a + $b]], 'dummy');
+        that($code)->is([
+            'fn($a, $b)',
+            '[[$a + $b]]',
+        ]);
+
+        $fn = fn($a, $b) => [fn() => [$a + $b]];
+        $code = (callable_code)($fn, 'dummy');
+        that($code)->is([
+            'fn($a, $b)',
+            '[fn() => [$a + $b]]',
+        ]);
+
+        $fn = fn($a, $b) => fn($a) => fn() => [$a, $b];
+        $code = (callable_code)($fn, 'dummy');
+        that($code)->is([
+            'fn($a, $b)',
+            'fn($a) => fn() => [$a, $b]',
+        ]);
+
+        $fn = fn($a, $b) => new class ( $a, $b ) { public function __construct($a, $b) { } };
+        $code = (callable_code)($fn, 'dummy');
+        that($code)->is([
+            'fn($a, $b)',
+            'new class ( $a, $b ) { public function __construct($a, $b) { } }',
+        ]);
     }
 
     function test_call_safely()
