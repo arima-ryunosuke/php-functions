@@ -1649,10 +1649,12 @@ class Vars implements Interfaces\Vars
                     return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
                 }
 
-                $tokens = array_slice(Syntax::parse_php(implode(' ', Funchand::callable_code($value)) . ';', TOKEN_PARSE), 1, -1);
+                [$meta, $body] = Funchand::callable_code($value);
+                $arrow = Strings::starts_with($meta, 'fn') ? ' => ' : ' ';
+                $tokens = array_slice(Syntax::parse_php("$meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+
                 $uses = "";
                 $context = [
-                    'use'   => false,
                     'class' => 0,
                     'brace' => 0,
                 ];
@@ -1684,19 +1686,13 @@ class Vars implements Interfaces\Vars
                     }
 
                     // use 変数の導出
-                    if ($prev[1] === ')' && $token[0] === T_USE) {
-                        $context['use'] = true;
-                    }
-                    if ($context['use'] && $token[0] === T_VARIABLE) {
+                    if ($token[0] === T_VARIABLE) {
                         $varname = substr($token[1], 1);
                         // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
                         if (array_key_exists($varname, $statics)) {
                             $recurself = $statics[$varname] === $value ? '&' : '';
                             $uses .= "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
                         }
-                    }
-                    if ($context['use'] && $token[1] === ')') {
-                        $context['use'] = false;
                     }
 
                     $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref->getFileName());
