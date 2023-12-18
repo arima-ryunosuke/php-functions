@@ -100,6 +100,25 @@ class iteratorTest extends AbstractTestCase
         that($gens)->send(null)->wasThrown('$length must be');
     }
 
+    function test_iterator_chunk_SplFileObject()
+    {
+        $tmp = new \SplTempFileObject();
+        $tmp->fwrite("a\nb\nc\nd\n");
+        $tmp->rewind();
+
+        $expected = [
+            ["a\n", "b\n", "c\n"],
+            ["d\n"],
+        ];
+
+        $chunks = iterator_chunk($tmp, 3);
+        foreach ($chunks as $n => $lines) {
+            that(iterator_to_array($lines))->is($expected[$n]);
+            that($lines->getReturn())->is(count($expected[$n]));
+        }
+        that($chunks->getReturn())->is(4);
+    }
+
     function test_iterator_combine()
     {
         // 配列から key => value なイテレータを作る

@@ -85,8 +85,8 @@ function iterator_chunk($iterator, $length, $preserve_keys = false)
         $length = fn($v, $k, $n, $chunk, $iterator) => $n < $length;
     }
 
-    // Traversable は Iterator ではないので変換する（例えば ArrayObject は IteratorAggregate であり Iterator ではない）
-    if (!$iterator instanceof \Iterator) {
+    // Generator は Iterator であるが Iterator は Generator ではないので変換する
+    if (is_iterable($iterator)) {
         $iterator = (fn() => yield from $iterator)();
     }
 
