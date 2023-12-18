@@ -12,6 +12,17 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.12
+
+- [feature] str_patch を追加
+- [feature] var_export3 の Generator 対応
+- [fixbug] var_export3 でコンストラクタ代入プロパティが吹き飛ぶ不具合を修正
+- [feature] var_pretty の Generator 対応
+- [refactor] ArrayIterator を Generator(yield from) に統一
+- [feature] iterator_combine を追加
+- [feature] iterator_maps を追加
+- [feature] iterator_map を追加
+
 ## 1.6.11
 
 - [feature] array_range を追加
