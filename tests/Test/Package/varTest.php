@@ -867,23 +867,38 @@ class varTest extends AbstractTestCase
                 }
             },
             'resolve'   => new class ( ) extends ArrayObject { },
-            'internal'  => new class () {
-                public      $pdo1;
-                public \PDO $pdo2;
+            'internal'  => (function () {
+                $object = new class () {
+                    private \PDO $private_pdo;
+                    public       $pdo1;
+                    public \PDO  $pdo2;
+                    public array $array;
 
-                public function __construct()
-                {
-                    $this->pdo1 = new \PDO('sqlite::memory:');
-                    $this->pdo2 = new \PDO('sqlite::memory:');
-                }
-            },
+                    public function __construct()
+                    {
+                        $this->private_pdo = new \PDO('sqlite::memory:');
+                        $this->pdo1 = new \PDO('sqlite::memory:');
+                        $this->pdo2 = new \PDO('sqlite::memory:');
+                        $this->array = ['A', 'B', 'C'];
+                    }
+
+                    public function getPDO()
+                    {
+                        return $this->private_pdo;
+                    }
+                };
+                $object->array = array_merge($object->array, ['Z']);
+                return $object;
+            })(),
         ];
         $exported = var_export3($objects, ['outmode' => 'eval']);
         $objects2 = eval($exported);
         that($objects2['anonymous']())->is([1, 2, 3]);
         that($objects2['resolve'])->isInstanceOf(ArrayObject::class);
+        that($objects2['internal'])->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->pdo1->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->pdo2->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
+        that($objects2['internal'])->array->is(['A', 'B', 'C', 'Z']);
     }
 
     function test_var_export3_array()
