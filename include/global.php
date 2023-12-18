@@ -16004,8 +16004,8 @@ if (!function_exists('iterator_chunk')) {
             $length = fn($v, $k, $n, $chunk, $iterator) => $n < $length;
         }
 
-        // Traversable は Iterator ではないので変換する（例えば ArrayObject は IteratorAggregate であり Iterator ではない）
-        if (!$iterator instanceof \Iterator) {
+        // Generator は Iterator であるが Iterator は Generator ではないので変換する
+        if (is_iterable($iterator)) {
             $iterator = (fn() => yield from $iterator)();
         }
 
@@ -27903,6 +27903,16 @@ if (!function_exists('var_export3')) {
             if (is_object($value)) {
                 $ref = new \ReflectionObject($value);
 
+                // 内部クラスで serialize 出来ないものは __PHP_Incomplete_Class で代替（復元時に無視する）
+                try {
+                    if ($ref->isInternal()) {
+                        serialize($value);
+                    }
+                }
+                catch (\Exception $e){
+                    return "\$this->$vid = new \\__PHP_Incomplete_Class()";
+                }
+
                 // 無名クラスは定義がないのでパースが必要
                 // さらにコンストラクタを呼ぶわけには行かない（引数を検出するのは不可能）ので潰す必要もある
                 if ($ref->isAnonymous()) {
@@ -28033,11 +28043,11 @@ if (!function_exists('var_export3')) {
 
                     foreach ($reflection["parents"] as $parent) {
                         foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
-                            if (isset($privates[$parent->name][$name])) {
+                            if (isset($privates[$parent->name][$name]) && !$privates[$parent->name][$name] instanceof \__PHP_Incomplete_Class) {
                                 $property->setValue($object, $privates[$parent->name][$name]);
                             }
-                            if (isset($fields[$name]) || array_key_exists($name, $fields)) {
-                                if (!$property->isInitialized($object) || $property->getValue($object) === null) {
+                            if ((isset($fields[$name]) || array_key_exists($name, $fields))) {
+                                if (!$fields[$name] instanceof \__PHP_Incomplete_Class) {
                                     $property->setValue($object, $fields[$name]);
                                 }
                                 unset($fields[$name]);
