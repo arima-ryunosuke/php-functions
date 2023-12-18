@@ -12,6 +12,11 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.13
+
+- [fixbug] var_export3 でプロパティが常にコンストラクタ代入時の値になっていた不具合を修正
+- [fixbug] iterator_chunk で SplFileObject だと結果が空になる不具合を修正
+
 ## 1.6.12
 
 - [feature] str_patch を追加
