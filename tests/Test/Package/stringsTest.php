@@ -13,6 +13,7 @@ use function ryunosuke\Functions\Package\kvsprintf;
 use function ryunosuke\Functions\Package\mb_compatible_encoding;
 use function ryunosuke\Functions\Package\mb_ellipsis;
 use function ryunosuke\Functions\Package\mb_ereg_options;
+use function ryunosuke\Functions\Package\mb_ereg_split;
 use function ryunosuke\Functions\Package\mb_monospace;
 use function ryunosuke\Functions\Package\mb_str_pad;
 use function ryunosuke\Functions\Package\mb_substr_replace;
@@ -308,6 +309,42 @@ This is VARIABLE.
         that(mb_substitute_character())->is(mb_ord("Ｘ"));
         unset($recover1);
         that(mb_substitute_character())->is($original);
+    }
+
+    function test_mb_ereg_split()
+    {
+        $testcases = [
+            // pattern
+            'standard'             => [',', 'a1,b22,c333', -1, 0],
+            'space'                => [',', ',a1,,b22,,c333,', -1, 0],
+            'empty'                => ['', 'a1,b22,c333', -1, 0],
+            'unmatch'              => ['hoge', 'a1,b22,c333', -1, 0],
+            'nomatch'              => ['X?', 'a1,b22,c333', -1, 0],
+            'nomatch-multi'        => ['X?', 'あ,いい,ううう', -1, 0],
+            'or'                   => [',|\\|', 'a1|b22|,c333', -1, 0],
+            '@invalid'             => ['**', 'hoge', -1, 0],
+            // limit
+            'limit0'               => [',', 'a1,b22,c333', 0, 0],
+            'limit2'               => [',', 'a1,b22,c333', 2, 0],
+            'limit2-empty'         => [',', ',a1,b22,c333,', 2, 0],
+            'limit-2'              => [',', ',a1,b22,c333,', -2, 0],
+            // flags
+            'no_empty'             => [',', ',a1,,b22,,c333,', -1, PREG_SPLIT_NO_EMPTY],
+            'no_empty+limit'       => [',', ',a1,,b22,,c333,', 2, PREG_SPLIT_NO_EMPTY],
+            'delim_capture+no'     => [',', ',a1,,b22,,c333,', -1, PREG_SPLIT_DELIM_CAPTURE],
+            'delim_capture1'       => ['(,)', ',a1,,b22,,c333,', -1, PREG_SPLIT_DELIM_CAPTURE],
+            'delim_capture2'       => ['(,)(,)', ',a1,,b22,,c333,', -1, PREG_SPLIT_DELIM_CAPTURE],
+            'offset_capture'       => ['(,)(,)', ',a1,,b22,,c333,', -1, PREG_SPLIT_OFFSET_CAPTURE],
+            'all-flag'             => ['(,)(,)', ',a1,,b22,,c333,', -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE],
+            'all-multibyte'        => ['(，)', '，Ａ，Ｂ，，Ｃ，', 2, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE],
+            'all-flag+empty'       => ['', ',a1,,b22,,c333,', -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE],
+            'all-flag+empty+limit' => ['', ',a1,,b22,,c333,', 3, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE],
+        ];
+        foreach ($testcases as $name => $args) {
+            set_error_handler(fn() => $name[0] === '@');
+            that(mb_ereg_split($args[0], $args[1], $args[2], $args[3]))->as($name)->is(preg_split("#{$args[0]}#u", $args[1], $args[2], $args[3]));
+            restore_error_handler();
+        }
     }
 
     function test_mb_monospace()
