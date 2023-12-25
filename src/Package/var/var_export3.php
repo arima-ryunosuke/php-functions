@@ -303,7 +303,7 @@ function var_export3($value, $return = false)
                     serialize($value);
                 }
             }
-            catch (\Exception $e){
+            catch (\Exception $e) {
                 return "\$this->$vid = new \\__PHP_Incomplete_Class()";
             }
 
