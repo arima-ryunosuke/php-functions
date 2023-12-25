@@ -1045,6 +1045,18 @@ zero is index 0.
             SIDEBYSIDE
         );
 
+        that(str_diff(mb_convert_encoding("同\n左\n同\n同\n異1\n長い行長い行長い行長い行", 'SJIS'), mb_convert_encoding("同\n同\n右\n同\n異2\n長い行長い行長い行長い行", 'SJIS'), ['encoding' => 'SJIS', 'stringify' => 'split=10,32']))->is(mb_convert_encoding(<<<SIDEBYSIDE
+            同             | 同
+            左             < 
+            同             | 同
+                           > 右
+            同             | 同
+            異1            * 異2
+            長い行長い行長 | 長い行長い行長
+            い行長い行       い行長い行
+            SIDEBYSIDE, 'SJIS')
+        );
+
         that(str_diff("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']))->is('e
 <del>d</del>
 e
@@ -1271,6 +1283,28 @@ that is <del>a</del><ins>the</ins> pen
         $patch = str_diff($xstring, $ystring, ['stringify' => 'unified=0']);
         that(str_patch($xstring, $patch))->is($ystring);
         that(str_patch($ystring, $patch, ['reverse' => true]))->is($xstring);
+
+        // UTF8
+        $xstring = <<<S
+        あいうえおsame
+        かきくけこold
+        わをんsame
+        S;
+        $ystring = <<<S
+        あいうえおsame
+        さしすせそnew
+        わをんsame
+        S;
+        $patch = str_diff($xstring, $ystring, ['stringify' => 'unified=3']);
+        that(str_patch($xstring, $patch))->is($ystring);
+        that(str_patch($ystring, $patch, ['reverse' => true]))->is($xstring);
+
+        // SJIS
+        $xstring = mb_convert_encoding($xstring, 'SJIS');
+        $ystring = mb_convert_encoding($ystring, 'SJIS');
+        $patch = str_diff($xstring, $ystring, ['encoding' => 'SJIS', 'stringify' => 'unified=3']);
+        that(str_patch($xstring, $patch, ['encoding' => 'SJIS']))->is($ystring);
+        that(str_patch($ystring, $patch, ['encoding' => 'SJIS', 'reverse' => true]))->is($xstring);
 
         $dataset = [
             [__DIR__ . '/files/diff/diff-x.txt', __DIR__ . '/files/diff/diff-y.txt'],

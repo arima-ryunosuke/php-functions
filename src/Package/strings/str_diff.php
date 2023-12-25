@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_zip.php';
+require_once __DIR__ . '/../strings/mb_ereg_options.php';
 require_once __DIR__ . '/../strings/mb_str_pad.php';
 require_once __DIR__ . '/../strings/mb_wordwrap.php';
 // @codeCoverageIgnoreEnd
@@ -95,6 +96,7 @@ function str_diff($xstring, $ystring, $options = [])
 {
     $differ = new class($options) {
         private $options;
+        private $recover;
 
         public function __construct($options)
         {
@@ -106,6 +108,11 @@ function str_diff($xstring, $ystring, $options = [])
                 'stringify'           => 'unified',
             ];
             $this->options = $options;
+
+            $this->recover = mb_ereg_options([
+                'encoding'      => $options['encoding'] ?? null,
+                'regex_options' => 'r',
+            ]);
         }
 
         public function __invoke($xstring, $ystring)
@@ -128,7 +135,7 @@ function str_diff($xstring, $ystring, $options = [])
                 if (is_array($string)) {
                     return array_values(array_map($binary_check, $string));
                 }
-                return preg_split('#\R#u', $binary_check($string));
+                return mb_split('\\R', $binary_check($string));
             };
 
             try {
@@ -193,10 +200,10 @@ function str_diff($xstring, $ystring, $options = [])
                     $string = strtoupper($string);
                 }
                 if ($this->options['ignore-space-change']) {
-                    $string = preg_replace('#\s+#u', ' ', $string);
+                    $string = mb_ereg_replace('\\s+', ' ', $string);
                 }
                 if ($this->options['ignore-all-space']) {
-                    $string = preg_replace('#\s+#u', '', $string);
+                    $string = mb_ereg_replace('\\s+', '', $string);
                 }
                 return $string;
             };
@@ -501,6 +508,7 @@ function str_diff($xstring, $ystring, $options = [])
                     for ($i = 0; $i < $length; $i++) {
                         $options2 = ['stringify' => null] + $this->options;
                         $diffs2 = str_diff(preg_split('/(?<!^)(?!$)/u', $delete[$i]), preg_split('/(?<!^)(?!$)/u', $append[$i]), $options2);
+                        //$diffs2 = str_diff(mb_split('(?<!^)(?!$)', $delete[$i]), mb_split('(?<!^)(?!$)', $append[$i]), $options2);
                         $result2 = [];
                         foreach ($diffs2 as $diff2) {
                             foreach ($rule[$diff2[0]] as $n => $tag) {

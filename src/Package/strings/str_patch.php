@@ -2,6 +2,8 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../strings/mb_ereg_options.php';
+require_once __DIR__ . '/../strings/mb_ereg_split.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -40,10 +42,11 @@ namespace ryunosuke\Functions\Package;
 function str_patch($string, $patch, $options = [])
 {
     $options += [
-        'format'  => 'unified', // パッチ形式（未実装。現在は unified のみ）
-        'fuzz'    => 0,         // ハンク検出失敗時に同一行を伏せる量（未実装でおそらく実装しない。diff 側でせっかく出力してるのに無視するのはもったいない）
-        'reverse' => false,     // 逆パッチフラグ
-        'forward' => false,     // 既に当たっているなら例外を投げずにスルーする
+        'encoding' => null,
+        'format'   => 'unified', // パッチ形式（未実装。現在は unified のみ）
+        'fuzz'     => 0,         // ハンク検出失敗時に同一行を伏せる量（未実装でおそらく実装しない。diff 側でせっかく出力してるのに無視するのはもったいない）
+        'reverse'  => false,     // 逆パッチフラグ
+        'forward'  => false,     // 既に当たっているなら例外を投げずにスルーする
     ];
 
     // 空文字の時は特別扱いで「差分なし」とみなす（差分がないなら diff 結果が空文字になるので必然的に渡ってくる機会が多くなる）
@@ -51,8 +54,22 @@ function str_patch($string, $patch, $options = [])
         return $string;
     }
 
-    if (!preg_match_all('#^@@\s+-(?<oldpos>\d+)(,(?<oldlen>\d+))?\s+\+(?<newpos>\d+)(,(?<newlen>\d+))?\s+@@\r?\n(?<diff>[^@][^@]*)#ums', $patch, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL)) {
+    $recover = mb_ereg_options([
+        'encoding'      => $options['encoding'],
+        'regex_options' => 'r',
+    ]);
+
+    $parts = mb_ereg_split('(^@@\s+-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@\r?\n)', $patch, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $comment = array_shift($parts);
+    assert(is_string($comment) && count($parts) % 2 === 0);
+    if (!$parts) {
         throw new \InvalidArgumentException('$patch is invalid');
+    }
+
+    $matches = [];
+    foreach (array_chunk($parts, 2) as $chunk) {
+        mb_ereg('^@@\s+-(?<oldpos>\d+)(,(?<oldlen>\d+))?\s+\+(?<newpos>\d+)(,(?<newlen>\d+))?\s+@@\r?\n', $chunk[0], $match);
+        $matches[] = array_map(fn($m) => $m === false ? null : $m, $match) + ['diff' => $chunk[1]];
     }
 
     $hunks = [];
@@ -77,7 +94,7 @@ function str_patch($string, $patch, $options = [])
                 $this->oldLength = $oldlen ?? 1;
                 $this->newOffset = $newpos - 1;
                 $this->newLength = $newlen ?? 1;
-                $this->diffs = preg_split('#\\R#u', $diff, -1, PREG_SPLIT_NO_EMPTY);
+                $this->diffs = mb_ereg_split('\\R', $diff, -1, PREG_SPLIT_NO_EMPTY);
 
                 $this->oldOriginalOffset = $this->oldOffset;
                 $this->newOriginalOffset = $this->newOffset;
@@ -178,7 +195,7 @@ function str_patch($string, $patch, $options = [])
     };
 
     try {
-        $lines = preg_split('#\\R#u', $string);
+        $lines = mb_split('\\R', $string);
         return $apply($hunks, $lines);
     }
     catch (\Exception $e) {
@@ -191,5 +208,8 @@ function str_patch($string, $patch, $options = [])
             return $string;
         }
         throw $e;
+    }
+    finally {
+        $recover();
     }
 }
