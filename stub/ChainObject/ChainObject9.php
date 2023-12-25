@@ -528,6 +528,11 @@ trait ChainObject9
     public function http_get($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }
     public function http_get($data = [], $options = [], &$response_header = [], &$info = []): self { }
 
+    /** @see \mb_ereg_options() */
+    public self $mb_ereg_options;
+    public function mb_ereg_options($options): self { }
+    public function mb_ereg_options(): self { }
+
     /** @see \mb_trim() */
     public self $mb_trim;
     public function mb_trim($string): self { }

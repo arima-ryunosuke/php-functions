@@ -21795,6 +21795,219 @@ if (!function_exists('ryunosuke\\Functions\\mb_ellipsis')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\mb_ereg_options') || (new \ReflectionFunction('ryunosuke\\Functions\\mb_ereg_options'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\mb_ereg_options')) {
+    /**
+     * mb_系の全体設定を一括設定する
+     *
+     * 返り値として「コールすると元に戻す callable」を返す。
+     * あるいはその返り値はスコープが外れると自動で元に戻す処理が行われる。
+     *
+     * 余計なことはしない素直な実装だが、'encoding' というキーは mb_internal_encoding と regex_encoding の両方に適用される。
+     *
+     * Example:
+     * ```php
+     * $recover = mb_ereg_options([
+     *     'internal_encoding' => 'SJIS', // 今だけは internal_encoding を SJIS にする
+     *     'regex_options'     => 'ir',   // 今だけは regex_options を ir にする
+     * ]);
+     * that($recover)->isCallable();             // 返り値は callable
+     * that(mb_internal_encoding())->is('SJIS'); // 今だけは SJIS
+     * that(mb_regex_set_options())->is('ir');   // 今だけは ir
+     *
+     * $recover();
+     * that(mb_internal_encoding())->is('UTF-8'); // $recover をコールすると戻る
+     * that(mb_regex_set_options())->is('pr');    // $recover をコールすると戻る
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param array $options オプション配列
+     * @return callable 元に戻す callable
+     */
+    function mb_ereg_options($options)
+    {
+        return new class($options) {
+            private $options, $backup;
+
+            private $settled = false;
+
+            public function __construct($options)
+            {
+                $this->options = [
+                    'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
+                    'substitute_character' => $options['substitute_character'] ?? null,
+                    'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
+                    'regex_options'        => $options['regex_options'] ?? null,
+                ];
+                $this->backup = [
+                    'internal_encoding'    => mb_internal_encoding(),
+                    'substitute_character' => mb_substitute_character(),
+                    'regex_encoding'       => mb_regex_encoding(),
+                    'regex_options'        => mb_regex_set_options(),
+                ];
+
+                $this->set($this->options, true);
+            }
+
+            public function __destruct()
+            {
+                $this();
+            }
+
+            public function __invoke()
+            {
+                if ($this->settled) {
+                    $this->set($this->backup, false);
+                }
+            }
+
+            private function set($setting, $settled)
+            {
+                if (strlen((string) $setting['internal_encoding'])) {
+                    mb_internal_encoding($setting['internal_encoding']);
+                }
+                if (strlen((string) $setting['substitute_character'])) {
+                    mb_substitute_character($setting['substitute_character']);
+                }
+                if (strlen((string) $setting['regex_encoding'])) {
+                    mb_regex_encoding($setting['regex_encoding']);
+                }
+                if (strlen((string) $setting['regex_options'])) {
+                    mb_regex_set_options($setting['regex_options']);
+                }
+
+                $this->settled = $settled;
+            }
+        };
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\mb_ereg_split') || (new \ReflectionFunction('ryunosuke\\Functions\\mb_ereg_split'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\mb_ereg_split')) {
+    /**
+     * マルチバイト対応 preg_split
+     *
+     * preg_split の PREG_SPLIT_NO_EMPTY, PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_OFFSET_CAPTURE も使用できる。
+     *
+     * Example:
+     * ```php
+     * # 下記のようにすべて preg_split と合わせてある
+     * // limit:2
+     * that(mb_ereg_split(",", "a,b,c", 2))->is(['a', 'b,c']);
+     * // flags:PREG_SPLIT_NO_EMPTY
+     * that(mb_ereg_split(",", ",a,,b,,c,", -1, PREG_SPLIT_NO_EMPTY))->is(['a', 'b', 'c']);
+     * // flags:PREG_SPLIT_DELIM_CAPTURE
+     * that(mb_ereg_split("(,)", "a,c", -1, PREG_SPLIT_DELIM_CAPTURE))->is(['a', ',', 'c']);
+     * // flags:PREG_SPLIT_OFFSET_CAPTURE
+     * that(mb_ereg_split(",", "a,b,c", -1, PREG_SPLIT_OFFSET_CAPTURE))->is([['a', 0], ['b', 2], ['c', 4]]);
+     * # 他の preg_split 特有の動きも同じ
+     * // 例えば limit は PREG_SPLIT_DELIM_CAPTURE には作用しない
+     * that(mb_ereg_split("(,)", "a,b,c", 2, PREG_SPLIT_DELIM_CAPTURE))->is(['a', ',', 'b,c']);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $pattern パターン文字列
+     * @param string $subject 対象文字列
+     * @param int $limit 分割数
+     * @param int $flags フラグ
+     * @return array|false 分割された文字列
+     */
+    function mb_ereg_split($pattern, $subject, $limit = -1, $flags = 0)
+    {
+        // 是正（奇妙だが preg_split は 0, -1 以外は特別扱いしないようだ（個数が負数になることはないので実質的に 1 指定と同じ））
+        if (-1 <= $limit && $limit <= 0) {
+            $limit = PHP_INT_MAX;
+        }
+
+        // フラグに応じて追加するクロージャ
+        $SPLIT_NO_EMPTY = !!($flags & PREG_SPLIT_NO_EMPTY);
+        $SPLIT_DELIM_CAPTURE = !!($flags & PREG_SPLIT_DELIM_CAPTURE);
+        $SPLIT_OFFSET_CAPTURE = !!($flags & PREG_SPLIT_OFFSET_CAPTURE);
+        $result = [];
+        $append = function ($part, $offset, $delim) use (&$result, $SPLIT_NO_EMPTY, $SPLIT_DELIM_CAPTURE, $SPLIT_OFFSET_CAPTURE) {
+            if ($SPLIT_NO_EMPTY && !strlen($part)) {
+                return false;
+            }
+            if (!$SPLIT_DELIM_CAPTURE && $delim) {
+                return false;
+            }
+            if ($SPLIT_OFFSET_CAPTURE) {
+                $result[] = [$part, $offset];
+            }
+            else {
+                $result[] = $part;
+            }
+            return true;
+        };
+
+        // 超特別扱い（mb_ereg は空パターンを許容せず、文字境界での分割ができない。.でバラしてさらに消費しないようにする）
+        $empty_pattern = !strlen($pattern);
+        if ($empty_pattern) {
+            $pattern = '.';
+        }
+
+        // 不正ならそこで終わり
+        if (!mb_ereg_search_init($subject, $pattern)) {
+            return false;
+        }
+
+        // マッチしなくなるまでループ（ただし $length を超えた場合は無駄なので break）
+        $offset = 0;
+        $length = 0;
+        while (($pos = mb_ereg_search_pos()) !== false && $length < $limit - 1) {
+            // PREG_SPLIT_NO_EMPTY は空文字をカウントしない（極論全て空文字なら最後まで読む）
+            $part = substr($subject, $offset, $pos[0] - $offset);
+            if ($append($part, $offset, false)) {
+                $length++;
+            }
+
+            // 空パターンは区切り文字自体は計上しない
+            if ($empty_pattern) {
+                $offset = $pos[0];
+            }
+            // 空じゃなければ計上する
+            else {
+                $offset = $pos[0] + $pos[1];
+            }
+
+            // キャプチャパターンも入れておく
+            $regs = mb_ereg_search_getregs();
+            $all = array_shift($regs);
+            $offset2 = $pos[0];
+            foreach ($regs as $reg) {
+                $append($reg, $offset2, true);
+                $offset2 += strlen($reg);
+            }
+
+            // マッチしてない場合無限ループになるので強制的に進める（かなりやっつけ。もっといい方法はあるはず）
+            if ($all === '') {
+                for ($i = 1; $i < strlen($subject); $i++) {
+                    $c = substr($subject, $offset, $i);
+                    if ($c === '') {
+                        break 2;
+                    }
+                    if (mb_ord($c) !== false && mb_ereg_search_setpos($offset + $i)) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 打ち切った場合にまだ残っていることがある
+        $part = substr($subject, $offset);
+        $append($part, $offset, false);
+
+        // 空パターンの場合、境界で区切るので preg_split と合わせるため空文字が必要
+        if ($empty_pattern) {
+            $append("", $offset + strlen($part), false);
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\mb_monospace') || (new \ReflectionFunction('ryunosuke\\Functions\\mb_monospace'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\mb_monospace')) {
     /**
@@ -23005,6 +23218,7 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
     {
         $differ = new class($options) {
             private $options;
+            private $recover;
 
             public function __construct($options)
             {
@@ -23016,6 +23230,11 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
                     'stringify'           => 'unified',
                 ];
                 $this->options = $options;
+
+                $this->recover = mb_ereg_options([
+                    'encoding'      => $options['encoding'] ?? null,
+                    'regex_options' => 'r',
+                ]);
             }
 
             public function __invoke($xstring, $ystring)
@@ -23038,7 +23257,7 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
                     if (is_array($string)) {
                         return array_values(array_map($binary_check, $string));
                     }
-                    return preg_split('#\R#u', $binary_check($string));
+                    return mb_split('\\R', $binary_check($string));
                 };
 
                 try {
@@ -23103,10 +23322,10 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
                         $string = strtoupper($string);
                     }
                     if ($this->options['ignore-space-change']) {
-                        $string = preg_replace('#\s+#u', ' ', $string);
+                        $string = mb_ereg_replace('\\s+', ' ', $string);
                     }
                     if ($this->options['ignore-all-space']) {
-                        $string = preg_replace('#\s+#u', '', $string);
+                        $string = mb_ereg_replace('\\s+', '', $string);
                     }
                     return $string;
                 };
@@ -23411,6 +23630,7 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
                         for ($i = 0; $i < $length; $i++) {
                             $options2 = ['stringify' => null] + $this->options;
                             $diffs2 = str_diff(preg_split('/(?<!^)(?!$)/u', $delete[$i]), preg_split('/(?<!^)(?!$)/u', $append[$i]), $options2);
+                            //$diffs2 = str_diff(mb_split('(?<!^)(?!$)', $delete[$i]), mb_split('(?<!^)(?!$)', $append[$i]), $options2);
                             $result2 = [];
                             foreach ($diffs2 as $diff2) {
                                 foreach ($rule[$diff2[0]] as $n => $tag) {
@@ -23885,10 +24105,11 @@ if (!function_exists('ryunosuke\\Functions\\str_patch')) {
     function str_patch($string, $patch, $options = [])
     {
         $options += [
-            'format'  => 'unified', // パッチ形式（未実装。現在は unified のみ）
-            'fuzz'    => 0,         // ハンク検出失敗時に同一行を伏せる量（未実装でおそらく実装しない。diff 側でせっかく出力してるのに無視するのはもったいない）
-            'reverse' => false,     // 逆パッチフラグ
-            'forward' => false,     // 既に当たっているなら例外を投げずにスルーする
+            'encoding' => null,
+            'format'   => 'unified', // パッチ形式（未実装。現在は unified のみ）
+            'fuzz'     => 0,         // ハンク検出失敗時に同一行を伏せる量（未実装でおそらく実装しない。diff 側でせっかく出力してるのに無視するのはもったいない）
+            'reverse'  => false,     // 逆パッチフラグ
+            'forward'  => false,     // 既に当たっているなら例外を投げずにスルーする
         ];
 
         // 空文字の時は特別扱いで「差分なし」とみなす（差分がないなら diff 結果が空文字になるので必然的に渡ってくる機会が多くなる）
@@ -23896,8 +24117,22 @@ if (!function_exists('ryunosuke\\Functions\\str_patch')) {
             return $string;
         }
 
-        if (!preg_match_all('#^@@\s+-(?<oldpos>\d+)(,(?<oldlen>\d+))?\s+\+(?<newpos>\d+)(,(?<newlen>\d+))?\s+@@\r?\n(?<diff>[^@][^@]*)#ums', $patch, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL)) {
+        $recover = mb_ereg_options([
+            'encoding'      => $options['encoding'],
+            'regex_options' => 'r',
+        ]);
+
+        $parts = mb_ereg_split('(^@@\s+-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@\r?\n)', $patch, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $comment = array_shift($parts);
+        assert(is_string($comment) && count($parts) % 2 === 0);
+        if (!$parts) {
             throw new \InvalidArgumentException('$patch is invalid');
+        }
+
+        $matches = [];
+        foreach (array_chunk($parts, 2) as $chunk) {
+            mb_ereg('^@@\s+-(?<oldpos>\d+)(,(?<oldlen>\d+))?\s+\+(?<newpos>\d+)(,(?<newlen>\d+))?\s+@@\r?\n', $chunk[0], $match);
+            $matches[] = array_map(fn($m) => $m === false ? null : $m, $match) + ['diff' => $chunk[1]];
         }
 
         $hunks = [];
@@ -23922,7 +24157,7 @@ if (!function_exists('ryunosuke\\Functions\\str_patch')) {
                     $this->oldLength = $oldlen ?? 1;
                     $this->newOffset = $newpos - 1;
                     $this->newLength = $newlen ?? 1;
-                    $this->diffs = preg_split('#\\R#u', $diff, -1, PREG_SPLIT_NO_EMPTY);
+                    $this->diffs = mb_ereg_split('\\R', $diff, -1, PREG_SPLIT_NO_EMPTY);
 
                     $this->oldOriginalOffset = $this->oldOffset;
                     $this->newOriginalOffset = $this->newOffset;
@@ -24023,7 +24258,7 @@ if (!function_exists('ryunosuke\\Functions\\str_patch')) {
         };
 
         try {
-            $lines = preg_split('#\\R#u', $string);
+            $lines = mb_split('\\R', $string);
             return $apply($hunks, $lines);
         }
         catch (\Exception $e) {
@@ -24036,6 +24271,9 @@ if (!function_exists('ryunosuke\\Functions\\str_patch')) {
                 return $string;
             }
             throw $e;
+        }
+        finally {
+            $recover();
         }
     }
 }

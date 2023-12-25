@@ -548,6 +548,11 @@ trait ChainObject6
     public function chain_case($string, $delimiter = "-"): self { }
     public function chain_case($delimiter = "-"): self { }
 
+    /** @see \mb_ereg_split() */
+    public self $mb_ereg_split;
+    public function mb_ereg_split($pattern, $subject, $limit = -1, $flags = 0): self { }
+    public function mb_ereg_split($subject, $limit = -1, $flags = 0): self { }
+
     /** @see \mb_substr_replace() */
     public self $mb_substr_replace;
     public function mb_substr_replace($string, $replacement, $start, $length = null): self { }
