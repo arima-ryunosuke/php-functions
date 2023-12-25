@@ -12,6 +12,7 @@ use function ryunosuke\Functions\Package\include_string;
 use function ryunosuke\Functions\Package\kvsprintf;
 use function ryunosuke\Functions\Package\mb_compatible_encoding;
 use function ryunosuke\Functions\Package\mb_ellipsis;
+use function ryunosuke\Functions\Package\mb_ereg_options;
 use function ryunosuke\Functions\Package\mb_monospace;
 use function ryunosuke\Functions\Package\mb_str_pad;
 use function ryunosuke\Functions\Package\mb_substr_replace;
@@ -271,6 +272,42 @@ This is VARIABLE.
         that(mb_ellipsis('', 1, '...', null))->isSame('');
         that(mb_ellipsis('1234567890', 1, '...', null))->isSame('...');
         that(mb_ellipsis('1234567890', 1000, '...', null))->isSame('1234567890');
+    }
+
+    function test_mb_ereg_options()
+    {
+        $recover = mb_ereg_options([
+            'encoding' => 'cp932',
+        ]);
+        $pattern = mb_convert_encoding('fgａｂ', 'cp932', 'utf8');
+        $subject = mb_convert_encoding('abcdefgａｂｃｄｅｆｇｈ', 'cp932', 'utf8');
+        that(mb_ereg($pattern, $subject))->is(1);
+        $recover();
+        that(mb_ereg($pattern, $subject))->is(false);
+
+        $recover = mb_ereg_options([
+            'encoding'      => 'cp932',
+            'regex_options' => 'i',
+        ]);
+        $pattern = mb_convert_encoding('fgａｂ', 'cp932', 'utf8');
+        $subject = mb_convert_encoding('ABCDEFGａｂＣＤＥＦＧＨ', 'cp932', 'utf8');
+        that(mb_ereg($pattern, $subject))->is(1);
+        unset($recover);
+        that(mb_ereg($pattern, $subject))->is(false);
+
+        $original = mb_substitute_character();
+        $recover1 = mb_ereg_options([
+            'substitute_character' => mb_ord("Ｘ"),
+        ]);
+        that(mb_substitute_character())->is(mb_ord("Ｘ"));
+        $recover2 = mb_ereg_options([
+            'substitute_character' => mb_ord("Ｙ"),
+        ]);
+        that(mb_substitute_character())->is(mb_ord("Ｙ"));
+        unset($recover2);
+        that(mb_substitute_character())->is(mb_ord("Ｘ"));
+        unset($recover1);
+        that(mb_substitute_character())->is($original);
     }
 
     function test_mb_monospace()
