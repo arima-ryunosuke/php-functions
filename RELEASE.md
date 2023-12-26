@@ -12,6 +12,12 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.14
+
+- [feature] str_diff/patch の任意エンコーディング対応
+- [feature] mb_ereg_split を追加
+- [feature] mb_ereg_options を追加
+
 ## 1.6.13
 
 - [fixbug] var_export3 でプロパティが常にコンストラクタ代入時の値になっていた不具合を修正
