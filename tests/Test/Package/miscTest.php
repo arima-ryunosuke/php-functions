@@ -907,6 +907,27 @@ $colA
             [ord(';'), ';', 1, 6, 'UNKNOWN'],
         ]);
 
+        $code = <<<'PHP'
+        echo `this is backtick`;
+        echo `this is $backtick`;
+        PHP;
+
+        that(parse_php($code, [
+            'backtick' => false,
+            'flags'    => TOKEN_NAME,
+        ]))->is([
+            [T_OPEN_TAG, "<?php ", 1, -6, "T_OPEN_TAG"],
+            [T_ECHO, "echo", 1, 0, "T_ECHO"],
+            [T_WHITESPACE, " ", 1, 4, "T_WHITESPACE"],
+            [ord('`'), "`this is backtick`", 1, 5, "T_BACKTICK"],
+            [ord(';'), ";", 1, 23, "UNKNOWN"],
+            [T_WHITESPACE, "\n", 1, 24, "T_WHITESPACE"],
+            [T_ECHO, "echo", 2, 25, "T_ECHO"],
+            [T_WHITESPACE, " ", 2, 29, "T_WHITESPACE"],
+            [ord('`'), "`this is \$backtick`", 2, 30, "T_BACKTICK"],
+            [ord(';'), ";", 2, 49, "UNKNOWN"],
+        ]);
+
         $code = '$c = function ($a = null) use ($x) {
     return $a + $x;
 };';

@@ -61,6 +61,7 @@ function parse_php($phpcode, $option = [])
         'flags'          => 0,    // token_get_all の $flags. TOKEN_PARSE を与えると ParseError が出ることがあるのでデフォルト 0
         'cache'          => true, // キャッシュするか否か
         'greedy'         => false,// end と nest か一致したときに処理を継続するか
+        'backtick'       => true, // `` もパースするか
         'nest_token'     => [
             ')' => '(',
             '}' => '{',
@@ -75,6 +76,9 @@ function parse_php($phpcode, $option = [])
         $phptag = $option['phptag'] ? '<?php ' : '';
         $phpcode = $phptag . $phpcode;
         $position = -strlen($phptag);
+
+        $backtick = '';
+        $backticking = false;
 
         $tokens = [];
         $tmp = token_get_all($phpcode, $option['flags']);
@@ -123,9 +127,23 @@ function parse_php($phpcode, $option = [])
             }
             // @codeCoverageIgnoreEnd
 
+            if (!$option['backtick']) {
+                if ($token[1] === '`') {
+                    if ($backticking) {
+                        $token[1] = $backtick . $token[1];
+                        $backtick = '';
+                    }
+                    $backticking = !$backticking;
+                }
+                if ($backticking) {
+                    $backtick .= $token[1];
+                    continue;
+                }
+            }
+
             $token[] = $position;
             if ($option['flags'] & TOKEN_NAME) {
-                $token[] = token_name($token[0]);
+                $token[] = !$option['backtick'] && $token[0] === 96 ? 'T_BACKTICK' : token_name($token[0]);
             }
 
             $position += strlen($token[1]);
