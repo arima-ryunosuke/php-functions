@@ -722,31 +722,27 @@ zero is index 0.
 
     function test_render_template()
     {
+        // single
+        $actual = render_template('false', ['false' => 'hoge']);
+        that($actual)->is('false');
+
+        // array
+        $actual = render_template('${array[key]}', ['array' => ['h' => 'hoge'], 'key' => 'h']);
+        that($actual)->is('hoge');
+
         // escape
-        $actual = render_template('{val} {$val} \\${val} \\"hello\\" \'world\'', ['val' => 'hoge']);
+        $actual = render_template('{val} {$val} \\${val} "hello" \'world\'', ['val' => 'hoge']);
         that($actual)->is('{val} {$val} ${val} "hello" \'world\'');
 
         // embed var
-        $actual = render_template('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper("pre-$val")}, S:${1+2+3}', ['val' => 'hoge']);
+        $actual = render_template('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper(`pre-${val}`)}, S:${1+2+3}', ['val' => 'hoge']);
         that($actual)->is("C:cli, V:hoge, E:{\$val}, F:PRE-HOGE, S:6");
 
-        // embed closure
-        $actual = render_template('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper("pre-$val")}, S:${1+2+3}', fn($strings, ...$values) => [$strings, $values]);
+        // with tag
+        $actual = render_template('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper(`pre-${val}`)}, S:${1+2+3}', [], fn($strings, ...$values) => [$strings, $values]);
         that($actual)->is([
-            ['C:', ', V:', ', E:{$val}, F:', ', S:'],
-            ['cli', 'val', 'PRE-', 6],
-        ]);
-
-        // callable object
-        $actual = render_template('C:${PHP_SAPI}, V:${val}, E:{$val}, F:${strtoupper("pre-$val")}, S:${1+2+3}', new class(['val' => 'hoge']) extends \ArrayObject {
-            public function __invoke($strings, ...$values)
-            {
-                return [$strings, $values];
-            }
-        });
-        that($actual)->is([
-            ['C:', ', V:', ', E:{$val}, F:', ', S:'],
-            ['cli', 'hoge', 'PRE-HOGE', 6],
+            ['C:', ', V:', ', E:{$val}, F:', ', S:', ''],
+            ['cli', 'val', 'PRE-VAL', 6],
         ]);
     }
 
