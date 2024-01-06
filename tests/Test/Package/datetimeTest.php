@@ -9,6 +9,7 @@ use function ryunosuke\Functions\Package\date_fromto;
 use function ryunosuke\Functions\Package\date_interval;
 use function ryunosuke\Functions\Package\date_interval_second;
 use function ryunosuke\Functions\Package\date_match;
+use function ryunosuke\Functions\Package\date_modulate;
 use function ryunosuke\Functions\Package\date_parse_format;
 use function ryunosuke\Functions\Package\date_timestamp;
 use function ryunosuke\Functions\Package\date_validate;
@@ -563,6 +564,65 @@ class datetimeTest extends AbstractTestCase
         that(self::resolveFunction('date_match'))('hoge', '****/**/**')->wasThrown('failed to parse');
         that(self::resolveFunction('date_match'))('2014/12/24 12:35:56', 'hoge')->wasThrown('failed to parse');
         that(self::resolveFunction('date_match'))('2014/12/24 12:35:56', '****/13/**')->wasThrown('13(1~12)');
+    }
+
+    function test_date_modulate()
+    {
+        that(date_modulate('2014                   ', 1))->isSame('2015');
+        that(date_modulate('2014/12                ', 1))->isSame('2015/01');
+        that(date_modulate('2014/12/24             ', 1))->isSame('2014/12/25');
+        that(date_modulate('2014/12/24 12          ', 1))->isSame('2014/12/24 13');
+        that(date_modulate('2014/12/24 12:34       ', 1))->isSame('2014/12/24 12:35');
+        that(date_modulate('2014/12/24 12:34:56    ', 1))->isSame('2014/12/24 12:34:57');
+        that(date_modulate('2014/12/24 12:34:56.789', 1))->isSame('2014/12/24 12:34:56.790');
+
+        that(date_modulate('1999                   ', '+1'))->isSame('2000');
+        that(date_modulate('1999/12                ', '+1'))->isSame('2000/01');
+        that(date_modulate('1999/12/31             ', '+1'))->isSame('2000/01/01');
+        that(date_modulate('1999/12/31 23          ', '+1'))->isSame('2000/01/01 00');
+        that(date_modulate('1999/12/31 23:59       ', '+1'))->isSame('2000/01/01 00:00');
+        that(date_modulate('1999/12/31 23:59:59    ', '+1'))->isSame('2000/01/01 00:00:00');
+        that(date_modulate('1999/12/31 23:59:59.999', '+1'))->isSame('2000/01/01 00:00:00.000');
+
+        that(date_modulate('1999/12                ', '+14'))->isSame('2001/02');
+        that(date_modulate('1999/12/31             ', '+33'))->isSame('2000/02/02');
+        that(date_modulate('1999/12/31 23          ', '+26'))->isSame('2000/01/02 01');
+        that(date_modulate('1999/12/31 23:59       ', '+62'))->isSame('2000/01/01 01:01');
+        that(date_modulate('1999/12/31 23:59:59    ', '+62'))->isSame('2000/01/01 00:01:01');
+        that(date_modulate('1999/12/31 23:59:59.999', '+1002'))->isSame('2000/01/01 00:00:01.001');
+
+        that(date_modulate('1999/12                ', 'P1Y2M'))->isSame('2001/02');
+        that(date_modulate('1999/12/31             ', 'P1M2D'))->isSame('2000/02/02');
+        that(date_modulate('1999/12/31 23          ', 'P1DT2H'))->isSame('2000/01/02 01');
+        that(date_modulate('1999/12/31 23:59       ', 'PT1H2M'))->isSame('2000/01/01 01:01');
+        that(date_modulate('1999/12/31 23:59:59    ', 'PT1M2S'))->isSame('2000/01/01 00:01:01');
+        that(date_modulate('1999/12/31 23:59:59.999', 'PT1.002S'))->isSame('2000/01/01 00:00:01.001');
+
+        that(date_modulate('2000                   ', '-1'))->isSame('1999');
+        that(date_modulate('2000/01                ', '-1'))->isSame('1999/12');
+        that(date_modulate('2000/01/01             ', '-1'))->isSame('1999/12/31');
+        that(date_modulate('2000/01/01 00          ', '-1'))->isSame('1999/12/31 23');
+        that(date_modulate('2000/01/01 00:00       ', '-1'))->isSame('1999/12/31 23:59');
+        that(date_modulate('2000/01/01 00:00:00    ', '-1'))->isSame('1999/12/31 23:59:59');
+        that(date_modulate('2000/01/01 00:00:00.000', '-1'))->isSame('1999/12/31 23:59:59.999');
+
+        that(date_modulate('2001/02                ', '-14'))->isSame('1999/12');
+        that(date_modulate('2000/02/02             ', '-33'))->isSame('1999/12/31');
+        that(date_modulate('2000/01/02 01          ', '-26'))->isSame('1999/12/31 23');
+        that(date_modulate('2000/01/01 01:01       ', '-62'))->isSame('1999/12/31 23:59');
+        that(date_modulate('2000/01/01 00:01:01    ', '-62'))->isSame('1999/12/31 23:59:59');
+        that(date_modulate('2000/01/01 00:00:01.001', '-1002'))->isSame('1999/12/31 23:59:59.999');
+
+        that(date_modulate('2001/02                ', '-P1Y2M'))->isSame('1999/12');
+        that(date_modulate('2000/02/02             ', '-P1M2D'))->isSame('1999/12/31');
+        that(date_modulate('2000/01/02 01          ', '-P1DT2H'))->isSame('1999/12/31 23');
+        that(date_modulate('2000/01/01 01:01       ', '-PT1H2M'))->isSame('1999/12/31 23:59');
+        that(date_modulate('2000/01/01 00:01:01    ', '-PT1M2S'))->isSame('1999/12/31 23:59:59');
+        that(date_modulate('2000/01/01 00:00:01.001', '-PT1.002S'))->isSame('1999/12/31 23:59:59.999');
+
+        that(self::resolveFunction('date_modulate'))('', 1)->wasThrown('failed parse date format');
+        that(self::resolveFunction('date_modulate'))('hoge', 1)->wasThrown('failed parse date format');
+        that(self::resolveFunction('date_modulate'))('99999', 1)->wasThrown('failed parse date format');
     }
 
     function test_date_parse_format()
