@@ -13,6 +13,38 @@ const IS_PROTECTED = 8;
 /** private を表す定数 */
 const IS_PRIVATE = 16;
 
+/** 月名（省略） */
+const EN_MONTH_SHORT = [
+    1  => 'jan',
+    2  => 'feb',
+    3  => 'mar',
+    4  => 'apr',
+    5  => 'may',
+    6  => 'jun',
+    7  => 'jul',
+    8  => 'aug',
+    9  => 'sep',
+    10 => 'oct',
+    11 => 'nov',
+    12 => 'dec',
+];
+
+/** 月名（フル） */
+const EN_MONTH_LONG = [
+    1  => 'january',
+    2  => 'february',
+    3  => 'march',
+    4  => 'april',
+    5  => 'may',
+    6  => 'june',
+    7  => 'july',
+    8  => 'august',
+    9  => 'september',
+    10 => 'october',
+    11 => 'november',
+    12 => 'december',
+];
+
 /** 和暦 */
 const JP_ERA = [
     [

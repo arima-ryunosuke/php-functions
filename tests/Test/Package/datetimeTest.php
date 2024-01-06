@@ -9,6 +9,7 @@ use function ryunosuke\Functions\Package\date_fromto;
 use function ryunosuke\Functions\Package\date_interval;
 use function ryunosuke\Functions\Package\date_interval_second;
 use function ryunosuke\Functions\Package\date_match;
+use function ryunosuke\Functions\Package\date_parse_format;
 use function ryunosuke\Functions\Package\date_timestamp;
 use function ryunosuke\Functions\Package\date_validate;
 use function ryunosuke\Functions\Package\now;
@@ -562,6 +563,129 @@ class datetimeTest extends AbstractTestCase
         that(self::resolveFunction('date_match'))('hoge', '****/**/**')->wasThrown('failed to parse');
         that(self::resolveFunction('date_match'))('2014/12/24 12:35:56', 'hoge')->wasThrown('failed to parse');
         that(self::resolveFunction('date_match'))('2014/12/24 12:35:56', '****/13/**')->wasThrown('13(1~12)');
+    }
+
+    function test_date_parse_format()
+    {
+        // 数値系
+        that(date_parse_format('20020202123456       '))->is('YmdHis');
+        that(date_parse_format('20020202123456.789   '))->is('YmdHis.v');
+        that(date_parse_format('20020202123456.789123'))->is('YmdHis.u');
+
+        // RFC 3339（基本）
+        that(date_parse_format('2002                  '))->is('Y');
+        that(date_parse_format('200202                '))->is('Ym');
+        that(date_parse_format('20020202              '))->is('Ymd');
+        that(date_parse_format('20020202T12           '))->is('Ymd\TH');
+        that(date_parse_format('20020202T1234         '))->is('Ymd\THi');
+        that(date_parse_format('20020202T123456       '))->is('Ymd\THis');
+        that(date_parse_format('20020202T123456.789   '))->is('Ymd\THis.v');
+        that(date_parse_format('20020202T123456.789123'))->is('Ymd\THis.u');
+
+        // RFC 3339（拡張）
+        that(date_parse_format('2002                      '))->is('Y');
+        that(date_parse_format('2002-02                   '))->is('Y-m');
+        that(date_parse_format('2002-02-02                '))->is('Y-m-d');
+        that(date_parse_format('2002-02-02T12             '))->is('Y-m-d\TH');
+        that(date_parse_format('2002-02-02T12:34          '))->is('Y-m-d\TH:i');
+        that(date_parse_format('2002-02-02T12:34:56       '))->is('Y-m-d\TH:i:s');
+        that(date_parse_format('2002-02-02T12:34:56.789   '))->is('Y-m-d\TH:i:s.v');
+        that(date_parse_format('2002-02-02T12:34:56.789123'))->is('Y-m-d\TH:i:s.u');
+
+        // RFC 3339（TZ付き）
+        that(date_parse_format('2002-02-02 +0900                 '))->is('Y-m-d O');
+        that(date_parse_format('2002-02-02T12:34:56 +0900        '))->is('Y-m-d\TH:i:s O');
+        that(date_parse_format('2002-02-02T12:34:56.789 +0900    '))->is('Y-m-d\TH:i:s.v O');
+        that(date_parse_format('2002-02-02T12:34:56.789123 +09:00'))->is('Y-m-d\TH:i:s.u P');
+
+        // 全て1の区切り無し
+        that(date_parse_format('1111                 '))->is('Y');
+        that(date_parse_format('111111               '))->is('Ym');
+        that(date_parse_format('11111111             '))->is('Ymd');
+        that(date_parse_format('1111111111           '))->is('YmdH');
+        that(date_parse_format('111111111111         '))->is('YmdHi');
+        that(date_parse_format('11111111111111       '))->is('YmdHis');
+        that(date_parse_format('11111111111111.111   '))->is('YmdHis.v');
+        that(date_parse_format('11111111111111.111111'))->is('YmdHis.u');
+
+        // 日本式
+        that(date_parse_format('2002                      '))->is('Y');
+        that(date_parse_format('2002/02                   '))->is('Y/m');
+        that(date_parse_format('2002/02/02                '))->is('Y/m/d');
+        that(date_parse_format('2002/02/02 12             '))->is('Y/m/d H');
+        that(date_parse_format('2002/02/02 12:34          '))->is('Y/m/d H:i');
+        that(date_parse_format('2002/02/02 12:34:56       '))->is('Y/m/d H:i:s');
+        that(date_parse_format('2002/02/02 12:34:56.789   '))->is('Y/m/d H:i:s.v');
+        that(date_parse_format('2002/02/02 12:34:56.789123'))->is('Y/m/d H:i:s.u');
+
+        // 日本式2
+        that(date_parse_format('1999                      '))->is('Y');
+        that(date_parse_format('1999/02                   '))->is('Y/m');
+        that(date_parse_format('1999/02/02                '))->is('Y/m/d');
+        that(date_parse_format('1999/02/02 12             '))->is('Y/m/d H');
+        that(date_parse_format('1999/02/02 12:34          '))->is('Y/m/d H:i');
+        that(date_parse_format('1999/02/02 12:34:56       '))->is('Y/m/d H:i:s');
+        that(date_parse_format('1999/02/02 12:34:56.789   '))->is('Y/m/d H:i:s.v');
+        that(date_parse_format('1999/02/02 12:34:56.789123'))->is('Y/m/d H:i:s.u');
+
+        // アメリカ式
+        that(date_parse_format('12/24                     '))->is('m/d');
+        that(date_parse_format('12/24/2014                '))->is('m/d/Y');
+        that(date_parse_format('12/24/2014 12:34:56       '))->is('m/d/Y H:i:s');
+        that(date_parse_format('12/24/2014 12:34:56.789   '))->is('m/d/Y H:i:s.v');
+        that(date_parse_format('12/24/2014 12:34:56.789123'))->is('m/d/Y H:i:s.u');
+
+        // イギリス式
+        that(date_parse_format('24.12.2014 '))->is('d.m.Y');
+        that(date_parse_format('24-12-2014 '))->is('d-m-Y');
+
+        // 月名
+        that(date_parse_format('2014/jan/24    '))->is('Y/M/d');
+        that(date_parse_format('2014/jan/25    '))->is('Y/M/d');
+
+        that(date_parse_format('      jan.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      feb.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      mar.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      apr.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      may.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      jun.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      jul.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      aug.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      sep.24.2014'))->is('M.d.Y');
+        that(date_parse_format('      oct.24.2014'))->is('M.d.Y');
+        that(date_parse_format('  january.24.2014'))->is('F.d.Y');
+        that(date_parse_format(' february.24.2014'))->is('F.d.Y');
+        that(date_parse_format('    march.24.2014'))->is('F.d.Y');
+        that(date_parse_format('    april.24.2014'))->is('F.d.Y');
+        that(date_parse_format('      may.24.2014'))->is('M.d.Y'); // 3文字なのでどうしようもない
+        that(date_parse_format('     june.24.2014'))->is('F.d.Y');
+        that(date_parse_format('     july.24.2014'))->is('F.d.Y');
+        that(date_parse_format('   august.24.2014'))->is('F.d.Y');
+        that(date_parse_format('september.24.2014'))->is('F.d.Y');
+        that(date_parse_format('  october.24.2014'))->is('F.d.Y');
+
+        // 序数
+        that(date_parse_format(' jan.1st.2014'))->is('M.jS.Y');
+        that(date_parse_format(' jan.2nd.2014'))->is('M.jS.Y');
+        that(date_parse_format(' jan.3rd.2014'))->is('M.jS.Y');
+        that(date_parse_format(' jan.4th.2014'))->is('M.jS.Y');
+        that(date_parse_format('jan.01st.2014'))->is('M.dS.Y');
+        that(date_parse_format('jan.02nd.2014'))->is('M.dS.Y');
+        that(date_parse_format('jan.03rd.2014'))->is('M.dS.Y');
+        that(date_parse_format('jan.04th.2014'))->is('M.dS.Y');
+        that(date_parse_format('jan.11th.2014'))->is('M.dS.Y');
+
+        // パース不可
+        that(date_parse_format('hoge'))->is(null);
+        that(date_parse_format('9999/99/99'))->is(null);
+        that(date_parse_format('2014/00/30'))->is(null);
+        that(date_parse_format('2014/13/30'))->is(null);
+        that(date_parse_format('2014/09/31'))->is(null);
+        that(date_parse_format('2014/09/30 25:00:00'))->is(null);
+        that(date_parse_format('prefix 2002/02/02'))->is(null);
+        that(date_parse_format('2002/02/02 suffix'))->is(null);
+        that(date_parse_format('wed, 2002/02/02'))->is(null);
+        that(date_parse_format('200223'))->is(null);
     }
 
     function test_date_timestamp()
