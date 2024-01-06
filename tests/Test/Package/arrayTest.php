@@ -3216,18 +3216,27 @@ class arrayTest extends AbstractTestCase
 
     function test_kvsort()
     {
-        $array = array_fill_keys(range('a', 'z'), 9);
+        $array = array_pad([], 32, 'a');
+        $shuffled = array_shuffle($array);
 
         // 安定ソートである
-        that(kvsort($array))->isSame($array);
+        that(kvsort($shuffled))->isSame($shuffled);
 
         // キーでソートできる
-        that(array_keys(kvsort($array, fn($av, $bv, $ak, $bk) => strcmp($bk, $ak))))->isSame(array_reverse(array_keys($array)));
+        that(kvsort($shuffled, fn($av, $bv, $ak, $bk) => ($ak <=> $bk)))->isSame($array);
 
         // 負数定数でリバースソートになる
         that(kvsort([1, 2, 3, 4, 5], -SORT_NUMERIC))->isSame(array_reverse([1, 2, 3, 4, 5], true));
         that(kvsort([0.1, 0.2, 0.3], -SORT_NUMERIC))->isSame(array_reverse([0.1, 0.2, 0.3], true));
         that(kvsort(['a', 'b', 'c'], -SORT_STRING))->isSame(array_reverse(['a', 'b', 'c'], true));
+
+        // シュワルツ変換でソート可能
+        that(kvsort(['a', 'b', 'c'], null, fn($v) => sha1($v)))->isSame([2 => 'c', 0 => 'a', 1 => 'b']);
+        that(kvsort(['a', 'b', 'c'], SORT_DESC, fn($v) => sha1($v)))->isSame([1 => 'b', 0 => 'a', 2 => 'c']);
+        that(kvsort(['a', 'b', 'c'], null, [
+            'dummy' => fn($v) => 1,
+            'sha1'  => fn($v) => sha1($v),
+        ]))->isSame([2 => 'c', 0 => 'a', 1 => 'b']);
 
         // 配列じゃなくても Traversable ならソート可能
         that(kvsort((function () {
