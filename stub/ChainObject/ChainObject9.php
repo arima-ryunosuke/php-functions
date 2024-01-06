@@ -458,6 +458,11 @@ trait ChainObject9
     public function paml_import($pamlstring, $options = []): self { }
     public function paml_import($options = []): self { }
 
+    /** @see \date_parse_format() */
+    public self $date_parse_format;
+    public function date_parse_format($datetimestring, &$parsed = []): self { }
+    public function date_parse_format(&$parsed = []): self { }
+
     /** @see \file_equals() */
     public self $file_equals;
     public function file_equals($file1, $file2, $chunk_size = null): self { }

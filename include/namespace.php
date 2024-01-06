@@ -18,6 +18,40 @@ if (!defined('ryunosuke\\Functions\\IS_PRIVATE')) {
     define('ryunosuke\\Functions\\IS_PRIVATE', 16);
 }
 
+if (!defined('ryunosuke\\Functions\\EN_MONTH_SHORT')) {
+    define('ryunosuke\\Functions\\EN_MONTH_SHORT', [
+        1  => "jan",
+        2  => "feb",
+        3  => "mar",
+        4  => "apr",
+        5  => "may",
+        6  => "jun",
+        7  => "jul",
+        8  => "aug",
+        9  => "sep",
+        10 => "oct",
+        11 => "nov",
+        12 => "dec",
+    ]);
+}
+
+if (!defined('ryunosuke\\Functions\\EN_MONTH_LONG')) {
+    define('ryunosuke\\Functions\\EN_MONTH_LONG', [
+        1  => "january",
+        2  => "february",
+        3  => "march",
+        4  => "april",
+        5  => "may",
+        6  => "june",
+        7  => "july",
+        8  => "august",
+        9  => "september",
+        10 => "october",
+        11 => "november",
+        12 => "december",
+    ]);
+}
+
 if (!defined('ryunosuke\\Functions\\JP_ERA')) {
     define('ryunosuke\\Functions\\JP_ERA', [
         [
@@ -5275,9 +5309,13 @@ if (!function_exists('ryunosuke\\Functions\\kvsort')) {
     /**
      * 比較関数にキーも渡ってくる安定ソート
      *
-     * 比較関数は ($avalue, $bvalue, $akey, $bkey) という引数を取る。
+     * 比較関数は ($valueA, $valueB, $keyA, $keyB) という引数を取る。
      * 「値で比較して同値だったらキーも見たい」という状況はまれによくあるはず。
      * さらに安定ソートであり、同値だとしても元の並び順は維持される。
+     *
+     * $schwartzians を指定した場合は呼び出しが ($schwartzianA, $schwartzianB, $valueA, $valueB, $keyA, $keyB) になる。
+     * $schwartzianX は単一値の場合はその結果、配列の場合はキー構造が維持されて渡ってくる。
+     * このあたりは表現しにくいので Example を参照。
      *
      * $comparator は省略できる。省略した場合、型に基づいてよしなにソートする。
      * （が、比較のたびに型チェックが入るので指定したほうが高速に動く）。
@@ -5313,32 +5351,86 @@ if (!function_exists('ryunosuke\\Functions\\kvsort')) {
      *     'b'  => 1,
      *     'a'  => 3,
      * ]);
+     * // シュワルツ変換を使用したソート（引数説明のために全て列挙している）
+     * that(kvsort($array, fn($hashA, $hashB, $av, $bv, $ak, $bk) => ($hashA['md5'] <=> $hashB['md5']) ?: ($hashA['sha1'] <=> $hashB['sha1']), [
+     *     'md5'  => fn($v) => md5($v),
+     *     'sha1' => fn($v) => sha1($v),
+     * ]))->isSame([
+     *     'x1' => 9,
+     *     'x2' => 9,
+     *     'x3' => 9,
+     *     'b'  => 1,
+     *     'c'  => 2,
+     *     'a'  => 3,
+     * ]);
+     * // シュワルツ変換の場合 $comparator は省略可能（昇順）で、配列ではなく単一値を渡せばその結果値が渡ってくる（これは要するに md5 での昇順ソート）
+     * that(kvsort($array, null, fn($v) => md5($v)))->isSame([
+     *     'x1' => 9,
+     *     'x2' => 9,
+     *     'x3' => 9,
+     *     'b'  => 1,
+     *     'c'  => 2,
+     *     'a'  => 3,
+     * ]);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
      *
-     * @param iterable|array $array 対象配列
+     * @template T of iterable|array
+     * @param T $array 対象配列
      * @param callable|int|null $comparator 比較関数。SORT_XXX も使える
-     * @return array ソートされた配列
+     * @param callable|callable[] $schwartzians シュワルツ変換に使用する仮想列
+     * @return T ソートされた配列
      */
-    function kvsort($array, $comparator = null)
+    function kvsort($array, $comparator = null, $schwartzians = [])
     {
-        if ($comparator === null || is_int($comparator)) {
-            $sort_flg = $comparator;
-            $comparator = fn($av, $bv, $ak, $bk) => varcmp($av, $bv, $sort_flg);
+        // シュワルツ変換の準備（単一であるとかピッタリ呼び出しとか）
+        $is_array = is_array($schwartzians) && !is_callable($schwartzians);
+        $schwartzians = arrayize($schwartzians);
+        foreach ($schwartzians as $s => $schwartzian) {
+            $schwartzians[$s] = func_user_func_array($schwartzian);
         }
 
+        // $comparator が定数あるいは省略時は自動導出
+        if ($comparator === null || is_int($comparator)) {
+            // シュワルツ変換のときは型は意識しなくてよい（呼び元の責務）ので昇順降順だけ見る
+            if ($schwartzians) {
+                if (($comparator ?? SORT_ASC) === SORT_ASC) {
+                    $comparator = fn($as, $bs) => $as <=> $bs;
+                }
+                else {
+                    $comparator = fn($as, $bs) => -($as <=> $bs);
+                }
+            }
+            // そうでない場合は varcmp に委譲
+            else {
+                $sort_flg = $comparator;
+                $comparator = fn($av, $bv, $ak, $bk) => varcmp($av, $bv, $sort_flg);
+            }
+        }
+
+        // 一時配列の準備
         $n = 0;
         $tmp = [];
         foreach ($array as $k => $v) {
-            $tmp[$k] = [$n++, $k, $v];
+            $virtuals = [];
+            if ($is_array) {
+                foreach ($schwartzians as $s => $schwartzian) {
+                    $virtuals[$s] = $schwartzian($v, $k, $n);
+                }
+            }
+            else {
+                $virtuals = $schwartzians[0]($v, $k, $n);
+            }
+            $tmp[] = [$n++, $k, $v, $virtuals];
         }
 
-        uasort($tmp, function ($a, $b) use ($comparator) {
-            $com = $comparator($a[2], $b[2], $a[1], $b[1]);
+        // ソートしてから元の配列の体裁で返す
+        usort($tmp, function ($a, $b) use ($comparator, $schwartzians) {
+            $virtuals = $schwartzians ? [$a[3], $b[3]] : [];
+            $com = $comparator(...$virtuals, ...[$a[2], $b[2], $a[1], $b[1]]);
             return $com !== 0 ? $com : ($a[0] - $b[0]);
         });
-
         return array_column($tmp, 2, 1);
     }
 }
@@ -10844,6 +10936,238 @@ if (!function_exists('ryunosuke\\Functions\\date_match')) {
         }
 
         return true;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\date_modulate') || (new \ReflectionFunction('ryunosuke\\Functions\\date_modulate'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\date_modulate')) {
+    /**
+     * 日時を加減算する
+     *
+     * フォーマットを維持しつつ日時文字列の最小単位でよしなに加算する。
+     * 具体的には Example を参照。
+     *
+     * Example:
+     * ```php
+     * // 年加算
+     * that(date_modulate('2014', 1))->isSame('2015');
+     * // 月加算
+     * that(date_modulate('2014/12', 1))->isSame('2015/01');
+     * // 日加算
+     * that(date_modulate('2014/12/24', 1))->isSame('2014/12/25');
+     * // 時加算
+     * that(date_modulate('2014/12/24 12', 1))->isSame('2014/12/24 13');
+     * // 分加算
+     * that(date_modulate('2014/12/24 12:34', 1))->isSame('2014/12/24 12:35');
+     * // 秒加算
+     * that(date_modulate('2014/12/24 12:34:56', 1))->isSame('2014/12/24 12:34:57');
+     * // ミリ秒加算
+     * that(date_modulate('2014/12/24 12:34:56.789', 1))->isSame('2014/12/24 12:34:56.790');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\datetime
+     *
+     * @param string $datetimedata 日時文字列
+     * @param int|string|\DateInterval $modify 加減算値
+     * @return string 加算された日時文字列
+     */
+    function date_modulate($datetimedata, $modify)
+    {
+        $format = date_parse_format($datetimedata, $parseinfo);
+        if ($format === null) {
+            throw new \UnexpectedValueException("failed parse date format ($datetimedata)");
+        }
+
+        if (is_string($modify) && !ctype_digit(ltrim($modify, '+-'))) {
+            $modify = date_interval($modify);
+        }
+
+        $dt = new \DateTime();
+        $dt->setDate($parseinfo['Y'] ?? 1, $parseinfo['M'] ?? 1, $parseinfo['D'] ?? 1);
+        $dt->setTime($parseinfo['h'] ?? 0, $parseinfo['m'] ?? 0, $parseinfo['s'] ?? 0, ($parseinfo['f'] ?? 0) * 1000);
+        if ($modify instanceof \DateInterval) {
+            $dt->add($modify);
+        }
+        else {
+            $unitmap = [
+                'Y' => 'year',
+                'M' => 'month',
+                'D' => 'day',
+                'h' => 'hour',
+                'm' => 'minute',
+                's' => 'second',
+                'f' => 'millisecond',
+            ];
+            $unit = $unitmap[array_key_last(array_filter($unitmap, fn($key) => $parseinfo[$key] !== null, ARRAY_FILTER_USE_KEY))];
+            $dt->modify("$modify $unit");
+        }
+        return $dt->format($format);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\date_parse_format') || (new \ReflectionFunction('ryunosuke\\Functions\\date_parse_format'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\date_parse_format')) {
+    /**
+     * 日時文字列のフォーマットを返す
+     *
+     * 例えば "2014/12/24 12:34:56" から "Y/m/d H:i:s" を逆算して返す。
+     * 精度は非常に低く、相対表現なども未対応（そもそも逆算は一意に決まるものでもない）。
+     *
+     *  Example:
+     * ```php
+     * // RFC3339
+     * that(date_parse_format('2014-12-24T12:34:56'))->isSame('Y-m-d\TH:i:s');
+     * // 日本式
+     * that(date_parse_format('2014/12/24 12:34:56'))->isSame('Y/m/d H:i:s');
+     * // アメリカ式
+     * that(date_parse_format('12/24/2014 12:34:56'))->isSame('m/d/Y H:i:s');
+     * // イギリス式
+     * that(date_parse_format('24.12.2014 12:34:56'))->isSame('d.m.Y H:i:s');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\datetime
+     *
+     * @param string $datetimestring 日時文字列
+     * @param array $parsed パースの参考情報が格納される（内部向け）
+     * @return ?string フォーマット文字列
+     */
+    function date_parse_format($datetimestring, &$parsed = [])
+    {
+        $datetimestring = trim($datetimestring);
+        $parsed = (function ($datetimestring) {
+            $date_parse = function ($datetimestring) {
+                $parsed = date_parse($datetimestring);
+                $parsed['datetimestring'] = $datetimestring;
+                $parsed += [
+                    'has:Y' => $parsed['year'] !== false,
+                    'has:M' => $parsed['month'] !== false,
+                    'has:D' => $parsed['day'] !== false,
+                    'has:h' => $parsed['hour'] !== false,
+                    'has:m' => $parsed['minute'] !== false,
+                    'has:s' => $parsed['second'] !== false,
+                    'has:f' => $parsed['fraction'] !== false,
+                    'has:z' => ($parsed['zone'] ?? false) !== false,
+                ];
+                return $parsed;
+            };
+
+            $parsed = $date_parse($datetimestring);
+
+            // エラーがあってもある程度は救うことができる
+            if ($parsed['error_count']) {
+                // スラッシュの扱いに難があるので統一して再チャレンジ（2014/12 と 2014-12 は扱いがまったく異なる）
+                $parsed = $date_parse(str_replace('/', '-', $datetimestring));
+                if (!$parsed['error_count']) {
+                    $parsed['warnings'][] = 'replace "/" -> "-"';
+                    return $parsed;
+                }
+                // 例えば fraction で誤検知している場合（20140202T123456.789123 は Y:7891 になる）
+                if ($parsed['has:Y'] && $parsed['has:M'] && $parsed['has:D'] && $parsed['has:h'] && $parsed['has:m'] && $parsed['has:s'] && $parsed['has:f']) {
+                    $rdot = strrpos($datetimestring, '.');
+                    if ($rdot !== false) {
+                        $parsed = $date_parse(substr($datetimestring, 0, $rdot));
+                        if (!$parsed['error_count']) {
+                            $parsed['warnings'][] = 'remove fraction';
+                            $parsed['fraction'] = '0' . substr($datetimestring, $rdot);
+                            return $parsed;
+                        }
+                    }
+                }
+                // 例えば minute が足りない場合（20140202T12, 2014-02-02T12 のような分無しはパース自体が失敗する）
+                if ($parsed['has:Y'] && $parsed['has:M'] && $parsed['has:D'] && !$parsed['has:h'] && !$parsed['has:m'] && !$parsed['has:s'] && !$parsed['has:f']) {
+                    $parsed = $date_parse($datetimestring . ':00');
+                    if (!$parsed['error_count']) {
+                        $parsed['warnings'][] = 'add minute';
+                        return $parsed;
+                    }
+                }
+                return $parsed;
+            }
+
+            // 日付ありきとする
+            if (!$parsed['has:Y'] && !$parsed['has:M'] && !$parsed['has:D'] && $parsed['has:h'] && $parsed['has:m'] && $parsed['has:s']) {
+                // 例えば 201412 は h:20,m:14,s:12 と解釈される
+                $parsed = $date_parse($datetimestring . '01T00:00:00');
+                if (!$parsed['error_count']) {
+                    $parsed['warnings'][] = 'add day';
+                    return $parsed;
+                }
+                // 例えば 2014 は h:20,m:14 と解釈される
+                $parsed = $date_parse($datetimestring . '0101T00:00:00');
+                if (!$parsed['error_count']) {
+                    $parsed['warnings'][] = 'add month,day';
+                    return $parsed;
+                }
+                return $parsed;
+            }
+
+            return $parsed;
+        })($datetimestring);
+
+        if ($parsed['error_count']) {
+            return null;
+        }
+        // date_parse は妥当でない日付はエラーではなく警告扱い（2015-09-31 等）
+        if ($parsed['has:Y'] && $parsed['has:M'] && $parsed['has:D'] && !checkdate($parsed['month'], $parsed['day'], $parsed['year'])) {
+            return null;
+        }
+
+        // 得られた値でマッチングすれば元となる文字列が取得できる
+        $parsed['monthF'] = EN_MONTH_LONG[$parsed['month']] ?? '';
+        $parsed['monthM'] = EN_MONTH_SHORT[$parsed['month']] ?? '';
+        $parsed['dayS'] = (new \NumberFormatter('en_US', \NumberFormatter::ORDINAL))->format($parsed['day'] ?: 0);
+        $parsed['fractionV'] = substr($parsed['fraction'], 2);
+        $regex = [
+            'Y' => "(?<Y>{$parsed['year']})?          (?<dY>[^0-9a-z]+)?",
+            'M' => "(?<M>(0?{$parsed['month']})|({$parsed['monthF']})|({$parsed['monthM']}))? (?<dM>[^0-9]+)?",
+            'D' => "(?<D>(0?{$parsed['dayS']})|(0?{$parsed['day']}))?                         (?<dD>[^0-9]+)?",
+            'h' => "(?<h>0?{$parsed['hour']})?        (?<dh>[^0-9]+)?",
+            'm' => "(?<m>0?{$parsed['minute']})?      (?<dm>[^0-9]+)?",
+            's' => "(?<s>0?{$parsed['second']})?      (?<ds>[^0-9]+)?",
+            'f' => "(?<f>0?{$parsed['fractionV']}0*)? (?<df>[^0-9]+)?",
+            'z' => "(?<z>[+\-]\d{1,2}:?\d{1,2})?      (?<dz>[^0-9]+)?",
+        ];
+        $formats = [
+            'ja-jp' => "^{$regex['Y']}{$regex['M']}{$regex['D']}{$regex['h']}{$regex['m']}{$regex['s']}{$regex['f']}{$regex['z']}$",
+            'en-us' => "^{$regex['M']}{$regex['D']}{$regex['Y']}{$regex['h']}{$regex['m']}{$regex['s']}{$regex['f']}{$regex['z']}$",
+            'en-gb' => "^{$regex['D']}{$regex['M']}{$regex['Y']}{$regex['h']}{$regex['m']}{$regex['s']}{$regex['f']}{$regex['z']}$",
+        ];
+        foreach ($formats as $format) {
+            if (preg_match("#$format#ixu", $datetimestring, $matches, PREG_UNMATCHED_AS_NULL)) {
+                break;
+            }
+        }
+        if (!$matches) {
+            $parsed['errors'][] = 'unmatch regex';
+            return null;
+        }
+
+        $parsed += [
+            'Y' => strlen($matches['Y'] ?? '') ? $matches['Y'] : null,
+            'M' => strlen($matches['M'] ?? '') ? $matches['M'] : null,
+            'D' => strlen($matches['D'] ?? '') ? $matches['D'] : null,
+            'h' => strlen($matches['h'] ?? '') ? $matches['h'] : null,
+            'm' => strlen($matches['m'] ?? '') ? $matches['m'] : null,
+            's' => strlen($matches['s'] ?? '') ? $matches['s'] : null,
+            'f' => strlen($matches['f'] ?? '') ? $matches['f'] : null,
+            'z' => strlen($matches['z'] ?? '') ? $matches['z'] : null,
+        ];
+
+        $parts = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+        $parts['Y'] = $parsed['Y'] === null ? '' : 'Y';
+        $parts['M'] = $parsed['M'] === null ? '' : [1 => 'n', 2 => 'm', 3 => 'M'][strlen($parts['M'])] ?? 'F';
+        $parts['D'] = $parsed['D'] === null ? '' : [1 => 'j', 2 => 'd', 3 => 'jS'][strlen($parts['D'])] ?? 'dS';
+        $parts['h'] = $parsed['h'] === null ? '' : (strlen($parts['h']) === 1 ? 'G' : 'H');
+        $parts['m'] = $parsed['m'] === null ? '' : 'i'; // ゼロなし分フォーマットは存在しない
+        $parts['s'] = $parsed['s'] === null ? '' : 's'; // ゼロなし秒フォーマットは存在しない
+        $parts['f'] = $parsed['f'] === null ? '' : (strlen($parts['f']) > 3 ? 'u' : 'v');
+        $parts['z'] = $parsed['z'] === null ? '' : (strpos($parts['z'], ':') !== false ? 'P' : 'O');
+
+        foreach (['dY', 'dM', 'dD', 'dh', 'dm', 'ds', 'df', 'dz'] as $d) {
+            $parts[$d] = implode('', array_map(fn($v) => ctype_alpha($v) ? "\\$v" : $v, str_split($parts[$d] ?? '')));
+        }
+
+        return implode('', $parts);
     }
 }
 
@@ -17615,6 +17939,7 @@ if (!function_exists('ryunosuke\\Functions\\parse_php')) {
             'flags'          => 0,    // token_get_all の $flags. TOKEN_PARSE を与えると ParseError が出ることがあるのでデフォルト 0
             'cache'          => true, // キャッシュするか否か
             'greedy'         => false,// end と nest か一致したときに処理を継続するか
+            'backtick'       => true, // `` もパースするか
             'nest_token'     => [
                 ')' => '(',
                 '}' => '{',
@@ -17629,6 +17954,9 @@ if (!function_exists('ryunosuke\\Functions\\parse_php')) {
             $phptag = $option['phptag'] ? '<?php ' : '';
             $phpcode = $phptag . $phpcode;
             $position = -strlen($phptag);
+
+            $backtick = '';
+            $backticking = false;
 
             $tokens = [];
             $tmp = token_get_all($phpcode, $option['flags']);
@@ -17677,9 +18005,23 @@ if (!function_exists('ryunosuke\\Functions\\parse_php')) {
                 }
                 // @codeCoverageIgnoreEnd
 
+                if (!$option['backtick']) {
+                    if ($token[1] === '`') {
+                        if ($backticking) {
+                            $token[1] = $backtick . $token[1];
+                            $backtick = '';
+                        }
+                        $backticking = !$backticking;
+                    }
+                    if ($backticking) {
+                        $backtick .= $token[1];
+                        continue;
+                    }
+                }
+
                 $token[] = $position;
                 if ($option['flags'] & TOKEN_NAME) {
-                    $token[] = token_name($token[0]);
+                    $token[] = !$option['backtick'] && $token[0] === 96 ? 'T_BACKTICK' : token_name($token[0]);
                 }
 
                 $position += strlen($token[1]);
@@ -22577,11 +22919,8 @@ if (!function_exists('ryunosuke\\Functions\\render_template')) {
      * - 埋め込みは ${var} のみで、{$var} は無効
      * - ${expression} は「評価結果の変数名」ではなく「評価結果」が埋め込まれる
      *
-     * $vars に callable を渡すと元文字列とプレースホルダー部分の配列でコールバックされる（タグ付きテンプレートの模倣）。
-     *
-     * 実装的にはただの文字列 eval なので " はエスケープする必要がある。
-     *
      * この関数は実験的機能のため、互換性を維持せず変更される可能性がある。
+     * また、 token_get_all に頼っているため php9 で `${var}` 構文が廃止されたらおそらく動かない。
      *
      * Example:
      * ```php
@@ -22590,75 +22929,68 @@ if (!function_exists('ryunosuke\\Functions\\render_template')) {
      *
      * @package ryunosuke\Functions\Package\strings
      *
-     * @param string $template レンダリングするファイル名
-     * @param array|object|\Closure $vars レンダリング変数
+     * @param string $template レンダリングする文字列
+     * @param array|object $vars レンダリング変数
+     * @param callable $tag ブロックと変数値が渡ってくるクロージャ（タグ付きテンプレートリテラルのようなもの）
      * @return string レンダリングされた文字列
      */
-    function render_template($template, $vars)
+    function render_template($template, $vars, $tag = null)
     {
-        assert(is_arrayable($vars) || is_callable($vars) || is_array($vars));
+        assert(is_arrayable($vars) || is_array($vars));
 
-        $tokens = array_slice(parse_php('"' . $template . '"', [
-            //'flags' => Syntax::TOKEN_NAME,
-        ]), 2, -1);
-
-        $callable_mode = is_callable($vars);
-
-        $embed = $callable_mode ? null : unique_string($template, "embedclosure");
-        $blocks = [""];
-        $values = [];
-        for ($i = 0, $l = count($tokens); $i < $l; $i++) {
-            if (!$callable_mode) {
-                if ($tokens[$i][0] === T_VARIABLE) {
-                    $tokens[$i][1] = '\\' . $tokens[$i][1];
-                }
+        $tag ??= function ($literals, ...$values) {
+            $l = max(count($literals), count($values));
+            $result = '';
+            for ($i = 0; $i < $l; $i++) {
+                $result .= ($literals[$i] ?? '') . ($values[$i] ?? '');
             }
-            if ($tokens[$i][0] === T_DOLLAR_OPEN_CURLY_BRACES) {
-                for ($j = $i; $j < $l; $j++) {
-                    if ($tokens[$j][1] === '}') {
-                        $stmt = implode('', array_column(array_slice($tokens, $i + 1, $j - $i - 1, true), 1));
-                        if (attr_exists($stmt, $vars)) {
-                            if ($callable_mode) {
-                                $blocks[] = "";
-                                $values[] = attr_get($stmt, $vars);
-                            }
-                            else {
-                                // 書き換える必要はない（`${varname}` は正しく埋め込まれる）
-                                assert(strlen($stmt));
-                            }
+            return $result;
+        };
+
+        [$blocks, $stmts] = cache("template-$template", function () use ($template) {
+            $tokens = array_slice(parse_php("<<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
+                'backtick' => false,
+            ]), 2, -2);
+            $last = array_key_last($tokens);
+            if ($tokens[$last][0] === T_ENCAPSED_AND_WHITESPACE) {
+                $tokens[$last][1] = substr($tokens[$last][1], 0, -1);
+            }
+
+            $blocks = [""];
+            $stmts = [];
+            for ($i = 0, $l = count($tokens); $i < $l; $i++) {
+                if ($tokens[$i][0] === T_DOLLAR_OPEN_CURLY_BRACES) {
+                    for ($j = $i + 1; $j < $l; $j++) {
+                        if ($tokens[$j][1] === '}') {
+                            $blocks[] = "";
+                            $stmts[] = array_slice($tokens, $i + 1, $j - $i - 1, true);
+                            $i = $j;
+                            break;
                         }
-                        else {
-                            if ($callable_mode) {
-                                $blocks[] = "";
-                                $values[] = phpval($stmt, (array) $vars);
-                            }
-                            else {
-                                // ${varname} を {$embedclosure(varname)} に書き換えて埋め込みを有効化する
-                                $tokens = array_replace($tokens, array_fill($i, $j - $i + 1, [1 => '']));
-                                $tokens[$i][1] = "{\$$embed($stmt)}";
-                            }
-                        }
-                        $i = $j;
-                        break;
                     }
                 }
-            }
-            else {
-                if ($callable_mode) {
-                    $blocks[count($blocks) - 1] .= $tokens[$i][1];
+                else {
+                    $blocks[count($blocks) - 1] .= strtr_escaped($tokens[$i][1], ['\$' => '$']);
                 }
             }
-        }
 
-        if ($callable_mode) {
-            if (strlen($blocks[count($blocks) - 1]) === 0) {
-                unset($blocks[count($blocks) - 1]);
+            return [$blocks, $stmts];
+        }, __FUNCTION__);
+
+        $values = [];
+        foreach ($stmts as $stmt) {
+            foreach ($stmt as $n => $subtoken) {
+                if ($subtoken[0] === ord('`')) {
+                    $stmt[$n][1] = var_export(render_template(substr($subtoken[1], 1, -1), $vars), true);
+                }
+                elseif (attr_exists($subtoken[1], $vars) && ($stmt[$n + 1][1] ?? '') !== '(') {
+                    $stmt[$n][1] = '$' . $subtoken[1];
+                }
             }
-            return $vars($blocks, ...$values);
+            $values[] = phpval(implode('', array_column($stmt, 1)), (array) $vars);
         }
 
-        $template = '"' . implode('', array_column($tokens, 1)) . '"';
-        return evaluate("return $template;", $vars + [$embed => fn($v) => $v]);
+        return $tag($blocks, ...$values);
     }
 }
 
@@ -28148,7 +28480,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                         serialize($value);
                     }
                 }
-                catch (\Exception $e){
+                catch (\Exception $e) {
                     return "\$this->$vid = new \\__PHP_Incomplete_Class()";
                 }
 

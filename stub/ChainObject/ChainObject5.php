@@ -555,8 +555,8 @@ trait ChainObject5
 
     /** @see \render_template() */
     public self $render_template;
-    public function render_template($template, $vars): self { }
-    public function render_template($vars): self { }
+    public function render_template($template, $vars, $tag = null): self { }
+    public function render_template($vars, $tag = null): self { }
 
     /** @see \str_bytes() */
     public self $str_bytes;

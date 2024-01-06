@@ -290,8 +290,8 @@ trait ChainObject8
 
     /** @see \kvsort() */
     public self $kvsort;
-    public function kvsort(iterable $array, $comparator = null): self { }
-    public function kvsort($comparator = null): self { }
+    public function kvsort(iterable $array, $comparator = null, $schwartzians = []): self { }
+    public function kvsort($comparator = null, $schwartzians = []): self { }
 
     /** @see \csv_import() */
     public self $csv_import;
