@@ -12,6 +12,14 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.15
+
+- [feature] kvsort のシュワルツ変換対応
+- [feature] date_modulate を追加
+- [feature] date_parse_format を追加
+- [feature] render_template の改善
+- [feature] parse_php に backtick オプションを追加
+
 ## 1.6.14
 
 - [feature] str_diff/patch の任意エンコーディング対応
