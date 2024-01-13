@@ -8,6 +8,9 @@ require_once __DIR__ . '/../var/cipher_metadata.php';
 /**
  * 指定されたパスワードで復号化する
  *
+ * $password は配列で複数与えることができる。
+ * 複数与えた場合、順に試みて複合できた段階でその値を返す。
+ *
  * $ciphers は配列で複数与えることができる。
  * 複数与えた場合、順に試みて複合できた段階でその値を返す。
  * v2 以降は生成文字列に $cipher が含まれているため指定不要（今後指定してはならない）。
@@ -18,18 +21,44 @@ require_once __DIR__ . '/../var/cipher_metadata.php';
  * @package ryunosuke\Functions\Package\var
  *
  * @param string $cipherdata 復号化するデータ
- * @param string $password パスワード
+ * @param string|array $password パスワード
  * @param string|array $ciphers 暗号化方式（openssl_get_cipher_methods で得られるもの）
  * @param string $tag 認証タグ
  * @return mixed 復号化されたデータ
  */
 function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
 {
-    [$cipherdata, $version] = explode('=', $cipherdata, 2) + [1 => 0];
-    $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
-    $version = (int) $version;
+    $version = $cipherdata[-1] ?? '';
+    // for compatible
+    if (!ctype_digit($version)) {
+        $version = '0';
+        $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
+    }
+    else {
+        $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
+    }
 
-    if ($version === 2) {
+    if ($version === "3") {
+        $cp = strrpos($cipherdata, ':');
+        $ivtagpayload = substr($cipherdata, 0, $cp);
+        $cipher = substr($cipherdata, $cp + 1);
+        $metadata = cipher_metadata($cipher);
+        if (!$metadata) {
+            return null;
+        }
+        $tag = substr($ivtagpayload, 0, $metadata['taglen']);
+        $iv = substr($ivtagpayload, $metadata['taglen'], $metadata['ivlen']);
+        $payload = substr($ivtagpayload, $metadata['ivlen'] + $metadata['taglen']);
+        foreach ((array) $password as $pass) {
+            $decryptdata = openssl_decrypt($payload, $cipher, $pass, OPENSSL_RAW_DATA, $iv, $tag);
+            if ($decryptdata !== false) {
+                return json_decode(gzinflate($decryptdata), true);
+            }
+        }
+        return null;
+    }
+
+    if ($version === "2") {
         [$cipher, $ivtagpayload] = explode(':', $cipherdata, 2) + [1 => null];
         $metadata = cipher_metadata($cipher);
         if (!$metadata) {
@@ -60,7 +89,7 @@ function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
 
         $decryptdata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
         if ($decryptdata !== false) {
-            if ($version === 1) {
+            if ($version === "1") {
                 $decryptdata = gzinflate($decryptdata);
             }
             return json_decode($decryptdata, true);

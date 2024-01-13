@@ -236,18 +236,21 @@ class varTest extends AbstractTestCase
 
         $encrypted = encrypt($data, 'secret', 'aes-128-ecb');                 // IV なし, TAG なし
         that(decrypt($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
+        that(decrypt($encrypted, ['invalid', 'secret']))->isSame($data);      // password は配列でもよい
         that(decrypt($encrypted, 'invalid'))->isNull();                       // password が異なれば複合できない
         that(decrypt('this is invalid', 'secret'))->isNull();                 // data が不正なら複合できない
         that(encrypt($data, 'secret', 'aes-128-ecb'))->isSame($encrypted);    // ecb なので同じ暗号文が生成される
 
         $encrypted = encrypt($data, 'secret', 'aes-256-cbc');                 // IV あり, TAG なし
         that(decrypt($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
+        that(decrypt($encrypted, ['invalid', 'secret']))->isSame($data);      // password は配列でもよい
         that(decrypt($encrypted, 'invalid'))->isNull();                       // password が異なれば複合できない
         that(decrypt('this is invalid', 'secret'))->isNull();                 // data が不正なら複合できない
         that(encrypt($data, 'secret', 'aes-256-cbc'))->isNotSame($encrypted); // cbc なので異なる暗号文が生成される
 
         $encrypted = encrypt($data, 'secret', 'aes-256-ccm');                 // IV あり, TAG あり
         that(decrypt($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
+        that(decrypt($encrypted, ['invalid', 'secret']))->isSame($data);      // password は配列でもよい
         that(decrypt($encrypted, 'invalid'))->isNull();                       // password が異なれば複合できない
         that(decrypt('this is invalid=2', 'secret'))->isNull();               // data が不正なら複合できない
         that(encrypt($data, 'secret', 'aes-256-ccm'))->isNotSame($encrypted); // ccm なので異なる暗号文が生成される
@@ -261,6 +264,7 @@ class varTest extends AbstractTestCase
         that(decrypt('=0', 'secret', 'aes-128-ecb'))->isNull();
         that(decrypt('=1', 'secret', 'aes-128-ecb'))->isNull();
         that(decrypt('v=1', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt('v3', 'secret', 'aes-128-ecb'))->isNull();
         that(decrypt('xxxxxxxxxxxxxxxxxxxx', 'secret', 'aes-128-ecb'))->isNull();
         that(decrypt(base64_encode('xxxxxxxxxxxxxxxxxxxx') . '=1', 'secret', 'aes-128-ecb'))->isNull();
     }
@@ -287,6 +291,10 @@ class varTest extends AbstractTestCase
 
         $v1 = "uuz9p1tBXG3jFKV_y2PN_23s549iyppC5TsUeC4uOe5vdDNkot8DjuXL9kWzmDUlmPH4k0VP05nlHazteEQndsClvXVt_LztaTFno0Y0tg8=1";
         that(decrypt($v1, 'secret', 'aes-128-ecb'))->isSame($data);
+
+        $v2 = "YWVzLTEyOC1lY2I6uuz9p1tBXG3jFKV_y2PN_23s549iyppC5TsUeC4uOe5vdDNkot8DjuXL9kWzmDUlmPH4k0VP05nlHazteEQndsClvXVt_LztaTFno0Y0tg8=2";
+        that(decrypt($v2, 'secret', 'aes-128-ecb'))->isSame($data);
+        that(decrypt($v2, 'invalid', 'aes-128-ecb'))->isNull();
     }
 
     function test_flagval()
