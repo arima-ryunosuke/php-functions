@@ -15,6 +15,7 @@ use function ryunosuke\Functions\Package\process;
 use function ryunosuke\Functions\Package\resolve_symbol;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\strip_php;
+use function ryunosuke\Functions\Package\unique_id;
 use function ryunosuke\Functions\Package\var_export2;
 use const ryunosuke\Functions\Package\TOKEN_NAME;
 
@@ -1112,5 +1113,56 @@ aplain text
         $mapping = [];
         $html = strip_php($code, [], $mapping);
         that(strtr($html, $mapping))->is($code);
+    }
+
+    function test_unique_id()
+    {
+        $now = time();
+
+        // 重複しない
+        $ids = [];
+        for ($i = 0; $i < 10; $i++) {
+            for ($j = 0; $j < 10000; $j++) {
+                $ids[] = unique_id();
+            }
+            usleep(1 * 1000);
+        }
+        that(count($ids))->is(count(array_unique($ids)));
+
+        // 例え同じ時刻・IP・プロセスでも9bitまでは重複しない
+        $ids = [];
+        for ($i = 0; $i < 512; $i++) {
+            $ids[] = unique_id($id_info, [
+                'timestamp' => $now,
+                'ipaddress' => '127.0.0.1',
+                'processid' => 123,
+            ]);
+        }
+        that(count($ids))->is(count(array_unique($ids)));
+
+        // 9bit を超えても sleep が入るので結局重複しない
+        $ids[] = unique_id($id_info, [
+            'timestamp' => $now,
+            'ipaddress' => '127.0.0.1',
+            'processid' => 123,
+        ]);
+        that(count($ids))->is(count(array_unique($ids)));
+        that($id_info['timestamp'])->gt((int) (microtime(true) * 1000));
+        that($id_info['sequence'])->isSame(0);
+
+        // 同じ時刻・IP・プロセスなら sequence が進んでいる
+        $ids = [];
+        $ids[] = unique_id($id_info1, [
+            'timestamp' => $now,
+            'ipaddress' => '127.0.0.1',
+            'processid' => 123,
+        ]);
+        $ids[] = unique_id($id_info2, [
+            'timestamp' => $now,
+            'ipaddress' => '127.0.0.1',
+            'processid' => 123,
+        ]);
+        that(count($ids))->is(count(array_unique($ids)));
+        that($id_info1['sequence'])->isSame($id_info2['sequence'] - 1);
     }
 }
