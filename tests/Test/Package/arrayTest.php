@@ -2319,12 +2319,14 @@ class arrayTest extends AbstractTestCase
         that(array_random($array, 2))->is(['B', 'C']);
         that(array_random($array, 3))->is(['A', 'B', 'C']);
         that(array_random($array, 2, true))->is(['b' => 'B', 'c' => 'C']);
+        that(array_random($array, -9, true))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that(array_random($array, -9, false))->is(['A', 'B', 'C']);
 
         that(array_random([], 0))->is([]);
+        that(array_random([], -3))->is([]);
 
         that(self::resolveFunction('array_random'))($array, 4)->wasThrown('number of elements');
         that(self::resolveFunction('array_random'))([], +1)->wasThrown('number of elements');
-        that(self::resolveFunction('array_random'))([], -1)->wasThrown('number of elements');
     }
 
     function test_array_range()
