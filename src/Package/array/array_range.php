@@ -4,6 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../datetime/date_convert.php';
 require_once __DIR__ . '/../datetime/date_interval.php';
+require_once __DIR__ . '/../datetime/date_parse_format.php';
 require_once __DIR__ . '/../var/is_decimal.php';
 // @codeCoverageIgnoreEnd
 
@@ -180,11 +181,28 @@ function array_range($start, $end, $step = null, $options = [])
         && ($step instanceof \DateInterval || is_string($step))
     ) {
         try {
+            if ($options['format'] === 'auto') {
+                $options['format'] = (function (...$dts) {
+                    foreach ($dts as $dt) {
+                        if (is_string($dt) && ($format = date_parse_format($dt)) !== null) {
+                            return $format;
+                        }
+                    }
+                    throw new \InvalidArgumentException("failed to auto detect dateformat");
+                })($start, $end);
+            }
+
             if (is_string($start)) {
                 $start = date_convert(\DateTimeImmutable::class, $start);
             }
+            if ($start instanceof \DateTime) {
+                $start = \DateTimeImmutable::createFromMutable($start);
+            }
             if (is_string($end)) {
                 $end = date_convert(\DateTimeImmutable::class, $end);
+            }
+            if ($end instanceof \DateTime) {
+                $end = \DateTimeImmutable::createFromMutable($end);
             }
             if (is_string($step)) {
                 $step = @\DateInterval::createFromDateString($step) ?: date_interval($step);

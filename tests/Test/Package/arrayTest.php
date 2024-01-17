@@ -2411,12 +2411,23 @@ class arrayTest extends AbstractTestCase
             '2014/12/24 00:00:02.700',
             '2014/12/24 00:00:01.200',
         ]);
+        that(array_range(new \DateTime('2014-12-24'), '2014-12-26', '1day', ['format' => 'auto']))->is([
+            '2014-12-24',
+            '2014-12-25',
+            '2014-12-26',
+        ]);
+        that(array_range('2014-12-24', new \DateTime('2014-12-26'), '1day', ['format' => 'auto']))->is([
+            '2014-12-24',
+            '2014-12-25',
+            '2014-12-26',
+        ]);
 
         // 例外
         that(self::resolveFunction('array_range'))('1', '3', 0)->wasThrown("step is empty(0)");
         that(self::resolveFunction('array_range'))('a', 'c', 0)->wasThrown("step is empty(0)");
         that(self::resolveFunction('array_range'))('2014/12/24', '2014/12/27', 'P0Y')->wasThrown("step is empty(+P00-00-00T00:00:00.000000)");
         that(self::resolveFunction('array_range'))('', '', '')->wasThrown("failed to detect mode");
+        that(self::resolveFunction('array_range'))(new \DateTime('2014-12-24'), new \DateTime('2014-12-26'), '1day', ['format' => 'auto'])->wasThrown("failed to auto detect");
     }
 
     function test_array_rank()
