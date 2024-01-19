@@ -1478,10 +1478,12 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 | xx  |
 ");
 
-        that("\n" . markdown_table([['a' => '99']]))->is("
-|   a |
-| --: |
-|  99 |
+        that("\n" . markdown_table([['a' => '99', 'b' => '123,456.789'], ['a' => '999', 'b' => '-123.456'], ['a' => '', 'b' => '']]))->is("
+|   a |           b |
+| --: | ----------: |
+|  99 | 123,456.789 |
+| 999 |    -123.456 |
+|     |             |
 ");
 
         that("\n" . markdown_table([['a' => 'aa'], ['b' => "b\nb"]]))->is("

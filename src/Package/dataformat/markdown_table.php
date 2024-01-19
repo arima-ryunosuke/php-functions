@@ -50,6 +50,16 @@ function markdown_table($array, $option = [])
     ];
 
     $stringify = fn($v) => strtr(trim(is_stringable($v) ? $v : $option['stringify']($v)), ["\t" => '    ']);
+    $is_numeric = function ($v) {
+        $v = trim($v);
+        if (strlen($v) === 0) {
+            return true;
+        }
+        if (is_numeric($v)) {
+            return true;
+        }
+        return preg_match('#^-?[1-9][0-9]{0,2}(,[0-9]{3})*(\.[0-9]+)?$#', $v);
+    };
 
     $rows = [];
     $defaults = [];
@@ -71,7 +81,7 @@ function markdown_table($array, $option = [])
             foreach ($v as $i => $t) {
                 $e = ansi_strip($t);
                 $rows["{$n}_{$i}"][$k] = $t;
-                $numerics[$k] = ($numerics[$k] ?? true) && (is_numeric($e) || strlen($e) === 0);
+                $numerics[$k] = ($numerics[$k] ?? true) && $is_numeric($e);
                 $lengths[$k] = max($lengths[$k] ?? 3, mb_monospace(ansi_strip($k)), mb_monospace($e)); // 3 は markdown の最低見出し長
             }
         }
