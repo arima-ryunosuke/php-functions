@@ -33,7 +33,15 @@ class utilityTest extends AbstractTestCase
 
         // 1000 ミリ秒間の usleep(50000) の呼び出し回数は 20 回のはず（Windows での分解能がめちゃくちゃ？なので余裕を持たしてる）
         $output = benchmark(['usleep'], [50 * 1000], 1000, false);
-        that($output[0]['called'])->break()->isBetween(17, 20);
+        that($output['usleep']['called'])->break()->isBetween(17, 20);
+
+        // メモリ使用量（ticks なので直接 return しても得られない）
+        $output = benchmark([
+            'mem100' => static fn() => str_repeat('X', 1024 * 100),
+            'mem200' => static fn() => str_repeat('X', 1024 * 200),
+        ], [], 100, false);
+        that($output['mem100']['memory'])->isBetween(100 * 1024, 120 * 1024);
+        that($output['mem200']['memory'])->isBetween(200 * 1024, 220 * 1024);
 
         // 参照渡しも呼べる
         benchmark(['reset', 'end'], [['hoge']], 10, false);

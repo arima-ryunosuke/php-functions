@@ -7,6 +7,8 @@ require_once __DIR__ . '/../dataformat/markdown_table.php';
 require_once __DIR__ . '/../funchand/call_safely.php';
 require_once __DIR__ . '/../info/ini_sets.php';
 require_once __DIR__ . '/../info/is_ansi.php';
+require_once __DIR__ . '/../misc/evaluate.php';
+require_once __DIR__ . '/../var/var_export3.php';
 require_once __DIR__ . '/../var/var_pretty.php';
 // @codeCoverageIgnoreEnd
 
@@ -14,6 +16,7 @@ require_once __DIR__ . '/../var/var_pretty.php';
  * 簡易ベンチマークを取る
  *
  * 「指定ミリ秒内で何回コールできるか？」でベンチする。
+ * メモリ使用量も取れるが ticks を利用しているのであまり正確ではないし、モノによっては計測できない（バージョンアップで memory_reset_peak_usage に変更される）。
  *
  * $suite は ['表示名' => $callable] 形式の配列。
  * 表示名が与えられていない場合、それらしい名前で表示する。
@@ -56,7 +59,22 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
             throw new \InvalidArgumentException('duplicated benchname.');
         }
 
-        $benchset[$name] = \Closure::fromCallable($caller);
+        $closure = \Closure::fromCallable($caller);
+        // for compatible (wait for memory_reset_peak_usage)
+        try {
+            // いったん受けて返すことで tick を誘発する
+            // @codeCoverageIgnoreStart
+            $caller = function (&...$args) use ($caller) {
+                $dummy = $caller(...$args);
+                return $dummy;
+            };
+            // @codeCoverageIgnoreEnd
+            $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
+        }
+        catch (\Throwable $t) { // @codeCoverageIgnore
+            // do nothing
+        }
+        $benchset[$name] = $closure;
     }
 
     if (!$benchset) {
@@ -109,46 +127,66 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     }
 
     // ベンチ
+    $tick = function () use (&$usage) {
+        $usage = max($usage, memory_get_usage());
+    };
+    register_tick_function($tick);
     $stats = [];
     foreach ($benchset as $name => $caller) {
+        $usage = null;
+        gc_collect_cycles();
+        $memory = memory_get_usage();
         $microtime = microtime(true);
-        $stats[$name]['elapsed'] = $microtime;
         $end = $microtime + $millisec / 1000;
         $args2 = $args;
         for ($n = 0; ($t = microtime(true)) <= $end; $n++) {
             $caller(...$args2);
-            $stats[$name]['fastest'] = min($stats[$name]['fastest'] ?? PHP_FLOAT_MAX, microtime(true) - $t);
+            $elapsed = microtime(true) - $t;
+            $stats[$name]['fastest'] = min($stats[$name]['fastest'] ?? PHP_FLOAT_MAX, $elapsed);
+            $stats[$name]['slowest'] = max($stats[$name]['slowest'] ?? PHP_FLOAT_MIN, $elapsed);
         }
         $stats[$name]['count'] = $n;
-        $stats[$name]['elapsed'] = microtime(true) - $stats[$name]['elapsed'];
+        $stats[$name]['mills'] = (microtime(true) - $microtime) / $n;
+        $stats[$name]['memory'] = $usage === null ? null : $usage - $memory;
     }
+    unregister_tick_function($tick);
 
     $restore();
 
     // 結果配列
     $result = [];
-    $maxcount = max(array_column($stats, 'count'));
+    $minmills = min(array_column($stats, 'mills'));
     uasort($stats, fn($a, $b) => $b['count'] <=> $a['count']);
     foreach ($stats as $name => $stat) {
-        $result[] = [
+        $result[$name] = [
             'name'    => $name,
+            'memory'  => $stat['memory'],
             'called'  => $stat['count'],
             'fastest' => $stat['fastest'],
-            'mills'   => $stat['elapsed'] / $stat['count'],
-            'ratio'   => $maxcount / $stat['count'],
+            'slowest' => $stat['slowest'],
+            'mills'   => $stat['mills'],
+            'ratio'   => $stat['mills'] / $minmills,
         ];
     }
 
     // 出力するなら出力
     if ($output) {
-        printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
-        echo markdown_table(array_map(function ($v) {
+        $number_format = function ($value, $ratio = 1, $decimal = 0, $nullvalue = '') {
+            if ($value === null) {
+                return $nullvalue;
+            }
+            return number_format($value * $ratio, $decimal);
+        };
+        printf("Running %s cases (between %s ms):\n", count($benchset), $number_format($millisec));
+        echo markdown_table(array_map(function ($v) use ($number_format) {
             return [
                 'name'        => $v['name'],
-                'called'      => number_format($v['called'], 0),
-                'fastest(ms)' => number_format($v['fastest'] * 1000, 6),
-                '1 call(ms)'  => number_format($v['mills'] * 1000, 6),
-                'ratio'       => number_format($v['ratio'], 3),
+                'memory(KB)'  => $number_format($v['memory'], 1 / 1024, 3, "N/A"),
+                'called'      => $number_format($v['called']),
+                'fastest(ms)' => $number_format($v['fastest'], 1000, 6),
+                'slowest(ms)' => $number_format($v['slowest'], 1000, 6),
+                'average(ms)' => $number_format($v['mills'], 1000, 6),
+                'ratio'       => $number_format($v['ratio'], 1, 3),
             ];
         }, $result));
     }
