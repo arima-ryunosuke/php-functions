@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test\Package;
 
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerTrait;
 use function ryunosuke\Functions\Package\add_error_handler;
 use function ryunosuke\Functions\Package\backtrace;
 use function ryunosuke\Functions\Package\error;
@@ -162,25 +164,34 @@ class errorfuncTest extends AbstractTestCase
     {
         $_SERVER['UNIQUE_ID'] = 'thisisid';
 
-        $logfile = tmpfile();
-        $loader = set_trace_logger($logfile, null, "#TraceTarget#");
+        $loader = set_trace_logger(new class($logs) extends AbstractLogger {
+            use LoggerTrait;
 
-        \ryunosuke\Test\Package\files\errorfunc\TraceTarget::run([
-            'a' => ['b' => ['c' => ['d' => ['e' => ['f' => ['g' => ['h' => ['i' => ['j' => ['k' => ['l' => ['m' => ['n' => []]]]]]]]]]]]]],
-        ], new \stdClass(), $logfile, 123, "string");
+            private array $logs;
+
+            public function __construct(&$logs)
+            {
+                $logs ??= [];
+                $this->logs = &$logs;
+            }
+
+            public function log($level, $message, array $context = [])
+            {
+                $this->logs[] = $context;
+            }
+        }, "#TraceTarget#");
+
+        \ryunosuke\Test\Package\files\errorfunc\TraceTarget::run(['a' => ['b' => ['c' => 'Z']]], $s = new \stdClass(), 123, "string");
 
         spl_autoload_unregister($loader);
 
-        rewind($logfile);
-        $log = stream_get_contents($logfile);
-        that($log)->contains('thisisid');
-        that($log)->contains('TraceTarget::run');
-        that($log)->contains('TraceTarget::__construct');
-        that($log)->contains('TraceTarget::initialize');
-        that($log)->contains('j:[...]');
-        that($log)->contains('stdClass#');
-        that($log)->contains('Resource id #');
-        that($log)->contains('123, "string"');
+        that(array_column($logs, 'id'))->is(['thisisid', 'thisisid', 'thisisid']);
+        that(array_column($logs, 'method'))->is(['run', '__construct', 'initialize']);
+        that(array_column($logs, 'args'))->is([
+            [['a' => ['b' => ['c' => 'Z']]], $s, 123, "string"],
+            [[['a' => ['b' => ['c' => 'Z']]], $s, 123, "string"]],
+            ['before'],
+        ]);
     }
 
     function test_stacktrace()
