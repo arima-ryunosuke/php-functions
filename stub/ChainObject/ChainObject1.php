@@ -493,6 +493,16 @@ trait ChainObject1
     public function preg_capture($pattern, $subject, $default): self { }
     public function preg_capture($subject, $default): self { }
 
+    /** @see \random_float() */
+    public self $random_float;
+    public function random_float($min, $max): self { }
+    public function random_float($max): self { }
+
+    /** @see \random_range() */
+    public self $random_range;
+    public function random_range($min, $max, $count = null): self { }
+    public function random_range($max, $count = null): self { }
+
     /** @see \ngram() */
     public self $ngram;
     public function ngram($string, $N, $encoding = "UTF-8"): self { }

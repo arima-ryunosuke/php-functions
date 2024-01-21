@@ -360,8 +360,8 @@ trait ChainObject0
 
     /** @see \set_trace_logger() */
     public self $set_trace_logger;
-    public function set_trace_logger($logfile, $liner, string $target): self { }
-    public function set_trace_logger($liner, string $target): self { }
+    public function set_trace_logger($logger, string $target): self { }
+    public function set_trace_logger(string $target): self { }
 
     /** @see \process() */
     public self $process;

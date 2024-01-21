@@ -3470,6 +3470,7 @@ if (!function_exists('array_random')) {
      * - 第2引数に null を与えると単一の値として返す
      * - 第2引数に数値を与えると配列で返す（たとえ1でも配列で返す）
      * - 第2引数に 0 を与えてもエラーにはならない（空配列を返す）
+     * - 第2引数に負数を与えるとその個数に満たなくても例外にならない
      * - 第3引数に true を与えるとキーを維持して返す
      *
      * Example:
@@ -3481,6 +3482,8 @@ if (!function_exists('array_random')) {
      * that(array_random(['a' => 'A', 'b' => 'B', 'c' => 'C'], 2))->isSame(['B', 'C']);
      * // 配列からランダムに値2件取得（キーを維持）
      * that(array_random(['a' => 'A', 'b' => 'B', 'c' => 'C'], 2, true))->isSame(['a' => 'A', 'c' => 'C']);
+     * // 配列からランダムに値N件取得（負数指定。配列数を超えた指定は例外になるので負数にする必要がある）
+     * that(array_random(['a' => 'A', 'b' => 'B', 'c' => 'C'], -999, true))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
@@ -3499,8 +3502,15 @@ if (!function_exists('array_random')) {
             return [];
         }
 
-        if ($count < 0 || count($array) < $count) {
+        if ($count > 0 && count($array) < $count) {
             throw new \InvalidArgumentException('Argument #2 ($count) must be between 1 and the number of elements in argument #1 ($array)');
+        }
+        if ($count < 0) {
+            $count = min(count($array), -$count);
+        }
+
+        if (count($array) === 0) {
+            return [];
         }
 
         $result = [];
@@ -3691,11 +3701,28 @@ if (!function_exists('array_range')) {
             && ($step instanceof \DateInterval || is_string($step))
         ) {
             try {
+                if ($options['format'] === 'auto') {
+                    $options['format'] = (function (...$dts) {
+                        foreach ($dts as $dt) {
+                            if (is_string($dt) && ($format = date_parse_format($dt)) !== null) {
+                                return $format;
+                            }
+                        }
+                        throw new \InvalidArgumentException("failed to auto detect dateformat");
+                    })($start, $end);
+                }
+
                 if (is_string($start)) {
                     $start = date_convert(\DateTimeImmutable::class, $start);
                 }
+                if ($start instanceof \DateTime) {
+                    $start = \DateTimeImmutable::createFromMutable($start);
+                }
                 if (is_string($end)) {
                     $end = date_convert(\DateTimeImmutable::class, $end);
+                }
+                if ($end instanceof \DateTime) {
+                    $end = \DateTimeImmutable::createFromMutable($end);
                 }
                 if (is_string($step)) {
                     $step = @\DateInterval::createFromDateString($step) ?: date_interval($step);
@@ -9937,6 +9964,16 @@ if (!function_exists('markdown_table')) {
         ];
 
         $stringify = fn($v) => strtr(trim(is_stringable($v) ? $v : $option['stringify']($v)), ["\t" => '    ']);
+        $is_numeric = function ($v) {
+            $v = trim($v);
+            if (strlen($v) === 0) {
+                return true;
+            }
+            if (is_numeric($v)) {
+                return true;
+            }
+            return preg_match('#^-?[1-9][0-9]{0,2}(,[0-9]{3})*(\.[0-9]+)?$#', $v);
+        };
 
         $rows = [];
         $defaults = [];
@@ -9958,7 +9995,7 @@ if (!function_exists('markdown_table')) {
                 foreach ($v as $i => $t) {
                     $e = ansi_strip($t);
                     $rows["{$n}_{$i}"][$k] = $t;
-                    $numerics[$k] = ($numerics[$k] ?? true) && (is_numeric($e) || strlen($e) === 0);
+                    $numerics[$k] = ($numerics[$k] ?? true) && $is_numeric($e);
                     $lengths[$k] = max($lengths[$k] ?? 3, mb_monospace(ansi_strip($k)), mb_monospace($e)); // 3 は markdown の最低見出し長
                 }
             }
@@ -11636,64 +11673,27 @@ if (!function_exists('set_trace_logger')) {
      *
      * @package ryunosuke\Functions\Package\errorfunc
      *
-     * @param resource|string $logfile 書き出すファイル名
-     * @param string $target 仕込むクラスの正規表現
+     * @param \Psr\Log\LoggerInterface $logger 書き出すファイル名
      * @return mixed
      */
-    function set_trace_logger($logfile, $liner, string $target)
+    function set_trace_logger($logger, string $target)
     {
-        $logfile = is_string($logfile) ? fopen($logfile, 'a') : $logfile; // for testing
-        $liner ??= function ($values) {
-            $stringify = function ($value, &$total = 0) use (&$stringify) {
-                if (is_array($value)) {
-                    $result = [];
-                    $n = 0;
-                    foreach ($value as $k => $v) {
-                        if (++$total > 10) {
-                            $result[] = '...';
-                            break;
-                        }
-                        $v = $stringify($v, $total);
-                        if ($k === $n) {
-                            $result[] = $v;
-                        }
-                        else {
-                            $result[] = "$k:$v";
-                        }
-                        $n++;
-                    }
-                    return "[" . implode(",", $result) . "]";
-                }
-                if (is_object($value)) {
-                    return get_class($value) . "#" . spl_object_id($value);
-                }
-                if (is_resource($value)) {
-                    return (string) $value;
-                }
-                return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            };
-            $values['time'] = $values['time']->format('Y-m-d\TH:i:s.v');
-            $values['args'] = implode(', ', array_map($stringify, $values['args']));
-            return vsprintf("[%s] %s %s::%s(%s);%s:%d\n", $values);
-        };
-
-        $GLOBALS['___trace_log_internal'] = function (string $file, int $line, string $class, string $method) use ($logfile, $liner) {
-            fwrite($logfile, $liner([
+        $GLOBALS['___trace_log_internal'] = function (string $file, int $line, string $class, string $method, array $args) use ($logger) {
+            $logger->debug("", [
                 'id'     => $_SERVER['UNIQUE_ID'] ?? str_pad($_SERVER['REQUEST_TIME_FLOAT'], 15, STR_PAD_RIGHT),
-                'time'   => new \DateTime(),
                 'class'  => $class,
                 'method' => $method,
-                'args'   => debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1]['args'] ?? [],
+                'args'   => $args,
                 'file'   => $file,
                 'line'   => $line,
-            ]));
+            ]);
         };
 
         return register_autoload_function(function ($classname, $filename, $contents) use ($target) {
             if (preg_match($target, $classname)) {
                 $contents ??= file_get_contents($filename);
                 $contents = preg_replace_callback('#((final|public|protected|private|static)\s+){0,3}function\s+[_0-9a-z]+?\([^{]+\{#usmi', function ($m) {
-                    return $m[0] . "(\$GLOBALS['___trace_log_internal'] ?? fn() => null)(__FILE__, __LINE__ - 1, __CLASS__, __FUNCTION__);";
+                    return $m[0] . "(\$GLOBALS['___trace_log_internal'] ?? fn() => null)(__FILE__, __LINE__ - 1, __CLASS__, __FUNCTION__, func_get_args());";
                 }, $contents);
                 return $contents;
             }
@@ -18293,6 +18293,138 @@ if (!function_exists('strip_php')) {
     }
 }
 
+assert(!function_exists('unique_id') || (new \ReflectionFunction('unique_id'))->isUserDefined());
+if (!function_exists('unique_id')) {
+    /**
+     * 一意な文字列を返す
+     *
+     * 最大でも12バイト（96ビット）に収まるようにしてある。
+     *
+     * - 41bit: ミリ秒
+     * - 24bit: IPv4アドレス下3桁
+     * - 22bit: プロセスID
+     * - 9bit: シーケンス
+     *
+     * IPv6 のみは対応していないし、複数の IPv4 アドレスを持つ場合は先頭（loopback ではない subnet/8 以上のもの）が使用される。
+     *
+     * 以下、思考過程と備考。
+     *
+     * - この関数は暗号化の初期化ベクトルで使用する想定なので 12byte を超えたくない（GCM の IV が 12byte なので）
+     * - サーバー間で重複を許したくない場合の候補は下記で、現在は IPv4 を採用している
+     *     - ホスト名
+     *         - 文字列で大きさが読めないし一意である保証もない
+     *     - MAC アドレス
+     *         - 一意だが少し大きすぎる
+     *         - 下3桁がシリアルIDらしいので同メーカーなら重複しないかもしれない
+     *         - ただそもそも php で MAC アドレスを簡単に得る手段がない
+     *     - IPv4
+     *         - サーバー間で重複を許さないような id の生成は大抵クラスタを組んでいて IP が振られているはず
+     *         - そして 4byte でユニークな IP が振られることはまずない（大抵は 2,3byte で固有のはず。/8未満のクラスタ構成なんて見たことない）
+     *     - IPv6
+     *         - 桁が大きすぎる
+     *         - まだまだ IPv4 も現役なので積極的に採用する理由に乏しい
+     * - 同じサーバーでも別プロセスだと sequence が効かないのでプロセスIDが必要
+     *     - 少なくとも Windows では 65535 を超えないらしいし、現代的な linux ではデフォルト 2**22 のようだ
+     *
+     * @package ryunosuke\Functions\Package\misc
+     *
+     * @param array $id_info 元になった生成データのレシーバ引数
+     * @param array $debug デバッグ用引数（配列で内部の動的な値を指定できる）
+     * @return string|array 一意なバイナリ文字列（debug.raw:true なら配列で返す）
+     */
+    function unique_id(&$id_info = [], $debug = [])
+    {
+        static $TIMESTAMP_BASE = 1704034800; // 2024-01-01 00:00:00
+        static $TIMESTAMP_PRECISION = 1000;
+        static $RESULT_BIT = 96;
+        static $LONG_BIT = 8 * PHP_INT_SIZE;
+        static $TIMESTAMP_BIT = 41;
+        static $IPADDRESS_BIT = 24;
+        static $PROCESSID_BIT = 22;
+        static $SEQUENCE_BIT = 9;
+        assert(PHP_INT_SIZE === 8);
+        assert(($TIMESTAMP_BIT + $IPADDRESS_BIT + $PROCESSID_BIT + $SEQUENCE_BIT) === $RESULT_BIT);
+
+        static $laststamp = null;
+        static $ipaddress = null;
+        static $processid = null;
+        static $sequence = 0;
+
+        $id_info = [];
+
+        $timestamp = $debug['timestamp'] ?? (int) (microtime(true) * $TIMESTAMP_PRECISION);
+        if ($sequence === 2 ** $SEQUENCE_BIT) {
+            usleep(1 * $TIMESTAMP_PRECISION);
+            $timestamp += (int) (microtime(true) * $TIMESTAMP_PRECISION);
+        }
+        if ($timestamp !== $laststamp) {
+            $sequence = 0;
+        }
+
+        $ipaddress ??= $debug['ipaddress'] ?? (function () {
+            foreach (net_get_interfaces() as $interface) {
+                // linkup していて・・・
+                if ($interface['up']) {
+                    foreach ($interface['unicast'] as $addr) {
+                        // IPv4 で・・・
+                        if ($addr['family'] === AF_INET) {
+                            // loopback ではない subnet/8 以上のもの
+                            if (strpos($addr['address'], '127.') !== 0 && strpos($addr['netmask'], '255.') === 0) {
+                                return $addr['address'];
+                            }
+                        }
+                        // @todo subnet が /104 なら IPv6 でもいける？
+                    }
+                }
+            }
+            throw new \UnexpectedValueException("ip address is not found"); // @codeCoverageIgnore
+        })();
+
+        $processid ??= $debug['processid'] ?? (function () use ($PROCESSID_BIT) {
+            $pid = getmypid();
+            if ($pid <= 2 ** $PROCESSID_BIT) {
+                return $pid;
+            }
+            throw new \UnexpectedValueException("process id is too big ($pid)"); // @codeCoverageIgnore
+        })();
+
+        $id_info = [
+            'timestamp' => $timestamp - $TIMESTAMP_BASE,
+            'ipsegment' => ip2long($ipaddress) & (2 ** $IPADDRESS_BIT - 1),
+            'processid' => $processid,
+            'sequence'  => $sequence++,
+        ];
+        $laststamp = $timestamp;
+
+        $sequence_right_bits = 0;
+        $processid_right_bits = $sequence_right_bits + $SEQUENCE_BIT;
+        $ipaddress_right_bits = $processid_right_bits + $PROCESSID_BIT;
+        $timestamp_right_bits = $ipaddress_right_bits + $IPADDRESS_BIT;
+        $lo_bits = $LONG_BIT - $timestamp_right_bits;
+
+        // 123456789A123456789B123456789C123456789D123456789E123456789F1234
+        // 00000000000000000000000_____________________________________time
+        $hi64 = $id_info['timestamp'];
+
+        // 123456789A123456789B123456789C123456789D123456789E123456789F1234
+        // 000000000______________________ip___________________pid______seq
+        $lo64 = ($id_info['ipsegment'] << $ipaddress_right_bits) | ($id_info['processid'] << $processid_right_bits) | ($id_info['sequence'] << $sequence_right_bits);
+
+        // 123456789A123456789B123456789C123456789D123456789E123456789F123456789G123456789H123456789I123456
+        // ------------time 32------------|-time 9-|---------ip 24---------|--------pid 22-------|---seq---
+        $binary = pack('NJ', $hi64 >> $lo_bits, (($hi64 & (2 ** $lo_bits - 1)) << $timestamp_right_bits) | $lo64);
+        assert($binary === (function () use ($TIMESTAMP_BIT, $timestamp_right_bits, $hi64, $lo64) {
+                $binstr = sprintf("%0{$TIMESTAMP_BIT}b%0{$timestamp_right_bits}b", $hi64, $lo64);
+                $octets = str_split($binstr, 8);
+                $bytes = array_map(fn($v) => bindec($v), $octets);
+                $chars = array_map(fn($v) => chr($v), $bytes);
+                return implode('', $chars);
+            })(),
+        );
+        return $binary;
+    }
+}
+
 assert(!function_exists('cidr2ip') || (new \ReflectionFunction('cidr2ip'))->isUserDefined());
 if (!function_exists('cidr2ip')) {
     /**
@@ -19884,6 +20016,91 @@ if (!function_exists('random_at')) {
     function random_at(...$args)
     {
         return $args[mt_rand(0, count($args) - 1)];
+    }
+}
+
+assert(!function_exists('random_float') || (new \ReflectionFunction('random_float'))->isUserDefined());
+if (!function_exists('random_float')) {
+    /**
+     * 疑似乱数小数を返す
+     *
+     * 疑似的に生成しているので偏りはあることに注意。
+     * https://www.php.net/manual/random-randomizer.getfloat.php
+     * https://www.php.net/manual/random-randomizer.nextfloat.php
+     *
+     * Example:
+     * ```php
+     * // [-M_PI~+M_PI] の区間でランダムに返す
+     * that(random_float(-M_PI, +M_PI))->isBetween(-M_PI, +M_PI);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\random
+     *
+     * @param float $min 最小値
+     * @param float $max 最大値
+     * @return float min～maxの乱数
+     */
+    function random_float($min, $max)
+    {
+        if ($min > $max) {
+            throw new \Error('Minimum value must be less than or equal to the maximum value');
+        }
+        //return ($min + ($max - $min) * lcg_value());
+        return $min + ($max - $min) * rand(0, getrandmax()) / getrandmax();
+    }
+}
+
+assert(!function_exists('random_range') || (new \ReflectionFunction('random_range'))->isUserDefined());
+if (!function_exists('random_range')) {
+    /**
+     * 指定範囲内からランダムで返す
+     *
+     * $count を null にすると個数すらもランダムで返す。
+     * 結果は範囲内では重複しない。
+     *
+     * 範囲が負数の場合は例外を投げるが、$count の 0 や範囲超過数は許容される（array_rand とは違う）。
+     *
+     * Example:
+     * ```php
+     * mt_srand(5); // テストがコケるので種固定
+     *
+     * // [10~20] の区間でランダムに3件返す
+     * that(random_range(10, 20, 3))->is([19, 20, 10]);
+     * // 0 を渡しても OK（単に空配列を返す）
+     * that(random_range(10, 20, 0))->is([]);
+     * // 範囲超過数を渡しても OK（最大個数で返す）
+     * that(count(random_range(10, 20, 999)))->is(11);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\random
+     *
+     * @param int $min 最小値
+     * @param int $max 最大値
+     * @param ?int $count 返す個数
+     * @return array min～maxの数値の配列
+     */
+    function random_range($min, $max, $count = null)
+    {
+        $range = $max - $min;
+        if ($range < 0) {
+            throw new \InvalidArgumentException("invalid range ($min > $max)");
+        }
+
+        if ($count === null) {
+            $count = rand(0, $range + 1);
+        }
+
+        if ($count > ($range >> 1)) {
+            $array = range($min, $max);
+            shuffle($array);
+            return array_slice($array, 0, $count);
+        }
+
+        $result = [];
+        while (count($result) < $count) {
+            $result[rand($min, $max)] = null;
+        }
+        return array_keys($result);
     }
 }
 
@@ -26135,6 +26352,7 @@ if (!function_exists('benchmark')) {
      * 簡易ベンチマークを取る
      *
      * 「指定ミリ秒内で何回コールできるか？」でベンチする。
+     * メモリ使用量も取れるが ticks を利用しているのであまり正確ではないし、モノによっては計測できない（バージョンアップで memory_reset_peak_usage に変更される）。
      *
      * $suite は ['表示名' => $callable] 形式の配列。
      * 表示名が与えられていない場合、それらしい名前で表示する。
@@ -26177,7 +26395,22 @@ if (!function_exists('benchmark')) {
                 throw new \InvalidArgumentException('duplicated benchname.');
             }
 
-            $benchset[$name] = \Closure::fromCallable($caller);
+            $closure = \Closure::fromCallable($caller);
+            // for compatible (wait for memory_reset_peak_usage)
+            try {
+                // いったん受けて返すことで tick を誘発する
+                // @codeCoverageIgnoreStart
+                $caller = function (&...$args) use ($caller) {
+                    $dummy = $caller(...$args);
+                    return $dummy;
+                };
+                // @codeCoverageIgnoreEnd
+                $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
+            }
+            catch (\Throwable $t) { // @codeCoverageIgnore
+                // do nothing
+            }
+            $benchset[$name] = $closure;
         }
 
         if (!$benchset) {
@@ -26230,46 +26463,66 @@ if (!function_exists('benchmark')) {
         }
 
         // ベンチ
+        $tick = function () use (&$usage) {
+            $usage = max($usage, memory_get_usage());
+        };
+        register_tick_function($tick);
         $stats = [];
         foreach ($benchset as $name => $caller) {
+            $usage = null;
+            gc_collect_cycles();
+            $memory = memory_get_usage();
             $microtime = microtime(true);
-            $stats[$name]['elapsed'] = $microtime;
             $end = $microtime + $millisec / 1000;
             $args2 = $args;
             for ($n = 0; ($t = microtime(true)) <= $end; $n++) {
                 $caller(...$args2);
-                $stats[$name]['fastest'] = min($stats[$name]['fastest'] ?? PHP_FLOAT_MAX, microtime(true) - $t);
+                $elapsed = microtime(true) - $t;
+                $stats[$name]['fastest'] = min($stats[$name]['fastest'] ?? PHP_FLOAT_MAX, $elapsed);
+                $stats[$name]['slowest'] = max($stats[$name]['slowest'] ?? PHP_FLOAT_MIN, $elapsed);
             }
             $stats[$name]['count'] = $n;
-            $stats[$name]['elapsed'] = microtime(true) - $stats[$name]['elapsed'];
+            $stats[$name]['mills'] = (microtime(true) - $microtime) / $n;
+            $stats[$name]['memory'] = $usage === null ? null : $usage - $memory;
         }
+        unregister_tick_function($tick);
 
         $restore();
 
         // 結果配列
         $result = [];
-        $maxcount = max(array_column($stats, 'count'));
+        $minmills = min(array_column($stats, 'mills'));
         uasort($stats, fn($a, $b) => $b['count'] <=> $a['count']);
         foreach ($stats as $name => $stat) {
-            $result[] = [
+            $result[$name] = [
                 'name'    => $name,
+                'memory'  => $stat['memory'],
                 'called'  => $stat['count'],
                 'fastest' => $stat['fastest'],
-                'mills'   => $stat['elapsed'] / $stat['count'],
-                'ratio'   => $maxcount / $stat['count'],
+                'slowest' => $stat['slowest'],
+                'mills'   => $stat['mills'],
+                'ratio'   => $stat['mills'] / $minmills,
             ];
         }
 
         // 出力するなら出力
         if ($output) {
-            printf("Running %s cases (between %s ms):\n", count($benchset), number_format($millisec));
-            echo markdown_table(array_map(function ($v) {
+            $number_format = function ($value, $ratio = 1, $decimal = 0, $nullvalue = '') {
+                if ($value === null) {
+                    return $nullvalue;
+                }
+                return number_format($value * $ratio, $decimal);
+            };
+            printf("Running %s cases (between %s ms):\n", count($benchset), $number_format($millisec));
+            echo markdown_table(array_map(function ($v) use ($number_format) {
                 return [
                     'name'        => $v['name'],
-                    'called'      => number_format($v['called'], 0),
-                    'fastest(ms)' => number_format($v['fastest'] * 1000, 6),
-                    '1 call(ms)'  => number_format($v['mills'] * 1000, 6),
-                    'ratio'       => number_format($v['ratio'], 3),
+                    'memory(KB)'  => $number_format($v['memory'], 1 / 1024, 3, "N/A"),
+                    'called'      => $number_format($v['called']),
+                    'fastest(ms)' => $number_format($v['fastest'], 1000, 6),
+                    'slowest(ms)' => $number_format($v['slowest'], 1000, 6),
+                    'average(ms)' => $number_format($v['mills'], 1000, 6),
+                    'ratio'       => $number_format($v['ratio'], 1, 3),
                 ];
             }, $result));
         }
@@ -27150,6 +27403,9 @@ if (!function_exists('decrypt')) {
     /**
      * 指定されたパスワードで復号化する
      *
+     * $password は配列で複数与えることができる。
+     * 複数与えた場合、順に試みて複合できた段階でその値を返す。
+     *
      * $ciphers は配列で複数与えることができる。
      * 複数与えた場合、順に試みて複合できた段階でその値を返す。
      * v2 以降は生成文字列に $cipher が含まれているため指定不要（今後指定してはならない）。
@@ -27160,18 +27416,44 @@ if (!function_exists('decrypt')) {
      * @package ryunosuke\Functions\Package\var
      *
      * @param string $cipherdata 復号化するデータ
-     * @param string $password パスワード
+     * @param string|array $password パスワード
      * @param string|array $ciphers 暗号化方式（openssl_get_cipher_methods で得られるもの）
      * @param string $tag 認証タグ
      * @return mixed 復号化されたデータ
      */
     function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
     {
-        [$cipherdata, $version] = explode('=', $cipherdata, 2) + [1 => 0];
-        $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
-        $version = (int) $version;
+        $version = $cipherdata[-1] ?? '';
+        // for compatible
+        if (!ctype_digit($version)) {
+            $version = '0';
+            $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
+        }
+        else {
+            $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
+        }
 
-        if ($version === 2) {
+        if ($version === "3") {
+            $cp = strrpos($cipherdata, ':');
+            $ivtagpayload = substr($cipherdata, 0, $cp);
+            $cipher = substr($cipherdata, $cp + 1);
+            $metadata = cipher_metadata($cipher);
+            if (!$metadata) {
+                return null;
+            }
+            $tag = substr($ivtagpayload, 0, $metadata['taglen']);
+            $iv = substr($ivtagpayload, $metadata['taglen'], $metadata['ivlen']);
+            $payload = substr($ivtagpayload, $metadata['ivlen'] + $metadata['taglen']);
+            foreach ((array) $password as $pass) {
+                $decryptdata = openssl_decrypt($payload, $cipher, $pass, OPENSSL_RAW_DATA, $iv, $tag);
+                if ($decryptdata !== false) {
+                    return json_decode(gzinflate($decryptdata), true);
+                }
+            }
+            return null;
+        }
+
+        if ($version === "2") {
             [$cipher, $ivtagpayload] = explode(':', $cipherdata, 2) + [1 => null];
             $metadata = cipher_metadata($cipher);
             if (!$metadata) {
@@ -27202,7 +27484,7 @@ if (!function_exists('decrypt')) {
 
             $decryptdata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
             if ($decryptdata !== false) {
-                if ($version === 1) {
+                if ($version === "1") {
                     $decryptdata = gzinflate($decryptdata);
                 }
                 return json_decode($decryptdata, true);
@@ -27219,6 +27501,10 @@ if (!function_exists('encrypt')) {
      *
      * データは json を経由して base64（URL セーフ） して返す。
      * $tag を与えると認証タグが設定される。
+     *
+     * $password は配列で複数与えることができる。
+     * 複数与えた場合、先頭の要素が使用される。
+     * これは decrypt との親和性のため（password の変更・移行期間は複数を扱いたいことがある）であり、決して「複数のパスワード対応」ではない。
      *
      * データ末尾には =v が付与される。
      * これによって処理が変わり、バージョン違いの暗号化文字列を与えたとしても複合することができる。
@@ -27243,24 +27529,33 @@ if (!function_exists('encrypt')) {
      * @package ryunosuke\Functions\Package\var
      *
      * @param mixed $plaindata 暗号化するデータ
-     * @param string $password パスワード。十分な長さ、あるいは鍵導出関数を通した文字列でなければならない
+     * @param string|array $password パスワード。十分な長さ、あるいは鍵導出関数を通した文字列でなければならない
      * @param string $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
      * @param string $tag 認証タグ
      * @return string 暗号化された文字列
      */
     function encrypt($plaindata, $password, $cipher = 'aes-256-gcm', &$tag = '')
     {
-        $jsondata = json_encode($plaindata, JSON_UNESCAPED_UNICODE);
-        $zlibdata = gzdeflate($jsondata, 9);
-
         $metadata = cipher_metadata($cipher);
         if (!$metadata) {
             throw new \InvalidArgumentException("undefined cipher algorithm('$cipher')");
         }
-        $iv = $metadata['ivlen'] ? random_bytes($metadata['ivlen']) : '';
+
+        $jsondata = json_encode($plaindata, JSON_UNESCAPED_UNICODE);
+        $zlibdata = gzdeflate($jsondata, 9);
+
+        $iv = '';
+        if ($metadata['ivlen']) {
+            $iv = unique_id();
+            $rest = $metadata['ivlen'] - strlen($iv);
+            if ($rest) {
+                $iv = random_bytes($rest) . $iv;
+            }
+        }
+        $password = is_array($password) ? reset($password) : $password;
         $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [&$tag] : []);
 
-        return rtrim(strtr(base64_encode($cipher . ':' . $iv . $tag . $payload), ['+' => '-', '/' => '_']), '=') . '=2';
+        return rtrim(strtr(base64_encode($tag . $iv . $payload . ':' . $cipher), ['+' => '-', '/' => '_']), '=') . '3';
     }
 }
 

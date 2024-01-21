@@ -508,6 +508,11 @@ trait ChainObject5
     public function indent_php($phpcode, $options = []): self { }
     public function indent_php($options = []): self { }
 
+    /** @see \unique_id() */
+    public self $unique_id;
+    public function unique_id(&$id_info = [], $debug = []): self { }
+    public function unique_id($debug = []): self { }
+
     /** @see \http_put() */
     public self $http_put;
     public function http_put($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }
