@@ -381,7 +381,8 @@ class Transporter
             elseif (is_dir($name)) {
                 $rdi = new \RecursiveDirectoryIterator($name, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME);
                 $rii = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::LEAVES_ONLY);
-                $name = iterator_to_array($rii);
+                $ri = new \RegexIterator($rii, '#\.php#i', \RecursiveRegexIterator::MATCH);
+                $name = iterator_to_array($ri);
             }
             // ファイルエントリなら php とみなしてトークンで検出する
             foreach ((array) $name as $file) {
