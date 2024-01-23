@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\normal_rand;
 use function ryunosuke\Functions\Package\probability;
 use function ryunosuke\Functions\Package\random_at;
 use function ryunosuke\Functions\Package\random_float;
+use function ryunosuke\Functions\Package\random_range;
 use function ryunosuke\Functions\Package\random_string;
 use function ryunosuke\Functions\Package\unique_string;
 
@@ -111,6 +112,53 @@ class randomTest extends AbstractTestCase
         that(max($result))->isBetween(+1.299, +1.3);
 
         that(self::resolveFunction('random_float'))(3, 0)->wasThrown('Minimum value must be less than or equal to the maximum value');
+    }
+
+    function test_random_range()
+    {
+        mt_srand(123); // 時々変えた方がいい
+
+        $plusminus = [];
+        $under7 = [];
+        $over70 = [];
+        $counts = [];
+        foreach (range(0, 1000) as $ignored) {
+            $plusminus = array_merge($plusminus, random_range(-100, 100, 7));
+            $under7 = array_merge($under7, random_range(100, 200, 7));
+            $over70 = array_merge($over70, random_range(100, 200, 77));
+            $counts[] = count(random_range(100, 200));
+        }
+
+        that(min($plusminus))->is(-100);
+        that(max($plusminus))->is(+100);
+        that(mean($plusminus))->isBetween(-1, +1);
+
+        that(min($under7))->is(100);
+        that(max($under7))->is(200);
+        that(mean($under7))->isBetween(149, 151);
+
+        that(min($over70))->is(100);
+        that(max($over70))->is(200);
+        that(mean($over70))->isBetween(149, 151);
+
+        that(min($counts))->is(0);
+        that(max($counts))->is(101);
+
+        // 0 や範囲超過数でも OK
+        that(count(random_range(10, 20, 0)))->is(0);
+        that(count(random_range(10, 20, 999)))->is(11);
+        that(count(random_range(-10, +10, 999)))->is(21);
+
+        // 範囲内で重複しない
+        $array = random_range(100, 200, 999);
+        that(count($array))->is(count(array_unique($array)));
+
+        // 膨大な範囲から少しだけ取る場合でもメモリエラーを起こさない
+        that(fn() => count(random_range(100000001, 200000000, 7)))->try(null)->inElapsedTime(0.015)->is(7);
+        // 膨大な範囲からピッタリ取る場合でも現実的な時間で返ってくる
+        that(fn() => count(random_range(1000001, 2000000, 1000000)))->try(null)->inElapsedTime(0.150)->is(1000000);
+
+        that(self::resolveFunction('random_range'))(3, 0)->wasThrown('invalid range');
     }
 
     function test_random_string()
