@@ -6,6 +6,7 @@ use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\normal_rand;
 use function ryunosuke\Functions\Package\probability;
 use function ryunosuke\Functions\Package\random_at;
+use function ryunosuke\Functions\Package\random_float;
 use function ryunosuke\Functions\Package\random_string;
 use function ryunosuke\Functions\Package\unique_string;
 
@@ -87,6 +88,29 @@ class randomTest extends AbstractTestCase
         if ($i === 1000) {
             $this->fail('invisible [1, 2, 3]');
         }
+    }
+
+    function test_random_float()
+    {
+        mt_srand(141); // 時々変えた方がいい
+
+        // まぁ±0.01くらいには収束するだろう
+        $result = [];
+        foreach (range(0, 10000) as $n) {
+            $result[$n] = random_float(-1, +1);
+        }
+        that(mean($result))->isBetween(-0.01, +0.01);
+        that(min($result))->isBetween(-1, -0.999);
+        that(max($result))->isBetween(+0.999, +1);
+
+        $result = [];
+        foreach (range(0, 10000) as $n) {
+            $result[$n] = random_float(-1.7, +1.3);
+        }
+        that(min($result))->isBetween(-1.7, -1.699);
+        that(max($result))->isBetween(+1.299, +1.3);
+
+        that(self::resolveFunction('random_float'))(3, 0)->wasThrown('Minimum value must be less than or equal to the maximum value');
     }
 
     function test_random_string()
