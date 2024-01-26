@@ -12,6 +12,20 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.16
+
+- [fixbug] Transporter で php 以外のファイルも検出されてしまう不具合を修正
+- [feature] benchmark の改善
+- [feature] markdown_table で3桁カンマも数値とみなす機能
+- [feature] random_range を追加
+- [feature] random_float を追加
+- [feature] array_random で負数を与えると個数を超えても例外にならない機能
+- [feature] array_range に auto format モードを追加
+- [change] encrypt の改善
+- [feature] unique_id を追加
+- [*change] set_trace_logger のロガーを psr-3 に変更
+- [composer] psr/log を追加
+
 ## 1.6.15
 
 - [feature] kvsort のシュワルツ変換対応
