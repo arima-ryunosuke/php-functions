@@ -4728,6 +4728,54 @@ if (!function_exists('ryunosuke\\Functions\\array_unset')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\array_walk_recursive2') || (new \ReflectionFunction('ryunosuke\\Functions\\array_walk_recursive2'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_walk_recursive2')) {
+    /**
+     * array_walk_recursive の改善版
+     *
+     * 違いは下記。
+     *
+     * - 第3引数はなし
+     *     - クロージャの use で十分だしそちらの方が優れている
+     * - コールバックは ($value, $key, $array, $keys) が渡ってくる
+     *     - $value, $array はリファレンスにすることで書き換え可能
+     * - 返り値で返す
+     *     - 元の array_walk_recursive の返り値はほとんど意味がない
+     *     - 返り値が空いてるなら変に参照を使わず返り値の方がシンプル
+     *
+     * array_walk_recursive で「この要素は伏せたいのに…」「このノードだけ触りたいのに…」ということはままあるが、
+     * - $array が渡ってくるので unset したり他のキーを生やしたりすることが可能
+     * - $keys が渡ってくるのでツリー構造の特定のノードだけ触ることが可能
+     * になっている。
+     *
+     * 「map も filter も可能」という少しマッチョな関数。
+     * 実質的には「再帰的な array_kvmap」のように振る舞う。
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param array $array 対象配列
+     * @param callable $callback コールバック
+     * @return array walk 後の配列
+     */
+    function array_walk_recursive2($array, $callback)
+    {
+        $callback = func_user_func_array($callback);
+
+        $main = function (&$array, $keys) use (&$main, $callback) {
+            foreach ($array as $k => &$v) {
+                if (is_array($v)) {
+                    $main($v, array_merge($keys, [$k]));
+                }
+                else {
+                    $callback($v, $k, $array, $keys);
+                }
+            }
+        };
+        $main($array, []);
+        return $array;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\array_where') || (new \ReflectionFunction('ryunosuke\\Functions\\array_where'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\array_where')) {
     /**
@@ -6841,9 +6889,7 @@ if (!function_exists('ryunosuke\\Functions\\type_exists')) {
         if (trait_exists($typename, $autoload)) {
             return true;
         }
-        if (function_exists('enum_exists') && enum_exists($typename, $autoload)) {
-            return true; // @codeCoverageIgnore
-        }
+        // enum は class で実装されているので enum_exists は不要
         return false;
     }
 }
@@ -16662,6 +16708,68 @@ if (!function_exists('ryunosuke\\Functions\\average')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\base_convert_array') || (new \ReflectionFunction('ryunosuke\\Functions\\base_convert_array'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\base_convert_array')) {
+    /**
+     * 配列を対象とした base_convert
+     *
+     * 配列の各要素を数値の桁とみなして基数を変換する。
+     *
+     * Example:
+     * ```php
+     * // 123(10進)を7B(16進)に変換
+     * that(base_convert_array([1, 2, 3], 10, 16))->isSame([7, 11]);
+     * // つまりこういうこと（10 * 10^2 + 20 * 10^1 + 30 * 10^0 => 4 * 16^2 + 12 * 16^1 + 14 * 16^0）
+     * that(base_convert_array([10, 20, 30], 10, 16))->isSame([4, 12, 14]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\math
+     *
+     * @copyright 2011 Anthony Ferrara
+     * @copyright 2016-2021 Mika Tuupola
+     * @see https://github.com/tuupola/base62/blob/2.x/LICENSE
+     *
+     * @param array $array 対象配列
+     * @param int $from_base 変換元基数
+     * @param int $to_base 変換先基数
+     * @return array 基数変換後の配列
+     */
+    function base_convert_array($array, $from_base, $to_base)
+    {
+        assert($from_base > 0);
+        assert($to_base > 0);
+
+        // 隠し第4引数が false の場合は gmp を使わない（ロジックのテスト用なので実運用で渡してはならない）
+        if (extension_loaded('gmp') && !(func_num_args() === 4 && func_get_arg(3) === false)) {
+            $array = array_values(array_reverse($array));
+            $bigint = array_reduce(array_keys($array), fn($carry, $i) => $carry + $array[$i] * gmp_pow($from_base, $i), 0);
+            $result = [];
+            while (gmp_cmp($bigint, 0)) {
+                [$bigint, $result[]] = gmp_div_qr($bigint, $to_base);
+            }
+            return array_reverse(array_map(fn($v) => gmp_intval($v), $result));
+        }
+
+        $result = [];
+        while ($array) {
+            $remainder = 0;
+            $quotients = [];
+            foreach ($array as $v) {
+                $accumulator = $v + $remainder * $from_base;
+                $remainder = $accumulator % $to_base;
+                $quotient = ($accumulator - ($accumulator % $to_base)) / $to_base;
+
+                if ($quotient || count($quotients)) {
+                    $quotients[] = $quotient;
+                }
+            }
+            $result[] = $remainder;
+            $array = $quotients;
+        }
+        return array_reverse($result);
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\calculate_formula') || (new \ReflectionFunction('ryunosuke\\Functions\\calculate_formula'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\calculate_formula')) {
     /**
@@ -18299,18 +18407,29 @@ if (!function_exists('ryunosuke\\Functions\\unique_id')) {
     /**
      * 一意な文字列を返す
      *
-     * 最大でも12バイト（96ビット）に収まるようにしてある。
+     * 最大でも8バイト（64ビット）に収まるようにしてある。
      *
-     * - 41bit: ミリ秒
-     * - 24bit: IPv4アドレス下3桁
-     * - 22bit: プロセスID
-     * - 9bit: シーケンス
+     * - 41bit: 1ミリ秒単位
+     * - 7bit: シーケンス
+     * - 16bit: IPv4ホストアドレス
      *
-     * IPv6 のみは対応していないし、複数の IPv4 アドレスを持つ場合は先頭（loopback ではない subnet/8 以上のもの）が使用される。
+     * いわゆる snowflake 系で sonyflake が近い。
+     *
+     * シーケンスは「単位時間（1ミリ秒）あたりに発行できる数」を表す。
+     * 7bit で少し少ないが、生成にファイルロックを使用しているため、1ミリ秒で 128 回生成されることがそもそもレアケース。
+     * 7bit を超えると強制的に1ミリ秒待って timestamp を変えることで重複を防ぐ（≒その時は発行に1ミリ秒かかる）。
+     *
+     * 複数の IPv4 アドレスを持つ場合はサブネットが最も長いもの（ホストアドレスが最も短いもの）が使用される。
+     * IPv6 は未対応で、サブネット /16 未満も未対応。
+     *
+     * 引数はデバッグ用でいくつか用意しているが、実運用としては引数ゼロとして扱うこと。
      *
      * 以下、思考過程と備考。
      *
-     * - この関数は暗号化の初期化ベクトルで使用する想定なので 12byte を超えたくない（GCM の IV が 12byte なので）
+     * - 単調増加の値としてタイムスタンプを採用
+     *     - 如何にホスト・シーケンスが同じになろうと発行時刻が別なら別IDにするためのプレフィックスとして使用する
+     *     - 時間が巻き戻らない限りは大丈夫
+     *     - 2093年までしか発行できない（`(2 ** 41) * (10 ** -3) / 60 / 60 / 24 / 365` = 69.73 年）
      * - サーバー間で重複を許したくない場合の候補は下記で、現在は IPv4 を採用している
      *     - ホスト名
      *         - 文字列で大きさが読めないし一意である保証もない
@@ -18320,109 +18439,153 @@ if (!function_exists('ryunosuke\\Functions\\unique_id')) {
      *         - ただそもそも php で MAC アドレスを簡単に得る手段がない
      *     - IPv4
      *         - サーバー間で重複を許さないような id の生成は大抵クラスタを組んでいて IP が振られているはず
-     *         - そして 4byte でユニークな IP が振られることはまずない（大抵は 2,3byte で固有のはず。/8未満のクラスタ構成なんて見たことない）
+     *         - そして 4byte でユニークな IP が振られることはまずない（大抵は 2,3byte で固有のはず。/12未満のクラスタ構成なんて見たことない）
      *     - IPv6
      *         - 桁が大きすぎる
      *         - まだまだ IPv4 も現役なので積極的に採用する理由に乏しい
-     * - 同じサーバーでも別プロセスだと sequence が効かないのでプロセスIDが必要
-     *     - 少なくとも Windows では 65535 を超えないらしいし、現代的な linux ではデフォルト 2**22 のようだ
+     *     - 引数で machine id を渡す
+     *         - 大抵のシステムでホスト数は1,2桁だろうので小bitで済む
+     *         - でも引数無しにしたかった
+     * - プロセス間の重複（シーケンス）はファイルロックを使用して採番している
+     *     - プロセスIDを採用してたが思ったより大きすぎた（現代的な linux ではデフォルト 2**22 らしい）
+     *     - 逐次ロックなので大量生成には全く向かない
      *
      * @package ryunosuke\Functions\Package\misc
      *
      * @param array $id_info 元になった生成データのレシーバ引数
      * @param array $debug デバッグ用引数（配列で内部の動的な値を指定できる）
-     * @return string|array 一意なバイナリ文字列（debug.raw:true なら配列で返す）
+     * @return string 一意なバイナリ文字列
      */
     function unique_id(&$id_info = [], $debug = [])
     {
-        static $TIMESTAMP_BASE = 1704034800; // 2024-01-01 00:00:00
-        static $TIMESTAMP_PRECISION = 1000;
-        static $RESULT_BIT = 96;
-        static $LONG_BIT = 8 * PHP_INT_SIZE;
-        static $TIMESTAMP_BIT = 41;
-        static $IPADDRESS_BIT = 24;
-        static $PROCESSID_BIT = 22;
-        static $SEQUENCE_BIT = 9;
-        assert(PHP_INT_SIZE === 8);
-        assert(($TIMESTAMP_BIT + $IPADDRESS_BIT + $PROCESSID_BIT + $SEQUENCE_BIT) === $RESULT_BIT);
-
-        static $laststamp = null;
-        static $ipaddress = null;
-        static $processid = null;
-        static $sequence = 0;
-
         $id_info = [];
 
-        $timestamp = $debug['timestamp'] ?? (int) (microtime(true) * $TIMESTAMP_PRECISION);
-        if ($sequence === 2 ** $SEQUENCE_BIT) {
-            usleep(1 * $TIMESTAMP_PRECISION);
-            $timestamp += (int) (microtime(true) * $TIMESTAMP_PRECISION);
-        }
-        if ($timestamp !== $laststamp) {
-            $sequence = 0;
-        }
+        assert(PHP_INT_SIZE === 8);
+        static $TIMESTAMP_BASE = 1704034800; // 2024-01-01 00:00:00
+        static $TIMESTAMP_PRECISION = 1;
+        static $TIMESTAMP_BIT = 41;
+        static $SEQUENCE_BIT = 7;
+        static $IPADDRESS_BIT = 16;
+        assert(($TIMESTAMP_BIT + $SEQUENCE_BIT + $IPADDRESS_BIT) === 64);
 
-        $ipaddress ??= $debug['ipaddress'] ?? (function () {
+        static $ipaddress = null;
+        $ipaddress ??= (function () {
+            $addrs = [];
             foreach (net_get_interfaces() as $interface) {
-                // linkup していて・・・
-                if ($interface['up']) {
-                    foreach ($interface['unicast'] as $addr) {
-                        // IPv4 で・・・
-                        if ($addr['family'] === AF_INET) {
-                            // loopback ではない subnet/8 以上のもの
-                            if (strpos($addr['address'], '127.') !== 0 && strpos($addr['netmask'], '255.') === 0) {
-                                return $addr['address'];
-                            }
+                foreach ($interface['unicast'] as $addr) {
+                    // IPv4 で・・・
+                    if ($addr['family'] === AF_INET) {
+                        // subnet/16 以上のもの
+                        $subnet = strrpos(decbin((ip2long($addr['netmask']))), '1') + 1;
+                        if ($subnet >= 16) {
+                            $addrs[] = [$addr['address'], $subnet];
                         }
-                        // @todo subnet が /104 なら IPv6 でもいける？
                     }
+                    // @todo subnet が /104 なら IPv6 でもいける？
                 }
+            }
+            if ($addrs) {
+                usort($addrs, fn($a, $b) => -($a[1] <=> $b[1]));
+                return reset($addrs)[0];
             }
             throw new \UnexpectedValueException("ip address is not found"); // @codeCoverageIgnore
         })();
+        $ipaddress = $debug['ipaddress'] ?? $ipaddress;
 
-        $processid ??= $debug['processid'] ?? (function () use ($PROCESSID_BIT) {
-            $pid = getmypid();
-            if ($pid <= 2 ** $PROCESSID_BIT) {
-                return $pid;
+        // プロセスを跨いだ連番生成器（何かに使えそうなのでクラスにまとめて少し冗長になっている）
+        static $sequencer = null;
+        $sequencer ??= new class (sys_get_temp_dir() . "/id-sequence") {
+            private     $handle;
+            private int $lockcount = 0;
+
+            public function __construct(string $lockfile)
+            {
+                $this->handle = fopen($lockfile, 'c+');
             }
-            throw new \UnexpectedValueException("process id is too big ($pid)"); // @codeCoverageIgnore
-        })();
+
+            public function lock(): int
+            {
+                if (flock($this->handle, LOCK_EX)) {
+                    $this->lockcount++;
+                }
+                return $this->lockcount;
+            }
+
+            public function unlock(): int
+            {
+                if (flock($this->handle, LOCK_UN)) {
+                    $this->lockcount--;
+                }
+                return $this->lockcount;
+            }
+
+            public function reset(int $sequence): void
+            {
+                assert($this->lockcount > 0, 'must be lock');
+
+                set_error_handler(function ($severity, $message, $file, $line) { throw new \ErrorException($message, 0, $severity, $file, $line); });
+                try {
+                    rewind($this->handle);
+                    ftruncate($this->handle, 0);
+                    fwrite($this->handle, $sequence);
+                }
+                finally {
+                    restore_error_handler();
+                }
+            }
+
+            public function add(int $increment = 1): int
+            {
+                assert($this->lockcount > 0, 'must be lock');
+
+                set_error_handler(function ($severity, $message, $file, $line) { throw new \ErrorException($message, 0, $severity, $file, $line); });
+                try {
+                    rewind($this->handle);
+                    $sequence = (int) stream_get_contents($this->handle);
+
+                    $next = $sequence + $increment;
+                    $this->reset(is_float($next) ? 0 : $next);
+
+                    return $sequence;
+                }
+                finally {
+                    restore_error_handler();
+                }
+            }
+        };
+
+        $sequencer->lock();
+        try {
+            $timestamp = $debug['timestamp'] ?? microtime(true);
+            if (isset($debug['sequence'])) {
+                $sequencer->reset($debug['sequence']);
+            }
+
+            $sequence = $sequencer->add() % (1 << $SEQUENCE_BIT);
+            if ($sequence === 0) {
+                usleep(1000 * $TIMESTAMP_PRECISION);
+                $timestamp = microtime(true);
+            }
+        }
+        finally {
+            $sequencer->unlock();
+        }
 
         $id_info = [
-            'timestamp' => $timestamp - $TIMESTAMP_BASE,
-            'ipsegment' => ip2long($ipaddress) & (2 ** $IPADDRESS_BIT - 1),
-            'processid' => $processid,
-            'sequence'  => $sequence++,
+            'timestamp' => (int) (($timestamp - $TIMESTAMP_BASE) * 1000 / $TIMESTAMP_PRECISION),
+            'sequence'  => $sequence,
+            'ipsegment' => ip2long($ipaddress) & ((1 << $IPADDRESS_BIT) - 1),
         ];
-        $laststamp = $timestamp;
 
-        $sequence_right_bits = 0;
-        $processid_right_bits = $sequence_right_bits + $SEQUENCE_BIT;
-        $ipaddress_right_bits = $processid_right_bits + $PROCESSID_BIT;
-        $timestamp_right_bits = $ipaddress_right_bits + $IPADDRESS_BIT;
-        $lo_bits = $LONG_BIT - $timestamp_right_bits;
+        assert(($id_info['timestamp'] & ((1 << $TIMESTAMP_BIT) - 1)) === $id_info['timestamp']);
+        assert(($id_info['sequence'] & ((1 << $SEQUENCE_BIT) - 1)) === $id_info['sequence']);
+        assert(($id_info['ipsegment'] & ((1 << $IPADDRESS_BIT) - 1)) === $id_info['ipsegment']);
 
-        // 123456789A123456789B123456789C123456789D123456789E123456789F1234
-        // 00000000000000000000000_____________________________________time
-        $hi64 = $id_info['timestamp'];
+        $ipaddress_right_bits = 0;
+        $sequence_right_bits = $ipaddress_right_bits + $IPADDRESS_BIT;
+        $timestamp_right_bits = $sequence_right_bits + $SEQUENCE_BIT;
 
-        // 123456789A123456789B123456789C123456789D123456789E123456789F1234
-        // 000000000______________________ip___________________pid______seq
-        $lo64 = ($id_info['ipsegment'] << $ipaddress_right_bits) | ($id_info['processid'] << $processid_right_bits) | ($id_info['sequence'] << $sequence_right_bits);
-
-        // 123456789A123456789B123456789C123456789D123456789E123456789F123456789G123456789H123456789I123456
-        // ------------time 32------------|-time 9-|---------ip 24---------|--------pid 22-------|---seq---
-        $binary = pack('NJ', $hi64 >> $lo_bits, (($hi64 & (2 ** $lo_bits - 1)) << $timestamp_right_bits) | $lo64);
-        assert($binary === (function () use ($TIMESTAMP_BIT, $timestamp_right_bits, $hi64, $lo64) {
-                $binstr = sprintf("%0{$TIMESTAMP_BIT}b%0{$timestamp_right_bits}b", $hi64, $lo64);
-                $octets = str_split($binstr, 8);
-                $bytes = array_map(fn($v) => bindec($v), $octets);
-                $chars = array_map(fn($v) => chr($v), $bytes);
-                return implode('', $chars);
-            })(),
-        );
-        return $binary;
+        return pack('J', ($id_info['timestamp'] << $timestamp_right_bits) | ($id_info['sequence'] << $sequence_right_bits) | ($id_info['ipsegment'] << $ipaddress_right_bits));
     }
 }
 
@@ -25865,6 +26028,102 @@ if (!function_exists('ryunosuke\\Functions\\try_return')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\base62_decode') || (new \ReflectionFunction('ryunosuke\\Functions\\base62_decode'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\base62_decode')) {
+    /**
+     * 数値とアルファベットで base62 デコードする
+     *
+     * 対で使うと思うので base62_encode を参照。
+     *
+     * @package ryunosuke\Functions\Package\url
+     *
+     * @param string $string base62 文字列
+     * @return string 変換元文字列
+     */
+    function base62_decode($string)
+    {
+        // あくまで数値として扱うので先頭の 0 は吹き飛んでしまう
+        $zeropos = strspn($string, "0");
+        $zeroprefix = str_repeat("\0", $zeropos);
+        $string = substr($string, $zeropos);
+
+        // php<8.2 の str_split は [""] を返すし gmp が扱うのはあくまで数値なので空文字は特別扱いとする
+        if (!strlen($string)) {
+            return $zeroprefix;
+        }
+
+        // 隠し第2引数が false の場合は gmp を使わない（ロジックのテスト用なので実運用で渡してはならない）
+        if (extension_loaded('gmp') && !(func_num_args() === 2 && func_get_arg(1) === false)) {
+            $gmp = @gmp_init($string, 62);
+            if ($gmp === false) {
+                throw new \InvalidArgumentException("string is not an base62");
+            }
+            return $zeroprefix . gmp_export($gmp);
+        }
+
+        static $basechars_assoc = null;
+        $basechars_assoc ??= array_flip(str_split('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'));
+
+        $chars = str_split($string);
+        $base62 = array_map(fn($c) => $basechars_assoc[$c] ?? throws(new \InvalidArgumentException("string is not an base62")), $chars);
+        $bytes = base_convert_array($base62, 62, 256);
+        return $zeroprefix . implode('', array_map('chr', $bytes));
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\base62_encode') || (new \ReflectionFunction('ryunosuke\\Functions\\base62_encode'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\base62_encode')) {
+    /**
+     * 数値とアルファベットで base62 エンコードする
+     *
+     * あくまでエンコードであって引数は文字列として扱う。つまり数値の基数変換ではない。
+     *
+     * base64 と違い、下記の特徴がある。
+     * - =パディングなし
+     * - 記号が入らない（完全に URL セーフ）
+     * - ASCII 順（元の推移律が維持される）
+     *
+     * 変換効率もあまり変わらないため、文字列が小さい間はほぼ base64_encode の上位互換に近い。
+     * ただし gmp が入っていないと猛烈に遅い。
+     *
+     * Example:
+     * ```php
+     * that(base62_encode('abcdefg'))->isSame('21XiSSifQN');
+     * that(base62_decode('21XiSSifQN'))->isSame('abcdefg');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\url
+     *
+     * @param string $string 変換元文字列
+     * @return string base62 文字列
+     */
+    function base62_encode($string)
+    {
+        // あくまで数値として扱うので先頭の 0 は吹き飛んでしまう
+        $zeropos = strspn($string, "\0");
+        $zeroprefix = str_repeat("0", $zeropos);
+        $string = substr($string, $zeropos);
+
+        // php<8.2 の str_split は [""] を返すし gmp が扱うのはあくまで数値なので空文字は特別扱いとする
+        if (!strlen($string)) {
+            return $zeroprefix;
+        }
+
+        // 隠し第2引数が false の場合は gmp を使わない（ロジックのテスト用なので実運用で渡してはならない）
+        if (extension_loaded('gmp') && !(func_num_args() === 2 && func_get_arg(1) === false)) {
+            return $zeroprefix . gmp_strval(gmp_import($string), 62);
+        }
+
+        static $basechars_index = null;
+        $basechars_index ??= str_split('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz');
+
+        $chars = str_split($string);
+        $bytes = array_map('ord', $chars);
+        $base62 = base_convert_array($bytes, 256, 62);
+        return $zeroprefix . implode('', array_map(fn($v) => $basechars_index[$v], $base62));
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\build_query') || (new \ReflectionFunction('ryunosuke\\Functions\\build_query'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\build_query')) {
     /**
@@ -26509,10 +26768,7 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
         // 出力するなら出力
         if ($output) {
             $number_format = function ($value, $ratio = 1, $decimal = 0, $nullvalue = '') {
-                if ($value === null) {
-                    return $nullvalue;
-                }
-                return number_format($value * $ratio, $decimal);
+                return $value === null ? $nullvalue : number_format($value * $ratio, $decimal);
             };
             printf("Running %s cases (between %s ms):\n", count($benchset), $number_format($millisec));
             echo markdown_table(array_map(function ($v) use ($number_format) {
@@ -26752,6 +27008,19 @@ if (!function_exists('ryunosuke\\Functions\\cacheobject')) {
             {
                 assert(strlen($directory));
                 $this->directory = $directory;
+            }
+
+            public function __debugInfo()
+            {
+                $class = self::class;
+                $props = (array) $this;
+
+                // 全キャッシュは情報量としてでかすぎるが、何がどこに配置されているかくらいは有ってもいい
+                $ekey = "\0$class\0entries";
+                assert(array_key_exists($ekey, $props));
+                $props[$ekey] = array_reduce(array_keys($props[$ekey]), fn($acc, $k) => $acc + [$k => $this->_getFilename($k)], []);
+
+                return $props;
             }
 
             private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
