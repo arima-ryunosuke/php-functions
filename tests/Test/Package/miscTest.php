@@ -7,11 +7,13 @@ use function ryunosuke\Functions\Package\evaluate;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\highlight_php;
 use function ryunosuke\Functions\Package\indent_php;
+use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\parse_annotation;
 use function ryunosuke\Functions\Package\parse_namespace;
 use function ryunosuke\Functions\Package\parse_php;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\process;
+use function ryunosuke\Functions\Package\process_parallel;
 use function ryunosuke\Functions\Package\resolve_symbol;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\strip_php;
@@ -1122,47 +1124,94 @@ aplain text
         // 重複しない
         $ids = [];
         for ($i = 0; $i < 10; $i++) {
-            for ($j = 0; $j < 10000; $j++) {
+            for ($j = 0; $j < 1000; $j++) {
                 $ids[] = unique_id();
             }
-            usleep(1 * 1000);
+            usleep(10 * 1000);
         }
         that(count($ids))->is(count(array_unique($ids)));
 
-        // 例え同じ時刻・IP・プロセスでも9bitまでは重複しない
+        // 例え同じ時刻・IPでも7bitまでは重複しない
         $ids = [];
-        for ($i = 0; $i < 512; $i++) {
+        for ($i = 0; $i < 128; $i++) {
             $ids[] = unique_id($id_info, [
                 'timestamp' => $now,
                 'ipaddress' => '127.0.0.1',
-                'processid' => 123,
+                'sequence'  => $i === 0 ? 0 : null,
             ]);
         }
         that(count($ids))->is(count(array_unique($ids)));
 
-        // 9bit を超えても sleep が入るので結局重複しない
+        // そもそも7bitを超えても sleep が入って timestamp が進むので結局重複しない
         $ids[] = unique_id($id_info, [
             'timestamp' => $now,
             'ipaddress' => '127.0.0.1',
-            'processid' => 123,
         ]);
         that(count($ids))->is(count(array_unique($ids)));
-        that($id_info['timestamp'])->gt((int) (microtime(true) * 1000));
+        that($id_info['timestamp'])->gt($now);
         that($id_info['sequence'])->isSame(0);
 
-        // 同じ時刻・IP・プロセスなら sequence が進んでいる
+        // 同じ時刻・IPなら sequence が進んでいる
+        unique_id($id_info, [
+            'sequence' => 0,
+        ]);
         $ids = [];
         $ids[] = unique_id($id_info1, [
             'timestamp' => $now,
             'ipaddress' => '127.0.0.1',
-            'processid' => 123,
         ]);
         $ids[] = unique_id($id_info2, [
             'timestamp' => $now,
             'ipaddress' => '127.0.0.1',
-            'processid' => 123,
         ]);
         that(count($ids))->is(count(array_unique($ids)));
         that($id_info1['sequence'])->isSame($id_info2['sequence'] - 1);
+
+        // 同じ時刻でも異なるIPなら重複しない
+        $ids = [];
+        unique_id($id_info, [
+            'sequence' => 0,
+        ]);
+        $ids[] = unique_id($id_info1, [
+            'timestamp' => $now,
+            'ipaddress' => '127.0.0.1',
+        ]);
+        unique_id($id_info, [
+            'sequence' => 0,
+        ]);
+        $ids[] = unique_id($id_info2, [
+            'timestamp' => $now,
+            'ipaddress' => '127.0.0.2',
+        ]);
+        that(count($ids))->is(count(array_unique($ids)));
+        that($id_info1['timestamp'])->isSame($id_info2['timestamp']);
+        that($id_info1['sequence'])->isSame($id_info2['sequence']);
+        that($id_info1['ipsegment'])->isNotSame($id_info2['ipsegment']);
+
+        // 別プロセス
+        $now = time();
+        $returns = process_parallel(static function ($index) use ($now) {
+            time_sleep_until($now + 2);
+            $ids = [];
+            for ($i = 0; $i < 1000; $i++) {
+                $id = unique_id($id_info);
+                $id_info['id'] = $id;
+                $ids[] = $id_info;
+            }
+            return $ids;
+        }, [0, 1, 2, 3], [__DIR__ . '/../../../src/Package/misc/unique_id.php']);
+
+        $results = array_merge(...array_column($returns, 'return'));
+        $ids = array_column($results, 'id');
+        $tss = array_column($results, 'timestamp');
+
+        // 重複しない
+        that(count($ids))->is(4 * 1000);
+        that(count($ids))->is(count(array_unique($ids)));
+
+        // 1ミリ秒で1回しか生成してないならテストの意味がない（絶対に重複しない）のでまぁ2回は生成出来ているものとする
+        that(mean(array_count_values($tss)))->gt(2);
+        // その中でも5回生成があればまぁよしとする
+        that(max(array_count_values($tss)))->gt(5);
     }
 }
