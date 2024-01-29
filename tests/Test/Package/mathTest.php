@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\array_shuffle;
+use function ryunosuke\Functions\Package\base_convert_array;
 use function ryunosuke\Functions\Package\calculate_formula;
 use function ryunosuke\Functions\Package\clamp;
 use function ryunosuke\Functions\Package\decimal;
@@ -43,6 +44,44 @@ class mathTest extends AbstractTestCase
     function test_average()
     {
         that(self::resolveFunction('average'))()->wasThrown('not implement yet');
+    }
+
+    function test_base_convert_array()
+    {
+        foreach ([false, true] as $ext) {
+            $base10 = str_split(1024);
+            $base02 = base_convert_array($base10, 10, 2, $ext);
+            $base08 = base_convert_array($base02, 2, 8, $ext);
+            $base16 = base_convert_array($base08, 8, 16, $ext);
+            that(base_convert_array($base16, 16, 10, $ext))->is($base10);
+
+            that(base_convert_array(str_split(1024), 10, 2, $ext))->is(str_split(10000000000));
+            that(base_convert_array(str_split(1024), 10, 8, $ext))->is(str_split(2000));
+            that(base_convert_array(str_split(1024), 10, 10, $ext))->is(str_split(1024));
+            that(base_convert_array(str_split(1024), 10, 16, $ext))->is(str_split(400));
+
+            that(base_convert_array([1, 2, 3], 10, 10, $ext))->is([1, 2, 3]);
+            that(base_convert_array([1, 2, -3], 10, 10, $ext))->is([1, 1, 7]);
+            that(base_convert_array([1, -2, -3], 10, 10, $ext))->is([7, 7]);
+            that(base_convert_array([-1, -2, -3], 10, 10, $ext))->is([-1, -2, -3]);
+            that(base_convert_array([-1, -2, 3], 10, 10, $ext))->is([-1, -1, -7]);
+            that(base_convert_array([-1, 2, 3], 10, 10, $ext))->is([-7, -7]);
+            that(base_convert_array([-1, 2, -3], 10, 10, $ext))->is([-8, -3]);
+
+            that(base_convert_array([11, 12, 13], 10, 10, $ext))->is(str_split((11 * 10 ** 2) + (12 * 10 ** 1) + (13 * 10 ** 0)));
+
+            that(base_convert_array([], 99, 99, $ext))->is([]);
+        }
+
+        // zero
+        $bytes = [0, 10, 0];
+        that(base_convert_array($bytes, 256, 10, false))->is(base_convert_array($bytes, 256, 10, true));
+        that(base_convert_array($bytes, 10, 256, false))->is(base_convert_array($bytes, 10, 256, true));
+
+        // big
+        $bytes = array_map('ord', str_split(random_bytes(4096)));
+        that(base_convert_array($bytes, 256, 10, false))->is(base_convert_array($bytes, 256, 10, true));
+        that(base_convert_array($bytes, 10, 256, false))->is(base_convert_array($bytes, 10, 256, true));
     }
 
     function test_calculate_formula()
