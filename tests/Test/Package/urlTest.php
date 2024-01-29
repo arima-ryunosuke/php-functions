@@ -2,6 +2,8 @@
 
 namespace ryunosuke\Test\Package;
 
+use function ryunosuke\Functions\Package\base62_decode;
+use function ryunosuke\Functions\Package\base62_encode;
 use function ryunosuke\Functions\Package\build_query;
 use function ryunosuke\Functions\Package\build_uri;
 use function ryunosuke\Functions\Package\dataurl_decode;
@@ -90,6 +92,33 @@ class urlTest extends AbstractTestCase
                 'parts' => $gen('scheme', '', '', 'local.host', '', '/path/to/hoge', ['aaa' => 'あああ'], 'いいい'),
             ],
         ];
+    }
+
+    function test_base62()
+    {
+        foreach ([0, 1, 15, 16, 255, 256, 1023, 1024] as $length) {
+            $string = $length === 0 ? '' : random_bytes($length);
+            $encoded = base62_encode($string, false);
+            $decoded = base62_decode($encoded, false);
+            that($decoded)->isSame($string);
+
+            that($encoded)->isSame(base62_encode($string, true));
+            that($decoded)->isSame(base62_decode($encoded, true));
+        }
+
+        foreach ([false, true] as $ext) {
+            // string
+            that(base62_encode(61, $ext))->isSame('3bl');
+            that(base62_decode('3bl', $ext))->isSame('61');
+
+            // zero byte
+            $zerobytestring = "\0\0\0\0\0\0\0\0A";
+            that(base62_encode($zerobytestring, $ext))->isSame('0000000013');
+            that(base62_decode('0000000013', $ext))->isSame($zerobytestring);
+
+            // invalid
+            that(self::resolveFunction('base62_decode'))('a+z', $ext)->wasThrown('is not');
+        }
     }
 
     function test_build_query()
