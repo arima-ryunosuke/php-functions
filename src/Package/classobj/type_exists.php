@@ -39,8 +39,6 @@ function type_exists($typename, $autoload = true)
     if (trait_exists($typename, $autoload)) {
         return true;
     }
-    if (function_exists('enum_exists') && enum_exists($typename, $autoload)) {
-        return true; // @codeCoverageIgnore
-    }
+    // enum は class で実装されているので enum_exists は不要
     return false;
 }
