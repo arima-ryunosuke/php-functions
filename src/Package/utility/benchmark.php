@@ -172,10 +172,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     // 出力するなら出力
     if ($output) {
         $number_format = function ($value, $ratio = 1, $decimal = 0, $nullvalue = '') {
-            if ($value === null) {
-                return $nullvalue;
-            }
-            return number_format($value * $ratio, $decimal);
+            return $value === null ? $nullvalue : number_format($value * $ratio, $decimal);
         };
         printf("Running %s cases (between %s ms):\n", count($benchset), $number_format($millisec));
         echo markdown_table(array_map(function ($v) use ($number_format) {
