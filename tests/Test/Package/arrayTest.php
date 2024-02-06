@@ -70,6 +70,7 @@ use function ryunosuke\Functions\Package\array_sprintf;
 use function ryunosuke\Functions\Package\array_strpad;
 use function ryunosuke\Functions\Package\array_uncolumns;
 use function ryunosuke\Functions\Package\array_unset;
+use function ryunosuke\Functions\Package\array_walk_recursive2;
 use function ryunosuke\Functions\Package\array_where;
 use function ryunosuke\Functions\Package\array_zip;
 use function ryunosuke\Functions\Package\arrayize;
@@ -3006,6 +3007,81 @@ class arrayTest extends AbstractTestCase
             99 => 99,
         ]);
         that($array)->is([]);
+    }
+
+    function test_array_walk_recursive2()
+    {
+        $array = [
+            'a' => [
+                'b' => [
+                    'c' => [1, 2, 3],
+                ],
+            ],
+            'x' => [
+                'y' => [
+                    'z' => [7, 8, 9],
+                ],
+            ],
+        ];
+
+        // 単純書き換えはオリジナルと同じ
+        $copied = $array;
+        array_walk_recursive($copied, function (&$v, $k) {
+            $v *= 2;
+        });
+        that(array_walk_recursive2($array, function (&$v, $k) {
+            $v *= 2;
+        }))->is($copied);
+
+        // 追加や削除ができる
+        that(array_walk_recursive2($array, function (&$v, $k, &$array) {
+            if ($v === 2) {
+                unset($array[$k]);
+            }
+            if ($v === 8) {
+                $array["_$k"] = 88;
+            }
+        }))->is([
+            "a" => [
+                "b" => [
+                    "c" => [
+                        0 => 1,
+                        2 => 3,
+                    ],
+                ],
+            ],
+            "x" => [
+                "y" => [
+                    "z" => [
+                        0    => 7,
+                        1    => 8,
+                        2    => 9,
+                        "_1" => 88,
+                    ],
+                ],
+            ],
+        ]);
+
+        // 特定キーだけの処理ができる
+        that(array_walk_recursive2($array, function (&$v, $k, &$array, $keys) {
+            if ($keys === ['a', 'b', 'c']) {
+                $array[$k] = $v * 2;
+            }
+            if ($keys === ['x', 'y', 'z']) {
+                $array[$k] = $v * 3;
+            }
+        }))->is([
+            "a" => [
+                "b" => [
+                    "c" => [2, 4, 6],
+                ],
+            ],
+            "x" => [
+                "y" => [
+                    "z" => [21, 24, 27],
+                ],
+            ],
+        ]);
     }
 
     function test_array_where()
