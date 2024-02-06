@@ -47,6 +47,19 @@ function cacheobject($directory, $clean_probability = 0)
             $this->directory = $directory;
         }
 
+        public function __debugInfo()
+        {
+            $class = self::class;
+            $props = (array) $this;
+
+            // 全キャッシュは情報量としてでかすぎるが、何がどこに配置されているかくらいは有ってもいい
+            $ekey = "\0$class\0entries";
+            assert(array_key_exists($ekey, $props));
+            $props[$ekey] = array_reduce(array_keys($props[$ekey]), fn($acc, $k) => $acc + [$k => $this->_getFilename($k)], []);
+
+            return $props;
+        }
+
         private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
         {
             return interface_exists(\Psr\SimpleCache\InvalidArgumentException::class)

@@ -229,6 +229,10 @@ class utilityTest extends AbstractTestCase
         that($cache)->getMultiple(new \ArrayObject(['']))->wasThrown('empty string');
         that($cache)->set('ttl', 'value', 'hoge')->wasThrown('ttl must be');
 
+        $debugString = print_r($cache, true);
+        that($debugString)->contains($tmpdir);
+        that($debugString)->contains('path.to.dir');
+
         // clean
 
         that($cache->set('dir.expired', 'value', 1))->isTrue();
