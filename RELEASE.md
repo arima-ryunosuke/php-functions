@@ -12,6 +12,17 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.17
+
+- [bin] ChainObject の stub から \\ を除去
+- [refactor] benchmark のカバレッジ漏れがあったのでコード側を修正
+- [refactor] enum の認識誤りを修正
+- [feature] array_walk_recursive2 を追加
+- [feature] cacheobject に __debugInfo を実装
+- [feature] base62_encode/decode を追加
+- [feature] base_convert_array を追加
+- [change] unique_id の内部動作を変更
+
 ## 1.6.16
 
 - [fixbug] Transporter で php 以外のファイルも検出されてしまう不具合を修正
