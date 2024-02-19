@@ -10,6 +10,7 @@ use function ryunosuke\Functions\Package\get_modified_files;
 use function ryunosuke\Functions\Package\get_uploaded_files;
 use function ryunosuke\Functions\Package\ini_sets;
 use function ryunosuke\Functions\Package\is_ansi;
+use function ryunosuke\Functions\Package\sys_set_temp_dir;
 
 class infoTest extends AbstractTestCase
 {
@@ -544,5 +545,18 @@ class infoTest extends AbstractTestCase
         that(getenv('ENV_3', true))->is('');
         that(getenv('ENV_X', true))->isFalse();
         that(getenv('undefined', true))->isFalse();
+    }
+
+    function test_sys_set_temp_dir()
+    {
+        // 変更できないので実質的にカバレッジのみ
+
+        $tmpdir = $this->emptyDirectory();
+        that(sys_set_temp_dir($tmpdir))->isFalse();
+        that(sys_set_temp_dir('local'))->isFalse();
+        that(sys_set_temp_dir($tmpdir, true, false))->isTrue();
+        that(sys_set_temp_dir('local', true, false))->isTrue();
+        that(sys_set_temp_dir($tmpdir, false, false))->isTrue();
+        that(sys_set_temp_dir('local', false, false))->isTrue();
     }
 }
