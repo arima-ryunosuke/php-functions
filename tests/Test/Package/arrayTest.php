@@ -2259,9 +2259,16 @@ class arrayTest extends AbstractTestCase
 
     function test_array_pos_key()
     {
-        that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'))->is(2);
-        that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1))->is(-1);
-        that(self::resolveFunction('array_pos_key'))(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x')->wasThrown('OutOfBoundsException');
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+
+        that(array_pos_key($array, 'c'))->is(2);
+        that(array_pos_key($array, 'x', -1))->is(-1);
+        that(self::resolveFunction('array_pos_key'))($array, 'x')->wasThrown('OutOfBoundsException');
+
+        that(array_pos_key($array, ['c']))->is(['c' => 2]);
+        that(array_pos_key($array, ['c', 'a']))->is(['a' => 0, 'c' => 2]);
+        that(array_pos_key($array, ['c', 'x'], null))->is(['c' => 2, 'x' => null]);
+        that(self::resolveFunction('array_pos_key'))($array, ['c', 'x'])->wasThrown('OutOfBoundsException');
     }
 
     function test_array_prepend()
