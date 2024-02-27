@@ -23,6 +23,10 @@ namespace ryunosuke\Functions\Package;
  */
 function is_hasharray(array $array)
 {
+    if (function_exists('array_is_list')) {
+        return !array_is_list($array); // @codeCoverageIgnore
+    }
+
     $i = 0;
     foreach ($array as $k => $dummy) {
         if ($k !== $i++) {
