@@ -36,6 +36,7 @@ use function ryunosuke\Functions\Package\array_insert;
 use function ryunosuke\Functions\Package\array_keys_exist;
 use function ryunosuke\Functions\Package\array_kmap;
 use function ryunosuke\Functions\Package\array_kvmap;
+use function ryunosuke\Functions\Package\array_limit;
 use function ryunosuke\Functions\Package\array_lmap;
 use function ryunosuke\Functions\Package\array_lookup;
 use function ryunosuke\Functions\Package\array_map_filter;
@@ -1580,6 +1581,77 @@ class arrayTest extends AbstractTestCase
                 ],
             ]
         );
+    }
+
+    function test_array_limit()
+    {
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+
+        // offset 省略
+        that(array_limit($array, -4))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that(array_limit($array, -3))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that(array_limit($array, -2))->isSame(['b' => 'B', 'c' => 'C']);
+        that(array_limit($array, -1))->isSame(['c' => 'C']);
+        that(array_limit($array, 0))->isSame([]);
+        that(array_limit($array, +1))->isSame(['a' => 'A']);
+        that(array_limit($array, +2))->isSame(['a' => 'A', 'b' => 'B']);
+        that(array_limit($array, +3))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that(array_limit($array, +4))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+
+        // offset 0
+        that(array_limit($array, -4, 0))->isSame(['a' => 'A']);
+        that(array_limit($array, -3, 0))->isSame(['a' => 'A']);
+        that(array_limit($array, -2, 0))->isSame(['a' => 'A']);
+        that(array_limit($array, -1, 0))->isSame(['a' => 'A']);
+        that(array_limit($array, 0, 0))->isSame([]);
+        that(array_limit($array, +1, 0))->isSame(['a' => 'A']);
+        that(array_limit($array, +4, 0))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+
+        // offset 1
+        that(array_limit($array, -4, 1))->isSame(['a' => 'A', 'b' => 'B']);
+        that(array_limit($array, -3, 1))->isSame(['a' => 'A', 'b' => 'B']);
+        that(array_limit($array, -2, 1))->isSame(['a' => 'A', 'b' => 'B']);
+        that(array_limit($array, -1, 1))->isSame(['b' => 'B']);
+        that(array_limit($array, 0, 1))->isSame([]);
+        that(array_limit($array, +1, 1))->isSame(['b' => 'B']);
+        that(array_limit($array, +2, 1))->isSame(['b' => 'B', 'c' => 'C']);
+        that(array_limit($array, +3, 1))->isSame(['b' => 'B', 'c' => 'C']);
+        that(array_limit($array, +4, 1))->isSame(['b' => 'B', 'c' => 'C']);
+
+        // offset 2
+        that(array_limit($array, -4, 2))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that(array_limit($array, -3, 2))->isSame(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+        that(array_limit($array, -2, 2))->isSame(['b' => 'B', 'c' => 'C']);
+        that(array_limit($array, -1, 2))->isSame(['c' => 'C']);
+        that(array_limit($array, 0, 2))->isSame([]);
+        that(array_limit($array, +1, 2))->isSame(['c' => 'C']);
+        that(array_limit($array, +2, 2))->isSame(['c' => 'C']);
+        that(array_limit($array, +3, 2))->isSame(['c' => 'C']);
+        that(array_limit($array, +4, 2))->isSame(['c' => 'C']);
+
+        // offset 5
+        that(array_limit($array, -4, 5))->isSame(['c' => 'C']);
+        that(array_limit($array, -3, 5))->isSame([]);
+        that(array_limit($array, -2, 5))->isSame([]);
+        that(array_limit($array, -1, 5))->isSame([]);
+        that(array_limit($array, 0, 5))->isSame([]);
+        that(array_limit($array, +1, 5))->isSame([]);
+        that(array_limit($array, +2, 5))->isSame([]);
+        that(array_limit($array, +3, 5))->isSame([]);
+        that(array_limit($array, +4, 5))->isSame([]);
+
+        // offset -5
+        that(array_limit($array, -4, -5))->isSame([]);
+        that(array_limit($array, -3, -5))->isSame([]);
+        that(array_limit($array, -2, -5))->isSame([]);
+        that(array_limit($array, -1, -5))->isSame([]);
+        that(array_limit($array, 0, -5))->isSame([]);
+        that(array_limit($array, +1, -5))->isSame([]);
+        that(array_limit($array, +2, -5))->isSame([]);
+        that(array_limit($array, +3, -5))->isSame([]);
+        that(array_limit($array, +4, -5))->isSame([]);
+        that(array_limit($array, +5, -5))->isSame([]);
+        that(array_limit($array, +6, -5))->isSame(['a' => 'A']);
     }
 
     function test_array_lmap()
