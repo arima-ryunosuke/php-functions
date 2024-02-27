@@ -23,6 +23,7 @@ use function ryunosuke\Functions\Package\is_decimal;
 use function ryunosuke\Functions\Package\is_empty;
 use function ryunosuke\Functions\Package\is_primitive;
 use function ryunosuke\Functions\Package\is_recursive;
+use function ryunosuke\Functions\Package\is_resourcable;
 use function ryunosuke\Functions\Package\is_stringable;
 use function ryunosuke\Functions\Package\numberify;
 use function ryunosuke\Functions\Package\numval;
@@ -503,6 +504,26 @@ class varTest extends AbstractTestCase
         $rnestobject->parent->child = new \stdClass();
         $rnestobject->parent->child->grand = $rnestobject;
         that(is_recursive($rnestobject))->isTrue();
+    }
+
+    function test_is_resourcable()
+    {
+        that(is_resourcable(null))->isFalse();
+        that(is_resourcable(false))->isFalse();
+        that(is_resourcable(true))->isFalse();
+        that(is_resourcable(123))->isFalse();
+        that(is_resourcable(123.456))->isFalse();
+        that(is_resourcable('hoge'))->isFalse();
+        that(is_resourcable(['array']))->isFalse();
+        that(is_resourcable(new \stdClass()))->isFalse();
+        that(is_resourcable(new \Concrete('hoge')))->isFalse();
+        that(is_resourcable(STDIN))->isTrue();
+        that(is_resourcable(STDOUT))->isTrue();
+
+        $resource = tmpfile();
+        that(is_resourcable($resource))->isTrue();
+        fclose($resource);
+        that(is_resourcable($resource))->isTrue();
     }
 
     function test_is_stringable()

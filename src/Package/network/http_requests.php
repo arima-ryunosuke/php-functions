@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../network/http_request.php';
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -94,7 +95,7 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
 
     $stringify_curl = function ($curl) {
         // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-        if (is_resource($curl)) {
+        if (is_resourcable($curl)) {
             return (string) $curl;
         }
         // @codeCoverageIgnoreStart

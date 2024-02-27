@@ -16,6 +16,7 @@ require_once __DIR__ . '/../info/is_ansi.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 require_once __DIR__ . '/../strings/str_ellipsis.php';
 require_once __DIR__ . '/../var/is_primitive.php';
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -197,9 +198,6 @@ function var_pretty($value, $options = [])
             elseif (is_object($token)) {
                 return $this->_append($this->string($token), 'green', ['type' => 'object', 'id' => spl_object_id($token)]);
             }
-            elseif (is_resource($token)) {
-                return $this->_append($this->string($token), 'bold', ['type' => 'resource']);
-            }
             elseif (is_string($token)) {
                 return $this->_append($this->string($token), 'magenta', ['type' => 'scalar']);
             }
@@ -208,6 +206,9 @@ function var_pretty($value, $options = [])
             }
             elseif (is_scalar($token)) {
                 return $this->_append($this->string($token), 'magenta', ['type' => 'scalar']);
+            }
+            elseif (is_resourcable($token)) {
+                return $this->_append($this->string($token), 'bold', ['type' => 'resource']);
             }
             else {
                 throw new \DomainException(); // @codeCoverageIgnore
@@ -246,9 +247,6 @@ function var_pretty($value, $options = [])
                 }
                 return get_class($token) . "#" . spl_object_id($token);
             }
-            elseif (is_resource($token)) {
-                return sprintf('%s of type (%s)', $token, get_resource_type($token));
-            }
             elseif (is_string($token)) {
                 if ($this->options['maxlength']) {
                     $token = str_ellipsis($token, $this->options['maxlength'], '...(too length)...');
@@ -257,6 +255,9 @@ function var_pretty($value, $options = [])
             }
             elseif (is_scalar($token)) {
                 return var_export($token, true);
+            }
+            elseif (is_resourcable($token)) {
+                return sprintf('%s of type (%s)', $token, get_resource_type($token));
             }
             else {
                 throw new \DomainException(gettype($token)); // @codeCoverageIgnore

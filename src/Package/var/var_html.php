@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -60,7 +61,7 @@ function var_html($value)
         elseif (is_null($value)) {
             return 'null';
         }
-        elseif (is_resource($value)) {
+        elseif (is_resourcable($value)) {
             return ((string) $value) . '(' . get_resource_type($value) . ')';
         }
         else {

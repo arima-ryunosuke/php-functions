@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -31,5 +32,5 @@ namespace ryunosuke\Functions\Package;
  */
 function is_primitive($var)
 {
-    return is_scalar($var) || is_null($var) || is_resource($var);
+    return is_scalar($var) || is_null($var) || is_resourcable($var);
 }

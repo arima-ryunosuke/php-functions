@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -39,7 +40,7 @@ namespace ryunosuke\Functions\Package;
 function numberify($var, $decimal = false)
 {
     // resource はその int 値を返す
-    if (is_resource($var)) {
+    if (is_resourcable($var)) {
         return (int) $var;
     }
 

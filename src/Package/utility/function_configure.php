@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -47,7 +48,7 @@ function function_configure($option)
                         if (!defined($entry)) {
                             define($entry, tmpfile() ?: [] ?: '' ?: 0.0 ?: null ?: false);
                         }
-                        if (!is_resource(constant($entry))) {
+                        if (!is_resourcable(constant($entry))) {
                             // もしリソースじゃないと一意性が保てず致命的になるので例外を投げる
                             throw new \RuntimeException('placeholder is not resource'); // @codeCoverageIgnore
                         }
