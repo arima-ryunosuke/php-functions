@@ -283,6 +283,16 @@ trait ChainObject8
     public function insert(iterable $array, $value, $position = null): self { }
     public function insert($value, $position = null): self { }
 
+    /** @see array_limit() */
+    public self $array_limit;
+    public function array_limit(iterable $array, $limit, $offset = null, $preserve_keys = null): self { }
+    public function array_limit($limit, $offset = null, $preserve_keys = null): self { }
+
+    /** @see array_limit() */
+    public self $limit;
+    public function limit(iterable $array, $limit, $offset = null, $preserve_keys = null): self { }
+    public function limit($limit, $offset = null, $preserve_keys = null): self { }
+
     /** @see groupsort() */
     public self $groupsort;
     public function groupsort(iterable $array, $grouper, $comparator): self { }

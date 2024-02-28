@@ -483,6 +483,11 @@ trait ChainObject9
     public function fnmatch_and($patterns, $string, $flags = 0): self { }
     public function fnmatch_and($string, $flags = 0): self { }
 
+    /** @see globstar() */
+    public self $globstar;
+    public function globstar($pattern, $flags = 0): self { }
+    public function globstar($flags = 0): self { }
+
     /** @see path_is_absolute() */
     public self $path_is_absolute;
     public function path_is_absolute($path): self { }
@@ -592,5 +597,10 @@ trait ChainObject9
     public self $build_uri;
     public function build_uri($parts, $options = []): self { }
     public function build_uri($options = []): self { }
+
+    /** @see is_resourcable() */
+    public self $is_resourcable;
+    public function is_resourcable($var): self { }
+    public function is_resourcable(): self { }
 
 }

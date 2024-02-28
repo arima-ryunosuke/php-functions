@@ -463,6 +463,11 @@ trait ChainObject1
     public function ansi_colorize($string, $color): self { }
     public function ansi_colorize($color): self { }
 
+    /** @see sys_set_temp_dir() */
+    public self $sys_set_temp_dir;
+    public function sys_set_temp_dir($directory, $creates = true, $check_settled = true): self { }
+    public function sys_set_temp_dir($creates = true, $check_settled = true): self { }
+
     /** @see iterator_map() */
     public self $iterator_map;
     public function iterator_map(callable $callback, iterable ...$iterables): self { }

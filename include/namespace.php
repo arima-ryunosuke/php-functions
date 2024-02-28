@@ -2399,6 +2399,95 @@ if (!function_exists('ryunosuke\\Functions\\array_kvmap')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\array_limit') || (new \ReflectionFunction('ryunosuke\\Functions\\array_limit'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_limit')) {
+    /**
+     * limit を主体とした array_slice
+     *
+     * 「配列の上から/下からN件取りたい」というユースケースがそれなりに多いが、毎回迷う上に1文で書けないので関数化した。
+     *
+     * $limit が負数の場合は戻って読む。
+     * $offset 省略時は $limit の符号で自動で先頭か末尾になる。
+     * $offset を指定することは少なく、端的に言えば「$limit が整数なら先頭から、負数なら末尾から $limit 件返す」と考えてもよい。
+     * 配列を無限数直線にマッピングし、位置範囲指定で切り取るイメージ。
+     * 文章で書くと複雑なので Example を参照。
+     *
+     * また、「array_slice しても結果が変わらないケース」でコールせずに結果を返すようにしてある。
+     * （結果が変わらなくても無駄に呼ばれて速度低下があるため）。
+     * 例えば `array_slice($array, 0, 0)` は必ず空配列を返すし `array_slice($array, 0, null)` は必ず元の配列を返すはず。
+     * にも関わらず array_slice は愚直に切り取り処理をしているようで、その分岐の有る無しで速度がだいぶ違う。
+     *
+     * $preserve_keys は array_slice と同じだが、 null を渡すと「通常配列時に true, 連想配列時に false」が動的に決まるようになる。
+     * ユースケースとしてはそのような使い方が多いはず。
+     * あくまで null 指定の場合のみなのでこの動作が嫌なら明示的に bool を渡せばよい。
+     *
+     * Example:
+     * ```php
+     * $array = ['a', 'b', 'c', 'd', 'e'];
+     *
+     * that(array_limit($array, 3))->isSame(['a', 'b', 'c']);     // シンプルに先頭から3件
+     * that(array_limit($array, -3))->isSame(['c', 'd', 'e']);    // シンプルに末尾から3件
+     *
+     * that(array_limit($array, 3, 1))->isSame(['b', 'c', 'd']);  // 1番目（'b'）から正順に3件
+     * that(array_limit($array, -3, 1))->isSame(['a', 'b']);      // 1番目（'b'）から逆順に3件（足りないので結果は2件）
+     *
+     * that(array_limit($array, 3, 3))->isSame(['d', 'e']);       // 3番目（'d'）から正順に3件（足りないので結果は2件）
+     * that(array_limit($array, -3, 3))->isSame(['b', 'c', 'd']); // 3番目（'d'）から逆順に3件
+     *
+     * that(array_limit($array, 3, -2))->isSame(['a']);           // -2番目（範囲外）から正順に3件（'a'だけがギリギリ範囲に入る）
+     * that(array_limit($array, -3, 6))->isSame(['e']);           // 6番目（範囲外）から逆順に3件（'e'だけがギリギリ範囲に入る）
+     *
+     * that(array_limit($array, 3, -100))->isSame([]);            // -100番目（範囲外）から正順に3件（完全に範囲外なので空）
+     * that(array_limit($array, -3, 100))->isSame([]);            // 100番目（範囲外）から逆順に3件（完全に範囲外なので空）
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param iterable $array 対象配列
+     * @param int $limit 切り詰めるサイズ
+     * @param ?int $offset 開始位置
+     * @param ?bool $preserve_keys キーの保存フラグ（null にすると連想配列の時のみ保存される）
+     * @return array slice した配列
+     */
+    function array_limit($array, $limit, $offset = null, $preserve_keys = null)
+    {
+        $array = arrayval($array, false);
+        $count = count($array);
+
+        // $offset 省略時は $limit の符号に応じて最初か最後
+        $offset ??= $limit >= 0 ? 0 : $count - 1;
+
+        // 負から負方向は必ず空
+        if ($offset < 0 && $limit < 0) {
+            return [];
+        }
+
+        // 負数 $limit は戻る方向
+        if ($limit < 0) {
+            $offset += $limit + 1;
+            $limit = -$limit;
+        }
+
+        // 負数 $offset は0補正
+        if ($offset < 0) {
+            $limit += $offset;
+            $offset = 0;
+        }
+
+        // 完全に範囲外なら slice するまでもなく空
+        if ($offset + $limit <= 0 || $count <= $offset) {
+            return [];
+        }
+
+        // 完全に範囲一致なら slice するまでもなく元の配列
+        if ($offset <= 0 && $count <= $limit) {
+            return $array;
+        }
+
+        return array_slice($array, $offset, $limit, $preserve_keys ?? is_hasharray($array));
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\array_lmap') || (new \ReflectionFunction('ryunosuke\\Functions\\array_lmap'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\array_lmap')) {
     /**
@@ -3313,35 +3402,54 @@ if (!function_exists('ryunosuke\\Functions\\array_pos_key')) {
     /**
      * 配列の指定キーの位置を返す
      *
+     * $key に配列を与えるとその全ての位置を返す。
+     *
      * Example:
      * ```php
      * that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'c'))->isSame(2);
      * that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], 'x', -1))->isSame(-1);
+     *  that(array_pos_key(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']))->isSame(['a' => 0, 'c' => 2]);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
      *
      * @param array $array 対象配列
-     * @param string|int $key 取得する位置
-     * @param mixed $default 見つからなかったときのデフォルト値。指定しないと例外
-     * @return mixed 指定キーの位置
+     * @param string|int|array $key 取得したい位置のキー
+     * @param mixed $default 見つからなかったときのデフォルト値。指定しないと例外。$key が配列の場合は見つからなかったキー全てに代入される
+     * @return int|int[] 指定キーの位置
      */
     function array_pos_key($array, $key, $default = null)
     {
         // very slow
         // return array_flip(array_keys($array))[$key];
 
+        $is_array = is_array($key);
+        $key = array_flip((array) $key);
+
+        $result = [];
         $n = 0;
         foreach ($array as $k => $v) {
-            if ($k === $key) {
-                return $n;
+            if (isset($key[$k])) {
+                if (!$is_array) {
+                    return $n;
+                }
+                else {
+                    $result[$k] = $n;
+                }
             }
             $n++;
         }
 
         if (func_num_args() === 2) {
-            throw new \OutOfBoundsException("$key is not found.");
+            if (count($result) !== count($key)) {
+                throw new \OutOfBoundsException(implode(',', $key) . " is not found.");
+            }
         }
+
+        if ($is_array) {
+            return $result + array_fill_keys(array_keys($key), $default);
+        }
+
         return $default;
     }
 }
@@ -5334,6 +5442,10 @@ if (!function_exists('ryunosuke\\Functions\\is_hasharray')) {
      */
     function is_hasharray(array $array)
     {
+        if (function_exists('array_is_list')) {
+            return !array_is_list($array); // @codeCoverageIgnore
+        }
+
         $i = 0;
         foreach ($array as $k => $dummy) {
             if ($k !== $i++) {
@@ -6665,6 +6777,275 @@ if (!function_exists('ryunosuke\\Functions\\object_dive')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\object_id') || (new \ReflectionFunction('ryunosuke\\Functions\\object_id'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\object_id')) {
+    /**
+     * 重複しない spl_object_id
+     *
+     * 内部でオブジェクト自体は保持しない。
+     * つまり、そのオブジェクトは GC の対象になる。
+     *
+     * オブジェクトを与えると一意な整数を返す。
+     * 内部で連番を保持するので PHP_INT_MAX まで生成できる。
+     * PHP_INT_MAX を超えた場合の挙動は未定義（まぁまずありえないだろう）。
+     * null は特別扱いとして必ず 0 を返す。
+     *
+     * 逆に整数を与えると対応したオブジェクトを返す。
+     * 設定していないか既に GC されている場合は null を返す。
+     * 0 は特別扱いとして必ず null を返す。
+     *
+     * Example:
+     * ```php
+     * // spl_object_id は容易に重複するが・・・
+     * that(spl_object_id(new \stdClass()) === spl_object_id(new \stdClass()))->isTrue();
+     * // この object_id 関数は重複しない
+     * that(object_id(new \stdClass()) === object_id(new \stdClass()))->isFalse();
+     *
+     * $o = new \stdClass();
+     * // オブジェクトを与えると固有IDを返す
+     * that($id = object_id($o))->isInt();
+     * // そのIDを与えると元のオブジェクトが得られる
+     * that($o === object_id($id))->isTrue();
+     * // 参照を握っているわけではないので GC されていると null を返す
+     * unset($o);
+     * that(null === object_id($id))->isTrue();
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\classobj
+     *
+     * @param null|object|int $objectOrId 対象オブジェクト or オブジェクトID
+     * @return null|int|object オブジェクトID or 対象オブジェクト
+     */
+    function object_id($objectOrId)
+    {
+        if (is_string($objectOrId) && ctype_digit($objectOrId)) {
+            $objectOrId = (int) $objectOrId;
+        }
+
+        assert(is_null($objectOrId) || is_object($objectOrId) || is_int($objectOrId));
+
+        if ($objectOrId === null) {
+            return 0;
+        }
+        if ($objectOrId === 0) {
+            return null;
+        }
+
+        /** @var array<\WeakReference> $idmap */
+        static $idmap = [];
+
+        if (is_int($objectOrId)) {
+            if (!isset($idmap[$objectOrId])) {
+                return null;
+            }
+            $result = $idmap[$objectOrId]->get();
+            if ($result === null) {
+                unset($idmap[$objectOrId]);
+            }
+            return $result;
+        }
+
+        /** @var array<\WeakReference, int>[] $references */
+        static $references = [];
+        static $lastid = 0;
+
+        $id = spl_object_id($objectOrId);
+
+        if (!isset($references[$id]) || $references[$id][0]->get() === null) {
+            $references[$id] = [\WeakReference::create($objectOrId), ++$lastid];
+        }
+
+        $idmap[$references[$id][1]] = $references[$id][0];
+        return $references[$id][1];
+
+        /* php8.0 version
+         static $references = null;
+         $references ??= new \WeakMap();
+    
+         $references[$objectOrId] ??= [\WeakReference::create($objectOrId), ++$lastid];
+         $idmap[$references[$objectOrId][1]] = $references[$objectOrId][0];
+         return $references[$objectOrId][1];
+         */
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\object_storage') || (new \ReflectionFunction('ryunosuke\\Functions\\object_storage'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\object_storage')) {
+    /**
+     * オブジェクトに付加データを付与する
+     *
+     * 実質的に WeakMap と同じ。
+     * ただし php 内部では本来オブジェクトであるべきものもリソースとして扱われる（curl とか）ので統一のためにリソースも扱える。
+     *
+     * 典型的な利用法として「クロージャに値を持たせたい」がある。
+     * クロージャに限らず、大抵の内部オブジェクトは動的プロパティを生やせないので、値の保持がめんどくさい。
+     * （spl_object_id は重複するので使えないし、下手に実装すると参照が握られて GC されない羽目になる）。
+     *
+     * Example:
+     * ```php
+     * $storage = object_storage('test');
+     * $closure = fn() => 123;
+     * $resource = tmpfile();
+     *
+     * // このように set すると・・・
+     * $storage->set($closure, 'attached data1');
+     * // get で取り出せる
+     * that($storage->get($closure))->isSame('attached data1');
+     * // リソースも扱える
+     * $storage->set($resource, 'attached data2');
+     * that($storage->get($resource))->isSame('attached data2');
+     *
+     * // 名前空間が同じならインスタンスをまたいで取得できる
+     * $storage2 = object_storage('test');
+     * that($storage2->get($closure))->isSame('attached data1');
+     *
+     * // オブジェクトが死ぬと同時に消える
+     * unset($closure);
+     * that($storage2->count())->isSame(1);
+     * // リソースの場合は close でも消える
+     * fclose($resource);
+     * that($storage2->count())->isSame(0);
+     * that($storage2->get($resource))->is(null);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\classobj
+     *
+     * @param string $namespace 名前空間
+     * @return \ObjectStorage|object ストレージオブジェクト
+     */
+    function object_storage($namespace = 'global')
+    {
+        static $storages = [];
+        return $storages[$namespace] ??= new class() implements \Countable, \ArrayAccess, \IteratorAggregate {
+            private iterable $objects;
+            private iterable $resources;
+
+            public function __construct()
+            {
+                $this->objects = class_exists(\WeakMap::class) ? new \WeakMap() : [];
+                $this->resources = [];
+            }
+
+            private function typeid($objectOrResource)
+            {
+                if (is_object($objectOrResource)) {
+                    return ['objects', $this->objects instanceof \WeakMap ? $objectOrResource : object_id($objectOrResource)];
+                }
+                if (is_resourcable($objectOrResource)) {
+                    return ['resources', (int) $objectOrResource];
+                }
+                throw new \InvalidArgumentException('supports only object or resource');
+            }
+
+            private function gc()
+            {
+                // WeakMap と言えど循環参照が残っているかもしれないので呼んでおく
+                gc_collect_cycles();
+
+                // 回収されているオブジェクトを消す（WeakMap なら勝手に消えるのでその必要はない）
+                if (!$this->objects instanceof \WeakMap) {
+                    // @codeCoverageIgnoreStart
+                    foreach ($this->objects as $id => $data) {
+                        if (object_id($id) === null) {
+                            unset($this->objects[$id]);
+                        }
+                    }
+                    // @codeCoverageIgnoreEnd
+                }
+
+                // 参照が切れたり閉じてるリソースを消す
+                if ($this->resources) {
+                    $resources = get_resources();
+                    foreach ($this->resources as $id => $data) {
+                        // 参照が切れてるのは get_resources に現れない、閉じてるのは現れるが gettype しないと判断できない
+                        if (!isset($resources[$id]) || strpos(gettype($resources[$id]), 'closed') !== false) {
+                            unset($this->resources[$id]);
+                        }
+                    }
+                }
+            }
+
+            public function has($objectOrResource): bool
+            {
+                return $this->offsetExists($objectOrResource);
+            }
+
+            public function get($objectOrResource, $default = null)
+            {
+                if ($this->has($objectOrResource)) {
+                    return $this->offsetGet($objectOrResource);
+                }
+                return $default;
+            }
+
+            public function set($objectOrResource, $data): self
+            {
+                $this->offsetSet($objectOrResource, $data);
+                return $this;
+            }
+
+            public function clear(): bool
+            {
+                // 型が違ったりでめんどくさいので横着している
+                $this->__construct();
+
+                gc_collect_cycles();
+                return true;
+            }
+
+            public function offsetExists($offset): bool
+            {
+                $this->gc();
+
+                [$type, $id] = $this->typeid($offset);
+                return isset($this->$type[$id]);
+            }
+
+            #[\ReturnTypeWillChange]
+            public function offsetGet($offset)
+            {
+                [$type, $id] = $this->typeid($offset);
+                return $this->$type[$id];
+            }
+
+            public function offsetSet($offset, $value): void
+            {
+                [$type, $id] = $this->typeid($offset);
+                $this->$type[$id] = $value;
+            }
+
+            public function offsetUnset($offset): void
+            {
+                [$type, $id] = $this->typeid($offset);
+                unset($this->$type[$id]);
+            }
+
+            public function count(): int
+            {
+                $this->gc();
+
+                return count($this->objects) + count($this->resources);
+            }
+
+            public function getIterator(): \Generator
+            {
+                $this->gc();
+
+                // WeakMap はキーとしてオブジェクトを返すのでそれに合わせる（ID を返されても意味がないし）
+
+                foreach ($this->objects as $id => $data) {
+                    yield is_int($id) ? object_id($id) : $id => $data;
+                }
+
+                $resources = get_resources();
+                foreach ($this->resources as $id => $data) {
+                    yield $resources[$id] => $data;
+                }
+            }
+        };
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\optional') || (new \ReflectionFunction('ryunosuke\\Functions\\optional'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\optional')) {
     /**
@@ -6769,37 +7150,44 @@ if (!function_exists('ryunosuke\\Functions\\register_autoload_function')) {
             public $befores = [];
             public $afters  = [];
 
+            private $loading = false;
+
             public function __invoke($classname)
             {
-                // file スキームをこの瞬間だけ上書きして require/include をフックする
-                $include_stream = include_stream()->register(function ($filename) use ($classname) {
-                    $contents = null;
-                    foreach ($this->befores as $before) {
-                        $contents = $before($classname, $filename, $contents);
-                    }
-                    return $contents ?? file_get_contents($filename);
-                });
-                try {
-                    $autoloaders = spl_autoload_functions();
-                    foreach ($autoloaders as $autoloader) {
-                        if ($autoloader === $this) {
-                            continue;
+                if (!$this->loading) {
+                    $this->loading = true;
+                    // file スキームをこの瞬間だけ上書きして require/include をフックする
+                    $include_stream = include_stream()->register(function ($filename) use ($classname) {
+                        $contents = null;
+                        foreach ($this->befores as $before) {
+                            $contents = $before($classname, $filename, $contents);
+                        }
+                        return $contents ?? file_get_contents($filename);
+                    });
+                    try {
+                        $autoloaders = spl_autoload_functions();
+                        foreach ($autoloaders as $autoloader) {
+                            if ($autoloader !== $this) {
+                                // ここで require/include が走れば↑の before がコールされる
+                                $autoloader($classname);
+                                if (type_exists($classname, false)) {
+                                    break;
+                                }
+                            }
                         }
 
-                        // ここで require/include が走れば↑の before がコールされる
-                        $autoloader($classname);
-                        if (type_exists($classname, false)) {
-                            // ロードができたら after をコールする
-                            foreach ($this->afters as $after) {
-                                $after($classname);
-                            }
-                            break;
-                        }
+                    }
+                    finally {
+                        // file スキームの上書きは影響範囲が大きいので必ず元に戻す
+                        $include_stream->restore();
+                        $this->loading = false;
                     }
                 }
-                finally {
-                    // file スキームの上書きは影響範囲が大きいので必ず元に戻す
-                    $include_stream->restore();
+                if (type_exists($classname, false)) {
+                    // ロードができたら after をコールする
+                    foreach ($this->afters as $after) {
+                        $after($classname);
+                    }
                 }
             }
         };
@@ -11413,15 +11801,20 @@ if (!function_exists('ryunosuke\\Functions\\date_timestamp')) {
         }
 
         $relative = $parts['relative'] ?? [];
-        if (($relative['month'] ?? false)
+        if (true
             && !isset($relative['weekday'])            // 週指定があるとかなり特殊で初日末日が意味を為さない
             && !isset($relative['first_day_of_month']) // first day 指定があるなら初日確定
             && !isset($relative['last_day_of_month'])  // last day 指定があるなら末日確定
         ) {
-            $parts['month'] += $relative['month'];
-            $parts['year'] += intdiv($parts['month'], 12);
-            $parts['month'] %= 12;
-            $parts['month'] += $parts['month'] <= 0 ? 12 : 0;
+            if ($relative['year'] ?? false) {
+                $parts['year'] += $relative['year'];
+            }
+            if ($relative['month'] ?? false) {
+                $parts['month'] += $relative['month'];
+                $parts['year'] += intdiv($parts['month'], 12);
+                $parts['month'] %= 12;
+                $parts['month'] += $parts['month'] <= 0 ? 12 : 0;
+            }
 
             if (!checkdate($parts['month'], $parts['day'], $parts['year'])) {
                 $timestamp = strtotime(date('Y-m-t H:i:s', $timestamp - $DAY1 * 4));
@@ -13690,6 +14083,55 @@ if (!function_exists('ryunosuke\\Functions\\fnmatch_or')) {
             }
         }
         return false;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\globstar') || (new \ReflectionFunction('ryunosuke\\Functions\\globstar'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\globstar')) {
+    /**
+     * globstar（再帰パターン有効）な glob
+     *
+     * file_list でも代替可能だが、もっと手軽にササっとファイル一覧が欲しいこともある。
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     *
+     * @param string $pattern glob パターン。** が使えること以外は glob と同じ
+     * @param int $flags glob フラグ
+     * @return array|false マッチしたファイル名配列
+     */
+    function globstar($pattern, $flags = 0)
+    {
+        $GLOB_NOESCAPE = $flags & GLOB_NOESCAPE;
+        $GLOB_NOCHECK = $flags & GLOB_NOCHECK;
+        $GLOB_NOSORT = $flags & GLOB_NOSORT;
+
+        // \** は「アスターの後の任意の文字」という意味になるので再帰パターンではない
+        // さらに Windows では \* も特別扱いされているようなのでそれに倣う
+        // （Windows で "\*" は「エスケープされたアスター」なのか「ディレクトリ区切りの後の *」なのか判断ができないためと思われる）
+        $backslash = ($GLOB_NOESCAPE || DIRECTORY_SEPARATOR === '\\') ? '' : '(?<!\\\\)';
+        $patterns = preg_split("#$backslash\\*\\*#", $pattern, 2);
+
+        $result = glob($pattern, $flags);
+
+        if (count($patterns) === 1) {
+            return $result;
+        }
+
+        foreach (glob($patterns[0] . '*', $flags & ~GLOB_NOCHECK & ~GLOB_MARK | GLOB_ONLYDIR) as $dir) {
+            $subpattern = $dir . DIRECTORY_SEPARATOR . '**' . $patterns[1];
+            $children = globstar($subpattern, $flags & ~GLOB_NOCHECK);
+            if ($GLOB_NOCHECK && !$children) {
+                return [$pattern];
+            }
+
+            $result = array_merge($result, $children);
+        }
+
+        if (!$GLOB_NOSORT) {
+            sort($result);
+        }
+
+        return $result;
     }
 }
 
@@ -16029,6 +16471,116 @@ if (!function_exists('ryunosuke\\Functions\\arguments')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\cpu_timer') || (new \ReflectionFunction('ryunosuke\\Functions\\cpu_timer'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\cpu_timer')) {
+    /**
+     * CPU 時間を計れるオブジェクトを返す
+     *
+     * コンストラクタ（あるいは start）時点から stop までの下記を返す。
+     *
+     * - real: 実際の経過時間
+     * - time: CPU時間（user + system）
+     * - user: ユーザー時間
+     * - system: システム時間
+     * - idle: アイドル時間（real - time）
+     * - time%: CPU使用率（time / real）
+     * - user%: ユーザー使用率（user / time）
+     * - system%: システム使用率（system / time）
+     * - idle%: アイドル率（idle / real）
+     *
+     * 要するに POSIX の time コマンドとほぼ同じで、計算から導出できる値がちょっと増えただけ。
+     *
+     * - user が大きい場合（time と user が近い場合）、ユーザーランドの処理が多かったことを表す
+     * - system が大きい場合（time と system が近い場合）、システムコールが多かったことを表す
+     * - idle が大きい場合（real と time が離れている場合）、ネットワークや IO 等で CPU が遊んでいたことを表す
+     *   - もっとも、コア数によってはその限りではない（単に他のプロセスを捌いていただけ、もあり得る）
+     *   - linux 版 getrusage だとコンテキストスイッチが取れるので傾向は表せるけど…正確には無理だし Windows が対応していないので未対応
+     *
+     * Example:
+     * ```php
+     * $timer = cpu_timer();
+     * foreach (range(0, 999) as $i) {
+     *    // ファイル IO を伴う sha1 なら user,system,idle を程よく使うはず
+     *    $hash = sha1_file(__FILE__);
+     * }
+     * //var_dump($timer->result());
+     * //{
+     * //  real: 0.13377594947814941,
+     * //  user: 0.078125,
+     * //  system: 0.046875,
+     * //  time: 0.125,
+     * //  idle: 0.008775949478149414,
+     * //  user%: 62.5,
+     * //  system%: 37.5,
+     * //  time%: 93.4398152191154,
+     * //  idle%: 6.560184780884589,
+     * //}
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\info
+     *
+     * @return \CpuTimer|object タイマーオブジェクト
+     */
+    function cpu_timer()
+    {
+        return new class() {
+            private float $start;
+            private array $rusage;
+
+            public function __construct()
+            {
+                $this->start();
+            }
+
+            public function start(): void
+            {
+                $this->start = microtime(true);
+                $this->rusage = $this->getrusage();
+            }
+
+            public function result(): array
+            {
+                $real = microtime(true) - $this->start;
+                $rusage = $this->getrusage();
+
+                $utime = $rusage['ru_utime'] - $this->rusage['ru_utime'];
+                $stime = $rusage['ru_stime'] - $this->rusage['ru_stime'];
+                $time = $utime + $stime;
+                $idle = $real - $time;
+
+                return [
+                    'real'    => $real,
+                    'user'    => $utime,
+                    'system'  => $stime,
+                    'time'    => $time,
+                    'idle'    => $idle,
+                    'user%'   => $time === 0.0 ? NAN : ($utime / $time * 100),
+                    'system%' => $time === 0.0 ? NAN : ($stime / $time * 100),
+                    'time%'   => $real === 0.0 ? NAN : ($time / $real * 100),
+                    'idle%'   => $real === 0.0 ? NAN : ($idle / $real * 100),
+                ];
+            }
+
+            public function __invoke($callback)
+            {
+                $this->start();
+
+                $callback();
+
+                return $this->result();
+            }
+
+            private function getrusage()
+            {
+                $rusage = getrusage();
+                $rusage['ru_utime'] = $rusage['ru_utime.tv_sec'] + $rusage['ru_utime.tv_usec'] / 1000 / 1000;
+                $rusage['ru_stime'] = $rusage['ru_stime.tv_sec'] + $rusage['ru_stime.tv_usec'] / 1000 / 1000;
+                return $rusage;
+            }
+        };
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\get_modified_files') || (new \ReflectionFunction('ryunosuke\\Functions\\get_modified_files'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\get_modified_files')) {
     /**
@@ -16289,6 +16841,63 @@ if (!function_exists('ryunosuke\\Functions\\setenvs')) {
             }
         }
         return $result;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\sys_set_temp_dir') || (new \ReflectionFunction('ryunosuke\\Functions\\sys_set_temp_dir'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\sys_set_temp_dir')) {
+    /**
+     * sys_get_temp_dir が返すディレクトリを変更する
+     *
+     * ただし、sys_get_temp_dir は一度でも呼ぶと内部的にキャッシュされるので、必ず呼ぶ前に設定しなければならない。
+     * 相対パスを指定すると標準設定からの相対になる。
+     *
+     * $check_settled はデバッグ用なので運用では使わないこと。
+     *
+     * @see https://github.com/php/php-src/blob/af6c11c5f060870d052a2b765dc634d9e47d0f18/main/php_open_temporary_file.c
+     *
+     * Example:
+     * ```php
+     * // 標準一時ディレクトリ/systemname で一時ディレクトリを設定してかつ作成する
+     * sys_set_temp_dir("systemname", true);
+     * //that(sys_get_temp_dir())->is(...); // 上記が設定されている
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\info
+     *
+     * @param string $directory 一時ディレクトリ
+     * @param bool $creates 設定すると同時に作成するか
+     * @return bool 成功時に true
+     */
+    function sys_set_temp_dir($directory, $creates = true, $check_settled = true)
+    {
+        $envname = ['\\' => 'TMP', '/' => 'TMPDIR'][DIRECTORY_SEPARATOR];
+        $current = getenv($envname);
+
+        // sys_temp_dir が指定されているならそこからの相対とする
+        $sys_temp_dir = ini_get('sys_temp_dir');
+        $sys_temp_dir = strlen($sys_temp_dir) ? $sys_temp_dir : $current;
+        if (strlen($sys_temp_dir) && !path_is_absolute($directory)) {
+            $directory = $sys_temp_dir . DIRECTORY_SEPARATOR . $directory;
+        }
+
+        // 各プラットフォームの環境変数を変更して sys_get_temp_dir で確定させる（環境変数を変更したままは行儀が悪いので確定したら元に戻す）
+        putenv("$envname=$directory");
+        $tmpdir = sys_get_temp_dir();
+        putenv("$envname=$current");
+
+        // 設定できてないなら何かがおかしい
+        if ($check_settled && $tmpdir !== path_normalize($directory)) {
+            return false;
+        }
+
+        // 作成する場合は作ってその結果を返り値とする
+        if ($creates) {
+            @mkdir($tmpdir, 0777, true);
+            return is_dir($tmpdir);
+        }
+
+        return true;
     }
 }
 
@@ -17224,7 +17833,7 @@ if (!function_exists('ryunosuke\\Functions\\evaluate')) {
     {
         $cachefile = null;
         if ($cachesize && strlen($phpcode) >= $cachesize) {
-            $cachefile = function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+            $cachefile = function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
             if (!file_exists($cachefile)) {
                 file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
             }
@@ -18880,6 +19489,8 @@ if (!function_exists('ryunosuke\\Functions\\http_request')) {
      *
      * - `raw` (bool): curl インスタンスと変換クロージャを返すだけになる
      *     - ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず
+     * - `async` (bool): リクエストを投げて、結果を返すオブジェクトを返す
+     *     - いわゆる非同期で、すぐさま処理を返し、結果は返り値オブジェクト経由で取得する
      * - `nobody` (bool): ヘッダーの受信が完了したらただちに処理を返す
      *     - ボディは空文字になる（CURLOPT_NOBODY とは全く性質が異なるので注意）
      * - `throw` (bool): ステータスコードが 400 以上のときに例外を投げる
@@ -18955,6 +19566,7 @@ if (!function_exists('ryunosuke\\Functions\\http_request')) {
 
             // custom options
             'raw'                  => false,
+            'async'                => false,
             'nobody'               => false,
             'throw'                => true,
             'retry'                => [],
@@ -19145,7 +19757,13 @@ if (!function_exists('ryunosuke\\Functions\\http_request')) {
             return false;
         };
 
-        $responser = function ($response, $info) use ($response_parse, $cache) {
+        $responser = function ($response, $info) use ($options, $response_parse, $cache) {
+            if ($options['throw'] && $info['http_code'] >= 400) {
+                throw new \UnexpectedValueException("status is {$info['http_code']}.");
+            }
+            if (!($info['errno'] === CURLE_OK || ($options['nobody'] && $info['errno'] === CURLE_WRITE_ERROR))) {
+                throw new \RuntimeException(curl_strerror($info['errno']), $info['errno']);
+            }
             [$info, $head, $body] = $response_parse($response, $info);
             return [$cache($response, $info) ?? $body, $head, $info];
         };
@@ -19154,6 +19772,95 @@ if (!function_exists('ryunosuke\\Functions\\http_request')) {
         curl_setopt_array($ch, array_filter($options, 'is_int', ARRAY_FILTER_USE_KEY));
         if ($options['raw']) {
             return [$ch, $responser, $retry];
+        }
+
+        if ($options['async']) {
+            // コールバックを実行したときに初めてエラーが分かるので自動リトライに何の意味もない
+            assert(empty($options['retry']), 'Cannot specify async and retry option');
+
+            $client = new class($ch, $responser, $response_header, $info) {
+                private $singleHandle;
+                private $multiHandle;
+
+                private $responser;
+
+                private $header;
+                private $info;
+
+                public function __construct($handle, $responser, &$header, &$info)
+                {
+                    $this->singleHandle = $handle;
+                    $this->multiHandle = curl_multi_init();
+                    curl_multi_add_handle($this->multiHandle, $this->singleHandle);
+
+                    $this->responser = $responser;
+
+                    $this->header = &$header;
+                    $this->info = &$info;
+                }
+
+                public function __destruct()
+                {
+                    $this->close();
+                }
+
+                public function __invoke()
+                {
+                    while (true) {
+                        $this->wait();
+                        $minfo = curl_multi_info_read($this->multiHandle);
+
+                        if ($minfo !== false) {
+                            $info = curl_getinfo($minfo['handle']);
+                            $info['errno'] = curl_errno($minfo['handle']);
+                            $response = curl_multi_getcontent($minfo['handle']);
+                            [$body, $this->header, $this->info] = ($this->responser)($response, $info);
+
+                            $this->close();
+                            return $body;
+                        }
+                        usleep(1);
+                    }
+                }
+
+                public function wait(float $timeout = 1.0)
+                {
+                    do {
+                        $execed = curl_multi_exec($this->multiHandle, $still_running);
+                    } while ($execed === CURLM_CALL_MULTI_PERFORM);
+
+                    while (curl_multi_select($this->multiHandle, $timeout) === -1) {
+                        usleep(1); // @codeCoverageIgnore
+                    }
+
+                    return $still_running;
+                }
+
+                public function close()
+                {
+                    if (isset($this->singleHandle)) {
+                        curl_multi_remove_handle($this->multiHandle, $this->singleHandle);
+                        curl_close($this->singleHandle);
+                        curl_multi_close($this->multiHandle);
+
+                        unset($this->singleHandle);
+                        unset($this->multiHandle);
+                    }
+                }
+            };
+
+            // この wait がないとリクエストが始まってすらいないので非同期にならない
+            // 名前解決、cert 処理など様々なアクティビティがあるが「手を離してもよい」と判断できる最適なものは接続済み(connect_time>0)っぽい
+            while (true) {
+                $active = $client->wait();
+                $info = curl_getinfo($ch);
+                if ($info['connect_time'] || $active === 0) {
+                    break;
+                }
+                usleep(1);
+            }
+            // 接続さえしてしまえば後は OS/curl が勝手にやってくれるはずなのでこの段階で返してよい
+            return $client;
         }
 
         try {
@@ -19170,17 +19877,9 @@ if (!function_exists('ryunosuke\\Functions\\http_request')) {
                 $time = $retry($info, $response);
                 usleep($time * 1000 * 1000);
             } while ($time);
-
-            if (!($info['errno'] === CURLE_OK || ($options['nobody'] && $info['errno'] === CURLE_WRITE_ERROR))) {
-                throw new \RuntimeException(curl_error($ch), curl_errno($ch));
-            }
         }
         finally {
             curl_close($ch);
-        }
-
-        if ($options['throw'] && $info['http_code'] >= 400) {
-            throw new \UnexpectedValueException("status is {$info['http_code']}.");
         }
 
         [$body, $response_header, $info] = $responser($response, $info);
@@ -19200,6 +19899,8 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
      * 返り値は $urls のキーを保持したまま、レスポンスが返ってきた順にボディを格納して配列で返す。
      * 構造は下記のサンプルを参照。
      *
+     * ただし、オプションに callback がある場合、各リクエスト完了直後にそれがコールされ、返り値はそのコールバックの返り値になる。
+     *
      * Example:
      * ```php
      * $responses = http_requests([
@@ -19213,6 +19914,7 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
      *     // さらに、このような [URL => CURL オプション] 形式も許容される（あまり用途はないだろうが）
      *     'http://127.0.0.1' => [
      *         CURLOPT_TIMEOUT => 5,
+     *         'callback'      => fn($key, $body) => strlen($body),
      *     ],
      * ], [
      *     // 第2引数で各リクエストの共通オプションを指定できる（個別指定優先）
@@ -19221,36 +19923,23 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
      *     // 第3引数でマルチリクエストのオプションを指定できる
      *     // @see https://www.php.net/manual/ja/function.curl-multi-setopt.php
      * ],
-     *     // 第4引数を与えると動作が変わる（将来的にこの動作がデフォルトになる）
+     *     // 第4引数を与えるとボディ以外の各種情報が格納される
      *     $infos
      * );
-     * # 第4引数を指定した場合の返り値
+     * # 返り値
      * [
      *     // キーが維持されるので hoge キー
      *     'hoge'             => 'response body',
      *     // curl のエラーが出た場合は null になる（詳細なエラー情報は $infos に格納される）
      *     'fuga'             => null,
-     *     'http://127.0.0.1' => 'response body',
+     *     // callback を設定しているので strlen($body) が返り値になる
+     *     'http://127.0.0.1' => 12345,
      * ];
-     * # 第4引数を指定しなかった場合の返り値
+     * # 第4引数（要するにキーを維持しつつ [header, curlinfo] が格納される）
      * [
-     *     // キーが維持されるので hoge キー
-     *     'hoge'             => [
-     *         // 0 番目の要素は body 文字列
-     *         'response body',
-     *         // 1 番目の要素は header 配列
-     *         [
-     *             // ・・・・・
-     *             'Content-Type' => 'text/plain',
-     *             // ・・・・・
-     *         ],
-     *         // 2 番目の要素は curl のメタ配列
-     *         [
-     *             // ・・・・・
-     *         ],
-     *     ],
-     *     // curl のエラーが出た場合は int になる（CURLE_*** の値）
-     *     'fuga'             => 6,
+     *     'hoge'             => [['response header'], ['curl_info']],
+     *     'fuga'             => [['response header'], ['curl_info']],
+     *     'http://127.0.0.1' => [['response header'], ['curl_info']],
      * ];
      * ```
      *
@@ -19264,6 +19953,24 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
      */
     function http_requests($urls, $single_options = [], $multi_options = [], &$infos = [])
     {
+        // urls の正規化
+        foreach ($urls as $key => $opt) {
+            // 文字列は URL 指定とみなす
+            if (is_string($opt)) {
+                $opt = [CURLOPT_URL => $opt];
+            }
+            // クロージャはコールバック指定とみなす
+            if ($opt instanceof \Closure) {
+                $opt = ['callback' => $opt];
+            }
+            // さらに URL 指定がないなら key を URL とみなす
+            if (!isset($opt[CURLOPT_URL]) && !isset($opt['url'])) {
+                $opt[CURLOPT_URL] = $key;
+            }
+
+            $urls[$key] = $opt + $single_options;
+        }
+
         $multi_options += [
             'throw' => false, // curl レイヤーでエラーが出たら例外を投げるか（http レイヤーではない）
         ];
@@ -19279,7 +19986,7 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
 
         $stringify_curl = function ($curl) {
             // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-            if (is_resource($curl)) {
+            if (is_resourcable($curl)) {
                 return (string) $curl;
             }
             // @codeCoverageIgnoreStart
@@ -19294,9 +20001,13 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
         $resultmap = [];
         $infos = [];
 
-        $set_response = function ($key, $body, $header, $info) use (&$responses, &$infos) {
+        $set_response = function ($key, $body, $header, $info) use ($urls, &$responses, &$infos) {
             $responses[$key] = $body;
             $infos[$key] = [$header, $info];
+
+            if (isset($urls[$key]['callback'])) {
+                $responses[$key] = $urls[$key]['callback']($key, $body, $header, $info);
+            }
         };
 
         $mh = curl_multi_init();
@@ -19306,18 +20017,9 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
 
         try {
             foreach ($urls as $key => $opt) {
-                // 文字列は URL 指定とみなす
-                if (is_string($opt)) {
-                    $opt = [CURLOPT_URL => $opt];
-                }
-                // さらに URL 指定がないなら key を URL とみなす
-                if (!isset($opt[CURLOPT_URL]) && !isset($opt['url'])) {
-                    $opt[CURLOPT_URL] = $key;
-                }
-
                 $rheader = null;
                 $info = null;
-                $res = http_request($default + $opt + $single_options, $rheader, $info);
+                $res = http_request($default + $opt, $rheader, $info);
                 if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
                     curl_multi_add_handle($mh, $res[0]);
                     $resultmap[$handle_id] = [$key, $res[1], $res[2], microtime(true), 0];
@@ -19493,6 +20195,169 @@ if (!function_exists('ryunosuke\\Functions\\ip2cidr')) {
             $result[] = long2ip($long) . '/' . (32 - $nbits);
         }
         return $result;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\ip_info') || (new \ReflectionFunction('ryunosuke\\Functions\\ip_info'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\ip_info')) {
+    /**
+     * ipv4 の情報を返す
+     *
+     * 登録機関とか登録日、国等を返すが、実際のところ cc（国）くらいしか使わないはず。
+     * データソースは各 RIR の delegated-afrinic-latest だが、かなりでかいのでデフォルトでは24時間のキャッシュが効く。
+     * キャッシュ切れ/効かせないと最悪30秒くらいかかるので注意（バッチで叩くといいと思う）。
+     *
+     * $ipaddr に null を渡すと全 ip 情報を返す。
+     * 上記の通り、情報としてかなりでかいので php で処理するのではなく、全取得して RDBMS に登録したり htaccess に書き込んだりするのに使える。
+     *
+     * 膨大な配列として保持するのでメモ化等は一切行わない。
+     * opcache 前提であるので、CLI 等で呼ぶとかなり遅くなるので注意。
+     *
+     * ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * // apnic 管轄
+     * that(ip_info(gethostbyname('www.nic.ad.jp')))->is([
+     *     'cidr'     => '192.41.192.0/24',
+     *     'registry' => 'apnic',
+     *     'cc'       => 'JP',
+     *     'date'     => '19880620',
+     * ]);
+     * // arin 管轄
+     * that(ip_info(gethostbyname('www.internic.net')))->is([
+     *     'cidr'     => '192.0.32.0/20',
+     *     'registry' => 'arin',
+     *     'cc'       => 'US',
+     *     'date'     => '20090629',
+     * ]);
+     * // こういう特殊なアドレスも一応対応している（全てではない）
+     * that(ip_info('127.0.0.1'))['registry']->is('RFC1122');
+     * that(ip_info('192.168.0.1'))['registry']->is('RFC1918');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\network
+     *
+     * @param string $ipaddr 調べる IP アドレス
+     * @param array $options オプション配列
+     * @return ?array IP の情報。ヒットしない場合は null
+     */
+    function ip_info($ipaddr, $options = [])
+    {
+        if ($ipaddr === null) {
+            $ipv = 0;
+        }
+        elseif (filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ipv = 4;
+        }
+        elseif (filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $ipv = 6; // @codeCoverageIgnore
+        }
+
+        if (!isset($ipv)) {
+            throw new \InvalidArgumentException("\$ipaddr($ipaddr) is invalid");
+        }
+        if ($ipv === 6) {
+            throw new \InvalidArgumentException("IPV6($ipaddr) is not supported");
+        }
+
+        $options += [
+            'cachedir' => function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__),
+            'ttl'      => 60 * 60 * 24 + 120, // 120 は1日1回バッチで叩くことを前提としたバッファ
+            'rir'      => [],
+        ];
+        $options['rir'] += [
+            'afrinic' => 'https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-latest',
+            'apnic'   => 'https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-latest',
+            'arin'    => 'https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest',
+            'lacnic'  => 'https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-latest',
+            'ripe'    => 'https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-latest',
+        ];
+
+        $urls = [];
+        $files = [
+            'reserved' => (function () {
+                $reserved = [];
+                foreach ([
+                    ['RFC1700', '0.0.0.0', 8],         // wildcard
+                    ['RFC919', '255.255.255.255', 32], // broadcast
+                    ['RFC5771', '224.0.0.0', 4],       // multicast
+                    ['RFC1122', '127.0.0.0', 8],       // loopback
+                    ['RFC3927', '169.254.0.0', 16],    // link-local
+                    ['RFC1918', '10.0.0.0', 8],        // private
+                    ['RFC1918', '172.16.0.0', 12],     // private
+                    ['RFC1918', '192.168.0.0', 24],    // private
+                ] as [$name, $ip, $mask]) {
+                    $reserved[substr(sprintf("%032b", ip2long($ip)), 0, $mask)] = [
+                        'cidr'     => "$ip/$mask",
+                        'registry' => $name,
+                        'cc'       => null,
+                        'date'     => null,
+                    ];
+                }
+                return $reserved;
+            })(),
+        ];
+        foreach ($options['rir'] as $rir => $url) {
+            $cachefile = "{$options['cachedir']}/$rir.php";
+            if (!file_exists($cachefile) || (time() - filemtime($cachefile)) >= $options['ttl']) {
+                $urls[$rir] = $url;
+            }
+            $files[$rir] = $cachefile;
+        }
+
+        http_requests($urls, [
+            'cachedir' => $options['cachedir'],
+            'callback' => function ($rir, $body) use ($files) {
+                $tmpfile = tmpfile();
+                fwrite($tmpfile, $body);
+                rewind($tmpfile);
+
+                $cidrs = [];
+                while (($fields = fgetcsv($tmpfile, 0, "|")) !== false) {
+                    if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
+                        $subnet = 32 - strlen(sprintf("%b", $fields[4] - 1));
+                        $key = substr(sprintf("%032b", ip2long($fields[3])), 0, $subnet);
+                        $cidrs[$key] = [
+                            'cidr'     => "{$fields[3]}/$subnet",
+                            'registry' => $fields[0],
+                            'cc'       => $fields[1],
+                            'date'     => $fields[5],
+                        ];
+                    }
+                }
+
+                $cachefile = $files[$rir];
+                file_put_contents($cachefile, "<?php\nreturn " . var_export($cidrs, true) . ";", LOCK_EX);
+                //file_put_contents($cachefile, php_strip_whitespace($cachefile));
+                opcache_invalidate($cachefile, true);
+            },
+        ]);
+
+        $all = [];
+        foreach ($files as $file) {
+            // サイズがでかいので static 等にはしない（opcache に完全に任せる）
+            $rir = is_array($file) ? $file : include $file;
+
+            if ($ipaddr === null) {
+                $all += $rir;
+                continue;
+            }
+
+            $binary = sprintf("%032b", ip2long($ipaddr));
+            foreach (range(32, 1) as $n) {
+                $key = substr($binary, 0, $n);
+                if (isset($rir[$key])) {
+                    return $rir[$key];
+                }
+            }
+        }
+
+        if ($ipaddr === null) {
+            return $all;
+        }
+
+        return null;
     }
 }
 
@@ -19689,6 +20554,129 @@ if (!function_exists('ryunosuke\\Functions\\ob_include')) {
             include func_get_arg(0);
             return ob_get_clean();
         })($include_file, $array);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\ob_stdout') || (new \ReflectionFunction('ryunosuke\\Functions\\ob_stdout'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\ob_stdout')) {
+    /**
+     * 標準出力をコメント化して埋め込む ob_start
+     *
+     * 非常にニッチな関数で、想定用途は「README.md の中の php を実行して出力結果を埋め込みたい」のみ。
+     * 例えば php のマニュアルみたいな「上記の結果は下記のようになります」は対応が分かりにくいのでコメントで埋め込みたいことがある。
+     * いちいち結果を手で埋め込むのも馬鹿らしいのでこの関数を使えば自動で埋め込まれる。
+     *
+     * 言語仕様上の制約で echo/print は不可。
+     * また、 ob_content 系で途中経過の出力は取れない（chunk_size を指定すると強制フラッシュされるらしいので制御できない）。
+     * 返り値オブジェクトが toString を実装してるのでそれで得ること（ただし返り値は toString であること以外はいかなる前提も置いてはならない）。
+     *
+     * @package ryunosuke\Functions\Package\outcontrol
+     *
+     * @return object|string 制御用（デバッグ用）
+     */
+    function ob_stdout()
+    {
+        $status = new class {
+            public const SPECIALS = [
+                'include'      => true,
+                'include_once' => true,
+                'require'      => true,
+                'require_once' => true,
+            ];
+
+            private array  $traces  = [];
+            private array  $outputs = [];
+            private string $buffer  = '';
+
+            public function trace(string $buffer, int $phase): ?array
+            {
+                $traces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+                $trace = $traces[2] ?? [];
+                assert($this->traces[] = $trace + ['buffer' => $buffer, 'phase' => $phase]);
+
+                // end を呼ばずに言語ランタイムのシャットダウン関数が呼ばれた場合
+                if (!$trace) {
+                    return null; // @codeCoverageIgnore
+                }
+
+                // php タグ外と echo/print はオペコードレベルで同じっぽいので検出不可（何か方法があるかもしれないので残しておく）
+                if (isset(self::SPECIALS[$trace['function'] ?? ''])) {
+                    return null;
+                }
+
+                return $trace;
+            }
+
+            public function append(?string $file, ?int $line, string $buffer): void
+            {
+                if (isset($file, $line)) {
+                    $this->outputs[$file][$line] ??= '';
+                    $this->outputs[$file][$line] .= $buffer;
+                }
+
+                $this->buffer .= $buffer;
+            }
+
+            public function outputs(): array
+            {
+                return $this->outputs;
+            }
+
+            public function __toString(): string
+            {
+                return $this->buffer;
+            }
+        };
+
+        // ob_start を $chunk_size:1 で呼べば標準出力をキャプチャできる（実際には1バイト単位ではなく行単位っぽい）
+        ob_start(function ($buffer, $phase) use ($status) {
+            $trace = $status->trace($buffer, $phase);
+
+            if (!($phase & PHP_OUTPUT_HANDLER_FINAL)) {
+                $status->append($trace['file'] ?? null, $trace['line'] ?? null, $buffer);
+                // chunk_size を指定してるので $buffer を返すと出力されてしまう
+                // さらに、空文字を返すと get_contents 系で取得ができなくなる
+                // 出力されてしまうよりは得られない方がマシと判断（最悪 $status で得ることはできるし）
+                // php の仕様がおかしい気がするけど18年前からずっとこうらしい…
+                return '';
+            }
+
+            foreach ($status->outputs() as $file => $lines) {
+                $content = file_get_contents($file);
+                $contents = preg_split('#\\R#u', $content);
+
+                // 実行のたびに増えていくことになるので既存の出力コメントは捨てる
+                foreach (token_get_all($content) as $token) {
+                    if (is_array($token) && $token[0] === T_COMMENT && strpos($token[1], "/*= ") === 0) {
+                        $comments = preg_split('#\\R#u', $token[1]);
+                        array_splice($contents, $token[2] - 1, count($comments), array_pad([], count($comments), null));
+                    }
+                }
+
+                // コメント化して埋め込む（行番号がだんだんズレていくので注意）
+                ksort($lines);
+                $addition = 0;
+                foreach ($lines as $line => $buffer) {
+                    $stmt = $contents[$line + $addition - 1];
+                    $indent = str_repeat(' ', strspn($stmt, ' '));
+
+                    $outlines = preg_split('#\\R#u', "/*= " . trim(ansi_strip($buffer)) . " */");
+                    $outlines = array_map(fn($v) => "$indent$v", $outlines);
+
+                    array_splice($contents, $line + $addition, 0, $outlines);
+                    $addition += count($outlines);
+                }
+
+                // 異なっていたら書き換え
+                $newcontent = implode("\n", array_filter($contents, fn($v) => $v !== null));
+                if ($content !== $newcontent) {
+                    file_put_contents($file, $newcontent);
+                }
+            }
+
+            return $status;
+        }, 1);
+        return $status;
     }
 }
 
@@ -26723,6 +27711,7 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
         }
 
         // ベンチ
+        $cpu_timer = cpu_timer();
         $tick = function () use (&$usage) {
             $usage = max($usage, memory_get_usage());
         };
@@ -26731,6 +27720,7 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
         foreach ($benchset as $name => $caller) {
             $usage = null;
             gc_collect_cycles();
+            $cpu_timer->start();
             $memory = memory_get_usage();
             $microtime = microtime(true);
             $end = $microtime + $millisec / 1000;
@@ -26743,6 +27733,7 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
             }
             $stats[$name]['count'] = $n;
             $stats[$name]['mills'] = (microtime(true) - $microtime) / $n;
+            $stats[$name]['cpu'] = $cpu_timer->result();
             $stats[$name]['memory'] = $usage === null ? null : $usage - $memory;
         }
         unregister_tick_function($tick);
@@ -26756,6 +27747,7 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
         foreach ($stats as $name => $stat) {
             $result[$name] = [
                 'name'    => $name,
+                'cpu'     => $stat['cpu'],
                 'memory'  => $stat['memory'],
                 'called'  => $stat['count'],
                 'fastest' => $stat['fastest'],
@@ -26774,6 +27766,9 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
             echo markdown_table(array_map(function ($v) use ($number_format) {
                 return [
                     'name'        => $v['name'],
+                    'cpu(user)'   => $number_format($v['cpu']['user'], 1000, 3),
+                    'cpu(system)' => $number_format($v['cpu']['system'], 1000, 3),
+                    'cpu(idle)'   => $number_format($v['cpu']['idle'], 1000, 3),
                     'memory(KB)'  => $number_format($v['memory'], 1 / 1024, 3, "N/A"),
                     'called'      => $number_format($v['called']),
                     'fastest(ms)' => $number_format($v['fastest'], 1000, 6),
@@ -27247,7 +28242,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
      *
      * @package ryunosuke\Functions\Package\utility
      *
-     * @param array|string $option 設定。文字列指定時はその値を返す
+     * @param array|?string $option 設定。文字列指定時はその値を返す
      * @return array|string 設定値
      */
     function function_configure($option)
@@ -27256,6 +28251,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
 
         // default
         $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
+        $config['storagedir'] ??= DIRECTORY_SEPARATOR === '/' ? '/var/tmp/rf' : (getenv('ALLUSERSPROFILE') ?: sys_get_temp_dir()) . '\\rf';
         $config['placeholder'] ??= '';
         $config['var_stream'] ??= get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';          // for compatible
         $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
@@ -27271,6 +28267,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
                         $config[$name] = $entry;
                         break;
                     case 'cachedir':
+                    case 'storagedir':
                         $entry ??= $config[$name];
                         if (!file_exists($entry)) {
                             @mkdir($entry, 0777 & (~umask()), true);
@@ -27283,7 +28280,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
                             if (!defined($entry)) {
                                 define($entry, tmpfile() ?: [] ?: '' ?: 0.0 ?: null ?: false);
                             }
-                            if (!is_resource(constant($entry))) {
+                            if (!is_resourcable(constant($entry))) {
                                 // もしリソースじゃないと一意性が保てず致命的になるので例外を投げる
                                 throw new \RuntimeException('placeholder is not resource'); // @codeCoverageIgnore
                             }
@@ -27296,11 +28293,15 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
         }
 
         // getting
+        if ($option === null) {
+            return $config;
+        }
         if (is_string($option)) {
             switch ($option) {
                 default:
                     return $config[$option] ?? null;
                 case 'cachedir':
+                case 'storagedir':
                     $dirname = $config[$option];
                     if (!file_exists($dirname)) {
                         @mkdir($dirname, 0777 & (~umask()), true); // @codeCoverageIgnore
@@ -28120,7 +29121,7 @@ if (!function_exists('ryunosuke\\Functions\\is_primitive')) {
      */
     function is_primitive($var)
     {
-        return is_scalar($var) || is_null($var) || is_resource($var);
+        return is_scalar($var) || is_null($var) || is_resourcable($var);
     }
 }
 
@@ -28174,6 +29175,43 @@ if (!function_exists('ryunosuke\\Functions\\is_recursive')) {
             return false;
         };
         return $core($var, []);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\is_resourcable') || (new \ReflectionFunction('ryunosuke\\Functions\\is_resourcable'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\is_resourcable')) {
+    /**
+     * 閉じたリソースでも true を返す is_resource
+     *
+     * マニュアル（ https://www.php.net/manual/ja/function.is-resource.php ）に記載の通り、 isresource は閉じたリソースで false を返す。
+     * リソースはリソースであり、それでは不便なこともあるので、閉じていようとリソースなら true を返す関数。
+     *
+     * Example:
+     * ```php
+     * // 閉じたリソースを用意
+     * $resource = tmpfile();
+     * fclose($resource);
+     * // is_resource は false を返すが・・・
+     * that(is_resource($resource))->isFalse();
+     * // is_resourcable は true を返す
+     * that(is_resourcable($resource))->isTrue();
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     *
+     * @param mixed $var 調べる値
+     * @return bool リソースなら true
+     */
+    function is_resourcable($var)
+    {
+        if (is_resource($var)) {
+            return true;
+        }
+        // もっといい方法があるかもしれないが、簡単に調査したところ gettype するしか術がないような気がする
+        if (strpos(gettype($var), 'resource') === 0) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -28252,7 +29290,7 @@ if (!function_exists('ryunosuke\\Functions\\numberify')) {
     function numberify($var, $decimal = false)
     {
         // resource はその int 値を返す
-        if (is_resource($var)) {
+        if (is_resourcable($var)) {
             return (int) $var;
         }
 
@@ -28764,7 +29802,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
      * ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。
      *
      * - 特定の内部クラス（PDO など）
-     * - リソース
+     * - 大部分のリソース
      *
      * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
      * ただしコンストラクタが必須引数無しの場合はコールされる。
@@ -28777,6 +29815,9 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
      *
      * クロージャはコード自体を引っ張ってきて普通に function (){} として埋め込む。
      * クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。
+     *
+     * リソースはファイル的なリソースであればメタ情報を出力して復元時に再オープンする。
+     * それ以外のリソースは null で出力される（将来的に例外にするかもしれない）。
      *
      * 軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。
      * オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。
@@ -28835,6 +29876,12 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     if (!$id) {
                         $id = 'array' . (count($this->vars) + 1);
                     }
+                    $this->vars[$id] = $var;
+                    return $id;
+                }
+                // リソースも一応は ID がある
+                if (is_resourcable($var)) {
+                    $id = 'resource' . (int) $var;
                     $this->vars[$id] = $var;
                     return $id;
                 }
@@ -29038,6 +30085,42 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
             if (is_object($value)) {
                 $ref = new \ReflectionObject($value);
 
+                // enum はリテラルを返せばよい
+                if ($value instanceof \UnitEnum) {
+                    $declare = "\\$ref->name::$value->name";
+                    if ($ref->getConstant($value->name) === $value) {
+                        return "\$this->$vid = $declare";
+                    }
+                    // enum の polyfill で、__callStatic を利用して疑似的にエミュレートしているライブラリは多い
+                    // もっとも、「多い」だけであり、そうとは限らないので値は見る必要はある（例外が飛ぶかもしれないので try も必要）
+                    if ($ref->hasMethod('__callStatic')) {
+                        try {
+                            if ($declare() === $value) {
+                                return "\$this->$vid = $declare()";
+                            }
+                        }
+                        catch (\Throwable $t) { // @codeCoverageIgnore
+                            // through. treat regular object
+                        }
+                    }
+                }
+
+                // 弱参照系は同時に渡ってきていれば復元できる
+                if ($value instanceof \WeakReference) {
+                    $weakreference = $value->get();
+                    if ($weakreference === null) {
+                        $weakreference = new \stdClass();
+                    }
+                    return "\$this->$vid = \\WeakReference::create({$export($weakreference, $nest)})";
+                }
+                if ($value instanceof \WeakMap) {
+                    $weakmap = "{$spacer1}\$this->$vid = new \\WeakMap();\n";
+                    foreach ($value as $object => $data) {
+                        $weakmap .= "{$spacer1}\$this->{$vid}[{$export($object)}] = {$export($data)};\n";
+                    }
+                    return "\$this->$vid = (function () {\n{$weakmap}{$spacer1}return \$this->$vid;\n$spacer0})->call(\$this)";
+                }
+
                 // 内部クラスで serialize 出来ないものは __PHP_Incomplete_Class で代替（復元時に無視する）
                 try {
                     if ($ref->isInternal()) {
@@ -29138,8 +30221,18 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
 
                 return "\$this->new(\$this->$vid, $classname, (function () {\n{$spacer1}return {$export([$fields, $privates], $nest + 1)};\n{$spacer0}}))";
             }
+            if (is_resourcable($value)) {
+                // スタンダードなリソースなら復元できないこともない
+                $meta = stream_get_meta_data($value);
+                if (!in_array(strtolower($meta['stream_type']), ['stdio', 'output'], true)) {
+                    return 'null'; // for compatible. 例外にしたい
+                }
+                $meta['position'] = @ftell($value);
+                $meta['context'] = stream_context_get_options($value);
+                return "\$this->$vid = \$this->open({$export($meta, $nest + 1)})";
+            }
 
-            return is_null($value) || is_resource($value) ? 'null' : $var_export($value);
+            return is_null($value) ? 'null' : $var_export($value);
         };
 
         $exported = $export($value, 1);
@@ -29198,6 +30291,18 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     }
 
                     return $object;
+                }
+
+                public function open($metadata)
+                {
+                    $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
+                    if ($resource === false) {
+                        return null;
+                    }
+                    if ($metadata['seekable'] && is_int($metadata['position'])) {
+                        fseek($resource, $metadata['position']);
+                    }
+                    return $resource;
                 }
 
                 private function reflect($class)
@@ -29360,7 +30465,7 @@ if (!function_exists('ryunosuke\\Functions\\var_html')) {
             elseif (is_null($value)) {
                 return 'null';
             }
-            elseif (is_resource($value)) {
+            elseif (is_resourcable($value)) {
                 return ((string) $value) . '(' . get_resource_type($value) . ')';
             }
             else {
@@ -29561,9 +30666,6 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                 elseif (is_object($token)) {
                     return $this->_append($this->string($token), 'green', ['type' => 'object', 'id' => spl_object_id($token)]);
                 }
-                elseif (is_resource($token)) {
-                    return $this->_append($this->string($token), 'bold', ['type' => 'resource']);
-                }
                 elseif (is_string($token)) {
                     return $this->_append($this->string($token), 'magenta', ['type' => 'scalar']);
                 }
@@ -29572,6 +30674,9 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                 }
                 elseif (is_scalar($token)) {
                     return $this->_append($this->string($token), 'magenta', ['type' => 'scalar']);
+                }
+                elseif (is_resourcable($token)) {
+                    return $this->_append($this->string($token), 'bold', ['type' => 'resource']);
                 }
                 else {
                     throw new \DomainException(); // @codeCoverageIgnore
@@ -29610,9 +30715,6 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                     }
                     return get_class($token) . "#" . spl_object_id($token);
                 }
-                elseif (is_resource($token)) {
-                    return sprintf('%s of type (%s)', $token, get_resource_type($token));
-                }
                 elseif (is_string($token)) {
                     if ($this->options['maxlength']) {
                         $token = str_ellipsis($token, $this->options['maxlength'], '...(too length)...');
@@ -29621,6 +30723,9 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                 }
                 elseif (is_scalar($token)) {
                     return var_export($token, true);
+                }
+                elseif (is_resourcable($token)) {
+                    return sprintf('%s of type (%s)', $token, get_resource_type($token));
                 }
                 else {
                     throw new \DomainException(gettype($token)); // @codeCoverageIgnore

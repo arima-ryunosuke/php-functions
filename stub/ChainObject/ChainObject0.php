@@ -343,6 +343,11 @@ trait ChainObject0
     public function object_dive($object, $path, $default = null, $delimiter = "."): self { }
     public function object_dive($path, $default = null, $delimiter = "."): self { }
 
+    /** @see object_storage() */
+    public self $object_storage;
+    public function object_storage($namespace = "global"): self { }
+    public function object_storage(): self { }
+
     /** @see json_import() */
     public self $json_import;
     public function json_import($value, $options = []): self { }

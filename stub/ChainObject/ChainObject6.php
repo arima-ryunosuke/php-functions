@@ -538,6 +538,11 @@ trait ChainObject6
     public function http_requests($urls, $single_options = [], $multi_options = [], &$infos = []): self { }
     public function http_requests($single_options = [], $multi_options = [], &$infos = []): self { }
 
+    /** @see ip_info() */
+    public self $ip_info;
+    public function ip_info($ipaddr, $options = []): self { }
+    public function ip_info($options = []): self { }
+
     /** @see preg_matches() */
     public self $preg_matches;
     public function preg_matches($pattern, $subject, $flags = 0, $offset = 0): self { }

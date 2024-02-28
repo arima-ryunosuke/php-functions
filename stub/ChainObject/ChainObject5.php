@@ -443,6 +443,11 @@ trait ChainObject5
     public function class_extends($object, $methods, $fields = [], $implements = []): self { }
     public function class_extends($methods, $fields = [], $implements = []): self { }
 
+    /** @see object_id() */
+    public self $object_id;
+    public function object_id($objectOrId): self { }
+    public function object_id(): self { }
+
     /** @see type_exists() */
     public self $type_exists;
     public function type_exists($typename, $autoload = true): self { }
