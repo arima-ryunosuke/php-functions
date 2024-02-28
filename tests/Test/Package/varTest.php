@@ -1132,6 +1132,35 @@ class varTest extends AbstractTestCase
         that($values2['self2']['new'])->isSame('new!');
     }
 
+    function test_var_export3_resource()
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 've3');
+        $file = fopen($tmp, 'r+', false, stream_context_create(['file' => ['hoge' => 'HOGE']]));
+        fwrite($file, 'Hello');
+
+        $values = [
+            'file'   => $file,
+            'stdout' => STDOUT,
+            'output' => fopen('php://output', 'w'),
+            'http'   => fopen(TESTWEBSERVER, 'r'),
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+
+        that($values2['file'])->isResource();
+        that($values2['stdout'])->isResource();
+        that($values2['output'])->isResource();
+        that($values2['http'])->isNull();
+
+        // that(stream_context_get_options($values2['file']))->is(['file' => ['hoge' => 'HOGE']]);
+        that(ftell($values2['file']))->is(5);
+        fwrite($values2['file'], 'World');
+        that(file_get_contents($tmp))->is('HelloWorld');
+
+        $this->expectOutputString('this is output string');
+        fwrite($values2['output'], 'this is output string');
+    }
+
     function test_var_hash()
     {
         that(var_hash([1, 2, 3], ['md5'], false))->isSame('262bbc0aa0dc62a93e350f1f7df792b9');

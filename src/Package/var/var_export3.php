@@ -12,6 +12,7 @@ require_once __DIR__ . '/../misc/resolve_symbol.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../var/is_primitive.php';
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -23,7 +24,7 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * ただし、下記は不可能あるいは復元不可（今度も対応するかは未定）。
  *
  * - 特定の内部クラス（PDO など）
- * - リソース
+ * - 大部分のリソース
  *
  * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
  * ただしコンストラクタが必須引数無しの場合はコールされる。
@@ -36,6 +37,9 @@ require_once __DIR__ . '/../var/is_primitive.php';
  *
  * クロージャはコード自体を引っ張ってきて普通に function (){} として埋め込む。
  * クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。
+ *
+ * リソースはファイル的なリソースであればメタ情報を出力して復元時に再オープンする。
+ * それ以外のリソースは null で出力される（将来的に例外にするかもしれない）。
  *
  * 軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。
  * オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。
@@ -94,6 +98,12 @@ function var_export3($value, $return = false)
                 if (!$id) {
                     $id = 'array' . (count($this->vars) + 1);
                 }
+                $this->vars[$id] = $var;
+                return $id;
+            }
+            // リソースも一応は ID がある
+            if (is_resourcable($var)) {
+                $id = 'resource' . (int) $var;
                 $this->vars[$id] = $var;
                 return $id;
             }
@@ -397,8 +407,18 @@ function var_export3($value, $return = false)
 
             return "\$this->new(\$this->$vid, $classname, (function () {\n{$spacer1}return {$export([$fields, $privates], $nest + 1)};\n{$spacer0}}))";
         }
+        if (is_resourcable($value)) {
+            // スタンダードなリソースなら復元できないこともない
+            $meta = stream_get_meta_data($value);
+            if (!in_array(strtolower($meta['stream_type']), ['stdio', 'output'], true)) {
+                return 'null'; // for compatible. 例外にしたい
+            }
+            $meta['position'] = @ftell($value);
+            $meta['context'] = stream_context_get_options($value);
+            return "\$this->$vid = \$this->open({$export($meta, $nest + 1)})";
+        }
 
-        return is_null($value) || is_resource($value) ? 'null' : $var_export($value);
+        return is_null($value) ? 'null' : $var_export($value);
     };
 
     $exported = $export($value, 1);
@@ -457,6 +477,18 @@ function var_export3($value, $return = false)
                 }
 
                 return $object;
+            }
+
+            public function open($metadata)
+            {
+                $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
+                if ($resource === false) {
+                    return null;
+                }
+                if ($metadata['seekable'] && is_int($metadata['position'])) {
+                    fseek($resource, $metadata['position']);
+                }
+                return $resource;
             }
 
             private function reflect($class)
