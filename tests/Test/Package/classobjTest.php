@@ -16,6 +16,7 @@ use function ryunosuke\Functions\Package\detect_namespace;
 use function ryunosuke\Functions\Package\get_class_constants;
 use function ryunosuke\Functions\Package\get_object_properties;
 use function ryunosuke\Functions\Package\object_dive;
+use function ryunosuke\Functions\Package\object_id;
 use function ryunosuke\Functions\Package\optional;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\register_autoload_function;
@@ -471,6 +472,53 @@ class classobjTest extends AbstractTestCase
         that(object_dive($class, 'a.b.c'))->is('abc');
         that(object_dive($class, 'a.b.c.x', 'none'))->is('none');
         that(object_dive($class, 'a.b.X', 'none'))->is('none');
+    }
+
+    function test_object_id()
+    {
+        $object = new class() {
+            public $destructed;
+
+            public function __destruct()
+            {
+                $this->destructed[] = spl_object_id($this);
+            }
+        };
+        $destructed = [];
+        $object->destructed = &$destructed;
+
+        $base_id = object_id($object);
+        $inc = 0;
+
+        // null と 0 は完全対応する
+        that(object_id(null))->isSame(0);
+        that(object_id(0))->isSame(null);
+
+        // 同じオブジェクトは同じ ID を返す
+        that(object_id($object))->isSame($base_id);
+        that(object_id($object))->isSame($base_id);
+        that(object_id(clone $object))->isSame($base_id + ++$inc);
+
+        // int を与えると対応したオブジェクトを返す
+        that(object_id($base_id))->isSame($object);
+        that(object_id($base_id + $inc))->isSame(null);
+
+        // 異なるオブジェクトは異なる ID を返す
+        that(object_id(new \stdClass()))->isSame($base_id + ++$inc);
+        that(object_id(new \stdClass()))->isSame($base_id + ++$inc);
+
+        // 内部で変に参照が握られておらずちゃんとデストラクタが呼ばれる
+        unset($object);
+        gc_collect_cycles();
+        that($destructed)->count(2);
+
+        // 数が減っても -1 されて再利用されたりはしない
+        that(object_id(new \stdClass()))->isSame($base_id + ++$inc);
+        that(object_id(new \stdClass()))->isSame($base_id + ++$inc);
+
+        // よく分からないID
+        that(object_id(999))->isSame(null);
+        that(object_id("999"))->isSame(null);
     }
 
     function test_optional()
