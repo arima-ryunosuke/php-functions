@@ -17,6 +17,7 @@ use function ryunosuke\Functions\Package\get_class_constants;
 use function ryunosuke\Functions\Package\get_object_properties;
 use function ryunosuke\Functions\Package\object_dive;
 use function ryunosuke\Functions\Package\object_id;
+use function ryunosuke\Functions\Package\object_storage;
 use function ryunosuke\Functions\Package\optional;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\register_autoload_function;
@@ -519,6 +520,81 @@ class classobjTest extends AbstractTestCase
         // よく分からないID
         that(object_id(999))->isSame(null);
         that(object_id("999"))->isSame(null);
+    }
+
+    function test_object_storage()
+    {
+        $object = new class() {
+            public $destructed;
+
+            public function __destruct()
+            {
+                $this->destructed[] = spl_object_id($this);
+            }
+        };
+        $destructed = [];
+        $object->destructed = &$destructed;
+
+        $resource = tmpfile();
+
+        $test_storage = object_storage('test');
+
+        // 基本操作系
+        that($test_storage)->has($object)->isSame(false);
+        that($test_storage)->has($resource)->isSame(false);
+        that($test_storage)->set($object, 'data1')->isSame($test_storage);
+        that($test_storage)->set($resource, 'data2')->isSame($test_storage);
+        that($test_storage)->has($object)->isSame(true);
+        that($test_storage)->has($resource)->isSame(true);
+        that($test_storage)->get($object)->isSame('data1');
+        that($test_storage)->get($resource)->isSame('data2');
+        unset($test_storage[$object]);
+        unset($test_storage[$resource]);
+        that($test_storage)->has($object)->isSame(false);
+        that($test_storage)->has($resource)->isSame(false);
+        that($test_storage)->get($object)->isSame(null);
+        that($test_storage)->get($resource)->isSame(null);
+
+        // イテレーション系
+        $test_storage->set($object, 'data1');
+        $test_storage->set($resource, 'data2');
+        that($test_storage)->count(2);
+        [$keys, $vals] = (function ($test_storage) {
+            $keys = $vals = [];
+            foreach ($test_storage as $key => $val) {
+                $keys[] = $key;
+                $vals[] = $val;
+            }
+            return [$keys, $vals];
+        })($test_storage);
+        that($keys)->isSame([$object, $resource]);
+        that($vals)->isSame(['data1', 'data2']);
+        that($test_storage)->clear()->isSame(true);
+        that($test_storage)->count(0);
+
+        // 参照切れ
+        $test_storage->set($object, 'data1');
+        $test_storage->set($resource, 'data2');
+        that($test_storage)->count(2);
+        unset($object);
+        unset($resource);
+        unset($keys);
+        gc_collect_cycles();
+        that($test_storage)->count(0);
+
+        // 閉じたリソースは消される
+        $resource = tmpfile();
+        $test_storage->set($resource, 'data');
+        fclose($resource);
+        that($test_storage)->get($resource)->isSame(null);
+        that($test_storage)->has($resource)->isSame(false);
+        that($test_storage)->count(0);
+        that(iterator_to_array($test_storage))->isSame([]);
+
+        // 内部で変に参照が握られておらずちゃんとデストラクタが呼ばれる
+        that($destructed)->count(1);
+
+        that($test_storage)->get('hoge')->wasThrown('supports only object or resource');
     }
 
     function test_optional()
