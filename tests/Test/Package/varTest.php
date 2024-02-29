@@ -7,6 +7,8 @@ use ArrayObject;
 use Concrete;
 use Exception as Ex;
 use Invoker;
+use ryunosuke\Test\Package\files\enums\IntEnum;
+use ryunosuke\Test\Package\files\enums\StringEnum;
 use SerialMethod;
 use SleepWakeupMethod;
 use stdClass;
@@ -1086,6 +1088,19 @@ class varTest extends AbstractTestCase
         that($objects2['concreate']->getPrivate())->is('Changed/Concrete');
 
         that(serialize($objects2))->isSame(serialize(unserialize(serialize($objects))));
+    }
+
+    function test_var_export3_enum()
+    {
+        $values = [
+            'int-enum'    => IntEnum::Case1(),
+            'string-enum' => StringEnum::CaseHoge(),
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+
+        that($values2['int-enum'])->isSame(IntEnum::Case1());
+        that($values2['string-enum'])->isSame(StringEnum::CaseHoge());
     }
 
     function test_var_export3_reference()

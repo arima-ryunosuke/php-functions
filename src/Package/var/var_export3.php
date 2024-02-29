@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
@@ -306,6 +306,26 @@ function var_export3($value, $return = false)
         }
         if (is_object($value)) {
             $ref = new \ReflectionObject($value);
+
+            // enum はリテラルを返せばよい
+            if ($value instanceof \UnitEnum) {
+                $declare = "\\$ref->name::$value->name";
+                if ($ref->getConstant($value->name) === $value) {
+                    return "\$this->$vid = $declare";
+                }
+                // enum の polyfill で、__callStatic を利用して疑似的にエミュレートしているライブラリは多い
+                // もっとも、「多い」だけであり、そうとは限らないので値は見る必要はある（例外が飛ぶかもしれないので try も必要）
+                if ($ref->hasMethod('__callStatic')) {
+                    try {
+                        if ($declare() === $value) {
+                            return "\$this->$vid = $declare()";
+                        }
+                    }
+                    catch (\Throwable $t) { // @codeCoverageIgnore
+                        // through. treat regular object
+                    }
+                }
+            }
 
             // 内部クラスで serialize 出来ないものは __PHP_Incomplete_Class で代替（復元時に無視する）
             try {
