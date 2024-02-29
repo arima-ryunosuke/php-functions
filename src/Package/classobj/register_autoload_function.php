@@ -32,37 +32,44 @@ function register_autoload_function($before = null, $after = null)
         public $befores = [];
         public $afters  = [];
 
+        private $loading = false;
+
         public function __invoke($classname)
         {
-            // file スキームをこの瞬間だけ上書きして require/include をフックする
-            $include_stream = include_stream()->register(function ($filename) use ($classname) {
-                $contents = null;
-                foreach ($this->befores as $before) {
-                    $contents = $before($classname, $filename, $contents);
-                }
-                return $contents ?? file_get_contents($filename);
-            });
-            try {
-                $autoloaders = spl_autoload_functions();
-                foreach ($autoloaders as $autoloader) {
-                    if ($autoloader === $this) {
-                        continue;
+            if (!$this->loading) {
+                $this->loading = true;
+                // file スキームをこの瞬間だけ上書きして require/include をフックする
+                $include_stream = include_stream()->register(function ($filename) use ($classname) {
+                    $contents = null;
+                    foreach ($this->befores as $before) {
+                        $contents = $before($classname, $filename, $contents);
+                    }
+                    return $contents ?? file_get_contents($filename);
+                });
+                try {
+                    $autoloaders = spl_autoload_functions();
+                    foreach ($autoloaders as $autoloader) {
+                        if ($autoloader !== $this) {
+                            // ここで require/include が走れば↑の before がコールされる
+                            $autoloader($classname);
+                            if (type_exists($classname, false)) {
+                                break;
+                            }
+                        }
                     }
 
-                    // ここで require/include が走れば↑の before がコールされる
-                    $autoloader($classname);
-                    if (type_exists($classname, false)) {
-                        // ロードができたら after をコールする
-                        foreach ($this->afters as $after) {
-                            $after($classname);
-                        }
-                        break;
-                    }
+                }
+                finally {
+                    // file スキームの上書きは影響範囲が大きいので必ず元に戻す
+                    $include_stream->restore();
+                    $this->loading = false;
                 }
             }
-            finally {
-                // file スキームの上書きは影響範囲が大きいので必ず元に戻す
-                $include_stream->restore();
+            if (type_exists($classname, false)) {
+                // ロードができたら after をコールする
+                foreach ($this->afters as $after) {
+                    $after($classname);
+                }
             }
         }
     };
