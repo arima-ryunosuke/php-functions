@@ -29,6 +29,8 @@
   "require-dev": {
     "phpunit/phpunit": "9.*",
     "ryunosuke/phpunit-extension": "3.*",
+    "ryunosuke/polyfill-enum": "*",
+    "benmorel/weakmap-polyfill": "*",
     "psr/simple-cache": "*",
     "psr/log": "*"
   },
