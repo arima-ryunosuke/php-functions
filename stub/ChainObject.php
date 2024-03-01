@@ -2,6 +2,10 @@
 
 /**
  * chain 関数のためのクラススタブ
+ *
+ * @used-by \chain()
+ * @used-by \ryunosuke\Functions\chain()
+ * @used-by \ryunosuke\Functions\Package\chain()
  */
 class ChainObject implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable
 {

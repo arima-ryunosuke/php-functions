@@ -7,6 +7,10 @@
  * @mixin \ReflectionNamedType
  * @mixin \ReflectionUnionType
  * @mixin \ReflectionIntersectionType
+ *
+ * @used-by \reflect_types()
+ * @used-by \ryunosuke\Functions\reflect_types()
+ * @used-by \ryunosuke\Functions\Package\reflect_types()
  */
 class ReflectionAnyType implements \IteratorAggregate, \ArrayAccess, \Countable, \JsonSerializable
 {

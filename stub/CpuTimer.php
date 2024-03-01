@@ -2,6 +2,10 @@
 
 /**
  * cpu_timer 関数のためのクラススタブ
+ *
+ * @used-by \cpu_timer()
+ * @used-by \ryunosuke\Functions\cpu_timer()
+ * @used-by \ryunosuke\Functions\Package\cpu_timer()
  */
 class CpuTimer
 {

@@ -2,6 +2,10 @@
 
 /**
  * object_storage 関数のためのクラススタブ
+ *
+ * @used-by \object_storage()
+ * @used-by \ryunosuke\Functions\object_storage()
+ * @used-by \ryunosuke\Functions\Package\object_storage()
  */
 class ObjectStorage implements \Countable, \ArrayAccess, \IteratorAggregate
 {

@@ -2,6 +2,10 @@
 
 /**
  * include_stream 関数のためのクラススタブ
+ *
+ * @used-by \include_stream()
+ * @used-by \ryunosuke\Functions\include_stream()
+ * @used-by \ryunosuke\Functions\Package\include_stream()
  */
 class IncludeStream
 {

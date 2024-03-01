@@ -2,6 +2,10 @@
 
 /**
  * process_async 関数のためのクラススタブ
+ *
+ * @used-by \process_async()
+ * @used-by \ryunosuke\Functions\process_async()
+ * @used-by \ryunosuke\Functions\Package\process_async()
  */
 class ProcessAsync
 {
