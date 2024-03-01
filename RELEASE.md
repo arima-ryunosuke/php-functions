@@ -12,6 +12,29 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.18
+
+- [feature] function_configure の項目に storagedir を追加
+- [feature] globstar を追加
+- [feature] ip_info を追加
+- [feature] http_requests のコールバック対応
+- [feature] http_request に async オプションを追加
+- [feature] benchmark に CPU 使用率を追加
+- [feature] cpu_timer を追加
+- [feature] object_storage を追加
+- [feature] object_id を追加
+- [feature] var_export3 の WeakReference/WeakMap 対応
+- [feature] var_export3 の enum 対応
+- [feature] var_export3 の resource 対応
+- [feature] is_resourcable を追加
+- [feature] array_limit を追加
+- [feature] array_pos_key の配列対応
+- [feature] is_hasharray の array_is_list 委譲
+- [feature] ob_stdout を追加
+- [feature] sys_set_temp_dir を追加
+- [fixbug] date_timestamp で閏日の1年後が 03/01 になる不具合を修正
+- [fixbug] register_autoload_function で無限ループする不具合を修正
+
 ## 1.6.17
 
 - [bin] ChainObject の stub から \\ を除去
