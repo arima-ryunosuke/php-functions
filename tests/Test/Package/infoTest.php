@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\ansi_colorize;
 use function ryunosuke\Functions\Package\ansi_strip;
 use function ryunosuke\Functions\Package\arguments;
+use function ryunosuke\Functions\Package\cpu_timer;
 use function ryunosuke\Functions\Package\file_set_contents;
 use function ryunosuke\Functions\Package\get_modified_files;
 use function ryunosuke\Functions\Package\get_uploaded_files;
@@ -216,6 +217,25 @@ class infoTest extends AbstractTestCase
 
         // 値が指定されていない
         that(self::resolveFunction('arguments'))(['req' => 'hoge'], 'arg1 arg2 --req')->wasThrown('requires value');
+    }
+
+    function test_cpu_timer()
+    {
+        $timer = cpu_timer();
+        $result = $timer(function () {
+            usleep(100 * 1000);
+            $hash = '';
+            foreach (range(0, 500) as $i) {
+                $hash .= $i . sha1_file(realpath(__FILE__));
+            }
+            return $hash;
+        });
+
+        // 値自体に意味はないので結果の意味合いだけ確認
+        that($result['user'] + $result['system'])->closesTo($result['time']);
+        that($result['time'] + $result['idle'])->closesTo($result['real']);
+        that($result['user%'] + $result['system%'])->closesTo(100.0);
+        that($result['time%'] + $result['idle%'])->closesTo(100.0);
     }
 
     function test_get_modified_files()
