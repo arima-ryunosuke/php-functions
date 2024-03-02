@@ -5,6 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/arrayize.php';
 require_once __DIR__ . '/../dataformat/markdown_table.php';
 require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../info/cpu_timer.php';
 require_once __DIR__ . '/../info/ini_sets.php';
 require_once __DIR__ . '/../info/is_ansi.php';
 require_once __DIR__ . '/../misc/evaluate.php';
@@ -127,6 +128,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     }
 
     // ベンチ
+    $cpu_timer = cpu_timer();
     $tick = function () use (&$usage) {
         $usage = max($usage, memory_get_usage());
     };
@@ -135,6 +137,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     foreach ($benchset as $name => $caller) {
         $usage = null;
         gc_collect_cycles();
+        $cpu_timer->start();
         $memory = memory_get_usage();
         $microtime = microtime(true);
         $end = $microtime + $millisec / 1000;
@@ -147,6 +150,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
         }
         $stats[$name]['count'] = $n;
         $stats[$name]['mills'] = (microtime(true) - $microtime) / $n;
+        $stats[$name]['cpu'] = $cpu_timer->result();
         $stats[$name]['memory'] = $usage === null ? null : $usage - $memory;
     }
     unregister_tick_function($tick);
@@ -160,6 +164,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     foreach ($stats as $name => $stat) {
         $result[$name] = [
             'name'    => $name,
+            'cpu'     => $stat['cpu'],
             'memory'  => $stat['memory'],
             'called'  => $stat['count'],
             'fastest' => $stat['fastest'],
@@ -178,6 +183,9 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
         echo markdown_table(array_map(function ($v) use ($number_format) {
             return [
                 'name'        => $v['name'],
+                'cpu(user)'   => $number_format($v['cpu']['user'], 1000, 3),
+                'cpu(system)' => $number_format($v['cpu']['system'], 1000, 3),
+                'cpu(idle)'   => $number_format($v['cpu']['idle'], 1000, 3),
                 'memory(KB)'  => $number_format($v['memory'], 1 / 1024, 3, "N/A"),
                 'called'      => $number_format($v['called']),
                 'fastest(ms)' => $number_format($v['fastest'], 1000, 6),
