@@ -163,15 +163,20 @@ function date_timestamp($datetimedata, $baseTimestamp = null)
     }
 
     $relative = $parts['relative'] ?? [];
-    if (($relative['month'] ?? false)
+    if (true
         && !isset($relative['weekday'])            // 週指定があるとかなり特殊で初日末日が意味を為さない
         && !isset($relative['first_day_of_month']) // first day 指定があるなら初日確定
         && !isset($relative['last_day_of_month'])  // last day 指定があるなら末日確定
     ) {
-        $parts['month'] += $relative['month'];
-        $parts['year'] += intdiv($parts['month'], 12);
-        $parts['month'] %= 12;
-        $parts['month'] += $parts['month'] <= 0 ? 12 : 0;
+        if ($relative['year'] ?? false) {
+            $parts['year'] += $relative['year'];
+        }
+        if ($relative['month'] ?? false) {
+            $parts['month'] += $relative['month'];
+            $parts['year'] += intdiv($parts['month'], 12);
+            $parts['month'] %= 12;
+            $parts['month'] += $parts['month'] <= 0 ? 12 : 0;
+        }
 
         if (!checkdate($parts['month'], $parts['day'], $parts['year'])) {
             $timestamp = strtotime(date('Y-m-t H:i:s', $timestamp - $DAY1 * 4));
