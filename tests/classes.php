@@ -1,11 +1,11 @@
 <?php
 
-use ryunosuke\Test\Package\AbstractTestCase;
-
 /**
  * @noinspection PhpUnusedPrivateMethodInspection
  * @noinspection PhpUnusedPrivateFieldInspection
  */
+
+use ryunosuke\Test\Package\AbstractTestCase;
 
 abstract class AbstractConcrete
 {
