@@ -17,6 +17,7 @@ use function ryunosuke\Functions\Package\http_request;
 use function ryunosuke\Functions\Package\http_requests;
 use function ryunosuke\Functions\Package\incidr;
 use function ryunosuke\Functions\Package\ip2cidr;
+use function ryunosuke\Functions\Package\ip_info;
 use function ryunosuke\Functions\Package\ping;
 use function ryunosuke\Functions\Package\rm_rf;
 
@@ -724,6 +725,58 @@ class networkTest extends AbstractTestCase
         that(self::resolveFunction('ip2cidr'))('256.256.256.256', 'hogera')->wasThrown('is invalid');
         that(self::resolveFunction('ip2cidr'))('127.0.0.0', 'hogera')->wasThrown('is invalid');
         that(self::resolveFunction('ip2cidr'))('256.256.256.256', '127.0.0.0')->wasThrown('is invalid');
+    }
+
+    function test_ip_info()
+    {
+        if (!defined('TESTRIRSERVER')) {
+            return;
+        }
+
+        $storage = function_configure('storagedir');
+        rm_rf($storage, false);
+
+        $options = [
+            'rir' => [
+                'afrinic' => TESTRIRSERVER . '/afrinic.csv',
+                'apnic'   => TESTRIRSERVER . '/apnic.csv',
+                'arin'    => TESTRIRSERVER . '/arin.csv',
+                'lacnic'  => TESTRIRSERVER . '/lacnic.csv',
+                'ripe'    => TESTRIRSERVER . '/ripe.csv',
+            ],
+        ];
+
+        that(ip_info("0.0.0.0", $options))->is([
+            "cidr"     => "0.0.0.0/8",
+            "registry" => "RFC1700",
+            "cc"       => null,
+            "date"     => null,
+        ]);
+        that(ip_info("127.0.0.0", $options))->is([
+            "cidr"     => "127.0.0.0/8",
+            "registry" => "RFC1122",
+            "cc"       => null,
+            "date"     => null,
+        ]);
+
+        that(ip_info(gethostbyname('www.nic.ad.jp'), $options))->is([
+            "cidr"     => "192.41.192.0/24",
+            "registry" => "apnic",
+            "cc"       => "JP",
+            "date"     => "19880620",
+        ]);
+        that(ip_info(gethostbyname('www.internic.net'), $options))->is([
+            "cidr"     => "192.0.32.0/20",
+            "registry" => "arin",
+            "cc"       => "US",
+            "date"     => "20090629",
+        ]);
+
+        that(ip_info('100.64.0.0', $options))->is(null);
+        that(count(ip_info(null, $options)))->gt(100000);
+
+        that(self::resolveFunction('ip_info'))("hogera", $options)->wasThrown('is invalid');
+        that(self::resolveFunction('ip_info'))("00:00:5e:ef:10:00:00:00", $options)->wasThrown('is not supported');
     }
 
     function test_ping()

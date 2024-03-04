@@ -25,6 +25,7 @@ foreach (glob(__DIR__ . '/../src/Package/*/*.php') as $fn) {
 if (false) {
     define('TESTWEBSERVER', null);
     define('TESTPINGSERVER', null);
+    define('TESTRIRSERVER', null);
     define('DIFF', null);
 }
 
