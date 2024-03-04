@@ -590,7 +590,7 @@ class networkTest extends AbstractTestCase
             "$server/delay/1",
             "$server/delay/1",
             "$server/delay/1",
-            "$server/delay/1",
+            "$server/delay/1" => fn($key, $body) => "done!",
         ], [], [
             CURLMOPT_MAX_TOTAL_CONNECTIONS => 2,
         ]);
@@ -600,6 +600,8 @@ class networkTest extends AbstractTestCase
         // つまり d1 は d5 に巻きこまれる形で5つまでは並列だが、最後の1つは個別で実行されるので約6秒で完了することになる
         that($time)->break()->isBetween(6.0, 6.5);
         that($responses)->count(7);
+        // さらに最後の要素はコールバック指定なので返り値が変わっている
+        that($responses["$server/delay/1"])->is('done!');
 
         that(self::resolveFunction('http_requests'))([
             "$server/delay/1",

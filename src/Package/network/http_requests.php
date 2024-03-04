@@ -16,6 +16,8 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * 返り値は $urls のキーを保持したまま、レスポンスが返ってきた順にボディを格納して配列で返す。
  * 構造は下記のサンプルを参照。
  *
+ * ただし、オプションに callback がある場合、各リクエスト完了直後にそれがコールされ、返り値はそのコールバックの返り値になる。
+ *
  * Example:
  * ```php
  * $responses = http_requests([
@@ -29,6 +31,7 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  *     // さらに、このような [URL => CURL オプション] 形式も許容される（あまり用途はないだろうが）
  *     'http://127.0.0.1' => [
  *         CURLOPT_TIMEOUT => 5,
+ *         'callback'      => fn($key, $body) => strlen($body),
  *     ],
  * ], [
  *     // 第2引数で各リクエストの共通オプションを指定できる（個別指定優先）
@@ -37,36 +40,23 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  *     // 第3引数でマルチリクエストのオプションを指定できる
  *     // @see https://www.php.net/manual/ja/function.curl-multi-setopt.php
  * ],
- *     // 第4引数を与えると動作が変わる（将来的にこの動作がデフォルトになる）
+ *     // 第4引数を与えるとボディ以外の各種情報が格納される
  *     $infos
  * );
- * # 第4引数を指定した場合の返り値
+ * # 返り値
  * [
  *     // キーが維持されるので hoge キー
  *     'hoge'             => 'response body',
  *     // curl のエラーが出た場合は null になる（詳細なエラー情報は $infos に格納される）
  *     'fuga'             => null,
- *     'http://127.0.0.1' => 'response body',
+ *     // callback を設定しているので strlen($body) が返り値になる
+ *     'http://127.0.0.1' => 12345,
  * ];
- * # 第4引数を指定しなかった場合の返り値
+ * # 第4引数（要するにキーを維持しつつ [header, curlinfo] が格納される）
  * [
- *     // キーが維持されるので hoge キー
- *     'hoge'             => [
- *         // 0 番目の要素は body 文字列
- *         'response body',
- *         // 1 番目の要素は header 配列
- *         [
- *             // ・・・・・
- *             'Content-Type' => 'text/plain',
- *             // ・・・・・
- *         ],
- *         // 2 番目の要素は curl のメタ配列
- *         [
- *             // ・・・・・
- *         ],
- *     ],
- *     // curl のエラーが出た場合は int になる（CURLE_*** の値）
- *     'fuga'             => 6,
+ *     'hoge'             => [['response header'], ['curl_info']],
+ *     'fuga'             => [['response header'], ['curl_info']],
+ *     'http://127.0.0.1' => [['response header'], ['curl_info']],
  * ];
  * ```
  *
@@ -80,6 +70,24 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  */
 function http_requests($urls, $single_options = [], $multi_options = [], &$infos = [])
 {
+    // urls の正規化
+    foreach ($urls as $key => $opt) {
+        // 文字列は URL 指定とみなす
+        if (is_string($opt)) {
+            $opt = [CURLOPT_URL => $opt];
+        }
+        // クロージャはコールバック指定とみなす
+        if ($opt instanceof \Closure) {
+            $opt = ['callback' => $opt];
+        }
+        // さらに URL 指定がないなら key を URL とみなす
+        if (!isset($opt[CURLOPT_URL]) && !isset($opt['url'])) {
+            $opt[CURLOPT_URL] = $key;
+        }
+
+        $urls[$key] = $opt + $single_options;
+    }
+
     $multi_options += [
         'throw' => false, // curl レイヤーでエラーが出たら例外を投げるか（http レイヤーではない）
     ];
@@ -110,9 +118,13 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
     $resultmap = [];
     $infos = [];
 
-    $set_response = function ($key, $body, $header, $info) use (&$responses, &$infos) {
+    $set_response = function ($key, $body, $header, $info) use ($urls, &$responses, &$infos) {
         $responses[$key] = $body;
         $infos[$key] = [$header, $info];
+
+        if (isset($urls[$key]['callback'])) {
+            $responses[$key] = $urls[$key]['callback']($key, $body, $header, $info);
+        }
     };
 
     $mh = curl_multi_init();
@@ -122,18 +134,9 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
 
     try {
         foreach ($urls as $key => $opt) {
-            // 文字列は URL 指定とみなす
-            if (is_string($opt)) {
-                $opt = [CURLOPT_URL => $opt];
-            }
-            // さらに URL 指定がないなら key を URL とみなす
-            if (!isset($opt[CURLOPT_URL]) && !isset($opt['url'])) {
-                $opt[CURLOPT_URL] = $key;
-            }
-
             $rheader = null;
             $info = null;
-            $res = http_request($default + $opt + $single_options, $rheader, $info);
+            $res = http_request($default + $opt, $rheader, $info);
             if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
                 curl_multi_add_handle($mh, $res[0]);
                 $resultmap[$handle_id] = [$key, $res[1], $res[2], microtime(true), 0];
