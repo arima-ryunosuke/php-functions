@@ -23,6 +23,7 @@ use function ryunosuke\Functions\Package\file_suffix;
 use function ryunosuke\Functions\Package\file_tree;
 use function ryunosuke\Functions\Package\fnmatch_and;
 use function ryunosuke\Functions\Package\fnmatch_or;
+use function ryunosuke\Functions\Package\globstar;
 use function ryunosuke\Functions\Package\json_export;
 use function ryunosuke\Functions\Package\ltsv_export;
 use function ryunosuke\Functions\Package\memory_path;
@@ -1037,6 +1038,90 @@ class filesystemTest extends AbstractTestCase
         that(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'))->isFalse();
 
         that(self::resolveFunction('fnmatch_or'))([], '')->wasThrown('empty');
+    }
+
+    function test_globstar()
+    {
+        $DS = DIRECTORY_SEPARATOR;
+
+        $root = self::$TMPDIR . '/globstar';
+        file_set_tree([
+            $root => [
+                'a.txt' => '',
+                'a.log' => '',
+                'z.zip' => '',
+                'dir'   => [
+                    'b.txt'  => '',
+                    'b.log'  => '',
+                    'subdir' => [
+                        'c.txt' => '',
+                        'c.log' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        // ** が無ければ glob と同じ
+        that(globstar("$root"))->is(glob("$root"));
+        that(globstar("$root/"))->is(glob("$root/"));
+        that(globstar("$root/*"))->is(glob("$root/*"));
+
+        // ** は再帰パターン
+        that(globstar("$root/**"))->is([
+            "$root/a.log",
+            "$root/a.txt",
+            "$root/dir",
+            "$root/dir{$DS}b.log",
+            "$root/dir{$DS}b.txt",
+            "$root/dir{$DS}subdir",
+            "$root/dir{$DS}subdir{$DS}c.log",
+            "$root/dir{$DS}subdir{$DS}c.txt",
+            "$root/z.zip",
+        ]);
+        that(globstar("$root/**/"))->is([
+            "$root/dir/",
+            "$root/dir{$DS}subdir/",
+        ]);
+        that(globstar("$root/**/*.txt"))->is([
+            "$root/dir/b.txt",
+            "$root/dir{$DS}subdir/c.txt",
+        ]);
+
+        // オプションの扱いも同じ
+        that(globstar("$root/**", GLOB_MARK))->is([
+            "$root/a.log",
+            "$root/a.txt",
+            "$root/dir{$DS}",
+            "$root/dir{$DS}b.log",
+            "$root/dir{$DS}b.txt",
+            "$root/dir{$DS}subdir{$DS}",
+            "$root/dir{$DS}subdir{$DS}c.log",
+            "$root/dir{$DS}subdir{$DS}c.txt",
+            "$root/z.zip",
+        ]);
+        that(globstar("$root/**/{a,b,c}.txt", GLOB_BRACE))->is([
+            "$root/dir/b.txt",
+            "$root/dir{$DS}subdir/c.txt",
+        ]);
+        that(globstar("$root/**", GLOB_ONLYDIR))->is([
+            "$root/dir",
+            "$root/dir{$DS}subdir",
+        ]);
+        that(globstar("$root/notfound/**", GLOB_NOCHECK))->is(["$root/notfound/**"]);
+        that(globstar("$root/**/notfound", GLOB_NOCHECK))->is(["$root/**/notfound"]);
+        if ($DS === '\\') {
+            that(globstar("$root/**", GLOB_NOSORT))->is([
+                "$root/a.log",
+                "$root/a.txt",
+                "$root/dir",
+                "$root/z.zip",
+                "$root/dir{$DS}b.log",
+                "$root/dir{$DS}b.txt",
+                "$root/dir{$DS}subdir",
+                "$root/dir{$DS}subdir{$DS}c.log",
+                "$root/dir{$DS}subdir{$DS}c.txt",
+            ]);
+        }
     }
 
     function test_mkdir_p()
