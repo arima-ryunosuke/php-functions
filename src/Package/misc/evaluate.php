@@ -39,7 +39,7 @@ function evaluate($phpcode, $contextvars = [], $cachesize = 256)
 {
     $cachefile = null;
     if ($cachesize && strlen($phpcode) >= $cachesize) {
-        $cachefile = function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+        $cachefile = function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
         if (!file_exists($cachefile)) {
             file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
         }

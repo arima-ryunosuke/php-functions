@@ -68,7 +68,7 @@ function ip_info($ipaddr, $options = [])
     }
 
     $options += [
-        'cachedir' => function_configure('cachedir') . '/' . rawurlencode(__FUNCTION__),
+        'cachedir' => function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__),
         'ttl'      => 60 * 60 * 24 + 120, // 120 は1日1回バッチで叩くことを前提としたバッファ
         'rir'      => [],
     ];

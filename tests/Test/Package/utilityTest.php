@@ -255,8 +255,9 @@ class utilityTest extends AbstractTestCase
         that(function_configure('hoge'))->is(null);
         that(function_configure(['other' => 'hoge']))->is(['other' => null]);
         that(function_configure(['other' => 'fuga']))->is(['other' => 'hoge']);
+        that(function_configure(null))->isArray();
 
-        that(self::resolveFunction('function_configure'))(null)->wasThrown('unknown type(NULL)');
+        that(self::resolveFunction('function_configure'))(123)->wasThrown('unknown type(integer)');
     }
 
     function test_number_serial()

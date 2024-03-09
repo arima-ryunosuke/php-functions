@@ -43,7 +43,7 @@ class miscTest extends AbstractTestCase
 
     function test_evaluate()
     {
-        $tmpdir = function_configure('cachedir');
+        $tmpdir = function_configure('storagedir');
         @rm_rf($tmpdir, false);
         that(evaluate('return $x * $x;', ['x' => 1]))->is(1);
         that(evaluate('return $x * $x;', ['x' => 2]))->is(4);

@@ -12,7 +12,7 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  *
  * @package ryunosuke\Functions\Package\utility
  *
- * @param array|string $option 設定。文字列指定時はその値を返す
+ * @param array|?string $option 設定。文字列指定時はその値を返す
  * @return array|string 設定値
  */
 function function_configure($option)
@@ -21,6 +21,7 @@ function function_configure($option)
 
     // default
     $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
+    $config['storagedir'] ??= DIRECTORY_SEPARATOR === '/' ? '/var/tmp/rf' : (getenv('ALLUSERSPROFILE') ?: sys_get_temp_dir()) . '\\rf';
     $config['placeholder'] ??= '';
     $config['var_stream'] ??= get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';          // for compatible
     $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
@@ -36,6 +37,7 @@ function function_configure($option)
                     $config[$name] = $entry;
                     break;
                 case 'cachedir':
+                case 'storagedir':
                     $entry ??= $config[$name];
                     if (!file_exists($entry)) {
                         @mkdir($entry, 0777 & (~umask()), true);
@@ -61,11 +63,15 @@ function function_configure($option)
     }
 
     // getting
+    if ($option === null) {
+        return $config;
+    }
     if (is_string($option)) {
         switch ($option) {
             default:
                 return $config[$option] ?? null;
             case 'cachedir':
+            case 'storagedir':
                 $dirname = $config[$option];
                 if (!file_exists($dirname)) {
                     @mkdir($dirname, 0777 & (~umask()), true); // @codeCoverageIgnore
