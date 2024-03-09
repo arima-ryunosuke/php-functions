@@ -327,6 +327,22 @@ function var_export3($value, $return = false)
                 }
             }
 
+            // 弱参照系は同時に渡ってきていれば復元できる
+            if ($value instanceof \WeakReference) {
+                $weakreference = $value->get();
+                if ($weakreference === null) {
+                    $weakreference = new \stdClass();
+                }
+                return "\$this->$vid = \\WeakReference::create({$export($weakreference, $nest)})";
+            }
+            if ($value instanceof \WeakMap) {
+                $weakmap = "{$spacer1}\$this->$vid = new \\WeakMap();\n";
+                foreach ($value as $object => $data) {
+                    $weakmap .= "{$spacer1}\$this->{$vid}[{$export($object)}] = {$export($data)};\n";
+                }
+                return "\$this->$vid = (function () {\n{$weakmap}{$spacer1}return \$this->$vid;\n$spacer0})->call(\$this)";
+            }
+
             // 内部クラスで serialize 出来ないものは __PHP_Incomplete_Class で代替（復元時に無視する）
             try {
                 if ($ref->isInternal()) {

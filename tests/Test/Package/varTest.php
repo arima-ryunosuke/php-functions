@@ -1147,6 +1147,53 @@ class varTest extends AbstractTestCase
         that($values2['self2']['new'])->isSame('new!');
     }
 
+    function test_var_export3_weak()
+    {
+        $object1 = new \stdClass();
+        $object2 = new \stdClass();
+        $object3 = new \stdClass();
+
+        $reference1 = \WeakReference::create($object1);
+        $reference2 = \WeakReference::create($object2);
+        $reference3 = \WeakReference::create($object3);
+
+        $weakmap = new \WeakMap();
+        $weakmap[$object1] = 1;
+        $weakmap[$object2] = 2;
+        $weakmap[$object3] = 3;
+
+        unset($object3);
+        $values = [
+            $object1,
+            'ref1' => $reference1,
+            'ref2' => $reference2,
+            'ref3' => $reference3,
+            'map'  => $weakmap,
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+
+        // 型は同じ
+        that($values2['ref1'])->isInstanceOf(\WeakReference::class);
+        that($values2['ref2'])->isInstanceOf(\WeakReference::class);
+        that($values2['ref3'])->isInstanceOf(\WeakReference::class);
+        that($values2['map'])->isInstanceOf(\WeakMap::class);
+
+        // object1 は生き残っているし、エクスポート内にあるので復元できる
+        that($values2['ref1']->get())->isObject();
+        // object2 は生き残っているが、エクスポート内にないので復元できない
+        that($values2['ref2']->get())->isNull();
+        // object3 はそもそもエクスポート時点で参照が切れている
+        that($values2['ref3']->get())->isNull();
+
+        // 同上（object1 しか復元できない）
+        that(iterator_to_array($values2['map'], false))->is([1]);
+        // 変に復元されても困るので出力されていないこと自体を担保
+        that($exported)->contains(' = 1;');
+        that($exported)->contains(' = 2;');
+        that($exported)->notContains(' = 3;');
+    }
+
     function test_var_export3_resource()
     {
         $tmp = tempnam(sys_get_temp_dir(), 've3');
