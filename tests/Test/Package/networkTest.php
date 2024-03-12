@@ -405,7 +405,7 @@ class networkTest extends AbstractTestCase
 
         that(self::resolveFunction('http_request'))([
             CURLOPT_URL => "http://0.0.0.0:801",
-        ])->wasThrown('Failed to connect');
+        ])->wasThrown("Couldn't connect");
     }
 
     function test_http_request_nobody()
@@ -428,7 +428,7 @@ class networkTest extends AbstractTestCase
         that(self::resolveFunction('http_request'))([
             CURLOPT_URL => "http://0.0.0.0:801",
             'nobody'    => true,
-        ], $response_header, $info)->wasThrown('Failed to connect');
+        ], $response_header, $info)->wasThrown("Couldn't connect");
     }
 
     function test_http_request_retry()
@@ -469,7 +469,7 @@ class networkTest extends AbstractTestCase
             ], $response_header, $info);
         }
         catch (\Throwable $t) {
-            that($t->getMessage())->contains('Failed to connect');
+            that($t->getMessage())->contains("Couldn't connect");
         }
         that(microtime(true) - $time)->break()->isBetween(0.0, 0.2);
         that($info['retry'])->is(0);
@@ -484,10 +484,75 @@ class networkTest extends AbstractTestCase
             ], $response_header, $info);
         }
         catch (\Throwable $t) {
-            that($t->getMessage())->contains('timed out after');
+            that($t->getMessage())->contains('Timeout was reached');
         }
         that(microtime(true) - $time)->break()->isBetween(10.0, 10.2);
         that($info['retry'])->is(3);
+    }
+
+    function test_http_request_async()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+        $response_header = null;
+        $info = null;
+
+        $response = http_request([
+            CURLOPT_URL => "$server/status/200",
+            'throw'     => true,
+            'async'     => true,
+        ], $response_header, $info);
+        // 成功して response_header,info が代入されている
+        that($response())->is('');
+        that($response_header[0])->is('HTTP/1.1 200 OK');
+        that($info['http_code'])->is(200);
+
+        $response = http_request([
+            CURLOPT_URL => "$server/status/503",
+            'throw'     => true,
+            'async'     => true,
+        ]);
+        // 例外は取得時に発生する
+        that($response)->try(null)->wasThrown('status is 503');
+
+        // delay1,2,3 を投げてさらに 3 秒待っても精々 4 秒程度に収まる
+        $time = microtime(true);
+        $res1 = http_request([
+            CURLOPT_URL => "$server/delay/1",
+            'async'     => true,
+        ]);
+        $res2 = http_request([
+            CURLOPT_URL => "$server/delay/2",
+            'async'     => true,
+        ]);
+        $res3 = http_request([
+            CURLOPT_URL => "$server/delay/3",
+            'async'     => true,
+        ]);
+        sleep(3);
+        that($res1())->isArray();
+        that($res2())->isArray();
+        that($res3())->isArray();
+        that(microtime(true) - $time)->break()->isBetween(3.0, 4.0);
+
+        // リダイレクトでも大丈夫（ただし、サーバーに依存しそう）
+        $time = microtime(true);
+        $response = http_request([
+            CURLOPT_URL => "$server/redirect-to?url=/delay/3",
+            'async'     => true,
+        ]);
+        that($response())->isArray();
+        that(microtime(true) - $time)->break()->isBetween(3.0, 4.0);
+
+        // タイムアウト例外も効く
+        $response = http_request([
+            CURLOPT_URL     => "$server/delay/2",
+            CURLOPT_TIMEOUT => 1,
+            'async'         => true,
+        ]);
+        that($response)->try(null)->wasThrown('Timeout was reached');
     }
 
     function test_http_requests()

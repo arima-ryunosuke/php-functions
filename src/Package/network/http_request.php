@@ -30,6 +30,8 @@ require_once __DIR__ . '/../strings/str_chunk.php';
  *
  * - `raw` (bool): curl インスタンスと変換クロージャを返すだけになる
  *     - ただし、ほぼデバッグや内部用なので指定することはほぼ無いはず
+ * - `async` (bool): リクエストを投げて、結果を返すオブジェクトを返す
+ *     - いわゆる非同期で、すぐさま処理を返し、結果は返り値オブジェクト経由で取得する
  * - `nobody` (bool): ヘッダーの受信が完了したらただちに処理を返す
  *     - ボディは空文字になる（CURLOPT_NOBODY とは全く性質が異なるので注意）
  * - `throw` (bool): ステータスコードが 400 以上のときに例外を投げる
@@ -105,6 +107,7 @@ function http_request($options = [], &$response_header = [], &$info = [])
 
         // custom options
         'raw'                  => false,
+        'async'                => false,
         'nobody'               => false,
         'throw'                => true,
         'retry'                => [],
@@ -295,7 +298,13 @@ function http_request($options = [], &$response_header = [], &$info = [])
         return false;
     };
 
-    $responser = function ($response, $info) use ($response_parse, $cache) {
+    $responser = function ($response, $info) use ($options, $response_parse, $cache) {
+        if ($options['throw'] && $info['http_code'] >= 400) {
+            throw new \UnexpectedValueException("status is {$info['http_code']}.");
+        }
+        if (!($info['errno'] === CURLE_OK || ($options['nobody'] && $info['errno'] === CURLE_WRITE_ERROR))) {
+            throw new \RuntimeException(curl_strerror($info['errno']), $info['errno']);
+        }
         [$info, $head, $body] = $response_parse($response, $info);
         return [$cache($response, $info) ?? $body, $head, $info];
     };
@@ -304,6 +313,95 @@ function http_request($options = [], &$response_header = [], &$info = [])
     curl_setopt_array($ch, array_filter($options, 'is_int', ARRAY_FILTER_USE_KEY));
     if ($options['raw']) {
         return [$ch, $responser, $retry];
+    }
+
+    if ($options['async']) {
+        // コールバックを実行したときに初めてエラーが分かるので自動リトライに何の意味もない
+        assert(empty($options['retry']), 'Cannot specify async and retry option');
+
+        $client = new class($ch, $responser, $response_header, $info) {
+            private $singleHandle;
+            private $multiHandle;
+
+            private $responser;
+
+            private $header;
+            private $info;
+
+            public function __construct($handle, $responser, &$header, &$info)
+            {
+                $this->singleHandle = $handle;
+                $this->multiHandle = curl_multi_init();
+                curl_multi_add_handle($this->multiHandle, $this->singleHandle);
+
+                $this->responser = $responser;
+
+                $this->header = &$header;
+                $this->info = &$info;
+            }
+
+            public function __destruct()
+            {
+                $this->close();
+            }
+
+            public function __invoke()
+            {
+                while (true) {
+                    $this->wait();
+                    $minfo = curl_multi_info_read($this->multiHandle);
+
+                    if ($minfo !== false) {
+                        $info = curl_getinfo($minfo['handle']);
+                        $info['errno'] = curl_errno($minfo['handle']);
+                        $response = curl_multi_getcontent($minfo['handle']);
+                        [$body, $this->header, $this->info] = ($this->responser)($response, $info);
+
+                        $this->close();
+                        return $body;
+                    }
+                    usleep(1);
+                }
+            }
+
+            public function wait(float $timeout = 1.0)
+            {
+                do {
+                    $execed = curl_multi_exec($this->multiHandle, $still_running);
+                } while ($execed === CURLM_CALL_MULTI_PERFORM);
+
+                while (curl_multi_select($this->multiHandle, $timeout) === -1) {
+                    usleep(1); // @codeCoverageIgnore
+                }
+
+                return $still_running;
+            }
+
+            public function close()
+            {
+                if (isset($this->singleHandle)) {
+                    curl_multi_remove_handle($this->multiHandle, $this->singleHandle);
+                    curl_close($this->singleHandle);
+                    curl_multi_close($this->multiHandle);
+
+                    unset($this->singleHandle);
+                    unset($this->multiHandle);
+                }
+            }
+        };
+
+        // この wait がないとリクエストが始まってすらいないので非同期にならない
+        // 名前解決、cert 処理など様々なアクティビティがあるが「手を離してもよい」と判断できる最適なものは接続済み(connect_time>0)っぽい
+        while (true) {
+            $active = $client->wait();
+            $info = curl_getinfo($ch);
+            if ($info['connect_time'] || $active === 0) {
+                break;
+            }
+            usleep(1);
+        }
+        // 接続さえしてしまえば後は OS/curl が勝手にやってくれるはずなのでこの段階で返してよい
+        return $client;
     }
 
     try {
@@ -320,17 +418,9 @@ function http_request($options = [], &$response_header = [], &$info = [])
             $time = $retry($info, $response);
             usleep($time * 1000 * 1000);
         } while ($time);
-
-        if (!($info['errno'] === CURLE_OK || ($options['nobody'] && $info['errno'] === CURLE_WRITE_ERROR))) {
-            throw new \RuntimeException(curl_error($ch), curl_errno($ch));
-        }
     }
     finally {
         curl_close($ch);
-    }
-
-    if ($options['throw'] && $info['http_code'] >= 400) {
-        throw new \UnexpectedValueException("status is {$info['http_code']}.");
     }
 
     [$body, $response_header, $info] = $responser($response, $info);
