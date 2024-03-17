@@ -319,7 +319,7 @@ class Transporter
         for ($i = 0; $i < count($tokens); $i++) {
             $token = is_array($tokens[$i]) ? $tokens[$i] : [null, $tokens[$i], null];
             if ($token[0] === T_STRING) {
-                if (isset($constants[$token[1]])) {
+                if (isset($constants[$token[1]]) && ($tokens[$i - 1][0] ?? '') !== T_DOUBLE_COLON) {
                     $token['dependent'] = 'constant';
                 }
                 if (isset($functions[$token[1]]) && ($tokens[$i - 2][0] ?? '') !== T_FUNCTION && ($tokens[$i + 1] ?? '') === '(') {
