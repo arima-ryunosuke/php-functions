@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use ryunosuke\Functions\Utility;
 use function ryunosuke\Functions\Package\abind;
 use function ryunosuke\Functions\Package\call_safely;
 use function ryunosuke\Functions\Package\chain;
@@ -163,6 +164,9 @@ class funchandTest extends AbstractTestCase
             3 => 'fuga',
             9 => 'hage',
         ]);
+
+        // exportClass で動くことを担保
+        that(Utility::chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
 
 //        if (version_compare(PHP_VERSION, 8.0) >= 0) {
 //            //that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');

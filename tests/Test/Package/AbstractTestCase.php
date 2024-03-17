@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use ryunosuke\Functions\Utility;
 use function ryunosuke\Functions\Package\cache;
 use function ryunosuke\Functions\Package\function_configure;
 
@@ -18,6 +19,11 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
         function_configure(['cachedir' => self::$TMPDIR]);
         cache('dummy', function () { });
         cache(null, null);
+
+        Utility::function_configure([
+            'cachedir'      => self::$TMPDIR,
+            'chain.version' => 2,
+        ]);
     }
 
     /**

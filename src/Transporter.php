@@ -59,6 +59,7 @@ class Transporter
 
         file_put_contents(__DIR__ . "/../include/global.php", self::exportGlobal());
         file_put_contents(__DIR__ . "/../include/namespace.php", self::exportNamespace(__NAMESPACE__));
+        file_put_contents(__DIR__ . '/../src/Utility.php', self::exportClass(__NAMESPACE__ . '\\Utility', __DIR__ . '/../src/Package'));
     }
 
     /**
