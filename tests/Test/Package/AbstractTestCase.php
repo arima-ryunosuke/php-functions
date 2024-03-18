@@ -16,7 +16,10 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
 
         self::$TMPDIR = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'rfunc';
 
-        function_configure(['cachedir' => self::$TMPDIR]);
+        function_configure([
+            'cachedir'         => self::$TMPDIR,
+            'process.autoload' => glob(__DIR__ . '/../../../src/Package/*/*.php'),
+        ]);
         cache('dummy', function () { });
         cache(null, null);
 

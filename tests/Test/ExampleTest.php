@@ -31,7 +31,8 @@ defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
 function_configure([
-    'chain.version' => 2,
+    'chain.version'    => 2,
+    'process.autoload' => [__DIR__ . '/../../include/global.php'],
 ]);
 
 if (!function_exists('Example\\that')) {

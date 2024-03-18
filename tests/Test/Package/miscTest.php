@@ -1199,7 +1199,7 @@ aplain text
                 $ids[] = $id_info;
             }
             return $ids;
-        }, [0, 1, 2, 3], [__DIR__ . '/../../../src/Package/misc/unique_id.php']);
+        }, [0, 1, 2, 3]);
 
         $results = array_merge(...array_column($returns, 'return'));
         $ids = array_column($results, 'id');

@@ -27,6 +27,7 @@ function function_configure($option)
     $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
     $config['chain.version'] ??= 1;
     $config['chain.nullsafe'] ??= false;
+    $config['process.autoload'] ??= [];
 
     // setting
     if (is_array($option)) {
