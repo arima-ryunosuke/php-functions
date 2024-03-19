@@ -66,6 +66,8 @@ function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stder
         private $pipes;
         private $status;
         private $destructAction;
+        private $completeAction;
+        private $result;
         public  $stdout;
         public  $stderr;
 
@@ -91,7 +93,7 @@ function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stder
         public function __invoke()
         {
             if ($this->proc === null) {
-                return $this->status['exitcode'];
+                return $this->result;
             }
 
             try {
@@ -106,14 +108,27 @@ function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stder
                 fclose($this->pipes[2]);
                 $rc = proc_close($this->proc);
                 $this->proc = null;
+                if ($this->status['exitcode'] === -1) {
+                    $this->status['exitcode'] = $rc;
+                }
             }
 
-            return $this->status['running'] ? $rc : $this->status['exitcode'];
+            if ($this->completeAction) {
+                return $this->result = $this->completeAction->call($this);
+            }
+
+            return $this->result = $this->status['exitcode'];
         }
 
         public function setDestructAction($action)
         {
             $this->destructAction = $action;
+            return $this;
+        }
+
+        public function setCompleteAction($action)
+        {
+            $this->completeAction = $action;
             return $this;
         }
 

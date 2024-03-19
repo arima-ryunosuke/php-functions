@@ -2,8 +2,10 @@
 
 namespace ryunosuke\Test\Package;
 
+use ryunosuke\Functions\Utility;
 use function ryunosuke\Functions\Package\process;
 use function ryunosuke\Functions\Package\process_async;
+use function ryunosuke\Functions\Package\process_closure;
 use function tmpfile;
 
 class execTest extends AbstractTestCase
@@ -143,6 +145,36 @@ class execTest extends AbstractTestCase
         that(microtime(true) - $time)->lte(1.5);
 
         gc_collect_cycles();
+    }
+
+    function test_process_closure()
+    {
+        $closure = static function ($sleep) {
+            sleep($sleep);
+            return $sleep * 1000;
+        };
+
+        $time = microtime(true);
+        $process1 = process_closure($closure, 1);
+        $process2 = process_closure($closure, 2);
+        $process3 = process_closure($closure, 3);
+        that($process1())->is(1000);
+        that($process2())->is(2000);
+        that($process3())->is(3000);
+        that(microtime(true) - $time)->break()->isBetween(3.0, 4.5);
+
+        that($process1->status())->hasKey('cpu');
+        that($process2->status())->hasKey('memory');
+
+        $invalid = static fn($hoge) => $hoge();
+        $process = process_closure($invalid, ['hoge'], false);
+        that($process())->isNull();
+        that($process->terminate())->isBool();
+        $process = process_closure($invalid, ['hoge']);
+        that($process)->try(null)->wasThrown('Call to undefined function hoge');
+        that($process->terminate())->isBool();
+
+        that(Utility::process_closure(static fn() => 123)())->is(123);
     }
 
     function test_process_parallel()

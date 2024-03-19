@@ -9,10 +9,15 @@
  */
 class ProcessAsync
 {
+    public array  $status;
     public string $stdout;
     public string $stderr;
 
+    public function __invoke() { }
+
     public function setDestructAction($action) { }
+
+    public function setCompleteAction($action) { }
 
     public function update() { }
 

@@ -3,12 +3,8 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/arrayize.php';
-require_once __DIR__ . '/../classobj/auto_loader.php';
-require_once __DIR__ . '/../exec/process_async.php';
-require_once __DIR__ . '/../filesystem/mkdir_p.php';
-require_once __DIR__ . '/../filesystem/path_resolve.php';
+require_once __DIR__ . '/../exec/process_closure.php';
 require_once __DIR__ . '/../reflection/parameter_length.php';
-require_once __DIR__ . '/../var/var_export3.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -94,7 +90,7 @@ require_once __DIR__ . '/../var/var_export3.php';
  *
  * @param callable|callable[] $tasks 並列実行する callable. 単一の場合は引数分実行して結果を返す
  * @param array $args 各々の引数。$tasks が配列の場合はそれに対応する引数配列。単一の場合は実行回数も兼ねた引数配列
- * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php
+ * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php と function_configure/process.autoload
  * @param ?string $workdir ワーキングディレクトリ。省略時はテンポラリディレクトリ
  * @return array 実行結果（['return' => callable の返り値, 'status' => 終了コード, 'stdout' => 標準出力, 'stderr' => 標準エラー]）
  */
@@ -113,42 +109,21 @@ function process_parallel($tasks, $args = [], $autoload = null, $workdir = null,
         assert(parameter_length($task, true) <= count($args[$key] ?? []), "task $key's arguments are mismatch.");
     }
 
-    // 変数や環境の準備
-    $autoload = arrayize($autoload ?? auto_loader());
-    $workdir ??= (sys_get_temp_dir() . '/rfpp');
-    mkdir_p($workdir);
-
-    // 実行バイナリとコード本体
-    $phpbin = path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
-    $maincode = '<?php
-            $context = ' . var_export3([$autoload, $tasks], true) . ';
-            foreach ($context[0] as $file) {
-                require_once $file;
-            }
-            $stdin = unserialize(stream_get_contents(STDIN));
-            $return = $context[1][$argv[2]](...$stdin);
-            file_put_contents($argv[1], serialize($return));
-        ';
-    file_put_contents($mainscript = tempnam($workdir, 'main'), $maincode);
-
     // プロセスを準備
     $processes = [];
     foreach ($tasks as $key => $task) {
-        unset($stdout, $stderr);
-        $stdout = $stderr = '';
-        $return = tempnam($workdir, 'return');
-        $processes[$key] = process_async($phpbin, [$mainscript, $return, $key], serialize($args[$key] ?? []), $stdout, $stderr, $workdir, $env);
-        $processes[$key]->return = static fn() => strlen($result = file_get_contents($return)) ? unserialize($result) : null;
+        $processes[$key] = process_closure($task, $args[$key] ?? [], false, $autoload, $workdir, $env);
     }
 
     // プロセスを実行兼返り値用に加工
     $results = [];
     foreach ($processes as $key => $process) {
+        $return = $process();
         $results[$key] = [
-            'status' => $process(),
+            'status' => $process->status()['exitcode'],
             'stdout' => $process->stdout,
             'stderr' => $process->stderr,
-            'return' => ($process->return)(),
+            'return' => $return,
         ];
     }
     return $results;
