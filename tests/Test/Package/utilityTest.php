@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\array_maps;
 use function ryunosuke\Functions\Package\benchmark;
+use function ryunosuke\Functions\Package\built_in_server;
 use function ryunosuke\Functions\Package\cache;
 use function ryunosuke\Functions\Package\cache_fetch;
 use function ryunosuke\Functions\Package\cachedir;
@@ -54,6 +55,48 @@ class utilityTest extends AbstractTestCase
             [new \Concrete('hoge'), 'getName'],
             [new \Concrete('hoge'), 'getName'],
         ])->wasThrown('duplicated benchname');
+    }
+
+    function test_built_in_server()
+    {
+        // https://bugs.php.net/bug.php?id=80931
+        if (DIRECTORY_SEPARATOR === '/') {
+            $this->markTestSkipped();
+        }
+
+        $docroot = __DIR__ . '/files/server';
+        $server = built_in_server($docroot);
+        that(file_get_contents('http://127.0.0.1:8000/hoge.txt'))->is(file_get_contents("$docroot/hoge.txt"));
+        that(file_get_contents('http://127.0.0.1:8000/fuga.txt'))->is(file_get_contents("$docroot/fuga.txt"));
+        $server->terminate();
+
+        $routerscript = self::$TMPDIR . '/rf-built_in_server.php';
+        file_put_contents($routerscript, '<?php
+            echo "response";
+        ');
+        $server = built_in_server($docroot, $routerscript);
+        that(file_get_contents('http://127.0.0.1:8000/undefined'))->is('response');
+        $server->terminate();
+
+        $server = built_in_server($docroot, static function () {
+            switch ($_SERVER['REQUEST_URI']) {
+                default:
+                    return false;
+                case '/hoge':
+                    echo 'HOGE';
+                    break;
+                case '/fuga':
+                    echo 'FUGA';
+                    break;
+            }
+        }, [
+            'port' => 8001,
+        ]);
+        that(file_get_contents('http://127.0.0.1:8001/hoge'))->is('HOGE');
+        that(file_get_contents('http://127.0.0.1:8001/fuga'))->is('FUGA');
+        that(file_get_contents('http://127.0.0.1:8001/hoge.txt'))->is(file_get_contents("$docroot/hoge.txt"));
+        that(file_get_contents('http://127.0.0.1:8001/fuga.txt'))->is(file_get_contents("$docroot/fuga.txt"));
+        $server->terminate();
     }
 
     function test_cache()
