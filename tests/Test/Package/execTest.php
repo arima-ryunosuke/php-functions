@@ -104,6 +104,7 @@ class execTest extends AbstractTestCase
         that($process)->isObject();
         that($process->stdout)->isSame('');
         that($process->stderr)->isSame('');
+        that($process->update())->is(true);
 
         $status = $process->status();
         that($status['command'])->contains('rf-process_async.php');
@@ -115,6 +116,7 @@ class execTest extends AbstractTestCase
         that($process())->isSame(123); // 2回呼んでも同じ値が返る
         that($process->stdout)->isSame('STDIN!');
         that($process->stderr)->isSame('STDERR!');
+        that($process->update())->is(false);
 
         $process = process_async(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
         that($process->terminate())->isTrue();
@@ -131,7 +133,7 @@ class execTest extends AbstractTestCase
         ');
 
         // close だと3秒かかる
-        $process = process_async(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr);
+        $process = process_async(PHP_BINARY, $file, 'STDIN!', $stdout, $stderr, null, null, ['wait-mode' => 'select']);
         $process->setDestructAction('close');
         $time = microtime(true);
         unset($process);

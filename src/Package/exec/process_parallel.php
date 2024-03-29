@@ -92,9 +92,10 @@ require_once __DIR__ . '/../reflection/parameter_length.php';
  * @param array $args 各々の引数。$tasks が配列の場合はそれに対応する引数配列。単一の場合は実行回数も兼ねた引数配列
  * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php と function_configure/process.autoload
  * @param ?string $workdir ワーキングディレクトリ。省略時はテンポラリディレクトリ
+ * @param ?array $options その他の追加オプション
  * @return array 実行結果（['return' => callable の返り値, 'status' => 終了コード, 'stdout' => 標準出力, 'stderr' => 標準エラー]）
  */
-function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null)
+function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null, $options = null)
 {
     // 単一で来た場合は同じものを異なる引数で呼び出すシングルモードとなる
     if (!is_array($tasks)) {
@@ -112,7 +113,7 @@ function process_parallel($tasks, $args = [], $autoload = null, $workdir = null,
     // プロセスを準備
     $processes = [];
     foreach ($tasks as $key => $task) {
-        $processes[$key] = process_closure($task, $args[$key] ?? [], false, $autoload, $workdir, $env);
+        $processes[$key] = process_closure($task, $args[$key] ?? [], false, $autoload, $workdir, $env, $options);
     }
 
     // プロセスを実行兼返り値用に加工

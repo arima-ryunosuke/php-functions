@@ -57,9 +57,10 @@ require_once __DIR__ . '/../var/var_export3.php';
  * @param bool|int $throw exitcode で例外を投げるか（現在は bool のみ対応）
  * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php と function_configure/process.autoload
  * @param ?string $workdir ワーキングディレクトリ。省略時はテンポラリディレクトリ
+ * @param ?array $options その他の追加オプション
  * @return \ProcessAsync|object プロセスオブジェクト
  */
-function process_closure($closure, $args = [], $throw = true, $autoload = null, $workdir = null, $env = null)
+function process_closure($closure, $args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null)
 {
     static $storage = null;
     $storage ??= object_storage(__FUNCTION__);
@@ -85,7 +86,7 @@ function process_closure($closure, $args = [], $throw = true, $autoload = null, 
 
     $phpbin = path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
     $return = tempnam($workdir, 'return');
-    $process = process_async($phpbin, [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env);
+    $process = process_async($phpbin, [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
     $process->setDestructAction('terminate');
     $process->setCompleteAction(function () use ($throw, $return) {
         /** @var $this \ProcessAsync */

@@ -39,11 +39,12 @@ require_once __DIR__ . '/../exec/process_async.php';
  * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
  * @param ?string $cwd 作業ディレクトリ
  * @param ?array $env 環境変数
+ * @param ?array $options その他の追加オプション
  * @return int リターンコード
  */
-function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
+function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
 {
-    $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env)();
+    $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env, $options)();
     if ($rc === -1) {
         // どうしたら失敗するのかわからない
         throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
