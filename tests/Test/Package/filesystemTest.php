@@ -696,6 +696,14 @@ class filesystemTest extends AbstractTestCase
 
     function test_file_mimetype()
     {
+        that(file_mimetype(__FILE__, true))->is('text/x-php');
+        that(file_mimetype(__FILE__ . '.txt', true))->is('text/plain');
+        that(file_mimetype('http://127.0.0.1/hoge.csv', true))->is('text/csv');
+        that(file_mimetype('http://127.0.0.1/hoge.csv?fuga.txt', true))->is('text/csv');
+        that(file_mimetype('http://127.0.0.1/hoge.csv?fuga.txt', [
+            'csv' => 'application/ms-office',
+        ]))->is('application/ms-office');
+
         that(file_mimetype(__FILE__))->is('text/x-php');
         that(@(fn(...$args) => file_mimetype(...$args))('notfound'))->isNull();
         that(error_get_last()['message'])->contains('mime_content_type(notfound)');

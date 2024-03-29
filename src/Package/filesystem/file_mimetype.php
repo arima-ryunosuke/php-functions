@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../network/http_head.php';
+require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -23,12 +24,26 @@ require_once __DIR__ . '/../network/http_head.php';
  * @package ryunosuke\Functions\Package\filesystem
  *
  * @param string $filename ファイル名（URL）
+ * @param array|bool $prefer_extension extension => mimetype のマップ（true を与えると組み込みを使用する）
  * @return string|null MIME タイプ
  */
-function file_mimetype($filename)
+function file_mimetype($filename, $prefer_extension = [])
 {
-    $scheme = parse_url($filename, PHP_URL_SCHEME) ?? null;
-    switch (strtolower($scheme)) {
+    $mimetypes = GENERAL_MIMETYPE;
+    if (is_array($prefer_extension)) {
+        $mimetypes = $prefer_extension + $mimetypes;
+    }
+
+    $parts = parse_url($filename) ?: [];
+
+    if ($prefer_extension) {
+        $extension = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+        if (isset($mimetypes[$extension])) {
+            return $mimetypes[$extension];
+        }
+    }
+
+    switch (strtolower($parts['scheme'] ?? '')) {
         default:
         case 'file':
             return mime_content_type($filename) ?: null;
