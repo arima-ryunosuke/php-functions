@@ -8,6 +8,58 @@ $targetDirectory = __DIR__ . '/../stub';
 rm_rf("$targetDirectory/ChainObject");
 mkdir("$targetDirectory/ChainObject");
 
+$targetFunction = [
+    'cpu_timer'      => [],
+    'include_stream' => [],
+    'object_storage' => [],
+    'process_async'  => [PHP_BINARY, ['-v']],
+    'reflect_types'  => [],
+];
+
+foreach ($targetFunction as $funcname => $args) {
+    $refobject = new \ReflectionObject($funcname(...$args));
+
+    $doccomment = preg_replace('#^/\*\*\s*|\s*\*/$#ums', '', $refobject->getDocComment() ?: '*');
+    $doccomment = preg_replace('#\\R\s+#u', "\n ", $doccomment);
+    $classname = pascal_case($funcname);
+    $properties = array_map_filter($refobject->getProperties(), function (\ReflectionProperty $property) {
+        if ($property->isPublic()) {
+            $doccomment = preg_replace('#\\R\s+#u', "\n ", $property->getDocComment());
+            $doccomment = concat($doccomment, "\n");
+            return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public $" . $property->getName() . ";");
+        }
+    });
+    $methods = array_map_filter($refobject->getMethods(), function (\ReflectionMethod $method) {
+        if ($method->isPublic() && !$method->isConstructor() && !$method->isDestructor()) {
+            $doccomment = preg_replace('#\\R\s+#u', "\n ", $method->getDocComment());
+            $doccomment = concat($doccomment, "\n");
+            return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ") { }");
+        }
+    });
+
+    file_put_contents("$targetDirectory/$classname.php", <<<CLASS
+    <?php
+    {$V('// @' . 'formatter:off')}
+    
+    /**
+     * stub for $funcname
+     *
+     $doccomment
+     *
+     * @used-by \\{$funcname}()
+     * @used-by \\ryunosuke\\Functions\\{$funcname}()
+     * @used-by \\ryunosuke\\Functions\\Package\\{$funcname}()
+     */
+    class $classname
+    {
+    {$V(implode("\n", $properties))}
+    
+    {$V(implode("\n", $methods))}
+    }
+    
+    CLASS,);
+}
+
 $targetExtension = [
     'date'     => [
         'timezone*',

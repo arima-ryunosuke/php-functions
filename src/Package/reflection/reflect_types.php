@@ -60,7 +60,7 @@ namespace ryunosuke\Functions\Package;
  * @package ryunosuke\Functions\Package\reflection
  *
  * @param \ReflectionFunctionAbstract|\ReflectionType|\ReflectionType[]|null $reflection_type getType 等で得られるインスタンス
- * @return \ReflectionAnyType|object
+ * @return \ReflectTypes|object
  */
 function reflect_types($reflection_type = null)
 {
@@ -80,6 +80,12 @@ function reflect_types($reflection_type = null)
         }
     }
 
+    /**
+     * @mixin \ReflectionType
+     * @mixin \ReflectionNamedType
+     * @mixin \ReflectionUnionType
+     * @mixin \ReflectionIntersectionType
+     */
     return new class(...$reflection_type)
         extends \stdClass
         implements \IteratorAggregate, \ArrayAccess, \Countable, \JsonSerializable {
