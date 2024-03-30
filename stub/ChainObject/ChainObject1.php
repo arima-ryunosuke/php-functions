@@ -430,8 +430,8 @@ trait ChainObject1
 
     /** @see process_parallel() */
     public self $process_parallel;
-    public function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null): self { }
-    public function process_parallel($args = [], $autoload = null, $workdir = null, $env = null): self { }
+    public function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null, $options = null): self { }
+    public function process_parallel($args = [], $autoload = null, $workdir = null, $env = null, $options = null): self { }
 
     /** @see dirname_r() */
     public self $dirname_r;

@@ -360,13 +360,18 @@ trait ChainObject7
 
     /** @see process_async() */
     public self $process_async;
-    public function process_async($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process_async($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process_async($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null, $options = null): self { }
+    public function process_async($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null, $options = null): self { }
 
     /** @see file_extension() */
     public self $file_extension;
     public function file_extension($filename, $extension = ""): self { }
     public function file_extension($extension = ""): self { }
+
+    /** @see rsync() */
+    public self $rsync;
+    public function rsync($src, $dst, $options = []): self { }
+    public function rsync($dst, $options = []): self { }
 
     /** @see abind() */
     public self $abind;

@@ -1,36 +1,27 @@
-<?php /** @noinspection PhpLanguageLevelInspection */
+<?php
+// @formatter:off
 
 /**
- * object_storage 関数のためのクラススタブ
+ * stub for object_storage
+ *
+ *
  *
  * @used-by \object_storage()
  * @used-by \ryunosuke\Functions\object_storage()
  * @used-by \ryunosuke\Functions\Package\object_storage()
  */
-class ObjectStorage implements \Countable, \ArrayAccess, \IteratorAggregate
+class ObjectStorage
 {
-    public function has(object|resource $objectOrResource): bool { }
 
-    public function get(object|resource $objectOrResource, mixed $default = null) { }
 
-    public function set(object|resource $objectOrResource, mixed $data): static { }
-
+    public function has($objectOrResource) { }
+    public function get($objectOrResource, $default = null) { }
+    public function set($objectOrResource, $data) { }
     public function clear() { }
-
-    /** @param object|resource $offset */
-    public function offsetExists($offset): bool { }
-
-    /** @param object|resource $offset */
+    public function offsetExists($offset) { }
     public function offsetGet($offset) { }
-
-    /** @param object|resource $offset */
-    public function offsetSet($offset, mixed $value) { }
-
-    /** @param object|resource $offset */
+    public function offsetSet($offset, $value) { }
     public function offsetUnset($offset) { }
-
-    public function count(): int { }
-
-    /** @return \Generator{object|resource: mixed} */
-    public function getIterator(): \Generator { }
+    public function count() { }
+    public function getIterator() { }
 }

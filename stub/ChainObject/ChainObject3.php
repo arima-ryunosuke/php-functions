@@ -490,8 +490,8 @@ trait ChainObject3
 
     /** @see file_mimetype() */
     public self $file_mimetype;
-    public function file_mimetype($filename): self { }
-    public function file_mimetype(): self { }
+    public function file_mimetype($filename, $prefer_extension = []): self { }
+    public function file_mimetype($prefer_extension = []): self { }
 
     /** @see file_rewrite_contents() */
     public self $file_rewrite_contents;
@@ -605,8 +605,8 @@ trait ChainObject3
 
     /** @see encrypt() */
     public self $encrypt;
-    public function encrypt($plaindata, $password, $cipher = "aes-256-gcm", &$tag = ""): self { }
-    public function encrypt($password, $cipher = "aes-256-gcm", &$tag = ""): self { }
+    public function encrypt($plaindata, $password, $cipher = null, &$tag = ""): self { }
+    public function encrypt($password, $cipher = null, &$tag = ""): self { }
 
     /** @see is_decimal() */
     public self $is_decimal;

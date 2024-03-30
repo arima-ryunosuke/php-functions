@@ -403,6 +403,11 @@ trait ChainObject2
     public function markdown_list(iterable $array, $option = []): self { }
     public function markdown_list($option = []): self { }
 
+    /** @see process_closure() */
+    public self $process_closure;
+    public function process_closure($closure, $args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null): self { }
+    public function process_closure($args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null): self { }
+
     /** @see path_info() */
     public self $path_info;
     public function path_info($path): self { }
@@ -432,6 +437,11 @@ trait ChainObject2
     public self $func_user_func_array;
     public function func_user_func_array(callable $callback): self { }
     public function func_user_func_array(): self { }
+
+    /** @see php_opcode() */
+    public self $php_opcode;
+    public function php_opcode($phpcode, $level = 131072): self { }
+    public function php_opcode($level = 131072): self { }
 
     /** @see resolve_symbol() */
     public self $resolve_symbol;
@@ -522,6 +532,11 @@ trait ChainObject2
     public self $try_null;
     public function try_null($try, ...$variadic): self { }
     public function try_null(...$variadic): self { }
+
+    /** @see built_in_server() */
+    public self $built_in_server;
+    public function built_in_server($document_root, $router = null, $options = []): self { }
+    public function built_in_server($router = null, $options = []): self { }
 
     /** @see cachedir() */
     public self $cachedir;

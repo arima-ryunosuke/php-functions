@@ -370,8 +370,8 @@ trait ChainObject0
 
     /** @see process() */
     public self $process;
-    public function process($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
-    public function process($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null): self { }
+    public function process($command, $args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null, $options = null): self { }
+    public function process($args = [], $stdin = "", &$stdout = "", &$stderr = "", $cwd = null, ?array $env = null, $options = null): self { }
 
     /** @see file_list() */
     public self $file_list;
@@ -457,6 +457,11 @@ trait ChainObject0
     public self $try_catch_finally;
     public function try_catch_finally($try, $catch = null, $finally = null, ...$variadic): self { }
     public function try_catch_finally($catch = null, $finally = null, ...$variadic): self { }
+
+    /** @see try_close() */
+    public self $try_close;
+    public function try_close(callable $callback, ...$resources): self { }
+    public function try_close(...$resources): self { }
 
     /** @see base62_decode() */
     public self $base62_decode;

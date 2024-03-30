@@ -1,7 +1,10 @@
 <?php
+// @formatter:off
 
 /**
- * process_async 関数のためのクラススタブ
+ * stub for process_async
+ *
+ *
  *
  * @used-by \process_async()
  * @used-by \ryunosuke\Functions\process_async()
@@ -9,19 +12,13 @@
  */
 class ProcessAsync
 {
-    public array  $status;
-    public string $stdout;
-    public string $stderr;
+    public $stdout;
+    public $stderr;
 
     public function __invoke() { }
-
     public function setDestructAction($action) { }
-
     public function setCompleteAction($action) { }
-
     public function update() { }
-
     public function status() { }
-
     public function terminate() { }
 }

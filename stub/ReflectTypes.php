@@ -1,7 +1,8 @@
 <?php
+// @formatter:off
 
 /**
- * reflect_types 関数のためのクラススタブ
+ * stub for reflect_types
  *
  * @mixin \ReflectionType
  * @mixin \ReflectionNamedType
@@ -12,21 +13,20 @@
  * @used-by \ryunosuke\Functions\reflect_types()
  * @used-by \ryunosuke\Functions\Package\reflect_types()
  */
-class ReflectionAnyType implements \IteratorAggregate, \ArrayAccess, \Countable, \JsonSerializable
+class ReflectTypes
 {
-    public function offsetExists($offset) { }
 
-    public function offsetGet($offset) { }
 
-    public function offsetSet($offset, $value) { }
-
-    public function offsetUnset($offset) { }
-
-    public function count() { }
-
+    public function __toString() { }
     public function getIterator() { }
-
+    public function offsetExists($offset) { }
+    /** @noinspection PhpLanguageLevelInspection */
+    public function offsetGet($offset) { }
+    public function offsetSet($offset, $value) { }
+    public function offsetUnset($offset) { }
+    public function count() { }
     public function jsonSerialize() { }
-
+    public function getName() { }
+    public function getTypes() { }
     public function allows($type, $strict = false) { }
 }

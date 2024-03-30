@@ -81,6 +81,143 @@ if (!defined('JP_ERA')) {
     ]);
 }
 
+if (!defined('GENERAL_MIMETYPE')) {
+    define('GENERAL_MIMETYPE', [
+        "csv"   => "text/csv",
+        "dcm"   => "application/dicom",
+        "dvc"   => "application/dvcs",
+        "finf"  => "application/fastinfoset",
+        "stk"   => "application/hyperstudio",
+        "ipfix" => "application/ipfix",
+        "json"  => "application/json",
+        "mrc"   => "application/marc",
+        "nb"    => "application/mathematica",
+        "ma"    => "application/mathematica",
+        "mb"    => "application/mathematica",
+        "mbox"  => "application/mbox",
+        "m21"   => "application/mp21",
+        "mp21"  => "application/mp21",
+        "xls"   => "application/vnd.ms-excel",
+        "doc"   => "application/vnd.ms-word",
+        "mxf"   => "application/mxf",
+        "oda"   => "application/oda",
+        "ogx"   => "application/ogg",
+        "pdf"   => "application/pdf",
+        "p10"   => "application/pkcs10",
+        "ai"    => "application/postscript",
+        "eps"   => "application/postscript",
+        "ps"    => "application/postscript",
+        "rtf"   => "application/rtf",
+        "sdp"   => "application/sdp",
+        "siv"   => "application/sieve",
+        "sieve" => "application/sieve",
+        "smil"  => "application/smil",
+        "smi"   => "application/smil",
+        "sml"   => "application/smil",
+        "gram"  => "application/srgs",
+        "xml"   => "text/xml",
+        "zip"   => "application/x-zip-compressed",
+        "xlsx"  => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "docx"  => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        726     => "audio/32kadpcm",
+        "amr"   => "audio/AMR",
+        "at3"   => "audio/ATRAC3",
+        "aa3"   => "audio/ATRAC3",
+        "omg"   => "audio/ATRAC3",
+        "evc"   => "audio/EVRC",
+        "evb"   => "audio/EVRCB",
+        "evw"   => "audio/EVRCWB",
+        "l16"   => "audio/L16",
+        "smv"   => "audio/SMV",
+        "ac3"   => "audio/ac3",
+        "au"    => "audio/basic",
+        "snd"   => "audio/basic",
+        "dls"   => "audio/dls",
+        "lbc"   => "audio/iLBC",
+        "mid"   => "audio/midi",
+        "midi"  => "audio/midi",
+        "kar"   => "audio/midi",
+        "mpga"  => "audio/mpeg",
+        "mp1"   => "audio/mpeg",
+        "mp2"   => "audio/mpeg",
+        "mp3"   => "audio/mpeg",
+        "oga"   => "audio/ogg",
+        "ogg"   => "audio/ogg",
+        "spx"   => "audio/ogg",
+        "qcp"   => "audio/qcelp",
+        "bmp"   => "image/bmp",
+        "fits"  => "image/fits",
+        "fit"   => "image/fits",
+        "fts"   => "image/fits",
+        "gif"   => "image/gif",
+        "ief"   => "image/ief",
+        "jp2"   => "image/jp2",
+        "jpg2"  => "image/jp2",
+        "jpeg"  => "image/jpeg",
+        "jpg"   => "image/jpeg",
+        "jpe"   => "image/jpeg",
+        "jfif"  => "image/jpeg",
+        "jpm"   => "image/jpm",
+        "jpgm"  => "image/jpm",
+        "jpx"   => "image/jpx",
+        "jpf"   => "image/jpx",
+        "svg"   => "image/svg+xml",
+        "png"   => "image/png",
+        "t38"   => "image/t38",
+        "tiff"  => "image/tiff",
+        "tif"   => "image/tiff",
+        "u8msg" => "message/global",
+        "eml"   => "message/rfc822",
+        "mail"  => "message/rfc822",
+        "art"   => "message/rfc822",
+        "igs"   => "model/iges",
+        "iges"  => "model/iges",
+        "msh"   => "model/mesh",
+        "mesh"  => "model/mesh",
+        "silo"  => "model/mesh",
+        "wrl"   => "model/vrml",
+        "vrml"  => "model/vrml",
+        "ics"   => "text/calendar",
+        "ifb"   => "text/calendar",
+        "css"   => "text/css",
+        "soa"   => "text/dns",
+        "zone"  => "text/dns",
+        "html"  => "text/html",
+        "htm"   => "text/html",
+        "js"    => "text/javascript",
+        "asc"   => "text/plain",
+        "txt"   => "text/plain",
+        "text"  => "text/plain",
+        "pm"    => "text/plain",
+        "el"    => "text/plain",
+        "c"     => "text/plain",
+        "h"     => "text/plain",
+        "cc"    => "text/plain",
+        "hh"    => "text/plain",
+        "cxx"   => "text/plain",
+        "hxx"   => "text/plain",
+        "f90"   => "text/plain",
+        "rtx"   => "text/richtext",
+        "sgml"  => "text/sgml",
+        "sgm"   => "text/sgml",
+        "3gp"   => "video/3gpp",
+        "3gpp"  => "video/3gpp",
+        "3g2"   => "video/3gpp2",
+        "3gpp2" => "video/3gpp2",
+        "mj2"   => "video/mj2",
+        "mjp2"  => "video/mj2",
+        "mp4"   => "video/mp4",
+        "mpg4"  => "video/mp4",
+        "mpeg"  => "video/mpeg",
+        "mpg"   => "video/mpeg",
+        "mpe"   => "video/mpeg",
+        "ogv"   => "video/ogg",
+        "qt"    => "video/quicktime",
+        "mov"   => "video/quicktime",
+        "webm"  => "video/webm",
+    ]);
+}
+
 if (!defined('GLOB_RECURSIVE')) {
     define('GLOB_RECURSIVE', 65536);
 }
@@ -983,6 +1120,7 @@ if (!function_exists('array_distinct')) {
      *   - 数値キーは配列アクセス
      *   - 文字キーはメソッドコール（値は引数）
      * - もちろん（$a, $b を受け取る）クロージャも渡せる
+     * - 引数1つのクロージャを渡すとシュワルツ的動作になる（Example 参照）
      *
      * Example:
      * ```php
@@ -1003,6 +1141,8 @@ if (!function_exists('array_distinct')) {
      * that(array_distinct([$v1, $v2, $v3, $v4], ['count' => []]))->isSame([$v1, $v2]);
      * // 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
      * that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' => []]))->isSame([$v1, $v2, 2 => $v3]);
+     * // 引数1つのクロージャ
+     * that(array_distinct([$v1, $v2, $v3, $v4], fn($ao) => $ao['group']))->isSame([$v1, $v2]);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
@@ -1044,6 +1184,10 @@ if (!function_exists('array_distinct')) {
                 }
                 return 0;
             };
+        }
+        // 引数1つのコールバックはシュワルツ関数とみなす
+        elseif (is_callable($comparator) && parameter_length($comparator) === 1) {
+            return array_intersect_key($array, array_unique(array_map($comparator, $array)));
         }
 
         // 2重ループで探すよりは1度ソートしてしまったほうがマシ…だと思う（php の実装もそうだし）
@@ -12322,11 +12466,12 @@ if (!function_exists('process')) {
      * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param ?string $cwd 作業ディレクトリ
      * @param ?array $env 環境変数
+     * @param ?array $options その他の追加オプション
      * @return int リターンコード
      */
-    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
+    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
     {
-        $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env)();
+        $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env, $options)();
         if ($rc === -1) {
             // どうしたら失敗するのかわからない
             throw new \RuntimeException("$command exit failed."); // @codeCoverageIgnore
@@ -12350,28 +12495,46 @@ if (!function_exists('process_async')) {
      * @param string|resource $stderr 標準エラー（string を渡すと参照渡しで格納される。resource を渡すと fwrite される）
      * @param ?string $cwd 作業ディレクトリ
      * @param ?array $env 環境変数
+     * @param ?array $options その他の追加オプション
      * @return \ProcessAsync|object プロセスオブジェクト
      */
-    function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null)
+    function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
     {
         if (is_array($args)) {
             $statement = [$command];
             foreach ($args as $k => $v) {
-                if (!is_int($k)) {
-                    $statement[] = $k;
+                foreach (arrayize($v) as $vv) {
+                    if (!is_int($k)) {
+                        $statement[] = $k;
+                    }
+                    $statement[] = $vv;
                 }
-                $statement[] = $v;
             }
         }
         else {
             $statement = escapeshellcmd($command) . " $args";
         }
 
-        $proc = proc_open($statement, [
-            0 => is_resource($stdin) ? $stdin : ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ], $pipes, $cwd, $env);
+        $options['wait-mode'] ??= DIRECTORY_SEPARATOR === '/' ? 'select' : 'polling';
+
+        // Windows ではノンブロッキングパイプが実装されていない
+        // 非常に無駄だがファイルに書き出してその差分をポーリングすることで出力判定を行っている
+        if ($options['wait-mode'] === 'polling') {
+            $proc = proc_open($statement, [
+                0 => is_resource($stdin) ? $stdin : ['pipe', 'r'],
+                1 => $out = tmpfile(),
+                2 => $err = tmpfile(),
+            ], $pipes, $cwd, $env, $options);
+            $pipes[1] = $out;
+            $pipes[2] = $err;
+        }
+        else {
+            $proc = proc_open($statement, [
+                0 => is_resource($stdin) ? $stdin : ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ], $pipes, $cwd, $env, $options);
+        }
 
         if ($proc === false) {
             // どうしたら失敗するのかわからない
@@ -12394,20 +12557,25 @@ if (!function_exists('process_async')) {
         stream_set_read_buffer($pipes[1], 4096);
         stream_set_read_buffer($pipes[2], 4096);
 
-        return new class($proc, $pipes, $stdout, $stderr) {
+        return new class($proc, $pipes, $stdout, $stderr, $options) {
             private $proc;
             private $pipes;
+            private $names;
             private $status;
+            private $options;
             private $destructAction;
+            private $completeAction;
+            private $result;
             public  $stdout;
             public  $stderr;
 
-            public function __construct($proc, $pipes, &$stdout, &$stderr)
+            public function __construct($proc, $pipes, &$stdout, &$stderr, $options)
             {
                 $this->proc = $proc;
                 $this->pipes = $pipes;
                 $this->stdout = &$stdout;
                 $this->stderr = &$stderr;
+                $this->options = $options;
                 $this->destructAction = 'close';
             }
 
@@ -12424,7 +12592,7 @@ if (!function_exists('process_async')) {
             public function __invoke()
             {
                 if ($this->proc === null) {
-                    return $this->status['exitcode'];
+                    return $this->result;
                 }
 
                 try {
@@ -12434,14 +12602,18 @@ if (!function_exists('process_async')) {
                     }
                 }
                 finally {
-                    $this->status = proc_get_status($this->proc);
                     fclose($this->pipes[1]);
                     fclose($this->pipes[2]);
                     $rc = proc_close($this->proc);
+                    assert($rc === $this->status['exitcode']);
                     $this->proc = null;
                 }
 
-                return $this->status['running'] ? $rc : $this->status['exitcode'];
+                if ($this->completeAction) {
+                    return $this->result = $this->completeAction->call($this);
+                }
+
+                return $this->result = $this->status['exitcode'];
             }
 
             public function setDestructAction($action)
@@ -12450,20 +12622,61 @@ if (!function_exists('process_async')) {
                 return $this;
             }
 
+            public function setCompleteAction($action)
+            {
+                $this->completeAction = $action;
+                return $this;
+            }
+
             public function update()
             {
-                if ($this->proc === null || (feof($this->pipes[1]) && feof($this->pipes[2]))) {
+                if ($this->proc === null) {
                     return false;
                 }
 
-                $read = [$this->pipes[1], $this->pipes[2]];
-                $write = $except = null;
-                if (stream_select($read, $write, $except, 1) === false) {
-                    // （システムコールが別のシグナルによって中断された場合などに起こりえます）
-                    throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
+                $this->status = proc_get_status($this->proc);
+
+                $fds = [];
+                if ($this->options['wait-mode'] === 'polling') {
+                    // pipes は FD そのものなので名前管理して file_get_contents せずとも stream_get_contents で直接読めるはず
+                    // が、fstat のサイズが変わることは確認できるものの、バッファされているのか fread で読むことはできなかった
+                    $this->names ??= (function () {
+                        return [
+                            stream_get_meta_data($this->pipes[1])['uri'] => [$this->pipes[1], 0],
+                            stream_get_meta_data($this->pipes[2])['uri'] => [$this->pipes[2], 0],
+                        ];
+                    })();
+                    foreach ($this->names as $name => [$fp, &$pos]) {
+                        /*
+                        var_dump([
+                            'ftell'    => ftell($fp),
+                            'fsize'    => fstat($fp)['size'],
+                            'contents' => stream_get_contents($fp),
+                        ]);
+                         */
+                        $buffer = file_get_contents($name, false, null, $pos);
+                        if ($len = strlen($buffer)) {
+                            $fds[] = [$fp, $buffer];
+                            $pos += $len;
+                        }
+                    }
+                    if (!$fds && $this->status['running']) {
+                        usleep(100_000);
+                    }
                 }
-                foreach ($read as $fp) {
-                    $buffer = fread($fp, 1024);
+                else {
+                    $read = [$this->pipes[1], $this->pipes[2]];
+                    $write = $except = null;
+                    if (stream_select($read, $write, $except, 1) === false) {
+                        // （システムコールが別のシグナルによって中断された場合などに起こりえます）
+                        throw new \RuntimeException('stream_select failed.'); // @codeCoverageIgnore
+                    }
+                    foreach ($read as $fp) {
+                        $fds[] = [$fp, stream_get_contents($fp)];
+                    }
+                }
+
+                foreach ($fds as [$fp, $buffer]) {
                     if ($fp === $this->pipes[1]) {
                         if (!is_resource($this->stdout)) {
                             $this->stdout .= $buffer;
@@ -12481,12 +12694,12 @@ if (!function_exists('process_async')) {
                         }
                     }
                 }
-                return true;
+
+                return $this->status['running'];
             }
 
             public function status()
             {
-                $this->update();
                 return $this->status ?? proc_get_status($this->proc);
             }
 
@@ -12495,6 +12708,8 @@ if (!function_exists('process_async')) {
                 if ($this->proc === null) {
                     return !$this->status['running'];
                 }
+
+                $this->update();
 
                 fclose($this->pipes[1]);
                 fclose($this->pipes[2]);
@@ -12510,6 +12725,103 @@ if (!function_exists('process_async')) {
                 return !$this->status['running'];
             }
         };
+    }
+}
+
+assert(!function_exists('process_closure') || (new \ReflectionFunction('process_closure'))->isUserDefined());
+if (!function_exists('process_closure')) {
+    /**
+     * クロージャを別プロセスで実行する
+     *
+     * process_parallel の単一クロージャ特化版。
+     * クロージャを別プロセスでバックグラウンド実行して結果を返すオブジェクトを返す。
+     * クロージャは独自の方法でエクスポートしてから実行するので可能な限り this bind は外したほうが良い。
+     *
+     * バックグラウンドで実行するので指定クロージャを実行中に別のことができる。
+     * これはマルチコアを活かすのにも有用であるし、IO を伴う処理を効率よく実行できる。
+     *
+     * Example:
+     * ```php
+     * $hugefile1 = tempnam(sys_get_temp_dir(), 't');
+     * $hugefile2 = tempnam(sys_get_temp_dir(), 't');
+     * file_put_contents($hugefile1, str_repeat('x', 1024* 1024)); // もっとでかくないと効果は薄いがテストなのであまり大きくしない
+     * file_put_contents($hugefile2, str_repeat('y', 1024* 1024));
+     * // 超絶でかいファイルの sha1 を計算してる間に・・・
+     * $hash1 = process_closure(static fn() => sha1_file($hugefile1));
+     * $hash2 = process_closure(static fn() => sha1_file($hugefile2));
+     * // ここで別のことができる（裏で処理は走っている）
+     * // doSomething())
+     * // 返り値オブジェクトをコールすると結果が得られる（この時、処理が未完なら待たされる）
+     * that($hash1())->is('e37f4d5be56713044d62525e406d250a722647d6');
+     * that($hash2())->is('2b6a7ad91a60e40a5fd37abe06e165dc7498b24e');
+     *
+     * // あるいは http リクエストを走らせている間に・・・
+     * $start = microtime(true);
+     * $response1 = process_closure(static fn($url) => file_get_contents($url), TESTWEBSERVER . '/delay/2');
+     * $response2 = process_closure(static fn($url) => file_get_contents($url), TESTWEBSERVER . '/delay/2');
+     * // 別のことができる（裏でリクエストは走っている）
+     * // doSomething())
+     * // 返り値オブジェクトをコールするとレスポンスが得られる
+     * that($response1())->isNotEmpty();
+     * that($response2())->isNotEmpty();
+     * // トータルで2秒程度である（少なくとも 2 * 2 で4秒にはならない）
+     * that(microtime(true) - $start)->break()->isBetween(2.0, 4.0);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\exec
+     *
+     * @param \Closure $closure 非同期実行するクロージャ
+     * @param mixed $args クロージャの引数
+     * @param bool|int $throw exitcode で例外を投げるか（現在は bool のみ対応）
+     * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php と function_configure/process.autoload
+     * @param ?string $workdir ワーキングディレクトリ。省略時はテンポラリディレクトリ
+     * @param ?array $options その他の追加オプション
+     * @return \ProcessAsync|object プロセスオブジェクト
+     */
+    function process_closure($closure, $args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null)
+    {
+        static $storage = null;
+        $storage ??= object_storage(__FUNCTION__);
+        /** @noinspection PhpIllegalArrayKeyTypeInspection */
+        $closure_code = $storage[$closure] ??= var_export3($closure, true);
+
+        $autoload = arrayize($autoload ?? array_merge([auto_loader()], function_configure('process.autoload')));
+        $workdir ??= (sys_get_temp_dir() . '/rfpc');
+        mkdir_p($workdir);
+
+        $namespace = strlen(__CLASS__) ? __CLASS__ . '::' : __NAMESPACE__ . '\\';
+        $maincode = '<?php
+        $autoload = ' . var_export($autoload, true) . ';
+        foreach ($autoload as $file) {
+            require_once $file;
+        }
+        $stdin  = eval(stream_get_contents(STDIN));
+        $timer  = ' . $namespace . 'cpu_timer();
+        $return = ' . $closure_code . '(...$stdin);
+        file_put_contents($argv[1], ' . $namespace . 'var_export3([$return, $timer->result(), memory_get_peak_usage()], ["outmode" => "file"]));
+    ';
+        file_put_contents($mainscript = sys_get_temp_dir() . '/process-' . sha1($maincode) . '.php', $maincode);
+
+        $return = tempnam($workdir, 'return');
+        $process = process_async(php_binary(), [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
+        $process->setDestructAction('terminate');
+        $process->setCompleteAction(function () use ($throw, $return) {
+            /** @var $this \ProcessAsync */
+            // 勝手プロセスじゃなくて php なので Fatal error のとき exitcode が非0なのは保証されている
+            if ($throw && $this->status['exitcode']) {
+                // が、php は設定次第で標準出力/エラーのどちらにも出力されうるので読み替えなければならない
+                throw new \ErrorException(strlen($this->stderr) ? $this->stderr : $this->stdout, $this->status['exitcode']);
+            }
+            if (!filesize($return)) {
+                return null;
+            }
+            $results = include $return;
+            opcache_invalidate($return, true);
+            $this->status['cpu'] = $results[1];
+            $this->status['memory'] = $results[2];
+            return $results[0];
+        });
+        return $process;
     }
 }
 
@@ -12598,11 +12910,12 @@ if (!function_exists('process_parallel')) {
      *
      * @param callable|callable[] $tasks 並列実行する callable. 単一の場合は引数分実行して結果を返す
      * @param array $args 各々の引数。$tasks が配列の場合はそれに対応する引数配列。単一の場合は実行回数も兼ねた引数配列
-     * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php
+     * @param ?array $autoload 実行前に読み込むスクリプト。省略時は自動検出された vendor/autoload.php と function_configure/process.autoload
      * @param ?string $workdir ワーキングディレクトリ。省略時はテンポラリディレクトリ
+     * @param ?array $options その他の追加オプション
      * @return array 実行結果（['return' => callable の返り値, 'status' => 終了コード, 'stdout' => 標準出力, 'stderr' => 標準エラー]）
      */
-    function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null)
+    function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null, $options = null)
     {
         // 単一で来た場合は同じものを異なる引数で呼び出すシングルモードとなる
         if (!is_array($tasks)) {
@@ -12617,42 +12930,21 @@ if (!function_exists('process_parallel')) {
             assert(parameter_length($task, true) <= count($args[$key] ?? []), "task $key's arguments are mismatch.");
         }
 
-        // 変数や環境の準備
-        $autoload = arrayize($autoload ?? auto_loader());
-        $workdir ??= (sys_get_temp_dir() . '/rfpp');
-        mkdir_p($workdir);
-
-        // 実行バイナリとコード本体
-        $phpbin = path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
-        $maincode = '<?php
-            $context = ' . var_export3([$autoload, $tasks], true) . ';
-            foreach ($context[0] as $file) {
-                require_once $file;
-            }
-            $stdin = unserialize(stream_get_contents(STDIN));
-            $return = $context[1][$argv[2]](...$stdin);
-            file_put_contents($argv[1], serialize($return));
-        ';
-        file_put_contents($mainscript = tempnam($workdir, 'main'), $maincode);
-
         // プロセスを準備
         $processes = [];
         foreach ($tasks as $key => $task) {
-            unset($stdout, $stderr);
-            $stdout = $stderr = '';
-            $return = tempnam($workdir, 'return');
-            $processes[$key] = process_async($phpbin, [$mainscript, $return, $key], serialize($args[$key] ?? []), $stdout, $stderr, $workdir, $env);
-            $processes[$key]->return = static fn() => strlen($result = file_get_contents($return)) ? unserialize($result) : null;
+            $processes[$key] = process_closure($task, $args[$key] ?? [], false, $autoload, $workdir, $env, $options);
         }
 
         // プロセスを実行兼返り値用に加工
         $results = [];
         foreach ($processes as $key => $process) {
+            $return = $process();
             $results[$key] = [
-                'status' => $process(),
+                'status' => $process->status()['exitcode'],
                 'stdout' => $process->stdout,
                 'stderr' => $process->stderr,
-                'return' => ($process->return)(),
+                'return' => $return,
             ];
         }
         return $results;
@@ -13491,12 +13783,26 @@ if (!function_exists('file_mimetype')) {
      * @package ryunosuke\Functions\Package\filesystem
      *
      * @param string $filename ファイル名（URL）
+     * @param array|bool $prefer_extension extension => mimetype のマップ（true を与えると組み込みを使用する）
      * @return string|null MIME タイプ
      */
-    function file_mimetype($filename)
+    function file_mimetype($filename, $prefer_extension = [])
     {
-        $scheme = parse_url($filename, PHP_URL_SCHEME) ?? null;
-        switch (strtolower($scheme)) {
+        $mimetypes = GENERAL_MIMETYPE;
+        if (is_array($prefer_extension)) {
+            $mimetypes = $prefer_extension + $mimetypes;
+        }
+
+        $parts = parse_url($filename) ?: [];
+
+        if ($prefer_extension) {
+            $extension = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+            if (isset($mimetypes[$extension])) {
+                return $mimetypes[$extension];
+            }
+        }
+
+        switch (strtolower($parts['scheme'] ?? '')) {
             default:
             case 'file':
                 return mime_content_type($filename) ?: null;
@@ -14648,6 +14954,452 @@ if (!function_exists('rm_rf')) {
             $result = $main($target, $self) && $result;
         }
         return $result;
+    }
+}
+
+assert(!function_exists('rsync') || (new \ReflectionFunction('rsync'))->isUserDefined());
+if (!function_exists('rsync')) {
+    /**
+     * php レイヤーで rsync 的なことをする
+     *
+     * rsync プロトコルを喋ったりオプションを完全網羅していたりはしない（意図的に合わせたりはしているが）。
+     * 単純に必要に迫られて実装したものであり、効率も度外視。
+     *
+     * generator で実装されており、動作ログを generate する。
+     * generator は返り値として統計情報を返す。
+     *
+     * ただの劣化 rsync だが php 実装なのでストリームラッパーさえ実装すればプロトコルを超えることができる。
+     * やる気になればリモート間転送も可能（自身経由なので速度は劣悪になるが）。
+     * つまり file -> S3 や S3 -> S3 等も可能。
+     *
+     * generate される文字列は互換性を担保しない。
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     *
+     * @param string $src 送信側ディレクトリ
+     * @param string $dst 受信側ディレクトリ
+     * @param array $options オプション
+     * @return \Generator 動作ログを返す generator
+     */
+    function rsync($src, $dst, $options = [])
+    {
+        $rsyncer = new class($options + [
+                // important
+                'dry-run'          => false,         // 実際には転送せずログのみを出す
+                'block-size'       => 4096,          // ファイル比較に使用するチャンクサイズ
+                // transmit
+                'exclude'          => [],            // 除外パターン（**が使える glob パターン。~始まりで正規表現）
+                'include'          => [],            // 許可パターン（除外されていてもこれにマッチすれば転送される）
+                'update'           => false,         // 受信側の方が新しい場合は転送しない
+                'delete'           => false,         // 送信側にないファイルを削除する
+                'delete-excluded'  => false,         // ファイルリスト外のファイルを削除する
+                // transfer
+                'times'            => true,          // タイムスタンプを維持する
+                'perms'            => true,          // パーミッションを維持する
+                'owner'            => true,          // ファイルオーナーを維持する
+                'group'            => true,          // ファイルグループを維持する
+                // output
+                'log-format'       => '%-6s %s=>%s, %s=>%s, %s:%s=>%s:%s, %s=>%s', // null 指定で raw な配列で返ってくる（実質的にデバッグ用）
+                'diff'             => 'split=1,160', // ファイル差分も合わせて表示するときのオプション（null 指定で差分表示なし）
+                'human-readable'   => false,         // 出力を見やすく整形する
+                'verbose'          => 0,             // ログの詳細度（0:出力なし, 1:ファイルリストのみ, 2:1+記号, 3:2+詳細）
+                'verbose-excluded' => true,          // excluded されたものでも verbose ログに含める
+                'ansi'             => null,          // ansi color フラグ
+            ]) {
+            const DIFF_TIMES   = 1 << 1;
+            const DIFF_PERMS   = 1 << 2;
+            const DIFF_OWNER   = 1 << 3;
+            const DIFF_GROUP   = 1 << 4;
+            const DIFF_CONTENT = 1 << 32;
+
+            const OPERATION_SIGNS = [
+                'exclude' => '!',
+                'mkdir'   => '+',
+                'rmdir'   => '-',
+                'create'  => '+',
+                'delete'  => '-',
+                'update'  => '*',
+            ];
+
+            const OPERATION_STYLES = [
+                'exclude' => 'gray',
+                'mkdir'   => 'green',
+                'create'  => 'green',
+                'update'  => 'yellow',
+                'rmdir'   => 'red',
+                'delete'  => 'red',
+            ];
+
+            private array $options;
+            private array $stats = [];
+
+            public function __construct(array $options)
+            {
+                $options['verbose'] = (int) $options['verbose'];
+                $options['ansi'] ??= is_ansi(STDOUT);
+                $toregex = function ($pattern) {
+                    if ($pattern[0] === '~') {
+                        return substr($pattern, 1);
+                    }
+                    // この動作は rsync に合わせてある
+                    $regex = glob2regex($pattern, GLOB_RECURSIVE) . '$';
+                    if ($pattern[0] === '/') {
+                        return '^' . $regex;
+                    }
+                    else {
+                        return '(^|/)' . $regex;
+                    }
+                };
+                $options['exclude'] = array_map($toregex, (array) $options['exclude']);
+                $options['include'] = array_map($toregex, (array) $options['include']);
+
+                $this->options = $options;
+            }
+
+            public function __invoke(string $src, string $dst): \Generator
+            {
+                if (!is_dir($src)) {
+                    throw new \UnexpectedValueException("$src is not directory");
+                }
+                if (is_file($dst)) {
+                    throw new \UnexpectedValueException("$dst is not directory");
+                }
+
+                $reports = array_fill_keys(['mkdir', 'rmdir', 'create', 'update', 'delete', 'size'], 0);
+                $reports += array_fill_keys(array_map(fn($k) => "!$k", array_keys($reports)), 0);
+                $reports['errors'] = [];
+                $reports['start'] = microtime(true);
+
+                $shortnames = [];
+                $fileist = array_filter($this->filelist($src, $dst), function ($diff, $filename) use (&$shortnames) {
+                    // 差分がない場合 delete-excluded でない限りはファイルリストとして不要（逆に言えば delete-excluded の時は必要）
+                    if ($diff === 0 && !$this->options['delete-excluded']) {
+                        return false;
+                    }
+                    $shortnames[$filename] = mb_ellipsis($filename, 80, '...');
+                    return true;
+                }, ARRAY_FILTER_USE_BOTH);
+                $reports['listing'] = microtime(true);
+
+                $maxlength = max(array_map(fn($v) => mb_monospace($v), $shortnames ?: ['']));
+
+                set_error_handler(function ($errno, $errstr, $errfile, $errline) use (&$reports) {
+                    if (!(error_reporting() & $errno)) {
+                        return false;
+                    }
+                    // @codeCoverageIgnoreStart 除外パターン次第でたまにエラーが出るがテストまではしない
+                    $reports['errors'][] = [
+                        'severity' => $errno,
+                        'message'  => $errstr,
+                        'filename' => $errfile,
+                        'line'     => $errline,
+                    ];
+                    // @codeCoverageIgnoreEnd
+                });
+                try {
+                    foreach ($fileist as $filename => $diff) {
+                        $srcfile = "$src/$filename";
+                        $dstfile = "$dst/$filename";
+
+                        $matches = true;
+                        foreach ($this->options['exclude'] as $exclude) {
+                            if (preg_match("<$exclude>u", "/$filename")) {
+                                $matches = false;
+                                foreach ($this->options['include'] as $include) {
+                                    if (preg_match("<$include>u", "/$filename")) {
+                                        $matches = true;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
+                        // 自分だけに有る時
+                        if ($diff === true) {
+                            $operation = ($this->stat($srcfile)['mode'] & 0040_000) ? 'mkdir' : 'create';
+                            $excluded = !$matches;
+                            $reports[($excluded ? '!' : '') . $operation]++;
+                            $reports[($excluded ? '!' : '') . 'size'] += $this->stat($srcfile)['size'];
+                        }
+                        // 相手だけに有る時
+                        elseif ($diff === false) {
+                            $operation = ($this->stat($dstfile)['mode'] & 0040_000) ? 'rmdir' : 'delete';
+                            $excluded = !$this->options['delete'] || !$matches;
+                            $reports[($excluded ? '!' : '') . $operation]++;
+                            $reports[($excluded ? '!' : '') . 'size'] += 0;
+                        }
+                        // 自分にも相手にも有る時
+                        else {
+                            // マッチしておらず delete-excluded の時は実質的に削除処理（超危険だが rsync はそうなってる）
+                            if (!$matches && $this->options['delete-excluded']) {
+                                $operation = ($this->stat($dstfile)['mode'] & 0040_000) ? 'rmdir' : 'delete';
+                                $excluded = false;
+                            }
+                            else {
+                                $operation = 'update';
+                                $excluded = $this->options['update'] && $this->stat($srcfile)['mtime'] < $this->stat($dstfile)['mtime'] || !$matches;
+                            }
+                            $reports[($excluded ? '!' : '') . $operation]++;
+                            $reports[($excluded ? '!' : '') . 'size'] += $this->stat($srcfile)['size'];
+                        }
+
+                        yield from $this->sync($shortnames[$filename], $srcfile, $dstfile, $operation, $excluded, $maxlength);
+                    }
+                }
+                finally {
+                    restore_error_handler();
+                }
+                $reports['syncing'] = microtime(true);
+
+                $results = [
+                    'time'     => [
+                        'total'   => microtime(true) - $reports['start'],
+                        'listing' => $reports['listing'] - $reports['start'],
+                        'syncing' => $reports['syncing'] - $reports['listing'],
+                    ],
+                    'count'    => [
+                        'files' => count($fileist),
+                    ],
+                    'transfer' => [
+                        'mkdir'  => $reports['mkdir'],
+                        'rmdir'  => $reports['rmdir'],
+                        'create' => $reports['create'],
+                        'update' => $reports['update'],
+                        'delete' => $reports['delete'],
+                        'size'   => $reports['size'],
+                    ],
+                    'excluded' => [
+                        'mkdir'  => $reports['!mkdir'],
+                        'rmdir'  => $reports['!rmdir'],
+                        'create' => $reports['!create'],
+                        'update' => $reports['!update'],
+                        'delete' => $reports['!delete'],
+                        'size'   => $reports['!size'],
+                    ],
+                    'errors'   => $reports['errors'],
+                ];
+
+                if ($this->options['log-format'] !== null) {
+                    $outstats = function ($data) {
+                        return sprintf("mkdir: %s, rmdir: %s, create: %s, update: %s, delete: %s, size: %s",
+                            $this->format('int', $data['mkdir']),
+                            $this->format('int', $data['rmdir']),
+                            $this->format('int', $data['create']),
+                            $this->format('int', $data['update']),
+                            $this->format('int', $data['delete']),
+                            $this->format('byte', $data['size']),
+                        );
+                    };
+                    $results = <<<STATS
+                        times total: {$this->format('float', $results['time']['total'])}, listing: {$this->format('float', $results['time']['listing'])}, syncing: {$this->format('float', $results['time']['syncing'])} seconds
+                        total file: {$this->format('int', $results['count']['files'])} files
+                        transfer {$outstats($results['transfer'])}
+                        excluded {$outstats($results['excluded'])}
+                        errors: {$this->format('int', count($results['errors']))}
+                        STATS;
+                }
+                return $results;
+            }
+
+            private function filelist(string $src, string $dst): array
+            {
+                // ファイルリスト
+                $filelist = dir_diff($src, $dst, [
+                    'unixpath' => true,
+                    'differ'   => function ($file1, $file2) {
+                        $stat1 = $this->stat($file1);
+                        $stat2 = $this->stat($file2);
+
+                        // メタ系の差分はメタ系だけで返す（どうせコピーするので中身を比較するまでもない）
+                        $meta = 0;
+                        $meta |= ($this->options['times'] && $stat1['mtime'] !== $stat2['mtime']) ? self::DIFF_TIMES : 0;
+                        $meta |= ($this->options['perms'] && $stat1['mode'] !== $stat2['mode']) ? self::DIFF_PERMS : 0;
+                        $meta |= ($this->options['owner'] && $stat1['uid'] !== $stat2['uid']) ? self::DIFF_OWNER : 0;
+                        $meta |= ($this->options['group'] && $stat1['gid'] !== $stat2['gid']) ? self::DIFF_GROUP : 0;
+                        if ($meta) {
+                            return $meta;
+                        }
+
+                        if (!file_equals($file1, $file2, $this->options['block-size'])) {
+                            return self::DIFF_CONTENT;
+                        }
+                        return 0;
+                    },
+                ]);
+
+                // 追加は親から、削除は子からになるように並べ替え
+                $filelist = groupsort($filelist, function ($v, $k) {
+                    static $current = null;
+                    if ($v !== false) {
+                        return $current = null;
+                    }
+                    if ($current === null || strpos($k, $current) === false) {
+                        return $current = $k;
+                    }
+                    return $current; // @codeCoverageIgnore
+                }, fn($a, $b, $ak, $bk) => $bk <=> $ak);
+
+                // 受信側に大本が存在しない場合はリストに加える
+                if (!$this->stat($dst)) {
+                    $filelist = ['/' => true] + $filelist;
+                }
+
+                return $filelist;
+            }
+
+            private function sync(string $filename, string $srcfile, string $dstfile, string $operation, bool $excluded, int $maxlength)
+            {
+                $log = null;
+                if (!$excluded || $this->options['verbose-excluded']) {
+                    if ($this->options['verbose'] >= 1) {
+                        $log = [
+                            'sign' => null,
+                            'src'  => null,
+                            'dst'  => null,
+                            'diff' => null,
+                        ];
+
+                        if ($this->options['verbose'] >= 2) {
+                            $log['sign'] = ($excluded ? '!' : '') . self::OPERATION_SIGNS[$operation];
+                        }
+
+                        if ($this->options['verbose'] >= 3) {
+                            $log['src'] = $this->stat($srcfile);
+                            $log['dst'] = $this->stat($dstfile);
+
+                            if ($this->options['diff'] && $operation === 'update') {
+                                $log['diff'] = try_close(function ($dstfp, $srcfp) {
+                                    return rtrim(str_diff($dstfp, $srcfp, [
+                                        'allow-binary' => null,
+                                        'stringify'    => $this->options['diff'],
+                                    ]));
+                                }, fopen($dstfile, 'rb'), fopen($srcfile, 'rb'));
+                            }
+                        }
+
+                        if ($this->options['log-format'] !== null) {
+                            $prefix = $filename;
+                            if (isset($log['sign'])) {
+                                $prefix = $log['sign'] . $prefix;
+                            }
+                            $logstring = $this->options['ansi'] ? ansi_colorize($prefix, self::OPERATION_STYLES[$excluded ? 'exclude' : $operation]) : $prefix;
+
+                            if (isset($log['src'], $log['dst'])) {
+                                $logstring .= str_repeat(' ', $maxlength - mb_monospace($prefix) + 3);
+                                $logstring .= sprintf($this->options['log-format'],
+                                    $operation,
+                                    $this->format('mode', $log['dst']['mode'] ?? null) ?? '(none)',
+                                    $this->format('mode', $log['src']['mode'] ?? null) ?? '(none)',
+                                    $this->format('time', $log['dst']['mtime'] ?? null) ?? '(none)',
+                                    $this->format('time', $log['src']['mtime'] ?? null) ?? '(none)',
+                                    $this->format('owner', $log['dst']['uid'] ?? null) ?? '(none)',
+                                    $this->format('group', $log['dst']['gid'] ?? null) ?? '(none)',
+                                    $this->format('owner', $log['src']['uid'] ?? null) ?? '(none)',
+                                    $this->format('group', $log['src']['gid'] ?? null) ?? '(none)',
+                                    $this->format('byte', $log['dst']['size'] ?? null) ?? '(none)',
+                                    $this->format('byte', $log['src']['size'] ?? null) ?? '(none)',
+                                );
+                            }
+                            if (strlen($log['diff'] ?? '')) {
+                                $logstring .= "\n" . $log['diff'];
+                            }
+                            $log = $logstring;
+                        }
+                    }
+                }
+
+                if (!$this->options['dry-run'] && !$excluded) {
+                    static $functions = null;
+                    $functions ??= [
+                        'mkdir'  => static fn($src, $dst) => mkdir($dst, 0777, true),
+                        'rmdir'  => static fn($src, $dst) => rmdir($dst),
+                        'create' => static fn($src, $dst) => copy($src, $dst),
+                        'update' => static fn($src, $dst) => copy($src, $dst),
+                        'delete' => static fn($src, $dst) => unlink($dst),
+                    ];
+                    $functions[$operation]($srcfile, $dstfile);
+
+                    // メタだけの変更を検出してメタ変更だけする、ということはしない
+                    // 「メタだけの変更」を検出するためには中身を比較して同じである、という検出が必要
+                    // そんなことをするくらいなら比較せずコピーしてしまった方がマシまである
+                    if (in_array($operation, ['mkdir', 'create', 'update'], true)) {
+                        if ($this->options['times']) {
+                            touch($dstfile, $this->stat($srcfile)['mtime']);
+                        }
+                        if ($this->options['perms']) {
+                            chmod($dstfile, $this->stat($srcfile)['mode'] & 0777);
+                        }
+                        if ($this->options['owner']) {
+                            chown($dstfile, $this->stat($srcfile)['uid']);
+                        }
+                        if ($this->options['group']) {
+                            chgrp($dstfile, $this->stat($srcfile)['gid']);
+                        }
+                    }
+                }
+
+                return isset($log) ? [$filename => $log] : [];
+            }
+
+            private function stat(string $fullpath): array
+            {
+                // リモートを扱うこともあるので stat を完全にキャッシュする
+                $fullpath = strtr($fullpath, [DIRECTORY_SEPARATOR => '/']);
+                return $this->stats[$fullpath] ??= (function ($fullpath) {
+                    $stat = @stat($fullpath);
+                    if ($stat === false) {
+                        return [];
+                    }
+                    // array モードで邪魔なので数値は伏せる
+                    $stat = array_filter($stat, fn($k) => !is_int($k), ARRAY_FILTER_USE_KEY);
+                    // ディレクトリのサイズ（ブロックサイズ）が得られることがあるが無視して強制0とする
+                    if ($stat['mode'] & 0040_000) {
+                        $stat['size'] = 0;
+                    }
+                    return $stat;
+                })($fullpath);
+            }
+
+            private function format(string $mode, ?int $var): ?string
+            {
+                if ($var === null) {
+                    return null;
+                }
+                if ($this->options['human-readable']) {
+                    switch ($mode) {
+                        case 'int':
+                            return number_format($var);
+                        case 'float':
+                            return number_format($var, 3);
+                        case 'byte':
+                            return si_prefix($var, 1024, '%.1f %sbytes');
+                        case 'time':
+                            return date('Y/m/d H:i:s', $var);
+                        case 'mode':
+                            return strmode($var);
+                        case 'owner':
+                            return function_exists('posix_getpwuid') ? posix_getpwuid($var)['name'] : $var;
+                        case 'group':
+                            return function_exists('posix_getgrgid') ? posix_getgrgid($var)['name'] : $var;
+                    }
+                }
+                else {
+                    switch ($mode) {
+                        default:
+                            return $var;
+                        case 'byte':
+                            return "$var byte";
+                        case 'time':
+                            return date('Ymd\THis', $var);
+                        case 'mode':
+                            return str_pad(decoct($var), 7, '0', STR_PAD_LEFT);
+                    }
+                }
+            }
+        };
+
+        return $rsyncer($src, $dst);
     }
 }
 
@@ -16803,6 +17555,37 @@ if (!function_exists('is_ansi')) {
     }
 }
 
+assert(!function_exists('php_binary') || (new \ReflectionFunction('php_binary'))->isUserDefined());
+if (!function_exists('php_binary')) {
+    /**
+     * php-cli のパスを返す
+     *
+     * 見つからない場合は null を返す。
+     * 実質的には PHP_BINARY と同じと考えてよい。
+     * ただ PHP_BINARY は SAPI によって異なるので fpm 時にはこの関数を用いて php-cli のパスを得る必要がある。
+     *
+     * @package ryunosuke\Functions\Package\info
+     *
+     * @return string|null php-cli のパス
+     */
+    function php_binary()
+    {
+        if (PHP_SAPI === 'cli' && !defined('PHPUNIT')) {
+            return PHP_BINARY; // @codeCoverageIgnore
+        }
+
+        $phpdir = dirname(PHP_BINARY);
+        $targets = ['php', 'php.exe', 'php.bat'];
+        foreach ($targets as $target) {
+            if (file_exists($bin = $phpdir . DIRECTORY_SEPARATOR . $target)) {
+                return $bin;
+            }
+        }
+
+        return null; // @codeCoverageIgnore
+    }
+}
+
 assert(!function_exists('setenvs') || (new \ReflectionFunction('setenvs'))->isUserDefined());
 if (!function_exists('setenvs')) {
     /**
@@ -18824,6 +19607,48 @@ if (!function_exists('parse_php')) {
     }
 }
 
+assert(!function_exists('php_opcode') || (new \ReflectionFunction('php_opcode'))->isUserDefined());
+if (!function_exists('php_opcode')) {
+    /**
+     * コード断片の opcode を返す
+     *
+     * php レベルでサクッと取りたいことはあるし、ini 設定がややややこしく、簡単に取れない場合があるので関数化した。
+     * phpdbg 等ではなく opcache で出すため、与えたコードは実行されることに注意。
+     *
+     * @see https://www.npopov.com/2022/05/22/The-opcache-optimizer.html
+     *
+     * @package ryunosuke\Functions\Package\misc
+     *
+     * @param string $phpcode php コード
+     * @param int $level opt_debug_level に渡される（URL 参照だが、正味使うのは 0x10000:最適化前, 0x20000:最適化後 くらいだろう）
+     * @return string opcode
+     */
+    function php_opcode($phpcode, $level = 0x20000)
+    {
+        $level = dechex($level);
+
+        // log_errors=0 でもいいけど、何かに使えるかもしれないしログは残しておく
+        $errorlog = sys_get_temp_dir() . '/php-cli.log';
+        touch($errorlog);
+        $errorlog = realpath($errorlog);
+        @unlink($errorlog);
+
+        process(php_binary(), [
+            '-d' => [
+                "opcache.enable=1",                   // 必須
+                "opcache.enable_cli=1",               // 必須
+                "opcache.opt_debug_level=0x{$level}", // 必須
+                "opcache.file_update_protection=0",   // 0 にしないと作成直後は opcache が無効になる
+                "auto_prepend_file=",                 // 余計なファイルが実行されうる
+                "auto_append_file=",                  // 余計なファイルが実行されうる
+                "error_log=$errorlog",                // 標準エラーに出力されるので指定しないと混ざる
+            ],
+        ], "<?php\n$phpcode", $stdout, $stderr);
+
+        return $stderr;
+    }
+}
+
 assert(!function_exists('resolve_symbol') || (new \ReflectionFunction('resolve_symbol'))->isUserDefined());
 if (!function_exists('resolve_symbol')) {
     /**
@@ -19650,27 +20475,29 @@ if (!function_exists('http_request')) {
         if (isset($filekey)) {
             if (file_exists($filekey)) {
                 $fp = fopen($filekey, 'r');
-                try {
-                    $info = json_decode(fgets($fp), true);
-                    if (stripos($info['cache_control'] ?? '', 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'] ?? '', $matches)) {
-                        clearstatcache(true, $filekey);
-                        if (time() - filemtime($filekey) < $matches[1]) {
-                            $info['no_request'] = true;
-                            $response = stream_get_contents($fp);
-                            [, $response_header, $body] = $response_parse($response, $info);
-                            return $body;
+                if ($fp !== false) {
+                    try {
+                        $info = json_decode(fgets($fp), true);
+                        if (stripos($info['cache_control'] ?? '', 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'] ?? '', $matches)) {
+                            clearstatcache(true, $filekey);
+                            if (time() - filemtime($filekey) < $matches[1]) {
+                                $info['no_request'] = true;
+                                $response = stream_get_contents($fp);
+                                [, $response_header, $body] = $response_parse($response, $info);
+                                return $body;
+                            }
+                        }
+
+                        if ($info['last_modified']) {
+                            $options[CURLOPT_HTTPHEADER]['if-modified-since'] = $info['last_modified'];
+                        }
+                        if ($info['etag']) {
+                            $options[CURLOPT_HTTPHEADER]['if-none-match'] = $info['etag'];
                         }
                     }
-
-                    if ($info['last_modified']) {
-                        $options[CURLOPT_HTTPHEADER]['if-modified-since'] = $info['last_modified'];
+                    finally {
+                        fclose($fp);
                     }
-                    if ($info['etag']) {
-                        $options[CURLOPT_HTTPHEADER]['if-none-match'] = $info['etag'];
-                    }
-                }
-                finally {
-                    fclose($fp);
                 }
             }
         }
@@ -21146,6 +21973,73 @@ if (!function_exists('probability')) {
     }
 }
 
+assert(!function_exists('probability_array') || (new \ReflectionFunction('probability_array'))->isUserDefined());
+if (!function_exists('probability_array')) {
+    /**
+     * 指定確率で配列のキーを返す
+     *
+     * 確率の合計が 100% を超えている場合は例外を投げる。
+     * 100% に満たない場合は残り確率で null を返す。
+     *
+     * 分母の 100% は $divisor 引数で指定可能（1000 を指定すればパーミルになる）。
+     * null を与えると確率の合計値が設定される（いわゆる重み付け乱数になる）。
+     *
+     * Example:
+     * ```php
+     * srand(123);
+     * // a:10%, b:20%, c:30%, d:40% の確率で返す
+     * that(probability_array([
+     *     'a' => 10,
+     *     'b' => 20,
+     *     'c' => 30,
+     *     'd' => 40,
+     * ]))->isSame('b');
+     *
+     * // a:16.6%, b:32.3%, c:50% の確率で返す（いわゆる重み付け）
+     * that(probability_array([
+     *     'a' => 1,
+     *     'b' => 2,
+     *     'c' => 3,
+     * ], null))->isSame('c');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\random
+     *
+     * @param array $array 配列
+     * @param ?int $divisor 分母
+     * @return mixed $array のどれか1つ
+     */
+    function probability_array($array, $divisor = 100)
+    {
+        $array = arrayval($array, false);
+        if (empty($array)) {
+            throw new \InvalidArgumentException("array is empty");
+        }
+
+        assert(array_reduce($array, fn($carry, $item) => $carry && ctype_digit("$item"), true));
+
+        $weights = array_sum($array);
+        $divisor ??= $weights;
+
+        if ($weights > $divisor) {
+            throw new \InvalidArgumentException("The sum of probabilities exceeds $divisor");
+        }
+        if ($divisor <= 0) {
+            throw new \InvalidArgumentException("divisor <= 0");
+        }
+
+        $probability = mt_rand(1, $divisor);
+
+        foreach ($array as $key => $per) {
+            if (($divisor -= $per) < $probability) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+}
+
 assert(!function_exists('random_at') || (new \ReflectionFunction('random_at'))->isUserDefined());
 if (!function_exists('random_at')) {
     /**
@@ -21809,7 +22703,7 @@ if (!function_exists('reflect_types')) {
      * @package ryunosuke\Functions\Package\reflection
      *
      * @param \ReflectionFunctionAbstract|\ReflectionType|\ReflectionType[]|null $reflection_type getType 等で得られるインスタンス
-     * @return \ReflectionAnyType|object
+     * @return \ReflectTypes|object
      */
     function reflect_types($reflection_type = null)
     {
@@ -21829,6 +22723,12 @@ if (!function_exists('reflect_types')) {
             }
         }
 
+        /**
+         * @mixin \ReflectionType
+         * @mixin \ReflectionNamedType
+         * @mixin \ReflectionUnionType
+         * @mixin \ReflectionIntersectionType
+         */
         return new class(...$reflection_type)
             extends \stdClass
             implements \IteratorAggregate, \ArrayAccess, \Countable, \JsonSerializable {
@@ -26913,6 +27813,124 @@ if (!function_exists('try_catch_finally')) {
     }
 }
 
+assert(!function_exists('try_close') || (new \ReflectionFunction('try_close'))->isUserDefined());
+if (!function_exists('try_close')) {
+    /**
+     * try ～ finally 構文の close 特化版
+     *
+     * $try の呼び出し完了後に必ず close するようにする。
+     * C# の using, java の try-with-resource みたいなもの。
+     *
+     * $resources 引数は [filename, mode], [filename => mode] のような配列を受け付け、中で fopen される。
+     *
+     * resource 型を想定しているが、オブジェクトの場合は close, free, dispose あたりを試みる。
+     * このメソッド候補は互換性を問わず変更されることがある。
+     * そもそも、stream 以外のリソースや完全不透明クラスはオマケのようなもので完全サポートはしないし互換性も考慮しない。
+     *
+     * close で例外が飛んだ場合は握りつぶされる。
+     * この握りつぶした例外を取得する方法は今のところ存在しない。
+     *
+     * Example:
+     * ```php
+     * that(try_close(fn($fp, $string) => fwrite($fp, $string), $tmpfile = tmpfile(), 'test'))->is(4);
+     * that(gettype($tmpfile))->is('resource (closed)'); // 閉じている
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\syntax
+     *
+     * @param callable $try try ブロッククロージャ
+     * @param resource|array ...$resources $try に渡る引数
+     * @return mixed $try ブロックの返り値
+     */
+    function try_close($callback, ...$resources)
+    {
+        // hash to array
+        foreach ($resources as $n => $resource) {
+            if (is_array($resource) && is_hasharray($resource)) {
+                array_splice($resources, $n, 1, iterator_to_array(arrays($resource)));
+            }
+        }
+        // array to resource
+        foreach ($resources as $n => $resource) {
+            if (is_array($resource)) {
+                $resources[$n] = fopen(...$resource);
+            }
+        }
+
+        try {
+            return $callback(...$resources);
+        }
+        catch (\Throwable $t) {
+            // $t を設定するために catch ブロックが必要
+            throw $t;
+        }
+        finally {
+            // 逆順で閉じる（今のところあまり意味はないが C#/java もそうなってる）
+            foreach (array_reverse($resources, true) as $n => $resource) {
+                try {
+                    $names = ['close', 'free', 'dispose'];
+
+                    if (is_resource($resource)) {
+                        $rtype = get_resource_type($resource);
+                        if ($rtype === 'stream') {
+                            fclose($resource);
+                        }
+                        else {
+                            // fclose は stoream しか使えず、他は大抵専用の XXX_close のようなものが存在する
+                            foreach ($names as $method) {
+                                $funcname = explode(' ', $rtype)[0] . "_{$method}";
+                                if (is_callable($funcname)) {
+                                    $funcname($resource);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (is_object($resource)) {
+                        foreach ($names as $method) {
+                            if (is_callable([$resource, $method])) {
+                                $resource->$method();
+                                break;
+                            }
+
+                            // @codeCoverageIgnoreStart
+                            // php8.0 からリソースから不透明クラスへの移行が進んでいる（リソースがクラスになっただけでメソッドが生えているわけではない）
+                            // その変換は容易ではない（例えば↓は curl_close を想定しているが、CurlShareHandle 等のクラスもあり完全対応しない）
+                            $funcname = (new \ReflectionClass($resource))->getExtension() . "_{$method}";
+                            if (is_callable($funcname)) {
+                                $funcname($resource);
+                                break;
+                            }
+                            // @codeCoverageIgnoreEnd
+                        }
+                    }
+                }
+                catch (\Throwable $t2) {
+                    // どうする？
+                    // java の try-with-resource は close 例外を握りつぶして後から getSuppressed で取得できるようになっている
+                    // php には getSuppressed なんてない。 previous があるが後から設定できないし設定済みかもしれないので上書きはよくない
+                    // 文脈的には確実に閉じたいわけなので throw することもできないし、欲しい例外は $callback 内の例外であって close の例外ではない
+
+                    // @codeCoverageIgnoreStart
+                    if (1 === 2) {
+                        // エラー化する？（欲しいとき以外は邪魔だし例外オブジェクトとしては取得できない）
+                        trigger_error($t2, E_USER_WARNING);
+
+                        // 溜めておいて error_get_last みたいな別関数で取得できるようにする？（「握りつぶした例外をとりあえず溜めておく場所」は有用な気もする）
+                        $suppressed[$n] = $t2;
+
+                        // 直代入？ （php8.2 以降は不可能）
+                        if (isset($t)) {
+                            $t->suppressed = $t2;
+                        }
+                    }
+                    // @codeCoverageIgnoreEnd
+                }
+            }
+        }
+    }
+}
+
 assert(!function_exists('try_finally') || (new \ReflectionFunction('try_finally'))->isUserDefined());
 if (!function_exists('try_finally')) {
     /**
@@ -27782,6 +28800,100 @@ if (!function_exists('benchmark')) {
     }
 }
 
+assert(!function_exists('built_in_server') || (new \ReflectionFunction('built_in_server'))->isUserDefined());
+if (!function_exists('built_in_server')) {
+    /**
+     * ビルトインサーバーを起動する
+     *
+     * 単に別プロセスで php -S するだけなので本番では使用してはならない。
+     * 少し小細工として下記を実装してある。
+     *
+     * - $router: クロージャを渡せる
+     * - $options['last-modified']: true にすると存在するファイルの 304 キャッシュが有効になる
+     *
+     * @package ryunosuke\Functions\Package\utility
+     *
+     * @param string $document_root 公開ディレクトリ兼カレントディレクトリ
+     * @param string|callable $router ルータースクリプト or クロージャ
+     * @param array $options オプション配列
+     * @return \ProcessAsync|object プロセスオブジェクト
+     */
+    function built_in_server($document_root, $router = null, $options = [])
+    {
+        $options += [
+            'host'          => '0.0.0.0', // bind アドレス
+            'port'          => 8000,      // bind ポート
+            'last-modified' => true,      // 静的ファイルの 304 キャッシュの有効無効
+            // php.ini のエントリ
+            '-d'            => [
+                'opcache.enable' => 1,
+                'uopz.disable'   => 1, // built in server で uopz が有効だとおかしなエラーを吐くことを確認
+            ],
+        ];
+
+        // @codeCoverageIgnoreStart
+        $mimetypes = GENERAL_MIMETYPE;
+        $response304 = static function () use ($mimetypes) {
+            //$file = $_SERVER['DOCUMENT_ROOT'] . $_SERVER['REQUEST_URI'];
+            $file = $_SERVER['SCRIPT_FILENAME'];
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if (file_exists($file) && $ext !== 'php') {
+                $modifiedSince = filter_input(INPUT_SERVER, 'HTTP_IF_MODIFIED_SINCE');
+                $lastModified = filemtime($file);
+                if ($modifiedSince && strtotime($modifiedSince) >= $lastModified) {
+                    http_response_code(304);
+                    header('content-type:' . ($mimetypes[$ext] ?? 'text/plain'));
+                }
+                else {
+                    http_response_code(200);
+                    header('content-type:' . ($mimetypes[$ext] ?? 'text/plain'));
+                    header('last-modified:' . gmdate('D, d M Y H:i:s \G\M\T', $lastModified));
+                    readfile($file);
+                }
+                exit;
+            }
+        };
+        // @codeCoverageIgnoreEnd
+
+        $mainscript = null;
+        if (is_string($router) && file_exists($router)) {
+            $mainscript = $router;
+        }
+        elseif (is_callable($router)) {
+            $autoload = array_merge([auto_loader()], function_configure('process.autoload'));
+            $router_code = var_export3($router, true);
+            $static_code = $options['last-modified'] ? var_export3($response304, true) . '();' : '';
+
+            $maincode = '<?php
+            $autoload = ' . var_export($autoload, true) . ';
+            foreach ($autoload as $file) {
+                require_once $file;
+            }
+            ' . $static_code . '
+            return ' . $router_code . '();
+        ';
+            file_put_contents($mainscript = sys_get_temp_dir() . '/router-' . sha1($maincode) . '.php', $maincode);
+        }
+        elseif ($options['last-modified']) {
+            $static_code = var_export3($response304, true) . '();';
+            $maincode = '<?php
+            ' . $static_code . '
+            return false;
+        ';
+            file_put_contents($mainscript = sys_get_temp_dir() . '/router-' . sha1($maincode) . '.php', $maincode);
+        }
+
+        $process = process_async(php_binary(), array_filter([
+            '-S' => "{$options['host']}:{$options['port']}",
+            '-t' => $document_root,
+            '-d' => array_kmap((array) $options['-d'], fn($v, $k) => is_int($k) ? $v : "$k=$v"),
+            $mainscript,
+        ], fn($v) => $v !== null), '', $stdout, $stderr, $document_root);
+
+        return $process;
+    }
+}
+
 assert(!function_exists('cache') || (new \ReflectionFunction('cache'))->isUserDefined());
 if (!function_exists('cache')) {
     /**
@@ -28056,6 +29168,9 @@ if (!function_exists('cacheobject')) {
             private function _getMetadata(string $filename): ?array
             {
                 $fp = fopen($filename, "r");
+                if ($fp === false) {
+                    return null; // @codeCoverageIgnore
+                }
                 try {
                     $first = fgets($fp);
                     $meta = @json_decode(substr($first, strpos($first, '#') + 1), true);
@@ -28256,6 +29371,7 @@ if (!function_exists('function_configure')) {
         $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
         $config['chain.version'] ??= 1;
         $config['chain.nullsafe'] ??= false;
+        $config['process.autoload'] ??= [];
 
         // setting
         if (is_array($option)) {
@@ -28659,9 +29775,133 @@ if (!function_exists('cipher_metadata')) {
             return $cache[$cipher];
         }
 
+        // var_export(array_reduce(openssl_get_cipher_methods(), fn($carry, $item) => $carry + [$item => @openssl_cipher_key_length($item)], []));
+        $keylens = [
+            'aes-128-cbc'             => 16,
+            'aes-128-cbc-cts'         => false,
+            'aes-128-cbc-hmac-sha1'   => 16,
+            'aes-128-cbc-hmac-sha256' => 16,
+            'aes-128-ccm'             => 16,
+            'aes-128-cfb'             => 16,
+            'aes-128-cfb1'            => 16,
+            'aes-128-cfb8'            => 16,
+            'aes-128-ctr'             => 16,
+            'aes-128-ecb'             => 16,
+            'aes-128-gcm'             => 16,
+            'aes-128-ocb'             => 16,
+            'aes-128-ofb'             => 16,
+            'aes-128-siv'             => false,
+            'aes-128-wrap'            => 16,
+            'aes-128-wrap-inv'        => false,
+            'aes-128-wrap-pad'        => 16,
+            'aes-128-wrap-pad-inv'    => false,
+            'aes-128-xts'             => 32,
+            'aes-192-cbc'             => 24,
+            'aes-192-cbc-cts'         => false,
+            'aes-192-ccm'             => 24,
+            'aes-192-cfb'             => 24,
+            'aes-192-cfb1'            => 24,
+            'aes-192-cfb8'            => 24,
+            'aes-192-ctr'             => 24,
+            'aes-192-ecb'             => 24,
+            'aes-192-gcm'             => 24,
+            'aes-192-ocb'             => 24,
+            'aes-192-ofb'             => 24,
+            'aes-192-siv'             => false,
+            'aes-192-wrap'            => 24,
+            'aes-192-wrap-inv'        => false,
+            'aes-192-wrap-pad'        => 24,
+            'aes-192-wrap-pad-inv'    => false,
+            'aes-256-cbc'             => 32,
+            'aes-256-cbc-cts'         => false,
+            'aes-256-cbc-hmac-sha1'   => 32,
+            'aes-256-cbc-hmac-sha256' => 32,
+            'aes-256-ccm'             => 32,
+            'aes-256-cfb'             => 32,
+            'aes-256-cfb1'            => 32,
+            'aes-256-cfb8'            => 32,
+            'aes-256-ctr'             => 32,
+            'aes-256-ecb'             => 32,
+            'aes-256-gcm'             => 32,
+            'aes-256-ocb'             => 32,
+            'aes-256-ofb'             => 32,
+            'aes-256-siv'             => false,
+            'aes-256-wrap'            => 32,
+            'aes-256-wrap-inv'        => false,
+            'aes-256-wrap-pad'        => 32,
+            'aes-256-wrap-pad-inv'    => false,
+            'aes-256-xts'             => 64,
+            'aria-128-cbc'            => 16,
+            'aria-128-ccm'            => 16,
+            'aria-128-cfb'            => 16,
+            'aria-128-cfb1'           => 16,
+            'aria-128-cfb8'           => 16,
+            'aria-128-ctr'            => 16,
+            'aria-128-ecb'            => 16,
+            'aria-128-gcm'            => 16,
+            'aria-128-ofb'            => 16,
+            'aria-192-cbc'            => 24,
+            'aria-192-ccm'            => 24,
+            'aria-192-cfb'            => 24,
+            'aria-192-cfb1'           => 24,
+            'aria-192-cfb8'           => 24,
+            'aria-192-ctr'            => 24,
+            'aria-192-ecb'            => 24,
+            'aria-192-gcm'            => 24,
+            'aria-192-ofb'            => 24,
+            'aria-256-cbc'            => 32,
+            'aria-256-ccm'            => 32,
+            'aria-256-cfb'            => 32,
+            'aria-256-cfb1'           => 32,
+            'aria-256-cfb8'           => 32,
+            'aria-256-ctr'            => 32,
+            'aria-256-ecb'            => 32,
+            'aria-256-gcm'            => 32,
+            'aria-256-ofb'            => 32,
+            'camellia-128-cbc'        => 16,
+            'camellia-128-cbc-cts'    => false,
+            'camellia-128-cfb'        => 16,
+            'camellia-128-cfb1'       => 16,
+            'camellia-128-cfb8'       => 16,
+            'camellia-128-ctr'        => 16,
+            'camellia-128-ecb'        => 16,
+            'camellia-128-ofb'        => 16,
+            'camellia-192-cbc'        => 24,
+            'camellia-192-cbc-cts'    => false,
+            'camellia-192-cfb'        => 24,
+            'camellia-192-cfb1'       => 24,
+            'camellia-192-cfb8'       => 24,
+            'camellia-192-ctr'        => 24,
+            'camellia-192-ecb'        => 24,
+            'camellia-192-ofb'        => 24,
+            'camellia-256-cbc'        => 32,
+            'camellia-256-cbc-cts'    => false,
+            'camellia-256-cfb'        => 32,
+            'camellia-256-cfb1'       => 32,
+            'camellia-256-cfb8'       => 32,
+            'camellia-256-ctr'        => 32,
+            'camellia-256-ecb'        => 32,
+            'camellia-256-ofb'        => 32,
+            'chacha20'                => 32,
+            'chacha20-poly1305'       => 32,
+            'des-ede-cbc'             => 16,
+            'des-ede-cfb'             => 16,
+            'des-ede-ecb'             => 16,
+            'des-ede-ofb'             => 16,
+            'des-ede3-cbc'            => 24,
+            'des-ede3-cfb'            => 24,
+            'des-ede3-cfb1'           => 24,
+            'des-ede3-cfb8'           => 24,
+            'des-ede3-ecb'            => 24,
+            'des-ede3-ofb'            => 24,
+            'des3-wrap'               => 24,
+            'null'                    => false,
+        ];
+
         $ivlen = openssl_cipher_iv_length($cipher);
         @openssl_encrypt('dummy', $cipher, 'password', 0, str_repeat('x', $ivlen), $tag);
         return $cache[$cipher] = [
+            'keylen' => intval($keylens[$cipher] ?? 0),
             'ivlen'  => $ivlen,
             'taglen' => strlen($tag ?? ''),
         ];
@@ -28701,6 +29941,22 @@ if (!function_exists('decrypt')) {
         }
         else {
             $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
+        }
+
+        if ($version === "4") {
+            $cipher = 'aes-256-gcm';
+            $metadata = cipher_metadata($cipher);
+            $payload = substr($cipherdata, 0, -($metadata['taglen'] + $metadata['ivlen']));
+            $tag = substr($cipherdata, strlen($payload), $metadata['taglen']);
+            $iv = substr($cipherdata, -$metadata['ivlen']);
+            foreach ((array) $password as $pass) {
+                $pass = hash_hkdf('sha256', $pass, $metadata['keylen']);
+                $decryptdata = openssl_decrypt($payload, $cipher, $pass, OPENSSL_RAW_DATA, str_pad($iv, $metadata['ivlen'], "\0"), $tag);
+                if ($decryptdata !== false) {
+                    return json_decode(gzinflate($decryptdata), true);
+                }
+            }
+            return null;
         }
 
         if ($version === "3") {
@@ -28770,18 +30026,24 @@ if (!function_exists('encrypt')) {
      * 指定されたパスワードで暗号化する
      *
      * データは json を経由して base64（URL セーフ） して返す。
-     * $tag を与えると認証タグが設定される。
+     *
+     * $tag を与えると認証タグが設定される（非推奨）。
+     * $cipher で暗号化メソッドを指定できる（非推奨）。
+     * v4 から $cipher は aes-256-gcm 決め打ち、結果に $tag が含まれるようになったので引数は2つだけを推奨。
+     * 要するに sodium_crypto_aead_aes256gcm_encrypt+iv と等しくなった。
      *
      * $password は配列で複数与えることができる。
      * 複数与えた場合、先頭の要素が使用される。
      * これは decrypt との親和性のため（password の変更・移行期間は複数を扱いたいことがある）であり、決して「複数のパスワード対応」ではない。
      *
-     * データ末尾には =v が付与される。
+     * データ末尾には v が付与される。
      * これによって処理が変わり、バージョン違いの暗号化文字列を与えたとしても複合することができる。
      *
      * - v0: バージョンのない無印。json -> encrypt -> base64
      * - v1: 上記に圧縮処理を加えたもの。json -> deflate -> encrypt -> base64
      * - v2: 生成文字列に $cipher, $iv, $tag を加えたもの。json -> deflate -> cipher+iv+tag+encrypt -> base64
+     * - v3: 生成文字列に $iv, $tag, $cipher を加えたもの。json -> deflate -> encrypt+cipher+iv+tag -> base64
+     * - v4: 生成文字列に $tag, $iv を加えたもの。json -> deflate -> encrypt+tag+iv -> base64
      *
      * Example:
      * ```php
@@ -28799,13 +30061,15 @@ if (!function_exists('encrypt')) {
      * @package ryunosuke\Functions\Package\var
      *
      * @param mixed $plaindata 暗号化するデータ
-     * @param string|array $password パスワード。十分な長さ、あるいは鍵導出関数を通した文字列でなければならない
+     * @param string|array $password パスワード。十分な長さでなければならない
      * @param string $cipher 暗号化方式（openssl_get_cipher_methods で得られるもの）
      * @param string $tag 認証タグ
      * @return string 暗号化された文字列
      */
-    function encrypt($plaindata, $password, $cipher = 'aes-256-gcm', &$tag = '')
+    function encrypt($plaindata, $password, $cipher = null, &$tag = '')
     {
+        $original_cipher = $cipher;
+        $cipher ??= 'aes-256-gcm';
         $metadata = cipher_metadata($cipher);
         if (!$metadata) {
             throw new \InvalidArgumentException("undefined cipher algorithm('$cipher')");
@@ -28822,10 +30086,17 @@ if (!function_exists('encrypt')) {
                 $iv = random_bytes($rest) . $iv;
             }
         }
-        $password = is_array($password) ? reset($password) : $password;
+        if ($original_cipher === null) {
+            $password = hash_hkdf('sha256', is_array($password) ? reset($password) : $password, $metadata['keylen']);
+        }
         $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [&$tag] : []);
 
-        return rtrim(strtr(base64_encode($tag . $iv . $payload . ':' . $cipher), ['+' => '-', '/' => '_']), '=') . '3';
+        if ($original_cipher === null) {
+            return rtrim(strtr(base64_encode($payload . $tag . $iv), ['+' => '-', '/' => '_']), '=') . '4';
+        }
+        else {
+            return rtrim(strtr(base64_encode($tag . $iv . $payload . ':' . $cipher), ['+' => '-', '/' => '_']), '=') . '3';
+        }
     }
 }
 
