@@ -2,6 +2,8 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../exec/process.php';
+require_once __DIR__ . '/../info/php_binary.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -28,8 +30,7 @@ function php_opcode($phpcode, $level = 0x20000)
     $errorlog = realpath($errorlog);
     @unlink($errorlog);
 
-    $phpbin = path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
-    process($phpbin, [
+    process(php_binary(), [
         '-d' => [
             "opcache.enable=1",                   // 必須
             "opcache.enable_cli=1",               // 必須

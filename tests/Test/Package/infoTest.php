@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\get_modified_files;
 use function ryunosuke\Functions\Package\get_uploaded_files;
 use function ryunosuke\Functions\Package\ini_sets;
 use function ryunosuke\Functions\Package\is_ansi;
+use function ryunosuke\Functions\Package\php_binary;
 use function ryunosuke\Functions\Package\sys_set_temp_dir;
 
 class infoTest extends AbstractTestCase
@@ -542,6 +543,11 @@ class infoTest extends AbstractTestCase
             that(is_ansi(STDOUT, '/'))->isFalse();
             that(is_ansi(tmpfile(), '/'))->isFalse();
         }
+    }
+
+    function test_php_binary()
+    {
+        that(php_binary())->is(PHP_BINARY);
     }
 
     function test_setenvs()

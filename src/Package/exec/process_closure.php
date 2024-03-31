@@ -7,7 +7,7 @@ require_once __DIR__ . '/../classobj/auto_loader.php';
 require_once __DIR__ . '/../classobj/object_storage.php';
 require_once __DIR__ . '/../exec/process_async.php';
 require_once __DIR__ . '/../filesystem/mkdir_p.php';
-require_once __DIR__ . '/../filesystem/path_resolve.php';
+require_once __DIR__ . '/../info/php_binary.php';
 require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../var/var_export3.php';
 // @codeCoverageIgnoreEnd
@@ -84,9 +84,8 @@ function process_closure($closure, $args = [], $throw = true, $autoload = null, 
     ';
     file_put_contents($mainscript = sys_get_temp_dir() . '/process-' . sha1($maincode) . '.php', $maincode);
 
-    $phpbin = path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
     $return = tempnam($workdir, 'return');
-    $process = process_async($phpbin, [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
+    $process = process_async(php_binary(), [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
     $process->setDestructAction('terminate');
     $process->setCompleteAction(function () use ($throw, $return) {
         /** @var $this \ProcessAsync */

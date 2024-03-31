@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_kmap.php';
 require_once __DIR__ . '/../classobj/auto_loader.php';
 require_once __DIR__ . '/../exec/process_async.php';
-require_once __DIR__ . '/../filesystem/path_resolve.php';
+require_once __DIR__ . '/../info/php_binary.php';
 require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../var/var_export3.php';
 require_once __DIR__ . '/../constants.php';
@@ -92,8 +92,7 @@ function built_in_server($document_root, $router = null, $options = [])
         file_put_contents($mainscript = sys_get_temp_dir() . '/router-' . sha1($maincode) . '.php', $maincode);
     }
 
-    $phpbin = path_resolve('php' . (DIRECTORY_SEPARATOR === '\\' ? '.exe' : ''), [dirname(PHP_BINARY)]);
-    $process = process_async($phpbin, array_filter([
+    $process = process_async(php_binary(), array_filter([
         '-S' => "{$options['host']}:{$options['port']}",
         '-t' => $document_root,
         '-d' => array_kmap((array) $options['-d'], fn($v, $k) => is_int($k) ? $v : "$k=$v"),
