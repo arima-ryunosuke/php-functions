@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\parse_annotation;
 use function ryunosuke\Functions\Package\parse_namespace;
 use function ryunosuke\Functions\Package\parse_php;
+use function ryunosuke\Functions\Package\php_opcode;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\process;
 use function ryunosuke\Functions\Package\process_parallel;
@@ -1054,6 +1055,19 @@ plain text
             'short_open_tag' => false,
             'flags'          => TOKEN_NAME,
         ]))->is($providerExpected($code, 0));
+    }
+
+    function test_php_opcode()
+    {
+        $opcode = php_opcode('$a=1;$b=2;var_dump($a + $b + $c);');
+        that($opcode)->containsAll([
+            'ASSIGN',
+            'INIT_FCALL',
+        ]);
+        that($opcode)->notContainsAny([
+            'Notice',
+            'Undefined',
+        ], false);
     }
 
     function test_resolve_symbol()
