@@ -38,6 +38,22 @@ function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
         $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
     }
 
+    if ($version === "4") {
+        $cipher = 'aes-256-gcm';
+        $metadata = cipher_metadata($cipher);
+        $payload = substr($cipherdata, 0, -($metadata['taglen'] + $metadata['ivlen']));
+        $tag = substr($cipherdata, strlen($payload), $metadata['taglen']);
+        $iv = substr($cipherdata, -$metadata['ivlen']);
+        foreach ((array) $password as $pass) {
+            $pass = hash_hkdf('sha256', $pass, $metadata['keylen']);
+            $decryptdata = openssl_decrypt($payload, $cipher, $pass, OPENSSL_RAW_DATA, str_pad($iv, $metadata['ivlen'], "\0"), $tag);
+            if ($decryptdata !== false) {
+                return json_decode(gzinflate($decryptdata), true);
+            }
+        }
+        return null;
+    }
+
     if ($version === "3") {
         $cp = strrpos($cipherdata, ':');
         $ivtagpayload = substr($cipherdata, 0, $cp);

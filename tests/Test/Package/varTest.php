@@ -237,6 +237,50 @@ class varTest extends AbstractTestCase
             ],
         ];
 
+        $rewrite = function ($eitherTagIv, $encrypted) {
+            $cipherdata = base64_decode(strtr($encrypted, ['-' => '+', '_' => '/']));
+            if ($eitherTagIv === 'tag') {
+                $cipherdata[0] = "\0";
+            }
+            if ($eitherTagIv === 'iv') {
+                $cipherdata[16] = "\0";
+            }
+            return strtr(base64_encode($cipherdata), ['+' => '-', '/' => '_']);
+        };
+
+        $encrypted = encrypt($data, 'secret');
+        that(decrypt($encrypted, 'secret'))->isSame($data);              // password が同じなら復号できる
+        that(decrypt($encrypted, ['invalid', 'secret']))->isSame($data); // password は配列でもよい
+        that(decrypt($encrypted, 'invalid'))->isNull();                  // password が異なれば複合できない
+        that(decrypt($rewrite('tag', $encrypted), 'secret'))->isNull();  // tag が不正なら複合できない
+        that(decrypt($rewrite('iv', $encrypted), 'secret'))->isNull();   // iv が不正なら複合できない
+        that(decrypt('this is invalid=4', 'secret'))->isNull();          // data が不正なら複合できない
+        that(encrypt($data, 'secret'))->isNotSame($encrypted);           // gcm なので異なる暗号文が生成される
+    }
+
+    function test_encrypt_decrypt_invalid()
+    {
+        that(decrypt('', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt('=0', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt('=1', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt('v=1', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt('v3', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt('v4', 'secret'))->isNull();
+        that(decrypt('xxxxxxxxxxxxxxxxxxxx', 'secret', 'aes-128-ecb'))->isNull();
+        that(decrypt(base64_encode('xxxxxxxxxxxxxxxxxxxx') . '=1', 'secret', 'aes-128-ecb'))->isNull();
+    }
+
+    function test_encrypt_decrypt_regression()
+    {
+        $data = [
+            'user_id' => 12345,
+            'time'    => '20141224T123456',
+            'data'    => [
+                'a' => 'あああ',
+                'c' => 'ううう',
+            ],
+        ];
+
         $encrypted = encrypt($data, 'secret', 'aes-128-ecb');                 // IV なし, TAG なし
         that(decrypt($encrypted, 'secret'))->isSame($data);                   // password が同じなら復号できる
         that(decrypt($encrypted, ['invalid', 'secret']))->isSame($data);      // password は配列でもよい
@@ -259,29 +303,6 @@ class varTest extends AbstractTestCase
         that(encrypt($data, 'secret', 'aes-256-ccm'))->isNotSame($encrypted); // ccm なので異なる暗号文が生成される
 
         that(self::resolveFunction('encrypt'))('dummy', 'pass', 'unknown')->wasThrown('undefined cipher algorithm');
-    }
-
-    function test_encrypt_decrypt_invalid()
-    {
-        that(decrypt('', 'secret', 'aes-128-ecb'))->isNull();
-        that(decrypt('=0', 'secret', 'aes-128-ecb'))->isNull();
-        that(decrypt('=1', 'secret', 'aes-128-ecb'))->isNull();
-        that(decrypt('v=1', 'secret', 'aes-128-ecb'))->isNull();
-        that(decrypt('v3', 'secret', 'aes-128-ecb'))->isNull();
-        that(decrypt('xxxxxxxxxxxxxxxxxxxx', 'secret', 'aes-128-ecb'))->isNull();
-        that(decrypt(base64_encode('xxxxxxxxxxxxxxxxxxxx') . '=1', 'secret', 'aes-128-ecb'))->isNull();
-    }
-
-    function test_encrypt_decrypt_regression()
-    {
-        $data = [
-            'user_id' => 12345,
-            'time'    => '20141224T123456',
-            'data'    => [
-                'a' => 'あああ',
-                'c' => 'ううう',
-            ],
-        ];
 
         $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s";
         that(decrypt($v0, 'secret', 'aes-128-ecb'))->isSame($data);
@@ -298,6 +319,10 @@ class varTest extends AbstractTestCase
         $v2 = "YWVzLTEyOC1lY2I6uuz9p1tBXG3jFKV_y2PN_23s549iyppC5TsUeC4uOe5vdDNkot8DjuXL9kWzmDUlmPH4k0VP05nlHazteEQndsClvXVt_LztaTFno0Y0tg8=2";
         that(decrypt($v2, 'secret', 'aes-128-ecb'))->isSame($data);
         that(decrypt($v2, 'invalid', 'aes-128-ecb'))->isNull();
+
+        $v3 = "KkEchcWXN6ckkhx0xtooSRTttT4A9phKRAICrW9BoGgDb8H3H4pP1c9X57sOigLRrQDJ53soq3j9tvs-pwGtKZR-HK2WgD24VmB0jNVUxcKJbFpIogiNJ_a-U26tqjo6YWVzLTI1Ni1jY203";
+        that(decrypt($v3, 'secret', 'aes-128-ecb'))->isSame($data);
+        that(decrypt($v3, 'invalid', 'aes-128-ecb'))->isNull();
     }
 
     function test_flagval()
