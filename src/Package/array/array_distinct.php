@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/arrayize.php';
+require_once __DIR__ . '/../reflection/parameter_length.php';
 require_once __DIR__ . '/../var/arrayval.php';
 require_once __DIR__ . '/../var/varcmp.php';
 // @codeCoverageIgnoreEnd
@@ -18,6 +19,7 @@ require_once __DIR__ . '/../var/varcmp.php';
  *   - 数値キーは配列アクセス
  *   - 文字キーはメソッドコール（値は引数）
  * - もちろん（$a, $b を受け取る）クロージャも渡せる
+ * - 引数1つのクロージャを渡すとシュワルツ的動作になる（Example 参照）
  *
  * Example:
  * ```php
@@ -38,6 +40,8 @@ require_once __DIR__ . '/../var/varcmp.php';
  * that(array_distinct([$v1, $v2, $v3, $v4], ['count' => []]))->isSame([$v1, $v2]);
  * // 上記2つは混在できる（group キー + count メソッドで重複検出。端的に言えば "aaa+2", "bbb+3", "aaa+3", "bbb+3" で除去）
  * that(array_distinct([$v1, $v2, $v3, $v4], ['group', 'count' => []]))->isSame([$v1, $v2, 2 => $v3]);
+ * // 引数1つのクロージャ
+ * that(array_distinct([$v1, $v2, $v3, $v4], fn($ao) => $ao['group']))->isSame([$v1, $v2]);
  * ```
  *
  * @package ryunosuke\Functions\Package\array
@@ -79,6 +83,10 @@ function array_distinct($array, $comparator = null)
             }
             return 0;
         };
+    }
+    // 引数1つのコールバックはシュワルツ関数とみなす
+    elseif (is_callable($comparator) && parameter_length($comparator) === 1) {
+        return array_intersect_key($array, array_unique(array_map($comparator, $array)));
     }
 
     // 2重ループで探すよりは1度ソートしてしまったほうがマシ…だと思う（php の実装もそうだし）

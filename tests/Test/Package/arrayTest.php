@@ -857,6 +857,10 @@ class arrayTest extends AbstractTestCase
             12 => $r2,
             13 => $r3,
         ]);
+        that(array_distinct($rows, fn($row) => $row['group1']))->is([
+            11 => $r1,
+            12 => $r2,
+        ]);
 
         /** @noinspection PhpUnusedLocalVariableInspection */
         $objects = [
@@ -873,6 +877,10 @@ class arrayTest extends AbstractTestCase
             11 => $e1,
             12 => $e2,
             13 => $e3,
+        ]);
+        that(array_distinct($objects, fn($object) => $object->getMessage()))->is([
+            11 => $e1,
+            12 => $e2,
         ]);
     }
 
