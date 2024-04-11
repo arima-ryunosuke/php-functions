@@ -253,7 +253,7 @@ class Transporter
         if (!isset($cache)) {
             $cache = [];
             $fn = __DIR__ . '/Package/constants.php';
-            $tmpfile = sys_get_temp_dir() . '/tmpfunc/constants.php' . basename($fn);
+            $tmpfile = sys_get_temp_dir() . '/tmpfunc/constants-' . sha1($fn) . '.php';
             if ($nocache || !file_exists($tmpfile) || filemtime($fn) >= filemtime($tmpfile)) {
                 @mkdir(dirname($tmpfile), 0777, true);
                 $lines = file($fn);
