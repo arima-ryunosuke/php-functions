@@ -218,12 +218,13 @@ class Transporter
         $parts = explode("\\", $classname);
         $shortname = array_pop($parts);
         $namespace = implode("\\", $parts);
+        $formatter = "// @formatter";
         return <<<CONTENTS
         <?php
         # Don't touch this code. This is auto generated.
         namespace $namespace;
         
-        // @formatter:off
+        $formatter:off
         
         /**
          * @codeCoverageIgnore
