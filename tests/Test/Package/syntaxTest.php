@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\throw_if;
 use function ryunosuke\Functions\Package\throws;
 use function ryunosuke\Functions\Package\try_catch;
 use function ryunosuke\Functions\Package\try_catch_finally;
+use function ryunosuke\Functions\Package\try_close;
 use function ryunosuke\Functions\Package\try_finally;
 use function ryunosuke\Functions\Package\try_null;
 use function ryunosuke\Functions\Package\try_return;
@@ -189,6 +190,97 @@ class syntaxTest extends AbstractTestCase
         }
         // finally が仕事をしてディレクトリが消えているはず
         that($workingdir)->fileNotExists();
+    }
+
+    function test_try_close()
+    {
+        // 通常
+        that(try_close(function ($r1, $r2) {
+            that($r1)->isResource();
+            that($r2)->isResource();
+            return [$r1, $r2];
+        }, $r1 = tmpfile(), $r2 = tmpfile()))->isSame([$r1, $r2]);
+        that(gettype($r1))->contains('closed');
+        that(gettype($r2))->contains('closed');
+
+        // リソースだけど stream じゃない（これは php8.0 で実行するとコケる）
+        that(try_close(function ($r) {
+            return $r;
+        }, $r = curl_init()))->isSame($r);
+        that(gettype($r1))->contains('closed');
+        that(gettype($r2))->contains('closed');
+
+        // 配列
+        $actual = try_close(function ($r1, $r2, $r3, $r4) {
+            that($r1)->isResource();
+            that($r2)->isResource();
+            that($r3)->isResource();
+            that($r4)->isResource();
+            return [
+                basename(stream_get_meta_data($r1)['uri']),
+                basename(stream_get_meta_data($r2)['uri']),
+                basename(stream_get_meta_data($r3)['uri']),
+                basename(stream_get_meta_data($r4)['uri']),
+            ];
+        },
+            [tempnam(sys_get_temp_dir(), 't1'), 'w'],
+            [
+                tempnam(sys_get_temp_dir(), 't2') => 'w',
+                tempnam(sys_get_temp_dir(), 't3') => 'w',
+            ],
+            [tempnam(sys_get_temp_dir(), 't4'), 'w'],
+        );
+        that($actual[0])->stringStartsWith('t1');
+        that($actual[1])->stringStartsWith('t2');
+        that($actual[2])->stringStartsWith('t3');
+        that($actual[3])->stringStartsWith('t4');
+
+        // 例外
+        that(self::resolveFunction('try_close'))(function ($r1, $r2) {
+            throw new \RuntimeException('failed try');
+        }, $r1 = tmpfile(), $r2 = tmpfile())->wasThrown('failed try');
+        that(gettype($r1))->contains('closed');
+        that(gettype($r2))->contains('closed');
+
+        $r = new class() {
+            static $closed;
+            public $name;
+
+            function clone($name)
+            {
+                self::$closed = [];
+                $that = clone $this;
+                $that->name = $name;
+                return $that;
+            }
+
+            function free()
+            {
+                self::$closed[] = $this->name;
+                if ($this->name === 'r3') {
+                    throw new \RuntimeException('failed close');
+                }
+            }
+
+            protected function close()
+            {
+                throw new \DomainException('never called');
+            }
+        };
+
+        // 逆順で close
+        that(try_close(function ($r1, $r2) {
+            that($r1)->isObject();
+            that($r2)->isObject();
+            return [$r1, $r2];
+        }, $r1 = $r->clone('r1'), $r2 = $r->clone('r2')))->isSame([$r1, $r2]);
+        that($r::$closed)->isSame(['r2', 'r1']);
+
+        // close で例外
+        that(self::resolveFunction('try_close'))(function ($r1, $r2) {
+            throw new \RuntimeException('failed try');
+        }, $r->clone('r3'), $r->clone('r4'))->wasThrown('failed');
+        that($r::$closed)->isSame(['r4', 'r3']);
     }
 
     function test_try_finally()
