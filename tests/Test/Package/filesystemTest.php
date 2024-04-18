@@ -36,6 +36,7 @@ use function ryunosuke\Functions\Package\path_relative;
 use function ryunosuke\Functions\Package\path_resolve;
 use function ryunosuke\Functions\Package\reflect_callable;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\rsync;
 use function ryunosuke\Functions\Package\strmode;
 use function ryunosuke\Functions\Package\strmode2oct;
 use function ryunosuke\Functions\Package\tmpname;
@@ -1600,6 +1601,214 @@ class filesystemTest extends AbstractTestCase
         file_set_contents("$dir/a.txt", '');
         that(rm_rf($dir))->isTrue();
         that($dir)->fileNotExists();
+    }
+
+    function test_rsync()
+    {
+        $src = self::$TMPDIR . '/rsync1';
+        $dst = self::$TMPDIR . '/rsync2';
+        rm_rf($src);
+        rm_rf($dst);
+
+        srand(1);
+        $tree = [
+            'file1'      => 'file1',
+            'file2'      => 'file2',
+            'file3'      => 'file3',
+            'directory1' => [
+                'hoge'            => 'hoge',
+                'fuga'            => 'fuga',
+                'piyo'            => 'piyo',
+                'nest-directory1' => [
+                    'hoge'            => 'hoge',
+                    'nest-directory2' => [
+                        'fuga'            => fn() => rand(),
+                        'nest-directory3' => [],
+                    ],
+                ],
+            ],
+            'directory2' => [
+                'hoge' => 'hoge',
+                'fuga' => fn() => rand(),
+            ],
+        ];
+        file_set_tree([
+            $src => $tree + ['src' => 'src'],
+            $dst => $tree + ['dst' => 'dst'],
+        ]);
+        touch("$dst/directory2/hoge", time() + 2);
+
+        // verbose:0
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'verbose' => 0,
+            'diff'    => null,
+        ]), false))->is([]);
+
+        // verbose:1
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'verbose' => 1,
+            'diff'    => null,
+        ]), false))->is([
+            "directory1/nest-directory1/nest-directory2/fuga",
+            "directory2/fuga",
+            "directory2/hoge",
+            "dst",
+            "src",
+        ]);
+
+        // verbose:2
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'verbose' => 2,
+            'diff'    => null,
+        ]), false))->is([
+            "*directory1/nest-directory1/nest-directory2/fuga",
+            "*directory2/fuga",
+            "*directory2/hoge",
+            "!-dst",
+            "+src",
+        ]);
+
+        // verbose:3, human-readable
+        that(implode("\n", iterator_to_array(rsync($src, $dst, [
+            'dry-run'        => true,
+            'ansi'           => false,
+            'verbose'        => 3,
+            'human-readable' => true,
+        ]), false)))->containsAll(['-rw']);
+        that(implode("\n", iterator_to_array(rsync($src, $dst, [
+            'dry-run'        => true,
+            'ansi'           => false,
+            'verbose'        => 3,
+            'human-readable' => false,
+        ]), false)))->containsAll(['01006']);
+
+        // exclude
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'exclude' => ['*directory2/**'],
+            'verbose' => 2,
+            'diff'    => null,
+        ]), false))->containsAll([
+            "!*directory1/nest-directory1/nest-directory2/fuga",
+            "!*directory2/fuga",
+            "!*directory2/hoge",
+        ]);
+
+        // exclude, include
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'exclude' => ['*directory2/**'],
+            'include' => ['fuga'],
+            'verbose' => 2,
+            'diff'    => null,
+        ]), false))->containsAll([
+            "*directory1/nest-directory1/nest-directory2/fuga",
+            "*directory2/fuga",
+            "!*directory2/hoge",
+        ]);
+
+        // regex
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'exclude' => ['~.*directory2/.*'],
+            'include' => ['/directory1/**'],
+            'verbose' => 2,
+            'diff'    => null,
+        ]), false))->containsAll([
+            "*directory1/nest-directory1/nest-directory2/fuga",
+            "!*directory2/fuga",
+            "!*directory2/hoge",
+        ]);
+
+        // delete:false
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'delete'  => false,
+            'verbose' => 2,
+        ]), false))->containsAll([
+            "!-dst",
+        ]);
+        // delete:true
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'delete'  => true,
+            'verbose' => 2,
+        ]), false))->containsAll([
+            "-dst",
+        ]);
+
+        // update:false
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'update'  => false,
+            'verbose' => 2,
+        ]), false))->containsAll([
+            "*directory2/hoge",
+        ]);
+        // update:true
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run' => true,
+            'ansi'    => false,
+            'update'  => true,
+            'verbose' => 2,
+        ]), false))->containsAll([
+            "!*directory2/hoge",
+        ]);
+
+        // delete-excluded:true
+        that(iterator_to_array(rsync($src, $dst, [
+            'dry-run'         => true,
+            'ansi'            => false,
+            'exclude'         => ['*directory2/**'],
+            'delete-excluded' => true,
+            'verbose'         => 2,
+        ]), false))->containsAll([
+            "-directory1/nest-directory1/nest-directory2/fuga",
+            "-directory2/fuga",
+        ]);
+
+        // dry-run:false
+        $rsync = rsync($src, $dst, [
+            'dry-run'         => false,
+            'ansi'            => false,
+            'delete'          => true,
+            'delete-excluded' => true,
+            'verbose'         => 2,
+        ]);
+        iterator_to_array($rsync);
+        that($rsync->getReturn())->containsAll(['create: 1', 'delete: 1']);
+        that(file_list($dst, ['relative' => true]))->is(file_list($src, ['relative' => true]), null, true);
+
+        // dry-run:false(not exists)
+        rm_rf($dst);
+        $rsync = rsync($src, $dst, [
+            'dry-run'         => false,
+            'ansi'            => false,
+            'delete'          => true,
+            'delete-excluded' => true,
+            'verbose'         => 2,
+        ]);
+        iterator_to_array($rsync);
+        that($rsync->getReturn())->containsAll(['mkdir: 6', 'create: 11', 'update: 0', 'delete: 0']);
+        that(file_list($dst, ['relative' => true]))->is(file_list($src, ['relative' => true]), null, true);
+
+        // exception
+        $rsync = rsync(self::$TMPDIR . '/rsync-notfound', $dst);
+        that(fn() => $rsync->next())()->wasThrown('rsync-notfound is not directory');
+        $rsync = rsync($src, "$dst/file1");
+        that(fn() => $rsync->next())()->wasThrown('file1 is not directory');
     }
 
     function test_strmode()
