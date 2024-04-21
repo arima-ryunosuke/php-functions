@@ -192,27 +192,29 @@ function http_request($options = [], &$response_header = [], &$info = [])
     if (isset($filekey)) {
         if (file_exists($filekey)) {
             $fp = fopen($filekey, 'r');
-            try {
-                $info = json_decode(fgets($fp), true);
-                if (stripos($info['cache_control'] ?? '', 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'] ?? '', $matches)) {
-                    clearstatcache(true, $filekey);
-                    if (time() - filemtime($filekey) < $matches[1]) {
-                        $info['no_request'] = true;
-                        $response = stream_get_contents($fp);
-                        [, $response_header, $body] = $response_parse($response, $info);
-                        return $body;
+            if ($fp !== false) {
+                try {
+                    $info = json_decode(fgets($fp), true);
+                    if (stripos($info['cache_control'] ?? '', 'no-cache') === false && preg_match('#max-age=(\\d+)#i', $info['cache_control'] ?? '', $matches)) {
+                        clearstatcache(true, $filekey);
+                        if (time() - filemtime($filekey) < $matches[1]) {
+                            $info['no_request'] = true;
+                            $response = stream_get_contents($fp);
+                            [, $response_header, $body] = $response_parse($response, $info);
+                            return $body;
+                        }
+                    }
+
+                    if ($info['last_modified']) {
+                        $options[CURLOPT_HTTPHEADER]['if-modified-since'] = $info['last_modified'];
+                    }
+                    if ($info['etag']) {
+                        $options[CURLOPT_HTTPHEADER]['if-none-match'] = $info['etag'];
                     }
                 }
-
-                if ($info['last_modified']) {
-                    $options[CURLOPT_HTTPHEADER]['if-modified-since'] = $info['last_modified'];
+                finally {
+                    fclose($fp);
                 }
-                if ($info['etag']) {
-                    $options[CURLOPT_HTTPHEADER]['if-none-match'] = $info['etag'];
-                }
-            }
-            finally {
-                fclose($fp);
             }
         }
     }

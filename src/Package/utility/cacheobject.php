@@ -99,6 +99,9 @@ function cacheobject($directory, $clean_probability = 0)
         private function _getMetadata(string $filename): ?array
         {
             $fp = fopen($filename, "r");
+            if ($fp === false) {
+                return null; // @codeCoverageIgnore
+            }
             try {
                 $first = fgets($fp);
                 $meta = @json_decode(substr($first, strpos($first, '#') + 1), true);
