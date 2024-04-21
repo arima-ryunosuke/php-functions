@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\normal_rand;
 use function ryunosuke\Functions\Package\probability;
+use function ryunosuke\Functions\Package\probability_array;
 use function ryunosuke\Functions\Package\random_at;
 use function ryunosuke\Functions\Package\random_float;
 use function ryunosuke\Functions\Package\random_range;
@@ -61,6 +62,86 @@ class randomTest extends AbstractTestCase
         // 負数は NG
         that(self::resolveFunction('probability'))(-1, 1)->wasThrown('probability must be positive number');
         that(self::resolveFunction('probability'))(1, -1)->wasThrown('divisor must be positive number');
+    }
+
+    function test_probability_array()
+    {
+        $COUNT = 10000;
+        mt_srand(123); // 時々変えた方がいい
+
+        // 指定パーセントに収束する
+        $result = [];
+        foreach (range(1, $COUNT) as $n) {
+            $result[$n] = probability_array([
+                '10%' => 10,
+                '20%' => 20,
+                '30%' => 30,
+                '40%' => 40,
+            ]);
+        }
+        $result = array_count_values(array_map('strval', $result));
+        that($result['10%'])->closesTo($COUNT * 0.1 - 100, 200);
+        that($result['20%'])->closesTo($COUNT * 0.2 - 100, 200);
+        that($result['30%'])->closesTo($COUNT * 0.3 - 100, 200);
+        that($result['40%'])->closesTo($COUNT * 0.4 - 100, 200);
+
+        // 順番には依存しないし、足りない場合は null で埋められる
+        $result = [];
+        foreach (range(1, $COUNT) as $n) {
+            $result[$n] = probability_array([
+                '30%' => 30,
+                '10%' => 10,
+                '20%' => 20,
+            ]);
+        }
+        $result = array_count_values(array_map('strval', $result));
+        that($result['10%'])->closesTo($COUNT * 0.1 - 100, 200);
+        that($result['20%'])->closesTo($COUNT * 0.2 - 100, 200);
+        that($result['30%'])->closesTo($COUNT * 0.3 - 100, 200);
+        that($result[''])->closesTo($COUNT * 0.4 - 100, 200);
+
+        // パーミル（0.1%）
+        $result = [];
+        foreach (range(1, $COUNT) as $n) {
+            $result[$n] = probability_array([
+                '999' => 999,
+                '1'   => 1,
+            ], 1000);
+        }
+        $result = array_count_values(array_map('strval', $result));
+        that($result['1'])->closesTo($COUNT * 0.001 - 10, 20);
+
+        // 0 は敢えて許容している
+        $result = [];
+        foreach (range(1, $COUNT) as $n) {
+            $result[$n] = probability_array([
+                '0'   => 0,
+                '100' => 100,
+            ]);
+        }
+        $result = array_count_values(array_map('strval', $result));
+        that($result['100'])->is($COUNT);
+        that($result)->notHasKey('0');
+
+        // 重み付け
+        $result = [];
+        foreach (range(1, $COUNT) as $n) {
+            $result[$n] = probability_array([
+                'a' => 1,
+                'b' => 2,
+                'c' => 3,
+            ], null);
+        }
+        $result = array_count_values(array_map('strval', $result));
+        that($result['a'])->closesTo($COUNT * (1 / 6 * 1) - 100, 200);
+        that($result['b'])->closesTo($COUNT * (1 / 6 * 2) - 100, 200);
+        that($result['c'])->closesTo($COUNT * (1 / 6 * 3) - 100, 200);
+        that($result)->notHasKey('');
+
+        // 例外系
+        that(self::resolveFunction('probability_array'))([])->wasThrown('is empty');
+        that(self::resolveFunction('probability_array'))(['110%' => 110])->wasThrown('exceeds 100');
+        that(self::resolveFunction('probability_array'))(['-1%' => 0], 0)->wasThrown('divisor <= 0');
     }
 
     function test_random_at()
