@@ -291,7 +291,7 @@ class Transporter
                 $contents = file_get_contents($fn);
                 $docstart = strpos($contents, "/**\n");
                 $codeblock = substr($contents, $docstart);
-                $funcstart = strpos($codeblock, " */\nfunction $name(", $docstart) + 4;
+                $funcstart = strpos($codeblock, " */\nfunction $name(") + 4;
                 $cache[$name] = [
                     'filename'  => $fn,
                     'directory' => basename(dirname($fn)),
