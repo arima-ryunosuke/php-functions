@@ -134,6 +134,7 @@ function ip_info($ipaddr, $options = [])
             }
 
             $cachefile = $files[$rir];
+            @mkdir(dirname($cachefile));
             file_put_contents($cachefile, "<?php\nreturn " . var_export($cidrs, true) . ";", LOCK_EX);
             //file_put_contents($cachefile, php_strip_whitespace($cachefile));
             opcache_invalidate($cachefile, true);

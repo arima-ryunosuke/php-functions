@@ -175,7 +175,7 @@ class errorfuncTest extends AbstractTestCase
                 $this->logs = &$logs;
             }
 
-            public function log($level, $message, array $context = [])
+            public function log($level, $message, array $context = []): void
             {
                 $this->logs[] = $context;
             }

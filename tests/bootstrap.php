@@ -31,6 +31,8 @@ if (false) {
     define('DIFF', null);
 }
 
+$GLOBALS['exception'] = new \Exception();
+
 if (DIRECTORY_SEPARATOR === '\\') {
     setlocale(LC_CTYPE, 'C');
 }

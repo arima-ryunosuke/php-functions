@@ -1298,7 +1298,7 @@ class varTest extends AbstractTestCase
 
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
-        $closure = fn() => $recur;
+        $closure = (fn() => $recur)->bindTo(new class ( ) { });
         $sclosure = static fn() => $recur;
         $value = [
             stdclass([
@@ -1321,7 +1321,7 @@ class varTest extends AbstractTestCase
             ],
             'R'     => STDOUT,
             'empty' => [],
-            'ex'    => new \Exception(),
+            'ex'    => $GLOBALS['exception'],
         ];
         that(var_pretty($value, [
             'context'      => 'plain',
@@ -1336,7 +1336,7 @@ class varTest extends AbstractTestCase
             ->stringContains("  E: Concrete#")
             ->stringContains("    info: \"this is __debugInfo\"")
             ->stringContains("  A: [\"str\", 1, 2, 3, true, null]")
-            ->stringContains("ryunosuke\\Test\\Package\\varTest#")
+            ->stringContains("class@anonymous")
             ->stringContains("    recur: {")
             ->stringContains("    Closure#")
             ->stringContains("    Generator#")
