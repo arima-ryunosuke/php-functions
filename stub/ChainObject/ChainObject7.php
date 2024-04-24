@@ -323,16 +323,6 @@ trait ChainObject7
     public function map_key(iterable $array, callable $callback): self { }
     public function map_key(callable $callback): self { }
 
-    /** @see array_nmap() */
-    public self $array_nmap;
-    public function array_nmap(iterable $array, callable $callback, $n, ...$variadic): self { }
-    public function array_nmap(callable $callback, $n, ...$variadic): self { }
-
-    /** @see array_nmap() */
-    public self $nmap;
-    public function nmap(iterable $array, callable $callback, $n, ...$variadic): self { }
-    public function nmap(callable $callback, $n, ...$variadic): self { }
-
     /** @see class_namespace() */
     public self $class_namespace;
     public function class_namespace($class): self { }
@@ -343,11 +333,6 @@ trait ChainObject7
     public function class_shorten($class): self { }
     public function class_shorten(): self { }
 
-    /** @see get_object_properties() */
-    public self $get_object_properties;
-    public function get_object_properties($object, &$privates = []): self { }
-    public function get_object_properties(&$privates = []): self { }
-
     /** @see paml_export() */
     public self $paml_export;
     public function paml_export(iterable $pamlarray, $options = []): self { }
@@ -357,6 +342,11 @@ trait ChainObject7
     public self $date_validate;
     public function date_validate($datetime_string, $format = "Y/m/d H:i:s", $overhour = 0): self { }
     public function date_validate($format = "Y/m/d H:i:s", $overhour = 0): self { }
+
+    /** @see set_error_exception_handler() */
+    public self $set_error_exception_handler;
+    public function set_error_exception_handler($error_levels = E_ALL, $handle_atmark_error = false): self { }
+    public function set_error_exception_handler($handle_atmark_error = false): self { }
 
     /** @see process_async() */
     public self $process_async;
@@ -372,16 +362,6 @@ trait ChainObject7
     public self $rsync;
     public function rsync($src, $dst, $options = []): self { }
     public function rsync($dst, $options = []): self { }
-
-    /** @see abind() */
-    public self $abind;
-    public function abind(callable $callable, $default_args): self { }
-    public function abind($default_args): self { }
-
-    /** @see delegate() */
-    public self $delegate;
-    public function delegate($invoker, callable $callable, $arity = null): self { }
-    public function delegate(callable $callable, $arity = null): self { }
 
     /** @see func_method() */
     public self $func_method;
@@ -403,15 +383,10 @@ trait ChainObject7
     public function minimum(...$variadic): self { }
     public function minimum(): self { }
 
-    /** @see highlight_php() */
-    public self $highlight_php;
-    public function highlight_php($phpcode, $options = []): self { }
-    public function highlight_php($options = []): self { }
-
-    /** @see parse_php() */
-    public self $parse_php;
-    public function parse_php($phpcode, $option = []): self { }
-    public function parse_php($option = []): self { }
+    /** @see php_strip() */
+    public self $php_strip;
+    public function php_strip($phtml, $option = [], &$mapping = []): self { }
+    public function php_strip($option = [], &$mapping = []): self { }
 
     /** @see http_post() */
     public self $http_post;
@@ -443,11 +418,6 @@ trait ChainObject7
     public function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
     public function strpos_quoted($needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
 
-    /** @see throw_if() */
-    public self $throw_if;
-    public function throw_if($flag, $ex, ...$ex_args): self { }
-    public function throw_if($ex, ...$ex_args): self { }
-
     /** @see benchmark() */
     public self $benchmark;
     public function benchmark($suite, $args = [], $millisec = 1000, $output = true): self { }
@@ -465,7 +435,7 @@ trait ChainObject7
 
     /** @see var_type() */
     public self $var_type;
-    public function var_type($var, $valid_name = false): self { }
-    public function var_type($valid_name = false): self { }
+    public function var_type($var): self { }
+    public function var_type(): self { }
 
 }

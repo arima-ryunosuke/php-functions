@@ -20,7 +20,6 @@ class ReflectTypes
     public function __toString() { }
     public function getIterator() { }
     public function offsetExists($offset) { }
-    /** @noinspection PhpLanguageLevelInspection */
     public function offsetGet($offset) { }
     public function offsetSet($offset, $value) { }
     public function offsetUnset($offset) { }

@@ -323,36 +323,6 @@ trait ChainObject2
     public function depth(iterable $array, $max_depth = null): self { }
     public function depth($max_depth = null): self { }
 
-    /** @see array_filter_key() */
-    public self $array_filter_key;
-    public function array_filter_key(iterable $array, callable $callback): self { }
-    public function array_filter_key(callable $callback): self { }
-
-    /** @see array_filter_key() */
-    public self $filter_key;
-    public function filter_key(iterable $array, callable $callback): self { }
-    public function filter_key(callable $callback): self { }
-
-    /** @see array_kmap() */
-    public self $array_kmap;
-    public function array_kmap(iterable $array, callable $callback): self { }
-    public function array_kmap(callable $callback): self { }
-
-    /** @see array_kmap() */
-    public self $kmap;
-    public function kmap(iterable $array, callable $callback): self { }
-    public function kmap(callable $callback): self { }
-
-    /** @see array_put() */
-    public self $array_put;
-    public function array_put(iterable &$array, $value, $key = null, $condition = null): self { }
-    public function array_put($value, $key = null, $condition = null): self { }
-
-    /** @see array_put() */
-    public self $put;
-    public function put(iterable &$array, $value, $key = null, $condition = null): self { }
-    public function put($value, $key = null, $condition = null): self { }
-
     /** @see array_shuffle() */
     public self $array_shuffle;
     public function array_shuffle(iterable $array): self { }
@@ -383,11 +353,6 @@ trait ChainObject2
     public function first_value(iterable $array, $default = null): self { }
     public function first_value($default = null): self { }
 
-    /** @see detect_namespace() */
-    public self $detect_namespace;
-    public function detect_namespace($location): self { }
-    public function detect_namespace(): self { }
-
     /** @see html_attr() */
     public self $html_attr;
     public function html_attr(iterable $array, $options = []): self { }
@@ -407,11 +372,6 @@ trait ChainObject2
     public self $process_closure;
     public function process_closure($closure, $args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null): self { }
     public function process_closure($args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null): self { }
-
-    /** @see path_info() */
-    public self $path_info;
-    public function path_info($path): self { }
-    public function path_info(): self { }
 
     /** @see path_resolve() */
     public self $path_resolve;
@@ -438,15 +398,15 @@ trait ChainObject2
     public function func_user_func_array(callable $callback): self { }
     public function func_user_func_array(): self { }
 
+    /** @see php_highlight() */
+    public self $php_highlight;
+    public function php_highlight($phpcode, $options = []): self { }
+    public function php_highlight($options = []): self { }
+
     /** @see php_opcode() */
     public self $php_opcode;
     public function php_opcode($phpcode, $level = 131072): self { }
     public function php_opcode($level = 131072): self { }
-
-    /** @see resolve_symbol() */
-    public self $resolve_symbol;
-    public function resolve_symbol(string $shortname, $nsfiles, $targets = ["const", "function", "alias"]): self { }
-    public function resolve_symbol($nsfiles, $targets = ["const", "function", "alias"]): self { }
 
     /** @see http_delete() */
     public self $http_delete;
@@ -457,6 +417,11 @@ trait ChainObject2
     public self $ob_include;
     public function ob_include($include_file, iterable $array = []): self { }
     public function ob_include(iterable $array = []): self { }
+
+    /** @see random_normal() */
+    public self $random_normal;
+    public function random_normal($average = 0.0, $std_deviation = 1.0): self { }
+    public function random_normal($std_deviation = 1.0): self { }
 
     /** @see parameter_wiring() */
     public self $parameter_wiring;
@@ -522,11 +487,6 @@ trait ChainObject2
     public self $blank_if;
     public function blank_if($var, $default = null): self { }
     public function blank_if($default = null): self { }
-
-    /** @see throws() */
-    public self $throws;
-    public function throws($ex): self { }
-    public function throws(): self { }
 
     /** @see try_null() */
     public self $try_null;

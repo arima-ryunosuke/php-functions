@@ -258,16 +258,6 @@ trait ChainObject4
     public function flatten(iterable $array, $delimiter = null): self { }
     public function flatten($delimiter = null): self { }
 
-    /** @see array_lmap() */
-    public self $array_lmap;
-    public function array_lmap(iterable $array, callable $callback, ...$variadic): self { }
-    public function array_lmap(callable $callback, ...$variadic): self { }
-
-    /** @see array_lmap() */
-    public self $lmap;
-    public function lmap(iterable $array, callable $callback, ...$variadic): self { }
-    public function lmap(callable $callback, ...$variadic): self { }
-
     /** @see array_unset() */
     public self $array_unset;
     public function array_unset(iterable &$array, $key, $default = null): self { }
@@ -308,16 +298,6 @@ trait ChainObject4
     public function auto_loader($startdir = null): self { }
     public function auto_loader(): self { }
 
-    /** @see get_class_constants() */
-    public self $get_class_constants;
-    public function get_class_constants($class, $filter = null): self { }
-    public function get_class_constants($filter = null): self { }
-
-    /** @see stdclass() */
-    public self $stdclass;
-    public function stdclass(iterable $fields = []): self { }
-    public function stdclass(): self { }
-
     /** @see ini_import() */
     public self $ini_import;
     public function ini_import($inistring, $options = []): self { }
@@ -348,11 +328,6 @@ trait ChainObject4
     public function func_wiring(callable $callable, $dependency): self { }
     public function func_wiring($dependency): self { }
 
-    /** @see not_func() */
-    public self $not_func;
-    public function not_func(callable $callable): self { }
-    public function not_func(): self { }
-
     /** @see getenvs() */
     public self $getenvs;
     public function getenvs($env_vars): self { }
@@ -367,11 +342,6 @@ trait ChainObject4
     public self $iterator_join;
     public function iterator_join(iterable $iterables, $preserve_keys = true): self { }
     public function iterator_join($preserve_keys = true): self { }
-
-    /** @see strip_php() */
-    public self $strip_php;
-    public function strip_php($phtml, $option = [], &$mapping = []): self { }
-    public function strip_php($option = [], &$mapping = []): self { }
 
     /** @see probability() */
     public self $probability;
@@ -392,11 +362,6 @@ trait ChainObject4
     public self $reflect_callable;
     public function reflect_callable(callable $callable): self { }
     public function reflect_callable(): self { }
-
-    /** @see memory_path() */
-    public self $memory_path;
-    public function memory_path($path = ""): self { }
-    public function memory_path(): self { }
 
     /** @see mb_monospace() */
     public self $mb_monospace;
@@ -442,11 +407,6 @@ trait ChainObject4
     public self $strpos_array;
     public function strpos_array($haystack, $needles, $offset = 0): self { }
     public function strpos_array($needles, $offset = 0): self { }
-
-    /** @see timer() */
-    public self $timer;
-    public function timer(callable $callable, $count = 1): self { }
-    public function timer($count = 1): self { }
 
     /** @see decrypt() */
     public self $decrypt;

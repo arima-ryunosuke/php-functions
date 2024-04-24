@@ -308,11 +308,6 @@ trait ChainObject8
     public function csv_import($csvstring, $options = []): self { }
     public function csv_import($options = []): self { }
 
-    /** @see htmltag() */
-    public self $htmltag;
-    public function htmltag($selector): self { }
-    public function htmltag(): self { }
-
     /** @see date_fromto() */
     public self $date_fromto;
     public function date_fromto($format, $datetimestring): self { }
@@ -338,11 +333,6 @@ trait ChainObject8
     public function file_set_tree($contents_tree, $umask = null): self { }
     public function file_set_tree($umask = null): self { }
 
-    /** @see rbind() */
-    public self $rbind;
-    public function rbind(callable $callable, ...$variadic): self { }
-    public function rbind(...$variadic): self { }
-
     /** @see evaluate() */
     public self $evaluate;
     public function evaluate($phpcode, $contextvars = [], $cachesize = 256): self { }
@@ -363,11 +353,6 @@ trait ChainObject8
     public function glob2regex($pattern, $flags = 0): self { }
     public function glob2regex($flags = 0): self { }
 
-    /** @see normal_rand() */
-    public self $normal_rand;
-    public function normal_rand($average = 0.0, $std_deviation = 1.0): self { }
-    public function normal_rand($std_deviation = 1.0): self { }
-
     /** @see unique_string() */
     public self $unique_string;
     public function unique_string($source, $initial = null, $charlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"): self { }
@@ -377,6 +362,11 @@ trait ChainObject8
     public self $callable_code;
     public function callable_code(callable $callable): self { }
     public function callable_code(): self { }
+
+    /** @see memory_stream() */
+    public self $memory_stream;
+    public function memory_stream($path = ""): self { }
+    public function memory_stream(): self { }
 
     /** @see profiler() */
     public self $profiler;
@@ -417,6 +407,11 @@ trait ChainObject8
     public self $dataurl_encode;
     public function dataurl_encode($data, $metadata = []): self { }
     public function dataurl_encode($metadata = []): self { }
+
+    /** @see uri_parse() */
+    public self $uri_parse;
+    public function uri_parse($uri, $default = []): self { }
+    public function uri_parse($default = []): self { }
 
     /** @see cacheobject() */
     public self $cacheobject;

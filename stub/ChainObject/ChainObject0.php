@@ -315,13 +315,13 @@ trait ChainObject0
 
     /** @see array_set() */
     public self $array_set;
-    public function array_set(iterable &$array, $value, $key = null, $require_return = true): self { }
-    public function array_set($value, $key = null, $require_return = true): self { }
+    public function array_set(iterable &$array, $value, $key = null, $condition = null): self { }
+    public function array_set($value, $key = null, $condition = null): self { }
 
     /** @see array_set() */
     public self $set;
-    public function set(iterable &$array, $value, $key = null, $require_return = true): self { }
-    public function set($value, $key = null, $require_return = true): self { }
+    public function set(iterable &$array, $value, $key = null, $condition = null): self { }
+    public function set($value, $key = null, $condition = null): self { }
 
     /** @see array_uncolumns() */
     public self $array_uncolumns;
@@ -393,6 +393,11 @@ trait ChainObject0
     public function path_parse($path): self { }
     public function path_parse(): self { }
 
+    /** @see func_eval() */
+    public self $func_eval;
+    public function func_eval($expression, ...$variadic): self { }
+    public function func_eval(...$variadic): self { }
+
     /** @see func_new() */
     public self $func_new;
     public function func_new($classname, ...$defaultargs): self { }
@@ -407,11 +412,6 @@ trait ChainObject0
     public self $base_convert_array;
     public function base_convert_array(iterable $array, $from_base, $to_base): self { }
     public function base_convert_array($from_base, $to_base): self { }
-
-    /** @see parse_annotation() */
-    public self $parse_annotation;
-    public function parse_annotation($annotation, $schema = [], $nsfiles = []): self { }
-    public function parse_annotation($schema = [], $nsfiles = []): self { }
 
     /** @see http_request() */
     public self $http_request;
@@ -467,6 +467,11 @@ trait ChainObject0
     public self $base62_decode;
     public function base62_decode($string): self { }
     public function base62_decode(): self { }
+
+    /** @see query_parse() */
+    public self $query_parse;
+    public function query_parse($query, $arg_separator = null, $encoding_type = null): self { }
+    public function query_parse($arg_separator = null, $encoding_type = null): self { }
 
     /** @see cache_fetch() */
     public self $cache_fetch;

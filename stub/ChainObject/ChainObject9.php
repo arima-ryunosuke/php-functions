@@ -433,6 +433,11 @@ trait ChainObject9
     public function last_key(iterable $array, $default = null): self { }
     public function last_key($default = null): self { }
 
+    /** @see class_constants() */
+    public self $class_constants;
+    public function class_constants($class, $filter = null): self { }
+    public function class_constants($filter = null): self { }
+
     /** @see class_loader() */
     public self $class_loader;
     public function class_loader($startdir = null): self { }
@@ -493,6 +498,11 @@ trait ChainObject9
     public function path_is_absolute($path): self { }
     public function path_is_absolute(): self { }
 
+    /** @see func_operator() */
+    public self $func_operator;
+    public function func_operator($operator, ...$operands): self { }
+    public function func_operator(...$operands): self { }
+
     /** @see function_alias() */
     public self $function_alias;
     public function function_alias($original, $alias): self { }
@@ -527,6 +537,21 @@ trait ChainObject9
     public self $console_log;
     public function console_log(...$values): self { }
     public function console_log(): self { }
+
+    /** @see namespace_resolve() */
+    public self $namespace_resolve;
+    public function namespace_resolve(string $shortname, $nsfiles, $targets = ["const", "function", "alias"]): self { }
+    public function namespace_resolve($nsfiles, $targets = ["const", "function", "alias"]): self { }
+
+    /** @see php_indent() */
+    public self $php_indent;
+    public function php_indent($phpcode, $options = []): self { }
+    public function php_indent($options = []): self { }
+
+    /** @see php_parse() */
+    public self $php_parse;
+    public function php_parse($phpcode, $option = []): self { }
+    public function php_parse($option = []): self { }
 
     /** @see getipaddress() */
     public self $getipaddress;
@@ -588,20 +613,10 @@ trait ChainObject9
     public function patch($string, $patch, $options = []): self { }
     public function patch($patch, $options = []): self { }
 
-    /** @see call_if() */
-    public self $call_if;
-    public function call_if($condition, callable $callable, ...$arguments): self { }
-    public function call_if(callable $callable, ...$arguments): self { }
-
     /** @see try_catch() */
     public self $try_catch;
     public function try_catch($try, $catch = null, ...$variadic): self { }
     public function try_catch($catch = null, ...$variadic): self { }
-
-    /** @see build_uri() */
-    public self $build_uri;
-    public function build_uri($parts, $options = []): self { }
-    public function build_uri($options = []): self { }
 
     /** @see is_resourcable() */
     public self $is_resourcable;

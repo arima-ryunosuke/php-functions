@@ -413,16 +413,6 @@ trait ChainObject6
     public function map_filter(iterable $array, callable $callback, $strict = false): self { }
     public function map_filter(callable $callback, $strict = false): self { }
 
-    /** @see array_map_method() */
-    public self $array_map_method;
-    public function array_map_method(iterable $array, $method, $args = [], $ignore = false): self { }
-    public function array_map_method($method, $args = [], $ignore = false): self { }
-
-    /** @see array_map_method() */
-    public self $map_method;
-    public function map_method(iterable $array, $method, $args = [], $ignore = false): self { }
-    public function map_method($method, $args = [], $ignore = false): self { }
-
     /** @see array_map_recursive() */
     public self $array_map_recursive;
     public function array_map_recursive(iterable $array, callable $callback, iterable $iterable = true, iterable $apply_array = false): self { }
@@ -493,6 +483,11 @@ trait ChainObject6
     public function is_hasharray(array $array): self { }
     public function is_hasharray(): self { }
 
+    /** @see object_properties() */
+    public self $object_properties;
+    public function object_properties($object, &$privates = []): self { }
+    public function object_properties(&$privates = []): self { }
+
     /** @see csv_export() */
     public self $csv_export;
     public function csv_export(iterable $csvarrays, $options = []): self { }
@@ -502,6 +497,11 @@ trait ChainObject6
     public self $html_strip;
     public function html_strip($html, $options = []): self { }
     public function html_strip($options = []): self { }
+
+    /** @see html_tag() */
+    public self $html_tag;
+    public function html_tag($selector): self { }
+    public function html_tag(): self { }
 
     /** @see json_export() */
     public self $json_export;
@@ -607,6 +607,11 @@ trait ChainObject6
     public self $base62_encode;
     public function base62_encode($string): self { }
     public function base62_encode(): self { }
+
+    /** @see query_build() */
+    public self $query_build;
+    public function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
+    public function query_build($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
 
     /** @see arrayval() */
     public self $arrayval;

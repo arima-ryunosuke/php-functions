@@ -453,10 +453,10 @@ trait ChainObject3
     public function class_replace($class, $register): self { }
     public function class_replace($register): self { }
 
-    /** @see optional() */
-    public self $optional;
-    public function optional($object, $expected = null): self { }
-    public function optional($expected = null): self { }
+    /** @see namespace_detect() */
+    public self $namespace_detect;
+    public function namespace_detect($location): self { }
+    public function namespace_detect(): self { }
 
     /** @see register_autoload_function() */
     public self $register_autoload_function;
@@ -503,11 +503,6 @@ trait ChainObject3
     public function path_relative($from, $to): self { }
     public function path_relative($to): self { }
 
-    /** @see call_safely() */
-    public self $call_safely;
-    public function call_safely(callable $callback, ...$variadic): self { }
-    public function call_safely(...$variadic): self { }
-
     /** @see chain() */
     public self $chain;
     public function chain($source = null): self { }
@@ -522,21 +517,6 @@ trait ChainObject3
     public self $is_bindable_closure;
     public function is_bindable_closure(\Closure $closure): self { }
     public function is_bindable_closure(): self { }
-
-    /** @see lbind() */
-    public self $lbind;
-    public function lbind(callable $callable, ...$variadic): self { }
-    public function lbind(...$variadic): self { }
-
-    /** @see namedcallize() */
-    public self $namedcallize;
-    public function namedcallize(callable $callable, $defaults = []): self { }
-    public function namedcallize($defaults = []): self { }
-
-    /** @see nbind() */
-    public self $nbind;
-    public function nbind(callable $callable, $n, ...$variadic): self { }
-    public function nbind($n, ...$variadic): self { }
 
     /** @see get_uploaded_files() */
     public self $get_uploaded_files;
@@ -557,6 +537,16 @@ trait ChainObject3
     public self $median;
     public function median(...$variadic): self { }
     public function median(): self { }
+
+    /** @see annotation_parse() */
+    public self $annotation_parse;
+    public function annotation_parse($annotation, $schema = [], $nsfiles = []): self { }
+    public function annotation_parse($schema = [], $nsfiles = []): self { }
+
+    /** @see namespace_parse() */
+    public self $namespace_parse;
+    public function namespace_parse($filename, $options = []): self { }
+    public function namespace_parse($options = []): self { }
 
     /** @see cidr_parse() */
     public self $cidr_parse;
@@ -593,10 +583,15 @@ trait ChainObject3
     public function pascal_case($string, $delimiter = "_"): self { }
     public function pascal_case($delimiter = "_"): self { }
 
-    /** @see build_query() */
-    public self $build_query;
-    public function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
-    public function build_query($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
+    /** @see instance_of() */
+    public self $instance_of;
+    public function instance_of($object, $class): self { }
+    public function instance_of($class): self { }
+
+    /** @see uri_build() */
+    public self $uri_build;
+    public function uri_build($parts, $options = []): self { }
+    public function uri_build($options = []): self { }
 
     /** @see function_configure() */
     public self $function_configure;

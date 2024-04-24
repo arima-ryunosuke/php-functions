@@ -453,11 +453,6 @@ trait ChainObject1
     public function fnmatch_or($patterns, $string, $flags = 0): self { }
     public function fnmatch_or($string, $flags = 0): self { }
 
-    /** @see eval_func() */
-    public self $eval_func;
-    public function eval_func($expression, ...$variadic): self { }
-    public function eval_func(...$variadic): self { }
-
     /** @see is_callback() */
     public self $is_callback;
     public function is_callback(callable $callable): self { }
@@ -487,11 +482,6 @@ trait ChainObject1
     public self $mode;
     public function mode(...$variadic): self { }
     public function mode(): self { }
-
-    /** @see parse_namespace() */
-    public self $parse_namespace;
-    public function parse_namespace($filename, $options = []): self { }
-    public function parse_namespace($options = []): self { }
 
     /** @see ip2cidr() */
     public self $ip2cidr;
@@ -542,11 +532,6 @@ trait ChainObject1
     public self $subreplace;
     public function subreplace($subject, $search, $replaces, $case_insensitivity = false): self { }
     public function subreplace($search, $replaces, $case_insensitivity = false): self { }
-
-    /** @see switchs() */
-    public self $switchs;
-    public function switchs($value, $cases, $default = null): self { }
-    public function switchs($cases, $default = null): self { }
 
     /** @see dataurl_decode() */
     public self $dataurl_decode;

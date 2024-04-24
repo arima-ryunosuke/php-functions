@@ -413,16 +413,6 @@ trait ChainObject5
     public function prepend(iterable $array, $value, $key = null): self { }
     public function prepend($value, $key = null): self { }
 
-    /** @see array_rmap() */
-    public self $array_rmap;
-    public function array_rmap(iterable $array, callable $callback, ...$variadic): self { }
-    public function array_rmap(callable $callback, ...$variadic): self { }
-
-    /** @see array_rmap() */
-    public self $rmap;
-    public function rmap(iterable $array, callable $callback, ...$variadic): self { }
-    public function rmap(callable $callback, ...$variadic): self { }
-
     /** @see array_schema() */
     public self $array_schema;
     public function array_schema($schema, iterable ...$arrays): self { }
@@ -478,11 +468,6 @@ trait ChainObject5
     public function path_normalize($path): self { }
     public function path_normalize(): self { }
 
-    /** @see ope_func() */
-    public self $ope_func;
-    public function ope_func($operator, ...$operands): self { }
-    public function ope_func(...$operands): self { }
-
     /** @see ansi_strip() */
     public self $ansi_strip;
     public function ansi_strip($string): self { }
@@ -507,11 +492,6 @@ trait ChainObject5
     public self $mean;
     public function mean(...$variadic): self { }
     public function mean(): self { }
-
-    /** @see indent_php() */
-    public self $indent_php;
-    public function indent_php($phpcode, $options = []): self { }
-    public function indent_php($options = []): self { }
 
     /** @see unique_id() */
     public self $unique_id;
@@ -592,16 +572,6 @@ trait ChainObject5
     public self $try_finally;
     public function try_finally($try, $finally = null, ...$variadic): self { }
     public function try_finally($finally = null, ...$variadic): self { }
-
-    /** @see parse_query() */
-    public self $parse_query;
-    public function parse_query($query, $arg_separator = null, $encoding_type = null): self { }
-    public function parse_query($arg_separator = null, $encoding_type = null): self { }
-
-    /** @see parse_uri() */
-    public self $parse_uri;
-    public function parse_uri($uri, $default = []): self { }
-    public function parse_uri($default = []): self { }
 
     /** @see cache() */
     public self $cache;
