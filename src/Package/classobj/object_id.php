@@ -70,25 +70,11 @@ function object_id($objectOrId)
         return $result;
     }
 
-    /** @var array<\WeakReference, int>[] $references */
-    static $references = [];
     static $lastid = 0;
+    static $references = null;
+    $references ??= new \WeakMap();
 
-    $id = spl_object_id($objectOrId);
-
-    if (!isset($references[$id]) || $references[$id][0]->get() === null) {
-        $references[$id] = [\WeakReference::create($objectOrId), ++$lastid];
-    }
-
-    $idmap[$references[$id][1]] = $references[$id][0];
-    return $references[$id][1];
-
-    /* php8.0 version
-     static $references = null;
-     $references ??= new \WeakMap();
-
-     $references[$objectOrId] ??= [\WeakReference::create($objectOrId), ++$lastid];
-     $idmap[$references[$objectOrId][1]] = $references[$objectOrId][0];
-     return $references[$objectOrId][1];
-     */
+    $references[$objectOrId] ??= [\WeakReference::create($objectOrId), ++$lastid];
+    $idmap[$references[$objectOrId][1]] = $references[$objectOrId][0];
+    return $references[$objectOrId][1];
 }

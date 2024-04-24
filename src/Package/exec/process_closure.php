@@ -64,7 +64,6 @@ function process_closure($closure, $args = [], $throw = true, $autoload = null, 
 {
     static $storage = null;
     $storage ??= object_storage(__FUNCTION__);
-    /** @noinspection PhpIllegalArrayKeyTypeInspection */
     $closure_code = $storage[$closure] ??= var_export3($closure, true);
 
     $autoload = arrayize($autoload ?? array_merge([auto_loader()], function_configure('process.autoload')));

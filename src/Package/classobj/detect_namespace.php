@@ -40,16 +40,12 @@ function detect_namespace($location)
             if (is_array($token) && $token[0] === T_NAMESPACE) {
                 // T_NAMESPACE と T_WHITESPACE で最低でも2つは読み飛ばしてよい
                 for ($m = $n + 2; $m < $count; $m++) {
-                    // @codeCoverageIgnoreStart
-                    if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
-                        if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_QUALIFIED) {
-                            return $tokens[$m][1];
-                        }
-                        if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_FULLY_QUALIFIED) {
-                            $namespace[] = trim($tokens[$m][1], '\\');
-                        }
+                    if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_QUALIFIED) {
+                        return $tokens[$m][1];
                     }
-                    // @codeCoverageIgnoreEnd
+                    if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_FULLY_QUALIFIED) {
+                        $namespace[] = trim($tokens[$m][1], '\\');
+                    }
                     // よほどのことがないと T_NAMESPACE の次の T_STRING は名前空間の一部
                     if (is_array($tokens[$m]) && $tokens[$m][0] === T_STRING) {
                         $namespace[] = $tokens[$m][1];

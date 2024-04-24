@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../network/http_request.php';
-require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -101,19 +100,6 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
         CURLOPT_HEADER         => true, // ヘッダを含める
     ];
 
-    $stringify_curl = function ($curl) {
-        // スクリプトの実行中 (ウェブのリクエストや CLI プロセスの処理中) は、指定したリソースに対してこの文字列が一意に割り当てられることが保証されます
-        if (is_resourcable($curl)) {
-            return (string) $curl;
-        }
-        // @codeCoverageIgnoreStart
-        if (is_object($curl)) {
-            return spl_object_id($curl);
-        }
-        return null;
-        // @codeCoverageIgnoreEnd
-    };
-
     $responses = [];
     $resultmap = [];
     $infos = [];
@@ -137,7 +123,7 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
             $rheader = null;
             $info = null;
             $res = http_request($default + $opt, $rheader, $info);
-            if (is_array($res) && isset($res[0]) && $handle_id = $stringify_curl($res[0])) {
+            if (is_array($res) && isset($res[0]) && $handle_id = spl_object_id($res[0])) {
                 curl_multi_add_handle($mh, $res[0]);
                 $resultmap[$handle_id] = [$key, $res[1], $res[2], microtime(true), 0];
             }
@@ -162,7 +148,7 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
                 }
 
                 $handle = $minfo['handle'];
-                $handle_id = $stringify_curl($handle);
+                $handle_id = spl_object_id($handle);
                 [$key, $responser, $retry, $now, $retry_count] = $resultmap[$handle_id];
 
                 $response = curl_multi_getcontent($handle);

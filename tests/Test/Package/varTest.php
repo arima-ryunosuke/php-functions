@@ -72,9 +72,7 @@ class varTest extends AbstractTestCase
                 return isset($this->holder[$offset]);
             }
 
-            /** @noinspection PhpLanguageLevelInspection */
-            #[\ReturnTypeWillChange]
-            public function offsetGet($offset)
+            public function offsetGet($offset): mixed
             {
                 if ($offset === 'ex') {
                     throw new \OutOfBoundsException();
@@ -178,9 +176,7 @@ class varTest extends AbstractTestCase
                 return isset($this->holder[$offset]);
             }
 
-            /** @noinspection PhpLanguageLevelInspection */
-            #[\ReturnTypeWillChange]
-            public function offsetGet($offset)
+            public function offsetGet($offset): mixed
             {
                 if ($offset === 'ex') {
                     throw new \OutOfBoundsException();

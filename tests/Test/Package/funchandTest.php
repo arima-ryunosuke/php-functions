@@ -168,9 +168,7 @@ class funchandTest extends AbstractTestCase
         // exportClass で動くことを担保
         that(Utility::chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
 
-//        if (version_compare(PHP_VERSION, 8.0) >= 0) {
-//            //that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');
-//        }
+        that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');
 
         $backup = function_configure([
             'chain.nullsafe' => true,
@@ -484,9 +482,8 @@ class funchandTest extends AbstractTestCase
         ]);
 
         // コンストラクタ
-        $iterator_class = version_compare(PHP_VERSION, '8.0.0') >= 0 ? 'iteratorClass' : 'iterator_class';
         /** @var \ArrayObject $arrayobject */
-        $arrayobject = namedcallize('\\ArrayObject::__construct')([[1, 2, 3], $iterator_class => 'ArrayIterator', \ArrayObject::ARRAY_AS_PROPS]);
+        $arrayobject = namedcallize('\\ArrayObject::__construct')([[1, 2, 3], 'iteratorClass' => 'ArrayIterator', \ArrayObject::ARRAY_AS_PROPS]);
         that($arrayobject)->getArrayCopy()->is([1, 2, 3]);
         that($arrayobject)->getIteratorClass()->is('ArrayIterator');
         that($arrayobject)->getFlags()->is(\ArrayObject::ARRAY_AS_PROPS);

@@ -122,8 +122,6 @@ class reflectionTest extends AbstractTestCase
 
     function test_function_parameter()
     {
-        $default = version_compare(PHP_VERSION, 8.0) < 0 ? ' = null' : '';
-
         // reflection
         $params = function_parameter(reflect_callable(function ($a, &$b, $c = 123, &$d = 456, ...$x) { }));
         that($params)->isSame([
@@ -131,7 +129,7 @@ class reflectionTest extends AbstractTestCase
             '&$b' => '&$b',
             '$c'  => '$c = 123',
             '&$d' => '&$d = 456',
-            '$x'  => '...$x' . $default,
+            '$x'  => '...$x',
         ]);
 
         // callable
@@ -141,13 +139,13 @@ class reflectionTest extends AbstractTestCase
             '&$b' => '&$b',
             '$c'  => '$c = 123',
             '&$d' => '&$d = 456',
-            '$x'  => '...$x' . $default,
+            '$x'  => '...$x',
         ]);
 
         // reference variadic
         $params = function_parameter(function (&...$args) { });
         that($params)->isSame([
-            '&$args' => '&...$args' . $default,
+            '&$args' => '&...$args',
         ]);
 
         // type hint
@@ -169,14 +167,12 @@ class reflectionTest extends AbstractTestCase
         ]);
 
         // internal
-        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
-            $params = function_parameter('strpos');
-            that($params)->isSame([
-                '$haystack' => 'string $haystack',
-                '$needle'   => 'string $needle',
-                '$offset'   => 'int $offset = 0',
-            ]);
-        }
+        $params = function_parameter('strpos');
+        that($params)->isSame([
+            '$haystack' => 'string $haystack',
+            '$needle'   => 'string $needle',
+            '$offset'   => 'int $offset = 0',
+        ]);
     }
 
     function test_parameter_default()

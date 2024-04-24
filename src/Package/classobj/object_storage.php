@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+<?php
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
@@ -57,14 +57,14 @@ function object_storage($namespace = 'global')
 
         public function __construct()
         {
-            $this->objects = class_exists(\WeakMap::class) ? new \WeakMap() : [];
+            $this->objects = new \WeakMap();
             $this->resources = [];
         }
 
         private function typeid($objectOrResource)
         {
             if (is_object($objectOrResource)) {
-                return ['objects', $this->objects instanceof \WeakMap ? $objectOrResource : object_id($objectOrResource)];
+                return ['objects', $objectOrResource];
             }
             if (is_resourcable($objectOrResource)) {
                 return ['resources', (int) $objectOrResource];
@@ -76,17 +76,6 @@ function object_storage($namespace = 'global')
         {
             // WeakMap と言えど循環参照が残っているかもしれないので呼んでおく
             gc_collect_cycles();
-
-            // 回収されているオブジェクトを消す（WeakMap なら勝手に消えるのでその必要はない）
-            if (!$this->objects instanceof \WeakMap) {
-                // @codeCoverageIgnoreStart
-                foreach ($this->objects as $id => $data) {
-                    if (object_id($id) === null) {
-                        unset($this->objects[$id]);
-                    }
-                }
-                // @codeCoverageIgnoreEnd
-            }
 
             // 参照が切れたり閉じてるリソースを消す
             if ($this->resources) {
@@ -136,8 +125,7 @@ function object_storage($namespace = 'global')
             return isset($this->$type[$id]);
         }
 
-        #[\ReturnTypeWillChange]
-        public function offsetGet($offset)
+        public function offsetGet($offset): mixed
         {
             [$type, $id] = $this->typeid($offset);
             return $this->$type[$id];

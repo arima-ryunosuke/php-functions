@@ -38,7 +38,6 @@ function iterator_combine($keys, $values)
 
     // どちらかが回し切れていない≒数が一致していない
     if ($itK->valid() || $itV->valid()) {
-        // throw new \ValueError("Both parameters should have an equal number of iterators");
-        throw new \InvalidArgumentException("Both parameters should have an equal number of iterators");
+        throw new \ValueError("Both parameters should have an equal number of iterators");
     }
 }

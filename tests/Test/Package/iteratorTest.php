@@ -130,7 +130,7 @@ class iteratorTest extends AbstractTestCase
         that(iterator_to_array($it))->isSame(['a' => 1, 'b' => 2, 'c' => 3]);
 
         // 数が一致しなければ例外
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\ValueError::class);
         iterator_to_array(iterator_combine([1, 2], [3, 4, 5]));
     }
 

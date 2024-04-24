@@ -89,17 +89,6 @@ function indent_php($phpcode, $options = [])
             $tmp[$i] = [-1, $tmp[$i], null];
         }
 
-        // 行コメントの分割（T_COMMENT には改行が含まれている）
-        if ($tmp[$i][0] === T_COMMENT && preg_match('@^(#|//).*?(\\R)@um', $tmp[$i][1], $matches)) {
-            $tmp[$i][1] = trim($tmp[$i][1]);
-            if (($tmp[$i + 1][0] ?? null) === T_WHITESPACE) {
-                $tmp[$i + 1][1] = $matches[2] . $tmp[$i + 1][1];
-            }
-            else {
-                array_splice($tmp, $i + 1, 0, [[T_WHITESPACE, $matches[2], null]]);
-            }
-        }
-
         if ($options['heredoc']) {
             // 行コメントと同じ（T_START_HEREDOC には改行が含まれている）
             if ($tmp[$i][0] === T_START_HEREDOC && preg_match('@^(<<<).*?(\\R)@um', $tmp[$i][1], $matches)) {

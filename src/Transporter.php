@@ -393,14 +393,10 @@ class Transporter
                     if ($token[0] === T_STRING && isset($depends[$token[1]])) {
                         $main($token[1], $result);
                     }
-                    // @codeCoverageIgnoreStart
-                    if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
-                        if (in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true)) {
-                            $parts = explode('\\', $token[1]);
-                            $main(array_pop($parts), $result);
-                        }
+                    if (in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true)) {
+                        $parts = explode('\\', $token[1]);
+                        $main(array_pop($parts), $result);
                     }
-                    // @codeCoverageIgnoreEnd
                 }
             }
         }

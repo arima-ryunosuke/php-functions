@@ -30,7 +30,7 @@ require_once __DIR__ . '/../array/is_hasharray.php';
  * @package ryunosuke\Functions\Package\syntax
  *
  * @param callable $try try ブロッククロージャ
- * @param resource|array ...$resources $try に渡る引数
+ * @param object|resource|array ...$resources $try に渡る引数
  * @return mixed $try ブロックの返り値
  */
 function try_close($callback, ...$resources)
@@ -68,6 +68,7 @@ function try_close($callback, ...$resources)
                     }
                     else {
                         // fclose は stoream しか使えず、他は大抵専用の XXX_close のようなものが存在する
+                        // @codeCoverageIgnoreStart
                         foreach ($names as $method) {
                             $funcname = explode(' ', $rtype)[0] . "_{$method}";
                             if (is_callable($funcname)) {
@@ -75,6 +76,7 @@ function try_close($callback, ...$resources)
                                 break;
                             }
                         }
+                        // @codeCoverageIgnoreEnd
                     }
                 }
                 if (is_object($resource)) {
@@ -84,15 +86,13 @@ function try_close($callback, ...$resources)
                             break;
                         }
 
-                        // @codeCoverageIgnoreStart
                         // php8.0 からリソースから不透明クラスへの移行が進んでいる（リソースがクラスになっただけでメソッドが生えているわけではない）
                         // その変換は容易ではない（例えば↓は curl_close を想定しているが、CurlShareHandle 等のクラスもあり完全対応しない）
-                        $funcname = (new \ReflectionClass($resource))->getExtension() . "_{$method}";
+                        $funcname = (new \ReflectionClass($resource))->getExtension()?->getName() . "_{$method}";
                         if (is_callable($funcname)) {
                             $funcname($resource);
                             break;
                         }
-                        // @codeCoverageIgnoreEnd
                     }
                 }
             }

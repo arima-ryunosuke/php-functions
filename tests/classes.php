@@ -143,9 +143,7 @@ class Concrete extends AbstractConcrete implements \Countable, \ArrayAccess, \It
         return isset($this->$offset);
     }
 
-    /** @noinspection PhpLanguageLevelInspection */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->$offset;
     }
@@ -170,9 +168,7 @@ class Concrete extends AbstractConcrete implements \Countable, \ArrayAccess, \It
         return strlen($this->name);
     }
 
-    /** @noinspection PhpLanguageLevelInspection */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->value;
     }
@@ -231,9 +227,7 @@ class JsonObject implements \JsonSerializable
         $this->values = $values;
     }
 
-    /** @noinspection PhpLanguageLevelInspection */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->values;
     }
@@ -253,9 +247,7 @@ class Arrayable implements \ArrayAccess
         return array_key_exists($offset, $this->array);
     }
 
-    /** @noinspection PhpLanguageLevelInspection */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }

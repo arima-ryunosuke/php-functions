@@ -36,13 +36,7 @@ function calculate_formula($formula)
     array_shift($tokens);
     array_pop($tokens);
 
-    $constants = [T_STRING, T_DOUBLE_COLON, T_NS_SEPARATOR];
-    // @codeCoverageIgnoreStart
-    if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
-        /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-        $constants = [T_STRING, T_DOUBLE_COLON, T_NS_SEPARATOR, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE];
-    }
-    // @codeCoverageIgnoreEnd
+    $constants = [T_STRING, T_DOUBLE_COLON, T_NS_SEPARATOR, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE];
     $operands = [T_LNUMBER, T_DNUMBER];
     $operators = ['(', ')', '+', '-', '*', '/', '%', '**'];
 

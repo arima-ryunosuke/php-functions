@@ -69,7 +69,7 @@ class execTest extends AbstractTestCase
         that($stderr)->isSame(str_repeat("e", 100 * 1000));
 
         $return = process(PHP_BINARY, ['-r' => "syntax error"], '', $stdout, $stderr);
-        that($return)->isSame(version_compare(PHP_VERSION, '8.0.0') >= 0 ? 255 : 254);
+        that($return)->isSame(255);
         that("$stdout $stderr")->stringContains('Parse error');
 
         $pingopt = DIRECTORY_SEPARATOR === '\\' ? '-n' : '-c';

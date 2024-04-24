@@ -135,9 +135,7 @@ function chain($source = null)
                 return count($this());
             }
 
-            /** @noinspection PhpLanguageLevelInspection */
-            #[\ReturnTypeWillChange]
-            public function jsonSerialize()
+            public function jsonSerialize(): mixed
             {
                 return $this();
             }

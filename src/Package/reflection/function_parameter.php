@@ -64,11 +64,6 @@ function function_parameter($eitherReffuncOrCallable)
                     }
                 }
             }
-            // 「オプショナルだけどデフォルト値がないって有り得るのか？」と思ったが、上記の通り組み込み関数だと普通に有り得るようだ
-            // notice が出るので記述せざるを得ないがその値を得る術がない。が、どうせ与えられないので null でいい
-            elseif (version_compare(PHP_VERSION, 8.0) < 0) {
-                $defval = 'null';
-            }
 
             if (isset($defval)) {
                 $declare .= ' = ' . $defval;

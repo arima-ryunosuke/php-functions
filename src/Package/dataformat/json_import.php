@@ -103,14 +103,9 @@ function json_import($value, $options = [])
 
         public function parse($options)
         {
-            error_clear_last();
             $tokens = @parse_php($this->json_string, [
                 'cache' => false,
             ]);
-            $error = error_get_last();
-            if (strpos($error['message'] ?? '', 'Unterminated comment') !== false) {
-                throw new \ErrorException(sprintf('%s at line %d of the JSON5 data', "Unterminated block comment", $error['line']));
-            }
             array_shift($tokens);
 
             $braces = [];

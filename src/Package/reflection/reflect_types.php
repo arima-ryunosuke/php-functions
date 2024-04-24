@@ -116,7 +116,6 @@ function reflect_types($reflection_type = null)
                     continue;
                 }
 
-                /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
                 $types = array_merge($types, $type instanceof \ReflectionUnionType ? $type->getTypes() : [$type]);
             }
 
@@ -142,9 +141,7 @@ function reflect_types($reflection_type = null)
             return isset($this->$offset);
         }
 
-        /** @noinspection PhpLanguageLevelInspection */
-        #[\ReturnTypeWillChange]
-        public function offsetGet($offset)
+        public function offsetGet($offset): mixed
         {
             return $this->$offset;
         }

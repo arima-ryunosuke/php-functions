@@ -30,11 +30,7 @@ function base62_decode($string)
 
     // 隠し第2引数が false の場合は gmp を使わない（ロジックのテスト用なので実運用で渡してはならない）
     if (extension_loaded('gmp') && !(func_num_args() === 2 && func_get_arg(1) === false)) {
-        $gmp = @gmp_init($string, 62);
-        if ($gmp === false) {
-            throw new \InvalidArgumentException("string is not an base62");
-        }
-        return $zeroprefix . gmp_export($gmp);
+        return $zeroprefix . gmp_export(gmp_init($string, 62));
     }
 
     static $basechars_assoc = null;
