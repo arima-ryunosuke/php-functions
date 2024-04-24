@@ -3,7 +3,6 @@
 namespace ryunosuke\Test\Package;
 
 use ryunosuke\Functions\Utility;
-use function ryunosuke\Functions\Package\abind;
 use function ryunosuke\Functions\Package\call_safely;
 use function ryunosuke\Functions\Package\chain;
 use function ryunosuke\Functions\Package\func_eval;
@@ -17,19 +16,10 @@ use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\function_shorten;
 use function ryunosuke\Functions\Package\is_bindable_closure;
 use function ryunosuke\Functions\Package\is_callback;
-use function ryunosuke\Functions\Package\lbind;
-use function ryunosuke\Functions\Package\nbind;
 use function ryunosuke\Functions\Package\parameter_length;
-use function ryunosuke\Functions\Package\rbind;
 
 class funchandTest extends AbstractTestCase
 {
-    function test_abind()
-    {
-        $sprintf = abind('sprintf', [1 => 'a', 3 => 'c']);
-        that($sprintf('%s%s%s%s', 'b', 'Z'))->is('abcZ');
-    }
-
     function test_by_builtin()
     {
         $object = new \BuiltIn();
@@ -534,63 +524,5 @@ class funchandTest extends AbstractTestCase
         that(is_callback(new class { }))->isFalse();
         that(is_callback(new class { function __invoke() { } }))->isTrue();
         that(is_callback(fn($v) => strtoupper($v)))->isTrue();
-    }
-
-    function test_lbind()
-    {
-        $arrayize_lX = lbind(self::resolveFunction('arrayize'), 'X');
-        that($arrayize_lX(1, 2, 3, 4))->is(['X', 1, 2, 3, 4]);
-
-        $arrayize_lXY = lbind(self::resolveFunction('arrayize'), 'X', 'Y');
-        that($arrayize_lXY(1, 2, 3, 4))->is(['X', 'Y', 1, 2, 3, 4]);
-    }
-
-    function test_nbind()
-    {
-        $arrayize_2X = nbind(self::resolveFunction('arrayize'), 2, 'X');
-        that($arrayize_2X(1, 2, 3, 4))->is([1, 2, 'X', 3, 4]);
-
-        $arrayize_3XY = nbind(self::resolveFunction('arrayize'), 3, 'X', 'Y');
-        that($arrayize_3XY(1, 2, 3, 4))->is([1, 2, 3, 'X', 'Y', 4]);
-    }
-
-    function test_nbind_arity()
-    {
-        // 引数を7個要求するクロージャ
-        $func7 = fn($_0, $_1, $_2, $_3, $_4, $_5, $_6) => func_get_args();
-        $func6 = nbind($func7, 6, 'g');// 引数を6個要求するクロージャ
-        $func5 = nbind($func6, 5, 'f');// 引数を5個要求するクロージャ
-        $func4 = nbind($func5, 4, 'e');// 引数を4個要求するクロージャ
-        $func3 = nbind($func4, 3, 'd');// 引数を3個要求するクロージャ
-        $func2 = nbind($func3, 2, 'c');// 引数を2個要求するクロージャ
-        $func1 = nbind($func2, 1, 'b');// 引数を1個要求するクロージャ
-        $func0 = nbind($func1, 0, 'a');// 引数を0個要求するクロージャ
-
-        that(parameter_length($func0))->is(0);
-        that(parameter_length($func1))->is(1);
-        that(parameter_length($func2))->is(2);
-        that(parameter_length($func3))->is(3);
-        that(parameter_length($func4))->is(4);
-        that(parameter_length($func5))->is(5);
-        that(parameter_length($func6))->is(6);
-        that(parameter_length($func7))->is(7);
-
-        that($func0())->is(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
-        that($func1('A'))->is(['A', 'b', 'c', 'd', 'e', 'f', 'g']);
-        that($func2('A', 'B'))->is(['A', 'B', 'c', 'd', 'e', 'f', 'g']);
-        that($func3('A', 'B', 'C'))->is(['A', 'B', 'C', 'd', 'e', 'f', 'g']);
-        that($func4('A', 'B', 'C', 'D'))->is(['A', 'B', 'C', 'D', 'e', 'f', 'g']);
-        that($func5('A', 'B', 'C', 'D', 'E'))->is(['A', 'B', 'C', 'D', 'E', 'f', 'g']);
-        that($func6('A', 'B', 'C', 'D', 'E', 'F'))->is(['A', 'B', 'C', 'D', 'E', 'F', 'g']);
-        that($func7('A', 'B', 'C', 'D', 'E', 'F', 'G'))->is(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
-    }
-
-    function test_rbind()
-    {
-        $arrayize_rX = rbind(self::resolveFunction('arrayize'), 'X');
-        that($arrayize_rX(1, 2, 3, 4))->is([1, 2, 3, 4, 'X']);
-
-        $arrayize_rXY = rbind(self::resolveFunction('arrayize'), 'X', 'Y');
-        that($arrayize_rXY(1, 2, 3, 4))->is([1, 2, 3, 4, 'X', 'Y']);
     }
 }

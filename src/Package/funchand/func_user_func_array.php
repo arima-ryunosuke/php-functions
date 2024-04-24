@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../funchand/delegate.php';
 require_once __DIR__ . '/../reflection/parameter_length.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 // @codeCoverageIgnoreEnd
@@ -44,10 +43,10 @@ function func_user_func_array($callback)
 
     // 上記以外は「引数ぴったりで削ぎ落としてコールするクロージャ」を返す
     $plength = parameter_length($callback, true, true);
-    return delegate(function ($callback, $args) use ($plength) {
+    return function (...$args) use ($callback, $plength) {
         if (is_infinite($plength)) {
             return $callback(...$args);
         }
         return $callback(...array_slice($args, 0, $plength));
-    }, $callback, $plength);
+    };
 }

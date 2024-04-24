@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../funchand/rbind.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -36,7 +35,7 @@ function split_noempty($delimiter, $string, $trimchars = true)
     }
 
     // trim するなら preg_split だと無駄にややこしくなるのでベタにやる
-    $trim = ($trimchars === true) ? 'trim' : rbind('trim', $trimchars);
+    $trim = ($trimchars === true) ? 'trim' : fn($v) => trim($v, $trimchars);
     $parts = explode($delimiter, $string);
     $parts = array_map($trim, $parts);
     $parts = array_filter($parts, 'strlen');

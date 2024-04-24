@@ -21,7 +21,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * Example:
  * ```php
  * // 値を3乗したあと16進表記にして大文字化する
- * that(array_maps([1, 2, 3, 4, 5], rbind('pow', 3), 'dechex', 'strtoupper'))->isSame(['1', '8', '1B', '40', '7D']);
+ * that(array_maps([1, 2, 3, 4, 5], fn($v) => pow($v, 3), 'dechex', 'strtoupper'))->isSame(['1', '8', '1B', '40', '7D']);
  * // キーも渡ってくる
  * that(array_maps(['a' => 'A', 'b' => 'B'], fn($v, $k) => "$k:$v"))->isSame(['a' => 'a:A', 'b' => 'b:B']);
  * // ... で可変引数コール

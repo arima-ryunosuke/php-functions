@@ -37,7 +37,6 @@ use function ryunosuke\Functions\Package\array_keys_exist;
 use function ryunosuke\Functions\Package\array_kmap;
 use function ryunosuke\Functions\Package\array_kvmap;
 use function ryunosuke\Functions\Package\array_limit;
-use function ryunosuke\Functions\Package\array_lmap;
 use function ryunosuke\Functions\Package\array_lookup;
 use function ryunosuke\Functions\Package\array_map_filter;
 use function ryunosuke\Functions\Package\array_map_key;
@@ -47,7 +46,6 @@ use function ryunosuke\Functions\Package\array_maps;
 use function ryunosuke\Functions\Package\array_merge2;
 use function ryunosuke\Functions\Package\array_mix;
 use function ryunosuke\Functions\Package\array_nest;
-use function ryunosuke\Functions\Package\array_nmap;
 use function ryunosuke\Functions\Package\array_of;
 use function ryunosuke\Functions\Package\array_order;
 use function ryunosuke\Functions\Package\array_pickup;
@@ -61,7 +59,6 @@ use function ryunosuke\Functions\Package\array_rank;
 use function ryunosuke\Functions\Package\array_rekey;
 use function ryunosuke\Functions\Package\array_remove;
 use function ryunosuke\Functions\Package\array_revise;
-use function ryunosuke\Functions\Package\array_rmap;
 use function ryunosuke\Functions\Package\array_schema;
 use function ryunosuke\Functions\Package\array_select;
 use function ryunosuke\Functions\Package\array_set;
@@ -89,10 +86,9 @@ use function ryunosuke\Functions\Package\kvsort;
 use function ryunosuke\Functions\Package\last_key;
 use function ryunosuke\Functions\Package\last_keyvalue;
 use function ryunosuke\Functions\Package\last_value;
-use function ryunosuke\Functions\Package\lbind;
 use function ryunosuke\Functions\Package\next_key;
-use function ryunosuke\Functions\Package\not_func;
 use function ryunosuke\Functions\Package\prev_key;
+use function ryunosuke\Functions\Package\strcat;
 
 class arrayTest extends AbstractTestCase
 {
@@ -528,7 +524,7 @@ class arrayTest extends AbstractTestCase
 
         // flag をカウント
         that(array_count($array, array_of('flag')))->is(1);
-        that(array_count($array, not_func(array_of('flag'))))->is(2);
+        that(array_count($array, fn($v) => !$v['flag']))->is(2);
 
         // group: 'B' をカウント。ただし、数値キーの場合のみ
         that(array_count($array, fn($v, $k) => is_int($k) && $v['group'] === 'B'))->is(1);
@@ -1661,12 +1657,6 @@ class arrayTest extends AbstractTestCase
         that(array_limit($array, +6, -5))->isSame(['a' => 'A']);
     }
 
-    function test_array_lmap()
-    {
-        // 最左に適用される
-        that(array_lmap([1, 2], self::resolveFunction('strcat'), 'a-', '-z'))->is(['1a--z', '2a--z']);
-    }
-
     function test_array_lookup()
     {
         $arrays = [
@@ -1831,8 +1821,7 @@ class arrayTest extends AbstractTestCase
 
     function test_array_maps()
     {
-        that(array_maps(['a', 'b', 'c'], 'strtoupper', lbind(self::resolveFunction('strcat'), '_')))->is(['_A00', '_B11', '_C22']);
-        that(array_maps(['a', 'b', 'c'], 'strtoupper', lbind(self::resolveFunction('strcat'), '_', '-')))->is(['_-A00', '_-B11', '_-C22']);
+        that(array_maps(['a', 'b', 'c'], 'strtoupper', fn($v, $k) => strcat("$k:$v")))->is(['0:A', '1:B', '2:C']);
 
         that(array_maps(['a' => 'A', 'b' => 'B'], self::resolveFunction('strcat'), self::resolveFunction('strcat')))->is(['a' => 'Aa0a0', 'b' => 'Bb1b1']);
 
@@ -1934,26 +1923,6 @@ class arrayTest extends AbstractTestCase
             'k1'    => 'v1',
             'k1.k2' => 'v2',
         ])->wasThrown('already exists');
-    }
-
-    function test_array_nmap()
-    {
-        // それぞれ N 番目に適用される
-        that(array_nmap([1, 2], self::resolveFunction('strcat'), 0, 'a-', '-z'))->is(['1a--z', '2a--z']);
-        that(array_nmap([1, 2], self::resolveFunction('strcat'), 1, 'a-', '-z'))->is(['a-1-z', 'a-2-z']);
-        that(array_nmap([1, 2], self::resolveFunction('strcat'), 2, 'a-', '-z'))->is(['a--z1', 'a--z2']);
-
-        /// $n に配列を渡すとキー・値の両方が渡ってくる
-        // キーを1番目、値を2番目に渡す
-        that(array_nmap(['k' => 'v'], self::resolveFunction('strcat'), [1 => 2], ' a ', ' b ', ' c '))->is(['k' => ' a k b v c ']);
-        // キーを2番目、値を1番目に渡す
-        that(array_nmap(['k' => 'v'], self::resolveFunction('strcat'), [2 => 1], ' a ', ' b ', ' c '))->is(['k' => ' a v b k c ']);
-        // キーを1番目、値を1番目に渡す（キーが優先される）
-        that(array_nmap(['k' => 'v'], self::resolveFunction('strcat'), [1 => 1], ' a ', ' b ', ' c '))->is(['k' => ' a kv b  c ']);
-
-        that(self::resolveFunction('array_nmap'))([], self::resolveFunction('strcat'), [])->wasThrown('empty');
-        that(self::resolveFunction('array_nmap'))([], self::resolveFunction('strcat'), [1 => -1])->wasThrown('positive');
-        that(self::resolveFunction('array_nmap'))([], self::resolveFunction('strcat'), [-1 => 1])->wasThrown('positive');
     }
 
     function test_array_of()
@@ -2610,12 +2579,6 @@ class arrayTest extends AbstractTestCase
             'append'  => 'newkey',
             'null'    => null,
         ]);
-    }
-
-    function test_array_rmap()
-    {
-        // 最右に適用される
-        that(array_rmap([1, 2], self::resolveFunction('strcat'), 'a-', '-z'))->is(['a--z1', 'a--z2']);
     }
 
     function test_array_schema_misc()

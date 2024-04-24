@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_distinct.php';
-require_once __DIR__ . '/../array/array_lmap.php';
 require_once __DIR__ . '/../array/array_map_key.php';
 require_once __DIR__ . '/../dataformat/paml_import.php';
 require_once __DIR__ . '/../strings/str_ellipsis.php';
@@ -211,7 +210,7 @@ function array_schema($schema, ...$arrays)
 
         [$maintype, $subtype] = explode('@', implode('', (array) $schema['type']), 2) + [1 => null];
         if ($maintype === 'list') {
-            $result = array_merge(...array_lmap($arrays, $validate, $schema, $path));
+            $result = array_merge(...array_map(fn($v) => $validate($v, $schema, $path), $arrays));
             if (isset($subtype)) {
                 $subschema = ['type' => $subtype] + array_map_key($schema, fn($k) => $k[0] === '@' ? substr($k, 1) : null);
                 foreach ($result as $k => $v) {
