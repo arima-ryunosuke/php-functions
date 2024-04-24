@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_put.php';
+require_once __DIR__ . '/../array/array_set.php';
 require_once __DIR__ . '/../strings/quoteexplode.php';
 // @codeCoverageIgnoreEnd
 
@@ -158,7 +158,7 @@ function paml_import($pamlstring, $options = [])
             }
         }
 
-        array_put($result, $value, $key);
+        array_set($result, $value, is_int($key) ? null : $key);
     }
     return $result;
 }

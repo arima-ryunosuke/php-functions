@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_kmap.php';
+require_once __DIR__ . '/../array/array_maps.php';
 require_once __DIR__ . '/../var/arrayval.php';
 // @codeCoverageIgnoreEnd
 
@@ -48,7 +48,7 @@ function array_lookup($array, $column_key = null, $index_key = null)
     $array = arrayval($array, false);
 
     if ($index_key instanceof \Closure) {
-        return array_combine(array_kmap($array, $index_key), array_column($array, $column_key));
+        return array_combine(array_maps($array, $index_key), array_column($array, $column_key));
     }
     if (func_num_args() === 3) {
         return array_column($array, $column_key, $index_key);

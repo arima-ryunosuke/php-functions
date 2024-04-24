@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_put.php';
+require_once __DIR__ . '/../array/array_set.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 // @codeCoverageIgnoreEnd
 
@@ -49,7 +49,7 @@ function array_zip(...$arrays)
             for ($i = 0, $limit = max(array_map('count', $arrays)); $i < $limit; $i++) {
                 $e = [];
                 foreach ($yielders as $yielder) {
-                    array_put($e, $yielder->current(), $yielder->key());
+                    array_set($e, $yielder->current(), is_int($yielder->key()) ? null : $yielder->key());
                     $yielder->next();
                 }
                 $result[] = $e;

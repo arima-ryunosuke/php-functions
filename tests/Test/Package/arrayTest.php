@@ -21,7 +21,6 @@ use function ryunosuke\Functions\Package\array_explode;
 use function ryunosuke\Functions\Package\array_extend;
 use function ryunosuke\Functions\Package\array_fill_callback;
 use function ryunosuke\Functions\Package\array_fill_gap;
-use function ryunosuke\Functions\Package\array_filter_key;
 use function ryunosuke\Functions\Package\array_filter_map;
 use function ryunosuke\Functions\Package\array_filters;
 use function ryunosuke\Functions\Package\array_find;
@@ -34,13 +33,11 @@ use function ryunosuke\Functions\Package\array_group;
 use function ryunosuke\Functions\Package\array_implode;
 use function ryunosuke\Functions\Package\array_insert;
 use function ryunosuke\Functions\Package\array_keys_exist;
-use function ryunosuke\Functions\Package\array_kmap;
 use function ryunosuke\Functions\Package\array_kvmap;
 use function ryunosuke\Functions\Package\array_limit;
 use function ryunosuke\Functions\Package\array_lookup;
 use function ryunosuke\Functions\Package\array_map_filter;
 use function ryunosuke\Functions\Package\array_map_key;
-use function ryunosuke\Functions\Package\array_map_method;
 use function ryunosuke\Functions\Package\array_map_recursive;
 use function ryunosuke\Functions\Package\array_maps;
 use function ryunosuke\Functions\Package\array_merge2;
@@ -52,7 +49,6 @@ use function ryunosuke\Functions\Package\array_pickup;
 use function ryunosuke\Functions\Package\array_pos;
 use function ryunosuke\Functions\Package\array_pos_key;
 use function ryunosuke\Functions\Package\array_prepend;
-use function ryunosuke\Functions\Package\array_put;
 use function ryunosuke\Functions\Package\array_random;
 use function ryunosuke\Functions\Package\array_range;
 use function ryunosuke\Functions\Package\array_rank;
@@ -1115,14 +1111,6 @@ class arrayTest extends AbstractTestCase
         that(array_fill_gap(array_fill_gap(['a', 4 => 'e'], 'b', 'c'), 'd'))->isSame(['a', 'b', 'c', 'd', 'e']);
     }
 
-    function test_array_filter_key()
-    {
-        that(array_filter_key(['a' => 'A', 'b' => 'B', 'X'], fn($v) => ctype_alpha("$v")))->is(['a' => 'A', 'b' => 'B']);
-        that(array_filter_key(['a', 'b', 'c'], fn($k, $v) => $k === 1))->is([1 => 'b']);
-        that(array_filter_key(['a', 'b', 'c'], fn($k, $v) => $v === "b"))->is([1 => 'b']);
-        that(array_filter_key(['a', 'b', 'c'], fn($k, $v) => $v !== "b"))->is(['a', 2 => 'c']);
-    }
-
     function test_array_filter_map()
     {
         // 値を2乗して奇数だけを取り出す
@@ -1518,20 +1506,6 @@ class arrayTest extends AbstractTestCase
         that(array_keys_exist(['nx' => ['y']], $array))->isFalse();
     }
 
-    function test_array_kmap()
-    {
-        $array = [
-            'k1' => 'v1',
-            'k2' => 'v2',
-            'k3' => 'v3',
-        ];
-        that(array_kmap($array, fn($v, $k, $n) => "$n:$k-$v"))->is([
-            'k1' => '0:k1-v1',
-            'k2' => '1:k2-v2',
-            'k3' => '2:k3-v3',
-        ]);
-    }
-
     function test_array_kvmap()
     {
         that(array_kvmap(['a' => 'A', 'b' => 'B', 'c' => 'C'], function ($k, $v) {
@@ -1696,26 +1670,6 @@ class arrayTest extends AbstractTestCase
         that(array_map_key(['a' => 'A', 'b' => 'B'], 'strtoupper'))->is(['A' => 'A', 'B' => 'B']);
         that(array_map_key(['a' => 'A', 'b' => 'B'], fn($k) => $k === 'b' ? null : strtoupper($k)))->is(['A' => 'A']);
         that(array_map_key(['a' => 'A', 'b' => 'B'], fn($k, $v) => $v === 'B' ? null : strtoupper($k)))->is(['A' => 'A']);
-    }
-
-    function test_array_map_method()
-    {
-        $o1 = new \Concrete('a');
-        $o2 = new \Concrete('b');
-        $o3 = new \Concrete('c');
-
-        // きちんと呼ばれるし引数も渡る
-        that(array_map_method([$o1, $o2, $o3], 'getName'))->is(['a', 'b', 'c']);
-        that(array_map_method([$o1, $o2, $o3], 'getName', ['_', true]))->is(['_A', '_B', '_C']);
-
-        // $ignore=true すると filter される
-        that(array_map_method([$o1, null, 123], 'getName', [], true))->is(['a']);
-
-        // $ignore=null するとそのまま返す
-        that(array_map_method([$o1, null, 123], 'getName', [], null))->is(['a', null, 123]);
-
-        // iterable
-        that(array_map_method(new \ArrayObject([$o1, null, 123]), 'getName', [], null))->is(['a', null, 123]);
     }
 
     function test_array_map_recursive()
@@ -2331,39 +2285,6 @@ class arrayTest extends AbstractTestCase
         that(array_prepend(['a' => 'A', 'b' => 'B', 'c'], 'X', 'a'))->isSame(['a' => 'X', 'b' => 'B', 'c']);
     }
 
-    function test_array_put()
-    {
-        // single
-        $array = ['a' => 'A', 'B'];
-        that(array_put($array, 'Z'))->is(1);
-        that($array)->is(['a' => 'A', 'B', 'Z']);
-        that(array_put($array, 'Z', 123))->is(2);
-        that($array)->is(['a' => 'A', 'B', 'Z', 'Z']);
-        that(array_put($array, 'Z', 'z'))->is('z');
-        that($array)->is(['a' => 'A', 'B', 'Z', 'Z', 'z' => 'Z']);
-        that(array_put($array, 'X', 'a'))->is('a');
-        that($array)->is(['a' => 'X', 'B', 'Z', 'Z', 'z' => 'Z']);
-
-        // condition
-        $array = ['a' => 'A', 'B'];
-        that(array_put($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(1);
-        that($array)->is(['a' => 'A', 'B', 'Z']);
-        that(array_put($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(false);
-        that($array)->is(['a' => 'A', 'B', 'Z']);
-
-        // array
-        $array = ['a' => 'A', 'b' => ['B']];
-        that(array_put($array, 'X', ['x']))->is('x');
-        that($array)->is(['a' => 'A', 'b' => ['B'], 'x' => 'X']);
-        that(array_put($array, 'X', ['y', 'z']))->is('z');
-        that($array)->is(['a' => 'A', 'b' => ['B'], 'x' => 'X', 'y' => ['z' => 'X']]);
-        that(array_put($array, 'W', ['b']))->is('b');
-        that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X']]);
-        that(array_put($array, 'Y2', ['y', null]))->is(0);
-        that($array)->is(['a' => 'A', 'b' => 'W', 'x' => 'X', 'y' => ['z' => 'X', 'Y2']]);
-        that(self::resolveFunction('array_put'))($array, 'X', ['a', 'b', 'c'])->wasThrown('is not array');
-    }
-
     function test_array_random()
     {
         srand(123);
@@ -2816,8 +2737,15 @@ class arrayTest extends AbstractTestCase
         that($array)->is(['a' => 'A', 'B', 'Z', 'z' => 'Z']);
         that(array_set($array, 'X', 'a'))->is('a');
         that($array)->is(['a' => 'X', 'B', 'Z', 'z' => 'Z']);
-        that(array_set($array, 'Z', null, false))->is(null);
-        that($array)->is(['a' => 'X', 'B', 'Z', 'z' => 'Z', 'Z']);
+        that(array_set($array, 'Z', 9))->is(9);
+        that($array)->is(['a' => 'X', 'B', 'Z', 'z' => 'Z', 9 => 'Z']);
+
+        // condition
+        $array = ['a' => 'A', 'B'];
+        that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(1);
+        that($array)->is(['a' => 'A', 'B', 'Z']);
+        that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(false);
+        that($array)->is(['a' => 'A', 'B', 'Z']);
 
         // array
         $array = ['a' => 'A', 'b' => ['B']];

@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_kmap.php';
+require_once __DIR__ . '/../array/array_maps.php';
 require_once __DIR__ . '/../classobj/auto_loader.php';
 require_once __DIR__ . '/../exec/process_async.php';
 require_once __DIR__ . '/../info/php_binary.php';
@@ -95,7 +95,7 @@ function built_in_server($document_root, $router = null, $options = [])
     $process = process_async(php_binary(), array_filter([
         '-S' => "{$options['host']}:{$options['port']}",
         '-t' => $document_root,
-        '-d' => array_kmap((array) $options['-d'], fn($v, $k) => is_int($k) ? $v : "$k=$v"),
+        '-d' => array_maps((array) $options['-d'], fn($v, $k) => is_int($k) ? $v : "$k=$v"),
         $mainscript,
     ], fn($v) => $v !== null), '', $stdout, $stderr, $document_root);
 

@@ -28,7 +28,6 @@ use function ryunosuke\Functions\Package\json_export;
 use function ryunosuke\Functions\Package\ltsv_export;
 use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\mkdir_p;
-use function ryunosuke\Functions\Package\path_info;
 use function ryunosuke\Functions\Package\path_is_absolute;
 use function ryunosuke\Functions\Package\path_normalize;
 use function ryunosuke\Functions\Package\path_parse;
@@ -1142,210 +1141,6 @@ class filesystemTest extends AbstractTestCase
         that(mkdir_p($dir))->isFalse();
     }
 
-    function test_path_info()
-    {
-        $DS = DIRECTORY_SEPARATOR;
-
-        if ($DS === '\\') {
-            that(path_info('C:\\dir1\\dir2\\\\file.sjis.min.js'))->is([
-                "dirname"    => "C:\\dir1\dir2",
-                "basename"   => "file.sjis.min.js",
-                "extension"  => "js",
-                "filename"   => "file.sjis.min",
-                "drive"      => "C:",
-                "root"       => "\\",
-                "parents"    => ["dir1", "dir2"],
-                "dirnames"   => ["dir1", "dir2"],
-                "localname"  => "file",
-                "localpath"  => "C:\\dir1\\dir2\\file",
-                "extensions" => ["sjis", "min", "js"],
-            ]);
-            that(path_info('\\dir1\\dir2\\\\file.sjis.min.js'))->is([
-                "dirname"    => "\\dir1\\dir2",
-                "basename"   => "file.sjis.min.js",
-                "extension"  => "js",
-                "filename"   => "file.sjis.min",
-                "drive"      => "",
-                "root"       => "\\",
-                "parents"    => ["dir1", "dir2"],
-                "dirnames"   => ["dir1", "dir2"],
-                "localname"  => "file",
-                "localpath"  => "\\dir1\\dir2\\file",
-                "extensions" => ["sjis", "min", "js"],
-            ]);
-            that(path_info('dir1\\dir2\\\\file.sjis.min.js'))->is([
-                "dirname"    => "dir1\\dir2",
-                "basename"   => "file.sjis.min.js",
-                "extension"  => "js",
-                "filename"   => "file.sjis.min",
-                "drive"      => "",
-                "root"       => "",
-                "parents"    => ["dir1", "dir2"],
-                "dirnames"   => ["dir1", "dir2"],
-                "localname"  => "file",
-                "localpath"  => "dir1\\dir2\\file",
-                "extensions" => ["sjis", "min", "js"],
-            ]);
-            // 下記2ケースのオリジナルの pathinfo の結果が明らかに不穏
-            that(path_info('C:\\'))->is([
-                "dirname"    => "C:\\",
-                "basename"   => "C",
-                "extension"  => "",
-                "filename"   => "C",
-                "drive"      => "C:",
-                "root"       => "\\",
-                "parents"    => [],
-                "dirnames"   => [],
-                "localname"  => "",
-                "localpath"  => "C:\\",
-                "extensions" => [],
-            ]);
-            that(path_info('C:\\C'))->is([
-                "dirname"    => "C:\\",
-                "basename"   => "C",
-                "extension"  => "",
-                "filename"   => "C",
-                "drive"      => "C:",
-                "root"       => "\\",
-                "parents"    => [],
-                "dirnames"   => [],
-                "localname"  => "C",
-                "localpath"  => "C:\\\\C",
-                "extensions" => [],
-            ]);
-        }
-        that(path_info('C:/dir1/dir2//file.sjis.min.js'))->is([
-            "dirname"    => "C:/dir1/dir2",
-            "basename"   => "file.sjis.min.js",
-            "extension"  => "js",
-            "filename"   => "file.sjis.min",
-            "drive"      => "C:",
-            "root"       => "/",
-            "parents"    => ["dir1", "dir2"],
-            "dirnames"   => ["dir1", "dir2"],
-            "localname"  => "file",
-            "localpath"  => "C:/dir1/dir2{$DS}file",
-            "extensions" => ["sjis", "min", "js"],
-        ]);
-        that(path_info('/dir1/dir2//file.sjis.min.js'))->is([
-            "dirname"    => "/dir1/dir2",
-            "basename"   => "file.sjis.min.js",
-            "extension"  => "js",
-            "filename"   => "file.sjis.min",
-            "drive"      => "",
-            "root"       => "/",
-            "parents"    => ["dir1", "dir2"],
-            "dirnames"   => ["dir1", "dir2"],
-            "localname"  => "file",
-            "localpath"  => "/dir1/dir2{$DS}file",
-            "extensions" => ["sjis", "min", "js"],
-        ]);
-        that(path_info('dir1/dir2//file.sjis.min.js'))->is([
-            "dirname"    => "dir1/dir2",
-            "basename"   => "file.sjis.min.js",
-            "extension"  => "js",
-            "filename"   => "file.sjis.min",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => ["dir1", "dir2"],
-            "dirnames"   => ["dir1", "dir2"],
-            "localname"  => "file",
-            "localpath"  => "dir1/dir2{$DS}file",
-            "extensions" => ["sjis", "min", "js"],
-        ]);
-        that(path_info('dir1.dot/./dir2.dot/file.ext'))->is([
-            "dirname"    => "dir1.dot/./dir2.dot",
-            "basename"   => "file.ext",
-            "extension"  => "ext",
-            "filename"   => "file",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => ["dir1.dot", "dir2.dot"],
-            "dirnames"   => ["dir1.dot", ".", "dir2.dot"],
-            "localname"  => "file",
-            "localpath"  => "dir1.dot/./dir2.dot{$DS}file",
-            "extensions" => ["ext"],
-        ]);
-        that(path_info('dir1.dot/../dir2.dot/file.ext'))->is([
-            "dirname"    => "dir1.dot/../dir2.dot",
-            "basename"   => "file.ext",
-            "extension"  => "ext",
-            "filename"   => "file",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => ["dir2.dot"],
-            "dirnames"   => ["dir1.dot", "..", "dir2.dot"],
-            "localname"  => "file",
-            "localpath"  => "dir1.dot/../dir2.dot{$DS}file",
-            "extensions" => ["ext"],
-        ]);
-        that(path_info('no.dir'))->is([
-            "dirname"    => ".",
-            "basename"   => "no.dir",
-            "extension"  => "dir",
-            "filename"   => "no",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => [],
-            "dirnames"   => [],
-            "localname"  => "no",
-            "localpath"  => "no",
-            "extensions" => ["dir"],
-        ]);
-        that(path_info('localonly'))->is([
-            "dirname"    => ".",
-            "basename"   => "localonly",
-            "extension"  => "",
-            "filename"   => "localonly",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => [],
-            "dirnames"   => [],
-            "localname"  => "localonly",
-            "localpath"  => "localonly",
-            "extensions" => [],
-        ]);
-        that(path_info('.ext.only'))->is([
-            "dirname"    => ".",
-            "basename"   => ".ext.only",
-            "extension"  => "only",
-            "filename"   => ".ext",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => [],
-            "dirnames"   => [],
-            "localname"  => "",
-            "localpath"  => "",
-            "extensions" => ["ext", "only"],
-        ]);
-        that(path_info('...'))->is([
-            "dirname"    => ".",
-            "basename"   => "...",
-            "extension"  => "",
-            "filename"   => "..",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => [],
-            "dirnames"   => [],
-            "localname"  => "",
-            "localpath"  => "",
-            "extensions" => ["", "", ""],
-        ]);
-        that(path_info(''))->is([
-            "dirname"    => "",
-            "basename"   => "",
-            "extension"  => "",
-            "filename"   => "",
-            "drive"      => "",
-            "root"       => "",
-            "parents"    => [],
-            "dirnames"   => [],
-            "localname"  => "",
-            "localpath"  => "",
-            "extensions" => [],
-        ]);
-    }
-
     function test_path_is_absolute()
     {
         that(path_is_absolute('a/b/c'))->isFalse();
@@ -1411,86 +1206,203 @@ class filesystemTest extends AbstractTestCase
     {
         $DS = DIRECTORY_SEPARATOR;
 
-        that(path_parse("/path/to/local.txt"))->is([
-            "dirname"      => "{$DS}path{$DS}to",
-            "basename"     => "local.txt",
-            "extension"    => "txt",
-            "filename"     => "local",
-            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
-            "localname"    => "local",
-            "extensions"   => ["txt"],
+        if ($DS === '\\') {
+            that(path_parse('C:\\dir1\\dir2\\\\file.sjis.min.js'))->is([
+                "dirname"    => "C:\\dir1\dir2",
+                "basename"   => "file.sjis.min.js",
+                "extension"  => "js",
+                "filename"   => "file.sjis.min",
+                "drive"      => "C:",
+                "root"       => "\\",
+                "parents"    => ["dir1", "dir2"],
+                "dirnames"   => ["dir1", "dir2"],
+                "localname"  => "file",
+                "localpath"  => "C:\\dir1\\dir2\\file",
+                "extensions" => ["sjis", "min", "js"],
+            ]);
+            that(path_parse('\\dir1\\dir2\\\\file.sjis.min.js'))->is([
+                "dirname"    => "\\dir1\\dir2",
+                "basename"   => "file.sjis.min.js",
+                "extension"  => "js",
+                "filename"   => "file.sjis.min",
+                "drive"      => "",
+                "root"       => "\\",
+                "parents"    => ["dir1", "dir2"],
+                "dirnames"   => ["dir1", "dir2"],
+                "localname"  => "file",
+                "localpath"  => "\\dir1\\dir2\\file",
+                "extensions" => ["sjis", "min", "js"],
+            ]);
+            that(path_parse('dir1\\dir2\\\\file.sjis.min.js'))->is([
+                "dirname"    => "dir1\\dir2",
+                "basename"   => "file.sjis.min.js",
+                "extension"  => "js",
+                "filename"   => "file.sjis.min",
+                "drive"      => "",
+                "root"       => "",
+                "parents"    => ["dir1", "dir2"],
+                "dirnames"   => ["dir1", "dir2"],
+                "localname"  => "file",
+                "localpath"  => "dir1\\dir2\\file",
+                "extensions" => ["sjis", "min", "js"],
+            ]);
+            // 下記2ケースのオリジナルの pathinfo の結果が明らかに不穏
+            that(path_parse('C:\\'))->is([
+                "dirname"    => "C:\\",
+                "basename"   => "C",
+                "extension"  => "",
+                "filename"   => "C",
+                "drive"      => "C:",
+                "root"       => "\\",
+                "parents"    => [],
+                "dirnames"   => [],
+                "localname"  => "",
+                "localpath"  => "C:\\",
+                "extensions" => [],
+            ]);
+            that(path_parse('C:\\C'))->is([
+                "dirname"    => "C:\\",
+                "basename"   => "C",
+                "extension"  => "",
+                "filename"   => "C",
+                "drive"      => "C:",
+                "root"       => "\\",
+                "parents"    => [],
+                "dirnames"   => [],
+                "localname"  => "C",
+                "localpath"  => "C:\\\\C",
+                "extensions" => [],
+            ]);
+        }
+        that(path_parse('C:/dir1/dir2//file.sjis.min.js'))->is([
+            "dirname"    => "C:/dir1/dir2",
+            "basename"   => "file.sjis.min.js",
+            "extension"  => "js",
+            "filename"   => "file.sjis.min",
+            "drive"      => "C:",
+            "root"       => "/",
+            "parents"    => ["dir1", "dir2"],
+            "dirnames"   => ["dir1", "dir2"],
+            "localname"  => "file",
+            "localpath"  => "C:/dir1/dir2{$DS}file",
+            "extensions" => ["sjis", "min", "js"],
         ]);
-        that(path_parse("/path/to/local.txt1.txt2"))->is([
-            "dirname"      => "{$DS}path{$DS}to",
-            "basename"     => "local.txt1.txt2",
-            "filename"     => "local.txt1",
-            "extension"    => "txt2",
-            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
-            "localname"    => "local",
-            "extensions"   => ["txt1", "txt2"],
+        that(path_parse('/dir1/dir2//file.sjis.min.js'))->is([
+            "dirname"    => "/dir1/dir2",
+            "basename"   => "file.sjis.min.js",
+            "extension"  => "js",
+            "filename"   => "file.sjis.min",
+            "drive"      => "",
+            "root"       => "/",
+            "parents"    => ["dir1", "dir2"],
+            "dirnames"   => ["dir1", "dir2"],
+            "localname"  => "file",
+            "localpath"  => "/dir1/dir2{$DS}file",
+            "extensions" => ["sjis", "min", "js"],
         ]);
-        that(path_parse("/path/to/local"))->is([
-            "dirname"      => "{$DS}path{$DS}to",
-            "basename"     => "local",
-            "filename"     => "local",
-            "extension"    => null,
-            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
-            "localname"    => "local",
-            "extensions"   => [],
+        that(path_parse('dir1/dir2//file.sjis.min.js'))->is([
+            "dirname"    => "dir1/dir2",
+            "basename"   => "file.sjis.min.js",
+            "extension"  => "js",
+            "filename"   => "file.sjis.min",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => ["dir1", "dir2"],
+            "dirnames"   => ["dir1", "dir2"],
+            "localname"  => "file",
+            "localpath"  => "dir1/dir2{$DS}file",
+            "extensions" => ["sjis", "min", "js"],
         ]);
-        that(path_parse("/path/to/local."))->is([
-            "dirname"      => "{$DS}path{$DS}to",
-            "basename"     => "local.",
-            "filename"     => "local",
-            "extension"    => "",
-            "dirlocalname" => "{$DS}path{$DS}to{$DS}local",
-            "localname"    => "local",
-            "extensions"   => [""],
+        that(path_parse('dir1.dot/./dir2.dot/file.ext'))->is([
+            "dirname"    => "dir1.dot/./dir2.dot",
+            "basename"   => "file.ext",
+            "extension"  => "ext",
+            "filename"   => "file",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => ["dir1.dot", "dir2.dot"],
+            "dirnames"   => ["dir1.dot", ".", "dir2.dot"],
+            "localname"  => "file",
+            "localpath"  => "dir1.dot/./dir2.dot{$DS}file",
+            "extensions" => ["ext"],
         ]);
-        that(path_parse("/path/to/.local"))->is([
-            "dirname"      => "{$DS}path{$DS}to",
-            "basename"     => ".local",
-            "filename"     => "",
-            "extension"    => "local",
-            "dirlocalname" => "{$DS}path{$DS}to",
-            "localname"    => "",
-            "extensions"   => ["local"],
+        that(path_parse('dir1.dot/../dir2.dot/file.ext'))->is([
+            "dirname"    => "dir1.dot/../dir2.dot",
+            "basename"   => "file.ext",
+            "extension"  => "ext",
+            "filename"   => "file",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => ["dir2.dot"],
+            "dirnames"   => ["dir1.dot", "..", "dir2.dot"],
+            "localname"  => "file",
+            "localpath"  => "dir1.dot/../dir2.dot{$DS}file",
+            "extensions" => ["ext"],
         ]);
-        that(path_parse("/local.txt"))->is([
-            "dirname"      => "{$DS}",
-            "basename"     => "local.txt",
-            "filename"     => "local",
-            "extension"    => "txt",
-            "dirlocalname" => "{$DS}local",
-            "localname"    => "local",
-            "extensions"   => ["txt"],
+        that(path_parse('no.dir'))->is([
+            "dirname"    => ".",
+            "basename"   => "no.dir",
+            "extension"  => "dir",
+            "filename"   => "no",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => [],
+            "dirnames"   => [],
+            "localname"  => "no",
+            "localpath"  => "no",
+            "extensions" => ["dir"],
         ]);
-        that(path_parse("local"))->is([
-            "dirname"      => "",
-            "basename"     => "local",
-            "filename"     => "local",
-            "extension"    => null,
-            "dirlocalname" => "local",
-            "localname"    => "local",
-            "extensions"   => [],
+        that(path_parse('localonly'))->is([
+            "dirname"    => ".",
+            "basename"   => "localonly",
+            "extension"  => "",
+            "filename"   => "localonly",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => [],
+            "dirnames"   => [],
+            "localname"  => "localonly",
+            "localpath"  => "localonly",
+            "extensions" => [],
         ]);
-        that(path_parse(""))->is([
-            "dirname"      => "",
-            "basename"     => "",
-            "filename"     => "",
-            "extension"    => null,
-            "dirlocalname" => "{$DS}",
-            "localname"    => "",
-            "extensions"   => [],
+        that(path_parse('.ext.only'))->is([
+            "dirname"    => ".",
+            "basename"   => ".ext.only",
+            "extension"  => "only",
+            "filename"   => ".ext",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => [],
+            "dirnames"   => [],
+            "localname"  => "",
+            "localpath"  => "",
+            "extensions" => ["ext", "only"],
         ]);
-        that(path_parse("/"))->is([
-            "dirname"      => "{$DS}",
-            "basename"     => "",
-            "filename"     => "",
-            "extension"    => null,
-            "dirlocalname" => "{$DS}",
-            "localname"    => "",
-            "extensions"   => [],
+        that(path_parse('...'))->is([
+            "dirname"    => ".",
+            "basename"   => "...",
+            "extension"  => "",
+            "filename"   => "..",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => [],
+            "dirnames"   => [],
+            "localname"  => "",
+            "localpath"  => "",
+            "extensions" => ["", "", ""],
+        ]);
+        that(path_parse(''))->is([
+            "dirname"    => "",
+            "basename"   => "",
+            "extension"  => "",
+            "filename"   => "",
+            "drive"      => "",
+            "root"       => "",
+            "parents"    => [],
+            "dirnames"   => [],
+            "localname"  => "",
+            "localpath"  => "",
+            "extensions" => [],
         ]);
     }
 

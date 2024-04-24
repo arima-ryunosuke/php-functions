@@ -111,7 +111,7 @@ class funchandTest extends AbstractTestCase
 
         // internal
         $list = '1,2,3,4,5';
-        that($chain($list)->multiexplode[1](',')->filter_key(fn($v) => $v >= 2)->maps(fn($v) => $v * 2)->values()())->is([6, 8, 10]);
+        that($chain($list)->multiexplode[1](',')->filters(fn($v, $k) => $k >= 2)->maps(fn($v) => $v * 2)->values()())->is([6, 8, 10]);
 
         // exception
         that($chain(null))->try('undefined_function')->wasThrown('is not defined');
