@@ -13,7 +13,7 @@ namespace ryunosuke\Functions\Package;
  *
  * @param string $pattern glob パターン。** が使えること以外は glob と同じ
  * @param int $flags glob フラグ
- * @return array|false マッチしたファイル名配列
+ * @return ?array マッチしたファイル名配列
  */
 function globstar($pattern, $flags = 0)
 {
@@ -30,7 +30,7 @@ function globstar($pattern, $flags = 0)
     $result = glob($pattern, $flags);
 
     if (count($patterns) === 1) {
-        return $result;
+        return $result === false ? null : $result;
     }
 
     foreach (glob($patterns[0] . '*', $flags & ~GLOB_NOCHECK & ~GLOB_MARK | GLOB_ONLYDIR) as $dir) {

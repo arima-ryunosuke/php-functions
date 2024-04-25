@@ -36,7 +36,7 @@ require_once __DIR__ . '/../strings/strpos_quoted.php';
  * @param int $position 開始位置。渡した場合次の開始位置が設定される
  * @param string $enclosure 囲い文字。この文字中にいる $from, $to 文字は走査外になる
  * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
- * @return string|bool $from, $to で囲まれた文字。見つからなかった場合は false
+ * @return ?string $from, $to で囲まれた文字。見つからなかった場合は null
  */
 function str_between($string, $from, $to, &$position = 0, $enclosure = '\'"', $escape = '\\')
 {
@@ -48,7 +48,7 @@ function str_between($string, $from, $to, &$position = 0, $enclosure = '\'"', $e
     $start = null;
     for ($i = $position; $i < $strlen; $i++) {
         $i = strpos_quoted($string, [$from, $to], $i, $enclosure, $escape);
-        if ($i === false) {
+        if ($i === null) {
             break;
         }
 
@@ -69,5 +69,5 @@ function str_between($string, $from, $to, &$position = 0, $enclosure = '\'"', $e
             }
         }
     }
-    return false;
+    return null;
 }

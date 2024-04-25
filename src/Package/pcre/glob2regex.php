@@ -121,11 +121,11 @@ function glob2regex($pattern, $flags = 0)
     if ($flags & GLOB_BRACE) {
         while (true) {
             $brace_s = strpos_escaped($pattern, '{');
-            if ($brace_s === false) {
+            if ($brace_s === null) {
                 break;
             }
             $brace_e = strpos_escaped($pattern, '}', $brace_s);
-            if ($brace_e === false) {
+            if ($brace_e === null) {
                 break;
             }
             $brace = substr($pattern, $brace_s + 1, $brace_e - $brace_s - 1);

@@ -22,7 +22,7 @@ require_once __DIR__ . '/../filesystem/path_normalize.php';
  * @param string $filename 書き込むファイル名
  * @param string $data 書き込む内容
  * @param int $umask ディレクトリを掘る際の umask
- * @return int 書き込まれたバイト数
+ * @return ?int 書き込まれたバイト数
  */
 function file_set_contents($filename, $data, $umask = 0002)
 {
@@ -43,14 +43,14 @@ function file_set_contents($filename, $data, $umask = 0002)
     if (strpos(error_get_last()['message'] ?? '', "file created in the system's temporary directory") !== false) {
         $result = file_put_contents($filename, $data);
         @chmod($filename, 0666 & ~$umask);
-        return $result;
+        return $result === false ? null : $result;
     }
     if (($result = file_put_contents($tempnam, $data)) !== false) {
         if (rename($tempnam, $filename)) {
             @chmod($filename, 0666 & ~$umask);
-            return $result;
+            return $result === false ? null : $result;
         }
         unlink($tempnam);
     }
-    return false;
+    return null;
 }

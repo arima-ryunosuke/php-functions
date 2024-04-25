@@ -355,8 +355,8 @@ trait ChainObject0
 
     /** @see date_interval() */
     public self $date_interval;
-    public function date_interval($sec, $format = null, $limit_type = "y"): self { }
-    public function date_interval($format = null, $limit_type = "y"): self { }
+    public function date_interval($interval): self { }
+    public function date_interval(): self { }
 
     /** @see date_timestamp() */
     public self $date_timestamp;

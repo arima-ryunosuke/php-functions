@@ -145,7 +145,7 @@ function json_import($value, $options = [])
                                 throw $this->exception("Missing object key", first_value($keyandval[0]));
                             }
                             // check objective key (e.g. {[1]: 123})
-                            if (($k = array_find($keyandval[0], 'is_object')) !== false) {
+                            if (($k = array_find($keyandval[0], 'is_object')) !== null) {
                                 throw $this->exception("Unexpected object key", $keyandval[0][$k]);
                             }
                             // check consecutive objective value (e.g. {k: 123 [1]})

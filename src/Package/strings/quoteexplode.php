@@ -53,7 +53,7 @@ function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $
             break;
         }
         $i = strpos_quoted($string, $delimiters, $i, $enclosures, $escape);
-        if ($i === false) {
+        if ($i === null) {
             break;
         }
         foreach ($delimiters as $delimiter) {

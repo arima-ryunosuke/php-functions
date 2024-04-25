@@ -29,7 +29,7 @@ require_once __DIR__ . '/../funchand/func_user_func_array.php';
  * @param iterable $array 調べる配列
  * @param callable $callback 評価コールバック
  * @param bool $is_key キーを返すか否か
- * @return mixed コールバックが true を返した最初のキー。存在しなかったら false
+ * @return mixed コールバックが true を返した最初のキー。存在しなかったら null
  */
 function array_find($array, $callback, $is_key = true)
 {
@@ -45,5 +45,5 @@ function array_find($array, $callback, $is_key = true)
             return $result;
         }
     }
-    return false;
+    return null;
 }

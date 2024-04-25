@@ -32,7 +32,7 @@ require_once __DIR__ . '/../strings/str_exists.php';
  *
  * @param string $dirname 調べるディレクトリ名
  * @param array $filter_condition フィルタ条件
- * @return array|false ファイルの配列
+ * @return ?array ファイルの配列
  */
 function file_list($dirname, $filter_condition = [])
 {
@@ -63,7 +63,7 @@ function file_list($dirname, $filter_condition = [])
     }
 
     if (!file_exists($dirname) || $dirname === dirname($dirname)) {
-        return false;
+        return null;
     }
 
     $match = file_matcher($filter_condition);

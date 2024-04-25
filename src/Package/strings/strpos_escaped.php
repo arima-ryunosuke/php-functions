@@ -27,15 +27,15 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * # 分かりにくいので \ ではなく % をエスケープ文字とする
  * $defargs = [0, '%'];
  *
- * // これは false である（"%d" という文字の列であるため "d" という文字は存在しない）
- * that(strpos_escaped('%d', 'd', ...$defargs))->isSame(false);
+ * // これは null である（"%d" という文字の列であるため "d" という文字は存在しない）
+ * that(strpos_escaped('%d', 'd', ...$defargs))->isSame(null);
  * // これは 2 である（"%" "d" という文字の列であるため（d の前の % は更にその前の % に呑まれておりメタ文字ではない））
  * that(strpos_escaped('%%d', 'd', ...$defargs))->isSame(2);
  *
  * // これは 0 である（% をつけて検索するとそのエスケープシーケンス的なものそのものを探すため）
  * that(strpos_escaped('%d', '%d', ...$defargs))->isSame(0);
- * // これは false である（"%" "d" という文字の列であるため "%d" という文字は存在しない）
- * that(strpos_escaped('%%d', '%d', ...$defargs))->isSame(false);
+ * // これは null である（"%" "d" という文字の列であるため "%d" という文字は存在しない）
+ * that(strpos_escaped('%%d', '%d', ...$defargs))->isSame(null);
  * // これは 2 である（"%" "%d" という文字の列であるため）
  * that(strpos_escaped('%%%d', '%d', ...$defargs))->isSame(2);
  * ```
@@ -47,7 +47,7 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * @param int $offset 開始位置
  * @param string $escape エスケープ文字
  * @param ?string $found 見つかった文字が格納される
- * @return false|int 見つかった位置
+ * @return ?int 見つかった位置
  */
 function strpos_escaped($haystack, $needle, $offset = 0, $escape = '\\', &$found = null)
 {
@@ -71,7 +71,7 @@ function strpos_escaped($haystack, $needle, $offset = 0, $escape = '\\', &$found
     }
     if (!$matched) {
         $found = null;
-        return false;
+        return null;
     }
 
     ksort($matched);

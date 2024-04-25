@@ -68,7 +68,7 @@ function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\', &$r
     $counter = array_fill_keys(array_keys($replacemap), 0);
     for ($i = 0; $i < strlen($string); $i++) {
         $i = strpos_quoted($string, $srcs, $i, $enclosure, $escape);
-        if ($i === false) {
+        if ($i === null) {
             break;
         }
 

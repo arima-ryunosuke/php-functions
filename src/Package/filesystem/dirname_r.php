@@ -23,7 +23,7 @@ namespace ryunosuke\Functions\Package;
  *
  * @param string $path パス名
  * @param callable $callback コールバック
- * @return mixed $callback の返り値。頂上まで辿ったら false
+ * @return mixed $callback の返り値。頂上まで辿ったら null
  */
 function dirname_r($path, $callback)
 {
@@ -34,7 +34,7 @@ function dirname_r($path, $callback)
 
     $dirname = dirname($path);
     if ($dirname === $path) {
-        return false;
+        return null;
     }
     return dirname_r($dirname, $callback);
 }

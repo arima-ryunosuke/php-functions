@@ -1168,7 +1168,7 @@ class arrayTest extends AbstractTestCase
         that(array_find(['a', 'b', '9'], 'ctype_digit'))->is(2);
         that(array_find(['a' => 'A', 'b' => 'B'], fn($v) => $v === 'B'))->is('b');
         that(array_find(['9', 'b', 'c'], 'ctype_digit'))->isSame(0);
-        that(array_find(['a', 'b', 'c'], fn($v) => null))->isSame(false);
+        that(array_find(['a', 'b', 'c'], fn($v) => null))->isSame(null);
 
         that(array_find(['a', 'b', '9'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('A');
         that(array_find(['9', 'b', 'c'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('B');
@@ -2744,7 +2744,7 @@ class arrayTest extends AbstractTestCase
         $array = ['a' => 'A', 'B'];
         that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(1);
         that($array)->is(['a' => 'A', 'B', 'Z']);
-        that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(false);
+        that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->is(null);
         that($array)->is(['a' => 'A', 'B', 'Z']);
 
         // array

@@ -31,7 +31,7 @@ namespace ryunosuke\Functions\Package;
  * @param string $haystack 調べる文字列
  * @param string $needle 検索文字列
  * @param bool $after_needle $needle より後ろを返すか
- * @return string
+ * @return ?string
  */
 function strrstr($haystack, $needle, $after_needle = true)
 {
@@ -39,7 +39,7 @@ function strrstr($haystack, $needle, $after_needle = true)
 
     $lastpos = mb_strrpos($haystack, $needle);
     if ($lastpos === false) {
-        return false;
+        return null;
     }
 
     if ($after_needle) {

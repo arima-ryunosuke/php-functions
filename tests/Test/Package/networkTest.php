@@ -790,7 +790,7 @@ class networkTest extends AbstractTestCase
         that(ping($server, 80, 1, $err))->isFloat();
         that($err)->isEmpty();
 
-        that(ping($server, 888, 1, $err))->isFalse();
+        that(ping($server, 888, 1, $err))->isNull();
         that($err)->isNotEmpty();
 
         that(ping($server, null, 1, $err))->isFloat();
@@ -799,10 +799,10 @@ class networkTest extends AbstractTestCase
         that(ping("udp://128.0.0.1", 1234, 1, $err))->isFloat();
         that($err)->isEmpty();
 
-        that(ping("unknown-host", 1234, 1, $err))->isFalse();
+        that(ping("unknown-host", 1234, 1, $err))->isNull();
         that($err)->isNotEmpty();
 
-        that(ping("unknown-host", null, 1, $err))->isFalse();
+        that(ping("unknown-host", null, 1, $err))->isNull();
         that($err)->isNotEmpty();
 
         that(self::resolveFunction('ping'))("http://hostname")->wasThrown('is not supported');

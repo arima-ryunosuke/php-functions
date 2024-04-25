@@ -302,12 +302,12 @@ class filesystemTest extends AbstractTestCase
         // composer.json が見つかるまで親を辿って見つかったらそのパスを返す
         that(dirname_r(__DIR__, fn($path) => realpath("$path/composer.json")))->is(realpath(__DIR__ . '/../../../composer.json'));
         // 見つからない場合は false を返す
-        that(dirname_r(__DIR__, fn($path) => realpath("$path/notfound.ext")))->is(false);
+        that(dirname_r(__DIR__, fn($path) => realpath("$path/notfound.ext")))->is(null);
         // 使い方の毛色は違うが、このようにすると各構成要素が得られる
         $paths = [];
         that(dirname_r('/root/path/to/something', function ($path) use (&$paths) {
             $paths[] = $path;
-        }))->is(false);
+        }))->is(null);
         that($paths)->is([
             '/root/path/to/something',
             '/root/path/to',
@@ -489,7 +489,7 @@ class filesystemTest extends AbstractTestCase
         file_set_contents($base . '/a//b/c/abc1.log', 'xxxxx');
         file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
 
-        that(file_list('/notfound'))->isFalse();
+        that(file_list('/notfound'))->isNull();
 
         // 単純列挙
         that(file_list($base))->equalsCanonicalizing([
@@ -726,31 +726,31 @@ class filesystemTest extends AbstractTestCase
         that(file_pos($tmpfile, 'x', 1))->is(1);
         that(file_pos($tmpfile, 'x', 2))->is(2);
         that(file_pos($tmpfile, 'x', 99))->is(99);
-        that(file_pos($tmpfile, 'x', 100))->is(false);
+        that(file_pos($tmpfile, 'x', 100))->is(null);
 
         that(file_pos($tmpfile, 'abc'))->is(100);
-        that(file_pos($tmpfile, 'abc', -1))->is(false);
-        that(file_pos($tmpfile, 'abc', -2))->is(false);
+        that(file_pos($tmpfile, 'abc', -1))->is(null);
+        that(file_pos($tmpfile, 'abc', -2))->is(null);
         that(file_pos($tmpfile, 'abc', -3))->is(100);
 
-        that(file_pos($tmpfile, 'abc', 1, 10, 4))->is(false);
-        that(file_pos($tmpfile, 'abc', 1, 100))->is(false);
-        that(file_pos($tmpfile, 'abc', 1, 101))->is(false);
-        that(file_pos($tmpfile, 'abc', 1, 102))->is(false);
+        that(file_pos($tmpfile, 'abc', 1, 10, 4))->is(null);
+        that(file_pos($tmpfile, 'abc', 1, 100))->is(null);
+        that(file_pos($tmpfile, 'abc', 1, 101))->is(null);
+        that(file_pos($tmpfile, 'abc', 1, 102))->is(null);
         that(file_pos($tmpfile, 'abc', 1, 103))->is(100);
-        that(file_pos($tmpfile, 'abc', 101))->is(false);
+        that(file_pos($tmpfile, 'abc', 101))->is(null);
 
-        that(file_pos($tmpfile, 'abc', 100, 101))->is(false);
-        that(file_pos($tmpfile, 'abc', 100, 102))->is(false);
+        that(file_pos($tmpfile, 'abc', 100, 101))->is(null);
+        that(file_pos($tmpfile, 'abc', 100, 102))->is(null);
         that(file_pos($tmpfile, 'abc', 100, 103))->is(100);
 
         that(file_pos($tmpfile, 'ab', 0, -1))->is(100);
-        that(file_pos($tmpfile, 'ab', 0, -2))->is(false);
-        that(file_pos($tmpfile, 'ab', 0, -3))->is(false);
+        that(file_pos($tmpfile, 'ab', 0, -2))->is(null);
+        that(file_pos($tmpfile, 'ab', 0, -3))->is(null);
 
         that(file_pos($tmpfile, 'xab', 99, -1))->is(99);
-        that(file_pos($tmpfile, 'xab', 99, -2))->is(false);
-        that(file_pos($tmpfile, 'xab', 99, -3))->is(false);
+        that(file_pos($tmpfile, 'xab', 99, -2))->is(null);
+        that(file_pos($tmpfile, 'xab', 99, -3))->is(null);
 
         that(file_pos($tmpfile, 'abc', 0, null, 3))->is(100);
         that(file_pos($tmpfile, 'abc', 0, null, 4))->is(100);
@@ -760,12 +760,12 @@ class filesystemTest extends AbstractTestCase
 
         that(file_pos($tmpfile, ['0123|', 'uvwx|'], 0, null, 5))->is(0);
         that(file_pos($tmpfile, ['X123|', 'uvwx|'], 0, null, 5))->is(70);
-        that(file_pos($tmpfile, ['X123|', 'Xvwx|'], 0, null, 5))->is(false);
+        that(file_pos($tmpfile, ['X123|', 'Xvwx|'], 0, null, 5))->is(null);
         that(file_pos($tmpfile, ['23|45', 'st|uv'], 0, null, 5))->is(2);
         that(file_pos($tmpfile, ['X3|45', 'st|uv'], 0, null, 5))->is(67);
-        that(file_pos($tmpfile, ['X3|45', 'Xt|uv'], 0, null, 5))->is(false);
+        that(file_pos($tmpfile, ['X3|45', 'Xt|uv'], 0, null, 5))->is(null);
 
-        that(file_pos($tmpfile, ['X123|4567', '0123|4567|89AB'], 0, 10))->is(false);
+        that(file_pos($tmpfile, ['X123|4567', '0123|4567|89AB'], 0, 10))->is(null);
         that(file_pos($tmpfile, ['X123|4567', '0123|4567|89AB'], 0, 15))->is(0);
 
         file_put_contents($tmpfile, str_repeat('ん', 100) . "あ");
@@ -773,7 +773,7 @@ class filesystemTest extends AbstractTestCase
         that(file_pos($tmpfile, 'あ'))->is(300);
         that(file_pos($tmpfile, 'あ', 299))->is(300);
         that(file_pos($tmpfile, 'あ', 300))->is(300);
-        that(file_pos($tmpfile, 'あ', 301))->is(false);
+        that(file_pos($tmpfile, 'あ', 301))->is(null);
 
         that(self::resolveFunction('file_pos'))('not found', 'hoge')->wasThrown('is not found');
     }
@@ -981,7 +981,7 @@ class filesystemTest extends AbstractTestCase
         file_set_contents($base . '/a//b/c/abc2.log', 'xxxxxxx');
         file_set_contents($base . '/x.ext', '');
 
-        that(file_tree('/notfound'))->isFalse();
+        that(file_tree('/notfound'))->isNull();
 
         // 単純列挙
         that(file_tree($base))->isSame([

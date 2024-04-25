@@ -31,7 +31,7 @@ namespace ryunosuke\Functions\Package;
  * @param string $subject 対象文字列
  * @param int $limit 分割数
  * @param int $flags フラグ
- * @return array|false 分割された文字列
+ * @return ?array 分割された文字列
  */
 function mb_ereg_split($pattern, $subject, $limit = -1, $flags = 0)
 {
@@ -69,7 +69,7 @@ function mb_ereg_split($pattern, $subject, $limit = -1, $flags = 0)
 
     // 不正ならそこで終わり
     if (!mb_ereg_search_init($subject, $pattern)) {
-        return false;
+        return null;
     }
 
     // マッチしなくなるまでループ（ただし $length を超えた場合は無駄なので break）

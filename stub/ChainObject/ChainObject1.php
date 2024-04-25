@@ -418,6 +418,11 @@ trait ChainObject1
     public function sql_format($sql, $options = []): self { }
     public function sql_format($options = []): self { }
 
+    /** @see date_interval_string() */
+    public self $date_interval_string;
+    public function date_interval_string($interval, $format = null, $limit_type = "y"): self { }
+    public function date_interval_string($format = null, $limit_type = "y"): self { }
+
     /** @see date_modulate() */
     public self $date_modulate;
     public function date_modulate($datetimedata, $modify): self { }

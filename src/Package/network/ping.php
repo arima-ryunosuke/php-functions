@@ -19,9 +19,9 @@ require_once __DIR__ . '/../exec/process.php';
  * ```php
  * // 自身へ ICMP ping を打つ（正常終了なら float を返し、失敗なら false を返す）
  * that(ping('127.0.0.1'))->isFloat();
- * // 自身の tcp:1234 が開いているか（開いていれば float を返し、開いていなければ false を返す）
- * that(ping('tcp://127.0.0.1', 1234))->isFalse();
- * that(ping('127.0.0.1', 1234))->isFalse(); // tcp はスキームを省略できる
+ * // 自身の tcp:1234 が開いているか（開いていれば float を返し、開いていなければ null を返す）
+ * that(ping('tcp://127.0.0.1', 1234))->isNull();
+ * that(ping('127.0.0.1', 1234))->isNull(); // tcp はスキームを省略できる
  * ```
  *
  * @package ryunosuke\Functions\Package\network
@@ -30,7 +30,7 @@ require_once __DIR__ . '/../exec/process.php';
  * @param int|null $port ポート番号。指定しないと ICMP になる
  * @param int $timeout タイムアウト秒
  * @param string $errstr エラー文字列が格納される
- * @return float|bool 成功したときは疎通時間。失敗したときは false
+ * @return ?float 成功したときは疎通時間。失敗したときは null
  */
 function ping($host, $port = null, $timeout = 1, &$errstr = '')
 {
@@ -61,7 +61,7 @@ function ping($host, $port = null, $timeout = 1, &$errstr = '')
         if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
             return $m[1] / 1000.0;
         }
-        return false;
+        return null;
         // @codeCoverageIgnoreEnd
     }
 
@@ -115,7 +115,7 @@ function ping($host, $port = null, $timeout = 1, &$errstr = '')
             return microtime(true) - $mtime;
         }
         $errstr = socket_strerror($errno);
-        return false;
+        return null;
     }
     finally {
         $restore();

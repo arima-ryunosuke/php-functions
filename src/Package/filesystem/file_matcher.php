@@ -213,7 +213,7 @@ function file_matcher(array $filter_condition)
             }
         }
         foreach (['contains' => false, '!contains' => true] as $key => $cond) {
-            if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === (file_pos($file->getPathname(), $filter_condition[$key]) !== false))) {
+            if (isset($filter_condition[$key]) && (!file_exists($file->getPathname()) || $cond === (file_pos($file->getPathname(), $filter_condition[$key]) !== null))) {
                 return false;
             }
         }

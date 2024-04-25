@@ -71,11 +71,11 @@ function dir_diff($path1, $path2, $options = [])
     $differ = $options['differ'] ?? fn($file1, $file2) => file_equals($file1, $file2) ? null : "";
 
     $list1 = file_list($path1, $filter_condition);
-    if ($list1 === false) {
+    if ($list1 === null) {
         throw new \UnexpectedValueException("$path1 does not exists");
     }
     $list2 = file_list($path2, $filter_condition);
-    if ($list2 === false) {
+    if ($list2 === null) {
         $list2 = [];
     }
 

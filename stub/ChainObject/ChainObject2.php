@@ -538,11 +538,6 @@ trait ChainObject2
     public function built_in_server($document_root, $router = null, $options = []): self { }
     public function built_in_server($router = null, $options = []): self { }
 
-    /** @see cachedir() */
-    public self $cachedir;
-    public function cachedir($dirname = null): self { }
-    public function cachedir(): self { }
-
     /** @see is_primitive() */
     public self $is_primitive;
     public function is_primitive($var): self { }

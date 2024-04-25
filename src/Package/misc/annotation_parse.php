@@ -127,7 +127,7 @@ function annotation_parse($annotation, $schema = [], $nsfiles = [])
     ];
     for ($i = 0, $l = strlen($annotation); $i < $l; $i++) {
         $i = strpos_quoted($annotation, '@', $i);
-        if ($i === false) {
+        if ($i === null) {
             break;
         }
 

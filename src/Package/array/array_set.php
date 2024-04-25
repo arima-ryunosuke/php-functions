@@ -28,9 +28,9 @@ namespace ryunosuke\Functions\Package;
  * that(array_set($array, 'Z', ['x', 'y', 'z']))->isSame('z');
  * that($array)->isSame(['a' => 'A', 'B', 'Z', 'z' => 'Z', 'x' => ['y' => ['z' => 'Z']]]);
  * // 第4引数で条件を指定（キーが存在するなら追加しない）
- * that(array_set($array, 'Z', 'z', fn($v, $k, $array) => !isset($array[$k])))->isSame(false);
+ * that(array_set($array, 'Z', 'z', fn($v, $k, $array) => !isset($array[$k])))->isSame(null);
  * // 第4引数で条件を指定（値が存在するなら追加しない）
- * that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->isSame(false);
+ * that(array_set($array, 'Z', null, fn($v, $k, $array) => !in_array($v, $array)))->isSame(null);
  * ```
  *
  * @package ryunosuke\Functions\Package\array
@@ -39,7 +39,7 @@ namespace ryunosuke\Functions\Package;
  * @param mixed $value 設定する値
  * @param array|string|int|null $key 設定するキー
  * @param callable|null $condition 追加する条件
- * @return string|int 設定したキー
+ * @return string|int|null 設定したキー
  */
 function array_set(&$array, $value, $key = null, $condition = null)
 {
@@ -58,7 +58,7 @@ function array_set(&$array, $value, $key = null, $condition = null)
 
     if ($condition !== null) {
         if (!$condition($value, $key, $array)) {
-            return false;
+            return null;
         }
     }
 

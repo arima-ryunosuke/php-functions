@@ -96,7 +96,7 @@ function namespace_parse($filename, $options = [])
         };
 
         $keys = [
-            0           => 'alias', // for use
+            null        => 'alias', // for use
             T_CLASS     => 'alias',
             T_INTERFACE => 'alias',
             T_TRAIT     => 'alias',

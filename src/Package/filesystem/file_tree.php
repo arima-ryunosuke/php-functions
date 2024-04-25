@@ -36,7 +36,7 @@ require_once __DIR__ . '/../filesystem/path_normalize.php';
  *
  * @param string $dirname 調べるディレクトリ名
  * @param array $filter_condition フィルタ条件
- * @return array|false ツリー構造の配列
+ * @return ?array ツリー構造の配列
  */
 function file_tree($dirname, $filter_condition = [])
 {
@@ -45,7 +45,7 @@ function file_tree($dirname, $filter_condition = [])
 
     $dirname = path_normalize($dirname);
     if (!file_exists($dirname)) {
-        return false;
+        return null;
     }
 
     $filter_condition += [

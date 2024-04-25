@@ -22,7 +22,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * // 2つ目の fuga の位置を返す
  * that(file_pos($testpath, 'fuga', 6))->is(15);
  * // 見つからない場合は false を返す
- * that(file_pos($testpath, 'hogera'))->is(false);
+ * that(file_pos($testpath, 'hogera'))->is(null);
  * ```
  *
  * @package ryunosuke\Functions\Package\filesystem
@@ -32,7 +32,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param int $start 読み込み位置
  * @param int|null $end 読み込むまでの位置。省略時は指定なし（最後まで）。負数は後ろからのインデックス
  * @param int|null $chunksize 読み込みチャンクサイズ。省略時は 4096 の倍数に正規化
- * @return int|false $needle の位置。見つからなかった場合は false
+ * @return ?int $needle の位置。見つからなかった場合は null
  */
 function file_pos($filename, $needle, $start = 0, $end = null, $chunksize = null)
 {
@@ -80,7 +80,7 @@ function file_pos($filename, $needle, $start = 0, $end = null, $chunksize = null
             }
             $start += strlen($part);
         }
-        return false;
+        return null;
     }
     finally {
         fclose($fp);

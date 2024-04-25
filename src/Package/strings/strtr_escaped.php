@@ -41,7 +41,7 @@ function strtr_escaped($string, $replace_pairs, $escape = '\\')
     $froms = array_keys($replace_pairs);
 
     $offset = 0;
-    while (($pos = strpos_escaped($string, $froms, $offset, $escape, $found)) !== false) {
+    while (($pos = strpos_escaped($string, $froms, $offset, $escape, $found)) !== null) {
         $to = $replace_pairs[$found];
         $replaced = $to instanceof \Closure ? $to($found, $pos) : $to;
         $string = substr_replace($string, $replaced, $pos, strlen($found));

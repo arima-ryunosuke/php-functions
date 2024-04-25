@@ -896,20 +896,20 @@ zero is index 0.
         that($n)->isSame(8);
         that(str_between($string, '{', '}', $n))->isSame('escape\\}');
         that($n)->isSame(35);
-        that(str_between($string, '{', '}', $n))->isSame(false);
+        that(str_between($string, '{', '}', $n))->isSame(null);
         that($n)->isSame(35);
 
         // ずっとエスケープ中なので見つからない
         $string = '"{a}{b}{c}{d}{e}{f}{g}"';
         $n = 0;
-        that(str_between($string, '{', '}', $n))->isSame(false);
+        that(str_between($string, '{', '}', $n))->isSame(null);
 
         // from to が複数文字の場合
         $string = '{{name}}, {{hobby}}';
         $n = 0;
         that(str_between($string, '{{', '}}', $n))->isSame('name');
         that(str_between($string, '{{', '}}', $n))->isSame('hobby');
-        that(str_between($string, '{{', '}}', $n))->isSame(false);
+        that(str_between($string, '{{', '}}', $n))->isSame(null);
 
         // 中身が空の場合
         $string = '{{}} {{}} {{}}';
@@ -917,7 +917,7 @@ zero is index 0.
         that(str_between($string, '{{', '}}', $n))->isSame('');
         that(str_between($string, '{{', '}}', $n))->isSame('');
         that(str_between($string, '{{', '}}', $n))->isSame('');
-        that(str_between($string, '{{', '}}', $n))->isSame(false);
+        that(str_between($string, '{{', '}}', $n))->isSame(null);
 
         // くっついている場合
         $string = '{{first}}{{second}}{{third}}';
@@ -925,14 +925,14 @@ zero is index 0.
         that(str_between($string, '{{', '}}', $n))->isSame('first');
         that(str_between($string, '{{', '}}', $n))->isSame('second');
         that(str_between($string, '{{', '}}', $n))->isSame('third');
-        that(str_between($string, '{{', '}}', $n))->isSame(false);
+        that(str_between($string, '{{', '}}', $n))->isSame(null);
 
         // 開始終了が一致していない場合
         $string = '{first}}}}}} and {second}';
         $n = 0;
         that(str_between($string, '{', '}', $n))->isSame('first');
         that(str_between($string, '{', '}', $n))->isSame('second');
-        that(str_between($string, '{', '}', $n))->isSame(false);
+        that(str_between($string, '{', '}', $n))->isSame(null);
 
         // 開始終了に包含関係がある場合
         that(str_between('!first!!', '!', '!!'))->isSame('first');
@@ -1703,10 +1703,10 @@ that is <del>a</del><ins>the</ins> pen
         that($found)->isSame('%T');
         that(strpos_escaped('T-%T', '%T', 0, '%', $found))->isSame(2);
         that($found)->isSame('%T');
-        that(strpos_escaped('%%T-T', '%T', 0, '%', $found))->isSame(false);
+        that(strpos_escaped('%%T-T', '%T', 0, '%', $found))->isSame(null);
         that($found)->isSame(null);
 
-        that(strpos_escaped('%xyz', ['xyz'], 0, '%', $found))->isSame(false);
+        that(strpos_escaped('%xyz', ['xyz'], 0, '%', $found))->isSame(null);
         that($found)->isSame(null);
         that(strpos_escaped('%xyz', ['%xyz'], 0, '%', $found))->isSame(0);
         that($found)->isSame('%xyz');
@@ -1717,7 +1717,7 @@ that is <del>a</del><ins>the</ins> pen
         that(strpos_escaped('x%%yz', ['x%%yz'], 0, '%', $found))->isSame(0);
         that($found)->isSame('x%%yz');
 
-        that(strpos_escaped('%%xyz', ['xyz'], 0, '%%', $found))->isSame(false);
+        that(strpos_escaped('%%xyz', ['xyz'], 0, '%%', $found))->isSame(null);
         that($found)->isSame(null);
         that(strpos_escaped('%%xyz', ['%%xyz'], 0, '%%', $found))->isSame(0);
         that($found)->isSame('%%xyz');
@@ -1738,32 +1738,32 @@ that is <del>a</del><ins>the</ins> pen
         that($found)->isSame('d');
         that(strpos_escaped('%f-f', 'asdf%g', 0, '%', $found))->isSame(3);
         that($found)->isSame('f');
-        that(strpos_escaped('%-X', 'asdf%g', 0, '%', $found))->isSame(false);
+        that(strpos_escaped('%-X', 'asdf%g', 0, '%', $found))->isSame(null);
         that($found)->isSame(null);
 
-        that(strpos_escaped('%%T', 'T', 1, '%', $found))->isSame(false);
+        that(strpos_escaped('%%T', 'T', 1, '%', $found))->isSame(null);
         that(strpos_escaped('%%T', 'T', 2, '%', $found))->isSame(2);
-        that(strpos_escaped('%%T', 'T', 3, '%', $found))->isSame(false);
-        that(strpos_escaped('%%%T', '%T', 1, '%', $found))->isSame(false);
+        that(strpos_escaped('%%T', 'T', 3, '%', $found))->isSame(null);
+        that(strpos_escaped('%%%T', '%T', 1, '%', $found))->isSame(null);
         that(strpos_escaped('%%%T', '%T', 2, '%', $found))->isSame(2);
-        that(strpos_escaped('%%%T', '%T', 3, '%', $found))->isSame(false);
+        that(strpos_escaped('%%%T', '%T', 3, '%', $found))->isSame(null);
     }
 
     function test_strpos_quoted()
     {
-        that(strpos_quoted("this is a 'special word' that special word", ['notfound']))->isSame(false);
+        that(strpos_quoted("this is a 'special word' that special word", ['notfound']))->isSame(null);
         that(strpos_quoted('this is a "special word" that special word', 'special'))->isSame(30);
         that(strpos_quoted("this is a 'special word' that special word", 'word'))->isSame(38);
         that(strpos_quoted("this is a \\'special word' that special word", 'word'))->isSame(20);
 
         that(strpos_quoted('this is a "special word" that special word', 'special', 30))->isSame(30);
-        that(strpos_quoted('this is a "special word" that special word', 'special', 31))->isSame(false);
+        that(strpos_quoted('this is a "special word" that special word', 'special', 31))->isSame(null);
 
         that(strpos_quoted('this is a "special word" that special word', 'word', -4))->isSame(38);
-        that(strpos_quoted('this is a "special word" that special word', 'word', -3))->isSame(false);
+        that(strpos_quoted('this is a "special word" that special word', 'word', -3))->isSame(null);
 
         that(strpos_quoted("this is a 'special word' that special word", ['word', 'special']))->isSame(30);
-        that(strpos_quoted("this is a 'special word' that special word", ['hoge', 'hoga']))->isSame(false);
+        that(strpos_quoted("this is a 'special word' that special word", ['hoge', 'hoga']))->isSame(null);
 
         that(strpos_quoted('1:hoge, 2:*hoge*, 3:hoge', 'hoge', 5, '*'))->isSame(20);
         that(strpos_quoted('1:hoge, 2:\\*hoge*, 3:hoge', 'hoge', 5, '*'))->isSame(12);
@@ -1775,14 +1775,14 @@ that is <del>a</del><ins>the</ins> pen
         that($found)->is("special");
         that(strpos_quoted("this is a 'special word' that sPecial word", ['word', 'special'], 0, "'", "\\", $found))->isSame(38);
         that($found)->is("word");
-        that(strpos_quoted("this is a 'special word' that sPecial wOrd", ['word', 'special'], 0, "'", "\\", $found))->isSame(false);
+        that(strpos_quoted("this is a 'special word' that sPecial wOrd", ['word', 'special'], 0, "'", "\\", $found))->isSame(null);
         that($found)->isNull();
     }
 
     function test_strrstr()
     {
-        that(strrstr('/a/b/c', 'not', true))->isSame(false);
-        that(strrstr('/a/b/c', 'not', false))->isSame(false);
+        that(strrstr('/a/b/c', 'not', true))->isSame(null);
+        that(strrstr('/a/b/c', 'not', false))->isSame(null);
 
         that(strrstr('/a/b/c', '/'))->isSame('c');
         that(strrstr('//a//b//c', '//'))->isSame('c');
