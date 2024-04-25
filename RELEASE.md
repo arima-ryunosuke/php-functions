@@ -9,29 +9,99 @@
 ## x.y.z
 
 - Utility が増えてきたから然るべき場所へ移動する
-- 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
-## 1.6.19
+## 2.0.0
 
-- [change] (en|de)crypt の v4 を実装
-- [feature] probability_array を追加
-- [feature] rsync を追加
-- [feature] try_close を追加
-- [feature] array_distinct のシュワルツ対応
-- [feature] php_binary を追加
-- [feature] php_opcode を追加
-- [feature] built_in_server を追加
-- [feature] process 周りを改善
-- [feature] process_closure を追加
-- [feature] function_configure に process 系で自動で読み込むファイル群のエントリを追加
-- [feature] file_mimetype で読み込まずに拡張子で判定する機能を追加
-- [refactor] exportClass した Utility をテストしたいことがある
-- [refactor] formmater が off になっていたので修正
-- [fixbug] 「最悪読めなくても構わない」シチュエーションで読めないときに即死していた不具合を修正
-- [fixbug] 別ディレクトリの constant.php を読んでしまう不具合を修正
-- [fixbug] exportClass 時に使用定数の判定に誤りがあったので修正
-- [fixbug] exportClass 時に public static にならない不具合を修正
+- [change] php>=8.0
+- [*change] concat で null が紛れ込んでいたら null を返す仕様に変更
+  - 呼び元で ?? したいことがある
+- [*change] class_replace の静的定義機能を削除
+  - 無名クラスで十分
+- [*change] token_get_all を PhpToken::tokenize に変更
+  - 結果がオブジェクトになった
+  - 一部の意味の分からない仕様も同時に削除
+- [*change] 後方互換性のためコードを削除
+  - cachedir: 削除
+  - csv_export: callback_header オプションを削除
+  - date_interval: 純粋に継続時間のパースに変更（既存処理は date_interval_string へ移行）
+  - file_set_tree: 配列のみ受付可能
+  - chain: v1 を削除
+  - function_configure: 古いデフォルト値を削除
+  - decrypt: バージョニングがない時代のコードを削除
+  - var_export3: エクスポートできないリソースは例外
+  - var_type: $valid_name 引数を削除
+- [*change] false 返しを null 返しに変更
+  - bool を返すなら false でもよい
+  - 非bool を返すなら ?type とした方が利便性が高いし型システムとして正しい
+  - 差分
+    - array_find
+    - array_set
+    - dirname_r
+    - file_list
+    - file_pos
+    - file_set_contents
+    - file_tree
+    - globstar
+    - ping
+    - mb_ereg_split
+    - str_between
+    - strpos_escaped
+    - strpos_quoted
+    - strrstr
+- [*change] 利用頻度の低い関数を削除
+  - call_safely: 内部で設定するよりも「エラーを例外に設定するハンドラ」を設定する関数の方が汎用性がある
+  - call_if: 用途不明（確かループ内で var_dump したいとき用だった気がする）
+  - timer: 明らかに不要（ベタに呼べばよい）
+- [*change] 用途の重複している関数を削除
+  - array_kmap: array_maps で完全置換可能
+  - array_map_method: array_maps で完全置換可能
+  - array_filter_key: ARRAY_FILTER_USE_KEY/BOTH があるし array_filters で代替可能
+  - array_put: array_set で十分だし紛らわしい
+  - path_info: path_parse の下位互換（ただし名前は parse の方がふさわしいので維持）
+- [*change] カリー化関数を削除
+  - 元々 5.4 時代に use を避けたかった意味合いが強く、今はアロー関数があるため原則不要
+  - 差分
+    - array_lmap
+    - array_rmap
+    - array_nmap
+    - abind
+    - lbind
+    - rbind
+    - nbind
+    - delegate
+- [*change] 言語の進化によって不要になった関数を削除
+  - optional: ?-> があるので不要
+  - stdclass: 数値キーが正しく扱えるようになったので不要
+  - namedcallize: 名前付き引数が実装されたので不要
+  - switches: match 式が追加されたので不要
+  - throws/if: 言語レベルで式になったので不要
+  - not_func: アロー関数の出現により不要
+- [*change] 命名規則を変更
+  - 明らかにレシーバ的なものが第1引数ならプレフィックスにする
+    - e.g. url, php
+  - 意図して標準関数に寄せているものはそのまま
+    - e.g. is_系, in_array_XXX, strrstr
+  - 差分
+    - get_class_constants: class_constants
+    - detect_namespace: namespace_detect
+    - get_object_properties: object_properties
+    - htmltag: html_tag
+    - eval_func: func_eval
+    - ope_func: func_operator
+    - parse_annotation: annotation_parse
+    - parse_namespace: namespace_parse
+    - resolve_symbol: namespace_resolve
+    - highlight_php: php_highlight
+    - indent_php: php_indent
+    - parse_php: php_parse
+    - strip_php: php_strip
+    - normal_rand: random_normal
+    - memory_path: memory_stream
+    - build_query: query_build
+    - parse_query: query_parse
+    - build_uri: uri_build
+    - parse_uri: uri_parse
 
 ## 1.6.18
 
